@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #F4F5F7;
+  --bg-surface: #EBEDF2;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #F0F2F7;
+  --border-default: #D4D8E4;
+  --border-strong: #B8BDD0;
+  --text-primary: #0F1829;
+  --text-secondary: #5A6480;
+  --text-disabled: #A0A8BF;
+  --accent: #C4A96A;
+  --positive-bg: #EDF4F0;
+  --positive-text: #2E6848;
+  --negative-bg: #F5EDEB;
+  --negative-text: #8C3A2A;
+}
+
+.dark {
+  --bg-base: #0A0E17;
+  --bg-surface: #111827;
+  --bg-card: #1A2235;
+  --bg-elevated: #243048;
+  --border-default: #2E3D58;
+  --border-strong: #3A4C6E;
+  --text-primary: #E8EAF0;
+  --text-secondary: #8896B0;
+  --text-disabled: #4A5878;
+  --accent: #C4A96A;
+  --positive-bg: #1A3028;
+  --positive-text: #5A9470;
+  --negative-bg: #301818;
+  --negative-text: #B06858;
+}

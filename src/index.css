@@ -2,36 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-  --bg-base: #F4F5F7;
-  --bg-surface: #EBEDF2;
-  --bg-card: #FFFFFF;
-  --bg-elevated: #F0F2F7;
-  --border-default: #D4D8E4;
-  --border-strong: #B8BDD0;
-  --text-primary: #0F1829;
-  --text-secondary: #5A6480;
-  --text-disabled: #A0A8BF;
-  --accent: #C4A96A;
-  --positive-bg: #EDF4F0;
-  --positive-text: #2E6848;
-  --negative-bg: #F5EDEB;
-  --negative-text: #8C3A2A;
+  /* MARCA */
+  --primary: #0D2045;
+  --silver: #8A95A8;
+  --secondary: #1A3D28;
+  --gold: #A8905A;
+
+  /* FONDOS */
+  --page: #F5F4F0;
+  --surface: #FFFFFF;
+  --surface-alt: #EDECEA;
+
+  /* TEXTO */
+  --text: #0A0D12;
+  --text-2: #52565F;
+  --text-3: #8E9198;
 }
 
-.dark {
-  --bg-base: #0A0E17;
-  --bg-surface: #111827;
-  --bg-card: #1A2235;
-  --bg-elevated: #243048;
-  --border-default: #2E3D58;
-  --border-strong: #3A4C6E;
-  --text-primary: #E8EAF0;
-  --text-secondary: #8896B0;
-  --text-disabled: #4A5878;
-  --accent: #C4A96A;
-  --positive-bg: #1A3028;
-  --positive-text: #5A9470;
-  --negative-bg: #301818;
-  --negative-text: #B06858;
+[data-theme="dark"] {
+  /* MARCA */
+  --primary: #4878B8;
+  --silver: #A8B4C5;
+  --secondary: #2A8A48;
+  --gold: #C0A265;
+
+  /* FONDOS */
+  --page: #0E1117;
+  --surface: #161B24;
+  --surface-alt: #1E2530;
+
+  /* TEXTO */
+  --text: #E6ECF2;
+  --text-2: #8894A8;
+  --text-3: #5A6B78;
+}
+
+* {
+  font-family: 'Figtree', sans-serif;
+  font-feature-settings: "tnum";
+}
+
+body {
+  background-color: var(--page);
+  color: var(--text);
 }

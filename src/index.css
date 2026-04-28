@@ -1,40 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap');
-
 :root {
-  /* MARCA */
   --primary: #0D2045;
   --silver: #8A95A8;
   --secondary: #1A3D28;
   --gold: #A8905A;
-
-  /* FONDOS */
   --page: #F5F4F0;
   --surface: #FFFFFF;
   --surface-alt: #EDECEA;
-
-  /* TEXTO */
   --text: #0A0D12;
   --text-2: #52565F;
   --text-3: #8E9198;
 }
 
 [data-theme="dark"] {
-  /* MARCA */
   --primary: #4878B8;
   --silver: #A8B4C5;
   --secondary: #2A8A48;
   --gold: #C0A265;
-
-  /* FONDOS */
   --page: #0E1117;
   --surface: #161B24;
   --surface-alt: #1E2530;
-
-  /* TEXTO */
   --text: #E6ECF2;
   --text-2: #8894A8;
   --text-3: #5A6B78;

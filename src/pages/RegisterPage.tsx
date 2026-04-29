@@ -1,6 +1,7 @@
 import { type FormEvent, useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
+import { GoogleLogin } from '@react-oauth/google'
 import AuthLayout from '../components/ui/AuthLayout'
 import { registerWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
@@ -30,9 +31,13 @@ function GoogleIcon() {
 export default function RegisterPage() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
+  const [apellido, setApellido] = useState('')
   const [email, setEmail] = useState('')
+  const [telefono, setTelefono] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
@@ -42,22 +47,38 @@ export default function RegisterPage() {
   }, [navigate])
 
   const nameError = hasSubmitted && !name.trim() ? 'Ingresá tu nombre.' : null
+  const apellidoError = hasSubmitted && !apellido.trim() ? 'Ingresá tu apellido.' : null
   const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
-  const passwordError = hasSubmitted && !password ? 'Creá una contraseña.' : null
+  const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu teléfono.' : null
+
+  const validatePassword = (pwd: string) => {
+    if (!pwd) return 'Creá una contraseña.'
+    if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
+    if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
+    if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
+    if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
+    return null
+  }
+  const passwordError = hasSubmitted ? validatePassword(password) : null
+  const confirmPasswordError = hasSubmitted && confirmPassword !== password ? 'Las contraseñas no coinciden.' : (!confirmPassword && hasSubmitted ? 'Confirmá tu contraseña.' : null)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
-    if (!name.trim() || !email.trim() || !password) return
+    if (!name.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || passwordError || confirmPasswordError) return
     setLoading(true)
     setApiError(null)
     try {
-      await registerWithEmail({ name, email, password })
+      await registerWithEmail({ name, apellido, email, telefono, password })
       navigate('/onboarding', { replace: true })
-    } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response?.status
-      if (status === 409) {
-        setApiError('Ese mail ya tiene una cuenta.')
+    } catch (err: any) {
+      const status = err.response?.status
+      const detail = err.response?.data?.detail
+      if (status === 409 && detail) {
+        setApiError(detail)
+      } else if (status === 422 && detail) {
+        const msg = Array.isArray(detail) ? detail[0]?.msg : detail
+        setApiError(msg ? msg.replace('Value error, ', '') : 'Verificá los datos ingresados.')
       } else {
         setApiError('Algo salió mal. Intentá de nuevo.')
       }
@@ -69,25 +90,67 @@ export default function RegisterPage() {
   return (
     <AuthLayout title="Crear cuenta">
       <form onSubmit={handleSubmit} noValidate>
-        {/* Nombre */}
+        <div className="flex gap-3 mb-4">
+          {/* Nombre */}
+          <div className="flex-1">
+            <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
+              Nombre
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+              className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
+              style={{
+                fontSize: '16px',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                borderColor: nameError ? '#C0392B' : 'var(--surface-alt)',
+              }}
+            />
+            {nameError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{nameError}</p>}
+          </div>
+
+          {/* Apellido */}
+          <div className="flex-1">
+            <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
+              Apellido
+            </label>
+            <input
+              type="text"
+              value={apellido}
+              onChange={(e) => setApellido(e.target.value)}
+              className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
+              style={{
+                fontSize: '16px',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                borderColor: apellidoError ? '#C0392B' : 'var(--surface-alt)',
+              }}
+            />
+            {apellidoError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{apellidoError}</p>}
+          </div>
+        </div>
+
+        {/* Teléfono */}
         <div className="mb-4">
           <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
-            Nombre
+            Teléfono
           </label>
           <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoFocus
+            type="tel"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
             className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
             style={{
               fontSize: '16px',
               background: 'var(--surface)',
               color: 'var(--text)',
-              borderColor: nameError ? '#C0392B' : 'var(--surface-alt)',
+              borderColor: telefonoError ? '#C0392B' : 'var(--surface-alt)',
             }}
           />
-          {nameError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{nameError}</p>}
+          {telefonoError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{telefonoError}</p>}
         </div>
 
         {/* Mail */}
@@ -110,36 +173,69 @@ export default function RegisterPage() {
           {emailError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{emailError}</p>}
         </div>
 
-        {/* Contraseña */}
-        <div className="mb-6">
-          <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
-            Contraseña
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
-              style={{
-                fontSize: '16px',
-                background: 'var(--surface)',
-                color: 'var(--text)',
-                borderColor: passwordError ? '#C0392B' : 'var(--surface-alt)',
-                paddingRight: '48px',
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
-              aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-              style={{ color: 'var(--text-3)' }}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
+        {/* Contraseña y Confirmar Contraseña */}
+        <div className="flex gap-3 mb-6">
+          <div className="flex-1">
+            <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
+              Contraseña
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
+                style={{
+                  fontSize: '16px',
+                  background: 'var(--surface)',
+                  color: 'var(--text)',
+                  borderColor: passwordError ? '#C0392B' : 'var(--surface-alt)',
+                  paddingRight: '48px',
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                style={{ color: 'var(--text-3)' }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {passwordError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{passwordError}</p>}
           </div>
-          {passwordError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{passwordError}</p>}
+
+          <div className="flex-1">
+            <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
+              Repetir Contraseña
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
+                style={{
+                  fontSize: '16px',
+                  background: 'var(--surface)',
+                  color: 'var(--text)',
+                  borderColor: confirmPasswordError ? '#C0392B' : 'var(--surface-alt)',
+                  paddingRight: '48px',
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+                aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                style={{ color: 'var(--text-3)' }}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {confirmPasswordError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{confirmPasswordError}</p>}
+          </div>
         </div>
 
         {apiError && (
@@ -163,15 +259,31 @@ export default function RegisterPage() {
           <div className="flex-1 h-px" style={{ background: 'var(--surface-alt)' }} />
         </div>
 
-        <button
-          type="button"
-          onClick={loginWithGoogle}
-          className="w-full h-12 rounded-[10px] border flex items-center justify-center gap-3 font-medium transition-colors"
-          style={{ borderColor: 'var(--silver)', color: 'var(--text)', fontSize: '15px' }}
-        >
-          <GoogleIcon />
-          Continuar con Google
-        </button>
+        <div className="flex justify-center w-full">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              if (credentialResponse.credential) {
+                try {
+                  setLoading(true)
+                  setApiError(null)
+                  const data = await loginWithGoogle(credentialResponse.credential)
+                  if (!data.user.onboarding_completo) {
+                    navigate('/onboarding', { replace: true })
+                  } else {
+                    navigate('/app/dashboard', { replace: true })
+                  }
+                } catch (error) {
+                  setApiError('Falló el login con Google')
+                } finally {
+                  setLoading(false)
+                }
+              }
+            }}
+            onError={() => {
+              setApiError('Falló el login con Google')
+            }}
+          />
+        </div>
 
         <button
           type="button"

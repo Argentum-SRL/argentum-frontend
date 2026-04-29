@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute'
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
@@ -9,16 +9,22 @@ import BilleterasPage from '../pages/app/BilleterasPage'
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
-  { path: '/onboarding', element: <OnboardingPage /> },
   {
-    path: '/app',
+    path: '/',
     element: <ProtectedRoute />,
     children: [
-      { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'billeteras', element: <BilleterasPage /> },
+      { index: true, element: <Navigate to="/app/dashboard" replace /> },
+      { path: 'onboarding', element: <OnboardingPage /> },
+      {
+        path: 'app',
+        children: [
+          { path: 'dashboard', element: <DashboardPage /> },
+          { path: 'billeteras', element: <BilleterasPage /> },
+        ],
+      },
     ],
   },
-  { path: '*', element: <LoginPage /> },
+  { path: '*', element: <Navigate to="/login" replace /> },
 ])
 
 export default router

@@ -1,6 +1,7 @@
 import { type FormEvent, useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
+import { GoogleLogin } from '@react-oauth/google'
 import AuthLayout from '../components/ui/AuthLayout'
 import { loginWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
@@ -159,15 +160,31 @@ export default function LoginPage() {
           <div className="flex-1 h-px" style={{ background: 'var(--surface-alt)' }} />
         </div>
 
-        <button
-          type="button"
-          onClick={loginWithGoogle}
-          className="w-full h-12 rounded-[10px] border flex items-center justify-center gap-3 font-medium transition-colors"
-          style={{ borderColor: 'var(--silver)', color: 'var(--text)', fontSize: '15px' }}
-        >
-          <GoogleIcon />
-          Continuar con Google
-        </button>
+        <div className="flex justify-center w-full">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              if (credentialResponse.credential) {
+                try {
+                  setLoading(true)
+                  setApiError(null)
+                  const data = await loginWithGoogle(credentialResponse.credential)
+                  if (!data.user.onboarding_completo) {
+                    navigate('/onboarding', { replace: true })
+                  } else {
+                    navigate('/app/dashboard', { replace: true })
+                  }
+                } catch (error) {
+                  setApiError('Falló el login con Google')
+                } finally {
+                  setLoading(false)
+                }
+              }
+            }}
+            onError={() => {
+              setApiError('Falló el login con Google')
+            }}
+          />
+        </div>
 
         <button
           type="button"

@@ -8,7 +8,9 @@ export interface LoginPayload {
 
 export interface RegisterPayload {
   name: string
+  apellido: string
   email: string
+  telefono: string
   password: string
 }
 
@@ -23,12 +25,19 @@ export async function loginWithEmail(payload: LoginPayload): Promise<void> {
 export async function registerWithEmail(payload: RegisterPayload): Promise<void> {
   const { data } = await api.post('/auth/register', {
     name: payload.name.trim(),
+    apellido: payload.apellido.trim(),
     email: payload.email.trim(),
+    telefono: payload.telefono.trim(),
     password: payload.password,
   })
   setToken(data.access_token as string)
 }
 
-export function loginWithGoogle(): void {
-  window.location.href = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/auth/google`
+export async function loginWithGoogle(token: string): Promise<any> {
+  const { data } = await api.post('/auth/google', { token })
+  setToken(data.access_token as string)
+  if (data.refresh_token) {
+    localStorage.setItem('refresh_token', data.refresh_token)
+  }
+  return data
 }

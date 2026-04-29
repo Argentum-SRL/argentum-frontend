@@ -41,3 +41,16 @@ export async function loginWithGoogle(token: string): Promise<any> {
   setRefreshToken(data.refresh_token as string)
   return data
 }
+
+// --- Teléfono ---
+
+export async function enviarCodigoTelefono(telefono: string): Promise<void> {
+  await api.post('/auth/telefono/enviar-codigo', { telefono })
+}
+
+export async function verificarCodigoTelefono(telefono: string, codigo: string): Promise<any> {
+  const { data } = await api.post('/auth/telefono/verificar', { telefono, codigo })
+  setToken(data.access_token as string)
+  setRefreshToken(data.refresh_token as string)
+  return data
+}

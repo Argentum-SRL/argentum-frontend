@@ -1,6 +1,6 @@
 import { type FormEvent, useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Phone } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import AuthLayout from '../components/ui/AuthLayout'
 import { registerWithEmail, loginWithGoogle } from '../lib/api/auth'
@@ -284,6 +284,15 @@ export default function RegisterPage() {
             }}
           />
         </div>
+
+        <Link
+          to="/login/telefono"
+          className="w-full h-12 rounded-[10px] border flex items-center justify-center gap-3 font-medium mt-3 transition-colors"
+          style={{ borderColor: 'var(--silver)', color: 'var(--text)', fontSize: '15px', textDecoration: 'none' }}
+        >
+          <Phone size={18} />
+          Continuar con teléfono
+        </Link>
 
         <button
           type="button"

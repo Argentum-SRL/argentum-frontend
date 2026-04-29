@@ -44,3 +44,19 @@ export interface EstadoOnboarding {
     ciclo_valor: string | null
   }
 }
+
+export interface CotizacionDolar {
+  tipo: 'oficial' | 'blue' | 'tarjeta' | 'mep'
+  nombre: string
+  compra: number | null
+  venta: number | null
+  promedio: number | null
+  moneda: string
+  fecha_actualizacion: string | null
+}
+
+export interface CotizacionesDolarResponse {
+  fuente: string
+  actualizado_en: string
+  cotizaciones: Record<'oficial' | 'blue' | 'tarjeta' | 'mep', CotizacionDolar>
+}

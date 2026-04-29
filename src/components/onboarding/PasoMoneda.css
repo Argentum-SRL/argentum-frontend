@@ -1,0 +1,78 @@
+.paso-moneda-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.paso-moneda-subtitle {
+  color: var(--text-2);
+  margin-bottom: 24px;
+}
+
+.paso-moneda-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.paso-moneda-toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.paso-moneda-btn {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--surface-alt);
+}
+
+.paso-moneda-btn--active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.paso-moneda-select {
+  background: var(--surface);
+  border-color: var(--surface-alt);
+}
+
+.paso-moneda-loading {
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.paso-moneda-card {
+  border-color: var(--surface-alt);
+  background: var(--surface);
+}
+
+.paso-moneda-card--selected {
+  border-color: var(--primary);
+  background: rgba(52, 152, 219, 0.08);
+}
+
+.paso-moneda-card-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.paso-moneda-card-meta {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.paso-moneda-card-values {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.paso-moneda-error {
+  color: #c0392b;
+  font-size: 13px;
+}
+
+.paso-moneda-submit {
+  background: var(--primary);
+}

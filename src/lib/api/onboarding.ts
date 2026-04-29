@@ -1,23 +1,13 @@
-import axios from 'axios'
-import type { EstadoOnboarding } from '../../types/index'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-
-const api = axios.create({
-  baseURL: API_URL,
-})
-
-// Interceptor para agregar el token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+import api from '../axios'
+import type { CotizacionesDolarResponse, EstadoOnboarding } from '../../types/index'
 
 export async function getEstadoOnboarding(): Promise<EstadoOnboarding> {
   const res = await api.get('/onboarding/estado')
+  return res.data
+}
+
+export async function getCotizacionesDolar(): Promise<CotizacionesDolarResponse> {
+  const res = await api.get('/onboarding/cotizaciones-dolar')
   return res.data
 }
 

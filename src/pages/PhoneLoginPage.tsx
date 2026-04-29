@@ -104,7 +104,7 @@ export default function PhoneLoginPage() {
       <AuthLayout title="Ingresá con tu teléfono">
         <form onSubmit={handleSendCode} noValidate>
           <p className="mb-5" style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: 1.5 }}>
-            Te vamos a enviar un código de verificación por SMS al número que ingreses.
+            Te vamos a enviar un código de verificación por WhatsApp al número que ingreses.
           </p>
 
           <div className="mb-6">

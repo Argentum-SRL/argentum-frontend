@@ -43,6 +43,11 @@ export default function RegisterPage() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
 
+  const logGoogleError = (stage: string, error: unknown) => {
+    if (!import.meta.env.DEV) return
+    console.error(`[Auth][Google][Register] ${stage}`, error)
+  }
+
   useEffect(() => {
     if (getToken()) navigate('/app/dashboard', { replace: true })
   }, [navigate])
@@ -89,20 +94,31 @@ export default function RegisterPage() {
 
   const handleGoogleSuccess = useCallback(async (credentialResponse: { credential: string }) => {
     try {
+      if (import.meta.env.DEV) {
+        console.log('[Auth][Google][Register] onSuccess', {
+          credentialLength: credentialResponse.credential.length,
+          credentialPrefix: `${credentialResponse.credential.slice(0, 12)}...`,
+        })
+      }
       setLoading(true)
       setApiError(null)
       const respuesta = await loginWithGoogle(credentialResponse.credential)
       login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
+      logGoogleError('Error al llamar loginWithGoogle', err)
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'Falló el login con Google.')
+      const message = (err as { message?: string })?.message
+      setApiError(detail || message || 'Falló el login con Google.')
     } finally {
       setLoading(false)
     }
   }, [navigate])
 
   const handleGoogleError = useCallback(() => {
+    if (import.meta.env.DEV) {
+      console.error('[Auth][Google][Register] onError del botón Google')
+    }
     setApiError('Falló el login con Google.')
   }, [])
 

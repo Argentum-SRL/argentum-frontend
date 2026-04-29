@@ -51,9 +51,46 @@ export async function registerWithEmail(payload: RegisterPayload): Promise<AuthR
 }
 
 export async function loginWithGoogle(token: string): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>('/auth/google', { token })
-  guardarTokensSiPresentes(data)
-  return data
+  if (import.meta.env.DEV) {
+    console.log('[Auth][Google] Enviando token al backend', {
+      tokenPresent: Boolean(token),
+      tokenLength: token?.length ?? 0,
+      tokenPrefix: token ? `${token.slice(0, 12)}...` : null,
+    })
+  }
+
+  try {
+    const { data } = await api.post<AuthResponse>('/auth/google', { token })
+
+    if (import.meta.env.DEV) {
+      console.log('[Auth][Google] Respuesta backend recibida', {
+        hasAccessToken: Boolean(data.access_token),
+        hasRefreshToken: Boolean(data.refresh_token),
+        requiereTelefono: data.requiere_telefono,
+        requiereOnboarding: data.requiere_onboarding,
+        usuarioEmail: data.usuario?.email,
+      })
+    }
+
+    guardarTokensSiPresentes(data)
+    return data
+  } catch (error: unknown) {
+    if (import.meta.env.DEV) {
+      const err = error as {
+        message?: string
+        response?: { status?: number; data?: unknown }
+        config?: { baseURL?: string; url?: string }
+      }
+      console.error('[Auth][Google] Error al hacer POST /auth/google', {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        baseURL: err.config?.baseURL,
+        url: err.config?.url,
+      })
+    }
+    throw error
+  }
 }
 
 // --- Teléfono ---

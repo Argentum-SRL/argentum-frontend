@@ -74,6 +74,11 @@ export default function LoginPage() {
 
   const successMessage = location.state?.message
 
+  const logGoogleError = (stage: string, error: unknown) => {
+    if (!import.meta.env.DEV) return
+    console.error(`[Auth][Google][Login] ${stage}`, error)
+  }
+
   useEffect(() => {
     if (getToken()) navigate('/app/dashboard', { replace: true })
   }, [navigate])
@@ -92,8 +97,12 @@ export default function LoginPage() {
       login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
+      if (import.meta.env.DEV) {
+        console.error('[Auth][Google][Login] Error visible en UI', err)
+      }
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'Algo salió mal. Intentá de nuevo.')
+      const message = (err as { message?: string })?.message
+      setApiError(detail || message || 'Algo salió mal. Intentá de nuevo.')
     } finally {
       setLoading(false)
     }
@@ -163,20 +172,33 @@ export default function LoginPage() {
             onSuccess={async (credentialResponse) => {
               if (credentialResponse.credential) {
                 try {
+                  if (import.meta.env.DEV) {
+                    console.log('[Auth][Google][Login] onSuccess', {
+                      credentialLength: credentialResponse.credential.length,
+                      credentialPrefix: `${credentialResponse.credential.slice(0, 12)}...`,
+                    })
+                  }
                   setLoading(true)
                   setApiError(null)
                   const respuesta = await loginWithGoogle(credentialResponse.credential)
                   login(respuesta)
                   manejarRespuestaAuth(respuesta, navigate)
                 } catch (err: unknown) {
+                  logGoogleError('Error al llamar loginWithGoogle', err)
                   const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-                  setApiError(detail || 'Falló el login con Google.')
+                  const message = (err as { message?: string })?.message
+                  setApiError(detail || message || 'Falló el login con Google.')
                 } finally {
                   setLoading(false)
                 }
+              } else if (import.meta.env.DEV) {
+                console.warn('[Auth][Google][Login] onSuccess llegó sin credential')
               }
             }}
             onError={() => {
+              if (import.meta.env.DEV) {
+                console.error('[Auth][Google][Login] onError del botón Google')
+              }
               setApiError('Falló el login con Google.')
             }}
           />

@@ -5,10 +5,12 @@ import AuthLayout from '../components/ui/AuthLayout'
 import { enviarCodigoTelefono, verificarCodigoTelefono } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
 import { manejarRespuestaAuth } from '../utils/authRedirect'
+import { useAuth } from '../hooks/useAuth'
 
 type Step = 'phone' | 'code'
 
 export default function PhoneLoginPage() {
+  const { login } = useAuth()
   const navigate = useNavigate()
   const [step, setStep] = useState<Step>('phone')
   const [telefono, setTelefono] = useState('')
@@ -83,6 +85,7 @@ export default function PhoneLoginPage() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoTelefono(telefono.trim(), codigo.trim())
+      login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail

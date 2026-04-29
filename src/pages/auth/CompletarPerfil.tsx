@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import AuthLayout from '../../components/ui/AuthLayout'
 import { completarPerfil } from '../../lib/api/auth'
 import { manejarRespuestaAuth } from '../../utils/authRedirect'
+import { useAuth } from '../../hooks/useAuth'
 
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
@@ -15,6 +16,7 @@ const validatePassword = (pwd: string): string | null => {
 }
 
 export default function CompletarPerfil() {
+  const { login } = useAuth()
   const navigate = useNavigate()
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -38,6 +40,7 @@ export default function CompletarPerfil() {
     setApiError(null)
     try {
       const respuesta = await completarPerfil({ nombre, apellido, email, password })
+      login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail

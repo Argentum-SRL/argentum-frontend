@@ -18,3 +18,7 @@ export async function verificarCodigo(telefono: string, codigo: string): Promise
   })
   return data
 }
+
+export async function eliminarCuenta(): Promise<void> {
+  await api.delete('/auth/me')
+}

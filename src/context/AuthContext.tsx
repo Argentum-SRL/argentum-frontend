@@ -9,7 +9,7 @@ export interface AuthContextValue {
   isAuthenticated: boolean
   isLoading: boolean
   login: (respuesta: AuthResponse) => void
-  logout: () => Promise<void>
+  logout: (options?: { state?: any }) => Promise<void>
   refreshUser: () => Promise<void>
   updateUsuario: (nuevo: Usuario) => void
 }
@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(async (options?: { state?: any }) => {
     const refreshToken = localStorage.getItem('argentum_refresh_token')
     try {
       if (refreshToken) {
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       clearTokens()
       setUsuario(null)
-      navigate('/login', { replace: true })
+      navigate('/login', { replace: true, state: options?.state })
     }
   }, [navigate])
 

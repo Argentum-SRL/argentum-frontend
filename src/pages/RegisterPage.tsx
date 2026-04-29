@@ -6,6 +6,7 @@ import AuthLayout from '../components/ui/AuthLayout'
 import { registerWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
 import { manejarRespuestaAuth } from '../utils/authRedirect'
+import { useAuth } from '../hooks/useAuth'
 
 function AppleIcon() {
   return (
@@ -28,6 +29,7 @@ const validatePassword = (pwd: string): string | null => {
 }
 
 export default function RegisterPage() {
+  const { login } = useAuth()
   const navigate = useNavigate()
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -66,6 +68,7 @@ export default function RegisterPage() {
     setApiError(null)
     try {
       const respuesta = await registerWithEmail({ nombre, apellido, email, telefono, password })
+      login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const e = err as { response?: { status?: number; data?: { detail?: unknown } } }
@@ -89,6 +92,7 @@ export default function RegisterPage() {
       setLoading(true)
       setApiError(null)
       const respuesta = await loginWithGoogle(credentialResponse.credential)
+      login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail

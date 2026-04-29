@@ -11,6 +11,8 @@ import WhatsappOtpPage from '../pages/auth/WhatsappOtpPage'
 import Onboarding from '../pages/Onboarding'
 import DashboardPage from '../pages/app/DashboardPage'
 import BilleterasPage from '../pages/app/BilleterasPage'
+import PerfilPage from '../pages/app/PerfilPage'
+import AppWrapper from '../components/layout/AppWrapper'
 
 const router = createBrowserRouter([
   {
@@ -33,13 +35,18 @@ const router = createBrowserRouter([
         ],
       },
 
-      // App: requiere auth + onboarding completo
       {
         element: <ProtectedRoute mode="app" />,
         children: [
-          { index: true, element: <Navigate to="/app/dashboard" replace /> },
-          { path: '/app/dashboard', element: <DashboardPage /> },
-          { path: '/app/billeteras', element: <BilleterasPage /> },
+          {
+            element: <AppWrapper />,
+            children: [
+              { index: true, element: <Navigate to="/app/dashboard" replace /> },
+              { path: '/app/dashboard', element: <DashboardPage /> },
+              { path: '/app/billeteras', element: <BilleterasPage /> },
+              { path: '/app/perfil', element: <PerfilPage /> },
+            ],
+          },
         ],
       },
 

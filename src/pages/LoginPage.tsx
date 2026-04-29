@@ -1,11 +1,12 @@
 import { type FormEvent, useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Eye, EyeOff, Phone } from 'lucide-react'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { Eye, EyeOff, Phone, CheckCircle2 } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import AuthLayout from '../components/ui/AuthLayout'
 import { loginWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
 import { manejarRespuestaAuth } from '../utils/authRedirect'
+import { useAuth } from '../hooks/useAuth'
 
 function AppleIcon() {
   return (
@@ -61,13 +62,17 @@ function Field({ label, value, onChange, type = 'text', autoFocus, error, rightS
 }
 
 export default function LoginPage() {
+  const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
+
+  const successMessage = location.state?.message
 
   useEffect(() => {
     if (getToken()) navigate('/app/dashboard', { replace: true })
@@ -84,6 +89,7 @@ export default function LoginPage() {
     setApiError(null)
     try {
       const respuesta = await loginWithEmail({ email, password })
+      login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
@@ -95,6 +101,12 @@ export default function LoginPage() {
 
   return (
     <AuthLayout title="Bienvenido de vuelta">
+      {successMessage && (
+        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 rounded-2xl flex items-center gap-3 text-green-700 dark:text-green-400 animate-in slide-in-from-top-2 duration-500">
+          <CheckCircle2 size={20} />
+          <p className="text-sm font-bold">{successMessage}</p>
+        </div>
+      )}
       <form onSubmit={handleSubmit} noValidate>
         <Field
           label="Mail"
@@ -154,6 +166,7 @@ export default function LoginPage() {
                   setLoading(true)
                   setApiError(null)
                   const respuesta = await loginWithGoogle(credentialResponse.credential)
+                  login(respuesta)
                   manejarRespuestaAuth(respuesta, navigate)
                 } catch (err: unknown) {
                   const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail

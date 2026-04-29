@@ -1,8 +1,9 @@
 import { type FormEvent, useState, useEffect } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Phone, CheckCircle2 } from 'lucide-react'
-import { GoogleLogin } from '@react-oauth/google'
 import AuthLayout from '../components/ui/AuthLayout'
+import WppChatMockup from '../components/ui/WppChatMockup'
+import GoogleLoginButton from '../components/ui/GoogleLoginButton'
 import { loginWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
 import { manejarRespuestaAuth } from '../utils/authRedirect'
@@ -98,7 +99,7 @@ export default function LoginPage() {
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       if (import.meta.env.DEV) {
-        console.error('[Auth][Google][Login] Error visible en UI', err)
+        console.error('[Auth][Email][Login] Error visible en UI', err)
       }
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
       const message = (err as { message?: string })?.message
@@ -109,7 +110,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthLayout title="Bienvenido de vuelta">
+    <AuthLayout title="Bienvenido de vuelta" leftPanel={<WppChatMockup />}>
       {successMessage && (
         <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 rounded-2xl flex items-center gap-3 text-green-700 dark:text-green-400 animate-in slide-in-from-top-2 duration-500">
           <CheckCircle2 size={20} />
@@ -167,42 +168,33 @@ export default function LoginPage() {
           <div className="flex-1 h-px" style={{ background: 'var(--surface-alt)' }} />
         </div>
 
-        <div className="flex justify-center w-full">
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              if (credentialResponse.credential) {
-                try {
-                  if (import.meta.env.DEV) {
-                    console.log('[Auth][Google][Login] onSuccess', {
-                      credentialLength: credentialResponse.credential.length,
-                      credentialPrefix: `${credentialResponse.credential.slice(0, 12)}...`,
-                    })
-                  }
-                  setLoading(true)
-                  setApiError(null)
-                  const respuesta = await loginWithGoogle(credentialResponse.credential)
-                  login(respuesta)
-                  manejarRespuestaAuth(respuesta, navigate)
-                } catch (err: unknown) {
-                  logGoogleError('Error al llamar loginWithGoogle', err)
-                  const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-                  const message = (err as { message?: string })?.message
-                  setApiError(detail || message || 'Falló el login con Google.')
-                } finally {
-                  setLoading(false)
-                }
-              } else if (import.meta.env.DEV) {
-                console.warn('[Auth][Google][Login] onSuccess llegó sin credential')
-              }
-            }}
-            onError={() => {
+        <GoogleLoginButton
+          onSuccess={async ({ credential }) => {
+            try {
               if (import.meta.env.DEV) {
-                console.error('[Auth][Google][Login] onError del botón Google')
+                console.log('[Auth][Google][Login] credential recibido', { length: credential.length })
               }
-              setApiError('Falló el login con Google.')
-            }}
-          />
-        </div>
+              setLoading(true)
+              setApiError(null)
+              const respuesta = await loginWithGoogle(credential)
+              login(respuesta)
+              manejarRespuestaAuth(respuesta, navigate)
+            } catch (err: unknown) {
+              logGoogleError('Error al llamar loginWithGoogle', err)
+              const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+              const message = (err as { message?: string })?.message
+              setApiError(detail || message || 'Falló el login con Google.')
+            } finally {
+              setLoading(false)
+            }
+          }}
+          onError={() => {
+            if (import.meta.env.DEV) {
+              console.error('[Auth][Google][Login] onError del botón Google')
+            }
+            setApiError('Falló el login con Google.')
+          }}
+        />
 
         <Link
           to="/login/telefono"

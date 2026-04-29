@@ -7,7 +7,6 @@ import PhoneLoginPage from '../pages/PhoneLoginPage'
 import VerificarEmail from '../pages/auth/VerificarEmail'
 import VerificarTelefono from '../pages/auth/VerificarTelefono'
 import CompletarPerfil from '../pages/auth/CompletarPerfil'
-import WhatsappOtpPage from '../pages/auth/WhatsappOtpPage'
 import Onboarding from '../pages/Onboarding'
 import DashboardPage from '../pages/app/DashboardPage'
 import BilleterasPage from '../pages/app/BilleterasPage'
@@ -25,7 +24,6 @@ const router = createBrowserRouter([
       { path: '/auth/verificar-email', element: <VerificarEmail /> },
       { path: '/auth/verificar-telefono', element: <VerificarTelefono /> },
       { path: '/auth/completar-perfil', element: <CompletarPerfil /> },
-      { path: '/auth/whatsapp-otp', element: <WhatsappOtpPage /> },
 
       // Onboarding: requiere auth, redirige a dashboard si ya lo completó
       {

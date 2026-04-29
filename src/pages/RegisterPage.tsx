@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff, Phone } from 'lucide-react'
 import GoogleLoginButton from '../components/ui/GoogleLoginButton'
 import AuthLayout from '../components/ui/AuthLayout'
+import DashboardMockup from '../components/ui/DashboardMockup'
 import { registerWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
 import { manejarRespuestaAuth } from '../utils/authRedirect'
@@ -113,7 +114,7 @@ export default function RegisterPage() {
     } finally {
       setLoading(false)
     }
-  }, [navigate])
+  }, [navigate, login])
 
   const handleGoogleError = useCallback(() => {
     if (import.meta.env.DEV) {
@@ -131,7 +132,7 @@ export default function RegisterPage() {
   })
 
   return (
-    <AuthLayout title="Crear cuenta">
+    <AuthLayout title="Crear cuenta" leftPanel={<DashboardMockup />}>
       <form onSubmit={handleSubmit} noValidate>
         <div className="flex gap-3 mb-4">
           <div className="flex-1">

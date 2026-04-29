@@ -1,18 +1,20 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../lib/axios'
 import { clearTokens, getToken, setToken, setRefreshToken } from '../lib/auth'
-import type { Usuario, AuthResponse } from '../types'
+import type { Usuario, AuthResponse } from '../types/index'
 
-interface AuthContextValue {
+export interface AuthContextValue {
   usuario: Usuario | null
   isAuthenticated: boolean
   isLoading: boolean
   login: (respuesta: AuthResponse) => void
   logout: () => Promise<void>
+  refreshUser: () => Promise<void>
+  updateUsuario: (nuevo: Usuario) => void
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null)
+export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
@@ -40,6 +42,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (respuesta.usuario) setUsuario(respuesta.usuario)
   }, [])
 
+  const updateUsuario = useCallback((nuevo: Usuario) => {
+    setUsuario(nuevo)
+  }, [])
+
+  const refreshUser = useCallback(async () => {
+    const token = getToken()
+    if (!token) return
+    try {
+      const { data } = await api.get<{ usuario: Usuario }>('/auth/me')
+      setUsuario(data.usuario)
+    } catch {
+      // Ignorar
+    }
+  }, [])
+
   useEffect(() => {
     const token = getToken()
     if (!token) {
@@ -47,18 +64,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    let mounted = true
     api
       .get<{ usuario: Usuario }>('/auth/me')
       .then(({ data }) => {
-        setUsuario(data.usuario)
+        if (mounted) setUsuario(data.usuario)
       })
       .catch(() => {
-        clearTokens()
-        setUsuario(null)
+        if (mounted) {
+          clearTokens()
+          setUsuario(null)
+        }
       })
       .finally(() => {
-        setIsLoading(false)
+        if (mounted) setIsLoading(false)
       })
+    return () => {
+      mounted = false
+    }
   }, [])
 
   return (
@@ -69,15 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
+        refreshUser,
+        updateUsuario,
       }}
     >
       {children}
     </AuthContext.Provider>
   )
-}
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth debe usarse dentro de AuthProvider')
-  return ctx
 }

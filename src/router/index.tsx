@@ -7,7 +7,7 @@ import PhoneLoginPage from '../pages/PhoneLoginPage'
 import VerificarEmail from '../pages/auth/VerificarEmail'
 import VerificarTelefono from '../pages/auth/VerificarTelefono'
 import CompletarPerfil from '../pages/auth/CompletarPerfil'
-import OnboardingPage from '../pages/OnboardingPage'
+import Onboarding from '../pages/Onboarding'
 import DashboardPage from '../pages/app/DashboardPage'
 import BilleterasPage from '../pages/app/BilleterasPage'
 
@@ -27,7 +27,7 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute mode="onboarding" />,
         children: [
-          { path: '/onboarding', element: <OnboardingPage /> },
+          { path: '/onboarding', element: <Onboarding /> },
         ],
       },
 

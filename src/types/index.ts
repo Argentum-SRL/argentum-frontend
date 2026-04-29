@@ -7,7 +7,7 @@ export interface Usuario {
   foto_url: string | null
   rol: 'usuario' | 'admin'
   estado: string
-  moneda_principal: 'ARS' | 'USD'
+  moneda_principal: 'ARS' | 'USD' | null
   moneda_secundaria_activa: boolean
   tipo_dolar: string
   ciclo_tipo: string | null
@@ -27,4 +27,20 @@ export interface AuthResponse {
   requiere_verificacion_email: boolean
   requiere_verificacion_telefono: boolean
   requiere_onboarding: boolean
+}
+
+export interface MeResponse {
+  usuario: Usuario
+}
+
+export interface EstadoOnboarding {
+  onboarding_completo: boolean
+  pasos_pendientes: string[]
+  datos_actuales: {
+    nombre: string | null
+    apellido: string | null
+    moneda_principal: string | null
+    ciclo_tipo: string | null
+    ciclo_valor: string | null
+  }
 }

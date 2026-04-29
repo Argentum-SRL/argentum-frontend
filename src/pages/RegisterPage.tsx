@@ -1,7 +1,7 @@
-import { type FormEvent, useState, useEffect } from 'react'
+import { type FormEvent, useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff, Phone } from 'lucide-react'
-import { GoogleLogin } from '@react-oauth/google'
+import GoogleLoginButton from '../components/ui/GoogleLoginButton'
 import AuthLayout from '../components/ui/AuthLayout'
 import { registerWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
@@ -83,6 +83,24 @@ export default function RegisterPage() {
       setLoading(false)
     }
   }
+
+  const handleGoogleSuccess = useCallback(async (credentialResponse: { credential: string }) => {
+    try {
+      setLoading(true)
+      setApiError(null)
+      const respuesta = await loginWithGoogle(credentialResponse.credential)
+      manejarRespuestaAuth(respuesta, navigate)
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      setApiError(detail || 'Falló el login con Google.')
+    } finally {
+      setLoading(false)
+    }
+  }, [navigate])
+
+  const handleGoogleError = useCallback(() => {
+    setApiError('Falló el login con Google.')
+  }, [])
 
   const inputClass = "w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
   const inputStyle = (error: string | null) => ({
@@ -228,24 +246,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="flex justify-center w-full">
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              if (credentialResponse.credential) {
-                try {
-                  setLoading(true)
-                  setApiError(null)
-                  const respuesta = await loginWithGoogle(credentialResponse.credential)
-                  manejarRespuestaAuth(respuesta, navigate)
-                } catch (err: unknown) {
-                  const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-                  setApiError(detail || 'Falló el login con Google.')
-                } finally {
-                  setLoading(false)
-                }
-              }
-            }}
-            onError={() => setApiError('Falló el login con Google.')}
-          />
+          <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
         </div>
 
         <Link

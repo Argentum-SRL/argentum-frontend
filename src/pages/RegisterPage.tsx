@@ -5,6 +5,7 @@ import { GoogleLogin } from '@react-oauth/google'
 import AuthLayout from '../components/ui/AuthLayout'
 import { registerWithEmail, loginWithGoogle } from '../lib/api/auth'
 import { getToken } from '../lib/auth'
+import { manejarRespuestaAuth } from '../utils/authRedirect'
 
 function AppleIcon() {
   return (
@@ -17,20 +18,18 @@ function AppleIcon() {
   )
 }
 
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-    </svg>
-  )
+const validatePassword = (pwd: string): string | null => {
+  if (!pwd) return 'Creá una contraseña.'
+  if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
+  if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
+  if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
+  if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
+  return null
 }
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const [name, setName] = useState('')
+  const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
   const [email, setEmail] = useState('')
   const [telefono, setTelefono] = useState('')
@@ -46,38 +45,36 @@ export default function RegisterPage() {
     if (getToken()) navigate('/app/dashboard', { replace: true })
   }, [navigate])
 
-  const nameError = hasSubmitted && !name.trim() ? 'Ingresá tu nombre.' : null
+  const nombreError = hasSubmitted && !nombre.trim() ? 'Ingresá tu nombre.' : null
   const apellidoError = hasSubmitted && !apellido.trim() ? 'Ingresá tu apellido.' : null
   const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
   const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu teléfono.' : null
-
-  const validatePassword = (pwd: string) => {
-    if (!pwd) return 'Creá una contraseña.'
-    if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
-    if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
-    if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
-    if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
-    return null
-  }
   const passwordError = hasSubmitted ? validatePassword(password) : null
-  const confirmPasswordError = hasSubmitted && confirmPassword !== password ? 'Las contraseñas no coinciden.' : (!confirmPassword && hasSubmitted ? 'Confirmá tu contraseña.' : null)
+  const confirmPasswordError = hasSubmitted
+    ? !confirmPassword
+      ? 'Confirmá tu contraseña.'
+      : confirmPassword !== password
+        ? 'Las contraseñas no coinciden.'
+        : null
+    : null
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
-    if (!name.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || passwordError || confirmPasswordError) return
+    if (!nombre.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || passwordError || confirmPasswordError) return
     setLoading(true)
     setApiError(null)
     try {
-      await registerWithEmail({ name, apellido, email, telefono, password })
-      navigate('/onboarding', { replace: true })
-    } catch (err: any) {
-      const status = err.response?.status
-      const detail = err.response?.data?.detail
-      if (status === 409 && detail) {
+      const respuesta = await registerWithEmail({ nombre, apellido, email, telefono, password })
+      manejarRespuestaAuth(respuesta, navigate)
+    } catch (err: unknown) {
+      const e = err as { response?: { status?: number; data?: { detail?: unknown } } }
+      const status = e.response?.status
+      const detail = e.response?.data?.detail
+      if ((status === 400 || status === 409) && typeof detail === 'string') {
         setApiError(detail)
-      } else if (status === 422 && detail) {
-        const msg = Array.isArray(detail) ? detail[0]?.msg : detail
+      } else if (status === 422 && Array.isArray(detail)) {
+        const msg = (detail[0] as { msg?: string })?.msg
         setApiError(msg ? msg.replace('Value error, ', '') : 'Verificá los datos ingresados.')
       } else {
         setApiError('Algo salió mal. Intentá de nuevo.')
@@ -87,32 +84,32 @@ export default function RegisterPage() {
     }
   }
 
+  const inputClass = "w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
+  const inputStyle = (error: string | null) => ({
+    fontSize: '16px',
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    borderColor: error ? '#C0392B' : 'var(--surface-alt)',
+  })
+
   return (
     <AuthLayout title="Crear cuenta">
       <form onSubmit={handleSubmit} noValidate>
         <div className="flex gap-3 mb-4">
-          {/* Nombre */}
           <div className="flex-1">
             <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
               Nombre
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
               autoFocus
-              className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
-              style={{
-                fontSize: '16px',
-                background: 'var(--surface)',
-                color: 'var(--text)',
-                borderColor: nameError ? '#C0392B' : 'var(--surface-alt)',
-              }}
+              className={inputClass}
+              style={inputStyle(nombreError)}
             />
-            {nameError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{nameError}</p>}
+            {nombreError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{nombreError}</p>}
           </div>
-
-          {/* Apellido */}
           <div className="flex-1">
             <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
               Apellido
@@ -121,19 +118,13 @@ export default function RegisterPage() {
               type="text"
               value={apellido}
               onChange={(e) => setApellido(e.target.value)}
-              className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
-              style={{
-                fontSize: '16px',
-                background: 'var(--surface)',
-                color: 'var(--text)',
-                borderColor: apellidoError ? '#C0392B' : 'var(--surface-alt)',
-              }}
+              className={inputClass}
+              style={inputStyle(apellidoError)}
             />
             {apellidoError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{apellidoError}</p>}
           </div>
         </div>
 
-        {/* Teléfono */}
         <div className="mb-4">
           <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
             Teléfono
@@ -142,18 +133,14 @@ export default function RegisterPage() {
             type="tel"
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}
-            className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
-            style={{
-              fontSize: '16px',
-              background: 'var(--surface)',
-              color: 'var(--text)',
-              borderColor: telefonoError ? '#C0392B' : 'var(--surface-alt)',
-            }}
+            placeholder="+5491112345678"
+            className={inputClass}
+            style={inputStyle(telefonoError)}
           />
           {telefonoError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{telefonoError}</p>}
+          <p className="mt-1" style={{ fontSize: '12px', color: 'var(--text-3)' }}>Incluí el código de país, ej: +54</p>
         </div>
 
-        {/* Mail */}
         <div className="mb-4">
           <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
             Mail
@@ -162,18 +149,12 @@ export default function RegisterPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
-            style={{
-              fontSize: '16px',
-              background: 'var(--surface)',
-              color: 'var(--text)',
-              borderColor: emailError ? '#C0392B' : 'var(--surface-alt)',
-            }}
+            className={inputClass}
+            style={inputStyle(emailError)}
           />
           {emailError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{emailError}</p>}
         </div>
 
-        {/* Contraseña y Confirmar Contraseña */}
         <div className="flex gap-3 mb-6">
           <div className="flex-1">
             <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
@@ -184,14 +165,8 @@ export default function RegisterPage() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
-                style={{
-                  fontSize: '16px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)',
-                  borderColor: passwordError ? '#C0392B' : 'var(--surface-alt)',
-                  paddingRight: '48px',
-                }}
+                className={inputClass}
+                style={{ ...inputStyle(passwordError), paddingRight: '48px' }}
               />
               <button
                 type="button"
@@ -205,24 +180,17 @@ export default function RegisterPage() {
             </div>
             {passwordError && <p className="mt-1" style={{ fontSize: '13px', color: '#C0392B' }}>{passwordError}</p>}
           </div>
-
           <div className="flex-1">
             <label className="block mb-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
-              Repetir Contraseña
+              Repetir
             </label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full h-12 px-4 rounded-[10px] border outline-none transition-colors"
-                style={{
-                  fontSize: '16px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)',
-                  borderColor: confirmPasswordError ? '#C0392B' : 'var(--surface-alt)',
-                  paddingRight: '48px',
-                }}
+                className={inputClass}
+                style={{ ...inputStyle(confirmPasswordError), paddingRight: '48px' }}
               />
               <button
                 type="button"
@@ -266,22 +234,17 @@ export default function RegisterPage() {
                 try {
                   setLoading(true)
                   setApiError(null)
-                  const data = await loginWithGoogle(credentialResponse.credential)
-                  if (!data.usuario.onboarding_completo) {
-                    navigate('/onboarding', { replace: true })
-                  } else {
-                    navigate('/app/dashboard', { replace: true })
-                  }
-                } catch (error) {
-                  setApiError('Falló el login con Google')
+                  const respuesta = await loginWithGoogle(credentialResponse.credential)
+                  manejarRespuestaAuth(respuesta, navigate)
+                } catch (err: unknown) {
+                  const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+                  setApiError(detail || 'Falló el login con Google.')
                 } finally {
                   setLoading(false)
                 }
               }
             }}
-            onError={() => {
-              setApiError('Falló el login con Google')
-            }}
+            onError={() => setApiError('Falló el login con Google.')}
           />
         </div>
 

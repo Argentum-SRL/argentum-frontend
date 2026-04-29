@@ -1,32 +1,49 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import RootLayout from './RootLayout'
 import ProtectedRoute from './ProtectedRoute'
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import PhoneLoginPage from '../pages/PhoneLoginPage'
+import VerificarEmail from '../pages/auth/VerificarEmail'
+import VerificarTelefono from '../pages/auth/VerificarTelefono'
+import CompletarPerfil from '../pages/auth/CompletarPerfil'
 import OnboardingPage from '../pages/OnboardingPage'
 import DashboardPage from '../pages/app/DashboardPage'
 import BilleterasPage from '../pages/app/BilleterasPage'
 
 const router = createBrowserRouter([
-  { path: '/login', element: <LoginPage /> },
-  { path: '/login/telefono', element: <PhoneLoginPage /> },
-  { path: '/register', element: <RegisterPage /> },
   {
-    path: '/',
-    element: <ProtectedRoute />,
+    element: <RootLayout />,
     children: [
-      { index: true, element: <Navigate to="/app/dashboard" replace /> },
-      { path: 'onboarding', element: <OnboardingPage /> },
+      // Rutas públicas
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <RegisterPage /> },
+      { path: '/login/telefono', element: <PhoneLoginPage /> },
+      { path: '/auth/verificar-email', element: <VerificarEmail /> },
+      { path: '/auth/verificar-telefono', element: <VerificarTelefono /> },
+      { path: '/auth/completar-perfil', element: <CompletarPerfil /> },
+
+      // Onboarding: requiere auth, redirige a dashboard si ya lo completó
       {
-        path: 'app',
+        element: <ProtectedRoute mode="onboarding" />,
         children: [
-          { path: 'dashboard', element: <DashboardPage /> },
-          { path: 'billeteras', element: <BilleterasPage /> },
+          { path: '/onboarding', element: <OnboardingPage /> },
         ],
       },
+
+      // App: requiere auth + onboarding completo
+      {
+        element: <ProtectedRoute mode="app" />,
+        children: [
+          { index: true, element: <Navigate to="/app/dashboard" replace /> },
+          { path: '/app/dashboard', element: <DashboardPage /> },
+          { path: '/app/billeteras', element: <BilleterasPage /> },
+        ],
+      },
+
+      { path: '*', element: <Navigate to="/login" replace /> },
     ],
   },
-  { path: '*', element: <Navigate to="/login" replace /> },
 ])
 
 export default router

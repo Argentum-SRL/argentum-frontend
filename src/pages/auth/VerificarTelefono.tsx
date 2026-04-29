@@ -1,17 +1,28 @@
 import { type FormEvent, useState, useEffect, useRef } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Phone, ArrowLeft, Loader2 } from 'lucide-react'
-import AuthLayout from '../components/ui/AuthLayout'
-import { enviarCodigoTelefono, verificarCodigoTelefono } from '../lib/api/auth'
-import { getToken } from '../lib/auth'
-import { manejarRespuestaAuth } from '../utils/authRedirect'
+import AuthLayout from '../../components/ui/AuthLayout'
+import { enviarCodigoTelefono, verificarCodigoTelefono } from '../../lib/api/auth'
+import { manejarRespuestaAuth } from '../../utils/authRedirect'
 
-type Step = 'phone' | 'code'
-
-export default function PhoneLoginPage() {
+/**
+ * Maneja dos escenarios:
+ * A) modoVerificacion=true: teléfono ya conocido (flujo email, paso 3).
+ *    Muestra directo el input de código.
+ * B) modoVerificacion=false/ausente: flujo Google o entrada directa.
+ *    Muestra primero el input de teléfono.
+ */
+export default function VerificarTelefono() {
   const navigate = useNavigate()
-  const [step, setStep] = useState<Step>('phone')
-  const [telefono, setTelefono] = useState('')
+  const location = useLocation()
+  const state = location.state as { telefono?: string; modoVerificacion?: boolean } | null
+
+  const telefonoInicial = state?.telefono ?? ''
+  const modoVerificacion = state?.modoVerificacion ?? false
+
+  type Step = 'phone' | 'code'
+  const [step, setStep] = useState<Step>(modoVerificacion && telefonoInicial ? 'code' : 'phone')
+  const [telefono, setTelefono] = useState(telefonoInicial)
   const [codigo, setCodigo] = useState('')
   const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
@@ -19,25 +30,29 @@ export default function PhoneLoginPage() {
   const [countdown, setCountdown] = useState(0)
   const codeInputRef = useRef<HTMLInputElement>(null)
 
+  // Si llegamos en modo verificación con teléfono ya sabido, enviamos el código automáticamente
   useEffect(() => {
-    if (getToken()) navigate('/app/dashboard', { replace: true })
-  }, [navigate])
+    if (modoVerificacion && telefonoInicial && step === 'code') {
+      enviarCodigoTelefono(telefonoInicial)
+        .then(() => setCountdown(60))
+        .catch(() => setApiError('No se pudo enviar el código. Pedí uno nuevo.'))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (step === 'code') setTimeout(() => codeInputRef.current?.focus(), 100)
+  }, [step])
 
   useEffect(() => {
     if (countdown <= 0) return
-    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000)
-    return () => clearTimeout(timer)
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
   }, [countdown])
-
-  useEffect(() => {
-    if (step === 'code') {
-      setTimeout(() => codeInputRef.current?.focus(), 100)
-    }
-  }, [step])
 
   const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu número de teléfono.' : null
 
-  async function handleSendCode(e: FormEvent) {
+  async function handleEnviarCodigo(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
     if (!telefono.trim()) return
@@ -57,7 +72,7 @@ export default function PhoneLoginPage() {
     }
   }
 
-  async function handleResend() {
+  async function handleReenviar() {
     if (countdown > 0) return
     setLoading(true)
     setApiError(null)
@@ -73,9 +88,9 @@ export default function PhoneLoginPage() {
     }
   }
 
-  async function handleVerifyCode(e: FormEvent) {
+  async function handleVerificar(e: FormEvent) {
     e.preventDefault()
-    if (!codigo.trim() || codigo.trim().length !== 6) {
+    if (codigo.length !== 6) {
       setApiError('Ingresá el código de 6 dígitos.')
       return
     }
@@ -92,19 +107,12 @@ export default function PhoneLoginPage() {
     }
   }
 
-  function handleBack() {
-    setStep('phone')
-    setCodigo('')
-    setApiError(null)
-    setHasSubmitted(false)
-  }
-
   if (step === 'phone') {
     return (
-      <AuthLayout title="Ingresá con tu teléfono">
-        <form onSubmit={handleSendCode} noValidate>
+      <AuthLayout title="Verificá tu teléfono">
+        <form onSubmit={handleEnviarCodigo} noValidate>
           <p className="mb-5" style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: 1.5 }}>
-            Te vamos a enviar un código de verificación por SMS al número que ingreses.
+            Necesitamos verificar tu número de teléfono para continuar.
           </p>
 
           <div className="mb-6">
@@ -148,27 +156,6 @@ export default function PhoneLoginPage() {
           >
             {loading ? <><Loader2 size={18} className="animate-spin" /> Enviando...</> : 'Enviar código'}
           </button>
-
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px" style={{ background: 'var(--surface-alt)' }} />
-            <span style={{ fontSize: '13px', color: 'var(--text-3)' }}>o</span>
-            <div className="flex-1 h-px" style={{ background: 'var(--surface-alt)' }} />
-          </div>
-
-          <Link
-            to="/login"
-            className="w-full h-12 rounded-[10px] border flex items-center justify-center gap-2 font-medium transition-colors"
-            style={{ borderColor: 'var(--silver)', color: 'var(--text)', fontSize: '15px', textDecoration: 'none' }}
-          >
-            Ingresar con mail y contraseña
-          </Link>
-
-          <p className="text-center mt-6" style={{ fontSize: '13px', color: 'var(--text-3)' }}>
-            ¿No tenés cuenta?{' '}
-            <Link to="/register" className="font-medium" style={{ color: 'var(--primary)' }}>
-              Registrate
-            </Link>
-          </p>
         </form>
       </AuthLayout>
     )
@@ -176,16 +163,18 @@ export default function PhoneLoginPage() {
 
   return (
     <AuthLayout title="Ingresá el código">
-      <form onSubmit={handleVerifyCode} noValidate>
-        <button
-          type="button"
-          onClick={handleBack}
-          className="flex items-center gap-1 mb-4 transition-colors"
-          style={{ fontSize: '13px', color: 'var(--text-3)' }}
-        >
-          <ArrowLeft size={14} />
-          Cambiar número
-        </button>
+      <form onSubmit={handleVerificar} noValidate>
+        {!modoVerificacion && (
+          <button
+            type="button"
+            onClick={() => { setStep('phone'); setCodigo(''); setApiError(null) }}
+            className="flex items-center gap-1 mb-4 transition-colors"
+            style={{ fontSize: '13px', color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <ArrowLeft size={14} />
+            Cambiar número
+          </button>
+        )}
 
         <p className="mb-5" style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: 1.5 }}>
           Enviamos un código de 6 dígitos a{' '}
@@ -235,9 +224,9 @@ export default function PhoneLoginPage() {
           ) : (
             <button
               type="button"
-              onClick={handleResend}
+              onClick={handleReenviar}
               disabled={loading}
-              className="font-medium transition-colors"
+              className="font-medium transition-colors disabled:opacity-60"
               style={{ fontSize: '13px', color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               Reenviar código

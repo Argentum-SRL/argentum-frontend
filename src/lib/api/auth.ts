@@ -1,5 +1,5 @@
 import api from '../axios'
-import { setToken } from '../auth'
+import { setRefreshToken, setToken } from '../auth'
 
 export interface LoginPayload {
   email: string
@@ -20,6 +20,7 @@ export async function loginWithEmail(payload: LoginPayload): Promise<void> {
     password: payload.password,
   })
   setToken(data.access_token as string)
+  setRefreshToken(data.refresh_token as string)
 }
 
 export async function registerWithEmail(payload: RegisterPayload): Promise<void> {
@@ -31,13 +32,12 @@ export async function registerWithEmail(payload: RegisterPayload): Promise<void>
     password: payload.password,
   })
   setToken(data.access_token as string)
+  setRefreshToken(data.refresh_token as string)
 }
 
 export async function loginWithGoogle(token: string): Promise<any> {
   const { data } = await api.post('/auth/google', { token })
   setToken(data.access_token as string)
-  if (data.refresh_token) {
-    localStorage.setItem('refresh_token', data.refresh_token)
-  }
+  setRefreshToken(data.refresh_token as string)
   return data
 }

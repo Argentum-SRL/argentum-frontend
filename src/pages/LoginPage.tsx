@@ -168,7 +168,7 @@ export default function LoginPage() {
                   setLoading(true)
                   setApiError(null)
                   const data = await loginWithGoogle(credentialResponse.credential)
-                  if (!data.user.onboarding_completo) {
+                  if (!data.usuario.onboarding_completo) {
                     navigate('/onboarding', { replace: true })
                   } else {
                     navigate('/app/dashboard', { replace: true })

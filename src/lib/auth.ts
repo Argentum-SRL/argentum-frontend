@@ -1,7 +1,19 @@
-const TOKEN_KEY = 'argentum_token'
+const ACCESS_KEY = 'argentum_access_token'
+const REFRESH_KEY = 'argentum_refresh_token'
 
-export const getToken = (): string | null => localStorage.getItem(TOKEN_KEY)
+// Access token
+export const getToken = (): string | null => localStorage.getItem(ACCESS_KEY)
+export const setToken = (token: string): void => localStorage.setItem(ACCESS_KEY, token)
 
-export const setToken = (token: string): void => localStorage.setItem(TOKEN_KEY, token)
+// Refresh token
+export const getRefreshToken = (): string | null => localStorage.getItem(REFRESH_KEY)
+export const setRefreshToken = (token: string): void => localStorage.setItem(REFRESH_KEY, token)
 
-export const clearToken = (): void => localStorage.removeItem(TOKEN_KEY)
+// Limpiar ambos
+export const clearTokens = (): void => {
+  localStorage.removeItem(ACCESS_KEY)
+  localStorage.removeItem(REFRESH_KEY)
+}
+
+/** @deprecated usá clearTokens() */
+export const clearToken = clearTokens

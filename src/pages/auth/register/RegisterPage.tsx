@@ -11,17 +11,6 @@ import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
 import styles from './RegisterPage.module.css'
 
-function AppleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-      <path
-        d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.32.07 2.24.77 3.01.8.96-.19 1.88-.9 3.05-.96 1.55-.08 2.98.57 3.82 1.76-3.53 2.08-2.94 6.72.56 8.03-.65 1.56-1.47 3.1-2.44 3.23zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
   if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
@@ -230,10 +219,6 @@ export default function RegisterPage() {
           Continuar con teléfono
         </Link>
 
-        <button type="button" disabled className={`${styles.altBtn} ${styles.altBtnDisabled}`}>
-          <AppleIcon />
-          Continuar con Apple
-        </button>
 
         <p className={styles.footer}>
           ¿Ya tenés cuenta?{' '}

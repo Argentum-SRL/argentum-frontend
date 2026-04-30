@@ -20,8 +20,9 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import usuarioService from '@/services/usuario.service'
 import styles from './PerfilPage.module.css'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import type { MetodosLogin } from '@/types'
+import * as authService from '@/services/auth.service'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -123,10 +124,38 @@ export default function PerfilPage() {
       const res = await usuarioService.actualizarEmail(formEmail)
       if (res.requiere_verificacion_email) {
         alert(res.confirmacion)
-        navigate('/auth/verificar-email')
+        navigate('/auth/verificar-email', { state: { email: formEmail.email_nuevo } })
+      } else {
+        // Si no requiere verificación (bypass), actualizamos el usuario localmente
+        if (usuario) {
+          updateUsuario({ ...usuario, email: formEmail.email_nuevo, email_verificado: true })
+        }
+        alert('Email actualizado correctamente.')
+        handleCloseModal()
       }
     } catch (err: any) {
       setModalError(err.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleVerificarEmailActual = async () => {
+    if (!usuario?.email) return
+    setIsSaving(true)
+    try {
+      const res = await authService.enviarCodigoEmail(usuario.email)
+      // Si el backend aplicó el bypass y devolvió verificado: true
+      if ((res as any).verificado) {
+        if (usuario) {
+          updateUsuario({ ...usuario, email_verificado: true })
+        }
+        alert('Email verificado correctamente (Bypass activo).')
+      } else {
+        navigate('/auth/verificar-email', { state: { email: usuario.email } })
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.detail || 'Error al enviar el código de verificación.')
     } finally {
       setIsSaving(false)
     }
@@ -397,9 +426,14 @@ export default function PerfilPage() {
                   </button>
                 )}
                 {metodosLogin?.puede_agregar_email && (
-                  <button className={styles.actionLink} onClick={() => handleOpenModal('email')}>
-                    Verificar email
-                  </button>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button className={styles.actionLink} onClick={handleVerificarEmailActual}>
+                      Verificar ahora
+                    </button>
+                    <button className={styles.actionLink} onClick={() => handleOpenModal('email')}>
+                      Cambiar email
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -626,7 +660,7 @@ export default function PerfilPage() {
                   />
                 </div>
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> Actualizar Email</>}
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> Guardar Cambios</>}
                 </button>
               </form>
             )}

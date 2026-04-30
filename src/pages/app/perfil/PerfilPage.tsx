@@ -20,7 +20,7 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import usuarioService from '@/services/usuario.service'
 import styles from './PerfilPage.module.css'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { MetodosLogin } from '@/types'
 import * as authService from '@/services/auth.service'
 

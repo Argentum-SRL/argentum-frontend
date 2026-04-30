@@ -11,7 +11,12 @@ export async function getCotizaciones(): Promise<CotizacionesDolarResponse> {
   return res.data
 }
 
-export async function guardarDatosPersonales(params: { nombre: string; apellido: string }) {
+export async function guardarDatosPersonales(params: {
+  nombre: string
+  apellido: string
+  fecha_nacimiento: string
+  sexo: string
+}) {
   const res = await api.post('/onboarding/datos-personales', params)
   return res.data
 }

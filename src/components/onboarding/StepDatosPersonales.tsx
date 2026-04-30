@@ -4,28 +4,55 @@ import { guardarDatosPersonales } from '@/lib/api/onboarding'
 import styles from './StepDatosPersonales.module.css'
 
 interface Props {
-  datosIniciales: { nombre: string | null; apellido: string | null }
+  datosIniciales: { 
+    nombre: string | null; 
+    apellido: string | null;
+    fecha_nacimiento?: string | null;
+    sexo?: string | null;
+  }
   onNext: (siguientePaso: string | null) => void
 }
 
 export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
   const [nombre, setNombre] = useState(datosIniciales.nombre ?? '')
   const [apellido, setApellido] = useState(datosIniciales.apellido ?? '')
+  const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales.fecha_nacimiento ?? '')
+  const [sexo, setSexo] = useState(datosIniciales.sexo ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
   const nombreError = submitted && !nombre.trim() ? 'El nombre es obligatorio.' : null
   const apellidoError = submitted && !apellido.trim() ? 'El apellido es obligatorio.' : null
+  
+  const getFechaNacimientoError = () => {
+    if (!submitted) return null
+    if (!fechaNacimiento) return 'Ingresa tu fecha de nacimiento.'
+    const selectedDate = new Date(fechaNacimiento)
+    const today = new Date()
+    if (selectedDate > today) return 'La fecha no puede ser futura.'
+    return null
+  }
+  const fechaNacimientoError = getFechaNacimientoError()
+  
+  const sexoError = submitted && !sexo ? 'Selecciona una opcion.' : null
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitted(true)
-    if (!nombre.trim() || !apellido.trim()) return
+    
+    if (!nombre.trim() || !apellido.trim() || !fechaNacimiento || !sexo) return
+    if (new Date(fechaNacimiento) > new Date()) return
+
     setLoading(true)
     setError(null)
     try {
-      const res = await guardarDatosPersonales({ nombre: nombre.trim(), apellido: apellido.trim() })
+      const res = await guardarDatosPersonales({ 
+        nombre: nombre.trim(), 
+        apellido: apellido.trim(),
+        fecha_nacimiento: fechaNacimiento,
+        sexo: sexo
+      })
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
       const apiError = err as { response?: { data?: { detail?: string } } }
@@ -38,7 +65,7 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
   return (
     <div>
       <h2 className={styles.title}>Contanos quién sos</h2>
-      <p className={styles.subtitle}>Necesitamos tu nombre para personalizar tu experiencia.</p>
+      <p className={styles.subtitle}>Necesitamos tus datos para personalizar tu experiencia.</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
@@ -66,6 +93,35 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
             autoComplete="family-name"
           />
           {apellidoError && <p className={styles.fieldError}>{apellidoError}</p>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="fecha_nacimiento" className={styles.label}>Fecha de nacimiento</label>
+          <input
+            id="fecha_nacimiento"
+            type="date"
+            value={fechaNacimiento}
+            onChange={(e) => setFechaNacimiento(e.target.value)}
+            className={[styles.input, fechaNacimientoError ? styles.inputError : ''].filter(Boolean).join(' ')}
+          />
+          {fechaNacimientoError && <p className={styles.fieldError}>{fechaNacimientoError}</p>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="sexo" className={styles.label}>Sexo</label>
+          <select
+            id="sexo"
+            value={sexo}
+            onChange={(e) => setSexo(e.target.value)}
+            className={[styles.input, sexoError ? styles.inputError : ''].filter(Boolean).join(' ')}
+          >
+            <option value="" disabled>Seleccionar</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+            <option value="no_binario">No binario</option>
+            <option value="prefiero_no_decir">Prefiero no decirlo</option>
+          </select>
+          {sexoError && <p className={styles.fieldError}>{sexoError}</p>}
         </div>
 
         {error && <p className={styles.error}>{error}</p>}

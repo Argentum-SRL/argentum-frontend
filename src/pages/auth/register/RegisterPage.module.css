@@ -125,3 +125,11 @@
   cursor: pointer;
   padding: 0;
 }
+
+.infoText {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+  margin-top: 16px;
+  opacity: 0.8;
+}

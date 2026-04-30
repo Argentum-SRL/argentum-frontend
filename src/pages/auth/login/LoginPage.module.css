@@ -15,11 +15,25 @@
   font-weight: 700;
 }
 
+.errorContainer {
+  margin-bottom: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .error {
   font-size: 13px;
   color: var(--error);
-  margin-bottom: 16px;
-  text-align: center;
+  margin: 0;
+}
+
+.errorLink {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: underline;
 }
 
 .submitBtn {

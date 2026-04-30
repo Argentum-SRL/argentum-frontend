@@ -21,13 +21,37 @@ import { useAuth } from '@/hooks/useAuth'
 import usuarioService from '@/services/usuario.service'
 import styles from './PerfilPage.module.css'
 import { useNavigate } from 'react-router-dom'
+import type { MetodosLogin } from '@/types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+const GoogleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+  </svg>
+)
 
 export default function PerfilPage() {
   const { usuario, logout, updateUsuario } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
+
+  useEffect(() => {
+    const fetchMetodos = async () => {
+      try {
+        const data = await usuarioService.getMetodosLogin()
+        setMetodosLogin(data)
+      } catch (err) {
+        console.error('Error fetching metodos login:', err)
+      }
+    }
+    fetchMetodos()
+  }, [usuario])
 
   // Estados de modales
   const [activeModal, setActiveModal] = useState<string | null>(null)
@@ -333,36 +357,107 @@ export default function PerfilPage() {
             </div>
           </div>
         </div>
-
-        {/* Seguridad */}
+        
+        {/* Métodos de inicio de sesión */}
         <div className={styles.dataCard}>
           <h2 className={styles.dataCardTitle}>
             <ShieldCheck className={styles.dataCardTitleIcon} size={20} />
-            Seguridad
+            Métodos de inicio de sesión
           </h2>
           
           <div className={styles.dataRows}>
-            <div className={styles.dataRow}>
-              <div className={styles.dataRowIcon}>
-                <Lock size={20} />
-              </div>
-              <div className={styles.dataRowHeader}>
-                <div>
-                  <p className={styles.dataRowLabel}>Contraseña</p>
-                  <p className={styles.dataRowValue}>
-                    {isGoogle ? 'Gestionada por Google' : (usuario?.password_hash ? '••••••••' : 'No configurada')}
-                  </p>
+            {/* Email + Password */}
+            <div className={styles.metodoRow}>
+              <div className={styles.metodoRowMain}>
+                <div className={styles.metodoInfo}>
+                  <div className={styles.dataRowIcon}>
+                    <Mail size={20} />
+                  </div>
+                  <p className={styles.dataRowValue}>Email + Contraseña</p>
                 </div>
-                {isGoogle ? (
-                  <Lock size={16} className={styles.lockIcon} />
+                {metodosLogin?.email_password ? (
+                  <span className={styles.metodoActivo}>Activo</span>
+                ) : metodosLogin?.puede_agregar_password ? (
+                  <span className={styles.metodoInactivo}>Sin contraseña</span>
+                ) : metodosLogin?.puede_agregar_email ? (
+                  <span className={styles.metodoWarning}>Email no verificado</span>
                 ) : (
-                  <button className={styles.editBtn} onClick={() => handleOpenModal('password')}>
-                    <Edit size={18} />
+                  <span className={styles.metodoInactivo}>No configurado</span>
+                )}
+              </div>
+              <div>
+                {metodosLogin?.email_password && (
+                  <button className={styles.actionLink} onClick={() => handleOpenModal('password')}>
+                    Cambiar contraseña
+                  </button>
+                )}
+                {metodosLogin?.puede_agregar_password && (
+                  <button className={styles.actionLink} onClick={() => handleOpenModal('password')}>
+                    Crear contraseña
+                  </button>
+                )}
+                {metodosLogin?.puede_agregar_email && (
+                  <button className={styles.actionLink} onClick={() => handleOpenModal('email')}>
+                    Verificar email
                   </button>
                 )}
               </div>
             </div>
 
+            {/* Teléfono */}
+            <div className={styles.metodoRow}>
+              <div className={styles.metodoRowMain}>
+                <div className={styles.metodoInfo}>
+                  <div className={styles.dataRowIcon}>
+                    <Phone size={20} />
+                  </div>
+                  <p className={styles.dataRowValue}>WhatsApp</p>
+                </div>
+                {metodosLogin?.telefono ? (
+                  <span className={styles.metodoActivo}>Activo</span>
+                ) : (
+                  <span className={styles.metodoInactivo}>No configurado</span>
+                )}
+              </div>
+              <div>
+                <button className={styles.actionLink} onClick={() => handleOpenModal('telefono')}>
+                  {metodosLogin?.telefono ? 'Cambiar teléfono' : 'Agregar teléfono'}
+                </button>
+              </div>
+            </div>
+
+            {/* Google */}
+            <div className={styles.metodoRow}>
+              <div className={styles.metodoRowMain}>
+                <div className={styles.metodoInfo}>
+                  <div className={styles.dataRowIcon}>
+                    <GoogleIcon />
+                  </div>
+                  <p className={styles.dataRowValue}>Google</p>
+                </div>
+                {metodosLogin?.google ? (
+                  <span className={styles.metodoActivo}>Disponible</span>
+                ) : (
+                  <span className={styles.metodoInactivo}>No disponible</span>
+                )}
+              </div>
+              <p className={styles.metodoDescription}>
+                {metodosLogin?.google 
+                  ? 'Podés iniciar sesión con tu cuenta de Google si coincide con tu email verificado.'
+                  : 'Verificá tu email para poder usar Google como método de ingreso.'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Seguridad (original, simplificada) */}
+        <div className={styles.dataCard}>
+          <h2 className={styles.dataCardTitle}>
+            <ShieldCheck className={styles.dataCardTitleIcon} size={20} />
+            Estado de Verificación
+          </h2>
+          
+          <div className={styles.dataRows}>
             <div className={styles.dataRow}>
               <div className={styles.dataRowIcon}>
                 <ShieldCheck size={20} />

@@ -94,7 +94,16 @@ export default function LoginPage() {
           }
         />
 
-        {apiError && <p className={styles.error}>{apiError}</p>}
+        {apiError && (
+          <div className={styles.errorContainer}>
+            <p className={styles.error}>{apiError}</p>
+            {apiError.includes('contraseña configurada') && (
+              <Link to="/login/telefono" className={styles.errorLink}>
+                Ingresá con tu teléfono
+              </Link>
+            )}
+          </div>
+        )}
 
         <button type="submit" disabled={loading} className={styles.submitBtn}>
           {loading ? 'Ingresando...' : 'Ingresar'}

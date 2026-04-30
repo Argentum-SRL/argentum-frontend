@@ -68,10 +68,10 @@ export default function RegisterPage() {
       login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
-      const e = err as { response?: { status?: number; data?: { detail?: unknown } } }
-      const status = e.response?.status
-      const detail = e.response?.data?.detail
-      if ((status === 400 || status === 409) && typeof detail === 'string') {
+      const error = err as { response?: { status?: number; data?: { detail?: unknown } } }
+      const detail = error.response?.data?.detail
+      const status = error.response?.status
+      if (typeof detail === 'string') {
         setApiError(detail)
       } else if (status === 422 && Array.isArray(detail)) {
         const msg = (detail[0] as { msg?: string })?.msg
@@ -219,6 +219,10 @@ export default function RegisterPage() {
           Continuar con teléfono
         </Link>
 
+
+        <p className={styles.infoText}>
+          Una vez registrado, podrás agregar otros métodos de inicio de sesión desde tu perfil.
+        </p>
 
         <p className={styles.footer}>
           ¿Ya tenés cuenta?{' '}

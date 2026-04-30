@@ -15,6 +15,7 @@ export interface Usuario {
   onboarding_completo: boolean
   email_verificado: boolean
   telefono_verificado: boolean
+  password_configurada: boolean
   auth_provider?: string
   fecha_registro?: string
   password_hash?: string | null
@@ -94,4 +95,13 @@ export interface EditarMonedaRequest {
   moneda_principal: 'ARS' | 'USD'
   moneda_secundaria_activa: boolean
   tipo_dolar?: string
+}
+
+export interface MetodosLogin {
+  email_password: boolean
+  telefono: boolean
+  google: boolean
+  puede_agregar_password: boolean
+  puede_agregar_email: boolean
+  puede_agregar_telefono: boolean
 }

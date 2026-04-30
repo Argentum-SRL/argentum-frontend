@@ -6,12 +6,18 @@ import type {
   EditarPasswordRequest,
   EditarTelefonoRequest,
   EditarCicloFinancieroRequest,
-  EditarMonedaRequest
+  EditarMonedaRequest,
+  MetodosLogin
 } from '../types'
 
 const usuarioService = {
   getMe: async () => {
     const { data } = await api.get<Usuario>('/usuarios/me')
+    return data
+  },
+
+  getMetodosLogin: async () => {
+    const { data } = await api.get<MetodosLogin>('/usuarios/me/metodos-login')
     return data
   },
 

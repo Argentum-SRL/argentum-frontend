@@ -15,6 +15,8 @@ export interface Usuario {
   onboarding_completo: boolean
   email_verificado: boolean
   telefono_verificado: boolean
+  auth_provider?: string
+  fecha_registro?: string
 }
 
 export interface AuthResponse {

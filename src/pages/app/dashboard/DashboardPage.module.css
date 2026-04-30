@@ -1,0 +1,144 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ── Header ──────────────────────────────────── */
+.title {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.subtitle {
+  color: var(--text-3);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* ── Summary cards ───────────────────────────── */
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  background: var(--surface);
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.cardIcon {
+  padding: 12px;
+  border-radius: 16px;
+}
+
+.cardIconGreen {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.cardIconBlue {
+  background: rgba(52, 152, 219, 0.1);
+  color: var(--primary);
+}
+
+.cardIconRed {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.cardBadge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--success);
+  background: var(--success-bg);
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.cardLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cardAmount {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+/* ── Empty state ─────────────────────────────── */
+.empty {
+  background: var(--surface);
+  border-radius: 40px;
+  padding: 48px;
+  border: 2px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 80px;
+  height: 80px;
+  background: var(--page);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  margin-bottom: 24px;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.emptyText {
+  color: var(--text-3);
+  max-width: 448px;
+}
+
+.emptyBtn {
+  margin-top: 32px;
+  padding: 12px 32px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(13, 32, 69, 0.15);
+  transition: transform 0.15s;
+}
+
+.emptyBtn:hover {
+  transform: scale(1.05);
+}

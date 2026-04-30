@@ -1,0 +1,253 @@
+.subtitle {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ── Phone input composite ───────────────────── */
+.phoneInputWrap {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.15s;
+}
+
+.phoneInputWrapError {
+  border-color: var(--error);
+}
+
+.phoneSelect {
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--text);
+  cursor: pointer;
+  padding-left: 12px;
+  padding-right: 4px;
+  flex-shrink: 0;
+}
+
+.phoneSep {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.phoneInput {
+  flex: 1;
+  height: 100%;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  padding: 0 12px;
+  color: var(--text);
+  border: none;
+}
+
+.phonePreview {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 8px;
+}
+
+/* ── OTP digit boxes ─────────────────────────── */
+.otpWrap {
+  display: flex;
+  gap: 8px;
+}
+
+.otpDigit {
+  width: 44px;
+  height: 56px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.otpDigit:focus {
+  border-color: var(--primary);
+}
+
+.otpDigitFilled {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+}
+
+.otpDigitError {
+  border-color: var(--error);
+  background: var(--error-bg);
+}
+
+/* ── Shared ──────────────────────────────────── */
+.error {
+  font-size: 13px;
+  color: var(--error);
+  margin-bottom: 16px;
+}
+
+.errorCenter {
+  text-align: center;
+}
+
+.submitBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Divider ─────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.dividerText {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* ── Alt button ──────────────────────────────── */
+.altBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--silver);
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.altBtn:hover {
+  border-color: var(--primary);
+}
+
+/* ── Footer ──────────────────────────────────── */
+.footer {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+  margin-top: 24px;
+}
+
+.footerLink {
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* ── Code step ───────────────────────────────── */
+.codeSubtitle {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.phoneHighlight {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Resend / countdown ──────────────────────── */
+.resendWrap {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.countdown {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.countdownBold {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.resendBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.resendBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Back button ─────────────────────────────── */
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.backBtn:hover {
+  opacity: 0.7;
+}

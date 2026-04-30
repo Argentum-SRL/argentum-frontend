@@ -1,6 +1,6 @@
 import type { NavigateFunction } from 'react-router-dom'
-import type { AuthResponse } from '../types'
-import { setToken, setRefreshToken } from '../services/api'
+import type { AuthResponse } from '@/types'
+import { setToken, setRefreshToken } from '@/services/api'
 
 export function manejarRespuestaAuth(respuesta: AuthResponse, navigate: NavigateFunction): void {
   if (respuesta.access_token) setToken(respuesta.access_token)

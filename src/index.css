@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
   --primary: #0D2045;
@@ -15,6 +15,11 @@
   --text: #0A0D12;
   --text-2: #52565F;
   --text-3: #8E9198;
+  --error: #C0392B;
+  --error-bg: #FDEDEC;
+  --success: #1A7A4A;
+  --success-bg: #EAFAF1;
+  --border: var(--surface-alt);
 }
 
 [data-theme="dark"] {
@@ -28,6 +33,10 @@
   --text: #E6ECF2;
   --text-2: #8894A8;
   --text-3: #5A6B78;
+  --error: #E74C3C;
+  --error-bg: rgba(231,76,60,0.12);
+  --success: #2ECC71;
+  --success-bg: rgba(46,204,113,0.12);
 }
 
 * {

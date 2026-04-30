@@ -1,0 +1,112 @@
+.successBanner {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--success);
+}
+
+.successText {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.error {
+  font-size: 13px;
+  color: var(--error);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.submitBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Divider ─────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.dividerText {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* ── Alt buttons (phone, apple) ──────────────── */
+.altBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--silver);
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-top: 12px;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.altBtn:hover {
+  border-color: var(--primary);
+}
+
+.altBtnDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Footer ──────────────────────────────────── */
+.footer {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+  margin-top: 24px;
+}
+
+.footerLink {
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* ── Toggle password button ──────────────────── */
+.togglePassword {
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}

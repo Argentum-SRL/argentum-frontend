@@ -1,0 +1,123 @@
+.root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+}
+
+/* ── Desktop split layout ────────────────────── */
+.desktop {
+  display: none;
+  height: 100vh;
+}
+
+@media (min-width: 768px) {
+  .desktop {
+    display: flex;
+  }
+}
+
+.leftPanel {
+  width: 50%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.rightPanel {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  background: var(--page);
+}
+
+.formWrap {
+  width: 100%;
+  max-width: 440px;
+  padding: 48px 40px;
+}
+
+/* ── Mobile full-screen ──────────────────────── */
+.mobile {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+}
+
+@media (min-width: 768px) {
+  .mobile {
+    display: none;
+  }
+}
+
+.mobileInner {
+  flex: 1;
+  width: 100%;
+  padding: 64px 24px 40px;
+}
+
+/* ── Standalone (no left panel) ──────────────── */
+.standalone {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+}
+
+@media (min-width: 768px) {
+  .standalone {
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.standaloneCard {
+  flex: 1;
+  width: 100%;
+  padding: 64px 24px 40px;
+}
+
+@media (min-width: 768px) {
+  .standaloneCard {
+    flex: none;
+    max-width: 400px;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 2px 24px rgba(13, 32, 69, 0.08);
+    background: var(--surface);
+  }
+}
+
+/* ── Shared content pieces ───────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.logoText {
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.logoTextCompact {
+  font-size: 22px;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.titleCompact {
+  font-size: 28px;
+}

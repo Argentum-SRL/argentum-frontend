@@ -1,0 +1,424 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-bottom: 48px;
+}
+
+/* ── Profile header card ─────────────────────── */
+.headerCard {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+}
+
+.headerInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .headerInner {
+    flex-direction: row;
+  }
+}
+
+.avatarWrap {
+  position: relative;
+}
+
+.avatar {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 36px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 4px solid var(--surface);
+}
+
+.avatarOnline {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  background: var(--success);
+  border: 4px solid var(--surface);
+  border-radius: 50%;
+}
+
+.headerMeta {
+  text-align: center;
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .headerMeta {
+    text-align: left;
+  }
+}
+
+.headerName {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.headerVerified {
+  color: var(--text-3);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .headerVerified {
+    justify-content: flex-start;
+  }
+}
+
+.headerVerifiedIcon {
+  color: var(--success);
+}
+
+.headerBadges {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .headerBadges {
+    justify-content: flex-start;
+  }
+}
+
+.badge {
+  padding: 4px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badgeId {
+  background: var(--surface-alt);
+  color: var(--text-2);
+}
+
+.badgeRole {
+  background: rgba(52, 152, 219, 0.1);
+  color: var(--primary);
+}
+
+/* ── Info grid ───────────────────────────────── */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .infoGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Data card ───────────────────────────────── */
+.dataCard {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+}
+
+.dataCardTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dataCardTitleIcon {
+  color: var(--primary);
+}
+
+.dataRows {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dataRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.dataRowIcon {
+  padding: 12px;
+  background: var(--page);
+  border-radius: 12px;
+  color: var(--text-3);
+}
+
+.dataRowLabel {
+  font-size: 12px;
+  color: var(--text-3);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.dataRowValue {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ── Danger zone ─────────────────────────────── */
+.dangerCard {
+  background: var(--error-bg);
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid var(--error);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dangerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--error);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dangerText {
+  color: var(--error);
+  opacity: 0.8;
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.dangerBtn {
+  width: 100%;
+  padding: 16px;
+  background: var(--error);
+  color: #fff;
+  border-radius: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dangerBtn:hover {
+  opacity: 0.9;
+}
+
+/* ── Confirm modal ───────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modalCard {
+  background: var(--surface);
+  border-radius: 40px;
+  max-width: 448px;
+  width: 100%;
+  padding: 32px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+}
+
+.modalIconWrap {
+  width: 80px;
+  height: 80px;
+  background: var(--error-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--error);
+  margin: 0 auto 24px;
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.modalText {
+  color: var(--text-2);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.modalInputWrap {
+  background: var(--page);
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.modalInputLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.modalInput {
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--error);
+  outline: none;
+  padding: 8px 0;
+  color: var(--error);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+
+.modalInput:focus {
+  border-bottom-color: var(--error);
+}
+
+.modalActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modalConfirmBtn {
+  width: 100%;
+  padding: 16px;
+  background: var(--error);
+  color: #fff;
+  border-radius: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.modalConfirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modalCancelBtn {
+  width: 100%;
+  padding: 16px;
+  color: var(--text-2);
+  font-weight: 700;
+  border-radius: 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.modalCancelBtn:hover {
+  background: var(--surface-alt);
+}
+
+.modalCancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Success state ───────────────────────────── */
+.successWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.successIconWrap {
+  width: 64px;
+  height: 64px;
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.successTitle {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.successText {
+  color: var(--text-3);
+  font-size: 14px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ── Spinner ─────────────────────────────────── */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

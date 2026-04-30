@@ -1,5 +1,5 @@
 import api from './api'
-import type { CotizacionesDolarResponse, EstadoOnboarding } from '../types/index'
+import type { CotizacionesDolarResponse, EstadoOnboarding } from '@/types/index'
 
 export async function getEstadoOnboarding(): Promise<EstadoOnboarding> {
   const res = await api.get('/onboarding/estado')

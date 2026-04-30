@@ -1,0 +1,131 @@
+.subtitle {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.emailHighlight {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ── Code input ──────────────────────────────── */
+.codeInput {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.5em;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.codeInput:focus {
+  border-color: var(--primary);
+}
+
+.codeInputError {
+  border-color: var(--error);
+}
+
+/* ── Shared ──────────────────────────────────── */
+.error {
+  font-size: 13px;
+  color: var(--error);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.submitBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Back button ─────────────────────────────── */
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.backBtn:hover {
+  color: var(--text-2);
+}
+
+/* ── Resend / countdown ──────────────────────── */
+.resendWrap {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.countdown {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.resendBtn {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.resendBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Missing email fallback ──────────────────── */
+.fallback {
+  font-size: 14px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.fallbackLink {
+  color: var(--primary);
+  text-decoration: none;
+}

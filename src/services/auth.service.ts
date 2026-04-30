@@ -1,5 +1,5 @@
 import api, { setRefreshToken, setToken } from './api'
-import type { AuthResponse } from '../types'
+import type { AuthResponse } from '@/types'
 
 export type { AuthResponse }
 

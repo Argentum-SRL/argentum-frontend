@@ -1,4 +1,4 @@
-import { type FormEvent, type ChangeEvent, type KeyboardEvent, type ClipboardEvent, useEffect, useRef, useState } from 'react'
+import { type FormEvent, type ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
@@ -49,12 +49,14 @@ export default function PhoneLoginPage() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [countdown, setCountdown] = useState(0)
+  const [otpFocused, setOtpFocused] = useState(false)
 
-  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null))
+  const otpInputRef = useRef<HTMLInputElement>(null)
 
   const codigo = digits.join('')
   const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu número de teléfono.' : null
   const phonePreview = telefono.trim() ? buildPhone(codigoPais, telefono) : ''
+  const activeBox = codigo.length < 6 ? codigo.length : -1
 
   useEffect(() => {
     if (getToken()) navigate('/app/dashboard', { replace: true })
@@ -68,43 +70,17 @@ export default function PhoneLoginPage() {
 
   useEffect(() => {
     if (step === 'code') {
-      setTimeout(() => inputRefs.current[0]?.focus(), 100)
+      const id = setTimeout(() => otpInputRef.current?.focus(), 100)
+      return () => clearTimeout(id)
     }
   }, [step])
 
-  const handleOtpKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace') {
-      e.preventDefault()
-      const newDigits = [...digits]
-      if (newDigits[index]) {
-        newDigits[index] = ''
-        setDigits(newDigits)
-      } else if (index > 0) {
-        newDigits[index - 1] = ''
-        setDigits(newDigits)
-        inputRefs.current[index - 1]?.focus()
-      }
-    }
-  }
-
-  const handleOtpChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/\D/g, '')
-    if (!val) return
-    const newDigits = [...digits]
-    newDigits[index] = val[val.length - 1]
+  const handleOtpChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 6)
+    const newDigits: string[] = Array(6).fill('')
+    raw.split('').forEach((char, i) => { newDigits[i] = char })
     setDigits(newDigits)
-    if (index < 5) inputRefs.current[index + 1]?.focus()
-  }
-
-  const handleOtpPaste = (e: ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault()
-    const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
-    const newDigits = Array(6).fill('')
-    text.split('').forEach((char, i) => { newDigits[i] = char })
-    setDigits(newDigits)
-    const nextEmpty = newDigits.findIndex((d: string) => !d)
-    const focusIndex = nextEmpty === -1 ? 5 : nextEmpty
-    setTimeout(() => inputRefs.current[focusIndex]?.focus(), 0)
+    setApiError(null)
   }
 
   async function handleSendCode(e: FormEvent) {
@@ -121,7 +97,7 @@ export default function PhoneLoginPage() {
       setCountdown(60)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'No se pudo enviar el código. Intentá de nuevo.')
+      setApiError(detail ?? 'No se pudo enviar el código. Intentá de nuevo.')
     } finally {
       setLoading(false)
     }
@@ -137,7 +113,7 @@ export default function PhoneLoginPage() {
       setDigits(Array(6).fill(''))
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'No se pudo reenviar el código.')
+      setApiError(detail ?? 'No se pudo reenviar el código.')
     } finally {
       setLoading(false)
     }
@@ -157,9 +133,9 @@ export default function PhoneLoginPage() {
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'Código incorrecto. Revisalo e intentá de nuevo.')
+      setApiError(detail ?? 'Código incorrecto. Revisalo e intentá de nuevo.')
       setDigits(Array(6).fill(''))
-      setTimeout(() => inputRefs.current[0]?.focus(), 50)
+      setTimeout(() => otpInputRef.current?.focus(), 50)
     } finally {
       setLoading(false)
     }
@@ -185,7 +161,7 @@ export default function PhoneLoginPage() {
           <div className="mb-6">
             <label htmlFor="phone_number" className={styles.label}>Número de teléfono</label>
 
-            <div className={`${styles.phoneInputWrap} ${telefonoError ? styles.phoneInputWrapError : ''}`}>
+            <div className={[styles.phoneInputWrap, telefonoError ? styles.phoneInputWrapError : ''].filter(Boolean).join(' ')}>
               <select
                 value={codigoPais}
                 onChange={(e) => setCodigoPais(e.target.value)}
@@ -221,7 +197,7 @@ export default function PhoneLoginPage() {
             )}
           </div>
 
-          {apiError && <p className={`${styles.error} ${styles.errorCenter}`}>{apiError}</p>}
+          {apiError && <p className={[styles.error, styles.errorCenter].join(' ')}>{apiError}</p>}
 
           <button type="submit" disabled={loading} className={styles.submitBtn}>
             {loading
@@ -258,32 +234,43 @@ export default function PhoneLoginPage() {
 
           <div className="mb-6">
             <label className={styles.label}>Código de verificación</label>
-            <div className={styles.otpWrap}>
+
+            <div
+              className={styles.otpWrap}
+              onClick={() => otpInputRef.current?.focus()}
+            >
+              <input
+                ref={otpInputRef}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
+                autoComplete="one-time-code"
+                value={codigo}
+                onChange={handleOtpChange}
+                onFocus={() => setOtpFocused(true)}
+                onBlur={() => setOtpFocused(false)}
+                aria-label="Código de verificación de 6 dígitos"
+                className={styles.otpHiddenInput}
+              />
               {digits.map((d, i) => {
-                const digitCls = [
-                  styles.otpDigit,
-                  apiError ? styles.otpDigitError : d ? styles.otpDigitFilled : '',
+                const boxCls = [
+                  styles.otpBox,
+                  apiError
+                    ? styles.otpBoxError
+                    : otpFocused && i === activeBox
+                      ? styles.otpBoxActive
+                      : d
+                        ? styles.otpBoxFilled
+                        : '',
                 ]
                   .filter(Boolean)
                   .join(' ')
 
                 return (
-                  <input
-                    key={i}
-                    id={`otp-${i}`}
-                    ref={(el) => { inputRefs.current[i] = el }}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    autoComplete="one-time-code"
-                    value={d}
-                    onFocus={(e) => e.target.select()}
-                    onChange={(e) => handleOtpChange(i, e)}
-                    onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                    onPaste={handleOtpPaste}
-                    className={digitCls}
-                    aria-label={`Dígito ${i + 1} del código de verificación`}
-                  />
+                  <div key={i} className={boxCls}>
+                    {d}
+                  </div>
                 )
               })}
             </div>
@@ -293,7 +280,7 @@ export default function PhoneLoginPage() {
 
           <button
             type="submit"
-            disabled={!digits.every(d => d !== '')}
+            disabled={codigo.length !== 6}
             className={styles.submitBtn}
           >
             {loading

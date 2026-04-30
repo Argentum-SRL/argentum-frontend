@@ -94,7 +94,12 @@ export default function OnboardingPage() {
           <div key={pasoActual} className={styles.stepWrap}>
             {pasoActual === 1 && (
               <StepDatosPersonales
-                datosIniciales={{ nombre: datos?.nombre ?? null, apellido: datos?.apellido ?? null }}
+                datosIniciales={{ 
+                  nombre: datos?.nombre ?? null, 
+                  apellido: datos?.apellido ?? null,
+                  fecha_nacimiento: datos?.fecha_nacimiento ?? null,
+                  sexo: datos?.sexo ?? null
+                }}
                 onNext={avanzar}
               />
             )}

@@ -66,7 +66,7 @@ export default function PerfilPage() {
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
   // Formularios
-  const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '' })
+  const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '', fecha_nacimiento: '', sexo: '' })
   const [formEmail, setFormEmail] = useState({ email_nuevo: '', password_actual: '' })
   const [formTelefono, setFormTelefono] = useState({ telefono_nuevo: '', password_actual: '' })
   const [formPassword, setFormPassword] = useState({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
@@ -76,7 +76,12 @@ export default function PerfilPage() {
   // Inicializar formularios cuando el usuario carga
   useEffect(() => {
     if (usuario) {
-      setFormDatos({ nombre: usuario.nombre || '', apellido: usuario.apellido || '' })
+      setFormDatos({ 
+        nombre: usuario.nombre || '', 
+        apellido: usuario.apellido || '',
+        fecha_nacimiento: usuario.fecha_nacimiento || '',
+        sexo: usuario.sexo || ''
+      })
       setFormEmail({ email_nuevo: usuario.email || '', password_actual: '' })
       setFormTelefono({ telefono_nuevo: usuario.telefono || '', password_actual: '' })
       setFormCiclo({ 

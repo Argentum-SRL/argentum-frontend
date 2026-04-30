@@ -19,8 +19,8 @@ export interface Usuario {
   auth_provider?: string
   fecha_registro?: string
   password_hash?: string | null
-  fecha_nacimiento: string
-  sexo: 'masculino' | 'femenino' | 'no_binario' | 'prefiero_no_decir'
+  fecha_nacimiento: string | null
+  sexo: 'masculino' | 'femenino' | 'no_binario' | 'prefiero_no_decir' | null
 }
 
 export interface AuthResponse {
@@ -72,6 +72,8 @@ export interface CotizacionesDolarResponse {
 export interface EditarDatosPersonalesRequest {
   nombre: string
   apellido: string
+  fecha_nacimiento?: string | null
+  sexo?: string | null
 }
 
 export interface EditarEmailRequest {

@@ -1,122 +1,140 @@
 .root {
-  min-height: 100vh;
-  background: var(--page);
   display: flex;
+  min-height: 100dvh;
+  background: var(--page);
 }
 
-/* ── Desktop Sidebar ─────────────────────────── */
+/* ── Desktop Sidebar ─────────────────────────────────────────────────────── */
+
 .sidebar {
   display: none;
-  flex-direction: column;
-  width: 256px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 @media (min-width: 768px) {
   .sidebar {
     display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 240px;
+    height: 100vh;
+    background: var(--primary);
+    z-index: 30;
+    overflow: hidden;
   }
 }
 
-.sidebarHeader {
-  padding: 24px;
+/* Decorative circles */
+.decoTop {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07); /* intentional: decorative overlay on primary */
+  pointer-events: none;
 }
 
-.sidebarTitle {
-  font-size: 24px;
+.decoBottom {
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05); /* intentional: decorative overlay on primary */
+  pointer-events: none;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.logoText {
+  font-size: 19px;
   font-weight: 700;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sidebarBadge {
-  width: 32px;
-  height: 32px;
-  background: var(--primary);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #fff;
-  font-size: 14px;
+  letter-spacing: -0.3px;
 }
 
-/* ── Nav ─────────────────────────────────────── */
+/* Nav */
 .nav {
-  flex: 1;
-  padding: 16px;
+  flex: 0 0 auto;
+  padding: 4px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.navSection {
+  padding: 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
 }
 
-.navLink {
+.navSeparator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08); /* intentional: subtle separator on primary */
+  margin: 10px 20px;
+}
+
+.navItem {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
+  gap: 12px;
+  padding: 10px 12px;
   border-radius: 12px;
-  transition: all 0.2s;
-  color: var(--text-2);
   text-decoration: none;
+  font-size: 14px;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
 }
 
-.navLink:hover {
-  background: var(--surface-alt);
-  color: var(--primary);
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.navLinkActive {
-  background: var(--primary);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(13, 32, 69, 0.15);
+.navItemActive {
+  background: rgba(255, 255, 255, 0.11) !important;
+  color: #fff !important;
+  font-weight: 600;
 }
 
-.navLinkActive:hover {
-  background: var(--primary);
-  color: #fff;
+/* Spacer */
+.spacer {
+  flex: 1;
 }
 
-.navLinkInner {
+/* User block */
+.userBlock {
+  padding: 12px 12px 20px;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.userInner {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.navIcon {
-  transition: transform 0.15s;
-}
-
-.navLink:hover .navIcon {
-  transform: scale(1.1);
-}
-
-.navLinkActive .navIcon {
-  transform: none;
-}
-
-/* ── User section ────────────────────────────── */
-.userSection {
-  padding: 16px;
-  border-top: 1px solid var(--border);
-}
-
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  margin-bottom: 16px;
+  padding: 10px 8px;
+  border-radius: 12px;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--gold);
   display: flex;
@@ -124,54 +142,48 @@
   justify-content: center;
   color: #fff;
   font-weight: 700;
-  font-size: 18px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  font-size: 15px;
   flex-shrink: 0;
 }
 
 .userMeta {
-  flex: 1;
   min-width: 0;
 }
 
 .userName {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text);
+  color: #fff;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.userEmail {
-  font-size: 12px;
-  color: var(--text-3);
+.userCiclo {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 1px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.logoutBtn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  color: var(--text-2);
-  font-weight: 500;
-  border-radius: 12px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
+/* ── Main content ────────────────────────────────────────────────────────── */
+
+.main {
+  flex: 1;
+  min-height: 100dvh;
+  overflow-y: auto;
 }
 
-.logoutBtn:hover {
-  color: var(--error);
-  background: var(--error-bg);
+@media (min-width: 768px) {
+  .main {
+    margin-left: 240px;
+  }
 }
 
-/* ── Mobile Header ───────────────────────────── */
+/* ── Mobile header ───────────────────────────────────────────────────────── */
+
 .mobileHeader {
   display: flex;
   position: fixed;
@@ -184,7 +196,7 @@
   padding: 0 16px;
   align-items: center;
   justify-content: space-between;
-  z-index: 50;
+  z-index: 40;
 }
 
 @media (min-width: 768px) {
@@ -193,103 +205,179 @@
   }
 }
 
-.mobileTitle {
-  font-size: 20px;
+.mobileLogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobileLogoText {
+  font-size: 18px;
   font-weight: 700;
   color: var(--primary);
+  letter-spacing: -0.3px;
 }
 
-.menuBtn {
-  padding: 8px;
-  color: var(--text-2);
-  background: none;
+.mobileActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mobileIconBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   border: none;
+  background: transparent;
+  color: var(--text-2);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
 }
 
-/* ── Mobile Menu Overlay ─────────────────────── */
-.overlay {
+.mobileIconBtn:hover {
+  background: var(--surface-alt);
+}
+
+.mobileAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+/* ── Mobile bottom nav ───────────────────────────────────────────────────── */
+
+.mobileNav {
+  display: flex;
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(60px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
   z-index: 40;
 }
 
 @media (min-width: 768px) {
-  .overlay {
+  .mobileNav {
     display: none;
   }
 }
 
-.mobileMenu {
-  position: absolute;
-  top: 64px;
-  left: 0;
-  right: 0;
-  background: var(--surface);
-  padding: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.mobileNav {
+.mobileNavItem {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.mobileNavLink {
-  display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
-  color: var(--text-2);
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 4px 4px;
   text-decoration: none;
-  font-weight: 500;
-}
-
-.mobileNavLinkActive {
-  background: var(--primary);
-  color: #fff;
-}
-
-.mobileLogoutBtn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  color: var(--error);
-  font-weight: 500;
+  color: var(--text-3);
   background: none;
   border: none;
   cursor: pointer;
+  transition: color 0.15s;
 }
 
-/* ── Main content ────────────────────────────── */
-.main {
-  flex: 1;
-  width: 100%;
-  padding-top: 64px;
-  overflow: auto;
+.mobileNavItemActive {
+  color: var(--primary);
+}
+
+.mobileNavLabel {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.mobileNavItemActive .mobileNavLabel {
+  font-weight: 700;
+}
+
+.mobileNavDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* ── Bottom sheet "Más" ──────────────────────────────────────────────────── */
+
+.moreOverlay {
+  position: fixed;
+  inset: 0;
+  bottom: calc(60px + env(safe-area-inset-bottom));
+  z-index: 45;
+}
+
+.moreSheet {
+  position: fixed;
+  bottom: calc(60px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 16px;
+  z-index: 50;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.10); /* intentional: sheet elevation shadow */
 }
 
 @media (min-width: 768px) {
-  .main {
-    padding-top: 0;
+  .moreSheet,
+  .moreOverlay {
+    display: none;
   }
 }
 
-.content {
-  max-width: 1024px;
-  margin: 0 auto;
-  padding: 16px;
+.moreSheetTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 12px;
+  padding: 0 4px;
 }
 
-@media (min-width: 768px) {
-  .content {
-    padding: 32px;
+.moreItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: background 0.15s, color 0.15s;
+}
+
+.moreItem:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.moreItemActive {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Fix: ensure main gets correct offsets on mobile */
+@media (max-width: 767px) {
+  .main {
+    padding-top: 64px;
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
   }
 }

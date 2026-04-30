@@ -1,138 +1,207 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { 
-  LayoutDashboard, 
-  Wallet, 
-  User, 
-  LogOut, 
-  Menu, 
-  X,
-  ChevronRight
+import {
+  Home, CreditCard, ArrowLeftRight, BarChart2, Clock, Package,
+  Bell, Search, MoreHorizontal,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { getCicloLabel } from '@/lib/utils/ciclo'
 import styles from './AppLayout.module.css'
+
+// ── Icons ──────────────────────────────────────────────────────────────────
+
+const ICON_PROPS = { size: 20, strokeWidth: 1.75 }
+
+function MoonIcon() {
+  const maskId = `moon-${useId().replace(/[^a-z0-9]/gi, '')}`
+  return (
+    <svg width={28} height={28} viewBox="0 0 100 100" aria-hidden="true">
+      <defs>
+        <mask id={maskId}>
+          <circle cx="50" cy="50" r="24" fill="white" />
+          <circle cx="58" cy="50" r="19" fill="black" />
+        </mask>
+      </defs>
+      <circle cx="50" cy="50" r="24" fill="rgba(255,255,255,0.85)" mask={`url(#${maskId})`} />
+    </svg>
+  )
+}
+
+// ── Nav config ─────────────────────────────────────────────────────────────
+
+const NAV_MAIN = [
+  { label: 'Dashboard',      path: '/app/dashboard',      Icon: Home           },
+  { label: 'Billeteras',     path: '/app/billeteras',     Icon: CreditCard     },
+  { label: 'Transacciones',  path: '/app/transacciones',  Icon: ArrowLeftRight },
+]
+
+const NAV_FINANCIAL = [
+  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: BarChart2 },
+  { label: 'Metas',          path: '/app/metas',           Icon: Clock     },
+  { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: Package   },
+]
+
+const MOBILE_NAV = [
+  { label: 'Inicio',         path: '/app/dashboard',      Icon: Home           },
+  { label: 'Billeteras',     path: '/app/billeteras',     Icon: CreditCard     },
+  { label: 'Gastos',         path: '/app/transacciones',  Icon: ArrowLeftRight },
+  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: BarChart2      },
+]
+
+// ── AppLayout ──────────────────────────────────────────────────────────────
 
 interface AppLayoutProps {
   children: ReactNode
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { usuario, logout } = useAuth()
+  const { usuario } = useAuth()
   const location = useLocation()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
 
-  const menuItems = [
-    { name: 'Dashboard', path: '/app/dashboard', icon: LayoutDashboard },
-    { name: 'Billeteras', path: '/app/billeteras', icon: Wallet },
-    { name: 'Mi Perfil', path: '/app/perfil', icon: User },
-  ]
+  useEffect(() => {
+    setIsMoreOpen(false)
+  }, [location.pathname])
 
-  const isActive = (path: string) => location.pathname === path
+  function isActive(path: string) {
+    return location.pathname === path
+  }
+
+  const cicloLabel = getCicloLabel(usuario?.ciclo_tipo ?? null, usuario?.ciclo_valor ?? null)
+  const inicial = usuario?.nombre?.charAt(0)?.toUpperCase() ?? 'U'
 
   return (
     <div className={styles.root}>
-      {/* Sidebar Desktop */}
+
+      {/* ── Desktop sidebar ──────────────────────── */}
       <aside className={styles.sidebar}>
-        <div className={styles.sidebarHeader}>
-          <h1 className={styles.sidebarTitle}>
-            <span className={styles.sidebarBadge}>A</span>
-            Argentum
-          </h1>
+        {/* Decorative circles */}
+        <div className={styles.decoTop} aria-hidden="true" />
+        <div className={styles.decoBottom} aria-hidden="true" />
+
+        {/* Logo */}
+        <div className={styles.logo}>
+          <MoonIcon />
+          <span className={styles.logoText}>Argentum</span>
         </div>
 
+        {/* Nav main */}
         <nav className={styles.nav}>
-          {menuItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.path)
-            const linkCls = [styles.navLink, active ? styles.navLinkActive : '']
-              .filter(Boolean)
-              .join(' ')
-
-            return (
-              <Link key={item.path} to={item.path} className={linkCls}>
-                <div className={styles.navLinkInner}>
-                  <Icon size={20} className={styles.navIcon} />
-                  <span>{item.name}</span>
-                </div>
-                {active && <ChevronRight size={16} />}
+          <div className={styles.navSection}>
+            {NAV_MAIN.map(({ label, path, Icon }) => (
+              <Link
+                key={path}
+                to={path}
+                className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
+              >
+                <Icon {...ICON_PROPS} />
+                <span>{label}</span>
               </Link>
-            )
-          })}
+            ))}
+          </div>
+
+          <div className={styles.navSeparator} />
+
+          <div className={styles.navSection}>
+            {NAV_FINANCIAL.map(({ label, path, Icon }) => (
+              <Link
+                key={path}
+                to={path}
+                className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
+              >
+                <Icon {...ICON_PROPS} />
+                <span>{label}</span>
+              </Link>
+            ))}
+          </div>
         </nav>
 
-        <div className={styles.userSection}>
-          <div className={styles.userInfo}>
-            <div className={styles.avatar}>
-              {usuario?.nombre?.charAt(0) || 'U'}
-            </div>
+        {/* Spacer */}
+        <div className={styles.spacer} />
+
+        {/* User block */}
+        <div className={styles.userBlock}>
+          <div className={styles.userInner}>
+            <div className={styles.avatar}>{inicial}</div>
             <div className={styles.userMeta}>
-              <p className={styles.userName}>{usuario?.nombre} {usuario?.apellido}</p>
-              <p className={styles.userEmail}>{usuario?.email}</p>
+              <p className={styles.userName}>
+                {usuario?.nombre ?? ''} {usuario?.apellido ?? ''}
+              </p>
+              {cicloLabel && <p className={styles.userCiclo}>{cicloLabel}</p>}
             </div>
           </div>
-          <button onClick={() => logout()} className={styles.logoutBtn}>
-            <LogOut size={20} />
-            Cerrar Sesión
-          </button>
         </div>
       </aside>
 
-      {/* Mobile Header */}
-      <div className={styles.mobileHeader}>
-        <h1 className={styles.mobileTitle}>Argentum</h1>
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className={styles.menuBtn}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className={styles.overlay} onClick={() => setIsMobileMenuOpen(false)}>
-          <div className={styles.mobileMenu} onClick={e => e.stopPropagation()}>
-            <nav className={styles.mobileNav}>
-              {menuItems.map((item) => {
-                const Icon = item.icon
-                const active = isActive(item.path)
-                const linkCls = [styles.mobileNavLink, active ? styles.mobileNavLinkActive : '']
-                  .filter(Boolean)
-                  .join(' ')
-
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={linkCls}
-                  >
-                    <Icon size={20} />
-                    <span>{item.name}</span>
-                  </Link>
-                )
-              })}
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false)
-                  logout()
-                }}
-                className={styles.mobileLogoutBtn}
-              >
-                <LogOut size={20} />
-                Cerrar Sesión
-              </button>
-            </nav>
-          </div>
+      {/* ── Mobile header ────────────────────────── */}
+      <header className={styles.mobileHeader}>
+        <div className={styles.mobileLogo}>
+          <MoonIcon />
+          <span className={styles.mobileLogoText}>Argentum</span>
         </div>
+        <div className={styles.mobileActions}>
+          <button className={styles.mobileIconBtn} aria-label="Notificaciones">
+            <Bell size={22} strokeWidth={1.75} />
+          </button>
+          <button className={styles.mobileIconBtn} aria-label="Buscar">
+            <Search size={22} strokeWidth={1.75} />
+          </button>
+          <div className={styles.mobileAvatar}>{inicial}</div>
+        </div>
+      </header>
+
+      {/* ── Mobile bottom nav ────────────────────── */}
+      <nav className={styles.mobileNav}>
+        {MOBILE_NAV.map(({ label, path, Icon }) => {
+          const active = isActive(path)
+          return (
+            <Link
+              key={path}
+              to={path}
+              className={[styles.mobileNavItem, active ? styles.mobileNavItemActive : ''].filter(Boolean).join(' ')}
+            >
+              <Icon {...ICON_PROPS} />
+              <span className={styles.mobileNavLabel}>{label}</span>
+              {active && <span className={styles.mobileNavDot} />}
+            </Link>
+          )
+        })}
+
+        <button
+          className={[styles.mobileNavItem, isMoreOpen ? styles.mobileNavItemActive : ''].filter(Boolean).join(' ')}
+          onClick={() => setIsMoreOpen((v) => !v)}
+          aria-label="Más opciones"
+        >
+          <MoreHorizontal {...ICON_PROPS} />
+          <span className={styles.mobileNavLabel}>Más</span>
+        </button>
+      </nav>
+
+      {/* ── Bottom sheet "Más" ───────────────────── */}
+      {isMoreOpen && (
+        <>
+          <div className={styles.moreOverlay} onClick={() => setIsMoreOpen(false)} />
+          <div className={styles.moreSheet}>
+            <p className={styles.moreSheetTitle}>Más opciones</p>
+            {NAV_FINANCIAL.slice(1).map(({ label, path, Icon }) => (
+              <Link
+                key={path}
+                to={path}
+                className={[styles.moreItem, isActive(path) ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+              >
+                <Icon size={22} strokeWidth={1.75} />
+                <span>{label}</span>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
 
-      {/* Main Content */}
+      {/* ── Main content ─────────────────────────── */}
       <main className={styles.main}>
-        <div className={styles.content}>
-          {children}
-        </div>
+        {children}
       </main>
+
     </div>
   )
 }

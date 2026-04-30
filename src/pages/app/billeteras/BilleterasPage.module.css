@@ -1,172 +1,512 @@
+/* ── Root ────────────────────────────────────────────────────────────────── */
+
 .root {
+  padding: 20px 16px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
 
-/* ── Header ──────────────────────────────────── */
-.header {
+@media (min-width: 768px) {
+  .root {
+    padding: 32px 40px 48px;
+    gap: 28px;
+  }
+}
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+
+.pageHeader {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: flex-end;
+  gap: 16px;
 }
 
-.title {
-  font-size: 30px;
-  font-weight: 800;
+.pageTitle {
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text);
 }
 
-.subtitle {
+@media (min-width: 768px) {
+  .pageTitle {
+    font-size: 26px;
+  }
+}
+
+.pageSubtitle {
+  font-size: 14px;
   color: var(--text-3);
-  font-weight: 500;
   margin-top: 4px;
 }
 
 .newBtn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 10px;
   background: var(--primary);
   color: #fff;
-  border-radius: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(13, 32, 69, 0.15);
-  transition: all 0.15s;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
 }
 
 .newBtn:hover {
-  opacity: 0.9;
+  opacity: 0.88;
 }
 
-/* ── Card grid ───────────────────────────────── */
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
 }
 
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* ── Billetera card ──────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: box-shadow 0.15s;
 }
 
-@media (min-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); /* intentional: elevation shadow */
 }
 
-/* ── Wallet card ─────────────────────────────── */
-.walletCard {
-  position: relative;
-  overflow: hidden;
-  padding: 32px;
-  border-radius: 32px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+.cardPrimary {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cardIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardIconWrapPrimary {
+  background: rgba(255, 255, 255, 0.15); /* intentional: icon bg on primary */
   color: #fff;
 }
 
-.walletCardPrimary {
-  background: linear-gradient(135deg, var(--primary) 0%, #1a3d82 100%);
-}
-
-.walletCardSecondary {
-  background: linear-gradient(135deg, var(--secondary) 0%, #2d6342 100%);
-}
-
-.walletCardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 48px;
-}
-
-.walletCardIconWrap {
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-}
-
-.walletCardName {
-  font-size: 14px;
+.principalBadge {
+  font-size: 11px;
   font-weight: 700;
-  opacity: 0.6;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.15); /* intentional: badge on primary */
+  padding: 3px 8px;
+  border-radius: 20px;
 }
 
-.walletCardLabel {
-  font-size: 14px;
-  opacity: 0.8;
-  margin-bottom: 4px;
+.cardNombre {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
 }
 
-.walletCardAmount {
-  font-size: 30px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
+.cardNombrePrimary {
+  color: #fff;
 }
 
-.walletCardGlow {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 128px;
-  height: 128px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 50%;
-  margin-right: -64px;
-  margin-top: -64px;
-  filter: blur(24px);
-  transition: transform 0.7s;
+.cardMoneda {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-bottom: 12px;
 }
 
-.walletCard:hover .walletCardGlow {
-  transform: scale(1.5);
+.cardMonedaPrimary {
+  color: rgba(255, 255, 255, 0.6);
 }
 
-/* ── Add button card ─────────────────────────── */
-.addCard {
-  border: 2px dashed var(--border);
-  border-radius: 32px;
-  padding: 32px;
+.cardSaldoLabel {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}
+
+.cardSaldoLabelPrimary {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.cardSaldo {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.cardSaldoPrimary {
+  color: #fff;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+
+.empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  color: var(--text-3);
-  background: none;
-  cursor: pointer;
-  transition: all 0.15s;
+  text-align: center;
+  gap: 8px;
+  padding: 64px 24px;
 }
 
-.addCard:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.addCardCircle {
+.emptyIcon {
   width: 64px;
   height: 64px;
-  background: var(--surface-alt);
   border-radius: 50%;
+  background: var(--surface-alt);
+  color: var(--text-3);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  margin-bottom: 8px;
 }
 
-.addCard:hover .addCardCircle {
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.emptySub {
+  font-size: 14px;
+  color: var(--text-3);
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.emptyBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 10px 20px;
+  border-radius: 10px;
   background: var(--primary);
   color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
 }
 
-.addCardText {
+.emptyBtn:hover {
+  opacity: 0.88;
+}
+
+/* ── Drawer / bottom sheet ───────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35); /* intentional: modal backdrop */
+  z-index: 60;
+}
+
+/* Mobile: bottom sheet */
+.drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  z-index: 70;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+.drawerOpen {
+  transform: translateY(0);
+}
+
+/* Desktop: right drawer */
+@media (min-width: 768px) {
+  .drawer {
+    left: auto;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    width: 400px;
+    border-radius: 0;
+    transform: translateX(100%);
+    max-height: none;
+  }
+
+  .drawerOpen {
+    transform: translateX(0);
+  }
+}
+
+/* ── Form ────────────────────────────────────────────────────────────────── */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 20px;
+}
+
+@media (min-width: 768px) {
+  .form {
+    padding: 32px 28px;
+    gap: 22px;
+  }
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.formTitle {
+  font-size: 18px;
   font-weight: 700;
+  color: var(--text);
+}
+
+.formClose {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.formClose:hover {
+  background: var(--border);
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.formInput {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.formInput:focus {
+  border-color: var(--primary);
+}
+
+.formInputError {
+  border-color: var(--error);
+}
+
+.formError {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 2px;
+}
+
+/* ── Moneda pills ────────────────────────────────────────────────────────── */
+
+.monedaPills {
+  display: flex;
+  gap: 8px;
+}
+
+.monedaPill {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.monedaPillActive {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--surface-alt);
+}
+
+/* ── Saldo input ─────────────────────────────────────────────────────────── */
+
+.saldoWrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.saldoWrap:focus-within {
+  border-color: var(--primary);
+}
+
+.saldoCurrency {
+  padding: 10px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  border-right: 1.5px solid var(--border);
+  white-space: nowrap;
+}
+
+.saldoInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+}
+
+/* ── Checkbox ────────────────────────────────────────────────────────────── */
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkInput {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkLabel {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* ── Info box ────────────────────────────────────────────────────────────── */
+
+.infoBox {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.infoText {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+/* ── Submit ──────────────────────────────────────────────────────────────── */
+
+.submitBtn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.submitBtn:hover {
+  opacity: 0.88;
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: calc(72px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--surface);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 80;
+  max-width: calc(100vw - 32px);
+  white-space: normal;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .toast {
+    bottom: 32px;
+    left: auto;
+    right: 32px;
+    transform: none;
+    text-align: left;
+    max-width: 380px;
+  }
+}
+
+.toastIcon {
+  flex-shrink: 0;
+  color: var(--success);
 }

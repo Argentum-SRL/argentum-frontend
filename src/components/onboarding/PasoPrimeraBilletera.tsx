@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { postPrimeraBilletera } from '../../lib/api/onboarding'
+import { postPrimeraBilletera } from '../../services/onboarding.service'
 import { useAuth } from '../../hooks/useAuth'
 
 interface Props {

@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../lib/axios'
-import { clearTokens, getToken, setToken, setRefreshToken } from '../lib/auth'
+import api from '../services/api'
+import { clearTokens, getToken, setToken, setRefreshToken } from '../services/api'
 import type { Usuario, AuthResponse } from '../types/index'
 
 export interface AuthContextValue {

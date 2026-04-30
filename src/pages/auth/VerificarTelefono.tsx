@@ -1,8 +1,8 @@
 import { type FormEvent, useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Phone, ArrowLeft, Loader2 } from 'lucide-react'
-import AuthLayout from '../../components/ui/AuthLayout'
-import { enviarCodigoTelefono, verificarCodigoTelefono } from '../../lib/api/auth'
+import AuthLayout from '../../components/auth/AuthLayout'
+import { enviarCodigoTelefono, verificarCodigoTelefono } from '../../services/auth.service'
 import { manejarRespuestaAuth } from '../../utils/authRedirect'
 
 /**

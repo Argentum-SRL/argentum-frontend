@@ -1,12 +1,12 @@
 import { type FormEvent, type ChangeEvent, type KeyboardEvent, type ClipboardEvent, useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Loader2 } from 'lucide-react'
-import AuthLayout from '../components/ui/AuthLayout'
-import WppChatMockup from '../components/ui/WppChatMockup'
-import { enviarCodigoTelefono, verificarCodigoTelefono } from '../lib/api/auth'
-import { getToken } from '../lib/auth'
-import { manejarRespuestaAuth } from '../utils/authRedirect'
-import { useAuth } from '../hooks/useAuth'
+import AuthLayout from '../../components/auth/AuthLayout'
+import WppChatMockup from '../../components/ui/WppChatMockup'
+import { enviarCodigoTelefono, verificarCodigoTelefono } from '../../services/auth.service'
+import { getToken } from '../../services/api'
+import { manejarRespuestaAuth } from '../../utils/authRedirect'
+import { useAuth } from '../../hooks/useAuth'
 
 type Step = 'phone' | 'code'
 
@@ -71,7 +71,6 @@ export default function PhoneLoginPage() {
     }
   }, [step])
 
-  // ── OTP handlers ─────────────────────────────────────────────────────────
   const handleOtpKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace') {
       e.preventDefault()
@@ -107,7 +106,6 @@ export default function PhoneLoginPage() {
     setTimeout(() => inputRefs.current[focusIndex]?.focus(), 0)
   }
 
-  // ── Step handlers ─────────────────────────────────────────────────────────
   async function handleSendCode(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
@@ -178,7 +176,6 @@ export default function PhoneLoginPage() {
   return (
     <AuthLayout title={title} leftPanel={<WppChatMockup />}>
       {step === 'phone' ? (
-        // ── PASO 1: número ────────────────────────────────────────────────────
         <form onSubmit={handleSendCode} noValidate>
           <p className="mb-5" style={{ fontSize: '15px', color: 'var(--text-2)', lineHeight: 1.5 }}>
             Te mandamos un código por WhatsApp al número que ingreses.
@@ -189,7 +186,6 @@ export default function PhoneLoginPage() {
               Número de teléfono
             </label>
 
-            {/* Selector de país + input de número */}
             <div
               className="flex items-center h-12 rounded-[10px] border"
               style={{
@@ -282,7 +278,6 @@ export default function PhoneLoginPage() {
           </p>
         </form>
       ) : (
-        // ── PASO 2: código OTP ────────────────────────────────────────────────
         <form onSubmit={handleVerifyCode} noValidate>
           <p className="mb-6" style={{ fontSize: '15px', color: 'var(--text-2)', lineHeight: 1.5 }}>
             Te mandamos un código de 6 dígitos por WhatsApp al{' '}

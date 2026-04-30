@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { postDatosPersonales } from '../../lib/api/onboarding'
+import { postDatosPersonales } from '../../services/onboarding.service'
 
 interface Props {
   datos: { nombre: string | null; apellido: string | null }

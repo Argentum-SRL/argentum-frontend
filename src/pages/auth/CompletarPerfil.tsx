@@ -1,8 +1,8 @@
 import { type FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import AuthLayout from '../../components/ui/AuthLayout'
-import { completarPerfil } from '../../lib/api/auth'
+import AuthLayout from '../../components/auth/AuthLayout'
+import { completarPerfil } from '../../services/auth.service'
 import { manejarRespuestaAuth } from '../../utils/authRedirect'
 import { useAuth } from '../../hooks/useAuth'
 

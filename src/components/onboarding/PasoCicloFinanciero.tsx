@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { postCicloFinanciero } from '../../lib/api/onboarding'
+import { postCicloFinanciero } from '../../services/onboarding.service'
 
 interface Props {
   datos: { ciclo_tipo: string | null; ciclo_valor: string | null }

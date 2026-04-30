@@ -1,5 +1,5 @@
-import api from '../axios'
-import type { CotizacionesDolarResponse, EstadoOnboarding } from '../../types/index'
+import api from './api'
+import type { CotizacionesDolarResponse, EstadoOnboarding } from '../types/index'
 
 export async function getEstadoOnboarding(): Promise<EstadoOnboarding> {
   const res = await api.get('/onboarding/estado')
@@ -22,27 +22,27 @@ export async function postCicloFinanciero(ciclo_tipo: string, ciclo_valor: strin
 }
 
 export async function postMoneda(
-  moneda_principal: string, 
-  moneda_secundaria_activa: boolean, 
-  tipo_dolar: string | null
+  moneda_principal: string,
+  moneda_secundaria_activa: boolean,
+  tipo_dolar: string | null,
 ) {
-  const res = await api.post('/onboarding/moneda', { 
-    moneda_principal, 
-    moneda_secundaria_activa, 
-    tipo_dolar 
+  const res = await api.post('/onboarding/moneda', {
+    moneda_principal,
+    moneda_secundaria_activa,
+    tipo_dolar,
   })
   return res.data
 }
 
 export async function postPrimeraBilletera(
-  nombre: string, 
-  moneda: string, 
-  saldo_inicial: number
+  nombre: string,
+  moneda: string,
+  saldo_inicial: number,
 ) {
-  const res = await api.post('/onboarding/primera-billetera', { 
-    nombre, 
-    moneda, 
-    saldo_inicial 
+  const res = await api.post('/onboarding/primera-billetera', {
+    nombre,
+    moneda,
+    saldo_inicial,
   })
   return res.data
 }

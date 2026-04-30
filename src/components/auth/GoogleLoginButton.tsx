@@ -17,7 +17,6 @@ interface GoogleLoginButtonProps {
   onError: () => void
 }
 
-// useGoogleLogin (implicit flow + openid scope) returns id_token alongside access_token
 type TokenResponseWithIdToken = { id_token?: string }
 
 const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }: GoogleLoginButtonProps) {

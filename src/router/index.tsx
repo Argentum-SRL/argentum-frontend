@@ -1,13 +1,13 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import RootLayout from './RootLayout'
 import ProtectedRoute from './ProtectedRoute'
-import LoginPage from '../pages/LoginPage'
-import RegisterPage from '../pages/RegisterPage'
-import PhoneLoginPage from '../pages/PhoneLoginPage'
+import LoginPage from '../pages/auth/LoginPage'
+import RegisterPage from '../pages/auth/RegisterPage'
+import PhoneLoginPage from '../pages/auth/PhoneLoginPage'
 import VerificarEmail from '../pages/auth/VerificarEmail'
 import VerificarTelefono from '../pages/auth/VerificarTelefono'
 import CompletarPerfil from '../pages/auth/CompletarPerfil'
-import Onboarding from '../pages/Onboarding'
+import OnboardingPage from '../pages/onboarding/OnboardingPage'
 import DashboardPage from '../pages/app/DashboardPage'
 import BilleterasPage from '../pages/app/BilleterasPage'
 import PerfilPage from '../pages/app/PerfilPage'
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute mode="onboarding" />,
         children: [
-          { path: '/onboarding', element: <Onboarding /> },
+          { path: '/onboarding', element: <OnboardingPage /> },
         ],
       },
 

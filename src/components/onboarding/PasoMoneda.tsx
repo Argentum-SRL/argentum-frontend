@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { getCotizacionesDolar, postMoneda } from '../../lib/api/onboarding'
+import { getCotizacionesDolar, postMoneda } from '../../services/onboarding.service'
 import type { CotizacionesDolarResponse } from '../../types'
-import './PasoMoneda.css'
 
 interface Props {
   datos: { moneda_principal: string | null }
@@ -71,19 +70,26 @@ export default function PasoMoneda({ datos, onNext }: Props) {
 
   return (
     <div className="onboarding-step">
-      <h2 className="paso-moneda-title">Moneda y cotización</h2>
-      <p className="paso-moneda-subtitle">¿En qué moneda querés ver tus totales?</p>
+      <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>Moneda y cotización</h2>
+      <p style={{ color: 'var(--text-2)', marginBottom: '24px' }}>¿En qué moneda querés ver tus totales?</p>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="paso-moneda-label">Moneda principal</label>
+          <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
+            Moneda principal
+          </label>
           <div className="flex gap-2">
             {['ARS', 'USD'].map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setMoneda(m)}
-                className={`flex-1 h-11 rounded-[8px] border font-medium transition-colors paso-moneda-btn ${moneda === m ? 'paso-moneda-btn--active' : ''}`}
+                className="flex-1 h-11 rounded-[8px] border font-medium transition-colors"
+                style={
+                  moneda === m
+                    ? { background: 'var(--primary)', color: '#fff', borderColor: 'var(--primary)' }
+                    : { background: 'var(--surface)', color: 'var(--text)', borderColor: 'var(--surface-alt)' }
+                }
               >
                 {m}
               </button>
@@ -99,17 +105,17 @@ export default function PasoMoneda({ datos, onNext }: Props) {
               onChange={(e) => setSecundaria(e.target.checked)}
               className="w-4 h-4 accent-[var(--primary)]"
             />
-            <span className="paso-moneda-toggle-label">Mostrar moneda secundaria</span>
+            <span style={{ fontSize: '14px', fontWeight: 500 }}>Mostrar moneda secundaria</span>
           </label>
 
           {(moneda === 'USD' || secundaria) && (
             <div className="animate-in fade-in slide-in-from-top-1">
-              <label htmlFor="tipo-dolar-select" className="paso-moneda-label">
+              <label htmlFor="tipo-dolar-select" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
                 Tipo de cambio de referencia
               </label>
 
               {cargandoCotizaciones ? (
-                <div className="mb-3 flex items-center gap-2 paso-moneda-loading">
+                <div className="mb-3 flex items-center gap-2" style={{ color: 'var(--text-2)', fontSize: '13px' }}>
                   <Loader2 size={14} className="animate-spin" />
                   Cargando cotizaciones en tiempo real...
                 </div>
@@ -120,7 +126,8 @@ export default function PasoMoneda({ datos, onNext }: Props) {
                 title="Tipo de cambio de referencia"
                 value={tipoDolar}
                 onChange={(e) => setTipoDolar(e.target.value)}
-                className="w-full h-11 px-4 rounded-[8px] border outline-none paso-moneda-select"
+                className="w-full h-11 px-4 rounded-[8px] border outline-none"
+                style={{ background: 'var(--surface)', borderColor: 'var(--surface-alt)' }}
               >
                 {dolares.map((d) => (
                   <option key={d.id} value={d.id}>{d.label}</option>
@@ -134,15 +141,20 @@ export default function PasoMoneda({ datos, onNext }: Props) {
                     return (
                       <div
                         key={d.id}
-                        className={`p-3 rounded-[8px] border paso-moneda-card ${tipoDolar === d.id ? 'paso-moneda-card--selected' : ''}`}
+                        className="p-3 rounded-[8px] border"
+                        style={
+                          tipoDolar === d.id
+                            ? { borderColor: 'var(--primary)', background: 'rgba(52, 152, 219, 0.08)' }
+                            : { borderColor: 'var(--surface-alt)', background: 'var(--surface)' }
+                        }
                       >
                         <div className="flex items-center justify-between">
-                          <span className="paso-moneda-card-title">{d.label}</span>
-                          <span className="paso-moneda-card-meta">
+                          <span style={{ fontSize: '13px', fontWeight: 600 }}>{d.label}</span>
+                          <span style={{ fontSize: '12px', color: 'var(--text-2)' }}>
                             Promedio: {formatPrecio(c?.promedio)}
                           </span>
                         </div>
-                        <div className="mt-1 flex gap-3 paso-moneda-card-values">
+                        <div className="mt-1 flex gap-3" style={{ fontSize: '12px', color: 'var(--text-2)' }}>
                           <span>Compra: {formatPrecio(c?.compra)}</span>
                           <span>Venta: {formatPrecio(c?.venta)}</span>
                         </div>
@@ -155,12 +167,13 @@ export default function PasoMoneda({ datos, onNext }: Props) {
           )}
         </div>
 
-        {error && <p className="mb-4 paso-moneda-error">{error}</p>}
+        {error && <p className="mb-4" style={{ color: '#c0392b', fontSize: '13px' }}>{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-12 rounded-[10px] font-semibold text-white transition-opacity disabled:opacity-60 flex items-center justify-center gap-2 paso-moneda-submit"
+          className="w-full h-12 rounded-[10px] font-semibold text-white transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
+          style={{ background: 'var(--primary)' }}
         >
           {loading ? <Loader2 size={18} className="animate-spin" /> : 'Continuar'}
         </button>

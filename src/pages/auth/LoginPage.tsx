@@ -1,13 +1,13 @@
 import { type FormEvent, useState, useEffect } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Phone, CheckCircle2 } from 'lucide-react'
-import AuthLayout from '../components/ui/AuthLayout'
-import WppChatMockup from '../components/ui/WppChatMockup'
-import GoogleLoginButton from '../components/ui/GoogleLoginButton'
-import { loginWithEmail, loginWithGoogle } from '../lib/api/auth'
-import { getToken } from '../lib/auth'
-import { manejarRespuestaAuth } from '../utils/authRedirect'
-import { useAuth } from '../hooks/useAuth'
+import AuthLayout from '../../components/auth/AuthLayout'
+import WppChatMockup from '../../components/ui/WppChatMockup'
+import GoogleLoginButton from '../../components/auth/GoogleLoginButton'
+import { loginWithEmail, loginWithGoogle } from '../../services/auth.service'
+import { getToken } from '../../services/api'
+import { manejarRespuestaAuth } from '../../utils/authRedirect'
+import { useAuth } from '../../hooks/useAuth'
 
 function AppleIcon() {
   return (

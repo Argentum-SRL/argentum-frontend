@@ -1,8 +1,8 @@
 import { type FormEvent, useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { ArrowLeft, Loader2 } from 'lucide-react'
-import AuthLayout from '../../components/ui/AuthLayout'
-import { verificarCodigoEmail, enviarCodigoEmail } from '../../lib/api/auth'
+import AuthLayout from '../../components/auth/AuthLayout'
+import { verificarCodigoEmail, enviarCodigoEmail } from '../../services/auth.service'
 import { manejarRespuestaAuth } from '../../utils/authRedirect'
 
 export default function VerificarEmail() {

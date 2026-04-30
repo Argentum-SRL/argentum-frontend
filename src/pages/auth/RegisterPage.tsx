@@ -1,13 +1,13 @@
 import { type FormEvent, useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff, Phone } from 'lucide-react'
-import GoogleLoginButton from '../components/ui/GoogleLoginButton'
-import AuthLayout from '../components/ui/AuthLayout'
-import DashboardMockup from '../components/ui/DashboardMockup'
-import { registerWithEmail, loginWithGoogle } from '../lib/api/auth'
-import { getToken } from '../lib/auth'
-import { manejarRespuestaAuth } from '../utils/authRedirect'
-import { useAuth } from '../hooks/useAuth'
+import GoogleLoginButton from '../../components/auth/GoogleLoginButton'
+import AuthLayout from '../../components/auth/AuthLayout'
+import DashboardMockup from '../../components/ui/DashboardMockup'
+import { registerWithEmail, loginWithGoogle } from '../../services/auth.service'
+import { getToken } from '../../services/api'
+import { manejarRespuestaAuth } from '../../utils/authRedirect'
+import { useAuth } from '../../hooks/useAuth'
 
 function AppleIcon() {
   return (

@@ -1,5 +1,18 @@
 import axios from 'axios'
-import { clearTokens, getRefreshToken, getToken, setRefreshToken, setToken } from './auth'
+
+const ACCESS_KEY = 'argentum_access_token'
+const REFRESH_KEY = 'argentum_refresh_token'
+
+export const getToken = (): string | null => localStorage.getItem(ACCESS_KEY)
+export const setToken = (token: string): void => localStorage.setItem(ACCESS_KEY, token)
+export const getRefreshToken = (): string | null => localStorage.getItem(REFRESH_KEY)
+export const setRefreshToken = (token: string): void => localStorage.setItem(REFRESH_KEY, token)
+export const clearTokens = (): void => {
+  localStorage.removeItem(ACCESS_KEY)
+  localStorage.removeItem(REFRESH_KEY)
+}
+/** @deprecated usá clearTokens() */
+export const clearToken = clearTokens
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? '/api',
@@ -17,7 +30,6 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Flag para evitar bucles infinitos de refresh
 let isRefreshing = false
 let pendingQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = []
 
@@ -31,7 +43,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    // Si no es 401, ya se reintentó, o es un endpoint de auth (evitar loops)
     const isAuthEndpoint = originalRequest.url?.includes('/auth/')
     if (error.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {
       return Promise.reject(error)
@@ -39,14 +50,12 @@ api.interceptors.response.use(
 
     const refreshToken = getRefreshToken()
 
-    // Sin refresh token → ir al login
     if (!refreshToken) {
       clearTokens()
       window.location.replace('/login')
       return Promise.reject(error)
     }
 
-    // Si ya hay un refresh en curso, encolar
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         pendingQueue.push({

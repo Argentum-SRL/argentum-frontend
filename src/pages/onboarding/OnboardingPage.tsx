@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2, CheckCircle2, Circle } from 'lucide-react'
-import AuthLayout from '../components/ui/AuthLayout'
-import { getEstadoOnboarding } from '../lib/api/onboarding'
-import type { EstadoOnboarding } from '../types/index'
-import PasoDatosPersonales from '../components/onboarding/PasoDatosPersonales'
-import PasoCicloFinanciero from '../components/onboarding/PasoCicloFinanciero'
-import PasoMoneda from '../components/onboarding/PasoMoneda'
-import PasoPrimeraBilletera from '../components/onboarding/PasoPrimeraBilletera'
+import AuthLayout from '../../components/auth/AuthLayout'
+import { getEstadoOnboarding } from '../../services/onboarding.service'
+import type { EstadoOnboarding } from '../../types/index'
+import PasoDatosPersonales from '../../components/onboarding/PasoDatosPersonales'
+import PasoCicloFinanciero from '../../components/onboarding/PasoCicloFinanciero'
+import PasoMoneda from '../../components/onboarding/PasoMoneda'
+import PasoPrimeraBilletera from '../../components/onboarding/PasoPrimeraBilletera'
 
 type StepID = 'datos_personales' | 'ciclo_financiero' | 'moneda' | 'primera_billetera'
 
-export default function Onboarding() {
+export default function OnboardingPage() {
   const navigate = useNavigate()
   const [estado, setEstado] = useState<EstadoOnboarding | null>(null)
   const [pasoActual, setPasoActual] = useState<StepID | null>(null)
@@ -44,8 +44,7 @@ export default function Onboarding() {
       return
     }
     setPasoActual(siguiente as StepID)
-    
-    // Actualizar estado local para la barra de progreso
+
     if (estado) {
       setEstado({
         ...estado,
@@ -75,14 +74,14 @@ export default function Onboarding() {
         {pasosConfig.map((p, idx) => {
           const isComplete = !estado?.pasos_pendientes.includes(p.id) && p.id !== pasoActual
           const isCurrent = p.id === pasoActual
-          
+
           return (
             <div key={p.id} className="flex flex-col items-center gap-1">
               {isComplete ? (
                 <CheckCircle2 size={20} style={{ color: '#27AE60' }} />
               ) : isCurrent ? (
-                <div 
-                  className="w-5 h-5 rounded-full flex items-center justify-center" 
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center"
                   style={{ background: 'var(--primary)', color: 'white', fontSize: '10px', fontWeight: 'bold' }}
                 >
                   {idx + 1}
@@ -100,27 +99,27 @@ export default function Onboarding() {
 
       <div className="min-h-[300px]">
         {pasoActual === 'datos_personales' && (
-          <PasoDatosPersonales 
-            datos={{ nombre: estado?.datos_actuales.nombre || null, apellido: estado?.datos_actuales.apellido || null }} 
-            onNext={handleNext} 
+          <PasoDatosPersonales
+            datos={{ nombre: estado?.datos_actuales.nombre || null, apellido: estado?.datos_actuales.apellido || null }}
+            onNext={handleNext}
           />
         )}
         {pasoActual === 'ciclo_financiero' && (
-          <PasoCicloFinanciero 
-            datos={{ ciclo_tipo: estado?.datos_actuales.ciclo_tipo || null, ciclo_valor: estado?.datos_actuales.ciclo_valor || null }} 
-            onNext={handleNext} 
+          <PasoCicloFinanciero
+            datos={{ ciclo_tipo: estado?.datos_actuales.ciclo_tipo || null, ciclo_valor: estado?.datos_actuales.ciclo_valor || null }}
+            onNext={handleNext}
           />
         )}
         {pasoActual === 'moneda' && (
-          <PasoMoneda 
-            datos={{ moneda_principal: estado?.datos_actuales.moneda_principal || null }} 
-            onNext={handleNext} 
+          <PasoMoneda
+            datos={{ moneda_principal: estado?.datos_actuales.moneda_principal || null }}
+            onNext={handleNext}
           />
         )}
         {pasoActual === 'primera_billetera' && (
-          <PasoPrimeraBilletera 
-            monedaPrincipal={estado?.datos_actuales.moneda_principal || 'ARS'} 
-            onFinish={() => navigate('/app/dashboard', { replace: true })} 
+          <PasoPrimeraBilletera
+            monedaPrincipal={estado?.datos_actuales.moneda_principal || 'ARS'}
+            onFinish={() => navigate('/app/dashboard', { replace: true })}
           />
         )}
       </div>

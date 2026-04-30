@@ -407,14 +407,269 @@
   margin-top: 8px;
 }
 
-/* ── Spinner ─────────────────────────────────── */
-.spinner {
+/* ── Camera Button ─────────────────────────── */
+.cameraBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--gold);
+  border: 4px solid var(--surface);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 2;
+}
+
+.cameraBtn:hover {
+  transform: scale(1.1);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.deleteFotoBtn {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: var(--error);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.deleteFotoBtn:hover {
+  opacity: 1;
+}
+
+/* ── Edit Icons ─────────────────────────────── */
+.editBtn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editBtn:hover {
+  color: var(--primary);
+  background: var(--page);
+}
+
+.lockIcon {
+  color: var(--text-3);
+  opacity: 0.5;
+}
+
+.dataRowValueWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.dataRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ── Security Badges ────────────────────────── */
+.verificacionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.verificado {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.noVerificado {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+/* ── Generic Edit Modal ─────────────────────── */
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--page);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+.inputError {
+  border-color: var(--error);
+}
+
+.errorText {
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.saveBtn {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.saveBtn:hover {
+  opacity: 0.9;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Password Requirements ─────────────────── */
+.pwRequirements {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.requirement {
+  font-size: 12px;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.requirementMet {
+  color: var(--success);
+}
+
+/* ── Financial Config ──────────────────────── */
+.selector {
+  display: flex;
+  gap: 8px;
+  background: var(--page);
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.selectorBtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  color: var(--text-3);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.selectorBtnActive {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.exampleText {
+  font-size: 13px;
+  color: var(--text-3);
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.toggle {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggleActive {
+  background: var(--success);
+}
+
+.toggleCircle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  background: #fff;
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+  transition: transform 0.2s;
+}
+
+.toggleActive .toggleCircle {
+  transform: translateX(24px);
 }
 
 @keyframes spin {

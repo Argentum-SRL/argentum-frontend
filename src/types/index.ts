@@ -17,6 +17,7 @@ export interface Usuario {
   telefono_verificado: boolean
   auth_provider?: string
   fecha_registro?: string
+  password_hash?: string | null
 }
 
 export interface AuthResponse {
@@ -61,4 +62,36 @@ export interface CotizacionesDolarResponse {
   fuente: string
   actualizado_en: string
   cotizaciones: Record<'oficial' | 'blue' | 'tarjeta' | 'mep', CotizacionDolar>
+}
+
+export interface EditarDatosPersonalesRequest {
+  nombre: string
+  apellido: string
+}
+
+export interface EditarEmailRequest {
+  email_nuevo: string
+  password_actual: string
+}
+
+export interface EditarPasswordRequest {
+  password_actual?: string
+  password_nueva: string
+  password_nueva_confirmacion: string
+}
+
+export interface EditarTelefonoRequest {
+  telefono_nuevo: string
+  password_actual?: string
+}
+
+export interface EditarCicloFinancieroRequest {
+  ciclo_tipo: 'dia_fijo' | 'regla'
+  ciclo_valor: string
+}
+
+export interface EditarMonedaRequest {
+  moneda_principal: 'ARS' | 'USD'
+  moneda_secundaria_activa: boolean
+  tipo_dolar?: string
 }

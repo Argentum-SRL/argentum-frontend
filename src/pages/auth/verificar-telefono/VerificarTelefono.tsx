@@ -4,6 +4,7 @@ import { Phone, ArrowLeft, Loader2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import { enviarCodigoTelefono, verificarCodigoTelefono } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './VerificarTelefono.module.css'
 
 /**
@@ -14,6 +15,7 @@ import styles from './VerificarTelefono.module.css'
  *    Muestra primero el input de teléfono.
  */
 export default function VerificarTelefono() {
+  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as { telefono?: string; modoVerificacion?: boolean } | null
@@ -99,6 +101,7 @@ export default function VerificarTelefono() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoTelefono(telefono.trim(), codigo.trim())
+      login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail

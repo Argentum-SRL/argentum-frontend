@@ -4,9 +4,11 @@ import { ArrowLeft, Loader2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import { verificarCodigoEmail, enviarCodigoEmail } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './VerificarEmail.module.css'
 
 export default function VerificarEmail() {
+  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const email: string = (location.state as { email?: string })?.email ?? ''
@@ -38,6 +40,7 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoEmail(email, codigo)
+      login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail

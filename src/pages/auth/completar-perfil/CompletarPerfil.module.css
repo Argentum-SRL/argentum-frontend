@@ -5,13 +5,13 @@
   margin-bottom: 20px;
 }
 
-.nameRow {
+.nameRow, .passwordRow {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.nameCol {
+.nameCol, .passwordCol {
   flex: 1;
 }
 

@@ -7,14 +7,13 @@ import StepIndicator from '@/components/onboarding/StepIndicator'
 import StepDatosPersonales from '@/components/onboarding/StepDatosPersonales'
 import StepCicloFinanciero from '@/components/onboarding/StepCicloFinanciero'
 import StepMoneda from '@/components/onboarding/StepMoneda'
-import StepPrimeraBilletera from '@/components/onboarding/StepPrimeraBilletera'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './OnboardingPage.module.css'
 
 const PASO_NUMERO: Record<string, number> = {
   datos_personales:  1,
   ciclo_financiero:  2,
   moneda:            3,
-  primera_billetera: 4,
 }
 
 function mapEstadoAPaso(estado: EstadoOnboarding): number {
@@ -42,12 +41,15 @@ export default function OnboardingPage() {
   const [estado, setEstado] = useState<EstadoOnboarding | null>(null)
   const [pasoActual, setPasoActual] = useState(1)
   const [cargando, setCargando] = useState(true)
+  const { refreshUser } = useAuth()
 
   useEffect(() => {
     getEstadoOnboarding()
       .then((res) => {
         if (res.onboarding_completo) {
-          navigate('/app/dashboard', { replace: true })
+          refreshUser().then(() => {
+            navigate('/app/dashboard', { replace: true })
+          })
           return
         }
         setEstado(res)
@@ -55,11 +57,14 @@ export default function OnboardingPage() {
       })
       .catch(console.error)
       .finally(() => setCargando(false))
-  }, [navigate])
+  }, [navigate, refreshUser])
+
 
   function avanzar(siguientePaso: string | null) {
     if (!siguientePaso) {
-      navigate('/app/dashboard', { replace: true })
+      refreshUser().then(() => {
+        navigate('/app/dashboard', { replace: true })
+      })
       return
     }
     const next = PASO_NUMERO[siguientePaso]
@@ -88,7 +93,7 @@ export default function OnboardingPage() {
           <span className={styles.logoText}>Argentum</span>
         </div>
 
-        <StepIndicator total={4} current={pasoActual} />
+        <StepIndicator total={3} current={pasoActual} />
 
         <div className={styles.card}>
           <div key={pasoActual} className={styles.stepWrap}>
@@ -112,12 +117,6 @@ export default function OnboardingPage() {
             {pasoActual === 3 && (
               <StepMoneda
                 datosIniciales={{ moneda_principal: datos?.moneda_principal ?? null }}
-                onNext={avanzar}
-              />
-            )}
-            {pasoActual === 4 && (
-              <StepPrimeraBilletera
-                monedaPrincipal={datos?.moneda_principal ?? 'ARS'}
                 onNext={avanzar}
               />
             )}

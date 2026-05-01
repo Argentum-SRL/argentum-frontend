@@ -24,7 +24,9 @@ export default function CompletarPerfil() {
   const [apellido, setApellido] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
@@ -33,11 +35,14 @@ export default function CompletarPerfil() {
   const apellidoError = hasSubmitted && !apellido.trim() ? 'Ingresá tu apellido.' : null
   const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
   const passwordError = hasSubmitted ? validatePassword(password) : null
+  const confirmPasswordError = hasSubmitted 
+    ? (!confirmPassword ? 'Confirmá tu contraseña.' : (password !== confirmPassword ? 'Las contraseñas no coinciden.' : null))
+    : null
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || passwordError) return
+    if (!nombre.trim() || !apellido.trim() || !email.trim() || passwordError || confirmPasswordError) return
     setLoading(true)
     setApiError(null)
     try {
@@ -89,24 +94,47 @@ export default function CompletarPerfil() {
           error={emailError}
         />
 
-        <Field
-          label="Contraseña"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={setPassword}
-          error={passwordError}
-          hint="Mínimo 8 caracteres, una mayúscula, una minúscula y un número."
-          rightSlot={
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-              className={styles.togglePassword}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          }
-        />
+        <div className={styles.passwordRow}>
+          <div className={styles.passwordCol}>
+            <Field
+              label="Contraseña"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={setPassword}
+              error={passwordError}
+              hint="Mínimo 8 caracteres, una mayúscula, una minúscula y un número."
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  className={styles.togglePassword}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
+          </div>
+          <div className={styles.passwordCol}>
+            <Field
+              label="Repetir contraseña"
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              error={confirmPasswordError}
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  className={styles.togglePassword}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
+          </div>
+        </div>
 
         {apiError && <p className={styles.error}>{apiError}</p>}
 

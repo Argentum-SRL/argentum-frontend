@@ -380,6 +380,12 @@
   color: var(--text-2);
 }
 
+.optional {
+  font-weight: 400;
+  opacity: 0.6;
+  font-size: 12px;
+}
+
 .formInput {
   width: 100%;
   padding: 10px 12px;
@@ -431,6 +437,11 @@
   border-color: var(--primary);
   color: var(--primary);
   background: var(--surface-alt);
+}
+
+.monedaPillDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ── Saldo input ─────────────────────────────────────────────────────────── */
@@ -489,6 +500,11 @@
   font-size: 14px;
   color: var(--text-2);
   line-height: 1.4;
+}
+
+.checkLabelDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* ── Info box ────────────────────────────────────────────────────────────── */
@@ -561,6 +577,16 @@
 .toastIcon {
   flex-shrink: 0;
   color: var(--success);
+}
+
+.toastError {
+  background: var(--error) !important;
+  color: #fff !important;
+}
+
+.toastIconError {
+  flex-shrink: 0;
+  color: #fff;
 }
 
 /* ── Skeleton ────────────────────────────────────────────────────────────── */

@@ -40,15 +40,19 @@ function fmtSaldo(n: number, moneda: 'ARS' | 'USD'): string {
 
 // ── Toast ──────────────────────────────────────────────────────────────────
 
-function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+function Toast({ message, type = 'success', onClose }: { message: string; type?: 'success' | 'error'; onClose: () => void }) {
   useEffect(() => {
-    const t = setTimeout(onClose, 4000)
+    const t = setTimeout(onClose, 5000)
     return () => clearTimeout(t)
   }, [onClose])
 
   return (
-    <div className={styles.toast}>
-      <Check size={16} strokeWidth={2} className={styles.toastIcon} />
+    <div className={[styles.toast, type === 'error' ? styles.toastError : ''].filter(Boolean).join(' ')}>
+      {type === 'success' ? (
+        <Check size={16} strokeWidth={2} className={styles.toastIcon} />
+      ) : (
+        <X size={16} strokeWidth={2} className={styles.toastIconError} />
+      )}
       <span>{message}</span>
     </div>
   )
@@ -123,11 +127,12 @@ interface CreateFormProps {
   onCreate: (payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) => Promise<void>
 }
 
-function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { initial?: { nombre?: string; moneda?: 'ARS' | 'USD'; saldo_inicial?: number; es_principal?: boolean }; onSave?: (payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) => Promise<void> }) {
+function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { initial?: { nombre?: string; moneda?: 'ARS' | 'USD'; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean }; onSave?: (payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) => Promise<void> }) {
   const [nombre, setNombre] = useState('')
   const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS')
   const [saldo, setSaldo] = useState('')
   const [esPrincipal, setEsPrincipal] = useState(false)
+  const [esEfectivo, setEsEfectivo] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const nombreRef = useRef<HTMLInputElement>(null)
 
@@ -144,11 +149,13 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
       if (initial.moneda) setMoneda(initial.moneda)
       if (typeof initial.saldo_inicial === 'number') setSaldo(String(initial.saldo_inicial))
       if (typeof initial.es_principal === 'boolean') setEsPrincipal(initial.es_principal)
+      if (typeof initial.es_efectivo === 'boolean') setEsEfectivo(initial.es_efectivo)
     } else {
       setNombre('')
       setMoneda('ARS')
       setSaldo('')
       setEsPrincipal(false)
+      setEsEfectivo(false)
     }
   }
 
@@ -207,7 +214,8 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
             <button
               key={m}
               type="button"
-              className={[styles.monedaPill, moneda === m ? styles.monedaPillActive : ''].filter(Boolean).join(' ')}
+              disabled={esEfectivo}
+              className={[styles.monedaPill, moneda === m ? styles.monedaPillActive : '', esEfectivo ? styles.monedaPillDisabled : ''].filter(Boolean).join(' ')}
               onClick={() => setMoneda(m)}
             >
               {m}
@@ -218,7 +226,7 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
 
       {!onSave && (
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Saldo inicial</label>
+          <label className={styles.formLabel}>Saldo inicial <span className={styles.optional}>(opcional)</span></label>
           <div className={styles.saldoWrap}>
             <span className={styles.saldoCurrency}>{moneda === 'ARS' ? '$' : 'U$D'}</span>
             <input
@@ -236,16 +244,17 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
       <label className={styles.checkRow}>
         <input
           type="checkbox"
+          disabled={esEfectivo}
           className={styles.checkInput}
           checked={esPrincipal}
           onChange={(e) => setEsPrincipal(e.target.checked)}
         />
-        <span className={styles.checkLabel}>Marcar como billetera principal</span>
+        <span className={[styles.checkLabel, esEfectivo ? styles.checkLabelDisabled : ''].filter(Boolean).join(' ')}>Marcar como billetera principal</span>
       </label>
 
       <div className={styles.infoBox}>
         <p className={styles.infoText}>
-          {onSave ? 'Los cambios se guardarán en tu cuenta.' : 'Cuando el backend esté disponible, esta billetera se sincronizará automáticamente.'}
+          {onSave ? 'Los cambios se guardarán en tu cuenta.' : 'El saldo inicial se utiliza para establecer el balance de apertura de esta billetera.'}
         </p>
       </div>
 
@@ -262,7 +271,7 @@ export default function BilleterasPage() {
   const { billeteras, isLoading, setBilleteras } = useFinancial()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Billetera | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
   const [showArchived, setShowArchived] = useState(false)
 
   useEffect(() => {
@@ -284,10 +293,10 @@ export default function BilleterasPage() {
         }
         return [...updated, parsed]
       })
-      setToast('Billetera creada correctamente')
+      setToast({ msg: 'Billetera creada correctamente', type: 'success' })
     } catch (err) {
       console.error(err)
-      setToast('Error al crear billetera')
+      setToast({ msg: 'Error al crear billetera', type: 'error' })
       throw err
     }
   }
@@ -297,10 +306,23 @@ export default function BilleterasPage() {
     try {
       await billeteraService.remove(id)
       setBilleteras((prev) => prev.filter((b) => b.id !== id))
-      setToast('Billetera eliminada')
-    } catch (err) {
+      setToast({ msg: 'Billetera eliminada', type: 'success' })
+    } catch (err: unknown) {
       console.error(err)
-      setToast('Error al eliminar billetera')
+      const errorData = err as { response?: { data?: { detail?: string } } }
+      const detail = errorData.response?.data?.detail
+      
+      // LOGICA DE TRANSACCIONES ASOCIADAS:
+      // Si el backend detecta transacciones, informamos al usuario que debe archivar.
+      // Esto previene que se pierda el historial financiero en el futuro módulo de transacciones.
+      if (detail && detail.includes('transacciones')) {
+        setToast({ 
+          msg: detail, 
+          type: 'error' 
+        })
+      } else {
+        setToast({ msg: 'Error al eliminar billetera', type: 'error' })
+      }
     }
   }
 
@@ -310,16 +332,16 @@ export default function BilleterasPage() {
         const res = await billeteraService.desarchivar(b.id)
         const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
         setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-        setToast('Billetera desarchivada')
+        setToast({ msg: 'Billetera desarchivada', type: 'success' })
       } else {
         const res = await billeteraService.archivar(b.id)
         const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
         setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-        setToast('Billetera archivada')
+        setToast({ msg: 'Billetera archivada', type: 'success' })
       }
     } catch (err) {
       console.error(err)
-      setToast('Error actualizando estado')
+      setToast({ msg: 'Error actualizando estado', type: 'error' })
     }
   }
 
@@ -334,12 +356,12 @@ export default function BilleterasPage() {
       const res = await billeteraService.update(editTarget.id, payload)
       const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
       setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-      setToast('Billetera actualizada')
+      setToast({ msg: 'Billetera actualizada', type: 'success' })
       setEditTarget(null)
       setDrawerOpen(false)
     } catch (err) {
       console.error(err)
-      setToast('Error actualizando billetera')
+      setToast({ msg: 'Error actualizando billetera', type: 'error' })
       throw err
     }
   }
@@ -414,7 +436,13 @@ export default function BilleterasPage() {
         {editTarget ? (
           <CreateForm
             onClose={() => { setDrawerOpen(false); setEditTarget(null) }}
-            initial={{ nombre: editTarget.nombre, moneda: editTarget.moneda, saldo_inicial: editTarget.saldo_inicial, es_principal: editTarget.es_principal }}
+            initial={{ 
+              nombre: editTarget.nombre, 
+              moneda: editTarget.moneda, 
+              saldo_inicial: editTarget.saldo_inicial, 
+              es_principal: editTarget.es_principal,
+              es_efectivo: editTarget.es_efectivo
+            }}
             onCreate={handleCreate}
             onSave={handleSave}
           />
@@ -425,7 +453,7 @@ export default function BilleterasPage() {
 
       {/* Toast */}
       {toast && (
-        <Toast message={toast} onClose={() => setToast(null)} />
+        <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />
       )}
     </div>
   )

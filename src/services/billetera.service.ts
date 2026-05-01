@@ -11,7 +11,7 @@ const billeteraService = {
     return data
   },
 
-  update: async (id: string, payload: any) => {
+  update: async (id: string, payload: { nombre?: string; moneda?: string; saldo_inicial?: number; es_principal?: boolean; estado?: string }) => {
     const { data } = await api.put(`/billeteras/${id}`, payload)
     return data
   },

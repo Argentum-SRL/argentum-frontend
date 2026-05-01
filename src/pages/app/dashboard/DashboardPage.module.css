@@ -320,7 +320,18 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--icon-bg, var(--surface-alt));
+  color: var(--icon-color, var(--text-2));
 }
+
+.txIcon[data-categoria="supermercado"] { --icon-bg: #EAF3DE; --icon-color: #3B6D11; }
+.txIcon[data-categoria="transporte"]   { --icon-bg: #EDF2F7; --icon-color: #52565F; }
+.txIcon[data-categoria="salidas"]      { --icon-bg: #FAECE7; --icon-color: #993C1D; }
+.txIcon[data-categoria="ingreso"]      { --icon-bg: #E6F1FB; --icon-color: #185FA5; }
+.txIcon[data-categoria="vivienda"]     { --icon-bg: #F5F4F0; --icon-color: #52565F; }
+.txIcon[data-categoria="suscripciones"] { --icon-bg: #F3EEF8; --icon-color: #6B2E8A; }
+.txIcon[data-categoria="servicios"]    { --icon-bg: #FFF9E6; --icon-color: #A07800; }
+.txIcon[data-categoria="salud"]        { --icon-bg: #FDEAEA; --icon-color: #C0392B; }
 
 .txMeta {
   flex: 1;
@@ -448,7 +459,14 @@
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  background: var(--dot-bg, var(--border));
 }
+
+.catDot[data-color="#A8905A"] { --dot-bg: #A8905A; }
+.catDot[data-color="#3B6D11"] { --dot-bg: #3B6D11; }
+.catDot[data-color="#993C1D"] { --dot-bg: #993C1D; }
+.catDot[data-color="#185FA5"] { --dot-bg: #185FA5; }
+.catDot[data-color="#6B2E8A"] { --dot-bg: #6B2E8A; }
 
 .catNombre {
   flex: 1;

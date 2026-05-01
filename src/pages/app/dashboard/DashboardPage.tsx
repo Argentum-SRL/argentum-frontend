@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Bell, Search, TrendingUp, TrendingDown } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { calcularPeriodoActual } from '@/lib/utils/ciclo'
 import { getCategoriaMeta } from '@/lib/utils/categorias.utils'
-import { mockDashboard } from '@/lib/mock/dashboard.mock'
+import { useFinancial } from '@/hooks/useFinancial'
 import type { DashboardData, TransaccionMock, ProximoPagoMock, CategoriaMock } from '@/lib/mock/dashboard.mock'
 import styles from './DashboardPage.module.css'
 
@@ -59,26 +59,28 @@ function Skeleton() {
 function DonutChart({ categorias }: { categorias: CategoriaMock[] }) {
   const r = 44
   const circ = 2 * Math.PI * r
-  let cumAngle = -90
+  
+  // Calculate cumulative angles without mutation
+  const segments = categorias.map((cat, idx) => {
+    const len = (cat.porcentaje / 100) * circ
+    const prevSum = categorias.slice(0, idx).reduce((acc, c) => acc + (c.porcentaje / 100) * 360, 0)
+    const rotation = -90 + prevSum
+    return { ...cat, len, rotation }
+  })
 
   return (
     <svg viewBox="0 0 120 120" className={styles.donut}>
-      {categorias.map((cat) => {
-        const len = (cat.porcentaje / 100) * circ
-        const rotation = cumAngle
-        cumAngle += (cat.porcentaje / 100) * 360
-        return (
-          <circle
-            key={cat.nombre}
-            cx={60} cy={60} r={r}
-            fill="none"
-            stroke={cat.color}
-            strokeWidth={14}
-            strokeDasharray={`${len} ${circ - len}`}
-            transform={`rotate(${rotation}, 60, 60)`}
-          />
-        )
-      })}
+      {segments.map((seg) => (
+        <circle
+          key={seg.nombre}
+          cx={60} cy={60} r={r}
+          fill="none"
+          stroke={seg.color}
+          strokeWidth={14}
+          strokeDasharray={`${seg.len} ${circ - seg.len}`}
+          transform={`rotate(${seg.rotation}, 60, 60)`}
+        />
+      ))}
       <circle cx={60} cy={60} r={30} fill="var(--surface)" />
     </svg>
   )
@@ -156,7 +158,7 @@ function TransaccionesList({ transacciones }: { transacciones: TransaccionMock[]
             <div key={tx.id} className={styles.txRow}>
               <div
                 className={styles.txIcon}
-                style={{ background: meta.bg, color: meta.stroke }}
+                data-categoria={tx.categoria}
               >
                 {meta.icon}
               </div>
@@ -210,7 +212,7 @@ function Categorias({ categorias }: { categorias: CategoriaMock[] }) {
         <div className={styles.catList}>
           {categorias.map((cat) => (
             <div key={cat.nombre} className={styles.catRow}>
-              <span className={styles.catDot} style={{ background: cat.color }} />
+              <span className={styles.catDot} data-color={cat.color} />
               <span className={styles.catNombre}>{cat.nombre}</span>
               <span className={styles.catPct}>{cat.porcentaje}%</span>
             </div>
@@ -225,17 +227,8 @@ function Categorias({ categorias }: { categorias: CategoriaMock[] }) {
 
 export default function DashboardPage() {
   const { usuario } = useAuth()
-  const [isLoading, setIsLoading] = useState(true)
-  const [data, setData] = useState<DashboardData | null>(null)
+  const { dashboard, isLoading } = useFinancial()
   const [tab, setTab] = useState<PeriodoTab>('Mes')
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setData(mockDashboard)
-      setIsLoading(false)
-    }, 300)
-    return () => clearTimeout(t)
-  }, [])
 
   const periodo = calcularPeriodoActual(usuario ?? null)
   const nombre = usuario?.nombre ?? null
@@ -264,16 +257,16 @@ export default function DashboardPage() {
       </div>
 
       {/* Hero card */}
-      <HeroCard data={data!} tab={tab} onTab={setTab} />
+      <HeroCard data={dashboard!} tab={tab} onTab={setTab} />
 
       {/* Content grid */}
       <div className={styles.grid}>
         <div className={styles.gridMain}>
-          <TransaccionesList transacciones={data!.transacciones} />
+          <TransaccionesList transacciones={dashboard!.transacciones} />
         </div>
         <div className={styles.gridSide}>
-          <ProximosPagos pagos={data!.proximosPagos} />
-          <Categorias categorias={data!.categorias} />
+          <ProximosPagos pagos={dashboard!.proximosPagos} />
+          <Categorias categorias={dashboard!.categorias} />
         </div>
       </div>
     </div>

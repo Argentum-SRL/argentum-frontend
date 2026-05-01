@@ -562,3 +562,32 @@
   flex-shrink: 0;
   color: var(--success);
 }
+
+/* ── Skeleton ────────────────────────────────────────────────────────────── */
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+.skel {
+  background: var(--surface-alt);
+  border-radius: 10px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skelCard {
+  height: 180px;
+  border-radius: 16px;
+}
+
+.skelTitle {
+  height: 26px;
+  width: 140px;
+  margin-bottom: 8px;
+}
+
+.skelSubtitle {
+  height: 16px;
+  width: 100px;
+}

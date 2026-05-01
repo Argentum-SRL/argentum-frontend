@@ -1,12 +1,13 @@
-import { useEffect, useId, useState, type ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Home, CreditCard, ArrowLeftRight, BarChart2, Clock, Package,
   Bell, Search, MoreHorizontal,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { getCicloLabel } from '@/lib/utils/ciclo'
 import styles from './AppLayout.module.css'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
@@ -55,20 +56,30 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { usuario } = useAuth()
+  const { usuario, logout } = useAuth()
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
 
-  useEffect(() => {
+  // Reset mobile menu on navigation
+  const [prevPath, setPrevPath] = useState(location.pathname)
+  if (location.pathname !== prevPath) {
+    setPrevPath(location.pathname)
     setIsMoreOpen(false)
-  }, [location.pathname])
+  }
 
   function isActive(path: string) {
     return location.pathname === path
   }
 
-  const cicloLabel = getCicloLabel(usuario?.ciclo_tipo ?? null, usuario?.ciclo_valor ?? null)
   const inicial = usuario?.nombre?.charAt(0)?.toUpperCase() ?? 'U'
+
+  const getFotoUrl = () => {
+    if (!usuario?.foto_url) return null
+    if (usuario.foto_url.startsWith('http')) return usuario.foto_url
+    return `${API_URL}${usuario.foto_url}`
+  }
+
+  const fotoUrl = getFotoUrl()
 
   return (
     <div className={styles.root}>
@@ -80,10 +91,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className={styles.decoBottom} aria-hidden="true" />
 
         {/* Logo */}
-        <div className={styles.logo}>
+        <Link to="/app/dashboard" className={styles.logo} aria-label="Ir al dashboard">
           <MoonIcon />
           <span className={styles.logoText}>Argentum</span>
-        </div>
+        </Link>
 
         {/* Nav main */}
         <nav className={styles.nav}>
@@ -121,15 +132,27 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {/* User block */}
         <div className={styles.userBlock}>
-          <div className={styles.userInner}>
-            <div className={styles.avatar}>{inicial}</div>
+          <Link to="/app/perfil" className={styles.userInner} aria-label="Ir al perfil">
+            <div className={styles.avatar}>
+              {fotoUrl ? (
+                <img src={fotoUrl} alt="Foto de perfil" className={styles.avatarImage} />
+              ) : (
+                inicial
+              )}
+            </div>
             <div className={styles.userMeta}>
               <p className={styles.userName}>
                 {usuario?.nombre ?? ''} {usuario?.apellido ?? ''}
               </p>
-              {cicloLabel && <p className={styles.userCiclo}>{cicloLabel}</p>}
             </div>
-          </div>
+          </Link>
+          <button
+            type="button"
+            className={styles.logoutQuickAction}
+            onClick={() => { void logout() }}
+          >
+            Cerrar sesión
+          </button>
         </div>
       </aside>
 
@@ -146,7 +169,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <button className={styles.mobileIconBtn} aria-label="Buscar">
             <Search size={22} strokeWidth={1.75} />
           </button>
-          <div className={styles.mobileAvatar}>{inicial}</div>
+          <div className={styles.mobileAvatar}>
+            {fotoUrl ? (
+              <img src={fotoUrl} alt="Foto de perfil" className={styles.mobileAvatarImage} />
+            ) : (
+              inicial
+            )}
+          </div>
         </div>
       </header>
 

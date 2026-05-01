@@ -1,10 +1,13 @@
 import { Outlet } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthProvider'
+import { FinancialProvider } from '@/context/FinancialProvider'
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <Outlet />
+      <FinancialProvider>
+        <Outlet />
+      </FinancialProvider>
     </AuthProvider>
   )
 }

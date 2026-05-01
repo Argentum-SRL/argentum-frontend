@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   DollarSign,
   TrendingUp,
-  CreditCard
+  CreditCard,
+  LogOut
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import usuarioService from '@/services/usuario.service'
@@ -73,8 +74,10 @@ export default function PerfilPage() {
   const [formCiclo, setFormCiclo] = useState({ ciclo_tipo: 'dia_fijo' as 'dia_fijo' | 'regla', ciclo_valor: '' })
   const [formMoneda, setFormMoneda] = useState({ moneda_principal: 'ARS' as 'ARS' | 'USD', moneda_secundaria_activa: false, tipo_dolar: 'blue' })
 
-  // Inicializar formularios cuando el usuario carga
-  useEffect(() => {
+  // Inicializar formularios cuando el usuario carga (Sync in render to avoid cascading renders)
+  const [prevUsuarioId, setPrevUsuarioId] = useState(usuario?.id)
+  if (usuario?.id !== prevUsuarioId) {
+    setPrevUsuarioId(usuario?.id)
     if (usuario) {
       setFormDatos({ 
         nombre: usuario.nombre || '', 
@@ -94,7 +97,7 @@ export default function PerfilPage() {
         tipo_dolar: usuario.tipo_dolar || 'blue'
       })
     }
-  }, [usuario])
+  }
 
   const handleOpenModal = (modal: string) => {
     setModalError(null)
@@ -114,8 +117,9 @@ export default function PerfilPage() {
       const updated = await usuarioService.actualizarDatosPersonales(formDatos)
       updateUsuario(updated)
       handleCloseModal()
-    } catch (err: any) {
-      setModalError(err.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
     } finally {
       setIsSaving(false)
     }
@@ -138,8 +142,9 @@ export default function PerfilPage() {
         alert('Email actualizado correctamente.')
         handleCloseModal()
       }
-    } catch (err: any) {
-      setModalError(err.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
     } finally {
       setIsSaving(false)
     }
@@ -151,7 +156,7 @@ export default function PerfilPage() {
     try {
       const res = await authService.enviarCodigoEmail(usuario.email)
       // Si el backend aplicó el bypass y devolvió verificado: true
-      if ((res as any).verificado) {
+      if ((res as { verificado: boolean }).verificado) {
         if (usuario) {
           updateUsuario({ ...usuario, email_verificado: true })
         }
@@ -159,8 +164,9 @@ export default function PerfilPage() {
       } else {
         navigate('/auth/verificar-email', { state: { email: usuario.email } })
       }
-    } catch (err: any) {
-      alert(err.response?.data?.detail || 'Error al enviar el código de verificación.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      alert(error.response?.data?.detail || 'Error al enviar el código de verificación.')
     } finally {
       setIsSaving(false)
     }
@@ -178,8 +184,9 @@ export default function PerfilPage() {
       if (res.requiere_verificacion_telefono) {
         navigate('/auth/verificar-telefono')
       }
-    } catch (err: any) {
-      setModalError(err.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
     } finally {
       setIsSaving(false)
     }
@@ -199,8 +206,9 @@ export default function PerfilPage() {
       alert('Contraseña actualizada exitosamente')
       handleCloseModal()
       setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
-    } catch (err: any) {
-      setModalError(err.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
     } finally {
       setIsSaving(false)
     }
@@ -214,8 +222,9 @@ export default function PerfilPage() {
       const updated = await usuarioService.actualizarCicloFinanciero(formCiclo)
       updateUsuario(updated)
       handleCloseModal()
-    } catch (err: any) {
-      setModalError(err.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
     } finally {
       setIsSaving(false)
     }
@@ -229,8 +238,9 @@ export default function PerfilPage() {
       const updated = await usuarioService.actualizarMoneda(formMoneda)
       updateUsuario(updated)
       handleCloseModal()
-    } catch (err: any) {
-      setModalError(err.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
     } finally {
       setIsSaving(false)
     }
@@ -245,8 +255,9 @@ export default function PerfilPage() {
       if (usuario) {
         updateUsuario({ ...usuario, foto_url: res.foto_url })
       }
-    } catch (err: any) {
-      alert(err.response?.data?.detail || 'Error al subir la foto')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      alert(error.response?.data?.detail || 'Error al subir la foto')
     }
   }
 
@@ -257,9 +268,15 @@ export default function PerfilPage() {
       if (usuario) {
         updateUsuario({ ...usuario, foto_url: null })
       }
-    } catch (err: any) {
-      alert(err.response?.data?.detail || 'Error al eliminar la foto')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      alert(error.response?.data?.detail || 'Error al eliminar la foto')
     }
+  }
+
+  const handleLogout = async () => {
+    if (!confirm('¿Querés cerrar sesión ahora?')) return
+    await logout()
   }
 
   const handleDeleteAccount = async () => {
@@ -317,18 +334,24 @@ export default function PerfilPage() {
               className={styles.cameraBtn} 
               onClick={() => fileInputRef.current?.click()}
               title="Cambiar foto"
+              aria-label="Cambiar foto de perfil"
             >
               <Camera size={18} />
             </button>
             <input 
               type="file" 
               ref={fileInputRef} 
-              style={{ display: 'none' }} 
+              className={styles.hiddenInput} 
               accept="image/jpeg,image/png,image/webp"
               onChange={handleFileChange}
+              title="Seleccionar imagen de perfil"
             />
             {usuario?.foto_url && (
-              <button className={styles.deleteFotoBtn} onClick={handleDeleteFoto}>
+              <button 
+                className={styles.deleteFotoBtn} 
+                onClick={handleDeleteFoto}
+                aria-label="Eliminar foto de perfil"
+              >
                 Eliminar foto
               </button>
             )}
@@ -339,7 +362,11 @@ export default function PerfilPage() {
               <h1 className={styles.headerName}>
                 {usuario?.nombre} {usuario?.apellido}
               </h1>
-              <button className={styles.editBtn} onClick={() => handleOpenModal('datos-personales')}>
+              <button 
+                className={styles.editBtn} 
+                onClick={() => handleOpenModal('datos-personales')}
+                aria-label="Editar datos personales"
+              >
                 <Edit size={18} />
               </button>
             </div>
@@ -368,7 +395,11 @@ export default function PerfilPage() {
                 {isGoogle ? (
                   <Lock size={16} className={styles.lockIcon} />
                 ) : (
-                  <button className={styles.editBtn} onClick={() => handleOpenModal('email')}>
+                  <button 
+                    className={styles.editBtn} 
+                    onClick={() => handleOpenModal('email')}
+                    aria-label="Editar email"
+                  >
                     <Edit size={18} />
                   </button>
                 )}
@@ -384,7 +415,11 @@ export default function PerfilPage() {
                   <p className={styles.dataRowLabel}>Teléfono</p>
                   <p className={styles.dataRowValue}>{usuario?.telefono || 'No asociado'}</p>
                 </div>
-                <button className={styles.editBtn} onClick={() => handleOpenModal('telefono')}>
+                <button 
+                  className={styles.editBtn} 
+                  onClick={() => handleOpenModal('telefono')}
+                  aria-label="Editar teléfono"
+                >
                   <Edit size={18} />
                 </button>
               </div>
@@ -431,7 +466,7 @@ export default function PerfilPage() {
                   </button>
                 )}
                 {metodosLogin?.puede_agregar_email && (
-                  <div style={{ display: 'flex', gap: '12px' }}>
+                  <div className={styles.formMethodsActions}>
                     <button className={styles.actionLink} onClick={handleVerificarEmailActual}>
                       Verificar ahora
                     </button>
@@ -501,7 +536,7 @@ export default function PerfilPage() {
               <div className={styles.dataRowIcon}>
                 <ShieldCheck size={20} />
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
+              <div className={styles.formMethodsActions}>
                 <span className={`${styles.verificacionBadge} ${usuario?.email_verificado ? styles.verificado : styles.noVerificado}`}>
                   Email {usuario?.email_verificado ? 'verificado' : 'no verificado'}
                 </span>
@@ -534,7 +569,11 @@ export default function PerfilPage() {
                       : usuario?.ciclo_valor?.replace('_', ' ')}
                   </p>
                 </div>
-                <button className={styles.editBtn} onClick={() => handleOpenModal('ciclo')}>
+                <button 
+                  className={styles.editBtn} 
+                  onClick={() => handleOpenModal('ciclo')}
+                  aria-label="Editar ciclo de cobro"
+                >
                   <Edit size={18} />
                 </button>
               </div>
@@ -549,7 +588,11 @@ export default function PerfilPage() {
                   <p className={styles.dataRowLabel}>Moneda principal</p>
                   <p className={styles.dataRowValue}>{usuario?.moneda_principal}</p>
                 </div>
-                <button className={styles.editBtn} onClick={() => handleOpenModal('moneda')}>
+                <button 
+                  className={styles.editBtn} 
+                  onClick={() => handleOpenModal('moneda')}
+                  aria-label="Editar moneda principal"
+                >
                   <Edit size={18} />
                 </button>
               </div>
@@ -580,11 +623,18 @@ export default function PerfilPage() {
               Eliminar tu cuenta es una acción **permanente**. Se borrarán todas tus billeteras, transacciones, presupuestos y datos personales. No se puede deshacer.
             </p>
           </div>
-          
-          <button onClick={() => setShowConfirmDelete(true)} className={styles.dangerBtn}>
-            <Trash2 size={20} />
-            Eliminar mi cuenta permanentemente
-          </button>
+
+          <div className={styles.dangerActions}>
+            <button onClick={handleLogout} className={styles.logoutBtn}>
+              <LogOut size={20} />
+              Cerrar sesión
+            </button>
+
+            <button onClick={() => setShowConfirmDelete(true)} className={styles.dangerBtn}>
+              <Trash2 size={20} />
+              Eliminar mi cuenta permanentemente
+            </button>
+          </div>
         </div>
       </div>
 
@@ -592,8 +642,8 @@ export default function PerfilPage() {
       {activeModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
-            <div className={styles.modalHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 className={styles.modalTitle} style={{ margin: 0 }}>
+            <div className={styles.modalHeaderFlex}>
+              <h3 className={styles.modalTitleNoMargin}>
                 {activeModal === 'datos-personales' && 'Editar Datos Personales'}
                 {activeModal === 'email' && 'Editar Email'}
                 {activeModal === 'telefono' && 'Editar Teléfono'}
@@ -601,13 +651,17 @@ export default function PerfilPage() {
                 {activeModal === 'ciclo' && 'Configurar Ciclo Financiero'}
                 {activeModal === 'moneda' && 'Configurar Moneda'}
               </h3>
-              <button className={styles.editBtn} onClick={handleCloseModal}>
+              <button 
+                className={styles.editBtn} 
+                onClick={handleCloseModal}
+                aria-label="Cerrar modal"
+              >
                 <X size={20} />
               </button>
             </div>
 
             {modalError && (
-              <div className={styles.errorText} style={{ marginBottom: '16px', textAlign: 'center', padding: '8px', background: 'rgba(231, 76, 60, 0.1)', borderRadius: '8px' }}>
+              <div className={styles.modalErrorBox}>
                 {modalError}
               </div>
             )}
@@ -616,23 +670,27 @@ export default function PerfilPage() {
             {activeModal === 'datos-personales' && (
               <form onSubmit={handleSaveDatosPersonales} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Nombre</label>
+                  <label htmlFor="perfil-nombre" className={styles.inputLabel}>Nombre</label>
                   <input 
+                    id="perfil-nombre"
                     type="text" 
                     className={styles.input} 
                     value={formDatos.nombre}
                     onChange={(e) => setFormDatos({...formDatos, nombre: e.target.value})}
                     required
+                    placeholder="Tu nombre"
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Apellido</label>
+                  <label htmlFor="perfil-apellido" className={styles.inputLabel}>Apellido</label>
                   <input 
+                    id="perfil-apellido"
                     type="text" 
                     className={styles.input} 
                     value={formDatos.apellido}
                     onChange={(e) => setFormDatos({...formDatos, apellido: e.target.value})}
                     required
+                    placeholder="Tu apellido"
                   />
                 </div>
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
@@ -645,23 +703,27 @@ export default function PerfilPage() {
             {activeModal === 'email' && (
               <form onSubmit={handleSaveEmail} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Nuevo Email</label>
+                  <label htmlFor="perfil-email" className={styles.inputLabel}>Nuevo Email</label>
                   <input 
+                    id="perfil-email"
                     type="email" 
                     className={styles.input} 
                     value={formEmail.email_nuevo}
                     onChange={(e) => setFormEmail({...formEmail, email_nuevo: e.target.value})}
                     required
+                    placeholder="nuevo@email.com"
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Contraseña Actual</label>
+                  <label htmlFor="perfil-email-pass" className={styles.inputLabel}>Contraseña Actual</label>
                   <input 
+                    id="perfil-email-pass"
                     type="password" 
                     className={styles.input} 
                     value={formEmail.password_actual}
                     onChange={(e) => setFormEmail({...formEmail, password_actual: e.target.value})}
                     required
+                    placeholder="••••••••"
                   />
                 </div>
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
@@ -674,8 +736,9 @@ export default function PerfilPage() {
             {activeModal === 'telefono' && (
               <form onSubmit={handleSaveTelefono} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Nuevo Teléfono</label>
+                  <label htmlFor="perfil-tel" className={styles.inputLabel}>Nuevo Teléfono</label>
                   <input 
+                    id="perfil-tel"
                     type="tel" 
                     className={styles.input} 
                     placeholder="+549..."
@@ -686,13 +749,15 @@ export default function PerfilPage() {
                 </div>
                 {!isGoogle && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Contraseña Actual</label>
+                    <label htmlFor="perfil-tel-pass" className={styles.inputLabel}>Contraseña Actual</label>
                     <input 
+                      id="perfil-tel-pass"
                       type="password" 
                       className={styles.input} 
                       value={formTelefono.password_actual}
                       onChange={(e) => setFormTelefono({...formTelefono, password_actual: e.target.value})}
                       required
+                      placeholder="••••••••"
                     />
                   </div>
                 )}
@@ -707,24 +772,28 @@ export default function PerfilPage() {
               <form onSubmit={handleSavePassword} className={styles.modalForm}>
                 {usuario?.password_hash && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Contraseña Actual</label>
+                    <label htmlFor="perfil-pass-actual" className={styles.inputLabel}>Contraseña Actual</label>
                     <input 
+                      id="perfil-pass-actual"
                       type="password" 
                       className={styles.input} 
                       value={formPassword.password_actual}
                       onChange={(e) => setFormPassword({...formPassword, password_actual: e.target.value})}
                       required
+                      placeholder="••••••••"
                     />
                   </div>
                 )}
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Nueva Contraseña</label>
+                  <label htmlFor="perfil-pass-nueva" className={styles.inputLabel}>Nueva Contraseña</label>
                   <input 
+                    id="perfil-pass-nueva"
                     type="password" 
                     className={styles.input} 
                     value={formPassword.password_nueva}
                     onChange={(e) => setFormPassword({...formPassword, password_nueva: e.target.value})}
                     required
+                    placeholder="••••••••"
                   />
                   <div className={styles.pwRequirements}>
                     <p className={`${styles.requirement} ${pwReqs.length ? styles.requirementMet : ''}`}>
@@ -742,13 +811,15 @@ export default function PerfilPage() {
                   </div>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Confirmar Nueva Contraseña</label>
+                  <label htmlFor="perfil-pass-conf" className={styles.inputLabel}>Confirmar Nueva Contraseña</label>
                   <input 
+                    id="perfil-pass-conf"
                     type="password" 
                     className={styles.input} 
                     value={formPassword.password_nueva_confirmacion}
                     onChange={(e) => setFormPassword({...formPassword, password_nueva_confirmacion: e.target.value})}
                     required
+                    placeholder="••••••••"
                   />
                 </div>
                 <button type="submit" disabled={isSaving || !pwReqs.length || !pwReqs.upper || !pwReqs.lower || !pwReqs.number} className={styles.saveBtn}>
@@ -782,25 +853,29 @@ export default function PerfilPage() {
 
                 {formCiclo.ciclo_tipo === 'dia_fijo' ? (
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Día del mes (1-28)</label>
+                    <label htmlFor="perfil-ciclo-dia" className={styles.inputLabel}>Día del mes (1-28)</label>
                     <input 
+                      id="perfil-ciclo-dia"
                       type="number" 
                       min="1" max="28"
                       className={styles.input}
                       value={formCiclo.ciclo_valor}
                       onChange={(e) => setFormCiclo({...formCiclo, ciclo_valor: e.target.value})}
                       required
+                      placeholder="15"
                     />
                     <p className={styles.exampleText}>Tu ciclo empieza el día {formCiclo.ciclo_valor || '...'} de cada mes</p>
                   </div>
                 ) : (
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Seleccionar Regla</label>
+                    <label htmlFor="perfil-ciclo-regla" className={styles.inputLabel}>Seleccionar Regla</label>
                     <select 
+                      id="perfil-ciclo-regla"
                       className={styles.input}
                       value={formCiclo.ciclo_valor}
                       onChange={(e) => setFormCiclo({...formCiclo, ciclo_valor: e.target.value})}
                       required
+                      title="Regla de ciclo financiero"
                     >
                       <option value="">Seleccionar...</option>
                       <option value="primer_lunes">Primer Lunes</option>
@@ -858,11 +933,13 @@ export default function PerfilPage() {
 
                 {formMoneda.moneda_secundaria_activa && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Tipo de Dólar</label>
+                    <label htmlFor="perfil-tipo-dolar" className={styles.inputLabel}>Tipo de Dólar</label>
                     <select 
+                      id="perfil-tipo-dolar"
                       className={styles.input}
                       value={formMoneda.tipo_dolar}
                       onChange={(e) => setFormMoneda({...formMoneda, tipo_dolar: e.target.value})}
+                      title="Tipo de cambio dólar"
                     >
                       <option value="oficial">Oficial</option>
                       <option value="blue">Blue</option>

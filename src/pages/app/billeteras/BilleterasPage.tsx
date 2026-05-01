@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Plus, Wallet, Banknote, X, Check } from 'lucide-react'
 import styles from './BilleterasPage.module.css'
 import billeteraService from '@/services/billetera.service'
+import { useFinancial } from '@/hooks/useFinancial'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -49,6 +50,26 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
     <div className={styles.toast}>
       <Check size={16} strokeWidth={2} className={styles.toastIcon} />
       <span>{message}</span>
+    </div>
+  )
+}
+
+// ── Skeleton ───────────────────────────────────────────────────────────────
+
+function Skeleton() {
+  return (
+    <div className={styles.root}>
+      <div className={styles.pageHeader}>
+        <div>
+          <div className={`${styles.skel} ${styles.skelTitle}`} />
+          <div className={`${styles.skel} ${styles.skelSubtitle}`} />
+        </div>
+      </div>
+      <div className={styles.grid}>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className={`${styles.skel} ${styles.skelCard}`} />
+        ))}
+      </div>
     </div>
   )
 }
@@ -114,7 +135,10 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
     nombreRef.current?.focus()
   }, [])
 
-  useEffect(() => {
+  // Sync initial props in render
+  const [prevInitial, setPrevInitial] = useState(initial)
+  if (initial !== prevInitial) {
+    setPrevInitial(initial)
     if (initial) {
       if (initial.nombre) setNombre(initial.nombre)
       if (initial.moneda) setMoneda(initial.moneda)
@@ -126,7 +150,7 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
       setSaldo('')
       setEsPrincipal(false)
     }
-  }, [initial])
+  }
 
   function handleSaldoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/[^0-9.]/g, '')
@@ -235,11 +259,10 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
 // ── BilleterasPage ─────────────────────────────────────────────────────────
 
 export default function BilleterasPage() {
-  const [billeteras, setBilleteras] = useState<Billetera[]>([])
+  const { billeteras, isLoading, setBilleteras } = useFinancial()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Billetera | null>(null)
   const [toast, setToast] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
   const [showArchived, setShowArchived] = useState(false)
 
   useEffect(() => {
@@ -321,27 +344,11 @@ export default function BilleterasPage() {
     }
   }
 
-  useEffect(() => {
-    let mounted = true
-    async function load() {
-      setLoading(true)
-      try {
-        const data = await billeteraService.list()
-        if (mounted && Array.isArray(data)) setBilleteras(data.map((d: any) => ({ ...d, saldo_actual: Number(d.saldo_actual), saldo_inicial: Number(d.saldo_inicial) })))
-      } catch (err) {
-        // si hay error, lo dejamos en consola por ahora
-        console.error('Error cargando billeteras', err)
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-    load()
-    return () => { mounted = false }
-  }, [])
-
   const total = billeteras
-    .filter((b) => b.moneda === 'ARS')
+    .filter((b) => b.moneda === 'ARS' && b.estado !== 'archivada')
     .reduce((acc, b) => acc + b.saldo_actual, 0)
+
+  if (isLoading && billeteras.length === 0) return <Skeleton />
 
   return (
     <div className={styles.root}>

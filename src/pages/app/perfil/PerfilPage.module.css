@@ -244,6 +244,33 @@
   opacity: 0.9;
 }
 
+.dangerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  color: var(--error);
+  border-radius: 16px;
+  font-weight: 700;
+  border: 1px solid var(--error);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.logoutBtn:hover {
+  background: rgba(231, 76, 60, 0.08);
+  opacity: 0.95;
+}
+
 /* ── Confirm modal ───────────────────────────── */
 .modalOverlay {
   position: fixed;
@@ -265,6 +292,30 @@
   width: 100%;
   padding: 32px;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeaderFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modalTitleNoMargin {
+  margin: 0;
+}
+
+.modalErrorBox {
+  margin-bottom: 16px;
+  text-align: center;
+  padding: 8px;
+  background: rgba(231, 76, 60, 0.1);
+  border-radius: 8px;
+}
+
+.formMethodsActions {
+  display: flex;
+  gap: 12px;
 }
 
 .modalIconWrap {
@@ -751,3 +802,7 @@
   text-decoration: underline;
 }
 
+
+.hiddenInput {
+  display: none;
+}

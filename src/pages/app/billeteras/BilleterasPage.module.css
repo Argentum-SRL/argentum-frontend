@@ -63,6 +63,32 @@
   opacity: 0.88;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.archivedToggle {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.archivedToggle:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 /* ── Grid ────────────────────────────────────────────────────────────────── */
 
 .grid {
@@ -165,6 +191,32 @@
 
 .cardSaldoPrimary {
   color: #fff;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.actionBtn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  opacity: 0.9;
+}
+
+.actionBtnDanger {
+  background: transparent;
+  border-color: var(--error);
+  color: var(--error);
 }
 
 /* ── Empty state ─────────────────────────────────────────────────────────── */

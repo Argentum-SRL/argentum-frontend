@@ -221,3 +221,35 @@ export interface PagoDashboard {
   dias_restantes: number
   tipo: 'suscripcion' | 'cuota'
 }
+
+export interface Proyeccion {
+  periodo: {
+    fecha_inicio: string
+    fecha_fin: string
+    dias_transcurridos: number
+    dias_restantes: number
+    dias_totales: number
+  }
+  gasto_proyectado_total: number
+  balance_proyectado: number
+  ingresos_proyectados: number
+  certezas: {
+    cuotas_restantes: number
+    suscripciones_restantes: number
+    total: number
+  }
+  desglose_por_categoria: ProyeccionCategoria[]
+  nivel_confianza: 'alto' | 'medio' | 'bajo'
+  ciclos_analizados: number
+  pesos: { historial: number; ciclo_actual: number }
+  advertencias: string[]
+}
+
+export interface ProyeccionCategoria {
+  categoria_id: string
+  categoria_nombre: string
+  gasto_actual_ciclo: number
+  promedio_historico: number
+  proyectado: number
+  fuera_de_patron: boolean
+}

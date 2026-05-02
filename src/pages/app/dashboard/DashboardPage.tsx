@@ -8,14 +8,15 @@ import {
   RefreshCw, 
   CreditCard,
   ChevronRight,
-  ChevronLeft,
   TrendingUp,
   TrendingDown,
   AlertCircle
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, CotizacionDolar } from '@/types'
+import type { DashboardResumen, CotizacionDolar, Proyeccion } from '@/types'
+import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
+import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { getCategoryIcon } from '@/utils/categoryIcons'
 import styles from './DashboardPage.module.css'
@@ -85,7 +86,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [customRange, setCustomRange] = useState<{desde: string, hasta: string} | null>(null)
+  const [proyeccion, setProyeccion] = useState<Proyeccion | null>(null)
+  const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
+  const [isProyeccionModalOpen, setIsProyeccionModalOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     setError(false)
@@ -101,40 +105,27 @@ export default function DashboardPage() {
     }
   }, [customRange])
 
+  const fetchProyeccion = useCallback(async () => {
+    try {
+      setLoadingProyeccion(true)
+      const res = await dashboardService.getProyeccion()
+      setProyeccion(res)
+    } catch (err) {
+      console.error('Error loading proyeccion:', err)
+    } finally {
+      setLoadingProyeccion(false)
+    }
+  }, [])
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchData()
+      fetchProyeccion()
     }, 0)
     return () => clearTimeout(timer)
-  }, [fetchData])
+  }, [fetchData, fetchProyeccion])
 
-  const handlePrevPeriod = () => {
-    if (!data) return
-    const currentInicio = new Date(data.periodo.fecha_inicio)
-    const prevInicio = new Date(currentInicio.getFullYear(), currentInicio.getMonth() - 1, 1)
-    const prevFin = new Date(currentInicio.getFullYear(), currentInicio.getMonth(), 0)
-    
-    // Validar limite inferior
-    if (data.periodo.primera_transaccion) {
-      const primera = new Date(data.periodo.primera_transaccion)
-      if (prevFin < primera) return
-    }
 
-    const d = prevInicio.toISOString().split('T')[0]
-    const h = prevFin.toISOString().split('T')[0]
-    setCustomRange({ desde: d, hasta: h })
-  }
-
-  const handleNextPeriod = () => {
-    if (!data) return
-    const currentInicio = new Date(data.periodo.fecha_inicio)
-    const nextInicio = new Date(currentInicio.getFullYear(), currentInicio.getMonth() + 1, 1)
-    const nextFin = new Date(currentInicio.getFullYear(), currentInicio.getMonth() + 2, 0)
-
-    const d = nextInicio.toISOString().split('T')[0]
-    const h = nextFin.toISOString().split('T')[0]
-    setCustomRange({ desde: d, hasta: h })
-  }
 
   const handleResetPeriod = () => {
     setCustomRange(null)
@@ -173,14 +164,6 @@ export default function DashboardPage() {
           {data && (
             <div className={styles.headerInfo}>
               <div className={styles.cycleNavigation}>
-                <button 
-                  className={styles.navBtn} 
-                  onClick={handlePrevPeriod}
-                  title="Periodo anterior"
-                  disabled={data.periodo.primera_transaccion ? new Date(data.periodo.fecha_inicio) <= new Date(data.periodo.primera_transaccion) : false}
-                >
-                  <ChevronLeft size={20} />
-                </button>
                 <div className={styles.dateSelectorWrap}>
                   <span className={styles.cycleDates} onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}>
                     {formatFecha(data.periodo.fecha_inicio)} — {formatFecha(data.periodo.fecha_fin)}
@@ -204,9 +187,6 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </div>
-                <button className={styles.navBtn} onClick={handleNextPeriod} title="Periodo siguiente">
-                  <ChevronRight size={20} />
-                </button>
               </div>
               <Cotizacion />
             </div>
@@ -268,9 +248,17 @@ export default function DashboardPage() {
                   <span className={styles.secValue}>{formatMonto(data.disponible_real.disponible, 'ARS')}</span>
                 </div>
                 <div className={styles.secMetric}>
-                  <span className={styles.secLabel}>Proyección cierre</span>
+                  <div className={styles.labelWithHint} onClick={() => proyeccion && setIsProyeccionModalOpen(true)}>
+                    <span className={styles.secLabel}>Proyección cierre</span>
+                    {proyeccion && (
+                      <div className={`${styles.confianzaDot} ${styles[proyeccion.nivel_confianza]}`} />
+                    )}
+                    {proyeccion && proyeccion.advertencias.length > 0 && (
+                      <AlertCircle size={14} color="#f59e0b" style={{ marginLeft: '4px' }} />
+                    )}
+                  </div>
                   <span className={styles.secValue}>
-                    Próximamente <span className={styles.mockupBadge}>Mockup</span>
+                    {loadingProyeccion ? 'Calculando...' : proyeccion ? formatMonto(proyeccion.gasto_proyectado_total, 'ARS') : 'N/A'}
                   </span>
                 </div>
               </div>
@@ -278,6 +266,7 @@ export default function DashboardPage() {
           </div>
         )
       )}
+
 
       {/* Grid */}
       <div className={styles.dashboardGrid}>
@@ -372,6 +361,21 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Projection Card (Only shown if on current cycle) */}
+      {!customRange && (
+        <div className={styles.proyeccionSection}>
+          <ProyeccionCard />
+        </div>
+      )}
+
+      {proyeccion && (
+        <ProyeccionModal 
+          isOpen={isProyeccionModalOpen}
+          onClose={() => setIsProyeccionModalOpen(false)}
+          proyeccion={proyeccion}
+        />
+      )}
     </div>
   )
 }

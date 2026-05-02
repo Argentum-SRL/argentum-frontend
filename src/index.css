@@ -75,6 +75,19 @@ p, h1, h2, h3, h4, h5, h6 {
   --success-bg: rgba(46,204,113,0.12);
 }
 
+html {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+*, *::before, *::after {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
 * {
   font-family: 'Figtree', sans-serif;
   font-feature-settings: "tnum";
@@ -114,6 +127,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html,
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;

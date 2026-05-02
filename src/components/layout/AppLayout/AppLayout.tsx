@@ -2,9 +2,10 @@ import { useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Home, CreditCard, ArrowLeftRight, BarChart2, Clock, Package,
-  Bell, Search, MoreHorizontal, Repeat
+  Bell, Search, MoreHorizontal, Repeat, Sun, Moon
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/hooks/useTheme'
 import styles from './AppLayout.module.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -58,6 +59,7 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const { usuario, logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
 
@@ -149,6 +151,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </Link>
           <button
             type="button"
+            className={styles.themeBtn}
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+          >
+            {theme === 'dark' ? <Sun {...ICON_PROPS} /> : <Moon {...ICON_PROPS} />}
+            <span>{theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}</span>
+          </button>
+          <button
+            type="button"
             className={styles.logoutQuickAction}
             onClick={() => { void logout() }}
           >
@@ -166,6 +177,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className={styles.mobileActions}>
           <button className={styles.mobileIconBtn} aria-label="Notificaciones">
             <Bell size={22} strokeWidth={1.75} />
+          </button>
+          <button
+            className={styles.mobileIconBtn}
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+          >
+            {theme === 'dark' ? <Sun size={22} strokeWidth={1.75} /> : <Moon size={22} strokeWidth={1.75} />}
           </button>
           <button className={styles.mobileIconBtn} aria-label="Buscar">
             <Search size={22} strokeWidth={1.75} />

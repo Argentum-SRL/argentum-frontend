@@ -1,5 +1,6 @@
-import { useId } from 'react'
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
+import { Sun, Moon } from 'lucide-react'
+import { useTheme } from '@/hooks/useTheme'
 import styles from './AuthLayout.module.css'
 
 function MoonIcon({ size }: { size: number }) {
@@ -50,11 +51,24 @@ interface AuthLayoutProps {
 }
 
 export default function AuthLayout({ title, children, leftPanel }: AuthLayoutProps) {
+  const { theme, toggleTheme } = useTheme()
+
+  const themeBtn = (
+    <button
+      className={styles.themeToggle}
+      onClick={toggleTheme}
+      aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+    >
+      {theme === 'dark' ? <Sun size={20} strokeWidth={1.75} /> : <Moon size={20} strokeWidth={1.75} />}
+    </button>
+  )
+
   if (leftPanel) {
     return (
       <>
         {/* Desktop: split 50/50 */}
         <div className={styles.desktop}>
+          {themeBtn}
           <div className={styles.leftPanel}>{leftPanel}</div>
           <div className={styles.rightPanel}>
             <div className={styles.formWrap}>
@@ -65,6 +79,7 @@ export default function AuthLayout({ title, children, leftPanel }: AuthLayoutPro
 
         {/* Mobile: full screen */}
         <div className={styles.mobile}>
+          {themeBtn}
           <div className={styles.mobileInner}>
             <FormContent title={title}>{children}</FormContent>
           </div>
@@ -75,6 +90,7 @@ export default function AuthLayout({ title, children, leftPanel }: AuthLayoutPro
 
   return (
     <div className={styles.standalone}>
+      {themeBtn}
       <div className={styles.standaloneCard}>
         <FormContent title={title}>{children}</FormContent>
       </div>

@@ -124,6 +124,28 @@
   font-weight: 600;
 }
 
+.themeBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-align: left;
+}
+
+.themeBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+}
+
 /* Spacer */
 .spacer {
   flex: 1;
@@ -162,8 +184,8 @@
 
 .logoutQuickAction {
   width: 100%;
-  margin: 0;
-  padding: 0 12px;
+  margin-top: 8px;
+  padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.08);
@@ -172,23 +194,9 @@
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  opacity: 0;
-  transform: translateY(-4px);
-  max-height: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transition: opacity 0.15s, transform 0.15s, background 0.15s, border-color 0.15s, max-height 0.15s, padding 0.15s, margin 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.userBlock:hover .logoutQuickAction,
-.userBlock:focus-within .logoutQuickAction {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-  max-height: 48px;
-  margin-top: 8px;
-  padding: 10px 12px;
-}
 
 .logoutQuickAction:hover {
   background: rgba(255, 255, 255, 0.14);

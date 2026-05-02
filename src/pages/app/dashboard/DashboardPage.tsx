@@ -1,272 +1,295 @@
-import { useState } from 'react'
-import { Bell, Search, TrendingUp, TrendingDown } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
+import { 
+  Bell, 
+  Search, 
+  ArrowUpDown, 
+  Calendar, 
+  RefreshCw, 
+  CreditCard,
+  ChevronRight,
+  TrendingUp,
+  TrendingDown,
+  AlertCircle
+} from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { calcularPeriodoActual } from '@/lib/utils/ciclo'
-import { getCategoriaMeta } from '@/lib/utils/categorias.utils'
-import { useFinancial } from '@/hooks/useFinancial'
-import type { DashboardData, TransaccionMock, ProximoPagoMock, CategoriaMock } from '@/lib/mock/dashboard.mock'
+import { dashboardService } from '@/services/dashboard.service'
+import type { DashboardResumen, CotizacionDolar } from '@/types'
+import { formatMonto, formatFecha } from '@/utils/format'
+import { getCategoryIcon } from '@/utils/categoryIcons'
 import styles from './DashboardPage.module.css'
 
-// ── Formatters ─────────────────────────────────────────────────────────────
+// ── Components ───────────────────────────────────────────────────────────
 
-function fmtARS(n: number, decimales = 0): string {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: decimales,
-    maximumFractionDigits: decimales,
-  }).format(n)
-}
+const Greeting = ({ nombre }: { nombre: string | null }) => {
+  const hour = new Date().getHours()
+  let greeting = 'Buenas noches'
+  if (hour >= 6 && hour < 12) greeting = 'Buenos días'
+  else if (hour >= 12 && hour < 20) greeting = 'Buenas tardes'
 
-function fmtFecha(iso: string): string {
-  const d = new Date(iso + 'T12:00:00')
-  return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
-}
-
-function fmtDiasRestantes(iso: string): string {
-  const hoy = new Date()
-  hoy.setHours(0, 0, 0, 0)
-  const vence = new Date(iso + 'T12:00:00')
-  const diff = Math.ceil((vence.getTime() - hoy.getTime()) / 86400000)
-  if (diff === 0) return 'Hoy'
-  if (diff === 1) return 'Mañana'
-  if (diff < 0) return 'Vencido'
-  return `en ${diff}d`
-}
-
-// ── Skeleton ───────────────────────────────────────────────────────────────
-
-function Skeleton() {
   return (
-    <div className={styles.root}>
-      <div className={styles.pageHeader}>
-        <div>
-          <div className={`${styles.skel} ${styles.skelTitle}`} />
-          <div className={`${styles.skel} ${styles.skelSubtitle}`} />
+    <div className={styles.headerLeft}>
+      <h1 className={styles.greeting}>
+        {greeting}{nombre ? `, ${nombre}` : ''}
+      </h1>
+      <p className={styles.subtitle}>Tu panorama financiero</p>
+    </div>
+  )
+}
+
+const BalanceSkeleton = () => (
+  <div className={`${styles.skeleton} ${styles.skeletonBalance}`} />
+)
+
+const ListSkeleton = () => (
+  <div className={styles.list}>
+    {[1, 2, 3, 4].map(i => (
+      <div key={i} className={styles.skeletonRow}>
+        <div className={`${styles.skeleton} ${styles.skeletonIcon}`} />
+        <div className={styles.skeletonLines}>
+          <div className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonWidth60}`} />
+          <div className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonWidth40}`} />
         </div>
       </div>
-      <div className={`${styles.skel} ${styles.skelHero}`} />
-      <div className={styles.grid}>
-        <div className={`${styles.skel} ${styles.skelPanel}`} />
-        <div className={`${styles.skel} ${styles.skelPanel}`} />
-      </div>
+    ))}
+  </div>
+)
+
+const Cotizacion = () => {
+  const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    dashboardService.getCotizacion()
+      .then(setCotizacion)
+      .catch(() => {}) // Ignorar error segun requerimiento
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading || !cotizacion) return null
+
+  return (
+    <div className={styles.cotizacion}>
+      <span className={styles.cotLabel}>USD {cotizacion.tipo}:</span>
+      <span className={styles.cotValue}>{formatMonto(cotizacion.venta || 0, 'ARS').replace('ARS', '').trim()}</span>
     </div>
   )
 }
 
-// ── Donut chart ────────────────────────────────────────────────────────────
-
-function DonutChart({ categorias }: { categorias: CategoriaMock[] }) {
-  const r = 44
-  const circ = 2 * Math.PI * r
-  
-  // Calculate cumulative angles without mutation
-  const segments = categorias.map((cat, idx) => {
-    const len = (cat.porcentaje / 100) * circ
-    const prevSum = categorias.slice(0, idx).reduce((acc, c) => acc + (c.porcentaje / 100) * 360, 0)
-    const rotation = -90 + prevSum
-    return { ...cat, len, rotation }
-  })
-
-  return (
-    <svg viewBox="0 0 120 120" className={styles.donut}>
-      {segments.map((seg) => (
-        <circle
-          key={seg.nombre}
-          cx={60} cy={60} r={r}
-          fill="none"
-          stroke={seg.color}
-          strokeWidth={14}
-          strokeDasharray={`${seg.len} ${circ - seg.len}`}
-          transform={`rotate(${seg.rotation}, 60, 60)`}
-        />
-      ))}
-      <circle cx={60} cy={60} r={30} fill="var(--surface)" />
-    </svg>
-  )
-}
-
-// ── Hero card ──────────────────────────────────────────────────────────────
-
-const PERIODO_TABS = ['Hoy', 'Semana', 'Mes', 'USD'] as const
-type PeriodoTab = typeof PERIODO_TABS[number]
-
-function HeroCard({ data, tab, onTab }: { data: DashboardData; tab: PeriodoTab; onTab: (t: PeriodoTab) => void }) {
-  const positivo = data.balanceCambio >= 0
-  return (
-    <div className={styles.hero}>
-      {/* Decorative circles */}
-      <div className={styles.heroDecoA} aria-hidden="true" />
-      <div className={styles.heroDecoB} aria-hidden="true" />
-
-      <div className={styles.heroInner}>
-        {/* Left: balance */}
-        <div className={styles.heroLeft}>
-          <p className={styles.heroLabel}>Balance del ciclo</p>
-          <p className={styles.heroBalance}>{fmtARS(data.balance, 2)}</p>
-          <div className={styles.heroBadge}>
-            {positivo
-              ? <TrendingUp size={14} strokeWidth={2} />
-              : <TrendingDown size={14} strokeWidth={2} />
-            }
-            <span>{positivo ? '+' : ''}{data.balanceCambioPct}% vs ciclo ant.</span>
-          </div>
-        </div>
-
-        {/* Right: pills + stats */}
-        <div className={styles.heroRight}>
-          <div className={styles.heroPills}>
-            {PERIODO_TABS.map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => onTab(t)}
-                className={[styles.heroPill, tab === t ? styles.heroPillActive : ''].filter(Boolean).join(' ')}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.heroStats}>
-            <div className={styles.heroStat}>
-              <span className={styles.heroStatLabel}>Disponible real</span>
-              <span className={styles.heroStatValue}>{fmtARS(data.disponibleReal)}</span>
-            </div>
-            <div className={styles.heroStat}>
-              <span className={styles.heroStatLabel}>Proyección cierre</span>
-              <span className={styles.heroStatValue}>{fmtARS(data.proyeccion)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── Transacciones list ─────────────────────────────────────────────────────
-
-function TransaccionesList({ transacciones }: { transacciones: TransaccionMock[] }) {
-  return (
-    <div className={styles.panel}>
-      <p className={styles.panelTitle}>Últimos movimientos</p>
-      <div className={styles.txList}>
-        {transacciones.map((tx) => {
-          const meta = getCategoriaMeta(tx.categoria)
-          const positivo = tx.monto > 0
-          return (
-            <div key={tx.id} className={styles.txRow}>
-              <div
-                className={styles.txIcon}
-                data-categoria={tx.categoria}
-              >
-                {meta.icon}
-              </div>
-              <div className={styles.txMeta}>
-                <p className={styles.txDesc}>{tx.descripcion}</p>
-                <p className={styles.txSub}>{fmtFecha(tx.fecha)} · {tx.billetera}</p>
-              </div>
-              <p className={[styles.txMonto, positivo ? styles.txMontoPositivo : styles.txMontoNegativo].join(' ')}>
-                {positivo ? '+' : ''}{fmtARS(tx.monto)}
-              </p>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-// ── Próximos pagos ─────────────────────────────────────────────────────────
-
-function ProximosPagos({ pagos }: { pagos: ProximoPagoMock[] }) {
-  return (
-    <div className={styles.panel}>
-      <p className={styles.panelTitle}>Próximos pagos</p>
-      <div className={styles.pagosList}>
-        {pagos.map((pago) => (
-          <div key={pago.id} className={styles.pagoRow}>
-            <div className={styles.pagoLeft}>
-              <p className={styles.pagoNombre}>{pago.descripcion}</p>
-              <p className={styles.pagoFecha}>{fmtFecha(pago.fechaVencimiento)} — {fmtDiasRestantes(pago.fechaVencimiento)}</p>
-            </div>
-            <div className={styles.pagoRight}>
-              <p className={styles.pagoMonto}>{fmtARS(pago.monto)}</p>
-              {pago.urgente && <span className={styles.pagoUrgente}>Urgente</span>}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ── Categorías ─────────────────────────────────────────────────────────────
-
-function Categorias({ categorias }: { categorias: CategoriaMock[] }) {
-  return (
-    <div className={styles.panel}>
-      <p className={styles.panelTitle}>Por categoría</p>
-      <div className={styles.catWrap}>
-        <DonutChart categorias={categorias} />
-        <div className={styles.catList}>
-          {categorias.map((cat) => (
-            <div key={cat.nombre} className={styles.catRow}>
-              <span className={styles.catDot} data-color={cat.color} />
-              <span className={styles.catNombre}>{cat.nombre}</span>
-              <span className={styles.catPct}>{cat.porcentaje}%</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── DashboardPage ──────────────────────────────────────────────────────────
+// ── Main Page ────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const { usuario } = useAuth()
-  const { dashboard, isLoading } = useFinancial()
-  const [tab, setTab] = useState<PeriodoTab>('Mes')
+  const [data, setData] = useState<DashboardResumen | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  const periodo = calcularPeriodoActual(usuario ?? null)
-  const nombre = usuario?.nombre ?? null
+  const fetchData = useCallback(async () => {
+    setError(false)
+    try {
+      const res = await dashboardService.getResumen()
+      setData(res)
+    } catch (err) {
+      console.error('Error loading dashboard:', err)
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  if (isLoading) return <Skeleton />
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchData()
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [fetchData])
+
+  if (error) {
+    return (
+      <div className={styles.root}>
+        <Greeting nombre={usuario?.nombre ?? null} />
+        <div className={styles.errorState}>
+          <AlertCircle size={48} color="var(--error)" />
+          <p>No pudimos cargar tu resumen. Intenta de nuevo.</p>
+          <button className={styles.retryBtn} onClick={() => { setLoading(true); fetchData(); }}>Reintentar</button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.root}>
-      {/* Page header */}
-      <div className={styles.pageHeader}>
-        <div>
-          <h1 className={styles.pageTitle}>
-            Buen día{nombre ? `, ${nombre}` : ''}
-            <span className={styles.periodoBadge}>{periodo.label}</span>
-          </h1>
-          <p className={styles.pageSubtitle}>Tu panorama financiero</p>
+      {/* Header */}
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <Greeting nombre={usuario?.nombre ?? null} />
+          {data && (
+            <div className={styles.headerInfo}>
+              <span className={styles.cycleDates}>
+                {formatFecha(data.periodo.fecha_inicio)} — {formatFecha(data.periodo.fecha_fin)}
+              </span>
+              <Cotizacion />
+            </div>
+          )}
         </div>
         <div className={styles.headerActions}>
-          <button className={styles.headerBtn} aria-label="Notificaciones">
-            <Bell size={20} strokeWidth={1.75} />
+          <button className={styles.actionBtn} aria-label="Notificaciones">
+            <Bell size={20} />
           </button>
-          <button className={styles.headerBtn} aria-label="Buscar">
-            <Search size={20} strokeWidth={1.75} />
+          <button className={styles.actionBtn} aria-label="Buscar">
+            <Search size={20} />
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Hero card */}
-      <HeroCard data={dashboard!} tab={tab} onTab={setTab} />
+      {/* Balance Card */}
+      {loading ? (
+        <BalanceSkeleton />
+      ) : (
+        data && (
+          <div className={styles.balanceCard}>
+            <div className={styles.balanceContent}>
+              <div className={styles.balanceMain}>
+                <div className={styles.labelWithHint}>
+                  <span className={styles.balanceLabel}>Balance del ciclo</span>
+                  <div className={styles.hint} title="Es la diferencia entre lo que entró y salió de tu cuenta solo en este período.">
+                    <AlertCircle size={14} />
+                  </div>
+                </div>
+                <h2 className={styles.balanceAmount}>{formatMonto(data.balance.balance, 'ARS')}</h2>
+                <div className={styles.balanceBreakdown}>
+                  <div className={styles.breakdownItem}>
+                    <TrendingUp size={14} className={styles.iconPos} />
+                    <span>{formatMonto(data.balance.ingresos, 'ARS')}</span>
+                  </div>
+                  <div className={styles.breakdownItem}>
+                    <TrendingDown size={14} className={styles.iconNeg} />
+                    <span>{formatMonto(data.balance.egresos, 'ARS')}</span>
+                  </div>
+                </div>
+                {data.balance.variacion_vs_ciclo_anterior !== null && (
+                  <div className={`${styles.variationBadge} ${data.balance.variacion_vs_ciclo_anterior >= 0 ? styles.positive : styles.negative}`}>
+                    {data.balance.variacion_vs_ciclo_anterior >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                    <span>
+                      {data.balance.variacion_vs_ciclo_anterior >= 0 ? '+' : ''}
+                      {data.balance.variacion_vs_ciclo_anterior}% vs ciclo ant.
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className={styles.balanceSecondary}>
+                <div className={styles.secMetric}>
+                  <div className={styles.labelWithHint}>
+                    <span className={styles.secLabel}>Disponible real</span>
+                    <div className={styles.hint} title="Tu plata total en billeteras menos las cuotas que tenés que pagar el mes que viene.">
+                      <AlertCircle size={12} />
+                    </div>
+                  </div>
+                  <span className={styles.secValue}>{formatMonto(data.disponible_real.disponible, 'ARS')}</span>
+                </div>
+                <div className={styles.secMetric}>
+                  <span className={styles.secLabel}>Proyección cierre</span>
+                  <span className={styles.secValue}>
+                    Próximamente <span className={styles.mockupBadge}>Mockup</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      )}
 
-      {/* Content grid */}
-      <div className={styles.grid}>
-        <div className={styles.gridMain}>
-          <TransaccionesList transacciones={dashboard!.transacciones} />
+      {/* Grid */}
+      <div className={styles.dashboardGrid}>
+        {/* Ultimos Movimientos */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>Últimos movimientos</h3>
+            <Link to="/app/transacciones" className={styles.seeAll}>
+              Ver todos <ChevronRight size={16} />
+            </Link>
+          </div>
+          <div className={styles.cardContent}>
+            {loading ? (
+              <ListSkeleton />
+            ) : data?.ultimos_movimientos.length === 0 ? (
+              <div className={styles.emptyState}>
+                <ArrowUpDown size={40} className={styles.emptyIcon} />
+                <p>Sin movimientos en este ciclo</p>
+              </div>
+            ) : (
+              <div className={styles.list}>
+                {data?.ultimos_movimientos.map((m) => {
+                  const CategoryIcon = getCategoryIcon(m.categoria_nombre || '')
+                  return (
+                    <div key={m.id} className={styles.listItem}>
+                      <div className={styles.itemIcon}>
+                        <CategoryIcon size={20} color="var(--primary)" />
+                      </div>
+                      <div className={styles.itemMeta}>
+                        <p className={styles.itemName}>{m.descripcion}</p>
+                        <p className={styles.itemSub}>
+                          {formatFecha(m.fecha)} • {m.billetera_nombre}
+                        </p>
+                        {m.estado_verificacion === 'pendiente' && (
+                          <span className={styles.pendingBadge}>Pendiente IA</span>
+                        )}
+                      </div>
+                      <div className={`${styles.itemAmount} ${m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg}`}>
+                        {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, 'ARS')}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </div>
-        <div className={styles.gridSide}>
-          <ProximosPagos pagos={dashboard!.proximosPagos} />
-          <Categorias categorias={dashboard!.categorias} />
+
+        {/* Proximos Pagos */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>Próximos pagos</h3>
+            <Link to="/app/suscripciones" className={styles.seeAll}>
+              Ver todos <ChevronRight size={16} />
+            </Link>
+          </div>
+          <div className={styles.cardContent}>
+            {loading ? (
+              <ListSkeleton />
+            ) : data?.proximos_pagos.length === 0 ? (
+              <div className={styles.emptyState}>
+                <Calendar size={40} className={styles.emptyIcon} />
+                <p>Sin pagos próximos</p>
+              </div>
+            ) : (
+              <div className={styles.list}>
+                {data?.proximos_pagos.map((p) => {
+                  const isUrgente = p.dias_restantes <= 1
+                  let fechaTxt = formatFecha(p.fecha_cobro)
+                  if (p.dias_restantes === 0) fechaTxt = 'Hoy'
+                  else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
+                  else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
+
+                  return (
+                    <div key={p.id} className={styles.listItem}>
+                      <div className={styles.itemIcon}>
+                        {p.tipo === 'suscripcion' ? <RefreshCw size={20} /> : <CreditCard size={20} />}
+                      </div>
+                      <div className={styles.itemMeta}>
+                        <p className={styles.itemName}>{p.nombre}</p>
+                        <p className={styles.itemSub}>{fechaTxt}</p>
+                      </div>
+                      <div className={styles.pagoRight}>
+                        <div className={styles.itemAmount}>{formatMonto(p.monto, 'ARS')}</div>
+                        {isUrgente && <span className={styles.urgentBadge}>Urgente</span>}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

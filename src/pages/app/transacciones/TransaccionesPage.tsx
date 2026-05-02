@@ -27,13 +27,20 @@ const TransaccionesPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   // --- Estado de Filtros ---
-  const [filters, setFilters] = useState<TransaccionFilters>({
-    tipo: undefined,
-    moneda: undefined,
-    fecha_desde: '',
-    fecha_hasta: '',
-    billetera_id: '',
-    busqueda: ''
+  const [filters, setFilters] = useState<TransaccionFilters>(() => {
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    
+    return {
+      tipo: undefined,
+      moneda: undefined,
+      fecha_desde: `${year}-${month}-01`,
+      fecha_hasta: `${year}-${month}-${day}`,
+      billetera_id: '',
+      busqueda: ''
+    }
   })
 
   // --- Estado de Modales ---
@@ -134,11 +141,16 @@ const TransaccionesPage: React.FC = () => {
 
   // --- Handlers ---
   const handleClearFilters = () => {
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+
     setFilters({
       tipo: undefined,
       moneda: undefined,
-      fecha_desde: '',
-      fecha_hasta: '',
+      fecha_desde: `${year}-${month}-01`,
+      fecha_hasta: `${year}-${month}-${day}`,
       billetera_id: '',
       busqueda: ''
     })

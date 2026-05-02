@@ -182,3 +182,42 @@ export interface TransaccionRecurrente {
   estado: 'activa' | 'pausada'
   fecha_creacion: string
 }
+
+export interface DashboardResumen {
+  periodo: { fecha_inicio: string; fecha_fin: string }
+  balance: {
+    ingresos: number
+    egresos: number
+    balance: number
+    variacion_vs_ciclo_anterior: number | null
+  }
+  disponible_real: {
+    total_billeteras: number
+    cuotas_comprometidas_proximo_ciclo: number
+    disponible: number
+  }
+  ultimos_movimientos: MovimientoDashboard[]
+  proximos_pagos: PagoDashboard[]
+}
+
+export interface MovimientoDashboard {
+  id: string
+  descripcion: string
+  fecha: string
+  monto: number
+  tipo: 'ingreso' | 'egreso'
+  moneda: 'ARS' | 'USD'
+  billetera_nombre: string
+  categoria_nombre: string | null
+  estado_verificacion: 'confirmada' | 'pendiente' | null
+}
+
+export interface PagoDashboard {
+  id: string
+  nombre: string
+  monto: number
+  moneda: 'ARS' | 'USD'
+  fecha_cobro: string
+  dias_restantes: number
+  tipo: 'suscripcion' | 'cuota'
+}

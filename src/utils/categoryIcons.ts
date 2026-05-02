@@ -9,7 +9,7 @@ import {
   Package, TrendingUp, Landmark, ArrowDownCircle
 } from 'lucide-react'
 
-export const CATEGORY_ICONS: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+export const CATEGORY_ICONS: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string; color?: string }>> = {
 
   // ── Categorias padre ────────────────────────────────
   'Alimentación':          UtensilsCrossed,

@@ -8,7 +8,19 @@ export function formatMonto(monto: number, moneda: 'ARS' | 'USD'): string {
 }
 
 export function formatFecha(fecha: string | Date): string {
-  const d = typeof fecha === 'string' ? new Date(fecha) : fecha
+  let d: Date
+  if (typeof fecha === 'string') {
+    if (fecha.includes('T')) {
+      d = new Date(fecha)
+    } else {
+      // Es una fecha ISO pura YYYY-MM-DD
+      const [year, month, day] = fecha.split('-').map(Number)
+      d = new Date(year, month - 1, day)
+    }
+  } else {
+    d = fecha
+  }
+
   return new Intl.DateTimeFormat('es-AR', {
     day: '2-digit',
     month: '2-digit',

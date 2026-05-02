@@ -1,5 +1,5 @@
 .subtitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-2);
   line-height: 1.5;
   margin-bottom: 20px;
@@ -16,13 +16,13 @@
 }
 
 .hint {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-3);
   margin-top: 4px;
 }
 
 .error {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--error);
   margin-bottom: 16px;
   text-align: center;
@@ -33,7 +33,7 @@
   height: 48px;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: #fff;
   background: var(--primary);
   border: none;

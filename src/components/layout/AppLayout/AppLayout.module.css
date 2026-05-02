@@ -18,7 +18,7 @@
     left: 0;
     top: 0;
     width: 240px;
-    height: 100vh;
+    height: 100dvh;
     background: var(--primary);
     z-index: 30;
     overflow: hidden;
@@ -240,6 +240,25 @@
 }
 
 /* ── Main content ────────────────────────────────────────────────────────── */
+
+.content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 32px;
+}
+
+@media (max-width: 767px) {
+  .content {
+    padding: 20px 16px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .content {
+    padding: 28px 24px;
+  }
+}
 
 .main {
   flex: 1;

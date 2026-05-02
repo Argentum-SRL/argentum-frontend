@@ -1,9 +1,6 @@
 /* ── Root ────────────────────────────────────────────────────────────────── */
 
 .root {
-  padding: 20px 16px 32px;
-  max-width: 1200px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -11,7 +8,6 @@
 
 @media (min-width: 768px) {
   .root {
-    padding: 32px 40px 48px;
     gap: 28px;
   }
 }
@@ -26,7 +22,7 @@
 }
 
 .pageTitle {
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 700;
   color: var(--text);
   display: flex;
@@ -37,12 +33,12 @@
 
 @media (min-width: 768px) {
   .pageTitle {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
 }
 
 .periodoBadge {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-3);
   background: var(--surface-alt);
@@ -51,7 +47,7 @@
 }
 
 .pageSubtitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-3);
   margin-top: 4px;
 }
@@ -150,14 +146,14 @@
 }
 
 .heroLabel {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.6);
   margin-bottom: 8px;
 }
 
 .heroBalance {
-  font-size: 36px;
+  font-size: 2.25rem;
   font-weight: 700;
   color: #fff;
   letter-spacing: -1px;
@@ -166,7 +162,7 @@
 
 @media (min-width: 768px) {
   .heroBalance {
-    font-size: 42px;
+    font-size: 2.625rem;
   }
 }
 
@@ -176,7 +172,7 @@
   gap: 5px;
   background: var(--success);
   color: #fff;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 20px;
@@ -200,7 +196,7 @@
 .heroPill {
   padding: 5px 14px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.08);
@@ -228,14 +224,14 @@
 }
 
 .heroStatLabel {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .heroStatValue {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   color: #fff;
 }
@@ -285,7 +281,7 @@
 }
 
 .panelTitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 16px;
@@ -339,7 +335,7 @@
 }
 
 .txDesc {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
@@ -348,13 +344,13 @@
 }
 
 .txSub {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-3);
   margin-top: 1px;
 }
 
 .txMonto {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -392,13 +388,13 @@
 .pagoLeft { flex: 1; min-width: 0; }
 
 .pagoNombre {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
 }
 
 .pagoFecha {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-3);
   margin-top: 1px;
 }
@@ -412,13 +408,13 @@
 }
 
 .pagoMonto {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--text);
 }
 
 .pagoUrgente {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   color: var(--error);
   background: var(--error-bg);
@@ -451,7 +447,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .catDot {

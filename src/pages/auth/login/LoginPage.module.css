@@ -11,7 +11,7 @@
 }
 
 .successText {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
@@ -24,13 +24,13 @@
 }
 
 .error {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--error);
   margin: 0;
 }
 
 .errorLink {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--primary);
   text-decoration: underline;
@@ -41,7 +41,7 @@
   height: 48px;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: #fff;
   background: var(--primary);
   border: none;
@@ -69,7 +69,7 @@
 }
 
 .dividerText {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-3);
 }
 
@@ -81,7 +81,7 @@
   border: 1px solid var(--silver);
   background: transparent;
   color: var(--text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@
 
 /* ── Footer ──────────────────────────────────── */
 .footer {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-3);
   text-align: center;
   margin-top: 24px;

@@ -8,7 +8,7 @@
 /* ── Desktop split layout ────────────────────── */
 .desktop {
   display: none;
-  height: 100vh;
+  height: 100dvh;
 }
 
 @media (min-width: 768px) {
@@ -102,22 +102,22 @@
 
 .logoText {
   font-weight: 700;
-  font-size: 32px;
+  font-size: 2rem;
   color: var(--primary);
   letter-spacing: -0.5px;
 }
 
 .logoTextCompact {
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 
 .title {
   font-weight: 700;
-  font-size: 24px;
+  font-size: 1.5rem;
   color: var(--text);
   margin-bottom: 24px;
 }
 
 .titleCompact {
-  font-size: 28px;
+  font-size: 1.75rem;
 }

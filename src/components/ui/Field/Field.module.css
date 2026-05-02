@@ -3,7 +3,7 @@
 }
 
 .label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-2);
   display: block;
@@ -22,7 +22,7 @@
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-  font-size: 16px;
+  font-size: 1rem;
   outline: none;
   transition: border-color 0.15s;
 }
@@ -47,13 +47,13 @@
 }
 
 .error {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--error);
   margin-top: 4px;
 }
 
 .hint {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-3);
   margin-top: 4px;
 }

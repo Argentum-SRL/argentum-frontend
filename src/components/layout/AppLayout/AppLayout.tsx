@@ -229,7 +229,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* ── Main content ─────────────────────────── */}
       <main className={styles.main}>
-        {children}
+        <div className={styles.content}>
+          {children}
+        </div>
       </main>
 
     </div>

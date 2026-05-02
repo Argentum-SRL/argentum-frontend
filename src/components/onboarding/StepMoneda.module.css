@@ -1,12 +1,12 @@
 .title {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 6px;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-2);
   line-height: 1.5;
   margin-bottom: 24px;
@@ -17,7 +17,7 @@
 }
 
 .label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-2);
   display: block;
@@ -54,7 +54,7 @@
 }
 
 .currencyCode {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.5px;
@@ -199,7 +199,7 @@
   height: 48px;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: #fff;
   background: var(--primary);
   border: none;

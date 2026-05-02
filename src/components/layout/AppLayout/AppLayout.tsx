@@ -1,7 +1,7 @@
 import { useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  Home, CreditCard, ArrowLeftRight, BarChart2, Clock, Package,
+  LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
   Bell, Search, MoreHorizontal, Sun, Moon
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -32,22 +32,22 @@ function MoonIcon() {
 // ── Nav config ─────────────────────────────────────────────────────────────
 
 const NAV_MAIN = [
-  { label: 'Dashboard',      path: '/app/dashboard',      Icon: Home           },
-  { label: 'Billeteras',     path: '/app/billeteras',     Icon: CreditCard     },
-  { label: 'Transacciones',  path: '/app/transacciones',  Icon: ArrowLeftRight },
+  { label: 'Dashboard',      path: '/app/dashboard',      Icon: LayoutDashboard },
+  { label: 'Billeteras',     path: '/app/billeteras',     Icon: Wallet          },
+  { label: 'Transacciones',  path: '/app/transacciones',  Icon: ArrowUpDown     },
 ]
 
 const NAV_FINANCIAL = [
-  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: BarChart2 },
-  { label: 'Metas',          path: '/app/metas',           Icon: Clock     },
-  { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: Package   },
+  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart  },
+  { label: 'Metas',          path: '/app/metas',           Icon: Target    },
+  { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: RefreshCw },
 ]
 
 const MOBILE_NAV = [
-  { label: 'Inicio',         path: '/app/dashboard',      Icon: Home           },
-  { label: 'Billeteras',     path: '/app/billeteras',     Icon: CreditCard     },
-  { label: 'Gastos',         path: '/app/transacciones',  Icon: ArrowLeftRight },
-  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: BarChart2      },
+  { label: 'Inicio',         path: '/app/dashboard',      Icon: LayoutDashboard },
+  { label: 'Billeteras',     path: '/app/billeteras',     Icon: Wallet          },
+  { label: 'Gastos',         path: '/app/transacciones',  Icon: ArrowUpDown     },
+  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart        },
 ]
 
 // ── AppLayout ──────────────────────────────────────────────────────────────

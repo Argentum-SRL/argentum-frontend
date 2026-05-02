@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { Plus, ArrowLeftRight, Search, Trash2 } from 'lucide-react'
+import { Plus, ArrowLeftRight, Search, Trash2, MoreHorizontal } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
+import { getCategoryIcon } from '@/utils/categoryIcons'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import transferenciaService from '@/services/transferencia.service'
@@ -389,7 +390,10 @@ const TransaccionesPage: React.FC = () => {
                     }}
                   >
                     <div className={styles.icon}>
-                      {cat?.icono || '💰'}
+                      {(() => {
+                        const IconComp = cat ? getCategoryIcon(cat.nombre) : MoreHorizontal
+                        return <IconComp size={20} strokeWidth={1.75} />
+                      })()}
                     </div>
                     <div className={styles.desc}>
                       <span>{tx.descripcion}</span>

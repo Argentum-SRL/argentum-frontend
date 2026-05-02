@@ -11,6 +11,7 @@ import OnboardingPage from '@/pages/onboarding/OnboardingPage'
 import DashboardPage from '@/pages/app/dashboard/DashboardPage'
 import BilleterasPage from '@/pages/app/billeteras/BilleterasPage'
 import TransaccionesPage from '@/pages/app/transacciones/TransaccionesPage'
+import RecurrentesPage from '@/pages/app/transacciones/RecurrentesPage'
 import PresupuestosPage from '@/pages/app/presupuestos/PresupuestosPage'
 import MetasPage from '@/pages/app/metas/MetasPage'
 import SuscripcionesPage from '@/pages/app/suscripciones/SuscripcionesPage'
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
               { path: '/app/dashboard', element: <DashboardPage /> },
               { path: '/app/billeteras', element: <BilleterasPage /> },
               { path: '/app/transacciones', element: <TransaccionesPage /> },
+              { path: '/app/transacciones/recurrentes', element: <RecurrentesPage /> },
               { path: '/app/presupuestos', element: <PresupuestosPage /> },
               { path: '/app/metas', element: <MetasPage /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage /> },

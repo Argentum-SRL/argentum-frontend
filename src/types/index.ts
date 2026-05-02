@@ -111,3 +111,74 @@ export interface MetodosLogin {
   puede_agregar_email: boolean
   puede_agregar_telefono: boolean
 }
+
+export interface Billetera {
+  id: string
+  nombre: string
+  moneda: 'ARS' | 'USD'
+  saldo_actual: number
+  saldo_inicial: number
+  es_principal: boolean
+  es_efectivo: boolean
+  estado: 'activa' | 'archivada'
+  fecha_creacion: string
+}
+
+export interface Categoria {
+  id: string
+  nombre: string
+  icono: string
+  color: string
+  tipo: 'ingreso' | 'egreso'
+}
+
+export interface Subcategoria {
+  id: string
+  categoria_id: string
+  nombre: string
+}
+
+export interface Transaccion {
+  id: string
+  tipo: 'ingreso' | 'egreso'
+  monto: number
+  moneda: 'ARS' | 'USD'
+  fecha: string
+  descripcion: string
+  categoria_id: string | null
+  subcategoria_id: string | null
+  metodo_pago: 'efectivo' | 'debito' | 'transferencia' | 'credito'
+  billetera_id: string
+  es_recurrente: boolean
+  es_cuota_hija: boolean
+  es_padre_cuotas: boolean
+  grupo_cuotas_id: string | null
+  origen: 'manual' | 'ia_wpp' | 'ia_chat' | 'ia_pdf' | 'recurrente'
+  estado_verificacion: 'confirmada' | 'pendiente' | null
+  fecha_creacion: string
+}
+
+export interface TransferenciaInterna {
+  id: string
+  billetera_origen_id: string
+  billetera_destino_id: string
+  monto: number
+  moneda: 'ARS' | 'USD'
+  fecha: string
+  notas: string | null
+  fecha_creacion: string
+}
+
+export interface TransaccionRecurrente {
+  id: string
+  tipo: 'ingreso' | 'egreso'
+  monto: number
+  moneda: 'ARS' | 'USD'
+  descripcion: string
+  categoria_id: string | null
+  billetera_id: string
+  frecuencia: 'semanal' | 'quincenal' | 'mensual'
+  dia_registro: number
+  estado: 'activa' | 'pausada'
+  fecha_creacion: string
+}

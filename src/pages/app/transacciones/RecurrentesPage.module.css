@@ -5,10 +5,22 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+.embeddedContainer {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.15s ease-out;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.embeddedHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
 }
 
 .header h1 {

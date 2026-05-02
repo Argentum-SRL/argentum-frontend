@@ -12,8 +12,12 @@ import Button from '@/components/ui/Button/Button'
 import { Drawer } from '@/components/ui/Drawer/Drawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
+import RecurrentesPage from './RecurrentesPage'
 
 const TransaccionesPage: React.FC = () => {
+  // --- Estado de Tabs ---
+  const [activeTab, setActiveTab] = useState<'historial' | 'recurrentes'>('historial')
+
   // --- Estado de Datos ---
   const [transacciones, setTransacciones] = useState<Transaccion[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -144,6 +148,9 @@ const TransaccionesPage: React.FC = () => {
       const payload = {
         ...formData,
         monto: parseFloat(formData.monto),
+        categoria_id: formData.categoria_id || null,
+        subcategoria_id: formData.subcategoria_id || null,
+        billetera_id: formData.billetera_id,
         origen: 'manual' as const
       }
       if (formData.metodo_pago === 'credito') {
@@ -167,7 +174,9 @@ const TransaccionesPage: React.FC = () => {
     try {
       const payload = {
         ...formTrData,
-        monto: parseFloat(formTrData.monto)
+        monto: parseFloat(formTrData.monto),
+        billetera_origen_id: formTrData.billetera_origen_id,
+        billetera_destino_id: formTrData.billetera_destino_id
       }
       await transferenciaService.createTransferencia(payload)
       showToast('Transferencia realizada', 'success')
@@ -231,175 +240,198 @@ const TransaccionesPage: React.FC = () => {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Transacciones</h1>
-        <div className={styles.actions}>
-          <Button onClick={() => setIsModalTxOpen(true)}>
-            <Plus size={18} /> Nueva transacción
-          </Button>
-          <Button variant="secondary" onClick={() => setIsModalTrOpen(true)}>
-            <ArrowLeftRight size={18} /> Nueva transferencia
-          </Button>
-        </div>
+        {activeTab === 'historial' && (
+          <div className={styles.actions}>
+            <Button onClick={() => setIsModalTxOpen(true)}>
+              <Plus size={18} /> Nueva transacción
+            </Button>
+            <Button variant="secondary" onClick={() => setIsModalTrOpen(true)}>
+              <ArrowLeftRight size={18} /> Nueva transferencia
+            </Button>
+          </div>
+        )}
       </header>
 
-      {/* FILTROS */}
-      <div className={styles.filtersRow}>
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-tipo">Tipo</label>
-          <select 
-            id="filter-tipo"
-            className={styles.filterInput} 
-            value={filters.tipo || ''} 
-            onChange={e => setFilters({...filters, tipo: (e.target.value as 'ingreso' | 'egreso') || undefined})}
-            title="Filtrar por tipo"
-          >
-            <option value="">Todos</option>
-            <option value="ingreso">Ingreso</option>
-            <option value="egreso">Egreso</option>
-          </select>
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-moneda">Moneda</label>
-          <select 
-            id="filter-moneda"
-            className={styles.filterInput}
-            value={filters.moneda || ''}
-            onChange={e => setFilters({...filters, moneda: e.target.value || undefined})}
-            title="Filtrar por moneda"
-          >
-            <option value="">Todas</option>
-            <option value="ARS">ARS</option>
-            <option value="USD">USD</option>
-          </select>
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-billetera">Billetera</label>
-          <select 
-            id="filter-billetera"
-            className={styles.filterInput}
-            value={filters.billetera_id || ''}
-            onChange={e => setFilters({...filters, billetera_id: e.target.value})}
-            title="Filtrar por billetera"
-          >
-            <option value="">Todas</option>
-            {billeteras.map(b => (
-              <option key={b.id} value={b.id}>{b.nombre}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-desde">Desde</label>
-          <input 
-            id="filter-desde"
-            type="date" 
-            className={styles.filterInput}
-            value={filters.fecha_desde}
-            onChange={e => setFilters({...filters, fecha_desde: e.target.value})}
-          />
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-hasta">Hasta</label>
-          <input 
-            id="filter-hasta"
-            type="date" 
-            className={styles.filterInput}
-            value={filters.fecha_hasta}
-            onChange={e => setFilters({...filters, fecha_hasta: e.target.value})}
-          />
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-search">Buscar</label>
-          <div className={styles.searchWrapper}>
-            <Search size={14} className={styles.searchIcon} />
-            <input 
-              id="filter-search"
-              type="text" 
-              placeholder="Descripción..." 
-              className={`${styles.filterInput} ${styles.searchInput}`}
-              value={filters.busqueda}
-              onChange={e => setFilters({...filters, busqueda: e.target.value})}
-            />
-          </div>
-        </div>
-
-        <button className={styles.clearButton} onClick={handleClearFilters}>
-          Limpiar
+      <div className={styles.tabs}>
+        <button 
+          className={`${styles.tab} ${activeTab === 'historial' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('historial')}
+        >
+          Historial
+        </button>
+        <button 
+          className={`${styles.tab} ${activeTab === 'recurrentes' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('recurrentes')}
+        >
+          Recurrentes
         </button>
       </div>
 
-      {/* LISTA */}
-      <div className={styles.listContainer}>
-        <div className={styles.tableHeader}>
-          <span></span>
-          <span>Descripción</span>
-          <span>Billetera</span>
-          <span>Fecha</span>
-          <span className={styles.textRight}>Monto</span>
-          <span></span>
-        </div>
-        
-        {loading ? (
-          <div className={styles.emptyState}>Cargando transacciones...</div>
-        ) : transacciones.length === 0 ? (
-          <div className={styles.emptyState}>No se encontraron transacciones.</div>
-        ) : (
-          transacciones.map(tx => {
-            const cat = categorias.find(c => c.id === tx.categoria_id)
-            return (
-              <div 
-                key={tx.id} 
-                className={styles.transactionItem}
-                onClick={() => {
-                  if (tx.estado_verificacion === 'pendiente') {
-                    setSelectedTx(tx)
-                    setIsModalConfirmIAOpen(true)
-                  }
-                }}
+      {activeTab === 'historial' ? (
+        <>
+          {/* FILTROS */}
+          <div className={styles.filtersRow}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="filter-tipo">Tipo</label>
+              <select 
+                id="filter-tipo"
+                className={styles.filterInput} 
+                value={filters.tipo || ''} 
+                onChange={e => setFilters({...filters, tipo: (e.target.value as 'ingreso' | 'egreso') || undefined})}
+                title="Filtrar por tipo"
               >
-                <div className={styles.icon}>
-                  {cat?.icono || '💰'}
-                </div>
-                <div className={styles.desc}>
-                  <span>{tx.descripcion}</span>
-                  {cat && <small className={styles.sub}>{cat.nombre}</small>}
-                  <div className={styles.badges}>
-                    {tx.estado_verificacion === 'pendiente' && (
-                      <span className={`${styles.badge} ${styles.badgePending}`}>Pendiente IA</span>
-                    )}
-                    {tx.es_cuota_hija && (
-                      <span className={`${styles.badge} ${styles.badgeCuota}`}>Cuota</span>
-                    )}
-                  </div>
-                </div>
-                <div className={styles.billetera}>
-                  {billeteras.find(b => b.id === tx.billetera_id)?.nombre}
-                </div>
-                <div className={styles.fecha}>{formatFecha(tx.fecha)}</div>
-                <div className={`${styles.monto} ${tx.tipo === 'ingreso' ? styles.ingreso : styles.egreso}`}>
-                  {tx.tipo === 'egreso' ? '- ' : '+ '}
-                  {formatMonto(tx.monto, tx.moneda)}
-                </div>
-                <div className={styles.actionsCell}>
-                  <button 
-                    className={`${styles.clearButton} ${styles.deleteButton}`} 
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setDeleteTarget(tx.id)
-                    }}
-                    title="Eliminar transacción"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+                <option value="">Todos</option>
+                <option value="ingreso">Ingreso</option>
+                <option value="egreso">Egreso</option>
+              </select>
+            </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="filter-moneda">Moneda</label>
+              <select 
+                id="filter-moneda"
+                className={styles.filterInput}
+                value={filters.moneda || ''}
+                onChange={e => setFilters({...filters, moneda: e.target.value || undefined})}
+                title="Filtrar por moneda"
+              >
+                <option value="">Todas</option>
+                <option value="ARS">ARS</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="filter-billetera">Billetera</label>
+              <select 
+                id="filter-billetera"
+                className={styles.filterInput}
+                value={filters.billetera_id || ''}
+                onChange={e => setFilters({...filters, billetera_id: e.target.value})}
+                title="Filtrar por billetera"
+              >
+                <option value="">Todas</option>
+                {billeteras.map(b => (
+                  <option key={b.id} value={b.id}>{b.nombre}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="filter-desde">Desde</label>
+              <input 
+                id="filter-desde"
+                type="date" 
+                className={styles.filterInput}
+                value={filters.fecha_desde}
+                onChange={e => setFilters({...filters, fecha_desde: e.target.value})}
+              />
+            </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="filter-hasta">Hasta</label>
+              <input 
+                id="filter-hasta"
+                type="date" 
+                className={styles.filterInput}
+                value={filters.fecha_hasta}
+                onChange={e => setFilters({...filters, fecha_hasta: e.target.value})}
+              />
+            </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="filter-search">Buscar</label>
+              <div className={styles.searchWrapper}>
+                <Search size={14} className={styles.searchIcon} />
+                <input 
+                  id="filter-search"
+                  type="text" 
+                  placeholder="Descripción..." 
+                  className={`${styles.filterInput} ${styles.searchInput}`}
+                  value={filters.busqueda}
+                  onChange={e => setFilters({...filters, busqueda: e.target.value})}
+                />
               </div>
-            )
-          })
-        )}
-      </div>
+            </div>
+
+            <button className={styles.clearButton} onClick={handleClearFilters}>
+              Limpiar
+            </button>
+          </div>
+
+          {/* LISTA */}
+          <div className={styles.listContainer}>
+            <div className={styles.tableHeader}>
+              <span></span>
+              <span>Descripción</span>
+              <span>Billetera</span>
+              <span>Fecha</span>
+              <span className={styles.textRight}>Monto</span>
+              <span></span>
+            </div>
+            
+            {loading ? (
+              <div className={styles.emptyState}>Cargando transacciones...</div>
+            ) : transacciones.length === 0 ? (
+              <div className={styles.emptyState}>No se encontraron transacciones.</div>
+            ) : (
+              transacciones.map(tx => {
+                const cat = categorias.find(c => c.id === tx.categoria_id)
+                return (
+                  <div 
+                    key={tx.id} 
+                    className={styles.transactionItem}
+                    onClick={() => {
+                      if (tx.estado_verificacion === 'pendiente') {
+                        setSelectedTx(tx)
+                        setIsModalConfirmIAOpen(true)
+                      }
+                    }}
+                  >
+                    <div className={styles.icon}>
+                      {cat?.icono || '💰'}
+                    </div>
+                    <div className={styles.desc}>
+                      <span>{tx.descripcion}</span>
+                      {cat && <small className={styles.sub}>{cat.nombre}</small>}
+                      <div className={styles.badges}>
+                        {tx.estado_verificacion === 'pendiente' && (
+                          <span className={`${styles.badge} ${styles.badgePending}`}>Pendiente IA</span>
+                        )}
+                        {tx.es_cuota_hija && (
+                          <span className={`${styles.badge} ${styles.badgeCuota}`}>Cuota</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className={styles.billetera}>
+                      {billeteras.find(b => b.id === tx.billetera_id)?.nombre}
+                    </div>
+                    <div className={styles.fecha}>{formatFecha(tx.fecha)}</div>
+                    <div className={`${styles.monto} ${tx.tipo === 'ingreso' ? styles.ingreso : styles.egreso}`}>
+                      {tx.tipo === 'egreso' ? '- ' : '+ '}
+                      {formatMonto(tx.monto, tx.moneda)}
+                    </div>
+                    <div className={styles.actionsCell}>
+                      <button 
+                        className={`${styles.clearButton} ${styles.deleteButton}`} 
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDeleteTarget(tx.id)
+                        }}
+                        title="Eliminar transacción"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </>
+      ) : (
+        <RecurrentesPage embedded />
+      )}
 
 
       <Drawer

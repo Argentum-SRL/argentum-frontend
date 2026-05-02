@@ -2,7 +2,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Home, CreditCard, ArrowLeftRight, BarChart2, Clock, Package,
-  Bell, Search, MoreHorizontal, Repeat, Sun, Moon
+  Bell, Search, MoreHorizontal, Sun, Moon
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -35,7 +35,6 @@ const NAV_MAIN = [
   { label: 'Dashboard',      path: '/app/dashboard',      Icon: Home           },
   { label: 'Billeteras',     path: '/app/billeteras',     Icon: CreditCard     },
   { label: 'Transacciones',  path: '/app/transacciones',  Icon: ArrowLeftRight },
-  { label: 'Recurrentes',    path: '/app/transacciones/recurrentes', Icon: Repeat },
 ]
 
 const NAV_FINANCIAL = [

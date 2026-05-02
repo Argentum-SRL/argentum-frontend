@@ -21,7 +21,11 @@ import { Drawer } from '@/components/ui/Drawer/Drawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
 
-const RecurrentesPage: React.FC = () => {
+interface RecurrentesPageProps {
+  embedded?: boolean
+}
+
+const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) => {
   const [recurrentes, setRecurrentes] = useState<TransaccionRecurrente[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -103,7 +107,9 @@ const RecurrentesPage: React.FC = () => {
     try {
       const payload = {
         ...formData,
-        monto: parseFloat(formData.monto)
+        monto: parseFloat(formData.monto),
+        categoria_id: formData.categoria_id || null,
+        billetera_id: formData.billetera_id
       }
       if (editingId) {
         await recurrenteService.updateRecurrente(editingId, payload)
@@ -216,13 +222,21 @@ const RecurrentesPage: React.FC = () => {
   )
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Recurrentes</h1>
-        <Button onClick={() => handleOpenModal()}>
-          <Plus size={18} /> Nueva recurrente
-        </Button>
-      </header>
+    <div className={embedded ? styles.embeddedContainer : styles.container}>
+      {!embedded ? (
+        <header className={styles.header}>
+          <h1>Recurrentes</h1>
+          <Button onClick={() => handleOpenModal()}>
+            <Plus size={18} /> Nueva recurrente
+          </Button>
+        </header>
+      ) : (
+        <div className={styles.embeddedHeader}>
+          <Button onClick={() => handleOpenModal()}>
+            <Plus size={18} /> Nueva recurrente
+          </Button>
+        </div>
+      )}
 
       {loading ? (
         <div className={styles.loadingState}>Cargando...</div>

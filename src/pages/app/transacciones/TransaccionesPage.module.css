@@ -11,6 +11,34 @@
   align-items: center;
 }
 
+.tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: var(--surface-alt);
+  border-radius: 14px;
+  width: fit-content;
+  margin-bottom: 24px;
+}
+
+.tab {
+  padding: 8px 20px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tabActive {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
 .header h1 {
   margin: 0;
   font-size: 1.75rem;

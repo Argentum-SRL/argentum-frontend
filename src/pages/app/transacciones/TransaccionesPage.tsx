@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { Plus, ArrowLeftRight, Search, Trash2, X } from 'lucide-react'
+import { Plus, ArrowLeftRight, Search, Trash2 } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -9,6 +9,9 @@ import categoriaService from '@/services/categoria.service'
 import type { Transaccion, Billetera, Categoria, Subcategoria } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
 import Button from '@/components/ui/Button/Button'
+import { Drawer } from '@/components/ui/Drawer/Drawer'
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
+import { useToast } from '@/hooks/useToast'
 
 const TransaccionesPage: React.FC = () => {
   // --- Estado de Datos ---
@@ -33,6 +36,10 @@ const TransaccionesPage: React.FC = () => {
   const [isModalTrOpen, setIsModalTrOpen] = useState(false)
   const [isModalConfirmIAOpen, setIsModalConfirmIAOpen] = useState(false)
   const [selectedTx, setSelectedTx] = useState<Transaccion | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  
+  const { showToast } = useToast()
 
   // --- Estado de Formulario Transaccion ---
   const [formData, setFormData] = useState({
@@ -70,8 +77,9 @@ const TransaccionesPage: React.FC = () => {
       setTransacciones(data)
     } catch (err) {
       console.error('Error fetching transactions:', err)
+      showToast('Error al cargar transacciones', 'error')
     }
-  }, [filters])
+  }, [filters, showToast])
 
   const fetchData = useCallback(async () => {
     try {
@@ -90,18 +98,6 @@ const TransaccionesPage: React.FC = () => {
     }
   }, [fetchTransacciones])
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setIsModalTxOpen(false)
-        setIsModalTrOpen(false)
-        setIsModalConfirmIAOpen(false)
-      }
-    }
-    const isAnyOpen = isModalTxOpen || isModalTrOpen || isModalConfirmIAOpen
-    if (isAnyOpen) document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [isModalTxOpen, isModalTrOpen, isModalConfirmIAOpen])
 
   // --- Carga Inicial ---
   useEffect(() => {
@@ -158,11 +154,12 @@ const TransaccionesPage: React.FC = () => {
         }
       }
       await transaccionService.createTransaccion(payload)
+      showToast('Transacción guardada', 'success')
       setIsModalTxOpen(false)
       fetchData()
     } catch (err) {
       console.error(err)
-      alert('Error al guardar la transacción')
+      showToast('Error al guardar la transacción', 'error')
     }
   }
 
@@ -173,11 +170,12 @@ const TransaccionesPage: React.FC = () => {
         monto: parseFloat(formTrData.monto)
       }
       await transferenciaService.createTransferencia(payload)
+      showToast('Transferencia realizada', 'success')
       setIsModalTrOpen(false)
       fetchData()
     } catch (err) {
       console.error(err)
-      alert('Error al realizar la transferencia')
+      showToast('Error al realizar la transferencia', 'error')
     }
   }
 
@@ -188,19 +186,28 @@ const TransaccionesPage: React.FC = () => {
       await transaccionService.updateTransaccion(selectedTx.id, selectedTx)
       // Luego confirmamos
       await transaccionService.confirmarIA(selectedTx.id)
+      showToast('Transacción confirmada', 'success')
       setIsModalConfirmIAOpen(false)
       fetchData()
     } catch (err) {
       console.error(err)
-      alert('Error al confirmar transacción')
+      showToast('Error al confirmar transacción', 'error')
     }
   }
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (confirm('¿Estás seguro de eliminar esta transacción? Si es parte de un grupo de cuotas, se eliminará todo el grupo.')) {
-      await transaccionService.deleteTransaccion(id)
+  async function handleDeleteConfirmed() {
+    if (!deleteTarget) return
+    try {
+      setIsDeleting(true)
+      await transaccionService.deleteTransaccion(deleteTarget)
+      showToast('Transacción eliminada', 'success')
       fetchData()
+    } catch (err) {
+      console.error(err)
+      showToast('Error al eliminar', 'error')
+    } finally {
+      setIsDeleting(false)
+      setDeleteTarget(null)
     }
   }
 
@@ -379,7 +386,10 @@ const TransaccionesPage: React.FC = () => {
                 <div className={styles.actionsCell}>
                   <button 
                     className={`${styles.clearButton} ${styles.deleteButton}`} 
-                    onClick={(e) => handleDelete(tx.id, e)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setDeleteTarget(tx.id)
+                    }}
                     title="Eliminar transacción"
                   >
                     <Trash2 size={14} />
@@ -391,379 +401,364 @@ const TransaccionesPage: React.FC = () => {
         )}
       </div>
 
-      {/* OVERLAY */}
-      {(isModalTxOpen || isModalTrOpen || isModalConfirmIAOpen) && (
-        <div 
-          className={styles.overlay} 
-          onClick={() => {
-            setIsModalTxOpen(false)
-            setIsModalTrOpen(false)
-            setIsModalConfirmIAOpen(false)
-          }} 
-        />
-      )}
 
-      {/* DRAWER NUEVA TRANSACCION */}
-      <div className={[styles.drawer, isModalTxOpen ? styles.drawerOpen : ''].filter(Boolean).join(' ')}>
-        <div className={styles.drawerContent}>
-          <div className={styles.formHeader}>
-            <h2 className={styles.formTitle}>Nueva Transacción</h2>
-            <button className={styles.formClose} onClick={() => setIsModalTxOpen(false)} aria-label="Cerrar">
-              <X size={20} />
-            </button>
+      <Drawer
+        isOpen={isModalTxOpen}
+        onClose={() => setIsModalTxOpen(false)}
+        title="Nueva Transacción"
+        width={480}
+      >
+        <div className={styles.drawerForm}>
+          <div className={styles.formRow}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-tipo">Tipo</label>
+              <select 
+                id="form-tipo"
+                className={styles.filterInput} 
+                value={formData.tipo} 
+                onChange={e => setFormData({...formData, tipo: e.target.value as 'ingreso' | 'egreso'})}
+                title="Tipo de transacción"
+              >
+                <option value="egreso">Egreso</option>
+                <option value="ingreso">Ingreso</option>
+              </select>
+            </div>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-monto">Monto</label>
+              <input 
+                id="form-monto"
+                type="number" 
+                className={styles.filterInput} 
+                value={formData.monto} 
+                onChange={e => setFormData({...formData, monto: e.target.value})} 
+                placeholder="0.00" 
+              />
+            </div>
           </div>
 
-          <div className={styles.drawerForm}>
-            <div className={styles.formRow}>
-              <div className={styles.filterGroup}>
-                <label htmlFor="form-tipo">Tipo</label>
-                <select 
-                  id="form-tipo"
-                  className={styles.filterInput} 
-                  value={formData.tipo} 
-                  onChange={e => setFormData({...formData, tipo: e.target.value as 'ingreso' | 'egreso'})}
-                  title="Tipo de transacción"
-                >
-                  <option value="egreso">Egreso</option>
-                  <option value="ingreso">Ingreso</option>
-                </select>
+          <div className={styles.formRow}>
+            <div className={`${styles.filterGroup} ${styles.fullWidth}`}>
+              <label htmlFor="form-desc">Descripción</label>
+              <input 
+                id="form-desc"
+                type="text" 
+                className={styles.filterInput} 
+                value={formData.descripcion} 
+                onChange={e => setFormData({...formData, descripcion: e.target.value})} 
+                placeholder="Ej: Supermercado" 
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-moneda">Moneda</label>
+              <select 
+                id="form-moneda"
+                className={styles.filterInput} 
+                value={formData.moneda} 
+                onChange={e => setFormData({...formData, moneda: e.target.value as 'ARS' | 'USD'})}
+                title="Moneda"
+              >
+                <option value="ARS">ARS</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-fecha">Fecha</label>
+              <input 
+                id="form-fecha"
+                type="date" 
+                className={styles.filterInput} 
+                value={formData.fecha} 
+                onChange={e => setFormData({...formData, fecha: e.target.value})} 
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-categoria">Categoría</label>
+              <select 
+                id="form-categoria"
+                className={styles.filterInput} 
+                value={formData.categoria_id} 
+                onChange={e => {
+                  setFormData({...formData, categoria_id: e.target.value, subcategoria_id: ''})
+                  handleSubcategorias(e.target.value)
+                }}
+                title="Seleccionar categoría"
+              >
+                <option value="">Seleccionar...</option>
+                {categorias.filter(c => c.tipo === formData.tipo).map(c => (
+                  <option key={c.id} value={c.id}>{c.nombre}</option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-subcategoria">Subcategoría</label>
+              <select 
+                id="form-subcategoria"
+                className={styles.filterInput} 
+                value={formData.subcategoria_id} 
+                onChange={e => setFormData({...formData, subcategoria_id: e.target.value})}
+                title="Seleccionar subcategoría"
+              >
+                <option value="">Sin subcategoría</option>
+                {subcategorias.map(s => (
+                  <option key={s.id} value={s.id}>{s.nombre}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-billetera">Billetera</label>
+              <select 
+                id="form-billetera"
+                className={styles.filterInput} 
+                value={formData.billetera_id} 
+                onChange={e => setFormData({...formData, billetera_id: e.target.value})}
+                title="Seleccionar billetera"
+              >
+                <option value="">Seleccionar...</option>
+                {billeteras.filter(b => b.moneda === formData.moneda).map(b => (
+                  <option key={b.id} value={b.id}>{b.nombre}</option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.filterGroup}>
+              <label htmlFor="form-metodo">Método de Pago</label>
+              <select 
+                id="form-metodo"
+                className={styles.filterInput} 
+                value={formData.metodo_pago} 
+                onChange={e => setFormData({...formData, metodo_pago: e.target.value as 'debito' | 'efectivo' | 'credito'})}
+                title="Método de pago"
+              >
+                <option value="debito">Débito / Transferencia</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="credito">Crédito (Cuotas)</option>
+              </select>
+            </div>
+          </div>
+
+          {formData.metodo_pago === 'credito' && (
+            <div className={styles.creditSection}>
+              <div className={styles.formRow}>
+                <div className={styles.filterGroup}>
+                  <label htmlFor="form-cuotas">Cantidad de cuotas</label>
+                  <input 
+                    id="form-cuotas"
+                    type="number" 
+                    className={styles.filterInput} 
+                    value={formData.info_cuotas.cantidad_cuotas} 
+                    onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, cantidad_cuotas: parseInt(e.target.value) || 1}})}
+                  />
+                </div>
+                <div className={styles.filterGroup}>
+                  <div className={styles.toggleRow}>
+                    <label htmlFor="form-interes">¿Tiene interés?</label>
+                    <input 
+                      id="form-interes"
+                      type="checkbox" 
+                      checked={formData.info_cuotas.tiene_interes} 
+                      onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, tiene_interes: e.target.checked}})} 
+                    />
+                  </div>
+                  {formData.info_cuotas.tiene_interes && (
+                    <input 
+                      type="number" 
+                      placeholder="Tasa mensual %" 
+                      className={`${styles.filterInput} ${styles.mt8}`} 
+                      value={formData.info_cuotas.tasa_interes}
+                      onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, tasa_interes: parseFloat(e.target.value) || 0}})}
+                      title="Tasa de interés mensual"
+                    />
+                  )}
+                </div>
               </div>
-              <div className={styles.filterGroup}>
-                <label htmlFor="form-monto">Monto</label>
-                <input 
-                  id="form-monto"
-                  type="number" 
-                  className={styles.filterInput} 
-                  value={formData.monto} 
-                  onChange={e => setFormData({...formData, monto: e.target.value})} 
-                  placeholder="0.00" 
-                />
+              <div className={styles.summary}>
+                <p>Total financiado: <strong>{formatMonto(calculoCuotas.total, formData.moneda)}</strong></p>
+                <p>Valor de cada cuota: <strong>{formatMonto(calculoCuotas.cuota, formData.moneda)}</strong></p>
               </div>
             </div>
+          )}
 
+          <div className={styles.drawerFooter}>
+            <Button variant="secondary" onClick={() => setIsModalTxOpen(false)} fullWidth>Cancelar</Button>
+            <Button onClick={handleSaveTx} fullWidth>Guardar transacción</Button>
+          </div>
+        </div>
+      </Drawer>
+
+      <Drawer
+        isOpen={isModalTrOpen}
+        onClose={() => setIsModalTrOpen(false)}
+        title="Nueva Transferencia"
+        width={480}
+      >
+        <div className={styles.drawerForm}>
+          <div className={styles.formRow}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="tr-origen">Billetera Origen</label>
+              <select 
+                id="tr-origen"
+                className={styles.filterInput} 
+                value={formTrData.billetera_origen_id} 
+                onChange={e => setFormTrData({...formTrData, billetera_origen_id: e.target.value})}
+                title="Billetera origen"
+              >
+                <option value="">Seleccionar...</option>
+                {billeteras.map(b => (
+                  <option key={b.id} value={b.id}>{b.nombre} ({b.moneda})</option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.filterGroup}>
+              <label htmlFor="tr-destino">Billetera Destino</label>
+              <select 
+                id="tr-destino"
+                className={styles.filterInput} 
+                value={formTrData.billetera_destino_id} 
+                onChange={e => setFormTrData({...formTrData, billetera_destino_id: e.target.value})}
+                title="Billetera destino"
+              >
+                <option value="">Seleccionar...</option>
+                {billeteras.filter(b => b.id !== formTrData.billetera_origen_id).map(b => (
+                  <option key={b.id} value={b.id}>{b.nombre} ({b.moneda})</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className={styles.formRow}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="tr-monto">Monto</label>
+              <input 
+                id="tr-monto"
+                type="number" 
+                className={styles.filterInput} 
+                value={formTrData.monto} 
+                onChange={e => setFormTrData({...formTrData, monto: e.target.value})} 
+              />
+            </div>
+            <div className={styles.filterGroup}>
+              <label htmlFor="tr-moneda">Moneda que transfieres</label>
+              <select 
+                id="tr-moneda"
+                className={styles.filterInput} 
+                value={formTrData.moneda} 
+                onChange={e => setFormTrData({...formTrData, moneda: e.target.value as 'ARS' | 'USD'})}
+                title="Moneda de origen"
+              >
+                <option value="ARS">ARS</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+          </div>
+          <div className={styles.formRow}>
+            <div className={`${styles.filterGroup} ${styles.fullWidth}`}>
+              <label htmlFor="tr-notas">Notas</label>
+              <textarea 
+                id="tr-notas"
+                className={styles.filterInput} 
+                rows={3} 
+                value={formTrData.notas} 
+                onChange={e => setFormTrData({...formTrData, notas: e.target.value})} 
+              />
+            </div>
+          </div>
+
+          <div className={styles.drawerFooter}>
+            <Button variant="secondary" onClick={() => setIsModalTrOpen(false)} fullWidth>Cancelar</Button>
+            <Button onClick={handleSaveTr} fullWidth>Realizar transferencia</Button>
+          </div>
+        </div>
+      </Drawer>
+
+      <Drawer
+        isOpen={isModalConfirmIAOpen}
+        onClose={() => setIsModalConfirmIAOpen(false)}
+        title="Confirmar Transacción IA"
+        width={480}
+      >
+        {selectedTx && (
+          <div className={styles.drawerForm}>
+            <div className={styles.iaAlert}>
+              Esta transacción fue detectada automáticamente. Verificá los datos antes de confirmar.
+            </div>
             <div className={styles.formRow}>
-              <div className={`${styles.filterGroup} ${styles.fullWidth}`}>
-                <label htmlFor="form-desc">Descripción</label>
+              <div className={styles.filterGroup}>
+                <label htmlFor="ia-desc">Descripción</label>
                 <input 
-                  id="form-desc"
+                  id="ia-desc"
                   type="text" 
                   className={styles.filterInput} 
-                  value={formData.descripcion} 
-                  onChange={e => setFormData({...formData, descripcion: e.target.value})} 
-                  placeholder="Ej: Supermercado" 
+                  value={selectedTx.descripcion} 
+                  onChange={e => setSelectedTx({...selectedTx, descripcion: e.target.value})} 
                 />
               </div>
-            </div>
-
-            <div className={styles.formRow}>
               <div className={styles.filterGroup}>
-                <label htmlFor="form-moneda">Moneda</label>
-                <select 
-                  id="form-moneda"
-                  className={styles.filterInput} 
-                  value={formData.moneda} 
-                  onChange={e => setFormData({...formData, moneda: e.target.value as 'ARS' | 'USD'})}
-                  title="Moneda"
-                >
-                  <option value="ARS">ARS</option>
-                  <option value="USD">USD</option>
-                </select>
-              </div>
-              <div className={styles.filterGroup}>
-                <label htmlFor="form-fecha">Fecha</label>
+                <label htmlFor="ia-monto">Monto</label>
                 <input 
-                  id="form-fecha"
-                  type="date" 
+                  id="ia-monto"
+                  type="number" 
                   className={styles.filterInput} 
-                  value={formData.fecha} 
-                  onChange={e => setFormData({...formData, fecha: e.target.value})} 
+                  value={selectedTx.monto} 
+                  onChange={e => setSelectedTx({...selectedTx, monto: parseFloat(e.target.value) || 0})} 
                 />
               </div>
             </div>
-
             <div className={styles.formRow}>
               <div className={styles.filterGroup}>
-                <label htmlFor="form-categoria">Categoría</label>
+                <label htmlFor="ia-categoria">Categoría</label>
                 <select 
-                  id="form-categoria"
+                  id="ia-categoria"
                   className={styles.filterInput} 
-                  value={formData.categoria_id} 
-                  onChange={e => {
-                    setFormData({...formData, categoria_id: e.target.value, subcategoria_id: ''})
-                    handleSubcategorias(e.target.value)
-                  }}
-                  title="Seleccionar categoría"
+                  value={selectedTx.categoria_id || ''} 
+                  onChange={e => setSelectedTx({...selectedTx, categoria_id: e.target.value})}
+                  title="Categoría detectada"
                 >
-                  <option value="">Seleccionar...</option>
-                  {categorias.filter(c => c.tipo === formData.tipo).map(c => (
+                  {categorias.map(c => (
                     <option key={c.id} value={c.id}>{c.nombre}</option>
                   ))}
                 </select>
               </div>
               <div className={styles.filterGroup}>
-                <label htmlFor="form-subcategoria">Subcategoría</label>
+                <label htmlFor="ia-billetera">Billetera</label>
                 <select 
-                  id="form-subcategoria"
+                  id="ia-billetera"
                   className={styles.filterInput} 
-                  value={formData.subcategoria_id} 
-                  onChange={e => setFormData({...formData, subcategoria_id: e.target.value})}
-                  title="Seleccionar subcategoría"
+                  value={selectedTx.billetera_id} 
+                  onChange={e => setSelectedTx({...selectedTx, billetera_id: e.target.value})}
+                  title="Billetera detectada"
                 >
-                  <option value="">Sin subcategoría</option>
-                  {subcategorias.map(s => (
-                    <option key={s.id} value={s.id}>{s.nombre}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.filterGroup}>
-                <label htmlFor="form-billetera">Billetera</label>
-                <select 
-                  id="form-billetera"
-                  className={styles.filterInput} 
-                  value={formData.billetera_id} 
-                  onChange={e => setFormData({...formData, billetera_id: e.target.value})}
-                  title="Seleccionar billetera"
-                >
-                  <option value="">Seleccionar...</option>
-                  {billeteras.filter(b => b.moneda === formData.moneda).map(b => (
+                  {billeteras.map(b => (
                     <option key={b.id} value={b.id}>{b.nombre}</option>
                   ))}
                 </select>
               </div>
-              <div className={styles.filterGroup}>
-                <label htmlFor="form-metodo">Método de Pago</label>
-                <select 
-                  id="form-metodo"
-                  className={styles.filterInput} 
-                  value={formData.metodo_pago} 
-                  onChange={e => setFormData({...formData, metodo_pago: e.target.value as 'debito' | 'efectivo' | 'credito'})}
-                  title="Método de pago"
-                >
-                  <option value="debito">Débito / Transferencia</option>
-                  <option value="efectivo">Efectivo</option>
-                  <option value="credito">Crédito (Cuotas)</option>
-                </select>
-              </div>
-            </div>
-
-            {formData.metodo_pago === 'credito' && (
-              <div className={styles.creditSection}>
-                <div className={styles.formRow}>
-                  <div className={styles.filterGroup}>
-                    <label htmlFor="form-cuotas">Cantidad de cuotas</label>
-                    <input 
-                      id="form-cuotas"
-                      type="number" 
-                      className={styles.filterInput} 
-                      value={formData.info_cuotas.cantidad_cuotas} 
-                      onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, cantidad_cuotas: parseInt(e.target.value) || 1}})}
-                    />
-                  </div>
-                  <div className={styles.filterGroup}>
-                    <div className={styles.toggleRow}>
-                      <label htmlFor="form-interes">¿Tiene interés?</label>
-                      <input 
-                        id="form-interes"
-                        type="checkbox" 
-                        checked={formData.info_cuotas.tiene_interes} 
-                        onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, tiene_interes: e.target.checked}})} 
-                      />
-                    </div>
-                    {formData.info_cuotas.tiene_interes && (
-                      <input 
-                        type="number" 
-                        placeholder="Tasa mensual %" 
-                        className={`${styles.filterInput} ${styles.mt8}`} 
-                        value={formData.info_cuotas.tasa_interes}
-                        onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, tasa_interes: parseFloat(e.target.value) || 0}})}
-                        title="Tasa de interés mensual"
-                      />
-                    )}
-                  </div>
-                </div>
-                <div className={styles.summary}>
-                  <p>Total financiado: <strong>{formatMonto(calculoCuotas.total, formData.moneda)}</strong></p>
-                  <p>Valor de cada cuota: <strong>{formatMonto(calculoCuotas.cuota, formData.moneda)}</strong></p>
-                </div>
-              </div>
-            )}
-
-            <div className={styles.drawerFooter}>
-              <Button variant="secondary" onClick={() => setIsModalTxOpen(false)} fullWidth>Cancelar</Button>
-              <Button onClick={handleSaveTx} fullWidth>Guardar transacción</Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* DRAWER NUEVA TRANSFERENCIA */}
-      <div className={[styles.drawer, isModalTrOpen ? styles.drawerOpen : ''].filter(Boolean).join(' ')}>
-        <div className={styles.drawerContent}>
-          <div className={styles.formHeader}>
-            <h2 className={styles.formTitle}>Nueva Transferencia</h2>
-            <button className={styles.formClose} onClick={() => setIsModalTrOpen(false)} aria-label="Cerrar">
-              <X size={20} />
-            </button>
-          </div>
-
-          <div className={styles.drawerForm}>
-            <div className={styles.formRow}>
-              <div className={styles.filterGroup}>
-                <label htmlFor="tr-origen">Billetera Origen</label>
-                <select 
-                  id="tr-origen"
-                  className={styles.filterInput} 
-                  value={formTrData.billetera_origen_id} 
-                  onChange={e => setFormTrData({...formTrData, billetera_origen_id: e.target.value})}
-                  title="Billetera origen"
-                >
-                  <option value="">Seleccionar...</option>
-                  {billeteras.map(b => (
-                    <option key={b.id} value={b.id}>{b.nombre} ({b.moneda})</option>
-                  ))}
-                </select>
-              </div>
-              <div className={styles.filterGroup}>
-                <label htmlFor="tr-destino">Billetera Destino</label>
-                <select 
-                  id="tr-destino"
-                  className={styles.filterInput} 
-                  value={formTrData.billetera_destino_id} 
-                  onChange={e => setFormTrData({...formTrData, billetera_destino_id: e.target.value})}
-                  title="Billetera destino"
-                >
-                  <option value="">Seleccionar...</option>
-                  {billeteras.filter(b => b.id !== formTrData.billetera_origen_id).map(b => (
-                    <option key={b.id} value={b.id}>{b.nombre} ({b.moneda})</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className={styles.formRow}>
-              <div className={styles.filterGroup}>
-                <label htmlFor="tr-monto">Monto</label>
-                <input 
-                  id="tr-monto"
-                  type="number" 
-                  className={styles.filterInput} 
-                  value={formTrData.monto} 
-                  onChange={e => setFormTrData({...formTrData, monto: e.target.value})} 
-                />
-              </div>
-              <div className={styles.filterGroup}>
-                <label htmlFor="tr-moneda">Moneda que transfieres</label>
-                <select 
-                  id="tr-moneda"
-                  className={styles.filterInput} 
-                  value={formTrData.moneda} 
-                  onChange={e => setFormTrData({...formTrData, moneda: e.target.value as 'ARS' | 'USD'})}
-                  title="Moneda de origen"
-                >
-                  <option value="ARS">ARS</option>
-                  <option value="USD">USD</option>
-                </select>
-              </div>
-            </div>
-            <div className={styles.formRow}>
-              <div className={`${styles.filterGroup} ${styles.fullWidth}`}>
-                <label htmlFor="tr-notas">Notas</label>
-                <textarea 
-                  id="tr-notas"
-                  className={styles.filterInput} 
-                  rows={3} 
-                  value={formTrData.notas} 
-                  onChange={e => setFormTrData({...formTrData, notas: e.target.value})} 
-                />
-              </div>
             </div>
 
             <div className={styles.drawerFooter}>
-              <Button variant="secondary" onClick={() => setIsModalTrOpen(false)} fullWidth>Cancelar</Button>
-              <Button onClick={handleSaveTr} fullWidth>Realizar transferencia</Button>
+              <Button variant="secondary" onClick={() => setIsModalConfirmIAOpen(false)} fullWidth>Cancelar</Button>
+              <Button onClick={handleConfirmIA} fullWidth>Confirmar y Guardar</Button>
             </div>
           </div>
-        </div>
-      </div>
+        )}
+      </Drawer>
 
-      {/* DRAWER CONFIRMAR IA */}
-      <div className={[styles.drawer, isModalConfirmIAOpen ? styles.drawerOpen : ''].filter(Boolean).join(' ')}>
-        <div className={styles.drawerContent}>
-          <div className={styles.formHeader}>
-            <h2 className={styles.formTitle}>Confirmar Transacción IA</h2>
-            <button className={styles.formClose} onClick={() => setIsModalConfirmIAOpen(false)} aria-label="Cerrar">
-              <X size={20} />
-            </button>
-          </div>
-
-          {selectedTx && (
-            <div className={styles.drawerForm}>
-              <div className={styles.iaAlert}>
-                Esta transacción fue detectada automáticamente. Verificá los datos antes de confirmar.
-              </div>
-              <div className={styles.formRow}>
-                <div className={styles.filterGroup}>
-                  <label htmlFor="ia-desc">Descripción</label>
-                  <input 
-                    id="ia-desc"
-                    type="text" 
-                    className={styles.filterInput} 
-                    value={selectedTx.descripcion} 
-                    onChange={e => setSelectedTx({...selectedTx, descripcion: e.target.value})} 
-                  />
-                </div>
-                <div className={styles.filterGroup}>
-                  <label htmlFor="ia-monto">Monto</label>
-                  <input 
-                    id="ia-monto"
-                    type="number" 
-                    className={styles.filterInput} 
-                    value={selectedTx.monto} 
-                    onChange={e => setSelectedTx({...selectedTx, monto: parseFloat(e.target.value) || 0})} 
-                  />
-                </div>
-              </div>
-              <div className={styles.formRow}>
-                <div className={styles.filterGroup}>
-                  <label htmlFor="ia-categoria">Categoría</label>
-                  <select 
-                    id="ia-categoria"
-                    className={styles.filterInput} 
-                    value={selectedTx.categoria_id || ''} 
-                    onChange={e => setSelectedTx({...selectedTx, categoria_id: e.target.value})}
-                    title="Categoría detectada"
-                  >
-                    {categorias.map(c => (
-                      <option key={c.id} value={c.id}>{c.nombre}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className={styles.filterGroup}>
-                  <label htmlFor="ia-billetera">Billetera</label>
-                  <select 
-                    id="ia-billetera"
-                    className={styles.filterInput} 
-                    value={selectedTx.billetera_id} 
-                    onChange={e => setSelectedTx({...selectedTx, billetera_id: e.target.value})}
-                    title="Billetera detectada"
-                  >
-                    {billeteras.map(b => (
-                      <option key={b.id} value={b.id}>{b.nombre}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className={styles.drawerFooter}>
-                <Button variant="secondary" onClick={() => setIsModalConfirmIAOpen(false)} fullWidth>Cancelar</Button>
-                <Button onClick={handleConfirmIA} fullWidth>Confirmar y Guardar</Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirmed}
+        title="Eliminar transacción"
+        description="¿Estás seguro? Si es parte de un grupo de cuotas, se eliminará todo el grupo."
+        variant="danger"
+        confirmLabel="Eliminar"
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

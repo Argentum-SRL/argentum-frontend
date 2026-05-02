@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Plus, Wallet, Banknote, X, Check } from 'lucide-react'
+import { Plus, Wallet, Banknote } from 'lucide-react'
 import styles from './BilleterasPage.module.css'
 import billeteraService from '@/services/billetera.service'
 import { useFinancial } from '@/hooks/useFinancial'
+import { Drawer } from '@/components/ui/Drawer/Drawer'
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
+import { useToast } from '@/hooks/useToast'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -38,25 +41,6 @@ function fmtSaldo(n: number, moneda: 'ARS' | 'USD'): string {
   }).format(n)
 }
 
-// ── Toast ──────────────────────────────────────────────────────────────────
-
-function Toast({ message, type = 'success', onClose }: { message: string; type?: 'success' | 'error'; onClose: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onClose, 5000)
-    return () => clearTimeout(t)
-  }, [onClose])
-
-  return (
-    <div className={[styles.toast, type === 'error' ? styles.toastError : ''].filter(Boolean).join(' ')}>
-      {type === 'success' ? (
-        <Check size={16} strokeWidth={2} className={styles.toastIcon} />
-      ) : (
-        <X size={16} strokeWidth={2} className={styles.toastIconError} />
-      )}
-      <span>{message}</span>
-    </div>
-  )
-}
 
 // ── Skeleton ───────────────────────────────────────────────────────────────
 
@@ -186,12 +170,6 @@ function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { 
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <div className={styles.formHeader}>
-        <p className={styles.formTitle}>{onSave ? 'Editar billetera' : 'Nueva billetera'}</p>
-        <button type="button" className={styles.formClose} onClick={onClose} aria-label="Cerrar">
-          <X size={20} strokeWidth={1.75} />
-        </button>
-      </div>
 
       <div className={styles.formField}>
         <label className={styles.formLabel}>Nombre</label>
@@ -271,16 +249,10 @@ export default function BilleterasPage() {
   const { billeteras, isLoading, setBilleteras } = useFinancial()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Billetera | null>(null)
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [showArchived, setShowArchived] = useState(false)
+  const { showToast } = useToast()
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setDrawerOpen(false)
-    }
-    if (drawerOpen) document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [drawerOpen])
 
   async function handleCreate(payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) {
     try {
@@ -293,20 +265,20 @@ export default function BilleterasPage() {
         }
         return [...updated, parsed]
       })
-      setToast({ msg: 'Billetera creada correctamente', type: 'success' })
+      showToast('Billetera creada correctamente', 'success')
     } catch (err) {
       console.error(err)
-      setToast({ msg: 'Error al crear billetera', type: 'error' })
+      showToast('Error al crear billetera', 'error')
       throw err
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Confirmás que querés eliminar esta billetera? Esta acción no se puede deshacer.')) return
+  async function handleDeleteConfirmed() {
+    if (!deleteTarget) return
     try {
-      await billeteraService.remove(id)
-      setBilleteras((prev) => prev.filter((b) => b.id !== id))
-      setToast({ msg: 'Billetera eliminada', type: 'success' })
+      await billeteraService.remove(deleteTarget)
+      setBilleteras((prev) => prev.filter((b) => b.id !== deleteTarget))
+      showToast('Billetera eliminada', 'success')
     } catch (err: unknown) {
       console.error(err)
       const errorData = err as { response?: { data?: { detail?: string } } }
@@ -316,13 +288,12 @@ export default function BilleterasPage() {
       // Si el backend detecta transacciones, informamos al usuario que debe archivar.
       // Esto previene que se pierda el historial financiero en el futuro módulo de transacciones.
       if (detail && detail.includes('transacciones')) {
-        setToast({ 
-          msg: detail, 
-          type: 'error' 
-        })
+        showToast(detail, 'error')
       } else {
-        setToast({ msg: 'Error al eliminar billetera', type: 'error' })
+        showToast('Error al eliminar billetera', 'error')
       }
+    } finally {
+      setDeleteTarget(null)
     }
   }
 
@@ -332,16 +303,16 @@ export default function BilleterasPage() {
         const res = await billeteraService.desarchivar(b.id)
         const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
         setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-        setToast({ msg: 'Billetera desarchivada', type: 'success' })
+        showToast('Billetera desarchivada', 'success')
       } else {
         const res = await billeteraService.archivar(b.id)
         const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
         setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-        setToast({ msg: 'Billetera archivada', type: 'success' })
+        showToast('Billetera archivada', 'success')
       }
     } catch (err) {
       console.error(err)
-      setToast({ msg: 'Error actualizando estado', type: 'error' })
+      showToast('Error actualizando estado', 'error')
     }
   }
 
@@ -356,12 +327,12 @@ export default function BilleterasPage() {
       const res = await billeteraService.update(editTarget.id, payload)
       const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
       setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-      setToast({ msg: 'Billetera actualizada', type: 'success' })
+      showToast('Billetera actualizada', 'success')
       setEditTarget(null)
       setDrawerOpen(false)
     } catch (err) {
       console.error(err)
-      setToast({ msg: 'Error actualizando billetera', type: 'error' })
+      showToast('Error actualizando billetera', 'error')
       throw err
     }
   }
@@ -420,19 +391,17 @@ export default function BilleterasPage() {
                 billetera={b}
                 onEdit={handleEdit}
                 onArchiveToggle={handleArchiveToggle}
-                onDelete={b.es_efectivo ? () => {} : handleDelete}
+                onDelete={b.es_efectivo ? () => {} : setDeleteTarget}
               />
             ))}
           </div>
       )}
 
-      {/* Drawer overlay */}
-      {drawerOpen && (
-        <div className={styles.overlay} onClick={() => setDrawerOpen(false)} />
-      )}
-
-      {/* Drawer / bottom sheet */}
-      <div className={[styles.drawer, drawerOpen ? styles.drawerOpen : ''].filter(Boolean).join(' ')}>
+      <Drawer
+        isOpen={drawerOpen}
+        onClose={() => { setDrawerOpen(false); setEditTarget(null) }}
+        title={editTarget ? 'Editar billetera' : 'Nueva billetera'}
+      >
         {editTarget ? (
           <CreateForm
             onClose={() => { setDrawerOpen(false); setEditTarget(null) }}
@@ -449,12 +418,17 @@ export default function BilleterasPage() {
         ) : (
           <CreateForm onClose={() => setDrawerOpen(false)} onCreate={handleCreate} />
         )}
-      </div>
+      </Drawer>
 
-      {/* Toast */}
-      {toast && (
-        <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />
-      )}
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirmed}
+        title="Eliminar billetera"
+        description="¿Confirmás que querés eliminar esta billetera? Esta acción no se puede deshacer."
+        variant="danger"
+        confirmLabel="Eliminar"
+      />
     </div>
   )
 }

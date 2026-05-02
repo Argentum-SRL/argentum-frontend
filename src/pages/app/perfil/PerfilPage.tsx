@@ -24,6 +24,8 @@ import styles from './PerfilPage.module.css'
 import { useNavigate } from 'react-router-dom'
 import type { MetodosLogin } from '@/types'
 import * as authService from '@/services/auth.service'
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
+import { useToast } from '@/hooks/useToast'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -63,8 +65,10 @@ export default function PerfilPage() {
   // Estados de eliminación de cuenta
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+  const [showConfirmLogout, setShowConfirmLogout] = useState(false)
+  const [showConfirmDeleteFoto, setShowConfirmDeleteFoto] = useState(false)
+
+  const { showToast } = useToast()
 
   // Formularios
   const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '', fecha_nacimiento: '', sexo: '' })
@@ -132,14 +136,13 @@ export default function PerfilPage() {
     try {
       const res = await usuarioService.actualizarEmail(formEmail)
       if (res.requiere_verificacion_email) {
-        alert(res.confirmacion)
+        showToast(res.confirmacion, 'info')
         navigate('/auth/verificar-email', { state: { email: formEmail.email_nuevo } })
       } else {
-        // Si no requiere verificación (bypass), actualizamos el usuario localmente
         if (usuario) {
           updateUsuario({ ...usuario, email: formEmail.email_nuevo, email_verificado: true })
         }
-        alert('Email actualizado correctamente.')
+        showToast('Email actualizado correctamente.', 'success')
         handleCloseModal()
       }
     } catch (err: unknown) {
@@ -155,18 +158,17 @@ export default function PerfilPage() {
     setIsSaving(true)
     try {
       const res = await authService.enviarCodigoEmail(usuario.email)
-      // Si el backend aplicó el bypass y devolvió verificado: true
       if ((res as { verificado: boolean }).verificado) {
         if (usuario) {
           updateUsuario({ ...usuario, email_verificado: true })
         }
-        alert('Email verificado correctamente (Bypass activo).')
+        showToast('Email verificado correctamente (Bypass activo).', 'success')
       } else {
         navigate('/auth/verificar-email', { state: { email: usuario.email } })
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }
-      alert(error.response?.data?.detail || 'Error al enviar el código de verificación.')
+      showToast(error.response?.data?.detail || 'Error al enviar el código de verificación.', 'error')
     } finally {
       setIsSaving(false)
     }
@@ -203,7 +205,7 @@ export default function PerfilPage() {
         password_nueva: formPassword.password_nueva,
         password_nueva_confirmacion: formPassword.password_nueva_confirmacion
       })
-      alert('Contraseña actualizada exitosamente')
+      showToast('Contraseña actualizada exitosamente', 'success')
       handleCloseModal()
       setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
     } catch (err: unknown) {
@@ -255,45 +257,44 @@ export default function PerfilPage() {
       if (usuario) {
         updateUsuario({ ...usuario, foto_url: res.foto_url })
       }
+      showToast('Foto de perfil actualizada', 'success')
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }
-      alert(error.response?.data?.detail || 'Error al subir la foto')
+      showToast(error.response?.data?.detail || 'Error al subir la foto', 'error')
     }
   }
 
-  const handleDeleteFoto = async () => {
-    if (!confirm('¿Estás seguro de que quieres eliminar tu foto de perfil?')) return
+  const handleDeleteFotoConfirmed = async () => {
     try {
       await usuarioService.eliminarFoto()
       if (usuario) {
         updateUsuario({ ...usuario, foto_url: null })
       }
+      showToast('Foto eliminada', 'success')
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }
-      alert(error.response?.data?.detail || 'Error al eliminar la foto')
+      showToast(error.response?.data?.detail || 'Error al eliminar la foto', 'error')
+    } finally {
+      setShowConfirmDeleteFoto(false)
     }
   }
 
-  const handleLogout = async () => {
-    if (!confirm('¿Querés cerrar sesión ahora?')) return
+  const handleLogoutConfirmed = async () => {
     await logout()
   }
 
-  const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== 'ELIMINAR') return
-    
+  const handleDeleteAccountConfirmed = async () => {
     setIsDeleting(true)
     try {
       await usuarioService.eliminarCuenta()
-      setIsSuccess(true)
-      setTimeout(async () => {
-        await logout({ state: { message: 'Cuenta eliminada exitosamente' } })
-      }, 2500)
+      showToast('Cuenta eliminada exitosamente', 'success')
+      await logout()
     } catch (error) {
       console.error('Error al eliminar la cuenta:', error)
-      alert('Hubo un error al intentar eliminar la cuenta. Por favor, reintenta más tarde.')
+      showToast('Hubo un error al intentar eliminar la cuenta.', 'error')
     } finally {
       setIsDeleting(false)
+      setShowConfirmDelete(false)
     }
   }
 
@@ -349,7 +350,7 @@ export default function PerfilPage() {
             {usuario?.foto_url && (
               <button 
                 className={styles.deleteFotoBtn} 
-                onClick={handleDeleteFoto}
+                onClick={() => setShowConfirmDeleteFoto(true)}
                 aria-label="Eliminar foto de perfil"
               >
                 Eliminar foto
@@ -625,7 +626,7 @@ export default function PerfilPage() {
           </div>
 
           <div className={styles.dangerActions}>
-            <button onClick={handleLogout} className={styles.logoutBtn}>
+            <button onClick={() => setShowConfirmLogout(true)} className={styles.logoutBtn}>
               <LogOut size={20} />
               Cerrar sesión
             </button>
@@ -958,74 +959,34 @@ export default function PerfilPage() {
         </div>
       )}
 
-      {/* Modal de Confirmación Eliminación */}
-      {showConfirmDelete && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalCard}>
-            <div className={styles.modalIconWrap}>
-              <AlertTriangle size={40} />
-            </div>
-            
-            <h3 className={styles.modalTitle}>
-              ¿Estás absolutamente seguro?
-            </h3>
-            
-            {isSuccess ? (
-              <div className={styles.successWrap}>
-                <div className={styles.successIconWrap}>
-                  <ShieldCheck size={32} />
-                </div>
-                <p className={styles.successTitle}>Cuenta eliminada con éxito</p>
-                <p className={styles.successText}>
-                  Tus datos han sido borrados de Argentum. <br/>Redirigiendo...
-                </p>
-              </div>
-            ) : (
-              <>
-                <p className={styles.modalText}>
-                  Esta acción borrará definitivamente todos tus datos financieros en Argentum.
-                </p>
-                
-                <div className={styles.modalInputWrap}>
-                  <p className={styles.modalInputLabel}>Escribe &quot;ELIMINAR&quot; para confirmar</p>
-                  <input 
-                    type="text"
-                    value={deleteConfirmText}
-                    onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
-                    placeholder="ELIMINAR"
-                    className={styles.modalInput}
-                  />
-                </div>
+      <ConfirmModal
+        isOpen={showConfirmLogout}
+        onClose={() => setShowConfirmLogout(false)}
+        onConfirm={handleLogoutConfirmed}
+        title="Cerrar sesión"
+        description="¿Estás seguro de que querés cerrar sesión ahora?"
+      />
 
-                <div className={styles.modalActions}>
-                  <button 
-                    disabled={deleteConfirmText !== 'ELIMINAR' || isDeleting}
-                    onClick={handleDeleteAccount}
-                    className={styles.modalConfirmBtn}
-                  >
-                    {isDeleting ? (
-                      <div className={styles.spinner} />
-                    ) : (
-                      <>Confirmar Eliminación Total</>
-                    )}
-                  </button>
-                  
-                  <button 
-                    disabled={isDeleting}
-                    onClick={() => {
-                      setShowConfirmDelete(false)
-                      setDeleteConfirmText('')
-                    }}
-                    className={styles.modalCancelBtn}
-                  >
-                    Mejor no, volver atrás
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={showConfirmDeleteFoto}
+        onClose={() => setShowConfirmDeleteFoto(false)}
+        onConfirm={handleDeleteFotoConfirmed}
+        title="Eliminar foto de perfil"
+        description="¿Estás seguro de que querés eliminar tu foto de perfil?"
+        variant="danger"
+      />
+
+      <ConfirmModal
+        isOpen={showConfirmDelete}
+        onClose={() => setShowConfirmDelete(false)}
+        onConfirm={handleDeleteAccountConfirmed}
+        title="¿Estás absolutamente seguro?"
+        description="Esta acción borrará definitivamente todos tus datos financieros en Argentum. No se puede deshacer."
+        variant="danger"
+        confirmLabel="Confirmar eliminación total"
+        requireTyping="ELIMINAR"
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

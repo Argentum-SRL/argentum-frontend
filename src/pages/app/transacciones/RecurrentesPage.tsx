@@ -8,8 +8,7 @@ import {
   Play, 
   Edit3, 
   Trash2,
-  Clock,
-  X
+  Clock
 } from 'lucide-react'
 import styles from './RecurrentesPage.module.css'
 import recurrenteService from '@/services/recurrente.service'
@@ -18,6 +17,9 @@ import categoriaService from '@/services/categoria.service'
 import type { TransaccionRecurrente, Billetera, Categoria } from '@/types'
 import { formatMonto } from '@/utils/format'
 import Button from '@/components/ui/Button/Button'
+import { Drawer } from '@/components/ui/Drawer/Drawer'
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
+import { useToast } from '@/hooks/useToast'
 
 const RecurrentesPage: React.FC = () => {
   const [recurrentes, setRecurrentes] = useState<TransaccionRecurrente[]>([])
@@ -27,6 +29,9 @@ const RecurrentesPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const { showToast } = useToast()
 
   const [formData, setFormData] = useState({
     tipo: 'egreso' as 'ingreso' | 'egreso',
@@ -57,13 +62,6 @@ const RecurrentesPage: React.FC = () => {
     }
   }, [])
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setIsModalOpen(false)
-    }
-    if (isModalOpen) document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [isModalOpen])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -113,10 +111,11 @@ const RecurrentesPage: React.FC = () => {
         await recurrenteService.createRecurrente(payload)
       }
       setIsModalOpen(false)
+      showToast(editingId ? 'Configuración actualizada' : 'Recurrente creada', 'success')
       fetchInitialData()
     } catch (err) {
       console.error(err)
-      alert('Error al guardar la recurrente')
+      showToast('Error al guardar la recurrente', 'error')
     }
   }
 
@@ -127,22 +126,27 @@ const RecurrentesPage: React.FC = () => {
       } else {
         await recurrenteService.reanudarRecurrente(rec.id)
       }
+      showToast(rec.estado === 'activa' ? 'Recurrente pausada' : 'Recurrente reanudada', 'success')
       fetchInitialData()
     } catch (err) {
       console.error(err)
-      alert('Error al cambiar el estado')
+      showToast('Error al cambiar el estado', 'error')
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('¿Estás seguro de eliminar esta transacción recurrente? Dejará de generar transacciones automáticas.')) {
-      try {
-        await recurrenteService.deleteRecurrente(id)
-        fetchInitialData()
-      } catch (err) {
-        console.error(err)
-        alert('Error al eliminar')
-      }
+  async function handleDeleteConfirmed() {
+    if (!deleteTarget) return
+    try {
+      setIsDeleting(true)
+      await recurrenteService.deleteRecurrente(deleteTarget)
+      showToast('Recurrente eliminada', 'success')
+      fetchInitialData()
+    } catch (err) {
+      console.error(err)
+      showToast('Error al eliminar', 'error')
+    } finally {
+      setIsDeleting(false)
+      setDeleteTarget(null)
     }
   }
 
@@ -190,7 +194,7 @@ const RecurrentesPage: React.FC = () => {
           </button>
           <button 
             className={`${styles.actionButton} ${styles.deleteAction}`} 
-            onClick={() => handleDelete(rec.id)}
+            onClick={() => setDeleteTarget(rec.id)}
             title="Eliminar recurrente"
           >
             <Trash2 size={16} />
@@ -252,161 +256,163 @@ const RecurrentesPage: React.FC = () => {
         </>
       )}
 
-      {/* OVERLAY */}
-      {isModalOpen && (
-        <div className={styles.overlay} onClick={() => setIsModalOpen(false)} />
-      )}
 
-      {/* DRAWER */}
-      <div className={[styles.drawer, isModalOpen ? styles.drawerOpen : ''].filter(Boolean).join(' ')}>
-        <div className={styles.drawerContent}>
-          <div className={styles.formHeader}>
-            <h2 className={styles.formTitle}>{editingId ? 'Editar Recurrente' : 'Nueva Recurrente'}</h2>
-            <button className={styles.formClose} onClick={() => setIsModalOpen(false)} aria-label="Cerrar">
-              <X size={20} />
-            </button>
+      <Drawer
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingId ? 'Editar Recurrente' : 'Nueva Recurrente'}
+        width={480}
+      >
+        <div className={styles.drawerForm}>
+          <div className={styles.formGrid}>
+            <div className={styles.fullWidth}>
+              <label htmlFor="form-desc" className={styles.label}>Descripción</label>
+              <input 
+                id="form-desc"
+                type="text" 
+                className={styles.input} 
+                value={formData.descripcion}
+                onChange={e => setFormData({...formData, descripcion: e.target.value})}
+                placeholder="Ej: Netflix, Alquiler, Sueldo..."
+              />
+            </div>
+
+            <div>
+              <label htmlFor="form-tipo" className={styles.label}>Tipo</label>
+              <select 
+                id="form-tipo"
+                className={styles.select}
+                value={formData.tipo}
+                onChange={e => setFormData({...formData, tipo: e.target.value as 'ingreso' | 'egreso'})}
+                title="Tipo de transacción"
+              >
+                <option value="egreso">Egreso</option>
+                <option value="ingreso">Ingreso</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="form-monto" className={styles.label}>Monto</label>
+              <input 
+                id="form-monto"
+                type="number" 
+                className={styles.input}
+                value={formData.monto}
+                onChange={e => setFormData({...formData, monto: e.target.value})}
+                placeholder="0.00"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="form-moneda" className={styles.label}>Moneda</label>
+              <select 
+                id="form-moneda"
+                className={styles.select}
+                value={formData.moneda}
+                onChange={e => setFormData({...formData, moneda: e.target.value as 'ARS' | 'USD'})}
+                title="Moneda"
+              >
+                <option value="ARS">ARS</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="form-billetera" className={styles.label}>Billetera</label>
+              <select 
+                id="form-billetera"
+                className={styles.select}
+                value={formData.billetera_id}
+                onChange={e => setFormData({...formData, billetera_id: e.target.value})}
+                title="Seleccionar billetera"
+              >
+                <option value="">Seleccionar...</option>
+                {billeteras.filter(b => b.moneda === formData.moneda).map(b => (
+                  <option key={b.id} value={b.id}>{b.nombre}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.fullWidth}>
+              <label htmlFor="form-categoria" className={styles.label}>Categoría</label>
+              <select 
+                id="form-categoria"
+                className={styles.select}
+                value={formData.categoria_id}
+                onChange={e => setFormData({...formData, categoria_id: e.target.value})}
+                title="Seleccionar categoría"
+              >
+                <option value="">Seleccionar...</option>
+                {categorias.filter(c => c.tipo === formData.tipo).map(c => (
+                  <option key={c.id} value={c.id}>{c.nombre}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="form-frecuencia" className={styles.label}>Frecuencia</label>
+              <select 
+                id="form-frecuencia"
+                className={styles.select}
+                value={formData.frecuencia}
+                onChange={e => setFormData({...formData, frecuencia: e.target.value as 'semanal' | 'quincenal' | 'mensual', dia_registro: 1})}
+                title="Frecuencia de registro"
+              >
+                <option value="semanal">Semanal</option>
+                <option value="quincenal">Quincenal</option>
+                <option value="mensual">Mensual</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="form-dia" className={styles.label}>Día de registro</label>
+              {formData.frecuencia === 'semanal' ? (
+                <select 
+                  id="form-dia"
+                  className={styles.select}
+                  value={formData.dia_registro}
+                  onChange={e => setFormData({...formData, dia_registro: parseInt(e.target.value)})}
+                  title="Seleccionar día de la semana"
+                >
+                  <option value={0}>Lunes</option>
+                  <option value={1}>Martes</option>
+                  <option value={2}>Miércoles</option>
+                  <option value={3}>Jueves</option>
+                  <option value={4}>Viernes</option>
+                  <option value={5}>Sábado</option>
+                  <option value={6}>Domingo</option>
+                </select>
+              ) : (
+                <input 
+                  id="form-dia"
+                  type="number" 
+                  min={1} 
+                  max={28}
+                  className={styles.input}
+                  value={formData.dia_registro}
+                  onChange={e => setFormData({...formData, dia_registro: parseInt(e.target.value) || 1})}
+                />
+              )}
+            </div>
           </div>
 
-          <div className={styles.drawerForm}>
-            <div className={styles.formGrid}>
-              <div className={styles.fullWidth}>
-                <label htmlFor="form-desc" className={styles.label}>Descripción</label>
-                <input 
-                  id="form-desc"
-                  type="text" 
-                  className={styles.input} 
-                  value={formData.descripcion}
-                  onChange={e => setFormData({...formData, descripcion: e.target.value})}
-                  placeholder="Ej: Netflix, Alquiler, Sueldo..."
-                />
-              </div>
-
-              <div>
-                <label htmlFor="form-tipo" className={styles.label}>Tipo</label>
-                <select 
-                  id="form-tipo"
-                  className={styles.select}
-                  value={formData.tipo}
-                  onChange={e => setFormData({...formData, tipo: e.target.value as 'ingreso' | 'egreso'})}
-                  title="Tipo de transacción"
-                >
-                  <option value="egreso">Egreso</option>
-                  <option value="ingreso">Ingreso</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="form-monto" className={styles.label}>Monto</label>
-                <input 
-                  id="form-monto"
-                  type="number" 
-                  className={styles.input}
-                  value={formData.monto}
-                  onChange={e => setFormData({...formData, monto: e.target.value})}
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="form-moneda" className={styles.label}>Moneda</label>
-                <select 
-                  id="form-moneda"
-                  className={styles.select}
-                  value={formData.moneda}
-                  onChange={e => setFormData({...formData, moneda: e.target.value as 'ARS' | 'USD'})}
-                  title="Moneda"
-                >
-                  <option value="ARS">ARS</option>
-                  <option value="USD">USD</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="form-billetera" className={styles.label}>Billetera</label>
-                <select 
-                  id="form-billetera"
-                  className={styles.select}
-                  value={formData.billetera_id}
-                  onChange={e => setFormData({...formData, billetera_id: e.target.value})}
-                  title="Seleccionar billetera"
-                >
-                  <option value="">Seleccionar...</option>
-                  {billeteras.filter(b => b.moneda === formData.moneda).map(b => (
-                    <option key={b.id} value={b.id}>{b.nombre}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.fullWidth}>
-                <label htmlFor="form-categoria" className={styles.label}>Categoría</label>
-                <select 
-                  id="form-categoria"
-                  className={styles.select}
-                  value={formData.categoria_id}
-                  onChange={e => setFormData({...formData, categoria_id: e.target.value})}
-                  title="Seleccionar categoría"
-                >
-                  <option value="">Seleccionar...</option>
-                  {categorias.filter(c => c.tipo === formData.tipo).map(c => (
-                    <option key={c.id} value={c.id}>{c.nombre}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="form-frecuencia" className={styles.label}>Frecuencia</label>
-                <select 
-                  id="form-frecuencia"
-                  className={styles.select}
-                  value={formData.frecuencia}
-                  onChange={e => setFormData({...formData, frecuencia: e.target.value as 'semanal' | 'quincenal' | 'mensual', dia_registro: 1})}
-                  title="Frecuencia de registro"
-                >
-                  <option value="semanal">Semanal</option>
-                  <option value="quincenal">Quincenal</option>
-                  <option value="mensual">Mensual</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="form-dia" className={styles.label}>Día de registro</label>
-                {formData.frecuencia === 'semanal' ? (
-                  <select 
-                    id="form-dia"
-                    className={styles.select}
-                    value={formData.dia_registro}
-                    onChange={e => setFormData({...formData, dia_registro: parseInt(e.target.value)})}
-                    title="Seleccionar día de la semana"
-                  >
-                    <option value={0}>Lunes</option>
-                    <option value={1}>Martes</option>
-                    <option value={2}>Miércoles</option>
-                    <option value={3}>Jueves</option>
-                    <option value={4}>Viernes</option>
-                    <option value={5}>Sábado</option>
-                    <option value={6}>Domingo</option>
-                  </select>
-                ) : (
-                  <input 
-                    id="form-dia"
-                    type="number" 
-                    min={1} 
-                    max={28}
-                    className={styles.input}
-                    value={formData.dia_registro}
-                    onChange={e => setFormData({...formData, dia_registro: parseInt(e.target.value) || 1})}
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className={styles.drawerFooter}>
-              <Button variant="secondary" onClick={() => setIsModalOpen(false)} fullWidth>Cancelar</Button>
-              <Button onClick={handleSave} fullWidth>Guardar configuración</Button>
-            </div>
+          <div className={styles.drawerFooter}>
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)} fullWidth>Cancelar</Button>
+            <Button onClick={handleSave} fullWidth>Guardar configuración</Button>
           </div>
         </div>
-      </div>
+      </Drawer>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirmed}
+        title="Eliminar transacción recurrente"
+        description="¿Estás seguro de eliminar esta transacción recurrente? Dejará de generar transacciones automáticas."
+        variant="danger"
+        confirmLabel="Eliminar"
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

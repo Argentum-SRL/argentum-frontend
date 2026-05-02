@@ -245,104 +245,13 @@
   font-size: 0.875rem;
 }
 
-/* Drawer / Side Menu Styles */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  z-index: 60;
-  animation: fadeInOverlay 0.2s ease-out;
-}
 
-@keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
-.drawer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--surface);
-  border-radius: 20px 20px 0 0;
-  z-index: 70;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-  max-height: 90dvh;
-  overflow-y: auto;
-  border: 1px solid var(--border);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.drawerOpen {
-  transform: translateY(0);
-}
-
-@media (min-width: 768px) {
-  .drawer {
-    left: auto;
-    bottom: 0;
-    right: 0;
-    top: 0;
-    width: 480px;
-    border-radius: 0;
-    transform: translateX(100%);
-    max-height: none;
-    border-left: 1px solid var(--border);
-  }
-
-  .drawerOpen {
-    transform: translateX(0);
-  }
-}
-
-.drawerContent {
-  padding: 32px 24px;
-}
-
-.formHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.formTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.formClose {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: var(--page);
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.formClose:hover {
-  background: var(--border);
-  color: var(--text);
-}
 
 .drawerFooter {
   display: flex;
   gap: 12px;
   margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-}
-
-.drawerFooter button {
-  flex: 1;
 }
 
 .drawerForm {

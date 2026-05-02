@@ -54,6 +54,122 @@
   padding: 4px 12px;
   border-radius: 20px;
   display: inline-block;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cycleDates:hover {
+  background: var(--border-subtle);
+  color: var(--primary);
+}
+
+.cycleNavigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: var(--surface-alt);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.dateSelectorWrap {
+  position: relative;
+}
+
+.datePickerPopover {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  min-width: 260px;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.popoverField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.popoverField label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.popoverField input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.popoverActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.popoverReset {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.popoverApply {
+  flex: 1;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .cotizacion {

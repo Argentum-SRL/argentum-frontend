@@ -8,6 +8,7 @@ import {
   RefreshCw, 
   CreditCard,
   ChevronRight,
+  ChevronLeft,
   TrendingUp,
   TrendingDown,
   AlertCircle
@@ -83,11 +84,14 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardResumen | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [customRange, setCustomRange] = useState<{desde: string, hasta: string} | null>(null)
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     setError(false)
+    setLoading(true)
     try {
-      const res = await dashboardService.getResumen()
+      const res = await dashboardService.getResumen(customRange?.desde, customRange?.hasta)
       setData(res)
     } catch (err) {
       console.error('Error loading dashboard:', err)
@@ -95,7 +99,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [customRange])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -103,6 +107,49 @@ export default function DashboardPage() {
     }, 0)
     return () => clearTimeout(timer)
   }, [fetchData])
+
+  const handlePrevPeriod = () => {
+    if (!data) return
+    const currentInicio = new Date(data.periodo.fecha_inicio)
+    const prevInicio = new Date(currentInicio.getFullYear(), currentInicio.getMonth() - 1, 1)
+    const prevFin = new Date(currentInicio.getFullYear(), currentInicio.getMonth(), 0)
+    
+    // Validar limite inferior
+    if (data.periodo.primera_transaccion) {
+      const primera = new Date(data.periodo.primera_transaccion)
+      if (prevFin < primera) return
+    }
+
+    const d = prevInicio.toISOString().split('T')[0]
+    const h = prevFin.toISOString().split('T')[0]
+    setCustomRange({ desde: d, hasta: h })
+  }
+
+  const handleNextPeriod = () => {
+    if (!data) return
+    const currentInicio = new Date(data.periodo.fecha_inicio)
+    const nextInicio = new Date(currentInicio.getFullYear(), currentInicio.getMonth() + 1, 1)
+    const nextFin = new Date(currentInicio.getFullYear(), currentInicio.getMonth() + 2, 0)
+
+    const d = nextInicio.toISOString().split('T')[0]
+    const h = nextFin.toISOString().split('T')[0]
+    setCustomRange({ desde: d, hasta: h })
+  }
+
+  const handleResetPeriod = () => {
+    setCustomRange(null)
+  }
+
+  const handleCustomRangeSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const desde = formData.get('desde') as string
+    const hasta = formData.get('hasta') as string
+    if (desde && hasta) {
+      setCustomRange({ desde, hasta })
+      setIsDatePickerOpen(false)
+    }
+  }
 
   if (error) {
     return (
@@ -125,9 +172,42 @@ export default function DashboardPage() {
           <Greeting nombre={usuario?.nombre ?? null} />
           {data && (
             <div className={styles.headerInfo}>
-              <span className={styles.cycleDates}>
-                {formatFecha(data.periodo.fecha_inicio)} — {formatFecha(data.periodo.fecha_fin)}
-              </span>
+              <div className={styles.cycleNavigation}>
+                <button 
+                  className={styles.navBtn} 
+                  onClick={handlePrevPeriod}
+                  title="Periodo anterior"
+                  disabled={data.periodo.primera_transaccion ? new Date(data.periodo.fecha_inicio) <= new Date(data.periodo.primera_transaccion) : false}
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <div className={styles.dateSelectorWrap}>
+                  <span className={styles.cycleDates} onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}>
+                    {formatFecha(data.periodo.fecha_inicio)} — {formatFecha(data.periodo.fecha_fin)}
+                  </span>
+                  {isDatePickerOpen && (
+                    <div className={styles.datePickerPopover}>
+                      <form onSubmit={handleCustomRangeSubmit}>
+                        <div className={styles.popoverField}>
+                          <label htmlFor="dash-desde">Desde</label>
+                          <input id="dash-desde" name="desde" type="date" defaultValue={data.periodo.fecha_inicio} required />
+                        </div>
+                        <div className={styles.popoverField}>
+                          <label htmlFor="dash-hasta">Hasta</label>
+                          <input id="dash-hasta" name="hasta" type="date" defaultValue={data.periodo.fecha_fin} required />
+                        </div>
+                        <div className={styles.popoverActions}>
+                          <button type="button" className={styles.popoverReset} onClick={handleResetPeriod}>Mi Ciclo</button>
+                          <button type="submit" className={styles.popoverApply}>Aplicar</button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </div>
+                <button className={styles.navBtn} onClick={handleNextPeriod} title="Periodo siguiente">
+                  <ChevronRight size={20} />
+                </button>
+              </div>
               <Cotizacion />
             </div>
           )}

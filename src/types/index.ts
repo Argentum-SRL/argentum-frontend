@@ -184,7 +184,7 @@ export interface TransaccionRecurrente {
 }
 
 export interface DashboardResumen {
-  periodo: { fecha_inicio: string; fecha_fin: string }
+  periodo: { fecha_inicio: string; fecha_fin: string; primera_transaccion?: string }
   balance: {
     ingresos: number
     egresos: number

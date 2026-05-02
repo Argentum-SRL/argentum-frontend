@@ -2,8 +2,10 @@ import api from './api'
 import type { DashboardResumen, CotizacionDolar } from '../types'
 
 export const dashboardService = {
-  getResumen: async (): Promise<DashboardResumen> => {
-    const response = await api.get<DashboardResumen>('/dashboard/resumen')
+  getResumen: async (desde?: string, hasta?: string): Promise<DashboardResumen> => {
+    const response = await api.get<DashboardResumen>('/dashboard/resumen', {
+      params: { desde, hasta }
+    })
     return response.data
   },
 

@@ -4,8 +4,35 @@ import { mockDashboard } from '../lib/mock/dashboard.mock'
 import type { DashboardData } from '../lib/mock/dashboard.mock'
 import type { Billetera, MetaFinanciera, Presupuesto } from '../types/financial'
 import { FinancialContext } from './FinancialContext'
+import { useAuth } from '../hooks/useAuth'
 
-export function FinancialProvider({ children }: { children: ReactNode }) {
+interface Props {
+  children: ReactNode
+}
+
+export function FinancialProvider({ children }: Props) {
+  const { usuario, isAuthenticated, isLoading: authLoading } = useAuth()
+  
+  // Usamos el ID del usuario como key para forzar un reset completo del estado
+  // cuando el usuario cambia o se desloguea.
+  const key = isAuthenticated ? (usuario?.id ?? 'authenticated') : 'guest'
+
+  return (
+    <FinancialDataInternal key={key} authLoading={authLoading} isAuthenticated={isAuthenticated}>
+      {children}
+    </FinancialDataInternal>
+  )
+}
+
+function FinancialDataInternal({ 
+  children, 
+  authLoading, 
+  isAuthenticated 
+}: { 
+  children: ReactNode, 
+  authLoading: boolean, 
+  isAuthenticated: boolean 
+}) {
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [dashboard, setDashboard] = useState<DashboardData | null>(null)
   const [metas, setMetas] = useState<MetaFinanciera[]>([])
@@ -16,13 +43,12 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
   const initialized = useRef(false)
 
   const refreshAll = useCallback(async () => {
-    // Evitar múltiples llamadas simultáneas
+    if (!isAuthenticated || authLoading) return
     if (initialized.current && !hasLoaded) return
     
     if (!hasLoaded) setIsLoading(true)
     
     try {
-      // Fetch everything in parallel
       const [billeterasRes] = await Promise.all([
         billeteraService.list(),
         Promise.resolve(mockDashboard),
@@ -49,9 +75,10 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
       setIsLoading(false)
       initialized.current = true
     }
-  }, [hasLoaded])
+  }, [hasLoaded, isAuthenticated, authLoading])
 
   const refreshBilleteras = useCallback(async () => {
+    if (!isAuthenticated || authLoading) return
     try {
       const data = await billeteraService.list()
       if (Array.isArray(data)) {
@@ -64,13 +91,13 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Error refreshing wallets:', err)
     }
-  }, [])
+  }, [isAuthenticated, authLoading])
 
   useEffect(() => {
-    if (!initialized.current) {
+    if (isAuthenticated && !authLoading && !initialized.current) {
       refreshAll()
     }
-  }, [refreshAll])
+  }, [isAuthenticated, authLoading, refreshAll])
 
   return (
     <FinancialContext.Provider value={{ 

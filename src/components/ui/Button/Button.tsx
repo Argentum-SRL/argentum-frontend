@@ -10,6 +10,7 @@ interface ButtonProps {
   loading?: boolean
   variant?: 'primary' | 'secondary' | 'outline'
   className?: string
+  fullWidth?: boolean
 }
 
 export default function Button({
@@ -20,8 +21,14 @@ export default function Button({
   loading,
   variant = 'primary',
   className,
+  fullWidth = false,
 }: ButtonProps) {
-  const cls = [styles.btn, styles[variant], className].filter(Boolean).join(' ')
+  const cls = [
+    styles.btn, 
+    styles[variant], 
+    fullWidth ? styles.fullWidth : '',
+    className
+  ].filter(Boolean).join(' ')
 
   return (
     <button

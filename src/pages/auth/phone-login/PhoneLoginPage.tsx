@@ -38,7 +38,7 @@ function maskPhone(phone: string): string {
 }
 
 export default function PhoneLoginPage() {
-  const { login } = useAuth()
+  const { login, isAuthenticated, usuario } = useAuth()
   const navigate = useNavigate()
 
   const [step, setStep] = useState<Step>('phone')
@@ -59,8 +59,10 @@ export default function PhoneLoginPage() {
   const activeBox = codigo.length < 6 ? codigo.length : -1
 
   useEffect(() => {
-    if (getToken()) navigate('/app/dashboard', { replace: true })
-  }, [navigate])
+    if (getToken() && isAuthenticated && usuario?.onboarding_completo) {
+      navigate('/app/dashboard', { replace: true })
+    }
+  }, [isAuthenticated, usuario, navigate])
 
   useEffect(() => {
     if (countdown <= 0) return

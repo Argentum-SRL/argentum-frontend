@@ -19,9 +19,13 @@ export default function VerificarTelefono() {
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as { telefono?: string; modoVerificacion?: boolean } | null
+  
+  const queryParams = new URLSearchParams(location.search)
+  const telefonoFromUrl = queryParams.get('telefono')
+  const modoFromUrl = queryParams.get('modoVerificacion') === 'true'
 
-  const telefonoInicial = state?.telefono ?? ''
-  const modoVerificacion = state?.modoVerificacion ?? false
+  const telefonoInicial = telefonoFromUrl || state?.telefono || ''
+  const modoVerificacion = modoFromUrl || state?.modoVerificacion || false
 
   type Step = 'phone' | 'code'
   const [step, setStep] = useState<Step>(modoVerificacion && telefonoInicial ? 'code' : 'phone')
@@ -32,16 +36,18 @@ export default function VerificarTelefono() {
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [countdown, setCountdown] = useState(0)
   const codeInputRef = useRef<HTMLInputElement>(null)
+  const hasTriggered = useRef(false)
 
-  // Si llegamos en modo verificación con teléfono ya sabido, enviamos el código automáticamente
+  // Si llegamos en modo verificación con teléfono ya sabido, enviamos el código automáticamente.
+  // Usamos hasTriggered para evitar doble envío en React StrictMode (Dev).
   useEffect(() => {
-    if (modoVerificacion && telefonoInicial && step === 'code') {
+    if (modoVerificacion && telefonoInicial && step === 'code' && !hasTriggered.current) {
+      hasTriggered.current = true
       enviarCodigoTelefono(telefonoInicial)
         .then(() => setCountdown(60))
         .catch(() => setApiError('No se pudo enviar el código. Pedí uno nuevo.'))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [modoVerificacion, telefonoInicial, step])
 
   useEffect(() => {
     if (step === 'code') setTimeout(() => codeInputRef.current?.focus(), 100)

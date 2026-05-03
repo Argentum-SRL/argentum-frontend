@@ -42,7 +42,17 @@ export default function CompletarPerfil() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || passwordError || confirmPasswordError) return
+
+    const pError = validatePassword(password)
+    const cpError = !confirmPassword 
+      ? 'Confirmá tu contraseña.' 
+      : password !== confirmPassword 
+        ? 'Las contraseñas no coinciden.' 
+        : null
+
+    if (!nombre.trim() || !apellido.trim() || !email.trim() || pError || cpError) {
+      return
+    }
     setLoading(true)
     setApiError(null)
     try {

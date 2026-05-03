@@ -11,7 +11,15 @@ export default function VerificarEmail() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const email: string = (location.state as { email?: string })?.email ?? ''
+  
+  // Prioridad: 1. URL Params (?email=...), 2. Location State (registro previo)
+  const queryParams = new URLSearchParams(location.search)
+  const emailFromUrl = queryParams.get('email')
+  const verificadoFromUrl = queryParams.get('verificado') === 'true'
+  const emailFromState = (location.state as { email?: string })?.email ?? ''
+  
+  const email = emailFromUrl || emailFromState
+  const [yaVerificado, setYaVerificado] = useState(verificadoFromUrl)
 
   const [codigo, setCodigo] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,14 +29,16 @@ export default function VerificarEmail() {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
+    if (!yaVerificado) {
+      inputRef.current?.focus()
+    }
+  }, [yaVerificado])
 
   useEffect(() => {
-    if (countdown <= 0) return
+    if (countdown <= 0 || yaVerificado) return
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
     return () => clearTimeout(t)
-  }, [countdown])
+  }, [countdown, yaVerificado])
 
   async function handleVerificar(e: FormEvent) {
     e.preventDefault()
@@ -40,7 +50,13 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoEmail(email, codigo)
-      login(respuesta)
+      
+      // Solo hacemos login si la respuesta ya trae tokens.
+      // Si falta verificar el teléfono, no habrá tokens y login() nos rebotaría al Dashboard/Login.
+      if (respuesta.access_token) {
+        login(respuesta)
+      }
+      
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
@@ -66,6 +82,21 @@ export default function VerificarEmail() {
     }
   }
 
+  if (yaVerificado) {
+    return (
+      <AuthLayout title="¡Email Verificado!">
+        <div className={styles.successContainer}>
+          <p className={styles.subtitle}>
+            Tu cuenta ha sido verificada con éxito. Ya podés iniciar sesión para configurar tu teléfono.
+          </p>
+          <Link to="/login" className={styles.submitBtn} style={{ textDecoration: 'none', textAlign: 'center', display: 'block' }}>
+            Ir al Login
+          </Link>
+        </div>
+      </AuthLayout>
+    )
+  }
+
   if (!email) {
     return (
       <AuthLayout title="Verificar email">
@@ -80,9 +111,9 @@ export default function VerificarEmail() {
   return (
     <AuthLayout title="Verificá tu mail">
       <form onSubmit={handleVerificar} noValidate>
-        <button type="button" onClick={() => navigate(-1)} className={styles.backBtn}>
+        <button type="button" onClick={() => navigate('/register')} className={styles.backBtn}>
           <ArrowLeft size={14} />
-          Volver
+          Volver al registro
         </button>
 
         <p className={styles.subtitle}>

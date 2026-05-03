@@ -60,12 +60,30 @@ export default function RegisterPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || passwordError || confirmPasswordError) return
+    
+    // Validaciones directas para evitar problemas de asincronía del estado
+    const pError = validatePassword(password)
+    const cpError = !confirmPassword 
+      ? 'Confirmá tu contraseña.' 
+      : confirmPassword !== password 
+        ? 'Las contraseñas no coinciden.' 
+        : null
+
+    if (!nombre.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || pError || cpError) {
+      return
+    }
     setLoading(true)
     setApiError(null)
     try {
       const respuesta = await registerWithEmail({ nombre, apellido, email, telefono, password })
-      login(respuesta)
+      
+      // Solo activamos el estado de login si ya tenemos tokens (ej: Google)
+      // En registro por email, no hay tokens hasta que verifique, por lo que login()
+      // rompería la lógica y nos mandaría al dashboard prematuramente.
+      if (respuesta.access_token) {
+        login(respuesta)
+      }
+      
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const error = err as { response?: { status?: number; data?: { detail?: unknown } } }

@@ -83,7 +83,7 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
 
         <div className={styles.field}>
           <label htmlFor="valor_ciclo" className={styles.label}>
-            {tipo === 'dia_fijo' ? 'Día del mes (1–28)' : 'Regla'}
+            {tipo === 'dia_fijo' ? 'Día del mes (1–31)' : 'Regla'}
           </label>
 
           {tipo === 'dia_fijo' ? (
@@ -91,7 +91,7 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
               id="valor_ciclo"
               type="number"
               min="1"
-              max="28"
+              max="31"
               value={valor}
               onChange={(e) => setValor(e.target.value)}
               className={styles.input}

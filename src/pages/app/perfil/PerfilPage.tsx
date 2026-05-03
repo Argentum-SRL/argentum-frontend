@@ -147,7 +147,14 @@ export default function PerfilPage() {
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }
-      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+      const detail = error.response?.data?.detail
+      if (detail?.includes('Google')) {
+        setModalError('Tu cuenta está vinculada a Google. El email debe gestionarse desde Google.')
+      } else if (detail?.includes('Contraseña')) {
+        setModalError('Contraseña actual incorrecta. Por favor, verificala.')
+      } else {
+        setModalError(detail || 'Algo salió mal. Intenta de nuevo.')
+      }
     } finally {
       setIsSaving(false)
     }
@@ -210,7 +217,16 @@ export default function PerfilPage() {
       setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }
-      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+      const detail = error.response?.data?.detail
+      if (detail?.includes('coinciden')) {
+        setModalError('Las contraseñas nuevas no coinciden.')
+      } else if (detail?.includes('actual incorrecta')) {
+        setModalError('La contraseña actual es incorrecta.')
+      } else if (detail?.includes('8 caracteres')) {
+        setModalError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.')
+      } else {
+        setModalError(detail || 'Algo salió mal al actualizar la contraseña.')
+      }
     } finally {
       setIsSaving(false)
     }

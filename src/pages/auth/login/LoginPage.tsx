@@ -1,4 +1,4 @@
-import { type FormEvent, useState, useEffect } from 'react'
+import { type FormEvent, useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Phone, CheckCircle2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth'
 import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { login, isAuthenticated, usuario } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -30,11 +30,40 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    if (getToken()) navigate('/app/dashboard', { replace: true })
-  }, [navigate])
+    if (getToken() && isAuthenticated && usuario?.onboarding_completo) {
+      navigate('/app/dashboard', { replace: true })
+    }
+  }, [isAuthenticated, usuario, navigate])
 
   const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
   const passwordError = hasSubmitted && !password ? 'Ingresá tu contraseña.' : null
+
+  const handleGoogleSuccess = useCallback(async ({ credential }: { credential: string }) => {
+    try {
+      if (import.meta.env.DEV) {
+        console.log('[Auth][Google][Login] credential recibido', { length: credential.length })
+      }
+      setLoading(true)
+      setApiError(null)
+      const respuesta = await loginWithGoogle(credential)
+      login(respuesta)
+      manejarRespuestaAuth(respuesta, navigate)
+    } catch (err: unknown) {
+      logGoogleError('Error al llamar loginWithGoogle', err)
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      const message = (err as { message?: string })?.message
+      setApiError(detail || message || 'Falló el login con Google.')
+    } finally {
+      setLoading(false)
+    }
+  }, [login, navigate])
+
+  const handleGoogleError = useCallback(() => {
+    if (import.meta.env.DEV) {
+      console.error('[Auth][Google][Login] onError del botón Google')
+    }
+    setApiError('Falló el login con Google.')
+  }, [])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -116,31 +145,8 @@ export default function LoginPage() {
         </div>
 
         <GoogleLoginButton
-          onSuccess={async ({ credential }) => {
-            try {
-              if (import.meta.env.DEV) {
-                console.log('[Auth][Google][Login] credential recibido', { length: credential.length })
-              }
-              setLoading(true)
-              setApiError(null)
-              const respuesta = await loginWithGoogle(credential)
-              login(respuesta)
-              manejarRespuestaAuth(respuesta, navigate)
-            } catch (err: unknown) {
-              logGoogleError('Error al llamar loginWithGoogle', err)
-              const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-              const message = (err as { message?: string })?.message
-              setApiError(detail || message || 'Falló el login con Google.')
-            } finally {
-              setLoading(false)
-            }
-          }}
-          onError={() => {
-            if (import.meta.env.DEV) {
-              console.error('[Auth][Google][Login] onError del botón Google')
-            }
-            setApiError('Falló el login con Google.')
-          }}
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
         />
 
         <Link to="/login/telefono" className={styles.altBtn}>

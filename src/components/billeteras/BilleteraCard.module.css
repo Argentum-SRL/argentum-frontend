@@ -245,11 +245,17 @@
 .balLblDark  { color: rgba(0,0,0,0.40); }
 
 .wcBalAmt {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.7px;
+  letter-spacing: -1px;
   line-height: 1;
   margin: 0;
+}
+
+@media (min-width: 768px) {
+  .wcBalAmt {
+    font-size: 34px;
+  }
 }
 
 .balAmtLight { color: white; }

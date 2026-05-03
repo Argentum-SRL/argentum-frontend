@@ -10,6 +10,8 @@ import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
 import BankPickerModal from '@/components/billeteras/BankPickerModal'
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
+import EditBilleteraModal from '@/components/billeteras/EditBilleteraModal'
+import type { EditPayload } from '@/components/billeteras/EditBilleteraModal'
 import billeteraService from '@/services/billetera.service'
 import type { Billetera } from '@/types'
 import styles from './BilleterasPage.module.css'
@@ -91,6 +93,8 @@ export default function BilleterasPage() {
   const { billeteras, isLoading, refreshBilleteras } = useFinancial()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [billeteraAEditar, setBilleteraAEditar] = useState<Billetera | null>(null)
 
   const billeterasActivas = billeteras.filter((b) => b.estado === 'activa')
   const billeterasRegulares = billeterasActivas.filter((b) => !b.es_efectivo)
@@ -107,8 +111,20 @@ export default function BilleterasPage() {
     }
   }
 
-  const handleEditar = (_id: string) => {
-    showToast('Edición próximamente disponible', 'info')
+  const handleEditar = (id: string) => {
+    const b = billeteras.find((b) => b.id === id)
+    if (b) {
+      setBilleteraAEditar(b)
+      setEditModalOpen(true)
+    }
+  }
+
+  const handleGuardarEdicion = async (id: string, payload: EditPayload) => {
+    await billeteraService.update(id, payload)
+    await refreshBilleteras()
+    setEditModalOpen(false)
+    setBilleteraAEditar(null)
+    showToast(`Billetera actualizada exitosamente`, 'success')
   }
 
   const handleCrear = async (payload: CreatePayload) => {
@@ -189,6 +205,15 @@ export default function BilleterasPage() {
         onCrear={handleCrear}
         billeterasActuales={billeteras}
         monedaPrincipalUsuario={monedaPrincipal}
+      />
+
+      {/* ── Modal Edición ──────────────────────────────────────────────────── */}
+      <EditBilleteraModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onEditar={handleGuardarEdicion}
+        billetera={billeteraAEditar}
+        billeteraPrincipalActual={billeteras.find((b) => b.es_principal)}
       />
     </div>
   )

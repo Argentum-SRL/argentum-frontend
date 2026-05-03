@@ -1,433 +1,194 @@
-import { useEffect, useRef, useState } from 'react'
-import { Plus, Wallet, Banknote } from 'lucide-react'
-import styles from './BilleterasPage.module.css'
-import billeteraService from '@/services/billetera.service'
-import { useFinancial } from '@/hooks/useFinancial'
-import { Drawer } from '@/components/ui/Drawer/Drawer'
-import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
+// ─── BilleterasPage ───────────────────────────────────────────────────────────
+
+import { useState } from 'react'
+import { Plus } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
+import { useFinancial } from '@/hooks/useFinancial'
+import { MOCK_COTIZACION_USD } from '@/lib/mock/billeteras.mock'
+import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
+import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
+import BankPickerModal from '@/components/billeteras/BankPickerModal'
+import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
+import billeteraService from '@/services/billetera.service'
+import type { Billetera } from '@/types'
+import styles from './BilleterasPage.module.css'
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Skeleton ──────────────────────────────────────────────────────────────────
 
-interface Billetera {
-  id: string
-  nombre: string
-  moneda: 'ARS' | 'USD'
-  saldo_actual: number
-  saldo_inicial: number
-  es_principal: boolean
-  es_efectivo: boolean
-  estado?: 'activa' | 'archivada'
-}
-
-// Billeteras reales serán cargadas desde la API
-
-// ── Formatters ─────────────────────────────────────────────────────────────
-
-function fmtSaldo(n: number, moneda: 'ARS' | 'USD'): string {
-  if (moneda === 'USD') {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(n)
-  }
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n)
-}
-
-
-// ── Skeleton ───────────────────────────────────────────────────────────────
-
-function Skeleton() {
+function SkeletonGrid() {
   return (
-    <div className={styles.root}>
-      <div className={styles.pageHeader}>
-        <div>
-          <div className={`${styles.skel} ${styles.skelTitle}`} />
-          <div className={`${styles.skel} ${styles.skelSubtitle}`} />
-        </div>
-      </div>
-      <div className={styles.grid}>
-        {[1, 2, 3].map((i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelCard}`} />
-        ))}
-      </div>
+    <div className={styles.grid}>
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className={styles.skeletonCard} aria-hidden="true" />
+      ))}
     </div>
   )
 }
 
-// ── Billetera card ─────────────────────────────────────────────────────────
+// ── Estado vacío ──────────────────────────────────────────────────────────────
 
-function BilleteraCard({ billetera, onEdit, onArchiveToggle, onDelete }: { billetera: Billetera; onEdit: (b: Billetera) => void; onArchiveToggle: (b: Billetera) => void; onDelete: (id: string) => void }) {
-  const isPrimary = billetera.es_principal
+function EstadoVacio({ onCrear }: { onCrear: () => void }) {
   return (
-    <div className={[styles.card, isPrimary ? styles.cardPrimary : ''].filter(Boolean).join(' ')}>
-      <div className={styles.cardTop}>
-        <div className={[styles.cardIconWrap, isPrimary ? styles.cardIconWrapPrimary : ''].filter(Boolean).join(' ')}>
-          {billetera.es_efectivo
-            ? <Banknote size={20} strokeWidth={1.75} />
-            : <Wallet size={20} strokeWidth={1.75} />
-          }
-        </div>
-        {isPrimary && <span className={styles.principalBadge}>Principal</span>}
+    <div className={styles.emptyState}>
+      <div className={styles.emptyIcon} aria-hidden="true">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="36" r="36" fill="var(--surface-alt)" />
+          <path d="M22 28C22 25.8 23.8 24 26 24H46C48.2 24 50 25.8 50 28V44C50 46.2 48.2 48 46 48H26C23.8 48 22 46.2 22 44V28Z" stroke="var(--silver)" strokeWidth="1.75" fill="none"/>
+          <path d="M22 32H50" stroke="var(--silver)" strokeWidth="1.75"/>
+          <rect x="28" y="38" width="8" height="4" rx="2" fill="var(--silver)" opacity="0.5"/>
+        </svg>
       </div>
-
-      <p className={[styles.cardNombre, isPrimary ? styles.cardNombrePrimary : ''].filter(Boolean).join(' ')}>
-        {billetera.nombre}
+      <h2 className={styles.emptyTitle}>Todavía no tenés billeteras</h2>
+      <p className={styles.emptySubtitle}>
+        Agregá tu primera billetera para empezar a llevar el control de tu plata.
       </p>
-      <p className={[styles.cardMoneda, isPrimary ? styles.cardMonedaPrimary : ''].filter(Boolean).join(' ')}>
-        {billetera.moneda}
-      </p>
-
-      <p className={[styles.cardSaldoLabel, isPrimary ? styles.cardSaldoLabelPrimary : ''].filter(Boolean).join(' ')}>
-        Saldo actual
-      </p>
-      <p className={[styles.cardSaldo, isPrimary ? styles.cardSaldoPrimary : ''].filter(Boolean).join(' ')}>
-        {fmtSaldo(billetera.saldo_actual, billetera.moneda)}
-      </p>
-      <div className={styles.cardActions}>
-        <button type="button" className={styles.actionBtn} onClick={() => onEdit(billetera)}>Editar</button>
-        <button type="button" className={styles.actionBtn} onClick={() => onArchiveToggle(billetera)}>
-          {billetera.estado === 'archivada' ? 'Desarchivar' : 'Archivar'}
-        </button>
-        {!billetera.es_efectivo && (
-          <button type="button" className={[styles.actionBtn, styles.actionBtnDanger].filter(Boolean).join(' ')} onClick={() => onDelete(billetera.id)}>Borrar</button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ── Create form ────────────────────────────────────────────────────────────
-
-interface CreateFormProps {
-  onClose: () => void
-  onCreate: (payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) => Promise<void>
-}
-
-function CreateForm({ onClose, onCreate, initial, onSave }: CreateFormProps & { initial?: { nombre?: string; moneda?: 'ARS' | 'USD'; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean }; onSave?: (payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) => Promise<void> }) {
-  const [nombre, setNombre] = useState('')
-  const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS')
-  const [saldo, setSaldo] = useState('')
-  const [esPrincipal, setEsPrincipal] = useState(false)
-  const [esEfectivo, setEsEfectivo] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const nombreRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    nombreRef.current?.focus()
-  }, [])
-
-  // Sync initial props in render
-  const [prevInitial, setPrevInitial] = useState(initial)
-  if (initial !== prevInitial) {
-    setPrevInitial(initial)
-    if (initial) {
-      if (initial.nombre) setNombre(initial.nombre)
-      if (initial.moneda) setMoneda(initial.moneda)
-      if (typeof initial.saldo_inicial === 'number') setSaldo(String(initial.saldo_inicial))
-      if (typeof initial.es_principal === 'boolean') setEsPrincipal(initial.es_principal)
-      if (typeof initial.es_efectivo === 'boolean') setEsEfectivo(initial.es_efectivo)
-    } else {
-      setNombre('')
-      setMoneda('ARS')
-      setSaldo('')
-      setEsPrincipal(false)
-      setEsEfectivo(false)
-    }
-  }
-
-  function handleSaldoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const raw = e.target.value.replace(/[^0-9.]/g, '')
-    setSaldo(raw)
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!nombre.trim()) {
-      setError('El nombre es obligatorio.')
-      return
-    }
-    const saldoNum = parseFloat(saldo) || 0
-    try {
-      if (onSave) {
-        await onSave({ nombre: nombre.trim(), moneda, saldo_inicial: saldoNum, es_principal: esPrincipal })
-      } else {
-        await onCreate({ nombre: nombre.trim(), moneda, saldo_inicial: saldoNum, es_principal: esPrincipal })
-      }
-      onClose()
-    } catch (err: unknown) {
-      setError('No se pudo guardar la billetera. Intentá de nuevo.')
-      throw err
-    }
-  }
-
-  return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-
-      <div className={styles.formField}>
-        <label className={styles.formLabel}>Nombre</label>
-        <input
-          ref={nombreRef}
-          className={[styles.formInput, error ? styles.formInputError : ''].filter(Boolean).join(' ')}
-          type="text"
-          placeholder="Ej: Galicia, Mercado Pago…"
-          value={nombre}
-          onChange={(e) => { setNombre(e.target.value); setError(null) }}
-          maxLength={40}
-        />
-        {error && <p className={styles.formError}>{error}</p>}
-      </div>
-
-      <div className={styles.formField}>
-        <label className={styles.formLabel}>Moneda</label>
-        <div className={styles.monedaPills}>
-          {(['ARS', 'USD'] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              disabled={esEfectivo}
-              className={[styles.monedaPill, moneda === m ? styles.monedaPillActive : '', esEfectivo ? styles.monedaPillDisabled : ''].filter(Boolean).join(' ')}
-              onClick={() => setMoneda(m)}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {!onSave && (
-        <div className={styles.formField}>
-          <label className={styles.formLabel}>Saldo inicial <span className={styles.optional}>(opcional)</span></label>
-          <div className={styles.saldoWrap}>
-            <span className={styles.saldoCurrency}>{moneda === 'ARS' ? '$' : 'U$D'}</span>
-            <input
-              className={styles.saldoInput}
-              type="text"
-              inputMode="decimal"
-              placeholder="0.00"
-              value={saldo}
-              onChange={handleSaldoChange}
-            />
-          </div>
-        </div>
-      )}
-
-      <label className={styles.checkRow}>
-        <input
-          type="checkbox"
-          disabled={esEfectivo}
-          className={styles.checkInput}
-          checked={esPrincipal}
-          onChange={(e) => setEsPrincipal(e.target.checked)}
-        />
-        <span className={[styles.checkLabel, esEfectivo ? styles.checkLabelDisabled : ''].filter(Boolean).join(' ')}>Marcar como billetera principal</span>
-      </label>
-
-      <div className={styles.infoBox}>
-        <p className={styles.infoText}>
-          {onSave ? 'Los cambios se guardarán en tu cuenta.' : 'El saldo inicial se utiliza para establecer el balance de apertura de esta billetera.'}
-        </p>
-      </div>
-
-      <button type="submit" className={styles.submitBtn}>
-        {onSave ? 'Guardar cambios' : 'Crear billetera'}
+      <button className={styles.emptyBtn} onClick={onCrear}>
+        <Plus size={16} strokeWidth={2} />
+        Crear primera billetera
       </button>
-    </form>
+    </div>
   )
 }
 
-// ── BilleterasPage ─────────────────────────────────────────────────────────
+// ── Totales hero ──────────────────────────────────────────────────────────────
+
+function TotalesHero({ billeteras }: { billeteras: Billetera[] }) {
+  const cotizacion = MOCK_COTIZACION_USD
+  const { totalARS, totalUSD, equivalenteTotal } = calcularTotales(billeteras, cotizacion.valor)
+
+  return (
+    <div className={styles.totals}>
+      <div className={styles.tmMain}>
+        <p className={styles.totalLbl}>Equivalente total</p>
+        <p className={styles.tmMainVal}>{formatSaldo(equivalenteTotal, 'ARS')}</p>
+        <span className={styles.totalBadge}>
+          USD {cotizacion.tipo} · {formatSaldo(cotizacion.valor, 'ARS')}
+        </span>
+      </div>
+
+      <div className={styles.tmRow}>
+        <div className={styles.tmSub}>
+          <p className={styles.totalLbl}>Total ARS</p>
+          <p className={styles.tmSubVal}>{formatSaldo(totalARS, 'ARS')}</p>
+          <p className={styles.totalSub}>pesos argentinos</p>
+        </div>
+        <div className={styles.tmSub}>
+          <p className={styles.totalLbl}>Total USD</p>
+          <p className={styles.tmSubVal}>{formatSaldo(totalUSD, 'USD')}</p>
+          <p className={styles.totalSub}>dólares</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Página principal ──────────────────────────────────────────────────────────
 
 export default function BilleterasPage() {
-  const { billeteras, isLoading, setBilleteras } = useFinancial()
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [editTarget, setEditTarget] = useState<Billetera | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
-  const [showArchived, setShowArchived] = useState(false)
+  const { usuario } = useAuth()
   const { showToast } = useToast()
+  const { billeteras, isLoading, refreshBilleteras } = useFinancial()
 
+  const [modalOpen, setModalOpen] = useState(false)
 
-  async function handleCreate(payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) {
+  const billeterasActivas = billeteras.filter((b) => b.estado === 'activa')
+  const billeterasRegulares = billeterasActivas.filter((b) => !b.es_efectivo)
+  const billeterasEfectivo = billeterasActivas.filter((b) => b.es_efectivo)
+
+  const handleArchivar = async (id: string) => {
+    const b = billeteras.find((b) => b.id === id)
     try {
-      const created = await billeteraService.create(payload)
-      const parsed = { ...created, saldo_actual: Number(created.saldo_actual), saldo_inicial: Number(created.saldo_inicial) }
-      setBilleteras((prev) => {
-        let updated = prev
-        if (parsed.es_principal) {
-          updated = prev.map((b) => ({ ...b, es_principal: false }))
-        }
-        return [...updated, parsed]
-      })
-      showToast('Billetera creada correctamente', 'success')
-    } catch (err) {
-      console.error(err)
-      showToast('Error al crear billetera', 'error')
-      throw err
+      await billeteraService.archivar(id)
+      await refreshBilleteras()
+      if (b) showToast(`"${b.nombre}" archivada`, 'success')
+    } catch {
+      showToast('Error al archivar la billetera', 'error')
     }
   }
 
-  async function handleDeleteConfirmed() {
-    if (!deleteTarget) return
-    try {
-      await billeteraService.remove(deleteTarget)
-      setBilleteras((prev) => prev.filter((b) => b.id !== deleteTarget))
-      showToast('Billetera eliminada', 'success')
-    } catch (err: unknown) {
-      console.error(err)
-      const errorData = err as { response?: { data?: { detail?: string } } }
-      const detail = errorData.response?.data?.detail
-      
-      // LOGICA DE TRANSACCIONES ASOCIADAS:
-      // Si el backend detecta transacciones, informamos al usuario que debe archivar.
-      // Esto previene que se pierda el historial financiero en el futuro módulo de transacciones.
-      if (detail && detail.includes('transacciones')) {
-        showToast(detail, 'error')
-      } else {
-        showToast('Error al eliminar billetera', 'error')
-      }
-    } finally {
-      setDeleteTarget(null)
-    }
+  const handleEditar = (_id: string) => {
+    showToast('Edición próximamente disponible', 'info')
   }
 
-  async function handleArchiveToggle(b: Billetera) {
-    try {
-      if (b.estado === 'archivada') {
-        const res = await billeteraService.desarchivar(b.id)
-        const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
-        setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-        showToast('Billetera desarchivada', 'success')
-      } else {
-        const res = await billeteraService.archivar(b.id)
-        const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
-        setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-        showToast('Billetera archivada', 'success')
-      }
-    } catch (err) {
-      console.error(err)
-      showToast('Error actualizando estado', 'error')
-    }
+  const handleCrear = async (payload: CreatePayload) => {
+    await billeteraService.create({
+      nombre: payload.nombre,
+      moneda: payload.moneda,
+      saldo_inicial: payload.saldo_inicial,
+      es_principal: payload.es_principal,
+      bank_id: payload.bank_id,
+    })
+    await refreshBilleteras()
+    setModalOpen(false)
+    showToast(`"${payload.nombre}" creada exitosamente`, 'success')
   }
 
-  function handleEdit(b: Billetera) {
-    setEditTarget(b)
-    setDrawerOpen(true)
-  }
-
-  async function handleSave(payload: { nombre: string; moneda: 'ARS' | 'USD'; saldo_inicial: number; es_principal: boolean }) {
-    if (!editTarget) return
-    try {
-      const res = await billeteraService.update(editTarget.id, payload)
-      const parsed = { ...res, saldo_actual: Number(res.saldo_actual), saldo_inicial: Number(res.saldo_inicial) }
-      setBilleteras((prev) => prev.map((x) => x.id === parsed.id ? parsed : x))
-      showToast('Billetera actualizada', 'success')
-      setEditTarget(null)
-      setDrawerOpen(false)
-    } catch (err) {
-      console.error(err)
-      showToast('Error actualizando billetera', 'error')
-      throw err
-    }
-  }
-
-  const total = billeteras
-    .filter((b) => b.moneda === 'ARS' && b.estado !== 'archivada')
-    .reduce((acc, b) => acc + b.saldo_actual, 0)
-
-  if (isLoading && billeteras.length === 0) return <Skeleton />
+  const monedaPrincipal = (usuario?.moneda_principal as 'ARS' | 'USD') ?? 'ARS'
 
   return (
     <div className={styles.root}>
-
-      {/* Page header */}
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className={styles.pageHeader}>
-        <div>
+        <div className={styles.headerLeft}>
           <h1 className={styles.pageTitle}>Billeteras</h1>
-          <p className={styles.pageSubtitle}>
-            Total ARS: {fmtSaldo(total, 'ARS')}
-          </p>
+          {!isLoading && (
+            <p className={styles.pageSubtitle}>
+              {billeterasActivas.length} activa{billeterasActivas.length !== 1 ? 's' : ''}
+              {' · '}Total:{' '}
+              {formatSaldo(
+                billeteras
+                  .filter((b) => b.estado === 'activa' && b.moneda === 'ARS')
+                  .reduce((a, b) => a + b.saldo_actual, 0),
+                'ARS',
+              )}
+            </p>
+          )}
         </div>
-        <div className={styles.headerActions}>
-          <button type="button" className={styles.archivedToggle} onClick={() => setShowArchived((s) => !s)}>
-            {showArchived ? 'Ocultar archivadas' : `Archivadas (${billeteras.filter((b) => b.estado === 'archivada').length})`}
-          </button>
-          <button
-            className={styles.newBtn}
-            onClick={() => { setEditTarget(null); setDrawerOpen(true); setShowArchived(false) }}
-          >
-            <Plus size={18} strokeWidth={2} />
-            <span>Nueva</span>
-          </button>
-        </div>
+        <button
+          className={styles.nuevaBtn}
+          onClick={() => setModalOpen(true)}
+          aria-label="Agregar nueva billetera"
+        >
+          <Plus size={16} strokeWidth={2.5} />
+          Nueva<span className={styles.btnSuffix}> billetera</span>
+        </button>
       </div>
 
-      
-
-      {/* Cards grid */}
-      {billeteras.length === 0 ? (
-        <div className={styles.empty}>
-          <div className={styles.emptyIcon}>
-            <Wallet size={32} strokeWidth={1.5} />
-          </div>
-          <p className={styles.emptyTitle}>Sin billeteras</p>
-          <p className={styles.emptySub}>Agregá tu primera billetera para empezar a registrar tus saldos.</p>
-          <button className={styles.emptyBtn} onClick={() => setDrawerOpen(true)}>
-            <Plus size={16} strokeWidth={2} />
-            Agregar billetera
-          </button>
-        </div>
-      ) : (
-          <div className={styles.grid}>
-            {billeteras.filter((b) => showArchived ? b.estado === 'archivada' : b.estado !== 'archivada').map((b) => (
-              <BilleteraCard
-                key={b.id}
-                billetera={b}
-                onEdit={handleEdit}
-                onArchiveToggle={handleArchiveToggle}
-                onDelete={b.es_efectivo ? () => {} : setDeleteTarget}
-              />
-            ))}
-          </div>
+      {/* ── Barra de resumen ───────────────────────────────────────────────── */}
+      {!isLoading && billeterasActivas.length > 0 && (
+        <TotalesHero billeteras={billeteras} />
       )}
 
-      <Drawer
-        isOpen={drawerOpen}
-        onClose={() => { setDrawerOpen(false); setEditTarget(null) }}
-        title={editTarget ? 'Editar billetera' : 'Nueva billetera'}
-      >
-        {editTarget ? (
-          <CreateForm
-            onClose={() => { setDrawerOpen(false); setEditTarget(null) }}
-            initial={{ 
-              nombre: editTarget.nombre, 
-              moneda: editTarget.moneda, 
-              saldo_inicial: editTarget.saldo_inicial, 
-              es_principal: editTarget.es_principal,
-              es_efectivo: editTarget.es_efectivo
-            }}
-            onCreate={handleCreate}
-            onSave={handleSave}
-          />
-        ) : (
-          <CreateForm onClose={() => setDrawerOpen(false)} onCreate={handleCreate} />
-        )}
-      </Drawer>
+      {/* ── Grid / Skeleton / Estado vacío ────────────────────────────────── */}
+      {isLoading ? (
+        <SkeletonGrid />
+      ) : billeterasActivas.length === 0 ? (
+        <EstadoVacio onCrear={() => setModalOpen(true)} />
+      ) : (
+        <div className={styles.grid}>
+          {billeterasRegulares.map((b) => (
+            <BilleteraCard
+              key={b.id}
+              billetera={b}
+              onArchivar={handleArchivar}
+              onEditar={handleEditar}
+            />
+          ))}
+          {billeterasEfectivo.map((b) => (
+            <BilleteraCard key={b.id} billetera={b} />
+          ))}
+          <NuevaBilleteraCard onClick={() => setModalOpen(true)} />
+        </div>
+      )}
 
-      <ConfirmModal
-        isOpen={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDeleteConfirmed}
-        title="Eliminar billetera"
-        description="¿Confirmás que querés eliminar esta billetera? Esta acción no se puede deshacer."
-        variant="danger"
-        confirmLabel="Eliminar"
+      {/* ── Modal ──────────────────────────────────────────────────────────── */}
+      <BankPickerModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCrear={handleCrear}
+        billeterasActuales={billeteras}
+        monedaPrincipalUsuario={monedaPrincipal}
       />
     </div>
   )

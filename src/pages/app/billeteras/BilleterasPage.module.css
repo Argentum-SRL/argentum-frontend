@@ -1,493 +1,336 @@
-/* ── Root ────────────────────────────────────────────────────────────────── */
+/* ─── BilleterasPage.module.css — mobile first ───────────────────────────── */
 
+/* ── Layout raíz ───────────────────────────────────────────────────────────── */
 .root {
+  padding: 20px 16px 32px;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
 }
 
 @media (min-width: 768px) {
   .root {
-    gap: 28px;
+    padding: 28px 24px 40px;
+    max-width: 1200px;
+    gap: 24px;
   }
 }
 
-/* ── Page header ─────────────────────────────────────────────────────────── */
-
+/* ── Header ────────────────────────────────────────────────────────────────── */
 .pageHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-}
-
-.pageTitle {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-@media (min-width: 768px) {
-  .pageTitle {
-    font-size: 1.625rem;
-  }
-}
-
-.pageSubtitle {
-  font-size: 0.875rem;
-  color: var(--text-3);
-  margin-top: 4px;
-}
-
-.newBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 10px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s;
-  flex-shrink: 0;
-}
-
-.newBtn:hover {
-  opacity: 0.88;
-}
-
-.headerActions {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
-.archivedToggle {
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-2);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.archivedToggle:hover {
-  background: var(--surface-alt);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-/* ── Grid ────────────────────────────────────────────────────────────────── */
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-/* ── Billetera card ──────────────────────────────────────────────────────── */
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
+.headerLeft {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  transition: box-shadow 0.15s;
 }
 
-.card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); /* intentional: elevation shadow */
+.pageTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.1;
 }
 
-.cardPrimary {
+@media (min-width: 768px) {
+  .pageTitle { font-size: 26px; }
+}
+
+/* Subtítulo — oculto en mobile */
+.pageSubtitle {
+  display: none;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-3);
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .pageSubtitle { display: block; }
+}
+
+/* Botón "Nueva" */
+.nuevaBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 38px;
+  border-radius: 12px;
   background: var(--primary);
-  border-color: var(--primary);
-}
-
-.cardTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.cardIconWrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--surface-alt);
-  color: var(--text-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cardIconWrapPrimary {
-  background: rgba(255, 255, 255, 0.15); /* intentional: icon bg on primary */
-  color: #fff;
-}
-
-.principalBadge {
-  font-size: 0.6875rem;
+  color: white;
+  font-size: 13px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.15); /* intentional: badge on primary */
-  padding: 3px 8px;
-  border-radius: 20px;
-}
-
-.cardNombre {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.cardNombrePrimary {
-  color: #fff;
-}
-
-.cardMoneda {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-3);
-  margin-bottom: 12px;
-}
-
-.cardMonedaPrimary {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.cardSaldoLabel {
-  font-size: 0.6875rem;
-  color: var(--text-3);
-  margin-bottom: 2px;
-}
-
-.cardSaldoLabelPrimary {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.cardSaldo {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.5px;
-}
-
-.cardSaldoPrimary {
-  color: #fff;
-}
-
-.cardActions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.actionBtn {
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 0.8125rem;
+  border: none;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 120ms ease, transform 120ms ease;
 }
 
-.actionBtn:hover {
-  opacity: 0.9;
+.nuevaBtn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
-.actionBtnDanger {
-  background: transparent;
-  border-color: var(--error);
-  color: var(--error);
+/* " billetera" — oculto en mobile */
+.btnSuffix { display: none; }
+
+@media (min-width: 768px) {
+  .nuevaBtn { padding: 0 18px; height: 40px; }
+  .btnSuffix { display: inline; }
 }
 
-/* ── Empty state ─────────────────────────────────────────────────────────── */
+/* ── Totales hero — card marina ─────────────────────────────────────────────── */
+.totals {
+  background: #0D2045;
+  border-radius: 18px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
 
-.empty {
+.totals::before {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: rgba(138, 149, 168, 0.07);
+  top: -90px; right: -60px;
+  pointer-events: none;
+}
+
+.totals::after {
+  content: '';
+  position: absolute;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: rgba(138, 149, 168, 0.04);
+  bottom: -50px; left: 40px;
+  pointer-events: none;
+}
+
+/* Desktop: flex row */
+@media (min-width: 768px) {
+  .totals {
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+    padding: 24px 32px;
+  }
+}
+
+/* tmMain — bloque del equivalente total */
+.tmMain {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .tmMain { flex: 1; }
+}
+
+/* Número principal */
+.tmMainVal {
+  font-size: 30px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin: 6px 0 0;
+}
+
+@media (min-width: 768px) {
+  .tmMainVal { font-size: 36px; letter-spacing: -1.2px; }
+}
+
+/* tmRow — fila ARS + USD */
+.tmRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+  margin-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Desktop: display:contents — los hijos fluyen al flex padre */
+@media (min-width: 768px) {
+  .tmRow {
+    display: contents;
+  }
+}
+
+/* tmSub — cada columna secundaria */
+.tmSub {
+  display: flex;
+  flex-direction: column;
+}
+
+.tmSub + .tmSub {
+  padding-left: 16px;
+  margin-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (min-width: 768px) {
+  .tmSub {
+    flex: 1;
+    padding-left: 40px;
+    margin-left: 40px;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .tmSub + .tmSub {
+    padding-left: 40px;
+    margin-left: 40px;
+  }
+}
+
+/* Valor secundario */
+.tmSubVal {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.4px;
+  margin: 4px 0 0;
+}
+
+@media (min-width: 768px) {
+  .tmSubVal { font-size: 28px; letter-spacing: -0.8px; }
+}
+
+/* Labels, subs y badge compartidos */
+.totalLbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.totalSub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 3px 0 0;
+}
+
+.totalBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  background: rgba(76, 175, 125, 0.2);
+  color: #4CAF7D;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+
+/* ── Grid de billeteras ────────────────────────────────────────────────────── */
+/* Mobile: columna única */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Desktop: 3 columnas */
+@media (min-width: 768px) {
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+}
+
+/* ── Skeleton ──────────────────────────────────────────────────────────────── */
+.skeletonCard {
+  height: 140px; /* altura fija en mobile */
+  border-radius: 18px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-alt) 0%,
+    var(--surface) 50%,
+    var(--surface-alt) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.5s ease infinite;
+}
+
+@media (min-width: 768px) {
+  .skeletonCard {
+    height: unset;
+    border-radius: 20px;
+    aspect-ratio: 1.75 / 1;
+  }
+}
+
+@keyframes skeletonPulse {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Estado vacío ──────────────────────────────────────────────────────────── */
+.emptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
-  gap: 8px;
-  padding: 64px 24px;
+  gap: 12px;
+  flex: 1;
+  padding: 48px 16px;
 }
 
-.emptyIcon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--surface-alt);
-  color: var(--text-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-}
+.emptyIcon { margin-bottom: 4px; }
 
 .emptyTitle {
-  font-size: 1rem;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text);
+  margin: 0;
 }
 
-.emptySub {
-  font-size: 0.875rem;
-  color: var(--text-3);
-  max-width: 280px;
+.emptySubtitle {
+  font-size: 14px;
+  color: var(--text-2);
+  margin: 0;
+  max-width: 300px;
   line-height: 1.5;
 }
 
 .emptyBtn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 12px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.emptyBtn:hover {
-  opacity: 0.88;
-}
-
-
-/* ── Form ────────────────────────────────────────────────────────────────── */
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 24px 20px;
-}
-
-@media (min-width: 768px) {
-  .form {
-    padding: 32px 28px;
-    gap: 22px;
-  }
-}
-
-
-.formField {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.formLabel {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-2);
-}
-
-.optional {
-  font-weight: 400;
-  opacity: 0.6;
-  font-size: 0.75rem;
-}
-
-.formInput {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 0.9375rem;
-  outline: none;
-  transition: border-color 0.15s;
-  box-sizing: border-box;
-}
-
-.formInput:focus {
-  border-color: var(--primary);
-}
-
-.formInputError {
-  border-color: var(--error);
-}
-
-.formError {
-  font-size: 0.75rem;
-  color: var(--error);
-  margin-top: 2px;
-}
-
-/* ── Moneda pills ────────────────────────────────────────────────────────── */
-
-.monedaPills {
-  display: flex;
-  gap: 8px;
-}
-
-.monedaPill {
-  flex: 1;
-  padding: 9px 0;
-  border-radius: 10px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  color: var(--text-2);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-}
-
-.monedaPillActive {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--surface-alt);
-}
-
-.monedaPillDisabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ── Saldo input ─────────────────────────────────────────────────────────── */
-
-.saldoWrap {
-  display: flex;
-  align-items: center;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: border-color 0.15s;
-}
-
-.saldoWrap:focus-within {
-  border-color: var(--primary);
-}
-
-.saldoCurrency {
-  padding: 10px 12px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--text-2);
-  background: var(--surface-alt);
-  border-right: 1.5px solid var(--border);
-  white-space: nowrap;
-}
-
-.saldoInput {
-  flex: 1;
-  padding: 10px 12px;
-  border: none;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 0.9375rem;
-  outline: none;
-}
-
-/* ── Checkbox ────────────────────────────────────────────────────────────── */
-
-.checkRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.checkInput {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--primary);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.checkLabel {
-  font-size: 0.875rem;
-  color: var(--text-2);
-  line-height: 1.4;
-}
-
-.checkLabelDisabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* ── Info box ────────────────────────────────────────────────────────────── */
-
-.infoBox {
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-
-.infoText {
-  font-size: 0.75rem;
-  color: var(--text-3);
-  line-height: 1.5;
-}
-
-/* ── Submit ──────────────────────────────────────────────────────────────── */
-
-.submitBtn {
-  width: 100%;
-  padding: 13px;
+  gap: 7px;
+  margin-top: 8px;
+  padding: 0 22px;
+  height: 44px;
   border-radius: 12px;
   background: var(--primary);
-  color: #fff;
-  font-size: 0.9375rem;
+  color: white;
+  font-size: 14px;
   font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 120ms ease;
 }
 
-.submitBtn:hover {
-  opacity: 0.88;
-}
+.emptyBtn:hover { opacity: 0.88; }
 
-
-/* ── Skeleton ────────────────────────────────────────────────────────────── */
-
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
-}
-
-.skel {
-  background: var(--surface-alt);
-  border-radius: 10px;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
-}
-
-.skelCard {
-  height: 180px;
-  border-radius: 16px;
-}
-
-.skelTitle {
-  height: 26px;
-  width: 140px;
-  margin-bottom: 8px;
-}
-
-.skelSubtitle {
-  height: 16px;
-  width: 100px;
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .skeletonCard { animation: none; background: var(--surface-alt); }
+  .nuevaBtn     { transition: none; }
 }

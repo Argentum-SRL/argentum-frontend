@@ -1,15 +1,7 @@
 import type { DashboardData } from '../lib/mock/dashboard.mock'
+import type { Billetera } from './index'
 
-export interface Billetera {
-  id: string
-  nombre: string
-  moneda: 'ARS' | 'USD'
-  saldo_actual: number
-  saldo_inicial: number
-  es_principal: boolean
-  es_efectivo: boolean
-  estado?: 'activa' | 'archivada'
-}
+export type { Billetera }
 
 export interface MetaFinanciera {
   id: string
@@ -34,11 +26,11 @@ export interface FinancialContextType {
   dashboard: DashboardData | null
   metas: MetaFinanciera[]
   presupuestos: Presupuesto[]
-  
+
   // Status
   isLoading: boolean
   hasLoaded: boolean
-  
+
   // Actions
   refreshAll: () => Promise<void>
   refreshBilleteras: () => Promise<void>

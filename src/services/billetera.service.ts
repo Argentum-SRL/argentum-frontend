@@ -6,7 +6,7 @@ const billeteraService = {
     return data
   },
 
-  create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean }) => {
+  create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; bank_id?: string | null }) => {
     const { data } = await api.post('/billeteras', payload)
     return data
   },

@@ -2,7 +2,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
-  Bell, Search, MoreHorizontal, Sun, Moon
+  Bell, Search, MoreHorizontal, Sun, Moon,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -62,7 +62,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
 
-  // Reset mobile menu on navigation
   const [prevPath, setPrevPath] = useState(location.pathname)
   if (location.pathname !== prevPath) {
     setPrevPath(location.pathname)
@@ -108,7 +107,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
               >
                 <Icon {...ICON_PROPS} />
-                <span>{label}</span>
+                <span className={styles.navLabel}>{label}</span>
               </Link>
             ))}
           </div>
@@ -123,7 +122,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
               >
                 <Icon {...ICON_PROPS} />
-                <span>{label}</span>
+                <span className={styles.navLabel}>{label}</span>
               </Link>
             ))}
           </div>
@@ -155,7 +154,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
           >
             {theme === 'dark' ? <Sun {...ICON_PROPS} /> : <Moon {...ICON_PROPS} />}
-            <span>{theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}</span>
+            <span className={styles.themeBtnLabel}>{theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}</span>
           </button>
           <button
             type="button"

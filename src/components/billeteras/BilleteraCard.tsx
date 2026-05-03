@@ -1,0 +1,161 @@
+// ─── BilleteraCard ────────────────────────────────────────────────────────────
+
+import { useState, useEffect } from 'react'
+import { Edit2, Archive, CreditCard, DollarSign, Plus } from 'lucide-react'
+import type { Billetera } from '@/types'
+import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
+import styles from './BilleteraCard.module.css'
+
+export interface BilleteraCardProps {
+  billetera: Billetera
+  onArchivar?: (id: string) => void
+  onEditar?: (id: string) => void
+}
+
+const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
+  ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
+  USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
+}
+
+export default function BilleteraCard({ billetera, onArchivar, onEditar }: BilleteraCardProps) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [logoErr, setLogoErr] = useState(false)
+
+  const bank = billetera.bank_id
+    ? getBankById(billetera.bank_id)
+    : !billetera.es_efectivo
+      ? findBankByNombre(billetera.nombre)
+      : undefined
+  const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
+
+  let background: string
+  if (billetera.es_efectivo) {
+    background = EFECTIVO_BG[billetera.moneda]
+  } else if (bank?.gradiente) {
+    background = bank.gradiente
+  } else if (bank?.colorPrimario) {
+    background = bank.colorPrimario
+  } else {
+    background = 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
+  }
+
+  const isLight = !bank || bank.colorTexto === 'white'
+  const labelNombre = billetera.es_efectivo
+    ? `Efectivo ${billetera.moneda}`
+    : bank?.nombre ?? billetera.nombre
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    if (!menuOpen) return
+    const handleClick = () => setMenuOpen(false)
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [menuOpen])
+
+  return (
+    <div className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''}`}>
+      {/* Fondo clipeado */}
+      <div className={styles.wcBg} style={{ background }}>
+        <div className={styles.decoA} aria-hidden="true" />
+        <div className={styles.decoB} aria-hidden="true" />
+      </div>
+
+      <div className={styles.wcInner}>
+        {/* ── TOP ─────────────────────────────────────────────────────── */}
+        <div className={styles.wcTop}>
+          {/* Logo circular */}
+          <div className={styles.wcLogo}>
+            {billetera.es_efectivo ? (
+              billetera.moneda === 'ARS'
+                ? <CreditCard size={18} strokeWidth={1.75} color="white" />
+                : <DollarSign size={18} strokeWidth={1.75} color="white" />
+            ) : logoUrl && !logoErr ? (
+              <img src={logoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
+            ) : (
+              <span className={styles.logoFallback}>
+                {getInitials(bank?.nombre ?? billetera.nombre)}
+              </span>
+            )}
+          </div>
+
+          {/* Identidad */}
+          <div className={styles.wcIdentity}>
+            <div className={`${styles.wcName} ${isLight ? styles.textLight : styles.textDark}`}>
+              {billetera.nombre}
+            </div>
+            <div className={styles.wcChipRow}>
+              {billetera.es_principal && (
+                <span className={`${styles.chip} ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
+                  Principal
+                </span>
+              )}
+              <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                {billetera.moneda}
+              </span>
+              {billetera.es_efectivo && (
+                <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                  Efectivo
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Kebab — solo para no-efectivo */}
+          {!billetera.es_efectivo && (
+            <div className={styles.wcKebab}>
+              <button
+                className={styles.kebabBtn}
+                onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p) }}
+                aria-label="Opciones"
+                aria-expanded={menuOpen}
+              >
+                <div className={styles.dot} />
+                <div className={styles.dot} />
+                <div className={styles.dot} />
+              </button>
+
+              {menuOpen && (
+                <div className={styles.dropdown} role="menu">
+                  <button className={styles.dropdownItem} role="menuitem"
+                    onClick={() => { onEditar?.(billetera.id); setMenuOpen(false) }}>
+                    <Edit2 size={13} strokeWidth={1.75} /> Editar
+                  </button>
+                  <button className={styles.dropdownItem} role="menuitem"
+                    onClick={() => { onArchivar?.(billetera.id); setMenuOpen(false) }}>
+                    <Archive size={13} strokeWidth={1.75} /> Archivar
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── BALANCE ──────────────────────────────────────────────────── */}
+        <div className={styles.wcBalance}>
+          <p className={`${styles.wcBalLbl} ${isLight ? styles.balLblLight : styles.balLblDark}`}>
+            {labelNombre} · Saldo actual
+          </p>
+          <p className={`${styles.wcBalAmt} ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>
+            {formatSaldo(billetera.saldo_actual, billetera.moneda)}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Card "Nueva billetera" — fila en mobile, columna en desktop ──────────────
+
+export function NuevaBilleteraCard({ onClick }: { onClick: () => void }) {
+  return (
+    <button className={styles.wcAdd} onClick={onClick} aria-label="Agregar nueva billetera">
+      <div className={styles.addIcon}>
+        <Plus size={20} strokeWidth={2} color="#8E9198" />
+      </div>
+      <div className={styles.addText}>
+        <span className={styles.addTitle}>Nueva billetera</span>
+        <span className={styles.addSub}>Agregá un banco o billetera</span>
+      </div>
+    </button>
+  )
+}

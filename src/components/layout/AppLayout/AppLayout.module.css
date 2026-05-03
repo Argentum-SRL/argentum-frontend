@@ -17,11 +17,19 @@
     position: fixed;
     left: 0;
     top: 0;
-    width: 240px;
     height: 100dvh;
     background: var(--primary);
     z-index: 30;
     overflow: hidden;
+
+    /* Collapsed by default: 64px shows only icons */
+    width: 64px;
+    transition: width 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Expand on hover */
+  .sidebar:hover {
+    width: 240px;
   }
 }
 
@@ -48,22 +56,27 @@
   pointer-events: none;
 }
 
-/* Logo */
+/* ── Logo ────────────────────────────────────────────────────────────────── */
+
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 24px 20px 16px;
+  /* Collapsed: center the moon icon */
+  justify-content: center;
+  gap: 0;
+  padding: 20px 0 16px;
   position: relative;
   z-index: 1;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, justify-content 240ms ease,
+              gap 240ms ease, padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
 
 .logo:hover {
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
 .logo:focus-visible {
@@ -71,14 +84,34 @@
   outline-offset: 3px;
 }
 
+/* Expanded: restore normal layout */
+.sidebar:hover .logo {
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 20px 18px 16px;
+}
+
 .logoText {
   font-size: 19px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.3px;
+  white-space: nowrap;
+  /* Hidden when collapsed — zero width removes it from layout */
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms ease;
 }
 
-/* Nav */
+.sidebar:hover .logoText {
+  max-width: 160px;
+  opacity: 1;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+
 .nav {
   flex: 0 0 auto;
   padding: 4px 0;
@@ -87,30 +120,54 @@
 }
 
 .navSection {
-  padding: 0 12px;
+  /* Collapsed: minimal padding to keep icons centered in 64px */
+  padding: 0 8px;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  transition: padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar:hover .navSection {
+  padding: 0 10px;
 }
 
 .navSeparator {
   height: 1px;
   background: rgba(255, 255, 255, 0.08); /* intentional: subtle separator on primary */
+  margin: 10px 12px;
+  transition: margin 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar:hover .navSeparator {
   margin: 10px 20px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
   border-radius: 12px;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.55);
-  transition: background 0.15s, color 0.15s;
   white-space: nowrap;
+  overflow: hidden;
+
+  /* Collapsed: center icon, no gap */
+  justify-content: center;
+  gap: 0;
+  padding: 10px 0;
+  transition: background 0.15s, color 0.15s,
+              justify-content 240ms ease,
+              gap 240ms ease,
+              padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar:hover .navItem {
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
 }
 
 .navItem:hover {
@@ -124,12 +181,26 @@
   font-weight: 600;
 }
 
+/* Label: hidden when collapsed, shown on hover */
+.navLabel {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms ease;
+}
+
+.sidebar:hover .navLabel {
+  max-width: 160px;
+  opacity: 1;
+}
+
+/* ── Theme button ────────────────────────────────────────────────────────── */
+
 .themeBtn {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
   border-radius: 12px;
   border: none;
   background: transparent;
@@ -137,8 +208,18 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+
+  /* Collapsed */
+  justify-content: center;
+  gap: 0;
+  padding: 10px 0;
+  transition: background 0.15s, color 0.15s,
+              justify-content 240ms ease,
+              gap 240ms ease,
+              padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .themeBtn:hover {
@@ -146,31 +227,64 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
-/* Spacer */
+.sidebar:hover .themeBtn {
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+.themeBtnLabel {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms ease;
+}
+
+.sidebar:hover .themeBtnLabel {
+  max-width: 160px;
+  opacity: 1;
+}
+
+/* ── Spacer ──────────────────────────────────────────────────────────────── */
+
 .spacer {
   flex: 1;
 }
 
-/* User block */
+/* ── User block ──────────────────────────────────────────────────────────── */
+
 .userBlock {
-  padding: 12px;
+  padding: 12px 8px;
   position: relative;
   z-index: 1;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
+  transition: padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar:hover .userBlock {
+  padding: 12px;
 }
 
 .userInner {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 8px;
   border-radius: 12px;
   text-decoration: none;
   color: inherit;
-  transition: background 0.15s, transform 0.15s;
   cursor: pointer;
+  overflow: hidden;
+
+  /* Collapsed */
+  justify-content: center;
+  gap: 0;
+  padding: 10px 0;
+  transition: background 0.15s,
+              justify-content 240ms ease,
+              gap 240ms ease,
+              padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .userInner:hover {
@@ -182,9 +296,14 @@
   outline-offset: 2px;
 }
 
+.sidebar:hover .userInner {
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 8px;
+}
+
 .logoutQuickAction {
   width: 100%;
-  margin-top: 8px;
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -194,9 +313,29 @@
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+
+  /* Hidden when collapsed */
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  border-width: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  transition: background 0.15s, border-color 0.15s,
+              max-height 220ms ease, opacity 180ms ease,
+              margin-top 220ms ease, padding 220ms ease,
+              border-width 220ms ease;
 }
 
+.sidebar:hover .logoutQuickAction {
+  max-height: 52px;
+  opacity: 1;
+  margin-top: 8px;
+  border-width: 1px;
+  padding: 10px 12px;
+}
 
 .logoutQuickAction:hover {
   background: rgba(255, 255, 255, 0.14);
@@ -226,7 +365,16 @@
 }
 
 .userMeta {
-  min-width: 0;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  transition: max-width 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms ease;
+}
+
+.sidebar:hover .userMeta {
+  max-width: 140px;
+  opacity: 1;
 }
 
 .userName {
@@ -249,11 +397,30 @@
 
 /* ── Main content ────────────────────────────────────────────────────────── */
 
+.main {
+  flex: 1;
+  min-height: 100dvh;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  /* Collapsed state: 64px offset */
+  .main {
+    margin-left: 64px;
+    transition: margin-left 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* When sidebar is hovered (expanded): push content to 240px */
+  .sidebar:hover ~ .main {
+    margin-left: 240px;
+  }
+}
+
 .content {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 32px;
+  padding: 32px;
 }
 
 @media (max-width: 767px) {
@@ -265,18 +432,6 @@
 @media (min-width: 768px) and (max-width: 1024px) {
   .content {
     padding: 28px 24px;
-  }
-}
-
-.main {
-  flex: 1;
-  min-height: 100dvh;
-  overflow-y: auto;
-}
-
-@media (min-width: 768px) {
-  .main {
-    margin-left: 240px;
   }
 }
 
@@ -480,7 +635,8 @@
   font-weight: 600;
 }
 
-/* Fix: ensure main gets correct offsets on mobile */
+/* ── Mobile offsets ──────────────────────────────────────────────────────── */
+
 @media (max-width: 767px) {
   .main {
     padding-top: 64px;

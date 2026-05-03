@@ -1,0 +1,358 @@
+/* ─── BilleteraCard.module.css — mobile first ───────────────────────────── */
+
+/* ── Card contenedor ─────────────────────────────────────────────────────── */
+.wc {
+  position: relative;
+  border-radius: 18px;
+  /* sin aspect-ratio en mobile — altura natural */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* desktop */
+@media (min-width: 768px) {
+  .wc {
+    border-radius: 20px;
+    aspect-ratio: 1.75 / 1;
+  }
+
+  .wc:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(10, 13, 18, 0.12);
+  }
+}
+
+/* ── Fondo clipeado ──────────────────────────────────────────────────────── */
+.wcBg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.decoA {
+  position: absolute;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  top: -44px; right: -44px;
+  pointer-events: none;
+}
+
+.decoB {
+  position: absolute;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  bottom: -20px; left: 14px;
+  pointer-events: none;
+}
+
+/* ── Inner — mobile: padding + column, desktop: space-between ────────────── */
+.wcInner {
+  position: relative;
+  z-index: 1;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .wcInner {
+    padding: 20px 22px;
+    height: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* ── TOP ROW ─────────────────────────────────────────────────────────────── */
+.wcTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px; /* separación en mobile */
+}
+
+@media (min-width: 768px) {
+  .wcTop {
+    margin-bottom: 0; /* space-between lo maneja */
+  }
+}
+
+/* ── Logo circular ───────────────────────────────────────────────────────── */
+.wcLogo {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wcLogo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.logoFallback {
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.3px;
+}
+
+/* ── Identidad ───────────────────────────────────────────────────────────── */
+.wcIdentity {
+  flex: 1;
+  min-width: 0;
+}
+
+.wcName {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.textLight { color: white; }
+.textDark  { color: #111; }
+
+.wcChipRow {
+  display: flex;
+  gap: 4px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+/* ── Chips ───────────────────────────────────────────────────────────────── */
+.chip {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.chipMonedaLight    { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); }
+.chipPrincipalLight { background: rgba(255,255,255,0.22); color: white; }
+.chipMonedaDark     { background: rgba(0,0,0,0.10); color: rgba(0,0,0,0.60); }
+.chipPrincipalDark  { background: rgba(0,0,0,0.14); color: rgba(0,0,0,0.80); }
+
+/* ── Kebab — siempre visible en mobile, hover-only en desktop ─────────────── */
+.wcKebab {
+  position: relative;
+  flex-shrink: 0;
+  opacity: 1; /* visible en mobile por defecto */
+}
+
+@media (hover: hover) {
+  /* Solo en dispositivos que soportan hover (desktop/trackpad) */
+  .wcKebab {
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  .wc:hover .wcKebab,
+  .wcMenuOpen .wcKebab {
+    opacity: 1;
+  }
+}
+
+.kebabBtn {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0;
+  transition: background 120ms ease;
+}
+
+.kebabBtn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: white;
+}
+
+/* ── Dropdown ─────────────────────────────────────────────────────────────── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.06);
+  border: 1px solid #EDECEA;
+  overflow: hidden;
+  min-width: 148px;
+  z-index: 100;
+  animation: dropIn 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0A0D12;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 100ms ease;
+}
+
+.dropdownItem:hover { background: #F5F4F0; }
+.dropdownItem:first-child { border-bottom: 1px solid #F0EEE8; }
+
+/* ── Balance ─────────────────────────────────────────────────────────────── */
+.wcBalance {
+  display: flex;
+  flex-direction: column;
+}
+
+.wcBalLbl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 5px;
+  line-height: 1;
+}
+
+.balLblLight { color: rgba(255,255,255,0.45); }
+.balLblDark  { color: rgba(0,0,0,0.40); }
+
+.wcBalAmt {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+  line-height: 1;
+  margin: 0;
+}
+
+.balAmtLight { color: white; }
+.balAmtDark  { color: #111; }
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* CARD "NUEVA BILLETERA"                                                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* Mobile: fila horizontal */
+.wcAdd {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1.5px dashed #D4D1C7;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: border-color 0.2s ease;
+}
+
+.wcAdd:hover {
+  border-color: var(--primary);
+}
+
+/* Desktop: columna centrada con aspect-ratio */
+@media (min-width: 768px) {
+  .wcAdd {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    aspect-ratio: 1.75 / 1;
+    border-radius: 20px;
+    padding: 0;
+    gap: 10px;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .wcAdd:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(10,13,18,0.07);
+  }
+}
+
+.addIcon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #EDECEA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.wcAdd:hover .addIcon {
+  background: var(--primary);
+}
+
+.wcAdd:hover .addIcon svg {
+  color: white !important;
+}
+
+.addText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.addTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #8E9198;
+  transition: color 0.2s ease;
+}
+
+.wcAdd:hover .addTitle {
+  color: var(--primary);
+}
+
+/* Subtítulo — visible solo en mobile */
+.addSub {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #B0B3BA;
+}
+
+@media (min-width: 768px) {
+  .addSub { display: none; }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .wc, .wcAdd, .wcKebab, .dropdown { animation: none; transition: none; }
+
+  @media (hover: hover) {
+    .wcKebab { opacity: 0; }
+    .wc:hover .wcKebab, .wcMenuOpen .wcKebab { opacity: 1; }
+  }
+}

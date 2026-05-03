@@ -19,7 +19,7 @@ export default function VerificarEmail() {
   const emailFromState = (location.state as { email?: string })?.email ?? ''
   
   const email = emailFromUrl || emailFromState
-  const [yaVerificado, setYaVerificado] = useState(verificadoFromUrl)
+  const [yaVerificado] = useState(verificadoFromUrl)
 
   const [codigo, setCodigo] = useState('')
   const [loading, setLoading] = useState(false)

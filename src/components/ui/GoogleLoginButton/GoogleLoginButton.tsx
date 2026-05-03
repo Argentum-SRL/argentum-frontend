@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react'
+import { memo } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 import styles from './GoogleLoginButton.module.css'
 

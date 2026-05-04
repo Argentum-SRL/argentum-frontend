@@ -1,11 +1,13 @@
 // ─── BankPickerModal — modal de dos pasos para crear billetera ────────────────
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useReducer } from 'react'
 import { X, ChevronLeft, Search, Check } from 'lucide-react'
 import { BANKS, BANK_SECTIONS, CUSTOM_COLORS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
 import type { Billetera } from '@/types'
-import { getBankLogoUrl, getInitials, parseSaldoInput } from '@/lib/utils/billeteras.utils'
+import { getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
+import styles from './BankPickerModal.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
 export interface CreatePayload {
   nombre: string
@@ -14,7 +16,6 @@ export interface CreatePayload {
   es_principal: boolean
   bank_id: string | null
 }
-import styles from './BankPickerModal.module.css'
 
 // ── Tipos internos ────────────────────────────────────────────────────────────
 
@@ -35,27 +36,21 @@ function PickerLogo({
   size = 44,
 }: {
   bank: BankDefinition
-  size?: number
+  size?: 44 | 36
 }) {
   const [hasError, setHasError] = useState(false)
   const url = getBankLogoUrl(bank.logoPath)
 
-  const circleStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    borderRadius: '50%',
-    background: `${bank.colorPrimario}22`,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    overflow: 'hidden',
-  }
+  const sizeClass = size === 44 ? styles.size44 : styles.size36
+  const fontClass = size === 44 ? styles.initials44 : styles.initials36
 
   if (!url || hasError) {
     return (
-      <div style={circleStyle}>
-        <span style={{ fontWeight: 800, fontSize: size * 0.32, color: bank.colorPrimario }}>
+      <div 
+        className={`${styles.pickerLogoCircle} ${sizeClass}`} 
+        data-bank={bank.id}
+      >
+        <span className={`${styles.pickerLogoInitials} ${fontClass}`}>
           {getInitials(bank.nombre)}
         </span>
       </div>
@@ -63,13 +58,14 @@ function PickerLogo({
   }
 
   return (
-    <div style={circleStyle}>
+    <div 
+      className={`${styles.pickerLogoCircle} ${sizeClass}`} 
+      data-bank={bank.id}
+    >
       <img
         src={url}
         alt={bank.nombre}
-        width={size * 0.62}
-        height={size * 0.62}
-        style={{ objectFit: 'contain' }}
+        className={styles.pickerLogoImg}
         onError={() => setHasError(true)}
       />
     </div>
@@ -85,16 +81,11 @@ function BankPickerItem({
   bank: BankDefinition
   onSelect: (bank: BankDefinition) => void
 }) {
-  const cardStyle: React.CSSProperties = {
-    background: `${bank.colorPrimario}10`,
-    borderColor: `${bank.colorPrimario}30`,
-  }
-
   return (
     <button
       type="button"
       className={styles.pickerItem}
-      style={cardStyle}
+      data-bank={bank.id}
       onClick={() => onSelect(bank)}
       title={bank.nombre}
     >
@@ -115,6 +106,66 @@ const BANK_CUSTOM: BankDefinition = {
   logoPath: '',
 }
 
+// ── State Reducer ─────────────────────────────────────────────────────────────
+
+interface ModalState {
+  step: ModalStep
+  bankSeleccionado: BankDefinition | null
+  slideDirection: 'forward' | 'back'
+  searchQuery: string
+  nombre: string
+  moneda: 'ARS' | 'USD'
+  saldo: number | null
+  esPrincipal: boolean
+  colorCustom: string
+  isSubmitting: boolean
+}
+
+type ModalAction = 
+  | { type: 'RESET'; monedaPrincipal: 'ARS' | 'USD' }
+  | { type: 'SET_STEP'; step: ModalStep; direction?: 'forward' | 'back' }
+  | { type: 'SELECT_BANK'; bank: BankDefinition }
+  | { type: 'SET_SEARCH'; query: string }
+  | { [K in keyof ModalState]: { type: 'SET_FIELD'; field: K; value: ModalState[K] } }[keyof ModalState]
+
+function modalReducer(state: ModalState, action: ModalAction): ModalState {
+  switch (action.type) {
+    case 'RESET':
+      return {
+        step: 'picker',
+        bankSeleccionado: null,
+        slideDirection: 'forward',
+        searchQuery: '',
+        nombre: '',
+        moneda: action.monedaPrincipal,
+        saldo: null,
+        esPrincipal: false,
+        colorCustom: CUSTOM_COLORS[0],
+        isSubmitting: false,
+      }
+    case 'SET_STEP':
+      return { 
+        ...state, 
+        step: action.step, 
+        slideDirection: action.direction || state.slideDirection 
+      }
+    case 'SELECT_BANK':
+      return {
+        ...state,
+        bankSeleccionado: action.bank,
+        nombre: action.bank.id === 'custom' ? '' : action.bank.nombre,
+        slideDirection: 'forward',
+        step: 'form'
+      }
+    case 'SET_SEARCH':
+      return { ...state, searchQuery: action.query }
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value }
+    default:
+      return state
+  }
+}
+
 // ── Modal principal ───────────────────────────────────────────────────────────
 
 export default function BankPickerModal({
@@ -124,30 +175,36 @@ export default function BankPickerModal({
   billeterasActuales,
   monedaPrincipalUsuario,
 }: BankPickerModalProps) {
-  const [step, setStep] = useState<ModalStep>('picker')
-  const [bankSeleccionado, setBankSeleccionado] = useState<BankDefinition | null>(null)
-  const [slideDirection, setSlideDirection] = useState<'forward' | 'back'>('forward')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [state, dispatch] = useReducer(modalReducer, {
+    step: 'picker',
+    bankSeleccionado: null,
+    slideDirection: 'forward',
+    searchQuery: '',
+    nombre: '',
+    moneda: monedaPrincipalUsuario,
+    saldo: null,
+    esPrincipal: false,
+    colorCustom: CUSTOM_COLORS[0],
+    isSubmitting: false,
+  })
 
-  // Form state
-  const [nombre, setNombre] = useState('')
-  const [moneda, setMoneda] = useState<'ARS' | 'USD'>(monedaPrincipalUsuario)
-  const [saldoRaw, setSaldoRaw] = useState('')
-  const [esPrincipal, setEsPrincipal] = useState(false)
-  const [colorCustom, setColorCustom] = useState(CUSTOM_COLORS[0])
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const {
+    step,
+    bankSeleccionado,
+    slideDirection,
+    searchQuery,
+    nombre,
+    moneda,
+    saldo,
+    esPrincipal,
+    colorCustom,
+    isSubmitting
+  } = state
 
-  // Reset cuando se abre/cierra
+  // Reset cuando se abre
   useEffect(() => {
     if (isOpen) {
-      setStep('picker')
-      setBankSeleccionado(null)
-      setSearchQuery('')
-      setNombre('')
-      setMoneda(monedaPrincipalUsuario)
-      setSaldoRaw('')
-      setEsPrincipal(false)
-      setSlideDirection('forward')
+      dispatch({ type: 'RESET', monedaPrincipal: monedaPrincipalUsuario })
     }
   }, [isOpen, monedaPrincipalUsuario])
 
@@ -183,38 +240,28 @@ export default function BankPickerModal({
 
   // Seleccionar banco y pasar al form
   const handleSelectBank = (bank: BankDefinition) => {
-    setBankSeleccionado(bank)
-    setNombre(bank.id === 'custom' ? '' : bank.nombre)
-    setSlideDirection('forward')
-    setStep('form')
+    dispatch({ type: 'SELECT_BANK', bank })
   }
 
   const handleBack = () => {
-    setSlideDirection('back')
-    setStep('picker')
-  }
-
-  // Formatear saldo mientras escribe
-  const handleSaldoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^\d.,]/g, '')
-    setSaldoRaw(raw)
+    dispatch({ type: 'SET_STEP', step: 'picker', direction: 'back' })
   }
 
   // Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!bankSeleccionado || !nombre.trim() || isSubmitting) return
-    setIsSubmitting(true)
+    dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       await onCrear({
         nombre: nombre.trim(),
         moneda,
-        saldo_inicial: parseSaldoInput(saldoRaw),
+        saldo_inicial: saldo || 0,
         es_principal: esPrincipal,
         bank_id: bankSeleccionado.id === 'custom' ? null : bankSeleccionado.id,
       })
     } finally {
-      setIsSubmitting(false)
+      dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
   }
 
@@ -275,14 +322,14 @@ export default function BankPickerModal({
                   className={styles.searchInput}
                   placeholder="Buscar banco o billetera..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => dispatch({ type: 'SET_SEARCH', query: e.target.value })}
                   autoFocus
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     className={styles.searchClear}
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => dispatch({ type: 'SET_SEARCH', query: '' })}
                     aria-label="Limpiar búsqueda"
                   >
                     <X size={13} />
@@ -375,15 +422,9 @@ export default function BankPickerModal({
                     {isCustom ? (
                       <div
                         className={styles.bankPreviewIcon}
-                        style={{ background: `${colorCustom}22` }}
+                        data-color-hex={colorCustom}
                       >
-                        <span
-                          style={{
-                            fontSize: 16,
-                            fontWeight: 800,
-                            color: colorCustom,
-                          }}
-                        >
+                        <span className={styles.bankPreviewIconInitials}>
                           {getInitials(nombre || 'Mi')}
                         </span>
                       </div>
@@ -425,7 +466,7 @@ export default function BankPickerModal({
                       type="text"
                       className={styles.fieldInput}
                       value={nombre}
-                      onChange={(e) => setNombre(e.target.value)}
+                      onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
                       placeholder="Nombre de tu billetera"
                       required
                       autoFocus
@@ -439,14 +480,14 @@ export default function BankPickerModal({
                       <button
                         type="button"
                         className={`${styles.currencyPill} ${moneda === 'ARS' ? styles.pillActive : ''}`}
-                        onClick={() => setMoneda('ARS')}
+                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'moneda', value: 'ARS' })}
                       >
                         🇦🇷 ARS
                       </button>
                       <button
                         type="button"
                         className={`${styles.currencyPill} ${moneda === 'USD' ? styles.pillActive : ''}`}
-                        onClick={() => setMoneda('USD')}
+                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'moneda', value: 'USD' })}
                       >
                         🇺🇸 USD
                       </button>
@@ -455,23 +496,15 @@ export default function BankPickerModal({
 
                   {/* Saldo inicial */}
                   <div className={styles.formField}>
-                    <label className={styles.fieldLabel} htmlFor="bk-saldo">
-                      Saldo inicial <span className={styles.fieldOptional}>(opcional)</span>
-                    </label>
-                    <div className={styles.saldoWrap}>
-                      <span className={styles.saldoPrefix}>
-                        {moneda === 'ARS' ? '$' : 'USD'}
-                      </span>
-                      <input
-                        id="bk-saldo"
-                        type="text"
-                        inputMode="decimal"
-                        className={styles.saldoInput}
-                        value={saldoRaw}
-                        onChange={handleSaldoChange}
-                        placeholder="0"
-                      />
-                    </div>
+                    <MontoInput
+                      value={saldo}
+                      onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
+                      moneda={moneda}
+                      label="Saldo inicial"
+                      placeholder="0"
+                      allowDecimals
+                      optional
+                    />
                   </div>
 
                   {/* Color — solo para billetera personalizada */}
@@ -484,8 +517,8 @@ export default function BankPickerModal({
                             key={color}
                             type="button"
                             className={styles.colorSwatch}
-                            style={{ background: color }}
-                            onClick={() => setColorCustom(color)}
+                            data-color-hex={color}
+                            onClick={() => dispatch({ type: 'SET_FIELD', field: 'colorCustom', value: color })}
                             aria-label={`Color ${color}`}
                           >
                             {colorCustom === color && (
@@ -501,7 +534,7 @@ export default function BankPickerModal({
                   <button
                     type="button"
                     className={styles.principalRow}
-                    onClick={() => setEsPrincipal((p) => !p)}
+                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
                     role="checkbox"
                     aria-checked={esPrincipal}
                   >

@@ -230,7 +230,14 @@ export default function BilleterasPage() {
             />
           ))}
           {billeterasEfectivo.map((b) => (
-            <BilleteraCard key={b.id} billetera={b} />
+            <BilleteraCard
+              key={b.id}
+              billetera={b}
+              onArchivar={handleArchivar}
+              onDesarchivar={handleDesarchivar}
+              onEliminar={handleEliminar}
+              onEditar={handleEditar}
+            />
           ))}
           <NuevaBilleteraCard onClick={() => setModalOpen(true)} />
         </div>

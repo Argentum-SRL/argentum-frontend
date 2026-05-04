@@ -117,57 +117,70 @@ export default function BilleteraCard({
             </div>
           </div>
 
-          {/* Kebab — solo para no-efectivo */}
-          {!billetera.es_efectivo && (
-            <div className={styles.wcKebab}>
-              <button
-                className={styles.kebabBtn}
-                onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p) }}
-                aria-label="Opciones"
-                aria-expanded={menuOpen}
-              >
-                <div className={styles.dot} />
-                <div className={styles.dot} />
-                <div className={styles.dot} />
-              </button>
+          {/* Kebab — opciones de gestión */}
+          <div className={styles.wcKebab}>
+            <button
+              className={styles.kebabBtn}
+              onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p) }}
+              aria-label="Opciones"
+              aria-expanded={menuOpen}
+            >
+              <div className={styles.dot} />
+              <div className={styles.dot} />
+              <div className={styles.dot} />
+            </button>
 
-              {menuOpen && (
-                <div className={styles.dropdown} role="menu">
-                  <button className={styles.dropdownItem} role="menuitem"
-                    onClick={() => { onEditar?.(billetera.id); setMenuOpen(false) }}>
-                    <Edit2 size={13} strokeWidth={1.75} /> Editar
-                  </button>
+            {menuOpen && (
+              <div className={styles.dropdown} role="menu">
+                <button className={styles.dropdownItem} role="menuitem"
+                  onClick={() => { onEditar?.(billetera.id); setMenuOpen(false) }}>
+                  <Edit2 size={13} strokeWidth={1.75} /> Editar
+                </button>
 
-                  {billetera.estado === 'activa' ? (
-                    billetera.tiene_transacciones ? (
+                {billetera.estado === 'activa' ? (
+                  <>
+                    {/* Reglas de Archivo / Eliminación */}
+                    {billetera.es_efectivo ? (
                       <button className={styles.dropdownItem} role="menuitem"
                         onClick={() => { onArchivar?.(billetera.id); setMenuOpen(false) }}>
                         <Archive size={13} strokeWidth={1.75} /> Archivar
                       </button>
                     ) : (
+                      <>
+                        {billetera.tiene_transacciones ? (
+                          <button className={styles.dropdownItem} role="menuitem"
+                            onClick={() => { onArchivar?.(billetera.id); setMenuOpen(false) }}>
+                            <Archive size={13} strokeWidth={1.75} /> Archivar
+                          </button>
+                        ) : (
+                          <button className={`${styles.dropdownItem} ${styles.deleteItem}`} role="menuitem"
+                            onClick={() => { onEliminar?.(billetera.id); setMenuOpen(false) }}>
+                            <Trash2 size={13} strokeWidth={1.75} /> Eliminar
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* Estado Archivada */}
+                    <button className={styles.dropdownItem} role="menuitem"
+                      onClick={() => { onDesarchivar?.(billetera.id); setMenuOpen(false) }}>
+                      <RotateCcw size={13} strokeWidth={1.75} /> Desarchivar
+                    </button>
+                    
+                    {/* Solo eliminar si no es efectivo y no tiene transacciones */}
+                    {!billetera.es_efectivo && !billetera.tiene_transacciones && (
                       <button className={`${styles.dropdownItem} ${styles.deleteItem}`} role="menuitem"
                         onClick={() => { onEliminar?.(billetera.id); setMenuOpen(false) }}>
                         <Trash2 size={13} strokeWidth={1.75} /> Eliminar
                       </button>
-                    )
-                  ) : (
-                    <>
-                      <button className={styles.dropdownItem} role="menuitem"
-                        onClick={() => { onDesarchivar?.(billetera.id); setMenuOpen(false) }}>
-                        <RotateCcw size={13} strokeWidth={1.75} /> Desarchivar
-                      </button>
-                      {!billetera.tiene_transacciones && (
-                        <button className={`${styles.dropdownItem} ${styles.deleteItem}`} role="menuitem"
-                          onClick={() => { onEliminar?.(billetera.id); setMenuOpen(false) }}>
-                          <Trash2 size={13} strokeWidth={1.75} /> Eliminar
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ── BALANCE ──────────────────────────────────────────────────── */}

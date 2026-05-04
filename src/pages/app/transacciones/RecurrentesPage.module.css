@@ -206,6 +206,14 @@
   margin-bottom: 6px;
 }
 
+.fieldOptional {
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: none;
+  font-size: 10px;
+  margin-left: 4px;
+}
+
 .input, .select {
   width: 100%;
   background: var(--page);

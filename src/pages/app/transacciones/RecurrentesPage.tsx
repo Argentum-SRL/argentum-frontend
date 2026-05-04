@@ -21,6 +21,7 @@ import Button from '@/components/ui/Button/Button'
 import { Drawer } from '@/components/ui/Drawer/Drawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
 interface RecurrentesPageProps {
   embedded?: boolean
@@ -41,7 +42,7 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
   const [formData, setFormData] = useState({
     tipo: 'egreso' as 'ingreso' | 'egreso',
     descripcion: '',
-    monto: '',
+    monto: null as number | null,
     moneda: 'ARS' as 'ARS' | 'USD',
     billetera_id: '',
     categoria_id: '',
@@ -81,7 +82,7 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
       setFormData({
         tipo: rec.tipo,
         descripcion: rec.descripcion,
-        monto: rec.monto.toString(),
+        monto: rec.monto,
         moneda: rec.moneda,
         billetera_id: rec.billetera_id,
         categoria_id: rec.categoria_id || '',
@@ -93,7 +94,7 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
       setFormData({
         tipo: 'egreso',
         descripcion: '',
-        monto: '',
+        monto: null,
         moneda: 'ARS',
         billetera_id: '',
         categoria_id: '',
@@ -108,7 +109,7 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
     try {
       const payload = {
         ...formData,
-        monto: parseFloat(formData.monto),
+        monto: formData.monto || 0,
         categoria_id: formData.categoria_id || null,
         billetera_id: formData.billetera_id
       }
@@ -288,7 +289,7 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
         <div className={styles.drawerForm}>
           <div className={styles.formGrid}>
             <div className={styles.fullWidth}>
-              <label htmlFor="form-desc" className={styles.label}>Descripción</label>
+              <label htmlFor="form-desc" className={styles.label}>Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
               <input 
                 id="form-desc"
                 type="text" 
@@ -314,14 +315,13 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
             </div>
 
             <div>
-              <label htmlFor="form-monto" className={styles.label}>Monto</label>
-              <input 
-                id="form-monto"
-                type="number" 
-                className={styles.input}
+              <MontoInput
                 value={formData.monto}
-                onChange={e => setFormData({...formData, monto: e.target.value})}
-                placeholder="0.00"
+                onChange={v => setFormData({...formData, monto: v})}
+                moneda={formData.moneda}
+                label="Monto"
+                placeholder="0"
+                allowDecimals
               />
             </div>
 

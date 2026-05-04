@@ -6,8 +6,8 @@
   inset: 0;
   z-index: 9000;
   background: rgba(10, 13, 18, 0.5);
-  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   animation: fadeIn 180ms ease;
 }
 
@@ -44,6 +44,11 @@
 
 @media (min-width: 540px) {
   .modal { width: 520px; height: min(85dvh, 640px); }
+}
+
+.modalAuto {
+  height: auto !important;
+  max-height: 90dvh !important;
 }
 
 /* ── Indicador de pasos ───────────────────────────────────────────────────── */
@@ -222,10 +227,12 @@
   flex: 1;
   overflow-y: auto;
   padding: 12px 20px 20px;
+  /* Compatibility for scrollbars */
   scrollbar-width: thin;
   scrollbar-color: var(--surface-alt) transparent;
 }
 
+/* For browsers that don't support scrollbar-width/color */
 .pickerBody::-webkit-scrollbar {
   width: 4px;
 }
@@ -264,8 +271,9 @@
   gap: 8px;
   padding: 14px 8px 12px;
   border-radius: 16px;
-  border: 1.5px solid transparent;
-  background: transparent;
+  border: 1.5px solid rgba(0, 0, 0, 0.05);
+  border: 1.5px solid color-mix(in srgb, var(--bank-color, transparent) 30%, transparent);
+  background: color-mix(in srgb, var(--bank-color, transparent) 10%, transparent);
   cursor: pointer;
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
@@ -282,6 +290,35 @@
   text-align: center;
   line-height: 1.2;
   word-break: break-word;
+}
+
+/* ── Picker Logo ──────────────────────────────────────────────────────────── */
+.pickerLogoCircle {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--bank-color, #8A95A8) 14%, transparent);
+}
+
+.pickerLogoInitials {
+  font-weight: 800;
+  color: var(--bank-color, var(--text));
+}
+
+.size44 { width: 44px; height: 44px; }
+.size36 { width: 36px; height: 36px; }
+
+.initials44 { font-size: 14px; }
+.initials36 { font-size: 11.5px; }
+
+.pickerLogoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* Botón "Otra billetera" */
@@ -354,6 +391,11 @@
   overflow: hidden;
 }
 
+.formContainerFlex {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Header del form */
 .formHeader {
   display: flex;
@@ -391,6 +433,10 @@
   flex: 1;
 }
 
+.bankPreviewNoMargin {
+  margin-left: 0 !important;
+}
+
 .bankPreviewIcon {
   width: 36px;
   height: 36px;
@@ -399,6 +445,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: color-mix(in srgb, var(--preview-color, transparent) 14%, transparent);
+}
+
+.bankPreviewIconInitials {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--preview-color, var(--text));
 }
 
 .bankPreviewNombre {
@@ -559,6 +612,7 @@
   align-items: center;
   justify-content: center;
   transition: transform 120ms ease, border-color 120ms ease;
+  background: var(--swatch-color, transparent);
 }
 
 .colorSwatch:hover {
@@ -748,4 +802,45 @@
 
 [data-theme="dark"] .pickerItem:hover {
   background: var(--surface);
+}
+
+/* ── Bank Color Mappings ───────────────────────────────────────────────────── */
+[data-bank="mercadopago"] { --bank-color: #009EE3; }
+[data-bank="uala"] { --bank-color: #5C2D91; }
+[data-bank="naranjax"] { --bank-color: #FF6200; }
+[data-bank="personalpay"] { --bank-color: #6A0DAD; }
+[data-bank="prex"] { --bank-color: #FF3366; }
+[data-bank="paypal"] { --bank-color: #003087; }
+[data-bank="brubank"] { --bank-color: #00C9B1; }
+[data-bank="lemon"] { --bank-color: #C6F135; }
+[data-bank="cuentadni"] { --bank-color: #004B9D; }
+[data-bank="galicia"] { --bank-color: #FF8C00; }
+[data-bank="santander"] { --bank-color: #EC0000; }
+[data-bank="bbva"] { --bank-color: #004481; }
+[data-bank="macro"] { --bank-color: #F7A800; }
+[data-bank="nacion"] { --bank-color: #009B3A; }
+[data-bank="provincia"] { --bank-color: #004B9D; }
+[data-bank="hipotecario"] { --bank-color: #003DA5; }
+[data-bank="icbc"] { --bank-color: #C8102E; }
+[data-bank="hsbc"] { --bank-color: #DB0011; }
+[data-bank="supervielle"] { --bank-color: #E4002B; }
+[data-bank="bancosantafe"] { --bank-color: #005BA1; }
+[data-bank="custom"] { --bank-color: #8A95A8; }
+
+/* ── Custom Colors for "Otra" ─────────────────────────────────────────────── */
+[data-color-hex="#0D2045"] { --custom-color: #0D2045; }
+[data-color-hex="#1A3D28"] { --custom-color: #1A3D28; }
+[data-color-hex="#8A95A8"] { --custom-color: #8A95A8; }
+[data-color-hex="#A8905A"] { --custom-color: #A8905A; }
+[data-color-hex="#00C9B1"] { --custom-color: #00C9B1; }
+[data-color-hex="#5C2D91"] { --custom-color: #5C2D91; }
+[data-color-hex="#EC0000"] { --custom-color: #EC0000; }
+[data-color-hex="#009EE3"] { --custom-color: #009EE3; }
+
+.bankPreviewIcon {
+  background: color-mix(in srgb, var(--preview-color) 14%, transparent);
+}
+
+.colorSwatch {
+  background: var(--swatch-color);
 }

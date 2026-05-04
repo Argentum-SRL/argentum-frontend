@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useReducer } from 'react'
 import { X, Check } from 'lucide-react'
 import type { Billetera } from '@/types'
-import { getBankById, findBankByNombre, getBankLogoUrl, getInitials, parseSaldoInput, formatSaldoInput } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import type { BankDefinition } from '@/lib/constants/banks'
 import styles from './BankPickerModal.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
 export interface EditPayload {
   nombre: string
@@ -20,26 +21,62 @@ interface EditBilleteraModalProps {
 }
 
 function EditLogo({ bank, customNombre }: { bank?: BankDefinition, customNombre?: string }) {
-  const [hasError, setHasError] = useState(false)
   const url = bank ? getBankLogoUrl(bank.logoPath) : ''
+  const id = bank ? bank.id : 'custom'
 
-  const bg = bank ? `${bank.colorPrimario}22` : '#8A95A822'
-  const color = bank ? bank.colorPrimario : '#8A95A8'
-
-  if (bank && url && !hasError) {
+  if (bank && url) {
     return (
-      <div style={{ width: 36, height: 36, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <img src={url} alt={bank.nombre} width={22} height={22} style={{ objectFit: 'contain' }} onError={() => setHasError(true)} />
+      <div 
+        className={`${styles.pickerLogoCircle} ${styles.size36}`} 
+        data-bank={id}
+      >
+        <img 
+          src={url} 
+          alt={bank.nombre} 
+          width={22} 
+          height={22} 
+          className={styles.pickerLogoImg} 
+        />
       </div>
     )
   }
 
   const init = getInitials(bank ? bank.nombre : (customNombre || 'Mi'))
   return (
-    <div style={{ width: 36, height: 36, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-      <span style={{ fontSize: 13, fontWeight: 800, color }}>{init}</span>
+    <div 
+      className={`${styles.pickerLogoCircle} ${styles.size36}`} 
+      data-bank={id}
+    >
+      <span className={`${styles.bankPreviewIconInitials} ${styles.initials36}`}>{init}</span>
     </div>
   )
+}
+
+interface EditState {
+  nombre: string
+  saldo: number | null
+  esPrincipal: boolean
+  isSubmitting: boolean
+}
+
+type EditAction = 
+  | { type: 'INITIALIZE'; billetera: Billetera }
+  | { [K in keyof EditState]: { type: 'SET_FIELD'; field: K; value: EditState[K] } }[keyof EditState]
+
+function editReducer(state: EditState, action: EditAction): EditState {
+  switch (action.type) {
+    case 'INITIALIZE':
+      return {
+        nombre: action.billetera.nombre,
+        saldo: action.billetera.saldo_inicial || 0,
+        esPrincipal: action.billetera.es_principal,
+        isSubmitting: false
+      }
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value }
+    default:
+      return state
+  }
 }
 
 export default function EditBilleteraModal({
@@ -49,16 +86,18 @@ export default function EditBilleteraModal({
   billetera,
   billeteraPrincipalActual,
 }: EditBilleteraModalProps) {
-  const [nombre, setNombre] = useState('')
-  const [saldoRaw, setSaldoRaw] = useState('')
-  const [esPrincipal, setEsPrincipal] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [state, dispatch] = useReducer(editReducer, {
+    nombre: '',
+    saldo: null,
+    esPrincipal: false,
+    isSubmitting: false
+  })
+
+  const { nombre, saldo, esPrincipal, isSubmitting } = state
 
   useEffect(() => {
     if (isOpen && billetera) {
-      setNombre(billetera.nombre)
-      setSaldoRaw(billetera.saldo_inicial ? formatSaldoInput(billetera.saldo_inicial) : '')
-      setEsPrincipal(billetera.es_principal)
+      dispatch({ type: 'INITIALIZE', billetera })
     }
   }, [isOpen, billetera])
 
@@ -81,24 +120,19 @@ export default function EditBilleteraModal({
 
   if (!isOpen || !billetera) return null
 
-  const handleSaldoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^\d.,]/g, '')
-    setSaldoRaw(raw)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!nombre.trim() || isSubmitting) return
-    setIsSubmitting(true)
+    dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       await onEditar(billetera.id, {
         nombre: nombre.trim(),
-        saldo_inicial: parseSaldoInput(saldoRaw),
+        saldo_inicial: saldo || 0,
         es_principal: esPrincipal,
       })
       onClose()
     } finally {
-      setIsSubmitting(false)
+      dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
   }
 
@@ -120,11 +154,11 @@ export default function EditBilleteraModal({
       aria-modal="true"
       aria-label="Editar billetera"
     >
-      <div className={styles.modal} style={{ height: 'auto', minHeight: 'auto', maxHeight: '90dvh' }}>
-        <form onSubmit={handleSubmit} className={styles.formContainer} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className={`${styles.modal} ${styles.modalAuto}`}>
+        <form onSubmit={handleSubmit} className={`${styles.formContainer} ${styles.formContainerFlex}`}>
           
           <div className={styles.formHeader}>
-            <div className={styles.bankPreview} style={{ marginLeft: 0 }}>
+            <div className={`${styles.bankPreview} ${styles.bankPreviewNoMargin}`}>
               <EditLogo bank={bank} customNombre={billetera.nombre} />
               <div className={styles.bankPreviewInfo}>
                 <p className={styles.bankPreviewNombre}>Editar Billetera</p>
@@ -142,7 +176,7 @@ export default function EditBilleteraModal({
             </button>
           </div>
 
-          <div className={styles.formBody} style={{ overflowY: 'auto' }}>
+          <div className={styles.formBody}>
             <div className={styles.formField}>
               <label className={styles.fieldLabel} htmlFor="edit-nombre">
                 Nombre
@@ -152,7 +186,7 @@ export default function EditBilleteraModal({
                 type="text"
                 className={styles.fieldInput}
                 value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
                 placeholder="Nombre de tu billetera"
                 required
                 autoFocus
@@ -160,29 +194,21 @@ export default function EditBilleteraModal({
             </div>
 
             <div className={styles.formField}>
-              <label className={styles.fieldLabel} htmlFor="edit-saldo">
-                Saldo inicial
-              </label>
-              <div className={styles.saldoWrap}>
-                <span className={styles.saldoPrefix}>
-                  {billetera.moneda === 'ARS' ? '$' : 'USD'}
-                </span>
-                <input
-                  id="edit-saldo"
-                  type="text"
-                  inputMode="decimal"
-                  className={styles.saldoInput}
-                  value={saldoRaw}
-                  onChange={handleSaldoChange}
-                  placeholder="0"
-                />
-              </div>
+              <MontoInput
+                value={saldo}
+                onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
+                moneda={billetera.moneda}
+                label="Saldo inicial"
+                placeholder="0"
+                allowDecimals
+                optional
+              />
             </div>
 
             <button
               type="button"
               className={styles.principalRow}
-              onClick={() => setEsPrincipal((p) => !p)}
+              onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
               role="checkbox"
               aria-checked={esPrincipal}
             >

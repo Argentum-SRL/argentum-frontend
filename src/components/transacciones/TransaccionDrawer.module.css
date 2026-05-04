@@ -45,7 +45,7 @@
 /* Campo Monto */
 .montoCard {
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 20px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -62,8 +62,9 @@
 
 .montoInputWrapper {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
   flex: 1;
 }
 
@@ -74,9 +75,9 @@
 }
 
 .montoInput {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -1px;
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -2px;
   border: none;
   background: transparent;
   outline: none;
@@ -84,10 +85,11 @@
   width: 100%;
   flex: 1;
   min-width: 0;
+  padding: 0 4px !important;
 }
 
 .montoInput::placeholder {
-  color: rgba(10, 13, 18, 0.2);
+  color: rgba(10, 13, 18, 0.1);
 }
 
 .monedaToggle {
@@ -126,6 +128,14 @@
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: 6px;
+}
+
+.fieldOptional {
+  font-weight: 400;
+  color: var(--text-3);
+  text-transform: none;
+  font-size: 10px;
+  margin-left: 4px;
 }
 
 .textInput {
@@ -242,6 +252,10 @@
   flex-direction: column;
 }
 
+.cuotaInput {
+  padding: 8px 10px !important;
+}
+
 .cuotasSummary {
   background: var(--primary);
   border-radius: 10px;
@@ -254,6 +268,10 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.summaryColRight {
+  text-align: right;
 }
 
 .summaryLbl {
@@ -332,8 +350,51 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 767px) {
-  .textInput, .montoInput, .cuotaInput {
-    font-size: 16px;
-  }
+/* Override de MontoInput prefix para el Hero */
+.montoPrefixHero {
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  color: var(--text) !important;
+  padding-right: 8px !important;
+  padding-left: 0 !important;
+}
+
+.modalTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 16px;
+}
+
+.modalTitleText {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.typeToggleNoMargin {
+  margin: 0 !important;
+}
+
+.typeBtnFixed {
+  width: 100px;
+}
+
+.cuotaHijaWarning {
+  font-size: 12px;
+  color: #D97706;
+  background: #FEF3C7;
+  padding: 8px 12px;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+.gripIconWrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8E9198;
 }

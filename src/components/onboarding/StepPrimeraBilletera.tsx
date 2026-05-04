@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { crearPrimeraBilletera } from '@/lib/api/onboarding'
 import { useAuth } from '@/hooks/useAuth'
 import styles from './StepPrimeraBilletera.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
 interface Props {
   monedaPrincipal: string | null
@@ -13,7 +14,7 @@ export default function StepPrimeraBilletera({ monedaPrincipal, onNext }: Props)
   const { updateUsuario } = useAuth()
   const [nombre, setNombre] = useState('')
   const [moneda, setMoneda] = useState<'ARS' | 'USD'>((monedaPrincipal as 'ARS' | 'USD') ?? 'ARS')
-  const [saldo, setSaldo] = useState('')
+  const [saldo, setSaldo] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
@@ -27,7 +28,7 @@ export default function StepPrimeraBilletera({ monedaPrincipal, onNext }: Props)
     setLoading(true)
     setError(null)
     try {
-      const saldoNum = parseFloat(saldo.replace(',', '.')) || 0
+      const saldoNum = saldo || 0
       const res = await crearPrimeraBilletera({ nombre: nombre.trim(), moneda, saldo_inicial: saldoNum })
       updateUsuario(res.usuario)
       onNext(res.siguiente_paso)
@@ -76,20 +77,15 @@ export default function StepPrimeraBilletera({ monedaPrincipal, onNext }: Props)
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="saldo_inicial" className={styles.label}>Saldo inicial</label>
-          <div className={styles.saldoWrap}>
-            <span className={styles.saldoCurrency}>{moneda === 'ARS' ? '$' : 'U$D'}</span>
-            <input
-              id="saldo_inicial"
-              type="number"
-              step="0.01"
-              min="0"
-              value={saldo}
-              onChange={(e) => setSaldo(e.target.value)}
-              placeholder="0"
-              className={styles.saldoInput}
-            />
-          </div>
+          <MontoInput
+            value={saldo}
+            onChange={setSaldo}
+            moneda={moneda}
+            label="Saldo inicial"
+            placeholder="0"
+            allowDecimals
+            optional
+          />
         </div>
 
         <div className={styles.infoBox}>

@@ -243,6 +243,7 @@ export default function BankPickerModal({
         es_principal: esPrincipal,
         bank_id: bankSeleccionado.id === 'custom' ? null : bankSeleccionado.id,
       })
+      onClose()
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
@@ -513,15 +514,7 @@ export default function BankPickerModal({
                   type="button"
                   className={styles.principalRow}
                   onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
-                  role="checkbox"
-                  aria-checked={esPrincipal}
                   aria-label="Marcar como principal"
-                  onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                      e.preventDefault()
-                      dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })
-                    }
-                  }}
                 >
                   <div className={`${styles.checkbox} ${esPrincipal ? styles.checkboxActive : ''}`}>
                     {esPrincipal && <Check size={11} strokeWidth={3} color="white" />}

@@ -3,6 +3,10 @@
   inset: 0;
   z-index: 9000;
   background: rgba(10, 13, 18, 0.5);
+  /* Very subtle blur of the content behind the overlay */
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  will-change: backdrop-filter;
   display: flex;
   align-items: center;
   justify-content: center;

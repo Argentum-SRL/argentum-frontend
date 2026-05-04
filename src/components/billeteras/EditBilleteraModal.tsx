@@ -192,9 +192,7 @@ export default function EditBilleteraModal({
             type="button"
             className={styles.principalRow}
             onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
-            role="checkbox"
-            aria-checked={esPrincipal}
-            aria-label="Marcar como principal"
+            aria-label={esPrincipal ? 'Desmarcar como principal' : 'Marcar como principal'}
             onKeyDown={(e) => {
               if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault()

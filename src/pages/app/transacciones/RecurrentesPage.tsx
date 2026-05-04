@@ -18,10 +18,8 @@ import categoriaService from '@/services/categoria.service'
 import type { TransaccionRecurrente, Billetera, Categoria } from '@/types'
 import { formatMonto } from '@/utils/format'
 import Button from '@/components/ui/Button/Button'
-import Modal from '@/components/ui/Modal/Modal'
-import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
-import MontoInput from '@/components/ui/MontoInput/MontoInput'
+import { useModal } from '@/hooks/useModal'
 
 interface RecurrentesPageProps {
   embedded?: boolean
@@ -36,23 +34,8 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [loading, setLoading] = useState(true)
-
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
   const { showToast } = useToast()
-
-  const [formData, setFormData] = useState({
-    tipo: 'egreso' as 'ingreso' | 'egreso',
-    descripcion: '',
-    monto: null as number | null,
-    moneda: 'ARS' as 'ARS' | 'USD',
-    billetera_id: '',
-    categoria_id: '',
-    frecuencia: 'mensual' as 'semanal' | 'quincenal' | 'mensual',
-    dia_registro: 1
-  })
+  const { open, confirm } = useModal()
 
   useImperativeHandle(ref, () => ({
     openNew: () => handleOpenModal()
@@ -85,54 +68,14 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
   }, [fetchInitialData])
 
   const handleOpenModal = (rec?: TransaccionRecurrente) => {
-    if (rec) {
-      setEditingId(rec.id)
-      setFormData({
-        tipo: rec.tipo,
-        descripcion: rec.descripcion,
-        monto: rec.monto,
-        moneda: rec.moneda,
-        billetera_id: rec.billetera_id,
-        categoria_id: rec.categoria_id || '',
-        frecuencia: rec.frecuencia,
-        dia_registro: rec.dia_registro
-      })
-    } else {
-      setEditingId(null)
-      setFormData({
-        tipo: 'egreso',
-        descripcion: '',
-        monto: null,
-        moneda: 'ARS',
-        billetera_id: '',
-        categoria_id: '',
-        frecuencia: 'mensual',
-        dia_registro: 1
-      })
-    }
-    setIsModalOpen(true)
-  }
-
-  const handleSave = async () => {
-    try {
-      const payload = {
-        ...formData,
-        monto: formData.monto || 0,
-        categoria_id: formData.categoria_id || null,
-        billetera_id: formData.billetera_id
-      }
-      if (editingId) {
-        await recurrenteService.updateRecurrente(editingId, payload)
-      } else {
-        await recurrenteService.createRecurrente(payload)
-      }
-      setIsModalOpen(false)
-      showToast(editingId ? 'Configuración actualizada' : 'Recurrente creada', 'success')
-      fetchInitialData()
-    } catch (err) {
-      console.error(err)
-      showToast('Error al guardar la recurrente', 'error')
-    }
+    open('recurrente', {
+      data: {
+        recurrente: rec ?? null,
+        billeteras,
+        categorias,
+        onSuccess: fetchInitialData,
+      },
+    })
   }
 
   const handleToggleEstado = async (rec: TransaccionRecurrente) => {
@@ -150,20 +93,23 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
     }
   }
 
-  async function handleDeleteConfirmed() {
-    if (!deleteTarget) return
-    try {
-      setIsDeleting(true)
-      await recurrenteService.deleteRecurrente(deleteTarget)
-      showToast('Recurrente eliminada', 'success')
-      fetchInitialData()
-    } catch (err) {
-      console.error(err)
-      showToast('Error al eliminar', 'error')
-    } finally {
-      setIsDeleting(false)
-      setDeleteTarget(null)
-    }
+  const handleDelete = (rec: TransaccionRecurrente) => {
+    confirm({
+      title: 'Eliminar recurrente',
+      description: '¿Estás seguro de eliminar esta transacción recurrente? Dejará de generar transacciones automáticas.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await recurrenteService.deleteRecurrente(rec.id)
+          showToast('Recurrente eliminada', 'success')
+          fetchInitialData()
+        } catch (err) {
+          console.error(err)
+          showToast('Error al eliminar', 'error')
+        }
+      },
+    })
   }
 
   const getFriendlyFrequency = (rec: TransaccionRecurrente) => {
@@ -217,7 +163,7 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
           </button>
           <button 
             className={`${styles.actionButton} ${styles.deleteAction}`} 
-            onClick={() => setDeleteTarget(rec.id)}
+            onClick={() => handleDelete(rec)}
             title="Eliminar recurrente"
           >
             <Trash2 size={16} />
@@ -257,6 +203,7 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
           <p>No tienes transacciones recurrentes configuradas.</p>
           <p className={styles.emptyStateSubtext}>Las recurrentes generan movimientos automáticos según la frecuencia que elijas.</p>
         </div>
+
       ) : (
         <>
           <section className={styles.section}>
@@ -281,162 +228,6 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
         </>
       )}
 
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingId ? 'Editar Recurrente' : 'Nueva Recurrente'}
-        size="md"
-      >
-        <div className={styles.modalForm}>
-          <div className={styles.formGrid}>
-            <div className={styles.fullWidth}>
-              <label htmlFor="form-desc" className={styles.label}>Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
-              <input 
-                id="form-desc"
-                type="text" 
-                className={styles.input} 
-                value={formData.descripcion}
-                onChange={e => setFormData({...formData, descripcion: e.target.value})}
-                placeholder="Ej: Netflix, Alquiler, Sueldo..."
-              />
-            </div>
-
-            <div>
-              <label htmlFor="form-tipo" className={styles.label}>Tipo</label>
-              <select 
-                id="form-tipo"
-                className={styles.select}
-                value={formData.tipo}
-                onChange={e => setFormData({...formData, tipo: e.target.value as 'ingreso' | 'egreso'})}
-                title="Tipo de transacción"
-              >
-                <option value="egreso">Egreso</option>
-                <option value="ingreso">Ingreso</option>
-              </select>
-            </div>
-
-            <div>
-              <MontoInput
-                value={formData.monto}
-                onChange={v => setFormData({...formData, monto: v})}
-                moneda={formData.moneda}
-                label="Monto"
-                placeholder="0"
-                allowDecimals
-              />
-            </div>
-
-            <div>
-              <label htmlFor="form-moneda" className={styles.label}>Moneda</label>
-              <select 
-                id="form-moneda"
-                className={styles.select}
-                value={formData.moneda}
-                onChange={e => setFormData({...formData, moneda: e.target.value as 'ARS' | 'USD'})}
-                title="Moneda"
-              >
-                <option value="ARS">ARS</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="form-billetera" className={styles.label}>Billetera</label>
-              <select 
-                id="form-billetera"
-                className={styles.select}
-                value={formData.billetera_id}
-                onChange={e => setFormData({...formData, billetera_id: e.target.value})}
-                title="Seleccionar billetera"
-              >
-                <option value="">Seleccionar...</option>
-                {billeteras.filter(b => b.moneda === formData.moneda).map(b => (
-                  <option key={b.id} value={b.id}>{b.nombre}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.fullWidth}>
-              <label htmlFor="form-categoria" className={styles.label}>Categoría</label>
-              <select 
-                id="form-categoria"
-                className={styles.select}
-                value={formData.categoria_id}
-                onChange={e => setFormData({...formData, categoria_id: e.target.value})}
-                title="Seleccionar categoría"
-              >
-                <option value="">Seleccionar...</option>
-                {categorias.filter(c => c.tipo === formData.tipo).map(c => (
-                  <option key={c.id} value={c.id}>{c.nombre}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="form-frecuencia" className={styles.label}>Frecuencia</label>
-              <select 
-                id="form-frecuencia"
-                className={styles.select}
-                value={formData.frecuencia}
-                onChange={e => setFormData({...formData, frecuencia: e.target.value as 'semanal' | 'quincenal' | 'mensual', dia_registro: 1})}
-                title="Frecuencia de registro"
-              >
-                <option value="semanal">Semanal</option>
-                <option value="quincenal">Quincenal</option>
-                <option value="mensual">Mensual</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="form-dia" className={styles.label}>Día de registro</label>
-              {formData.frecuencia === 'semanal' ? (
-                <select 
-                  id="form-dia"
-                  className={styles.select}
-                  value={formData.dia_registro}
-                  onChange={e => setFormData({...formData, dia_registro: parseInt(e.target.value)})}
-                  title="Seleccionar día de la semana"
-                >
-                  <option value={0}>Lunes</option>
-                  <option value={1}>Martes</option>
-                  <option value={2}>Miércoles</option>
-                  <option value={3}>Jueves</option>
-                  <option value={4}>Viernes</option>
-                  <option value={5}>Sábado</option>
-                  <option value={6}>Domingo</option>
-                </select>
-              ) : (
-                <input 
-                  id="form-dia"
-                  type="number" 
-                  min={1} 
-                  max={28}
-                  className={styles.input}
-                  value={formData.dia_registro}
-                  onChange={e => setFormData({...formData, dia_registro: parseInt(e.target.value) || 1})}
-                />
-              )}
-            </div>
-          </div>
-
-          <div className={styles.modalFooter}>
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)} fullWidth>Cancelar</Button>
-            <Button onClick={handleSave} fullWidth>Guardar configuración</Button>
-          </div>
-        </div>
-      </Modal>
-
-      <ConfirmModal
-        isOpen={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDeleteConfirmed}
-        title="Eliminar transacción recurrente"
-        description="¿Estás seguro de eliminar esta transacción recurrente? Dejará de generar transacciones automáticas."
-        variant="danger"
-        confirmLabel="Eliminar"
-        isLoading={isDeleting}
-      />
     </div>
   )
 })

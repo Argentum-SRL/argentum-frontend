@@ -1,4 +1,5 @@
 import { getCategoriaVisual } from '@/lib/utils/categoria.utils'
+import styles from './CategoriaIcon.module.css'
 
 interface CategoriaIconProps {
   nombre?: string | null
@@ -8,6 +9,11 @@ interface CategoriaIconProps {
 
 export function CategoriaIcon({ nombre, size = 28, className }: CategoriaIconProps) {
   const visual = getCategoriaVisual(nombre)
+  const sizeClass =
+    size === 16 ? styles.size16 :
+    size === 32 ? styles.size32 :
+    size === 40 ? styles.size40 :
+    styles.size28
 
   if (visual.iconSrc) {
     return (
@@ -16,31 +22,16 @@ export function CategoriaIcon({ nombre, size = 28, className }: CategoriaIconPro
         alt={visual.label}
         width={size}
         height={size}
-        className={className}
-        style={{ objectFit: 'contain', flexShrink: 0, display: 'block' }}
+        className={[styles.iconImage, className].filter(Boolean).join(' ')}
       />
     )
   }
 
   return (
     <div
-      className={className}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '12px',
-        background: '#F0F0F0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-      }}
+      className={[styles.fallback, sizeClass, className].filter(Boolean).join(' ')}
     >
-      <span style={{
-        fontSize: Math.max(10, size * 0.4) + 'px',
-        fontWeight: 700,
-        color: '#8E9198',
-      }}>
+      <span className={styles.fallbackText}>
         {nombre?.[0]?.toUpperCase() ?? '?'}
       </span>
     </div>

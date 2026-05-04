@@ -11,10 +11,10 @@ import { calcularPeriodoActual } from '@/lib/utils/ciclo'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useFinancial } from '@/hooks/useFinancial'
+import { useModal } from '@/hooks/useModal'
 
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
-import TransaccionModal from '@/components/transacciones/TransaccionModal'
 import RecurrentesPage, { type RecurrentesPageRef } from './RecurrentesPage'
 
 export default function TransaccionesPage() {
@@ -45,8 +45,7 @@ export default function TransaccionesPage() {
   const [pendientesIA, setPendientesIA] = useState<Transaccion[]>([])
   const [loading, setLoading] = useState(true)
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedTx, setSelectedTx] = useState<Transaccion | null>(null)
+  const { open } = useModal()
   const recurrentesRef = useRef<RecurrentesPageRef>(null)
 
   const hasActiveFilters = Object.entries(filters).some(([k, v]) => {
@@ -116,14 +115,26 @@ export default function TransaccionesPage() {
   const handleEdit = (id: string) => {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
     if (tx) {
-      setSelectedTx(tx)
-      setIsModalOpen(true)
+      open('transaccion', {
+        data: {
+          transaccion: tx,
+          billeteras,
+          categorias,
+          onSuccess: fetchData,
+        },
+      })
     }
   }
 
   const openNewTransaccion = () => {
-    setSelectedTx(null)
-    setIsModalOpen(true)
+    open('transaccion', {
+      data: {
+        transaccion: null,
+        billeteras,
+        categorias,
+        onSuccess: fetchData,
+      },
+    })
   }
 
   const handleClearFilters = () => {
@@ -271,16 +282,6 @@ export default function TransaccionesPage() {
       ) : (
         <RecurrentesPage ref={recurrentesRef} embedded />
       )}
-
-      {/* ── Modal ── */}
-      <TransaccionModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        transaccion={selectedTx}
-        billeteras={billeteras}
-        categorias={categorias}
-        onSuccess={fetchData}
-      />
     </div>
   )
 }

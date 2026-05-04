@@ -24,8 +24,8 @@ import styles from './PerfilPage.module.css'
 import { useNavigate } from 'react-router-dom'
 import type { MetodosLogin } from '@/types'
 import * as authService from '@/services/auth.service'
-import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
+import { useModal } from '@/hooks/useModal'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -62,13 +62,8 @@ export default function PerfilPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [modalError, setModalError] = useState<string | null>(null)
 
-  // Estados de eliminación de cuenta
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [showConfirmLogout, setShowConfirmLogout] = useState(false)
-  const [showConfirmDeleteFoto, setShowConfirmDeleteFoto] = useState(false)
-
   const { showToast } = useToast()
+  const { confirm } = useModal()
 
   // Formularios
   const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '', fecha_nacimiento: '', sexo: '' })
@@ -124,37 +119,6 @@ export default function PerfilPage() {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }
       setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleSaveEmail = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
-    setModalError(null)
-    try {
-      const res = await usuarioService.actualizarEmail(formEmail)
-      if (res.requiere_verificacion_email) {
-        showToast(res.confirmacion, 'info')
-        navigate('/auth/verificar-email', { state: { email: formEmail.email_nuevo } })
-      } else {
-        if (usuario) {
-          updateUsuario({ ...usuario, email: formEmail.email_nuevo, email_verificado: true })
-        }
-        showToast('Email actualizado correctamente.', 'success')
-        handleCloseModal()
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      const detail = error.response?.data?.detail
-      if (detail?.includes('Google')) {
-        setModalError('Tu cuenta está vinculada a Google. El email debe gestionarse desde Google.')
-      } else if (detail?.includes('Contraseña')) {
-        setModalError('Contraseña actual incorrecta. Por favor, verificala.')
-      } else {
-        setModalError(detail || 'Algo salió mal. Intenta de nuevo.')
-      }
     } finally {
       setIsSaving(false)
     }
@@ -280,40 +244,6 @@ export default function PerfilPage() {
     }
   }
 
-  const handleDeleteFotoConfirmed = async () => {
-    try {
-      await usuarioService.eliminarFoto()
-      if (usuario) {
-        updateUsuario({ ...usuario, foto_url: null })
-      }
-      showToast('Foto eliminada', 'success')
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      showToast(error.response?.data?.detail || 'Error al eliminar la foto', 'error')
-    } finally {
-      setShowConfirmDeleteFoto(false)
-    }
-  }
-
-  const handleLogoutConfirmed = async () => {
-    await logout()
-  }
-
-  const handleDeleteAccountConfirmed = async () => {
-    setIsDeleting(true)
-    try {
-      await usuarioService.eliminarCuenta()
-      showToast('Cuenta eliminada exitosamente', 'success')
-      await logout()
-    } catch (error) {
-      console.error('Error al eliminar la cuenta:', error)
-      showToast('Hubo un error al intentar eliminar la cuenta.', 'error')
-    } finally {
-      setIsDeleting(false)
-      setShowConfirmDelete(false)
-    }
-  }
-
   const getFotoUrl = () => {
     if (!usuario?.foto_url) return null
     if (usuario.foto_url.startsWith('http')) return usuario.foto_url
@@ -366,7 +296,23 @@ export default function PerfilPage() {
             {usuario?.foto_url && (
               <button 
                 className={styles.deleteFotoBtn} 
-                onClick={() => setShowConfirmDeleteFoto(true)}
+                onClick={() => confirm({
+                  title: 'Eliminar foto de perfil',
+                  description: '¿Estás seguro de que querés eliminar tu foto de perfil?',
+                  variant: 'danger',
+                  onConfirm: async () => {
+                    try {
+                      await usuarioService.eliminarFoto()
+                      if (usuario) {
+                        updateUsuario({ ...usuario, foto_url: null })
+                      }
+                      showToast('Foto eliminada', 'success')
+                    } catch (err: unknown) {
+                      const error = err as { response?: { data?: { detail?: string } } }
+                      showToast(error.response?.data?.detail || 'Error al eliminar la foto', 'error')
+                    }
+                  },
+                })}
                 aria-label="Eliminar foto de perfil"
               >
                 Eliminar foto
@@ -642,12 +588,32 @@ export default function PerfilPage() {
           </div>
 
           <div className={styles.dangerActions}>
-            <button onClick={() => setShowConfirmLogout(true)} className={styles.logoutBtn}>
+            <button onClick={() => confirm({
+              title: 'Cerrar sesión',
+              description: '¿Estás seguro de que querés cerrar sesión ahora?',
+              onConfirm: logout,
+            })} className={styles.logoutBtn}>
               <LogOut size={20} />
               Cerrar sesión
             </button>
 
-            <button onClick={() => setShowConfirmDelete(true)} className={styles.dangerBtn}>
+            <button onClick={() => confirm({
+              title: '¿Estás absolutamente seguro?',
+              description: 'Esta acción borrará definitivamente todos tus datos financieros en Argentum. No se puede deshacer.',
+              variant: 'danger',
+              confirmLabel: 'Confirmar eliminación total',
+              requireTyping: 'ELIMINAR',
+              onConfirm: async () => {
+                try {
+                  await usuarioService.eliminarCuenta()
+                  showToast('Cuenta eliminada exitosamente', 'success')
+                  await logout()
+                } catch (error) {
+                  console.error('Error al eliminar la cuenta:', error)
+                  showToast('Hubo un error al intentar eliminar la cuenta.', 'error')
+                }
+              },
+            })} className={styles.dangerBtn}>
               <Trash2 size={20} />
               Eliminar mi cuenta permanentemente
             </button>
@@ -694,35 +660,6 @@ export default function PerfilPage() {
                     className={styles.input} 
                     value={formDatos.nombre}
                     onChange={(e) => setFormDatos({...formDatos, nombre: e.target.value})}
-                    required
-                    placeholder="Tu nombre"
-                  />
-                </div>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-apellido" className={styles.inputLabel}>Apellido</label>
-                  <input 
-                    id="perfil-apellido"
-                    type="text" 
-                    className={styles.input} 
-                    value={formDatos.apellido}
-                    onChange={(e) => setFormDatos({...formDatos, apellido: e.target.value})}
-                    required
-                    placeholder="Tu apellido"
-                  />
-                </div>
-                <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> Guardar Cambios</>}
-                </button>
-              </form>
-            )}
-
-            {/* Formulario Email */}
-            {activeModal === 'email' && (
-              <form onSubmit={handleSaveEmail} className={styles.modalForm}>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-email" className={styles.inputLabel}>Nuevo Email</label>
-                  <input 
-                    id="perfil-email"
                     type="email" 
                     className={styles.input} 
                     value={formEmail.email_nuevo}
@@ -975,34 +912,6 @@ export default function PerfilPage() {
         </div>
       )}
 
-      <ConfirmModal
-        isOpen={showConfirmLogout}
-        onClose={() => setShowConfirmLogout(false)}
-        onConfirm={handleLogoutConfirmed}
-        title="Cerrar sesión"
-        description="¿Estás seguro de que querés cerrar sesión ahora?"
-      />
-
-      <ConfirmModal
-        isOpen={showConfirmDeleteFoto}
-        onClose={() => setShowConfirmDeleteFoto(false)}
-        onConfirm={handleDeleteFotoConfirmed}
-        title="Eliminar foto de perfil"
-        description="¿Estás seguro de que querés eliminar tu foto de perfil?"
-        variant="danger"
-      />
-
-      <ConfirmModal
-        isOpen={showConfirmDelete}
-        onClose={() => setShowConfirmDelete(false)}
-        onConfirm={handleDeleteAccountConfirmed}
-        title="¿Estás absolutamente seguro?"
-        description="Esta acción borrará definitivamente todos tus datos financieros en Argentum. No se puede deshacer."
-        variant="danger"
-        confirmLabel="Confirmar eliminación total"
-        requireTyping="ELIMINAR"
-        isLoading={isDeleting}
-      />
     </div>
   )
 }

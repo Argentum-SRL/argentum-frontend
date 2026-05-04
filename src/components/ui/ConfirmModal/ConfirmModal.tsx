@@ -34,22 +34,33 @@ export function ConfirmModal({
   requireTyping
 }: ConfirmModalProps) {
   const [inputValue, setInputValue] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleClose = useCallback(() => {
-    if (isLoading) return
+    if (isLoading || isSubmitting) return
     setInputValue('')
     onClose()
-  }, [isLoading, onClose])
+  }, [isLoading, isSubmitting, onClose])
 
   const handleConfirm = useCallback(async () => {
     if (requireTyping && inputValue !== requireTyping) return
-    if (isLoading) return
-    await onConfirm()
-  }, [requireTyping, inputValue, isLoading, onConfirm])
+    if (isLoading || isSubmitting) return
+
+    setIsSubmitting(true)
+    try {
+      await onConfirm()
+      setInputValue('')
+      onClose()
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [requireTyping, inputValue, isLoading, isSubmitting, onConfirm, onClose])
 
 
   const isTypingCorrect = requireTyping ? inputValue === requireTyping : true
-  const canConfirm = isTypingCorrect && !isLoading
+  const canConfirm = isTypingCorrect && !isLoading && !isSubmitting
 
   const iconMap = {
     danger: <AlertTriangle size={32} />,

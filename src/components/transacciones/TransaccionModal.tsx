@@ -16,6 +16,7 @@ import { formatMonto } from '@/utils/format'
 import styles from './TransaccionModal.module.css'
 import { useToast } from '@/hooks/useToast'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
+import { useModal } from '@/hooks/useModal'
 
 interface TransaccionModalProps {
   open: boolean
@@ -101,6 +102,7 @@ export default function TransaccionModal({
 }: TransaccionModalProps) {
   const isEdit = !!transaccion
   const { showToast } = useToast()
+  const { confirm } = useModal()
 
   const [state, dispatch] = useReducer(formReducer, initialState)
 
@@ -124,7 +126,7 @@ export default function TransaccionModal({
     if (open) {
       dispatch({ type: 'RESET', transaccion: transaccion || null, billeteras })
     }
-  }, [open, transaccion, billeteras])
+  }, [open, transaccion, billeteras, isEdit])
 
   const isCuotaHija = isEdit && transaccion?.es_cuota_hija
 
@@ -234,20 +236,27 @@ export default function TransaccionModal({
 
   const handleDelete = async () => {
     if (!transaccion) return
-    if (!window.confirm('¿Estás seguro de que querés eliminar esta transacción?')) return
 
-    dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
-    try {
-      await transaccionService.deleteTransaccion(transaccion.id)
-      showToast('Transacción eliminada', 'success')
-      onSuccess()
-      onClose()
-    } catch (error) {
-      console.error(error)
-      showToast('Error al eliminar la transacción', 'error')
-    } finally {
-      dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
-    }
+    confirm({
+      title: 'Eliminar transacción',
+      description: '¿Estás seguro de que querés eliminar esta transacción? Esta acción no se puede deshacer.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
+        try {
+          await transaccionService.deleteTransaccion(transaccion.id)
+          showToast('Transacción eliminada', 'success')
+          onSuccess()
+          onClose()
+        } catch (error) {
+          console.error(error)
+          showToast('Error al eliminar la transacción', 'error')
+        } finally {
+          dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
+        }
+      },
+    })
   }
 
   const modalTitle = (

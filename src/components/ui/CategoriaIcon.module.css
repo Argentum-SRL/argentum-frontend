@@ -1,0 +1,55 @@
+.iconImage {
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+.fallback {
+  border-radius: 12px;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fallbackText {
+  font-weight: 700;
+  color: #8e9198;
+}
+
+.size16 {
+  width: 16px;
+  height: 16px;
+}
+
+.size16 .fallbackText {
+  font-size: 10px;
+}
+
+.size28 {
+  width: 28px;
+  height: 28px;
+}
+
+.size28 .fallbackText {
+  font-size: 11px;
+}
+
+.size32 {
+  width: 32px;
+  height: 32px;
+}
+
+.size32 .fallbackText {
+  font-size: 12px;
+}
+
+.size40 {
+  width: 40px;
+  height: 40px;
+}
+
+.size40 .fallbackText {
+  font-size: 16px;
+}

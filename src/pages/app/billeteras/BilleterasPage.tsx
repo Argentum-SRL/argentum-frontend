@@ -5,11 +5,10 @@ import { Plus, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useFinancial } from '@/hooks/useFinancial'
+import { useModal } from '@/hooks/useModal'
 import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
-import BankPickerModal from '@/components/billeteras/BankPickerModal'
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
-import EditBilleteraModal from '@/components/billeteras/EditBilleteraModal'
 import type { EditPayload } from '@/components/billeteras/EditBilleteraModal'
 import billeteraService from '@/services/billetera.service'
 import type { Billetera } from '@/types'
@@ -93,10 +92,8 @@ export default function BilleterasPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
   const { billeteras, isLoading, refreshBilleteras } = useFinancial()
+  const { open, confirm } = useModal()
 
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [billeteraAEditar, setBilleteraAEditar] = useState<Billetera | null>(null)
   const [showArchived, setShowArchived] = useState(false)
 
   const billeterasActivas = billeteras.filter((b) => b.estado === 'activa')
@@ -130,36 +127,44 @@ export default function BilleterasPage() {
     const b = billeteras.find((b) => b.id === id)
     if (!b) return
 
-    const confirmacion = window.confirm(`¿Estás seguro de que querés eliminar "${b.nombre}"? Esta acción no se puede deshacer.`)
-    if (!confirmacion) return
-
-    try {
-      await billeteraService.delete(id)
-      await refreshBilleteras()
-      showToast(`"${b.nombre}" eliminada exitosamente`, 'success')
-    } catch (error: unknown) {
-      let msg = 'Error al eliminar la billetera'
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosErr = error as { response?: { data?: { detail?: string } } }
-        msg = axiosErr.response?.data?.detail || msg
-      }
-      showToast(msg, 'error')
-    }
+    confirm({
+      title: 'Eliminar billetera',
+      description: `¿Estás seguro de que querés eliminar "${b.nombre}"? Esta acción no se puede deshacer.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await billeteraService.delete(id)
+          await refreshBilleteras()
+          showToast(`"${b.nombre}" eliminada exitosamente`, 'success')
+        } catch (error: unknown) {
+          let msg = 'Error al eliminar la billetera'
+          if (error && typeof error === 'object' && 'response' in error) {
+            const axiosErr = error as { response?: { data?: { detail?: string } } }
+            msg = axiosErr.response?.data?.detail || msg
+          }
+          showToast(msg, 'error')
+        }
+      },
+    })
   }
 
   const handleEditar = (id: string) => {
     const b = billeteras.find((b) => b.id === id)
     if (b) {
-      setBilleteraAEditar(b)
-      setEditModalOpen(true)
+      open('editBilletera', {
+        data: {
+          billetera: b,
+          billeteraPrincipalActual: billeteras.find((item) => item.es_principal),
+          onEditar: handleGuardarEdicion,
+        },
+      })
     }
   }
 
   const handleGuardarEdicion = async (id: string, payload: EditPayload) => {
     await billeteraService.update(id, payload)
     await refreshBilleteras()
-    setEditModalOpen(false)
-    setBilleteraAEditar(null)
     showToast(`Billetera actualizada exitosamente`, 'success')
   }
 
@@ -172,11 +177,20 @@ export default function BilleterasPage() {
       bank_id: payload.bank_id,
     })
     await refreshBilleteras()
-    setModalOpen(false)
     showToast(`"${payload.nombre}" creada exitosamente`, 'success')
   }
 
   const monedaPrincipal = (usuario?.moneda_principal as 'ARS' | 'USD') ?? 'ARS'
+
+  const openCrearModal = () => {
+    open('bankPicker', {
+      data: {
+        billeterasActuales: billeteras,
+        monedaPrincipalUsuario: monedaPrincipal,
+        onCrear: handleCrear,
+      },
+    })
+  }
 
   return (
     <div className={styles.root}>
@@ -199,7 +213,7 @@ export default function BilleterasPage() {
         </div>
         <button
           className={styles.nuevaBtn}
-          onClick={() => setModalOpen(true)}
+          onClick={openCrearModal}
           aria-label="Agregar nueva billetera"
         >
           <Plus size={16} strokeWidth={2.5} />
@@ -216,7 +230,7 @@ export default function BilleterasPage() {
       {isLoading ? (
         <SkeletonGrid />
       ) : billeterasActivas.length === 0 ? (
-        <EstadoVacio onCrear={() => setModalOpen(true)} />
+        <EstadoVacio onCrear={openCrearModal} />
       ) : (
         <div className={styles.grid}>
           {billeterasRegulares.map((b) => (
@@ -239,27 +253,9 @@ export default function BilleterasPage() {
               onEditar={handleEditar}
             />
           ))}
-          <NuevaBilleteraCard onClick={() => setModalOpen(true)} />
+          <NuevaBilleteraCard onClick={openCrearModal} />
         </div>
       )}
-
-      {/* ── Modal ──────────────────────────────────────────────────────────── */}
-      <BankPickerModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onCrear={handleCrear}
-        billeterasActuales={billeteras}
-        monedaPrincipalUsuario={monedaPrincipal}
-      />
-
-      {/* ── Modal Edición ──────────────────────────────────────────────────── */}
-      <EditBilleteraModal
-        isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        onEditar={handleGuardarEdicion}
-        billetera={billeteraAEditar}
-        billeteraPrincipalActual={billeteras.find((b) => b.es_principal)}
-      />
 
       {/* ── Sección de archivadas ─────────────────────────────────────────── */}
       {!isLoading && billeterasArchivadas.length > 0 && (

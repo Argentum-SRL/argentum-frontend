@@ -3,8 +3,8 @@ import { X, Search, ChevronDown, Filter, Calendar } from 'lucide-react'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
-import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
+import { useModal } from '@/hooks/useModal'
 
 interface FilterBarProps {
   filters: TransaccionFilters
@@ -41,7 +41,7 @@ export default function FilterBar({
   const [catPopoverOpen, setCatPopoverOpen] = useState(false)
   const [datePopoverOpen, setDatePopoverOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(filters.busqueda || '')
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
+  const { open } = useModal()
 
   const catRef = useRef<HTMLDivElement>(null)
   const dateRef = useRef<HTMLDivElement>(null)
@@ -137,7 +137,19 @@ export default function FilterBar({
     <>
       <div className={styles.filterBar}>
         {/* Mobile Filter Btn */}
-        <button className={styles.mobileFilterBtn} onClick={() => setMobileDrawerOpen(true)}>
+        <button
+          className={styles.mobileFilterBtn}
+          onClick={() => open('transaccionFilters', {
+            data: {
+              filters,
+              onFilterChange,
+              onClear,
+              billeteras,
+              categorias,
+              hasActiveFilters,
+            },
+          })}
+        >
           <Filter size={14} />
           Filtrar
         </button>
@@ -228,25 +240,6 @@ export default function FilterBar({
           </button>
         )}
       </div>
-
-      {/* Mobile Modal */}
-      <Modal isOpen={mobileDrawerOpen} onClose={() => setMobileDrawerOpen(false)} title="Filtros">
-        <div className={styles.mobileDrawerContainer}>
-          <div>
-            <div className={styles.popoverTitle}>Categoría</div>
-            {renderCategoriasList()}
-          </div>
-          <div>
-            <div className={styles.popoverTitle}>Período</div>
-            {renderDateForm()}
-          </div>
-          {hasActiveFilters && (
-            <button className={styles.clearBtnMobile} onClick={() => { onClear(); setMobileDrawerOpen(false) }}>
-              Limpiar todos los filtros
-            </button>
-          )}
-        </div>
-      </Modal>
     </>
   )
 }

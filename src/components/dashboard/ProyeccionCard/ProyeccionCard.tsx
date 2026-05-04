@@ -4,8 +4,8 @@ import { formatMonto } from '@/utils/format'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { dashboardService } from '@/services/dashboard.service'
 import type { Proyeccion } from '@/types'
-import ProyeccionModal from '../ProyeccionModal/ProyeccionModal'
 import styles from './ProyeccionCard.module.css'
+import { useModal } from '@/hooks/useModal'
 
 const ProgressBar = ({ progress }: { progress: number }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -28,7 +28,7 @@ const ProyeccionCard: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [expanded, setExpanded] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
+  const { open } = useModal()
 
   const fetchProyeccion = useCallback(async () => {
     try {
@@ -90,7 +90,7 @@ const ProyeccionCard: React.FC = () => {
         </div>
         <button 
           className={styles.infoButton} 
-          onClick={() => setModalOpen(true)}
+          onClick={() => open('proyeccion', { data: { proyeccion } })}
           title="Ver explicación de la proyección"
           aria-label="Ver explicación de la proyección"
         >
@@ -172,14 +172,6 @@ const ProyeccionCard: React.FC = () => {
             Ocultar desglose <ChevronUp size={16} />
           </button>
         </div>
-      )}
-
-      {modalOpen && (
-        <ProyeccionModal 
-          isOpen={modalOpen} 
-          onClose={() => setModalOpen(false)} 
-          proyeccion={proyeccion} 
-        />
       )}
     </div>
   )

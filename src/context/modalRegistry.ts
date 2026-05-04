@@ -1,0 +1,52 @@
+import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
+import type { EditPayload } from '@/components/billeteras/EditBilleteraModal'
+import type { ConfirmModalOptions } from '@/hooks/useModal'
+import type { Billetera, Categoria, Proyeccion, Transaccion, TransaccionRecurrente } from '@/types'
+import type { TransaccionFilters } from '@/services/transaccion.service'
+
+export interface ModalPayloadMap {
+  bankPicker: {
+    billeterasActuales: Billetera[]
+    monedaPrincipalUsuario: 'ARS' | 'USD'
+    onCrear: (payload: CreatePayload) => Promise<void>
+  }
+  editBilletera: {
+    billetera: Billetera
+    billeteraPrincipalActual?: Billetera
+    onEditar: (id: string, payload: EditPayload) => Promise<void>
+  }
+  transaccion: {
+    transaccion: Transaccion | null
+    billeteras: Billetera[]
+    categorias: Categoria[]
+    onSuccess: () => Promise<void> | void
+  }
+  recurrente: {
+    recurrente: TransaccionRecurrente | null
+    billeteras: Billetera[]
+    categorias: Categoria[]
+    onSuccess: () => Promise<void> | void
+  }
+  transaccionFilters: {
+    filters: TransaccionFilters
+    onFilterChange: (newFilters: TransaccionFilters) => void
+    onClear: () => void
+    billeteras: Billetera[]
+    categorias: Categoria[]
+    hasActiveFilters: boolean
+  }
+  proyeccion: {
+    proyeccion: Proyeccion
+  }
+  confirm: ConfirmModalOptions
+}
+
+export type ModalId = keyof ModalPayloadMap
+
+export type ModalStateMap = {
+  [K in ModalId]?: {
+    isOpen: boolean
+    data?: ModalPayloadMap[K]
+    onClose?: () => void
+  }
+}

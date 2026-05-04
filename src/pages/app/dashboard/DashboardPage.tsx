@@ -13,10 +13,10 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useModal } from '@/hooks/useModal'
 import { dashboardService } from '@/services/dashboard.service'
 import type { DashboardResumen, CotizacionDolar, Proyeccion } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
-import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import styles from './DashboardPage.module.css'
@@ -89,7 +89,7 @@ export default function DashboardPage() {
   const [proyeccion, setProyeccion] = useState<Proyeccion | null>(null)
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
-  const [isProyeccionModalOpen, setIsProyeccionModalOpen] = useState(false)
+  const { open } = useModal()
 
   const fetchData = useCallback(async () => {
     setError(false)
@@ -248,7 +248,7 @@ export default function DashboardPage() {
                   <span className={styles.secValue}>{formatMonto(data.disponible_real.disponible, 'ARS')}</span>
                 </div>
                 <div className={styles.secMetric}>
-                  <div className={styles.labelWithHint} onClick={() => proyeccion && setIsProyeccionModalOpen(true)}>
+                  <div className={styles.labelWithHint} onClick={() => proyeccion && open('proyeccion', { data: { proyeccion } })}>
                     <span className={styles.secLabel}>Proyección cierre</span>
                     {proyeccion && (
                       <div className={`${styles.confianzaDot} ${styles[proyeccion.nivel_confianza]}`} />
@@ -266,8 +266,6 @@ export default function DashboardPage() {
           </div>
         )
       )}
-
-
       {/* Grid */}
       <div className={styles.dashboardGrid}>
         {/* Ultimos Movimientos */}
@@ -366,14 +364,6 @@ export default function DashboardPage() {
         <div className={styles.proyeccionSection}>
           <ProyeccionCard />
         </div>
-      )}
-
-      {proyeccion && (
-        <ProyeccionModal 
-          isOpen={isProyeccionModalOpen}
-          onClose={() => setIsProyeccionModalOpen(false)}
-          proyeccion={proyeccion}
-        />
       )}
     </div>
   )

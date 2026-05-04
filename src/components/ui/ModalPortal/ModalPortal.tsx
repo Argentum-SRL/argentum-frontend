@@ -1,0 +1,106 @@
+import { useContext } from 'react'
+import { ModalContext } from '@/context/ModalContext'
+import BankPickerModal from '@/components/billeteras/BankPickerModal'
+import EditBilleteraModal from '@/components/billeteras/EditBilleteraModal'
+import TransaccionModal from '@/components/transacciones/TransaccionModal'
+import RecurrenteModal from '@/components/transacciones/RecurrenteModal'
+import FilterBarMobileDrawer from '@/components/transacciones/FilterBarMobileDrawer'
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
+import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
+
+export function ModalPortal() {
+  const context = useContext(ModalContext)
+
+  if (!context) return null
+
+  const { modals, closeModal } = context
+  const typedModals = modals
+  const bankPickerData = typedModals.bankPicker?.data
+  const editBilleteraData = typedModals.editBilletera?.data
+  const transaccionData = typedModals.transaccion?.data
+  const recurrenteData = typedModals.recurrente?.data
+  const filterDrawerData = typedModals.transaccionFilters?.data
+  const proyeccionData = typedModals.proyeccion?.data
+  const confirmData = typedModals.confirm?.data
+
+  return (
+    <>
+      {typedModals.bankPicker?.isOpen && bankPickerData && (
+        <BankPickerModal
+          isOpen={true}
+          onClose={() => closeModal('bankPicker')}
+          onCrear={bankPickerData.onCrear}
+          billeterasActuales={bankPickerData.billeterasActuales}
+          monedaPrincipalUsuario={bankPickerData.monedaPrincipalUsuario}
+        />
+      )}
+
+      {typedModals.editBilletera?.isOpen && editBilleteraData?.billetera && (
+        <EditBilleteraModal
+          isOpen={true}
+          onClose={() => closeModal('editBilletera')}
+          onEditar={editBilleteraData.onEditar}
+          billetera={editBilleteraData.billetera}
+          billeteraPrincipalActual={editBilleteraData.billeteraPrincipalActual}
+        />
+      )}
+
+      {typedModals.transaccion?.isOpen && transaccionData && (
+        <TransaccionModal
+          open={true}
+          onClose={() => closeModal('transaccion')}
+          transaccion={transaccionData.transaccion}
+          billeteras={transaccionData.billeteras}
+          categorias={transaccionData.categorias}
+          onSuccess={transaccionData.onSuccess}
+        />
+      )}
+
+      {typedModals.recurrente?.isOpen && recurrenteData && (
+        <RecurrenteModal
+          isOpen={true}
+          onClose={() => closeModal('recurrente')}
+          recurrente={recurrenteData.recurrente}
+          billeteras={recurrenteData.billeteras}
+          categorias={recurrenteData.categorias}
+          onSuccess={recurrenteData.onSuccess}
+        />
+      )}
+
+      {typedModals.transaccionFilters?.isOpen && filterDrawerData && (
+        <FilterBarMobileDrawer
+          isOpen={true}
+          onClose={() => closeModal('transaccionFilters')}
+          filters={filterDrawerData.filters}
+          onFilterChange={filterDrawerData.onFilterChange}
+          onClear={filterDrawerData.onClear}
+          billeteras={filterDrawerData.billeteras}
+          categorias={filterDrawerData.categorias}
+          hasActiveFilters={filterDrawerData.hasActiveFilters}
+        />
+      )}
+
+      {typedModals.proyeccion?.isOpen && proyeccionData?.proyeccion && (
+        <ProyeccionModal
+          isOpen={true}
+          onClose={() => closeModal('proyeccion')}
+          proyeccion={proyeccionData.proyeccion}
+        />
+      )}
+
+      {typedModals.confirm?.isOpen && confirmData && (
+        <ConfirmModal
+          isOpen={true}
+          onClose={() => closeModal('confirm')}
+          onConfirm={confirmData.onConfirm}
+          title={confirmData.title}
+          description={confirmData.description}
+          confirmLabel={confirmData.confirmLabel}
+          cancelLabel={confirmData.cancelLabel}
+          variant={confirmData.variant}
+          requireTyping={confirmData.requireTyping}
+        />
+      )}
+    </>
+  )
+}

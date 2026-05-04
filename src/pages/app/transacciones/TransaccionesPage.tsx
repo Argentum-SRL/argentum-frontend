@@ -10,7 +10,6 @@ import { formatMonto } from '@/utils/format'
 import { calcularPeriodoActual } from '@/lib/utils/ciclo'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
-import { useFinancial } from '@/hooks/useFinancial'
 import { useModal } from '@/hooks/useModal'
 
 import FilterBar from '@/components/transacciones/FilterBar'
@@ -20,7 +19,6 @@ import RecurrentesPage, { type RecurrentesPageRef } from './RecurrentesPage'
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
-  const { setBilleteras: setGlobalBilleteras } = useFinancial()
 
   const [activeTab, setActiveTab] = useState<'historial' | 'recurrentes'>('historial')
 
@@ -82,11 +80,6 @@ export default function TransaccionesPage() {
         categoriaService.getCategorias()
       ])
       setBilleteras(b.filter((w: Billetera) => w.estado === 'activa'))
-      setGlobalBilleteras(b.map((d: Billetera) => ({
-        ...d,
-        saldo_actual: Number(d.saldo_actual),
-        saldo_inicial: Number(d.saldo_inicial),
-      })))
       setCategorias(c)
       await Promise.all([fetchTransacciones(), fetchPendientes()])
     } catch (err) {
@@ -94,7 +87,7 @@ export default function TransaccionesPage() {
     } finally {
       setLoading(false)
     }
-  }, [fetchTransacciones, fetchPendientes, setGlobalBilleteras])
+  }, [fetchTransacciones, fetchPendientes])
 
   useEffect(() => {
     const tid = setTimeout(() => {

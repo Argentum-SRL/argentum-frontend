@@ -64,7 +64,7 @@ const Cotizacion = () => {
   useEffect(() => {
     dashboardService.getCotizacion()
       .then(setCotizacion)
-      .catch(() => {}) // Ignorar error segun requerimiento
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 

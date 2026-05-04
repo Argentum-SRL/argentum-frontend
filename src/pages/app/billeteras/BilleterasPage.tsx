@@ -1,17 +1,17 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Plus, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
-import { useFinancial } from '@/hooks/useFinancial'
 import { useModal } from '@/hooks/useModal'
 import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
 import type { EditPayload } from '@/components/billeteras/EditBilleteraModal'
 import billeteraService from '@/services/billetera.service'
-import type { Billetera } from '@/types'
+import { dashboardService } from '@/services/dashboard.service'
+import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
@@ -53,8 +53,7 @@ function EstadoVacio({ onCrear }: { onCrear: () => void }) {
 
 // ── Totales hero ──────────────────────────────────────────────────────────────
 
-function TotalesHero({ billeteras }: { billeteras: Billetera[] }) {
-  const { cotizacion } = useFinancial()
+function TotalesHero({ billeteras, cotizacion }: { billeteras: Billetera[], cotizacion: CotizacionDolar | null }) {
   const valorUSD = cotizacion?.venta ?? 0
   const tipoLabel = cotizacion?.nombre ?? 'Blue'
   
@@ -91,8 +90,41 @@ function TotalesHero({ billeteras }: { billeteras: Billetera[] }) {
 export default function BilleterasPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
-  const { billeteras, isLoading, refreshBilleteras } = useFinancial()
   const { open, confirm } = useModal()
+  const [billeteras, setBilleteras] = useState<Billetera[]>([])
+  const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const fetchPageData = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const [bRes, cRes] = await Promise.all([
+        billeteraService.list(),
+        dashboardService.getCotizacion().catch(() => null)
+      ])
+      
+      if (Array.isArray(bRes)) {
+        setBilleteras(bRes.map((d: Billetera) => ({
+          ...d,
+          saldo_actual: Number(d.saldo_actual),
+          saldo_inicial: Number(d.saldo_inicial)
+        })))
+      }
+      setCotizacion(cRes)
+    } catch (err) {
+      console.error('Error fetching billeteras data:', err)
+      showToast('Error al cargar datos', 'error')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [showToast])
+
+  useEffect(() => {
+    const tid = setTimeout(() => {
+      void fetchPageData()
+    }, 0)
+    return () => clearTimeout(tid)
+  }, [fetchPageData])
 
   const [showArchived, setShowArchived] = useState(false)
 
@@ -105,7 +137,7 @@ export default function BilleterasPage() {
     const b = billeteras.find((b) => b.id === id)
     try {
       await billeteraService.archivar(id)
-      await refreshBilleteras()
+      await fetchPageData()
       if (b) showToast(`"${b.nombre}" archivada`, 'success')
     } catch {
       showToast('Error al archivar la billetera', 'error')
@@ -116,7 +148,7 @@ export default function BilleterasPage() {
     const b = billeteras.find((b) => b.id === id)
     try {
       await billeteraService.desarchivar(id)
-      await refreshBilleteras()
+      await fetchPageData()
       if (b) showToast(`"${b.nombre}" reactivada`, 'success')
     } catch {
       showToast('Error al desarchivar la billetera', 'error')
@@ -135,7 +167,7 @@ export default function BilleterasPage() {
       onConfirm: async () => {
         try {
           await billeteraService.delete(id)
-          await refreshBilleteras()
+          await fetchPageData()
           showToast(`"${b.nombre}" eliminada exitosamente`, 'success')
         } catch (error: unknown) {
           let msg = 'Error al eliminar la billetera'
@@ -164,7 +196,7 @@ export default function BilleterasPage() {
 
   const handleGuardarEdicion = async (id: string, payload: EditPayload) => {
     await billeteraService.update(id, payload)
-    await refreshBilleteras()
+    await fetchPageData()
     showToast(`Billetera actualizada exitosamente`, 'success')
   }
 
@@ -176,7 +208,7 @@ export default function BilleterasPage() {
       es_principal: payload.es_principal,
       bank_id: payload.bank_id,
     })
-    await refreshBilleteras()
+    await fetchPageData()
     showToast(`"${payload.nombre}" creada exitosamente`, 'success')
   }
 
@@ -223,7 +255,7 @@ export default function BilleterasPage() {
 
       {/* ── Barra de resumen ───────────────────────────────────────────────── */}
       {!isLoading && billeterasActivas.length > 0 && (
-        <TotalesHero billeteras={billeteras} />
+        <TotalesHero billeteras={billeteras} cotizacion={cotizacion} />
       )}
 
       {/* ── Grid / Skeleton / Estado vacío ────────────────────────────────── */}

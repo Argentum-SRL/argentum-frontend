@@ -211,7 +211,7 @@ export default function FilterBar({
         </div>
 
         <div className={styles.searchPill}>
-          <Search size={16} color="#8E9198" />
+          <Search size={16} color="var(--text-2)" />
           <input
             type="text"
             className={styles.searchInput}

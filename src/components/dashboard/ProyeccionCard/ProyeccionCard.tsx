@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react'
 import { TrendingUp, Info, ChevronDown, ChevronUp, RefreshCcw } from 'lucide-react'
 import { formatMonto } from '@/utils/format'
-import { getCategoryIcon } from '@/utils/categoryIcons'
+import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { dashboardService } from '@/services/dashboard.service'
 import type { Proyeccion } from '@/types'
 import ProyeccionModal from '../ProyeccionModal/ProyeccionModal'
@@ -127,14 +127,13 @@ const ProyeccionCard: React.FC = () => {
         <div className={styles.expandedContent}>
           <div className={styles.categoryList}>
             <h3 className={styles.sectionTitle}>Gasto por categoría</h3>
-            {desglose_por_categoria.map((cat) => {
-              const CategoryIcon = getCategoryIcon(cat.categoria_nombre)
+            {desglose_por_categoria.map((cat, i) => {
               const catProgress = Math.min(Math.round((cat.gasto_actual_ciclo / (cat.proyectado || 1)) * 100), 100)
               
               return (
-                <div key={cat.categoria_id} className={styles.categoryRow}>
+                <div key={cat.categoria_id || i} className={styles.categoryRow}>
                   <div className={styles.categoryIcon}>
-                    <CategoryIcon size={20} />
+                    <CategoriaIcon nombre={cat.categoria_nombre} size={32} />
                   </div>
                   <div className={styles.categoryInfo}>
                     <div className={styles.categoryName}>

@@ -11,7 +11,7 @@ import {
   Clock
 } from 'lucide-react'
 import styles from './RecurrentesPage.module.css'
-import { getCategoryIcon } from '@/utils/categoryIcons'
+import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import recurrenteService from '@/services/recurrente.service'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
@@ -177,7 +177,10 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
           <div className={`${styles.iconWrapper} ${rec.tipo === 'ingreso' ? styles.ingresoIcon : styles.egresoIcon}`}>
             {(() => {
               const cat = categorias.find(c => c.id === rec.categoria_id)
-              const IconComp = cat ? getCategoryIcon(cat.nombre) : (rec.tipo === 'ingreso' ? ArrowUpRight : ArrowDownLeft)
+              if (cat) {
+                return <CategoriaIcon nombre={cat.nombre} size={32} />
+              }
+              const IconComp = rec.tipo === 'ingreso' ? ArrowUpRight : ArrowDownLeft
               return <IconComp size={20} strokeWidth={1.75} />
             })()}
           </div>

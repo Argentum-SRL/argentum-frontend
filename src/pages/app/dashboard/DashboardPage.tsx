@@ -18,7 +18,7 @@ import type { DashboardResumen, CotizacionDolar, Proyeccion } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
 import { formatMonto, formatFecha } from '@/utils/format'
-import { getCategoryIcon } from '@/utils/categoryIcons'
+import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import styles from './DashboardPage.module.css'
 
 // ── Components ───────────────────────────────────────────────────────────
@@ -289,11 +289,10 @@ export default function DashboardPage() {
             ) : (
               <div className={styles.list}>
                 {data?.ultimos_movimientos.map((m) => {
-                  const CategoryIcon = getCategoryIcon(m.categoria_nombre || '')
                   return (
                     <div key={m.id} className={styles.listItem}>
                       <div className={styles.itemIcon}>
-                        <CategoryIcon size={20} color="var(--primary)" />
+                        <CategoriaIcon nombre={m.categoria_nombre || ''} size={32} />
                       </div>
                       <div className={styles.itemMeta}>
                         <p className={styles.itemName}>{m.descripcion}</p>

@@ -19,8 +19,8 @@ export default function TransaccionRow({
 }: TransaccionRowProps) {
   const isIngreso = transaccion.tipo === 'ingreso'
   const isPendiente = transaccion.estado_verificacion === 'pendiente'
-  const montoColor = isIngreso ? '#1A3D28' : '#0A0D12'
-  const rowBg = isPendiente ? '#FFFDF5' : 'transparent'
+  const montoColor = isIngreso ? '#16A34A' : 'var(--text)'
+  const rowBg = isPendiente ? 'rgba(245, 158, 11, 0.05)' : 'transparent'
 
   const formatHora = (fechaStr: string) => {
     // Si viene hora, la mostramos, sino evitamos "00:00" si no corresponde
@@ -53,10 +53,10 @@ export default function TransaccionRow({
         background: rowBg,
         cursor: 'pointer',
         transition: 'background 0.2s',
-        borderBottom: '1px solid #F5F4F0'
+        borderBottom: '1px solid var(--border)'
       }}
       onMouseEnter={(e) => {
-        if (!isPendiente) e.currentTarget.style.background = '#FAFAF8'
+        if (!isPendiente) e.currentTarget.style.background = 'var(--surface-alt)'
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = rowBg
@@ -67,7 +67,7 @@ export default function TransaccionRow({
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{
-            fontSize: 14, fontWeight: 600, color: '#0A0D12',
+            fontSize: 14, fontWeight: 600, color: 'var(--text)',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
           }}>
             {transaccion.descripcion || 'Sin descripción'}
@@ -100,14 +100,14 @@ export default function TransaccionRow({
             )}
           </div>
         </div>
-        <span style={{ fontSize: 11, color: '#8E9198' }}>{metaText}</span>
+        <span style={{ fontSize: 11, color: 'var(--text-2)' }}>{metaText}</span>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0 }}>
         <span style={{ fontSize: 15, fontWeight: 700, color: montoColor }}>
           {isIngreso ? '+' : '-'}{formatMonto(transaccion.monto, transaccion.moneda)}
         </span>
-        <span style={{ fontSize: 11, color: '#8E9198' }}>
+        <span style={{ fontSize: 11, color: 'var(--text-2)' }}>
           {billetera?.nombre || 'Billetera eliminada'}
         </span>
       </div>

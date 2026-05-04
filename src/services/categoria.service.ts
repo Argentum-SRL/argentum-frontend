@@ -1,10 +1,33 @@
 import api from './api'
 import type { Categoria, Subcategoria } from '@/types'
 
+let categoriesCache: { data: Categoria[]; timestamp: number } | null = null
+let categoriesPromise: Promise<Categoria[]> | null = null
+const CATEGORIES_TTL = 5 * 60 * 1000 // 5 minutes, as they rarely change
+
+export const invalidateCategorias = () => {
+  categoriesCache = null
+}
+
 const categoriaService = {
   getCategorias: async () => {
-    const response = await api.get<Categoria[]>('/categorias')
-    return response.data
+    if (categoriesPromise) return categoriesPromise
+
+    if (categoriesCache && Date.now() - categoriesCache.timestamp < CATEGORIES_TTL) {
+      return categoriesCache.data
+    }
+
+    categoriesPromise = (async () => {
+      try {
+        const response = await api.get<Categoria[]>('/categorias')
+        categoriesCache = { data: response.data, timestamp: Date.now() }
+        return response.data
+      } finally {
+        categoriesPromise = null
+      }
+    })()
+
+    return categoriesPromise
   },
 
   getSubcategorias: async (categoriaId: string) => {

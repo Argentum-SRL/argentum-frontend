@@ -5,7 +5,6 @@ import { Plus, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useFinancial } from '@/hooks/useFinancial'
-import { MOCK_COTIZACION_USD } from '@/lib/mock/billeteras.mock'
 import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
 import BankPickerModal from '@/components/billeteras/BankPickerModal'
@@ -56,8 +55,11 @@ function EstadoVacio({ onCrear }: { onCrear: () => void }) {
 // ── Totales hero ──────────────────────────────────────────────────────────────
 
 function TotalesHero({ billeteras }: { billeteras: Billetera[] }) {
-  const cotizacion = MOCK_COTIZACION_USD
-  const { totalARS, totalUSD, equivalenteTotal } = calcularTotales(billeteras, cotizacion.valor)
+  const { cotizacion } = useFinancial()
+  const valorUSD = cotizacion?.venta ?? 0
+  const tipoLabel = cotizacion?.nombre ?? 'Blue'
+  
+  const { totalARS, totalUSD, equivalenteTotal } = calcularTotales(billeteras, valorUSD)
 
   return (
     <div className={styles.totals}>
@@ -65,7 +67,7 @@ function TotalesHero({ billeteras }: { billeteras: Billetera[] }) {
         <p className={styles.totalLbl}>Equivalente total</p>
         <p className={styles.tmMainVal}>{formatSaldo(equivalenteTotal, 'ARS')}</p>
         <span className={styles.totalBadge}>
-          USD {cotizacion.tipo} · {formatSaldo(cotizacion.valor, 'ARS')}
+          USD {tipoLabel} · {formatSaldo(valorUSD, 'ARS')}
         </span>
       </div>
 

@@ -37,6 +37,7 @@ function FinancialDataInternal({
   const [dashboard, setDashboard] = useState<DashboardResumen | null>(null)
   const [metas, setMetas] = useState<MetaFinanciera[]>([])
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([])
+  const [cotizacion, setCotizacion] = useState<import('../types').CotizacionDolar | null>(null)
   
   const [isLoading, setIsLoading] = useState(true)
   const [hasLoaded, setHasLoaded] = useState(false)
@@ -49,9 +50,10 @@ function FinancialDataInternal({
     if (!hasLoaded) setIsLoading(true)
     
     try {
-      const [billeterasRes, dashboardRes] = await Promise.all([
+      const [billeterasRes, dashboardRes, cotizacionRes] = await Promise.all([
         billeteraService.list(),
         dashboardService.getResumen().catch(() => null),
+        dashboardService.getCotizacion().catch(() => null),
       ])
 
       if (Array.isArray(billeterasRes)) {
@@ -63,6 +65,7 @@ function FinancialDataInternal({
       }
 
       setDashboard(dashboardRes)
+      setCotizacion(cotizacionRes)
       setMetas([])
       setPresupuestos([])
       
@@ -108,7 +111,8 @@ function FinancialDataInternal({
       refreshAll,
       refreshBilleteras, 
       setBilleteras,
-      setDashboard
+      setDashboard,
+      cotizacion
     }}>
       {children}
     </FinancialContext.Provider>

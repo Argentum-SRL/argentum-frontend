@@ -35,4 +35,5 @@ export interface FinancialContextType {
   refreshBilleteras: () => Promise<void>
   setBilleteras: React.Dispatch<React.SetStateAction<Billetera[]>>
   setDashboard: React.Dispatch<React.SetStateAction<DashboardResumen | null>>
+  cotizacion: import('./index').CotizacionDolar | null
 }

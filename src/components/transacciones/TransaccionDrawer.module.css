@@ -299,6 +299,22 @@
   cursor: pointer;
 }
 
+.btnDelete {
+  flex: 1;
+  border: 1.5px solid #FEE2E2;
+  border-radius: 14px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: #DC2626;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.btnDelete:hover {
+  background: #FEF2F2;
+}
+
 .btnSubmit {
   flex: 2;
   background: var(--primary);

@@ -192,6 +192,24 @@ export default function TransaccionDrawer({
     }
   }
 
+  const handleDelete = async () => {
+    if (!transaccion) return
+    if (!window.confirm('¿Estás seguro de que querés eliminar esta transacción?')) return
+    
+    setIsSubmitting(true)
+    try {
+      await transaccionService.deleteTransaccion(transaccion.id)
+      showToast('Transacción eliminada', 'success')
+      onSuccess()
+      onClose()
+    } catch (error) {
+      console.error(error)
+      showToast('Error al eliminar la transacción', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const modalTitle = (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: '16px' }}>
       <span style={{ fontSize: '18px', fontWeight: 600 }}>{isEdit ? 'Editar transacción' : 'Nueva transacción'}</span>
@@ -411,6 +429,11 @@ export default function TransaccionDrawer({
           <button className={styles.btnCancel} onClick={onClose} disabled={isSubmitting}>
             Cancelar
           </button>
+          {isEdit && (
+            <button className={styles.btnDelete} onClick={handleDelete} disabled={isSubmitting}>
+              Eliminar
+            </button>
+          )}
           <button className={styles.btnSubmit} onClick={handleSubmit} disabled={isSubmitting || !montoRaw || !descripcion || !billeteraId}>
             {isSubmitting ? 'Guardando...' : (metodoPago === 'credito' && !isEdit && cantidadCuotas > 1 ? `Guardar · ${cantidadCuotas} cuotas` : 'Guardar transacción')}
           </button>

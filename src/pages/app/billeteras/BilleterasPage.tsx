@@ -1,7 +1,7 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useFinancial } from '@/hooks/useFinancial'
@@ -95,8 +95,10 @@ export default function BilleterasPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [billeteraAEditar, setBilleteraAEditar] = useState<Billetera | null>(null)
+  const [showArchived, setShowArchived] = useState(false)
 
   const billeterasActivas = billeteras.filter((b) => b.estado === 'activa')
+  const billeterasArchivadas = billeteras.filter((b) => b.estado === 'archivada')
   const billeterasRegulares = billeterasActivas.filter((b) => !b.es_efectivo)
   const billeterasEfectivo = billeterasActivas.filter((b) => b.es_efectivo)
 
@@ -108,6 +110,38 @@ export default function BilleterasPage() {
       if (b) showToast(`"${b.nombre}" archivada`, 'success')
     } catch {
       showToast('Error al archivar la billetera', 'error')
+    }
+  }
+
+  const handleDesarchivar = async (id: string) => {
+    const b = billeteras.find((b) => b.id === id)
+    try {
+      await billeteraService.desarchivar(id)
+      await refreshBilleteras()
+      if (b) showToast(`"${b.nombre}" reactivada`, 'success')
+    } catch {
+      showToast('Error al desarchivar la billetera', 'error')
+    }
+  }
+
+  const handleEliminar = async (id: string) => {
+    const b = billeteras.find((b) => b.id === id)
+    if (!b) return
+
+    const confirmacion = window.confirm(`¿Estás seguro de que querés eliminar "${b.nombre}"? Esta acción no se puede deshacer.`)
+    if (!confirmacion) return
+
+    try {
+      await billeteraService.delete(id)
+      await refreshBilleteras()
+      showToast(`"${b.nombre}" eliminada exitosamente`, 'success')
+    } catch (error: unknown) {
+      let msg = 'Error al eliminar la billetera'
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosErr = error as { response?: { data?: { detail?: string } } }
+        msg = axiosErr.response?.data?.detail || msg
+      }
+      showToast(msg, 'error')
     }
   }
 
@@ -188,6 +222,8 @@ export default function BilleterasPage() {
               key={b.id}
               billetera={b}
               onArchivar={handleArchivar}
+              onDesarchivar={handleDesarchivar}
+              onEliminar={handleEliminar}
               onEditar={handleEditar}
             />
           ))}
@@ -215,6 +251,41 @@ export default function BilleterasPage() {
         billetera={billeteraAEditar}
         billeteraPrincipalActual={billeteras.find((b) => b.es_principal)}
       />
+
+      {/* ── Sección de archivadas ─────────────────────────────────────────── */}
+      {!isLoading && billeterasArchivadas.length > 0 && (
+        <div className={styles.archivedSection}>
+          <div className={styles.archivedHeader}>
+            <h2 className={styles.archivedTitle}>
+              Billeteras archivadas ({billeterasArchivadas.length})
+            </h2>
+            <button 
+              className={styles.showArchivedBtn}
+              onClick={() => setShowArchived(!showArchived)}
+            >
+              {showArchived ? (
+                <><EyeOff size={16} /> Ocultar</>
+              ) : (
+                <><Eye size={16} /> Ver todas</>
+              )}
+            </button>
+          </div>
+
+          {showArchived && (
+            <div className={styles.grid}>
+              {billeterasArchivadas.map((b) => (
+                <BilleteraCard
+                  key={b.id}
+                  billetera={b}
+                  onDesarchivar={handleDesarchivar}
+                  onEliminar={handleEliminar}
+                  onEditar={handleEditar}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

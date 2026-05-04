@@ -1,7 +1,7 @@
 // ─── BilleteraCard ────────────────────────────────────────────────────────────
 
-import { useState, useEffect } from 'react'
-import { Edit2, Archive, CreditCard, DollarSign, Plus } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Edit2, Archive, CreditCard, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BilleteraCard.module.css'
@@ -9,6 +9,8 @@ import styles from './BilleteraCard.module.css'
 export interface BilleteraCardProps {
   billetera: Billetera
   onArchivar?: (id: string) => void
+  onDesarchivar?: (id: string) => void
+  onEliminar?: (id: string) => void
   onEditar?: (id: string) => void
 }
 
@@ -17,7 +19,13 @@ const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
   USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
 }
 
-export default function BilleteraCard({ billetera, onArchivar, onEditar }: BilleteraCardProps) {
+export default function BilleteraCard({ 
+  billetera, 
+  onArchivar, 
+  onDesarchivar,
+  onEliminar, 
+  onEditar 
+}: BilleteraCardProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
 
@@ -44,6 +52,8 @@ export default function BilleteraCard({ billetera, onArchivar, onEditar }: Bille
     ? `Efectivo ${billetera.moneda}`
     : bank?.nombre ?? billetera.nombre
 
+  const bgRef = useRef<HTMLDivElement>(null)
+
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
     if (!menuOpen) return
@@ -52,10 +62,17 @@ export default function BilleteraCard({ billetera, onArchivar, onEditar }: Bille
     return () => document.removeEventListener('click', handleClick)
   }, [menuOpen])
 
+  // Set background variable via ref to avoid inline style lint errors
+  useEffect(() => {
+    if (bgRef.current) {
+      bgRef.current.style.setProperty('--wc-bg', background)
+    }
+  }, [background])
+
   return (
-    <div className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''}`}>
+    <div className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''}`}>
       {/* Fondo clipeado */}
-      <div className={styles.wcBg} style={{ background }}>
+      <div className={styles.wcBg} ref={bgRef}>
         <div className={styles.decoA} aria-hidden="true" />
         <div className={styles.decoB} aria-hidden="true" />
       </div>
@@ -120,10 +137,33 @@ export default function BilleteraCard({ billetera, onArchivar, onEditar }: Bille
                     onClick={() => { onEditar?.(billetera.id); setMenuOpen(false) }}>
                     <Edit2 size={13} strokeWidth={1.75} /> Editar
                   </button>
-                  <button className={styles.dropdownItem} role="menuitem"
-                    onClick={() => { onArchivar?.(billetera.id); setMenuOpen(false) }}>
-                    <Archive size={13} strokeWidth={1.75} /> Archivar
-                  </button>
+
+                  {billetera.estado === 'activa' ? (
+                    billetera.tiene_transacciones ? (
+                      <button className={styles.dropdownItem} role="menuitem"
+                        onClick={() => { onArchivar?.(billetera.id); setMenuOpen(false) }}>
+                        <Archive size={13} strokeWidth={1.75} /> Archivar
+                      </button>
+                    ) : (
+                      <button className={`${styles.dropdownItem} ${styles.deleteItem}`} role="menuitem"
+                        onClick={() => { onEliminar?.(billetera.id); setMenuOpen(false) }}>
+                        <Trash2 size={13} strokeWidth={1.75} /> Eliminar
+                      </button>
+                    )
+                  ) : (
+                    <>
+                      <button className={styles.dropdownItem} role="menuitem"
+                        onClick={() => { onDesarchivar?.(billetera.id); setMenuOpen(false) }}>
+                        <RotateCcw size={13} strokeWidth={1.75} /> Desarchivar
+                      </button>
+                      {!billetera.tiene_transacciones && (
+                        <button className={`${styles.dropdownItem} ${styles.deleteItem}`} role="menuitem"
+                          onClick={() => { onEliminar?.(billetera.id); setMenuOpen(false) }}>
+                          <Trash2 size={13} strokeWidth={1.75} /> Eliminar
+                        </button>
+                      )}
+                    </>
+                  )}
                 </div>
               )}
             </div>

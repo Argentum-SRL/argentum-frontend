@@ -329,8 +329,52 @@
 
 .emptyBtn:hover { opacity: 0.88; }
 
+/* ── Sección de archivadas ─────────────────────────────────────────────────── */
+.archivedSection {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+
+.archivedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.archivedTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.showArchivedBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.showArchivedBtn:hover {
+  background: rgba(13, 32, 69, 0.05);
+}
+
+[data-theme="dark"] .showArchivedBtn:hover {
+  background: rgba(72, 120, 184, 0.1);
+}
+
 /* ── Reduced motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .skeletonCard { animation: none; background: var(--surface-alt); }
-  .nuevaBtn     { transition: none; }
+  .nuevaBtn, .showArchivedBtn { transition: none; }
 }

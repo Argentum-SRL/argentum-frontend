@@ -21,12 +21,22 @@
   }
 }
 
+.archived {
+  filter: grayscale(0.8) opacity(0.6);
+  transition: filter 0.3s ease;
+}
+
+.archived:hover {
+  filter: grayscale(0.3) opacity(0.9);
+}
+
 /* ── Fondo clipeado ──────────────────────────────────────────────────────── */
 .wcBg {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   overflow: hidden;
+  background: var(--wc-bg, #0D2045);
 }
 
 .decoA {
@@ -225,6 +235,14 @@
 
 .dropdownItem:hover { background: #F5F4F0; }
 .dropdownItem:first-child { border-bottom: 1px solid #F0EEE8; }
+
+.deleteItem {
+  color: #DC2626;
+}
+
+.deleteItem:hover {
+  background: #FEF2F2;
+}
 
 /* ── Balance ─────────────────────────────────────────────────────────────── */
 .wcBalance {

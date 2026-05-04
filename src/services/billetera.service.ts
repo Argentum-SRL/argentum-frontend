@@ -16,7 +16,7 @@ const billeteraService = {
     return data
   },
 
-  remove: async (id: string) => {
+  delete: async (id: string) => {
     await api.delete(`/billeteras/${id}`)
     return true
   },

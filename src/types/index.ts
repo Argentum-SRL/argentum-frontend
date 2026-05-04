@@ -123,6 +123,7 @@ export interface Billetera {
   estado: 'activa' | 'archivada'
   fecha_creacion: string
   bank_id?: string | null
+  tiene_transacciones: boolean
 }
 
 export interface Categoria {

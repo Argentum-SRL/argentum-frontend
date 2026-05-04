@@ -18,7 +18,7 @@
     left: 0;
     top: 0;
     height: 100dvh;
-    background: var(--primary);
+    background: #0D2045;
     z-index: 30;
     overflow: hidden;
 
@@ -33,28 +33,7 @@
   }
 }
 
-/* Decorative circles */
-.decoTop {
-  position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07); /* intentional: decorative overlay on primary */
-  pointer-events: none;
-}
-
-.decoBottom {
-  position: absolute;
-  bottom: -40px;
-  left: -40px;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05); /* intentional: decorative overlay on primary */
-  pointer-events: none;
-}
+/* Decorative circles removed */
 
 /* ── Logo ────────────────────────────────────────────────────────────────── */
 
@@ -64,7 +43,7 @@
   /* Collapsed: center the moon icon */
   justify-content: center;
   gap: 0;
-  padding: 20px 0 16px;
+  padding: 24px 0 20px;
   position: relative;
   z-index: 1;
   text-decoration: none;
@@ -88,13 +67,13 @@
 .sidebar:hover .logo {
   justify-content: flex-start;
   gap: 10px;
-  padding: 20px 18px 16px;
+  padding: 24px 20px 20px;
 }
 
 .logoText {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
-  color: #fff;
+  color: white;
   letter-spacing: -0.3px;
   white-space: nowrap;
   /* Hidden when collapsed — zero width removes it from layout */
@@ -134,51 +113,62 @@
 
 .navSeparator {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08); /* intentional: subtle separator on primary */
-  margin: 10px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 8px 12px;
   transition: margin 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar:hover .navSeparator {
-  margin: 10px 20px;
+  margin: 8px 12px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  border-radius: 12px;
+  border-radius: 10px;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+  border: none;
   white-space: nowrap;
   overflow: hidden;
+  cursor: pointer;
 
   /* Collapsed: center icon, no gap */
   justify-content: center;
   gap: 0;
   padding: 10px 0;
-  transition: background 0.15s, color 0.15s,
+  transition: background 150ms, color 150ms,
               justify-content 240ms ease,
               gap 240ms ease,
               padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.navItem svg {
+  stroke: rgba(255, 255, 255, 0.35);
+  transition: stroke 150ms;
+}
+
 .sidebar:hover .navItem {
   justify-content: flex-start;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 12px;
 }
 
 .navItem:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .navItemActive {
-  background: rgba(255, 255, 255, 0.11) !important;
-  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: white !important;
   font-weight: 600;
+}
+
+.navItemActive svg {
+  stroke: white !important;
 }
 
 /* Label: hidden when collapsed, shown on hover */
@@ -195,56 +185,7 @@
   opacity: 1;
 }
 
-/* ── Theme button ────────────────────────────────────────────────────────── */
 
-.themeBtn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  border-radius: 12px;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-
-  /* Collapsed */
-  justify-content: center;
-  gap: 0;
-  padding: 10px 0;
-  transition: background 0.15s, color 0.15s,
-              justify-content 240ms ease,
-              gap 240ms ease,
-              padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.themeBtn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.sidebar:hover .themeBtn {
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 10px 16px;
-}
-
-.themeBtnLabel {
-  max-width: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-width 240ms cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 180ms ease;
-}
-
-.sidebar:hover .themeBtnLabel {
-  max-width: 160px;
-  opacity: 1;
-}
 
 /* ── Spacer ──────────────────────────────────────────────────────────────── */
 
@@ -258,7 +199,6 @@
   padding: 12px 8px;
   position: relative;
   z-index: 1;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   transition: padding 240ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -302,44 +242,37 @@
   padding: 10px 8px;
 }
 
-.logoutQuickAction {
+.logoutBtn {
+  display: block;
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  text-align: left;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
+  transition: color 150ms, max-height 220ms ease, opacity 180ms ease, margin-top 220ms ease;
 
   /* Hidden when collapsed */
   max-height: 0;
   opacity: 0;
   margin-top: 0;
-  border-width: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  transition: background 0.15s, border-color 0.15s,
-              max-height 220ms ease, opacity 180ms ease,
-              margin-top 220ms ease, padding 220ms ease,
-              border-width 220ms ease;
+  padding: 0;
 }
 
-.sidebar:hover .logoutQuickAction {
-  max-height: 52px;
+.sidebar:hover .logoutBtn {
+  max-height: 30px;
   opacity: 1;
-  margin-top: 8px;
-  border-width: 1px;
-  padding: 10px 12px;
+  margin-top: 12px;
+  padding: 4px 0;
 }
 
-.logoutQuickAction:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.28);
+.logoutBtn:hover {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: underline;
 }
 
 .avatar {
@@ -379,8 +312,8 @@
 
 .userName {
   font-size: 13px;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -388,7 +321,7 @@
 
 .userCiclo {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.3);
   margin-top: 1px;
   white-space: nowrap;
   overflow: hidden;

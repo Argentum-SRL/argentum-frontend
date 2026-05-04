@@ -87,10 +87,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* ── Desktop sidebar ──────────────────────── */}
       <aside className={styles.sidebar}>
-        {/* Decorative circles */}
-        <div className={styles.decoTop} aria-hidden="true" />
-        <div className={styles.decoBottom} aria-hidden="true" />
-
         {/* Logo */}
         <Link to="/app/dashboard" className={styles.logo} aria-label="Ir al dashboard">
           <MoonIcon />
@@ -131,6 +127,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Spacer */}
         <div className={styles.spacer} />
 
+        <div className={styles.navSeparator} />
+
         {/* User block */}
         <div className={styles.userBlock}>
           <Link to="/app/perfil" className={styles.userInner} aria-label="Ir al perfil">
@@ -149,16 +147,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </Link>
           <button
             type="button"
-            className={styles.themeBtn}
+            className={styles.navItem}
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
           >
             {theme === 'dark' ? <Sun {...ICON_PROPS} /> : <Moon {...ICON_PROPS} />}
-            <span className={styles.themeBtnLabel}>{theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}</span>
+            <span className={styles.navLabel}>{theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}</span>
           </button>
           <button
             type="button"
-            className={styles.logoutQuickAction}
+            className={styles.logoutBtn}
             onClick={() => { void logout() }}
           >
             Cerrar sesión

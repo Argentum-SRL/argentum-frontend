@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
@@ -14,8 +14,8 @@ import { useFinancial } from '@/hooks/useFinancial'
 
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
-import TransaccionDrawer from '@/components/transacciones/TransaccionDrawer'
-import RecurrentesPage from './RecurrentesPage'
+import TransaccionModal from '@/components/transacciones/TransaccionModal'
+import RecurrentesPage, { type RecurrentesPageRef } from './RecurrentesPage'
 
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
@@ -45,8 +45,9 @@ export default function TransaccionesPage() {
   const [pendientesIA, setPendientesIA] = useState<Transaccion[]>([])
   const [loading, setLoading] = useState(true)
 
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTx, setSelectedTx] = useState<Transaccion | null>(null)
+  const recurrentesRef = useRef<RecurrentesPageRef>(null)
 
   const hasActiveFilters = Object.entries(filters).some(([k, v]) => {
     if (k === 'fecha_desde' || k === 'fecha_hasta') {
@@ -97,11 +98,17 @@ export default function TransaccionesPage() {
   }, [fetchTransacciones, fetchPendientes, setGlobalBilleteras])
 
   useEffect(() => {
-    fetchData()
+    const tid = setTimeout(() => {
+      void fetchData()
+    }, 0)
+    return () => clearTimeout(tid)
   }, [fetchData])
 
   useEffect(() => {
-    fetchTransacciones()
+    const tid = setTimeout(() => {
+      void fetchTransacciones()
+    }, 0)
+    return () => clearTimeout(tid)
   }, [filters, fetchTransacciones])
 
 
@@ -110,13 +117,13 @@ export default function TransaccionesPage() {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
     if (tx) {
       setSelectedTx(tx)
-      setDrawerOpen(true)
+      setIsModalOpen(true)
     }
   }
 
   const openNewTransaccion = () => {
     setSelectedTx(null)
-    setDrawerOpen(true)
+    setIsModalOpen(true)
   }
 
   const handleClearFilters = () => {
@@ -152,24 +159,22 @@ export default function TransaccionesPage() {
         </div>
         <div className={styles.actions}>
           <button className={styles.btnGhost} title="Próximamente">
-            <Download size={16} style={{ marginRight: 6, display: 'inline-block', verticalAlign: '-3px' }} />
+            <Download size={16} className={styles.btnIcon} />
             Exportar
           </button>
           <button 
-            className={styles.btnGhost} 
+            className={`${styles.btnGhost} ${activeTab === 'recurrentes' ? styles.btnTabActive : ''}`} 
             onClick={() => setActiveTab(activeTab === 'historial' ? 'recurrentes' : 'historial')}
-            style={{ background: activeTab === 'recurrentes' ? '#F5F4F0' : 'transparent' }}
           >
-            <ArrowLeftRight size={16} style={{ marginRight: 6, display: 'inline-block', verticalAlign: '-3px' }} />
+            <ArrowLeftRight size={16} className={styles.btnIcon} />
             Recurrentes
           </button>
           <button 
-            className={styles.btnGhost} 
-            style={{ background: '#0D2045', color: 'white' }}
-            onClick={openNewTransaccion}
+            className={`${styles.btnGhost} ${styles.btnPrimary}`}
+            onClick={activeTab === 'historial' ? openNewTransaccion : () => recurrentesRef.current?.openNew()}
           >
-            <Plus size={16} style={{ marginRight: 6, display: 'inline-block', verticalAlign: '-3px' }} />
-            Nueva transacción
+            <Plus size={16} className={styles.btnIcon} />
+            {activeTab === 'historial' ? 'Nueva transacción' : 'Nueva recurrente'}
           </button>
         </div>
       </div>
@@ -195,8 +200,7 @@ export default function TransaccionesPage() {
                 <div className={styles.heroMetric}>
                   <span className={styles.heroLabel}>Pendientes IA</span>
                   <button 
-                    className={styles.heroBadgePending} 
-                    style={{ border: 'none', cursor: 'pointer' }}
+                    className={`${styles.heroBadgePending} ${styles.heroBadgeBtn}`} 
                     onClick={() => setFilters({ ...filters, estado_verificacion: 'pendiente' })}
                   >
                     {pendientesIA.length} sin revisar
@@ -227,7 +231,7 @@ export default function TransaccionesPage() {
                 className={styles.pendientesLink}
                 onClick={() => setFilters({ ...filters, estado_verificacion: 'pendiente' })}
               >
-                Ver pendientes <ArrowRight size={14} style={{ display: 'inline-block', verticalAlign: '-3px' }} />
+                Ver pendientes <ArrowRight size={14} className={styles.btnIcon} />
               </button>
             </div>
           )}
@@ -241,12 +245,12 @@ export default function TransaccionesPage() {
                 {hasActiveFilters ? (
                   <>
                     <p>No encontramos transacciones con esos filtros.</p>
-                    <button className={styles.btnGhost} style={{ background: '#F5F4F0' }} onClick={handleClearFilters}>Limpiar filtros</button>
+                    <button className={`${styles.btnGhost} ${styles.btnGhostBg}`} onClick={handleClearFilters}>Limpiar filtros</button>
                   </>
                 ) : (
                   <>
                     <p>Todavía no registraste ninguna transacción este ciclo.</p>
-                    <button className={styles.btnGhost} style={{ background: '#0D2045', color: 'white' }} onClick={openNewTransaccion}>Registrar primera transacción</button>
+                    <button className={`${styles.btnGhost} ${styles.btnPrimary}`} onClick={openNewTransaccion}>Registrar primera transacción</button>
                   </>
                 )}
               </div>
@@ -265,13 +269,13 @@ export default function TransaccionesPage() {
           </div>
         </>
       ) : (
-        <RecurrentesPage embedded />
+        <RecurrentesPage ref={recurrentesRef} embedded />
       )}
 
-      {/* ── Drawer ─────────────────────────────────────────────────────────── */}
-      <TransaccionDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+      {/* ── Modal ── */}
+      <TransaccionModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         transaccion={selectedTx}
         billeteras={billeteras}
         categorias={categorias}

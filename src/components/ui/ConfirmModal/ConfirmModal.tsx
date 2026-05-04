@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { AlertTriangle, Info } from 'lucide-react'
+import Modal from '@/components/ui/Modal/Modal'
 import styles from './ConfirmModal.module.css'
 
 /**
@@ -46,19 +47,6 @@ export function ConfirmModal({
     await onConfirm()
   }, [requireTyping, inputValue, isLoading, onConfirm])
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        handleClose()
-      }
-    }
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown)
-    }
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, handleClose])
-
-  if (!isOpen) return null
 
   const isTypingCorrect = requireTyping ? inputValue === requireTyping : true
   const canConfirm = isTypingCorrect && !isLoading
@@ -82,8 +70,14 @@ export function ConfirmModal({
   }
 
   return (
-    <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && handleClose()}>
-      <div className={styles.modal} role="dialog" aria-modal="true">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      showHeader={false}
+      size="sm"
+      autoHeight
+    >
+      <div className={styles.modalContent}>
         <div className={[styles.iconWrap, iconClassMap[variant]].join(' ')}>
           {iconMap[variant]}
         </div>
@@ -126,6 +120,6 @@ export function ConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }

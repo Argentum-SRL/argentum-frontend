@@ -268,13 +268,13 @@
 
 
 
-.drawerFooter {
+.modalFooter {
   display: flex;
   gap: 12px;
   margin-top: 32px;
 }
 
-.drawerForm {
+.modalForm {
   display: flex;
   flex-direction: column;
 }

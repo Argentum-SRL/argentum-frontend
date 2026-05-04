@@ -1,10 +1,11 @@
 export function formatMonto(monto: number, moneda: 'ARS' | 'USD'): string {
+  const safeMonto = isNaN(monto) || monto === null || monto === undefined ? 0 : monto
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: moneda,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(monto)
+  }).format(safeMonto)
 }
 
 export function formatFecha(fecha: string | Date): string {

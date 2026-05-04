@@ -3,7 +3,7 @@ import { X, Search, ChevronDown, Filter, Calendar } from 'lucide-react'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
-import { Drawer } from '@/components/ui/Drawer/Drawer'
+import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 
 interface FilterBarProps {
@@ -40,6 +40,7 @@ export default function FilterBar({
 }: FilterBarProps) {
   const [catPopoverOpen, setCatPopoverOpen] = useState(false)
   const [datePopoverOpen, setDatePopoverOpen] = useState(false)
+  const [localSearch, setLocalSearch] = useState(filters.busqueda || '')
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
 
   const catRef = useRef<HTMLDivElement>(null)
@@ -47,6 +48,22 @@ export default function FilterBar({
 
   useClickOutside(catRef, () => setCatPopoverOpen(false))
   useClickOutside(dateRef, () => setDatePopoverOpen(false))
+
+  // Debounce para la búsqueda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== (filters.busqueda || '')) {
+        onFilterChange({ ...filters, busqueda: localSearch || undefined })
+      }
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [localSearch, filters, onFilterChange])
+
+  const [prevBusqueda, setPrevBusqueda] = useState(filters.busqueda)
+  if (filters.busqueda !== prevBusqueda) {
+    setLocalSearch(filters.busqueda || '')
+    setPrevBusqueda(filters.busqueda)
+  }
 
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {
     onFilterChange({ ...filters, tipo })
@@ -71,7 +88,7 @@ export default function FilterBar({
   }
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFilterChange({ ...filters, busqueda: e.target.value })
+    setLocalSearch(e.target.value)
   }
 
   const activeBilletera = billeteras.find(b => b.id === filters.billetera_id)
@@ -101,16 +118,16 @@ export default function FilterBar({
   )
 
   const renderDateForm = () => (
-    <form onSubmit={handleDateSubmit} className={styles.dateGroup}>
+      <form onSubmit={handleDateSubmit} className={styles.dateGroup}>
       <div>
-        <label className={styles.popoverTitle} style={{ display: 'block', fontSize: 10 }}>Desde</label>
-        <input type="date" name="desde" defaultValue={filters.fecha_desde} className={styles.dateInput} style={{ width: '100%' }} />
+        <label className={styles.dateLabel} htmlFor="filter-desde">Desde</label>
+        <input id="filter-desde" type="date" name="desde" defaultValue={filters.fecha_desde} className={styles.dateInputFull} />
       </div>
       <div>
-        <label className={styles.popoverTitle} style={{ display: 'block', fontSize: 10 }}>Hasta</label>
-        <input type="date" name="hasta" defaultValue={filters.fecha_hasta} className={styles.dateInput} style={{ width: '100%' }} />
+        <label className={styles.dateLabel} htmlFor="filter-hasta">Hasta</label>
+        <input id="filter-hasta" type="date" name="hasta" defaultValue={filters.fecha_hasta} className={styles.dateInputFull} />
       </div>
-      <button type="submit" className={styles.typePillActive} style={{ padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer', marginTop: 4 }}>
+      <button type="submit" className={`${styles.typePillActive} ${styles.dateSubmitBtn}`}>
         Aplicar
       </button>
     </form>
@@ -166,27 +183,27 @@ export default function FilterBar({
           </div>
         )}
 
-        <div className={styles.pill} style={{ position: 'relative' }} ref={catRef}>
-          <div className={styles.pillIcon} onClick={() => setCatPopoverOpen(!catPopoverOpen)} style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
+        <div className={`${styles.pill} ${styles.pillRelative}`} ref={catRef}>
+          <div className={styles.pillIconFlex} onClick={() => setCatPopoverOpen(!catPopoverOpen)}>
             {activeCategoria ? activeCategoria.nombre : 'Categoría'}
             <ChevronDown size={14} />
           </div>
           {catPopoverOpen && (
-            <div className={styles.popover} style={{ display: window.innerWidth >= 768 ? 'block' : 'none' }}>
+            <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
               <div className={styles.popoverTitle}>Categoría</div>
               {renderCategoriasList()}
             </div>
           )}
         </div>
 
-        <div className={styles.pill} style={{ position: 'relative' }} ref={dateRef}>
-          <div className={styles.pillIcon} onClick={() => setDatePopoverOpen(!datePopoverOpen)} style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
+        <div className={`${styles.pill} ${styles.pillRelative}`} ref={dateRef}>
+          <div className={styles.pillIconFlex} onClick={() => setDatePopoverOpen(!datePopoverOpen)}>
             <Calendar size={14} />
             Período
             <ChevronDown size={14} />
           </div>
           {datePopoverOpen && (
-            <div className={styles.popover} style={{ display: window.innerWidth >= 768 ? 'block' : 'none' }}>
+            <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
               <div className={styles.popoverTitle}>Rango de fechas</div>
               {renderDateForm()}
             </div>
@@ -199,7 +216,8 @@ export default function FilterBar({
             type="text"
             className={styles.searchInput}
             placeholder="Buscar..."
-            value={filters.busqueda || ''}
+            title="Buscar transacción"
+            value={localSearch}
             onChange={handleSearchChange}
           />
         </div>
@@ -211,9 +229,9 @@ export default function FilterBar({
         )}
       </div>
 
-      {/* Mobile Drawer */}
-      <Drawer isOpen={mobileDrawerOpen} onClose={() => setMobileDrawerOpen(false)} title="Filtros">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '0 4px 20px' }}>
+      {/* Mobile Modal */}
+      <Modal isOpen={mobileDrawerOpen} onClose={() => setMobileDrawerOpen(false)} title="Filtros">
+        <div className={styles.mobileDrawerContainer}>
           <div>
             <div className={styles.popoverTitle}>Categoría</div>
             {renderCategoriasList()}
@@ -223,12 +241,12 @@ export default function FilterBar({
             {renderDateForm()}
           </div>
           {hasActiveFilters && (
-            <button className={styles.clearBtn} onClick={() => { onClear(); setMobileDrawerOpen(false) }} style={{ width: '100%', textAlign: 'center', background: '#FEE2E2', color: '#DC2626', borderRadius: 12, padding: 12, textDecoration: 'none' }}>
+            <button className={styles.clearBtnMobile} onClick={() => { onClear(); setMobileDrawerOpen(false) }}>
               Limpiar todos los filtros
             </button>
           )}
         </div>
-      </Drawer>
+      </Modal>
     </>
   )
 }

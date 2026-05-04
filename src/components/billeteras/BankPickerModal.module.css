@@ -1,56 +1,5 @@
 /* ─── BankPickerModal.module.css ─────────────────────────────────────────── */
 
-/* ── Overlay ──────────────────────────────────────────────────────────────── */
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  background: rgba(10, 13, 18, 0.5);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  animation: fadeIn 180ms ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ── Modal container ──────────────────────────────────────────────────────── */
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95vw;
-  /* height explícita para que flex:1 en slidesContainer funcione */
-  height: 85dvh;
-  max-height: 90dvh;
-  background: var(--surface);
-  border-radius: 24px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.18),
-    0 4px 16px rgba(0, 0, 0, 0.08);
-  animation: slideUp 220ms cubic-bezier(0.34, 1.2, 0.64, 1);
-}
-
-@keyframes slideUp {
-  from { opacity: 0; scale: 0.97; }
-  to   { opacity: 1; scale: 1; }
-}
-
-@media (min-width: 540px) {
-  .modal { width: 520px; height: min(85dvh, 640px); }
-}
-
-.modalAuto {
-  height: auto !important;
-  max-height: 90dvh !important;
-}
-
 /* ── Indicador de pasos ───────────────────────────────────────────────────── */
 .stepIndicator {
   display: flex;
@@ -83,6 +32,8 @@
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  height: 600px;
+  max-height: 85dvh;
 }
 
 .slide {
@@ -751,22 +702,8 @@
 
 /* ── Mobile ─────────────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .overlay {
-    align-items: flex-end;
-    padding: 0;
-  }
-
-  .modal {
-    width: 100%;
-    max-width: 100%;
-    max-height: 90dvh;
-    border-radius: 24px 24px 0 0;
-    animation: slideUpMobile 240ms cubic-bezier(0.34, 1.1, 0.64, 1);
-  }
-
-  @keyframes slideUpMobile {
-    from { transform: translateY(60px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
+  .slidesContainer {
+    height: 85dvh;
   }
 
   .pickerGrid {

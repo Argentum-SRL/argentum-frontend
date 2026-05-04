@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useImperativeHandle } from 'react'
 import { 
   Plus, 
   ArrowUpRight, 
@@ -18,7 +18,7 @@ import categoriaService from '@/services/categoria.service'
 import type { TransaccionRecurrente, Billetera, Categoria } from '@/types'
 import { formatMonto } from '@/utils/format'
 import Button from '@/components/ui/Button/Button'
-import { Drawer } from '@/components/ui/Drawer/Drawer'
+import Modal from '@/components/ui/Modal/Modal'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
@@ -27,7 +27,11 @@ interface RecurrentesPageProps {
   embedded?: boolean
 }
 
-const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) => {
+export interface RecurrentesPageRef {
+  openNew: () => void
+}
+
+const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProps>(({ embedded = false }, ref) => {
   const [recurrentes, setRecurrentes] = useState<TransaccionRecurrente[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -49,6 +53,10 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
     frecuencia: 'mensual' as 'semanal' | 'quincenal' | 'mensual',
     dia_registro: 1
   })
+
+  useImperativeHandle(ref, () => ({
+    openNew: () => handleOpenModal()
+  }))
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -239,13 +247,7 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
             <Plus size={18} /> Nueva recurrente
           </Button>
         </header>
-      ) : (
-        <div className={styles.embeddedHeader}>
-          <Button onClick={() => handleOpenModal()}>
-            <Plus size={18} /> Nueva recurrente
-          </Button>
-        </div>
-      )}
+      ) : null}
 
       {loading ? (
         <div className={styles.loadingState}>Cargando...</div>
@@ -280,13 +282,13 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
       )}
 
 
-      <Drawer
+      <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingId ? 'Editar Recurrente' : 'Nueva Recurrente'}
-        width={480}
+        size="md"
       >
-        <div className={styles.drawerForm}>
+        <div className={styles.modalForm}>
           <div className={styles.formGrid}>
             <div className={styles.fullWidth}>
               <label htmlFor="form-desc" className={styles.label}>Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
@@ -418,12 +420,12 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
             </div>
           </div>
 
-          <div className={styles.drawerFooter}>
+          <div className={styles.modalFooter}>
             <Button variant="secondary" onClick={() => setIsModalOpen(false)} fullWidth>Cancelar</Button>
             <Button onClick={handleSave} fullWidth>Guardar configuración</Button>
           </div>
         </div>
-      </Drawer>
+      </Modal>
 
       <ConfirmModal
         isOpen={!!deleteTarget}
@@ -437,6 +439,6 @@ const RecurrentesPage: React.FC<RecurrentesPageProps> = ({ embedded = false }) =
       />
     </div>
   )
-}
+})
 
 export default RecurrentesPage

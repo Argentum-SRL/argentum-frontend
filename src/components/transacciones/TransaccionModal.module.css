@@ -1,4 +1,4 @@
-.drawerContent {
+.modalContent {
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -297,7 +297,7 @@
 }
 
 /* Footer */
-.drawerFooter {
+.modalFooter {
   padding: 16px 24px 24px;
   border-top: 1px solid var(--surface-alt);
   display: flex;
@@ -364,7 +364,6 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding-right: 16px;
 }
 
 .modalTitleText {

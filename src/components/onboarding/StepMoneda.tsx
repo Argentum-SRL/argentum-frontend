@@ -87,12 +87,19 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
 
         <div className={styles.field}>
           <label className={styles.toggleLabel}>
-            <div className={[styles.toggle, secundaria ? styles.toggleOn : ''].filter(Boolean).join(' ')}
+            <div
+              className={[styles.toggle, secundaria ? styles.toggleOn : ''].filter(Boolean).join(' ')}
               onClick={() => setSecundaria((v) => !v)}
               role="checkbox"
               aria-checked={secundaria}
+              title="Alternar moneda secundaria"
               tabIndex={0}
-              onKeyDown={(e) => e.key === ' ' && setSecundaria((v) => !v)}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault()
+                  setSecundaria((v) => !v)
+                }
+              }}
             >
               <div className={styles.toggleThumb} />
             </div>

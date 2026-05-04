@@ -246,3 +246,27 @@
   color: #8E9198;
   font-weight: 500;
 }
+
+.btnIcon {
+  margin-right: 6px;
+  display: inline-block;
+  vertical-align: -3px;
+}
+
+.btnPrimary {
+  background: #0D2045 !important;
+  color: white !important;
+}
+
+.btnTabActive {
+  background: #F5F4F0 !important;
+}
+
+.heroBadgeBtn {
+  border: none;
+  cursor: pointer;
+}
+
+.btnGhostBg {
+  background: #F5F4F0;
+}

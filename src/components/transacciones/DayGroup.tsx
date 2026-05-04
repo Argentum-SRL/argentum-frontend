@@ -49,14 +49,12 @@ export default function DayGroup({
   let hasEgresos = false
 
   transacciones.forEach(tx => {
-    // Para simplificar, si hay USD y ARS mezclados, mostramos ARS por defecto, 
-    // pero idealmente deberíamos separar o mostrar el principal.
-    // Aquí acumulamos basándonos en la moneda principal de la primera tx.
     const isIngreso = tx.tipo === 'ingreso'
     if (isIngreso) hasIngresos = true
     if (!isIngreso) hasEgresos = true
     
-    const amount = isIngreso ? tx.monto : -tx.monto
+    const rawMonto = Number(tx.monto) || 0
+    const amount = isIngreso ? rawMonto : -rawMonto
     if (tx.moneda === 'ARS') totalARS += amount
     else totalUSD += amount
   })

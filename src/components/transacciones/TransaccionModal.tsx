@@ -13,11 +13,11 @@ import type { Transaccion, Billetera, Categoria } from '@/types'
 import transaccionService from '@/services/transaccion.service'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { formatMonto } from '@/utils/format'
-import styles from './TransaccionDrawer.module.css'
+import styles from './TransaccionModal.module.css'
 import { useToast } from '@/hooks/useToast'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
-interface TransaccionDrawerProps {
+interface TransaccionModalProps {
   open: boolean
   onClose: () => void
   transaccion?: Transaccion | null
@@ -91,14 +91,14 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-export default function TransaccionDrawer({
+export default function TransaccionModal({
   open,
   onClose,
   transaccion,
   billeteras,
   categorias,
   onSuccess,
-}: TransaccionDrawerProps) {
+}: TransaccionModalProps) {
   const isEdit = !!transaccion
   const { showToast } = useToast()
 
@@ -280,7 +280,7 @@ export default function TransaccionDrawer({
 
   return (
     <Modal isOpen={open} onClose={onClose} title={modalTitle} size="md">
-      <div className={styles.drawerContent}>
+      <div className={styles.modalContent}>
         {/* Hero Monto */}
         <div
           className={`${styles.montoCard} ${
@@ -502,7 +502,7 @@ export default function TransaccionDrawer({
           </div>
         )}
 
-        <div className={styles.drawerFooter}>
+        <div className={styles.modalFooter}>
           <button className={styles.btnCancel} onClick={onClose} disabled={isSubmitting}>
             Cancelar
           </button>

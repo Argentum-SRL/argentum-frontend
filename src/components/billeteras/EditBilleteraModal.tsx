@@ -1,10 +1,11 @@
-import { useEffect, useCallback, useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 import { X, Check } from 'lucide-react'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import type { BankDefinition } from '@/lib/constants/banks'
 import styles from './BankPickerModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
+import Modal from '@/components/ui/Modal/Modal'
 
 export interface EditPayload {
   nombre: string
@@ -101,22 +102,6 @@ export default function EditBilleteraModal({
     }
   }, [isOpen, billetera])
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    },
-    [onClose],
-  )
-
-  useEffect(() => {
-    if (!isOpen) return
-    document.addEventListener('keydown', handleKeyDown)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = ''
-    }
-  }, [isOpen, handleKeyDown])
 
   if (!isOpen || !billetera) return null
 
@@ -145,109 +130,113 @@ export default function EditBilleteraModal({
   const muestraAdvertencia = esPrincipal && !billetera.es_principal && billeteraPrincipalActual
 
   return (
-    <div
-      className={styles.overlay}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Editar billetera"
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      showHeader={false}
+      noPadding
+      autoHeight
+      ariaLabel="Editar billetera"
     >
-      <div className={`${styles.modal} ${styles.modalAuto}`}>
-        <form onSubmit={handleSubmit} className={`${styles.formContainer} ${styles.formContainerFlex}`}>
-          
-          <div className={styles.formHeader}>
-            <div className={`${styles.bankPreview} ${styles.bankPreviewNoMargin}`}>
-              <EditLogo bank={bank} customNombre={billetera.nombre} />
-              <div className={styles.bankPreviewInfo}>
-                <p className={styles.bankPreviewNombre}>Editar Billetera</p>
-                <p className={styles.bankPreviewTipo}>{billetera.nombre}</p>
-              </div>
+      <form onSubmit={handleSubmit} className={`${styles.formContainer} ${styles.formContainerFlex}`}>
+        
+        <div className={styles.formHeader}>
+          <div className={`${styles.bankPreview} ${styles.bankPreviewNoMargin}`}>
+            <EditLogo bank={bank} customNombre={billetera.nombre} />
+            <div className={styles.bankPreviewInfo}>
+              <p className={styles.bankPreviewNombre}>Editar Billetera</p>
+              <p className={styles.bankPreviewTipo}>{billetera.nombre}</p>
             </div>
-
-            <button
-              type="button"
-              className={styles.closeBtn}
-              onClick={onClose}
-              aria-label="Cerrar"
-            >
-              <X size={18} strokeWidth={1.75} />
-            </button>
           </div>
 
-          <div className={styles.formBody}>
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel} htmlFor="edit-nombre">
-                Nombre
-              </label>
-              <input
-                id="edit-nombre"
-                type="text"
-                className={styles.fieldInput}
-                value={nombre}
-                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
-                placeholder="Nombre de tu billetera"
-                required
-                autoFocus
-              />
-            </div>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            <X size={18} strokeWidth={1.75} />
+          </button>
+        </div>
 
-            <div className={styles.formField}>
-              <MontoInput
-                value={saldo}
-                onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
-                moneda={billetera.moneda}
-                label="Saldo inicial"
-                placeholder="0"
-                allowDecimals
-                optional
-              />
-            </div>
-
-            <button
-              type="button"
-              className={styles.principalRow}
-              onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
-              role="checkbox"
-              aria-checked={esPrincipal}
-            >
-              <div className={`${styles.checkbox} ${esPrincipal ? styles.checkboxActive : ''}`}>
-                {esPrincipal && <Check size={11} strokeWidth={3} color="white" />}
-              </div>
-              <div className={styles.principalInfo}>
-                <span className={styles.principalLabel}>Marcar como principal</span>
-                <span className={styles.principalSub}>
-                  Se usa por defecto al registrar transacciones
-                </span>
-              </div>
-            </button>
-
-            {muestraAdvertencia && (
-              <div className={styles.warningBox}>
-                <span className={styles.warningIcon}>⚠️</span>
-                <p className={styles.warningText}>
-                  Esto va a quitar el estado principal de{' '}
-                  <strong>{billeteraPrincipalActual?.nombre}</strong>.
-                </p>
-              </div>
-            )}
+        <div className={styles.formBody}>
+          <div className={styles.formField}>
+            <label className={styles.fieldLabel} htmlFor="edit-nombre">
+              Nombre
+            </label>
+            <input
+              id="edit-nombre"
+              type="text"
+              className={styles.fieldInput}
+              value={nombre}
+              onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
+              placeholder="Nombre de tu billetera"
+              required
+              autoFocus
+            />
           </div>
 
-          <div className={styles.formFooter}>
-            <button type="button" className={styles.cancelBtn} onClick={onClose}>
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className={styles.crearBtn}
-              disabled={!nombre.trim() || isSubmitting}
-            >
-              {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
-            </button>
+          <div className={styles.formField}>
+            <MontoInput
+              value={saldo}
+              onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
+              moneda={billetera.moneda}
+              label="Saldo inicial"
+              placeholder="0"
+              allowDecimals
+              optional
+            />
           </div>
-        </form>
-      </div>
-    </div>
+
+          <button
+            type="button"
+            className={styles.principalRow}
+            onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
+            role="checkbox"
+            aria-checked={esPrincipal}
+            aria-label="Marcar como principal"
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault()
+                dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })
+              }
+            }}
+          >
+            <div className={`${styles.checkbox} ${esPrincipal ? styles.checkboxActive : ''}`}>
+              {esPrincipal && <Check size={11} strokeWidth={3} color="white" />}
+            </div>
+            <div className={styles.principalInfo}>
+              <span className={styles.principalLabel}>Marcar como principal</span>
+              <span className={styles.principalSub}>
+                Se usa por defecto al registrar transacciones
+              </span>
+            </div>
+          </button>
+
+          {muestraAdvertencia && (
+            <div className={styles.warningBox}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <p className={styles.warningText}>
+                Esto va a quitar el estado principal de{' '}
+                <strong>{billeteraPrincipalActual?.nombre}</strong>.
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.formFooter}>
+          <button type="button" className={styles.cancelBtn} onClick={onClose}>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className={styles.crearBtn}
+            disabled={!nombre.trim() || isSubmitting}
+          >
+            {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        </div>
+      </form>
+    </Modal>
   )
 }

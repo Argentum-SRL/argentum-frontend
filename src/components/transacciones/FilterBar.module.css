@@ -231,3 +231,70 @@
     display: none;
   }
 }
+
+.dateInputFull {
+  width: 100%;
+  border: 1px solid #EDECEA;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+.dateLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #8E9198;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.dateSubmitBtn {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.pillRelative {
+  position: relative !important;
+}
+
+.pillIconFlex {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.popoverDesktopOnly {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .popoverDesktopOnly {
+    display: block !important;
+  }
+}
+
+.mobileDrawerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 4px 20px;
+}
+
+.clearBtnMobile {
+  width: 100% !important;
+  text-align: center !important;
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+  border: none !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}

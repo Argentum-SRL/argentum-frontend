@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { Loader2 } from 'lucide-react'
 import styles from './Button.module.css'
 
@@ -13,7 +13,7 @@ interface ButtonProps {
   fullWidth?: boolean
 }
 
-export default function Button({
+const Button = memo(({
   children,
   onClick,
   type = 'button',
@@ -22,7 +22,7 @@ export default function Button({
   variant = 'primary',
   className,
   fullWidth = false,
-}: ButtonProps) {
+}: ButtonProps) => {
   const cls = [
     styles.btn, 
     styles[variant], 
@@ -47,4 +47,8 @@ export default function Button({
       )}
     </button>
   )
-}
+})
+
+Button.displayName = 'Button'
+
+export default Button

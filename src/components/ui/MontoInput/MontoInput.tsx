@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react'
+import { useRef, useCallback, useState, memo } from 'react'
 import styles from './MontoInput.module.css'
 
 interface MontoInputProps {
@@ -38,7 +38,7 @@ function limpiarParaNumero(str: string): string {
   return str.replace(/\./g, '').replace(',', '.')
 }
 
-export default function MontoInput({
+const MontoInput = memo(({
   value,
   onChange,
   moneda = 'ARS',
@@ -54,7 +54,7 @@ export default function MontoInput({
   ghost = false,
   optional = false,
   prefixClassName,
-}: MontoInputProps) {
+}: MontoInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   
   // Sincronizar el estado local con el prop value
@@ -229,4 +229,8 @@ export default function MontoInput({
       )}
     </div>
   )
-}
+})
+
+MontoInput.displayName = 'MontoInput'
+
+export default MontoInput

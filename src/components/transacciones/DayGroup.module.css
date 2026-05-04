@@ -1,0 +1,50 @@
+.container {
+  margin-bottom: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.total {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.totalText {
+  color: var(--text);
+}
+
+.totalPos {
+  color: #16A34A;
+}
+
+.totalMixed {
+  color: var(--text-2);
+}
+
+.list {
+  background: var(--surface);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.rowWrapper {
+  display: block;
+}
+
+.rowWrapperBorder {
+  border-bottom: 1px solid var(--border);
+}

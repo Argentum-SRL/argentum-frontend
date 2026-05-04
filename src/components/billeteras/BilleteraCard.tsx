@@ -1,6 +1,6 @@
 // ─── BilleteraCard ────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import { Edit2, Archive, CreditCard, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
@@ -19,13 +19,13 @@ const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
   USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
 }
 
-export default function BilleteraCard({ 
+const BilleteraCard = memo(({ 
   billetera, 
   onArchivar, 
   onDesarchivar,
   onEliminar, 
   onEditar 
-}: BilleteraCardProps) {
+}: BilleteraCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
 
@@ -123,6 +123,7 @@ export default function BilleteraCard({
               className={styles.kebabBtn}
               onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p) }}
               aria-label="Opciones"
+              aria-haspopup="true"
               aria-expanded={menuOpen}
             >
               <div className={styles.dot} />
@@ -195,11 +196,15 @@ export default function BilleteraCard({
       </div>
     </div>
   )
-}
+})
+
+BilleteraCard.displayName = 'BilleteraCard'
+
+export default BilleteraCard
 
 // ─── Card "Nueva billetera" — fila en mobile, columna en desktop ──────────────
 
-export function NuevaBilleteraCard({ onClick }: { onClick: () => void }) {
+export const NuevaBilleteraCard = memo(({ onClick }: { onClick: () => void }) => {
   return (
     <button className={styles.wcAdd} onClick={onClick} aria-label="Agregar nueva billetera">
       <div className={styles.addIcon}>
@@ -211,4 +216,6 @@ export function NuevaBilleteraCard({ onClick }: { onClick: () => void }) {
       </div>
     </button>
   )
-}
+})
+
+NuevaBilleteraCard.displayName = 'NuevaBilleteraCard'

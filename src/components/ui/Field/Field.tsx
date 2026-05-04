@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import styles from './Field.module.css'
 
 interface FieldProps {
@@ -16,7 +16,7 @@ interface FieldProps {
   id?: string
 }
 
-export default function Field({
+const Field = memo(({
   label,
   value,
   onChange,
@@ -29,7 +29,7 @@ export default function Field({
   inputMode,
   maxLength,
   id,
-}: FieldProps) {
+}: FieldProps) => {
   const inputCls = [
     styles.input,
     error ? styles.inputError : '',
@@ -61,4 +61,8 @@ export default function Field({
       {hint && !error && <p className={styles.hint}>{hint}</p>}
     </div>
   )
-}
+})
+
+Field.displayName = 'Field'
+
+export default Field

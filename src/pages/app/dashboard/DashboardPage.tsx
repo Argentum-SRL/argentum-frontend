@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, memo, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   Bell, 
@@ -23,11 +23,13 @@ import styles from './DashboardPage.module.css'
 
 // ── Components ───────────────────────────────────────────────────────────
 
-const Greeting = ({ nombre }: { nombre: string | null }) => {
-  const hour = new Date().getHours()
-  let greeting = 'Buenas noches'
-  if (hour >= 6 && hour < 12) greeting = 'Buenos días'
-  else if (hour >= 12 && hour < 20) greeting = 'Buenas tardes'
+const Greeting = memo(({ nombre }: { nombre: string | null }) => {
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours()
+    if (hour >= 6 && hour < 12) return 'Buenos días'
+    if (hour >= 12 && hour < 20) return 'Buenas tardes'
+    return 'Buenas noches'
+  }, [])
 
   return (
     <div className={styles.headerLeft}>
@@ -37,13 +39,15 @@ const Greeting = ({ nombre }: { nombre: string | null }) => {
       <p className={styles.subtitle}>Tu panorama financiero</p>
     </div>
   )
-}
+})
+Greeting.displayName = 'Greeting'
 
-const BalanceSkeleton = () => (
+const BalanceSkeleton = memo(() => (
   <div className={`${styles.skeleton} ${styles.skeletonBalance}`} />
-)
+))
+BalanceSkeleton.displayName = 'BalanceSkeleton'
 
-const ListSkeleton = () => (
+const ListSkeleton = memo(() => (
   <div className={styles.list}>
     {[1, 2, 3, 4].map(i => (
       <div key={i} className={styles.skeletonRow}>
@@ -55,9 +59,10 @@ const ListSkeleton = () => (
       </div>
     ))}
   </div>
-)
+))
+ListSkeleton.displayName = 'ListSkeleton'
 
-const Cotizacion = () => {
+const Cotizacion = memo(() => {
   const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -68,15 +73,21 @@ const Cotizacion = () => {
       .finally(() => setLoading(false))
   }, [])
 
+  const formattedMonto = useMemo(() => {
+    if (!cotizacion) return ''
+    return formatMonto(cotizacion.venta || 0, 'ARS').replace('ARS', '').trim()
+  }, [cotizacion])
+
   if (loading || !cotizacion) return null
 
   return (
     <div className={styles.cotizacion}>
       <span className={styles.cotLabel}>USD {cotizacion.tipo}:</span>
-      <span className={styles.cotValue}>{formatMonto(cotizacion.venta || 0, 'ARS').replace('ARS', '').trim()}</span>
+      <span className={styles.cotValue}>{formattedMonto}</span>
     </div>
   )
-}
+})
+Cotizacion.displayName = 'Cotizacion'
 
 // ── Main Page ────────────────────────────────────────────────────────────
 
@@ -118,20 +129,18 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchData()
-      fetchProyeccion()
+    const tid = setTimeout(() => {
+      void fetchData()
+      void fetchProyeccion()
     }, 0)
-    return () => clearTimeout(timer)
+    return () => clearTimeout(tid)
   }, [fetchData, fetchProyeccion])
 
-
-
-  const handleResetPeriod = () => {
+  const handleResetPeriod = useCallback(() => {
     setCustomRange(null)
-  }
+  }, [])
 
-  const handleCustomRangeSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCustomRangeSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const desde = formData.get('desde') as string
@@ -140,7 +149,22 @@ export default function DashboardPage() {
       setCustomRange({ desde, hasta })
       setIsDatePickerOpen(false)
     }
-  }
+  }, [])
+
+  const handleOpenProyeccion = useCallback(() => {
+    if (proyeccion) {
+      open('proyeccion', { data: { proyeccion } })
+    }
+  }, [proyeccion, open])
+
+  const toggleDatePicker = useCallback(() => {
+    setIsDatePickerOpen(prev => !prev)
+  }, [])
+
+  const handleRetry = useCallback(() => {
+    setLoading(true)
+    fetchData()
+  }, [fetchData])
 
   if (error) {
     return (
@@ -149,7 +173,7 @@ export default function DashboardPage() {
         <div className={styles.errorState}>
           <AlertCircle size={48} color="var(--error)" />
           <p>No pudimos cargar tu resumen. Intenta de nuevo.</p>
-          <button className={styles.retryBtn} onClick={() => { setLoading(true); fetchData(); }}>Reintentar</button>
+          <button className={styles.retryBtn} onClick={handleRetry}>Reintentar</button>
         </div>
       </div>
     )
@@ -165,7 +189,7 @@ export default function DashboardPage() {
             <div className={styles.headerInfo}>
               <div className={styles.cycleNavigation}>
                 <div className={styles.dateSelectorWrap}>
-                  <span className={styles.cycleDates} onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}>
+                  <span className={styles.cycleDates} onClick={toggleDatePicker}>
                     {formatFecha(data.periodo.fecha_inicio)} — {formatFecha(data.periodo.fecha_fin)}
                   </span>
                   {isDatePickerOpen && (
@@ -248,7 +272,7 @@ export default function DashboardPage() {
                   <span className={styles.secValue}>{formatMonto(data.disponible_real.disponible, 'ARS')}</span>
                 </div>
                 <div className={styles.secMetric}>
-                  <div className={styles.labelWithHint} onClick={() => proyeccion && open('proyeccion', { data: { proyeccion } })}>
+                  <div className={styles.labelWithHint} onClick={handleOpenProyeccion}>
                     <span className={styles.secLabel}>Proyección cierre</span>
                     {proyeccion && (
                       <div className={`${styles.confianzaDot} ${styles[proyeccion.nivel_confianza]}`} />
@@ -286,27 +310,25 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className={styles.list}>
-                {data?.ultimos_movimientos.map((m) => {
-                  return (
-                    <div key={m.id} className={styles.listItem}>
-                      <div className={styles.itemIcon}>
-                        <CategoriaIcon nombre={m.categoria_nombre || ''} size={32} />
-                      </div>
-                      <div className={styles.itemMeta}>
-                        <p className={styles.itemName}>{m.descripcion}</p>
-                        <p className={styles.itemSub}>
-                          {formatFecha(m.fecha)} • {m.billetera_nombre}
-                        </p>
-                        {m.estado_verificacion === 'pendiente' && (
-                          <span className={styles.pendingBadge}>Pendiente IA</span>
-                        )}
-                      </div>
-                      <div className={`${styles.itemAmount} ${m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg}`}>
-                        {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, 'ARS')}
-                      </div>
+                {data?.ultimos_movimientos.map((m) => (
+                  <div key={m.id} className={styles.listItem}>
+                    <div className={styles.itemIcon}>
+                      <CategoriaIcon nombre={m.categoria_nombre || ''} size={32} />
                     </div>
-                  )
-                })}
+                    <div className={styles.itemMeta}>
+                      <p className={styles.itemName}>{m.descripcion}</p>
+                      <p className={styles.itemSub}>
+                        {formatFecha(m.fecha)} • {m.billetera_nombre}
+                      </p>
+                      {m.estado_verificacion === 'pendiente' && (
+                        <span className={styles.pendingBadge}>Pendiente IA</span>
+                      )}
+                    </div>
+                    <div className={`${styles.itemAmount} ${m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg}`}>
+                      {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, 'ARS')}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

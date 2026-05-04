@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { getCategoriaVisual } from '@/lib/utils/categoria.utils'
 import styles from './CategoriaIcon.module.css'
 
@@ -7,7 +8,7 @@ interface CategoriaIconProps {
   className?: string
 }
 
-export function CategoriaIcon({ nombre, size = 28, className }: CategoriaIconProps) {
+export const CategoriaIcon = memo(({ nombre, size = 28, className }: CategoriaIconProps) => {
   const visual = getCategoriaVisual(nombre)
   const sizeClass =
     size === 16 ? styles.size16 :
@@ -36,4 +37,6 @@ export function CategoriaIcon({ nombre, size = 28, className }: CategoriaIconPro
       </span>
     </div>
   )
-}
+})
+
+CategoriaIcon.displayName = 'CategoriaIcon'

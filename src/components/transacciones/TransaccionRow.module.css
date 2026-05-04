@@ -1,0 +1,102 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid var(--border);
+}
+
+.row:hover:not(.pendiente) {
+  background: var(--surface-alt);
+}
+
+.pendiente {
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.description {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badges {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.badgePendiente {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.badgeCuota {
+  background: #EEF2FF;
+  color: #4F46E5;
+}
+
+.badgeRecurrente {
+  background: #F0FDF4;
+  color: #16A34A;
+}
+
+.meta {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.amountArea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.amount {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.amountPos {
+  color: #16A34A;
+}
+
+.amountNeg {
+  color: var(--text);
+}
+
+.walletName {
+  font-size: 11px;
+  color: var(--text-2);
+}

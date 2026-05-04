@@ -1,7 +1,8 @@
-
+import { memo, useMemo } from 'react'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import TransaccionRow from './TransaccionRow'
 import { formatMonto } from '@/utils/format'
+import styles from './DayGroup.module.css'
 
 interface DayGroupProps {
   fecha: string // YYYY-MM-DD
@@ -34,65 +35,76 @@ function getDayLabel(fechaStr: string): string {
   return `${d} de ${MESES[m - 1]}`
 }
 
-export default function DayGroup({
+const DayGroup = memo(({
   fecha,
   transacciones,
   categorias,
   billeteras,
   onEdit
-}: DayGroupProps) {
-  if (transacciones.length === 0) return null
+}: DayGroupProps) => {
+  const dayLabel = useMemo(() => getDayLabel(fecha), [fecha])
 
-  let totalARS = 0
-  let totalUSD = 0
-  let hasIngresos = false
-  let hasEgresos = false
+  const { total, mainCurrency, totalColor } = useMemo(() => {
+    let totalARS = 0
+    let totalUSD = 0
+    let hasIngresos = false
+    let hasEgresos = false
 
-  transacciones.forEach(tx => {
-    const isIngreso = tx.tipo === 'ingreso'
-    if (isIngreso) hasIngresos = true
-    if (!isIngreso) hasEgresos = true
-    
-    const rawMonto = Number(tx.monto) || 0
-    const amount = isIngreso ? rawMonto : -rawMonto
-    if (tx.moneda === 'ARS') totalARS += amount
-    else totalUSD += amount
-  })
+    transacciones.forEach(tx => {
+      const isIngreso = tx.tipo === 'ingreso'
+      if (isIngreso) hasIngresos = true
+      if (!isIngreso) hasEgresos = true
+      
+      const rawMonto = Number(tx.monto) || 0
+      const amount = isIngreso ? rawMonto : -rawMonto
+      if (tx.moneda === 'ARS') totalARS += amount
+      else totalUSD += amount
+    })
 
-  // Usamos ARS si hay transacciones en ARS, sino USD
-  const mainCurrency: 'ARS' | 'USD' = totalARS !== 0 || totalUSD === 0 ? 'ARS' : 'USD'
-  const total = mainCurrency === 'ARS' ? totalARS : totalUSD
+    const mainCurr: 'ARS' | 'USD' = totalARS !== 0 || totalUSD === 0 ? 'ARS' : 'USD'
+    const tot = mainCurr === 'ARS' ? totalARS : totalUSD
 
-  let totalColor = 'var(--text)' // neutral
-  if (hasEgresos && !hasIngresos) totalColor = 'var(--text)' // egresos only -> negro o naranja? The brief says: "suma de egresos negativa si solo hay egresos, verde si solo ingresos, gris neutro si mixto" -> Actually it says "gris neutro si mixto". Wait, for egresos, should it be black? The brief doesn't specify color for egresos, just "negativa". I'll use black for negative, green for positive, gray for mixed.
-  if (!hasEgresos && hasIngresos) totalColor = '#16A34A' // solo ingresos -> verde
-  if (hasEgresos && hasIngresos) totalColor = 'var(--text-2)' // mixto -> gris neutro
+    let color = 'var(--text)'
+    if (hasEgresos && !hasIngresos) color = 'var(--text)'
+    if (!hasEgresos && hasIngresos) color = '#16A34A'
+    if (hasEgresos && hasIngresos) color = 'var(--text-2)'
+
+    return { total: tot, mainCurrency: mainCurr, totalColor: color }
+  }, [transacciones])
+
+  const totalClass = useMemo(() => {
+    if (totalColor === '#16A34A') return styles.totalPos
+    if (totalColor === 'var(--text-2)') return styles.totalMixed
+    return styles.totalText
+  }, [totalColor])
 
   const formatTotal = (val: number, cur: 'ARS' | 'USD') => {
     const sign = val < 0 ? '-' : (val > 0 ? '+' : '')
     return `${sign}${formatMonto(Math.abs(val), cur)}`
   }
 
+  if (transacciones.length === 0) return null
+
   return (
-    <div style={{ marginBottom: 24 }}>
-      <div style={{ 
-        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-        padding: '0 20px', marginBottom: 12 
-      }}>
-        <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', margin: 0 }}>
-          {getDayLabel(fecha)}
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h3 className={styles.title}>
+          {dayLabel}
         </h3>
-        <span style={{ fontSize: 13, fontWeight: 600, color: totalColor }}>
+        <span className={`${styles.total} ${totalClass}`}>
           {formatTotal(total, mainCurrency)}
         </span>
       </div>
       
-      <div style={{ background: 'var(--surface)', borderRadius: 20, overflow: 'hidden', border: '1px solid var(--border)' }}>
+      <div className={styles.list}>
         {transacciones.map((tx, idx) => {
           const cat = categorias.find(c => c.id === tx.categoria_id)
           const bill = billeteras.find(b => b.id === tx.billetera_id)
           return (
-            <div key={tx.id} style={{ borderBottom: idx < transacciones.length - 1 ? '1px solid var(--border)' : 'none' }}>
+            <div 
+              key={tx.id} 
+              className={idx < transacciones.length - 1 ? styles.rowWrapperBorder : styles.rowWrapper}
+            >
               <TransaccionRow
                 transaccion={tx}
                 categoria={cat}
@@ -105,4 +117,8 @@ export default function DayGroup({
       </div>
     </div>
   )
-}
+})
+
+DayGroup.displayName = 'DayGroup'
+
+export default DayGroup

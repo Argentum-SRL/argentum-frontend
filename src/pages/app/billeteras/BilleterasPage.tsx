@@ -1,6 +1,6 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import { Plus, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
@@ -16,7 +16,7 @@ import styles from './BilleterasPage.module.css'
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 
-function SkeletonGrid() {
+const SkeletonGrid = memo(() => {
   return (
     <div className={styles.grid}>
       {[1, 2, 3, 4].map((i) => (
@@ -24,11 +24,12 @@ function SkeletonGrid() {
       ))}
     </div>
   )
-}
+})
+SkeletonGrid.displayName = 'SkeletonGrid'
 
 // ── Estado vacío ──────────────────────────────────────────────────────────────
 
-function EstadoVacio({ onCrear }: { onCrear: () => void }) {
+const EstadoVacio = memo(({ onCrear }: { onCrear: () => void }) => {
   return (
     <div className={styles.emptyState}>
       <div className={styles.emptyIcon} aria-hidden="true">
@@ -49,15 +50,19 @@ function EstadoVacio({ onCrear }: { onCrear: () => void }) {
       </button>
     </div>
   )
-}
+})
+EstadoVacio.displayName = 'EstadoVacio'
 
 // ── Totales hero ──────────────────────────────────────────────────────────────
 
-function TotalesHero({ billeteras, cotizacion }: { billeteras: Billetera[], cotizacion: CotizacionDolar | null }) {
+const TotalesHero = memo(({ billeteras, cotizacion }: { billeteras: Billetera[], cotizacion: CotizacionDolar | null }) => {
   const valorUSD = cotizacion?.venta ?? 0
   const tipoLabel = cotizacion?.nombre ?? 'Blue'
   
-  const { totalARS, totalUSD, equivalenteTotal } = calcularTotales(billeteras, valorUSD)
+  const { totalARS, totalUSD, equivalenteTotal } = useMemo(() => 
+    calcularTotales(billeteras, valorUSD), 
+    [billeteras, valorUSD]
+  )
 
   return (
     <div className={styles.totals}>
@@ -83,7 +88,8 @@ function TotalesHero({ billeteras, cotizacion }: { billeteras: Billetera[], coti
       </div>
     </div>
   )
-}
+})
+TotalesHero.displayName = 'TotalesHero'
 
 // ── Página principal ──────────────────────────────────────────────────────────
 
@@ -128,12 +134,28 @@ export default function BilleterasPage() {
 
   const [showArchived, setShowArchived] = useState(false)
 
-  const billeterasActivas = billeteras.filter((b) => b.estado === 'activa')
-  const billeterasArchivadas = billeteras.filter((b) => b.estado === 'archivada')
-  const billeterasRegulares = billeterasActivas.filter((b) => !b.es_efectivo)
-  const billeterasEfectivo = billeterasActivas.filter((b) => b.es_efectivo)
+  const { 
+    billeterasActivas, 
+    billeterasArchivadas, 
+    billeterasRegulares, 
+    billeterasEfectivo,
+    totalARSActivo
+  } = useMemo(() => {
+    const activas = billeteras.filter((b) => b.estado === 'activa')
+    const archivadas = billeteras.filter((b) => b.estado === 'archivada')
+    
+    return {
+      billeterasActivas: activas,
+      billeterasArchivadas: archivadas,
+      billeterasRegulares: activas.filter((b) => !b.es_efectivo),
+      billeterasEfectivo: activas.filter((b) => b.es_efectivo),
+      totalARSActivo: activas
+        .filter((b) => b.moneda === 'ARS')
+        .reduce((a, b) => a + b.saldo_actual, 0)
+    }
+  }, [billeteras])
 
-  const handleArchivar = async (id: string) => {
+  const handleArchivar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
     try {
       await billeteraService.archivar(id)
@@ -142,9 +164,9 @@ export default function BilleterasPage() {
     } catch {
       showToast('Error al archivar la billetera', 'error')
     }
-  }
+  }, [billeteras, fetchPageData, showToast])
 
-  const handleDesarchivar = async (id: string) => {
+  const handleDesarchivar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
     try {
       await billeteraService.desarchivar(id)
@@ -153,9 +175,9 @@ export default function BilleterasPage() {
     } catch {
       showToast('Error al desarchivar la billetera', 'error')
     }
-  }
+  }, [billeteras, fetchPageData, showToast])
 
-  const handleEliminar = async (id: string) => {
+  const handleEliminar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
     if (!b) return
 
@@ -179,9 +201,15 @@ export default function BilleterasPage() {
         }
       },
     })
-  }
+  }, [billeteras, confirm, fetchPageData, showToast])
 
-  const handleEditar = (id: string) => {
+  const handleGuardarEdicion = useCallback(async (id: string, payload: EditPayload) => {
+    await billeteraService.update(id, payload)
+    await fetchPageData()
+    showToast(`Billetera actualizada exitosamente`, 'success')
+  }, [fetchPageData, showToast])
+
+  const handleEditar = useCallback((id: string) => {
     const b = billeteras.find((b) => b.id === id)
     if (b) {
       open('editBilletera', {
@@ -192,15 +220,9 @@ export default function BilleterasPage() {
         },
       })
     }
-  }
+  }, [billeteras, open, handleGuardarEdicion])
 
-  const handleGuardarEdicion = async (id: string, payload: EditPayload) => {
-    await billeteraService.update(id, payload)
-    await fetchPageData()
-    showToast(`Billetera actualizada exitosamente`, 'success')
-  }
-
-  const handleCrear = async (payload: CreatePayload) => {
+  const handleCrear = useCallback(async (payload: CreatePayload) => {
     await billeteraService.create({
       nombre: payload.nombre,
       moneda: payload.moneda,
@@ -210,11 +232,11 @@ export default function BilleterasPage() {
     })
     await fetchPageData()
     showToast(`"${payload.nombre}" creada exitosamente`, 'success')
-  }
+  }, [fetchPageData, showToast])
 
   const monedaPrincipal = (usuario?.moneda_principal as 'ARS' | 'USD') ?? 'ARS'
 
-  const openCrearModal = () => {
+  const openCrearModal = useCallback(() => {
     open('bankPicker', {
       data: {
         billeterasActuales: billeteras,
@@ -222,7 +244,11 @@ export default function BilleterasPage() {
         onCrear: handleCrear,
       },
     })
-  }
+  }, [billeteras, open, monedaPrincipal, handleCrear])
+
+  const toggleShowArchived = useCallback(() => {
+    setShowArchived(prev => !prev)
+  }, [])
 
   return (
     <div className={styles.root}>
@@ -234,12 +260,7 @@ export default function BilleterasPage() {
             <p className={styles.pageSubtitle}>
               {billeterasActivas.length} activa{billeterasActivas.length !== 1 ? 's' : ''}
               {' · '}Total:{' '}
-              {formatSaldo(
-                billeteras
-                  .filter((b) => b.estado === 'activa' && b.moneda === 'ARS')
-                  .reduce((a, b) => a + b.saldo_actual, 0),
-                'ARS',
-              )}
+              {formatSaldo(totalARSActivo, 'ARS')}
             </p>
           )}
         </div>
@@ -298,7 +319,7 @@ export default function BilleterasPage() {
             </h2>
             <button 
               className={styles.showArchivedBtn}
-              onClick={() => setShowArchived(!showArchived)}
+              onClick={toggleShowArchived}
             >
               {showArchived ? (
                 <><EyeOff size={16} /> Ocultar</>

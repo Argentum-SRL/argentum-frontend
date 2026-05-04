@@ -46,12 +46,12 @@ export default function TransaccionesPage() {
   const { open } = useModal()
   const recurrentesRef = useRef<RecurrentesPageRef>(null)
 
-  const hasActiveFilters = Object.entries(filters).some(([k, v]) => {
+  const hasActiveFilters = useMemo(() => Object.entries(filters).some(([k, v]) => {
     if (k === 'fecha_desde' || k === 'fecha_hasta') {
       return v !== defaultFilters[k as keyof TransaccionFilters]
     }
     return v !== undefined && v !== ''
-  })
+  }), [filters, defaultFilters])
 
   const fetchTransacciones = useCallback(async () => {
     try {
@@ -103,9 +103,7 @@ export default function TransaccionesPage() {
     return () => clearTimeout(tid)
   }, [filters, fetchTransacciones])
 
-
-
-  const handleEdit = (id: string) => {
+  const handleEdit = useCallback((id: string) => {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
     if (tx) {
       open('transaccion', {
@@ -117,9 +115,9 @@ export default function TransaccionesPage() {
         },
       })
     }
-  }
+  }, [transacciones, pendientesIA, billeteras, categorias, open, fetchData])
 
-  const openNewTransaccion = () => {
+  const openNewTransaccion = useCallback(() => {
     open('transaccion', {
       data: {
         transaccion: null,
@@ -128,29 +126,49 @@ export default function TransaccionesPage() {
         onSuccess: fetchData,
       },
     })
-  }
+  }, [billeteras, categorias, open, fetchData])
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setFilters(defaultFilters)
-  }
+  }, [defaultFilters])
 
-  const agruparPorFecha = (txs: Transaccion[]) => {
-    const grupos: Record<string, Transaccion[]> = {}
-    txs.forEach(tx => {
+  const toggleTab = useCallback(() => {
+    setActiveTab(prev => prev === 'historial' ? 'recurrentes' : 'historial')
+  }, [])
+
+  const openNewRecurrente = useCallback(() => {
+    recurrentesRef.current?.openNew()
+  }, [])
+
+  const handleViewPendientes = useCallback(() => {
+    setFilters(prev => ({ ...prev, estado_verificacion: 'pendiente' }))
+  }, [])
+
+  const grupos = useMemo(() => {
+    const gruposObj: Record<string, Transaccion[]> = {}
+    transacciones.forEach(tx => {
       const fecha = tx.fecha.split('T')[0]
-      if (!grupos[fecha]) grupos[fecha] = []
-      grupos[fecha].push(tx)
+      if (!gruposObj[fecha]) gruposObj[fecha] = []
+      gruposObj[fecha].push(tx)
     })
-    return Object.entries(grupos).sort((a, b) => b[0].localeCompare(a[0]))
-  }
+    return Object.entries(gruposObj).sort((a, b) => b[0].localeCompare(a[0]))
+  }, [transacciones])
 
-  const grupos = agruparPorFecha(transacciones)
+  const { totalIngresos, totalEgresos, balance } = useMemo(() => {
+    let ingresos = 0
+    let egresos = 0
+    transacciones.forEach(t => {
+      if (t.tipo === 'ingreso') ingresos += t.monto
+      else egresos += t.monto
+    })
+    return {
+      totalIngresos: ingresos,
+      totalEgresos: egresos,
+      balance: ingresos - egresos
+    }
+  }, [transacciones])
 
-  // Calcular totales del período mostrado
-  const totalIngresos = transacciones.filter(t => t.tipo === 'ingreso').reduce((acc, t) => acc + t.monto, 0)
-  const totalEgresos = transacciones.filter(t => t.tipo === 'egreso').reduce((acc, t) => acc + t.monto, 0)
-  const balance = totalIngresos - totalEgresos
-  const mainCurrency = 'ARS' // Simplificado, idealmente viene de las preferencias
+  const mainCurrency = 'ARS' // Simplificado
 
   return (
     <div className={styles.page}>
@@ -168,14 +186,14 @@ export default function TransaccionesPage() {
           </button>
           <button 
             className={`${styles.btnGhost} ${activeTab === 'recurrentes' ? styles.btnTabActive : ''}`} 
-            onClick={() => setActiveTab(activeTab === 'historial' ? 'recurrentes' : 'historial')}
+            onClick={toggleTab}
           >
             <ArrowLeftRight size={16} className={styles.btnIcon} />
             Recurrentes
           </button>
           <button 
             className={`${styles.btnGhost} ${styles.btnPrimary}`}
-            onClick={activeTab === 'historial' ? openNewTransaccion : () => recurrentesRef.current?.openNew()}
+            onClick={activeTab === 'historial' ? openNewTransaccion : openNewRecurrente}
           >
             <Plus size={16} className={styles.btnIcon} />
             {activeTab === 'historial' ? 'Nueva transacción' : 'Nueva recurrente'}
@@ -205,7 +223,7 @@ export default function TransaccionesPage() {
                   <span className={styles.heroLabel}>Pendientes IA</span>
                   <button 
                     className={`${styles.heroBadgePending} ${styles.heroBadgeBtn}`} 
-                    onClick={() => setFilters({ ...filters, estado_verificacion: 'pendiente' })}
+                    onClick={handleViewPendientes}
                   >
                     {pendientesIA.length} sin revisar
                   </button>
@@ -233,7 +251,7 @@ export default function TransaccionesPage() {
               </div>
               <button 
                 className={styles.pendientesLink}
-                onClick={() => setFilters({ ...filters, estado_verificacion: 'pendiente' })}
+                onClick={handleViewPendientes}
               >
                 Ver pendientes <ArrowRight size={14} className={styles.btnIcon} />
               </button>

@@ -124,7 +124,7 @@ const BilleteraCard = memo(({
               onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p) }}
               aria-label="Opciones"
               aria-haspopup="true"
-              aria-expanded={menuOpen}
+              aria-expanded={menuOpen ? "true" : "false"}
             >
               <div className={styles.dot} />
               <div className={styles.dot} />

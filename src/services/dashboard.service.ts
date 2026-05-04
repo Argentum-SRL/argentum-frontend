@@ -1,5 +1,5 @@
 import api from './api'
-import type { DashboardResumen, CotizacionDolar, Proyeccion } from '../types'
+import type { DashboardResumen, CotizacionDolar, Proyeccion, Billetera } from '../types'
 
 // Cache storage
 let cotizacionCache: { data: CotizacionDolar; timestamp: number } | null = null
@@ -79,6 +79,18 @@ export const dashboardService = {
     })()
 
     return proyeccionPromise
+  },
+
+  getResumenCompleto: async (desde?: string, hasta?: string): Promise<{
+    billeteras: Billetera[];
+    resumen: DashboardResumen;
+    cotizacion: CotizacionDolar;
+  }> => {
+    // Esta llamada no usa cache por ahora para asegurar datos frescos al consolidar
+    const response = await api.get('/dashboard/resumen-completo', {
+      params: { desde, hasta }
+    })
+    return response.data
   },
 }
 

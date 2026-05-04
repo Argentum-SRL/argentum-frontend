@@ -62,27 +62,17 @@ const ListSkeleton = memo(() => (
 ))
 ListSkeleton.displayName = 'ListSkeleton'
 
-const Cotizacion = memo(() => {
-  const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    dashboardService.getCotizacion()
-      .then(setCotizacion)
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
+const Cotizacion = memo(({ data, loading }: { data: CotizacionDolar | null, loading: boolean }) => {
   const formattedMonto = useMemo(() => {
-    if (!cotizacion) return ''
-    return formatMonto(cotizacion.venta || 0, 'ARS').replace('ARS', '').trim()
-  }, [cotizacion])
+    if (!data) return ''
+    return formatMonto(data.venta || 0, 'ARS').replace('ARS', '').trim()
+  }, [data])
 
-  if (loading || !cotizacion) return null
+  if (loading || !data) return null
 
   return (
     <div className={styles.cotizacion}>
-      <span className={styles.cotLabel}>USD {cotizacion.tipo}:</span>
+      <span className={styles.cotLabel}>USD {data.tipo}:</span>
       <span className={styles.cotValue}>{formattedMonto}</span>
     </div>
   )
@@ -102,12 +92,18 @@ export default function DashboardPage() {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
   const { open } = useModal()
 
+  const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
+
   const fetchData = useCallback(async () => {
+    // Evitar setState sincrónico en useEffect
+    await Promise.resolve()
     setError(false)
     setLoading(true)
     try {
-      const res = await dashboardService.getResumen(customRange?.desde, customRange?.hasta)
-      setData(res)
+      // Endpoint consolidado: trae resumen, billeteras y cotización
+      const res = await dashboardService.getResumenCompleto(customRange?.desde, customRange?.hasta)
+      setData(res.resumen)
+      setCotizacion(res.cotizacion)
     } catch (err) {
       console.error('Error loading dashboard:', err)
       setError(true)
@@ -117,6 +113,8 @@ export default function DashboardPage() {
   }, [customRange])
 
   const fetchProyeccion = useCallback(async () => {
+    // Evitar setState sincrónico en useEffect
+    await Promise.resolve()
     try {
       setLoadingProyeccion(true)
       const res = await dashboardService.getProyeccion()
@@ -129,12 +127,25 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
-    const tid = setTimeout(() => {
+    let ignore = false
+
+    const load = async () => {
+      // Esperar un microtask para asegurar ejecución fuera del ciclo de renderizado sincrónico
+      await Promise.resolve()
+      if (ignore) return
+
       void fetchData()
-      void fetchProyeccion()
-    }, 0)
-    return () => clearTimeout(tid)
-  }, [fetchData, fetchProyeccion])
+      if (!customRange) {
+        void fetchProyeccion()
+      }
+    }
+
+    void load()
+
+    return () => {
+      ignore = true
+    }
+  }, [fetchData, fetchProyeccion, customRange])
 
   const handleResetPeriod = useCallback(() => {
     setCustomRange(null)
@@ -212,7 +223,7 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
-              <Cotizacion />
+              <Cotizacion data={cotizacion} loading={loading} />
             </div>
           )}
         </div>
@@ -384,7 +395,7 @@ export default function DashboardPage() {
       {/* Projection Card (Only shown if on current cycle) */}
       {!customRange && (
         <div className={styles.proyeccionSection}>
-          <ProyeccionCard />
+          <ProyeccionCard data={proyeccion} loading={loadingProyeccion} />
         </div>
       )}
     </div>

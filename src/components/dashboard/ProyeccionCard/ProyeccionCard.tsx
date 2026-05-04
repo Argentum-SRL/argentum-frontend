@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react'
 import { TrendingUp, Info, ChevronDown, ChevronUp, RefreshCcw } from 'lucide-react'
 import { formatMonto } from '@/utils/format'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
@@ -23,44 +23,65 @@ const ProgressBar = ({ progress }: { progress: number }) => {
   )
 }
 
-const ProyeccionCard: React.FC = () => {
-  const [proyeccion, setProyeccion] = useState<Proyeccion | null>(null)
-  const [loading, setLoading] = useState(true)
+interface ProyeccionCardProps {
+  data?: Proyeccion | null;
+  loading?: boolean;
+}
+
+const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: externalLoading }) => {
+  const [internalProyeccion, setInternalProyeccion] = useState<Proyeccion | null>(null)
+  const [internalLoading, setInternalLoading] = useState(true)
   const [error, setError] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const { open } = useModal()
 
+  const proyeccion = data !== undefined ? data : internalProyeccion
+  const loading = externalLoading !== undefined ? externalLoading : (data !== undefined ? false : internalLoading)
+
   const fetchProyeccion = useCallback(async () => {
+    if (data !== undefined) return // No fetchear si ya tenemos data
     try {
-      const data = await dashboardService.getProyeccion()
-      setProyeccion(data)
+      setInternalLoading(true)
+      const res = await dashboardService.getProyeccion()
+      setInternalProyeccion(res)
       setError(false)
     } catch (err) {
       console.error('Error fetching proyeccion:', err)
       setError(true)
     } finally {
-      setLoading(false)
+      setInternalLoading(false)
     }
-  }, [])
+  }, [data])
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchProyeccion()
-    }, 0)
-    return () => clearTimeout(timer)
-  }, [fetchProyeccion])
+    if (data === undefined) {
+      const tid = setTimeout(() => {
+        void fetchProyeccion()
+      }, 0)
+      return () => clearTimeout(tid)
+    }
+  }, [data, fetchProyeccion])
 
   const handleRetry = () => {
-    setLoading(true)
     setError(false)
     fetchProyeccion()
   }
+
+  const { progressPercent } = useMemo(() => {
+    if (!proyeccion) return { progressPercent: 0 }
+    
+    const actual = proyeccion.desglose_por_categoria.reduce((acc, cat) => acc + cat.gasto_actual_ciclo, 0)
+    const percent = Math.min(Math.round((actual / (proyeccion.gasto_proyectado_total || 1)) * 100), 100)
+    
+    return { progressPercent: percent }
+  }, [proyeccion])
 
   if (loading) {
     return <div className={`${styles.card} ${styles.skeleton} ${styles.skeletonCard}`} />
   }
 
   if (error || !proyeccion) {
+    if (data !== undefined) return null // Si viene por prop y no hay nada, no mostramos error (asumimos que el padre lo maneja)
     return (
       <div className={`${styles.card} ${styles.errorCard}`}>
         <p className={styles.errorText}>No pudimos calcular la proyección</p>
@@ -73,13 +94,6 @@ const ProyeccionCard: React.FC = () => {
   }
 
   const { gasto_proyectado_total, balance_proyectado, desglose_por_categoria, certezas } = proyeccion
-  
-  // Calcular gasto actual total (sumando categorias)
-  const gasto_actual_total = desglose_por_categoria.reduce((acc, cat) => acc + cat.gasto_actual_ciclo, 0)
-  
-  // El progreso es cuanto del proyectado ya se gasto (excluyendo certezas que son futuras)
-  // O mejor, cuanto del gasto_proyectado_total ya se gasto
-  const progressPercent = Math.min(Math.round((gasto_actual_total / (gasto_proyectado_total || 1)) * 100), 100)
 
   return (
     <div className={styles.card}>
@@ -131,7 +145,7 @@ const ProyeccionCard: React.FC = () => {
               const catProgress = Math.min(Math.round((cat.gasto_actual_ciclo / (cat.proyectado || 1)) * 100), 100)
               
               return (
-                <div key={cat.categoria_id || i} className={styles.categoryRow}>
+                <div key={cat.categoria_id || `cat-${i}`} className={styles.categoryRow}>
                   <div className={styles.categoryIcon}>
                     <CategoriaIcon nombre={cat.categoria_nombre} size={32} />
                   </div>

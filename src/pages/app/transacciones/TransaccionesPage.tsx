@@ -53,55 +53,83 @@ export default function TransaccionesPage() {
     return v !== undefined && v !== ''
   }), [filters, defaultFilters])
 
-  const fetchTransacciones = useCallback(async () => {
+  const fetchTransacciones = useCallback(async (signal?: AbortSignal) => {
     try {
       const data = await transaccionService.getTransacciones(filters)
-      setTransacciones(data)
+      if (!signal?.aborted) {
+        setTransacciones(data)
+      }
     } catch (err) {
-      console.error(err)
-      showToast('Error al cargar transacciones', 'error')
+      if (err instanceof Error && err.name !== 'AbortError') {
+        console.error(err)
+        showToast('Error al cargar transacciones', 'error')
+      }
     }
   }, [filters, showToast])
 
-  const fetchPendientes = useCallback(async () => {
+  const fetchPendientes = useCallback(async (signal?: AbortSignal) => {
     try {
       const data = await transaccionService.getPendientesIA()
-      setPendientesIA(data)
+      if (!signal?.aborted) {
+        setPendientesIA(data)
+      }
     } catch (err) {
       console.error(err)
     }
   }, [])
 
-  const fetchData = useCallback(async () => {
+  // Función para refrescar todo (usada por modales)
+  const refresh = useCallback(async () => {
     setLoading(true)
     try {
-      const [b, c] = await Promise.all([
-        billeteraService.list(),
-        categoriaService.getCategorias()
-      ])
-      setBilleteras(b.filter((w: Billetera) => w.estado === 'activa'))
-      setCategorias(c)
       await Promise.all([fetchTransacciones(), fetchPendientes()])
-    } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }
   }, [fetchTransacciones, fetchPendientes])
 
+  // 1. Carga de datos estáticos (Solo al montar)
   useEffect(() => {
-    const tid = setTimeout(() => {
-      void fetchData()
-    }, 0)
-    return () => clearTimeout(tid)
-  }, [fetchData])
+    let isMounted = true
+    const loadStatic = async () => {
+      try {
+        const [b, c] = await Promise.all([
+          billeteraService.list(),
+          categoriaService.getCategorias()
+        ])
+        if (isMounted) {
+          setBilleteras(b.filter((w: Billetera) => w.estado === 'activa'))
+          setCategorias(c)
+        }
+      } catch (err) {
+        console.error('Error loading static data:', err)
+      }
+    }
+    loadStatic()
+    return () => { isMounted = false }
+  }, [])
 
+  // 2. Carga de datos dinámicos (Cuando cambian los filtros)
   useEffect(() => {
-    const tid = setTimeout(() => {
-      void fetchTransacciones()
-    }, 0)
-    return () => clearTimeout(tid)
-  }, [filters, fetchTransacciones])
+    const controller = new AbortController()
+    
+    const loadDynamic = async () => {
+      setLoading(true)
+      try {
+        await Promise.all([
+          fetchTransacciones(controller.signal),
+          fetchPendientes(controller.signal)
+        ])
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      }
+    }
+    
+    loadDynamic()
+    return () => controller.abort()
+  }, [fetchTransacciones, fetchPendientes])
 
   const handleEdit = useCallback((id: string) => {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
@@ -111,11 +139,11 @@ export default function TransaccionesPage() {
           transaccion: tx,
           billeteras,
           categorias,
-          onSuccess: fetchData,
+          onSuccess: refresh,
         },
       })
     }
-  }, [transacciones, pendientesIA, billeteras, categorias, open, fetchData])
+  }, [transacciones, pendientesIA, billeteras, categorias, open, refresh])
 
   const openNewTransaccion = useCallback(() => {
     open('transaccion', {
@@ -123,10 +151,10 @@ export default function TransaccionesPage() {
         transaccion: null,
         billeteras,
         categorias,
-        onSuccess: fetchData,
+        onSuccess: refresh,
       },
     })
-  }, [billeteras, categorias, open, fetchData])
+  }, [billeteras, categorias, open, refresh])
 
   const handleClearFilters = useCallback(() => {
     setFilters(defaultFilters)

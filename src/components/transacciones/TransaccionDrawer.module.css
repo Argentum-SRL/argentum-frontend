@@ -1,0 +1,323 @@
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  gap: 16px;
+}
+
+/* Toggle Tipo */
+.typeToggle {
+  display: flex;
+  background: var(--surface-alt);
+  border-radius: 14px;
+  padding: 4px;
+}
+
+.typeBtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.typeBtnActiveEgreso {
+  background: white;
+  color: #0A0D12;
+  box-shadow: 0 2px 8px rgba(10,13,18,0.08);
+}
+
+.typeBtnActiveIngreso {
+  background: white;
+  color: #1A3D28;
+  box-shadow: 0 2px 8px rgba(10,13,18,0.08);
+}
+
+/* Campo Monto */
+.montoCard {
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.2s ease;
+}
+
+.montoCardEgreso {
+  background: var(--surface-alt);
+}
+
+.montoCardIngreso {
+  background: #F0FDF4;
+}
+
+.montoInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.montoPrefix {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.montoInput {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+}
+
+.montoInput::placeholder {
+  color: rgba(10, 13, 18, 0.2);
+}
+
+.monedaToggle {
+  display: flex;
+  gap: 4px;
+}
+
+.monedaBtn {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  background: white;
+  border: 1px solid var(--surface-alt);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.monedaBtnActive {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Secciones Generales */
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
+
+.textInput {
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: 'Figtree', sans-serif;
+  color: var(--text);
+  outline: none;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.textInput:focus {
+  border-color: var(--primary);
+}
+
+.selectInput {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E9198' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+/* Categorías Grid */
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.catBtn {
+  border-radius: 12px;
+  padding: 10px 8px;
+  border: 1.5px solid #F0EEE8;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.catBtnActive {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(13,32,69,0.06);
+}
+
+.catBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: white;
+  transform: scale(1.02);
+}
+
+.catName {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Método de pago */
+.methodGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.methodBtn {
+  border-radius: 12px;
+  padding: 10px 8px;
+  border: 1.5px solid var(--surface-alt);
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.methodBtnActive {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #F0F4FF;
+}
+
+/* Cuotas Section */
+.cuotasSection {
+  background: var(--surface-alt);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cuotasInputs {
+  display: flex;
+  gap: 12px;
+}
+
+.cuotaField {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cuotasSummary {
+  background: var(--primary);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.summaryCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summaryLbl {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.summaryVal {
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+}
+
+/* Billetera y Fecha */
+.row2 {
+  display: flex;
+  gap: 10px;
+}
+
+.row2 > div {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Footer */
+.drawerFooter {
+  padding: 16px 24px 24px;
+  border-top: 1px solid var(--surface-alt);
+  display: flex;
+  gap: 10px;
+  margin: 16px -24px -24px -24px;
+}
+
+.btnCancel {
+  flex: 1;
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 14px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 12px;
+  cursor: pointer;
+}
+
+.btnSubmit {
+  flex: 2;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.btnSubmit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+  .textInput, .montoInput, .cuotaInput {
+    font-size: 16px;
+  }
+}

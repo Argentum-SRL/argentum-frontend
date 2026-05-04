@@ -1,5 +1,4 @@
-import type { DashboardData } from '../lib/mock/dashboard.mock'
-import type { Billetera } from './index'
+import type { Billetera, DashboardResumen } from './index'
 
 export type { Billetera }
 
@@ -23,7 +22,7 @@ export interface Presupuesto {
 export interface FinancialContextType {
   // Data
   billeteras: Billetera[]
-  dashboard: DashboardData | null
+  dashboard: DashboardResumen | null
   metas: MetaFinanciera[]
   presupuestos: Presupuesto[]
 
@@ -35,5 +34,5 @@ export interface FinancialContextType {
   refreshAll: () => Promise<void>
   refreshBilleteras: () => Promise<void>
   setBilleteras: React.Dispatch<React.SetStateAction<Billetera[]>>
-  setDashboard: React.Dispatch<React.SetStateAction<DashboardData | null>>
+  setDashboard: React.Dispatch<React.SetStateAction<DashboardResumen | null>>
 }

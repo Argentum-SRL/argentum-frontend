@@ -5,7 +5,7 @@ import { X, ChevronLeft, Search, Check } from 'lucide-react'
 import { BANKS, BANK_SECTIONS, CUSTOM_COLORS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
 import type { Billetera } from '@/types'
-import { getBankLogoUrl, getInitials, formatSaldoInput, parseSaldoInput } from '@/lib/utils/billeteras.utils'
+import { getBankLogoUrl, getInitials, parseSaldoInput } from '@/lib/utils/billeteras.utils'
 
 export interface CreatePayload {
   nombre: string

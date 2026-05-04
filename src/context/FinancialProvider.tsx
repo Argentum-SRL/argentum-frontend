@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, type ReactNode, useRef } from 'react'
 import billeteraService from '../services/billetera.service'
-import { mockDashboard } from '../lib/mock/dashboard.mock'
-import type { DashboardData } from '../lib/mock/dashboard.mock'
+import { dashboardService } from '../services/dashboard.service'
+import type { DashboardResumen } from '../types'
 import type { Billetera, MetaFinanciera, Presupuesto } from '../types/financial'
 import { FinancialContext } from './FinancialContext'
 import { useAuth } from '../hooks/useAuth'
@@ -34,7 +34,7 @@ function FinancialDataInternal({
   isAuthenticated: boolean 
 }) {
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
-  const [dashboard, setDashboard] = useState<DashboardData | null>(null)
+  const [dashboard, setDashboard] = useState<DashboardResumen | null>(null)
   const [metas, setMetas] = useState<MetaFinanciera[]>([])
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([])
   
@@ -49,11 +49,9 @@ function FinancialDataInternal({
     if (!hasLoaded) setIsLoading(true)
     
     try {
-      const [billeterasRes] = await Promise.all([
+      const [billeterasRes, dashboardRes] = await Promise.all([
         billeteraService.list(),
-        Promise.resolve(mockDashboard),
-        Promise.resolve([]),
-        Promise.resolve([]),
+        dashboardService.getResumen().catch(() => null),
       ])
 
       if (Array.isArray(billeterasRes)) {
@@ -64,7 +62,7 @@ function FinancialDataInternal({
         })))
       }
 
-      setDashboard(mockDashboard)
+      setDashboard(dashboardRes)
       setMetas([])
       setPresupuestos([])
       

@@ -1,86 +1,58 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { Plus, ArrowLeftRight, Search, Trash2, MoreHorizontal } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
-import { getCategoryIcon } from '@/utils/categoryIcons'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
-import transferenciaService from '@/services/transferencia.service'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
-import type { Transaccion, Billetera, Categoria, Subcategoria } from '@/types'
-import { formatMonto, formatFecha } from '@/utils/format'
-import Button from '@/components/ui/Button/Button'
-import { Drawer } from '@/components/ui/Drawer/Drawer'
-import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
+import type { Transaccion, Billetera, Categoria } from '@/types'
+import { formatMonto } from '@/utils/format'
+import { calcularPeriodoActual } from '@/lib/utils/ciclo'
+import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
+import { useFinancial } from '@/hooks/useFinancial'
+
+import FilterBar from '@/components/transacciones/FilterBar'
+import DayGroup from '@/components/transacciones/DayGroup'
+import TransaccionDrawer from '@/components/transacciones/TransaccionDrawer'
 import RecurrentesPage from './RecurrentesPage'
 
-const TransaccionesPage: React.FC = () => {
-  // --- Estado de Tabs ---
+export default function TransaccionesPage() {
+  const { usuario } = useAuth()
+  const { showToast } = useToast()
+  const { setBilleteras: setGlobalBilleteras } = useFinancial()
+
   const [activeTab, setActiveTab] = useState<'historial' | 'recurrentes'>('historial')
 
-  // --- Estado de Datos ---
+  const periodoActual = useMemo(() => calcularPeriodoActual(usuario), [usuario])
+
+  const defaultFilters: TransaccionFilters = useMemo(() => ({
+    tipo: undefined,
+    moneda: undefined,
+    fecha_desde: periodoActual.inicio.toISOString().split('T')[0],
+    fecha_hasta: periodoActual.fin.toISOString().split('T')[0],
+    billetera_id: undefined,
+    categoria_id: undefined,
+    estado_verificacion: undefined,
+    busqueda: ''
+  }), [periodoActual])
+
+  const [filters, setFilters] = useState<TransaccionFilters>(defaultFilters)
+  
   const [transacciones, setTransacciones] = useState<Transaccion[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
-  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
+  const [pendientesIA, setPendientesIA] = useState<Transaccion[]>([])
   const [loading, setLoading] = useState(true)
 
-  // --- Estado de Filtros ---
-  const [filters, setFilters] = useState<TransaccionFilters>(() => {
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, '0')
-    const day = String(today.getDate()).padStart(2, '0')
-    
-    return {
-      tipo: undefined,
-      moneda: undefined,
-      fecha_desde: `${year}-${month}-01`,
-      fecha_hasta: `${year}-${month}-${day}`,
-      billetera_id: '',
-      busqueda: ''
-    }
-  })
-
-  // --- Estado de Modales ---
-  const [isModalTxOpen, setIsModalTxOpen] = useState(false)
-  const [isModalTrOpen, setIsModalTrOpen] = useState(false)
-  const [isModalConfirmIAOpen, setIsModalConfirmIAOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedTx, setSelectedTx] = useState<Transaccion | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  
-  const { showToast } = useToast()
 
-  // --- Estado de Formulario Transaccion ---
-  const [formData, setFormData] = useState({
-    tipo: 'egreso' as 'ingreso' | 'egreso',
-    descripcion: '',
-    monto: '',
-    moneda: 'ARS' as 'ARS' | 'USD',
-    fecha: new Date().toISOString().split('T')[0],
-    categoria_id: '',
-    subcategoria_id: '',
-    billetera_id: '',
-    metodo_pago: 'debito' as 'debito' | 'efectivo' | 'credito',
-    es_padre_cuotas: false,
-    info_cuotas: {
-      cantidad_cuotas: 2,
-      tiene_interes: false,
-      tasa_interes: 0,
-      monto_total: 0
+  const hasActiveFilters = Object.entries(filters).some(([k, v]) => {
+    if (k === 'fecha_desde' || k === 'fecha_hasta') {
+      return v !== defaultFilters[k as keyof TransaccionFilters]
     }
-  })
-
-  // --- Estado de Formulario Transferencia ---
-  const [formTrData, setFormTrData] = useState({
-    billetera_origen_id: '',
-    billetera_destino_id: '',
-    monto: '',
-    moneda: 'ARS' as 'ARS' | 'USD',
-    fecha: new Date().toISOString().split('T')[0],
-    notas: ''
+    return v !== undefined && v !== ''
   })
 
   const fetchTransacciones = useCallback(async () => {
@@ -88,360 +60,207 @@ const TransaccionesPage: React.FC = () => {
       const data = await transaccionService.getTransacciones(filters)
       setTransacciones(data)
     } catch (err) {
-      console.error('Error fetching transactions:', err)
+      console.error(err)
       showToast('Error al cargar transacciones', 'error')
     }
   }, [filters, showToast])
 
-  const fetchData = useCallback(async () => {
+  const fetchPendientes = useCallback(async () => {
     try {
-      setLoading(true)
+      const data = await transaccionService.getPendientesIA()
+      setPendientesIA(data)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+    try {
       const [b, c] = await Promise.all([
         billeteraService.list(),
         categoriaService.getCategorias()
       ])
       setBilleteras(b.filter((w: Billetera) => w.estado === 'activa'))
+      setGlobalBilleteras(b.map((d: Billetera) => ({
+        ...d,
+        saldo_actual: Number(d.saldo_actual),
+        saldo_inicial: Number(d.saldo_inicial),
+      })))
       setCategorias(c)
-      await fetchTransacciones()
+      await Promise.all([fetchTransacciones(), fetchPendientes()])
     } catch (err) {
-      console.error('Error fetching data:', err)
+      console.error(err)
     } finally {
       setLoading(false)
     }
-  }, [fetchTransacciones])
+  }, [fetchTransacciones, fetchPendientes, setGlobalBilleteras])
 
-
-  // --- Carga Inicial ---
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchData()
-    }, 0)
-    return () => clearTimeout(timer)
+    fetchData()
   }, [fetchData])
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchTransacciones()
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [fetchTransacciones])
+    fetchTransacciones()
+  }, [filters, fetchTransacciones])
 
-  const handleSubcategorias = async (catId: string) => {
-    if (!catId) {
-      setSubcategorias([])
-      return
-    }
-    try {
-      const data = await categoriaService.getSubcategorias(catId)
-      setSubcategorias(data)
-    } catch (err) {
-      console.error('Error fetching subcategories:', err)
+
+
+  const handleEdit = (id: string) => {
+    const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
+    if (tx) {
+      setSelectedTx(tx)
+      setDrawerOpen(true)
     }
   }
 
-  // --- Handlers ---
+  const openNewTransaccion = () => {
+    setSelectedTx(null)
+    setDrawerOpen(true)
+  }
+
   const handleClearFilters = () => {
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, '0')
-    const day = String(today.getDate()).padStart(2, '0')
+    setFilters(defaultFilters)
+  }
 
-    setFilters({
-      tipo: undefined,
-      moneda: undefined,
-      fecha_desde: `${year}-${month}-01`,
-      fecha_hasta: `${year}-${month}-${day}`,
-      billetera_id: '',
-      busqueda: ''
+  const agruparPorFecha = (txs: Transaccion[]) => {
+    const grupos: Record<string, Transaccion[]> = {}
+    txs.forEach(tx => {
+      const fecha = tx.fecha.split('T')[0]
+      if (!grupos[fecha]) grupos[fecha] = []
+      grupos[fecha].push(tx)
     })
+    return Object.entries(grupos).sort((a, b) => b[0].localeCompare(a[0]))
   }
 
-  const handleSaveTx = async () => {
-    try {
-      const payload = {
-        ...formData,
-        monto: parseFloat(formData.monto),
-        categoria_id: formData.categoria_id || null,
-        subcategoria_id: formData.subcategoria_id || null,
-        billetera_id: formData.billetera_id,
-        origen: 'manual' as const
-      }
-      if (formData.metodo_pago === 'credito') {
-        payload.es_padre_cuotas = true
-        payload.info_cuotas = {
-          ...formData.info_cuotas,
-          monto_total: parseFloat(formData.monto)
-        }
-      }
-      await transaccionService.createTransaccion(payload)
-      showToast('Transacción guardada', 'success')
-      setIsModalTxOpen(false)
-      fetchData()
-    } catch (err) {
-      console.error(err)
-      showToast('Error al guardar la transacción', 'error')
-    }
-  }
+  const grupos = agruparPorFecha(transacciones)
 
-  const handleSaveTr = async () => {
-    try {
-      const payload = {
-        ...formTrData,
-        monto: parseFloat(formTrData.monto),
-        billetera_origen_id: formTrData.billetera_origen_id,
-        billetera_destino_id: formTrData.billetera_destino_id
-      }
-      await transferenciaService.createTransferencia(payload)
-      showToast('Transferencia realizada', 'success')
-      setIsModalTrOpen(false)
-      fetchData()
-    } catch (err) {
-      console.error(err)
-      showToast('Error al realizar la transferencia', 'error')
-    }
-  }
-
-  const handleConfirmIA = async () => {
-    if (!selectedTx) return
-    try {
-      // Primero actualizamos por si el usuario editó algo en el modal de confirmacion
-      await transaccionService.updateTransaccion(selectedTx.id, selectedTx)
-      // Luego confirmamos
-      await transaccionService.confirmarIA(selectedTx.id)
-      showToast('Transacción confirmada', 'success')
-      setIsModalConfirmIAOpen(false)
-      fetchData()
-    } catch (err) {
-      console.error(err)
-      showToast('Error al confirmar transacción', 'error')
-    }
-  }
-
-  async function handleDeleteConfirmed() {
-    if (!deleteTarget) return
-    try {
-      setIsDeleting(true)
-      await transaccionService.deleteTransaccion(deleteTarget)
-      showToast('Transacción eliminada', 'success')
-      fetchData()
-    } catch (err) {
-      console.error(err)
-      showToast('Error al eliminar', 'error')
-    } finally {
-      setIsDeleting(false)
-      setDeleteTarget(null)
-    }
-  }
-
-  // --- Calculos Tiempo Real Cuotas ---
-  const calculoCuotas = useMemo(() => {
-    const monto = parseFloat(formData.monto) || 0
-    const cant = formData.info_cuotas.cantidad_cuotas || 1
-    const tasa = formData.info_cuotas.tiene_interes ? (formData.info_cuotas.tasa_interes || 0) / 100 : 0
-    
-    const valorCuota = tasa > 0 
-      ? monto * (tasa * Math.pow(1 + tasa, cant)) / (Math.pow(1 + tasa, cant) - 1)
-      : monto / cant
-
-    return {
-      total: valorCuota * cant,
-      cuota: valorCuota
-    }
-  }, [formData.monto, formData.info_cuotas])
+  // Calcular totales del período mostrado
+  const totalIngresos = transacciones.filter(t => t.tipo === 'ingreso').reduce((acc, t) => acc + t.monto, 0)
+  const totalEgresos = transacciones.filter(t => t.tipo === 'egreso').reduce((acc, t) => acc + t.monto, 0)
+  const balance = totalIngresos - totalEgresos
+  const mainCurrency = 'ARS' // Simplificado, idealmente viene de las preferencias
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Transacciones</h1>
-        {activeTab === 'historial' && (
-          <div className={styles.actions}>
-            <Button onClick={() => setIsModalTxOpen(true)}>
-              <Plus size={18} /> Nueva transacción
-            </Button>
-            <Button variant="secondary" onClick={() => setIsModalTrOpen(true)}>
-              <ArrowLeftRight size={18} /> Nueva transferencia
-            </Button>
-          </div>
-        )}
-      </header>
-
-      <div className={styles.tabs}>
-        <button 
-          className={`${styles.tab} ${activeTab === 'historial' ? styles.tabActive : ''}`}
-          onClick={() => setActiveTab('historial')}
-        >
-          Historial
-        </button>
-        <button 
-          className={`${styles.tab} ${activeTab === 'recurrentes' ? styles.tabActive : ''}`}
-          onClick={() => setActiveTab('recurrentes')}
-        >
-          Recurrentes
-        </button>
+    <div className={styles.page}>
+      
+      {/* ── Page Header ────────────────────────────────────────────────────── */}
+      <div className={styles.header}>
+        <div className={styles.titleGroup}>
+          <h1>Transacciones</h1>
+          <p className={styles.subtitle}>{periodoActual.label} · {transacciones.length} movimientos</p>
+        </div>
+        <div className={styles.actions}>
+          <button className={styles.btnGhost} title="Próximamente">
+            <Download size={16} style={{ marginRight: 6, display: 'inline-block', verticalAlign: '-3px' }} />
+            Exportar
+          </button>
+          <button 
+            className={styles.btnGhost} 
+            onClick={() => setActiveTab(activeTab === 'historial' ? 'recurrentes' : 'historial')}
+            style={{ background: activeTab === 'recurrentes' ? '#F5F4F0' : 'transparent' }}
+          >
+            <ArrowLeftRight size={16} style={{ marginRight: 6, display: 'inline-block', verticalAlign: '-3px' }} />
+            Recurrentes
+          </button>
+          <button 
+            className={styles.btnGhost} 
+            style={{ background: '#0D2045', color: 'white' }}
+            onClick={openNewTransaccion}
+          >
+            <Plus size={16} style={{ marginRight: 6, display: 'inline-block', verticalAlign: '-3px' }} />
+            Nueva transacción
+          </button>
+        </div>
       </div>
 
       {activeTab === 'historial' ? (
         <>
-          {/* FILTROS */}
-          <div className={styles.filtersRow}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="filter-tipo">Tipo</label>
-              <select 
-                id="filter-tipo"
-                className={styles.filterInput} 
-                value={filters.tipo || ''} 
-                onChange={e => setFilters({...filters, tipo: (e.target.value as 'ingreso' | 'egreso') || undefined})}
-                title="Filtrar por tipo"
-              >
-                <option value="">Todos</option>
-                <option value="ingreso">Ingreso</option>
-                <option value="egreso">Egreso</option>
-              </select>
+          {/* ── Hero Resumen ───────────────────────────────────────────────────── */}
+          <div className={styles.heroResumen}>
+            <div className={styles.heroMain}>
+              <span className={styles.heroLabel}>Balance del ciclo</span>
+              <h2 className={styles.heroBalance}>{formatMonto(balance, mainCurrency)}</h2>
             </div>
-
-            <div className={styles.filterGroup}>
-              <label htmlFor="filter-moneda">Moneda</label>
-              <select 
-                id="filter-moneda"
-                className={styles.filterInput}
-                value={filters.moneda || ''}
-                onChange={e => setFilters({...filters, moneda: e.target.value || undefined})}
-                title="Filtrar por moneda"
-              >
-                <option value="">Todas</option>
-                <option value="ARS">ARS</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
-
-            <div className={styles.filterGroup}>
-              <label htmlFor="filter-billetera">Billetera</label>
-              <select 
-                id="filter-billetera"
-                className={styles.filterInput}
-                value={filters.billetera_id || ''}
-                onChange={e => setFilters({...filters, billetera_id: e.target.value})}
-                title="Filtrar por billetera"
-              >
-                <option value="">Todas</option>
-                {billeteras.map(b => (
-                  <option key={b.id} value={b.id}>{b.nombre}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.filterGroup}>
-              <label htmlFor="filter-desde">Desde</label>
-              <input 
-                id="filter-desde"
-                type="date" 
-                className={styles.filterInput}
-                value={filters.fecha_desde}
-                onChange={e => setFilters({...filters, fecha_desde: e.target.value})}
-              />
-            </div>
-
-            <div className={styles.filterGroup}>
-              <label htmlFor="filter-hasta">Hasta</label>
-              <input 
-                id="filter-hasta"
-                type="date" 
-                className={styles.filterInput}
-                value={filters.fecha_hasta}
-                onChange={e => setFilters({...filters, fecha_hasta: e.target.value})}
-              />
-            </div>
-
-            <div className={styles.filterGroup}>
-              <label htmlFor="filter-search">Buscar</label>
-              <div className={styles.searchWrapper}>
-                <Search size={14} className={styles.searchIcon} />
-                <input 
-                  id="filter-search"
-                  type="text" 
-                  placeholder="Descripción..." 
-                  className={`${styles.filterInput} ${styles.searchInput}`}
-                  value={filters.busqueda}
-                  onChange={e => setFilters({...filters, busqueda: e.target.value})}
-                />
+            <div className={styles.heroGrid}>
+              <div className={styles.heroMetric}>
+                <span className={styles.heroLabel}>Ingresos</span>
+                <span className={styles.heroValueIngreso}>+{formatMonto(totalIngresos, mainCurrency)}</span>
               </div>
+              <div className={styles.heroMetric}>
+                <span className={styles.heroLabel}>Egresos</span>
+                <span className={styles.heroValueEgreso}>-{formatMonto(totalEgresos, mainCurrency)}</span>
+              </div>
+              {pendientesIA.length > 0 && (
+                <div className={styles.heroMetric}>
+                  <span className={styles.heroLabel}>Pendientes IA</span>
+                  <button 
+                    className={styles.heroBadgePending} 
+                    style={{ border: 'none', cursor: 'pointer' }}
+                    onClick={() => setFilters({ ...filters, estado_verificacion: 'pendiente' })}
+                  >
+                    {pendientesIA.length} sin revisar
+                  </button>
+                </div>
+              )}
             </div>
-
-            <button className={styles.clearButton} onClick={handleClearFilters}>
-              Limpiar
-            </button>
           </div>
 
-          {/* LISTA */}
-          <div className={styles.listContainer}>
-            <div className={styles.tableHeader}>
-              <span></span>
-              <span>Descripción</span>
-              <span>Billetera</span>
-              <span>Fecha</span>
-              <span className={styles.textRight}>Monto</span>
-              <span></span>
+          {/* ── Filter Bar ───────────────────────────────────────────────────── */}
+          <FilterBar
+            filters={filters}
+            onFilterChange={setFilters}
+            onClear={handleClearFilters}
+            billeteras={billeteras}
+            categorias={categorias}
+            hasActiveFilters={hasActiveFilters}
+          />
+
+          {/* ── Pendientes Banner ────────────────────────────────────────────── */}
+          {pendientesIA.length > 0 && filters.estado_verificacion !== 'pendiente' && (
+            <div className={styles.pendientesBanner}>
+              <div className={styles.pendientesInfo}>
+                <AlertCircle size={16} strokeWidth={2.5} />
+                <span>{pendientesIA.length} transacc{pendientesIA.length > 1 ? 'iones' : 'ión'} pendiente{pendientesIA.length > 1 ? 's' : ''} de confirmación IA</span>
+              </div>
+              <button 
+                className={styles.pendientesLink}
+                onClick={() => setFilters({ ...filters, estado_verificacion: 'pendiente' })}
+              >
+                Ver pendientes <ArrowRight size={14} style={{ display: 'inline-block', verticalAlign: '-3px' }} />
+              </button>
             </div>
-            
+          )}
+
+          {/* ── Lista ────────────────────────────────────────────────────────── */}
+          <div>
             {loading ? (
-              <div className={styles.emptyState}>Cargando transacciones...</div>
-            ) : transacciones.length === 0 ? (
-              <div className={styles.emptyState}>No se encontraron transacciones.</div>
+              <div className={styles.loadingState}>Cargando transacciones...</div>
+            ) : grupos.length === 0 ? (
+              <div className={styles.emptyState}>
+                {hasActiveFilters ? (
+                  <>
+                    <p>No encontramos transacciones con esos filtros.</p>
+                    <button className={styles.btnGhost} style={{ background: '#F5F4F0' }} onClick={handleClearFilters}>Limpiar filtros</button>
+                  </>
+                ) : (
+                  <>
+                    <p>Todavía no registraste ninguna transacción este ciclo.</p>
+                    <button className={styles.btnGhost} style={{ background: '#0D2045', color: 'white' }} onClick={openNewTransaccion}>Registrar primera transacción</button>
+                  </>
+                )}
+              </div>
             ) : (
-              transacciones.map(tx => {
-                const cat = categorias.find(c => c.id === tx.categoria_id)
-                return (
-                  <div 
-                    key={tx.id} 
-                    className={styles.transactionItem}
-                    onClick={() => {
-                      if (tx.estado_verificacion === 'pendiente') {
-                        setSelectedTx(tx)
-                        setIsModalConfirmIAOpen(true)
-                      }
-                    }}
-                  >
-                    <div className={styles.icon}>
-                      {(() => {
-                        const IconComp = cat ? getCategoryIcon(cat.nombre) : MoreHorizontal
-                        return <IconComp size={20} strokeWidth={1.75} />
-                      })()}
-                    </div>
-                    <div className={styles.desc}>
-                      <span>{tx.descripcion}</span>
-                      {cat && <small className={styles.sub}>{cat.nombre}</small>}
-                      <div className={styles.badges}>
-                        {tx.estado_verificacion === 'pendiente' && (
-                          <span className={`${styles.badge} ${styles.badgePending}`}>Pendiente IA</span>
-                        )}
-                        {tx.es_cuota_hija && (
-                          <span className={`${styles.badge} ${styles.badgeCuota}`}>Cuota</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className={styles.billetera}>
-                      {billeteras.find(b => b.id === tx.billetera_id)?.nombre}
-                    </div>
-                    <div className={styles.fecha}>{formatFecha(tx.fecha)}</div>
-                    <div className={`${styles.monto} ${tx.tipo === 'ingreso' ? styles.ingreso : styles.egreso}`}>
-                      {tx.tipo === 'egreso' ? '- ' : '+ '}
-                      {formatMonto(tx.monto, tx.moneda)}
-                    </div>
-                    <div className={styles.actionsCell}>
-                      <button 
-                        className={`${styles.clearButton} ${styles.deleteButton}`} 
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setDeleteTarget(tx.id)
-                        }}
-                        title="Eliminar transacción"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                )
-              })
+              grupos.map(([fecha, txs]) => (
+                <DayGroup
+                  key={fecha}
+                  fecha={fecha}
+                  transacciones={txs}
+                  categorias={categorias}
+                  billeteras={billeteras}
+                  onEdit={handleEdit}
+                />
+              ))
             )}
           </div>
         </>
@@ -449,366 +268,15 @@ const TransaccionesPage: React.FC = () => {
         <RecurrentesPage embedded />
       )}
 
-
-      <Drawer
-        isOpen={isModalTxOpen}
-        onClose={() => setIsModalTxOpen(false)}
-        title="Nueva Transacción"
-        width={480}
-      >
-        <div className={styles.drawerForm}>
-          <div className={styles.formRow}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-tipo">Tipo</label>
-              <select 
-                id="form-tipo"
-                className={styles.filterInput} 
-                value={formData.tipo} 
-                onChange={e => setFormData({...formData, tipo: e.target.value as 'ingreso' | 'egreso'})}
-                title="Tipo de transacción"
-              >
-                <option value="egreso">Egreso</option>
-                <option value="ingreso">Ingreso</option>
-              </select>
-            </div>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-monto">Monto</label>
-              <input 
-                id="form-monto"
-                type="number" 
-                className={styles.filterInput} 
-                value={formData.monto} 
-                onChange={e => setFormData({...formData, monto: e.target.value})} 
-                placeholder="0.00" 
-              />
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={`${styles.filterGroup} ${styles.fullWidth}`}>
-              <label htmlFor="form-desc">Descripción</label>
-              <input 
-                id="form-desc"
-                type="text" 
-                className={styles.filterInput} 
-                value={formData.descripcion} 
-                onChange={e => setFormData({...formData, descripcion: e.target.value})} 
-                placeholder="Ej: Supermercado" 
-              />
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-moneda">Moneda</label>
-              <select 
-                id="form-moneda"
-                className={styles.filterInput} 
-                value={formData.moneda} 
-                onChange={e => setFormData({...formData, moneda: e.target.value as 'ARS' | 'USD'})}
-                title="Moneda"
-              >
-                <option value="ARS">ARS</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-fecha">Fecha</label>
-              <input 
-                id="form-fecha"
-                type="date" 
-                className={styles.filterInput} 
-                value={formData.fecha} 
-                onChange={e => setFormData({...formData, fecha: e.target.value})} 
-              />
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-categoria">Categoría</label>
-              <select 
-                id="form-categoria"
-                className={styles.filterInput} 
-                value={formData.categoria_id} 
-                onChange={e => {
-                  setFormData({...formData, categoria_id: e.target.value, subcategoria_id: ''})
-                  handleSubcategorias(e.target.value)
-                }}
-                title="Seleccionar categoría"
-              >
-                <option value="">Seleccionar...</option>
-                {categorias.filter(c => c.tipo === formData.tipo).map(c => (
-                  <option key={c.id} value={c.id}>{c.nombre}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-subcategoria">Subcategoría</label>
-              <select 
-                id="form-subcategoria"
-                className={styles.filterInput} 
-                value={formData.subcategoria_id} 
-                onChange={e => setFormData({...formData, subcategoria_id: e.target.value})}
-                title="Seleccionar subcategoría"
-              >
-                <option value="">Sin subcategoría</option>
-                {subcategorias.map(s => (
-                  <option key={s.id} value={s.id}>{s.nombre}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-billetera">Billetera</label>
-              <select 
-                id="form-billetera"
-                className={styles.filterInput} 
-                value={formData.billetera_id} 
-                onChange={e => setFormData({...formData, billetera_id: e.target.value})}
-                title="Seleccionar billetera"
-              >
-                <option value="">Seleccionar...</option>
-                {billeteras.filter(b => b.moneda === formData.moneda).map(b => (
-                  <option key={b.id} value={b.id}>{b.nombre}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.filterGroup}>
-              <label htmlFor="form-metodo">Método de Pago</label>
-              <select 
-                id="form-metodo"
-                className={styles.filterInput} 
-                value={formData.metodo_pago} 
-                onChange={e => setFormData({...formData, metodo_pago: e.target.value as 'debito' | 'efectivo' | 'credito'})}
-                title="Método de pago"
-              >
-                <option value="debito">Débito / Transferencia</option>
-                <option value="efectivo">Efectivo</option>
-                <option value="credito">Crédito (Cuotas)</option>
-              </select>
-            </div>
-          </div>
-
-          {formData.metodo_pago === 'credito' && (
-            <div className={styles.creditSection}>
-              <div className={styles.formRow}>
-                <div className={styles.filterGroup}>
-                  <label htmlFor="form-cuotas">Cantidad de cuotas</label>
-                  <input 
-                    id="form-cuotas"
-                    type="number" 
-                    className={styles.filterInput} 
-                    value={formData.info_cuotas.cantidad_cuotas} 
-                    onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, cantidad_cuotas: parseInt(e.target.value) || 1}})}
-                  />
-                </div>
-                <div className={styles.filterGroup}>
-                  <div className={styles.toggleRow}>
-                    <label htmlFor="form-interes">¿Tiene interés?</label>
-                    <input 
-                      id="form-interes"
-                      type="checkbox" 
-                      checked={formData.info_cuotas.tiene_interes} 
-                      onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, tiene_interes: e.target.checked}})} 
-                    />
-                  </div>
-                  {formData.info_cuotas.tiene_interes && (
-                    <input 
-                      type="number" 
-                      placeholder="Tasa mensual %" 
-                      className={`${styles.filterInput} ${styles.mt8}`} 
-                      value={formData.info_cuotas.tasa_interes}
-                      onChange={e => setFormData({...formData, info_cuotas: {...formData.info_cuotas, tasa_interes: parseFloat(e.target.value) || 0}})}
-                      title="Tasa de interés mensual"
-                    />
-                  )}
-                </div>
-              </div>
-              <div className={styles.summary}>
-                <p>Total financiado: <strong>{formatMonto(calculoCuotas.total, formData.moneda)}</strong></p>
-                <p>Valor de cada cuota: <strong>{formatMonto(calculoCuotas.cuota, formData.moneda)}</strong></p>
-              </div>
-            </div>
-          )}
-
-          <div className={styles.drawerFooter}>
-            <Button variant="secondary" onClick={() => setIsModalTxOpen(false)} fullWidth>Cancelar</Button>
-            <Button onClick={handleSaveTx} fullWidth>Guardar transacción</Button>
-          </div>
-        </div>
-      </Drawer>
-
-      <Drawer
-        isOpen={isModalTrOpen}
-        onClose={() => setIsModalTrOpen(false)}
-        title="Nueva Transferencia"
-        width={480}
-      >
-        <div className={styles.drawerForm}>
-          <div className={styles.formRow}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="tr-origen">Billetera Origen</label>
-              <select 
-                id="tr-origen"
-                className={styles.filterInput} 
-                value={formTrData.billetera_origen_id} 
-                onChange={e => setFormTrData({...formTrData, billetera_origen_id: e.target.value})}
-                title="Billetera origen"
-              >
-                <option value="">Seleccionar...</option>
-                {billeteras.map(b => (
-                  <option key={b.id} value={b.id}>{b.nombre} ({b.moneda})</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.filterGroup}>
-              <label htmlFor="tr-destino">Billetera Destino</label>
-              <select 
-                id="tr-destino"
-                className={styles.filterInput} 
-                value={formTrData.billetera_destino_id} 
-                onChange={e => setFormTrData({...formTrData, billetera_destino_id: e.target.value})}
-                title="Billetera destino"
-              >
-                <option value="">Seleccionar...</option>
-                {billeteras.filter(b => b.id !== formTrData.billetera_origen_id).map(b => (
-                  <option key={b.id} value={b.id}>{b.nombre} ({b.moneda})</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className={styles.formRow}>
-            <div className={styles.filterGroup}>
-              <label htmlFor="tr-monto">Monto</label>
-              <input 
-                id="tr-monto"
-                type="number" 
-                className={styles.filterInput} 
-                value={formTrData.monto} 
-                onChange={e => setFormTrData({...formTrData, monto: e.target.value})} 
-              />
-            </div>
-            <div className={styles.filterGroup}>
-              <label htmlFor="tr-moneda">Moneda que transfieres</label>
-              <select 
-                id="tr-moneda"
-                className={styles.filterInput} 
-                value={formTrData.moneda} 
-                onChange={e => setFormTrData({...formTrData, moneda: e.target.value as 'ARS' | 'USD'})}
-                title="Moneda de origen"
-              >
-                <option value="ARS">ARS</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
-          </div>
-          <div className={styles.formRow}>
-            <div className={`${styles.filterGroup} ${styles.fullWidth}`}>
-              <label htmlFor="tr-notas">Notas</label>
-              <textarea 
-                id="tr-notas"
-                className={styles.filterInput} 
-                rows={3} 
-                value={formTrData.notas} 
-                onChange={e => setFormTrData({...formTrData, notas: e.target.value})} 
-              />
-            </div>
-          </div>
-
-          <div className={styles.drawerFooter}>
-            <Button variant="secondary" onClick={() => setIsModalTrOpen(false)} fullWidth>Cancelar</Button>
-            <Button onClick={handleSaveTr} fullWidth>Realizar transferencia</Button>
-          </div>
-        </div>
-      </Drawer>
-
-      <Drawer
-        isOpen={isModalConfirmIAOpen}
-        onClose={() => setIsModalConfirmIAOpen(false)}
-        title="Confirmar Transacción IA"
-        width={480}
-      >
-        {selectedTx && (
-          <div className={styles.drawerForm}>
-            <div className={styles.iaAlert}>
-              Esta transacción fue detectada automáticamente. Verificá los datos antes de confirmar.
-            </div>
-            <div className={styles.formRow}>
-              <div className={styles.filterGroup}>
-                <label htmlFor="ia-desc">Descripción</label>
-                <input 
-                  id="ia-desc"
-                  type="text" 
-                  className={styles.filterInput} 
-                  value={selectedTx.descripcion} 
-                  onChange={e => setSelectedTx({...selectedTx, descripcion: e.target.value})} 
-                />
-              </div>
-              <div className={styles.filterGroup}>
-                <label htmlFor="ia-monto">Monto</label>
-                <input 
-                  id="ia-monto"
-                  type="number" 
-                  className={styles.filterInput} 
-                  value={selectedTx.monto} 
-                  onChange={e => setSelectedTx({...selectedTx, monto: parseFloat(e.target.value) || 0})} 
-                />
-              </div>
-            </div>
-            <div className={styles.formRow}>
-              <div className={styles.filterGroup}>
-                <label htmlFor="ia-categoria">Categoría</label>
-                <select 
-                  id="ia-categoria"
-                  className={styles.filterInput} 
-                  value={selectedTx.categoria_id || ''} 
-                  onChange={e => setSelectedTx({...selectedTx, categoria_id: e.target.value})}
-                  title="Categoría detectada"
-                >
-                  {categorias.map(c => (
-                    <option key={c.id} value={c.id}>{c.nombre}</option>
-                  ))}
-                </select>
-              </div>
-              <div className={styles.filterGroup}>
-                <label htmlFor="ia-billetera">Billetera</label>
-                <select 
-                  id="ia-billetera"
-                  className={styles.filterInput} 
-                  value={selectedTx.billetera_id} 
-                  onChange={e => setSelectedTx({...selectedTx, billetera_id: e.target.value})}
-                  title="Billetera detectada"
-                >
-                  {billeteras.map(b => (
-                    <option key={b.id} value={b.id}>{b.nombre}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className={styles.drawerFooter}>
-              <Button variant="secondary" onClick={() => setIsModalConfirmIAOpen(false)} fullWidth>Cancelar</Button>
-              <Button onClick={handleConfirmIA} fullWidth>Confirmar y Guardar</Button>
-            </div>
-          </div>
-        )}
-      </Drawer>
-
-      <ConfirmModal
-        isOpen={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDeleteConfirmed}
-        title="Eliminar transacción"
-        description="¿Estás seguro? Si es parte de un grupo de cuotas, se eliminará todo el grupo."
-        variant="danger"
-        confirmLabel="Eliminar"
-        isLoading={isDeleting}
+      {/* ── Drawer ─────────────────────────────────────────────────────────── */}
+      <TransaccionDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        transaccion={selectedTx}
+        billeteras={billeteras}
+        categorias={categorias}
+        onSuccess={fetchData}
       />
     </div>
   )
 }
-
-export default TransaccionesPage

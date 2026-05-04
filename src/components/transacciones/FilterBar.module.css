@@ -1,0 +1,233 @@
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  padding-bottom: 4px;
+}
+
+.filterBar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+@media (min-width: 768px) {
+  .filterBar {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+.pillGroup {
+  display: flex;
+  background: white;
+  border-radius: 20px;
+  border: 1.5px solid #EDECEA;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.typePill {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #52565F;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.typePillActive {
+  background: #0D2045;
+  color: white;
+}
+
+.separator {
+  width: 1px;
+  background: #EDECEA;
+  margin: 6px 0;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #52565F;
+  background: white;
+  border: 1.5px solid #EDECEA;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.pillActive {
+  background: #0D2045;
+  border-color: #0D2045;
+  color: white;
+}
+
+.pill:hover:not(.pillActive) {
+  background: #FAFAF8;
+}
+
+.pillIcon {
+  display: flex;
+  align-items: center;
+}
+
+.pillRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+  margin-right: -6px;
+  padding: 2px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.pillRemove:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.searchPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  height: 34px;
+  background: white;
+  border: 1.5px solid #EDECEA;
+  border-radius: 20px;
+  flex-shrink: 0;
+  min-width: 150px;
+}
+
+.searchInput {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0A0D12;
+  width: 100%;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: #8E9198;
+}
+
+.clearBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: #F59E0B;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.clearBtn:hover {
+  text-decoration: underline;
+}
+
+/* Popover genérico para dropdowns */
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(10, 13, 18, 0.12);
+  border: 1px solid #EDECEA;
+  padding: 12px;
+  z-index: 100;
+  min-width: 220px;
+}
+
+.popoverTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8E9198;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.popoverList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.popoverItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0A0D12;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+
+.popoverItem:hover {
+  background: #FAFAF8;
+}
+
+.popoverItemActive {
+  background: #F0F4FF;
+  color: #0D2045;
+  font-weight: 600;
+}
+
+.dateGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dateInput {
+  border: 1px solid #EDECEA;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+/* Botón mobile para abrir filtros */
+.mobileFilterBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0D2045;
+  background: #F0F4FF;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .mobileFilterBtn {
+    display: none;
+  }
+}

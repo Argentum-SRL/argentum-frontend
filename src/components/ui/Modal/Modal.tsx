@@ -4,7 +4,7 @@ import styles from './Modal.module.css'
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  title: string
+  title: React.ReactNode
   children: React.ReactNode
   footer?: React.ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl'
@@ -38,7 +38,7 @@ const Modal: React.FC<ModalProps> = ({
         onClick={e => e.stopPropagation()}
       >
         <div className={styles.header}>
-          <h3>{title}</h3>
+          <div className={styles.title}>{title}</div>
           <button className={styles.closeButton} onClick={onClose}>
             &times;
           </button>

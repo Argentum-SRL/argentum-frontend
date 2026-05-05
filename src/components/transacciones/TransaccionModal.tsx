@@ -15,6 +15,7 @@ import type { Transaccion, Billetera, Categoria, Subcategoria } from '@/types'
 import transaccionService from '@/services/transaccion.service'
 import categoriaService from '@/services/categoria.service'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
+import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { formatMonto } from '@/utils/format'
 import styles from './TransaccionModal.module.css'
 import { useToast } from '@/hooks/useToast'
@@ -520,58 +521,90 @@ export default function TransaccionModal({
                 </div>
               </div>
 
-              {/* Categoría Grid */}
-              <div className={styles.formField}>
-                <label className={styles.fieldLabel}>Categoría</label>
-                <div className={styles.catGrid}>
-                  {displayCategorias.map((cat) => (
-                    <button
-                      key={cat.id}
-                      className={`${styles.catBtn} ${categoriaId === cat.id ? styles.catBtnActive : ''}`}
-                      onClick={() => {
-                        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                      }}
-                    >
-                      <CategoriaIcon nombre={cat.nombre} size={36} />
-                      <span className={styles.catName}>{cat.nombre}</span>
-                    </button>
-                  ))}
-                  {!showAllCats && hasMoreCats && (
-                    <button className={styles.catBtn} onClick={() => dispatch({ type: 'SET_FIELD', field: 'showAllCats', value: true })}>
-                      <div style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)' }}>
-                        <GripHorizontal size={22} strokeWidth={1.5} />
-                      </div>
-                      <span className={styles.catName}>Más</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Subcategoría Chips (si hay cargadas) */}
-              {categoriaId && (subcategorias.length > 0 || loadingSubcats) && (
+              {/* Selección de Categoría y Subcategoría */}
+              {!categoriaId ? (
+                /* ── PASO: Elegir Categoría ── */
                 <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Subcategoría <span className={styles.fieldOptional}>(opcional)</span></label>
-                  <div className={styles.subcatGrid}>
-                    {loadingSubcats ? (
-                      <div className={styles.subcatLoading}>Cargando...</div>
-                    ) : (
-                      subcategorias.map((sub) => (
-                        <button
-                          key={sub.id}
-                          className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
-                          onClick={() => dispatch({
-                            type: 'SET_FIELD',
-                            field: 'subcategoriaId',
-                            value: subcategoriaId === sub.id ? '' : sub.id
-                          })}
-                        >
-                          {sub.nombre}
-                        </button>
-                      ))
+                  <label className={styles.fieldLabel}>Categoría</label>
+                  <div className={styles.catGrid}>
+                    {displayCategorias.map((cat) => (
+                      <button
+                        key={cat.id}
+                        className={`${styles.catBtn} ${categoriaId === cat.id ? styles.catBtnActive : ''}`}
+                        onClick={() => {
+                          dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
+                          dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                        }}
+                      >
+                        <CategoriaIcon nombre={cat.nombre} size={36} />
+                        <span className={styles.catName}>{cat.nombre}</span>
+                      </button>
+                    ))}
+                    {!showAllCats && hasMoreCats && (
+                      <button className={styles.catBtn} onClick={() => dispatch({ type: 'SET_FIELD', field: 'showAllCats', value: true })}>
+                        <div style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)' }}>
+                          <GripHorizontal size={22} strokeWidth={1.5} />
+                        </div>
+                        <span className={styles.catName}>Más</span>
+                      </button>
                     )}
                   </div>
                 </div>
+              ) : (
+                /* ── PASO: Elegir Subcategoría (con categoría minimizada) ── */
+                <>
+                  <div className={styles.selectedCatBanner}>
+                    <div className={styles.selectedCatInfo}>
+                      <CategoriaIcon nombre={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
+                      <div className={styles.selectedCatText}>
+                        <span className={styles.selectedCatLabel}>Categoría</span>
+                        <span className={styles.selectedCatName}>{categorias.find(c => c.id === categoriaId)?.nombre}</span>
+                      </div>
+                    </div>
+                    <button 
+                      className={styles.changeCatBtn}
+                      onClick={() => {
+                        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: '' })
+                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                      }}
+                    >
+                      Cambiar
+                    </button>
+                  </div>
+
+                  <div className={styles.formField}>
+                    <label className={styles.fieldLabel}>Subcategoría <span className={styles.fieldOptional}>(opcional)</span></label>
+                    <div className={styles.subcatGrid}>
+                      {loadingSubcats ? (
+                        <div className={styles.subcatLoading}>Cargando...</div>
+                      ) : (
+                        <>
+                          <button
+                            className={`${styles.subcatChip} ${!subcategoriaId ? styles.subcatChipActive : ''}`}
+                            onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })}
+                          >
+                            <SubcategoriaIcon nombre="general" size={32} />
+                            General
+                          </button>
+                          {subcategorias.map((sub) => (
+                            <button
+                              key={sub.id}
+                              className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
+                              onClick={() => dispatch({
+                                type: 'SET_FIELD',
+                                field: 'subcategoriaId',
+                                value: subcategoriaId === sub.id ? '' : sub.id
+                              })}
+                            >
+                              <SubcategoriaIcon nombre={sub.nombre} size={32} />
+                              {sub.nombre}
+                            </button>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Cuotas (solo credito, nueva tx) */}

@@ -3,6 +3,11 @@ export interface CategoriaVisual {
   label: string
 }
 
+export interface SubcategoriaVisual {
+  iconSrc: string
+  label: string
+}
+
 export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   // Alimentación
   'supermercado':     { iconSrc: '/src/assets/icons/categorias/supermercado Background Removed.png', label: 'Supermercado' },
@@ -76,4 +81,28 @@ export function getCategoriaVisual(nombre?: string | null): CategoriaVisual {
   if (!nombre) return CATEGORIA_VISUAL['default']
   const key = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
   return CATEGORIA_VISUAL[key] ?? CATEGORIA_VISUAL['default']
+}
+
+export const SUBCATEGORIA_VISUAL: Record<string, SubcategoriaVisual> = {
+  // Alimentación
+  'supermercado': { iconSrc: '/src/assets/icons/categorias/supermercado Background Removed.png', label: 'Supermercado' },
+  'verduleria':   { iconSrc: '/src/assets/icons/subcategorias/verduleria Background Removed.png', label: 'Verdulería' },
+  'carniceria':   { iconSrc: '/src/assets/icons/subcategorias/carniceria Background Removed.png', label: 'Carnicería' },
+  'polleria':     { iconSrc: '/src/assets/icons/subcategorias/polleria Background Removed.png', label: 'Pollería' },
+  'panaderia':    { iconSrc: '/src/assets/icons/subcategorias/panaderia Background Removed.png', label: 'Panadería' },
+  'pescaderia':   { iconSrc: '/src/assets/icons/subcategorias/pescaderia Background Removed.png', label: 'Pescadería' },
+  'dietetica':    { iconSrc: '/src/assets/icons/subcategorias/dietetica Background Removed.png', label: 'Dietética' },
+  'restaurante':  { iconSrc: '/src/assets/icons/subcategorias/restaurante Background Removed.png', label: 'Restaurante' },
+  'delivery':     { iconSrc: '/src/assets/icons/subcategorias/delivery Background Removed.png', label: 'Delivery' },
+  'cafeteria':    { iconSrc: '/src/assets/icons/subcategorias/cafeteria Background Removed.png', label: 'Cafetería' },
+  'bar':          { iconSrc: '/src/assets/icons/subcategorias/bar Background Removed.png', label: 'Bar' },
+  'heladeria':    { iconSrc: '/src/assets/icons/subcategorias/heladeria Background Removed.png', label: 'Heladería' },
+  'general':      { iconSrc: '/src/assets/icons/subcategorias/alimentacion Background Removed.png', label: 'General' },
+  'default':      { iconSrc: '', label: '' }
+}
+
+export function getSubcategoriaVisual(nombre?: string | null): SubcategoriaVisual {
+  if (!nombre) return SUBCATEGORIA_VISUAL['default']
+  const key = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
+  return SUBCATEGORIA_VISUAL[key] ?? SUBCATEGORIA_VISUAL['default']
 }

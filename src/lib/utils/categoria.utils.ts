@@ -98,6 +98,29 @@ export const SUBCATEGORIA_VISUAL: Record<string, SubcategoriaVisual> = {
   'bar':          { iconSrc: '/src/assets/icons/subcategorias/bar Background Removed.png', label: 'Bar' },
   'heladeria':    { iconSrc: '/src/assets/icons/subcategorias/heladeria Background Removed.png', label: 'Heladería' },
   'general':      { iconSrc: '/src/assets/icons/subcategorias/alimentacion Background Removed.png', label: 'General' },
+  
+  // Transporte
+  'transporte publico': { iconSrc: '/src/assets/icons/categorias/transporte Background Removed.png', label: 'Transporte público' },
+  'taxi / remis':       { iconSrc: '/src/assets/icons/subcategorias/taxi Background Removed.png', label: 'Taxi / Remis' },
+  'combustible':        { iconSrc: '/src/assets/icons/subcategorias/combustible Background Removed.png', label: 'Combustible' },
+  'peaje':              { iconSrc: '/src/assets/icons/subcategorias/peaje Background Removed.png', label: 'Peaje' },
+  'estacionamiento':    { iconSrc: '/src/assets/icons/subcategorias/estacionamiento Background Removed.png', label: 'Estacionamiento' },
+  'mantenimiento del auto': { iconSrc: '/src/assets/icons/subcategorias/mecanico Background Removed.png', label: 'Mantenimiento' },
+  'seguro del auto':    { iconSrc: '/src/assets/icons/subcategorias/seguro Background Removed.png', label: 'Seguro auto' },
+  'bicicleta / patineta': { iconSrc: '/src/assets/icons/subcategorias/bicicleta Background Removed.png', label: 'Bici / Patineta' },
+  
+  // Vivienda
+  'alquiler':           { iconSrc: '/src/assets/icons/subcategorias/alquiler Background Removed.png', label: 'Alquiler' },
+  'expensas':           { iconSrc: '/src/assets/icons/subcategorias/expensas Background Removed.png', label: 'Expensas' },
+  'electricidad':       { iconSrc: '/src/assets/icons/subcategorias/energialuz Background Removed.png', label: 'Electricidad' },
+  'gas':                { iconSrc: '/src/assets/icons/subcategorias/gas Background Removed.png', label: 'Gas' },
+  'agua':               { iconSrc: '/src/assets/icons/subcategorias/agua Background Removed.png', label: 'Agua' },
+  'internet':           { iconSrc: '/src/assets/icons/subcategorias/internet Background Removed.png', label: 'Internet' },
+  'telefono':          { iconSrc: '/src/assets/icons/subcategorias/telefono Background Removed.png', label: 'Teléfono' },
+  'cable / tv':         { iconSrc: '/src/assets/icons/subcategorias/tv Background Removed.png', label: 'TV' },
+  'limpieza':           { iconSrc: '/src/assets/icons/subcategorias/limpieza Background Removed.png', label: 'Limpieza' },
+  'mantenimiento':      { iconSrc: '/src/assets/icons/subcategorias/mentenimiento Background Removed.png', label: 'Mantenimiento' },
+
   'default':      { iconSrc: '', label: '' }
 }
 

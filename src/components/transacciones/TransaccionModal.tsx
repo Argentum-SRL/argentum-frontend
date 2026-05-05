@@ -612,7 +612,11 @@ export default function TransaccionModal({
                             className={`${styles.subcatChip} ${!subcategoriaId ? styles.subcatChipActive : ''}`}
                             onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })}
                           >
-                            <SubcategoriaIcon nombre="general" size={32} />
+                            <SubcategoriaIcon 
+                              nombre="general" 
+                              parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} 
+                              size={32} 
+                            />
                             General
                           </button>
                           {subcategorias.map((sub) => (
@@ -625,7 +629,11 @@ export default function TransaccionModal({
                                 value: subcategoriaId === sub.id ? '' : sub.id
                               })}
                             >
-                              <SubcategoriaIcon nombre={sub.nombre} size={32} />
+                              <SubcategoriaIcon 
+                                nombre={sub.nombre} 
+                                parentCategory={categorias.find(c => c.id === categoriaId)?.nombre}
+                                size={32} 
+                              />
                               {sub.nombre}
                             </button>
                           ))}

@@ -1,21 +1,32 @@
 import { memo } from 'react'
-import { getSubcategoriaVisual } from '@/lib/utils/categoria.utils'
+import { getSubcategoriaVisual, getCategoriaVisual } from '@/lib/utils/categoria.utils'
 import styles from './CategoriaIcon.module.css' // Reutilizamos estilos de CategoriaIcon por ahora
 
 interface SubcategoriaIconProps {
   nombre?: string | null
+  parentCategory?: string | null
   size?: number
   className?: string
 }
 
-export const SubcategoriaIcon = memo(({ nombre, size = 24, className }: SubcategoriaIconProps) => {
+export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, className }: SubcategoriaIconProps) => {
+  // 1. Intentamos buscar el visual de la subcategoría
   const visual = getSubcategoriaVisual(nombre)
+  let iconSrc = visual.iconSrc
 
-  if (visual.iconSrc) {
+  // 2. Si no hay icono de subcategoría O el nombre es 'general', usamos el del padre
+  if (!iconSrc || nombre?.toLowerCase() === 'general') {
+    if (parentCategory) {
+      const parentVisual = getCategoriaVisual(parentCategory)
+      iconSrc = parentVisual.iconSrc
+    }
+  }
+
+  if (iconSrc) {
     return (
       <img
-        src={visual.iconSrc}
-        alt={visual.label}
+        src={iconSrc}
+        alt={nombre || 'Icono'}
         width={size}
         height={size}
         style={{ objectFit: 'contain' }}

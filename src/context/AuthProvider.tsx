@@ -7,8 +7,8 @@ import { AuthContext } from './AuthContext'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
-  // Inicializamos isLoading basándonos en si hay un token para evitar renderizados en cascada
-  const [isLoading, setIsLoading] = useState(() => !!getToken())
+  // Siempre arrancamos en loading=true hasta verificar el estado de auth
+  const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
 
   const logout = useCallback(async (options?: { state?: unknown }) => {
@@ -50,7 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = getToken()
     if (!token) {
-      // No llamamos a setIsLoading(false) aquí si ya está inicializado correctamente
+      // Sin token: no hay sesión, terminamos loading
+      setIsLoading(false)
       return
     }
 

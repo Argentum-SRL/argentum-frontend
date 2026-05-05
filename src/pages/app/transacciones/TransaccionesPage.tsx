@@ -21,7 +21,8 @@ export default function TransaccionesPage() {
   const { showToast } = useToast()
 
   const [activeTab, setActiveTab] = useState<'historial' | 'recurrentes'>('historial')
-
+  const mainCurrency = 'ARS' // Moneda base para el resumen
+  
   const periodoActual = useMemo(() => calcularPeriodoActual(usuario), [usuario])
 
   const defaultFilters: TransaccionFilters = useMemo(() => ({
@@ -206,18 +207,22 @@ export default function TransaccionesPage() {
   const { totalIngresos, totalEgresos, balance } = useMemo(() => {
     let ingresos = 0
     let egresos = 0
-    transacciones.forEach(t => {
-      if (t.tipo === 'ingreso') ingresos += t.monto
-      else egresos += t.monto
+    
+    // Solo sumamos lo que corresponde a la moneda principal para que el resumen sea coherente
+    const txsMoneda = transacciones.filter(t => t.moneda === mainCurrency)
+
+    txsMoneda.forEach(t => {
+      const monto = Number(t.monto) || 0
+      if (t.tipo === 'ingreso') ingresos += monto
+      else egresos += monto
     })
+
     return {
       totalIngresos: ingresos,
       totalEgresos: egresos,
       balance: ingresos - egresos
     }
-  }, [transacciones])
-
-  const mainCurrency = 'ARS' // Simplificado
+  }, [transacciones, mainCurrency])
 
   return (
     <div className={styles.page}>

@@ -453,7 +453,18 @@ export default function TransaccionModal({
                     <button
                       key={key}
                       className={`${styles.methodBtn} ${metodoPago === key ? styles.methodBtnActive : ''}`}
-                      onClick={() => !isCuotaHija && dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: key })}
+                      onClick={() => {
+                        if (isCuotaHija) return
+                        dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: key })
+                        
+                        // Si elige efectivo, buscar la billetera de efectivo de la misma moneda
+                        if (key === 'efectivo') {
+                          const cashWallet = billeteras.find(b => b.es_efectivo && b.moneda === moneda && b.estado === 'activa')
+                          if (cashWallet) {
+                            dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: cashWallet.id })
+                          }
+                        }
+                      }}
                       disabled={isCuotaHija}
                     >
                       {icon} {label}

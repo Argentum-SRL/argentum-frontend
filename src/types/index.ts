@@ -164,6 +164,7 @@ export interface Transaccion {
   origen: 'manual' | 'ia_wpp' | 'ia_chat' | 'ia_pdf' | 'recurrente'
   estado_verificacion: 'confirmada' | 'pendiente' | null
   fecha_creacion: string
+  subcategoria?: Subcategoria
 }
 
 export interface TransferenciaInterna {

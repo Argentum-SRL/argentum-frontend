@@ -36,8 +36,12 @@ const TransaccionRow = memo(({
   if (metodoTxt === 'credito') metodoTxt = 'Crédito'
   if (metodoTxt === 'efectivo') metodoTxt = 'Efectivo'
 
+  const categoriaText = transaccion.subcategoria 
+    ? `${categoria?.nombre} / ${transaccion.subcategoria.nombre}`
+    : (categoria?.nombre || 'General')
+
   const metaText = [
-    categoria?.nombre || 'General',
+    categoriaText,
     metodoTxt,
     hora
   ].filter(Boolean).join(' · ')

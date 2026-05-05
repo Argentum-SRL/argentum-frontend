@@ -11,8 +11,9 @@ import {
   X
 } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
-import type { Transaccion, Billetera, Categoria } from '@/types'
+import type { Transaccion, Billetera, Categoria, Subcategoria } from '@/types'
 import transaccionService from '@/services/transaccion.service'
+import categoriaService from '@/services/categoria.service'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { formatMonto } from '@/utils/format'
 import styles from './TransaccionModal.module.css'
@@ -37,6 +38,7 @@ interface FormState {
   moneda: 'ARS' | 'USD'
   descripcion: string
   categoriaId: string
+  subcategoriaId: string
   billeteraId: string
   fecha: string
   metodoPago: 'debito' | 'efectivo' | 'credito' | 'transferencia'
@@ -59,6 +61,7 @@ const initialState: FormState = {
   moneda: 'ARS',
   descripcion: '',
   categoriaId: '',
+  subcategoriaId: '',
   billeteraId: '',
   fecha: new Date().toISOString().split('T')[0],
   metodoPago: 'debito',
@@ -79,6 +82,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           moneda: action.transaccion.moneda,
           descripcion: action.transaccion.descripcion || '',
           categoriaId: action.transaccion.categoria_id || '',
+          subcategoriaId: action.transaccion.subcategoria_id || '',
           billeteraId: action.transaccion.billetera_id,
           fecha: action.transaccion.fecha.split('T')[0],
           metodoPago: action.transaccion.metodo_pago,
@@ -213,11 +217,35 @@ export default function TransaccionModal({
   const [state, dispatch] = useReducer(formReducer, initialState)
   const carouselRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
+  const [loadingSubcats, setLoadingSubcats] = useState(false)
 
   const {
-    step, slideDirection, tipo, monto, moneda, descripcion, categoriaId,
+    step, slideDirection, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
     billeteraId, fecha, metodoPago, showAllCats, cantidadCuotas, tasaInteres, isSubmitting,
   } = state
+
+  // Cargar subcategorías cuando cambia la categoría
+  useEffect(() => {
+    if (!categoriaId) {
+      setSubcategorias([])
+      return
+    }
+
+    const fetchSubcats = async () => {
+      setLoadingSubcats(true)
+      try {
+        const data = await categoriaService.getSubcategorias(categoriaId)
+        setSubcategorias(data)
+      } catch (e) {
+        console.error('Error fetching subcategorias:', e)
+      } finally {
+        setLoadingSubcats(false)
+      }
+    }
+
+    fetchSubcats()
+  }, [categoriaId])
 
   useEffect(() => {
     if (open) dispatch({ type: 'RESET', transaccion: transaccion || null, billeteras })
@@ -293,6 +321,7 @@ export default function TransaccionModal({
       const payload = {
         tipo, monto, moneda, descripcion,
         categoria_id: categoriaId || null,
+        subcategoria_id: subcategoriaId || null,
         billetera_id: billeteraId, fecha, metodo_pago: metodoPago,
         origen: isEdit ? undefined : ('manual' as const),
         es_padre_cuotas: !isEdit && metodoPago === 'credito' ? true : undefined,
@@ -442,14 +471,20 @@ export default function TransaccionModal({
                 <div className={styles.radioPills}>
                   <button
                     className={`${styles.radioPill} ${tipo === 'egreso' ? styles.pillActiveEgreso : ''}`}
-                    onClick={() => !isCuotaHija && dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'egreso' })}
+                    onClick={() => {
+                      dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'egreso' })
+                      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                    }}
                     disabled={isCuotaHija}
                   >
                     <ArrowUpRight size={15} strokeWidth={2} /> Egreso
                   </button>
                   <button
                     className={`${styles.radioPill} ${tipo === 'ingreso' ? styles.pillActiveIngreso : ''}`}
-                    onClick={() => !isCuotaHija && dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })}
+                    onClick={() => {
+                      dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })
+                      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                    }}
                     disabled={isCuotaHija}
                   >
                     <ArrowDownLeft size={15} strokeWidth={2} /> Ingreso
@@ -493,7 +528,10 @@ export default function TransaccionModal({
                     <button
                       key={cat.id}
                       className={`${styles.catBtn} ${categoriaId === cat.id ? styles.catBtnActive : ''}`}
-                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })}
+                      onClick={() => {
+                        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
+                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                      }}
                     >
                       <CategoriaIcon nombre={cat.nombre} size={36} />
                       <span className={styles.catName}>{cat.nombre}</span>
@@ -509,6 +547,32 @@ export default function TransaccionModal({
                   )}
                 </div>
               </div>
+
+              {/* Subcategoría Chips (si hay cargadas) */}
+              {categoriaId && (subcategorias.length > 0 || loadingSubcats) && (
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>Subcategoría <span className={styles.fieldOptional}>(opcional)</span></label>
+                  <div className={styles.subcatGrid}>
+                    {loadingSubcats ? (
+                      <div className={styles.subcatLoading}>Cargando...</div>
+                    ) : (
+                      subcategorias.map((sub) => (
+                        <button
+                          key={sub.id}
+                          className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
+                          onClick={() => dispatch({
+                            type: 'SET_FIELD',
+                            field: 'subcategoriaId',
+                            value: subcategoriaId === sub.id ? '' : sub.id
+                          })}
+                        >
+                          {sub.nombre}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Cuotas (solo credito, nueva tx) */}
               {!isEdit && metodoPago === 'credito' && (

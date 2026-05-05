@@ -1,159 +1,261 @@
-.modalContent {
+/* ── Slides container & animations ───────────────────────────────────────── */
+.slidesContainer {
+  width: 100%;
+  /* Sin altura fija — el modal se adapta al contenido */
+}
+
+.slide {
   display: flex;
   flex-direction: column;
-  padding: 0;
-  gap: 16px;
+  width: 100%;
 }
 
-/* Toggle Tipo */
-.typeToggle {
-  display: flex;
-  background: var(--surface-alt);
-  border-radius: 14px;
-  padding: 4px;
+.slideForward {
+  animation: slideInRight 280ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.typeBtn {
-  flex: 1;
-  padding: 8px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-3);
-  background: transparent;
-  border: none;
-  cursor: pointer;
+.slideBack {
+  animation: slideInLeft 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Step Indicator Dots ─────────────────────────────────────────────────── */
+.stepDots {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  padding: 12px 20px 0;
+  flex-shrink: 0;
 }
 
-.typeBtnActiveEgreso {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.typeBtnActiveIngreso {
-  background: var(--surface);
-  color: #4CAF7D;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-/* Campo Monto */
-.montoCard {
-  border-radius: 12px;
-  padding: 20px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: background 0.2s ease;
-}
-
-.montoCardEgreso {
+.stepDot {
+  height: 5px;
+  border-radius: 99px;
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
   background: var(--surface-alt);
 }
 
-.montoCardIngreso {
-  background: rgba(76, 175, 125, 0.1);
+.stepDotActive {
+  background: var(--primary);
+  width: 20px;
 }
 
-.montoInputWrapper {
+.stepDotInactive {
+  width: 6px;
+  opacity: 0.4;
+}
+
+/* ── Formulario Base ─────────────────────────────────────────────────────── */
+.formContainer {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
-  flex: 1;
+  height: 100%;
+  overflow: hidden;
 }
 
-.montoPrefix {
-  font-size: 20px;
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 10px;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.backBtn, .closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease;
+}
+
+.backBtn:hover, .closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.formBody {
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
 }
 
-.montoInput {
-  font-size: 48px;
+.fieldOptional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-3);
+  font-size: 10px;
+  margin-left: 3px;
+}
+
+.fieldInput {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 150ms ease;
+  font-family: 'Figtree', sans-serif;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+}
+
+/* ── Hero Monto ──────────────────────────────────────────────────────────── */
+.montoHero {
+  background: var(--surface-alt);
+  border-radius: 16px;
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Selector de moneda con bandera */
+.monedaSelector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.monedaFlag {
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 4px;
+  transition: background 120ms ease;
+}
+
+.monedaFlag:hover {
+  background: var(--border);
+}
+
+/* Chip toggle de moneda — un solo botón que alterna al hacer click */
+.monedaToggleChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: none;
+  background: var(--surface-alt);
+  cursor: pointer;
+  transition: background 140ms ease;
+  flex-shrink: 0;
+}
+
+.monedaToggleChip:hover {
+  background: var(--border);
+}
+
+.monedaChipFlag {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.monedaChipLabel {
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: -2px;
+  color: var(--text-2);
+  letter-spacing: 0.4px;
+}
+
+/* Divisor vertical entre el selector de moneda y el input */
+.montoDivider {
+  width: 1px;
+  height: 44px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* El input de número grande */
+.montoHeroInput {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.montoHeroPrefix {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--text-3);
+  line-height: 1;
+  flex-shrink: 0;
+  letter-spacing: -1.5px;
+}
+
+.montoHeroField {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
   border: none;
   background: transparent;
   outline: none;
   color: var(--text);
   width: 100%;
-  flex: 1;
   min-width: 0;
-  padding: 0 4px !important;
-}
-
-.montoInput::placeholder {
-  color: rgba(10, 13, 18, 0.1);
-}
-
-.monedaToggle {
-  display: flex;
-  gap: 4px;
-}
-
-.monedaBtn {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-2);
-  background: var(--surface);
-  border: 1px solid var(--surface-alt);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.monedaBtnActive {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-/* Secciones Generales */
-.section {
-  display: flex;
-  flex-direction: column;
-}
-
-.sectionLabel {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 6px;
-}
-
-.fieldOptional {
-  font-weight: 400;
-  color: var(--text-3);
-  text-transform: none;
-  font-size: 10px;
-  margin-left: 4px;
-}
-
-.textInput {
-  border: 1.5px solid var(--surface-alt);
-  border-radius: 12px;
-  padding: 11px 14px;
-  font-size: 14px;
+  padding: 0;
   font-family: 'Figtree', sans-serif;
-  color: var(--text);
-  outline: none;
-  background: var(--surface);
-  transition: border-color 0.2s ease;
+  line-height: 1;
 }
 
-.textInput:focus {
-  border-color: var(--primary);
+.montoHeroField::placeholder {
+  color: var(--border);
 }
 
+/* ── Select Input Overlay ────────────────────────────────────────────────── */
 .selectInput {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E9198' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -162,67 +264,112 @@
   padding-right: 40px;
 }
 
-/* Categorías Grid */
-.catGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-}
-
-.catBtn {
-  border-radius: 12px;
-  padding: 10px 8px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
+/* ── Radio Pills (Tipo) ──────────────────────────────────────────────────── */
+.radioPills {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.catBtnActive {
-  border-color: var(--primary);
-  background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
-}
-
-.catBtn:hover:not(:disabled) {
-  border-color: var(--primary);
-  background: var(--surface);
-  transform: scale(1.02);
-}
-
-.catName {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text);
-  text-align: center;
-  line-height: 1.2;
-}
-
-/* Método de pago */
-.methodGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
-.methodBtn {
+.radioPill {
+  flex: 1;
+  height: 44px;
   border-radius: 12px;
-  padding: 10px 8px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 150ms ease;
+}
+
+.radioPill:hover {
+  background: var(--surface-alt);
+}
+
+.pillActiveEgreso {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
+}
+
+.pillActiveIngreso {
+  border-color: #16A34A;
+  background: #16A34A;
+  color: white;
+}
+
+/* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
+.billeterasCarousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 2px 10px;
+  scrollbar-width: none;
+}
+
+.billeterasCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Wrap con border inset — nunca se clipea porque no necesita overflow */
+.billeteraSelectWrap {
+  position: relative;
+  min-width: 260px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  border-radius: 22px; /* un poco mayor que la card (18-20px) */
+  border: 3px solid transparent;
+  transition: transform 220ms ease, filter 220ms ease, border-color 220ms ease;
+}
+
+.billeteraSelectWrap[data-active="false"] {
+  transform: scale(0.93);
+  filter: saturate(0.3) brightness(0.7);
+}
+
+.billeteraSelectWrap[data-active="true"] {
+  transform: scale(1);
+  filter: none;
+  border-color: var(--primary);
+}
+
+.billeteraOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+  border-radius: inherit;
+  border: none;
+  background: transparent;
+}
+
+/* ── Método de pago ──────────────────────────────────────────────────────── */
+.methodGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+
+.methodBtn {
+  border-radius: 11px;
+  padding: 9px 6px;
   border: 1.5px solid var(--surface-alt);
   background: var(--surface);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
+  gap: 4px;
+  font-size: 10.5px;
   font-weight: 600;
   color: var(--text-2);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .methodBtnActive {
@@ -231,35 +378,75 @@
   background: var(--surface-alt);
 }
 
-/* Cuotas Section */
+/* ── Categorías Grid ─────────────────────────────────────────────────────── */
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.catBtn {
+  border-radius: 11px;
+  padding: 9px 6px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.catBtnActive {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+}
+
+.catBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  transform: scale(1.03);
+}
+
+.catName {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ── Cuotas Section ──────────────────────────────────────────────────────── */
 .cuotasSection {
   background: var(--surface-alt);
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 13px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .cuotasInputs {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .cuotaField {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 5px;
 }
 
 .cuotaInput {
-  padding: 8px 10px !important;
+  height: 38px !important;
+  font-size: 14px !important;
 }
 
 .cuotasSummary {
   background: var(--primary);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 9px 13px;
   display: flex;
   justify-content: space-between;
 }
@@ -275,109 +462,14 @@
 }
 
 .summaryLbl {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .summaryVal {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: white;
-}
-
-/* Billetera y Fecha */
-.row2 {
-  display: flex;
-  gap: 10px;
-}
-
-.row2 > div {
-  flex: 1;
-  min-width: 0;
-}
-
-/* Footer */
-.modalFooter {
-  padding: 16px 24px 24px;
-  border-top: 1px solid var(--surface-alt);
-  display: flex;
-  gap: 10px;
-  margin: 16px -24px -24px -24px;
-}
-
-.btnCancel {
-  flex: 1;
-  border: 1.5px solid var(--surface-alt);
-  border-radius: 14px;
-  background: var(--surface);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-2);
-  padding: 12px;
-  cursor: pointer;
-}
-
-.btnDelete {
-  flex: 1;
-  border: 1.5px solid rgba(220, 38, 38, 0.3);
-  border-radius: 14px;
-  background: var(--surface);
-  font-size: 14px;
-  font-weight: 600;
-  color: #DC2626;
-  padding: 12px;
-  cursor: pointer;
-}
-
-.btnDelete:hover {
-  background: rgba(220, 38, 38, 0.1);
-}
-
-.btnSubmit {
-  flex: 2;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 12px;
-  cursor: pointer;
-}
-
-.btnSubmit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Override de MontoInput prefix para el Hero */
-.montoPrefixHero {
-  font-size: 32px !important;
-  font-weight: 800 !important;
-  color: var(--text) !important;
-  padding-right: 8px !important;
-  padding-left: 0 !important;
-}
-
-.modalTitle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.modalTitleText {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.typeToggleNoMargin {
-  margin: 0 !important;
-}
-
-.typeBtnFixed {
-  width: 100px;
 }
 
 .cuotaHijaWarning {
@@ -389,11 +481,60 @@
   line-height: 1.4;
 }
 
-.gripIconWrapper {
-  width: 40px;
-  height: 40px;
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.formFooter {
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--surface-alt);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #8E9198;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cancelBtn, .btnDelete {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.cancelBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.btnDelete {
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #DC2626;
+}
+
+.btnDelete:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.submitBtn {
+  flex: 2;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.submitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

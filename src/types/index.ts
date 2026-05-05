@@ -141,6 +141,9 @@ export interface Subcategoria {
   id: string
   categoria_id: string
   nombre: string
+  es_global: boolean
+  creador_id: string | null
+  estado: 'activa' | 'archivada'
 }
 
 export interface Transaccion {

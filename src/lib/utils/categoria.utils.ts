@@ -22,7 +22,8 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'taxi':             { iconSrc: '/src/assets/icons/categorias/auto2 Background Removed.png',        label: 'Taxi / Remis' },
   'viaje':            { iconSrc: '/src/assets/icons/categorias/avion Background Removed.png',        label: 'Viaje' },
   // Salud & Bienestar
-  'salud':            { iconSrc: '/src/assets/icons/categorias/medicina Background Removed.png',     label: 'Salud' },
+  'salud':            { iconSrc: '/src/assets/icons/categorias/medicina Background Removed.png',     label: 'Salud y cuidado personal' },
+  'salud y cuidado personal': { iconSrc: '/src/assets/icons/categorias/medicina Background Removed.png', label: 'Salud y cuidado personal' },
   'farmacia':         { iconSrc: '/src/assets/icons/categorias/medicina Background Removed.png',     label: 'Farmacia' },
   'medico':           { iconSrc: '/src/assets/icons/categorias/bienestar Background Removed.png',    label: 'Médico' },
   'obra social':      { iconSrc: '/src/assets/icons/categorias/bienestar Background Removed.png',    label: 'Obra Social' },
@@ -109,6 +110,26 @@ export const SUBCATEGORIA_VISUAL: Record<string, SubcategoriaVisual> = {
   'seguro del auto':    { iconSrc: '/src/assets/icons/subcategorias/seguro Background Removed.png', label: 'Seguro auto' },
   'bicicleta / patineta': { iconSrc: '/src/assets/icons/subcategorias/bicicleta Background Removed.png', label: 'Bici / Patineta' },
   
+  // Salud
+  'farmacia':           { iconSrc: '/src/assets/icons/subcategorias/farmacia Background Removed.png', label: 'Farmacia' },
+  'medico / consulta':  { iconSrc: '/src/assets/icons/subcategorias/medicoconsulta Background Removed.png', label: 'Médico' },
+  'obra social / prepaga': { iconSrc: '/src/assets/icons/subcategorias/mutualprepaga Background Removed.png', label: 'Prepaga' },
+  'dentista':           { iconSrc: '/src/assets/icons/subcategorias/dentista Background Removed.png', label: 'Dentista' },
+  'optica':             { iconSrc: '/src/assets/icons/subcategorias/optica Background Removed.png', label: 'Óptica' },
+  'terapia':            { iconSrc: '/src/assets/icons/subcategorias/psicologia Background Removed.png', label: 'Terapia' },
+  'kinesiologia':       { iconSrc: '/src/assets/icons/subcategorias/kinesiologia Background Removed.png', label: 'Kinesiología' },
+  'estudios medicos':   { iconSrc: '/src/assets/icons/subcategorias/estudiosmedicos Background Removed.png', label: 'Estudios' },
+  'gimnasio':           { iconSrc: '/src/assets/icons/subcategorias/gym Background Removed.png', label: 'Gimnasio' },
+  'peluqueria':         { iconSrc: '/src/assets/icons/subcategorias/peluqueria Background Removed.png', label: 'Peluquería' },
+  'spa / cuidado personal': { iconSrc: '/src/assets/icons/subcategorias/spa Background Removed.png', label: 'Spa' },
+
+  // Educación
+  'cuotas escolares / universitarias': { iconSrc: '/src/assets/icons/subcategorias/escuela Background Removed.png', label: 'Cuotas' },
+  'cursos y capacitaciones':           { iconSrc: '/src/assets/icons/subcategorias/cursos Background Removed.png', label: 'Cursos' },
+  'libros y materiales':               { iconSrc: '/src/assets/icons/subcategorias/libro Background Removed.png', label: 'Libros' },
+  'idiomas':                           { iconSrc: '/src/assets/icons/subcategorias/idioma Background Removed.png', label: 'Idiomas' },
+  'guarderia / jardin':                { iconSrc: '/src/assets/icons/subcategorias/guarderia Background Removed.png', label: 'Guardería' },
+
   // Vivienda
   'alquiler':           { iconSrc: '/src/assets/icons/subcategorias/alquiler Background Removed.png', label: 'Alquiler' },
   'expensas':           { iconSrc: '/src/assets/icons/subcategorias/expensas Background Removed.png', label: 'Expensas' },

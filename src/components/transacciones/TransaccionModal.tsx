@@ -365,6 +365,7 @@ export default function TransaccionModal({
                 {billeterasCarousel.length === 0
                   ? <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>No hay billeteras en esta moneda.</p>
                   : (
+                  <div className={styles.billeterasCarouselScroller}>
                     <div className={styles.billeterasCarousel} ref={carouselRef}>
                       {billeterasCarousel.map(b => (
                         <div
@@ -387,6 +388,7 @@ export default function TransaccionModal({
                         </div>
                       ))}
                     </div>
+                  </div>
                   )}
               </div>
 

@@ -89,12 +89,22 @@ function formReducer(state: FormState, action: FormAction): FormState {
           metodoPago: action.transaccion.metodo_pago,
         }
       } else {
-        const principal = action.billeteras.find((b) => b.es_principal && b.estado === 'activa')
-        const firstActive = action.billeteras.find((b) => b.estado === 'activa')
+        const activas = action.billeteras.filter(b => b.estado === 'activa')
+        
+        // Prioridad:
+        // 1. Principal con saldo > 0
+        // 2. Cualquier otra con saldo > 0
+        // 3. Principal (aunque sea 0)
+        // 4. La primera activa que haya
+        const best = activas.find(b => b.es_principal && b.saldo_actual > 0) || 
+                     activas.find(b => b.saldo_actual > 0) ||
+                     activas.find(b => b.es_principal) ||
+                     activas[0]
+
         return {
           ...initialState,
-          billeteraId: principal?.id || firstActive?.id || '',
-          moneda: principal?.moneda || firstActive?.moneda || 'ARS',
+          billeteraId: best?.id || '',
+          moneda: best?.moneda || 'ARS',
         }
       }
     case 'SET_STEP':
@@ -254,19 +264,27 @@ export default function TransaccionModal({
 
   const isCuotaHija = isEdit && transaccion?.es_cuota_hija
 
-  const billeterasCarousel = useMemo(() =>
-    billeteras.filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId)),
-    [billeteras, moneda, billeteraId]
-  )
+  const billeterasCarousel = useMemo(() => {
+    const filtered = billeteras.filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId))
+    return filtered.sort((a, b) => {
+      // 1. Principal siempre primero
+      if (a.es_principal && !b.es_principal) return -1
+      if (!a.es_principal && b.es_principal) return 1
+      // 2. Por saldo descendente
+      return b.saldo_actual - a.saldo_actual
+    })
+  }, [billeteras, moneda, billeteraId])
 
+  // Solo auto-seleccionar si la billetera actual NO pertenece a la moneda seleccionada
   useEffect(() => {
-    if (!open) return
-    if (billeterasCarousel.length > 0 && !billeterasCarousel.find(b => b.id === billeteraId)) {
+    if (!open || !billeteraId) return
+    
+    const actualEsValida = billeteras.some(b => b.id === billeteraId && b.moneda === moneda)
+    
+    if (!actualEsValida && billeterasCarousel.length > 0) {
       dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: billeterasCarousel[0].id })
-    } else if (billeterasCarousel.length === 0) {
-      dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: '' })
     }
-  }, [moneda, billeterasCarousel, billeteraId, open])
+  }, [moneda, open]) // Quitamos billeteraId y billeterasCarousel de las dependencias para evitar loops y sobrescrituras innecesarias
 
   // Auto-scroll al card seleccionado cuando cambia billeteraId
   useEffect(() => {

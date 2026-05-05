@@ -56,7 +56,7 @@ const TransaccionRow = memo(({
       <div className={styles.content}>
         <div className={styles.titleRow}>
           <span className={styles.description}>
-            {transaccion.descripcion || 'Sin descripción'}
+            {transaccion.descripcion || transaccion.subcategoria?.nombre || 'Sin descripción'}
           </span>
           
           <div className={styles.badges}>

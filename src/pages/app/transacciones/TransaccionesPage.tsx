@@ -43,7 +43,7 @@ export default function TransaccionesPage() {
   const [pendientesIA, setPendientesIA] = useState<Transaccion[]>([])
   const [loading, setLoading] = useState(true)
 
-  const { open } = useModal()
+  const { open, confirm } = useModal()
   const recurrentesRef = useRef<RecurrentesPageRef>(null)
 
   const hasActiveFilters = useMemo(() => Object.entries(filters).some(([k, v]) => {
@@ -144,6 +144,27 @@ export default function TransaccionesPage() {
       })
     }
   }, [transacciones, pendientesIA, billeteras, categorias, open, refresh])
+
+  const handleDelete = useCallback((id: string) => {
+    const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
+    if (!tx) return
+    confirm({
+      title: 'Eliminar transacción',
+      description: '¿Estás seguro de que querés eliminar esta transacción? Esta acción no se puede deshacer.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await transaccionService.deleteTransaccion(id)
+          showToast('Transacción eliminada', 'success')
+          refresh()
+        } catch (e) {
+          console.error(e)
+          showToast('Error al eliminar la transacción', 'error')
+        }
+      },
+    })
+  }, [transacciones, pendientesIA, confirm, refresh, showToast])
 
   const openNewTransaccion = useCallback(() => {
     open('transaccion', {
@@ -313,6 +334,7 @@ export default function TransaccionesPage() {
                   categorias={categorias}
                   billeteras={billeteras}
                   onEdit={handleEdit}
+                  onDelete={handleDelete}
                 />
               ))
             )}

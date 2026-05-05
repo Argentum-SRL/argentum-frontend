@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { AlertCircle, CreditCard, RefreshCw } from 'lucide-react'
+import { AlertCircle, CreditCard, RefreshCw, Trash2 } from 'lucide-react'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { formatMonto } from '@/utils/format'
@@ -10,13 +10,15 @@ interface TransaccionRowProps {
   categoria?: Categoria
   billetera?: Billetera
   onEdit: (id: string) => void
+  onDelete: (id: string) => void
 }
 
 const TransaccionRow = memo(({
   transaccion,
   categoria,
   billetera,
-  onEdit
+  onEdit,
+  onDelete
 }: TransaccionRowProps) => {
   const isIngreso = transaccion.tipo === 'ingreso'
   const isPendiente = transaccion.estado_verificacion === 'pendiente'
@@ -82,6 +84,15 @@ const TransaccionRow = memo(({
           {billetera?.nombre || 'Billetera eliminada'}
         </span>
       </div>
+
+      <button
+        className={styles.deleteBtn}
+        onClick={(e) => { e.stopPropagation(); onDelete(transaccion.id) }}
+        aria-label="Eliminar transacción"
+        title="Eliminar transacción"
+      >
+        <Trash2 size={15} strokeWidth={1.75} />
+      </button>
     </div>
   )
 })

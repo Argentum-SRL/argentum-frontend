@@ -367,6 +367,11 @@
   background: transparent;
 }
 
+/* Ocultar el kebab menu en las cards del carrusel selector */
+.billeteraSelectWrap :global(.wcKebab) {
+  display: none !important;
+}
+
 /* ── Método de pago ──────────────────────────────────────────────────────── */
 .methodGrid {
   display: grid;

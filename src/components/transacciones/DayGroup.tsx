@@ -10,6 +10,7 @@ interface DayGroupProps {
   categorias: Categoria[]
   billeteras: Billetera[]
   onEdit: (id: string) => void
+  onDelete: (id: string) => void
 }
 
 const MESES = [
@@ -40,7 +41,8 @@ const DayGroup = memo(({
   transacciones,
   categorias,
   billeteras,
-  onEdit
+  onEdit,
+  onDelete,
 }: DayGroupProps) => {
   const dayLabel = useMemo(() => getDayLabel(fecha), [fecha])
 
@@ -110,6 +112,7 @@ const DayGroup = memo(({
                 categoria={cat}
                 billetera={bill}
                 onEdit={onEdit}
+                onDelete={onDelete}
               />
             </div>
           )

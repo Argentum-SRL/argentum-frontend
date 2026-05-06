@@ -297,7 +297,7 @@ export default function TransaccionModal({
 
   const activeCategorias = useMemo(() => {
     const filtered = categorias.filter((c) => c.tipo === tipo)
-    const mainCats = ['alimentacion','transporte','salud y cuidado personal','entretenimiento','servicios','ropa','ropa e indumentaria','educacion','vivienda']
+    const mainCats = ['alimentacion','transporte','salud y cuidado personal','entretenimiento','servicios','ropa','ropa e indumentaria','educacion','vivienda', 'banco', 'mascotas', 'regalos']
     return filtered.sort((a, b) => {
       const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
       const ai = mainCats.indexOf(norm(a.nombre)), bi = mainCats.indexOf(norm(b.nombre))

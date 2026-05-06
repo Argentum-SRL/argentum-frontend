@@ -17,7 +17,7 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'delivery':         { iconSrc: '/src/assets/icons/categorias/hamburguesa Background Removed.png',  label: 'Delivery' },
   'cafeteria':        { iconSrc: '/src/assets/icons/categorias/cafe Background Removed.png',         label: 'Cafetería' },
   // Transporte
-  'transporte':       { iconSrc: '/src/assets/icons/categorias/transporte Background Removed.png',   label: 'Transporte' },
+  'transporte':       { iconSrc: '/src/assets/icons/subcategorias/auto Background Removed.png',   label: 'Transporte' },
   'combustible':      { iconSrc: '/src/assets/icons/categorias/auto Background Removed.png',         label: 'Combustible' },
   'taxi':             { iconSrc: '/src/assets/icons/categorias/auto2 Background Removed.png',        label: 'Taxi / Remis' },
   'viaje':            { iconSrc: '/src/assets/icons/categorias/avion Background Removed.png',        label: 'Viaje' },
@@ -35,6 +35,13 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'streaming':        { iconSrc: '/src/assets/icons/categorias/peliculas Background Removed.png',    label: 'Streaming' },
   'cine':             { iconSrc: '/src/assets/icons/categorias/peliculas Background Removed.png',    label: 'Cine / Teatro' },
   'salidas':          { iconSrc: '/src/assets/icons/categorias/medialuna Background Removed.png',    label: 'Salidas' },
+  // Banco
+  'banco':            { iconSrc: '/src/assets/icons/categorias/banco Background Removed.png',         label: 'Banco' },
+  // Mascotas
+  'mascotas':         { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png',  label: 'Mascotas' },
+  'mascota':          { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png',  label: 'Mascotas' },
+  // Regalos
+  'regalos':          { iconSrc: '/src/assets/icons/categorias/regalo Background Removed.png',         label: 'Regalos' },
   // Servicios & Impuestos
   'servicios':        { iconSrc: '/src/assets/icons/categorias/luz Background Removed.png',          label: 'Servicios' },
   'servicios digitales': { iconSrc: '/src/assets/icons/categorias/serviciosdigitales Background Removed.png',       label: 'Servicios digitales' },
@@ -141,6 +148,34 @@ export const SUBCATEGORIA_VISUAL: Record<string, SubcategoriaVisual> = {
   'cable / tv':         { iconSrc: '/src/assets/icons/subcategorias/tv Background Removed.png', label: 'TV' },
   'limpieza':           { iconSrc: '/src/assets/icons/subcategorias/limpieza Background Removed.png', label: 'Limpieza' },
   'mantenimiento':      { iconSrc: '/src/assets/icons/subcategorias/mentenimiento Background Removed.png', label: 'Mantenimiento' },
+
+  // Ropa e indumentaria
+  'ropa':               { iconSrc: '/src/assets/icons/subcategorias/comprasropa Background Removed.png', label: 'Ropa' },
+  'calzado':            { iconSrc: '/src/assets/icons/subcategorias/zapatillas Background Removed.png', label: 'Calzado' },
+  'accesorios':         { iconSrc: '/src/assets/icons/subcategorias/accesorios Background Removed.png', label: 'Accesorios' },
+  'ropa deportiva':     { iconSrc: '/src/assets/icons/subcategorias/ropadeportiva Background Removed.png', label: 'Deportiva' },
+
+  // Entretenimiento y salidas
+  'cine / teatro / recitales': { iconSrc: '/src/assets/icons/subcategorias/peliculasycine Background Removed.png', label: 'Cine/Teatro' },
+  'salidas con amigos': { iconSrc: '/src/assets/icons/subcategorias/fiesta Background Removed.png', label: 'Salidas' },
+  'vacaciones y viajes':{ iconSrc: '/src/assets/icons/subcategorias/vacaciones Background Removed.png', label: 'Vacaciones' },
+  'hobbies':            { iconSrc: '/src/assets/icons/subcategorias/hobbies Background Removed.png', label: 'Hobbies' },
+  'juegos y videojuegos':{ iconSrc: '/src/assets/icons/subcategorias/juegos Background Removed.png', label: 'Juegos' },
+  'deportes':           { iconSrc: '/src/assets/icons/subcategorias/deportes Background Removed.png', label: 'Deportes' },
+
+  // Otros
+  'mascotas':           { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Mascotas' },
+  'alimento':           { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Alimento' },
+  'veterinario':        { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Veterinario' },
+  'accesorios':         { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Accesorios' },
+  'impuestos':          { iconSrc: '/src/assets/icons/subcategorias/impuestos Background Removed.png', label: 'Impuestos' },
+  'regalos':            { iconSrc: '/src/assets/icons/subcategorias/alimentacion Background Removed.png', label: 'Regalos' },
+  
+  // Banco
+  'tarjeta de credito': { iconSrc: '/src/assets/icons/subcategorias/tarjeta Background Removed.png', label: 'Tarjeta' },
+  'prestamos':          { iconSrc: '/src/assets/icons/subcategorias/prestamos Background Removed.png', label: 'Préstamos' },
+  'inversiones':        { iconSrc: '/src/assets/icons/subcategorias/inversiones Background Removed.png', label: 'Inversiones' },
+  'ahorros':            { iconSrc: '/src/assets/icons/subcategorias/ahorro Background Removed.png', label: 'Ahorros' },
 
   'default':      { iconSrc: '', label: '' }
 }

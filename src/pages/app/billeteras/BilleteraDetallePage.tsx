@@ -12,6 +12,7 @@ import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
 import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
+import ResumenDrawer from '@/components/tarjetas/ResumenDrawer'
 import { formatSaldo, getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BilleteraDetallePage.module.css'
 
@@ -26,6 +27,8 @@ const BilleteraDetallePage: React.FC = () => {
   const [movimientos, setMovimientos] = useState<Transaccion[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [selectedTarjetaIndex, setSelectedTarjetaIndex] = useState<number>(0)
+  const [resumenOpen, setResumenOpen] = useState(false)
+  const [tarjetaResumen, setTarjetaResumen] = useState<TarjetaCredito | null>(null)
   
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
@@ -333,6 +336,10 @@ const BilleteraDetallePage: React.FC = () => {
                         onEdit={handleEditTarjeta}
                         onArchive={handleArchiveTarjeta}
                         onDelete={handleDeleteTarjeta}
+                        onShowResumen={(t) => {
+                          setTarjetaResumen(t)
+                          setResumenOpen(true)
+                        }}
                       />
                     ) : (
                       <div className={styles.nuevaTarjetaGhost} onClick={handleCreateTarjeta}>
@@ -376,6 +383,14 @@ const BilleteraDetallePage: React.FC = () => {
           </section>
         )}
       </div>
+
+      {tarjetaResumen && (
+        <ResumenDrawer
+          open={resumenOpen}
+          onClose={() => setResumenOpen(false)}
+          tarjeta={tarjetaResumen}
+        />
+      )}
     </div>
   )
 }

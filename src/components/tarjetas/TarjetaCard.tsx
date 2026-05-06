@@ -1,7 +1,8 @@
 import React from 'react'
-import { Clock, Edit2, Archive, Trash2 } from 'lucide-react'
+import { Clock, Edit2, Archive, Trash2, Eye } from 'lucide-react'
 import type { TarjetaCredito, Billetera } from '@/types'
 import { calcularProximoVencimiento, RED_LABEL } from '@/lib/utils/tarjeta.utils'
+import { formatMonto } from '@/utils/format'
 import RealCardPreview from './RealCardPreview'
 import styles from './TarjetaCard.module.css'
 
@@ -11,9 +12,10 @@ interface TarjetaCardProps {
   onEdit: (tarjeta: TarjetaCredito) => void
   onArchive: (tarjeta: TarjetaCredito) => void
   onDelete: (tarjeta: TarjetaCredito) => void
+  onShowResumen: (tarjeta: TarjetaCredito) => void
 }
 
-const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete }) => {
+const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete, onShowResumen }) => {
   const proximoVencimiento = calcularProximoVencimiento(tarjeta.dia_vencimiento)
   
   const hoy = new Date()
@@ -23,12 +25,11 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
 
   // Extraer últimos 4 dígitos del nombre de la tarjeta
   const ultimos4 = tarjeta.nombre.replace('•••• ', '').slice(-4)
-  const titular = tarjeta.nombre // Podría extraerse del usuario, pero por ahora usamos el nombre
+  const titular = tarjeta.nombre
   const billeteraNombre = billetera?.nombre || RED_LABEL[tarjeta.red] || tarjeta.red
 
   return (
     <div className={styles.card}>
-      {/* Preview de la tarjeta */}
       <div className={styles.cardPreviewContainer}>
         <RealCardPreview
           ultimos4={ultimos4}
@@ -44,15 +45,26 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
       <div className={styles.content}>
         <div className={styles.divider} />
 
-        {mostrarAlerta && (
-          <div className={styles.chipAlerta}>
-            <Clock size={12} />
-            <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
-          </div>
-        )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {mostrarAlerta && (
+            <div className={styles.chipAlerta}>
+              <Clock size={12} />
+              <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
+            </div>
+          )}
+          
+          {tarjeta.resumen_actual && tarjeta.resumen_actual.total_comprometido_resumen_actual > 0 && (
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginLeft: 'auto' }}>
+              Resumen: {formatMonto(tarjeta.resumen_actual.total_comprometido_resumen_actual, tarjeta.moneda)}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className={styles.actions}>
+        <button className={styles.actionBtn} onClick={() => onShowResumen(tarjeta)} title="Ver resumen">
+          <Eye size={14} />
+        </button>
         <button className={styles.actionBtn} onClick={() => onEdit(tarjeta)} title="Editar">
           <Edit2 size={14} />
         </button>

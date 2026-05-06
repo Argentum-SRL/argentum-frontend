@@ -1,0 +1,246 @@
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 32px;
+}
+
+.headerCard {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  background: var(--surface-alt);
+  border-radius: 16px;
+  margin-bottom: 8px;
+}
+
+.cardScaleWrapper {
+  width: 60%;
+  transform: scale(0.9);
+  transform-origin: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--surface-alt);
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+
+.sectionDateLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.cuotasList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cuotaItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.cuotaIcon {
+  flex-shrink: 0;
+}
+
+.cuotaInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.cuotaDesc {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cuotaNum {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.cuotaMonto {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.emptySection {
+  padding: 20px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-3);
+  font-style: italic;
+}
+
+.sectionFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: baseline;
+}
+
+.totalLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+.totalValue {
+  font-family: 'Figtree', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.vencimientoInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vencimientoDate {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.vencimientoAlerta {
+  color: #E65100;
+}
+
+.venceProntoChip {
+  background: #FFF3E0;
+  color: #E65100;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* ── Sección Futuros ── */
+.futurosList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.futuroItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.futuroMes {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.futuroCuotas {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-left: 8px;
+}
+
+.futuroTotal {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── States ── */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+}
+
+.skeleton {
+  background: var(--surface-alt);
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.errorContainer {
+  padding: 40px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.errorText {
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+.retryBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .cardScaleWrapper {
+    width: 80%;
+  }
+}

@@ -1,5 +1,5 @@
 import api from './api'
-import type { TarjetaCredito, TarjetaCreditoCreate } from '@/types'
+import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta } from '@/types'
 
 const tarjetaService = {
   getTarjetas: async (): Promise<TarjetaCredito[]> => {
@@ -34,6 +34,11 @@ const tarjetaService = {
 
   deleteTarjeta: async (id: string): Promise<void> => {
     await api.delete(`/tarjetas/${id}`)
+  },
+
+  getResumenTarjeta: async (id: string): Promise<ResumenTarjeta> => {
+    const { data } = await api.get<ResumenTarjeta>(`/tarjetas/${id}/resumen`)
+    return data
   }
 }
 

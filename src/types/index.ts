@@ -263,6 +263,34 @@ export interface ProyeccionCategoria {
   fuera_de_patron: boolean
 }
 
+export interface CuotaResumen {
+  id: string
+  descripcion: string
+  numero_cuota: number
+  total_cuotas: number
+  monto: number
+  moneda: 'ARS' | 'USD'
+  fecha_vencimiento: string
+}
+
+export interface ResumenFuturo {
+  mes: string
+  mes_fecha: string
+  total: number
+  moneda: 'ARS' | 'USD'
+  cantidad_cuotas: number
+}
+
+export interface ResumenTarjeta {
+  fecha_cierre_proximo: string
+  fecha_vencimiento_proximo: string
+  total_comprometido_resumen_actual: number
+  total_comprometido_resumen_siguiente: number
+  cuotas_resumen_actual: CuotaResumen[]
+  cuotas_resumen_siguiente: CuotaResumen[]
+  resumenes_futuros: ResumenFuturo[]
+}
+
 export interface TarjetaCredito {
   id: string
   usuario_id: string
@@ -276,6 +304,7 @@ export interface TarjetaCredito {
   estado: 'activa' | 'archivada'
   color: string | null
   fecha_creacion: string
+  resumen_actual?: ResumenTarjeta
 }
 
 export interface TarjetaCreditoCreate {

@@ -368,7 +368,7 @@ export default function TarjetaModal() {
                 </div>
               </div>
 
-              {!data.billeteraId && (
+              {(!data.billeteraId && !data.tarjeta) && (
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Billetera asociada</label>
                   {bancarias.length > 0 ? (

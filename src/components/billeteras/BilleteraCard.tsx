@@ -13,6 +13,7 @@ export interface BilleteraCardProps {
   onDesarchivar?: (id: string) => void
   onEliminar?: (id: string) => void
   onEditar?: (id: string) => void
+  className?: string
 }
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
@@ -25,7 +26,8 @@ const BilleteraCard = memo(({
   onArchivar, 
   onDesarchivar,
   onEliminar, 
-  onEditar 
+  onEditar,
+  className
 }: BilleteraCardProps) => {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -73,7 +75,7 @@ const BilleteraCard = memo(({
 
   return (
     <div 
-      className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''}`}
+      className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''} ${className || ''}`}
       onClick={() => navigate(`/app/billeteras/${billetera.id}`)}
     >
       {/* Fondo clipeado */}

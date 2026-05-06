@@ -12,7 +12,6 @@ import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
 import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
-import ResumenDrawer from '@/components/tarjetas/ResumenDrawer'
 import { formatSaldo, getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BilleteraDetallePage.module.css'
 
@@ -23,12 +22,11 @@ const BilleteraDetallePage: React.FC = () => {
   const { open } = useModal()
 
   const [billetera, setBilletera] = useState<Billetera | null>(null)
+  const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [movimientos, setMovimientos] = useState<Transaccion[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [selectedTarjetaIndex, setSelectedTarjetaIndex] = useState<number>(0)
-  const [resumenOpen, setResumenOpen] = useState(false)
-  const [tarjetaResumen, setTarjetaResumen] = useState<TarjetaCredito | null>(null)
   
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
@@ -101,13 +99,16 @@ const BilleteraDetallePage: React.FC = () => {
     const loadTabData = async () => {
       setLoadingData(true)
       try {
-        // Cargar movimientos
-        const [txs, cats] = await Promise.all([
+        // Cargar movimientos (filtramos crédito ya que impactan vía Pago de Resumen)
+        const [txs, cats, allBills] = await Promise.all([
           transaccionService.getTransacciones({ billetera_id: id }),
-          categoriaService.getCategorias()
+          categoriaService.getCategorias(),
+          billeteraService.list()
         ])
-        setMovimientos(txs)
+        const movimientosBilletera = txs.filter(tx => tx.metodo_pago !== 'credito')
+        setMovimientos(movimientosBilletera)
         setCategorias(cats)
+        setBilleteras(allBills)
 
         // Cargar tarjetas si no es efectivo
         if (billetera && !billetera.es_efectivo) {
@@ -135,6 +136,26 @@ const BilleteraDetallePage: React.FC = () => {
     })
     return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]))
   }, [movimientos])
+
+  const refreshData = async () => {
+    if (!id) return
+    setLoadingData(true)
+    try {
+      const [txs, bill, cards] = await Promise.all([
+        transaccionService.getTransacciones({ billetera_id: id }),
+        billeteraService.getById(id),
+        tarjetaService.getTarjetasPorBilletera(id)
+      ])
+      const movimientosBilletera = txs.filter(tx => tx.metodo_pago !== 'credito')
+      setMovimientos(movimientosBilletera)
+      setBilletera(bill)
+      setTarjetas(cards)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoadingData(false)
+    }
+  }
 
   const loadTarjetas = async () => {
     if (!id) return
@@ -336,10 +357,6 @@ const BilleteraDetallePage: React.FC = () => {
                         onEdit={handleEditTarjeta}
                         onArchive={handleArchiveTarjeta}
                         onDelete={handleDeleteTarjeta}
-                        onShowResumen={(t) => {
-                          setTarjetaResumen(t)
-                          setResumenOpen(true)
-                        }}
                       />
                     ) : (
                       <div className={styles.nuevaTarjetaGhost} onClick={handleCreateTarjeta}>
@@ -363,7 +380,13 @@ const BilleteraDetallePage: React.FC = () => {
                 {/* Resumen de la tarjeta seleccionada — solo si no es el slide ghost */}
                 {tarjetas.length > 0 && selectedTarjetaIndex < tarjetas.length && (
                   <div className={styles.tarjetaSummary}>
-                    <TarjetaSummary tarjeta={tarjetas[selectedTarjetaIndex]} />
+                    <TarjetaSummary 
+                      tarjeta={tarjetas[selectedTarjetaIndex]} 
+                      billeteras={billeteras}
+                      categorias={categorias}
+                      todasLasTarjetas={tarjetas}
+                      onRefresh={refreshData}
+                    />
                   </div>
                 )}
 
@@ -384,13 +407,6 @@ const BilleteraDetallePage: React.FC = () => {
         )}
       </div>
 
-      {tarjetaResumen && (
-        <ResumenDrawer
-          open={resumenOpen}
-          onClose={() => setResumenOpen(false)}
-          tarjeta={tarjetaResumen}
-        />
-      )}
     </div>
   )
 }

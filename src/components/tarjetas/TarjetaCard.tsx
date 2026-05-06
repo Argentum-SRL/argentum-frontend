@@ -12,10 +12,9 @@ interface TarjetaCardProps {
   onEdit: (tarjeta: TarjetaCredito) => void
   onArchive: (tarjeta: TarjetaCredito) => void
   onDelete: (tarjeta: TarjetaCredito) => void
-  onShowResumen: (tarjeta: TarjetaCredito) => void
 }
 
-const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete, onShowResumen }) => {
+const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete }) => {
   const proximoVencimiento = calcularProximoVencimiento(tarjeta.dia_vencimiento)
   
   const hoy = new Date()
@@ -62,9 +61,6 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.actionBtn} onClick={() => onShowResumen(tarjeta)} title="Ver resumen">
-          <Eye size={14} />
-        </button>
         <button className={styles.actionBtn} onClick={() => onEdit(tarjeta)} title="Editar">
           <Edit2 size={14} />
         </button>

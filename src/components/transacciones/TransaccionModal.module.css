@@ -288,17 +288,16 @@
 }
 
 .radioPill:hover {
-  background: var(--surface-alt);
+  background: var(--surface);
 }
 
 .pillActiveEgreso {
-  border-color: var(--text);
-  background: var(--text);
-  color: var(--surface);
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
 }
 
 .pillActiveIngreso {
-  border-color: #16A34A;
   background: #16A34A;
   color: white;
 }
@@ -318,11 +317,13 @@
 /* El carrusel en sí: overflow visible para que sombra/outline respiren */
 .billeterasCarousel {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   overflow: visible;
   scroll-snap-type: x mandatory;
-  padding: 8px 4px 14px;  /* espacio para sombra y outline */
+  padding: 16px 40px; /* Mas padding para que no se corte al escalar/hover */
   scrollbar-width: none;
+  min-width: 100%;
+  justify-content: flex-start; /* flex-start es mejor para scroll con overflow */
 }
 
 .billeterasCarousel::-webkit-scrollbar {
@@ -332,9 +333,10 @@
 /* Wrap con efecto de elevación — sin border ni outline */
 .billeteraSelectWrap {
   position: relative;
-  min-width: 260px;
+  width: 280px;
+  aspect-ratio: 1.586 / 1;
   flex-shrink: 0;
-  scroll-snap-align: start;
+  scroll-snap-align: center;
   border-radius: 22px;
   border: none;
   transform: translateY(0);
@@ -370,6 +372,11 @@
 /* Ocultar el kebab menu en las cards del carrusel selector */
 .billeteraSelectWrap :global(.wcKebab) {
   display: none !important;
+}
+
+.fullHeightCard {
+  height: 100% !important;
+  aspect-ratio: auto !important; /* Desactivar el de la card interna */
 }
 
 /* ── Método de pago ──────────────────────────────────────────────────────── */
@@ -630,8 +637,133 @@
   box-shadow: 0 0 0 2px var(--primary-light);
 }
 
-.tarjetaNombre {
-  white-space: nowrap;
+.cuotasSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cuotasGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cuotasInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWrapper svg {
+  position: absolute;
+  left: 12px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.inputWrapper input {
+  width: 100%;
+  padding-left: 36px !important;
+}
+
+.resumenToggle {
+  display: flex;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 12px;
+  height: 42px;
+  border: 1px solid var(--border);
+}
+
+.resumenBtn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resumenBtnActive {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.cuotasHint {
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+  padding: 10px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.cuotasSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%);
+  border-radius: 16px;
+  color: white;
+  margin-top: 8px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.summaryHeader {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.summaryHint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-light);
+  opacity: 0.9;
+}
+
+.summaryBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.summaryCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryLbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  font-weight: 700;
+}
+
+.summaryVal {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.summaryColRight {
+  text-align: right;
 }
 
 .cuotaField {
@@ -740,4 +872,42 @@
 .submitBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 10px;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.radioPill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pillActiveEgreso {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #fecaca !important;
+}
+
+.pillActiveIngreso {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  border-color: #bbf7d0 !important;
 }

@@ -1,30 +1,276 @@
-/* ── TarjetaSummary.module.css ──────────────────────────────────────────── */
-
-.summary {
+.summaryContainer {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
-  background: var(--surface);
-  border-radius: 12px;
-  border: 1px solid var(--surface-alt);
+  padding: 12px 0;
+  width: 100%;
 }
 
-.summaryRow {
+/* ── Navegación Compacta ── */
+.ticketNav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* Flechas más cerca del título */
+  margin-bottom: 4px;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.navBtn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.monthTitle {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+  margin: 0;
+  min-width: 140px;
+  text-align: center;
+}
+
+/* ── Ticket Optimizado ── */
+.ticket {
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  position: relative;
+  padding: 20px 20px 16px; /* Padding reducido */
+  color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid #eee;
+}
+
+/* Efecto dentado más sutil */
+.ticket::before,
+.ticket::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-size: 12px 12px;
+  z-index: 2;
+}
+
+.ticket::before {
+  top: -3px;
+  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+}
+
+.ticket::after {
+  bottom: -3px;
+  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+}
+
+.ticketHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 10px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ticketLabel {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #999;
+  letter-spacing: 0.5px;
+}
+
+.ticketDate {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+
+.ticketContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Menos espacio entre items */
+}
+
+.itemRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
-.label {
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemTitle {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--text-3);
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.2;
 }
 
-.value {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
+.itemSub {
+  font-size: 10px;
+  color: #888;
+  font-weight: 500;
+}
+
+.itemMontoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.itemMonto {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.itemActions {
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.itemRow:hover .itemActions {
+  opacity: 1;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.actionBtn:nth-child(2):hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.ticketFooter {
+  border-top: 1px dashed #ddd;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.totalLabel {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.totalValue {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.vencimientoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.vencimientoLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.vencimientoValue {
+  font-size: 11px;
+  font-weight: 800;
+  color: #333;
+}
+
+.vencimientoUrgent {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+/* Dark mode logic para el ticket (papel) */
+:global(.dark) .ticket {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+.loadingSkeleton {
+  height: 240px;
+  width: 100%;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.emptyState {
+  padding: 24px 0;
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+  font-style: italic;
 }

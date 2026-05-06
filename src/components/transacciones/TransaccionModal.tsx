@@ -11,7 +11,7 @@ import {
   X
 } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
-import type { Transaccion, Billetera, Categoria, Subcategoria } from '@/types'
+import type { Transaccion, Billetera, Categoria, Subcategoria, TarjetaCredito } from '@/types'
 import transaccionService from '@/services/transaccion.service'
 import categoriaService from '@/services/categoria.service'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
@@ -28,6 +28,7 @@ interface TransaccionModalProps {
   transaccion?: Transaccion | null
   billeteras: Billetera[]
   categorias: Categoria[]
+  tarjetas: TarjetaCredito[]
   onSuccess: () => void
 }
 
@@ -41,6 +42,7 @@ interface FormState {
   categoriaId: string
   subcategoriaId: string
   billeteraId: string
+  tarjetaId: string
   fecha: string
   metodoPago: 'debito' | 'efectivo' | 'credito' | 'transferencia'
   showAllCats: boolean
@@ -64,6 +66,7 @@ const initialState: FormState = {
   categoriaId: '',
   subcategoriaId: '',
   billeteraId: '',
+  tarjetaId: '',
   fecha: new Date().toISOString().split('T')[0],
   metodoPago: 'debito',
   showAllCats: false,
@@ -85,6 +88,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           categoriaId: action.transaccion.categoria_id || '',
           subcategoriaId: action.transaccion.subcategoria_id || '',
           billeteraId: action.transaccion.billetera_id,
+          tarjetaId: action.transaccion.tarjeta_id || '',
           fecha: action.transaccion.fecha.split('T')[0],
           metodoPago: action.transaccion.metodo_pago,
         }
@@ -220,7 +224,7 @@ function MontoHero({
 }
 
 export default function TransaccionModal({
-  open, onClose, transaccion, billeteras, categorias, onSuccess,
+  open, onClose, transaccion, billeteras, categorias, tarjetas, onSuccess,
 }: TransaccionModalProps) {
   const isEdit = !!transaccion
   const { showToast } = useToast()
@@ -233,7 +237,7 @@ export default function TransaccionModal({
 
   const {
     step, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
-    billeteraId, fecha, metodoPago, showAllCats, cantidadCuotas, tasaInteres, isSubmitting,
+    billeteraId, tarjetaId, fecha, metodoPago, showAllCats, cantidadCuotas, tasaInteres, isSubmitting,
   } = state
 
   // Cargar subcategorías cuando cambia la categoría
@@ -263,6 +267,20 @@ export default function TransaccionModal({
   }, [open, transaccion, billeteras, isEdit])
 
   const isCuotaHija = isEdit && transaccion?.es_cuota_hija
+
+  const activeTarjetas = useMemo(() => {
+    return tarjetas.filter(t => t.moneda === moneda && t.estado === 'activa')
+  }, [tarjetas, moneda])
+
+  // Si cambia la tarjeta seleccionada, actualizar la billeteraId automáticamente
+  useEffect(() => {
+    if (metodoPago === 'credito' && tarjetaId) {
+      const t = tarjetas.find(x => x.id === tarjetaId)
+      if (t && t.billetera_id !== billeteraId) {
+        dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: t.billetera_id })
+      }
+    }
+  }, [tarjetaId, metodoPago, tarjetas, billeteraId])
 
   const billeterasCarousel = useMemo(() => {
     const filtered = billeteras.filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId))
@@ -342,6 +360,7 @@ export default function TransaccionModal({
         categoria_id: categoriaId || null,
         subcategoria_id: subcategoriaId || null,
         billetera_id: billeteraId, fecha, metodo_pago: metodoPago,
+        tarjeta_id: (metodoPago === 'credito' && tarjetaId) ? tarjetaId : null,
         origen: isEdit ? undefined : ('manual' as const),
         es_padre_cuotas: !isEdit && metodoPago === 'credito' ? true : undefined,
         info_cuotas: !isEdit && metodoPago === 'credito'
@@ -472,6 +491,31 @@ export default function TransaccionModal({
                   ))}
                 </div>
               </div>
+
+              {/* Selector de Tarjeta (solo si es Crédito) */}
+              {metodoPago === 'credito' && (
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>¿Qué tarjeta usaste?</label>
+                  <div className={styles.tarjetaGrid}>
+                    {activeTarjetas.length === 0 ? (
+                      <p className={styles.noTarjetas}>No tenés tarjetas configuradas en {moneda}.</p>
+                    ) : (
+                      activeTarjetas.map(t => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          className={`${styles.tarjetaOption} ${tarjetaId === t.id ? styles.tarjetaOptionActive : ''}`}
+                          onClick={() => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t.id })}
+                          style={{ '--tarjeta-color': t.color } as any}
+                        >
+                          <div className={styles.tarjetaDot} />
+                          <span className={styles.tarjetaNombre}>{t.nombre}</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className={styles.formFooter}>

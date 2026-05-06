@@ -5,7 +5,8 @@ import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
-import type { Transaccion, Billetera, Categoria } from '@/types'
+import tarjetaService from '@/services/tarjeta.service'
+import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { calcularPeriodoActual } from '@/lib/utils/ciclo'
 import { useAuth } from '@/hooks/useAuth'
@@ -41,6 +42,7 @@ export default function TransaccionesPage() {
   const [transacciones, setTransacciones] = useState<Transaccion[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [pendientesIA, setPendientesIA] = useState<Transaccion[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -94,13 +96,15 @@ export default function TransaccionesPage() {
     let isMounted = true
     const loadStatic = async () => {
       try {
-        const [b, c] = await Promise.all([
+        const [b, c, t] = await Promise.all([
           billeteraService.list(),
-          categoriaService.getCategorias()
+          categoriaService.getCategorias(),
+          tarjetaService.getTarjetas()
         ])
         if (isMounted) {
           setBilleteras(b.filter((w: Billetera) => w.estado === 'activa'))
           setCategorias(c)
+          setTarjetas(t)
         }
       } catch (err) {
         console.error('Error loading static data:', err)
@@ -140,11 +144,12 @@ export default function TransaccionesPage() {
           transaccion: tx,
           billeteras,
           categorias,
+          tarjetas,
           onSuccess: refresh,
         },
       })
     }
-  }, [transacciones, pendientesIA, billeteras, categorias, open, refresh])
+  }, [transacciones, pendientesIA, billeteras, categorias, tarjetas, open, refresh])
 
   const handleDelete = useCallback((id: string) => {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
@@ -173,10 +178,11 @@ export default function TransaccionesPage() {
         transaccion: null,
         billeteras,
         categorias,
+        tarjetas,
         onSuccess: refresh,
       },
     })
-  }, [billeteras, categorias, open, refresh])
+  }, [billeteras, categorias, tarjetas, open, refresh])
 
   const handleClearFilters = useCallback(() => {
     setFilters(defaultFilters)

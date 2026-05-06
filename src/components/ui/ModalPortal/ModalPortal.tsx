@@ -54,6 +54,7 @@ export function ModalPortal() {
           transaccion={transaccionData.transaccion}
           billeteras={transaccionData.billeteras}
           categorias={transaccionData.categorias}
+          tarjetas={transaccionData.tarjetas}
           onSuccess={transaccionData.onSuccess}
         />
       )}

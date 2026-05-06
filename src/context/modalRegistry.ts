@@ -19,6 +19,7 @@ export interface ModalPayloadMap {
     transaccion: Transaccion | null
     billeteras: Billetera[]
     categorias: Categoria[]
+    tarjetas: TarjetaCredito[]
     onSuccess: () => Promise<void> | void
   }
   recurrente: {

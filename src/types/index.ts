@@ -157,6 +157,7 @@ export interface Transaccion {
   subcategoria_id: string | null
   metodo_pago: 'efectivo' | 'debito' | 'transferencia' | 'credito'
   billetera_id: string
+  tarjeta_id: string | null
   es_recurrente: boolean
   es_cuota_hija: boolean
   es_padre_cuotas: boolean

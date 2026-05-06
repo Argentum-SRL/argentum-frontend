@@ -578,6 +578,62 @@
   gap: 10px;
 }
 
+.noTarjetas {
+  font-size: 13px;
+  color: var(--text-3);
+  margin: 0;
+  padding: 8px 0;
+}
+
+.tarjetaGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tarjetaOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tarjetaOption:hover {
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+}
+
+.tarjetaOptionActive {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tarjetaDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--tarjeta-color, var(--text-3));
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+.tarjetaOptionActive .tarjetaDot {
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.tarjetaNombre {
+  white-space: nowrap;
+}
+
 .cuotaField {
   flex: 1;
   display: flex;

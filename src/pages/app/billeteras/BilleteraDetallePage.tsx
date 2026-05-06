@@ -8,9 +8,9 @@ import transaccionService from '@/services/transaccion.service'
 import categoriaService from '@/services/categoria.service'
 import { Button } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
+import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
-import TarjetaDrawer from '@/components/tarjetas/TarjetaDrawer'
 import { formatSaldo } from '@/lib/utils/billeteras.utils'
 import styles from './BilleteraDetallePage.module.css'
 
@@ -18,6 +18,7 @@ const BilleteraDetallePage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { showToast } = useToast()
+  const { open } = useModal()
 
   const [billetera, setBilletera] = useState<Billetera | null>(null)
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
@@ -27,9 +28,6 @@ const BilleteraDetallePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'movimientos' | 'tarjetas'>('movimientos')
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
-  
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [tarjetaEditando, setTarjetaEditando] = useState<TarjetaCredito | undefined>(undefined)
 
   // Cargar billetera inicial
   useEffect(() => {
@@ -89,14 +87,41 @@ const BilleteraDetallePage: React.FC = () => {
     return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]))
   }, [movimientos])
 
-  const handleCreateTarjeta = () => {
-    setTarjetaEditando(undefined)
-    setDrawerOpen(true)
+  const loadTarjetas = async () => {
+    if (!id) return
+    const data = await tarjetaService.getTarjetasPorBilletera(id)
+    setTarjetas(data)
   }
 
-  const handleEditTarjeta = (tarjeta: TarjetaCredito) => {
-    setTarjetaEditando(tarjeta)
-    setDrawerOpen(true)
+  const handleCreateTarjeta = async () => {
+    try {
+      const allBilleteras = await billeteraService.list()
+      open('tarjeta', {
+        data: {
+          tarjeta: null,
+          billeteras: allBilleteras,
+          billeteraId: id,
+          onSuccess: loadTarjetas
+        }
+      })
+    } catch (error) {
+      showToast('Error al cargar billeteras', 'error')
+    }
+  }
+
+  const handleEditTarjeta = async (tarjeta: TarjetaCredito) => {
+    try {
+      const allBilleteras = await billeteraService.list()
+      open('tarjeta', {
+        data: {
+          tarjeta,
+          billeteras: allBilleteras,
+          onSuccess: loadTarjetas
+        }
+      })
+    } catch (error) {
+      showToast('Error al cargar billeteras', 'error')
+    }
   }
 
   const handleArchiveTarjeta = async (tarjeta: TarjetaCredito) => {
@@ -248,17 +273,6 @@ const BilleteraDetallePage: React.FC = () => {
           </div>
         )}
       </main>
-
-      <TarjetaDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        tarjeta={tarjetaEditando}
-        billeteraId={id!}
-        onSuccess={async () => {
-          const data = await tarjetaService.getTarjetasPorBilletera(id!)
-          setTarjetas(data)
-        }}
-      />
     </div>
   )
 }

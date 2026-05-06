@@ -3,6 +3,7 @@ import { ModalContext } from '@/context/ModalContext'
 import BankPickerModal from '@/components/billeteras/BankPickerModal'
 import EditBilleteraModal from '@/components/billeteras/EditBilleteraModal'
 import TransaccionModal from '@/components/transacciones/TransaccionModal'
+import TarjetaModal from '@/components/tarjetas/TarjetaModal'
 import RecurrenteModal from '@/components/transacciones/RecurrenteModal'
 import FilterBarMobileDrawer from '@/components/transacciones/FilterBarMobileDrawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
@@ -18,6 +19,7 @@ export function ModalPortal() {
   const bankPickerData = typedModals.bankPicker?.data
   const editBilleteraData = typedModals.editBilletera?.data
   const transaccionData = typedModals.transaccion?.data
+  const tarjetaData = typedModals.tarjeta?.data
   const recurrenteData = typedModals.recurrente?.data
   const filterDrawerData = typedModals.transaccionFilters?.data
   const proyeccionData = typedModals.proyeccion?.data
@@ -54,6 +56,10 @@ export function ModalPortal() {
           categorias={transaccionData.categorias}
           onSuccess={transaccionData.onSuccess}
         />
+      )}
+
+      {typedModals.tarjeta?.isOpen && tarjetaData && (
+        <TarjetaModal />
       )}
 
       {typedModals.recurrente?.isOpen && recurrenteData && (

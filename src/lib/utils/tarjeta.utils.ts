@@ -40,7 +40,7 @@ export function calcularPrimerVencimiento(
 // Labels de red
 export const RED_LABEL: Record<string, string> = {
   visa: 'Visa', mastercard: 'Mastercard', amex: 'Amex',
-  naranja: 'Naranja', cabal: 'Cabal', otro: 'Otra'
+  naranja: 'Naranja', cabal: 'Cabal'
 }
 
 // Colores predefinidos para el picker

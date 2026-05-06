@@ -1,8 +1,9 @@
 import React from 'react'
-import { CreditCard, Clock, Edit2, Archive, Trash2 } from 'lucide-react'
+import { Clock, Edit2, Archive, Trash2 } from 'lucide-react'
 import type { TarjetaCredito } from '@/types'
 import { calcularProximoCierre, calcularProximoVencimiento, RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import { formatMonto } from '@/utils/format'
+import RealCardPreview from './RealCardPreview'
 import styles from './TarjetaCard.module.css'
 
 interface TarjetaCardProps {

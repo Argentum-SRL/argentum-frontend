@@ -372,15 +372,29 @@ export default function DashboardPage() {
 
                   return (
                     <div key={p.id} className={styles.listItem}>
-                      <div className={styles.itemIcon}>
+                      <div className={styles.itemIcon} style={p.tipo === 'resumen_tarjeta' ? { position: 'relative' } : {}}>
                         {p.tipo === 'suscripcion' ? <RefreshCw size={20} /> : <CreditCard size={20} />}
+                        {p.tipo === 'resumen_tarjeta' && (
+                          <div 
+                            style={{ 
+                              position: 'absolute', 
+                              top: -2, 
+                              right: -2, 
+                              width: 10, 
+                              height: 10, 
+                              borderRadius: '50%', 
+                              backgroundColor: p.color || 'var(--primary)',
+                              border: '2px solid var(--surface)'
+                            }} 
+                          />
+                        )}
                       </div>
                       <div className={styles.itemMeta}>
                         <p className={styles.itemName}>{p.nombre}</p>
                         <p className={styles.itemSub}>{fechaTxt}</p>
                       </div>
                       <div className={styles.pagoRight}>
-                        <div className={styles.itemAmount}>{formatMonto(p.monto, 'ARS')}</div>
+                        <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
                         {isUrgente && <span className={styles.urgentBadge}>Urgente</span>}
                       </div>
                     </div>

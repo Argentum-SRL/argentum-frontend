@@ -228,7 +228,9 @@ export interface PagoDashboard {
   moneda: 'ARS' | 'USD'
   fecha_cobro: string
   dias_restantes: number
-  tipo: 'suscripcion' | 'cuota'
+  tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta'
+  tarjeta_id?: string
+  color?: string
 }
 
 export interface Proyeccion {

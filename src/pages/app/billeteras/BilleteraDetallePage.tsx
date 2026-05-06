@@ -296,10 +296,6 @@ const BilleteraDetallePage: React.FC = () => {
           <section className={styles.tarjetasSection}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Tarjetas de crédito</h2>
-              <Button onClick={handleCreateTarjeta}>
-                <Plus size={16} style={{ marginRight: '6px' }} />
-                Nueva tarjeta
-              </Button>
             </div>
 
             {loadingData ? (
@@ -323,33 +319,42 @@ const BilleteraDetallePage: React.FC = () => {
                 <div className={styles.carouselContainer}>
                   <button
                     className={styles.carouselBtn}
-                    onClick={() => setSelectedTarjetaIndex((i) => (i - 1 + tarjetas.length) % tarjetas.length)}
+                    onClick={() => setSelectedTarjetaIndex((i) => (i - 1 + (tarjetas.length + 1)) % (tarjetas.length + 1))}
                     aria-label="Tarjeta anterior"
                   >
                     <ChevronLeft size={20} />
                   </button>
 
                   <div className={styles.carouselPreview}>
-                    <TarjetaCard
-                      tarjeta={tarjetas[selectedTarjetaIndex]}
-                      billetera={billetera}
-                      onEdit={handleEditTarjeta}
-                      onArchive={handleArchiveTarjeta}
-                      onDelete={handleDeleteTarjeta}
-                    />
+                    {selectedTarjetaIndex < tarjetas.length ? (
+                      <TarjetaCard
+                        tarjeta={tarjetas[selectedTarjetaIndex]}
+                        billetera={billetera}
+                        onEdit={handleEditTarjeta}
+                        onArchive={handleArchiveTarjeta}
+                        onDelete={handleDeleteTarjeta}
+                      />
+                    ) : (
+                      <div className={styles.nuevaTarjetaGhost} onClick={handleCreateTarjeta}>
+                        <div className={styles.ghostInner}>
+                          <Plus size={32} strokeWidth={1.5} />
+                          <span>Nueva tarjeta</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <button
                     className={styles.carouselBtn}
-                    onClick={() => setSelectedTarjetaIndex((i) => (i + 1) % tarjetas.length)}
+                    onClick={() => setSelectedTarjetaIndex((i) => (i + 1) % (tarjetas.length + 1))}
                     aria-label="Próxima tarjeta"
                   >
                     <ChevronRight size={20} />
                   </button>
                 </div>
 
-                {/* Resumen de la tarjeta seleccionada */}
-                {tarjetas.length > 0 && (
+                {/* Resumen de la tarjeta seleccionada — solo si no es el slide ghost */}
+                {tarjetas.length > 0 && selectedTarjetaIndex < tarjetas.length && (
                   <div className={styles.tarjetaSummary}>
                     <TarjetaSummary tarjeta={tarjetas[selectedTarjetaIndex]} />
                   </div>
@@ -357,12 +362,12 @@ const BilleteraDetallePage: React.FC = () => {
 
                 {/* Indicador de posición */}
                 <div className={styles.carouselIndicator}>
-                  {tarjetas.map((_, index) => (
+                  {[...Array(tarjetas.length + 1)].map((_, index) => (
                     <button
                       key={index}
                       className={`${styles.indicator} ${index === selectedTarjetaIndex ? styles.indicatorActive : ''}`}
                       onClick={() => setSelectedTarjetaIndex(index)}
-                      aria-label={`Ir a tarjeta ${index + 1}`}
+                      aria-label={`Ir a slide ${index + 1}`}
                     />
                   ))}
                 </div>

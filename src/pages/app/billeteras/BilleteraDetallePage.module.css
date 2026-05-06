@@ -271,7 +271,42 @@
 
 /* ── Carousel Preview ────────────────────────────────────────────────────── */
 .carouselPreview {
-  flex: 0 1 320px; /* Reducido de 350px y más controlado */
+  flex: 0 1 320px;
+}
+
+.nuevaTarjetaGhost {
+  width: 100%;
+  aspect-ratio: 1.586 / 1;
+  border-radius: 12px;
+  border: 2px dashed var(--surface-alt);
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--text-3);
+}
+
+.nuevaTarjetaGhost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--surface-alt);
+  transform: translateY(-4px);
+}
+
+.ghostInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ghostInner span {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ── Tarjeta Summary ─────────────────────────────────────────────────────── */
@@ -324,7 +359,7 @@
 }
 
 .sectionHeader h2 {
-  display: none;
+  display: block;
 }
 
 .cardsGrid {

@@ -1,0 +1,30 @@
+/* ── TarjetaSummary.module.css ──────────────────────────────────────────── */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--surface-alt);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}

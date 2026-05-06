@@ -1,26 +1,26 @@
 .card {
   position: relative;
-  background: var(--surface);
-  border-radius: 16px;
-  border: 1px solid var(--surface-alt);
+  border: none;
   display: flex;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+  padding: 0;
+  gap: 0;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-4px) scale(1.02);
 }
 
-.colorBar {
-  width: 4px;
-  border-radius: 16px 0 0 16px;
+.cardPreviewContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .content {
   flex: 1;
-  padding: 18px 20px;
+  padding: 0;
 }
 
 .header {
@@ -116,12 +116,13 @@
 
 .actions {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
   display: flex;
-  gap: 4px;
+  gap: 6px;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  z-index: 10;
+  transition: all 0.2s ease;
 }
 
 .card:hover .actions {
@@ -134,22 +135,23 @@
 }
 
 .actionBtn {
-  background: var(--surface);
-  border: 1px solid var(--surface-alt);
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-2);
+  color: white;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .actionBtn:hover {
-  background: var(--surface-alt);
-  color: var(--primary);
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
 }
 
 .actionBtnDelete:hover {

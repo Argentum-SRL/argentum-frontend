@@ -1,20 +1,19 @@
 import React from 'react'
 import { Clock, Edit2, Archive, Trash2 } from 'lucide-react'
-import type { TarjetaCredito } from '@/types'
-import { calcularProximoCierre, calcularProximoVencimiento, RED_LABEL } from '@/lib/utils/tarjeta.utils'
-import { formatMonto } from '@/utils/format'
+import type { TarjetaCredito, Billetera } from '@/types'
+import { calcularProximoVencimiento, RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import RealCardPreview from './RealCardPreview'
 import styles from './TarjetaCard.module.css'
 
 interface TarjetaCardProps {
   tarjeta: TarjetaCredito
+  billetera?: Billetera
   onEdit: (tarjeta: TarjetaCredito) => void
   onArchive: (tarjeta: TarjetaCredito) => void
   onDelete: (tarjeta: TarjetaCredito) => void
 }
 
-const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, onEdit, onArchive, onDelete }) => {
-  const proximoCierre = calcularProximoCierre(tarjeta.dia_cierre)
+const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete }) => {
   const proximoVencimiento = calcularProximoVencimiento(tarjeta.dia_vencimiento)
   
   const hoy = new Date()
@@ -22,53 +21,36 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, onEdit, onArchive, o
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   const mostrarAlerta = diffDays >= 0 && diffDays <= 5
 
-  const color = tarjeta.color || 'var(--primary)'
+  // Extraer últimos 4 dígitos del nombre de la tarjeta
+  const ultimos4 = tarjeta.nombre.replace('•••• ', '').slice(-4)
+  const titular = tarjeta.nombre // Podría extraerse del usuario, pero por ahora usamos el nombre
+  const billeteraNombre = billetera?.nombre || RED_LABEL[tarjeta.red] || tarjeta.red
 
   return (
     <div className={styles.card}>
-      <div className={styles.colorBar} style={{ background: color }} />
-      
-      <div className={styles.content}>
-        <div className={styles.header}>
-          <div className={styles.iconWrapper}>
-            <CreditCard size={32} style={{ color }} />
-          </div>
-          <div className={styles.info}>
-            <span className={styles.nombre}>{tarjeta.nombre}</span>
-            <span className={styles.banco}>{RED_LABEL[tarjeta.red] || 'Tarjeta'}</span>
-            <span className={styles.dias}>
-              Cierre: día {tarjeta.dia_cierre} · Vence: día {tarjeta.dia_vencimiento}
-            </span>
-          </div>
-        </div>
+      {/* Preview de la tarjeta */}
+      <div className={styles.cardPreviewContainer}>
+        <RealCardPreview
+          ultimos4={ultimos4}
+          red={tarjeta.red}
+          titular={titular}
+          diaCierre={tarjeta.dia_cierre}
+          diaVencimiento={tarjeta.dia_vencimiento}
+          color={tarjeta.color || '#0D2045'}
+          billeteraNombre={billeteraNombre}
+        />
+      </div>
 
+      <div className={styles.content}>
         <div className={styles.divider} />
 
-        <div className={styles.dates}>
-          <div className={styles.dateRow}>
-            <span className={styles.dateLabel}>Próximo cierre:</span>
-            <span>{proximoCierre.toLocaleDateString()}</span>
-          </div>
-          <div className={styles.dateRow}>
-            <span className={styles.dateLabel}>Próximo vencimiento:</span>
-            <span>{proximoVencimiento.toLocaleDateString()}</span>
-          </div>
-        </div>
-
-        {tarjeta.limite_credito && (
-          <div className={styles.limite}>
-            <span className={styles.dateLabel}>Límite:</span>
-            <span>{formatMonto(tarjeta.limite_credito, tarjeta.moneda)}</span>
+        {mostrarAlerta && (
+          <div className={styles.chipAlerta}>
+            <Clock size={12} />
+            <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
           </div>
         )}
       </div>
-
-      {mostrarAlerta && (
-        <div className={styles.chipAlerta}>
-          <Clock size={12} />
-          <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
-        </div>
-      )}
 
       <div className={styles.actions}>
         <button className={styles.actionBtn} onClick={() => onEdit(tarjeta)} title="Editar">

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, CreditCard, Plus, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign } from 'lucide-react'
 import type { Billetera, TarjetaCredito, Transaccion, Categoria } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
@@ -11,7 +11,8 @@ import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
-import { formatSaldo } from '@/lib/utils/billeteras.utils'
+import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
+import { formatSaldo, getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BilleteraDetallePage.module.css'
 
 const BilleteraDetallePage: React.FC = () => {
@@ -24,10 +25,53 @@ const BilleteraDetallePage: React.FC = () => {
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [movimientos, setMovimientos] = useState<Transaccion[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [selectedTarjetaIndex, setSelectedTarjetaIndex] = useState<number>(0)
   
-  const [activeTab, setActiveTab] = useState<'movimientos' | 'tarjetas'>('movimientos')
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
+  const [logoErr, setLogoErr] = useState(false)
+  const bgRef = useRef<HTMLDivElement>(null)
+
+  // Obtener información del banco para estilo
+  const bank = useMemo(() => {
+    if (!billetera) return undefined
+    return billetera.bank_id
+      ? getBankById(billetera.bank_id)
+      : !billetera.es_efectivo
+        ? findBankByNombre(billetera.nombre)
+        : undefined
+  }, [billetera])
+
+  const logoUrl = useMemo(() => {
+    return bank ? getBankLogoUrl(bank.logoPath) : ''
+  }, [bank])
+
+  const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
+    ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
+    USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
+  }
+
+  const background = useMemo(() => {
+    if (!billetera) return 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
+    if (billetera.es_efectivo) {
+      return EFECTIVO_BG[billetera.moneda]
+    } else if (bank?.gradiente) {
+      return bank.gradiente
+    } else if (bank?.colorPrimario) {
+      return bank.colorPrimario
+    } else {
+      return 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
+    }
+  }, [billetera, bank])
+
+  const isLight = !bank || bank.colorTexto === 'white'
+
+  // Set background variable via ref
+  useEffect(() => {
+    if (bgRef.current && billetera) {
+      bgRef.current.style.setProperty('--bdh-bg', background)
+    }
+  }, [background, billetera])
 
   // Cargar billetera inicial
   useEffect(() => {
@@ -54,14 +98,16 @@ const BilleteraDetallePage: React.FC = () => {
     const loadTabData = async () => {
       setLoadingData(true)
       try {
-        if (activeTab === 'movimientos') {
-          const [txs, cats] = await Promise.all([
-            transaccionService.getTransacciones({ billetera_id: id }),
-            categoriaService.getCategorias()
-          ])
-          setMovimientos(txs)
-          setCategorias(cats)
-        } else {
+        // Cargar movimientos
+        const [txs, cats] = await Promise.all([
+          transaccionService.getTransacciones({ billetera_id: id }),
+          categoriaService.getCategorias()
+        ])
+        setMovimientos(txs)
+        setCategorias(cats)
+
+        // Cargar tarjetas si no es efectivo
+        if (billetera && !billetera.es_efectivo) {
           const data = await tarjetaService.getTarjetasPorBilletera(id)
           setTarjetas(data)
         }
@@ -74,7 +120,7 @@ const BilleteraDetallePage: React.FC = () => {
     }
 
     loadTabData()
-  }, [id, activeTab, billetera])
+  }, [id, billetera])
 
   // Agrupar movimientos por día
   const groupedMovimientos = useMemo(() => {
@@ -160,82 +206,96 @@ const BilleteraDetallePage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <button className={styles.backBtn} onClick={() => navigate('/app/billeteras')}>
-          <ChevronLeft size={18} />
-          Billeteras
-        </button>
-        
-        <div className={styles.titleRow}>
-          <div className={styles.billeteraInfo}>
-            <h1 className={styles.name}>{billetera.nombre}</h1>
-            <span className={styles.type}>
-              {billetera.es_efectivo ? 'Efectivo' : 'Banco'} · {billetera.moneda}
+      <div className={styles.headerCard} ref={bgRef}>
+        {/* Fondo clipeado */}
+        <div className={styles.headerBg}>
+          <div className={styles.decoA} aria-hidden="true" />
+          <div className={styles.decoB} aria-hidden="true" />
+        </div>
+
+        {/* Contenido del header en una sola línea */}
+        <div className={styles.headerInner}>
+          {/* Back button */}
+          <button className={styles.backBtn} onClick={() => navigate('/app/billeteras')}>
+            <ChevronLeft size={18} />
+          </button>
+
+          {/* Logo */}
+          <div className={styles.headerLogo}>
+            {billetera.es_efectivo ? (
+              billetera.moneda === 'ARS'
+                ? <CreditCard size={20} strokeWidth={1.75} color="white" />
+                : <DollarSign size={20} strokeWidth={1.75} color="white" />
+            ) : logoUrl && !logoErr ? (
+              <img src={logoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
+            ) : (
+              <span className={styles.logoFallback}>
+                {getInitials(bank?.nombre ?? billetera.nombre)}
+              </span>
+            )}
+          </div>
+
+          {/* Nombre y detalle */}
+          <div className={styles.headerIdentity}>
+            <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
+              {billetera.nombre}
+            </h1>
+            <span className={`${styles.headerDetail} ${isLight ? styles.textLight : styles.textDark}`}>
+              {billetera.es_principal && <span className={styles.principal}>Principal</span>}
+              {billetera.moneda}
             </span>
           </div>
-          <div className={styles.saldoContainer}>
-            <span className={styles.saldoLabel}>Saldo actual</span>
-            <div className={styles.saldo}>
+
+          {/* Saldo a la derecha */}
+          <div className={styles.headerSaldo}>
+            <span className={styles.headerSaldoLabel}>Saldo actual</span>
+            <div className={`${styles.headerSaldoValue} ${isLight ? styles.textLight : styles.textDark}`}>
               {formatSaldo(billetera.saldo_actual, billetera.moneda)}
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      <nav className={styles.tabs}>
-        <button 
-          className={`${styles.tab} ${activeTab === 'movimientos' ? styles.tabActive : ''}`}
-          onClick={() => setActiveTab('movimientos')}
-        >
-          Movimientos
-        </button>
+      <div className={styles.contentGrid}>
+        {/* Columna izquierda: Movimientos */}
+        <section className={styles.movimientosSection}>
+          <h2 className={styles.sectionTitle}>Movimientos</h2>
+          {loadingData ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+              <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
+            </div>
+          ) : movimientos.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>
+                <CreditCard size={48} />
+              </div>
+              <h3 className={styles.emptyTitle}>Sin movimientos</h3>
+              <p className={styles.emptyText}>
+                Esta billetera aún no tiene transacciones registradas.
+              </p>
+            </div>
+          ) : (
+            <div className={styles.movimientosList}>
+              {groupedMovimientos.map(([fecha, txs]) => (
+                <DayGroup
+                  key={fecha}
+                  fecha={fecha}
+                  transacciones={txs}
+                  categorias={categorias}
+                  billeteras={[billetera]}
+                  onEdit={() => {}} // TODO: implementar edicion si es necesario
+                  onDelete={() => {}} // TODO: implementar borrado
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Columna derecha: Tarjetas (solo si no es efectivo) */}
         {!billetera.es_efectivo && (
-          <button 
-            className={`${styles.tab} ${activeTab === 'tarjetas' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('tarjetas')}
-          >
-            Tarjetas de crédito
-          </button>
-        )}
-      </nav>
-
-      <main>
-        {activeTab === 'movimientos' ? (
-          <div className={styles.movimientosSection}>
-            {loadingData ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-                <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
-              </div>
-            ) : movimientos.length === 0 ? (
-              <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>
-                  <CreditCard size={48} />
-                </div>
-                <h3 className={styles.emptyTitle}>Sin movimientos</h3>
-                <p className={styles.emptyText}>
-                  Esta billetera aún no tiene transacciones registradas.
-                </p>
-              </div>
-            ) : (
-              <div className={styles.movimientosList}>
-                {groupedMovimientos.map(([fecha, txs]) => (
-                  <DayGroup
-                    key={fecha}
-                    fecha={fecha}
-                    transacciones={txs}
-                    categorias={categorias}
-                    billeteras={[billetera]}
-                    onEdit={() => {}} // TODO: implementar edicion si es necesario
-                    onDelete={() => {}} // TODO: implementar borrado
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className={styles.tarjetasSection}>
+          <section className={styles.tarjetasSection}>
             <div className={styles.sectionHeader}>
-              <h2>Tarjetas de crédito</h2>
+              <h2 className={styles.sectionTitle}>Tarjetas de crédito</h2>
               <Button onClick={handleCreateTarjeta}>
                 <Plus size={16} style={{ marginRight: '6px' }} />
                 Nueva tarjeta
@@ -258,21 +318,59 @@ const BilleteraDetallePage: React.FC = () => {
                 <Button onClick={handleCreateTarjeta}>Agregar tarjeta</Button>
               </div>
             ) : (
-              <div className={styles.cardsGrid}>
-                {tarjetas.map(tarjeta => (
-                  <TarjetaCard 
-                    key={tarjeta.id} 
-                    tarjeta={tarjeta} 
-                    onEdit={handleEditTarjeta}
-                    onArchive={handleArchiveTarjeta}
-                    onDelete={handleDeleteTarjeta}
-                  />
-                ))}
-              </div>
+              <>
+                {/* Carousel de tarjetas */}
+                <div className={styles.carouselContainer}>
+                  <button
+                    className={styles.carouselBtn}
+                    onClick={() => setSelectedTarjetaIndex((i) => (i - 1 + tarjetas.length) % tarjetas.length)}
+                    aria-label="Tarjeta anterior"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  <div className={styles.carouselPreview}>
+                    <TarjetaCard
+                      tarjeta={tarjetas[selectedTarjetaIndex]}
+                      billetera={billetera}
+                      onEdit={handleEditTarjeta}
+                      onArchive={handleArchiveTarjeta}
+                      onDelete={handleDeleteTarjeta}
+                    />
+                  </div>
+
+                  <button
+                    className={styles.carouselBtn}
+                    onClick={() => setSelectedTarjetaIndex((i) => (i + 1) % tarjetas.length)}
+                    aria-label="Próxima tarjeta"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+
+                {/* Resumen de la tarjeta seleccionada */}
+                {tarjetas.length > 0 && (
+                  <div className={styles.tarjetaSummary}>
+                    <TarjetaSummary tarjeta={tarjetas[selectedTarjetaIndex]} />
+                  </div>
+                )}
+
+                {/* Indicador de posición */}
+                <div className={styles.carouselIndicator}>
+                  {tarjetas.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`${styles.indicator} ${index === selectedTarjetaIndex ? styles.indicatorActive : ''}`}
+                      onClick={() => setSelectedTarjetaIndex(index)}
+                      aria-label={`Ir a tarjeta ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
             )}
-          </div>
+          </section>
         )}
-      </main>
+      </div>
     </div>
   )
 }

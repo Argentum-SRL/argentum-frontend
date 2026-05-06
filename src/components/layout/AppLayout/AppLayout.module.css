@@ -1,7 +1,6 @@
 .root {
   display: flex;
   min-height: 100dvh;
-  background: var(--page);
 }
 
 /* ── Desktop Sidebar ─────────────────────────────────────────────────────── */
@@ -334,6 +333,7 @@
   flex: 1;
   min-height: 100dvh;
   overflow-y: auto;
+  background: var(--page);
 }
 
 @media (min-width: 768px) {

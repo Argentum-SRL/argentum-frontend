@@ -16,6 +16,21 @@ import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from './RealCardPreview'
 import styles from './TarjetaModal.module.css'
 
+// Logos de redes
+import visaLogo from '@/assets/redes/visa.png'
+import mastercardLogo from '@/assets/redes/mastercard.png'
+import amexLogo from '@/assets/redes/amex.png'
+import cabalLogo from '@/assets/redes/cabal.png'
+import naranjaLogo from '@/assets/redes/naranjax.png'
+
+const RED_LOGOS: Record<string, string> = {
+  visa: visaLogo,
+  mastercard: mastercardLogo,
+  amex: amexLogo,
+  cabal: cabalLogo,
+  naranja: naranjaLogo
+}
+
 // Mapeo de colores premium a hex
 const PREMIUM_COLORS_HEX: Record<string, string> = {
   'linear-gradient(135deg, #D4AF37 0%, #C5A028 100%)': '#D4AF37', // GOLD
@@ -110,63 +125,6 @@ function tarjetaReducer(state: TarjetaModalState, action: TarjetaModalAction): T
     default:
       return state
   }
-}
-
-// ── Componente ColorPicker (Flechas) ──
-function ColorPicker({ 
-  value, 
-  onChange,
-  billeteraColor
-}: { 
-  value: string | null, 
-  onChange: (c: string) => void,
-  billeteraColor?: string
-}) {
-  const allColors = [
-    { id: 'default', label: 'Billetera', value: billeteraColor || TARJETA_COLORES[0] },
-    { id: 'gold', label: 'Gold', value: PREMIUM_COLORS.GOLD },
-    { id: 'platinum', label: 'Platinum', value: PREMIUM_COLORS.PLATINUM },
-    { id: 'black', label: 'Elite Black', value: PREMIUM_COLORS.BLACK }
-  ]
-  
-  const currentIndex = allColors.findIndex(c => c.value === value)
-  const current = allColors[currentIndex === -1 ? 0 : currentIndex]
-
-  const next = () => {
-    const idx = (currentIndex + 1) % allColors.length
-    onChange(allColors[idx].value)
-  }
-
-  const prev = () => {
-    const idx = (currentIndex - 1 + allColors.length) % allColors.length
-    onChange(allColors[idx].value)
-  }
-  
-  return (
-    <div className={styles.colorPicker}>
-      <button className={styles.colorArrow} onClick={prev}>
-        <ChevronLeft size={18} />
-      </button>
-      
-      <div className={styles.currentColorDisplay}>
-        <div 
-          style={{ 
-            width: 28, 
-            height: 28, 
-            borderRadius: '50%', 
-            background: current.value,
-            border: '2px solid white',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-          }} 
-        />
-        <span className={styles.colorLabel}>{current.label}</span>
-      </div>
-
-      <button className={styles.colorArrow} onClick={next}>
-        <ChevronRight size={18} />
-      </button>
-    </div>
-  )
 }
 
 // ── Componente MontoHero (para límite) ──

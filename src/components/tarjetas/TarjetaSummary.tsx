@@ -211,7 +211,12 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
               <div key={idx} className={styles.itemRow}>
                 <div className={styles.itemInfo}>
                   <span className={styles.itemTitle}>{cuota.descripcion}</span>
-                  <span className={styles.itemSub}>Cuota {cuota.numero_cuota}/{cuota.total_cuotas}</span>
+                  <span className={styles.itemSub}>
+                    Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
+                    {cuota.subcategoria_nombre && cuota.subcategoria_nombre !== cuota.descripcion && (
+                      <> • {cuota.subcategoria_nombre}</>
+                    )}
+                  </span>
                 </div>
                 <div className={styles.itemMontoContainer}>
                   <span className={styles.itemMonto}>{formatMonto(cuota.monto, cuota.moneda)}</span>

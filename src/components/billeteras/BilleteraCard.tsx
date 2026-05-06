@@ -1,6 +1,7 @@
 // ─── BilleteraCard ────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useRef, memo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Edit2, Archive, CreditCard, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
@@ -26,6 +27,7 @@ const BilleteraCard = memo(({
   onEliminar, 
   onEditar 
 }: BilleteraCardProps) => {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
 
@@ -70,7 +72,10 @@ const BilleteraCard = memo(({
   }, [background])
 
   return (
-    <div className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''}`}>
+    <div 
+      className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''}`}
+      onClick={() => navigate(`/app/billeteras/${billetera.id}`)}
+    >
       {/* Fondo clipeado */}
       <div className={styles.wcBg} ref={bgRef}>
         <div className={styles.decoA} aria-hidden="true" />

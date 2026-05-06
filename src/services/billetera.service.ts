@@ -38,6 +38,11 @@ const billeteraService = {
     return billeterasPromise
   },
 
+  getById: async (id: string): Promise<Billetera> => {
+    const { data } = await api.get<Billetera>(`/billeteras/${id}`)
+    return data
+  },
+
   create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; bank_id?: string | null }) => {
     const { data } = await api.post<Billetera>('/billeteras', payload)
     invalidateBilleteras()

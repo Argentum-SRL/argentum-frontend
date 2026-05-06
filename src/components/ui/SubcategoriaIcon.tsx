@@ -1,6 +1,5 @@
 import { memo } from 'react'
 import { getSubcategoriaVisual, getCategoriaVisual } from '@/lib/utils/categoria.utils'
-import styles from './CategoriaIcon.module.css' // Reutilizamos estilos de CategoriaIcon por ahora
 
 interface SubcategoriaIconProps {
   nombre?: string | null

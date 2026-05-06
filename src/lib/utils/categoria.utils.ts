@@ -39,7 +39,6 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'banco':            { iconSrc: '/src/assets/icons/categorias/banco Background Removed.png',         label: 'Banco' },
   // Mascotas
   'mascotas':         { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png',  label: 'Mascotas' },
-  'mascota':          { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png',  label: 'Mascotas' },
   // Regalos
   'regalos':          { iconSrc: '/src/assets/icons/categorias/regalo Background Removed.png',         label: 'Regalos' },
   // Servicios & Impuestos
@@ -75,8 +74,6 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'seguros':          { iconSrc: '/src/assets/icons/categorias/bienestar Background Removed.png',    label: 'Seguros' },
   // Otros
   'tecnologia':       { iconSrc: '/src/assets/icons/categorias/herramienta Background Removed.png',  label: 'Tecnología' },
-  'mascota':          { iconSrc: '/src/assets/icons/categorias/mascota Background Removed.png',      label: 'Mascotas' },
-  'mascotas':         { iconSrc: '/src/assets/icons/categorias/mascota Background Removed.png',      label: 'Mascotas' },
   'regalo':           { iconSrc: '/src/assets/icons/categorias/regalo Background Removed.png',       label: 'Regalos' },
   'regalos y donaciones': { iconSrc: '/src/assets/icons/categorias/regalo Background Removed.png',   label: 'Regalos y donaciones' },
   'ahorro':           { iconSrc: '/src/assets/icons/categorias/ahorro Background Removed.png',       label: 'Ahorro' },
@@ -164,11 +161,10 @@ export const SUBCATEGORIA_VISUAL: Record<string, SubcategoriaVisual> = {
   'deportes':           { iconSrc: '/src/assets/icons/subcategorias/deportes Background Removed.png', label: 'Deportes' },
 
   // Otros
-  'mascotas':           { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Mascotas' },
   'alimento':           { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Alimento' },
   'veterinario':        { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Veterinario' },
-  'accesorios':         { iconSrc: '/src/assets/icons/subcategorias/mascotas Background Removed.png', label: 'Accesorios' },
   'impuestos':          { iconSrc: '/src/assets/icons/subcategorias/impuestos Background Removed.png', label: 'Impuestos' },
+
   'regalos':            { iconSrc: '/src/assets/icons/subcategorias/alimentacion Background Removed.png', label: 'Regalos' },
   
   // Banco

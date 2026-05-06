@@ -660,12 +660,7 @@ export default function PerfilPage() {
                     className={styles.input} 
                     value={formDatos.nombre}
                     onChange={(e) => setFormDatos({...formDatos, nombre: e.target.value})}
-                    type="email" 
-                    className={styles.input} 
-                    value={formEmail.email_nuevo}
-                    onChange={(e) => setFormEmail({...formEmail, email_nuevo: e.target.value})}
                     required
-                    placeholder="nuevo@email.com"
                   />
                 </div>
                 <div className={styles.inputGroup}>

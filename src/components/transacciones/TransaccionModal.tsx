@@ -232,7 +232,7 @@ export default function TransaccionModal({
   const [loadingSubcats, setLoadingSubcats] = useState(false)
 
   const {
-    step, slideDirection, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
+    step, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
     billeteraId, fecha, metodoPago, showAllCats, cantidadCuotas, tasaInteres, isSubmitting,
   } = state
 

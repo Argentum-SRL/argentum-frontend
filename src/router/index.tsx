@@ -10,6 +10,7 @@ import CompletarPerfil from '@/pages/auth/completar-perfil/CompletarPerfil'
 import OnboardingPage from '@/pages/onboarding/OnboardingPage'
 import DashboardPage from '@/pages/app/dashboard/DashboardPage'
 import BilleterasPage from '@/pages/app/billeteras/BilleterasPage'
+import BilleteraDetallePage from '@/pages/app/billeteras/BilleteraDetallePage'
 import TransaccionesPage from '@/pages/app/transacciones/TransaccionesPage'
 import PresupuestosPage from '@/pages/app/presupuestos/PresupuestosPage'
 import MetasPage from '@/pages/app/metas/MetasPage'
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
               { index: true, element: <Navigate to="/app/dashboard" replace /> },
               { path: '/app/dashboard', element: <DashboardPage /> },
               { path: '/app/billeteras', element: <BilleterasPage /> },
+              { path: '/app/billeteras/:id', element: <BilleteraDetallePage /> },
               { path: '/app/transacciones', element: <TransaccionesPage /> },
               { path: '/app/transacciones/recurrentes', element: <Navigate to="/app/transacciones" replace /> },
               { path: '/app/presupuestos', element: <PresupuestosPage /> },

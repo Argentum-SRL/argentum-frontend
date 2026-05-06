@@ -262,3 +262,30 @@ export interface ProyeccionCategoria {
   proyectado: number
   fuera_de_patron: boolean
 }
+
+export interface TarjetaCredito {
+  id: string
+  usuario_id: string
+  billetera_id: string
+  nombre: string
+  red: 'visa' | 'mastercard' | 'amex' | 'naranja' | 'cabal' | 'otro'
+  dia_cierre: number
+  dia_vencimiento: number
+  limite_credito: number | null
+  moneda: 'ARS' | 'USD'
+  estado: 'activa' | 'archivada'
+  color: string | null
+  fecha_creacion: string
+}
+
+export interface TarjetaCreditoCreate {
+  billetera_id: string
+  nombre: string
+  red: string
+  dia_cierre: number
+  dia_vencimiento: number
+  limite_credito?: number
+  moneda: string
+  color?: string
+}
+

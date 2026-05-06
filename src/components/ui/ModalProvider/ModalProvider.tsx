@@ -44,7 +44,7 @@ export function ModalProvider({ children }: ModalProviderProps) {
     setModals((prev) => {
       const next = { ...prev }
 
-      Object.keys(next).forEach((key) => {
+      ;(Object.keys(next) as ModalId[]).forEach((key) => {
         const modal = next[key]
         if (modal?.onClose) {
           callbacks.push(modal.onClose)

@@ -85,7 +85,12 @@ export default function TransaccionesPage() {
   const refresh = useCallback(async () => {
     setLoading(true)
     try {
-      await Promise.all([fetchTransacciones(), fetchPendientes()])
+      const [, , freshBilleteras] = await Promise.all([
+        fetchTransacciones(),
+        fetchPendientes(),
+        billeteraService.list(),
+      ])
+      setBilleteras(freshBilleteras.filter((w) => w.estado === 'activa'))
     } finally {
       setLoading(false)
     }

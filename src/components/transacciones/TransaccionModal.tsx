@@ -62,6 +62,11 @@ type FormAction =
   | { type: 'SET_STEP'; step: 1 | 2 | 3; direction: 'forward' | 'back' }
   | { [K in keyof FormState]: { type: 'SET_FIELD'; field: K; value: FormState[K] } }[keyof FormState]
 
+function todayLocal(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 const initialState: FormState = {
   step: 1,
   slideDirection: 'forward',
@@ -73,7 +78,7 @@ const initialState: FormState = {
   subcategoriaId: '',
   billeteraId: '',
   tarjetaId: '',
-  fecha: new Date().toISOString().split('T')[0],
+  fecha: todayLocal(),
   metodoPago: 'debito',
   showAllCats: false,
   cantidadCuotas: 2,
@@ -115,6 +120,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
 
         return {
           ...initialState,
+          fecha: todayLocal(),
           billeteraId: best?.id || '',
           moneda: best?.moneda || 'ARS',
         }

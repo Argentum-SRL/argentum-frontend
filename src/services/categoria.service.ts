@@ -33,6 +33,11 @@ const categoriaService = {
   getSubcategorias: async (categoriaId: string) => {
     const response = await api.get<Subcategoria[]>(`/categorias/${categoriaId}/subcategorias`)
     return response.data
+  },
+
+  getAllSubcategorias: async () => {
+    const response = await api.get<Subcategoria[]>('/categorias/subcategorias')
+    return response.data
   }
 }
 

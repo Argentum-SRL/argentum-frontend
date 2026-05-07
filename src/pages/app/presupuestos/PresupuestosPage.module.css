@@ -1,31 +1,343 @@
-.root {
+/* ── Contenedor General ────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 16px 32px;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 28px 24px 40px;
+    max-width: 1200px;
+    gap: 24px;
+    margin: 0 auto;
+  }
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.titleGroup h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btnGhost {
+  background: transparent;
+  color: #52565F;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnGhost:hover {
+  background: #F5F4F0;
+}
+
+.btnPrimary {
+  background: #0D2045 !important;
+  color: white !important;
+}
+
+.btnIcon {
+  display: inline-block;
+}
+
+/* ── Hero Resumen (Marine) ────────────────────────────────────────────────── */
+.heroResumen {
+  background: #0D2045;
+  border-radius: 20px;
+  padding: 22px 28px;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .heroResumen {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 40px;
+  }
+}
+
+.heroResumen::before {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0.07;
+  top: -60px;
+  right: -40px;
+  pointer-events: none;
+}
+
+.heroMain {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.heroLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.heroBalance {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.heroProgress {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  margin: 12px 0 6px;
+  width: 100%;
+  max-width: 300px;
+  overflow: hidden;
+}
+
+.heroProgressBar {
+  height: 100%;
+  background: #4CAF7D;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.heroSubLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.heroGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .heroGrid {
+    display: flex;
+    padding-top: 0;
+    border-top: none;
+    gap: 40px;
+    align-items: flex-end;
+  }
+}
+
+.heroMetric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroValue {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.textError { color: #FF8A65; }
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+.tabsContainer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.tabs {
+  display: flex;
+  background: #F5F4F0;
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+}
+
+.tabActive {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* ── Estados Vacíos y Loading ────────────────────────────────────────────── */
+.emptyState {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-2);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  gap: 12px;
-  color: var(--text-3);
+  gap: 16px;
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1px dashed var(--border);
 }
 
-.icon {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--surface-alt);
+.emptyIcon { color: var(--border); }
+.emptyTitle { font-size: 18px; font-weight: 700; color: var(--text); margin: 0; }
+.emptyDesc { font-size: 14px; max-width: 320px; margin: 0; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-alt) 25%, #f0f0f0 50%, var(--surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeletonCard { height: 280px; border-radius: 20px; }
+
+/* ── History Drawer Content ──────────────────────────────────────────────── */
+.historyContent {
   display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.suggestionBanner {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  color: #92400E;
+}
+
+.suggestionTitle { font-weight: 800; font-size: 14px; margin: 0 0 4px; }
+.suggestionDesc { font-size: 13px; line-height: 1.4; margin: 0; }
+
+.historyList { display: flex; flex-direction: column; gap: 16px; }
+
+.historyItem {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
 }
 
-.title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
+.historyDates { font-size: 13px; font-weight: 700; color: var(--text); }
+.historyStatus { font-size: 11px; font-weight: 800; text-transform: uppercase; }
+
+.progressContainer {
+  height: 6px;
+  background: var(--surface-alt);
+  border-radius: 3px;
+  overflow: hidden;
 }
 
-.sub {
-  font-size: 14px;
-  color: var(--text-3);
+.progressBar {
+  height: 100%;
+  transition: width 0.6s ease;
+}
+
+.historyMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.historyPercent { font-weight: 700; color: var(--text); }
+
+.errorText { color: var(--error); }
+.successText { color: var(--success); }
+
+.loadingHistory, .emptyHistory {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-2);
 }

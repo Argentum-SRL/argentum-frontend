@@ -1,0 +1,195 @@
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.headerTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.closeBtn {
+  background: var(--surface-alt);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-3);
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Suggestion Banner */
+.suggestionBanner {
+  display: flex;
+  gap: 16px;
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  border: 1px solid #BFDBFE;
+  border-radius: 20px;
+  padding: 20px;
+  color: #1E40AF;
+}
+
+.suggestionIcon {
+  color: #3B82F6;
+  flex-shrink: 0;
+}
+
+.suggestionTitle {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+}
+
+.suggestionDesc {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* History List */
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.historyItem {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.historyItem:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dates {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.statusBadge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusSuccess {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.statusError {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+/* Progress Section */
+.progressSection {
+  margin-bottom: 12px;
+}
+
+.progressBarContainer {
+  height: 10px;
+  background: var(--surface-alt);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.amounts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.usedAmount {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.limitAmount {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.percent {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+/* Empty/Loading States */
+.loadingState, .emptyState {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-3);
+  gap: 16px;
+}
+
+.emptyIcon {
+  opacity: 0.2;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}

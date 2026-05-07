@@ -1,7 +1,7 @@
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
 import type { EditPayload } from '@/components/billeteras/EditBilleteraModal'
 import type { ConfirmModalOptions } from '@/hooks/useModal'
-import type { Billetera, Categoria, Proyeccion, Transaccion, TransaccionRecurrente, TarjetaCredito } from '@/types'
+import type { Billetera, Categoria, Proyeccion, Transaccion, TransaccionRecurrente, TarjetaCredito, Presupuesto } from '@/types'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 
 export interface ModalPayloadMap {
@@ -44,6 +44,11 @@ export interface ModalPayloadMap {
   }
   proyeccion: {
     proyeccion: Proyeccion
+  }
+  presupuesto: {
+    presupuesto: Presupuesto | null
+    categorias: Categoria[]
+    onSuccess: () => Promise<void> | void
   }
   confirm: ConfirmModalOptions
 }

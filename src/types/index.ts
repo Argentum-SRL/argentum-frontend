@@ -322,3 +322,59 @@ export interface TarjetaCreditoCreate {
   color?: string
 }
 
+export interface PresupuestoCategoriaResponse {
+  categoria_id: string | null
+  subcategoria_id: string | null
+  nombre: string
+  es_subcategoria: boolean
+}
+
+export interface PeriodoPresupuesto {
+  id: string
+  presupuesto_id: string
+  fecha_inicio: string
+  fecha_fin: string
+  monto_limite: number
+  monto_usado: number
+  superado: boolean
+  porcentaje_usado: number
+  dias_restantes: number
+}
+
+export interface Presupuesto {
+  id: string
+  usuario_id: string
+  nombre: string
+  monto: number
+  moneda: 'ARS' | 'USD'
+  periodo: 'semanal' | 'quincenal' | 'mensual'
+  renovacion: 'automatica' | 'manual'
+  estado: 'activo' | 'pausado' | 'finalizado'
+  fecha_creacion: string
+  categorias: PresupuestoCategoriaResponse[]
+  periodo_actual: PeriodoPresupuesto | null
+  proxima_renovacion: string | null
+}
+
+export interface PresupuestoCategoriaInput {
+  categoria_id: string | null
+  subcategoria_id: string | null
+}
+
+export interface PresupuestoCreate {
+  nombre: string
+  monto: number
+  moneda: 'ARS' | 'USD'
+  periodo: 'semanal' | 'quincenal' | 'mensual'
+  renovacion: 'automatica' | 'manual'
+  categorias: PresupuestoCategoriaInput[]
+}
+
+export interface PresupuestoUpdate {
+  nombre?: string
+  monto?: number
+  moneda?: string
+  renovacion?: string
+  categorias?: PresupuestoCategoriaInput[]
+}
+

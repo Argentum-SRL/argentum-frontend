@@ -8,6 +8,7 @@ import RecurrenteModal from '@/components/transacciones/RecurrenteModal'
 import FilterBarMobileDrawer from '@/components/transacciones/FilterBarMobileDrawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
+import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
 
 export function ModalPortal() {
   const context = useContext(ModalContext)
@@ -23,6 +24,7 @@ export function ModalPortal() {
   const recurrenteData = typedModals.recurrente?.data
   const filterDrawerData = typedModals.transaccionFilters?.data
   const proyeccionData = typedModals.proyeccion?.data
+  const presupuestoData = typedModals.presupuesto?.data
   const confirmData = typedModals.confirm?.data
 
   return (
@@ -92,6 +94,16 @@ export function ModalPortal() {
           isOpen={true}
           onClose={() => closeModal('proyeccion')}
           proyeccion={proyeccionData.proyeccion}
+        />
+      )}
+
+      {typedModals.presupuesto?.isOpen && presupuestoData && (
+        <PresupuestoModal
+          open={true}
+          onClose={() => closeModal('presupuesto')}
+          presupuesto={presupuestoData.presupuesto}
+          categorias={presupuestoData.categorias}
+          onSuccess={presupuestoData.onSuccess}
         />
       )}
 

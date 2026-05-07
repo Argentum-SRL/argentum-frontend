@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { X } from 'lucide-react'
 import styles from './Drawer.module.css'
 
@@ -7,34 +7,57 @@ interface DrawerProps {
   onClose: () => void
   title: string
   children: React.ReactNode
+  footer?: React.ReactNode
+  width?: number
 }
 
-const Drawer: React.FC<DrawerProps> = ({ open, onClose, title, children }) => {
-  useEffect(() => {
+const Drawer: React.FC<DrawerProps> = ({ 
+  open, 
+  onClose, 
+  title, 
+  children,
+  footer,
+  width
+}) => {
+  const drawerRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden'
+      if (drawerRef.current && width) {
+        drawerRef.current.style.setProperty('--drawer-width', `${width}px`)
+      }
     } else {
       document.body.style.overflow = 'unset'
     }
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [open])
+  }, [open, width])
 
   if (!open) return null
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.drawer} onClick={e => e.stopPropagation()}>
+      <div 
+        ref={drawerRef}
+        className={styles.drawer} 
+        onClick={e => e.stopPropagation()}
+      >
         <header className={styles.header}>
           <h2 className={styles.title}>{title}</h2>
-          <button className={styles.closeBtn} onClick={onClose}>
+          <button className={styles.closeBtn} onClick={onClose} title="Cerrar">
             <X size={20} />
           </button>
         </header>
         <div className={styles.content}>
           {children}
         </div>
+        {footer && (
+          <footer className={styles.footer}>
+            {footer}
+          </footer>
+        )}
       </div>
     </div>
   )

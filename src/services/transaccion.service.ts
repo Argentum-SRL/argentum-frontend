@@ -2,6 +2,7 @@ import api from './api'
 import type { Transaccion } from '@/types'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
+import { invalidatePresupuestos } from './presupuesto.service'
 
 export interface TransaccionFilters {
   billetera_id?: string
@@ -44,6 +45,7 @@ const transaccionService = {
     const response = await api.post<Transaccion>('/transacciones', data)
     invalidateBilleteras()
     invalidateResumen()
+    invalidatePresupuestos()
     return response.data
   },
 
@@ -51,6 +53,7 @@ const transaccionService = {
     const response = await api.patch<Transaccion>(`/transacciones/${id}`, data)
     invalidateBilleteras()
     invalidateResumen()
+    invalidatePresupuestos()
     return response.data
   },
 
@@ -58,12 +61,14 @@ const transaccionService = {
     await api.delete(`/transacciones/${id}`)
     invalidateBilleteras()
     invalidateResumen()
+    invalidatePresupuestos()
   },
 
   confirmarIA: async (id: string) => {
     const response = await api.post<Transaccion>(`/transacciones/${id}/confirmar`)
     invalidateBilleteras()
     invalidateResumen()
+    invalidatePresupuestos()
     return response.data
   }
 }

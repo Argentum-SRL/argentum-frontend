@@ -380,25 +380,36 @@ export default function DashboardPage() {
 
                   return (
                     <div key={p.id} className={styles.listItem}>
-                      <div className={styles.itemIcon} style={p.tipo === 'resumen_tarjeta' ? { position: 'relative' } : {}}>
-                        {p.tipo === 'suscripcion' ? <RefreshCw size={20} /> : <CreditCard size={20} />}
+                      <div 
+                        className={styles.itemIcon} 
+                        style={{ 
+                          position: 'relative',
+                          background: p.tipo === 'resumen_tarjeta' ? 'var(--surface-alt)' : undefined 
+                        }}
+                      >
+                        {p.tipo === 'suscripcion' && <RefreshCw size={20} />}
+                        {p.tipo === 'cuota' && <Calendar size={20} />}
+                        {p.tipo === 'resumen_tarjeta' && <CreditCard size={20} />}
+                        
                         {p.tipo === 'resumen_tarjeta' && (
                           <div 
                             style={{ 
                               position: 'absolute', 
                               top: -2, 
                               right: -2, 
-                              width: 10, 
-                              height: 10, 
+                              width: 12, 
+                              height: 12, 
                               borderRadius: '50%', 
                               backgroundColor: p.color || 'var(--primary)',
-                              border: '2px solid var(--surface)'
+                              border: '2px solid var(--surface)',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                             }} 
+                            title="Color de la tarjeta"
                           />
                         )}
                       </div>
                       <div className={styles.itemMeta}>
-                        <p className={styles.itemName}>{p.nombre}</p>
+                        <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
                         <p className={styles.itemSub}>{fechaTxt}</p>
                       </div>
                       <div className={styles.pagoRight}>

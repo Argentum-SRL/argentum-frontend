@@ -88,7 +88,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
         title: fut.mes,
         cierre: '',
         vencimiento: '',
-        cuotas: [],
+        cuotas: fut.cuotas,
         total: fut.total,
         isFuture: true
       })
@@ -202,11 +202,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
         </div>
 
         <div className={styles.ticketContent}>
-          {currentTicket.isFuture ? (
-            <div className={styles.emptyState}>
-              Compromisos proyectados para {currentTicket.title}.
-            </div>
-          ) : currentTicket.cuotas.length > 0 ? (
+          {currentTicket.cuotas.length > 0 ? (
             currentTicket.cuotas.map((cuota, idx) => (
               <div key={idx} className={styles.itemRow}>
                 <div className={styles.itemInfo}>

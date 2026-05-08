@@ -409,12 +409,6 @@ export default function TransaccionModal({
       const cant = Math.max(1, cantidadCuotas || 1)
       const inicial = Math.max(1, cuotaInicial || 1)
 
-      if (!isEdit && metodoPago === 'credito' && selectedTarjeta && proximoResumen) {
-        const base = calcularPrimerVencimiento(new Date(fecha + 'T12:00:00'), selectedTarjeta.dia_cierre, selectedTarjeta.dia_vencimiento)
-        base.setMonth(base.getMonth() + 1)
-        primerVencimientoManual = base.toISOString().split('T')[0]
-      }
-
       const payload = {
         tipo, monto, moneda, descripcion,
         categoria_id: categoriaId || null,
@@ -423,14 +417,14 @@ export default function TransaccionModal({
         tarjeta_id: (metodoPago === 'credito' && tarjetaId) ? tarjetaId : null,
         origen: isEdit ? undefined : ('manual' as const),
         es_padre_cuotas: !isEdit && metodoPago === 'credito' ? true : undefined,
-        primer_vencimiento_manual: primerVencimientoManual,
         info_cuotas: !isEdit && metodoPago === 'credito'
           ? { 
               cantidad_cuotas: cant, 
               cuota_inicial: inicial,
               tiene_interes: tasaInteres > 0, 
               tasa_interes: tasaInteres, 
-              monto_total: monto 
+              monto_total: monto,
+              proximo_resumen: proximoResumen
             }
           : undefined,
       }

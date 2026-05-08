@@ -1,0 +1,205 @@
+.card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--surface-alt);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoWrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+  border: 1px solid var(--surface-alt);
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logoFallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.info {
+  flex: 1;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.frecuencia {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  background: var(--surface-alt);
+  color: var(--text-3);
+  border-radius: 10px;
+}
+
+.proximoCobro {
+  font-size: 12px;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chipUrgencia {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.chipNaranja {
+  background: #FFF4E6;
+  color: #D97706;
+}
+
+.chipRojo {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.divider {
+  height: 1px;
+  background: var(--surface-alt);
+  margin: 0 -16px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.montoGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.montoReal {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-1);
+  font-family: 'Figtree', sans-serif;
+}
+
+.montoEquiv {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.vinculacion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+/* Estados */
+.cardPausada, .cardCancelada {
+  opacity: 0.6;
+}
+
+.estadoBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badgePausada {
+  background: #F3F4F6;
+  color: #4B5563;
+}
+
+.badgeCancelada {
+  background: #111827;
+  color: white;
+}
+
+/* Acciones */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.actionBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+  color: var(--text-3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.actionBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.actionBtnDelete:hover {
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+}

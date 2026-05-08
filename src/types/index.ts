@@ -23,6 +23,49 @@ export interface Usuario {
   sexo: 'masculino' | 'femenino' | 'no_binario' | 'prefiero_no_decir' | null
 }
 
+// Historial de precios de una suscripción
+export interface HistorialSuscripcion {
+  id: string
+  suscripcion_id: string
+  monto: number
+  moneda: 'ARS' | 'USD'
+  vigente_desde: string
+  fecha_creacion: string
+}
+
+export interface Suscripcion {
+  id: string
+  usuario_id: string
+  nombre: string
+  categoria_id: string | null
+  frecuencia: 'mensual' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'
+  proximo_cobro: string
+  estado: 'activa' | 'pausada' | 'cancelada'
+  billetera_id: string | null
+  tarjeta_id: string | null
+  fecha_creacion: string
+  precio_actual: HistorialSuscripcion | null
+  historial_precios: HistorialSuscripcion[]
+  costo_mensual_equivalente: number | null
+}
+
+export interface TotalMensualSuscripciones {
+  total_ars: number
+  total_usd: number
+}
+
+export interface SuscripcionCreate {
+  nombre: string
+  categoria_id?: string
+  frecuencia: string
+  proximo_cobro: string
+  monto: number
+  moneda: string
+  vigente_desde?: string
+  billetera_id?: string
+  tarjeta_id?: string
+}
+
 export interface AuthResponse {
   access_token: string | null
   refresh_token: string | null
@@ -237,6 +280,7 @@ export interface PagoDashboard {
   billetera_nombre?: string
   billetera_id?: string
 }
+
 
 export interface Proyeccion {
   periodo: {

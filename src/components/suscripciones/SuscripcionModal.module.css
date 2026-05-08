@@ -1,0 +1,313 @@
+.modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--surface-alt);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin: 0;
+}
+
+.steps {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  transition: all 0.3s ease;
+}
+
+.stepDotActive {
+  background: var(--primary);
+  width: 24px;
+  border-radius: 4px;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Paso 1: Catálogo */
+.catalogGroup {
+  margin-bottom: 24px;
+}
+
+.groupLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.catalogGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.catalogItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px;
+  background: var(--surface-alt);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 8px;
+  text-align: center;
+}
+
+.catalogItemActive {
+  background: white;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.logoWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logoFallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.serviceName {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.otherOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface-alt);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 12px;
+}
+
+.otherOptionActive {
+  background: white;
+  border-color: var(--primary);
+}
+
+/* Paso 2: Configuración */
+.sectionLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+
+.pillsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  padding: 8px 16px;
+  background: var(--surface-alt);
+  border: 1px solid var(--surface-alt);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pillActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.previewCosto {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-top: 8px;
+}
+
+.footer {
+  padding: 24px;
+  border-top: 1px solid var(--surface-alt);
+  display: flex;
+  gap: 12px;
+}
+
+.btnNext {
+  flex: 1;
+}
+
+.btnBack {
+  width: 100px;
+}
+
+.montoHero {
+  padding: 32px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(to bottom, var(--surface), white);
+  border-radius: 16px;
+  margin-bottom: 8px;
+}
+
+.montoInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.montoCurrency {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.montoInput {
+  border: none;
+  background: transparent;
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--text-1);
+  width: auto;
+  min-width: 100px;
+  max-width: 280px;
+  text-align: center;
+  outline: none;
+  font-family: 'Figtree', sans-serif;
+}
+
+.monedaToggle {
+  display: flex;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.monedaBtn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.monedaBtnActive {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.checkBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.backArrow {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  cursor: pointer;
+  margin-left: -4px;
+}
+
+.slide {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.slide-in-right) {
+  animation: slideInRight 0.3s ease forwards;
+}
+
+:global(.slide-in-left) {
+  animation: slideInLeft 0.3s ease forwards;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .catalogGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

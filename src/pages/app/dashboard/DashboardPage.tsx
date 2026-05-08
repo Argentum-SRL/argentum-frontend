@@ -332,9 +332,12 @@ export default function DashboardPage() {
                       />
                     </div>
                     <div className={styles.itemMeta}>
-                      <p className={styles.itemName}>{m.descripcion}</p>
+                      <p className={styles.itemName}>
+                        {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
+                      </p>
                       <p className={styles.itemSub}>
                         {formatFecha(m.fecha)} • {m.billetera_nombre}
+                        {m.subcategoria_nombre && ` • ${m.subcategoria_nombre}`}
                       </p>
                       {m.estado_verificacion === 'pendiente' && (
                         <span className={styles.pendingBadge}>Pendiente IA</span>

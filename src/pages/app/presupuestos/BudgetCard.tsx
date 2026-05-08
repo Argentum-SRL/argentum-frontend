@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import type { Presupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
+import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './BudgetCard.module.css'
 
 interface BudgetCardProps {
@@ -61,7 +62,10 @@ export default function BudgetCard({
           </div>
           <div className={styles.categoryChips}>
             {presupuesto.categorias.slice(0, 2).map((c, i) => (
-              <span key={i} className={styles.chip}>{c.nombre}</span>
+              <span key={i} className={styles.chip}>
+                <SubcategoriaIcon nombre={c.subcategoria_nombre} parentCategory={c.nombre} size={14} />
+                {c.subcategoria_nombre || c.nombre}
+              </span>
             ))}
             {presupuesto.categorias.length > 2 && (
               <span className={styles.chip}>+{presupuesto.categorias.length - 2}</span>

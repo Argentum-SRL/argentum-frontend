@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { AlertCircle, CreditCard, RefreshCw, Trash2 } from 'lucide-react'
 import type { Transaccion, Billetera, Categoria } from '@/types'
-import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
+import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { formatMonto } from '@/utils/format'
 import styles from './TransaccionRow.module.css'
 
@@ -51,7 +51,11 @@ const TransaccionRow = memo(({
       onClick={() => onEdit(transaccion.id)}
       className={`${styles.row} ${isPendiente ? styles.pendiente : ''}`}
     >
-      <CategoriaIcon nombre={categoria?.nombre} size={40} />
+      <SubcategoriaIcon 
+        nombre={transaccion.subcategoria?.nombre} 
+        parentCategory={categoria?.nombre} 
+        size={40} 
+      />
 
       <div className={styles.content}>
         <div className={styles.titleRow}>

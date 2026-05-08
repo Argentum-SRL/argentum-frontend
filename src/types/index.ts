@@ -219,6 +219,7 @@ export interface MovimientoDashboard {
   moneda: 'ARS' | 'USD'
   billetera_nombre: string
   categoria_nombre: string | null
+  subcategoria_nombre: string | null
   estado_verificacion: 'confirmada' | 'pendiente' | null
 }
 

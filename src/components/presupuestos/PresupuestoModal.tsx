@@ -15,6 +15,7 @@ import type { Presupuesto, Categoria, Subcategoria } from '@/types'
 import presupuestoService from '@/services/presupuesto.service'
 import categoriaService from '@/services/categoria.service'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
+import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './PresupuestoModal.module.css'
 import { useToast } from '@/hooks/useToast'
 
@@ -419,7 +420,10 @@ export default function PresupuestoModal({
                                     if (localError) dispatch({ type: 'SET_FIELD', field: 'localError', value: null })
                                   }}
                                 >
-                                  <span>{sub.nombre}</span>
+                                  <div className={styles.subInfo}>
+                                    <SubcategoriaIcon nombre={sub.nombre} parentCategory={cat.nombre} size={22} />
+                                    <span>{sub.nombre}</span>
+                                  </div>
                                   {isSubSelected && <Check size={14} />}
                                 </div>
                               )

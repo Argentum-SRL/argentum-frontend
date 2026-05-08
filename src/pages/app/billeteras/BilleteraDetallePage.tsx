@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign } from 'lucide-react'
 import type { Billetera, TarjetaCredito, Transaccion, Categoria } from '@/types'
 import billeteraService from '@/services/billetera.service'
@@ -17,6 +17,7 @@ import styles from './BilleteraDetallePage.module.css'
 
 const BilleteraDetallePage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { showToast } = useToast()
   const { open } = useModal()
@@ -32,6 +33,17 @@ const BilleteraDetallePage: React.FC = () => {
   const [loadingData, setLoadingData] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
   const bgRef = useRef<HTMLDivElement>(null)
+
+  // Efecto para posicionar la tarjeta si viene por URL
+  useEffect(() => {
+    const tid = searchParams.get('tarjeta_id')
+    if (tid && tarjetas.length > 0) {
+      const idx = tarjetas.findIndex(t => t.id === tid)
+      if (idx !== -1) {
+        setSelectedTarjetaIndex(idx)
+      }
+    }
+  }, [searchParams, tarjetas])
 
   // Obtener información del banco para estilo
   const bank = useMemo(() => {

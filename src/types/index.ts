@@ -233,6 +233,9 @@ export interface PagoDashboard {
   tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta'
   tarjeta_id?: string
   color?: string
+  red?: string
+  billetera_nombre?: string
+  billetera_id?: string
 }
 
 export interface Proyeccion {

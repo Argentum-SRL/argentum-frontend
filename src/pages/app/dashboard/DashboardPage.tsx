@@ -20,6 +20,7 @@ import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard
 import { formatMonto, formatFecha } from '@/utils/format'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import { MiniCard } from '@/components/tarjetas/MiniCard'
 import styles from './DashboardPage.module.css'
 
 // ── Components ───────────────────────────────────────────────────────────
@@ -378,39 +379,36 @@ export default function DashboardPage() {
                   else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
                   else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
 
+                  const handlePagoClick = () => {
+                    if (p.tipo === 'resumen_tarjeta' && p.billetera_id) {
+                      navigate(`/app/billeteras/${p.billetera_id}?tarjeta_id=${p.id}`)
+                    }
+                  }
+
                   return (
-                    <div key={p.id} className={styles.listItem}>
+                    <div 
+                      key={p.id} 
+                      className={styles.listItem}
+                      onClick={handlePagoClick}
+                      style={{ cursor: p.tipo === 'resumen_tarjeta' ? 'pointer' : 'default' }}
+                    >
                       <div 
                         className={styles.itemIcon} 
                         style={{ 
                           position: 'relative',
-                          background: p.tipo === 'resumen_tarjeta' ? 'var(--surface-alt)' : undefined 
+                          background: p.tipo === 'resumen_tarjeta' ? 'transparent' : undefined 
                         }}
                       >
                         {p.tipo === 'suscripcion' && <RefreshCw size={20} />}
                         {p.tipo === 'cuota' && <Calendar size={20} />}
-                        {p.tipo === 'resumen_tarjeta' && <CreditCard size={20} />}
-                        
-                        {p.tipo === 'resumen_tarjeta' && (
-                          <div 
-                            style={{ 
-                              position: 'absolute', 
-                              top: -2, 
-                              right: -2, 
-                              width: 12, 
-                              height: 12, 
-                              borderRadius: '50%', 
-                              backgroundColor: p.color || 'var(--primary)',
-                              border: '2px solid var(--surface)',
-                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                            }} 
-                            title="Color de la tarjeta"
-                          />
-                        )}
+                        {p.tipo === 'resumen_tarjeta' && <MiniCard color={p.color} red={p.red} />}
                       </div>
                       <div className={styles.itemMeta}>
                         <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
-                        <p className={styles.itemSub}>{fechaTxt}</p>
+                        <p className={styles.itemSub}>
+                          {fechaTxt}
+                          {p.billetera_nombre && ` • ${p.billetera_nombre}`}
+                        </p>
                       </div>
                       <div className={styles.pagoRight}>
                         <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>

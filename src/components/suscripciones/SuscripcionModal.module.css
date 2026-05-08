@@ -2,45 +2,46 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 600px;
+  max-height: 85vh;
+  background: white;
+  border-radius: 24px;
 }
 
 .header {
-  padding: 24px 24px 16px;
-  border-bottom: 1px solid var(--surface-alt);
+  padding: 32px 32px 16px;
 }
 
 .title {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-1);
+  color: #0D2045;
   margin: 0;
 }
 
 .steps {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-top: 16px;
 }
 
 .stepDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
   background: var(--surface-alt);
   transition: all 0.3s ease;
 }
 
 .stepDotActive {
-  background: var(--primary);
-  width: 24px;
-  border-radius: 4px;
+  background: #0D2045;
+  width: 40px;
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 0 32px 32px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -52,17 +53,17 @@
 }
 
 .groupLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: var(--text-3);
+  letter-spacing: 1px;
   margin-bottom: 12px;
 }
 
 .catalogGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 
@@ -70,31 +71,36 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 16px 8px;
-  background: var(--surface-alt);
-  border: 2px solid transparent;
-  border-radius: 12px;
+  padding: 12px 8px;
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  gap: 8px;
-  text-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border: 2px solid transparent;
+  background: var(--surface-alt);
+}
+
+.catalogItem:hover {
+  background: white;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
 }
 
 .catalogItemActive {
   background: white;
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #0D2045;
+  box-shadow: 0 10px 20px rgba(13, 32, 69, 0.1);
 }
 
 .logoWrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 8px;
+  overflow: hidden;
   background: white;
 }
 
@@ -105,10 +111,10 @@
 }
 
 .logoFallback {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #0D2045;
   color: white;
   display: flex;
   align-items: center;
@@ -120,7 +126,7 @@
 .serviceName {
   font-size: 10px;
   font-weight: 600;
-  color: var(--text-1);
+  color: #0D2045;
 }
 
 .otherOption {
@@ -130,23 +136,25 @@
   padding: 16px;
   background: var(--surface-alt);
   border: 2px solid transparent;
-  border-radius: 12px;
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 12px;
 }
 
 .otherOptionActive {
   background: white;
-  border-color: var(--primary);
+  border-color: #0D2045;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
 }
 
 /* Paso 2: Configuración */
 .sectionLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-2);
-  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0D2045;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .pillsRow {
@@ -161,27 +169,27 @@
   border: 1px solid var(--surface-alt);
   border-radius: 20px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-2);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .pillActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: #0D2045;
+  border-color: #0D2045;
   color: white;
 }
 
 .previewCosto {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-3);
   margin-top: 8px;
+  font-weight: 500;
 }
 
 .footer {
-  padding: 24px;
-  border-top: 1px solid var(--surface-alt);
+  padding: 24px 32px 32px;
   display: flex;
   gap: 12px;
 }
@@ -195,13 +203,12 @@
 }
 
 .montoHero {
-  padding: 32px 0;
+  padding: 40px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(to bottom, var(--surface), white);
-  border-radius: 16px;
-  margin-bottom: 8px;
+  background: #F8F9FB;
+  border-radius: 24px;
 }
 
 .montoInputWrapper {
@@ -213,15 +220,16 @@
 .montoCurrency {
   font-size: 32px;
   font-weight: 700;
-  color: var(--text-3);
+  color: #0D2045;
+  opacity: 0.3;
 }
 
 .montoInput {
   border: none;
   background: transparent;
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 800;
-  color: var(--text-1);
+  color: #0D2045;
   width: auto;
   min-width: 100px;
   max-width: 280px;
@@ -232,42 +240,45 @@
 
 .monedaToggle {
   display: flex;
-  background: var(--surface-alt);
+  background: rgba(13, 32, 69, 0.05);
   padding: 4px;
-  border-radius: 8px;
-  margin-top: 16px;
+  border-radius: 12px;
+  margin-top: 24px;
 }
 
 .monedaBtn {
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 6px 16px;
+  border-radius: 8px;
   border: none;
   background: transparent;
   font-size: 12px;
-  font-weight: 600;
-  color: var(--text-3);
+  font-weight: 700;
+  color: #0D2045;
   cursor: pointer;
   transition: all 0.2s;
+  opacity: 0.5;
 }
 
 .monedaBtnActive {
   background: white;
-  color: var(--primary);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  color: #0D2045;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .checkBadge {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 18px;
-  height: 18px;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: var(--primary);
+  background: #0D2045;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(13, 32, 69, 0.3);
+  border: 2px solid white;
 }
 
 .backArrow {
@@ -277,9 +288,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-2);
+  color: #0D2045;
   cursor: pointer;
   margin-left: -4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.backArrow:hover {
+  opacity: 1;
 }
 
 .slide {
@@ -289,20 +306,20 @@
 }
 
 :global(.slide-in-right) {
-  animation: slideInRight 0.3s ease forwards;
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 :global(.slide-in-left) {
-  animation: slideInLeft 0.3s ease forwards;
+  animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes slideInRight {
-  from { transform: translateX(30px); opacity: 0; }
+  from { transform: translateX(40px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes slideInLeft {
-  from { transform: translateX(-30px); opacity: 0; }
+  from { transform: translateX(-40px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 

@@ -1,77 +1,64 @@
 .root {
   padding: 32px;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 200px);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 32px;
 }
 
-.title {
+.pageTitle {
   font-size: 32px;
   font-weight: 800;
-  color: var(--text-1);
-  margin: 0 0 4px 0;
-  letter-spacing: -0.5px;
+  color: #0D2045;
+  margin: 0;
 }
 
-.subtitle {
-  font-size: 14px;
+.pageSubtitle {
+  font-size: 15px;
   color: var(--text-3);
-  font-weight: 500;
+  margin: 4px 0 0;
 }
 
-/* Totales Card */
 .totalsCard {
-  background: var(--primary-dark);
+  background: #0D2045;
   border-radius: 24px;
   padding: 32px;
-  margin-bottom: 40px;
   display: flex;
-  justify-content: space-around;
   align-items: center;
+  justify-content: space-around;
+  margin-bottom: 40px;
+  box-shadow: 0 20px 40px rgba(13, 32, 69, 0.15);
   color: white;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.totalsCard::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  pointer-events: none;
 }
 
 .totalItem {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  z-index: 1;
+  gap: 4px;
 }
 
 .totalLabel {
   font-size: 13px;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 1px;
-  opacity: 0.8;
 }
 
 .totalValue {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
-  font-family: 'Figtree', sans-serif;
 }
 
 .totalDivider {
@@ -80,32 +67,38 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Secciones */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
 .section {
-  margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
 }
 
 .sectionTitle {
   font-size: 18px;
   font-weight: 700;
-  color: var(--text-1);
+  color: #0D2045;
   margin: 0;
 }
 
 .sectionCount {
-  font-size: 12px;
-  font-weight: 600;
   background: var(--surface-alt);
   color: var(--text-3);
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 12px;
 }
 
 .grid {
@@ -114,56 +107,178 @@
   gap: 20px;
 }
 
-.emptyState {
-  background: white;
-  border: 2px dashed var(--surface-alt);
-  border-radius: 20px;
-  padding: 60px 40px;
+/* ─── ESTADO VACÍO REDISEÑADO ─── */
+
+.emptyStateContainer {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 250px);
+  min-height: 600px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  gap: 16px;
-  color: var(--text-3);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #F5F4F0;
+  border-radius: 40px;
 }
 
-.collapseBtn {
-  background: transparent;
-  border: none;
-  color: var(--primary);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
+.emptyStateExiting {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+}
+
+.logosLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.logoBurbuja {
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background: white;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0;
-  margin-left: auto;
+  justify-content: center;
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+
+.logoBurbuja img {
+  display: block;
+  object-fit: contain;
+}
+
+/* Variantes de profundidad */
+.far {
+  width: 40px;
+  height: 40px;
+  opacity: 0.35;
+  filter: blur(1px);
+  box-shadow: 0 4px 12px rgba(10,13,18,0.04);
+  animation: floatSlow 12s ease-in-out infinite;
+}
+.far img { width: 24px; height: 24px; }
+
+.mid {
+  width: 52px;
+  height: 52px;
+  opacity: 0.55;
+  box-shadow: 0 6px 16px rgba(10,13,18,0.08);
+  animation: floatMedium 9s ease-in-out infinite;
+}
+.mid img { width: 32px; height: 32px; }
+
+.near {
+  width: 64px;
+  height: 64px;
+  opacity: 0.8;
+  box-shadow: 0 8px 24px rgba(10,13,18,0.12);
+  animation: floatFast 7s ease-in-out infinite;
+  z-index: 2;
+}
+.near img { width: 40px; height: 40px; }
+
+/* Overlay de Blur con Gradiente Radial */
+.blurOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    rgba(245,244,240,0.92) 0%,
+    rgba(245,244,240,0.75) 50%,
+    rgba(245,244,240,0.3) 100%
+  );
+  backdrop-filter: blur(2px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Contenido Central con Glassmorphism */
+.emptyContent {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  max-width: 420px;
+  padding: 48px 40px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  border-radius: 32px;
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+/* ── MODO OSCURO ── */
+
+:global([data-theme="dark"]) .emptyStateContainer {
+  background: var(--page);
+}
+
+:global([data-theme="dark"]) .blurOverlay {
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    rgba(14,17,23,0.92) 0%,
+    rgba(14,17,23,0.75) 50%,
+    rgba(14,17,23,0.3) 100%
+  );
+}
+
+:global([data-theme="dark"]) .emptyContent {
+  background: rgba(22,27,36,0.7);
+  border-color: rgba(255,255,255,0.08);
+}
+
+:global([data-theme="dark"]) .logoBurbuja {
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+:global([data-theme="dark"]) .emptyTitle {
+  color: white;
+}
+
+.emptyTitle {
+  font-family: 'Figtree', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0D2045;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.emptySubtitle {
+  font-family: 'Figtree', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* Animaciones */
+@keyframes floatSlow {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(10px, -20px) rotate(3deg); }
+}
+
+@keyframes floatMedium {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-15px, -15px) rotate(-2deg); }
+}
+
+@keyframes floatFast {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-14px) rotate(2deg); }
+  66% { transform: translateY(7px) rotate(-1deg); }
 }
 
 @media (max-width: 768px) {
-  .root {
-    padding: 20px;
+  .emptyContent {
+    max-width: 340px;
+    padding: 32px 24px;
   }
-  
-  .header {
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .totalsCard {
-    flex-direction: column;
-    gap: 24px;
-    padding: 24px;
-  }
-  
-  .totalDivider {
-    width: 80%;
-    height: 1px;
-  }
-  
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  .emptyTitle { font-size: 24px; }
+  .mobileHidden { display: none; }
 }

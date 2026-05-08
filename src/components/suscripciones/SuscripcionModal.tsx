@@ -15,7 +15,7 @@ import { formatMonto } from '@/utils/format'
 import styles from './SuscripcionModal.module.css'
 
 interface SuscripcionModalProps {
-  open: boolean
+  isOpen: boolean
   onClose: () => void
   suscripcion?: Suscripcion | null
   onSuccess: () => void
@@ -131,7 +131,7 @@ function MontoHero({ value, onChange, moneda, onMonedaChange }: any) {
   )
 }
 
-const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, suscripcion, onSuccess }) => {
+const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, suscripcion, onSuccess }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { showToast } = useToast()
   
@@ -142,7 +142,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       dispatch({ type: 'RESET', data: suscripcion })
       loadData()
     }
@@ -236,7 +236,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const animClass = state.slideDirection === 'forward' ? 'slide-in-right' : 'slide-in-left'
 
   return (
-    <Modal open={open} onClose={onClose} side="right" width={450}>
+    <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding ariaLabel="Nueva suscripción">
       <div className={styles.modal}>
         {/* PASO 1 */}
         {state.step === 1 && (

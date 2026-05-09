@@ -260,43 +260,40 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 12px 6px;
+  padding: 14px 6px;
   border-radius: 14px;
-  border: 1.5px solid var(--surface-alt);
-  background: var(--surface);
+  border: 1.5px solid transparent; /* Removed visible border */
+  background: transparent; /* Removed background */
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all 180ms ease;
   position: relative;
 }
 
 .catalogItem:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+  transform: translateY(-4px) scale(1.05);
+  background: var(--surface-alt);
 }
 
 .catalogItemActive {
-  border-color: var(--primary);
   background: var(--primary-light);
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.1);
+  transform: scale(1.05);
 }
 
 .logoWrapper {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  overflow: hidden;
+  background: transparent;
+  overflow: visible;
 }
 
 .logo {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.12)); /* More pronounced shadow for floating effect */
 }
 
 .logoFallback {
@@ -322,8 +319,8 @@
 
 .checkBadge {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: 0;
+  right: 0;
   background: var(--primary);
   width: 18px;
   height: 18px;

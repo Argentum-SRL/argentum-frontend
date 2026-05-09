@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Play, Pause, Trash2, CreditCard, Wallet, Bell, Calendar, TrendingUp, MoreVertical } from 'lucide-react'
+import { Edit2, Play, Pause, Trash2, CreditCard, Wallet, Bell, Calendar, TrendingUp } from 'lucide-react'
 import type { Suscripcion, Billetera, TarjetaCredito } from '@/types'
 import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
 import { formatMonto } from '@/utils/format'
@@ -41,16 +41,27 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
     suscripcion.estado === 'pausada' ? styles.cardPausada : 
     suscripcion.estado === 'cancelada' ? styles.cardCancelada : ''
 
+  const isBrand = !!catalogoItem
+  const bgColor = catalogoItem?.color ?? 'var(--surface)'
+  const textColor = catalogoItem?.colorTexto ?? 'var(--text)'
+
+  const cardStyle: React.CSSProperties = isBrand ? {
+    backgroundColor: bgColor,
+    color: textColor,
+    borderColor: 'transparent'
+  } : {}
+
   return (
-    <div className={`${styles.card} ${cardStatusClass}`}>
+    <div className={`${styles.card} ${cardStatusClass}`} style={cardStyle}>
       {suscripcion.estado !== 'activa' && (
         <span className={`${styles.estadoBadge} ${suscripcion.estado === 'pausada' ? styles.badgePausada : styles.badgeCancelada}`}>
           {suscripcion.estado}
         </span>
       )}
 
+      {/* ZONA TOP: Logo, Nombre y Frecuencia */}
       <div className={styles.header}>
-        <div className={styles.logoWrapper}>
+        <div className={styles.logoWrapper} style={{ backgroundColor: isBrand ? 'rgba(255,255,255,0.15)' : 'var(--surface-alt)' }}>
           {catalogoItem?.logoPath ? (
             <img 
               src={catalogoItem.logoPath} 
@@ -75,9 +86,11 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
         <div className={styles.info}>
           <div className={styles.nameRow}>
             <h3 className={styles.name}>{suscripcion.nombre}</h3>
-            <span className={styles.frecuencia}>{suscripcion.frecuencia}</span>
+            <span className={styles.frecuencia} style={{ backgroundColor: isBrand ? 'rgba(0,0,0,0.1)' : 'var(--surface-alt)' }}>
+              {suscripcion.frecuencia}
+            </span>
           </div>
-          <div className={styles.proximoCobro}>
+          <div className={styles.proximoCobro} style={{ opacity: isBrand ? 0.8 : 1 }}>
             <Calendar size={12} />
             <span>{new Date(suscripcion.proximo_cobro).toLocaleDateString()}</span>
             {urgenciaClass && <span className={`${styles.chipUrgencia} ${urgenciaClass}`}>{urgenciaText}</span>}
@@ -85,54 +98,54 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
         </div>
       </div>
 
-      <div className={styles.divider} />
-
+      {/* ZONA BOTTOM: Monto, Método y Acciones */}
       <div className={styles.footer}>
-        <div className={styles.montoGroup}>
-          <span className={styles.montoReal}>
-            {formatMonto(suscripcion.precio_actual?.monto || 0, suscripcion.precio_actual?.moneda || 'ARS')}
-          </span>
-          {suscripcion.frecuencia !== 'mensual' && suscripcion.costo_mensual_equivalente && (
-            <span className={styles.montoEquiv}>
-              = {formatMonto(suscripcion.costo_mensual_equivalente, suscripcion.precio_actual?.moneda || 'ARS')}/mes
+        <div className={styles.montoSection}>
+          <div className={styles.montoGroup}>
+            <span className={styles.montoReal}>
+              {formatMonto(suscripcion.precio_actual?.monto || 0, suscripcion.precio_actual?.moneda || 'ARS')}
             </span>
-          )}
+            {suscripcion.frecuencia !== 'mensual' && suscripcion.costo_mensual_equivalente && (
+              <span className={styles.montoEquiv} style={{ opacity: isBrand ? 0.7 : 1 }}>
+                / {formatMonto(suscripcion.costo_mensual_equivalente, suscripcion.precio_actual?.moneda || 'ARS')} mes
+              </span>
+            )}
+          </div>
+
+          <div className={styles.vinculacion} style={{ opacity: isBrand ? 0.8 : 1 }}>
+            {tarjeta ? (
+              <><CreditCard size={14} /> <span>{tarjeta.nombre}</span></>
+            ) : billetera ? (
+              <><Wallet size={14} /> <span>{billetera.nombre}</span></>
+            ) : (
+              <><Bell size={14} /> <span>Recordatorio</span></>
+            )}
+          </div>
         </div>
 
-        <div className={styles.vinculacion}>
-          {tarjeta ? (
-            <><CreditCard size={14} /> <span>{tarjeta.nombre}</span></>
-          ) : billetera ? (
-            <><Wallet size={14} /> <span>{billetera.nombre}</span></>
-          ) : (
-            <><Bell size={14} /> <span>Recordatorio</span></>
-          )}
+        <div className={styles.actions}>
+          <button className={styles.actionBtn} onClick={() => onEdit(suscripcion)} title="Editar">
+            <Edit2 size={14} />
+          </button>
+          <button className={styles.actionBtn} onClick={() => onUpdatePrecio(suscripcion)} title="Actualizar precio">
+            <TrendingUp size={14} />
+          </button>
+          <button 
+            className={styles.actionBtn} 
+            onClick={() => onToggleEstado(suscripcion)} 
+            title={suscripcion.estado === 'activa' ? 'Pausar' : 'Reactivar'}
+            disabled={suscripcion.estado === 'cancelada'}
+          >
+            {suscripcion.estado === 'activa' ? <Pause size={14} /> : <Play size={14} />}
+          </button>
+          <button 
+            className={`${styles.actionBtn} ${styles.actionBtnDelete}`} 
+            onClick={() => onDelete(suscripcion)} 
+            title="Eliminar"
+          >
+            <Trash2 size={14} />
+          </button>
         </div>
-      </div>
-
-      {/* Acciones */}
-      <div className={styles.actions}>
-        <button className={styles.actionBtn} onClick={() => onEdit(suscripcion)} title="Editar">
-          <Edit2 size={14} />
-        </button>
-        <button className={styles.actionBtn} onClick={() => onUpdatePrecio(suscripcion)} title="Actualizar precio">
-          <TrendingUp size={14} />
-        </button>
-        <button 
-          className={styles.actionBtn} 
-          onClick={() => onToggleEstado(suscripcion)} 
-          title={suscripcion.estado === 'activa' ? 'Pausar' : 'Reactivar'}
-          disabled={suscripcion.estado === 'cancelada'}
-        >
-          {suscripcion.estado === 'activa' ? <Pause size={14} /> : <Play size={14} />}
-        </button>
-        <button 
-          className={`${styles.actionBtn} ${styles.actionBtnDelete}`} 
-          onClick={() => onDelete(suscripcion)} 
-          title="Eliminar"
-        >
-          <Trash2 size={14} />
-        </button>
       </div>
     </div>
   )

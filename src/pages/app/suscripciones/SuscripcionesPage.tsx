@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Plus, Loader2, Package, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
-import { useModal } from '@/hooks/useModal'
 import suscripcionService from '@/services/suscripcion.service'
 import type { Suscripcion, TotalMensualSuscripciones } from '@/types'
 import { formatMonto } from '@/utils/format'
@@ -11,22 +10,34 @@ import SuscripcionCard from '@/components/suscripciones/SuscripcionCard'
 import SuscripcionModal from '@/components/suscripciones/SuscripcionModal'
 import styles from './SuscripcionesPage.module.css'
 
-const LOGOS_CONFIG = [
-  // lejos (opacity 0.35, 40px)
-  { top: '5%',  left: '8%',  size: 'far'  },
-  { top: '10%', left: '78%', size: 'far'  },
-  { top: '82%', left: '15%', size: 'far'  },
-  { top: '88%', left: '72%', size: 'far'  },
-  // medio (opacity 0.55, 52px)
-  { top: '18%', left: '3%',  size: 'mid'  },
-  { top: '22%', left: '85%', size: 'mid'  },
-  { top: '68%', left: '5%',  size: 'mid'  },
-  { top: '72%', left: '82%', size: 'mid'  },
-  // cerca (opacity 0.8, 64px)
-  { top: '38%', left: '2%',  size: 'near' },
-  { top: '42%', left: '88%', size: 'near' },
-  { top: '12%', left: '48%', size: 'near' },
-  { top: '78%', left: '45%', size: 'near' },
+const POSICIONES = [
+  { top: '8%',  left: '15%', size: 'mid'  },
+  { top: '5%',  left: '55%', size: 'near' },
+  { top: '12%', left: '82%', size: 'mid'  },
+  { top: '35%', left: '4%',  size: 'near' },
+  { top: '55%', left: '8%',  size: 'far'  },
+  { top: '75%', left: '18%', size: 'mid'  },
+  { top: '85%', left: '48%', size: 'near' },
+  { top: '78%', left: '78%', size: 'mid'  },
+  { top: '55%', left: '88%', size: 'near' },
+  { top: '30%', left: '85%', size: 'far'  },
+  { top: '18%', left: '38%', size: 'far'  },
+  { top: '72%', left: '42%', size: 'far'  },
+]
+
+const LOGOS_ANIM = [
+  { dx1: 8,  dy1: -12, r1: 3,  dx2: -5, dy2: 8,   r2: -2, dx3: 10, dy3: -4, r3: 1,  duration: 8,  delay: 0   },
+  { dx1: -10,dy1: -8,  r1: -3, dx2: 6,  dy2: 12,  r2: 2,  dx3: -8, dy3: 4,  r3: -1, duration: 10, delay: 1.2 },
+  { dx1: 6,  dy1: 10,  r1: 2,  dx2: -8, dy2: -6,  r2: -3, dx3: 4,  dy3: 8,  r3: 2,  duration: 9,  delay: 0.6 },
+  { dx1: -8, dy1: 6,   r1: -2, dx2: 10, dy2: -10, r2: 3,  dx3: -6, dy3: -4, r3: -2, duration: 11, delay: 1.8 },
+  { dx1: 10, dy1: -6,  r1: 4,  dx2: -6, dy2: 10,  r2: -2, dx3: 8,  dy3: -8, r3: 3,  duration: 7,  delay: 0.3 },
+  { dx1: -6, dy1: -10, r1: -4, dx2: 8,  dy2: 6,   r2: 3,  dx3: -4, dy3: -8, r3: -3, duration: 9,  delay: 2.1 },
+  { dx1: 4,  dy1: 12,  r1: 2,  dx2: -10,dy2: -4,  r2: -4, dx3: 6,  dy3: 10, r3: 1,  duration: 12, delay: 0.9 },
+  { dx1: -4, dy1: -14, r1: -2, dx2: 6,  dy2: 8,   r2: 4,  dx3: -8, dy3: -6, r3: -2, duration: 8,  delay: 1.5 },
+  { dx1: 12, dy1: 4,   r1: 3,  dx2: -4, dy2: -12, r2: -3, dx3: 10, dy3: 6,  r3: 2,  duration: 10, delay: 0.4 },
+  { dx1: -12,dy1: 8,   r1: -3, dx2: 4,  dy2: -8,  r2: 4,  dx3: -6, dy3: 10, r3: -1, duration: 9,  delay: 1.7 },
+  { dx1: 8,  dy1: -4,  r1: 4,  dx2: -12,dy2: 6,   r2: -3, dx3: 4,  dy3: -10,r3: 3,  duration: 11, delay: 0.7 },
+  { dx1: -4, dy1: 8,   r1: -4, dx2: 10, dy2: -4,  r2: 2,  dx3: -10,dy3: 4,  r3: -4, duration: 7,  delay: 2.3 },
 ]
 
 const SuscripcionesPage: React.FC = () => {
@@ -118,32 +129,34 @@ const SuscripcionesPage: React.FC = () => {
   if (suscripciones.length === 0 || isExiting) {
     return (
       <div className={styles.root}>
-        <div className={`${styles.emptyStateContainer} ${isExiting ? styles.emptyStateExiting : ''}`}>
+        <div className={`${styles.emptyState} ${isExiting ? styles.emptyStateExiting : ''}`}>
           {/* Capa 1: Logos Flotantes con profundidad */}
           <div className={styles.logosLayer}>
-            {LOGOS_CONFIG.map((config, i) => {
+            {POSICIONES.map((pos, i) => {
               const s = CATALOGO_SUSCRIPCIONES[i % CATALOGO_SUSCRIPCIONES.length]
+              const anim = LOGOS_ANIM[i % LOGOS_ANIM.length]
+              
               return (
-                <div 
+                <img
                   key={`${s.id}-${i}`}
-                  className={`${styles.logoBurbuja} ${styles[config.size]} ${i >= 8 ? styles.mobileHidden : ''}`}
-                  style={{ 
-                    top: config.top,
-                    left: config.left,
-                    animationDelay: `${i * 0.6}s`
+                  src={s.logoPath}
+                  alt=""
+                  className={`${styles.logoFlotante} ${styles[pos.size]}`}
+                  style={{
+                    top: pos.top,
+                    left: pos.left,
+                    '--dx1': `${anim.dx1}px`, '--dy1': `${anim.dy1}px`, '--r1': `${anim.r1}deg`, '--s1': '1.05',
+                    '--dx2': `${anim.dx2}px`, '--dy2': `${anim.dy2}px`, '--r2': `${anim.r2}deg`,
+                    '--dx3': `${anim.dx3}px`, '--dy3': `${anim.dy3}px`, '--r3': `${anim.r3}deg`,
+                    animationDuration: `${anim.duration}s`,
+                    animationDelay: `${anim.delay}s`,
+                    animationTimingFunction: 'cubic-bezier(0.45, 0.05, 0.55, 0.95)',
+                    animationIterationCount: 'infinite',
+                  } as React.CSSProperties}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
                   }}
-                >
-                  <img 
-                    src={s.logoPath} 
-                    alt="" 
-                    onError={(e) => {
-                      // Ocultar el contenedor si la imagen falla
-                      if (e.currentTarget.parentElement) {
-                        e.currentTarget.parentElement.style.display = 'none'
-                      }
-                    }}
-                  />
-                </div>
+                />
               )
             })}
           </div>
@@ -158,14 +171,19 @@ const SuscripcionesPage: React.FC = () => {
               Agregá Netflix, Spotify, el gimnasio o cualquier servicio con cobro periódico. 
               El sistema calcula cuánto gastás por mes en total.
             </p>
-            <Button onClick={handleCreate} size="lg" className="w-full md:w-auto">
+            <Button 
+              onClick={handleCreate} 
+              size="lg" 
+              className={styles.emptyButton}
+              icon={<Plus size={20} />}
+            >
               Agregar mi primera suscripción
             </Button>
           </div>
         </div>
 
         <SuscripcionModal 
-          isOpen={modalOpen}
+          open={modalOpen}
           onClose={() => setModalOpen(false)}
           suscripcion={selectedSuscripcion}
           onSuccess={() => loadData()}
@@ -207,8 +225,8 @@ const SuscripcionesPage: React.FC = () => {
         {sections.map(section => (
           <div key={section.title} className={styles.section}>
             <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>{section.title}</h2>
-              <span className={styles.sectionCount}>{section.count}</span>
+              <h2 className={section.title === 'Activas' ? styles.sectionTitle : styles.sectionTitleAlt}>{section.title}</h2>
+              <span className={section.count > 0 ? styles.sectionCount : ''}>{section.count}</span>
             </div>
             <div className={styles.grid}>
               {section.items.map(s => (

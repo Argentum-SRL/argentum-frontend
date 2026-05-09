@@ -15,7 +15,7 @@ import { formatMonto } from '@/utils/format'
 import styles from './SuscripcionModal.module.css'
 
 interface SuscripcionModalProps {
-  isOpen: boolean
+  open: boolean
   onClose: () => void
   suscripcion?: Suscripcion | null
   onSuccess: () => void
@@ -37,7 +37,7 @@ interface FormState {
   isEdit: boolean
 }
 
-type FormAction = 
+type FormAction =
   | { type: 'SET_STEP'; step: 1 | 2; direction: 'forward' | 'back' }
   | { type: 'SET_FIELD'; field: keyof FormState; value: any }
   | { type: 'RESET'; data?: any }
@@ -118,11 +118,11 @@ function MontoHero({ value, onChange, moneda, onMonedaChange }: any) {
         />
       </div>
       <div className={styles.monedaToggle}>
-        <button 
+        <button
           className={`${styles.monedaBtn} ${moneda === 'ARS' ? styles.monedaBtnActive : ''}`}
           onClick={() => onMonedaChange('ARS')}
         >ARS</button>
-        <button 
+        <button
           className={`${styles.monedaBtn} ${moneda === 'USD' ? styles.monedaBtnActive : ''}`}
           onClick={() => onMonedaChange('USD')}
         >USD</button>
@@ -131,10 +131,10 @@ function MontoHero({ value, onChange, moneda, onMonedaChange }: any) {
   )
 }
 
-const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, suscripcion, onSuccess }) => {
+const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, suscripcion, onSuccess }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { showToast } = useToast()
-  
+
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -142,7 +142,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    if (isOpen) {
+    if (open) {
       dispatch({ type: 'RESET', data: suscripcion })
       loadData()
     }
@@ -158,7 +158,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
       setBilleteras(b.filter(x => !x.es_efectivo && x.estado === 'activa'))
       setTarjetas(t.filter(x => x.estado === 'activa'))
       setCategorias(c)
-      
+
       if (!state.billeteraId && b.length > 0) {
         dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.find(x => x.es_principal)?.id || b[0].id })
       }
@@ -172,7 +172,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
 
   const filteredCatalogo = useMemo(() => {
     if (!searchTerm) return CATALOGO_SUSCRIPCIONES
-    return CATALOGO_SUSCRIPCIONES.filter(s => 
+    return CATALOGO_SUSCRIPCIONES.filter(s =>
       s.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     )
   }, [searchTerm])
@@ -187,7 +187,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
     dispatch({ type: 'SET_FIELD', field: 'servicioId', value: s.id })
     dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: s.nombre })
     dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: s.frecuenciaDefault })
-    
+
     // Autoseleccionar categoría si existe
     if (s.categoria) {
       const cat = categorias.find(c => c.nombre.toLowerCase() === s.categoria.toLowerCase())
@@ -236,7 +236,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
   const animClass = state.slideDirection === 'forward' ? 'slide-in-right' : 'slide-in-left'
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding ariaLabel="Nueva suscripción">
+    <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding ariaLabel="Nueva suscripción">
       <div className={styles.modal}>
         {/* PASO 1 */}
         {state.step === 1 && (
@@ -248,9 +248,9 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
                 <div className={styles.stepDot} />
               </div>
               <div style={{ marginTop: 16 }}>
-                <Input 
-                  placeholder="Buscar servicio..." 
-                  icon={<Search size={18} />} 
+                <Input
+                  placeholder="Buscar servicio..."
+                  icon={<Search size={18} />}
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                 />
@@ -266,16 +266,16 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
                     <h3 className={styles.groupLabel}>{cat.label}</h3>
                     <div className={styles.catalogGrid}>
                       {items.map(s => (
-                        <div 
-                          key={s.id} 
+                        <div
+                          key={s.id}
                           className={`${styles.catalogItem} ${state.servicioId === s.id ? styles.catalogItemActive : ''}`}
                           onClick={() => handleSelectServicio(s)}
                         >
                           <div className={styles.logoWrapper}>
                             {s.logoPath ? (
-                              <img 
-                                src={s.logoPath} 
-                                alt={s.nombre} 
+                              <img
+                                src={s.logoPath}
+                                alt={s.nombre}
                                 className={styles.logo}
                                 onError={(e) => (e.currentTarget.style.display = 'none')}
                               />
@@ -292,7 +292,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
                 )
               })}
 
-              <div 
+              <div
                 className={`${styles.otherOption} ${state.servicioId === 'other' ? styles.otherOptionActive : ''}`}
                 onClick={() => dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })}
               >
@@ -303,8 +303,8 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
               </div>
 
               {state.servicioId === 'other' && (
-                <Input 
-                  placeholder="Nombre de la suscripción" 
+                <Input
+                  placeholder="Nombre de la suscripción"
                   value={state.nombrePersonalizado}
                   onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
                   autoFocus
@@ -313,8 +313,8 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
             </div>
 
             <div className={styles.footer}>
-              <Button 
-                className={styles.btnNext} 
+              <Button
+                className={styles.btnNext}
                 disabled={!state.nombrePersonalizado}
                 onClick={goNext}
               >Siguiente</Button>
@@ -337,7 +337,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
             </div>
 
             <div className={styles.content}>
-              <MontoHero 
+              <MontoHero
                 value={state.monto}
                 onChange={(v: any) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
                 moneda={state.moneda}
@@ -348,7 +348,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
                 <h4 className={styles.sectionLabel}>Frecuencia de cobro</h4>
                 <div className={styles.pillsRow}>
                   {['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'].map(f => (
-                    <button 
+                    <button
                       key={f}
                       className={`${styles.pill} ${state.frecuencia === f ? styles.pillActive : ''}`}
                       onClick={() => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: f })}
@@ -365,15 +365,15 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
               <div style={{ display: 'flex', gap: 12 }}>
                 <div style={{ flex: 1 }}>
                   <h4 className={styles.sectionLabel}>Próximo cobro</h4>
-                  <Input 
-                    type="date" 
-                    value={state.proximo_cobro} 
+                  <Input
+                    type="date"
+                    value={state.proximo_cobro}
                     onChange={e => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: e.target.value })}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
                   <h4 className={styles.sectionLabel}>Categoría</h4>
-                  <Select 
+                  <Select
                     value={state.categoriaId}
                     onChange={e => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: e.target.value })}
                   >
@@ -386,22 +386,22 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
               <div>
                 <h4 className={styles.sectionLabel}>¿Cómo se cobra?</h4>
                 <div className={styles.pillsRow} style={{ marginBottom: 16 }}>
-                  <button 
+                  <button
                     className={`${styles.pill} ${state.metodoCobro === 'tarjeta' ? styles.pillActive : ''}`}
                     onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'tarjeta' })}
                   ><CreditCard size={14} style={{ marginRight: 6 }} /> Tarjeta</button>
-                  <button 
+                  <button
                     className={`${styles.pill} ${state.metodoCobro === 'debito' ? styles.pillActive : ''}`}
                     onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'debito' })}
                   ><Wallet size={14} style={{ marginRight: 6 }} /> Débito</button>
-                  <button 
+                  <button
                     className={`${styles.pill} ${state.metodoCobro === 'recordatorio' ? styles.pillActive : ''}`}
                     onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'recordatorio' })}
                   ><Bell size={14} style={{ marginRight: 6 }} /> Solo recordatorio</button>
                 </div>
 
                 {state.metodoCobro === 'tarjeta' && (
-                  <Select 
+                  <Select
                     value={state.tarjetaId}
                     onChange={e => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: e.target.value })}
                   >
@@ -410,7 +410,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
                 )}
 
                 {state.metodoCobro === 'debito' && (
-                  <Select 
+                  <Select
                     value={state.billeteraId}
                     onChange={e => dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: e.target.value })}
                   >
@@ -422,8 +422,8 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ isOpen, onClose, su
 
             <div className={styles.footer}>
               <Button variant="outline" className={styles.btnBack} onClick={goBack}>Atrás</Button>
-              <Button 
-                className={styles.btnNext} 
+              <Button
+                className={styles.btnNext}
                 loading={loading}
                 onClick={handleSave}
               >{state.isEdit ? 'Actualizar' : 'Guardar suscripción'}</Button>

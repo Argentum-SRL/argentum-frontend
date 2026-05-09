@@ -13,7 +13,6 @@ const getLogo = (name: string) => `/src/assets/suscripciones/${name}`
 export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = [
   // Streaming video
   { id: 'netflix',     nombre: 'Netflix',      logoPath: getLogo('netflix.png'),     categoria: 'Entretenimiento y salidas', frecuenciaDefault: 'mensual' },
-  { id: 'disney',      nombre: 'Disney+',      logoPath: getLogo('disney.png'),      categoria: 'Entretenimiento y salidas', frecuenciaDefault: 'mensual' },
   { id: 'hbomax',      nombre: 'HBO Max',      logoPath: getLogo('hbomax.png'),      categoria: 'Entretenimiento y salidas', frecuenciaDefault: 'mensual' },
   { id: 'primevideo',  nombre: 'Prime Video',  logoPath: getLogo('primevideo.png'),  categoria: 'Entretenimiento y salidas', frecuenciaDefault: 'mensual' },
   { id: 'paramount',   nombre: 'Paramount+',   logoPath: getLogo('paramount.png'),   categoria: 'Entretenimiento y salidas', frecuenciaDefault: 'mensual' },
@@ -46,8 +45,8 @@ export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = [
   { id: 'playstation', nombre: 'PlayStation+', logoPath: getLogo('playstation.png'), categoria: 'Entretenimiento y salidas', frecuenciaDefault: 'mensual' },
   
   // Delivery
-  { id: 'rappi',       nombre: 'Rappi Prime',  logoPath: getLogo('rappi.png'),       categoria: 'Alimentación', frecuenciaDefault: 'mensual' },
-  { id: 'pedidosya',   nombre: 'PedidosYa Pass',logoPath: getLogo('pedidosya.png'),  categoria: 'Alimentación', frecuenciaDefault: 'mensual' },
+  { id: 'rappi',       nombre: 'Rappi Prime',  logoPath: getLogo('rappipro.png'),    categoria: 'Alimentación', frecuenciaDefault: 'mensual' },
+  { id: 'pedidosya',   nombre: 'PedidosYa Pass',logoPath: getLogo('pedidoya.png'),   categoria: 'Alimentación', frecuenciaDefault: 'mensual' },
   
   // Otros
   { id: 'duolingo',    nombre: 'Duolingo',     logoPath: getLogo('duolingo.png'),    categoria: 'Educación', frecuenciaDefault: 'mensual' },
@@ -55,7 +54,7 @@ export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = [
 
 // Categorías para agrupar en el picker
 export const CATEGORIAS_CATALOGO = [
-  { label: 'Streaming',      ids: ['netflix','disney','hbomax','primevideo','paramount','appletv','crunchyroll','plutotv','peacock'] },
+  { label: 'Streaming',      ids: ['netflix','hbomax','primevideo','paramount','appletv','crunchyroll','plutotv','peacock'] },
   { label: 'Música',         ids: ['spotify','applemusic','youtubemusic','tidal','deezer'] },
   { label: 'Productividad',  ids: ['icloud','googleone','microsoft365','adobe','chatgpt','canva','notion','evernote','dropbox','grammarly'] },
   { label: 'Gaming',         ids: ['xbox','playstation'] },

@@ -107,16 +107,16 @@ function formReducer(state: FormState, action: FormAction): FormState {
         }
       } else {
         const activas = action.billeteras.filter(b => b.estado === 'activa')
-        
+
         // Prioridad:
         // 1. Principal con saldo > 0
         // 2. Cualquier otra con saldo > 0
         // 3. Principal (aunque sea 0)
         // 4. La primera activa que haya
-        const best = activas.find(b => b.es_principal && b.saldo_actual > 0) || 
-                     activas.find(b => b.saldo_actual > 0) ||
-                     activas.find(b => b.es_principal) ||
-                     activas[0]
+        const best = activas.find(b => b.es_principal && b.saldo_actual > 0) ||
+          activas.find(b => b.saldo_actual > 0) ||
+          activas.find(b => b.es_principal) ||
+          activas[0]
 
         return {
           ...initialState,
@@ -191,7 +191,7 @@ function MontoHero({
   }, [onChange])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    const navKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter','Home','End']
+    const navKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Home', 'End']
     if (navKeys.includes(e.key) || e.ctrlKey || e.metaKey) return
     if (e.key === ',' || e.key === '.') { if (inputValue.includes(',')) e.preventDefault(); return }
     if (!/[0-9]/.test(e.key)) e.preventDefault()
@@ -296,14 +296,14 @@ export default function TransaccionModal({
   const billeterasCarousel = useMemo(() => {
     // Primero filtramos por moneda y estado
     let filtered = billeteras.filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId))
-    
+
     // Luego filtramos por tipo según el método de pago
     if (metodoPago === 'efectivo') {
       filtered = filtered.filter(b => b.es_efectivo)
     } else if (metodoPago === 'debito' || metodoPago === 'transferencia') {
       filtered = filtered.filter(b => !b.es_efectivo)
     }
-    
+
     // Finalmente ordenamos: principal primero, luego por saldo
     return filtered.sort((a, b) => {
       if (a.es_principal && !b.es_principal) return -1
@@ -314,9 +314,9 @@ export default function TransaccionModal({
 
   useEffect(() => {
     if (!open || !billeteraId) return
-    
+
     const actualEsValida = billeteras.some(b => b.id === billeteraId && b.moneda === moneda)
-    
+
     if (!actualEsValida && billeterasCarousel.length > 0) {
       dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: billeterasCarousel[0].id })
     }
@@ -326,20 +326,20 @@ export default function TransaccionModal({
     if (!open) return
     const idToScroll = metodoPago === 'credito' ? tarjetaId : billeteraId
     if (!idToScroll) return
-    
+
     const timer = setTimeout(() => {
       const card = cardRefs.current.get(idToScroll)
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
       }
     }, 100)
-    
+
     return () => clearTimeout(timer)
   }, [billeteraId, tarjetaId, open, metodoPago])
 
   const activeCategorias = useMemo(() => {
     const filtered = categorias.filter((c) => c.tipo === tipo)
-    const mainCats = ['alimentacion','transporte','salud y cuidado personal','entretenimiento','servicios','ropa','ropa e indumentaria','educacion','vivienda', 'banco', 'mascotas', 'regalos']
+    const mainCats = ['alimentacion', 'transporte', 'salud y cuidado personal', 'entretenimiento', 'servicios', 'ropa', 'ropa e indumentaria', 'educacion', 'vivienda', 'banco', 'mascotas', 'regalos']
     return filtered.sort((a, b) => {
       const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
       const ai = mainCats.indexOf(norm(a.nombre)), bi = mainCats.indexOf(norm(b.nombre))
@@ -362,15 +362,15 @@ export default function TransaccionModal({
       : m / cant
     return { total: valorCuota * cant, cuota: valorCuota }
   }, [monto, cantidadCuotas, tasaInteres])
-  
+
   const [animClass, setAnimClass] = useState('')
 
   const goNext = () => {
-    if (!monto || (metodoPago === 'credito' ? !tarjetaId : !billeteraId)) { 
+    if (!monto || (metodoPago === 'credito' ? !tarjetaId : !billeteraId)) {
       showToast(metodoPago === 'credito' ? 'Seleccioná una tarjeta' : 'Seleccioná una billetera', 'error')
-      return 
+      return
     }
-    
+
     let nextStep: 1 | 2 | 3 = 2
     if (step === 1) {
       nextStep = metodoPago === 'credito' ? 2 : 3
@@ -404,7 +404,7 @@ export default function TransaccionModal({
     try {
       const selectedTarjeta = tarjetas.find(t => t.id === tarjetaId)
       let primerVencimientoManual = undefined
-      
+
       // Sanitización de cuotas para el envío
       const cant = Math.max(1, cantidadCuotas || 1)
       const inicial = Math.max(1, cuotaInicial || 1)
@@ -418,14 +418,14 @@ export default function TransaccionModal({
         origen: isEdit ? undefined : ('manual' as const),
         es_padre_cuotas: !isEdit && metodoPago === 'credito' ? true : undefined,
         info_cuotas: !isEdit && metodoPago === 'credito'
-          ? { 
-              cantidad_cuotas: cant, 
-              cuota_inicial: inicial,
-              tiene_interes: tasaInteres > 0, 
-              tasa_interes: tasaInteres, 
-              monto_total: monto,
-              proximo_resumen: proximoResumen
-            }
+          ? {
+            cantidad_cuotas: cant,
+            cuota_inicial: inicial,
+            tiene_interes: tasaInteres > 0,
+            tasa_interes: tasaInteres,
+            monto_total: monto,
+            proximo_resumen: proximoResumen
+          }
           : undefined,
       }
       if (!isEdit) { await transaccionService.createTransaccion(payload); showToast('Transacción creada', 'success') }
@@ -489,7 +489,7 @@ export default function TransaccionModal({
                         onClick={() => {
                           if (isCuotaHija) return
                           dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: key })
-                          
+
                           if (key === 'efectivo') {
                             const cashWallet = billeteras.find(b => b.es_efectivo && b.moneda === moneda && b.estado === 'activa')
                             if (cashWallet) dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: cashWallet.id })
@@ -555,7 +555,7 @@ export default function TransaccionModal({
                       <div className={styles.billeterasCarousel} ref={carouselRef}>
                         {(() => {
                           if (billeterasCarousel.length === 0) return <p className={styles.noTarjetas}>No hay billeteras.</p>
-                          
+
                           return billeterasCarousel.map(b => (
                             <div
                               key={b.id}
@@ -635,7 +635,7 @@ export default function TransaccionModal({
                       <div className={styles.inputWrapper}>
                         <Percent size={16} />
                         <input id="tx-interes" type="number" step="0.1" className={styles.fieldInput}
-                          value={tasaInteres === 0 ? '0' : (tasaInteres || '')} 
+                          value={tasaInteres === 0 ? '0' : (tasaInteres || '')}
                           onChange={(e) => {
                             const val = e.target.value === '' ? 0 : parseFloat(e.target.value)
                             dispatch({ type: 'SET_FIELD', field: 'tasaInteres', value: val })
@@ -664,7 +664,7 @@ export default function TransaccionModal({
                   <div className={styles.cuotasSummary}>
                     <div className={styles.summaryHeader}>
                       <span className={styles.summaryHint}>
-                        {cuotaInicial > 1 
+                        {cuotaInicial > 1
                           ? `Se generarán ${Math.max(0, cantidadCuotas - cuotaInicial + 1)} cuotas (de la ${cuotaInicial} a la ${cantidadCuotas}).`
                           : `Se generarán ${cantidadCuotas || 0} cuotas.`
                         }

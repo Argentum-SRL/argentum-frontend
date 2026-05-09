@@ -144,7 +144,7 @@ function MontoHero({
   }, [onChange])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    const navKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter','Home','End']
+    const navKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Home', 'End']
     if (navKeys.includes(e.key) || e.ctrlKey || e.metaKey) return
     if (e.key === ',' || e.key === '.') { if (inputValue.includes(',')) e.preventDefault(); return }
     if (!/[0-9]/.test(e.key)) e.preventDefault()
@@ -227,7 +227,7 @@ export default function PresupuestoModal({
       dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Seleccioná al menos una categoría' })
       return
     }
-    
+
     dispatch({ type: 'SET_FIELD', field: 'localError', value: null })
     setAnimClass(styles.slideForward)
     dispatch({ type: 'SET_STEP', step: (step + 1) as 1 | 2 | 3, direction: 'forward' })
@@ -388,7 +388,7 @@ export default function PresupuestoModal({
                     const subs = allSubcategorias.filter(s => s.categoria_id === cat.id)
                     const isExpanded = expandedCats.has(cat.id)
                     const isCatSelected = selectedCategorias.some(s => s.categoria_id === cat.id && s.subcategoria_id === null)
-                    
+
                     return (
                       <div key={cat.id} className={styles.catItem}>
                         <div className={styles.catMain} onClick={() => toggleCatExpanded(cat.id)}>
@@ -406,7 +406,7 @@ export default function PresupuestoModal({
                             </button>
                           </div>
                         </div>
-                        
+
                         {isExpanded && subs.length > 0 && (
                           <div className={styles.subList}>
                             {subs.map(sub => {

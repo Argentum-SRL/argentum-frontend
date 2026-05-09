@@ -3,7 +3,9 @@ import { Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import suscripcionService from '@/services/suscripcion.service'
-import type { Suscripcion, TotalMensualSuscripciones } from '@/types'
+import billeteraService from '@/services/billetera.service'
+import tarjetaService from '@/services/tarjeta.service'
+import type { Suscripcion, TotalMensualSuscripciones, Billetera, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
 import SuscripcionCard from '@/components/suscripciones/SuscripcionCard'
@@ -43,6 +45,8 @@ const LOGOS_ANIM = [
 const SuscripcionesPage: React.FC = () => {
   const [suscripciones, setSuscripciones] = useState<Suscripcion[]>([])
   const [totales, setTotales] = useState<TotalMensualSuscripciones | null>(null)
+  const [billeteras, setBilleteras] = useState<Billetera[]>([])
+  const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedSuscripcion, setSelectedSuscripcion] = useState<Suscripcion | null>(null)
@@ -51,10 +55,14 @@ const SuscripcionesPage: React.FC = () => {
 
   const loadData = async (isFirstLoad = false) => {
     try {
-      const [data, t] = await Promise.all([
+      const [data, t, bills, cards] = await Promise.all([
         suscripcionService.getSuscripciones(),
-        suscripcionService.getTotalMensual()
+        suscripcionService.getTotalMensual(),
+        billeteraService.list(),
+        tarjetaService.getTarjetas(),
       ])
+      setBilleteras(bills)
+      setTarjetas(cards)
       
       if (!isFirstLoad && suscripciones.length === 0 && data.length > 0) {
         setIsExiting(true)
@@ -89,21 +97,32 @@ const SuscripcionesPage: React.FC = () => {
     setModalOpen(true)
   }
 
-  const handleAction = async (id: string, action: 'pausar' | 'activar' | 'eliminar') => {
+  const handleToggleEstado = async (s: Suscripcion) => {
     try {
-      if (action === 'eliminar') {
-        await suscripcionService.deleteSuscripcion(id)
-        showToast('Suscripción eliminada', 'success')
-      } else if (action === 'pausar') {
-        await suscripcionService.pausarSuscripcion(id)
+      if (s.estado === 'activa') {
+        await suscripcionService.pausarSuscripcion(s.id)
         showToast('Suscripción pausada', 'success')
       } else {
-        await suscripcionService.reactivarSuscripcion(id)
+        await suscripcionService.reactivarSuscripcion(s.id)
         showToast('Suscripción reactivada', 'success')
       }
       loadData()
     } catch (error) {
       showToast('Error al procesar acción', 'error')
+    }
+  }
+
+  const handleDelete = async (s: Suscripcion) => {
+    try {
+      if (s.estado !== 'cancelada') {
+        await suscripcionService.cancelarSuscripcion(s.id)
+      }
+      await suscripcionService.deleteSuscripcion(s.id)
+      showToast('Suscripción eliminada', 'success')
+      loadData()
+    } catch (error) {
+      console.error(error)
+      showToast('Error al eliminar', 'error')
     }
   }
 
@@ -230,11 +249,15 @@ const SuscripcionesPage: React.FC = () => {
             </div>
             <div className={styles.grid}>
               {section.items.map(s => (
-                <SuscripcionCard 
-                  key={s.id} 
-                  suscripcion={s} 
-                  onEdit={() => handleEdit(s)}
-                  onAction={(a) => handleAction(s.id, a)}
+                <SuscripcionCard
+                  key={s.id}
+                  suscripcion={s}
+                  billeteras={billeteras}
+                  tarjetas={tarjetas}
+                  onEdit={handleEdit}
+                  onUpdatePrecio={handleEdit}
+                  onToggleEstado={handleToggleEstado}
+                  onDelete={handleDelete}
                 />
               ))}
             </div>
@@ -243,7 +266,7 @@ const SuscripcionesPage: React.FC = () => {
       </div>
 
       <SuscripcionModal 
-        isOpen={modalOpen}
+        open={modalOpen}
         onClose={() => setModalOpen(false)}
         suscripcion={selectedSuscripcion}
         onSuccess={() => loadData()}

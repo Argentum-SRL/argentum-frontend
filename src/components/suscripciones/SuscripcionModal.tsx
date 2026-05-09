@@ -1,8 +1,7 @@
-import React, { useReducer, useEffect, useState, useMemo } from 'react'
-import { Plus, ChevronLeft, X, CreditCard, Wallet, Bell, Search, Check } from 'lucide-react'
+import React, { useReducer, useEffect, useState, useMemo, useRef, useCallback } from 'react'
+import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Hash, Calendar, Layers } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
-import { Button, Input, Select } from '@/components/ui'
-import { useModal } from '@/hooks/useModal'
+import { Button } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { CATALOGO_SUSCRIPCIONES, CATEGORIAS_CATALOGO } from '@/lib/constants/suscripciones'
 import type { ServicioCatalogo } from '@/lib/constants/suscripciones'
@@ -12,6 +11,9 @@ import tarjetaService from '@/services/tarjeta.service'
 import categoriaService from '@/services/categoria.service'
 import type { Billetera, TarjetaCredito, Categoria, Suscripcion } from '@/types'
 import { formatMonto } from '@/utils/format'
+import BilleteraCard from '@/components/billeteras/BilleteraCard'
+import RealCardPreview from '@/components/tarjetas/RealCardPreview'
+import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import styles from './SuscripcionModal.module.css'
 
 interface SuscripcionModalProps {
@@ -30,17 +32,18 @@ interface FormState {
   moneda: 'ARS' | 'USD'
   frecuencia: 'mensual' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'
   proximo_cobro: string
-  metodoCobro: 'tarjeta' | 'debito' | 'recordatorio'
+  metodoCobro: 'tarjeta' | 'debito'
   billeteraId: string
   tarjetaId: string
   categoriaId: string
   isEdit: boolean
+  isSubmitting: boolean
 }
 
 type FormAction =
   | { type: 'SET_STEP'; step: 1 | 2; direction: 'forward' | 'back' }
   | { type: 'SET_FIELD'; field: keyof FormState; value: any }
-  | { type: 'RESET'; data?: any }
+  | { type: 'RESET'; data?: any; defaultBilleteraId?: string; defaultTarjetaId?: string }
 
 const initialState: FormState = {
   step: 1,
@@ -55,7 +58,8 @@ const initialState: FormState = {
   billeteraId: '',
   tarjetaId: '',
   categoriaId: '',
-  isEdit: false
+  isEdit: false,
+  isSubmitting: false,
 }
 
 function reducer(state: FormState, action: FormAction): FormState {
@@ -76,56 +80,104 @@ function reducer(state: FormState, action: FormAction): FormState {
           moneda: s.precio_actual?.moneda || 'ARS',
           frecuencia: s.frecuencia,
           proximo_cobro: s.proximo_cobro,
-          metodoCobro: s.tarjeta_id ? 'tarjeta' : s.billetera_id ? 'debito' : 'recordatorio',
-          tarjetaId: s.tarjeta_id || '',
-          billeteraId: s.billetera_id || '',
+          metodoCobro: s.tarjeta_id ? 'tarjeta' : 'debito',
+          tarjetaId: s.tarjeta_id || action.defaultTarjetaId || '',
+          billeteraId: s.billetera_id || action.defaultBilleteraId || '',
           categoriaId: s.categoria_id || ''
         }
       }
-      return initialState
+      return {
+        ...initialState,
+        billeteraId: action.defaultBilleteraId || '',
+        tarjetaId: action.defaultTarjetaId || '',
+      }
     default:
       return state
   }
 }
 
-// ── Componente MontoHero ──
+// ── Componente MontoHero mejorado ──
+function formatParaMostrar(str: string): string {
+  const num = str.replace(/\./g, '')
+  const partes = num.split(',')
+  partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return partes.join(',')
+}
+
 function MontoHero({ value, onChange, moneda, onMonedaChange }: any) {
-  const [inputVal, setInputVal] = useState(value ? value.toString() : '')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [inputValue, setInputValue] = useState(() =>
+    value !== null ? value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''
+  )
+  const [prevValue, setPrevValue] = useState(value)
 
   useEffect(() => {
-    if (value === null) setInputVal('')
-    else setInputVal(value.toString())
-  }, [value])
+    if (value !== prevValue) {
+      setPrevValue(value)
+      if (value === null) { setInputValue('') }
+      else {
+        const cleaned = inputValue.replace(/\./g, '').replace(',', '.')
+        if (parseFloat(cleaned) !== value) {
+          setInputValue(value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+        }
+      }
+    }
+  }, [value, prevValue, inputValue])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/[^0-9.]/g, '')
-    setInputVal(val)
-    const num = parseFloat(val)
-    onChange(isNaN(num) ? null : num)
-  }
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value
+    if (!raw) { setInputValue(''); onChange(null); return }
+    if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
+    let cleaned = raw.replace(/[^0-9.,]/g, '')
+    const parts = cleaned.split(',')
+    if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
+    const formatted = formatParaMostrar(cleaned)
+    const start = e.target.selectionStart || 0
+    const oldLen = e.target.value.length
+    setInputValue(formatted)
+    const numStr = formatted.replace(/\./g, '').replace(',', '.')
+    if (numStr.endsWith('.')) { onChange(parseFloat(numStr.slice(0, -1)) || null) }
+    else { const n = parseFloat(numStr); onChange(isNaN(n) ? null : n) }
+    requestAnimationFrame(() => {
+      if (inputRef.current) {
+        const newPos = Math.max(0, start + (inputRef.current.value.length - oldLen))
+        inputRef.current.setSelectionRange(newPos, newPos)
+      }
+    })
+  }, [onChange])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) return
+    if (e.key === ',' || e.key === '.') { if (inputValue.includes(',')) e.preventDefault(); return }
+    if (!/[0-9]/.test(e.key)) e.preventDefault()
+  }, [inputValue])
 
   return (
     <div className={styles.montoHero}>
-      <div className={styles.montoInputWrapper}>
-        <span className={styles.montoCurrency}>{moneda === 'ARS' ? '$' : 'u$s'}</span>
+      <button
+        type="button"
+        className={styles.monedaToggleChip}
+        onClick={() => onMonedaChange(moneda === 'ARS' ? 'USD' : 'ARS')}
+      >
+        <span className={styles.monedaChipFlag}>{moneda === 'ARS' ? '🇦🇷' : '🇺🇸'}</span>
+        <span className={styles.monedaChipLabel}>{moneda}</span>
+      </button>
+
+      <div className={styles.montoDivider} />
+
+      <div className={styles.montoHeroInput}>
+        <span className={styles.montoHeroPrefix}>$</span>
         <input
+          ref={inputRef}
           type="text"
-          className={styles.montoInput}
-          value={inputVal}
-          onChange={handleInputChange}
+          inputMode="decimal"
+          className={styles.montoHeroField}
+          value={inputValue}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
           placeholder="0"
-          autoFocus
+          autoComplete="off"
         />
-      </div>
-      <div className={styles.monedaToggle}>
-        <button
-          className={`${styles.monedaBtn} ${moneda === 'ARS' ? styles.monedaBtnActive : ''}`}
-          onClick={() => onMonedaChange('ARS')}
-        >ARS</button>
-        <button
-          className={`${styles.monedaBtn} ${moneda === 'USD' ? styles.monedaBtnActive : ''}`}
-          onClick={() => onMonedaChange('USD')}
-        >USD</button>
       </div>
     </div>
   )
@@ -134,41 +186,62 @@ function MontoHero({ value, onChange, moneda, onMonedaChange }: any) {
 const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, suscripcion, onSuccess }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { showToast } = useToast()
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
-  const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    if (open) {
-      dispatch({ type: 'RESET', data: suscripcion })
-      loadData()
-    }
-  }, [open, suscripcion])
-
-  const loadData = async () => {
+  const loadInitialData = async () => {
     try {
       const [b, t, c] = await Promise.all([
         billeteraService.list(),
         tarjetaService.getTarjetas(),
         categoriaService.getCategorias()
       ])
-      setBilleteras(b.filter(x => !x.es_efectivo && x.estado === 'activa'))
-      setTarjetas(t.filter(x => x.estado === 'activa'))
+      const validBilleteras = b.filter(x => !x.es_efectivo && x.estado === 'activa')
+      const validTarjetas = t.filter(x => x.estado === 'activa')
+      setBilleteras(validBilleteras)
+      setTarjetas(validTarjetas)
       setCategorias(c)
 
-      if (!state.billeteraId && b.length > 0) {
-        dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.find(x => x.es_principal)?.id || b[0].id })
-      }
-      if (!state.tarjetaId && t.length > 0) {
-        dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t[0].id })
-      }
+      const defB = validBilleteras.find(x => x.es_principal)?.id || validBilleteras[0]?.id || ''
+      const defT = validTarjetas[0]?.id || ''
+      
+      dispatch({ 
+        type: 'RESET', 
+        data: suscripcion, 
+        defaultBilleteraId: defB, 
+        defaultTarjetaId: defT 
+      })
     } catch (error) {
       console.error(error)
     }
   }
+
+  useEffect(() => {
+    if (open) {
+      loadInitialData()
+      setSearchTerm('')
+    }
+  }, [open, suscripcion])
+
+  // Scroll to selected card
+  useEffect(() => {
+    if (!open) return
+    const idToScroll = state.metodoCobro === 'tarjeta' ? state.tarjetaId : state.billeteraId
+    if (!idToScroll) return
+
+    const timer = setTimeout(() => {
+      const card = cardRefs.current.get(idToScroll)
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+    }, 150)
+
+    return () => clearTimeout(timer)
+  }, [state.billeteraId, state.tarjetaId, state.metodoCobro, open])
 
   const filteredCatalogo = useMemo(() => {
     if (!searchTerm) return CATALOGO_SUSCRIPCIONES
@@ -180,7 +253,8 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const costoMensual = useMemo(() => {
     if (!state.monto) return null
     const DIVISORES: any = { mensual: 1, bimestral: 2, trimestral: 3, semestral: 6, anual: 12 }
-    return (state.monto / DIVISORES[state.frecuencia]).toFixed(2)
+    const val = (state.monto / DIVISORES[state.frecuencia])
+    return val % 1 === 0 ? val.toString() : val.toFixed(2)
   }, [state.monto, state.frecuencia])
 
   const handleSelectServicio = (s: ServicioCatalogo) => {
@@ -188,11 +262,11 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: s.nombre })
     dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: s.frecuenciaDefault })
 
-    // Autoseleccionar categoría si existe
     if (s.categoria) {
       const cat = categorias.find(c => c.nombre.toLowerCase() === s.categoria.toLowerCase())
       if (cat) dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
     }
+    goNext()
   }
 
   const goNext = () => dispatch({ type: 'SET_STEP', step: 2, direction: 'forward' })
@@ -204,7 +278,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
       return
     }
 
-    setLoading(true)
+    dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       const payload = {
         nombre: state.nombrePersonalizado,
@@ -229,204 +303,271 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     } catch (error: any) {
       showToast(error.response?.data?.detail || 'Error al guardar', 'error')
     } finally {
-      setLoading(false)
+      dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
   }
 
-  const animClass = state.slideDirection === 'forward' ? 'slide-in-right' : 'slide-in-left'
+  const animClass = state.slideDirection === 'forward' ? styles.slideForward : styles.slideBack
+
+  const currentItemsCount = state.metodoCobro === 'tarjeta' ? tarjetas.length : billeteras.length
 
   return (
     <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding ariaLabel="Nueva suscripción">
-      <div className={styles.modal}>
-        {/* PASO 1 */}
+      <div className={styles.slidesContainer}>
+        {/* Step Indicators */}
+        <div className={styles.stepDots}>
+          <div className={`${styles.stepDot} ${state.step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
+          <div className={`${styles.stepDot} ${state.step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
+        </div>
+
+        {/* PASO 1: Selección de Servicio */}
         {state.step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.header}>
-              <h2 className={styles.title}>¿Qué suscripción querés agregar?</h2>
-              <div className={styles.steps}>
-                <div className={`${styles.stepDot} ${styles.stepDotActive}`} />
-                <div className={styles.stepDot} />
+            <div className={styles.formContainer}>
+              <div className={styles.formHeader}>
+                <h2 className={styles.headerTitle}>¿Qué suscripción querés agregar?</h2>
+                <button className={styles.closeBtn} onClick={onClose}><X size={16} /></button>
               </div>
-              <div style={{ marginTop: 16 }}>
-                <Input
-                  placeholder="Buscar servicio..."
-                  icon={<Search size={18} />}
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
 
-            <div className={styles.content}>
-              {CATEGORIAS_CATALOGO.map(cat => {
-                const items = filteredCatalogo.filter(s => cat.ids.includes(s.id))
-                if (items.length === 0) return null
-                return (
-                  <div key={cat.label} className={styles.catalogGroup}>
-                    <h3 className={styles.groupLabel}>{cat.label}</h3>
-                    <div className={styles.catalogGrid}>
-                      {items.map(s => (
-                        <div
-                          key={s.id}
-                          className={`${styles.catalogItem} ${state.servicioId === s.id ? styles.catalogItemActive : ''}`}
-                          onClick={() => handleSelectServicio(s)}
-                        >
-                          <div className={styles.logoWrapper}>
-                            {s.logoPath ? (
-                              <img
-                                src={s.logoPath}
-                                alt={s.nombre}
-                                className={styles.logo}
-                                onError={(e) => (e.currentTarget.style.display = 'none')}
-                              />
-                            ) : (
-                              <div className={styles.logoFallback}>{s.nombre[0]}</div>
-                            )}
-                          </div>
-                          <span className={styles.serviceName}>{s.nombre}</span>
-                          {state.servicioId === s.id && <div className={styles.checkBadge}><Check size={10} color="white" /></div>}
+              <div className={styles.formBody}>
+                <div className={styles.searchWrapper}>
+                  <div className={styles.inputWrapper} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <Search size={18} style={{ position: 'absolute', left: 12, color: 'var(--text-3)' }} />
+                    <input 
+                      className={styles.fieldInput} 
+                      style={{ paddingLeft: 40, width: '100%' }}
+                      placeholder="Buscar servicio (Netflix, Spotify...)"
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.catalogScroll}>
+                  {CATEGORIAS_CATALOGO.map(cat => {
+                    const items = filteredCatalogo.filter(s => cat.ids.includes(s.id))
+                    if (items.length === 0) return null
+                    return (
+                      <div key={cat.label} className={styles.catalogGroup}>
+                        <h3 className={styles.groupLabel}>{cat.label}</h3>
+                        <div className={styles.catalogGrid}>
+                          {items.map(s => (
+                            <div
+                              key={s.id}
+                              className={`${styles.catalogItem} ${state.servicioId === s.id ? styles.catalogItemActive : ''}`}
+                              onClick={() => handleSelectServicio(s)}
+                            >
+                              <div className={styles.logoWrapper}>
+                                {s.logoPath ? (
+                                  <img
+                                    src={s.logoPath}
+                                    alt={s.nombre}
+                                    className={styles.logo}
+                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                  />
+                                ) : (
+                                  <div className={styles.logoFallback}>{s.nombre[0]}</div>
+                                )}
+                              </div>
+                              <span className={styles.serviceName}>{s.nombre}</span>
+                              {state.servicioId === s.id && <div className={styles.checkBadge}><Check size={10} color="white" /></div>}
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    )
+                  })}
+
+                  <div
+                    className={`${styles.otherOption} ${state.servicioId === 'other' ? styles.otherOptionActive : ''}`}
+                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })}
+                  >
+                    <div className={styles.logoFallback} style={{ background: 'var(--text-3)', color: 'white' }}><Plus size={20} /></div>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>Otra suscripción</span>
                     </div>
                   </div>
-                )
-              })}
 
-              <div
-                className={`${styles.otherOption} ${state.servicioId === 'other' ? styles.otherOptionActive : ''}`}
-                onClick={() => dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })}
-              >
-                <div className={styles.logoFallback} style={{ background: 'var(--text-3)' }}><Plus size={20} /></div>
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontWeight: 600, fontSize: 14 }}>Otra suscripción</span>
+                  {state.servicioId === 'other' && (
+                    <div style={{ marginTop: 12 }}>
+                      <input
+                        className={styles.fieldInput}
+                        style={{ width: '100%' }}
+                        placeholder="Nombre de la suscripción"
+                        value={state.nombrePersonalizado}
+                        onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
+                        autoFocus
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {state.servicioId === 'other' && (
-                <Input
-                  placeholder="Nombre de la suscripción"
-                  value={state.nombrePersonalizado}
-                  onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
-                  autoFocus
-                />
-              )}
-            </div>
-
-            <div className={styles.footer}>
-              <Button
-                className={styles.btnNext}
-                disabled={!state.nombrePersonalizado}
-                onClick={goNext}
-              >Siguiente</Button>
+              <div className={styles.formFooter}>
+                <button className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+                <button 
+                  className={styles.submitBtn} 
+                  disabled={!state.nombrePersonalizado} 
+                  onClick={goNext}
+                >
+                  Siguiente
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* PASO 2 */}
+        {/* PASO 2: Configuración */}
         {state.step === 2 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.header}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <button className={styles.backArrow} onClick={goBack}><ChevronLeft size={20} /></button>
-                <h2 className={styles.title}>Configuración</h2>
+            <div className={styles.formContainer}>
+              <div className={styles.formHeader}>
+                <button className={styles.backBtn} onClick={goBack}><ChevronLeft size={20} /></button>
+                <h2 className={styles.headerTitle}>Configuración de {state.nombrePersonalizado}</h2>
+                <button className={styles.closeBtn} onClick={onClose}><X size={16} /></button>
               </div>
-              <div className={styles.steps}>
-                <div className={styles.stepDot} />
-                <div className={`${styles.stepDot} ${styles.stepDotActive}`} />
-              </div>
-            </div>
 
-            <div className={styles.content}>
-              <MontoHero
-                value={state.monto}
-                onChange={(v: any) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
-                moneda={state.moneda}
-                onMonedaChange={(m: any) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
-              />
+              <div className={styles.formBody}>
+                <MontoHero
+                  value={state.monto}
+                  onChange={(v: any) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
+                  moneda={state.moneda}
+                  onMonedaChange={(m: any) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
+                />
 
-              <div>
-                <h4 className={styles.sectionLabel}>Frecuencia de cobro</h4>
-                <div className={styles.pillsRow}>
-                  {['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'].map(f => (
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>Frecuencia de cobro</label>
+                  <div className={styles.radioPills}>
+                    {['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'].map(f => (
+                      <button
+                        key={f}
+                        className={`${styles.pill} ${state.frecuencia === f ? styles.pillActive : ''}`}
+                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: f })}
+                      >
+                        {f.charAt(0).toUpperCase() + f.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                  {costoMensual && state.frecuencia !== 'mensual' && (
+                    <p className={styles.previewCosto}>Equivale a {state.moneda === 'ARS' ? '$' : 'u$s'} {costoMensual} por mes</p>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <div className={styles.formField} style={{ flex: 1 }}>
+                    <label className={styles.fieldLabel}>Próximo cobro</label>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <Calendar size={16} style={{ position: 'absolute', left: 12, color: 'var(--text-3)' }} />
+                      <input
+                        type="date"
+                        className={styles.fieldInput}
+                        style={{ paddingLeft: 36, width: '100%' }}
+                        value={state.proximo_cobro}
+                        onChange={e => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className={styles.formField} style={{ flex: 1 }}>
+                    <label className={styles.fieldLabel}>Categoría</label>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <Layers size={16} style={{ position: 'absolute', left: 12, color: 'var(--text-3)' }} />
+                      <select
+                        className={styles.fieldInput}
+                        style={{ paddingLeft: 36, width: '100%', appearance: 'none' }}
+                        value={state.categoriaId}
+                        onChange={e => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: e.target.value })}
+                      >
+                        <option value="">Seleccionar...</option>
+                        {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>¿Cómo se cobra?</label>
+                  <div className={styles.radioPills}>
                     <button
-                      key={f}
-                      className={`${styles.pill} ${state.frecuencia === f ? styles.pillActive : ''}`}
-                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: f })}
+                      className={`${styles.pill} ${state.metodoCobro === 'tarjeta' ? styles.pillActive : ''}`}
+                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'tarjeta' })}
                     >
-                      {f.charAt(0).toUpperCase() + f.slice(1)}
+                      <CreditCard size={14} /> Tarjeta
                     </button>
-                  ))}
+                    <button
+                      className={`${styles.pill} ${state.metodoCobro === 'debito' ? styles.pillActive : ''}`}
+                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'debito' })}
+                    >
+                      <Wallet size={14} /> Débito
+                    </button>
+                  </div>
                 </div>
-                {costoMensual && state.frecuencia !== 'mensual' && (
-                  <p className={styles.previewCosto}>Equivale a {state.moneda === 'ARS' ? '$' : 'u$s'} {costoMensual} por mes</p>
-                )}
+
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>
+                    {state.metodoCobro === 'tarjeta' ? 'Seleccioná tu tarjeta' : '¿De qué billetera?'}
+                  </label>
+                  
+                  <div className={styles.billeterasCarouselScroller}>
+                    <div 
+                      className={styles.billeterasCarousel}
+                      style={{ justifyContent: currentItemsCount === 1 ? 'center' : 'flex-start' }}
+                    >
+                      {state.metodoCobro === 'tarjeta' ? (
+                        tarjetas.map(t => (
+                          <div
+                            key={t.id}
+                            className={styles.billeteraSelectWrap}
+                            data-active={state.tarjetaId === t.id}
+                            ref={(el) => { if (el) cardRefs.current.set(t.id, el); else cardRefs.current.delete(t.id) }}
+                          >
+                            <RealCardPreview
+                              ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
+                              red={t.red}
+                              titular={t.nombre}
+                              diaCierre={t.dia_cierre}
+                              diaVencimiento={t.dia_vencimiento}
+                              color={t.color || '#0D2045'}
+                              billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
+                            />
+                            <button
+                              type="button"
+                              className={styles.billeteraOverlay}
+                              onClick={() => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t.id })}
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        billeteras.map(b => (
+                          <div
+                            key={b.id}
+                            className={styles.billeteraSelectWrap}
+                            data-active={state.billeteraId === b.id}
+                            ref={(el) => { if (el) cardRefs.current.set(b.id, el); else cardRefs.current.delete(b.id) }}
+                          >
+                            <BilleteraCard billetera={b} className={styles.fullHeightCard} />
+                            <button
+                              type="button"
+                              className={styles.billeteraOverlay}
+                              onClick={() => dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })}
+                            />
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div style={{ display: 'flex', gap: 12 }}>
-                <div style={{ flex: 1 }}>
-                  <h4 className={styles.sectionLabel}>Próximo cobro</h4>
-                  <Input
-                    type="date"
-                    value={state.proximo_cobro}
-                    onChange={e => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: e.target.value })}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h4 className={styles.sectionLabel}>Categoría</h4>
-                  <Select
-                    value={state.categoriaId}
-                    onChange={e => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: e.target.value })}
-                  >
-                    <option value="">Seleccionar...</option>
-                    {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-                  </Select>
-                </div>
+              <div className={styles.formFooter}>
+                <button className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button 
+                  className={styles.submitBtn} 
+                  onClick={handleSave}
+                  disabled={state.isSubmitting}
+                >
+                  {state.isSubmitting ? 'Guardando...' : (state.isEdit ? 'Actualizar' : 'Guardar suscripción')}
+                </button>
               </div>
-
-              <div>
-                <h4 className={styles.sectionLabel}>¿Cómo se cobra?</h4>
-                <div className={styles.pillsRow} style={{ marginBottom: 16 }}>
-                  <button
-                    className={`${styles.pill} ${state.metodoCobro === 'tarjeta' ? styles.pillActive : ''}`}
-                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'tarjeta' })}
-                  ><CreditCard size={14} style={{ marginRight: 6 }} /> Tarjeta</button>
-                  <button
-                    className={`${styles.pill} ${state.metodoCobro === 'debito' ? styles.pillActive : ''}`}
-                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'debito' })}
-                  ><Wallet size={14} style={{ marginRight: 6 }} /> Débito</button>
-                  <button
-                    className={`${styles.pill} ${state.metodoCobro === 'recordatorio' ? styles.pillActive : ''}`}
-                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'recordatorio' })}
-                  ><Bell size={14} style={{ marginRight: 6 }} /> Solo recordatorio</button>
-                </div>
-
-                {state.metodoCobro === 'tarjeta' && (
-                  <Select
-                    value={state.tarjetaId}
-                    onChange={e => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: e.target.value })}
-                  >
-                    {tarjetas.map(t => <option key={t.id} value={t.id}>{t.nombre} ({t.red})</option>)}
-                  </Select>
-                )}
-
-                {state.metodoCobro === 'debito' && (
-                  <Select
-                    value={state.billeteraId}
-                    onChange={e => dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: e.target.value })}
-                  >
-                    {billeteras.map(b => <option key={b.id} value={b.id}>{b.nombre}</option>)}
-                  </Select>
-                )}
-              </div>
-            </div>
-
-            <div className={styles.footer}>
-              <Button variant="outline" className={styles.btnBack} onClick={goBack}>Atrás</Button>
-              <Button
-                className={styles.btnNext}
-                loading={loading}
-                onClick={handleSave}
-              >{state.isEdit ? 'Actualizar' : 'Guardar suscripción'}</Button>
             </div>
           </div>
         )}

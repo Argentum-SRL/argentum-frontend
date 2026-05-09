@@ -337,26 +337,31 @@
   aspect-ratio: 1.586 / 1;
   flex-shrink: 0;
   scroll-snap-align: center;
-  border-radius: 22px;
-  border: none;
+  border-radius: 24px;
+  border: 2px solid transparent;
+  padding: 3px;
   transform: translateY(0);
-  box-shadow: none;
-  outline: 2px solid transparent;
-  transition: all 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .billeteraSelectWrap[data-active="false"] {
   transform: translateY(0) scale(0.93);
   filter: saturate(0.3) brightness(0.7);
-  box-shadow: none;
-  outline: 2px solid transparent;
+  opacity: 0.7;
 }
 
 .billeteraSelectWrap[data-active="true"] {
-  transform: translateY(-5px) scale(1);
+  transform: translateY(-6px) scale(1.02);
   filter: none;
-  outline: 2px solid rgba(255, 255, 255, 0.5);
-  outline-offset: 0px;
+  opacity: 1;
+  border-color: #0D2045;
+  background: white;
+  box-shadow: 0 12px 30px rgba(13, 32, 69, 0.12);
+}
+
+:global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
+  border-color: white;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .billeteraOverlay {

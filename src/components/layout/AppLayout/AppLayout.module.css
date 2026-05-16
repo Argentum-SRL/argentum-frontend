@@ -351,20 +351,20 @@
 
 .content {
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 32px;
+  padding: 32px var(--container-px-desktop);
 }
 
 @media (max-width: 767px) {
   .content {
-    padding: 20px 16px;
+    padding: 20px var(--container-px-mobile);
   }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .content {
-    padding: 28px 24px;
+    padding: 28px var(--container-px-tablet);
   }
 }
 

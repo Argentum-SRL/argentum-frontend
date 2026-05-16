@@ -1,18 +1,13 @@
-/* ── Contenedor General ────────────────────────────────────────────────────── */
 .page {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 20px 16px 32px;
   min-height: 100%;
 }
 
 @media (min-width: 768px) {
   .page {
-    padding: 28px 24px 40px;
-    max-width: 1200px;
     gap: 24px;
-    margin: 0 auto;
   }
 }
 

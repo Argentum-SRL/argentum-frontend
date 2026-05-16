@@ -88,7 +88,13 @@ export function ConfirmModal({
       size="sm"
       autoHeight
     >
-      <div className={styles.modalContent}>
+      <form 
+        className={styles.modalContent}
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (canConfirm) handleConfirm()
+        }}
+      >
         <div className={[styles.iconWrap, iconClassMap[variant]].join(' ')}>
           {iconMap[variant]}
         </div>
@@ -113,10 +119,10 @@ export function ConfirmModal({
 
         <div className={styles.actions}>
           <button
-            type="button"
+            type="submit"
             className={[styles.confirmBtn, confirmBtnClassMap[variant]].join(' ')}
-            onClick={handleConfirm}
             disabled={!canConfirm}
+            autoFocus={!requireTyping}
           >
             {isLoading && <div className={styles.spinner} />}
             {confirmLabel}
@@ -130,7 +136,7 @@ export function ConfirmModal({
             {cancelLabel}
           </button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

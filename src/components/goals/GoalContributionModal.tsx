@@ -244,12 +244,18 @@ export default function GoalContributionModal({
   return (
     <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding ariaLabel="Aportar a meta">
       <div className={styles.slidesContainer}>
-        <div className={styles.formContainer}>
+        <form 
+          className={styles.formContainer}
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSubmit()
+          }}
+        >
           <div className={styles.formHeader}>
             <h2 className={styles.headerTitle}>
               {tipo === 'aporte' ? 'Aportar a' : 'Retirar de'} {goal.nombre}
             </h2>
-            <button className={styles.closeBtn} onClick={onClose} title="Cerrar modal"><X size={16} /></button>
+            <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar modal"><X size={16} /></button>
           </div>
 
           <div className={styles.formBody}>
@@ -263,12 +269,14 @@ export default function GoalContributionModal({
             {/* Tipo de Operación */}
             <div className={styles.radioPills}>
               <button
+                type="button"
                 className={`${styles.radioPill} ${tipo === 'aporte' ? styles.pillActiveAporte : ''}`}
                 onClick={() => dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'aporte' })}
               >
                 <Plus size={16} /> Aportar
               </button>
               <button
+                type="button"
                 className={`${styles.radioPill} ${tipo === 'retiro' ? styles.pillActiveRetiro : ''}`}
                 onClick={() => dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'retiro' })}
               >
@@ -320,6 +328,7 @@ export default function GoalContributionModal({
                     >
                       <BilleteraCard billetera={b} className={styles.fullHeightCard} />
                       <button
+                        type="button"
                         className={styles.billeteraOverlay}
                         onClick={() => {
                           dispatch({ type: 'SET_FIELD', field: 'billetera_id', value: b.id })
@@ -379,12 +388,12 @@ export default function GoalContributionModal({
           </div>
 
           <div className={styles.formFooter}>
-            <button className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
-            <button className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
+            <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+            <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
               {isSubmitting ? 'Procesando...' : tipo === 'aporte' ? 'Confirmar Aporte' : 'Confirmar Retiro'}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </Modal>
   )

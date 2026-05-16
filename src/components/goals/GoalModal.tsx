@@ -261,10 +261,16 @@ export default function GoalModal({
         {/* STEP 1: Nombre y Monto */}
         {step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
               <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>{isEdit ? 'Editar meta' : 'Nueva meta'}</h2>
-                <button className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -310,21 +316,27 @@ export default function GoalModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
-                <button className={styles.submitBtn} onClick={goNext}>Continuar</button>
+                <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+                <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
-            </div>
+            </form>
           </div>
         )}
 
         {/* STEP 2: Detalles */}
         {step === 2 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSubmit()
+              }}
+            >
               <div className={styles.formHeader}>
-                <button className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Detalles finales</h2>
-                <button className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -407,12 +419,12 @@ export default function GoalModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={goBack}>Atrás</button>
-                <button className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                   {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Crear meta'}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         )}
       </div>

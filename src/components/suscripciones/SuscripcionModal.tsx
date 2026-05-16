@@ -1,7 +1,6 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef, useCallback } from 'react'
-import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Hash, Calendar, Layers } from 'lucide-react'
+import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Calendar, Layers } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
-import { Button } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { CATALOGO_SUSCRIPCIONES, CATEGORIAS_CATALOGO } from '@/lib/constants/suscripciones'
 import type { ServicioCatalogo } from '@/lib/constants/suscripciones'
@@ -10,7 +9,6 @@ import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import categoriaService from '@/services/categoria.service'
 import type { Billetera, TarjetaCredito, Categoria, Suscripcion } from '@/types'
-import { formatMonto } from '@/utils/format'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
@@ -42,8 +40,8 @@ interface FormState {
 
 type FormAction =
   | { type: 'SET_STEP'; step: 1 | 2; direction: 'forward' | 'back' }
-  | { type: 'SET_FIELD'; field: keyof FormState; value: any }
-  | { type: 'RESET'; data?: any; defaultBilleteraId?: string; defaultTarjetaId?: string }
+  | { type: 'SET_FIELD'; field: keyof FormState; value: string | number | boolean | null }
+  | { type: 'RESET'; data?: Suscripcion | null; defaultBilleteraId?: string; defaultTarjetaId?: string }
 
 const initialState: FormState = {
   step: 1,
@@ -104,25 +102,25 @@ function formatParaMostrar(str: string): string {
   return partes.join(',')
 }
 
-function MontoHero({ value, onChange, moneda, onMonedaChange }: any) {
+function MontoHero({ value, onChange, moneda, onMonedaChange }: { value: number | null, onChange: (v: number | null) => void, moneda: string, onMonedaChange: (m: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [inputValue, setInputValue] = useState(() =>
     value !== null ? value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''
   )
   const [prevValue, setPrevValue] = useState(value)
 
-  useEffect(() => {
-    if (value !== prevValue) {
-      setPrevValue(value)
-      if (value === null) { setInputValue('') }
-      else {
-        const cleaned = inputValue.replace(/\./g, '').replace(',', '.')
-        if (parseFloat(cleaned) !== value) {
-          setInputValue(value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
-        }
+  // Ajustar estado durante el render si cambia la prop value (patrón recomendado por React)
+  if (value !== prevValue) {
+    setPrevValue(value)
+    if (value === null) {
+      setInputValue('')
+    } else {
+      const cleaned = inputValue.replace(/\./g, '').replace(',', '.')
+      if (parseFloat(cleaned) !== value) {
+        setInputValue(value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
       }
     }
-  }, [value, prevValue, inputValue])
+  }
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value
@@ -193,37 +191,37 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [searchTerm, setSearchTerm] = useState('')
 
-  const loadInitialData = async () => {
-    try {
-      const [b, t, c] = await Promise.all([
-        billeteraService.list(),
-        tarjetaService.getTarjetas(),
-        categoriaService.getCategorias()
-      ])
-      const validBilleteras = b.filter(x => !x.es_efectivo && x.estado === 'activa')
-      const validTarjetas = t.filter(x => x.estado === 'activa')
-      setBilleteras(validBilleteras)
-      setTarjetas(validTarjetas)
-      setCategorias(c)
-
-      const defB = validBilleteras.find(x => x.es_principal)?.id || validBilleteras[0]?.id || ''
-      const defT = validTarjetas[0]?.id || ''
-      
-      dispatch({ 
-        type: 'RESET', 
-        data: suscripcion, 
-        defaultBilleteraId: defB, 
-        defaultTarjetaId: defT 
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [b, t, c] = await Promise.all([
+          billeteraService.list(),
+          tarjetaService.getTarjetas(),
+          categoriaService.getCategorias()
+        ])
+        const validBilleteras = b.filter(x => !x.es_efectivo && x.estado === 'activa')
+        const validTarjetas = t.filter(x => x.estado === 'activa')
+        setBilleteras(validBilleteras)
+        setTarjetas(validTarjetas)
+        setCategorias(c)
+
+        const defB = validBilleteras.find(x => x.es_principal)?.id || validBilleteras[0]?.id || ''
+        const defT = validTarjetas[0]?.id || ''
+        
+        dispatch({ 
+          type: 'RESET', 
+          data: suscripcion, 
+          defaultBilleteraId: defB, 
+          defaultTarjetaId: defT 
+        })
+        setSearchTerm('')
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     if (open) {
       loadInitialData()
-      setSearchTerm('')
     }
   }, [open, suscripcion])
 
@@ -252,7 +250,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
   const costoMensual = useMemo(() => {
     if (!state.monto) return null
-    const DIVISORES: any = { mensual: 1, bimestral: 2, trimestral: 3, semestral: 6, anual: 12 }
+    const DIVISORES: Record<string, number> = { mensual: 1, bimestral: 2, trimestral: 3, semestral: 6, anual: 12 }
     const val = (state.monto / DIVISORES[state.frecuencia])
     return val % 1 === 0 ? val.toString() : val.toFixed(2)
   }, [state.monto, state.frecuencia])
@@ -300,8 +298,10 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
       }
       onSuccess()
       onClose()
-    } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Error al guardar', 'error')
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { detail?: string } } }
+      const msg = axiosError.response?.data?.detail || 'Error al guardar'
+      showToast(msg, 'error')
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
@@ -323,19 +323,25 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
         {/* PASO 1: Selección de Servicio */}
         {state.step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
               <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>¿Qué suscripción querés agregar?</h2>
-                <button className={styles.closeBtn} onClick={onClose}><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
                 <div className={styles.searchWrapper}>
-                  <div className={styles.inputWrapper} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <Search size={18} style={{ position: 'absolute', left: 12, color: 'var(--text-3)' }} />
+                  <div className={styles.inputWrapperIcon}>
+                    <Search size={18} className={styles.inputIconLeft} />
                     <input 
-                      className={styles.fieldInput} 
-                      style={{ paddingLeft: 40, width: '100%' }}
+                      id="search-suscripcion"
+                      className={styles.fieldInputIcon} 
                       placeholder="Buscar servicio (Netflix, Spotify...)"
                       value={searchTerm}
                       onChange={e => setSearchTerm(e.target.value)}
@@ -382,17 +388,16 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                     className={`${styles.otherOption} ${state.servicioId === 'other' ? styles.otherOptionActive : ''}`}
                     onClick={() => dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })}
                   >
-                    <div className={styles.logoFallback} style={{ background: 'var(--text-3)', color: 'white' }}><Plus size={20} /></div>
-                    <div style={{ flex: 1 }}>
-                      <span style={{ fontWeight: 600, fontSize: 14 }}>Otra suscripción</span>
+                    <div className={`${styles.logoFallback} ${styles.otherOptionLogo}`}><Plus size={20} /></div>
+                    <div className={styles.flex1}>
+                      <span className={styles.otherOptionText}>Otra suscripción</span>
                     </div>
                   </div>
 
                   {state.servicioId === 'other' && (
-                    <div style={{ marginTop: 12 }}>
+                    <div className={styles.customInputWrap}>
                       <input
-                        className={styles.fieldInput}
-                        style={{ width: '100%' }}
+                        className={`${styles.fieldInput} ${styles.fullWidthInput}`}
                         placeholder="Nombre de la suscripción"
                         value={state.nombrePersonalizado}
                         onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
@@ -404,35 +409,41 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+                <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
                 <button 
+                  type="submit"
                   className={styles.submitBtn} 
                   disabled={!state.nombrePersonalizado} 
-                  onClick={goNext}
                 >
                   Siguiente
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         )}
 
         {/* PASO 2: Configuración */}
         {state.step === 2 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSave()
+              }}
+            >
               <div className={styles.formHeader}>
-                <button className={styles.backBtn} onClick={goBack}><ChevronLeft size={20} /></button>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Configuración de {state.nombrePersonalizado}</h2>
-                <button className={styles.closeBtn} onClick={onClose}><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
                 <MontoHero
                   value={state.monto}
-                  onChange={(v: any) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
+                  onChange={(v: number | null) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
                   moneda={state.moneda}
-                  onMonedaChange={(m: any) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
+                  onMonedaChange={(m: string) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                 />
 
                 <div className={styles.formField}>
@@ -441,6 +452,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                     {['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'].map(f => (
                       <button
                         key={f}
+                        type="button"
                         className={`${styles.pill} ${state.frecuencia === f ? styles.pillActive : ''}`}
                         onClick={() => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: f })}
                       >
@@ -453,27 +465,27 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   )}
                 </div>
 
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <div className={styles.formField} style={{ flex: 1 }}>
-                    <label className={styles.fieldLabel}>Próximo cobro</label>
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                      <Calendar size={16} style={{ position: 'absolute', left: 12, color: 'var(--text-3)' }} />
+                <div className={styles.formRow}>
+                  <div className={styles.formFieldFlex1}>
+                    <label className={styles.fieldLabel} htmlFor="proximo-cobro">Próximo cobro</label>
+                    <div className={styles.inputWrapperIcon}>
+                      <Calendar size={16} className={styles.inputIconLeftSmall} />
                       <input
+                        id="proximo-cobro"
                         type="date"
-                        className={styles.fieldInput}
-                        style={{ paddingLeft: 36, width: '100%' }}
+                        className={styles.fieldInputIconSmall}
                         value={state.proximo_cobro}
                         onChange={e => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: e.target.value })}
                       />
                     </div>
                   </div>
-                  <div className={styles.formField} style={{ flex: 1 }}>
-                    <label className={styles.fieldLabel}>Categoría</label>
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                      <Layers size={16} style={{ position: 'absolute', left: 12, color: 'var(--text-3)' }} />
+                  <div className={styles.formFieldFlex1}>
+                    <label className={styles.fieldLabel} htmlFor="categoria-suscripcion">Categoría</label>
+                    <div className={styles.inputWrapperIcon}>
+                      <Layers size={16} className={styles.inputIconLeftSmall} />
                       <select
-                        className={styles.fieldInput}
-                        style={{ paddingLeft: 36, width: '100%', appearance: 'none' }}
+                        id="categoria-suscripcion"
+                        className={styles.fieldSelectIcon}
                         value={state.categoriaId}
                         onChange={e => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: e.target.value })}
                       >
@@ -488,12 +500,14 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   <label className={styles.fieldLabel}>¿Cómo se cobra?</label>
                   <div className={styles.radioPills}>
                     <button
+                      type="button"
                       className={`${styles.pill} ${state.metodoCobro === 'tarjeta' ? styles.pillActive : ''}`}
                       onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'tarjeta' })}
                     >
                       <CreditCard size={14} /> Tarjeta
                     </button>
                     <button
+                      type="button"
                       className={`${styles.pill} ${state.metodoCobro === 'debito' ? styles.pillActive : ''}`}
                       onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'debito' })}
                     >
@@ -509,8 +523,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   
                   <div className={styles.billeterasCarouselScroller}>
                     <div 
-                      className={styles.billeterasCarousel}
-                      style={{ justifyContent: currentItemsCount === 1 ? 'center' : 'flex-start' }}
+                      className={`${styles.billeterasCarousel} ${currentItemsCount === 1 ? styles.carouselCenter : styles.carouselStart}`}
                     >
                       {state.metodoCobro === 'tarjeta' ? (
                         tarjetas.map(t => (
@@ -533,6 +546,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                               type="button"
                               className={styles.billeteraOverlay}
                               onClick={() => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t.id })}
+                              aria-label={`Seleccionar tarjeta ${t.nombre}`}
                             />
                           </div>
                         ))
@@ -549,6 +563,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                               type="button"
                               className={styles.billeteraOverlay}
                               onClick={() => dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })}
+                              aria-label={`Seleccionar billetera ${b.nombre}`}
                             />
                           </div>
                         ))
@@ -559,16 +574,16 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                 <button 
+                  type="submit"
                   className={styles.submitBtn} 
-                  onClick={handleSave}
                   disabled={state.isSubmitting}
                 >
                   {state.isSubmitting ? 'Guardando...' : (state.isEdit ? 'Actualizar' : 'Guardar suscripción')}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         )}
       </div>

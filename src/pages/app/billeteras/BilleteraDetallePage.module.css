@@ -11,6 +11,18 @@
   }
 }
 
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  padding-top: 100px;
+}
+
+.tabLoading {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
 /* ── Header Card — similar a BilleteraCard ───────────────────────────────── */
 .headerCard {
   position: relative;

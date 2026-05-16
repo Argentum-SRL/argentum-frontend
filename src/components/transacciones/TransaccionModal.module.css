@@ -307,7 +307,7 @@
 .billeterasCarouselScroller {
   overflow-x: auto;
   overflow-y: visible;
-  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .billeterasCarouselScroller::-webkit-scrollbar {
@@ -321,7 +321,7 @@
   overflow: visible;
   scroll-snap-type: x mandatory;
   padding: 16px 40px; /* Mas padding para que no se corte al escalar/hover */
-  scrollbar-width: none;
+  -ms-overflow-style: none;
   min-width: 100%;
   justify-content: flex-start; /* flex-start es mejor para scroll con overflow */
 }
@@ -801,6 +801,41 @@
   text-align: right;
 }
 
+/* ── Utility Classes ─────────────────────────────────────────────────────── */
+.inputWrapperIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.fieldInputIconLarge {
+  width: 100%;
+  padding-left: 40px !important;
+}
+
+.fieldInputIconSmall {
+  width: 100%;
+  padding-left: 36px !important;
+}
+
+.summaryValLarge {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.summaryValSmall {
+  font-size: 14px;
+  font-weight: 800;
+}
+
 .summaryLbl {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.55);
@@ -915,4 +950,27 @@
   background: #dcfce7 !important;
   color: #16a34a !important;
   border-color: #bbf7d0 !important;
+}
+
+/* ── Inline styles replacements ──────────────────────────────────────────── */
+.descFechaRow {
+  display: flex;
+  gap: 10px;
+}
+
+.flex2 {
+  flex: 2;
+}
+
+.flex1 {
+  flex: 1;
+}
+
+.moreCatsIconWrap {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
 }

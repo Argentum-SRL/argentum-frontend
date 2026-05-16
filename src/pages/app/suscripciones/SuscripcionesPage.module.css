@@ -176,12 +176,46 @@
   z-index: 4;
 }
 
+/* Specific Positions and Animations for the 12 floating logos */
+.logoFlotante:nth-child(1) {
+  top: 8%; left: 15%;
+  --dx1: 8px; --dy1: -12px; --r1: 3deg; --dx2: -5px; --dy2: 8px; --r2: -2deg; --dx3: 10px; --dy3: -4px; --r3: 1deg;
+  animation-duration: 8s; animation-delay: 0s;
+}
+.logoFlotante:nth-child(2) {
+  top: 5%; left: 55%;
+  --dx1: -10px; --dy1: -8px; --r1: -3deg; --dx2: 6px; --dy2: 12px; --r2: 2deg; --dx3: -8px; --dy3: 4px; --r3: -1deg;
+  animation-duration: 10s; animation-delay: 1.2s;
+}
+.logoFlotante:nth-child(3) {
+  top: 12%; left: 82%;
+  --dx1: 6px; --dy1: 10px; --r1: 2deg; --dx2: -8px; --dy2: -6px; --r2: -3deg; --dx3: 4px; --dy3: 8px; --r3: 2deg;
+  animation-duration: 9s; animation-delay: 0.6s;
+}
+.logoFlotante:nth-child(4) {
+  top: 35%; left: 4%;
+  --dx1: -8px; --dy1: 6px; --r1: -2deg; --dx2: 10px; --dy2: -10px; --r2: 3deg; --dx3: -6px; --dy3: -4px; --r3: -2deg;
+  animation-duration: 11s; animation-delay: 1.8s;
+}
+.logoFlotante:nth-child(5) {
+  top: 55%; left: 8%;
+  --dx1: 10px; --dy1: -6px; --r1: 4deg; --dx2: -6px; --dy2: 10px; --r2: -2deg; --dx3: 8px; --dy3: -8px; --r3: 3deg;
+  animation-duration: 7s; animation-delay: 0.3s;
+}
+.logoFlotante:nth-child(6) { top: 75%; left: 18%; --dx1: -6px; --dy1: -10px; --r1: -4deg; --dx2: 8px; --dy2: 6px; --r2: 3deg; --dx3: -4px; --dy3: -8px; --r3: -3deg; animation-duration: 9s; animation-delay: 2.1s; }
+.logoFlotante:nth-child(7) { top: 85%; left: 48%; --dx1: 4px; --dy1: 12px; --r1: 2deg; --dx2: -10px; --dy2: -4px; --r2: -4deg; --dx3: 6px; --dy3: 10px; --r3: 1deg; animation-duration: 12s; animation-delay: 0.9s; }
+.logoFlotante:nth-child(8) { top: 78%; left: 78%; --dx1: -4px; --dy1: -14px; --r1: -2deg; --dx2: 6px; --dy2: 8px; --r2: 4deg; --dx3: -8px; --dy3: -6px; --r3: -2deg; animation-duration: 8s; animation-delay: 1.5s; }
+.logoFlotante:nth-child(9) { top: 55%; left: 88%; --dx1: 12px; --dy1: 4px; --r1: 3deg; --dx2: -4px; --dy2: -12px; --r2: -3deg; --dx3: 10px; --dy3: 6px; --r3: 2deg; animation-duration: 10s; animation-delay: 0.4s; }
+.logoFlotante:nth-child(10) { top: 30%; left: 85%; --dx1: -12px; --dy1: 8px; --r1: -3deg; --dx2: 4px; --dy2: -8px; --r2: 4deg; --dx3: -6px; --dy3: 10px; --r3: -1deg; animation-duration: 9s; animation-delay: 1.7s; }
+.logoFlotante:nth-child(11) { top: 18%; left: 38%; --dx1: 8px; --dy1: -4px; --r1: 4deg; --dx2: -12px; --dy2: 6px; --r2: -3deg; --dx3: 4px; --dy3: -10px; --r3: 3deg; animation-duration: 11s; animation-delay: 0.7s; }
+.logoFlotante:nth-child(12) { top: 72%; left: 42%; --dx1: -4px; --dy1: 8px; --r1: -4deg; --dx2: 10px; --dy2: -4px; --r2: 2deg; --dx3: -10px; --dy3: 4px; --r3: -4deg; animation-duration: 7s; animation-delay: 2.3s; }
+
 /* Professional Animation with Physics */
 @keyframes drift {
   0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
-  25%  { transform: translate(var(--dx1), var(--dy1)) rotate(var(--r1)) scale(var(--s1)); }
-  50%  { transform: translate(var(--dx2), var(--dy2)) rotate(var(--r2)) scale(1); }
-  75%  { transform: translate(var(--dx3), var(--dy3)) rotate(var(--r3)) scale(var(--s1)); }
+  25%  { transform: translate(var(--dx1, 0), var(--dy1, 0)) rotate(var(--r1, 0deg)) scale(var(--s1, 1)); }
+  50%  { transform: translate(var(--dx2, 0), var(--dy2, 0)) rotate(var(--r2, 0deg)) scale(1); }
+  75%  { transform: translate(var(--dx3, 0), var(--dy3, 0)) rotate(var(--r3, 0deg)) scale(var(--s1, 1)); }
   100% { transform: translate(0, 0) rotate(0deg) scale(1); }
 }
 
@@ -302,6 +336,13 @@
 
 .emptyButton:active {
   transform: translateY(0) scale(0.98);
+}
+
+.btnLg {
+  padding: 16px 32px;
+  font-size: 16px;
+  border-radius: 18px;
+  gap: 10px;
 }
 
 /* ── MODO OSCURO ── */

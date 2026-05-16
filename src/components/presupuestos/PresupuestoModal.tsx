@@ -309,10 +309,16 @@ export default function PresupuestoModal({
         {/* STEP 1: Concepto y Monto */}
         {step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
               <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>{isEdit ? 'Editar presupuesto' : 'Nuevo presupuesto'}</h2>
-                <button className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -348,21 +354,27 @@ export default function PresupuestoModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
-                <button className={styles.submitBtn} onClick={goNext}>Continuar</button>
+                <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+                <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
-            </div>
+            </form>
           </div>
         )}
 
         {/* STEP 2: Categorías */}
         {step === 2 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
               <div className={styles.formHeader}>
-                <button className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>¿Qué incluye?</h2>
-                <button className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -398,6 +410,7 @@ export default function PresupuestoModal({
                           </div>
                           <div className={styles.catActions}>
                             <button
+                              type="button"
                               className={`${styles.selectBtn} ${isCatSelected ? styles.selectBtnActive : ''}`}
                               onClick={(e) => { e.stopPropagation(); toggleSelection(cat.id, null) }}
                             >
@@ -440,20 +453,26 @@ export default function PresupuestoModal({
                 <div className={styles.selectedCount}>
                   {selectedCategorias.length} seleccionadas
                 </div>
-                <button className={styles.submitBtn} onClick={goNext}>Continuar</button>
+                <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
-            </div>
+            </form>
           </div>
         )}
 
         {/* STEP 3: Temporalidad */}
         {step === 3 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSubmit()
+              }}
+            >
               <div className={styles.formHeader}>
-                <button className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Frecuencia</h2>
-                <button className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -469,6 +488,7 @@ export default function PresupuestoModal({
                   <div className={styles.periodGrid}>
                     {(['semanal', 'quincenal', 'mensual'] as const).map(p => (
                       <button
+                        type="button"
                         key={p}
                         className={`${styles.periodBtn} ${periodo === p ? styles.periodBtnActive : ''}`}
                         onClick={() => setField('periodo', p)}
@@ -508,12 +528,12 @@ export default function PresupuestoModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={goBack}>Atrás</button>
-                <button className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                   {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Crear presupuesto'}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         )}
       </div>

@@ -75,7 +75,7 @@ interface TarjetaModalState {
 }
 
 type TarjetaModalAction =
-  | { type: 'SET_FIELD'; field: keyof TarjetaModalState; value: any }
+  | { type: 'SET_FIELD'; field: keyof TarjetaModalState; value: TarjetaModalState[keyof TarjetaModalState] }
   | { type: 'RESET'; data: { tarjeta: TarjetaCredito | null, billeteras: Billetera[], defaultBilleteraId?: string } }
 
 const initialState: TarjetaModalState = {
@@ -164,12 +164,11 @@ function MontoHero({
 
   return (
     <div className={styles.formField}>
-      <label className={styles.fieldLabel}>{label} {optional && <span style={{opacity: 0.5, fontWeight: 400}}>(opcional)</span>}</label>
+      <label className={styles.fieldLabel}>{label} {optional && <span className={styles.optionalLabel}>(opcional)</span>}</label>
       <div className={styles.montoInputWrap}>
-        <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-3)' }}>{moneda === 'ARS' ? '$' : 'USD'}</span>
+        <span className={styles.monedaPreview}>{moneda === 'ARS' ? '$' : 'USD'}</span>
         <input
-          className={styles.montoInput}
-          style={{ fontSize: 15, textAlign: 'left', width: '100%', padding: '0 12px', fontWeight: 800 }}
+          className={styles.fieldInputLimit}
           value={inputValue}
           onChange={handleChange}
           placeholder="0"
@@ -249,10 +248,21 @@ export default function TarjetaModal() {
 
       data.onSuccess()
       close('tarjeta')
-    } catch (err: any) {
-      console.error('Error al guardar tarjeta:', err.response?.data)
-      const errorMsg = err.response?.data?.detail || err.response?.data || 'Error al guardar tarjeta'
-      dispatch({ type: 'SET_FIELD', field: 'error', value: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg) })
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { detail?: string } | string } };
+      const errorData = axiosError.response?.data;
+      console.error('Error al guardar tarjeta:', errorData)
+      
+      let errorMsg = 'Error al guardar tarjeta';
+      if (typeof errorData === 'string') {
+        errorMsg = errorData;
+      } else if (errorData && typeof errorData === 'object' && 'detail' in errorData && typeof errorData.detail === 'string') {
+        errorMsg = errorData.detail;
+      } else if (errorData) {
+        errorMsg = JSON.stringify(errorData);
+      }
+      
+      dispatch({ type: 'SET_FIELD', field: 'error', value: errorMsg })
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'loading', value: false })
     }
@@ -276,13 +286,19 @@ export default function TarjetaModal() {
       className={styles.baseModalOverride}
       size="md"
     >
-      <div className={styles.modal}>
+      <form 
+        className={styles.modal}
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (isValid && !state.loading) handleSubmit()
+        }}
+      >
         {/* Header */}
         <div className={styles.modalHeader}>
-          <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--text)' }}>
+          <div className={styles.headerTitleLarge}>
             {data.tarjeta ? 'Editar Tarjeta' : 'Nueva Tarjeta'}
           </div>
-          <button className={styles.closeBtn} onClick={() => close('tarjeta')}>
+          <button type="button" className={styles.closeBtn} onClick={() => close('tarjeta')} title="Cerrar">
             <X size={20} />
           </button>
         </div>
@@ -296,8 +312,7 @@ export default function TarjetaModal() {
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Últimos 4</label>
                   <input
-                    className={styles.fieldInput}
-                    style={{ fontSize: 15, letterSpacing: '0.1em', textAlign: 'center', fontWeight: 800 }}
+                    className={styles.fieldInputCenter}
                     value={state.ultimos4}
                     onChange={(e) => {
                       const val = e.target.value.replace(/\D/g, '').slice(0, 4)
@@ -309,25 +324,25 @@ export default function TarjetaModal() {
                   />
                 </div>
                 <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Día Cierre</label>
+                  <label className={styles.fieldLabel} htmlFor="dia-cierre">Día Cierre</label>
                   <input
+                    id="dia-cierre"
                     type="number"
                     min={1}
                     max={28}
-                    className={styles.fieldInput}
-                    style={{ textAlign: 'center', fontWeight: 800 }}
+                    className={styles.fieldInputCenter}
                     value={state.diaCierre}
                     onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'diaCierre', value: e.target.value })}
                   />
                 </div>
                 <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Día Vence</label>
+                  <label className={styles.fieldLabel} htmlFor="dia-vencimiento">Día Vence</label>
                   <input
+                    id="dia-vencimiento"
                     type="number"
                     min={1}
                     max={28}
-                    className={styles.fieldInput}
-                    style={{ textAlign: 'center', fontWeight: 800 }}
+                    className={styles.fieldInputCenter}
                     value={state.diaVencimiento}
                     onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'diaVencimiento', value: e.target.value })}
                   />
@@ -349,6 +364,7 @@ export default function TarjetaModal() {
                 <div className={styles.redGrid}>
                   {Object.entries(RED_LABEL).map(([id, label]) => (
                     <button
+                      type="button"
                       key={id}
                       className={`${styles.redBtn} ${state.red === id ? styles.redBtnActive : ''}`}
                       onClick={() => dispatch({ type: 'SET_FIELD', field: 'red', value: id })}
@@ -357,8 +373,7 @@ export default function TarjetaModal() {
                         <img 
                           src={RED_LOGOS[id]} 
                           alt={label} 
-                          className={styles.networkLogo}
-                          style={{ height: 32 }}
+                          className={styles.networkLogoSmall}
                         />
                       ) : (
                         label
@@ -399,7 +414,9 @@ export default function TarjetaModal() {
               <div className={styles.previewSection}>
                 <div className={styles.previewWithArrows}>
                   <button 
+                    type="button"
                     className={styles.colorArrowLarge}
+                    title="Color anterior"
                     onClick={() => {
                       const allColors = [
                         { value: TARJETA_COLORES[0] },
@@ -427,7 +444,9 @@ export default function TarjetaModal() {
                   />
                   
                   <button 
+                    type="button"
                     className={styles.colorArrowLarge}
+                    title="Siguiente color"
                     onClick={() => {
                       const allColors = [
                         { value: TARJETA_COLORES[0] },
@@ -452,18 +471,18 @@ export default function TarjetaModal() {
 
         {/* Footer */}
         <div className={styles.formFooter}>
-          <button className={styles.btnCancel} onClick={() => close('tarjeta')}>
+          <button type="button" className={styles.btnCancel} onClick={() => close('tarjeta')}>
             Cancelar
           </button>
           <button
+            type="submit"
             className={styles.btnSubmit}
-            onClick={handleSubmit}
             disabled={!isValid || state.loading}
           >
             {state.loading ? 'Guardando...' : data.tarjeta ? 'Actualizar tarjeta' : 'Guardar tarjeta'}
           </button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

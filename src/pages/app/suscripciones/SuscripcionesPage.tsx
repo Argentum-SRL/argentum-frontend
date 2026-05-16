@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
+import { useModal } from '@/hooks/useModal'
 import suscripcionService from '@/services/suscripcion.service'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
@@ -27,20 +28,6 @@ const POSICIONES = [
   { top: '72%', left: '42%', size: 'far'  },
 ]
 
-const LOGOS_ANIM = [
-  { dx1: 8,  dy1: -12, r1: 3,  dx2: -5, dy2: 8,   r2: -2, dx3: 10, dy3: -4, r3: 1,  duration: 8,  delay: 0   },
-  { dx1: -10,dy1: -8,  r1: -3, dx2: 6,  dy2: 12,  r2: 2,  dx3: -8, dy3: 4,  r3: -1, duration: 10, delay: 1.2 },
-  { dx1: 6,  dy1: 10,  r1: 2,  dx2: -8, dy2: -6,  r2: -3, dx3: 4,  dy3: 8,  r3: 2,  duration: 9,  delay: 0.6 },
-  { dx1: -8, dy1: 6,   r1: -2, dx2: 10, dy2: -10, r2: 3,  dx3: -6, dy3: -4, r3: -2, duration: 11, delay: 1.8 },
-  { dx1: 10, dy1: -6,  r1: 4,  dx2: -6, dy2: 10,  r2: -2, dx3: 8,  dy3: -8, r3: 3,  duration: 7,  delay: 0.3 },
-  { dx1: -6, dy1: -10, r1: -4, dx2: 8,  dy2: 6,   r2: 3,  dx3: -4, dy3: -8, r3: -3, duration: 9,  delay: 2.1 },
-  { dx1: 4,  dy1: 12,  r1: 2,  dx2: -10,dy2: -4,  r2: -4, dx3: 6,  dy3: 10, r3: 1,  duration: 12, delay: 0.9 },
-  { dx1: -4, dy1: -14, r1: -2, dx2: 6,  dy2: 8,   r2: 4,  dx3: -8, dy3: -6, r3: -2, duration: 8,  delay: 1.5 },
-  { dx1: 12, dy1: 4,   r1: 3,  dx2: -4, dy2: -12, r2: -3, dx3: 10, dy3: 6,  r3: 2,  duration: 10, delay: 0.4 },
-  { dx1: -12,dy1: 8,   r1: -3, dx2: 4,  dy2: -8,  r2: 4,  dx3: -6, dy3: 10, r3: -1, duration: 9,  delay: 1.7 },
-  { dx1: 8,  dy1: -4,  r1: 4,  dx2: -12,dy2: 6,   r2: -3, dx3: 4,  dy3: -10,r3: 3,  duration: 11, delay: 0.7 },
-  { dx1: -4, dy1: 8,   r1: -4, dx2: 10, dy2: -4,  r2: 2,  dx3: -10,dy3: 4,  r3: -4, duration: 7,  delay: 2.3 },
-]
 
 const SuscripcionesPage: React.FC = () => {
   const [suscripciones, setSuscripciones] = useState<Suscripcion[]>([])
@@ -52,8 +39,14 @@ const SuscripcionesPage: React.FC = () => {
   const [selectedSuscripcion, setSelectedSuscripcion] = useState<Suscripcion | null>(null)
   const [isExiting, setIsExiting] = useState(false)
   const { showToast } = useToast()
+  const { confirm } = useModal()
 
-  const loadData = async (isFirstLoad = false) => {
+  const suscripcionesLengthRef = useRef(0)
+  useEffect(() => {
+    suscripcionesLengthRef.current = suscripciones.length
+  }, [suscripciones.length])
+
+  const loadData = useCallback(async (isFirstLoad = false) => {
     try {
       const [data, t, bills, cards] = await Promise.all([
         suscripcionService.getSuscripciones(),
@@ -64,7 +57,8 @@ const SuscripcionesPage: React.FC = () => {
       setBilleteras(bills)
       setTarjetas(cards)
       
-      if (!isFirstLoad && suscripciones.length === 0 && data.length > 0) {
+      const prevLength = suscripcionesLengthRef.current
+      if (!isFirstLoad && prevLength === 0 && data.length > 0) {
         setIsExiting(true)
         setTimeout(() => {
           setSuscripciones(data)
@@ -81,11 +75,14 @@ const SuscripcionesPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [showToast])
 
   useEffect(() => {
-    loadData(true)
-  }, [])
+    const timer = setTimeout(() => {
+      loadData(true)
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [loadData])
 
   const handleCreate = () => {
     setSelectedSuscripcion(null)
@@ -107,23 +104,32 @@ const SuscripcionesPage: React.FC = () => {
         showToast('Suscripción reactivada', 'success')
       }
       loadData()
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error(error)
       showToast('Error al procesar acción', 'error')
     }
   }
 
   const handleDelete = async (s: Suscripcion) => {
-    try {
-      if (s.estado !== 'cancelada') {
-        await suscripcionService.cancelarSuscripcion(s.id)
+    confirm({
+      title: 'Eliminar suscripción',
+      description: `¿Estás seguro de que querés eliminar "${s.nombre}"? Esta acción no se puede deshacer.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          if (s.estado !== 'cancelada') {
+            await suscripcionService.cancelarSuscripcion(s.id)
+          }
+          await suscripcionService.deleteSuscripcion(s.id)
+          showToast('Suscripción eliminada', 'success')
+          loadData()
+        } catch (error) {
+          console.error(error)
+          showToast('Error al eliminar', 'error')
+        }
       }
-      await suscripcionService.deleteSuscripcion(s.id)
-      showToast('Suscripción eliminada', 'success')
-      loadData()
-    } catch (error) {
-      console.error(error)
-      showToast('Error al eliminar', 'error')
-    }
+    })
   }
 
   const sections = useMemo(() => {
@@ -153,7 +159,6 @@ const SuscripcionesPage: React.FC = () => {
           <div className={styles.logosLayer}>
             {POSICIONES.map((pos, i) => {
               const s = CATALOGO_SUSCRIPCIONES[i % CATALOGO_SUSCRIPCIONES.length]
-              const anim = LOGOS_ANIM[i % LOGOS_ANIM.length]
               
               return (
                 <img
@@ -161,17 +166,6 @@ const SuscripcionesPage: React.FC = () => {
                   src={s.logoPath}
                   alt=""
                   className={`${styles.logoFlotante} ${styles[pos.size]}`}
-                  style={{
-                    top: pos.top,
-                    left: pos.left,
-                    '--dx1': `${anim.dx1}px`, '--dy1': `${anim.dy1}px`, '--r1': `${anim.r1}deg`, '--s1': '1.05',
-                    '--dx2': `${anim.dx2}px`, '--dy2': `${anim.dy2}px`, '--r2': `${anim.r2}deg`,
-                    '--dx3': `${anim.dx3}px`, '--dy3': `${anim.dy3}px`, '--r3': `${anim.r3}deg`,
-                    animationDuration: `${anim.duration}s`,
-                    animationDelay: `${anim.delay}s`,
-                    animationTimingFunction: 'cubic-bezier(0.45, 0.05, 0.55, 0.95)',
-                    animationIterationCount: 'infinite',
-                  } as React.CSSProperties}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none'
                   }}
@@ -192,10 +186,9 @@ const SuscripcionesPage: React.FC = () => {
             </p>
             <Button 
               onClick={handleCreate} 
-              size="lg" 
-              className={styles.emptyButton}
-              icon={<Plus size={20} />}
+              className={`${styles.emptyButton} ${styles.btnLg}`}
             >
+              <Plus size={20} />
               Agregar mi primera suscripción
             </Button>
           </div>
@@ -220,7 +213,10 @@ const SuscripcionesPage: React.FC = () => {
             {suscripciones.filter(s => s.estado === 'activa').length} activas · Total mensual: {formatMonto(totales?.total_ars || 0, 'ARS')}
           </p>
         </div>
-        <Button onClick={handleCreate} icon={<Plus size={18} />}>Nueva suscripción</Button>
+        <Button onClick={handleCreate}>
+          <Plus size={18} />
+          Nueva suscripción
+        </Button>
       </header>
 
       <div className={styles.totalsCard}>

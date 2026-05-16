@@ -24,7 +24,7 @@ import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
-import { RED_LABEL, calcularPrimerVencimiento } from '@/lib/utils/tarjeta.utils'
+import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 
 interface TransaccionModalProps {
   open: boolean
@@ -255,11 +255,14 @@ export default function TransaccionModal({
   } = state
 
   // Cargar subcategorías cuando cambia la categoría
+  const [prevCategoriaId, setPrevCategoriaId] = useState(categoriaId)
+  if (categoriaId !== prevCategoriaId) {
+    setPrevCategoriaId(categoriaId)
+    setSubcategorias([])
+  }
+
   useEffect(() => {
-    if (!categoriaId) {
-      setSubcategorias([])
-      return
-    }
+    if (!categoriaId) return
 
     const fetchSubcats = async () => {
       setLoadingSubcats(true)
@@ -320,7 +323,7 @@ export default function TransaccionModal({
     if (!actualEsValida && billeterasCarousel.length > 0) {
       dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: billeterasCarousel[0].id })
     }
-  }, [moneda, open])
+  }, [moneda, open, billeteraId, billeteras, billeterasCarousel])
 
   useEffect(() => {
     if (!open) return
@@ -402,8 +405,6 @@ export default function TransaccionModal({
 
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
-      const selectedTarjeta = tarjetas.find(t => t.id === tarjetaId)
-      let primerVencimientoManual = undefined
 
       // Sanitización de cuotas para el envío
       const cant = Math.max(1, cantidadCuotas || 1)
@@ -451,10 +452,16 @@ export default function TransaccionModal({
         {/* ════════════════════ PASO 1: Monto y Origen ════════════════════ */}
         {step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
               <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>{isEdit ? 'Editar transacción' : 'Nueva transacción'}</h2>
-                <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -484,6 +491,7 @@ export default function TransaccionModal({
                       { key: 'efectivo', icon: <Banknote size={16} />, label: 'Efectivo' },
                     ] as const).map(({ key, icon, label }) => (
                       <button
+                        type="button"
                         key={key}
                         className={`${styles.methodBtn} ${metodoPago === key ? styles.methodBtnActive : ''}`}
                         onClick={() => {
@@ -544,6 +552,8 @@ export default function TransaccionModal({
                                 type="button"
                                 className={styles.billeteraOverlay}
                                 onClick={() => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t.id })}
+                                title={`Seleccionar tarjeta ${t.nombre}`}
+                                aria-label={`Seleccionar tarjeta ${t.nombre}`}
                               />
                             </div>
                           ))
@@ -572,6 +582,8 @@ export default function TransaccionModal({
                                 className={styles.billeteraOverlay}
                                 onClick={() => !isCuotaHija && dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })}
                                 disabled={isCuotaHija}
+                                title={`Seleccionar billetera ${b.nombre}`}
+                                aria-label={`Seleccionar billetera ${b.nombre}`}
                               />
                             </div>
                           ))
@@ -583,21 +595,27 @@ export default function TransaccionModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
-                <button className={styles.submitBtn} onClick={goNext}>Continuar</button>
+                <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+                <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
-            </div>
+            </form>
           </div>
         )}
 
         {/* ════════════════════ PASO 2: Configuración de Cuotas (Solo Crédito) ════════════════════ */}
         {step === 2 && metodoPago === 'credito' && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
               <div className={styles.formHeader}>
-                <button className={styles.backBtn} onClick={goBack}><ChevronLeft size={20} /></button>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Financiación</h2>
-                <button className={styles.closeBtn} onClick={onClose}><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -646,12 +664,14 @@ export default function TransaccionModal({
                       <label className={styles.fieldLabel}>Impacto en resumen</label>
                       <div className={styles.resumenToggle}>
                         <button
+                          type="button"
                           className={`${styles.resumenBtn} ${!proximoResumen ? styles.resumenBtnActive : ''}`}
                           onClick={() => dispatch({ type: 'SET_FIELD', field: 'proximoResumen', value: false })}
                         >
                           Actual
                         </button>
                         <button
+                          type="button"
                           className={`${styles.resumenBtn} ${proximoResumen ? styles.resumenBtnActive : ''}`}
                           onClick={() => dispatch({ type: 'SET_FIELD', field: 'proximoResumen', value: true })}
                         >
@@ -686,21 +706,27 @@ export default function TransaccionModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={goBack}>Atrás</button>
-                <button className={styles.submitBtn} onClick={goNext}>Continuar</button>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
-            </div>
+            </form>
           </div>
         )}
 
         {/* ════════════════════ PASO 3: Detalles y Categoría ════════════════════ */}
         {step === 3 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.formContainer}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSubmit()
+              }}
+            >
               <div className={styles.formHeader}>
-                <button className={styles.backBtn} onClick={goBack}><ChevronLeft size={20} /></button>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Detalles</h2>
-                <button className={styles.closeBtn} onClick={onClose}><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -709,6 +735,7 @@ export default function TransaccionModal({
                   <label className={styles.fieldLabel}>Tipo</label>
                   <div className={styles.radioGroup}>
                     <button
+                      type="button"
                       className={`${styles.radioPill} ${tipo === 'egreso' ? styles.pillActiveEgreso : ''}`}
                       onClick={() => {
                         dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'egreso' })
@@ -719,6 +746,7 @@ export default function TransaccionModal({
                       <ArrowUpRight size={15} strokeWidth={2} /> Egreso
                     </button>
                     <button
+                      type="button"
                       className={`${styles.radioPill} ${tipo === 'ingreso' ? styles.pillActiveIngreso : ''}`}
                       onClick={() => {
                         dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })
@@ -732,14 +760,14 @@ export default function TransaccionModal({
                 </div>
 
                 {/* Descripción + Fecha */}
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <div className={styles.formField} style={{ flex: 2 }}>
+                <div className={styles.descFechaRow}>
+                  <div className={`${styles.formField} ${styles.flex2}`}>
                     <label className={styles.fieldLabel} htmlFor="tx-desc">Descripción</label>
                     <input id="tx-desc" type="text" className={styles.fieldInput} value={descripcion}
                       onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'descripcion', value: e.target.value })}
                       placeholder="Ej: Supermercado" />
                   </div>
-                  <div className={styles.formField} style={{ flex: 1 }}>
+                  <div className={`${styles.formField} ${styles.flex1}`}>
                     <label className={styles.fieldLabel} htmlFor="tx-fecha">Fecha</label>
                     <input id="tx-fecha" type="date" className={styles.fieldInput} value={fecha}
                       onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'fecha', value: e.target.value })}
@@ -753,7 +781,7 @@ export default function TransaccionModal({
                     <label className={styles.fieldLabel}>Categoría</label>
                     <div className={styles.catGrid}>
                       {displayCategorias.map((cat) => (
-                        <button key={cat.id} className={`${styles.catBtn} ${categoriaId === cat.id ? styles.catBtnActive : ''}`}
+                        <button type="button" key={cat.id} className={`${styles.catBtn} ${categoriaId === cat.id ? styles.catBtnActive : ''}`}
                           onClick={() => {
                             dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
                             dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
@@ -763,8 +791,8 @@ export default function TransaccionModal({
                         </button>
                       ))}
                       {!showAllCats && hasMoreCats && (
-                        <button className={styles.catBtn} onClick={() => dispatch({ type: 'SET_FIELD', field: 'showAllCats', value: true })}>
-                          <div style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)' }}>
+                        <button type="button" className={styles.catBtn} onClick={() => dispatch({ type: 'SET_FIELD', field: 'showAllCats', value: true })}>
+                          <div className={styles.moreCatsIconWrap}>
                             <GripHorizontal size={22} strokeWidth={1.5} />
                           </div>
                           <span className={styles.catName}>Más</span>
@@ -782,7 +810,7 @@ export default function TransaccionModal({
                           <span className={styles.selectedCatName}>{categorias.find(c => c.id === categoriaId)?.nombre}</span>
                         </div>
                       </div>
-                      <button className={styles.changeCatBtn} onClick={() => {
+                      <button type="button" className={styles.changeCatBtn} onClick={() => {
                         dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: '' })
                         dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
                       }}>Cambiar</button>
@@ -793,13 +821,13 @@ export default function TransaccionModal({
                       <div className={styles.subcatGrid}>
                         {loadingSubcats ? <div className={styles.subcatLoading}>Cargando...</div> : (
                           <>
-                            <button className={`${styles.subcatChip} ${!subcategoriaId ? styles.subcatChipActive : ''}`}
+                            <button type="button" className={`${styles.subcatChip} ${!subcategoriaId ? styles.subcatChipActive : ''}`}
                               onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })}>
                               <SubcategoriaIcon nombre="general" parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
                               General
                             </button>
                             {subcategorias.map((sub) => (
-                              <button key={sub.id} className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
+                              <button type="button" key={sub.id} className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
                                 onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: sub.id })}>
                                 <SubcategoriaIcon nombre={sub.nombre} parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
                                 {sub.nombre}
@@ -814,12 +842,12 @@ export default function TransaccionModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button className={styles.cancelBtn} onClick={goBack}>Atrás</button>
-                <button className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                   {isSubmitting ? 'Guardando...' : 'Guardar transacción'}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         )}
 

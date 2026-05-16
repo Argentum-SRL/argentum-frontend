@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign } from 'lucide-react'
 import type { Billetera, TarjetaCredito, Transaccion, Categoria } from '@/types'
@@ -15,12 +15,17 @@ import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
 import { formatSaldo, getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BilleteraDetallePage.module.css'
 
+const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
+  ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
+  USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
+}
+
 const BilleteraDetallePage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { showToast } = useToast()
-  const { open } = useModal()
+  const { open, confirm } = useModal()
 
   const [billetera, setBilletera] = useState<Billetera | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -34,16 +39,16 @@ const BilleteraDetallePage: React.FC = () => {
   const [logoErr, setLogoErr] = useState(false)
   const bgRef = useRef<HTMLDivElement>(null)
 
-  // Efecto para posicionar la tarjeta si viene por URL
-  useEffect(() => {
+  // Función para manejar la selección de tarjeta desde URL
+  const checkUrlParams = useCallback((cards: TarjetaCredito[]) => {
     const tid = searchParams.get('tarjeta_id')
-    if (tid && tarjetas.length > 0) {
-      const idx = tarjetas.findIndex(t => t.id === tid)
+    if (tid && cards.length > 0) {
+      const idx = cards.findIndex(t => t.id === tid)
       if (idx !== -1) {
         setSelectedTarjetaIndex(idx)
       }
     }
-  }, [searchParams, tarjetas])
+  }, [searchParams])
 
   // Obtener información del banco para estilo
   const bank = useMemo(() => {
@@ -58,11 +63,6 @@ const BilleteraDetallePage: React.FC = () => {
   const logoUrl = useMemo(() => {
     return bank ? getBankLogoUrl(bank.logoPath) : ''
   }, [bank])
-
-  const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
-    ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
-    USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
-  }
 
   const background = useMemo(() => {
     if (!billetera) return 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
@@ -102,7 +102,7 @@ const BilleteraDetallePage: React.FC = () => {
       }
     }
     loadBilletera()
-  }, [id, navigate])
+  }, [id, navigate, showToast])
 
   // Cargar datos según el tab activo
   useEffect(() => {
@@ -126,6 +126,7 @@ const BilleteraDetallePage: React.FC = () => {
         if (billetera && !billetera.es_efectivo) {
           const data = await tarjetaService.getTarjetasPorBilletera(id)
           setTarjetas(data)
+          checkUrlParams(data)
         }
       } catch (error) {
         console.error(error)
@@ -136,7 +137,7 @@ const BilleteraDetallePage: React.FC = () => {
     }
 
     loadTabData()
-  }, [id, billetera])
+  }, [id, billetera, showToast, checkUrlParams])
 
   // Agrupar movimientos por día
   const groupedMovimientos = useMemo(() => {
@@ -162,6 +163,7 @@ const BilleteraDetallePage: React.FC = () => {
       setMovimientos(movimientosBilletera)
       setBilletera(bill)
       setTarjetas(cards)
+      checkUrlParams(cards)
     } catch (error) {
       console.error(error)
     } finally {
@@ -186,7 +188,8 @@ const BilleteraDetallePage: React.FC = () => {
           onSuccess: loadTarjetas
         }
       })
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error(error)
       showToast('Error al cargar billeteras', 'error')
     }
   }
@@ -201,38 +204,54 @@ const BilleteraDetallePage: React.FC = () => {
           onSuccess: loadTarjetas
         }
       })
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error(error)
       showToast('Error al cargar billeteras', 'error')
     }
   }
 
   const handleArchiveTarjeta = async (tarjeta: TarjetaCredito) => {
-    if (!confirm(`¿Estás seguro de archivar la tarjeta "${tarjeta.nombre}"?`)) return
-    try {
-      await tarjetaService.archivarTarjeta(tarjeta.id)
-      showToast('Tarjeta archivada', 'success')
-      // Refresh list
-      const data = await tarjetaService.getTarjetasPorBilletera(id!)
-      setTarjetas(data)
-    } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Error al archivar', 'error')
-    }
+    confirm({
+      title: 'Archivar tarjeta',
+      description: `¿Estás seguro de que querés archivar "${tarjeta.nombre}"?`,
+      variant: 'warning',
+      confirmLabel: 'Archivar',
+      onConfirm: async () => {
+        try {
+          await tarjetaService.archivarTarjeta(tarjeta.id)
+          showToast('Tarjeta archivada', 'success')
+          const data = await tarjetaService.getTarjetasPorBilletera(id!)
+          setTarjetas(data)
+        } catch (err: unknown) {
+          const error = err as { response?: { data?: { detail?: string } } }
+          showToast(error.response?.data?.detail || 'Error al archivar', 'error')
+        }
+      }
+    })
   }
 
   const handleDeleteTarjeta = async (tarjeta: TarjetaCredito) => {
-    if (!confirm(`¿Estás seguro de eliminar permanentemente la tarjeta "${tarjeta.nombre}"?`)) return
-    try {
-      await tarjetaService.deleteTarjeta(tarjeta.id)
-      showToast('Tarjeta eliminada', 'success')
-      setTarjetas(tarjetas.filter(t => t.id !== tarjeta.id))
-    } catch (error: any) {
-      showToast(error.response?.data?.detail || 'No se puede eliminar una tarjeta con transacciones', 'error')
-    }
+    confirm({
+      title: 'Eliminar tarjeta',
+      description: `¿Estás seguro de que querés eliminar "${tarjeta.nombre}"? Esta acción no se puede deshacer y fallará si la tarjeta tiene transacciones.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await tarjetaService.deleteTarjeta(tarjeta.id)
+          showToast('Tarjeta eliminada', 'success')
+          setTarjetas(tarjetas.filter(t => t.id !== tarjeta.id))
+        } catch (err: unknown) {
+          const error = err as { response?: { data?: { detail?: string } } }
+          showToast(error.response?.data?.detail || 'No se puede eliminar una tarjeta con transacciones', 'error')
+        }
+      }
+    })
   }
 
   if (loading) {
     return (
-      <div className={styles.container} style={{ display: 'flex', justifyContent: 'center', paddingTop: '100px' }}>
+      <div className={styles.loadingContainer}>
         <Loader2 className="animate-spin" size={32} />
       </div>
     )
@@ -252,7 +271,11 @@ const BilleteraDetallePage: React.FC = () => {
         {/* Contenido del header en una sola línea */}
         <div className={styles.headerInner}>
           {/* Back button */}
-          <button className={styles.backBtn} onClick={() => navigate('/app/billeteras')}>
+          <button 
+            className={styles.backBtn} 
+            onClick={() => navigate('/app/billeteras')}
+            title="Volver a Billeteras"
+          >
             <ChevronLeft size={18} />
           </button>
 
@@ -297,7 +320,7 @@ const BilleteraDetallePage: React.FC = () => {
         <section className={styles.movimientosSection}>
           <h2 className={styles.sectionTitle}>Movimientos</h2>
           {loadingData ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+            <div className={styles.tabLoading}>
               <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
             </div>
           ) : movimientos.length === 0 ? (
@@ -335,7 +358,7 @@ const BilleteraDetallePage: React.FC = () => {
             </div>
 
             {loadingData ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+              <div className={styles.tabLoading}>
                 <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
               </div>
             ) : tarjetas.length === 0 ? (

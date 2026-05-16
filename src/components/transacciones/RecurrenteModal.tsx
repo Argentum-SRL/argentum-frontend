@@ -111,7 +111,13 @@ export default function RecurrenteModal({
       title={recurrente ? 'Editar Recurrente' : 'Nueva Recurrente'}
       size="md"
     >
-      <div className={styles.modalForm}>
+      <form 
+        className={styles.modalForm}
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleSave()
+        }}
+      >
         <div className={styles.formGrid}>
           <div className={styles.fullWidth}>
             <label htmlFor="form-desc" className={styles.label}>Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
@@ -244,13 +250,13 @@ export default function RecurrenteModal({
         </div>
 
         <div className={styles.modalFooter}>
-          <Button variant="secondary" onClick={onClose} fullWidth>Cancelar</Button>
+          <Button type="button" variant="secondary" onClick={onClose} fullWidth>Cancelar</Button>
           {recurrente ? (
-            <Button variant="secondary" onClick={handleDelete} fullWidth>Eliminar</Button>
+            <Button type="button" variant="secondary" onClick={handleDelete} fullWidth>Eliminar</Button>
           ) : null}
-          <Button onClick={handleSave} fullWidth>Guardar configuración</Button>
+          <Button type="submit" fullWidth>Guardar configuración</Button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

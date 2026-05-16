@@ -9,7 +9,6 @@
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -36,9 +35,9 @@ p, h1, h2, h3, h4, h5, h6 {
   overflow-wrap: break-word;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
   --primary: #0D2045;
@@ -56,6 +55,12 @@ p, h1, h2, h3, h4, h5, h6 {
   --success: #1A7A4A;
   --success-bg: #EAFAF1;
   --border: var(--surface-alt);
+
+  /* Content Layout Tokens */
+  --content-max-width: 1200px;
+  --container-px-mobile: 16px;
+  --container-px-tablet: 24px;
+  --container-px-desktop: 32px;
 }
 
 [data-theme="dark"] {
@@ -119,7 +124,9 @@ body {
 }
 
 .scrollbar-none {
-  scrollbar-width: none;
+  @supports (scrollbar-width: none) {
+    scrollbar-width: none;
+  }
   -ms-overflow-style: none;
 }
 .scrollbar-none::-webkit-scrollbar {

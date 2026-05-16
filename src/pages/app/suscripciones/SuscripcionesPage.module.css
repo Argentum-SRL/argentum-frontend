@@ -1,5 +1,4 @@
 .root {
-  padding: 32px;
   min-height: 100vh;
 }
 
@@ -150,6 +149,7 @@
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(10, 13, 18, 0.15));
   pointer-events: none;
+  -webkit-user-select: none;
   user-select: none;
   animation: drift infinite;
 }
@@ -213,6 +213,7 @@
   max-width: 460px;
   padding: 64px 48px;
   background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
   border-radius: 40px;
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -261,6 +262,7 @@
   letter-spacing: -0.03em;
   background: linear-gradient(135deg, #0D2045 0%, #1a3a6e 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -319,6 +321,7 @@
 :global([data-theme="dark"]) .emptyTitle {
   background: linear-gradient(135deg, #ffffff 0%, #a0aec0 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

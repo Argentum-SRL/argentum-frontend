@@ -19,7 +19,7 @@ import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { MiniCard } from '@/components/tarjetas/MiniCard'
-import GoalSummaryWidget from '@/components/goals/GoalSummaryWidget'
+
 import styles from './DashboardPage.module.css'
 
 // ── Components ───────────────────────────────────────────────────────────
@@ -303,12 +303,7 @@ export default function DashboardPage() {
           </div>
         )
       )}
-      {/* Goal Summary Widget */}
-      {!loading && data && (
-        <div className={styles.goalSection}>
-          <GoalSummaryWidget />
-        </div>
-      )}
+
 
       {/* Grid */}
       <div className={styles.dashboardGrid}>

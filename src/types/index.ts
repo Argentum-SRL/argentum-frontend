@@ -281,7 +281,6 @@ export interface PagoDashboard {
   billetera_id?: string
 }
 
-
 export interface Proyeccion {
   periodo: {
     fecha_inicio: string
@@ -426,3 +425,4 @@ export interface PresupuestoUpdate {
   categorias?: PresupuestoCategoriaInput[]
 }
 
+export * from './goals'

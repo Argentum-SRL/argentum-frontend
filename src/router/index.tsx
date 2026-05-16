@@ -14,6 +14,7 @@ import BilleteraDetallePage from '@/pages/app/billeteras/BilleteraDetallePage'
 import TransaccionesPage from '@/pages/app/transacciones/TransaccionesPage'
 import PresupuestosPage from '@/pages/app/presupuestos/PresupuestosPage'
 import MetasPage from '@/pages/app/metas/MetasPage'
+import MetaDetallePage from '@/pages/app/metas/MetaDetallePage'
 import SuscripcionesPage from '@/pages/app/suscripciones/SuscripcionesPage'
 import PerfilPage from '@/pages/app/perfil/PerfilPage'
 import AppWrapper from '@/components/layout/AppWrapper/AppWrapper'
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
               { path: '/app/transacciones/recurrentes', element: <Navigate to="/app/transacciones" replace /> },
               { path: '/app/presupuestos', element: <PresupuestosPage /> },
               { path: '/app/metas', element: <MetasPage /> },
+              { path: '/app/metas/:id', element: <MetaDetallePage /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage /> },
               { path: '/app/perfil', element: <PerfilPage /> },
             ],

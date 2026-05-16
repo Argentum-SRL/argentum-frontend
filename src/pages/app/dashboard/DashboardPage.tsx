@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { 
   Bell, 
   Search, 
   ArrowUpDown, 
   Calendar, 
   RefreshCw, 
-  CreditCard,
   ChevronRight,
   TrendingUp,
   TrendingDown,
@@ -18,9 +17,9 @@ import { dashboardService } from '@/services/dashboard.service'
 import type { DashboardResumen, CotizacionDolar, Proyeccion } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { formatMonto, formatFecha } from '@/utils/format'
-import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { MiniCard } from '@/components/tarjetas/MiniCard'
+import GoalSummaryWidget from '@/components/goals/GoalSummaryWidget'
 import styles from './DashboardPage.module.css'
 
 // ── Components ───────────────────────────────────────────────────────────
@@ -93,6 +92,7 @@ export default function DashboardPage() {
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
   const { open } = useModal()
+  const navigate = useNavigate()
 
   const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
 
@@ -291,11 +291,11 @@ export default function DashboardPage() {
                       <div className={`${styles.confianzaDot} ${styles[proyeccion.nivel_confianza]}`} />
                     )}
                     {proyeccion && proyeccion.advertencias.length > 0 && (
-                      <AlertCircle size={14} color="#f59e0b" style={{ marginLeft: '4px' }} />
+                      <AlertCircle size={14} color="#f59e0b" className={styles.marginLeft4} />
                     )}
                   </div>
                   <span className={styles.secValue}>
-                    {loadingProyeccion ? 'Calculando...' : proyeccion ? formatMonto(proyeccion.gasto_proyectado_total, 'ARS') : 'N/A'}
+                    {loadingProyeccion ? 'Calculando...' : proyeccion ? formatMonto(proyeccion.gasto_proyectado_total, 'ARS') : 'Sin datos'}
                   </span>
                 </div>
               </div>
@@ -303,6 +303,13 @@ export default function DashboardPage() {
           </div>
         )
       )}
+      {/* Goal Summary Widget */}
+      {!loading && data && (
+        <div className={styles.goalSection}>
+          <GoalSummaryWidget />
+        </div>
+      )}
+
       {/* Grid */}
       <div className={styles.dashboardGrid}>
         {/* Ultimos Movimientos */}
@@ -388,16 +395,11 @@ export default function DashboardPage() {
                   return (
                     <div 
                       key={p.id} 
-                      className={styles.listItem}
+                      className={`${styles.listItem} ${p.tipo === 'resumen_tarjeta' ? styles.clickable : ''}`}
                       onClick={handlePagoClick}
-                      style={{ cursor: p.tipo === 'resumen_tarjeta' ? 'pointer' : 'default' }}
                     >
                       <div 
-                        className={styles.itemIcon} 
-                        style={{ 
-                          position: 'relative',
-                          background: p.tipo === 'resumen_tarjeta' ? 'transparent' : undefined 
-                        }}
+                        className={`${styles.itemIcon} ${p.tipo === 'resumen_tarjeta' ? styles.itemIconTransparent : ''}`} 
                       >
                         {p.tipo === 'suscripcion' && <RefreshCw size={20} />}
                         {p.tipo === 'cuota' && <Calendar size={20} />}

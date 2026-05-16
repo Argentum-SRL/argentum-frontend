@@ -8,7 +8,7 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
   loading?: boolean
-  variant?: 'primary' | 'secondary' | 'outline'
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
   className?: string
   fullWidth?: boolean
 }

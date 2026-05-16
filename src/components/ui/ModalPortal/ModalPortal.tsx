@@ -9,6 +9,8 @@ import FilterBarMobileDrawer from '@/components/transacciones/FilterBarMobileDra
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
 import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
+import GoalModal from '@/components/goals/GoalModal'
+import GoalContributionModal from '@/components/goals/GoalContributionModal'
 
 export function ModalPortal() {
   const context = useContext(ModalContext)
@@ -25,6 +27,8 @@ export function ModalPortal() {
   const filterDrawerData = typedModals.transaccionFilters?.data
   const proyeccionData = typedModals.proyeccion?.data
   const presupuestoData = typedModals.presupuesto?.data
+  const goalData = typedModals.goal?.data
+  const goalContributionData = typedModals.goalContribution?.data
   const confirmData = typedModals.confirm?.data
 
   return (
@@ -104,6 +108,25 @@ export function ModalPortal() {
           presupuesto={presupuestoData.presupuesto}
           categorias={presupuestoData.categorias}
           onSuccess={presupuestoData.onSuccess}
+        />
+      )}
+
+      {typedModals.goal?.isOpen && goalData && (
+        <GoalModal
+          open={true}
+          onClose={() => closeModal('goal')}
+          goal={goalData.goal}
+          onSuccess={goalData.onSuccess}
+        />
+      )}
+
+      {typedModals.goalContribution?.isOpen && goalContributionData && (
+        <GoalContributionModal
+          open={true}
+          onClose={() => closeModal('goalContribution')}
+          goal={goalContributionData.goal}
+          billeteras={goalContributionData.billeteras}
+          onSuccess={goalContributionData.onSuccess}
         />
       )}
 

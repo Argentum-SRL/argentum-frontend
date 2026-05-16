@@ -1,0 +1,368 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 16px 32px;
+  min-height: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 28px 24px 40px;
+  }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: color 0.2s;
+}
+
+.backBtn:hover {
+  color: var(--primary);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.titleInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconContainer {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text);
+}
+
+.statusRow {
+  display: flex;
+  gap: 8px;
+}
+
+.statusBadge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.currencyBadge {
+  font-size: 10px;
+  font-weight: 800;
+  background: #0D2045;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.btnPrimary {
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.overviewGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mainCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.progressDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.progressValues {
+  display: flex;
+  justify-content: space-between;
+}
+
+.valGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.valGroupRight {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.valLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+
+.valBig {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.progressBarFull {
+  height: 12px;
+  background: var(--surface-alt);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progressBarInner {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.progressStats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.metricCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metricIcon {
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.metricLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.metricValue {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.chartCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+
+.chartContainer {
+  width: 100%;
+  height: 240px;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activityItem {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.activityIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconAporte { background: #DCFCE7; color: #15803D; }
+.iconRetiro { background: #FEE2E2; color: #B91C1C; }
+
+.activityInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activityType {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.activityDate {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.activityAmount {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.amountPositive { color: var(--success); }
+.amountNegative { color: var(--error); }
+
+.emptyActivity {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-2);
+  font-style: italic;
+}
+
+.settingsSection {
+  padding: 20px 0;
+}
+
+.settingsCard {
+  background: #FFF1F2;
+  border: 1px solid #FECDD3;
+  border-radius: 20px;
+  padding: 24px;
+  color: #9F1239;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settingsCard h3 { margin: 0; }
+.settingsCard p { font-size: 14px; margin: 0; }
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-weight: 700;
+  color: var(--text-2);
+}

@@ -612,3 +612,26 @@
 .proyeccionSection {
   margin-bottom: 8px;
 }
+
+.goalSection {
+  margin-bottom: 8px;
+}
+
+@media (min-width: 768px) {
+  .goalSection {
+    max-width: 400px;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.itemIconTransparent {
+  position: relative;
+  background: transparent !important;
+}
+
+.marginLeft4 {
+  margin-left: 4px;
+}

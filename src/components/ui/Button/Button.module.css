@@ -50,3 +50,23 @@
   border-color: var(--primary);
   color: var(--primary);
 }
+
+.ghost {
+  background: transparent;
+  color: var(--text-2);
+  min-width: unset;
+}
+
+.ghost:not(:disabled):hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.danger {
+  background: var(--error);
+  color: #fff;
+}
+
+.danger:not(:disabled):hover {
+  background: #b91c1c;
+}

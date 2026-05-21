@@ -150,7 +150,7 @@ const BilleteraDetallePage: React.FC = () => {
     return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]))
   }, [movimientos])
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     if (!id) return
     setLoadingData(true)
     try {
@@ -169,7 +169,42 @@ const BilleteraDetallePage: React.FC = () => {
     } finally {
       setLoadingData(false)
     }
-  }
+  }, [id, checkUrlParams])
+
+  const handleEditMovimiento = useCallback((txId: string) => {
+    const tx = movimientos.find(t => t.id === txId)
+    if (!tx || !billetera) return
+    open('transaccion', {
+      data: {
+        transaccion: tx,
+        billeteras: billeteras,
+        categorias,
+        tarjetas,
+        onSuccess: refreshData,
+      },
+    })
+  }, [movimientos, billetera, billeteras, categorias, tarjetas, open, refreshData])
+
+  const handleDeleteMovimiento = useCallback((txId: string) => {
+    const tx = movimientos.find(t => t.id === txId)
+    if (!tx) return
+    confirm({
+      title: 'Eliminar transacción',
+      description: '¿Estás seguro de que querés eliminar esta transacción? Esta acción no se puede deshacer.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await transaccionService.deleteTransaccion(txId)
+          showToast('Transacción eliminada', 'success')
+          refreshData()
+        } catch (e) {
+          console.error(e)
+          showToast('Error al eliminar la transacción', 'error')
+        }
+      },
+    })
+  }, [movimientos, confirm, showToast, refreshData])
 
   const loadTarjetas = async () => {
     if (!id) return
@@ -342,8 +377,8 @@ const BilleteraDetallePage: React.FC = () => {
                   transacciones={txs}
                   categorias={categorias}
                   billeteras={[billetera]}
-                  onEdit={() => {}} // TODO: implementar edicion si es necesario
-                  onDelete={() => {}} // TODO: implementar borrado
+                  onEdit={handleEditMovimiento}
+                  onDelete={handleDeleteMovimiento}
                 />
               ))}
             </div>

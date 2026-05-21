@@ -202,7 +202,12 @@ export default function TransaccionesPage() {
   }, [])
 
   const handleViewPendientes = useCallback(() => {
-    setFilters(prev => ({ ...prev, estado_verificacion: 'pendiente' }))
+    setFilters(prev => ({
+      ...prev,
+      estado_verificacion: 'pendiente',
+      fecha_desde: undefined,
+      fecha_hasta: undefined,
+    }))
   }, [])
 
   const grupos = useMemo(() => {

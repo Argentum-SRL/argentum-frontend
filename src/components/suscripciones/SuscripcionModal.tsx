@@ -51,7 +51,7 @@ const initialState: FormState = {
   monto: null,
   moneda: 'ARS',
   frecuencia: 'mensual',
-  proximo_cobro: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+  proximo_cobro: new Date().toISOString().split('T')[0],
   metodoCobro: 'debito',
   billeteraId: '',
   tarjetaId: '',
@@ -467,7 +467,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
                 <div className={styles.formRow}>
                   <div className={styles.formFieldFlex1}>
-                    <label className={styles.fieldLabel} htmlFor="proximo-cobro">Próximo cobro</label>
+                    <label className={styles.fieldLabel} htmlFor="proximo-cobro">Fecha de facturación</label>
                     <div className={styles.inputWrapperIcon}>
                       <Calendar size={16} className={styles.inputIconLeftSmall} />
                       <input

@@ -22,6 +22,7 @@ const TransaccionRow = memo(({
 }: TransaccionRowProps) => {
   const isIngreso = transaccion.tipo === 'ingreso'
   const isPendiente = transaccion.estado_verificacion === 'pendiente'
+  const isPendienteIA = isPendiente && ['ia_wpp', 'ia_chat', 'ia_pdf'].includes(transaccion.origen)
 
   const formatHora = (fechaStr: string) => {
     if (!fechaStr.includes('T')) return ''
@@ -64,7 +65,7 @@ const TransaccionRow = memo(({
           </span>
           
           <div className={styles.badges}>
-            {isPendiente && (
+            {isPendienteIA && (
               <span className={`${styles.badge} ${styles.badgePendiente}`}>
                 <AlertCircle size={8} strokeWidth={3} /> Pendiente IA
               </span>

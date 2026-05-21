@@ -397,6 +397,10 @@ export default function TransaccionModal({
     dispatch({ type: 'SET_STEP', step: prevStep, direction: 'back' })
   }
 
+  const isPendienteIA = isEdit &&
+    transaccion?.estado_verificacion === 'pendiente' &&
+    ['ia_wpp', 'ia_chat', 'ia_pdf'].includes(transaccion?.origen ?? '')
+
   const handleSubmit = async () => {
     // Validaciones básicas
     if (!monto) { showToast('Ingresá un monto válido', 'error'); return }
@@ -429,8 +433,18 @@ export default function TransaccionModal({
           }
           : undefined,
       }
-      if (!isEdit) { await transaccionService.createTransaccion(payload); showToast('Transacción creada', 'success') }
-      else if (transaccion) { await transaccionService.updateTransaccion(transaccion.id, payload); showToast('Transacción actualizada', 'success') }
+      if (!isEdit) {
+        await transaccionService.createTransaccion(payload)
+        showToast('Transacción creada', 'success')
+      } else if (transaccion) {
+        await transaccionService.updateTransaccion(transaccion.id, payload)
+        if (isPendienteIA) {
+          await transaccionService.confirmarIA(transaccion.id)
+          showToast('Transacción confirmada', 'success')
+        } else {
+          showToast('Transacción actualizada', 'success')
+        }
+      }
       onSuccess(); onClose()
     } catch (e) { console.error(e); showToast('Error al guardar la transacción', 'error') }
     finally { dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false }) }
@@ -844,7 +858,7 @@ export default function TransaccionModal({
               <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                  {isSubmitting ? 'Guardando...' : 'Guardar transacción'}
+                  {isSubmitting ? 'Guardando...' : isPendienteIA ? 'Confirmar transacción' : 'Guardar transacción'}
                 </button>
               </div>
             </form>

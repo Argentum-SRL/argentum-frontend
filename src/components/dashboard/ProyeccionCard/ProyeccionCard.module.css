@@ -7,6 +7,7 @@
   flex-direction: column;
   gap: 1.25rem;
   transition: all 0.2s ease;
+  height: 100%;
 }
 
 .header {

@@ -9,12 +9,14 @@ import {
   ChevronRight,
   TrendingUp,
   TrendingDown,
-  AlertCircle
+  AlertCircle,
+  PieChart as PieChartIcon
 } from 'lucide-react'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, CotizacionDolar, Proyeccion } from '@/types'
+import type { DashboardResumen, CotizacionDolar, Proyeccion, ProyeccionCategoria } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
@@ -22,7 +24,26 @@ import { MiniCard } from '@/components/tarjetas/MiniCard'
 
 import styles from './DashboardPage.module.css'
 
+// ── Formatter ────────────────────────────────────────────────────────────
+
+const fmt = (n: number, moneda: 'ARS' | 'USD' = 'ARS') => {
+  const abs = Math.abs(n)
+  const [int, dec] = abs.toFixed(2).split('.')
+  const intFmt = int.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  const monto = dec === '00' ? intFmt : `${intFmt},${dec}`
+  const signo = n < 0 ? '-' : ''
+  return moneda === 'USD' ? `${signo}USD $ ${monto}` : `${signo}$ ${monto}`
+}
+
 // ── Components ───────────────────────────────────────────────────────────
+
+const PHRASES = [
+  "Mantenete al tanto de tus tareas, monitoreá el progreso y seguí tu estado.",
+  "Gestioná tu dinero de forma inteligente y alcanzá tus metas.",
+  "Revisá tus últimos movimientos y proyectá tu balance mensual.",
+  "Simplificá tus finanzas y tomá mejores decisiones todos los días.",
+  "Llevá el control de tus consumos y optimizá tus pagos."
+]
 
 const Greeting = memo(({ nombre }: { nombre: string | null }) => {
   const greeting = useMemo(() => {
@@ -32,12 +53,16 @@ const Greeting = memo(({ nombre }: { nombre: string | null }) => {
     return 'Buenas noches'
   }, [])
 
+  const phrase = useMemo(() => {
+    return PHRASES[Math.floor(Math.random() * PHRASES.length)]
+  }, [])
+
   return (
     <div className={styles.headerLeft}>
       <h1 className={styles.greeting}>
         {greeting}{nombre ? `, ${nombre}` : ''}
       </h1>
-      <p className={styles.subtitle}>Tu panorama financiero</p>
+      <p className={styles.subtitle}>{phrase}</p>
     </div>
   )
 })
@@ -62,6 +87,85 @@ const ListSkeleton = memo(() => (
   </div>
 ))
 ListSkeleton.displayName = 'ListSkeleton'
+
+const COLORES_CATEGORIA = [
+  '#0D2045',  // Vivienda — marino
+  '#8A95A8',  // Alimentación — plata
+  '#1A3D28',  // Transporte — verde oscuro
+  '#A8905A',  // Servicios — dorado
+  '#4878B8',  // Salud — azul medio
+  '#EDECEA',  // Otros — crema
+]
+
+const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria[], showPercent: boolean }) => {
+  const chartData = useMemo(() => {
+    return data
+      .filter(c => c.gasto_actual_ciclo > 0)
+      .sort((a, b) => b.gasto_actual_ciclo - a.gasto_actual_ciclo)
+      .slice(0, 6)
+  }, [data])
+
+  if (!chartData || chartData.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <PieChartIcon size={40} className={styles.emptyIcon} />
+        <p>Sin gastos por ahora</p>
+      </div>
+    )
+  }
+
+  const maxVal = chartData[0]?.gasto_actual_ciclo || 0
+  const total = chartData.reduce((acc, curr) => acc + curr.gasto_actual_ciclo, 0)
+
+  return (
+    <div className={styles.barChartWrap}>
+      {chartData.map((entry, idx) => {
+        const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
+        const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
+        const color = COLORES_CATEGORIA[idx % COLORES_CATEGORIA.length]
+        
+        return (
+          <div key={entry.categoria_id} className={styles.barItem}>
+            <div className={styles.barIconWrap}>
+              <SubcategoriaIcon nombre="" parentCategory={entry.categoria_nombre} size={32} />
+            </div>
+            <div className={styles.barContent}>
+              <div className={styles.barHeader}>
+                <span className={styles.barName}>{entry.categoria_nombre}</span>
+                <span className={styles.barAmount}>
+                  {showPercent ? `${pct}%` : fmt(entry.gasto_actual_ciclo, 'ARS')}
+                </span>
+              </div>
+              <div className={styles.barTrack}>
+                <div className={styles.barFill} style={{ width: `${fillPct}%`, background: color }} />
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+})
+CategoriasChart.displayName = 'CategoriasChart'
+
+const AppleCalendarIcon = memo(({ dateStr }: { dateStr: string }) => {
+  const parts = dateStr.split('-')
+  let date = new Date()
+  if (parts.length === 3) {
+    date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
+  }
+
+  const month = date.toLocaleString('es-AR', { month: 'short' }).toUpperCase().replace('.', '')
+  const day = date.getDate()
+
+  return (
+    <div className={styles.appleCalendar}>
+      <div className={styles.appleCalendarMonth}>{month}</div>
+      <div className={styles.appleCalendarDay}>{day}</div>
+    </div>
+  )
+})
+AppleCalendarIcon.displayName = 'AppleCalendarIcon'
 
 const Cotizacion = memo(({ data, loading }: { data: CotizacionDolar | null, loading: boolean }) => {
   const formattedMonto = useMemo(() => {
@@ -91,6 +195,7 @@ export default function DashboardPage() {
   const [proyeccion, setProyeccion] = useState<Proyeccion | null>(null)
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
+  const [showChartPercent, setShowChartPercent] = useState(false)
   const { open } = useModal()
   const navigate = useNavigate()
 
@@ -198,116 +303,146 @@ export default function DashboardPage() {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <Greeting nombre={usuario?.nombre ?? null} />
-          {data && (
-            <div className={styles.headerInfo}>
-              <div className={styles.cycleNavigation}>
-                <div className={styles.dateSelectorWrap}>
-                  <span className={styles.cycleDates} onClick={toggleDatePicker}>
-                    {formatFecha(data.periodo.fecha_inicio)} — {formatFecha(data.periodo.fecha_fin)}
-                  </span>
-                  {isDatePickerOpen && (
-                    <div className={styles.datePickerPopover}>
-                      <form onSubmit={handleCustomRangeSubmit}>
-                        <div className={styles.popoverField}>
-                          <label htmlFor="dash-desde">Desde</label>
-                          <input id="dash-desde" name="desde" type="date" defaultValue={data.periodo.fecha_inicio} required />
-                        </div>
-                        <div className={styles.popoverField}>
-                          <label htmlFor="dash-hasta">Hasta</label>
-                          <input id="dash-hasta" name="hasta" type="date" defaultValue={data.periodo.fecha_fin} required />
-                        </div>
-                        <div className={styles.popoverActions}>
-                          <button type="button" className={styles.popoverReset} onClick={handleResetPeriod}>Mi Ciclo</button>
-                          <button type="submit" className={styles.popoverApply}>Aplicar</button>
-                        </div>
-                      </form>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <Cotizacion data={cotizacion} loading={loading} />
-            </div>
-          )}
-        </div>
-        <div className={styles.headerActions}>
-          <button className={styles.actionBtn} aria-label="Notificaciones">
-            <Bell size={20} />
-          </button>
-          <button className={styles.actionBtn} aria-label="Buscar">
-            <Search size={20} />
-          </button>
         </div>
       </header>
 
-      {/* Balance Card */}
-      {loading ? (
-        <BalanceSkeleton />
-      ) : (
-        data && (
-          <div className={styles.balanceCard}>
-            <div className={styles.balanceContent}>
-              <div className={styles.balanceMain}>
-                <div className={styles.labelWithHint}>
-                  <span className={styles.balanceLabel}>Balance del ciclo</span>
-                  <div className={styles.hint} title="Es la diferencia entre lo que entró y salió de tu cuenta solo en este período.">
-                    <AlertCircle size={14} />
-                  </div>
-                </div>
-                <h2 className={styles.balanceAmount}>{formatMonto(data.balance.balance, 'ARS')}</h2>
-                <div className={styles.balanceBreakdown}>
-                  <div className={styles.breakdownItem}>
-                    <TrendingUp size={14} className={styles.iconPos} />
-                    <span>{formatMonto(data.balance.ingresos, 'ARS')}</span>
-                  </div>
-                  <div className={styles.breakdownItem}>
-                    <TrendingDown size={14} className={styles.iconNeg} />
-                    <span>{formatMonto(data.balance.egresos, 'ARS')}</span>
-                  </div>
-                </div>
-                {data.balance.variacion_vs_ciclo_anterior !== null && (
-                  <div className={`${styles.variationBadge} ${data.balance.variacion_vs_ciclo_anterior >= 0 ? styles.positive : styles.negative}`}>
-                    {data.balance.variacion_vs_ciclo_anterior >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                    <span>
-                      {data.balance.variacion_vs_ciclo_anterior >= 0 ? '+' : ''}
-                      {data.balance.variacion_vs_ciclo_anterior}% vs ciclo ant.
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className={styles.balanceSecondary}>
-                <div className={styles.secMetric}>
+      {/* ── Top Row (3 Cols) ──────────────────────────────────────────────── */}
+      <div className={styles.topRow}>
+        {/* Col 1: Balance */}
+        {loading ? (
+          <BalanceSkeleton />
+        ) : (
+          data && (
+            <div className={styles.balanceCard}>
+              <div className={styles.balanceContent}>
+                <div className={styles.balanceMain}>
                   <div className={styles.labelWithHint}>
-                    <span className={styles.secLabel}>Disponible real</span>
-                    <div className={styles.hint} title="Tu plata total en billeteras menos las cuotas que tenés que pagar el mes que viene.">
-                      <AlertCircle size={12} />
+                    <span className={styles.balanceLabel}>Balance del ciclo</span>
+                    <div className={styles.hint} title="Es la diferencia entre lo que entró y salió de tu cuenta solo en este período.">
+                      <AlertCircle size={14} />
                     </div>
                   </div>
-                  <span className={styles.secValue}>{formatMonto(data.disponible_real.disponible, 'ARS')}</span>
-                </div>
-                <div className={styles.secMetric}>
-                  <div className={styles.labelWithHint} onClick={handleOpenProyeccion}>
-                    <span className={styles.secLabel}>Proyección cierre</span>
-                    {proyeccion && (
-                      <div className={`${styles.confianzaDot} ${styles[proyeccion.nivel_confianza]}`} />
-                    )}
-                    {proyeccion && proyeccion.advertencias.length > 0 && (
-                      <AlertCircle size={14} color="#f59e0b" className={styles.marginLeft4} />
+                  <h2 className={styles.balanceAmount}>{fmt(data.balance.balance, 'ARS')}</h2>
+                  
+                  <div className={styles.balanceBreakdown}>
+                    <div className={styles.breakdownItem}>
+                      <TrendingUp size={14} className={styles.iconPos} />
+                      <span>{fmt(data.balance.ingresos, 'ARS')}</span>
+                    </div>
+                    <div className={styles.breakdownItem}>
+                      <TrendingDown size={14} className={styles.iconNeg} />
+                      <span>{fmt(data.balance.egresos, 'ARS')}</span>
+                    </div>
+                    {data.balance.variacion_vs_ciclo_anterior !== null && (
+                      <div className={`${styles.variationBadge} ${data.balance.variacion_vs_ciclo_anterior >= 0 ? styles.positive : styles.negative}`}>
+                        {data.balance.variacion_vs_ciclo_anterior >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        <span>
+                          {data.balance.variacion_vs_ciclo_anterior >= 0 ? '+' : ''}
+                          {data.balance.variacion_vs_ciclo_anterior}% vs ant.
+                        </span>
+                      </div>
                     )}
                   </div>
-                  <span className={styles.secValue}>
-                    {loadingProyeccion ? 'Calculando...' : proyeccion ? formatMonto(proyeccion.gasto_proyectado_total, 'ARS') : 'Sin datos'}
-                  </span>
+
+                  <div className={styles.balanceSecondary}>
+                    <div className={styles.secItem}>
+                      <span className={styles.secLabel}>Disponible real</span>
+                      <span className={styles.secValue}>{fmt(data.disponible_real.disponible, 'ARS')}</span>
+                      <span className={styles.secSub}>en billeteras</span>
+                    </div>
+                    <div className={styles.secItem}>
+                      <span className={styles.secLabel}>Proyección cierre</span>
+                      <span className={styles.secValue}>
+                        {loadingProyeccion ? '...' : proyeccion ? fmt(proyeccion.balance_proyectado, 'ARS') : '-'}
+                      </span>
+                      <span className={styles.secSub}>estimado</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          )
+        )}
+
+        {/* Col 2: Gastos por Categoría */}
+        <div className={styles.card}>
+          <div className={`${styles.cardHeader} ${styles.cardHeaderWithToggle}`}>
+            <h3 className={styles.cardTitle}>Gastos por categoría</h3>
+            <div className={styles.toggleGroup}>
+              <button 
+                className={`${styles.toggleBtn} ${!showChartPercent ? styles.active : ''}`} 
+                onClick={() => setShowChartPercent(false)}
+              >
+                $
+              </button>
+              <button 
+                className={`${styles.toggleBtn} ${showChartPercent ? styles.active : ''}`} 
+                onClick={() => setShowChartPercent(true)}
+              >
+                %
+              </button>
+            </div>
           </div>
-        )
-      )}
+          <div className={styles.chartCardContent}>
+            {loadingProyeccion ? <ListSkeleton /> : proyeccion && <CategoriasChart data={proyeccion.desglose_por_categoria} showPercent={showChartPercent} />}
+          </div>
+        </div>
 
+        {/* Col 3: Próximos Pagos */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>Próximos pagos</h3>
+            <Link to="/app/suscripciones" className={styles.seeAll}>
+              Ver <ChevronRight size={16} />
+            </Link>
+          </div>
+          <div className={styles.cardContent}>
+            {loading ? (
+              <ListSkeleton />
+            ) : data?.proximos_pagos.length === 0 ? (
+              <div className={styles.emptyState}>
+                <Calendar size={40} className={styles.emptyIcon} />
+                <p>Sin pagos próximos</p>
+              </div>
+            ) : (
+              <div className={styles.list}>
+                {data?.proximos_pagos.slice(0, 4).map((p) => {
+                  const isUrgente = p.dias_restantes <= 1
+                  let fechaTxt = formatFecha(p.fecha_cobro)
+                  if (p.dias_restantes === 0) fechaTxt = 'Hoy'
+                  else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
+                  else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
 
-      {/* Grid */}
-      <div className={styles.dashboardGrid}>
-        {/* Ultimos Movimientos */}
+                  return (
+                    <div key={p.id} className={styles.listItem}>
+                      <AppleCalendarIcon dateStr={p.fecha_cobro} />
+                      <div className={styles.itemMeta}>
+                        <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
+                        <p className={styles.itemSub}>{fechaTxt}</p>
+                      </div>
+                      <div className={styles.pagoRight}>
+                        <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
+                        {isUrgente && <span className={styles.urgentBadge}>Urgente</span>}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bottom Row (2 Cols) ───────────────────────────────────────────── */}
+      <div className={styles.bottomRow}>
+        {/* Col 1: Proyección */}
+        {!customRange && (
+          <div className={styles.proyeccionSection}>
+            <ProyeccionCard data={proyeccion} loading={loadingProyeccion} />
+          </div>
+        )}
+
+        {/* Col 2: Últimos Movimientos */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>Últimos movimientos</h3>
@@ -340,11 +475,7 @@ export default function DashboardPage() {
                       </p>
                       <p className={styles.itemSub}>
                         {formatFecha(m.fecha)} • {m.billetera_nombre}
-                        {m.subcategoria_nombre && ` • ${m.subcategoria_nombre}`}
                       </p>
-                      {m.estado_verificacion === 'pendiente' && (
-                        <span className={styles.pendingBadge}>Pendiente IA</span>
-                      )}
                     </div>
                     <div className={`${styles.itemAmount} ${m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg}`}>
                       {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, 'ARS')}
@@ -355,77 +486,7 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
-
-        {/* Proximos Pagos */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Próximos pagos</h3>
-            <Link to="/app/suscripciones" className={styles.seeAll}>
-              Ver todos <ChevronRight size={16} />
-            </Link>
-          </div>
-          <div className={styles.cardContent}>
-            {loading ? (
-              <ListSkeleton />
-            ) : data?.proximos_pagos.length === 0 ? (
-              <div className={styles.emptyState}>
-                <Calendar size={40} className={styles.emptyIcon} />
-                <p>Sin pagos próximos</p>
-              </div>
-            ) : (
-              <div className={styles.list}>
-                {data?.proximos_pagos.map((p) => {
-                  const isUrgente = p.dias_restantes <= 1
-                  let fechaTxt = formatFecha(p.fecha_cobro)
-                  if (p.dias_restantes === 0) fechaTxt = 'Hoy'
-                  else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
-                  else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
-
-                  const handlePagoClick = () => {
-                    if (p.tipo === 'resumen_tarjeta' && p.billetera_id) {
-                      navigate(`/app/billeteras/${p.billetera_id}?tarjeta_id=${p.id}`)
-                    }
-                  }
-
-                  return (
-                    <div 
-                      key={p.id} 
-                      className={`${styles.listItem} ${p.tipo === 'resumen_tarjeta' ? styles.clickable : ''}`}
-                      onClick={handlePagoClick}
-                    >
-                      <div 
-                        className={`${styles.itemIcon} ${p.tipo === 'resumen_tarjeta' ? styles.itemIconTransparent : ''}`} 
-                      >
-                        {p.tipo === 'suscripcion' && <RefreshCw size={20} />}
-                        {p.tipo === 'cuota' && <Calendar size={20} />}
-                        {p.tipo === 'resumen_tarjeta' && <MiniCard color={p.color} red={p.red} />}
-                      </div>
-                      <div className={styles.itemMeta}>
-                        <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
-                        <p className={styles.itemSub}>
-                          {fechaTxt}
-                          {p.billetera_nombre && ` • ${p.billetera_nombre}`}
-                        </p>
-                      </div>
-                      <div className={styles.pagoRight}>
-                        <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
-                        {isUrgente && <span className={styles.urgentBadge}>Urgente</span>}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
-
-      {/* Projection Card (Only shown if on current cycle) */}
-      {!customRange && (
-        <div className={styles.proyeccionSection}>
-          <ProyeccionCard data={proyeccion} loading={loadingProyeccion} />
-        </div>
-      )}
     </div>
   )
 }

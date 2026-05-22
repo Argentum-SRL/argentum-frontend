@@ -2,7 +2,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
-  Bell, Search, MoreHorizontal, Sun, Moon,
+  Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, AlertCircle, User
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -13,18 +13,19 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 // ── Icons ──────────────────────────────────────────────────────────────────
 
 const ICON_PROPS = { size: 20, strokeWidth: 1.75 }
+const SIDEBAR_ICON_PROPS = { size: 18, strokeWidth: 1.75 }
 
-function MoonIcon() {
+function MoonIcon({ size = 28, color = 'rgba(255,255,255,0.85)' }: { size?: number, color?: string } = {}) {
   const maskId = `moon-${useId().replace(/[^a-z0-9]/gi, '')}`
   return (
-    <svg width={28} height={28} viewBox="0 0 100 100" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
       <defs>
         <mask id={maskId}>
           <circle cx="50" cy="50" r="24" fill="white" />
           <circle cx="58" cy="50" r="19" fill="black" />
         </mask>
       </defs>
-      <circle cx="50" cy="50" r="24" fill="rgba(255,255,255,0.85)" mask={`url(#${maskId})`} />
+      <circle cx="50" cy="50" r="24" fill={color} mask={`url(#${maskId})`} />
     </svg>
   )
 }
@@ -61,6 +62,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { theme, toggleTheme } = useTheme()
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   const [prevPath, setPrevPath] = useState(location.pathname)
   if (location.pathname !== prevPath) {
@@ -85,84 +87,82 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className={styles.root}>
 
-      {/* ── Desktop sidebar ──────────────────────── */}
-      <aside className={styles.sidebar}>
-        {/* Logo */}
-        <Link to="/app/dashboard" className={styles.logo} aria-label="Ir al dashboard">
-          <MoonIcon />
-          <span className={styles.logoText}>Argentum</span>
-        </Link>
+      {/* ── Standalone Logo ──────────────────────── */}
+      <Link to="/app/dashboard" className={styles.standaloneLogo} aria-label="Ir al dashboard" title="Argentum">
+        <MoonIcon size={24} color="currentColor" />
+        <span className={styles.logoTitle}>Argentum</span>
+      </Link>
 
-        {/* Nav main */}
-        <nav className={styles.nav}>
-          <div className={styles.navSection}>
-            {NAV_MAIN.map(({ label, path, Icon }) => (
-              <Link
-                key={path}
-                to={path}
-                className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
-              >
-                <Icon {...ICON_PROPS} />
-                <span className={styles.navLabel}>{label}</span>
-              </Link>
-            ))}
-          </div>
-
-          <div className={styles.navSeparator} />
-
-          <div className={styles.navSection}>
-            {NAV_FINANCIAL.map(({ label, path, Icon }) => (
-              <Link
-                key={path}
-                to={path}
-                className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
-              >
-                <Icon {...ICON_PROPS} />
-                <span className={styles.navLabel}>{label}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-
-        {/* Spacer */}
-        <div className={styles.spacer} />
-
-        <div className={styles.navSeparator} />
-
-        {/* User block */}
-        <div className={styles.userBlock}>
-          <Link to="/app/perfil" className={styles.userInner} aria-label="Ir al perfil">
-            <div className={styles.avatar}>
-              {fotoUrl ? (
-                <img src={fotoUrl} alt="Foto de perfil" className={styles.avatarImage} />
-              ) : (
-                inicial
-              )}
-            </div>
-            <div className={styles.userMeta}>
-              <p className={styles.userName}>
-                {usuario?.nombre ?? ''} {usuario?.apellido ?? ''}
-              </p>
-            </div>
-          </Link>
-          <button
-            type="button"
-            className={styles.navItem}
-            onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-          >
-            {theme === 'dark' ? <Sun {...ICON_PROPS} /> : <Moon {...ICON_PROPS} />}
-            <span className={styles.navLabel}>{theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}</span>
-          </button>
-          <button
-            type="button"
-            className={styles.logoutBtn}
-            onClick={() => { void logout() }}
-          >
-            Cerrar sesión
-          </button>
+      {/* ── Top Navigation Desktop ──────────────────────── */}
+      <div className={styles.topNav}>
+        <div className={styles.topNavPill}>
+          {[...NAV_MAIN, ...NAV_FINANCIAL].map(({ label, path, Icon }) => (
+            <Link
+              key={path}
+              to={path}
+              className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
+            >
+              <span className={styles.navIcon}>
+                <Icon {...SIDEBAR_ICON_PROPS} />
+              </span>
+              <span className={styles.navLabel}>{label}</span>
+            </Link>
+          ))}
         </div>
-      </aside>
+      </div>
+
+      {/* ── Top Bar Desktop ──────────────────────── */}
+      <div className={styles.topBar}>
+        
+        <div className={styles.topBarActions}>
+          {/* Pill 1: Controls */}
+          <div className={styles.actionPill}>
+            <button className={styles.topBarBtn} title="Buscar">
+              <Search size={18} strokeWidth={1.75} />
+            </button>
+            <button className={styles.topBarBtn} title="Notificaciones">
+              <Bell size={18} strokeWidth={1.75} />
+              <span className={styles.notifDot} />
+            </button>
+            <button className={styles.topBarBtn} onClick={toggleTheme} title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}>
+              {theme === 'dark' ? <Sun size={18} strokeWidth={1.75} /> : <Moon size={18} strokeWidth={1.75} />}
+            </button>
+          </div>
+
+          {/* Pill 2: User Profile */}
+          <div className={styles.profileWrapper}>
+            <button className={styles.profilePill} onClick={() => setIsProfileOpen(!isProfileOpen)}>
+              <div className={styles.topBarAvatar}>
+                {fotoUrl
+                  ? <img src={fotoUrl} alt="avatar" />
+                  : <span>{inicial}</span>
+                }
+              </div>
+              <div className={styles.topBarUserInfo}>
+                <span className={styles.topBarUserName}>{usuario?.nombre}</span>
+                {usuario?.email && <span className={styles.topBarUserEmail}>{usuario.email}</span>}
+              </div>
+              <ChevronDown size={16} strokeWidth={1.75} className={styles.profileChevron} />
+            </button>
+            
+            {isProfileOpen && (
+              <>
+                <div className={styles.profileOverlay} onClick={() => setIsProfileOpen(false)} />
+                <div className={styles.profileDropdown}>
+                  <Link to="/app/perfil" className={styles.dropdownItem} onClick={() => setIsProfileOpen(false)}>
+                    <User size={16} />
+                    <span>Ver perfil</span>
+                  </Link>
+                  <button className={styles.dropdownItem} onClick={() => { setIsProfileOpen(false); void logout(); }}>
+                    <LogOut size={16} />
+                    <span>Cerrar sesión</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* ── Mobile header ────────────────────────── */}
       <header className={styles.mobileHeader}>

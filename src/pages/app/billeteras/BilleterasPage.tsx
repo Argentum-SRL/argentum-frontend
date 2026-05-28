@@ -1,7 +1,7 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
-import { Plus, Eye, EyeOff } from 'lucide-react'
+import { Plus, Eye, EyeOff, Info } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
@@ -69,21 +69,24 @@ const TotalesHero = memo(({ billeteras, cotizacion }: { billeteras: Billetera[],
       <div className={styles.tmMain}>
         <p className={styles.totalLbl}>Equivalente total</p>
         <p className={styles.tmMainVal}>{formatSaldo(equivalenteTotal, 'ARS')}</p>
-        <span className={styles.totalBadge}>
-          USD {tipoLabel} · {formatSaldo(valorUSD, 'ARS')}
-        </span>
       </div>
 
       <div className={styles.tmRow}>
         <div className={styles.tmSub}>
           <p className={styles.totalLbl}>Total ARS</p>
           <p className={styles.tmSubVal}>{formatSaldo(totalARS, 'ARS')}</p>
-          <p className={styles.totalSub}>pesos argentinos</p>
         </div>
         <div className={styles.tmSub}>
-          <p className={styles.totalLbl}>Total USD</p>
+          <div className={styles.lblWithIcon}>
+            <p className={styles.totalLbl}>Total USD</p>
+            <Info 
+              size={12} 
+              color="rgba(255, 255, 255, 0.4)" 
+              style={{ cursor: 'help' }}
+              title={`Cotización utilizada: USD ${tipoLabel} · ${formatSaldo(valorUSD, 'ARS')}`}
+            />
+          </div>
           <p className={styles.tmSubVal}>{formatSaldo(totalUSD, 'USD')}</p>
-          <p className={styles.totalSub}>dólares</p>
         </div>
       </div>
     </div>
@@ -98,6 +101,7 @@ export default function BilleterasPage() {
   const { showToast } = useToast()
   const { open, confirm } = useModal()
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
+  const [frontCardId, setFrontCardId] = useState<string | null>(null)
   const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -154,6 +158,18 @@ export default function BilleterasPage() {
         .reduce((a, b) => a + b.saldo_actual, 0)
     }
   }, [billeteras])
+
+  // Inicializar la tarjeta principal como la que está al frente por defecto
+  useEffect(() => {
+    if (billeterasActivas.length > 0 && !frontCardId) {
+      const principal = billeterasActivas.find(b => b.es_principal)
+      if (principal) {
+        setFrontCardId(principal.id)
+      } else {
+        setFrontCardId(billeterasActivas[0].id)
+      }
+    }
+  }, [billeterasActivas, frontCardId])
 
   const handleArchivar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
@@ -290,6 +306,8 @@ export default function BilleterasPage() {
             <BilleteraCard
               key={b.id}
               billetera={b}
+              isFront={frontCardId === b.id}
+              onSetFront={() => setFrontCardId(b.id)}
               onArchivar={handleArchivar}
               onDesarchivar={handleDesarchivar}
               onEliminar={handleEliminar}
@@ -300,6 +318,8 @@ export default function BilleterasPage() {
             <BilleteraCard
               key={b.id}
               billetera={b}
+              isFront={frontCardId === b.id}
+              onSetFront={() => setFrontCardId(b.id)}
               onArchivar={handleArchivar}
               onDesarchivar={handleDesarchivar}
               onEliminar={handleEliminar}

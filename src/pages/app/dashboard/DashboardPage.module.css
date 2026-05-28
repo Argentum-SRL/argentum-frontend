@@ -19,6 +19,12 @@
   align-items: flex-start;
 }
 
+@media (max-width: 767px) {
+  .header {
+    display: none;
+  }
+}
+
 .headerLeft {
   display: flex;
   flex-direction: column;
@@ -233,6 +239,64 @@
   box-shadow: 0 12px 24px -8px rgba(var(--primary-rgb), 0.4);
 }
 
+.mobileGreetingWrap {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .balanceCard {
+    margin-top: -20px;
+    margin-left: calc(-1 * var(--container-px-mobile));
+    margin-right: calc(-1 * var(--container-px-mobile));
+    border-radius: 0 0 32px 32px;
+    padding-top: calc(56px + env(safe-area-inset-top));
+    padding-bottom: 32px;
+  }
+
+  .mobileGreetingWrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    width: 100%;
+    z-index: 10;
+    position: relative;
+  }
+
+  .mobileGreetingText {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobileGreetingTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.95);
+    letter-spacing: -0.02em;
+  }
+
+  .mobileAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface-alt);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  
+  .mobileAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
 .topRow {
   display: grid;
   grid-template-columns: 1fr;
@@ -320,6 +384,23 @@
   margin: 0;
   letter-spacing: -1.5px;
   font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  .balanceAmount {
+    font-size: 2.75rem;
+  }
+  .balanceCard {
+    padding: 24px;
+    margin-top: -20px;
+    margin-left: calc(-1 * var(--container-px-mobile));
+    margin-right: calc(-1 * var(--container-px-mobile));
+    border-radius: 0 0 32px 32px;
+    padding-top: calc(32px + env(safe-area-inset-top));
+  }
+  .balanceBreakdown {
+    gap: 12px;
+  }
 }
 
 .balanceBreakdown {

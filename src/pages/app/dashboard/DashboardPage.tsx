@@ -68,6 +68,32 @@ const Greeting = memo(({ nombre }: { nombre: string | null }) => {
 })
 Greeting.displayName = 'Greeting'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours()
+    if (hour >= 6 && hour < 12) return 'Buenos días'
+    if (hour >= 12 && hour < 20) return 'Buenas tardes'
+    return 'Buenas noches'
+  }, [])
+  
+  const inicial = usuario?.nombre?.charAt(0)?.toUpperCase() ?? 'U'
+  const fotoUrl = usuario?.foto_url ? (usuario.foto_url.startsWith('http') ? usuario.foto_url : `${API_URL}${usuario.foto_url}`) : null
+
+  return (
+    <div className={styles.mobileGreetingWrap}>
+      <div className={styles.mobileGreetingText}>
+        <span className={styles.mobileGreetingTitle}>{greeting}, {usuario?.nombre}</span>
+      </div>
+      <div className={styles.mobileAvatar}>
+        {fotoUrl ? <img src={fotoUrl} alt="avatar" /> : <span>{inicial}</span>}
+      </div>
+    </div>
+  )
+})
+MobileGreeting.displayName = 'MobileGreeting'
+
 const BalanceSkeleton = memo(() => (
   <div className={`${styles.skeleton} ${styles.skeletonBalance}`} />
 ))
@@ -339,6 +365,7 @@ export default function DashboardPage() {
               </svg>
 
               <div className={styles.balanceContent}>
+                <MobileGreeting usuario={usuario} />
                 <div className={styles.balanceMain}>
                   {/* Top section */}
                   <div className={styles.balanceTop}>

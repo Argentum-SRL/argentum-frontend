@@ -54,7 +54,7 @@
 
 /* Botón "Nueva" */
 .nuevaBtn {
-  display: flex;
+  display: none; /* Oculto en mobile, usamos el boton flotante en la grilla */
   align-items: center;
   gap: 6px;
   padding: 0 14px;
@@ -80,7 +80,11 @@
 .btnSuffix { display: none; }
 
 @media (min-width: 768px) {
-  .nuevaBtn { padding: 0 18px; height: 40px; }
+  .nuevaBtn { 
+    display: flex; 
+    padding: 0 18px; 
+    height: 40px; 
+  }
   .btnSuffix { display: inline; }
 }
 
@@ -214,30 +218,28 @@
   margin: 0;
 }
 
-.totalSub {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
-  margin: 3px 0 0;
-}
-
-.totalBadge {
-  display: inline-flex;
-  align-self: flex-start;
-  background: rgba(76, 175, 125, 0.2);
-  color: #4CAF7D;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 20px;
-  margin-top: 6px;
+.lblWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* ── Grid de billeteras ────────────────────────────────────────────────────── */
-/* Mobile: columna única */
+/* Mobile: columna única con solapamiento */
 .grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
+  padding-bottom: 124px; /* 24px + 100px para compensar el margin negativo de la ultima tarjeta */
+  position: relative; /* Clave para el boton flotante de agregar */
+}
+
+@media (max-width: 767px) {
+  .grid > *:not(button) {
+    margin-bottom: -100px; /* Fuerte superposición tipo billetera real */
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1), margin 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+  }
 }
 
 /* Desktop: 3 columnas */
@@ -247,6 +249,10 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
     align-items: start;
+    padding-bottom: 0;
+  }
+  .grid > * {
+    margin-bottom: 0;
   }
 }
 

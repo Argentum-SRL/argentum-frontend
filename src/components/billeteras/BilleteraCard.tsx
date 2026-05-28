@@ -9,10 +9,12 @@ import styles from './BilleteraCard.module.css'
 
 export interface BilleteraCardProps {
   billetera: Billetera
+  isFront?: boolean
+  onSetFront?: () => void
   onArchivar?: (id: string) => void
   onDesarchivar?: (id: string) => void
   onEliminar?: (id: string) => void
-  onEditar?: (id: string) => void
+  onEditar?: (b: Billetera) => void
   className?: string
 }
 
@@ -23,6 +25,8 @@ const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
 
 const BilleteraCard = memo(({ 
   billetera, 
+  isFront,
+  onSetFront,
   onArchivar, 
   onDesarchivar,
   onEliminar, 
@@ -75,8 +79,22 @@ const BilleteraCard = memo(({
 
   return (
     <div 
-      className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''} ${className || ''}`}
-      onClick={() => navigate(`/app/billeteras/${billetera.id}`)}
+      className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''} ${isFront ? styles.frontCard : ''} ${className || ''}`}
+      onClick={(e) => {
+        // En mobile, el primer tap trae la tarjeta al frente si no lo está.
+        // El segundo tap (cuando ya está al frente) navega al detalle.
+        const isTouch = window.matchMedia('(max-width: 767px)').matches
+        if (isTouch) {
+          if (!isFront) {
+            e.preventDefault()
+            onSetFront?.()
+            return
+          }
+        }
+        navigate(`/app/billeteras/${billetera.id}`)
+      }}
+      tabIndex={0}
+      role="button"
     >
       {/* Fondo clipeado */}
       <div className={styles.wcBg} ref={bgRef}>
@@ -215,7 +233,7 @@ export const NuevaBilleteraCard = memo(({ onClick }: { onClick: () => void }) =>
   return (
     <button className={styles.wcAdd} onClick={onClick} aria-label="Agregar nueva billetera">
       <div className={styles.addIcon}>
-        <Plus size={20} strokeWidth={2} color="#8E9198" />
+        <Plus size={16} strokeWidth={3} className={styles.plusIcon} />
       </div>
       <div className={styles.addText}>
         <span className={styles.addTitle}>Nueva billetera</span>

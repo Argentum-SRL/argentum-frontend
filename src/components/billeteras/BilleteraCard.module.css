@@ -4,8 +4,24 @@
 .wc {
   position: relative;
   border-radius: 18px;
-  /* sin aspect-ratio en mobile — altura natural */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  isolation: isolate;
+  z-index: 1;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 767px) {
+  .wc {
+    height: 210px; /* Tamaño fijo tipo tarjeta solo en mobile */
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  }
+  .frontCard {
+    order: 99;
+    transform: translateY(-16px);
+    margin-bottom: -84px !important; /* -100px + 16px para hacer espacio al levantarse */
+    z-index: 10;
+  }
 }
 
 /* desktop */
@@ -66,6 +82,13 @@
   flex-direction: column;
 }
 
+@media (max-width: 767px) {
+  .wcInner {
+    height: 100%;
+    justify-content: space-between;
+  }
+}
+
 @media (min-width: 768px) {
   .wcInner {
     padding: 20px 22px;
@@ -79,12 +102,17 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-bottom: 20px; /* separación en mobile */
+}
+
+@media (max-width: 767px) {
+  .wcTop {
+    margin-bottom: 0;
+  }
 }
 
 @media (min-width: 768px) {
   .wcTop {
-    margin-bottom: 0; /* space-between lo maneja */
+    margin-bottom: 0;
   }
 }
 
@@ -283,24 +311,62 @@
 /* CARD "NUEVA BILLETERA"                                                        */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
-/* Mobile: fila horizontal */
+/* Mobile: floating pill */
 .wcAdd {
+  position: absolute;
+  bottom: 0;
+  right: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 14px;
-  padding: 20px;
-  border-radius: 18px;
-  border: 1.5px dashed #D4D1C7;
-  background: transparent;
+  gap: 8px;
+  padding: 6px 16px 6px 6px;
+  border-radius: 9999px;
+  border: 6px solid var(--page); /* Borde grueso para crear la ilusión de recorte */
+  background: #111;
+  color: white;
   cursor: pointer;
-  width: 100%;
   text-align: left;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
+  z-index: 20;
+  box-shadow: none; /* SIN SOMBRA para no romper la ilusión de recorte */
+  width: max-content;
+  max-width: 90%;
+}
+
+@media (max-width: 767px) {
+  .wcAdd {
+    /* Mantenemos el estilo de pill flotante */
+  }
+}
+
+@media (min-width: 768px) {
+  .wcAdd {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0;
+    border-radius: 20px;
+    border: 1.5px dashed #D4D1C7;
+    background: var(--surface);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.75 / 1;
+    text-align: center;
+    box-shadow: none;
+    color: inherit;
+  }
 }
 
 .wcAdd:hover {
   border-color: var(--primary);
+  background: var(--surface-alt);
 }
 
 /* Desktop: columna centrada con aspect-ratio */
@@ -337,10 +403,11 @@
   cursor: pointer;
 }
 
+/* Mobile: circle icon */
 .addIcon {
-  width: 40px; height: 40px;
+  width: 28px; height: 28px;
   border-radius: 50%;
-  background: #EDECEA;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,12 +415,24 @@
   transition: background 0.2s ease;
 }
 
-.wcAdd:hover .addIcon {
-  background: var(--primary);
+.plusIcon {
+  color: #111 !important;
 }
 
-.wcAdd:hover .addIcon svg {
-  color: white !important;
+@media (min-width: 768px) {
+  .addIcon {
+    width: 40px; height: 40px;
+    background: #EDECEA;
+  }
+  .plusIcon {
+    color: #8E9198 !important;
+  }
+  .wcAdd:hover .addIcon {
+    background: var(--primary);
+  }
+  .wcAdd:hover .plusIcon {
+    color: white !important;
+  }
 }
 
 .addText {
@@ -362,27 +441,33 @@
   gap: 2px;
 }
 
+/* Mobile: Title */
 .addTitle {
   font-size: 14px;
   font-weight: 700;
-  color: #8E9198;
+  color: white;
   transition: color 0.2s ease;
 }
 
-.wcAdd:hover .addTitle {
-  color: var(--primary);
+@media (min-width: 768px) {
+  .addTitle {
+    color: #8E9198;
+  }
+  .wcAdd:hover .addTitle {
+    color: var(--primary);
+  }
 }
 
-/* Subtítulo — visible solo en mobile */
+/* Subtítulo — oculto en mobile, visible en desktop */
 .addSub {
-  display: block;
+  display: none;
   font-size: 12px;
   font-weight: 400;
   color: #B0B3BA;
 }
 
 @media (min-width: 768px) {
-  .addSub { display: none; }
+  .addSub { display: block; }
 }
 
 /* ── Reduced motion ──────────────────────────────────────────────────────── */

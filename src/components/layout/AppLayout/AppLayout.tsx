@@ -196,7 +196,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* ── Mobile bottom nav ────────────────────── */}
       <nav className={styles.mobileNav}>
-        {MOBILE_NAV.map(({ label, path, Icon }) => {
+        {MOBILE_NAV.map(({ path, Icon }) => {
           const active = isActive(path)
           return (
             <Link
@@ -204,9 +204,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
               to={path}
               className={[styles.mobileNavItem, active ? styles.mobileNavItemActive : ''].filter(Boolean).join(' ')}
             >
-              <Icon {...ICON_PROPS} />
-              <span className={styles.mobileNavLabel}>{label}</span>
-              {active && <span className={styles.mobileNavDot} />}
+              <span className={styles.mobileNavIcon}>
+                <Icon size={24} strokeWidth={1.75} />
+              </span>
             </Link>
           )
         })}
@@ -216,8 +216,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
           onClick={() => setIsMoreOpen((v) => !v)}
           aria-label="Más opciones"
         >
-          <MoreHorizontal {...ICON_PROPS} />
-          <span className={styles.mobileNavLabel}>Más</span>
+          <span className={styles.mobileNavIcon}>
+            <MoreHorizontal size={24} strokeWidth={1.75} />
+          </span>
         </button>
       </nav>
 

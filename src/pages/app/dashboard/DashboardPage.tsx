@@ -88,14 +88,21 @@ const ListSkeleton = memo(() => (
 ))
 ListSkeleton.displayName = 'ListSkeleton'
 
-const COLORES_CATEGORIA = [
-  '#0D2045',  // Vivienda — marino
-  '#8A95A8',  // Alimentación — plata
-  '#1A3D28',  // Transporte — verde oscuro
-  '#A8905A',  // Servicios — dorado
-  '#4878B8',  // Salud — azul medio
-  '#EDECEA',  // Otros — crema
-]
+const COLORES_CATEGORIA: Record<string, string> = {
+  'Alimentación':               '#F97316',  // Naranja
+  'Transporte':                 '#166534',  // Verde oscuro
+  'Salud y cuidado personal':   '#4ADE80',  // Verde claro
+  'Ropa e indumentaria':        '#38BDF8',  // Celeste
+  'Educación':                  '#DC2626',  // Rojo
+  'Vivienda':                   '#3B82F6',  // Azul
+  'Banco':                      '#6B7280',  // Gris
+  'Mascotas':                   '#92400E',  // Marrón
+  'Regalos':                    '#F472B6',  // Rosa
+  'Entretenimiento y salidas':  '#F87171',  // Rojo claro
+  'Servicios digitales':        '#A78BFA',  // Violeta (fallback elegante)
+}
+
+const DEFAULT_COLOR = '#8A95A8'
 
 const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria[], showPercent: boolean }) => {
   const chartData = useMemo(() => {
@@ -119,10 +126,10 @@ const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria
 
   return (
     <div className={styles.barChartWrap}>
-      {chartData.map((entry, idx) => {
+      {chartData.map((entry) => {
         const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
         const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
-        const color = COLORES_CATEGORIA[idx % COLORES_CATEGORIA.length]
+        const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
         
         return (
           <div key={entry.categoria_id} className={styles.barItem}>
@@ -314,25 +321,47 @@ export default function DashboardPage() {
         ) : (
           data && (
             <div className={styles.balanceCard}>
+              {/* Luna Argentum Watermark */}
+              <svg
+                viewBox="0 0 100 100"
+                style={{
+                  position: 'absolute',
+                  bottom: -20,
+                  right: -20,
+                  width: 120,
+                  height: 120,
+                  opacity: 0.04,
+                  pointerEvents: 'none'
+                }}
+              >
+                <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
+                <circle cx="58" cy="50" r="38" fill="#0D2045"/>
+              </svg>
+
               <div className={styles.balanceContent}>
                 <div className={styles.balanceMain}>
-                  <div className={styles.labelWithHint}>
-                    <span className={styles.balanceLabel}>Balance del ciclo</span>
-                    <div className={styles.hint} title="Es la diferencia entre lo que entró y salió de tu cuenta solo en este período.">
-                      <AlertCircle size={14} />
+                  {/* Top section */}
+                  <div className={styles.balanceTop}>
+                    <div className={styles.labelWithHint}>
+                      <span className={styles.balanceLabel}>Balance del ciclo</span>
+                      <div className={styles.hint} title="Es la diferencia entre lo que entró y salió de tu cuenta solo en este período.">
+                        <AlertCircle size={14} />
+                      </div>
                     </div>
-                  </div>
-                  <h2 className={styles.balanceAmount}>{fmt(data.balance.balance, 'ARS')}</h2>
-                  
-                  <div className={styles.balanceBreakdown}>
-                    <div className={styles.breakdownItem}>
-                      <TrendingUp size={14} className={styles.iconPos} />
-                      <span>{fmt(data.balance.ingresos, 'ARS')}</span>
+
+                    <h2 className={styles.balanceAmount}>{fmt(data.balance.balance, 'ARS')}</h2>
+
+                    <div className={styles.balanceBreakdown}>
+                      <div className={`${styles.badge} ${styles.pos}`}>
+                        <TrendingUp size={16} />
+                        <span>{fmt(data.balance.ingresos, 'ARS')}</span>
+                      </div>
+                      <div className={`${styles.badge} ${styles.neg}`}>
+                        <TrendingDown size={16} />
+                        <span>{fmt(data.balance.egresos, 'ARS')}</span>
+                      </div>
                     </div>
-                    <div className={styles.breakdownItem}>
-                      <TrendingDown size={14} className={styles.iconNeg} />
-                      <span>{fmt(data.balance.egresos, 'ARS')}</span>
-                    </div>
+
                     {data.balance.variacion_vs_ciclo_anterior !== null && (
                       <div className={`${styles.variationBadge} ${data.balance.variacion_vs_ciclo_anterior >= 0 ? styles.positive : styles.negative}`}>
                         {data.balance.variacion_vs_ciclo_anterior >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
@@ -344,18 +373,12 @@ export default function DashboardPage() {
                     )}
                   </div>
 
-                  <div className={styles.balanceSecondary}>
-                    <div className={styles.secItem}>
-                      <span className={styles.secLabel}>Disponible real</span>
-                      <span className={styles.secValue}>{fmt(data.disponible_real.disponible, 'ARS')}</span>
-                      <span className={styles.secSub}>en billeteras</span>
-                    </div>
-                    <div className={styles.secItem}>
-                      <span className={styles.secLabel}>Proyección cierre</span>
-                      <span className={styles.secValue}>
-                        {loadingProyeccion ? '...' : proyeccion ? fmt(proyeccion.balance_proyectado, 'ARS') : '-'}
-                      </span>
-                      <span className={styles.secSub}>estimado</span>
+                  {/* Bottom metric */}
+                  <div className={styles.metricsRow}>
+                    <div className={styles.metricItem}>
+                      <div className={styles.metricLabel}>Disponible real</div>
+                      <div className={styles.metricValue}>{fmt(data.disponible_real.disponible, 'ARS')}</div>
+                      <div className={styles.metricSub}>en billeteras</div>
                     </div>
                   </div>
                 </div>

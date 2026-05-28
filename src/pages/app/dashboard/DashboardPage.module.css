@@ -224,32 +224,13 @@
 /* ── Balance Card ─────────────────────────────────────────────────── */
 
 .balanceCard {
-  background: var(--primary);
+  background: linear-gradient(180deg, #0D2045 0%, #1a3260 100%);
   border-radius: 24px;
   padding: 32px;
   color: white;
   position: relative;
   overflow: hidden;
   box-shadow: 0 12px 24px -8px rgba(var(--primary-rgb), 0.4);
-}
-
-.balanceCard::after {
-  content: '';
-  position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
-.balanceContent {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  position: relative;
-  z-index: 1;
 }
 
 .topRow {
@@ -274,12 +255,38 @@
   }
 }
 
-/* Removed media query that made balanceCard horizontal */
+.balanceCard::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.balanceContent {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
 
 .balanceMain {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  justify-content: space-between;
+  height: 100%;
+  gap: 16px;
+}
+
+.balanceTop {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .balanceLabel {
@@ -308,32 +315,38 @@
 }
 
 .balanceAmount {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-weight: 800;
   margin: 0;
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
+  font-variant-numeric: tabular-nums;
 }
 
 .balanceBreakdown {
   display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 20px;
   opacity: 0.9;
 }
 
-.breakdownItem {
-  display: flex;
+.badge {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 4px 8px;
-  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  background: none;
+  border: none;
+  padding: 0;
 }
 
-.iconPos { color: #86efac; }
-.iconNeg { color: #fca5a5; }
+.badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pos svg { stroke: #4CAF7D; }
+.neg svg { stroke: #FF8A65; }
 
 .variationBadge {
   display: inline-flex;
@@ -356,38 +369,39 @@
   color: #fca5a5;
 }
 
-.balanceSecondary {
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  margin-top: 16px;
+.metricsRow {
+  display: grid;
+  grid-template-columns: 1fr;
   padding-top: 16px;
-  gap: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.secItem {
+.metricItem {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-.secLabel {
+.metricLabel {
   font-size: 10px;
   font-weight: 700;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.35);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
 }
 
-.secValue {
-  font-size: 18px;
+.metricValue {
+  font-size: 20px;
   font-weight: 700;
   color: rgba(255,255,255,0.85);
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
 }
 
-.secSub {
-  font-size: 11px;
-  color: rgba(255,255,255,0.4);
+.metricSub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  margin-top: 2px;
 }
 
 /* ── Grid ─────────────────────────────────────────────────────────── */

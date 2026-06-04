@@ -84,7 +84,8 @@ const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
   return (
     <div className={styles.mobileGreetingWrap}>
       <div className={styles.mobileGreetingText}>
-        <span className={styles.mobileGreetingTitle}>{greeting}, {usuario?.nombre}</span>
+        <span className={styles.mobileGreetingSubtitle}>{greeting},</span>
+        <span className={styles.mobileGreetingName}>{usuario?.nombre}</span>
       </div>
       <div className={styles.mobileAvatar}>
         {fotoUrl ? <img src={fotoUrl} alt="avatar" /> : <span>{inicial}</span>}

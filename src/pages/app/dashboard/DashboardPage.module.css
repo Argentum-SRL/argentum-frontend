@@ -37,6 +37,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  animation: slideUpFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .greeting {
@@ -271,10 +272,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     width: 100%;
     z-index: 10;
     position: relative;
+    animation: slideUpFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .mobileGreetingText {
@@ -282,26 +284,38 @@
     flex-direction: column;
   }
 
-  .mobileGreetingTitle {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.95);
+  .mobileGreetingSubtitle {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+  }
+
+  .mobileGreetingName {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #ffffff;
     letter-spacing: -0.02em;
+    line-height: 1.1;
   }
 
   .mobileAvatar {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: var(--surface-alt);
-    color: var(--text);
+    background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 15px;
     overflow: hidden;
-    border: 2px solid rgba(255,255,255,0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
   }
   
   .mobileAvatar img {
@@ -329,6 +343,8 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+  width: 100%;
+  min-width: 0;
 }
 @media (min-width: 1024px) {
   .bottomRow {
@@ -365,6 +381,7 @@
   justify-content: space-between;
   height: 100%;
   gap: 16px;
+  animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
 
 .balanceTop {
@@ -513,6 +530,8 @@
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
 }
 @media (min-width: 1024px) {
   .card {
@@ -559,6 +578,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 @media (min-width: 1024px) {
   .cardContent {
@@ -717,6 +737,8 @@
 .list {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
 }
 @media (min-width: 1024px) {
   .list {
@@ -821,6 +843,17 @@
   50% { opacity: 0.4; }
 }
 
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .skeleton {
   background: var(--surface-alt);
   animation: pulse 1.5s infinite ease-in-out;
@@ -899,6 +932,8 @@
 
 .proyeccionSection {
   height: 100%;
+  width: 100%;
+  min-width: 0;
 }
 
 .goalSection {

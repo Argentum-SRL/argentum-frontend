@@ -1,8 +1,9 @@
 .root {
   display: flex;
   min-height: 100dvh;
-  --sb-bg: var(--surface-alt);
-  --sb-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --sb-bg: var(--surface);
+  --sb-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 10px rgba(0, 0, 0, 0.08);
+  --sb-border: rgba(0, 0, 0, 0.10);
   --sb-text: var(--primary);
   --sb-text-hover: var(--primary);
   --sb-hover-bg: rgba(0,0,0,0.05);
@@ -14,7 +15,8 @@
 
 :global([data-theme="dark"]) .root {
   --sb-bg: #0D2045;
-  --sb-shadow: 0 8px 32px rgba(10, 20, 50, 0.25), 0 2px 8px rgba(10, 20, 50, 0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+  --sb-shadow: 0 8px 32px rgba(10, 20, 50, 0.35), 0 2px 8px rgba(10, 20, 50, 0.20), inset 0 1px 0 rgba(255,255,255,0.08);
+  --sb-border: rgba(255, 255, 255, 0.10);
   --sb-text: rgba(255,255,255,0.35);
   --sb-text-hover: rgba(255,255,255,0.7);
   --sb-hover-bg: rgba(255,255,255,0.07);
@@ -496,6 +498,7 @@
   border-radius: 26px;
   padding: 4px;
   box-shadow: var(--sb-shadow);
+  border: 1px solid var(--sb-border);
   gap: 4px;
   z-index: 40;
   align-items: center;

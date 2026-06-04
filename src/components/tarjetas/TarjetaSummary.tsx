@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { AlertCircle, ChevronLeft, ChevronRight, Edit2, Trash2 } from 'lucide-react'
+import { AlertCircle, ChevronLeft, ChevronRight, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
 import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, Categoria } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
@@ -14,6 +14,8 @@ interface TarjetaSummaryProps {
   categorias: Categoria[]
   todasLasTarjetas: TarjetaCredito[]
   onRefresh?: () => void
+  isExpanded?: boolean
+  onToggleExpand?: () => void
 }
 
 interface TicketData {
@@ -43,14 +45,41 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
   billeteras, 
   categorias, 
   todasLasTarjetas,
-  onRefresh 
+  onRefresh,
+  isExpanded = false,
+  onToggleExpand
 }) => {
   const [resumen, setResumen] = useState<ResumenTarjeta | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [isPaying, setIsPaying] = useState(false)
   const { open, confirm } = useModal()
   const { showToast } = useToast()
+
+  const handlePagarTarjeta = () => {
+    confirm({
+      title: '¿Confirmar pago de tarjeta?',
+      description: `Se creará una transacción de pago para el resumen actual de "${tarjeta.nombre}" por un total de ${formatMonto(currentTicket.total, tarjeta.moneda)}. Esto restará el saldo de la billetera vinculada y marcará las cuotas como pagadas.`,
+      confirmLabel: 'Confirmar pago',
+      variant: 'primary',
+      onConfirm: async () => {
+        setIsPaying(true)
+        try {
+          await tarjetaService.pagarResumenTarjeta(tarjeta.id)
+          showToast('Tarjeta pagada con éxito', 'success')
+          fetchResumen()
+          if (onRefresh) onRefresh()
+        } catch (err: any) {
+          console.error(err)
+          const errorMsg = err.response?.data?.detail || 'Error al procesar el pago de la tarjeta.'
+          showToast(errorMsg, 'error')
+        } finally {
+          setIsPaying(false)
+        }
+      }
+    })
+  }
 
   const fetchResumen = useCallback(async () => {
     setLoading(true)
@@ -223,44 +252,46 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           </div>
         </div>
 
-        <div className={styles.ticketContent}>
-          {currentTicket.cuotas.length > 0 ? (
-            currentTicket.cuotas.map((cuota, idx) => (
-              <div key={idx} className={styles.itemRow}>
-                <div className={styles.itemInfo}>
-                  <span className={styles.itemTitle}>{cuota.descripcion}</span>
-                  <span className={styles.itemSub}>
-                    Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
-                    {cuota.subcategoria_nombre && cuota.subcategoria_nombre !== cuota.descripcion && (
-                      <> • {cuota.subcategoria_nombre}</>
-                    )}
-                  </span>
-                </div>
-                <div className={styles.itemMontoContainer}>
-                  <span className={styles.itemMonto}>{formatMonto(cuota.monto, cuota.moneda)}</span>
-                  <div className={styles.itemActions}>
-                    <button 
-                      className={styles.actionBtn} 
-                      onClick={() => handleEdit(cuota)}
-                      title="Editar"
-                    >
-                      <Edit2 size={12} />
-                    </button>
-                    <button 
-                      className={styles.actionBtn} 
-                      onClick={() => handleDelete(cuota)}
-                      title="Eliminar"
-                    >
-                      <Trash2 size={12} />
-                    </button>
+        {isExpanded && (
+          <div className={styles.ticketContent}>
+            {currentTicket.cuotas.length > 0 ? (
+              currentTicket.cuotas.map((cuota, idx) => (
+                <div key={idx} className={styles.itemRow}>
+                  <div className={styles.itemInfo}>
+                    <span className={styles.itemTitle}>{cuota.descripcion}</span>
+                    <span className={styles.itemSub}>
+                      Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
+                      {cuota.subcategoria_nombre && cuota.subcategoria_nombre !== cuota.descripcion && (
+                        <> • {cuota.subcategoria_nombre}</>
+                      )}
+                    </span>
+                  </div>
+                  <div className={styles.itemMontoContainer}>
+                    <span className={styles.itemMonto}>{formatMonto(cuota.monto, cuota.moneda)}</span>
+                    <div className={styles.itemActions}>
+                      <button 
+                        className={styles.actionBtn} 
+                        onClick={() => handleEdit(cuota)}
+                        title="Editar"
+                      >
+                        <Edit2 size={12} />
+                      </button>
+                      <button 
+                        className={styles.actionBtn} 
+                        onClick={() => handleDelete(cuota)}
+                        title="Eliminar"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div className={styles.emptyState}>Sin movimientos</div>
-          )}
-        </div>
+              ))
+            ) : (
+              <div className={styles.emptyState}>Sin movimientos</div>
+            )}
+          </div>
+        )}
 
         <div className={styles.ticketFooter}>
           <div className={styles.totalRow}>
@@ -277,6 +308,31 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                 {formatDate(currentTicket.vencimiento)}
               </span>
             </div>
+          )}
+
+          {activeIndex === 0 && currentTicket.total > 0 && (
+            <button 
+              type="button" 
+              className={styles.payBtn} 
+              onClick={handlePagarTarjeta}
+              disabled={isPaying}
+            >
+              {isPaying ? 'Procesando...' : 'Pagar Tarjeta'}
+            </button>
+          )}
+
+          {onToggleExpand && (
+            <button 
+              type="button" 
+              className={styles.expandBtn} 
+              onClick={onToggleExpand}
+            >
+              {isExpanded ? (
+                <>Ocultar detalle <ChevronUp size={14} /></>
+              ) : (
+                <>Ver resumen completo <ChevronDown size={14} /></>
+              )}
+            </button>
           )}
         </div>
       </div>

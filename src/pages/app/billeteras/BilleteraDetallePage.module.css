@@ -259,6 +259,14 @@
   justify-content: center;
   gap: 8px; /* Reducido de 16px */
   margin-bottom: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carouselContainerShrunk {
+  transform: scale(0.65);
+  transform-origin: top center;
+  height: 135px;
+  margin-bottom: -5px;
 }
 
 .carouselBtn {

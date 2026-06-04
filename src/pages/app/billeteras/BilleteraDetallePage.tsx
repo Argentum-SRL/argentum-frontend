@@ -33,6 +33,7 @@ const BilleteraDetallePage: React.FC = () => {
   const [movimientos, setMovimientos] = useState<Transaccion[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [selectedTarjetaIndex, setSelectedTarjetaIndex] = useState<number>(0)
+  const [isResumenExpanded, setIsResumenExpanded] = useState(false)
   
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
@@ -49,6 +50,11 @@ const BilleteraDetallePage: React.FC = () => {
       }
     }
   }, [searchParams])
+
+  // Resetear la expansion al cambiar de tarjeta
+  useEffect(() => {
+    setIsResumenExpanded(false)
+  }, [selectedTarjetaIndex])
 
   // Obtener información del banco para estilo
   const bank = useMemo(() => {
@@ -410,7 +416,7 @@ const BilleteraDetallePage: React.FC = () => {
             ) : (
               <>
                 {/* Carousel de tarjetas */}
-                <div className={styles.carouselContainer}>
+                <div className={`${styles.carouselContainer} ${isResumenExpanded ? styles.carouselContainerShrunk : ''}`}>
                   <button
                     className={styles.carouselBtn}
                     onClick={() => setSelectedTarjetaIndex((i) => (i - 1 + (tarjetas.length + 1)) % (tarjetas.length + 1))}
@@ -427,6 +433,7 @@ const BilleteraDetallePage: React.FC = () => {
                         onEdit={handleEditTarjeta}
                         onArchive={handleArchiveTarjeta}
                         onDelete={handleDeleteTarjeta}
+                        isShrunk={isResumenExpanded}
                       />
                     ) : (
                       <div className={styles.nuevaTarjetaGhost} onClick={handleCreateTarjeta}>
@@ -456,6 +463,8 @@ const BilleteraDetallePage: React.FC = () => {
                       categorias={categorias}
                       todasLasTarjetas={tarjetas}
                       onRefresh={refreshData}
+                      isExpanded={isResumenExpanded}
+                      onToggleExpand={() => setIsResumenExpanded(!isResumenExpanded)}
                     />
                   </div>
                 )}

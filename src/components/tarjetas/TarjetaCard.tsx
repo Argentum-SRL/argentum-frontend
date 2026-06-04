@@ -12,9 +12,10 @@ interface TarjetaCardProps {
   onEdit: (tarjeta: TarjetaCredito) => void
   onArchive: (tarjeta: TarjetaCredito) => void
   onDelete: (tarjeta: TarjetaCredito) => void
+  isShrunk?: boolean
 }
 
-const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete }) => {
+const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete, isShrunk }) => {
   const proximoVencimiento = calcularProximoVencimiento(tarjeta.dia_vencimiento)
   
   const hoy = new Date()
@@ -28,7 +29,7 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
   const billeteraNombre = billetera?.nombre || RED_LABEL[tarjeta.red] || tarjeta.red
 
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${isShrunk ? styles.cardShrunk : ''}`}>
       <div className={styles.cardPreviewContainer}>
         <RealCardPreview
           ultimos4={ultimos4}

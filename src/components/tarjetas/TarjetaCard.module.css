@@ -3,13 +3,21 @@
   border: none;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
   gap: 0;
 }
 
-.card:hover {
+.card:hover:not(.cardShrunk) {
   transform: translateY(-4px) scale(1.02);
+}
+
+.cardShrunk {
+  pointer-events: none;
+}
+
+.cardShrunk .actions {
+  display: none !important;
 }
 
 .cardPreviewContainer {

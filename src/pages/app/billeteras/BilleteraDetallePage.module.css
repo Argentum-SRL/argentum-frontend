@@ -11,6 +11,13 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .container {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
 .loadingContainer {
   display: flex;
   justify-content: center;
@@ -225,6 +232,9 @@
 @media (min-width: 1024px) {
   .contentGrid {
     grid-template-columns: 1fr 1fr;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
   }
 }
 
@@ -412,6 +422,15 @@
   gap: 24px;
 }
 
+@media (min-width: 1024px) {
+  .movimientosList {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 8px;
+  }
+}
+
 @media (max-width: 600px) {
   .titleRow {
     flex-direction: column;
@@ -433,4 +452,45 @@
     white-space: nowrap;
     padding-bottom: 4px;
   }
+}
+
+/* ── Section Sizing for Desktop ── */
+@media (min-width: 1024px) {
+  .movimientosSection {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .tarjetasSection {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+}
+
+/* Premium scrollbars */
+.movimientosList::-webkit-scrollbar,
+.tarjetasSection::-webkit-scrollbar {
+  width: 6px;
+}
+
+.movimientosList::-webkit-scrollbar-track,
+.tarjetasSection::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.movimientosList::-webkit-scrollbar-thumb,
+.tarjetasSection::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.movimientosList::-webkit-scrollbar-thumb:hover,
+.tarjetasSection::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
 }

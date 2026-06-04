@@ -136,7 +136,7 @@ export default function FilterBar({
   return (
     <>
       <div className={styles.filterBar}>
-        {/* Mobile Filter Btn */}
+        {/* Mobile Filter Button (only icon on mobile) */}
         <button
           className={styles.mobileFilterBtn}
           onClick={() => open('transaccionFilters', {
@@ -149,79 +149,12 @@ export default function FilterBar({
               hasActiveFilters,
             },
           })}
+          aria-label="Filtrar"
         >
-          <Filter size={14} />
-          Filtrar
+          <Filter size={16} />
         </button>
 
-        <div className={styles.pillGroup}>
-          <button
-            className={`${styles.typePill} ${!filters.tipo ? styles.typePillActive : ''}`}
-            onClick={() => handleTipoChange(undefined)}
-          >
-            Todos
-          </button>
-          <div className={styles.separator} />
-          <button
-            className={`${styles.typePill} ${filters.tipo === 'egreso' ? styles.typePillActive : ''}`}
-            onClick={() => handleTipoChange('egreso')}
-          >
-            Egresos
-          </button>
-          <div className={styles.separator} />
-          <button
-            className={`${styles.typePill} ${filters.tipo === 'ingreso' ? styles.typePillActive : ''}`}
-            onClick={() => handleTipoChange('ingreso')}
-          >
-            Ingresos
-          </button>
-        </div>
-
-        {activeBilletera && (
-          <div className={`${styles.pill} ${styles.pillActive}`}>
-            {activeBilletera.nombre}
-            <button className={styles.pillRemove} onClick={handleBilleteraRemove} aria-label="Remover filtro">
-              <X size={14} />
-            </button>
-          </div>
-        )}
-
-        {filters.estado_verificacion === 'pendiente' && (
-          <div className={`${styles.pill} ${styles.pillActive}`}>
-            Pendientes IA
-            <button className={styles.pillRemove} onClick={() => onFilterChange({ ...filters, estado_verificacion: undefined })} aria-label="Remover filtro">
-              <X size={14} />
-            </button>
-          </div>
-        )}
-
-        <div className={`${styles.pill} ${styles.pillRelative}`} ref={catRef}>
-          <div className={styles.pillIconFlex} onClick={() => setCatPopoverOpen(!catPopoverOpen)}>
-            {activeCategoria ? activeCategoria.nombre : 'Categoría'}
-            <ChevronDown size={14} />
-          </div>
-          {catPopoverOpen && (
-            <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
-              <div className={styles.popoverTitle}>Categoría</div>
-              {renderCategoriasList()}
-            </div>
-          )}
-        </div>
-
-        <div className={`${styles.pill} ${styles.pillRelative}`} ref={dateRef}>
-          <div className={styles.pillIconFlex} onClick={() => setDatePopoverOpen(!datePopoverOpen)}>
-            <Calendar size={14} />
-            Período
-            <ChevronDown size={14} />
-          </div>
-          {datePopoverOpen && (
-            <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
-              <div className={styles.popoverTitle}>Rango de fechas</div>
-              {renderDateForm()}
-            </div>
-          )}
-        </div>
-
+        {/* Search input next to filter button */}
         <div className={styles.searchPill}>
           <Search size={16} color="var(--text-2)" />
           <input
@@ -232,6 +165,77 @@ export default function FilterBar({
             value={localSearch}
             onChange={handleSearchChange}
           />
+        </div>
+
+        {/* Desktop-only filters group */}
+        <div className={styles.desktopFilterGroup}>
+          <div className={styles.pillGroup}>
+            <button
+              className={`${styles.typePill} ${!filters.tipo ? styles.typePillActive : ''}`}
+              onClick={() => handleTipoChange(undefined)}
+            >
+              Todos
+            </button>
+            <div className={styles.separator} />
+            <button
+              className={`${styles.typePill} ${filters.tipo === 'egreso' ? styles.typePillActive : ''}`}
+              onClick={() => handleTipoChange('egreso')}
+            >
+              Egresos
+            </button>
+            <div className={styles.separator} />
+            <button
+              className={`${styles.typePill} ${filters.tipo === 'ingreso' ? styles.typePillActive : ''}`}
+              onClick={() => handleTipoChange('ingreso')}
+            >
+              Ingresos
+            </button>
+          </div>
+
+          {activeBilletera && (
+            <div className={`${styles.pill} ${styles.pillActive}`}>
+              {activeBilletera.nombre}
+              <button className={styles.pillRemove} onClick={handleBilleteraRemove} aria-label="Remover filtro">
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          {filters.estado_verificacion === 'pendiente' && (
+            <div className={`${styles.pill} ${styles.pillActive}`}>
+              Pendientes IA
+              <button className={styles.pillRemove} onClick={() => onFilterChange({ ...filters, estado_verificacion: undefined })} aria-label="Remover filtro">
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          <div className={`${styles.pill} ${styles.pillRelative}`} ref={catRef}>
+            <div className={styles.pillIconFlex} onClick={() => setCatPopoverOpen(!catPopoverOpen)}>
+              {activeCategoria ? activeCategoria.nombre : 'Categoría'}
+              <ChevronDown size={14} />
+            </div>
+            {catPopoverOpen && (
+              <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
+                <div className={styles.popoverTitle}>Categoría</div>
+                {renderCategoriasList()}
+              </div>
+            )}
+          </div>
+
+          <div className={`${styles.pill} ${styles.pillRelative}`} ref={dateRef}>
+            <div className={styles.pillIconFlex} onClick={() => setDatePopoverOpen(!datePopoverOpen)}>
+              <Calendar size={14} />
+              Período
+              <ChevronDown size={14} />
+            </div>
+            {datePopoverOpen && (
+              <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
+                <div className={styles.popoverTitle}>Rango de fechas</div>
+                {renderDateForm()}
+              </div>
+            )}
+          </div>
         </div>
 
         {hasActiveFilters && (

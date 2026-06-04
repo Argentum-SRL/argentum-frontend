@@ -14,41 +14,96 @@
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
-.header {
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.headerLeft {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 4px;
+}
+
+.pageTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.1;
 }
 
 @media (min-width: 768px) {
-  .header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .pageTitle { font-size: 26px; }
 }
 
-.titleGroup h1 {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--text);
-  margin: 0 0 4px;
-}
-
-.subtitle {
+/* Subtítulo — oculto en mobile */
+.pageSubtitle {
+  display: none;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--text-2);
+  font-weight: 400;
+  color: var(--text-3);
   margin: 0;
 }
 
-.actions {
+@media (min-width: 768px) {
+  .pageSubtitle { display: block; }
+}
+
+/* Botón "Nueva" — visible en mobile Y desktop */
+.nuevaBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.nuevaBtn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* " transacción" — oculto en mobile, visible en desktop */
+.btnSuffix { display: none; }
+
+@media (min-width: 768px) {
+  .nuevaBtn { 
+    padding: 0 18px; 
+    height: 40px; 
+  }
+  .btnSuffix { display: inline; }
+}
+
+/* Desktop-only action items */
+.desktopOnly {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .desktopOnly {
+    display: inline-flex !important;
+  }
+}
+
+.headerActions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-/* Botón secundario/ghost */
 .btnGhost {
   background: transparent;
   color: #52565F;
@@ -63,6 +118,40 @@
 
 .btnGhost:hover {
   background: #F5F4F0;
+}
+
+/* Switch de pestañas solo para mobile */
+.tabsContainer {
+  display: flex;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabBtnActive {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 768px) {
+  .tabsContainer {
+    display: none;
+  }
 }
 
 /* ── Hero Resumen (Card Marino) ──────────────────────────────────────────── */

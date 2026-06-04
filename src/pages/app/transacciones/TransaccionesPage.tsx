@@ -244,31 +244,47 @@ export default function TransaccionesPage() {
     <div className={styles.page}>
       
       {/* ── Page Header ────────────────────────────────────────────────────── */}
-      <div className={styles.header}>
-        <div className={styles.titleGroup}>
-          <h1>Transacciones</h1>
-          <p className={styles.subtitle}>{periodoActual.label} · {transacciones.length} movimientos</p>
+      <div className={styles.pageHeader}>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.pageTitle}>Transacciones</h1>
+          <p className={styles.pageSubtitle}>{periodoActual.label} · {transacciones.length} movimientos</p>
         </div>
-        <div className={styles.actions}>
-          <button className={styles.btnGhost} title="Próximamente">
+        <div className={styles.headerActions}>
+          <button className={`${styles.btnGhost} ${styles.desktopOnly}`} title="Próximamente">
             <Download size={16} className={styles.btnIcon} />
             Exportar
           </button>
           <button 
-            className={`${styles.btnGhost} ${activeTab === 'recurrentes' ? styles.btnTabActive : ''}`} 
+            className={`${styles.btnGhost} ${activeTab === 'recurrentes' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
             onClick={toggleTab}
           >
             <ArrowLeftRight size={16} className={styles.btnIcon} />
             Recurrentes
           </button>
           <button 
-            className={`${styles.btnGhost} ${styles.btnPrimary}`}
+            className={styles.nuevaBtn}
             onClick={activeTab === 'historial' ? openNewTransaccion : openNewRecurrente}
           >
-            <Plus size={16} className={styles.btnIcon} />
-            {activeTab === 'historial' ? 'Nueva transacción' : 'Nueva recurrente'}
+            <Plus size={16} strokeWidth={2.5} />
+            Nueva<span className={styles.btnSuffix}>{activeTab === 'historial' ? ' transacción' : ' recurrente'}</span>
           </button>
         </div>
+      </div>
+
+      {/* Switch de pestañas solo para mobile */}
+      <div className={styles.tabsContainer}>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'historial' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('historial')}
+        >
+          Historial
+        </button>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'recurrentes' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('recurrentes')}
+        >
+          Recurrentes
+        </button>
       </div>
 
       {activeTab === 'historial' ? (

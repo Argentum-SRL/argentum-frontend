@@ -1,4 +1,3 @@
-import { Search } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -51,17 +50,6 @@ export default function FilterBarMobileDrawer({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Filtros">
       <div className={styles.mobileDrawerContainer}>
-        <div className={styles.searchPill}>
-          <Search size={16} color="#8E9198" />
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="Buscar..."
-            title="Buscar transacción"
-            value={filters.busqueda || ''}
-            onChange={(e) => onFilterChange({ ...filters, busqueda: e.target.value || undefined })}
-          />
-        </div>
 
         {activeBilletera && (
           <div className={`${styles.pill} ${styles.pillActive}`}>

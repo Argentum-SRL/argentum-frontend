@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Clock, Edit2, Archive, Trash2 } from 'lucide-react'
 import type { TarjetaCredito, Billetera } from '@/types'
 import { calcularProximoVencimiento, RED_LABEL } from '@/lib/utils/tarjeta.utils'
@@ -16,6 +16,7 @@ interface TarjetaCardProps {
 }
 
 const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete, isShrunk }) => {
+  const [isFlipped, setIsFlipped] = useState(false)
   const proximoVencimiento = calcularProximoVencimiento(tarjeta.dia_vencimiento)
   
   const hoy = new Date()
@@ -28,25 +29,121 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
   const titular = tarjeta.nombre
   const billeteraNombre = billetera?.nombre || RED_LABEL[tarjeta.red] || tarjeta.red
 
+  // Background style & adaptative colors for the back of the card
+  const color = tarjeta.color || '#0D2045'
+  const isComplex = color.startsWith('linear-gradient')
+  const backgroundStyle = isComplex ? color : `linear-gradient(135deg, ${color} 0%, color-mix(in srgb, ${color}, black 25%) 100%)`
+  
+  const isDarkText = color.includes('E5E4E2') || color.includes('B4B4B4') || color.includes('D4AF37') || color.includes('C5A028')
+  const textColor = isDarkText ? '#000000' : 'white'
+  const borderLight = isDarkText ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.25)'
+  const bgLight = isDarkText ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.15)'
+
+  const handleCardClick = () => {
+    if (isShrunk) return
+    setIsFlipped(!isFlipped)
+  }
+
   return (
     <div className={`${styles.card} ${isShrunk ? styles.cardShrunk : ''}`}>
-      <div className={styles.cardPreviewContainer}>
-        <RealCardPreview
-          ultimos4={ultimos4}
-          red={tarjeta.red}
-          titular={titular}
-          diaCierre={tarjeta.dia_cierre}
-          diaVencimiento={tarjeta.dia_vencimiento}
-          color={tarjeta.color || '#0D2045'}
-          billeteraNombre={billeteraNombre}
-        />
+      {/* Contenedor 3D Scene */}
+      <div className={styles.cardScene} onClick={handleCardClick}>
+        <div className={`${styles.cardInner} ${isFlipped ? styles.isFlipped : ''}`}>
+          
+          {/* Cara Frontal */}
+          <div className={styles.cardFront}>
+            <RealCardPreview
+              ultimos4={ultimos4}
+              red={tarjeta.red}
+              titular={titular}
+              diaCierre={tarjeta.dia_cierre}
+              diaVencimiento={tarjeta.dia_vencimiento}
+              color={color}
+              billeteraNombre={billeteraNombre}
+            />
+          </div>
+
+          {/* Cara Posterior */}
+          <div 
+            className={styles.cardBack} 
+            style={{ 
+              background: backgroundStyle,
+              color: textColor 
+            }}
+          >
+            {/* Banda magnética */}
+            <div className={styles.magneticStripe} />
+            
+            {/* Panel de firma y código de seguridad */}
+            <div className={styles.signatureStripRow}>
+              <div className={styles.signatureStrip}>
+                <span className={styles.signatureText}>{titular.toUpperCase()}</span>
+              </div>
+              <div className={styles.cvvBox}>
+                <span className={styles.cvvLabel}>CVV</span>
+                <span className={styles.cvvCode}>***</span>
+              </div>
+            </div>
+
+            {/* Botones de acción elegantes */}
+            <div className={styles.backActions}>
+              <button 
+                className={styles.backActionBtn}
+                style={{
+                  color: textColor,
+                  borderColor: borderLight,
+                  background: bgLight
+                }}
+                onClick={(e) => { e.stopPropagation(); onEdit(tarjeta) }} 
+                title="Editar"
+              >
+                <Edit2 size={14} />
+                <span>Editar</span>
+              </button>
+              
+              <button 
+                className={styles.backActionBtn}
+                style={{
+                  color: textColor,
+                  borderColor: borderLight,
+                  background: bgLight
+                }}
+                onClick={(e) => { e.stopPropagation(); onArchive(tarjeta) }} 
+                title="Archivar"
+              >
+                <Archive size={14} />
+                <span>Archivar</span>
+              </button>
+              
+              <button 
+                className={`${styles.backActionBtn} ${styles.backActionBtnDelete}`}
+                style={{
+                  color: textColor,
+                  borderColor: borderLight,
+                  background: bgLight
+                }}
+                onClick={(e) => { e.stopPropagation(); onDelete(tarjeta) }} 
+                title="Eliminar"
+              >
+                <Trash2 size={14} />
+                <span>Eliminar</span>
+              </button>
+            </div>
+
+            {/* Pista de giro */}
+            <div className={styles.flipBackHint} style={{ color: isDarkText ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }}>
+              <span>Click para volver</span>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       <div className={styles.content}>
         <div className={styles.divider} />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {mostrarAlerta && (
+          {mostrarAlerta && !isFlipped && (
             <div className={styles.chipAlerta}>
               <Clock size={12} />
               <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
@@ -59,18 +156,6 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
             </span>
           )}
         </div>
-      </div>
-
-      <div className={styles.actions}>
-        <button className={styles.actionBtn} onClick={() => onEdit(tarjeta)} title="Editar">
-          <Edit2 size={14} />
-        </button>
-        <button className={styles.actionBtn} onClick={() => onArchive(tarjeta)} title="Archivar">
-          <Archive size={14} />
-        </button>
-        <button className={`${styles.actionBtn} ${styles.actionBtnDelete}`} onClick={() => onDelete(tarjeta)} title="Eliminar">
-          <Trash2 size={14} />
-        </button>
       </div>
     </div>
   )

@@ -34,6 +34,7 @@ const BilleteraDetallePage: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [selectedTarjetaIndex, setSelectedTarjetaIndex] = useState<number>(0)
   const [isResumenExpanded, setIsResumenExpanded] = useState(false)
+  const [activeTab, setActiveTab] = useState<'movimientos' | 'credito'>('movimientos')
   
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
@@ -309,44 +310,46 @@ const BilleteraDetallePage: React.FC = () => {
           <div className={styles.decoB} aria-hidden="true" />
         </div>
 
-        {/* Contenido del header en una sola línea */}
+        {/* Contenido del header adaptativo */}
         <div className={styles.headerInner}>
-          {/* Back button */}
-          <button 
-            className={styles.backBtn} 
-            onClick={() => navigate('/app/billeteras')}
-            title="Volver a Billeteras"
-          >
-            <ChevronLeft size={18} />
-          </button>
+          <div className={styles.headerLeftCol}>
+            {/* Back button */}
+            <button 
+              className={styles.backBtn} 
+              onClick={() => navigate('/app/billeteras')}
+              title="Volver a Billeteras"
+            >
+              <ChevronLeft size={18} />
+            </button>
 
-          {/* Logo */}
-          <div className={styles.headerLogo}>
-            {billetera.es_efectivo ? (
-              billetera.moneda === 'ARS'
-                ? <CreditCard size={20} strokeWidth={1.75} color="white" />
-                : <DollarSign size={20} strokeWidth={1.75} color="white" />
-            ) : logoUrl && !logoErr ? (
-              <img src={logoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
-            ) : (
-              <span className={styles.logoFallback}>
-                {getInitials(bank?.nombre ?? billetera.nombre)}
+            {/* Logo */}
+            <div className={styles.headerLogo}>
+              {billetera.es_efectivo ? (
+                billetera.moneda === 'ARS'
+                  ? <CreditCard size={20} strokeWidth={1.75} color="white" />
+                  : <DollarSign size={20} strokeWidth={1.75} color="white" />
+              ) : logoUrl && !logoErr ? (
+                <img src={logoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
+              ) : (
+                <span className={styles.logoFallback}>
+                  {getInitials(bank?.nombre ?? billetera.nombre)}
+                </span>
+              )}
+            </div>
+
+            {/* Nombre y detalle */}
+            <div className={styles.headerIdentity}>
+              <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
+                {billetera.nombre}
+              </h1>
+              <span className={`${styles.headerDetail} ${isLight ? styles.textLight : styles.textDark}`}>
+                {billetera.es_principal && <span className={styles.principal}>Principal</span>}
+                {billetera.moneda}
               </span>
-            )}
+            </div>
           </div>
 
-          {/* Nombre y detalle */}
-          <div className={styles.headerIdentity}>
-            <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
-              {billetera.nombre}
-            </h1>
-            <span className={`${styles.headerDetail} ${isLight ? styles.textLight : styles.textDark}`}>
-              {billetera.es_principal && <span className={styles.principal}>Principal</span>}
-              {billetera.moneda}
-            </span>
-          </div>
-
-          {/* Saldo a la derecha */}
+          {/* Saldo */}
           <div className={styles.headerSaldo}>
             <span className={styles.headerSaldoLabel}>Saldo actual</span>
             <div className={`${styles.headerSaldoValue} ${isLight ? styles.textLight : styles.textDark}`}>
@@ -356,9 +359,27 @@ const BilleteraDetallePage: React.FC = () => {
         </div>
       </div>
 
+      {/* Switch de pestañas solo para mobile (solo si no es efectivo) */}
+      {!billetera.es_efectivo && (
+        <div className={styles.tabsContainer}>
+          <button 
+            className={`${styles.tabBtn} ${activeTab === 'movimientos' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('movimientos')}
+          >
+            Movimientos
+          </button>
+          <button 
+            className={`${styles.tabBtn} ${activeTab === 'credito' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('credito')}
+          >
+            Crédito
+          </button>
+        </div>
+      )}
+
       <div className={styles.contentGrid}>
         {/* Columna izquierda: Movimientos */}
-        <section className={styles.movimientosSection}>
+        <section className={`${styles.movimientosSection} ${!billetera.es_efectivo && activeTab !== 'movimientos' ? styles.hiddenMobile : ''}`}>
           <h2 className={styles.sectionTitle}>Movimientos</h2>
           {loadingData ? (
             <div className={styles.tabLoading}>
@@ -393,7 +414,7 @@ const BilleteraDetallePage: React.FC = () => {
 
         {/* Columna derecha: Tarjetas (solo si no es efectivo) */}
         {!billetera.es_efectivo && (
-          <section className={styles.tarjetasSection}>
+          <section className={`${styles.tarjetasSection} ${activeTab !== 'credito' ? styles.hiddenMobile : ''}`}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Tarjetas de crédito</h2>
             </div>

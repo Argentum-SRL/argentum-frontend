@@ -39,6 +39,16 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
   let logo = RED_LOGOS[red]
   if (red === 'visa') {
     logo = getCardLogoUrl('visa_tarjeta_negro.svg') || visaLogo
+  } else if (red === 'amex') {
+    const colorLower = color.toLowerCase()
+    const nameLower = titular.toLowerCase()
+    const isBlack = colorLower.includes('#1a1a1b') || colorLower.includes('#000000') || nameLower.includes('black') || nameLower.includes('signature')
+    
+    logo = isBlack 
+      ? (getCardLogoUrl('amex_tarjeta_black.svg') || amexLogo)
+      : (getCardLogoUrl('amex_tarjeta.svg') || amexLogo)
+  } else if (red === 'mastercard') {
+    logo = getCardLogoUrl('master_tarjeta.svg') || mastercardLogo
   }
   
   // Logo del banco emisor (desde assets/cards/)
@@ -56,6 +66,7 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
 
   // Reglas de color para el logo de red (Visa en negro o blanco)
   let shouldInvertNetworkLogo = false
+  let shouldApplyGrayscaleFilter = false
   if (red === 'visa') {
     const colorLower = color.toLowerCase()
     const nameLower = titular.toLowerCase()
@@ -75,6 +86,13 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
     } else {
       // Por defecto
       shouldInvertNetworkLogo = textColor === 'white'
+    }
+  } else if (red === 'mastercard') {
+    const colorLower = color.toLowerCase()
+    const nameLower = titular.toLowerCase()
+    const isBlack = colorLower.includes('#1a1a1b') || colorLower.includes('#000000') || nameLower.includes('black') || nameLower.includes('signature')
+    if (isBlack) {
+      shouldApplyGrayscaleFilter = true
     }
   }
 
@@ -196,8 +214,12 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
               alt={red} 
               className={styles.networkLogo} 
               style={{ 
-                height: 26,
-                filter: shouldInvertNetworkLogo ? 'invert(1) brightness(2)' : 'none'
+                height: red === 'amex' ? 40 : 26,
+                filter: shouldInvertNetworkLogo 
+                  ? 'invert(1) brightness(2)' 
+                  : shouldApplyGrayscaleFilter 
+                    ? 'grayscale(1) brightness(2.5) contrast(1.5)' 
+                    : 'none'
               }} 
             />
           ) : (

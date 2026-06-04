@@ -1,5 +1,5 @@
 import React from 'react'
-import { Clock, Edit2, Archive, Trash2, Eye } from 'lucide-react'
+import { Clock, Edit2, Archive, Trash2 } from 'lucide-react'
 import type { TarjetaCredito, Billetera } from '@/types'
 import { calcularProximoVencimiento, RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import { formatMonto } from '@/utils/format'

@@ -62,7 +62,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       title: '¿Confirmar pago de tarjeta?',
       description: `Se creará una transacción de pago para el resumen actual de "${tarjeta.nombre}" por un total de ${formatMonto(currentTicket.total, tarjeta.moneda)}. Esto restará el saldo de la billetera vinculada y marcará las cuotas como pagadas.`,
       confirmLabel: 'Confirmar pago',
-      variant: 'primary',
+      variant: 'default',
       onConfirm: async () => {
         setIsPaying(true)
         try {
@@ -137,7 +137,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
         title: fut.mes,
         cierre: '',
         vencimiento: '',
-        cuotas: fut.cuotas,
+        cuotas: [],
         total: fut.total,
         isFuture: true
       })

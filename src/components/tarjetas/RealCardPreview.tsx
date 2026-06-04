@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from './TarjetaModal.module.css'
+import { getCardLogoUrl, findCardBrandByNombre } from '@/lib/utils/tarjetas.utils'
 
 // Logos de redes
 import visaLogo from '@/assets/redes/visa.png'
@@ -37,6 +38,10 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
 }) => {
   const logo = RED_LOGOS[red]
   
+  // Logo del banco emisor (desde assets/cards/)
+  const bankBrand = findCardBrandByNombre(billeteraNombre)
+  const bankLogoUrl = bankBrand ? getCardLogoUrl(bankBrand.logoPath) : ''
+  
   // Si el color es uno de los premium o ya es un gradiente complejo, lo usamos directo
   const isComplex = color.startsWith('linear-gradient')
   const backgroundStyle = isComplex ? color : `linear-gradient(135deg, ${color} 0%, color-mix(in srgb, ${color}, black 25%) 100%)`
@@ -49,7 +54,15 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
   return (
     <div className={styles.realCard} style={{ background: backgroundStyle }}>
       <div className={styles.cardTop}>
-        <div className={styles.walletNamePreview} style={{ color: textColor }}>{billeteraNombre.toUpperCase()}</div>
+        {bankLogoUrl ? (
+          <img
+            src={bankLogoUrl}
+            alt={billeteraNombre}
+            style={{ height: 22, maxWidth: 90, objectFit: 'contain' }}
+          />
+        ) : (
+          <div className={styles.walletNamePreview} style={{ color: textColor }}>{billeteraNombre.toUpperCase()}</div>
+        )}
       </div>
       
       <div className={styles.cardMid}>

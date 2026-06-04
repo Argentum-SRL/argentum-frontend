@@ -1,26 +1,20 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { 
-  Bell, 
-  Search, 
   ArrowUpDown, 
   Calendar, 
-  RefreshCw, 
   ChevronRight,
   TrendingUp,
   TrendingDown,
   AlertCircle,
   PieChart as PieChartIcon
 } from 'lucide-react'
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { useAuth } from '@/hooks/useAuth'
-import { useModal } from '@/hooks/useModal'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, CotizacionDolar, Proyeccion, ProyeccionCategoria } from '@/types'
+import type { DashboardResumen, Proyeccion, ProyeccionCategoria } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
-import { MiniCard } from '@/components/tarjetas/MiniCard'
 
 import styles from './DashboardPage.module.css'
 
@@ -201,23 +195,6 @@ const AppleCalendarIcon = memo(({ dateStr }: { dateStr: string }) => {
 })
 AppleCalendarIcon.displayName = 'AppleCalendarIcon'
 
-const Cotizacion = memo(({ data, loading }: { data: CotizacionDolar | null, loading: boolean }) => {
-  const formattedMonto = useMemo(() => {
-    if (!data) return ''
-    return formatMonto(data.venta || 0, 'ARS').replace('ARS', '').trim()
-  }, [data])
-
-  if (loading || !data) return null
-
-  return (
-    <div className={styles.cotizacion}>
-      <span className={styles.cotLabel}>USD {data.tipo}:</span>
-      <span className={styles.cotValue}>{formattedMonto}</span>
-    </div>
-  )
-})
-Cotizacion.displayName = 'Cotizacion'
-
 // ── Main Page ────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -225,15 +202,10 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardResumen | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [customRange, setCustomRange] = useState<{desde: string, hasta: string} | null>(null)
+  const customRange = null
   const [proyeccion, setProyeccion] = useState<Proyeccion | null>(null)
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
   const [showChartPercent, setShowChartPercent] = useState(false)
-  const { open } = useModal()
-  const navigate = useNavigate()
-
-  const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
 
   const fetchData = useCallback(async () => {
     // Evitar setState sincrónico en useEffect
@@ -242,9 +214,8 @@ export default function DashboardPage() {
     setLoading(true)
     try {
       // Endpoint consolidado: trae resumen, billeteras y cotización
-      const res = await dashboardService.getResumenCompleto(customRange?.desde, customRange?.hasta)
+      const res = await dashboardService.getResumenCompleto(undefined, undefined)
       setData(res.resumen)
-      setCotizacion(res.cotizacion)
     } catch (err) {
       console.error('Error loading dashboard:', err)
       setError(true)
@@ -287,31 +258,6 @@ export default function DashboardPage() {
       ignore = true
     }
   }, [fetchData, fetchProyeccion, customRange])
-
-  const handleResetPeriod = useCallback(() => {
-    setCustomRange(null)
-  }, [])
-
-  const handleCustomRangeSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const desde = formData.get('desde') as string
-    const hasta = formData.get('hasta') as string
-    if (desde && hasta) {
-      setCustomRange({ desde, hasta })
-      setIsDatePickerOpen(false)
-    }
-  }, [])
-
-  const handleOpenProyeccion = useCallback(() => {
-    if (proyeccion) {
-      open('proyeccion', { data: { proyeccion } })
-    }
-  }, [proyeccion, open])
-
-  const toggleDatePicker = useCallback(() => {
-    setIsDatePickerOpen(prev => !prev)
-  }, [])
 
   const handleRetry = useCallback(() => {
     setLoading(true)

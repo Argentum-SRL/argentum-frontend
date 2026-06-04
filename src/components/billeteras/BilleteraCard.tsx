@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Edit2, Archive, CreditCard, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
+import { getCardLogoUrl, findCardBrandByNombre } from '@/lib/utils/tarjetas.utils'
 import styles from './BilleteraCard.module.css'
 
 export interface BilleteraCardProps {
@@ -20,7 +21,7 @@ export interface BilleteraCardProps {
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
   ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
-  USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
+  USD: 'linear-gradient(135deg, #0C3D48 0%, #051E26 100%)',
 }
 
 const BilleteraCard = memo(({ 
@@ -42,7 +43,11 @@ const BilleteraCard = memo(({
     : !billetera.es_efectivo
       ? findBankByNombre(billetera.nombre)
       : undefined
-  const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
+
+  // Logo de tarjeta (assets/cards/) tiene prioridad sobre el del banco (assets/banks/)
+  const cardBrand = bank ? findCardBrandByNombre(bank.nombre) : undefined
+  const cardLogoUrl = cardBrand ? getCardLogoUrl(cardBrand.logoPath) : ''
+  const bankLogoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
 
   let background: string
   if (billetera.es_efectivo) {
@@ -105,42 +110,66 @@ const BilleteraCard = memo(({
       <div className={styles.wcInner}>
         {/* ── TOP ─────────────────────────────────────────────────────── */}
         <div className={styles.wcTop}>
-          {/* Logo circular */}
-          <div className={styles.wcLogo}>
-            {billetera.es_efectivo ? (
-              billetera.moneda === 'ARS'
-                ? <CreditCard size={18} strokeWidth={1.75} color="white" />
-                : <DollarSign size={18} strokeWidth={1.75} color="white" />
-            ) : logoUrl && !logoErr ? (
-              <img src={logoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
-            ) : (
-              <span className={styles.logoFallback}>
-                {getInitials(bank?.nombre ?? billetera.nombre)}
-              </span>
-            )}
-          </div>
-
-          {/* Identidad */}
-          <div className={styles.wcIdentity}>
-            <div className={`${styles.wcName} ${isLight ? styles.textLight : styles.textDark}`}>
-              {billetera.nombre}
-            </div>
-            <div className={styles.wcChipRow}>
-              {billetera.es_principal && (
-                <span className={`${styles.chip} ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
-                  Principal
-                </span>
-              )}
-              <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
-                {billetera.moneda}
-              </span>
-              {billetera.es_efectivo && (
+          {/* ── Con logo de tarjeta: logo grande + chips debajo, sin nombre ── */}
+          {cardLogoUrl && !logoErr ? (
+            <div className={styles.wcCardLogoCol}>
+              <img
+                src={cardLogoUrl}
+                alt={bank?.nombre}
+                onError={() => setLogoErr(true)}
+                className={styles.wcCardLogo}
+              />
+              <div className={styles.wcChipRow}>
+                {billetera.es_principal && (
+                  <span className={`${styles.chip} ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
+                    Principal
+                  </span>
+                )}
                 <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
-                  Efectivo
+                  {billetera.moneda}
                 </span>
-              )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* ── Sin logo de tarjeta: layout original ── */}
+              <div className={styles.wcLogo}>
+                {billetera.es_efectivo ? (
+                  billetera.moneda === 'ARS'
+                    ? <CreditCard size={18} strokeWidth={1.75} color="white" />
+                    : <DollarSign size={18} strokeWidth={1.75} color="white" />
+                ) : bankLogoUrl && !logoErr ? (
+                  <img src={bankLogoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
+                ) : (
+                  <span className={styles.logoFallback}>
+                    {getInitials(bank?.nombre ?? billetera.nombre)}
+                  </span>
+                )}
+              </div>
+
+              {/* Identidad */}
+              <div className={styles.wcIdentity}>
+                <div className={`${styles.wcName} ${isLight ? styles.textLight : styles.textDark}`}>
+                  {billetera.nombre}
+                </div>
+                <div className={styles.wcChipRow}>
+                  {billetera.es_principal && (
+                    <span className={`${styles.chip} ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
+                      Principal
+                    </span>
+                  )}
+                  <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                    {billetera.moneda}
+                  </span>
+                  {billetera.es_efectivo && (
+                    <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                      Efectivo
+                    </span>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Kebab — opciones de gestión */}
           <div className={styles.wcKebab}>
@@ -159,7 +188,7 @@ const BilleteraCard = memo(({
             {menuOpen && (
               <div className={styles.dropdown} role="menu">
                 <button className={styles.dropdownItem} role="menuitem"
-                  onClick={() => { onEditar?.(billetera.id); setMenuOpen(false) }}>
+                  onClick={() => { onEditar?.(billetera); setMenuOpen(false) }}>
                   <Edit2 size={13} strokeWidth={1.75} /> Editar
                 </button>
 

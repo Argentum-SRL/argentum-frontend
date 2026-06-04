@@ -79,12 +79,15 @@ const TotalesHero = memo(({ billeteras, cotizacion }: { billeteras: Billetera[],
         <div className={styles.tmSub}>
           <div className={styles.lblWithIcon}>
             <p className={styles.totalLbl}>Total USD</p>
-            <Info 
-              size={12} 
-              color="rgba(255, 255, 255, 0.4)" 
-              style={{ cursor: 'help' }}
+            <span 
               title={`Cotización utilizada: USD ${tipoLabel} · ${formatSaldo(valorUSD, 'ARS')}`}
-            />
+              style={{ display: 'inline-flex', cursor: 'help' }}
+            >
+              <Info 
+                size={12} 
+                color="rgba(255, 255, 255, 0.4)" 
+              />
+            </span>
           </div>
           <p className={styles.tmSubVal}>{formatSaldo(totalUSD, 'USD')}</p>
         </div>
@@ -225,17 +228,14 @@ export default function BilleterasPage() {
     showToast(`Billetera actualizada exitosamente`, 'success')
   }, [fetchPageData, showToast])
 
-  const handleEditar = useCallback((id: string) => {
-    const b = billeteras.find((b) => b.id === id)
-    if (b) {
-      open('editBilletera', {
-        data: {
-          billetera: b,
-          billeteraPrincipalActual: billeteras.find((item) => item.es_principal),
-          onEditar: handleGuardarEdicion,
-        },
-      })
-    }
+  const handleEditar = useCallback((b: Billetera) => {
+    open('editBilletera', {
+      data: {
+        billetera: b,
+        billeteraPrincipalActual: billeteras.find((item) => item.es_principal),
+        onEditar: handleGuardarEdicion,
+      },
+    })
   }, [billeteras, open, handleGuardarEdicion])
 
   const handleCrear = useCallback(async (payload: CreatePayload) => {

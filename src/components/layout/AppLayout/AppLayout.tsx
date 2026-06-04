@@ -2,7 +2,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
-  Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, AlertCircle, User
+  Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, User
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -12,7 +12,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
-const ICON_PROPS = { size: 20, strokeWidth: 1.75 }
 const SIDEBAR_ICON_PROPS = { size: 18, strokeWidth: 1.75 }
 
 function MoonIcon({ size = 28, color = 'rgba(255,255,255,0.85)' }: { size?: number, color?: string } = {}) {

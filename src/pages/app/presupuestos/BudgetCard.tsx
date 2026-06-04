@@ -63,8 +63,12 @@ export default function BudgetCard({
           <div className={styles.categoryChips}>
             {presupuesto.categorias.slice(0, 2).map((c, i) => (
               <span key={i} className={styles.chip}>
-                <SubcategoriaIcon nombre={c.subcategoria_nombre} parentCategory={c.nombre} size={14} />
-                {c.subcategoria_nombre || c.nombre}
+                <SubcategoriaIcon 
+                  nombre={c.es_subcategoria ? c.nombre : null} 
+                  parentCategory={c.es_subcategoria ? null : c.nombre} 
+                  size={14} 
+                />
+                {c.nombre}
               </span>
             ))}
             {presupuesto.categorias.length > 2 && (

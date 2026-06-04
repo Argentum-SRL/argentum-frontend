@@ -329,7 +329,7 @@ export default function TransaccionesPage() {
           )}
 
           {/* ── Lista ────────────────────────────────────────────────────────── */}
-          <div>
+          <div className={styles.listContainer}>
             {loading ? (
               <div className={styles.loadingState}>Cargando transacciones...</div>
             ) : grupos.length === 0 ? (
@@ -362,7 +362,9 @@ export default function TransaccionesPage() {
           </div>
         </>
       ) : (
-        <RecurrentesPage ref={recurrentesRef} embedded />
+        <div className={styles.recurrentesWrapper}>
+          <RecurrentesPage ref={recurrentesRef} embedded />
+        </div>
       )}
     </div>
   )

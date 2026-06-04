@@ -8,6 +8,8 @@
 @media (min-width: 768px) {
   .page {
     gap: 24px;
+    height: 100%;
+    overflow: hidden;
   }
 }
 
@@ -264,4 +266,36 @@
 
 .btnGhostBg {
   background: #F5F4F0;
+}
+
+/* ── Scrollable containers for Desktop ── */
+@media (min-width: 768px) {
+  .listContainer,
+  .recurrentesWrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px; /* Spacing so cards don't touch the scrollbar */
+  }
+}
+
+/* Premium scrollbars */
+.listContainer::-webkit-scrollbar,
+.recurrentesWrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.listContainer::-webkit-scrollbar-track,
+.recurrentesWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.listContainer::-webkit-scrollbar-thumb,
+.recurrentesWrapper::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.listContainer::-webkit-scrollbar-thumb:hover,
+.recurrentesWrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
 }

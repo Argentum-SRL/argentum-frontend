@@ -7,7 +7,15 @@
 
 @media (min-width: 768px) {
   .root {
-    gap: 32px;
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .root {
+    height: 100%;
+    overflow: hidden;
+    padding-bottom: 0;
   }
 }
 
@@ -238,6 +246,12 @@
   overflow: hidden;
   box-shadow: 0 12px 24px -8px rgba(var(--primary-rgb), 0.4);
 }
+@media (min-width: 1024px) {
+  .balanceCard {
+    height: 100%;
+    min-height: 0;
+  }
+}
 
 .mobileGreetingWrap {
   display: none;
@@ -305,6 +319,9 @@
 @media (min-width: 1024px) {
   .topRow {
     grid-template-columns: repeat(3, 1fr);
+    flex: 1;
+    min-height: 0;
+    height: 100%;
   }
 }
 
@@ -316,6 +333,9 @@
 @media (min-width: 1024px) {
   .bottomRow {
     grid-template-columns: 1fr 1fr;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
   }
 }
 
@@ -494,6 +514,12 @@
   display: flex;
   flex-direction: column;
 }
+@media (min-width: 1024px) {
+  .card {
+    height: 100%;
+    min-height: 0;
+  }
+}
 
 .cardHeader {
   padding: 20px 24px;
@@ -534,6 +560,11 @@
   display: flex;
   flex-direction: column;
 }
+@media (min-width: 1024px) {
+  .cardContent {
+    min-height: 0;
+  }
+}
 
 .chartCardContent {
   padding: 12px;
@@ -543,6 +574,11 @@
   justify-content: space-between;
   min-height: 220px;
 }
+@media (min-width: 1024px) {
+  .chartCardContent {
+    min-height: 0;
+  }
+}
 
 /* ── Chart ────────────────────────────────────────────────────────── */
 
@@ -551,6 +587,14 @@
   flex-direction: column;
   gap: 20px;
   padding: 8px 0;
+}
+@media (min-width: 1024px) {
+  .barChartWrap {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+  }
 }
 
 .toggleGroup {
@@ -673,6 +717,14 @@
 .list {
   display: flex;
   flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .list {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+  }
 }
 
 .listItem {
@@ -870,4 +922,23 @@
 
 .marginLeft4 {
   margin-left: 4px;
+}
+
+/* Premium scrollbars */
+.list::-webkit-scrollbar,
+.barChartWrap::-webkit-scrollbar {
+  width: 6px;
+}
+.list::-webkit-scrollbar-track,
+.barChartWrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.list::-webkit-scrollbar-thumb,
+.barChartWrap::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.list::-webkit-scrollbar-thumb:hover,
+.barChartWrap::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
 }

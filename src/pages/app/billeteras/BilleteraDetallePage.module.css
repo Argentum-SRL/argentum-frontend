@@ -486,8 +486,13 @@
 
 .movimientosList::-webkit-scrollbar-thumb,
 .tarjetasSection::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: transparent;
   border-radius: 3px;
+}
+
+.movimientosList:hover::-webkit-scrollbar-thumb,
+.tarjetasSection:hover::-webkit-scrollbar-thumb {
+  background: var(--border);
 }
 
 .movimientosList::-webkit-scrollbar-thumb:hover,

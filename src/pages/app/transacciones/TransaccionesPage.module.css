@@ -291,8 +291,13 @@
 
 .listContainer::-webkit-scrollbar-thumb,
 .recurrentesWrapper::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: transparent;
   border-radius: 3px;
+}
+
+.listContainer:hover::-webkit-scrollbar-thumb,
+.recurrentesWrapper:hover::-webkit-scrollbar-thumb {
+  background: var(--border);
 }
 
 .listContainer::-webkit-scrollbar-thumb:hover,

@@ -935,8 +935,12 @@
 }
 .list::-webkit-scrollbar-thumb,
 .barChartWrap::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: transparent;
   border-radius: 3px;
+}
+.list:hover::-webkit-scrollbar-thumb,
+.barChartWrap:hover::-webkit-scrollbar-thumb {
+  background: var(--border);
 }
 .list::-webkit-scrollbar-thumb:hover,
 .barChartWrap::-webkit-scrollbar-thumb:hover {

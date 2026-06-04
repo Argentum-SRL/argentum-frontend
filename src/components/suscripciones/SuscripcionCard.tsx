@@ -2,7 +2,7 @@ import React from 'react'
 import { Edit2, Play, Pause, Trash2, CreditCard, Wallet, Bell, Calendar, TrendingUp } from 'lucide-react'
 import type { Suscripcion, Billetera, TarjetaCredito } from '@/types'
 import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatFecha } from '@/utils/format'
 import styles from './SuscripcionCard.module.css'
 
 interface SuscripcionCardProps {
@@ -26,8 +26,23 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
 }) => {
   const catalogoItem = CATALOGO_SUSCRIPCIONES.find(c => c.nombre === suscripcion.nombre)
   
+  const parseLocalDate = (dateStr: string): Date => {
+    if (!dateStr) return new Date()
+    const cleanDateStr = dateStr.split('T')[0]
+    const parts = cleanDateStr.split('-')
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10)
+      const month = parseInt(parts[1], 10) - 1
+      const day = parseInt(parts[2], 10)
+      return new Date(year, month, day)
+    }
+    return new Date(dateStr)
+  }
+  
   const hoy = new Date()
-  const fechaCobro = new Date(suscripcion.proximo_cobro)
+  hoy.setHours(0, 0, 0, 0)
+  const fechaCobro = parseLocalDate(suscripcion.proximo_cobro)
+  fechaCobro.setHours(0, 0, 0, 0)
   const diffTime = fechaCobro.getTime() - hoy.getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
@@ -92,7 +107,7 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
           </div>
           <div className={styles.proximoCobro} style={{ opacity: isBrand ? 0.8 : 1 }}>
             <Calendar size={12} />
-            <span>{new Date(suscripcion.proximo_cobro).toLocaleDateString()}</span>
+            <span>{formatFecha(suscripcion.proximo_cobro)}</span>
             {urgenciaClass && <span className={`${styles.chipUrgencia} ${urgenciaClass}`}>{urgenciaText}</span>}
           </div>
         </div>

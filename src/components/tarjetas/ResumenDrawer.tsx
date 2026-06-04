@@ -39,19 +39,47 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
     }
   }, [open, fetchResumen])
 
+  const parseLocalDate = (dateStr: string): Date => {
+    if (!dateStr) return new Date()
+    const cleanDateStr = dateStr.split('T')[0]
+    const parts = cleanDateStr.split('-')
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10)
+      const month = parseInt(parts[1], 10) - 1
+      const day = parseInt(parts[2], 10)
+      return new Date(year, month, day)
+    }
+    return new Date(dateStr)
+  }
+
+  const getProximoMesDateStr = (dateStr: string): string => {
+    if (!dateStr) return ''
+    const d = parseLocalDate(dateStr)
+    d.setMonth(d.getMonth() + 1)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
+    if (!dateStr) return '-'
+    const date = parseLocalDate(dateStr)
     return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
   }
 
   const formatDayMonth = (dateStr: string) => {
-    const date = new Date(dateStr)
+    if (!dateStr) return '-'
+    const date = parseLocalDate(dateStr)
     return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })
   }
 
   const isVencePronto = (dateStr: string) => {
-    const venc = new Date(dateStr)
+    if (!dateStr) return false
+    const venc = parseLocalDate(dateStr)
     const hoy = new Date()
+    venc.setHours(0, 0, 0, 0)
+    hoy.setHours(0, 0, 0, 0)
     const diff = venc.getTime() - hoy.getTime()
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
     return days >= 0 && days <= 5
@@ -165,14 +193,8 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
 
             {renderSection(
               "Próximo Resumen",
-              // Para el próximo cierre, simplemente sumamos un mes a la fecha de cierre actual
-              new Date(new Date(resumen.fecha_cierre_proximo).setMonth(new Date(resumen.fecha_cierre_proximo).getMonth() + 1)).toISOString(),
-              // El vencimiento siguiente ya viene en el cálculo (venc_proximo + 1 mes) aunque no explícitamente como fecha en el schema, 
-              // pero podemos estimarlo o pedirlo. El brief dice "Vence el DD/MM/YYYY" para el siguiente.
-              // En el backend venc_siguiente se calculó. Vamos a usar un hack simple o ajustar el schema si fuera necesario.
-              // Pero el brief no pide fecha_vencimiento_siguiente en el schema.
-              // Usaremos la fecha de vencimiento proximo + 1 mes.
-              new Date(new Date(resumen.fecha_vencimiento_proximo).setMonth(new Date(resumen.fecha_vencimiento_proximo).getMonth() + 1)).toISOString(),
+              getProximoMesDateStr(resumen.fecha_cierre_proximo),
+              getProximoMesDateStr(resumen.fecha_vencimiento_proximo),
               resumen.cuotas_resumen_siguiente,
               resumen.total_comprometido_resumen_siguiente,
               "Sin gastos comprometidos"

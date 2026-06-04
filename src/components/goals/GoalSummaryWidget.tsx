@@ -5,6 +5,19 @@ import goalsService from '@/services/goals.service'
 import type { GoalSummary } from '@/types/goals'
 import styles from './GoalSummaryWidget.module.css'
 
+const parseLocalDate = (dateStr: string): Date => {
+  if (!dateStr) return new Date()
+  const cleanDateStr = dateStr.split('T')[0]
+  const parts = cleanDateStr.split('-')
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1
+    const day = parseInt(parts[2], 10)
+    return new Date(year, month, day)
+  }
+  return new Date(dateStr)
+}
+
 export default function GoalSummaryWidget() {
   const [summary, setSummary] = useState<GoalSummary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -56,7 +69,7 @@ export default function GoalSummaryWidget() {
             <div className={styles.divider} />
             <div className={styles.metric}>
               <span className={`${styles.value} ${styles.valueSmall}`}>
-                {new Date(summary.proximo_vencimiento).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                {parseLocalDate(summary.proximo_vencimiento).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
               </span>
               <span className={styles.label}>Próximo hito</span>
             </div>

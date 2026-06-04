@@ -25,6 +25,19 @@ interface TicketData {
   isFuture?: boolean
 }
 
+const parseLocalDate = (dateStr: string): Date => {
+  if (!dateStr) return new Date()
+  const cleanDateStr = dateStr.split('T')[0]
+  const parts = cleanDateStr.split('-')
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1
+    const day = parseInt(parts[2], 10)
+    return new Date(year, month, day)
+  }
+  return new Date(dateStr)
+}
+
 const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({ 
   tarjeta, 
   billeteras, 
@@ -70,15 +83,22 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       total: resumen.total_comprometido_resumen_actual
     })
 
-    const proxCierre = new Date(resumen.fecha_cierre_proximo)
+    const proxCierre = parseLocalDate(resumen.fecha_cierre_proximo)
     proxCierre.setMonth(proxCierre.getMonth() + 1)
-    const proxVenc = new Date(resumen.fecha_vencimiento_proximo)
+    const proxVenc = parseLocalDate(resumen.fecha_vencimiento_proximo)
     proxVenc.setMonth(proxVenc.getMonth() + 1)
+
+    const toLocalYMD = (d: Date) => {
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
 
     list.push({
       title: 'Próximo Resumen',
-      cierre: proxCierre.toISOString(),
-      vencimiento: proxVenc.toISOString(),
+      cierre: toLocalYMD(proxCierre),
+      vencimiento: toLocalYMD(proxVenc),
       cuotas: resumen.cuotas_resumen_siguiente,
       total: resumen.total_comprometido_resumen_siguiente
     })
@@ -142,14 +162,16 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '-'
-    const date = new Date(dateStr)
+    const date = parseLocalDate(dateStr)
     return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
   }
 
   const isVencePronto = (dateStr: string) => {
     if (!dateStr) return false
-    const venc = new Date(dateStr)
+    const venc = parseLocalDate(dateStr)
     const hoy = new Date()
+    venc.setHours(0, 0, 0, 0)
+    hoy.setHours(0, 0, 0, 0)
     const diff = venc.getTime() - hoy.getTime()
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
     return days >= 0 && days <= 5

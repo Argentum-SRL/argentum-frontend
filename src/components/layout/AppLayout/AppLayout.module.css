@@ -402,10 +402,14 @@
 @media (min-width: 768px) {
   .content {
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+  }
+
+  .content > * {
+    min-width: 1200px;
   }
 }
 

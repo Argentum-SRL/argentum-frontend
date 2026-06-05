@@ -1,0 +1,173 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  .page {
+    gap: 24px;
+  }
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.titleGroup h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 0;
+}
+
+/* ── Hero Banner (Igual al de Transacciones/Presupuestos) ─────────────────── */
+.heroBanner {
+  background: #0D2045;
+  border-radius: 20px;
+  padding: 22px 28px;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 10px 25px -5px rgba(13, 32, 69, 0.3);
+}
+
+:global([data-theme="dark"]) .heroBanner {
+  background: #161B24;
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.heroBanner::before {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0.05;
+  top: -80px;
+  right: -50px;
+  pointer-events: none;
+}
+
+.heroLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.heroTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.heroDesc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 4px 0 0;
+  max-width: 600px;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+.tabsContainer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.tabs {
+  display: flex;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+}
+
+.tabActive {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.tabDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Grid Layout ──────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(12, 1fr);
+    align-items: start;
+  }
+  
+  .formCol {
+    grid-column: span 5;
+  }
+  
+  .resultCol {
+    grid-column: span 7;
+  }
+}
+
+/* ── Skeletons ───────────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--page) 50%, var(--surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 12px;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeletonCard {
+  height: 380px;
+  border-radius: 20px;
+}

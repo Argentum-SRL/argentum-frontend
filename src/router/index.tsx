@@ -17,6 +17,7 @@ import MetasPage from '@/pages/app/metas/MetasPage'
 import MetaDetallePage from '@/pages/app/metas/MetaDetallePage'
 import SuscripcionesPage from '@/pages/app/suscripciones/SuscripcionesPage'
 import PerfilPage from '@/pages/app/perfil/PerfilPage'
+import ToolsPage from '@/pages/app/tools/ToolsPage'
 import AppWrapper from '@/components/layout/AppWrapper/AppWrapper'
 
 const router = createBrowserRouter([
@@ -56,6 +57,8 @@ const router = createBrowserRouter([
               { path: '/app/metas/:id', element: <MetaDetallePage /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage /> },
               { path: '/app/perfil', element: <PerfilPage /> },
+              { path: '/app/tools', element: <ToolsPage /> },
+              { path: '/tools', element: <Navigate to="/app/tools" replace /> },
             ],
           },
         ],

@@ -1,10 +1,10 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { MessageCircle, PieChart, Play, RefreshCw } from 'lucide-react'
 import styles from './WppChatMockup.module.css'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Msg =
-  | { side: 'user' | 'bot'; kind: 'text'; text: string }
+  | { side: 'user' | 'bot'; kind: 'text'; text: ReactNode }
   | { side: 'user'; kind: 'audio' }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -12,9 +12,27 @@ const BAR_HEIGHTS = [4, 8, 14, 10, 16, 6, 12, 16, 8, 10, 6, 4]
 
 const ALL_MSGS: Msg[] = [
   { side: 'user', kind: 'audio' },
-  { side: 'bot', kind: 'text', text: 'Anotado. $ 12.480 en Supermercado. Llevás $ 84.200 gastado este mes.' },
+  { 
+    side: 'bot', 
+    kind: 'text', 
+    text: (
+      <>
+        ¡Listo! 📝 Anoté <strong>$12.480</strong> en <strong>Supermercado</strong>. 🛒 Llevás <strong>$84.200</strong> gastados este mes. ¡Buen control! 💪
+      </>
+    )
+  },
   { side: 'user', kind: 'text', text: 'balance?' },
-  { side: 'bot', kind: 'text', text: '$ 1.247.350,80 en pesos. USD $ 2.100 en dólares.' },
+  { 
+    side: 'bot', 
+    kind: 'text', 
+    text: (
+      <>
+        Tu balance actual: ⚖️<br/>
+        💵 <strong>$1.247.350,80</strong> en pesos.<br/>
+        💵 <strong>USD $2.100</strong> en dólares.
+      </>
+    )
+  },
 ]
 
 // ─── Decorative moons ─────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 import styles from './GoogleLoginButton.module.css'
 
@@ -8,9 +8,33 @@ interface GoogleLoginButtonProps {
 }
 
 const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }: GoogleLoginButtonProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [buttonWidth, setButtonWidth] = useState<string>('340px')
+
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    // Initial measurement
+    const initialWidth = containerRef.current.getBoundingClientRect().width
+    if (initialWidth > 0) {
+      const clampedWidth = Math.min(400, Math.max(200, Math.round(initialWidth)))
+      setButtonWidth(`${clampedWidth}px`)
+    }
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // Clamp width between 200px and 400px (Google API constraints)
+        const w = Math.min(400, Math.max(200, Math.round(entry.contentRect.width)))
+        setButtonWidth(`${w}px`)
+      }
+    })
+
+    resizeObserver.observe(containerRef.current)
+    return () => resizeObserver.disconnect()
+  }, [])
 
   return (
-    <div className={styles.container}>
+    <div ref={containerRef} className={styles.container}>
       <GoogleLogin
         onSuccess={(credentialResponse) => {
           if (credentialResponse.credential) {
@@ -25,8 +49,8 @@ const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }
         }}
         theme="outline"
         size="large"
-        shape="rectangular"
-        width="340px"
+        shape="pill"
+        width={buttonWidth}
       />
     </div>
   )

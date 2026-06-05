@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { createPortal } from 'react-dom'
 import { 
   ArrowUpDown, 
   Calendar, 
@@ -103,7 +104,7 @@ const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
         </button>
       </div>
 
-      {isMenuOpen && (
+      {isMenuOpen && createPortal(
         <>
           <div className={styles.profileOverlay} onClick={() => setIsMenuOpen(false)} />
           <div className={styles.profileSheet}>
@@ -141,7 +142,8 @@ const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
               <span>Cerrar Sesión</span>
             </button>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </>
   )

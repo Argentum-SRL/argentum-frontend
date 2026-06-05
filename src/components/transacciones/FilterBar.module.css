@@ -299,18 +299,248 @@
 .mobileDrawerContainer {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 0 4px 20px;
+  gap: 20px;
+  padding: 0 4px 10px;
 }
 
-.clearBtnMobile {
-  width: 100% !important;
-  text-align: center !important;
-  background: #FEE2E2 !important;
-  color: #DC2626 !important;
-  border-radius: 12px !important;
-  padding: 12px !important;
-  border: none !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
+.activePillsRowMobile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: -8px;
+}
+
+/* Tipo Segmented Control */
+.pillGroupMobile {
+  display: flex;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  padding: 4px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.typePillMobile {
+  flex: 1;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.typePillActiveTodosMobile {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.typePillActiveEgresoMobile {
+  background: var(--error-bg);
+  color: var(--error);
+  font-weight: 700;
+}
+
+.typePillActiveIngresoMobile {
+  background: var(--success-bg);
+  color: var(--success);
+  font-weight: 700;
+}
+
+/* Category Checklist */
+.categoriaListMobile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 6px;
+  padding-right: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] .categoriaListMobile {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.categoriaRowMobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.categoriaRowMobile:active {
+  background: var(--surface-alt);
+}
+
+.categoriaRowActiveMobile {
+  background: var(--surface-alt);
+  font-weight: 600;
+}
+
+.categoriaRowLeftMobile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.allCatsIconMobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+}
+
+.checkboxMobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--text-3);
+  background: transparent;
+  color: transparent;
+  transition: all 0.2s ease;
+}
+
+.checkboxCheckedMobile {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+/* Quick Presets Grid */
+.presetsGridMobile {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.presetBtnMobile {
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.presetBtnMobile:active {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Date Inputs Row */
+.dateInputsRowMobile {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.dateFieldMobile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dateLabelMobile {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dateInputMobile {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  font-weight: 500;
+}
+
+.dateInputMobile:focus {
+  border-color: var(--primary);
+}
+
+/* Actions Row at Bottom */
+.drawerActionsRowMobile {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.clearBtnMobileNew {
+  flex: 1;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.clearBtnMobileNew:active {
+  background: var(--border);
+}
+
+.applyBtnMobileNew {
+  flex: 2;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 14px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb, 13, 32, 69), 0.2);
+}
+
+.applyBtnMobileNew:active {
+  opacity: 0.9;
+}
+
+.clearBtnDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }

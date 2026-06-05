@@ -210,22 +210,29 @@ export default function TransaccionesPage() {
     }))
   }, [])
 
+  const filteredTransacciones = useMemo(() => {
+    if (!filters.categoria_ids || filters.categoria_ids.length === 0) {
+      return transacciones
+    }
+    return transacciones.filter(t => t.categoria_id && filters.categoria_ids?.includes(t.categoria_id))
+  }, [transacciones, filters.categoria_ids])
+
   const grupos = useMemo(() => {
     const gruposObj: Record<string, Transaccion[]> = {}
-    transacciones.forEach(tx => {
+    filteredTransacciones.forEach(tx => {
       const fecha = tx.fecha.split('T')[0]
       if (!gruposObj[fecha]) gruposObj[fecha] = []
       gruposObj[fecha].push(tx)
     })
     return Object.entries(gruposObj).sort((a, b) => b[0].localeCompare(a[0]))
-  }, [transacciones])
+  }, [filteredTransacciones])
 
   const { totalIngresos, totalEgresos, balance } = useMemo(() => {
     let ingresos = 0
     let egresos = 0
     
     // Solo sumamos lo que corresponde a la moneda principal para que el resumen sea coherente
-    const txsMoneda = transacciones.filter(t => t.moneda === mainCurrency)
+    const txsMoneda = filteredTransacciones.filter(t => t.moneda === mainCurrency)
 
     txsMoneda.forEach(t => {
       const monto = Number(t.monto) || 0
@@ -238,7 +245,7 @@ export default function TransaccionesPage() {
       totalEgresos: egresos,
       balance: ingresos - egresos
     }
-  }, [transacciones, mainCurrency])
+  }, [filteredTransacciones, mainCurrency])
 
   return (
     <div className={styles.page}>

@@ -1,7 +1,11 @@
+import { useState, useMemo } from 'react'
+import { Check, X } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
+import { useAuth } from '@/hooks/useAuth'
+import { calcularPeriodoActual } from '@/lib/utils/ciclo'
 import styles from './FilterBar.module.css'
 
 interface FilterBarMobileDrawerProps {
@@ -25,103 +29,264 @@ export default function FilterBarMobileDrawer({
   categorias,
   hasActiveFilters,
 }: FilterBarMobileDrawerProps) {
-  const activeBilletera = billeteras.find((b) => b.id === filters.billetera_id)
+  const { usuario } = useAuth()
+  const periodoActual = useMemo(() => calcularPeriodoActual(usuario), [usuario])
+
+  const [localFilters, setLocalFilters] = useState<TransaccionFilters>({ ...filters })
+
+  const activeBilletera = billeteras.find((b) => b.id === localFilters.billetera_id)
 
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {
-    onFilterChange({ ...filters, tipo })
+    setLocalFilters((prev) => ({ ...prev, tipo }))
   }
 
   const handleBilleteraRemove = () => {
-    onFilterChange({ ...filters, billetera_id: undefined })
+    setLocalFilters((prev) => ({ ...prev, billetera_id: undefined }))
   }
 
-  const handleCategoriaSelect = (catId?: string) => {
-    onFilterChange({ ...filters, categoria_id: catId })
+  const handleToggleCategory = (catId: string) => {
+    setLocalFilters((prev) => {
+      const current = prev.categoria_ids || []
+      const next = current.includes(catId)
+        ? current.filter((id) => id !== catId)
+        : [...current, catId]
+      return {
+        ...prev,
+        categoria_ids: next.length > 0 ? next : undefined,
+      }
+    })
   }
 
-  const handleDateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    const desde = (form.elements.namedItem('desde') as HTMLInputElement).value
-    const hasta = (form.elements.namedItem('hasta') as HTMLInputElement).value
-    onFilterChange({ ...filters, fecha_desde: desde || undefined, fecha_hasta: hasta || undefined })
+  const handleClearCategories = () => {
+    setLocalFilters((prev) => ({
+      ...prev,
+      categoria_ids: undefined,
+    }))
   }
+
+  const handleApplyPreset = (preset: 'ciclo' | 'este_mes' | 'mes_pasado' | 'ultimos_30d') => {
+    const today = new Date()
+    let desde: string
+    let hasta: string
+
+    if (preset === 'ciclo') {
+      desde = periodoActual.inicio.toISOString().split('T')[0]
+      hasta = periodoActual.fin.toISOString().split('T')[0]
+    } else if (preset === 'este_mes') {
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+      desde = firstDay.toISOString().split('T')[0]
+      hasta = lastDay.toISOString().split('T')[0]
+    } else if (preset === 'mes_pasado') {
+      const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+      const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
+      desde = firstDay.toISOString().split('T')[0]
+      hasta = lastDay.toISOString().split('T')[0]
+    } else { // ultimos_30d
+      const past = new Date()
+      past.setDate(today.getDate() - 30)
+      desde = past.toISOString().split('T')[0]
+      hasta = today.toISOString().split('T')[0]
+    }
+
+    setLocalFilters((prev) => ({
+      ...prev,
+      fecha_desde: desde,
+      fecha_hasta: hasta,
+    }))
+  }
+
+  const handleApply = () => {
+    const catIds = localFilters.categoria_ids || []
+    const singleCatId = catIds.length === 1 ? catIds[0] : undefined
+
+    onFilterChange({
+      ...localFilters,
+      categoria_id: singleCatId,
+      categoria_ids: catIds.length > 0 ? catIds : undefined,
+    })
+    onClose()
+  }
+
+  const handleClearAll = () => {
+    onClear()
+    onClose()
+  }
+
+  const isAllCategoriesSelected = !localFilters.categoria_ids || localFilters.categoria_ids.length === 0
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Filtros">
       <div className={styles.mobileDrawerContainer}>
+        {/* Active Pill Filters (Billetera, Pendientes IA) */}
+        {(activeBilletera || localFilters.estado_verificacion === 'pendiente') && (
+          <div className={styles.activePillsRowMobile}>
+            {activeBilletera && (
+              <div className={`${styles.pill} ${styles.pillActive}`}>
+                {activeBilletera.nombre}
+                <button className={styles.pillRemove} onClick={handleBilleteraRemove} aria-label="Remover filtro">
+                  <X size={14} />
+                </button>
+              </div>
+            )}
 
-        {activeBilletera && (
-          <div className={`${styles.pill} ${styles.pillActive}`}>
-            {activeBilletera.nombre}
-            <button className={styles.pillRemove} onClick={handleBilleteraRemove} aria-label="Remover filtro">
-              ×
-            </button>
+            {localFilters.estado_verificacion === 'pendiente' && (
+              <div className={`${styles.pill} ${styles.pillActive}`}>
+                Pendientes IA
+                <button className={styles.pillRemove} onClick={() => setLocalFilters((prev) => ({ ...prev, estado_verificacion: undefined }))} aria-label="Remover filtro">
+                  <X size={14} />
+                </button>
+              </div>
+            )}
           </div>
         )}
 
-        {filters.estado_verificacion === 'pendiente' && (
-          <div className={`${styles.pill} ${styles.pillActive}`}>
-            Pendientes IA
-            <button className={styles.pillRemove} onClick={() => onFilterChange({ ...filters, estado_verificacion: undefined })} aria-label="Remover filtro">
-              ×
-            </button>
-          </div>
-        )}
-
+        {/* Tipo Selector */}
         <div>
           <div className={styles.popoverTitle}>Tipo</div>
-          <div className={styles.pillGroup}>
-            <button className={`${styles.typePill} ${!filters.tipo ? styles.typePillActive : ''}`} onClick={() => handleTipoChange(undefined)}>Todos</button>
-            <button className={`${styles.typePill} ${filters.tipo === 'egreso' ? styles.typePillActive : ''}`} onClick={() => handleTipoChange('egreso')}>Egresos</button>
-            <button className={`${styles.typePill} ${filters.tipo === 'ingreso' ? styles.typePillActive : ''}`} onClick={() => handleTipoChange('ingreso')}>Ingresos</button>
-          </div>
-        </div>
-
-        <div>
-          <div className={styles.popoverTitle}>Categoría</div>
-          <div className={styles.popoverList}>
+          <div className={styles.pillGroupMobile}>
             <button
               type="button"
-              className={`${styles.popoverItem} ${!filters.categoria_id ? styles.popoverItemActive : ''}`}
-              onClick={() => handleCategoriaSelect(undefined)}
+              className={`${styles.typePillMobile} ${!localFilters.tipo ? styles.typePillActiveTodosMobile : ''}`}
+              onClick={() => handleTipoChange(undefined)}
             >
-              Todas las categorías
+              Todos
             </button>
-            {categorias.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`${styles.popoverItem} ${filters.categoria_id === cat.id ? styles.popoverItemActive : ''}`}
-                onClick={() => handleCategoriaSelect(cat.id)}
-              >
-                <CategoriaIcon nombre={cat.nombre} size={16} />
-                {cat.nombre}
-              </button>
-            ))}
+            <button
+              type="button"
+              className={`${styles.typePillMobile} ${localFilters.tipo === 'egreso' ? styles.typePillActiveEgresoMobile : ''}`}
+              onClick={() => handleTipoChange('egreso')}
+            >
+              Egresos
+            </button>
+            <button
+              type="button"
+              className={`${styles.typePillMobile} ${localFilters.tipo === 'ingreso' ? styles.typePillActiveIngresoMobile : ''}`}
+              onClick={() => handleTipoChange('ingreso')}
+            >
+              Ingresos
+            </button>
           </div>
         </div>
 
+        {/* Categoría Selector (Multi-selection checklist) */}
         <div>
-          <div className={styles.popoverTitle}>Período</div>
-          <form onSubmit={handleDateSubmit} className={styles.dateGroup}>
-            <div>
-              <label className={styles.dateLabel} htmlFor="mobile-filter-desde">Desde</label>
-              <input id="mobile-filter-desde" type="date" name="desde" defaultValue={filters.fecha_desde} className={styles.dateInputFull} />
-            </div>
-            <div>
-              <label className={styles.dateLabel} htmlFor="mobile-filter-hasta">Hasta</label>
-              <input id="mobile-filter-hasta" type="date" name="hasta" defaultValue={filters.fecha_hasta} className={styles.dateInputFull} />
-            </div>
-            <button type="submit" className={`${styles.typePillActive} ${styles.dateSubmitBtn}`}>Aplicar</button>
-          </form>
+          <div className={styles.popoverTitle}>Categorías</div>
+          <div className={styles.categoriaListMobile}>
+            <button
+              type="button"
+              className={`${styles.categoriaRowMobile} ${isAllCategoriesSelected ? styles.categoriaRowActiveMobile : ''}`}
+              onClick={handleClearCategories}
+            >
+              <div className={styles.categoriaRowLeftMobile}>
+                <div className={styles.allCatsIconMobile}>🌟</div>
+                <span>Todas las categorías</span>
+              </div>
+              <div className={`${styles.checkboxMobile} ${isAllCategoriesSelected ? styles.checkboxCheckedMobile : ''}`}>
+                {isAllCategoriesSelected && <Check size={14} strokeWidth={3} />}
+              </div>
+            </button>
+
+            {categorias.map((cat) => {
+              const isSelected = localFilters.categoria_ids?.includes(cat.id) || false
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className={`${styles.categoriaRowMobile} ${isSelected ? styles.categoriaRowActiveMobile : ''}`}
+                  onClick={() => handleToggleCategory(cat.id)}
+                >
+                  <div className={styles.categoriaRowLeftMobile}>
+                    <CategoriaIcon nombre={cat.nombre} size={16} />
+                    <span>{cat.nombre}</span>
+                  </div>
+                  <div className={`${styles.checkboxMobile} ${isSelected ? styles.checkboxCheckedMobile : ''}`}>
+                    {isSelected && <Check size={14} strokeWidth={3} />}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
-        {hasActiveFilters && (
-          <button className={styles.clearBtnMobile} onClick={onClear}>
-            Limpiar todos los filtros
+        {/* Período (Presets + Dates) */}
+        <div>
+          <div className={styles.popoverTitle}>Período</div>
+          
+          {/* Quick Presets */}
+          <div className={styles.presetsGridMobile}>
+            <button
+              type="button"
+              className={styles.presetBtnMobile}
+              onClick={() => handleApplyPreset('ciclo')}
+            >
+              Este ciclo
+            </button>
+            <button
+              type="button"
+              className={styles.presetBtnMobile}
+              onClick={() => handleApplyPreset('este_mes')}
+            >
+              Este mes
+            </button>
+            <button
+              type="button"
+              className={styles.presetBtnMobile}
+              onClick={() => handleApplyPreset('mes_pasado')}
+            >
+              Mes pasado
+            </button>
+            <button
+              type="button"
+              className={styles.presetBtnMobile}
+              onClick={() => handleApplyPreset('ultimos_30d')}
+            >
+              Últimos 30d
+            </button>
+          </div>
+
+          <div className={styles.dateInputsRowMobile}>
+            <div className={styles.dateFieldMobile}>
+              <label className={styles.dateLabelMobile} htmlFor="mobile-filter-desde">Desde</label>
+              <input
+                id="mobile-filter-desde"
+                type="date"
+                value={localFilters.fecha_desde || ''}
+                onChange={(e) => setLocalFilters((prev) => ({ ...prev, fecha_desde: e.target.value || undefined }))}
+                className={styles.dateInputMobile}
+              />
+            </div>
+            <div className={styles.dateFieldMobile}>
+              <label className={styles.dateLabelMobile} htmlFor="mobile-filter-hasta">Hasta</label>
+              <input
+                id="mobile-filter-hasta"
+                type="date"
+                value={localFilters.fecha_hasta || ''}
+                onChange={(e) => setLocalFilters((prev) => ({ ...prev, fecha_hasta: e.target.value || undefined }))}
+                className={styles.dateInputMobile}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Action Row */}
+        <div className={styles.drawerActionsRowMobile}>
+          <button
+            type="button"
+            className={`${styles.clearBtnMobileNew} ${!hasActiveFilters ? styles.clearBtnDisabled : ''}`}
+            onClick={handleClearAll}
+            disabled={!hasActiveFilters}
+          >
+            Limpiar
           </button>
-        )}
+          <button
+            type="button"
+            className={styles.applyBtnMobileNew}
+            onClick={handleApply}
+          >
+            Aplicar Filtros
+          </button>
+        </div>
       </div>
     </Modal>
   )

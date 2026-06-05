@@ -10,6 +10,7 @@ export interface TransaccionFilters {
   fecha_desde?: string
   fecha_hasta?: string
   categoria_id?: string
+  categoria_ids?: string[]
   subcategoria_id?: string
   moneda?: string
   estado_verificacion?: string
@@ -23,6 +24,7 @@ const transaccionService = {
   getTransacciones: async (filters: TransaccionFilters = {}) => {
     const params = new URLSearchParams()
     Object.entries(filters).forEach(([key, value]) => {
+      if (key === 'categoria_ids') return // Client-side filtering only
       if (value !== undefined && value !== null && value !== '') {
         params.append(key, value.toString())
       }

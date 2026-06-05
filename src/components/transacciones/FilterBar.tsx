@@ -74,7 +74,11 @@ export default function FilterBar({
   }
 
   const handleCategoriaSelect = (catId?: string) => {
-    onFilterChange({ ...filters, categoria_id: catId })
+    onFilterChange({
+      ...filters,
+      categoria_id: catId,
+      categoria_ids: catId ? [catId] : undefined
+    })
     setCatPopoverOpen(false)
   }
 
@@ -212,7 +216,11 @@ export default function FilterBar({
 
           <div className={`${styles.pill} ${styles.pillRelative}`} ref={catRef}>
             <div className={styles.pillIconFlex} onClick={() => setCatPopoverOpen(!catPopoverOpen)}>
-              {activeCategoria ? activeCategoria.nombre : 'Categoría'}
+              {filters.categoria_ids && filters.categoria_ids.length > 1
+                ? `${filters.categoria_ids.length} cat.`
+                : activeCategoria
+                ? activeCategoria.nombre
+                : 'Categoría'}
               <ChevronDown size={14} />
             </div>
             {catPopoverOpen && (

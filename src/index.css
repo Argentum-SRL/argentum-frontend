@@ -19,6 +19,7 @@ html {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   height: 100%;
+  background-color: var(--html-bg);
 }
 
 body {
@@ -41,6 +42,7 @@ p, h1, h2, h3, h4, h5, h6 {
 
 
 :root {
+  --html-bg: #0D2045;
   --primary: #0D2045;
   --silver: #8A95A8;
   --secondary: #1A3D28;
@@ -65,6 +67,7 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 
 [data-theme="dark"] {
+  --html-bg: #0E1117;
   --primary: #4878B8;
   --silver: #A8B4C5;
   --secondary: #2A8A48;

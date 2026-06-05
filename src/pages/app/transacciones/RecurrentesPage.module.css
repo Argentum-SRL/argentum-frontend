@@ -231,12 +231,49 @@
 }
 
 .emptyState {
-  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.02);
-  border: 2px dashed var(--border);
-  border-radius: 16px;
-  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  margin: 10px 0;
+  animation: fadeIn 0.3s ease-out;
+}
+
+[data-theme="dark"] .emptyState {
+  background: linear-gradient(180deg, var(--surface) 0%, rgba(22, 27, 36, 0.4) 100%);
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.emptyStateIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(72, 120, 184, 0.12) 0%, rgba(72, 120, 184, 0.04) 100%);
+  color: var(--primary);
+  margin-bottom: 18px;
+  box-shadow: inset 0 0 12px rgba(72, 120, 184, 0.08);
+}
+
+[data-theme="dark"] .emptyStateIconWrapper {
+  background: linear-gradient(135deg, rgba(72, 120, 184, 0.2) 0%, rgba(72, 120, 184, 0.05) 100%);
+  color: #60a5fa;
+}
+
+.emptyStateTitle {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
 }
 
 @keyframes fadeIn {
@@ -256,13 +293,50 @@
   color: var(--text-secondary);
 }
 
-.emptyStateIcon {
-  margin-bottom: 16px;
-  opacity: 0.5;
+.emptyStateIconNew {
+  display: block;
 }
 
 .emptyStateSubtext {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  max-width: 380px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.emptyStateBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(13, 32, 69, 0.12);
+}
+
+[data-theme="dark"] .emptyStateBtn {
+  box-shadow: 0 4px 12px rgba(72, 120, 184, 0.2);
+}
+
+.emptyStateBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(13, 32, 69, 0.2);
+  opacity: 0.95;
+}
+
+[data-theme="dark"] .emptyStateBtn:hover {
+  box-shadow: 0 6px 16px rgba(72, 120, 184, 0.3);
+}
+
+.emptyStateBtn:active {
+  transform: translateY(0);
 }
 
 

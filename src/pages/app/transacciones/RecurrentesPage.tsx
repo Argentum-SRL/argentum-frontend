@@ -199,9 +199,21 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
         <div className={styles.loadingState}>Cargando...</div>
       ) : recurrentes.length === 0 ? (
         <div className={styles.emptyState}>
-          <Clock size={40} className={styles.emptyStateIcon} />
-          <p>No tienes transacciones recurrentes configuradas.</p>
-          <p className={styles.emptyStateSubtext}>Las recurrentes generan movimientos automáticos según la frecuencia que elijas.</p>
+          <div className={styles.emptyStateIconWrapper}>
+            <Clock size={28} className={styles.emptyStateIconNew} />
+          </div>
+          <h3 className={styles.emptyStateTitle}>No hay transacciones recurrentes</h3>
+          <p className={styles.emptyStateSubtext}>
+            Automatizá tus cobros y pagos regulares (alquileres, suscripciones, sueldos) para que se registren solos según la frecuencia que elijas.
+          </p>
+          <button 
+            type="button" 
+            className={styles.emptyStateBtn} 
+            onClick={() => handleOpenModal()}
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            Configurar recurrente
+          </button>
         </div>
 
       ) : (

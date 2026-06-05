@@ -25,6 +25,8 @@ interface TicketData {
   cuotas: CuotaResumen[]
   total: number
   isFuture?: boolean
+  isPast?: boolean
+  pagado?: boolean
 }
 
 const parseLocalDate = (dateStr: string): Date => {
@@ -87,7 +89,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
     try {
       const data = await tarjetaService.getResumenTarjeta(tarjeta.id)
       setResumen(data)
-      setActiveIndex(0)
+      const actualIdx = data.resumenes_anteriores?.length || 0
+      setActiveIndex(actualIdx)
     } catch (err: any) {
       console.error('Error fetching resumen:', err)
       setError('Error al cargar resúmenes.')
@@ -104,12 +107,28 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
     if (!resumen) return []
     const list: TicketData[] = []
 
+    // 1. Prepend past statements
+    if (resumen.resumenes_anteriores) {
+      resumen.resumenes_anteriores.forEach(ant => {
+        list.push({
+          title: ant.mes,
+          cierre: ant.fecha_cierre,
+          vencimiento: ant.fecha_vencimiento,
+          cuotas: ant.cuotas,
+          total: Number(ant.total),
+          isPast: true,
+          pagado: ant.pagado
+        })
+      })
+    }
+
+    // 2. Add current statement
     list.push({
       title: 'Resumen Actual',
       cierre: resumen.fecha_cierre_proximo,
       vencimiento: resumen.fecha_vencimiento_proximo,
       cuotas: resumen.cuotas_resumen_actual,
-      total: resumen.total_comprometido_resumen_actual
+      total: Number(resumen.total_comprometido_resumen_actual)
     })
 
     const proxCierre = parseLocalDate(resumen.fecha_cierre_proximo)
@@ -124,21 +143,23 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       return `${year}-${month}-${day}`
     }
 
+    // 3. Add next statement
     list.push({
       title: 'Próximo Resumen',
       cierre: toLocalYMD(proxCierre),
       vencimiento: toLocalYMD(proxVenc),
       cuotas: resumen.cuotas_resumen_siguiente,
-      total: resumen.total_comprometido_resumen_siguiente
+      total: Number(resumen.total_comprometido_resumen_siguiente)
     })
 
+    // 4. Add future statements
     resumen.resumenes_futuros.forEach(fut => {
       list.push({
         title: fut.mes,
         cierre: '',
         vencimiento: '',
         cuotas: [],
-        total: fut.total,
+        total: Number(fut.total),
         isFuture: true
       })
     })
@@ -258,7 +279,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
               currentTicket.cuotas.map((cuota, idx) => (
                 <div key={idx} className={styles.itemRow}>
                   <div className={styles.itemInfo}>
-                    <span className={styles.itemTitle}>{cuota.descripcion}</span>
+                    <span className={`${styles.itemTitle} ${cuota.pagada ? styles.itemTitlePaid : ''}`}>{cuota.descripcion}</span>
                     <span className={styles.itemSub}>
                       Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
                       {cuota.subcategoria_nombre && cuota.subcategoria_nombre !== cuota.descripcion && (
@@ -310,15 +331,34 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
             </div>
           )}
 
-          {activeIndex === 0 && currentTicket.total > 0 && (
-            <button 
-              type="button" 
-              className={styles.payBtn} 
-              onClick={handlePagarTarjeta}
-              disabled={isPaying}
-            >
-              {isPaying ? 'Procesando...' : 'Pagar Tarjeta'}
-            </button>
+          {(currentTicket.isPast || currentTicket.title === 'Resumen Actual') && (
+            (() => {
+              const isPaid = currentTicket.pagado || (currentTicket.cuotas.length > 0 && currentTicket.cuotas.every(c => c.pagada))
+              if (isPaid) {
+                return (
+                  <div className={styles.paidBadge}>
+                    ✓ Resumen Pagado
+                  </div>
+                )
+              }
+              if (currentTicket.title === 'Resumen Actual') {
+                return (
+                  <button 
+                    type="button" 
+                    className={styles.payBtn} 
+                    onClick={handlePagarTarjeta}
+                    disabled={isPaying}
+                  >
+                    {isPaying ? 'Procesando...' : 'Pagar Tarjeta'}
+                  </button>
+                )
+              }
+              return (
+                <div className={styles.unpaidBadge}>
+                  ⚠️ Resumen Impago
+                </div>
+              )
+            })()
           )}
 
           {onToggleExpand && (

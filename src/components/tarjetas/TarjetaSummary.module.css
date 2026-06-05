@@ -338,3 +338,45 @@
   box-shadow: none;
 }
 
+.paidBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #eafaf1;
+  color: #2ecc71;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(46, 204, 113, 0.2);
+  margin-top: 12px;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.unpaidBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fdfedc;
+  color: #d4a300;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(212, 163, 0, 0.2);
+  margin-top: 12px;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.itemTitlePaid {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+

@@ -322,6 +322,17 @@ export interface CuotaResumen {
   monto: number
   moneda: 'ARS' | 'USD'
   fecha_vencimiento: string
+  pagada: boolean
+}
+
+export interface ResumenAnterior {
+  mes: string
+  fecha_vencimiento: string
+  fecha_cierre: string
+  total: number
+  moneda: string
+  pagado: boolean
+  cuotas: CuotaResumen[]
 }
 
 export interface ResumenFuturo {
@@ -340,6 +351,7 @@ export interface ResumenTarjeta {
   cuotas_resumen_actual: CuotaResumen[]
   cuotas_resumen_siguiente: CuotaResumen[]
   resumenes_futuros: ResumenFuturo[]
+  resumenes_anteriores?: ResumenAnterior[]
 }
 
 export interface TarjetaCredito {

@@ -19,6 +19,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     } else {
       document.documentElement.removeAttribute('data-theme')
     }
+
+    // Actualizar la etiqueta meta theme-color dinámicamente para Safari/iOS
+    const themeColor = newTheme === 'dark' ? '#0E1117' : '#0D2045'
+    const existingMetas = document.querySelectorAll('meta[name="theme-color"]')
+    existingMetas.forEach(meta => meta.remove())
+
+    const newMeta = document.createElement('meta')
+    newMeta.setAttribute('name', 'theme-color')
+    newMeta.setAttribute('content', themeColor)
+    document.head.appendChild(newMeta)
   }, [])
 
   useEffect(() => {

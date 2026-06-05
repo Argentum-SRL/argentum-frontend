@@ -61,6 +61,13 @@ export default function PerfilPage() {
   const [activeModal, setActiveModal] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [modalError, setModalError] = useState<string | null>(null)
+  const [fotoError, setFotoError] = useState(false)
+  const [prevFotoUrl, setPrevFotoUrl] = useState(usuario?.foto_url)
+
+  if (usuario?.foto_url !== prevFotoUrl) {
+    setPrevFotoUrl(usuario?.foto_url)
+    setFotoError(false)
+  }
 
   const { showToast } = useToast()
   const { confirm } = useModal()
@@ -271,8 +278,8 @@ export default function PerfilPage() {
         <div className={styles.headerInner}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>
-              {getFotoUrl() ? (
-                <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} />
+              {getFotoUrl() && !fotoError ? (
+                <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} onError={() => setFotoError(true)} />
               ) : (
                 usuario?.nombre?.charAt(0) || 'U'
               )}

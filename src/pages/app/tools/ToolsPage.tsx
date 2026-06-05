@@ -43,22 +43,6 @@ export default function ToolsPage() {
         </p>
       </div>
 
-      {/* ── Tabs Selector ──────────────────────────────────────────────── */}
-      <div className={pageStyles.tabsContainer}>
-        <div className={pageStyles.tabs}>
-          <button className={`${pageStyles.tab} ${pageStyles.tabActive}`}>
-            Cuotas vs Contado
-          </button>
-          <button 
-            className={`${pageStyles.tab} ${pageStyles.tabDisabled}`} 
-            disabled
-            title="Próximamente..."
-          >
-            Próximamente...
-          </button>
-        </div>
-      </div>
-
       {/* ── Main Content Grid ───────────────────────────────────────────── */}
       <div className={pageStyles.grid}>
         

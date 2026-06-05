@@ -17,7 +17,7 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, Proyeccion, ProyeccionCategoria } from '@/types'
+import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
@@ -54,8 +54,14 @@ const Greeting = memo(({ nombre }: { nombre: string | null }) => {
   }, [])
 
   const phrase = useMemo(() => {
-    return PHRASES[Math.floor(Math.random() * PHRASES.length)]
-  }, [])
+    if (!nombre) return PHRASES[0]
+    let hash = 0
+    for (let i = 0; i < nombre.length; i++) {
+      hash = nombre.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    const index = Math.abs(hash) % PHRASES.length
+    return PHRASES[index]
+  }, [nombre])
 
   return (
     <div className={styles.headerLeft}>
@@ -70,11 +76,18 @@ Greeting.displayName = 'Greeting'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
+const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   const { logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [fotoError, setFotoError] = useState(false)
+  const [prevFotoUrl, setPrevFotoUrl] = useState(usuario?.foto_url)
+
+  if (usuario?.foto_url !== prevFotoUrl) {
+    setPrevFotoUrl(usuario?.foto_url)
+    setFotoError(false)
+  }
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours()
@@ -99,7 +112,7 @@ const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
           aria-label="Menú de perfil"
         >
           <div className={styles.mobileAvatar}>
-            {fotoUrl ? <img src={fotoUrl} alt="avatar" /> : <span>{inicial}</span>}
+            {fotoUrl && !fotoError ? <img src={fotoUrl} alt="avatar" onError={() => setFotoError(true)} /> : <span>{inicial}</span>}
           </div>
         </button>
       </div>
@@ -226,7 +239,15 @@ const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria
                 </span>
               </div>
               <div className={styles.barTrack}>
-                <div className={styles.barFill} style={{ width: `${fillPct}%`, background: color }} />
+                <div 
+                  className={styles.barFill} 
+                  ref={el => {
+                    if (el) {
+                      el.style.width = `${fillPct}%`
+                      el.style.background = color || 'var(--text-3)'
+                    }
+                  }} 
+                />
               </div>
             </div>
           </div>
@@ -283,7 +304,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }, [customRange])
+  }, [])
 
   const fetchProyeccion = useCallback(async () => {
     // Evitar setState sincrónico en useEffect
@@ -318,7 +339,7 @@ export default function DashboardPage() {
     return () => {
       ignore = true
     }
-  }, [fetchData, fetchProyeccion, customRange])
+  }, [fetchData, fetchProyeccion])
 
   const handleRetry = useCallback(() => {
     setLoading(true)
@@ -358,15 +379,7 @@ export default function DashboardPage() {
               {/* Luna Argentum Watermark */}
               <svg
                 viewBox="0 0 100 100"
-                style={{
-                  position: 'absolute',
-                  bottom: -20,
-                  right: -20,
-                  width: 120,
-                  height: 120,
-                  opacity: 0.04,
-                  pointerEvents: 'none'
-                }}
+                className={styles.lunaWatermark}
               >
                 <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
                 <circle cx="58" cy="50" r="38" fill="#0D2045"/>

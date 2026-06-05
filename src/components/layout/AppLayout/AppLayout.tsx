@@ -64,6 +64,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [fotoError, setFotoError] = useState(false)
+  const [prevFotoUrl, setPrevFotoUrl] = useState(usuario?.foto_url)
+
+  if (usuario?.foto_url !== prevFotoUrl) {
+    setPrevFotoUrl(usuario?.foto_url)
+    setFotoError(false)
+  }
 
   const [prevPath, setPrevPath] = useState(location.pathname)
   if (location.pathname !== prevPath) {
@@ -134,8 +141,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className={styles.profileWrapper}>
             <button className={styles.profilePill} onClick={() => setIsProfileOpen(!isProfileOpen)}>
               <div className={styles.topBarAvatar}>
-                {fotoUrl
-                  ? <img src={fotoUrl} alt="avatar" />
+                {fotoUrl && !fotoError
+                  ? <img src={fotoUrl} alt="avatar" onError={() => setFotoError(true)} />
                   : <span>{inicial}</span>
                 }
               </div>
@@ -186,8 +193,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <Search size={22} strokeWidth={1.75} />
           </button>
           <div className={styles.mobileAvatar}>
-            {fotoUrl ? (
-              <img src={fotoUrl} alt="Foto de perfil" className={styles.mobileAvatarImage} />
+            {fotoUrl && !fotoError ? (
+              <img src={fotoUrl} alt="Foto de perfil" className={styles.mobileAvatarImage} onError={() => setFotoError(true)} />
             ) : (
               inicial
             )}

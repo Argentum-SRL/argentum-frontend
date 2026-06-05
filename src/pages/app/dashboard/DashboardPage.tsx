@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { 
   ArrowUpDown, 
   Calendar, 
@@ -7,9 +7,14 @@ import {
   TrendingUp,
   TrendingDown,
   AlertCircle,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  LogOut,
+  User,
+  Sun,
+  Moon
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/hooks/useTheme'
 import { dashboardService } from '@/services/dashboard.service'
 import type { DashboardResumen, Proyeccion, ProyeccionCategoria } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
@@ -65,6 +70,11 @@ Greeting.displayName = 'Greeting'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
+  const { logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
+  const navigate = useNavigate()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   const greeting = useMemo(() => {
     const hour = new Date().getHours()
     if (hour >= 6 && hour < 12) return 'Buenos días'
@@ -76,15 +86,64 @@ const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
   const fotoUrl = usuario?.foto_url ? (usuario.foto_url.startsWith('http') ? usuario.foto_url : `${API_URL}${usuario.foto_url}`) : null
 
   return (
-    <div className={styles.mobileGreetingWrap}>
-      <div className={styles.mobileGreetingText}>
-        <span className={styles.mobileGreetingSubtitle}>{greeting},</span>
-        <span className={styles.mobileGreetingName}>{usuario?.nombre}</span>
+    <>
+      <div className={styles.mobileGreetingWrap}>
+        <div className={styles.mobileGreetingText}>
+          <span className={styles.mobileGreetingSubtitle}>{greeting},</span>
+          <span className={styles.mobileGreetingName}>{usuario?.nombre}</span>
+        </div>
+        <button 
+          className={styles.mobileAvatarBtn} 
+          onClick={() => setIsMenuOpen(true)}
+          aria-label="Menú de perfil"
+        >
+          <div className={styles.mobileAvatar}>
+            {fotoUrl ? <img src={fotoUrl} alt="avatar" /> : <span>{inicial}</span>}
+          </div>
+        </button>
       </div>
-      <div className={styles.mobileAvatar}>
-        {fotoUrl ? <img src={fotoUrl} alt="avatar" /> : <span>{inicial}</span>}
-      </div>
-    </div>
+
+      {isMenuOpen && (
+        <>
+          <div className={styles.profileOverlay} onClick={() => setIsMenuOpen(false)} />
+          <div className={styles.profileSheet}>
+            <div className={styles.profileSheetTitle}>Mi Cuenta</div>
+            
+            <button 
+              className={styles.profileSheetItem}
+              onClick={() => {
+                setIsMenuOpen(false)
+                navigate('/app/perfil')
+              }}
+            >
+              <User size={18} />
+              <span>Editar Perfil</span>
+            </button>
+
+            <button 
+              className={styles.profileSheetItem}
+              onClick={() => {
+                toggleTheme()
+              }}
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              <span>Cambiar a Modo {theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
+            </button>
+
+            <button 
+              className={`${styles.profileSheetItem} ${styles.profileSheetItemDanger}`}
+              onClick={() => {
+                setIsMenuOpen(false)
+                void logout()
+              }}
+            >
+              <LogOut size={18} />
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
+        </>
+      )}
+    </>
   )
 })
 MobileGreeting.displayName = 'MobileGreeting'

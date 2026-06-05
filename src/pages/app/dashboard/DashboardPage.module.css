@@ -981,3 +981,90 @@
 .barChartWrap::-webkit-scrollbar-thumb:hover {
   background: var(--text-3);
 }
+
+/* Bottom Sheet / Profile Menu for Mobile */
+.mobileAvatarBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  display: block;
+  transition: transform 0.15s ease;
+}
+
+.mobileAvatarBtn:active {
+  transform: scale(0.95);
+}
+
+.profileOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.profileSheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  z-index: 1001;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profileSheetTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  padding-left: 4px;
+}
+
+.profileSheetItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  text-decoration: none;
+}
+
+.profileSheetItem:active {
+  transform: scale(0.98);
+  background-color: var(--border);
+}
+
+.profileSheetItemDanger {
+  color: var(--error);
+  background: var(--error-bg);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

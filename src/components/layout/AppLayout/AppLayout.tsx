@@ -237,6 +237,32 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <span>{label}</span>
               </Link>
             ))}
+
+            <div className={styles.moreSeparator} />
+            
+            <Link 
+              to="/app/perfil" 
+              className={[styles.moreItem, isActive('/app/perfil') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+            >
+              <User size={22} strokeWidth={1.75} />
+              <span>Ver/Editar Perfil</span>
+            </Link>
+
+            <button className={styles.moreItem} onClick={() => toggleTheme()}>
+              {theme === 'dark' ? <Sun size={22} strokeWidth={1.75} /> : <Moon size={22} strokeWidth={1.75} />}
+              <span>Modo {theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
+            </button>
+
+            <button 
+              className={`${styles.moreItem} ${styles.moreItemDanger}`}
+              onClick={() => {
+                setIsMoreOpen(false);
+                void logout();
+              }}
+            >
+              <LogOut size={22} strokeWidth={1.75} />
+              <span>Cerrar Sesión</span>
+            </button>
           </div>
         </>
       )}

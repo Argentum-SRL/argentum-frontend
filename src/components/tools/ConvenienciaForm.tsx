@@ -1,20 +1,20 @@
 import React from 'react';
-import { DollarSign, Percent } from 'lucide-react';
-import { Input, Select, Button } from '@/components/ui';
+import { Percent } from 'lucide-react';
+import { Input, Select, Button, MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import type { IPCData } from '@/types/tools';
 import styles from './ToolsComponents.module.css';
 
 interface ConvenienciaFormProps {
   formData: {
-    precio_contado: string;
-    precio_total_cuotas: string;
+    precio_contado: number | null;
+    precio_total_cuotas: number | null;
     cantidad_cuotas: number;
     inflacion_mensual: string;
   };
   setFormData: React.Dispatch<React.SetStateAction<{
-    precio_contado: string;
-    precio_total_cuotas: string;
+    precio_contado: number | null;
+    precio_total_cuotas: number | null;
     cantidad_cuotas: number;
     inflacion_mensual: string;
   }>>;
@@ -42,7 +42,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
     value: c
   }));
 
-  const handleChange = (field: string, value: string | number) => {
+  const handleChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -50,10 +50,10 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
   };
 
   const isFormInvalid = 
-    !formData.precio_contado || 
-    parseFloat(formData.precio_contado) <= 0 ||
-    !formData.precio_total_cuotas ||
-    parseFloat(formData.precio_total_cuotas) <= 0 ||
+    formData.precio_contado === null || 
+    formData.precio_contado <= 0 ||
+    formData.precio_total_cuotas === null ||
+    formData.precio_total_cuotas <= 0 ||
     !formData.inflacion_mensual ||
     parseFloat(formData.inflacion_mensual) < 0;
 
@@ -74,31 +74,23 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
       </div>
 
       <div className={styles.formGroup}>
-        <label className={styles.label} htmlFor="precio_contado">Precio de contado</label>
-        <Input
-          id="precio_contado"
-          type="number"
+        <MontoInput
+          label="Precio de contado"
           placeholder="Ej: 1.000.000"
           value={formData.precio_contado}
-          onChange={(e) => handleChange('precio_contado', e.target.value)}
-          icon={<DollarSign size={16} />}
-          min="1"
-          step="any"
+          onChange={(val) => handleChange('precio_contado', val)}
+          allowDecimals
         />
         <span className={styles.inputDesc}>Lo que pagarías si pagás todo junto hoy</span>
       </div>
 
       <div className={styles.formGroup}>
-        <label className={styles.label} htmlFor="precio_total_cuotas">Precio total en cuotas</label>
-        <Input
-          id="precio_total_cuotas"
-          type="number"
+        <MontoInput
+          label="Precio total en cuotas"
           placeholder="Ej: 1.500.000"
           value={formData.precio_total_cuotas}
-          onChange={(e) => handleChange('precio_total_cuotas', e.target.value)}
-          icon={<DollarSign size={16} />}
-          min="1"
-          step="any"
+          onChange={(val) => handleChange('precio_total_cuotas', val)}
+          allowDecimals
         />
         <span className={styles.inputDesc}>El total que terminarías pagando con todas las cuotas sumadas</span>
       </div>

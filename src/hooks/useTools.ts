@@ -10,9 +10,14 @@ export const useTools = () => {
   const [ipcLoading, setIpcLoading] = useState(true);
   const [ipcError, setIpcError] = useState(false);
   
-  const [formData, setFormData] = useState({
-    precio_contado: '',
-    precio_total_cuotas: '',
+  const [formData, setFormData] = useState<{
+    precio_contado: number | null;
+    precio_total_cuotas: number | null;
+    cantidad_cuotas: number;
+    inflacion_mensual: string;
+  }>({
+    precio_contado: null,
+    precio_total_cuotas: null,
     cantidad_cuotas: 12,
     inflacion_mensual: ''
   });
@@ -47,15 +52,15 @@ export const useTools = () => {
   }, [loadIPC]);
 
   const calcular = async () => {
-    const contado = parseFloat(formData.precio_contado);
-    const cuotasTotal = parseFloat(formData.precio_total_cuotas);
+    const contado = formData.precio_contado;
+    const cuotasTotal = formData.precio_total_cuotas;
     const inflacion = parseFloat(formData.inflacion_mensual);
     
-    if (isNaN(contado) || contado <= 0) {
+    if (contado === null || isNaN(contado) || contado <= 0) {
       showToast('El precio de contado debe ser mayor a 0', 'error');
       return;
     }
-    if (isNaN(cuotasTotal) || cuotasTotal <= 0) {
+    if (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0) {
       showToast('El precio total en cuotas debe ser mayor a 0', 'error');
       return;
     }
@@ -89,7 +94,7 @@ export const useTools = () => {
   };
 
   const cuotaCalculada = formData.precio_total_cuotas && formData.cantidad_cuotas
-    ? parseFloat(formData.precio_total_cuotas) / formData.cantidad_cuotas
+    ? formData.precio_total_cuotas / formData.cantidad_cuotas
     : null;
 
   return {

@@ -15,7 +15,6 @@ self.addEventListener('install', (event) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting();
 });
 
 // Activate Event
@@ -31,7 +30,6 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  self.clients.claim();
 });
 
 // Fetch Event
@@ -44,10 +42,11 @@ self.addEventListener('fetch', (event) => {
   // Exclude API calls and Vite HMR/dev files from being intercepted
   const url = new URL(event.request.url);
   if (
-    url.pathname.startsWith('/api') || 
-    url.pathname.includes('@vite') || 
-    url.pathname.includes('@id') || 
-    url.pathname.includes('node_modules') || 
+    url.pathname.startsWith('/api') ||
+    /\/node_modules\//.test(url.pathname) ||
+    /\/\@vite\//.test(url.pathname) ||
+    /\/\@id\//.test(url.pathname) ||
+    /\?v=[a-f0-9]+$/.test(url.href) ||
     url.pathname.includes('.vite')
   ) {
     return;

@@ -16,8 +16,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const applyTheme = useCallback((newTheme: Theme) => {
     if (newTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark')
+      document.documentElement.classList.add('dark')
     } else {
       document.documentElement.removeAttribute('data-theme')
+      document.documentElement.classList.remove('dark')
     }
 
     // Actualizar la etiqueta meta theme-color dinámicamente para Safari/iOS

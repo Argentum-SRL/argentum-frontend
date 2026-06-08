@@ -112,21 +112,39 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
   }
   
   return (
-    <div className={styles.realCard} style={{ background: backgroundStyle }}>
+    <div 
+      className={styles.realCard} 
+      ref={el => {
+        if (el) {
+          el.style.background = backgroundStyle
+        }
+      }}
+    >
       <div className={styles.cardTop}>
         {bankLogoUrl ? (
           <img
             src={bankLogoUrl}
             alt={billeteraNombre}
-            style={{ 
-              height: 26, 
-              maxWidth: 100, 
-              objectFit: 'contain',
-              filter: shouldInvertBankLogo ? 'invert(1)' : 'none'
+            ref={el => {
+              if (el) {
+                el.style.height = '26px'
+                el.style.maxWidth = '100px'
+                el.style.objectFit = 'contain'
+                el.style.filter = shouldInvertBankLogo ? 'invert(1)' : 'none'
+              }
             }}
           />
         ) : (
-          <div className={styles.walletNamePreview} style={{ color: textColor }}>{billeteraNombre.toUpperCase()}</div>
+          <div 
+            className={styles.walletNamePreview} 
+            ref={el => {
+              if (el) {
+                el.style.color = textColor
+              }
+            }}
+          >
+            {billeteraNombre.toUpperCase()}
+          </div>
         )}
       </div>
       
@@ -169,8 +187,28 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
           </svg>
           
           {/* Contactless Waves SVG (4 arcs pointing right) */}
-          <div className={styles.contactless} style={{ color: textColor }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" style={{ width: 18, height: 18, opacity: 0.85 }}>
+          <div 
+            className={styles.contactless} 
+            ref={el => {
+              if (el) {
+                el.style.color = textColor
+              }
+            }}
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.8" 
+              strokeLinecap="round" 
+              ref={el => {
+                if (el) {
+                  el.style.width = '18px'
+                  el.style.height = '18px'
+                  el.style.opacity = '0.85'
+                }
+              }}
+            >
               <path d="M 6 9 Q 8.5 12 6 15" />
               <path d="M 10 6.5 Q 13.5 12 10 17.5" />
               <path d="M 14 4 Q 18.5 12 14 20" />
@@ -183,27 +221,72 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
       {/* Número de tarjeta alineado a la izquierda, libre de contenedor flex lateral */}
       <div 
         className={styles.cardNumber} 
-        style={{ 
-          color: textColor, 
-          textAlign: 'left',
-          fontSize: '17px',
-          letterSpacing: '0.12em',
-          marginBottom: '6px',
-          whiteSpace: 'nowrap'
+        ref={el => {
+          if (el) {
+            el.style.color = textColor
+            el.style.textAlign = 'left'
+            el.style.fontSize = '17px'
+            el.style.letterSpacing = '0.12em'
+            el.style.marginBottom = '6px'
+            el.style.whiteSpace = 'nowrap'
+          }
         }}
       >
         XXXX  XXXX  XXXX  {ultimos4 ? ultimos4.padStart(4, '•') : '••••'}
       </div>
 
       <div className={styles.cardBottom}>
-        <div className={styles.cardInfoRow} style={{ gap: 16 }}>
+        <div 
+          className={styles.cardInfoRow} 
+          ref={el => {
+            if (el) {
+              el.style.gap = '16px'
+            }
+          }}
+        >
           <div className={styles.cardInfoGroup}>
-            <span className={styles.cardInfoLabel} style={{ color: labelColor }}>Cierra</span>
-            <span className={styles.cardInfoValue} style={{ color: textColor }}>día {diaCierre}</span>
+            <span 
+              className={styles.cardInfoLabel} 
+              ref={el => {
+                if (el) {
+                  el.style.color = labelColor
+                }
+              }}
+            >
+              Cierra
+            </span>
+            <span 
+              className={styles.cardInfoValue} 
+              ref={el => {
+                if (el) {
+                  el.style.color = textColor
+                }
+              }}
+            >
+              día {diaCierre}
+            </span>
           </div>
           <div className={styles.cardInfoGroup}>
-            <span className={styles.cardInfoLabel} style={{ color: labelColor }}>Vence</span>
-            <span className={styles.cardInfoValue} style={{ color: textColor }}>día {diaVencimiento}</span>
+            <span 
+              className={styles.cardInfoLabel} 
+              ref={el => {
+                if (el) {
+                  el.style.color = labelColor
+                }
+              }}
+            >
+              Vence
+            </span>
+            <span 
+              className={styles.cardInfoValue} 
+              ref={el => {
+                if (el) {
+                  el.style.color = textColor
+                }
+              }}
+            >
+              día {diaVencimiento}
+            </span>
           </div>
         </div>
  
@@ -213,17 +296,29 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
               src={logo} 
               alt={red} 
               className={styles.networkLogo} 
-              style={{ 
-                height: red === 'amex' ? 40 : 26,
-                filter: shouldInvertNetworkLogo 
-                  ? 'invert(1) brightness(2)' 
-                  : shouldApplyGrayscaleFilter 
-                    ? 'grayscale(1) brightness(2.5) contrast(1.5)' 
-                    : 'none'
+              ref={el => {
+                if (el) {
+                  el.style.height = red === 'amex' ? '40px' : '26px'
+                  el.style.filter = shouldInvertNetworkLogo 
+                    ? 'invert(1) brightness(2)' 
+                    : shouldApplyGrayscaleFilter 
+                      ? 'grayscale(1) brightness(2.5) contrast(1.5)' 
+                      : 'none'
+                }
               }} 
             />
           ) : (
-            <span style={{ fontSize: 10, fontWeight: 700, color: textColor }}>{red.toUpperCase()}</span>
+            <span 
+              ref={el => {
+                if (el) {
+                  el.style.fontSize = '10px'
+                  el.style.fontWeight = '700'
+                  el.style.color = textColor
+                }
+              }}
+            >
+              {red.toUpperCase()}
+            </span>
           )}
         </div>
       </div>

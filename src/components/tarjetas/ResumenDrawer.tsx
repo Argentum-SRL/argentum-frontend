@@ -25,7 +25,7 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
     try {
       const data = await tarjetaService.getResumenTarjeta(tarjeta.id)
       setResumen(data)
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching resumen:', err)
       setError('No pudimos cargar el resumen. Intentá de nuevo.')
     } finally {
@@ -35,7 +35,10 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
 
   useEffect(() => {
     if (open) {
-      fetchResumen()
+      const timer = setTimeout(() => {
+        fetchResumen()
+      }, 0)
+      return () => clearTimeout(timer)
     }
   }, [open, fetchResumen])
 
@@ -168,9 +171,9 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
 
         {loading ? (
           <div className={styles.loadingContainer}>
-            <div className={styles.skeleton} style={{ height: '200px' }} />
-            <div className={styles.skeleton} style={{ height: '200px' }} />
-            <div className={styles.skeleton} style={{ height: '100px' }} />
+            <div className={styles.skeleton} ref={el => { if (el) el.style.height = '200px' }} />
+            <div className={styles.skeleton} ref={el => { if (el) el.style.height = '200px' }} />
+            <div className={styles.skeleton} ref={el => { if (el) el.style.height = '100px' }} />
           </div>
         ) : error ? (
           <div className={styles.errorContainer}>

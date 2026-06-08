@@ -72,9 +72,10 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           showToast('Tarjeta pagada con éxito', 'success')
           fetchResumen()
           if (onRefresh) onRefresh()
-        } catch (err: any) {
+        } catch (err) {
           console.error(err)
-          const errorMsg = err.response?.data?.detail || 'Error al procesar el pago de la tarjeta.'
+          const error = err as { response?: { data?: { detail?: string } } }
+          const errorMsg = error.response?.data?.detail || 'Error al procesar el pago de la tarjeta.'
           showToast(errorMsg, 'error')
         } finally {
           setIsPaying(false)
@@ -91,7 +92,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       setResumen(data)
       const actualIdx = data.resumenes_anteriores?.length || 0
       setActiveIndex(actualIdx)
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching resumen:', err)
       setError('Error al cargar resúmenes.')
     } finally {
@@ -186,7 +187,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           }
         }
       })
-    } catch (err) {
+    } catch {
       showToast('No se pudo cargar la transacción para editar', 'error')
     }
   }
@@ -203,7 +204,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           showToast('Transacción eliminada correctamente', 'success')
           fetchResumen()
           if (onRefresh) onRefresh()
-        } catch (err) {
+        } catch {
           showToast('Error al eliminar la transacción', 'error')
         }
       }
@@ -249,6 +250,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           className={styles.navBtn} 
           onClick={handlePrev} 
           disabled={activeIndex === 0}
+          title="Anterior"
+          aria-label="Anterior"
         >
           <ChevronLeft size={16} />
         </button>
@@ -257,6 +260,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           className={styles.navBtn} 
           onClick={handleNext} 
           disabled={activeIndex === tickets.length - 1}
+          title="Siguiente"
+          aria-label="Siguiente"
         >
           <ChevronRight size={16} />
         </button>

@@ -68,7 +68,7 @@ const Greeting = memo(({ nombre }: { nombre: string | null }) => {
 })
 Greeting.displayName = 'Greeting'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   const { logout } = useAuth()
@@ -84,7 +84,9 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   }, [])
   
   const inicial = usuario?.nombre?.charAt(0)?.toUpperCase() ?? 'U'
-  const fotoUrl = usuario?.foto_url ? (usuario.foto_url.startsWith('http') ? usuario.foto_url : `${API_URL}${usuario.foto_url}`) : null
+  const fotoUrlRaw = usuario?.foto_url ? (usuario.foto_url.startsWith('http') ? usuario.foto_url : `${API_URL}${usuario.foto_url}`) : null
+  const [fotoError, setFotoError] = useState(false)
+  const fotoUrl = fotoError ? null : fotoUrlRaw
 
   return (
     <>
@@ -99,7 +101,7 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
           aria-label="Menú de perfil"
         >
           <div className={styles.mobileAvatar}>
-            {fotoUrl ? <img src={fotoUrl} alt="avatar" /> : <span>{inicial}</span>}
+            {fotoUrl ? <img src={fotoUrl} alt="avatar" onError={() => setFotoError(true)} /> : <span>{inicial}</span>}
           </div>
         </button>
       </div>

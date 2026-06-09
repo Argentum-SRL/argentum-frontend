@@ -10,7 +10,7 @@ import { useNotificaciones } from '@/hooks/useNotificaciones'
 import NotificacionesDrawer from '@/components/notificaciones/NotificacionesDrawer'
 import styles from './AppLayout.module.css'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
@@ -85,6 +85,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   const fotoUrl = getFotoUrl()
+  const [fotoError, setFotoError] = useState(false)
 
   return (
     <div className={styles.root}>
@@ -135,8 +136,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className={styles.profileWrapper}>
             <button className={styles.profilePill} onClick={() => setIsProfileOpen(!isProfileOpen)}>
               <div className={styles.topBarAvatar}>
-                {fotoUrl
-                  ? <img src={fotoUrl} alt="avatar" />
+                {fotoUrl && !fotoError
+                  ? <img src={fotoUrl} alt="avatar" onError={() => setFotoError(true)} />
                   : <span>{inicial}</span>
                 }
               </div>
@@ -188,8 +189,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <Search size={22} strokeWidth={1.75} />
           </button>
           <div className={styles.mobileAvatar}>
-            {fotoUrl ? (
-              <img src={fotoUrl} alt="Foto de perfil" className={styles.mobileAvatarImage} />
+            {fotoUrl && !fotoError ? (
+              <img src={fotoUrl} alt="Foto de perfil" className={styles.mobileAvatarImage} onError={() => setFotoError(true)} />
             ) : (
               inicial
             )}

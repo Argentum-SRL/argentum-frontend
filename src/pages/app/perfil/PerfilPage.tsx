@@ -27,7 +27,7 @@ import * as authService from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

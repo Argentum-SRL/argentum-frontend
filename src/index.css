@@ -144,3 +144,12 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Hide scrollbars globally across all browsers while retaining scroll functionality */
+::-webkit-scrollbar {
+  display: none !important;
+}
+html, body, * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}

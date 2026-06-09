@@ -13,8 +13,7 @@
 
 @media (min-width: 1024px) {
   .root {
-    height: 100%;
-    overflow: hidden;
+    min-height: 100%;
     padding-bottom: 0;
   }
 }
@@ -333,9 +332,6 @@
 @media (min-width: 1024px) {
   .topRow {
     grid-template-columns: repeat(3, 1fr);
-    flex: 1;
-    min-height: 0;
-    height: 100%;
   }
 }
 
@@ -349,9 +345,6 @@
 @media (min-width: 1024px) {
   .bottomRow {
     grid-template-columns: 1fr 1fr;
-    flex: 1;
-    min-height: 0;
-    height: 100%;
   }
 }
 

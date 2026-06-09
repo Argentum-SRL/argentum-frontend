@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useId, useState, useEffect, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import NotificacionesDrawer from '@/components/notificaciones/NotificacionesDrawer'
+import SearchModal from './SearchModal'
 import styles from './AppLayout.module.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
@@ -63,10 +64,23 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { theme, toggleTheme } = useTheme()
   const { unreadCount } = useNotificaciones()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [prevPath, setPrevPath] = useState(location.pathname)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setIsSearchOpen(prev => !prev)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   if (location.pathname !== prevPath) {
     setPrevPath(location.pathname)
     setIsMoreOpen(false)
@@ -120,7 +134,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className={styles.topBarActions}>
           {/* Pill 1: Controls */}
           <div className={styles.actionPill}>
-            <button className={styles.topBarBtn} title="Buscar">
+            <button className={styles.topBarBtn} onClick={() => setIsSearchOpen(true)} title="Buscar">
               <Search size={18} strokeWidth={1.75} />
             </button>
             <button className={styles.topBarBtn} onClick={() => setIsDrawerOpen(true)} title="Notificaciones">
@@ -185,7 +199,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           >
             {theme === 'dark' ? <Sun size={22} strokeWidth={1.75} /> : <Moon size={22} strokeWidth={1.75} />}
           </button>
-          <button className={styles.mobileIconBtn} aria-label="Buscar">
+          <button className={styles.mobileIconBtn} onClick={() => setIsSearchOpen(true)} aria-label="Buscar">
             <Search size={22} strokeWidth={1.75} />
           </button>
           <div className={styles.mobileAvatar}>
@@ -279,6 +293,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
       </main>
 
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <NotificacionesDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
 
     </div>

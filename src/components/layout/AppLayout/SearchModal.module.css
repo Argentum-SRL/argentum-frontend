@@ -1,0 +1,346 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.searchTitleArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.searchIcon {
+  color: var(--text-3);
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  font-family: inherit;
+}
+
+.input::placeholder {
+  color: var(--text-3);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shortcutBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-family: monospace;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Cuerpo y Área de Scroll */
+.formBody {
+  padding: 14px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 60vh;
+  min-height: 350px;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.scrollArea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollArea::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--text-3);
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  color: var(--text-3);
+  opacity: 0.6;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.emptyText {
+  font-size: 14px;
+  margin: 0;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* Agrupadores */
+.group {
+  margin-bottom: 8px;
+}
+
+.groupTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+  margin: 0 0 12px 0;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  padding: 4px 0;
+  z-index: 1;
+}
+
+/* Rejilla de tarjetas horizontales y compactas */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Tarjeta horizontal compacta */
+.gridCard {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 150ms ease;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.gridCard:hover, .gridCardActive {
+  border-color: var(--primary);
+  background: var(--surface-alt);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+}
+
+:global([data-theme="dark"]) .gridCard {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+:global([data-theme="dark"]) .gridCard:hover, 
+:global([data-theme="dark"]) .gridCardActive {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Iconos de tarjeta */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.gridCard:hover .iconWrapper, .gridCardActive .iconWrapper {
+  transform: scale(1.05);
+}
+
+/* Temas de color de los iconos */
+.nivel_nav {
+  background: rgba(var(--primary-rgb, 13, 32, 69), 0.1);
+  color: var(--primary);
+}
+
+.nivel_action {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.nivel_billetera {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.nivel_presupuesto {
+  background: rgba(236, 72, 153, 0.1);
+  color: #ec4899;
+}
+
+.nivel_meta {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.nivel_transaccion {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+/* Contenedor de textos */
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Textos de la tarjeta */
+.cardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.gridCardActive .cardTitle {
+  font-weight: 700;
+}
+
+.cardExtra {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  line-height: 1.2;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.cardSubtitle {
+  font-size: 11px;
+  color: var(--text-3);
+  margin: 0;
+  line-height: 1.2;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.cardExtraSub {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 1px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* Skeleton pulse loading */
+.loadingWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--text-3);
+}
+
+.spinner {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -76,7 +76,6 @@ export default function PerfilPage() {
 
   // Formularios
   const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '', fecha_nacimiento: '', sexo: '' })
-  const [formEmail, setFormEmail] = useState({ email_nuevo: '', password_actual: '' })
   const [formTelefono, setFormTelefono] = useState({ telefono_nuevo: '', password_actual: '' })
   const [formPassword, setFormPassword] = useState({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
   const [formCiclo, setFormCiclo] = useState({ ciclo_tipo: 'dia_fijo' as 'dia_fijo' | 'regla', ciclo_valor: '' })
@@ -93,7 +92,6 @@ export default function PerfilPage() {
         fecha_nacimiento: usuario.fecha_nacimiento || '',
         sexo: usuario.sexo || ''
       })
-      setFormEmail({ email_nuevo: usuario.email || '', password_actual: '' })
       setFormTelefono({ telefono_nuevo: usuario.telefono || '', password_actual: '' })
       setFormCiclo({ 
         ciclo_tipo: (usuario.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo', 
@@ -670,18 +668,6 @@ export default function PerfilPage() {
                     value={formDatos.nombre}
                     onChange={(e) => setFormDatos({...formDatos, nombre: e.target.value})}
                     required
-                  />
-                </div>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-email-pass" className={styles.inputLabel}>Contraseña Actual</label>
-                  <input 
-                    id="perfil-email-pass"
-                    type="password" 
-                    className={styles.input} 
-                    value={formEmail.password_actual}
-                    onChange={(e) => setFormEmail({...formEmail, password_actual: e.target.value})}
-                    required
-                    placeholder="••••••••"
                   />
                 </div>
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>

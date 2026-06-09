@@ -101,6 +101,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const fotoUrl = getFotoUrl()
   const [fotoError, setFotoError] = useState(false)
 
+  const [prevFotoUrl, setPrevFotoUrl] = useState(fotoUrl)
+  if (fotoUrl !== prevFotoUrl) {
+    setPrevFotoUrl(fotoUrl)
+    setFotoError(false)
+  }
+
   return (
     <div className={styles.root}>
 
@@ -151,7 +157,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <button className={styles.profilePill} onClick={() => setIsProfileOpen(!isProfileOpen)}>
               <div className={styles.topBarAvatar}>
                 {fotoUrl && !fotoError
-                  ? <img src={fotoUrl} alt="avatar" onError={() => setFotoError(true)} />
+                  ? <img src={fotoUrl} alt="avatar" referrerPolicy="no-referrer" onError={() => setFotoError(true)} />
                   : <span>{inicial}</span>
                 }
               </div>
@@ -204,7 +210,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </button>
           <div className={styles.mobileAvatar}>
             {fotoUrl && !fotoError ? (
-              <img src={fotoUrl} alt="Foto de perfil" className={styles.mobileAvatarImage} onError={() => setFotoError(true)} />
+              <img src={fotoUrl} alt="Foto de perfil" className={styles.mobileAvatarImage} referrerPolicy="no-referrer" onError={() => setFotoError(true)} />
             ) : (
               inicial
             )}

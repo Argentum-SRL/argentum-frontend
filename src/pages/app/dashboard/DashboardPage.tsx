@@ -88,6 +88,12 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   const [fotoError, setFotoError] = useState(false)
   const fotoUrl = fotoError ? null : fotoUrlRaw
 
+  const [prevFotoUrlRaw, setPrevFotoUrlRaw] = useState(fotoUrlRaw)
+  if (fotoUrlRaw !== prevFotoUrlRaw) {
+    setPrevFotoUrlRaw(fotoUrlRaw)
+    setFotoError(false)
+  }
+
   return (
     <>
       <div className={styles.mobileGreetingWrap}>
@@ -101,7 +107,7 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
           aria-label="Menú de perfil"
         >
           <div className={styles.mobileAvatar}>
-            {fotoUrl ? <img src={fotoUrl} alt="avatar" onError={() => setFotoError(true)} /> : <span>{inicial}</span>}
+            {fotoUrl ? <img src={fotoUrl} alt="avatar" referrerPolicy="no-referrer" onError={() => setFotoError(true)} /> : <span>{inicial}</span>}
           </div>
         </button>
       </div>

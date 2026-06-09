@@ -279,7 +279,7 @@ export default function PerfilPage() {
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>
               {getFotoUrl() ? (
-                <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} />
+                <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} referrerPolicy="no-referrer" />
               ) : (
                 usuario?.nombre?.charAt(0) || 'U'
               )}

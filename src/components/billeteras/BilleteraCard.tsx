@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Edit2, Archive, CreditCard, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
+import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
 import { getCardLogoUrl, findCardBrandByNombre } from '@/lib/utils/tarjetas.utils'
@@ -85,21 +85,6 @@ const BilleteraCard = memo(({
   return (
     <div 
       className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''} ${isFront ? styles.frontCard : ''} ${className || ''}`}
-      onClick={(e) => {
-        // En mobile, el primer tap trae la tarjeta al frente si no lo está.
-        // El segundo tap (cuando ya está al frente) navega al detalle.
-        const isTouch = window.matchMedia('(max-width: 767px)').matches
-        if (isTouch) {
-          if (!isFront) {
-            e.preventDefault()
-            onSetFront?.()
-            return
-          }
-        }
-        navigate(`/app/billeteras/${billetera.id}`)
-      }}
-      tabIndex={0}
-      role="button"
     >
       {/* Fondo clipeado */}
       <div className={styles.wcBg} ref={bgRef}>
@@ -108,6 +93,23 @@ const BilleteraCard = memo(({
       </div>
 
       <div className={styles.wcInner}>
+        <button
+          className={styles.overlayBtn}
+          onClick={(e) => {
+            // En mobile, el primer tap trae la tarjeta al frente si no lo está.
+            // El segundo tap (cuando ya está al frente) navega al detalle.
+            const isTouch = window.matchMedia('(max-width: 767px)').matches
+            if (isTouch) {
+              if (!isFront) {
+                e.preventDefault()
+                onSetFront?.()
+                return
+              }
+            }
+            navigate(`/app/billeteras/${billetera.id}`)
+          }}
+          aria-label={`Ver detalles de ${billetera.nombre}`}
+        />
         {/* ── TOP ─────────────────────────────────────────────────────── */}
         <div className={styles.wcTop}>
           {/* ── Con logo de tarjeta: logo grande + chips debajo, sin nombre ── */}
@@ -135,9 +137,7 @@ const BilleteraCard = memo(({
               {/* ── Sin logo de tarjeta: layout original ── */}
               <div className={styles.wcLogo}>
                 {billetera.es_efectivo ? (
-                  billetera.moneda === 'ARS'
-                    ? <CreditCard size={18} strokeWidth={1.75} color="white" />
-                    : <DollarSign size={18} strokeWidth={1.75} color="white" />
+                  <DollarSign size={18} strokeWidth={1.75} color="white" />
                 ) : bankLogoUrl && !logoErr ? (
                   <img src={bankLogoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
                 ) : (
@@ -178,7 +178,7 @@ const BilleteraCard = memo(({
               onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p) }}
               aria-label="Opciones"
               aria-haspopup="true"
-              aria-expanded={menuOpen ? "true" : "false"}
+              aria-expanded={menuOpen}
             >
               <div className={styles.dot} />
               <div className={styles.dot} />

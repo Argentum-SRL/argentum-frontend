@@ -156,8 +156,7 @@ export default function BilleterasPage() {
     billeterasActivas, 
     billeterasArchivadas, 
     billeterasRegulares, 
-    billeterasEfectivo,
-    totalARSActivo
+    billeterasEfectivo
   } = useMemo(() => {
     const activas = billeteras.filter((b) => b.estado === 'activa')
     const archivadas = billeteras.filter((b) => b.estado === 'archivada')
@@ -166,10 +165,7 @@ export default function BilleterasPage() {
       billeterasActivas: activas,
       billeterasArchivadas: archivadas,
       billeterasRegulares: activas.filter((b) => !b.es_efectivo),
-      billeterasEfectivo: activas.filter((b) => b.es_efectivo),
-      totalARSActivo: activas
-        .filter((b) => b.moneda === 'ARS')
-        .reduce((a, b) => a + b.saldo_actual, 0)
+      billeterasEfectivo: activas.filter((b) => b.es_efectivo)
     }
   }, [billeteras])
 
@@ -277,13 +273,6 @@ export default function BilleterasPage() {
       <div className={styles.pageHeader}>
         <div className={styles.headerLeft}>
           <h1 className={styles.pageTitle}>Billeteras</h1>
-          {!isLoading && (
-            <p className={styles.pageSubtitle}>
-              {billeterasActivas.length} activa{billeterasActivas.length !== 1 ? 's' : ''}
-              {' · '}Total:{' '}
-              {formatSaldo(totalARSActivo, 'ARS')}
-            </p>
-          )}
         </div>
         <button
           className={styles.nuevaBtn}

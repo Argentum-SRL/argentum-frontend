@@ -196,6 +196,7 @@
   position: relative;
   flex-shrink: 0;
   opacity: 1; /* visible en mobile por defecto */
+  z-index: 2;
 }
 
 @media (hover: hover) {
@@ -489,4 +490,29 @@
     .wcKebab { opacity: 0; }
     .wc:hover .wcKebab, .wcMenuOpen .wcKebab { opacity: 1; }
   }
+}
+
+/* ── Overlay Button ──────────────────────────────────────────────────────── */
+.overlayBtn {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+  border-radius: 18px;
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  .overlayBtn {
+    border-radius: 20px;
+  }
+}
+
+.overlayBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

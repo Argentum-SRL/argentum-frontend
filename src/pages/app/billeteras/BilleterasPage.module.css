@@ -39,18 +39,7 @@
   .pageTitle { font-size: 26px; }
 }
 
-/* Subtítulo — oculto en mobile */
-.pageSubtitle {
-  display: none;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-3);
-  margin: 0;
-}
 
-@media (min-width: 768px) {
-  .pageSubtitle { display: block; }
-}
 
 /* Botón "Nueva" — visible en mobile Y desktop */
 .nuevaBtn {

@@ -12,7 +12,7 @@
 
 .inputWrap {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   border: 1.5px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
@@ -56,7 +56,6 @@
   background: var(--surface-alt);
   border-right: 1.5px solid var(--border);
   white-space: nowrap;
-  height: 100%;
   display: flex;
   align-items: center;
   -webkit-user-select: none;

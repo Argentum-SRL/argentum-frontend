@@ -60,14 +60,24 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
   const bgColor = catalogoItem?.color ?? 'var(--surface)'
   const textColor = catalogoItem?.colorTexto ?? 'var(--text)'
 
-  const cardStyle: React.CSSProperties = isBrand ? {
-    backgroundColor: bgColor,
-    color: textColor,
-    borderColor: 'transparent'
-  } : {}
 
   return (
-    <div className={`${styles.card} ${cardStatusClass}`} style={cardStyle}>
+    <div 
+      className={`${styles.card} ${cardStatusClass}`} 
+      ref={el => {
+        if (el) {
+          if (isBrand) {
+            el.style.backgroundColor = bgColor
+            el.style.color = textColor
+            el.style.borderColor = 'transparent'
+          } else {
+            el.style.backgroundColor = ''
+            el.style.color = ''
+            el.style.borderColor = ''
+          }
+        }
+      }}
+    >
       {suscripcion.estado !== 'activa' && (
         <span className={`${styles.estadoBadge} ${suscripcion.estado === 'pausada' ? styles.badgePausada : styles.badgeCancelada}`}>
           {suscripcion.estado}
@@ -76,7 +86,14 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
 
       {/* ZONA TOP: Logo, Nombre y Frecuencia */}
       <div className={styles.header}>
-        <div className={styles.logoWrapper} style={{ backgroundColor: isBrand ? 'rgba(255,255,255,0.15)' : 'var(--surface-alt)' }}>
+        <div 
+          className={styles.logoWrapper} 
+          ref={el => {
+            if (el) {
+              el.style.backgroundColor = isBrand ? 'rgba(255,255,255,0.15)' : 'var(--surface-alt)'
+            }
+          }}
+        >
           {catalogoItem?.logoPath ? (
             <img 
               src={catalogoItem.logoPath} 
@@ -101,11 +118,25 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
         <div className={styles.info}>
           <div className={styles.nameRow}>
             <h3 className={styles.name}>{suscripcion.nombre}</h3>
-            <span className={styles.frecuencia} style={{ backgroundColor: isBrand ? 'rgba(0,0,0,0.1)' : 'var(--surface-alt)' }}>
+            <span 
+              className={styles.frecuencia} 
+              ref={el => {
+                if (el) {
+                  el.style.backgroundColor = isBrand ? 'rgba(0,0,0,0.1)' : 'var(--surface-alt)'
+                }
+              }}
+            >
               {suscripcion.frecuencia}
             </span>
           </div>
-          <div className={styles.proximoCobro} style={{ opacity: isBrand ? 0.8 : 1 }}>
+          <div 
+            className={styles.proximoCobro} 
+            ref={el => {
+              if (el) {
+                el.style.opacity = isBrand ? '0.8' : '1'
+              }
+            }}
+          >
             <Calendar size={12} />
             <span>{formatFecha(suscripcion.proximo_cobro)}</span>
             {urgenciaClass && <span className={`${styles.chipUrgencia} ${urgenciaClass}`}>{urgenciaText}</span>}
@@ -121,13 +152,27 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
               {formatMonto(suscripcion.precio_actual?.monto || 0, suscripcion.precio_actual?.moneda || 'ARS')}
             </span>
             {suscripcion.frecuencia !== 'mensual' && suscripcion.costo_mensual_equivalente && (
-              <span className={styles.montoEquiv} style={{ opacity: isBrand ? 0.7 : 1 }}>
+              <span 
+                className={styles.montoEquiv} 
+                ref={el => {
+                  if (el) {
+                    el.style.opacity = isBrand ? '0.7' : '1'
+                  }
+                }}
+              >
                 / {formatMonto(suscripcion.costo_mensual_equivalente, suscripcion.precio_actual?.moneda || 'ARS')} mes
               </span>
             )}
           </div>
 
-          <div className={styles.vinculacion} style={{ opacity: isBrand ? 0.8 : 1 }}>
+          <div 
+            className={styles.vinculacion} 
+            ref={el => {
+              if (el) {
+                el.style.opacity = isBrand ? '0.8' : '1'
+              }
+            }}
+          >
             {tarjeta ? (
               <><CreditCard size={14} /> <span>{tarjeta.nombre}</span></>
             ) : billetera ? (

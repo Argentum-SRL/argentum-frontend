@@ -66,9 +66,11 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
           {/* Cara Posterior */}
           <div 
             className={styles.cardBack} 
-            style={{ 
-              background: backgroundStyle,
-              color: textColor 
+            ref={el => {
+              if (el) {
+                el.style.background = backgroundStyle
+                el.style.color = textColor
+              }
             }}
           >
             {/* Banda magnética */}
@@ -89,10 +91,12 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
             <div className={styles.backActions}>
               <button 
                 className={styles.backActionBtn}
-                style={{
-                  color: textColor,
-                  borderColor: borderLight,
-                  background: bgLight
+                ref={el => {
+                  if (el) {
+                    el.style.color = textColor
+                    el.style.borderColor = borderLight
+                    el.style.background = bgLight
+                  }
                 }}
                 onClick={(e) => { e.stopPropagation(); onEdit(tarjeta) }} 
                 title="Editar"
@@ -103,10 +107,12 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
               
               <button 
                 className={styles.backActionBtn}
-                style={{
-                  color: textColor,
-                  borderColor: borderLight,
-                  background: bgLight
+                ref={el => {
+                  if (el) {
+                    el.style.color = textColor
+                    el.style.borderColor = borderLight
+                    el.style.background = bgLight
+                  }
                 }}
                 onClick={(e) => { e.stopPropagation(); onArchive(tarjeta) }} 
                 title="Archivar"
@@ -117,10 +123,12 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
               
               <button 
                 className={`${styles.backActionBtn} ${styles.backActionBtnDelete}`}
-                style={{
-                  color: textColor,
-                  borderColor: borderLight,
-                  background: bgLight
+                ref={el => {
+                  if (el) {
+                    el.style.color = textColor
+                    el.style.borderColor = borderLight
+                    el.style.background = bgLight
+                  }
                 }}
                 onClick={(e) => { e.stopPropagation(); onDelete(tarjeta) }} 
                 title="Eliminar"
@@ -131,7 +139,14 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
             </div>
 
             {/* Pista de giro */}
-            <div className={styles.flipBackHint} style={{ color: isDarkText ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }}>
+            <div 
+              className={styles.flipBackHint} 
+              ref={el => {
+                if (el) {
+                  el.style.color = isDarkText ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'
+                }
+              }}
+            >
               <span>Click para volver</span>
             </div>
           </div>
@@ -142,7 +157,7 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
       <div className={styles.content}>
         <div className={styles.divider} />
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="flex justify-between items-center">
           {mostrarAlerta && !isFlipped && (
             <div className={styles.chipAlerta}>
               <Clock size={12} />
@@ -151,7 +166,16 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
           )}
           
           {tarjeta.resumen_actual && tarjeta.resumen_actual.total_comprometido_resumen_actual > 0 && (
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginLeft: 'auto' }}>
+            <span 
+              ref={el => {
+                if (el) {
+                  el.style.fontSize = '12px'
+                  el.style.fontWeight = '600'
+                  el.style.color = 'var(--text-3)'
+                  el.style.marginLeft = 'auto'
+                }
+              }}
+            >
               Resumen: {formatMonto(tarjeta.resumen_actual.total_comprometido_resumen_actual, tarjeta.moneda)}
             </span>
           )}

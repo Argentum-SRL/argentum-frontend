@@ -9,7 +9,7 @@ interface GoogleLoginButtonProps {
 
 const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }: GoogleLoginButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [buttonWidth, setButtonWidth] = useState<string>('340px')
+  const [buttonWidth, setButtonWidth] = useState<string | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -25,7 +25,8 @@ const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }
       for (const entry of entries) {
         // Clamp width between 200px and 400px (Google API constraints)
         const w = Math.min(400, Math.max(200, Math.round(entry.contentRect.width)))
-        setButtonWidth(`${w}px`)
+        const nextWidth = `${w}px`
+        setButtonWidth((prev) => (prev === nextWidth ? prev : nextWidth))
       }
     })
 
@@ -35,23 +36,25 @@ const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }
 
   return (
     <div ref={containerRef} className={styles.container}>
-      <GoogleLogin
-        onSuccess={(credentialResponse) => {
-          if (credentialResponse.credential) {
-            onSuccess({ credential: credentialResponse.credential })
-          } else {
+      {buttonWidth && (
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            if (credentialResponse.credential) {
+              onSuccess({ credential: credentialResponse.credential })
+            } else {
+              onError()
+            }
+          }}
+          onError={() => {
+            console.error('[Auth][Google] Error en el componente GoogleLogin')
             onError()
-          }
-        }}
-        onError={() => {
-          console.error('[Auth][Google] Error en el componente GoogleLogin')
-          onError()
-        }}
-        theme="outline"
-        size="large"
-        shape="pill"
-        width={buttonWidth}
-      />
+          }}
+          theme="outline"
+          size="large"
+          shape="pill"
+          width={buttonWidth}
+        />
+      )}
     </div>
   )
 })

@@ -208,13 +208,18 @@ const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria
   const maxVal = chartData[0]?.gasto_actual_ciclo || 0
   const total = chartData.reduce((acc, curr) => acc + curr.gasto_actual_ciclo, 0)
 
+  const dynamicCSS = chartData.map((entry) => {
+    const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
+    const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
+    return `.bar-fill-${entry.categoria_id}{width:${fillPct.toFixed(2)}%;background:${color}}`
+  }).join('')
+
   return (
     <div className={styles.barChartWrap}>
+      <style>{dynamicCSS}</style>
       {chartData.map((entry) => {
         const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
-        const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
-        const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
-        
+
         return (
           <div key={entry.categoria_id} className={styles.barItem}>
             <div className={styles.barIconWrap}>
@@ -228,7 +233,7 @@ const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria
                 </span>
               </div>
               <div className={styles.barTrack}>
-                <div className={styles.barFill} style={{ width: `${fillPct}%`, background: color }} />
+                <div className={`${styles.barFill} bar-fill-${entry.categoria_id}`} />
               </div>
             </div>
           </div>

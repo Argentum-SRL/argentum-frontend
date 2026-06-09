@@ -2,13 +2,13 @@ import api from './api'
 import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta } from '@/types'
 
 const tarjetaService = {
-  getTarjetas: async (): Promise<TarjetaCredito[]> => {
-    const { data } = await api.get<TarjetaCredito[]>('/tarjetas')
+  getTarjetas: async (signal?: AbortSignal): Promise<TarjetaCredito[]> => {
+    const { data } = await api.get<TarjetaCredito[]>('/tarjetas', { signal })
     return data
   },
 
-  getTarjetasPorBilletera: async (billeteraId: string): Promise<TarjetaCredito[]> => {
-    const { data } = await api.get<TarjetaCredito[]>(`/tarjetas/billetera/${billeteraId}`)
+  getTarjetasPorBilletera: async (billeteraId: string, signal?: AbortSignal): Promise<TarjetaCredito[]> => {
+    const { data } = await api.get<TarjetaCredito[]>(`/tarjetas/billetera/${billeteraId}`, { signal })
     return data
   },
 
@@ -36,11 +36,11 @@ const tarjetaService = {
     await api.delete(`/tarjetas/${id}`)
   },
 
-  getResumenTarjeta: async (id: string): Promise<ResumenTarjeta> => {
-    const { data } = await api.get<ResumenTarjeta>(`/tarjetas/${id}/resumen`)
+  getResumenTarjeta: async (id: string, signal?: AbortSignal): Promise<ResumenTarjeta> => {
+    const { data } = await api.get<ResumenTarjeta>(`/tarjetas/${id}/resumen`, { signal })
     return data
   },
-  pagarResumenTarjeta: async (id: string, fechaPago?: string): Promise<any> => {
+  pagarResumenTarjeta: async (id: string, fechaPago?: string): Promise<unknown> => {
     const { data } = await api.post(`/tarjetas/${id}/pagar`, { fecha_pago: fechaPago })
     return data
   }

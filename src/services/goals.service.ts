@@ -2,13 +2,13 @@ import api from './api'
 import type { Goal, GoalMovement, GoalAnalytics, GoalSummary } from '@/types/goals'
 
 const goalsService = {
-  getGoals: async (activas_solo?: boolean): Promise<Goal[]> => {
-    const response = await api.get('/goals', { params: { activas_solo } })
+  getGoals: async (activas_solo?: boolean, signal?: AbortSignal): Promise<Goal[]> => {
+    const response = await api.get('/goals', { params: { activas_solo }, signal })
     return response.data
   },
 
-  getGoal: async (id: string): Promise<Goal> => {
-    const response = await api.get(`/goals/${id}`)
+  getGoal: async (id: string, signal?: AbortSignal): Promise<Goal> => {
+    const response = await api.get(`/goals/${id}`, { signal })
     return response.data
   },
 
@@ -35,13 +35,13 @@ const goalsService = {
     await api.delete(`/goals/${id}/movimientos/${movementId}`)
   },
 
-  getAnalytics: async (id: string): Promise<GoalAnalytics> => {
-    const response = await api.get(`/goals/${id}/analytics`)
+  getAnalytics: async (id: string, signal?: AbortSignal): Promise<GoalAnalytics> => {
+    const response = await api.get(`/goals/${id}/analytics`, { signal })
     return response.data
   },
 
-  getSummary: async (): Promise<GoalSummary> => {
-    const response = await api.get('/goals/summary')
+  getSummary: async (signal?: AbortSignal): Promise<GoalSummary> => {
+    const response = await api.get('/goals/summary', { signal })
     return response.data
   }
 }

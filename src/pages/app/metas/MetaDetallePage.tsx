@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { 
   ArrowLeft, 
@@ -43,6 +43,11 @@ export default function MetaDetallePage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'activity' | 'analytics' | 'settings'>('overview')
   
+  const datosGrafico = useMemo(() => {
+    if (!analytics?.chart_data) return []
+    return analytics.chart_data
+  }, [analytics?.chart_data])
+  
   const iconRef = useRef<HTMLDivElement>(null)
   const progressBarRef = useRef<HTMLDivElement>(null)
 
@@ -58,34 +63,40 @@ export default function MetaDetallePage() {
     }
   }, [goal, activeTab, analytics])
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (signal?: AbortSignal) => {
     if (!id) return
     try {
       const [goalData, analyticsData, billsData] = await Promise.all([
-        goalsService.getGoal(id),
-        goalsService.getAnalytics(id),
-        billeteraService.list()
+        goalsService.getGoal(id, signal),
+        goalsService.getAnalytics(id, signal),
+        billeteraService.list(signal)
       ])
+      if (signal?.aborted) return
       setGoal(goalData)
       setAnalytics(analyticsData)
       setBilleteras(billsData)
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       showToast('Error al cargar detalle de la meta', 'error')
       navigate('/app/metas')
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) {
+        setLoading(false)
+      }
     }
   }, [id, navigate, showToast])
 
   useEffect(() => {
-    let isMounted = true
+    const controller = new AbortController()
     const load = async () => {
-      await fetchData()
+      await fetchData(controller.signal)
     }
-    if (isMounted) {
-        load()
+    load()
+    return () => {
+      controller.abort()
     }
-    return () => { isMounted = false }
   }, [fetchData])
 
   const handleContribute = () => {
@@ -258,7 +269,7 @@ export default function MetaDetallePage() {
               <h3 className={styles.cardTitle}>Evolución del ahorro</h3>
               <div className={styles.chartContainer}>
                 <ResponsiveContainer width="100%" height={240}>
-                  <AreaChart data={analytics.chart_data}>
+                  <AreaChart data={datosGrafico}>
                     <defs>
                       <linearGradient id="colorMonto" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={goal.color || '#3B82F6'} stopOpacity={0.3}/>
@@ -276,6 +287,7 @@ export default function MetaDetallePage() {
                       fillOpacity={1} 
                       fill="url(#colorMonto)" 
                       strokeWidth={3}
+                      isAnimationActive={false}
                     />
                   </AreaChart>
                 </ResponsiveContainer>

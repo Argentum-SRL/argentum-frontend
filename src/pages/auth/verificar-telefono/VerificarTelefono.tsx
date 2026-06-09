@@ -41,16 +41,37 @@ export default function VerificarTelefono() {
   // Si llegamos en modo verificación con teléfono ya sabido, enviamos el código automáticamente.
   // Usamos hasTriggered para evitar doble envío en React StrictMode (Dev).
   useEffect(() => {
+    const controller = new AbortController()
     if (modoVerificacion && telefonoInicial && step === 'code' && !hasTriggered.current) {
       hasTriggered.current = true
-      enviarCodigoTelefono(telefonoInicial)
-        .then(() => setCountdown(60))
-        .catch(() => setApiError('No se pudo enviar el código. Pedí uno nuevo.'))
+      
+      const sendCode = async () => {
+        try {
+          await enviarCodigoTelefono(telefonoInicial)
+          if (!controller.signal.aborted) {
+            setCountdown(60)
+          }
+        } catch (err: unknown) {
+          if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+            return
+          }
+          if (!controller.signal.aborted) {
+            setApiError('No se pudo enviar el código. Pedí uno nuevo.')
+          }
+        }
+      }
+      void sendCode()
+    }
+    return () => {
+      controller.abort()
     }
   }, [modoVerificacion, telefonoInicial, step])
 
   useEffect(() => {
-    if (step === 'code') setTimeout(() => codeInputRef.current?.focus(), 100)
+    if (step === 'code') {
+      const timer = setTimeout(() => codeInputRef.current?.focus(), 100)
+      return () => clearTimeout(timer)
+    }
   }, [step])
 
   useEffect(() => {

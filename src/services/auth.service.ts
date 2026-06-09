@@ -106,7 +106,7 @@ export async function verificarCodigoTelefono(telefono: string, codigo: string):
   return data
 }
 
-export async function enviarCodigoEmail(email: string): Promise<any> {
+export async function enviarCodigoEmail(email: string): Promise<unknown> {
   const { data } = await api.post('/auth/email/enviar-codigo', { email })
   return data
 }

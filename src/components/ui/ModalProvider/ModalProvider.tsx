@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactNode } from 'react'
+import { useCallback, useState, useMemo, type ReactNode } from 'react'
 import { ModalContext } from '@/context/ModalContext'
 import type { ModalId, ModalPayloadMap, ModalStateMap } from '@/context/modalRegistry'
 
@@ -68,17 +68,20 @@ export function ModalProvider({ children }: ModalProviderProps) {
     [modals],
   )
 
+  const contextValue = useMemo(
+    () => ({
+      modals,
+      openModal,
+      closeModal,
+      closeAll,
+      isModalOpen,
+      getModalData,
+    }),
+    [modals, openModal, closeModal, closeAll, isModalOpen, getModalData]
+  )
+
   return (
-    <ModalContext.Provider
-      value={{
-        modals,
-        openModal,
-        closeModal,
-        closeAll,
-        isModalOpen,
-        getModalData,
-      }}
-    >
+    <ModalContext.Provider value={contextValue}>
       {children}
     </ModalContext.Provider>
   )

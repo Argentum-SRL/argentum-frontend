@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, type ReactNode } from 'react'
+import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { clearTokens, getToken, setToken, setRefreshToken } from '../services/api'
@@ -7,8 +7,10 @@ import { AuthContext } from './AuthContext'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
-  // Siempre arrancamos en loading=true hasta verificar el estado de auth
-  const [isLoading, setIsLoading] = useState(true)
+  // Siempre arrancamos en loading=true si hay token para verificar, de lo contrario false
+  const [isLoading, setIsLoading] = useState(() => {
+    return !!getToken()
+  })
   const navigate = useNavigate()
 
   const logout = useCallback(async (options?: { state?: unknown }) => {
@@ -50,44 +52,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = getToken()
     if (!token) {
-      // Sin token: no hay sesión, terminamos loading
-      setIsLoading(false)
+      // Sin token: no hay sesión, no hace falta hacer fetch
       return
     }
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
     let mounted = true
+
     api
-      .get<{ usuario: Usuario }>('/auth/me')
+      .get<{ usuario: Usuario }>('/auth/me', { signal: controller.signal })
       .then((res) => {
         const { data } = res
         if (mounted) setUsuario(data.usuario)
       })
-      .catch(() => {
-        if (mounted) {
+      .catch((err) => {
+        if (err && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          // timeout / aborted
+        } else {
           clearTokens()
-          setUsuario(null)
         }
+        if (mounted) setUsuario(null)
       })
       .finally(() => {
+        clearTimeout(timeoutId)
         if (mounted) setIsLoading(false)
       })
     return () => {
       mounted = false
+      controller.abort()
+      clearTimeout(timeoutId)
     }
   }, [])
 
+  const contextValue = useMemo(
+    () => ({
+      usuario,
+      isAuthenticated: !!usuario,
+      isLoading,
+      login,
+      logout,
+      refreshUser,
+      updateUsuario,
+    }),
+    [usuario, isLoading, login, logout, refreshUser, updateUsuario]
+  )
+
   return (
-    <AuthContext.Provider
-      value={{
-        usuario,
-        isAuthenticated: !!usuario,
-        isLoading,
-        login,
-        logout,
-        refreshUser,
-        updateUsuario,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   )

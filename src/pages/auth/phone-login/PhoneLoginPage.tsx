@@ -52,6 +52,13 @@ export default function PhoneLoginPage() {
   const [otpFocused, setOtpFocused] = useState(false)
 
   const otpInputRef = useRef<HTMLInputElement>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
 
   const codigo = digits.join('')
   const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu número de teléfono.' : null
@@ -137,7 +144,8 @@ export default function PhoneLoginPage() {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
       setApiError(detail ?? 'Código incorrecto. Revisalo e intentá de nuevo.')
       setDigits(Array(6).fill(''))
-      setTimeout(() => otpInputRef.current?.focus(), 50)
+      if (timerRef.current) clearTimeout(timerRef.current)
+      timerRef.current = setTimeout(() => otpInputRef.current?.focus(), 50)
     } finally {
       setLoading(false)
     }

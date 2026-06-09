@@ -62,7 +62,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-
   const [prevPath, setPrevPath] = useState(location.pathname)
   if (location.pathname !== prevPath) {
     setPrevPath(location.pathname)

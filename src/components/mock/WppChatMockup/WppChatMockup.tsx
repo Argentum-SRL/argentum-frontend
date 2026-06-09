@@ -160,9 +160,10 @@ export default function WppChatMockup() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     }, 50)
+    return () => clearTimeout(timer)
   }, [visibleMsgs, typingState])
 
   useEffect(() => {

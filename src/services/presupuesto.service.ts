@@ -15,7 +15,7 @@ export const invalidatePresupuestos = () => {
 }
 
 const presupuestoService = {
-  getPresupuestos: async (estado?: string): Promise<Presupuesto[]> => {
+  getPresupuestos: async (estado?: string, signal?: AbortSignal): Promise<Presupuesto[]> => {
     const key = estado || 'all'
     const cached = presupuestosCache[key]
     
@@ -23,13 +23,13 @@ const presupuestoService = {
       return cached.data
     }
 
-    const response = await api.get('/presupuestos', { params: { estado } })
+    const response = await api.get('/presupuestos', { params: { estado }, signal })
     presupuestosCache[key] = { data: response.data, timestamp: Date.now() }
     return response.data
   },
 
-  getPresupuesto: async (id: string): Promise<Presupuesto> => {
-    const response = await api.get(`/presupuestos/${id}`)
+  getPresupuesto: async (id: string, signal?: AbortSignal): Promise<Presupuesto> => {
+    const response = await api.get(`/presupuestos/${id}`, { signal })
     return response.data
   },
 
@@ -62,8 +62,8 @@ const presupuestoService = {
     invalidatePresupuestos()
   },
 
-  getHistorial: async (id: string): Promise<PeriodoPresupuesto[]> => {
-    const response = await api.get(`/presupuestos/${id}/historial`)
+  getHistorial: async (id: string, signal?: AbortSignal): Promise<PeriodoPresupuesto[]> => {
+    const response = await api.get(`/presupuestos/${id}/historial`, { signal })
     return response.data
   }
 }

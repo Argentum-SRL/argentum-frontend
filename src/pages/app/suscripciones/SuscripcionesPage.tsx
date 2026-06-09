@@ -40,48 +40,67 @@ const SuscripcionesPage: React.FC = () => {
   const [isExiting, setIsExiting] = useState(false)
   const { showToast } = useToast()
   const { confirm } = useModal()
+  
+  const internalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const suscripcionesLengthRef = useRef(0)
   useEffect(() => {
     suscripcionesLengthRef.current = suscripciones.length
   }, [suscripciones.length])
 
-  const loadData = useCallback(async (isFirstLoad = false) => {
+  const loadData = useCallback(async (isFirstLoad = false, signal?: AbortSignal) => {
     try {
       const [data, t, bills, cards] = await Promise.all([
-        suscripcionService.getSuscripciones(),
-        suscripcionService.getTotalMensual(),
-        billeteraService.list(),
-        tarjetaService.getTarjetas(),
+        suscripcionService.getSuscripciones(undefined, signal),
+        suscripcionService.getTotalMensual(signal),
+        billeteraService.list(signal),
+        tarjetaService.getTarjetas(signal),
       ])
+      if (signal?.aborted) return
+
       setBilleteras(bills)
       setTarjetas(cards)
       
       const prevLength = suscripcionesLengthRef.current
       if (!isFirstLoad && prevLength === 0 && data.length > 0) {
         setIsExiting(true)
-        setTimeout(() => {
-          setSuscripciones(data)
-          setTotales(t)
-          setIsExiting(false)
+        if (internalTimeoutRef.current) clearTimeout(internalTimeoutRef.current)
+        internalTimeoutRef.current = setTimeout(() => {
+          if (!signal?.aborted) {
+            setSuscripciones(data)
+            setTotales(t)
+            setIsExiting(false)
+          }
         }, 400)
       } else {
         setSuscripciones(data)
         setTotales(t)
       }
     } catch (error) {
+      if (error instanceof Error && (error.name === 'AbortError' || error.name === 'CanceledError')) {
+        return
+      }
       console.error(error)
       showToast('Error al cargar suscripciones', 'error')
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) {
+        setLoading(false)
+      }
     }
   }, [showToast])
 
   useEffect(() => {
+    const controller = new AbortController()
     const timer = setTimeout(() => {
-      loadData(true)
+      void loadData(true, controller.signal)
     }, 0)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+      if (internalTimeoutRef.current) {
+        clearTimeout(internalTimeoutRef.current)
+      }
+    }
   }, [loadData])
 
   const handleCreate = () => {

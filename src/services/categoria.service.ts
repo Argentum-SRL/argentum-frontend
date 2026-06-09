@@ -10,7 +10,7 @@ export const invalidateCategorias = () => {
 }
 
 const categoriaService = {
-  getCategorias: async () => {
+  getCategorias: async (signal?: AbortSignal) => {
     if (categoriesPromise) return categoriesPromise
 
     if (categoriesCache && Date.now() - categoriesCache.timestamp < CATEGORIES_TTL) {
@@ -19,7 +19,7 @@ const categoriaService = {
 
     categoriesPromise = (async () => {
       try {
-        const response = await api.get<Categoria[]>('/categorias')
+        const response = await api.get<Categoria[]>('/categorias', { signal })
         categoriesCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {
@@ -30,13 +30,13 @@ const categoriaService = {
     return categoriesPromise
   },
 
-  getSubcategorias: async (categoriaId: string) => {
-    const response = await api.get<Subcategoria[]>(`/categorias/${categoriaId}/subcategorias`)
+  getSubcategorias: async (categoriaId: string, signal?: AbortSignal) => {
+    const response = await api.get<Subcategoria[]>(`/categorias/${categoriaId}/subcategorias`, { signal })
     return response.data
   },
 
-  getAllSubcategorias: async () => {
-    const response = await api.get<Subcategoria[]>('/categorias/subcategorias')
+  getAllSubcategorias: async (signal?: AbortSignal) => {
+    const response = await api.get<Subcategoria[]>('/categorias/subcategorias', { signal })
     return response.data
   }
 }

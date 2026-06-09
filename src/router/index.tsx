@@ -1,23 +1,26 @@
+/* eslint-disable react-refresh/only-export-components */
+import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import RootLayout from '@/router/RootLayout'
 import ProtectedRoute from '@/router/ProtectedRoute'
-import LoginPage from '@/pages/auth/login/LoginPage'
-import RegisterPage from '@/pages/auth/register/RegisterPage'
-import PhoneLoginPage from '@/pages/auth/phone-login/PhoneLoginPage'
-import VerificarEmail from '@/pages/auth/verificar-email/VerificarEmail'
-import VerificarTelefono from '@/pages/auth/verificar-telefono/VerificarTelefono'
-import CompletarPerfil from '@/pages/auth/completar-perfil/CompletarPerfil'
-import OnboardingPage from '@/pages/onboarding/OnboardingPage'
-import DashboardPage from '@/pages/app/dashboard/DashboardPage'
-import BilleterasPage from '@/pages/app/billeteras/BilleterasPage'
-import BilleteraDetallePage from '@/pages/app/billeteras/BilleteraDetallePage'
-import TransaccionesPage from '@/pages/app/transacciones/TransaccionesPage'
-import PresupuestosPage from '@/pages/app/presupuestos/PresupuestosPage'
-import MetasPage from '@/pages/app/metas/MetasPage'
-import MetaDetallePage from '@/pages/app/metas/MetaDetallePage'
-import SuscripcionesPage from '@/pages/app/suscripciones/SuscripcionesPage'
-import PerfilPage from '@/pages/app/perfil/PerfilPage'
 import AppWrapper from '@/components/layout/AppWrapper/AppWrapper'
+
+const LoginPage = lazy(() => import('@/pages/auth/login/LoginPage'))
+const RegisterPage = lazy(() => import('@/pages/auth/register/RegisterPage'))
+const PhoneLoginPage = lazy(() => import('@/pages/auth/phone-login/PhoneLoginPage'))
+const VerificarEmail = lazy(() => import('@/pages/auth/verificar-email/VerificarEmail'))
+const VerificarTelefono = lazy(() => import('@/pages/auth/verificar-telefono/VerificarTelefono'))
+const CompletarPerfil = lazy(() => import('@/pages/auth/completar-perfil/CompletarPerfil'))
+const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'))
+const DashboardPage = lazy(() => import('@/pages/app/dashboard/DashboardPage'))
+const BilleterasPage = lazy(() => import('@/pages/app/billeteras/BilleterasPage'))
+const BilleteraDetallePage = lazy(() => import('@/pages/app/billeteras/BilleteraDetallePage'))
+const TransaccionesPage = lazy(() => import('@/pages/app/transacciones/TransaccionesPage'))
+const PresupuestosPage = lazy(() => import('@/pages/app/presupuestos/PresupuestosPage'))
+const MetasPage = lazy(() => import('@/pages/app/metas/MetasPage'))
+const MetaDetallePage = lazy(() => import('@/pages/app/metas/MetaDetallePage'))
+const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/SuscripcionesPage'))
+const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 
 const router = createBrowserRouter([
   {

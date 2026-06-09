@@ -211,10 +211,11 @@ export default function PresupuestoModal({
 
   useEffect(() => {
     if (open) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         dispatch({ type: 'RESET', presupuesto: presupuesto || null })
         loadSubcategorias()
       }, 0)
+      return () => clearTimeout(timer)
     }
   }, [open, presupuesto, loadSubcategorias])
 

@@ -2,19 +2,19 @@ import api from './api'
 import type { Suscripcion, SuscripcionCreate, TotalMensualSuscripciones, HistorialSuscripcion } from '../types'
 
 const suscripcionService = {
-  getSuscripciones: async (estado?: string): Promise<Suscripcion[]> => {
+  getSuscripciones: async (estado?: string, signal?: AbortSignal): Promise<Suscripcion[]> => {
     const params = estado ? { estado } : {}
-    const { data } = await api.get<Suscripcion[]>('/suscripciones', { params })
+    const { data } = await api.get<Suscripcion[]>('/suscripciones', { params, signal })
     return data
   },
 
-  getTotalMensual: async (): Promise<TotalMensualSuscripciones> => {
-    const { data } = await api.get<TotalMensualSuscripciones>('/suscripciones/total-mensual')
+  getTotalMensual: async (signal?: AbortSignal): Promise<TotalMensualSuscripciones> => {
+    const { data } = await api.get<TotalMensualSuscripciones>('/suscripciones/total-mensual', { signal })
     return data
   },
 
-  getSuscripcion: async (id: string): Promise<Suscripcion> => {
-    const { data } = await api.get<Suscripcion>(`/suscripciones/${id}`)
+  getSuscripcion: async (id: string, signal?: AbortSignal): Promise<Suscripcion> => {
+    const { data } = await api.get<Suscripcion>(`/suscripciones/${id}`, { signal })
     return data
   },
 

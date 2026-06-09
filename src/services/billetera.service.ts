@@ -15,7 +15,7 @@ export const invalidateBilleteras = () => {
 }
 
 const billeteraService = {
-  list: async (): Promise<Billetera[]> => {
+  list: async (signal?: AbortSignal): Promise<Billetera[]> => {
     // If there's a request in progress, reuse the promise
     if (billeterasPromise) return billeterasPromise
 
@@ -27,7 +27,7 @@ const billeteraService = {
     // Otherwise, fetch and store in cache
     billeterasPromise = (async () => {
       try {
-        const { data } = await api.get<Billetera[]>('/billeteras')
+        const { data } = await api.get<Billetera[]>('/billeteras', { signal })
         billeterasCache = { data, timestamp: Date.now() }
         return data
       } finally {
@@ -38,8 +38,8 @@ const billeteraService = {
     return billeterasPromise
   },
 
-  getById: async (id: string): Promise<Billetera> => {
-    const { data } = await api.get<Billetera>(`/billeteras/${id}`)
+  getById: async (id: string, signal?: AbortSignal): Promise<Billetera> => {
+    const { data } = await api.get<Billetera>(`/billeteras/${id}`, { signal })
     return data
   },
 

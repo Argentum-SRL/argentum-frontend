@@ -81,7 +81,7 @@ const TotalesHero = memo(({ billeteras, cotizacion }: { billeteras: Billetera[],
             <p className={styles.totalLbl}>Total USD</p>
             <span 
               title={`Cotización utilizada: USD ${tipoLabel} · ${formatSaldo(valorUSD, 'ARS')}`}
-              style={{ display: 'inline-flex', cursor: 'help' }}
+              className="inline-flex cursor-help"
             >
               <Info 
                 size={12} 
@@ -108,14 +108,16 @@ export default function BilleterasPage() {
   const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const fetchPageData = useCallback(async () => {
+  const fetchPageData = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     try {
       const [bRes, cRes] = await Promise.all([
-        billeteraService.list(),
-        dashboardService.getCotizacion().catch(() => null)
+        billeteraService.list(signal),
+        dashboardService.getCotizacion(signal).catch(() => null)
       ])
       
+      if (signal?.aborted) return
+
       if (Array.isArray(bRes)) {
         setBilleteras(bRes.map((d: Billetera) => ({
           ...d,
@@ -125,18 +127,27 @@ export default function BilleterasPage() {
       }
       setCotizacion(cRes)
     } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       console.error('Error fetching billeteras data:', err)
       showToast('Error al cargar datos', 'error')
     } finally {
-      setIsLoading(false)
+      if (!signal?.aborted) {
+        setIsLoading(false)
+      }
     }
   }, [showToast])
 
   useEffect(() => {
+    const controller = new AbortController()
     const tid = setTimeout(() => {
-      void fetchPageData()
+      void fetchPageData(controller.signal)
     }, 0)
-    return () => clearTimeout(tid)
+    return () => {
+      clearTimeout(tid)
+      controller.abort()
+    }
   }, [fetchPageData])
 
   const [showArchived, setShowArchived] = useState(false)
@@ -163,16 +174,10 @@ export default function BilleterasPage() {
   }, [billeteras])
 
   // Inicializar la tarjeta principal como la que está al frente por defecto
-  useEffect(() => {
-    if (billeterasActivas.length > 0 && !frontCardId) {
-      const principal = billeterasActivas.find(b => b.es_principal)
-      if (principal) {
-        setFrontCardId(principal.id)
-      } else {
-        setFrontCardId(billeterasActivas[0].id)
-      }
-    }
-  }, [billeterasActivas, frontCardId])
+  if (billeterasActivas.length > 0 && !frontCardId) {
+    const principal = billeterasActivas.find(b => b.es_principal)
+    setFrontCardId(principal ? principal.id : billeterasActivas[0].id)
+  }
 
   const handleArchivar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)

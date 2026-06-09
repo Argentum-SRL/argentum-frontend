@@ -14,7 +14,7 @@ let proyeccionPromise: Promise<Proyeccion> | null = null
 const DEFAULT_TTL = 60 * 1000 // 60 seconds
 
 export const dashboardService = {
-  getResumen: async (desde?: string, hasta?: string): Promise<DashboardResumen> => {
+  getResumen: async (desde?: string, hasta?: string, signal?: AbortSignal): Promise<DashboardResumen> => {
     const key = `${desde || 'all'}-${hasta || 'all'}`
     
     const pending = resumenPromises[key]
@@ -28,7 +28,8 @@ export const dashboardService = {
     const promise = (async () => {
       try {
         const response = await api.get<DashboardResumen>('/dashboard/resumen', {
-          params: { desde, hasta }
+          params: { desde, hasta },
+          signal
         })
         resumenCache[key] = { data: response.data, timestamp: Date.now() }
         return response.data
@@ -41,7 +42,7 @@ export const dashboardService = {
     return promise
   },
 
-  getCotizacion: async (): Promise<CotizacionDolar> => {
+  getCotizacion: async (signal?: AbortSignal): Promise<CotizacionDolar> => {
     if (cotizacionPromise) return cotizacionPromise
 
     if (cotizacionCache && Date.now() - cotizacionCache.timestamp < DEFAULT_TTL) {
@@ -50,7 +51,7 @@ export const dashboardService = {
 
     cotizacionPromise = (async () => {
       try {
-        const response = await api.get<CotizacionDolar>('/dashboard/cotizacion')
+        const response = await api.get<CotizacionDolar>('/dashboard/cotizacion', { signal })
         cotizacionCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {
@@ -61,7 +62,7 @@ export const dashboardService = {
     return cotizacionPromise
   },
 
-  getProyeccion: async (): Promise<Proyeccion> => {
+  getProyeccion: async (signal?: AbortSignal): Promise<Proyeccion> => {
     if (proyeccionPromise) return proyeccionPromise
 
     if (proyeccionCache && Date.now() - proyeccionCache.timestamp < DEFAULT_TTL) {
@@ -70,7 +71,7 @@ export const dashboardService = {
 
     proyeccionPromise = (async () => {
       try {
-        const response = await api.get<Proyeccion>('/dashboard/proyeccion')
+        const response = await api.get<Proyeccion>('/dashboard/proyeccion', { signal })
         proyeccionCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {
@@ -81,14 +82,15 @@ export const dashboardService = {
     return proyeccionPromise
   },
 
-  getResumenCompleto: async (desde?: string, hasta?: string): Promise<{
+  getResumenCompleto: async (desde?: string, hasta?: string, signal?: AbortSignal): Promise<{
     billeteras: Billetera[];
     resumen: DashboardResumen;
     cotizacion: CotizacionDolar;
   }> => {
     // Esta llamada no usa cache por ahora para asegurar datos frescos al consolidar
     const response = await api.get('/dashboard/resumen-completo', {
-      params: { desde, hasta }
+      params: { desde, hasta },
+      signal
     })
     return response.data
   },

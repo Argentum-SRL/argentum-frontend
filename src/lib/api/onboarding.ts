@@ -1,13 +1,13 @@
 import api from '@/services/api'
 import type { CotizacionesDolarResponse, EstadoOnboarding } from '@/types/index'
 
-export async function getEstadoOnboarding(): Promise<EstadoOnboarding> {
-  const res = await api.get('/onboarding/estado')
+export async function getEstadoOnboarding(signal?: AbortSignal): Promise<EstadoOnboarding> {
+  const res = await api.get('/onboarding/estado', { signal })
   return res.data
 }
 
-export async function getCotizaciones(): Promise<CotizacionesDolarResponse> {
-  const res = await api.get('/onboarding/cotizaciones-dolar')
+export async function getCotizaciones(signal?: AbortSignal): Promise<CotizacionesDolarResponse> {
+  const res = await api.get('/onboarding/cotizaciones-dolar', { signal })
   return res.data
 }
 

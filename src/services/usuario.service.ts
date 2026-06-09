@@ -11,13 +11,13 @@ import type {
 } from '../types'
 
 const usuarioService = {
-  getMe: async () => {
-    const { data } = await api.get<Usuario>('/usuarios/me')
+  getMe: async (signal?: AbortSignal) => {
+    const { data } = await api.get<Usuario>('/usuarios/me', { signal })
     return data
   },
 
-  getMetodosLogin: async () => {
-    const { data } = await api.get<MetodosLogin>('/usuarios/me/metodos-login')
+  getMetodosLogin: async (signal?: AbortSignal) => {
+    const { data } = await api.get<MetodosLogin>('/usuarios/me/metodos-login', { signal })
     return data
   },
 

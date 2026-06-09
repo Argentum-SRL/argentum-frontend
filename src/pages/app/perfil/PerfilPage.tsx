@@ -46,15 +46,24 @@ export default function PerfilPage() {
   const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
     const fetchMetodos = async () => {
       try {
-        const data = await usuarioService.getMetodosLogin()
-        setMetodosLogin(data)
+        const data = await usuarioService.getMetodosLogin(controller.signal)
+        if (!controller.signal.aborted) {
+          setMetodosLogin(data)
+        }
       } catch (err) {
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          return
+        }
         console.error('Error fetching metodos login:', err)
       }
     }
     fetchMetodos()
+    return () => {
+      controller.abort()
+    }
   }, [usuario])
 
   // Estados de modales

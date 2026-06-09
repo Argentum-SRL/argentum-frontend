@@ -17,7 +17,7 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, Proyeccion, ProyeccionCategoria } from '@/types'
+import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
@@ -53,9 +53,9 @@ const Greeting = memo(({ nombre }: { nombre: string | null }) => {
     return 'Buenas noches'
   }, [])
 
-  const phrase = useMemo(() => {
+  const [phrase] = useState(() => {
     return PHRASES[Math.floor(Math.random() * PHRASES.length)]
-  }, [])
+  })
 
   return (
     <div className={styles.headerLeft}>
@@ -70,7 +70,7 @@ Greeting.displayName = 'Greeting'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-const MobileGreeting = memo(({ usuario }: { usuario: any }) => {
+const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   const { logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
@@ -268,55 +268,63 @@ export default function DashboardPage() {
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [showChartPercent, setShowChartPercent] = useState(false)
 
-  const fetchData = useCallback(async () => {
-    // Evitar setState sincrónico en useEffect
-    await Promise.resolve()
+  const fetchData = useCallback(async (signal?: AbortSignal) => {
     setError(false)
     setLoading(true)
     try {
       // Endpoint consolidado: trae resumen, billeteras y cotización
-      const res = await dashboardService.getResumenCompleto(undefined, undefined)
+      const res = await dashboardService.getResumenCompleto(undefined, undefined, signal)
+      if (signal?.aborted) return
       setData(res.resumen)
     } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       console.error('Error loading dashboard:', err)
       setError(true)
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) {
+        setLoading(false)
+      }
     }
-  }, [customRange])
+  }, [])
 
-  const fetchProyeccion = useCallback(async () => {
-    // Evitar setState sincrónico en useEffect
-    await Promise.resolve()
+  const fetchProyeccion = useCallback(async (signal?: AbortSignal) => {
     try {
       setLoadingProyeccion(true)
-      const res = await dashboardService.getProyeccion()
+      const res = await dashboardService.getProyeccion(signal)
+      if (signal?.aborted) return
       setProyeccion(res)
     } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       console.error('Error loading proyeccion:', err)
     } finally {
-      setLoadingProyeccion(false)
+      if (!signal?.aborted) {
+        setLoadingProyeccion(false)
+      }
     }
   }, [])
 
   useEffect(() => {
-    let ignore = false
+    const controller = new AbortController()
 
     const load = async () => {
       // Esperar un microtask para asegurar ejecución fuera del ciclo de renderizado sincrónico
       await Promise.resolve()
-      if (ignore) return
+      if (controller.signal.aborted) return
 
-      void fetchData()
+      void fetchData(controller.signal)
       if (!customRange) {
-        void fetchProyeccion()
+        void fetchProyeccion(controller.signal)
       }
     }
 
     void load()
 
     return () => {
-      ignore = true
+      controller.abort()
     }
   }, [fetchData, fetchProyeccion, customRange])
 
@@ -358,15 +366,7 @@ export default function DashboardPage() {
               {/* Luna Argentum Watermark */}
               <svg
                 viewBox="0 0 100 100"
-                style={{
-                  position: 'absolute',
-                  bottom: -20,
-                  right: -20,
-                  width: 120,
-                  height: 120,
-                  opacity: 0.04,
-                  pointerEvents: 'none'
-                }}
+                className="absolute -bottom-5 -right-5 w-[120px] h-[120px] opacity-[0.04] pointer-events-none"
               >
                 <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
                 <circle cx="58" cy="50" r="38" fill="#0D2045"/>

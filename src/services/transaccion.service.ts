@@ -21,7 +21,7 @@ export interface TransaccionFilters {
 }
 
 const transaccionService = {
-  getTransacciones: async (filters: TransaccionFilters = {}) => {
+  getTransacciones: async (filters: TransaccionFilters = {}, signal?: AbortSignal) => {
     const params = new URLSearchParams()
     Object.entries(filters).forEach(([key, value]) => {
       if (key === 'categoria_ids') return // Client-side filtering only
@@ -29,7 +29,7 @@ const transaccionService = {
         params.append(key, value.toString())
       }
     })
-    const response = await api.get<Transaccion[]>(`/transacciones?${params.toString()}`)
+    const response = await api.get<Transaccion[]>(`/transacciones?${params.toString()}`, { signal })
     return response.data
   },
 
@@ -38,8 +38,8 @@ const transaccionService = {
     return response.data
   },
 
-  getPendientesIA: async () => {
-    const response = await api.get<Transaccion[]>('/transacciones/pendientes')
+  getPendientesIA: async (signal?: AbortSignal) => {
+    const response = await api.get<Transaccion[]>('/transacciones/pendientes', { signal })
     return response.data
   },
 

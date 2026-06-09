@@ -59,10 +59,10 @@ export default function FilterBar({
     return () => clearTimeout(timer)
   }, [localSearch, filters, onFilterChange])
 
-  const [prevBusqueda, setPrevBusqueda] = useState(filters.busqueda)
-  if (filters.busqueda !== prevBusqueda) {
+  const [prevBusqueda, setPrevBusqueda] = useState(filters.busqueda || '')
+  if ((filters.busqueda || '') !== prevBusqueda) {
+    setPrevBusqueda(filters.busqueda || '')
     setLocalSearch(filters.busqueda || '')
-    setPrevBusqueda(filters.busqueda)
   }
 
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {

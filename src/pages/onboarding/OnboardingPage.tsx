@@ -44,19 +44,35 @@ export default function OnboardingPage() {
   const { refreshUser } = useAuth()
 
   useEffect(() => {
-    getEstadoOnboarding()
+    const controller = new AbortController()
+    getEstadoOnboarding(controller.signal)
       .then((res) => {
+        if (controller.signal.aborted) return
         if (res.onboarding_completo) {
           refreshUser().then(() => {
-            navigate('/app/dashboard', { replace: true })
+            if (!controller.signal.aborted) {
+              navigate('/app/dashboard', { replace: true })
+            }
           })
           return
         }
         setEstado(res)
         setPasoActual(mapEstadoAPaso(res))
       })
-      .catch(console.error)
-      .finally(() => setCargando(false))
+      .catch((err) => {
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          return
+        }
+        console.error(err)
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setCargando(false)
+        }
+      })
+    return () => {
+      controller.abort()
+    }
   }, [navigate, refreshUser])
 
 

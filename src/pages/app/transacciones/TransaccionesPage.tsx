@@ -58,25 +58,29 @@ export default function TransaccionesPage() {
 
   const fetchTransacciones = useCallback(async (signal?: AbortSignal) => {
     try {
-      const data = await transaccionService.getTransacciones(filters)
+      const data = await transaccionService.getTransacciones(filters, signal)
       if (!signal?.aborted) {
         setTransacciones(data)
       }
     } catch (err) {
-      if (err instanceof Error && err.name !== 'AbortError') {
-        console.error(err)
-        showToast('Error al cargar transacciones', 'error')
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
       }
+      console.error(err)
+      showToast('Error al cargar transacciones', 'error')
     }
   }, [filters, showToast])
 
   const fetchPendientes = useCallback(async (signal?: AbortSignal) => {
     try {
-      const data = await transaccionService.getPendientesIA()
+      const data = await transaccionService.getPendientesIA(signal)
       if (!signal?.aborted) {
         setPendientesIA(data)
       }
     } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       console.error(err)
     }
   }, [])

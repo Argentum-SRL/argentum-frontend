@@ -26,43 +26,57 @@ export default function MetasPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const fetchGoals = useCallback(async () => {
+  const fetchGoals = useCallback(async (signal?: AbortSignal) => {
     try {
-      const data = await goalsService.getGoals()
-      setGoals(data)
-    } catch {
+      const data = await goalsService.getGoals(undefined, signal)
+      if (!signal?.aborted) {
+        setGoals(data)
+      }
+    } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       showToast('Error al cargar metas', 'error')
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) {
+        setLoading(false)
+      }
     }
   }, [showToast])
 
-  const fetchBilleteras = useCallback(async () => {
+  const fetchBilleteras = useCallback(async (signal?: AbortSignal) => {
     try {
-      const data = await billeteraService.list()
-      setBilleteras(data)
+      const data = await billeteraService.list(signal)
+      if (!signal?.aborted) {
+        setBilleteras(data)
+      }
     } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       console.error(err)
     }
   }, [])
 
-  const fetchAll = useCallback(async () => {
+  const fetchAll = useCallback(async (signal?: AbortSignal) => {
     setLoading(true)
-    await Promise.all([fetchGoals(), fetchBilleteras()])
+    await Promise.all([fetchGoals(signal), fetchBilleteras(signal)])
   }, [fetchGoals, fetchBilleteras])
 
   useEffect(() => {
-    let ignore = false
+    const controller = new AbortController()
 
     const load = async () => {
       await Promise.resolve()
-      if (!ignore) {
-        void fetchAll()
+      if (!controller.signal.aborted) {
+        void fetchAll(controller.signal)
       }
     }
 
     void load()
-    return () => { ignore = true }
+    return () => {
+      controller.abort()
+    }
   }, [fetchAll])
 
   const filteredGoals = useMemo(() => {

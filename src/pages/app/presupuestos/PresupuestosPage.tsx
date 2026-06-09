@@ -34,34 +34,55 @@ export default function PresupuestosPage() {
   const [historial, setHistorial] = useState<PeriodoPresupuesto[]>([])
   const [loadingHistory, setLoadingHistory] = useState(false)
 
-  const fetchPresupuestos = useCallback(async () => {
+  const fetchPresupuestos = useCallback(async (signal?: AbortSignal) => {
     setLoading(true)
     try {
-      const data = await presupuestoService.getPresupuestos(activeTab)
-      setPresupuestos(data)
-    } catch {
+      const data = await presupuestoService.getPresupuestos(activeTab, signal)
+      if (!signal?.aborted) {
+        setPresupuestos(data)
+      }
+    } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
       showToast('Error al cargar presupuestos', 'error')
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) {
+        setLoading(false)
+      }
     }
   }, [activeTab, showToast])
 
   useEffect(() => {
-    setTimeout(() => {
-      fetchPresupuestos()
+    const controller = new AbortController()
+    const timer = setTimeout(() => {
+      void fetchPresupuestos(controller.signal)
     }, 0)
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
   }, [fetchPresupuestos])
 
   useEffect(() => {
+    const controller = new AbortController()
     const loadData = async () => {
       try {
-        const cats = await categoriaService.getCategorias()
-        setCategorias(cats.filter(c => c.tipo === 'egreso'))
+        const cats = await categoriaService.getCategorias(controller.signal)
+        if (!controller.signal.aborted) {
+          setCategorias(cats.filter(c => c.tipo === 'egreso'))
+        }
       } catch (err) {
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          return
+        }
         console.error(err)
       }
     }
     loadData()
+    return () => {
+      controller.abort()
+    }
   }, [])
 
   const handleOpenNew = useCallback(() => {

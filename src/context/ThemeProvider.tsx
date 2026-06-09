@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { type Theme, ThemeContext } from './ThemeContext'
 
 interface ThemeProviderProps {
@@ -35,18 +35,26 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     applyTheme(theme)
   }, [theme, applyTheme])
 
-  const setTheme = (newTheme: Theme) => {
+  const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme)
     localStorage.setItem('argentum_theme', newTheme)
-  }
+  }, [])
 
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(nextTheme)
-  }
+  const toggleTheme = useCallback(() => {
+    setThemeState((prev) => {
+      const nextTheme = prev === 'light' ? 'dark' : 'light'
+      localStorage.setItem('argentum_theme', nextTheme)
+      return nextTheme
+    })
+  }, [])
+
+  const contextValue = useMemo(
+    () => ({ theme, toggleTheme, setTheme }),
+    [theme, toggleTheme, setTheme]
+  )
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   )

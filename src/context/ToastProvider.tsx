@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { ToastContext } from './ToastContext'
 import type { ToastItem } from './ToastContext'
@@ -22,8 +22,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
+  const contextValue = useMemo(() => ({ showToast }), [showToast])
+
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={contextValue}>
       {children}
       <div className={styles.container}>
         {toasts.map((toast) => (

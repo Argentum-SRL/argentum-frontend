@@ -2,13 +2,13 @@ import api from './api'
 import type { TransaccionRecurrente } from '@/types'
 
 const recurrenteService = {
-  getRecurrentes: async () => {
-    const response = await api.get<TransaccionRecurrente[]>('/recurrentes')
+  getRecurrentes: async (signal?: AbortSignal) => {
+    const response = await api.get<TransaccionRecurrente[]>('/recurrentes', { signal })
     return response.data
   },
 
-  getRecurrente: async (id: string) => {
-    const response = await api.get<TransaccionRecurrente>(`/recurrentes/${id}`)
+  getRecurrente: async (id: string, signal?: AbortSignal) => {
+    const response = await api.get<TransaccionRecurrente>(`/recurrentes/${id}`, { signal })
     return response.data
   },
 

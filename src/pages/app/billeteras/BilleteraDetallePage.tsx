@@ -53,9 +53,11 @@ const BilleteraDetallePage: React.FC = () => {
   }, [searchParams])
 
   // Resetear la expansion al cambiar de tarjeta
-  useEffect(() => {
+  const [prevTarjetaIndex, setPrevTarjetaIndex] = useState(selectedTarjetaIndex)
+  if (selectedTarjetaIndex !== prevTarjetaIndex) {
+    setPrevTarjetaIndex(selectedTarjetaIndex)
     setIsResumenExpanded(false)
-  }, [selectedTarjetaIndex])
+  }
 
   // Obtener información del banco para estilo
   const bank = useMemo(() => {
@@ -95,35 +97,49 @@ const BilleteraDetallePage: React.FC = () => {
 
   // Cargar billetera inicial
   useEffect(() => {
+    const controller = new AbortController()
     const loadBilletera = async () => {
       if (!id) return
       try {
-        const data = await billeteraService.getById(id)
-        setBilletera(data)
+        const data = await billeteraService.getById(id, controller.signal)
+        if (!controller.signal.aborted) {
+          setBilletera(data)
+        }
       } catch (error) {
+        if (error instanceof Error && (error.name === 'AbortError' || error.name === 'CanceledError')) {
+          return
+        }
         console.error(error)
         showToast('Billetera no encontrada', 'error')
         navigate('/app/billeteras')
       } finally {
-        setLoading(false)
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
       }
     }
     loadBilletera()
+    return () => {
+      controller.abort()
+    }
   }, [id, navigate, showToast])
 
   // Cargar datos según el tab activo
   useEffect(() => {
     if (!id || !billetera) return
+    const controller = new AbortController()
 
     const loadTabData = async () => {
       setLoadingData(true)
       try {
         // Cargar movimientos (filtramos crédito ya que impactan vía Pago de Resumen)
         const [txs, cats, allBills] = await Promise.all([
-          transaccionService.getTransacciones({ billetera_id: id }),
-          categoriaService.getCategorias(),
-          billeteraService.list()
+          transaccionService.getTransacciones({ billetera_id: id }, controller.signal),
+          categoriaService.getCategorias(controller.signal),
+          billeteraService.list(controller.signal)
         ])
+        if (controller.signal.aborted) return
+
         const movimientosBilletera = txs.filter(tx => tx.metodo_pago !== 'credito')
         setMovimientos(movimientosBilletera)
         setCategorias(cats)
@@ -131,19 +147,29 @@ const BilleteraDetallePage: React.FC = () => {
 
         // Cargar tarjetas si no es efectivo
         if (billetera && !billetera.es_efectivo) {
-          const data = await tarjetaService.getTarjetasPorBilletera(id)
-          setTarjetas(data)
-          checkUrlParams(data)
+          const data = await tarjetaService.getTarjetasPorBilletera(id, controller.signal)
+          if (!controller.signal.aborted) {
+            setTarjetas(data)
+            checkUrlParams(data)
+          }
         }
       } catch (error) {
+        if (error instanceof Error && (error.name === 'AbortError' || error.name === 'CanceledError')) {
+          return
+        }
         console.error(error)
         showToast('Error al cargar datos', 'error')
       } finally {
-        setLoadingData(false)
+        if (!controller.signal.aborted) {
+          setLoadingData(false)
+        }
       }
     }
 
     loadTabData()
+    return () => {
+      controller.abort()
+    }
   }, [id, billetera, showToast, checkUrlParams])
 
   // Agrupar movimientos por día

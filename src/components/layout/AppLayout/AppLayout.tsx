@@ -6,6 +6,8 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
+import NotificacionesDrawer from '@/components/notificaciones/NotificacionesDrawer'
 import styles from './AppLayout.module.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -59,6 +61,8 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const { usuario, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { unreadCount } = useNotificaciones()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -118,9 +122,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <button className={styles.topBarBtn} title="Buscar">
               <Search size={18} strokeWidth={1.75} />
             </button>
-            <button className={styles.topBarBtn} title="Notificaciones">
+            <button className={styles.topBarBtn} onClick={() => setIsDrawerOpen(true)} title="Notificaciones">
               <Bell size={18} strokeWidth={1.75} />
-              <span className={styles.notifDot} />
+              {unreadCount > 0 && <span className={styles.notifDot} />}
             </button>
             <button className={styles.topBarBtn} onClick={toggleTheme} title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}>
               {theme === 'dark' ? <Sun size={18} strokeWidth={1.75} /> : <Moon size={18} strokeWidth={1.75} />}
@@ -169,8 +173,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <span className={styles.mobileLogoText}>Argentum</span>
         </div>
         <div className={styles.mobileActions}>
-          <button className={styles.mobileIconBtn} aria-label="Notificaciones">
+          <button className={styles.mobileIconBtn} onClick={() => setIsDrawerOpen(true)} aria-label="Notificaciones">
             <Bell size={22} strokeWidth={1.75} />
+            {unreadCount > 0 && <span className={styles.notifDot} />}
           </button>
           <button
             className={styles.mobileIconBtn}
@@ -272,6 +277,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {children}
         </div>
       </main>
+
+      <NotificacionesDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
 
     </div>
   )

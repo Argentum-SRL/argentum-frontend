@@ -438,3 +438,81 @@ export interface PresupuestoUpdate {
 }
 
 export * from './goals'
+
+export type NivelNotificacion = 'CRITICA' | 'FINANCIERA_IMPORTANTE' | 'FINANCIERA_INFORMATIVA' | 'SOFT'
+
+export type TipoNotificacion =
+  | 'CAMBIO_CONTRASENA'
+  | 'NUEVO_DISPOSITIVO'
+  | 'CAMBIO_EMAIL'
+  | 'INTENTOS_LOGIN_FALLIDOS'
+  | 'WHATSAPP_NUEVO_VINCULADO'
+  | 'CUOTA_VENCE'
+  | 'PRESUPUESTO_AGOTADO'
+  | 'SALDO_CERO'
+  | 'SUSCRIPCION_HOY'
+  | 'PRESUPUESTO_LIMITE'
+  | 'SUSCRIPCION_PROXIMA'
+  | 'RESUMEN_SEMANAL'
+  | 'META_ALCANZADA'
+  | 'GASTO_INUSUAL'
+  | 'INACTIVIDAD'
+
+export interface Notificacion {
+  id: string
+  usuario_id: string
+  tipo: TipoNotificacion
+  nivel: NivelNotificacion
+  mensaje: string
+  leida: boolean
+  archivada: boolean
+  canal_web: boolean
+  canal_whatsapp: boolean
+  canal_email: boolean
+  enviada_whatsapp: boolean
+  enviada_email: boolean
+  grupo_agrupacion?: string | null
+  entidad_tipo?: string | null
+  entidad_id?: string | null
+  deep_link?: string | null
+  silenciada_hasta?: string | null
+  created_at: string
+}
+
+export interface ConfiguracionNotificacion {
+  id: string
+  usuario_id: string
+  cuota_vence_anticipacion_dias: number
+  cuota_vence_web: boolean
+  cuota_vence_whatsapp: boolean
+  presupuesto_umbral_1: number
+  presupuesto_umbral_1_activo: boolean
+  presupuesto_umbral_1_web: boolean
+  presupuesto_umbral_1_whatsapp: boolean
+  presupuesto_umbral_2_web: boolean
+  presupuesto_umbral_2_whatsapp: boolean
+  suscripcion_hoy_web: boolean
+  suscripcion_hoy_whatsapp: boolean
+  suscripcion_recordatorio_activo: boolean
+  suscripcion_recordatorio_dias: number
+  suscripcion_recordatorio_web: boolean
+  suscripcion_recordatorio_whatsapp: boolean
+  meta_alcanzada_activo: boolean
+  meta_alcanzada_web: boolean
+  meta_alcanzada_whatsapp: boolean
+  saldo_cero_web: boolean
+  saldo_cero_whatsapp: boolean
+  gasto_inusual_activo: boolean
+  gasto_inusual_web: boolean
+  gasto_inusual_whatsapp: boolean
+  resumen_semanal_activo: boolean
+  resumen_semanal_web: boolean
+  resumen_semanal_whatsapp: boolean
+  inactividad_activo: boolean
+  inactividad_dias: number
+  inactividad_web: boolean
+  inactividad_whatsapp: boolean
+  whatsapp_hora_envio: number
+  whatsapp_minuto_envio: number
+  updated_at?: string | null
+}

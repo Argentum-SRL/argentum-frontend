@@ -21,6 +21,7 @@ const MetasPage = lazy(() => import('@/pages/app/metas/MetasPage'))
 const MetaDetallePage = lazy(() => import('@/pages/app/metas/MetaDetallePage'))
 const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/SuscripcionesPage'))
 const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
+const NotificacionesConfigPage = lazy(() => import('@/pages/app/configuracion/NotificacionesConfigPage'))
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,7 @@ const router = createBrowserRouter([
               { path: '/app/metas/:id', element: <MetaDetallePage /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage /> },
               { path: '/app/perfil', element: <PerfilPage /> },
+              { path: '/app/notificaciones/configuracion', element: <NotificacionesConfigPage /> },
             ],
           },
         ],

@@ -462,6 +462,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
+  position: relative;
 }
 
 .mobileIconBtn:hover {

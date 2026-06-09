@@ -1,5 +1,5 @@
 import api from './api'
-import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta } from '@/types'
+import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData } from '@/types'
 
 const tarjetaService = {
   getTarjetas: async (signal?: AbortSignal): Promise<TarjetaCredito[]> => {
@@ -43,6 +43,10 @@ const tarjetaService = {
   pagarResumenTarjeta: async (id: string, fechaPago?: string): Promise<unknown> => {
     const { data } = await api.post(`/tarjetas/${id}/pagar`, { fecha_pago: fechaPago })
     return data
+  },
+  getPresionFutura: async (meses = 6, signal?: AbortSignal): Promise<PresionFuturaData> => {
+    const { data } = await api.get<{ success: boolean; data: PresionFuturaData }>('/tarjetas/presion-futura', { params: { meses }, signal })
+    return data.data
   }
 }
 

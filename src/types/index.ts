@@ -516,3 +516,26 @@ export interface ConfiguracionNotificacion {
   whatsapp_minuto_envio: number
   updated_at?: string | null
 }
+
+
+// ===== PRESIÓN FINANCIERA FUTURA =====
+
+export interface DetalleTarjetaMes {
+  tarjeta_id: string;
+  tarjeta_nombre: string;
+  total: number;
+}
+
+export interface MesPresionFutura {
+  anio: number;
+  mes: number;
+  mes_label: string;
+  total: number;
+  tarjetas: DetalleTarjetaMes[];
+}
+
+export interface PresionFuturaData {
+  meses: MesPresionFutura[];
+  total_comprometido: number;
+}
+

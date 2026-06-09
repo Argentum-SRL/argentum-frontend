@@ -171,13 +171,13 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
             <div className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.cardMeta}>
-                  <p className={styles.cardTitle}>Cuotas próximas a vencer</p>
-                  <p className={styles.cardDesc}>Avisar cuando tengas cuotas pendientes de pago.</p>
+                  <p className={styles.cardTitle}>Vencimiento de tarjetas</p>
+                  <p className={styles.cardDesc}>Avisarte antes del vencimiento del resumen de cada tarjeta.</p>
                 </div>
               </div>
               <div className={styles.cardControls}>
                 <div className={styles.inputGroup}>
-                  <label htmlFor="cuota_vence_anticipacion_dias">Anticipación:</label>
+                  <label htmlFor="cuota_vence_anticipacion_dias">Días de anticipación al vencimiento del resumen</label>
                   <input
                     type="number"
                     id="cuota_vence_anticipacion_dias"

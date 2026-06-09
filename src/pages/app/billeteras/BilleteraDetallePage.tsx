@@ -12,6 +12,7 @@ import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
 import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
+import { PresionFuturaCard } from '@/components/tarjetas/PresionFuturaCard'
 import { formatSaldo, getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BilleteraDetallePage.module.css'
 
@@ -527,6 +528,9 @@ const BilleteraDetallePage: React.FC = () => {
                     />
                   ))}
                 </div>
+
+                {/* Nuevo componente de presión financiera futura */}
+                <PresionFuturaCard meses={6} />
               </>
             )}
           </section>

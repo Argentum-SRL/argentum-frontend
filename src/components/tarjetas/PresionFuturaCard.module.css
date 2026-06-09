@@ -1,0 +1,199 @@
+.summaryContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+  width: 100%;
+}
+
+.ticket {
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  position: relative;
+  padding: 20px 20px 16px;
+  color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid #eee;
+}
+
+/* Efecto dentado */
+.ticket::before,
+.ticket::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-size: 12px 12px;
+  z-index: 2;
+}
+
+.ticket::before {
+  top: -3px;
+  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+}
+
+.ticket::after {
+  bottom: -3px;
+  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+}
+
+.ticketHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 10px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ticketLabel {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #999;
+  letter-spacing: 0.5px;
+}
+
+.ticketDate {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+
+.ticketContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Fila de mes */
+.mesRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f9f9f9;
+}
+
+.mesRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.mesRowMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mesLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  width: 70px;
+}
+
+.progressContainer {
+  flex: 1;
+  height: 6px;
+  background-color: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: var(--primary, #1e3a8a);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.mesTotal {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: right;
+  width: 85px;
+}
+
+/* Detalle por tarjeta */
+.detalleTarjetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: 70px; /* alinear con el inicio de la barra */
+  margin-top: 2px;
+}
+
+.chipTarjeta {
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  background-color: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e5e5e5;
+}
+
+/* Dark mode logic para el ticket (papel) */
+:global(.dark) .ticket {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Skeleton loader */
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 32px;
+}
+
+.skeletonItem {
+  background: #f3f4f6;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonHeaderLabel {
+  width: 120px;
+  height: 12px;
+  margin-bottom: 6px;
+}
+
+.skeletonHeaderDetail {
+  width: 200px;
+  height: 14px;
+}
+
+.skeletonLabel {
+  width: 60px;
+  height: 12px;
+}
+
+.skeletonBar {
+  flex: 1;
+  height: 6px;
+}
+
+.skeletonTotal {
+  width: 70px;
+  height: 12px;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}

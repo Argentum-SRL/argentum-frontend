@@ -184,13 +184,13 @@ const NotificacionesConfigPage: React.FC = () => {
             <div className={cardStyles.card}>
               <div className={cardStyles.cardHeader}>
                 <div className={cardStyles.cardMeta}>
-                  <p className={cardStyles.cardTitle}>Cuotas próximas a vencer</p>
-                  <p className={cardStyles.cardDesc}>Avisar cuando tengas cuotas pendientes de pago.</p>
+                  <p className={cardStyles.cardTitle}>Vencimiento de tarjetas</p>
+                  <p className={cardStyles.cardDesc}>Avisarte antes del vencimiento del resumen de cada tarjeta.</p>
                 </div>
               </div>
               <div className={cardStyles.cardControls}>
                 <div className={cardStyles.inputGroup}>
-                  <label htmlFor="cuota_vence_anticipacion_dias">Anticipación:</label>
+                  <label htmlFor="cuota_vence_anticipacion_dias">Días de anticipación al vencimiento del resumen</label>
                   <input
                     type="number"
                     id="cuota_vence_anticipacion_dias"

@@ -46,6 +46,7 @@ export interface ModalPayloadMap {
   proyeccion: {
     proyeccion: Proyeccion
   }
+  balance_ciclo: Record<string, never>
   presupuesto: {
     presupuesto: Presupuesto | null
     categorias: Categoria[]

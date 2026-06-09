@@ -14,8 +14,8 @@ let proyeccionPromise: Promise<Proyeccion> | null = null
 const DEFAULT_TTL = 60 * 1000 // 60 seconds
 
 export const dashboardService = {
-  getResumen: async (desde?: string, hasta?: string, signal?: AbortSignal): Promise<DashboardResumen> => {
-    const key = `${desde || 'all'}-${hasta || 'all'}`
+  getResumen: async (desde?: string, hasta?: string, billeteraIds?: string[], signal?: AbortSignal): Promise<DashboardResumen> => {
+    const key = `${desde || 'all'}-${hasta || 'all'}-${billeteraIds?.join(',') || 'all'}`
     
     const pending = resumenPromises[key]
     if (pending) return pending
@@ -27,8 +27,14 @@ export const dashboardService = {
 
     const promise = (async () => {
       try {
+        const params: Record<string, string> = {}
+        if (desde) params.desde = desde
+        if (hasta) params.hasta = hasta
+        if (billeteraIds && billeteraIds.length > 0) {
+          params.billetera_ids = billeteraIds.join(',')
+        }
         const response = await api.get<DashboardResumen>('/dashboard/resumen', {
-          params: { desde, hasta },
+          params,
           signal
         })
         resumenCache[key] = { data: response.data, timestamp: Date.now() }
@@ -82,14 +88,20 @@ export const dashboardService = {
     return proyeccionPromise
   },
 
-  getResumenCompleto: async (desde?: string, hasta?: string, signal?: AbortSignal): Promise<{
+  getResumenCompleto: async (desde?: string, hasta?: string, billeteraIds?: string[], signal?: AbortSignal): Promise<{
     billeteras: Billetera[];
     resumen: DashboardResumen;
     cotizacion: CotizacionDolar;
   }> => {
     // Esta llamada no usa cache por ahora para asegurar datos frescos al consolidar
+    const params: Record<string, string> = {}
+    if (desde) params.desde = desde
+    if (hasta) params.hasta = hasta
+    if (billeteraIds && billeteraIds.length > 0) {
+      params.billetera_ids = billeteraIds.join(',')
+    }
     const response = await api.get('/dashboard/resumen-completo', {
-      params: { desde, hasta },
+      params,
       signal
     })
     return response.data

@@ -8,6 +8,7 @@ import RecurrenteModal from '@/components/transacciones/RecurrenteModal'
 import FilterBarMobileDrawer from '@/components/transacciones/FilterBarMobileDrawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
+import BalanceCicloModal from '@/components/dashboard/BalanceCicloModal/BalanceCicloModal'
 import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
 import GoalModal from '@/components/goals/GoalModal'
 import GoalContributionModal from '@/components/goals/GoalContributionModal'
@@ -98,6 +99,13 @@ export function ModalPortal() {
           isOpen={true}
           onClose={() => closeModal('proyeccion')}
           proyeccion={proyeccionData.proyeccion}
+        />
+      )}
+
+      {typedModals.balance_ciclo?.isOpen && (
+        <BalanceCicloModal
+          isOpen={true}
+          onClose={() => closeModal('balance_ciclo')}
         />
       )}
 

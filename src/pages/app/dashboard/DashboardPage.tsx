@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback, memo, useMemo } from 'react'
+import { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createPortal } from 'react-dom'
 import { 
   ArrowUpDown, 
   Calendar, 
   ChevronRight,
-  TrendingUp,
-  TrendingDown,
+  ChevronDown,
   AlertCircle,
   PieChart as PieChartIcon,
   LogOut,
@@ -16,8 +15,9 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
+import { useModal } from '@/hooks/useModal'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario } from '@/types'
+import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario, Billetera } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
@@ -273,7 +273,13 @@ AppleCalendarIcon.displayName = 'AppleCalendarIcon'
 
 export default function DashboardPage() {
   const { usuario } = useAuth()
+  const { open } = useModal()
   const [data, setData] = useState<DashboardResumen | null>(null)
+  const [billeteras, setBilleteras] = useState<Billetera[]>([])
+  const [billeterasSeleccionadas, setBilleterasSeleccionadas] = useState<string[]>(() => {
+    const saved = localStorage.getItem('argentum_dashboard_billeteras')
+    return saved ? JSON.parse(saved) : []
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const customRange = null
@@ -281,14 +287,53 @@ export default function DashboardPage() {
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [showChartPercent, setShowChartPercent] = useState(false)
 
+  const [dropdownAbierto, setDropdownAbierto] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!dropdownAbierto) return
+    const handleOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownAbierto(false)
+      }
+    }
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDropdownAbierto(false)
+    }
+    document.addEventListener('mousedown', handleOutside)
+    document.addEventListener('keydown', handleEsc)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+      document.removeEventListener('keydown', handleEsc)
+    }
+  }, [dropdownAbierto])
+
+  const totalSaldoBilleteras = useMemo(() => {
+    return billeteras
+      .filter(b => b.estado === 'activa')
+      .reduce((acc, curr) => acc + curr.saldo_actual, 0)
+  }, [billeteras])
+
+  const getDropdownTriggerText = () => {
+    if (billeterasSeleccionadas.length === 0) {
+      return 'Todas las billeteras'
+    }
+    if (billeterasSeleccionadas.length === 1) {
+      const selected = billeteras.find(b => b.id === billeterasSeleccionadas[0])
+      return selected ? selected.nombre : 'Todas las billeteras'
+    }
+    return `${billeterasSeleccionadas.length} billeteras`
+  }
+
   const fetchData = useCallback(async (signal?: AbortSignal) => {
     setError(false)
     setLoading(true)
     try {
       // Endpoint consolidado: trae resumen, billeteras y cotización
-      const res = await dashboardService.getResumenCompleto(undefined, undefined, signal)
+      const res = await dashboardService.getResumenCompleto(undefined, undefined, billeterasSeleccionadas, signal)
       if (signal?.aborted) return
       setData(res.resumen)
+      setBilleteras(res.billeteras)
     } catch (err) {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
@@ -300,7 +345,17 @@ export default function DashboardPage() {
         setLoading(false)
       }
     }
-  }, [])
+  }, [billeterasSeleccionadas])
+
+  const handleToggleBilletera = useCallback((id: string | null) => {
+    const next = id === null
+      ? []
+      : billeterasSeleccionadas.includes(id)
+        ? billeterasSeleccionadas.filter(item => item !== id)
+        : [...billeterasSeleccionadas, id]
+    setBilleterasSeleccionadas(next)
+    localStorage.setItem('argentum_dashboard_billeteras', JSON.stringify(next))
+  }, [billeterasSeleccionadas])
 
   const fetchProyeccion = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -376,58 +431,142 @@ export default function DashboardPage() {
         ) : (
           data && (
             <div className={styles.balanceCard}>
-              {/* Luna Argentum Watermark */}
-              <svg
-                viewBox="0 0 100 100"
-                className="absolute -bottom-5 -right-5 w-[120px] h-[120px] opacity-[0.04] pointer-events-none"
-              >
-                <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
-                <circle cx="58" cy="50" r="38" fill="#0D2045"/>
-              </svg>
+              {/* Luna Argentum Watermark wrapper to allow overflow on parent card */}
+              <div className="absolute inset-0 rounded-[24px] overflow-hidden pointer-events-none">
+                <svg
+                  viewBox="0 0 100 100"
+                  className="absolute -bottom-5 -right-5 w-[120px] h-[120px] opacity-[0.04] pointer-events-none"
+                >
+                  <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
+                  <circle cx="58" cy="50" r="38" fill="#0D2045"/>
+                </svg>
+              </div>
+
+              {/* Selector de billeteras dropdown flotante */}
+              <div className={styles.dropdownContainer} ref={dropdownRef}>
+                <button
+                  className={`${styles.dropdownTrigger} ${dropdownAbierto ? styles.dropdownTriggerActive : ''}`}
+                  onClick={() => setDropdownAbierto(!dropdownAbierto)}
+                >
+                  <span>{getDropdownTriggerText()}</span>
+                  <ChevronDown size={14} />
+                </button>
+
+                {dropdownAbierto && (
+                  <div className={styles.dropdownPanel}>
+                    <div className={styles.dropdownHeader}>BILLETERAS</div>
+                    <button
+                      className={`${styles.dropdownItem} ${billeterasSeleccionadas.length === 0 ? styles.dropdownItemActive : ''}`}
+                      onClick={() => {
+                        handleToggleBilletera(null)
+                      }}
+                    >
+                      <span className={styles.dropdownItemName}>Todas las billeteras</span>
+                      <span className={styles.dropdownItemBalance}>
+                        {fmt(totalSaldoBilleteras, usuario?.moneda_principal ?? 'ARS')}
+                      </span>
+                    </button>
+                    <div className={styles.dropdownDivider} />
+                    {billeteras.filter(b => b.estado === 'activa').map(b => (
+                      <button
+                        key={b.id}
+                        className={`${styles.dropdownItem} ${billeterasSeleccionadas.includes(b.id) ? styles.dropdownItemActive : ''}`}
+                        onClick={() => {
+                          handleToggleBilletera(b.id)
+                        }}
+                      >
+                        <span className={styles.dropdownItemName}>{b.nombre}</span>
+                        <span className={styles.dropdownItemBalance}>
+                          {fmt(b.saldo_actual, b.moneda)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <div className={styles.balanceContent}>
                 <MobileGreeting usuario={usuario} />
                 <div className={styles.balanceMain}>
-                  {/* Top section */}
+                  {/* Top section: Saldo Disponible */}
                   <div className={styles.balanceTop}>
                     <div className={styles.labelWithHint}>
-                      <span className={styles.balanceLabel}>Balance del ciclo</span>
-                      <div className={styles.hint} title="Es la diferencia entre lo que entró y salió de tu cuenta solo en este período.">
+                      <span className={styles.saldoLabel}>Saldo disponible</span>
+                      <button
+                        className={styles.hint}
+                        onClick={() => open('balance_ciclo', {})}
+                        title="¿Qué es el balance del ciclo?"
+                        aria-label="Ver explicación del balance del ciclo"
+                      >
                         <AlertCircle size={14} />
-                      </div>
+                      </button>
                     </div>
-
-                    <h2 className={styles.balanceAmount}>{fmt(data.balance.balance, 'ARS')}</h2>
-
-                    <div className={styles.balanceBreakdown}>
-                      <div className={`${styles.badge} ${styles.pos}`}>
-                        <TrendingUp size={16} />
-                        <span>{fmt(data.balance.ingresos, 'ARS')}</span>
-                      </div>
-                      <div className={`${styles.badge} ${styles.neg}`}>
-                        <TrendingDown size={16} />
-                        <span>{fmt(data.balance.egresos, 'ARS')}</span>
-                      </div>
-                    </div>
-
-                    {data.balance.variacion_vs_ciclo_anterior !== null && (
-                      <div className={`${styles.variationBadge} ${data.balance.variacion_vs_ciclo_anterior >= 0 ? styles.positive : styles.negative}`}>
-                        {data.balance.variacion_vs_ciclo_anterior >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                        <span>
-                          {data.balance.variacion_vs_ciclo_anterior >= 0 ? '+' : ''}
-                          {data.balance.variacion_vs_ciclo_anterior}% vs ant.
-                        </span>
-                      </div>
-                    )}
+                    <h2 className={`${styles.saldoAmount} ${data.disponible_real.disponible < 0 ? styles.saldoAmountNegative : ''}`}>
+                      {fmt(data.disponible_real.disponible, 'ARS')}
+                    </h2>
                   </div>
 
-                  {/* Bottom metric */}
-                  <div className={styles.metricsRow}>
-                    <div className={styles.metricItem}>
-                      <div className={styles.metricLabel}>Disponible real</div>
-                      <div className={styles.metricValue}>{fmt(data.disponible_real.disponible, 'ARS')}</div>
-                      <div className={styles.metricSub}>en billeteras</div>
-                    </div>
+                  {/* Separador */}
+                  <div className={styles.progressDivider} />
+
+                  {/* Sección de barra de progreso */}
+                  <div className={styles.progressSection}>
+                    {(() => {
+                      const ingresos = data.balance.ingresos
+                      const egresos = data.balance.egresos
+
+                      // Caso: sin datos
+                      if (ingresos === 0 && egresos === 0) return null
+
+                      // Caso: egresos pero sin ingresos
+                      if (ingresos === 0 && egresos > 0) {
+                        return (
+                          <>
+                            <div className={styles.progressLabelRow}>
+                              <span className={styles.progressLabelLeft}>Gastado este ciclo</span>
+                              <span className={styles.progressLabelRight}>{fmt(egresos, 'ARS')}</span>
+                            </div>
+                            <div className={styles.progressTrack}>
+                              <div className={`${styles.progressFill} ${styles.progressDanger} ${styles.progressFull}`} />
+                            </div>
+                            <p className={styles.progressContext}>Sin ingresos registrados este ciclo</p>
+                          </>
+                        )
+                      }
+
+                      // Caso normal: hay ingresos
+                      const porcentaje = Math.min((egresos / ingresos) * 100, 100)
+                      const colorClass = porcentaje < 70
+                        ? styles.progressOk
+                        : porcentaje < 90
+                          ? styles.progressWarn
+                          : styles.progressDanger
+
+                      const contexto = porcentaje < 70
+                        ? `Gastaste el ${Math.round(porcentaje)}% de lo que ingresó`
+                        : porcentaje < 90
+                          ? `Vas ajustado — ${Math.round(porcentaje)}% gastado`
+                          : `Gastaste casi todo lo que ingresó`
+
+                      return (
+                        <>
+                          <style>{`.custom-progress-fill{width:${porcentaje}%}`}</style>
+                          <div className={styles.progressLabelRow}>
+                            <span className={styles.progressLabelLeft}>Gastado este ciclo</span>
+                            <span className={styles.progressLabelRight}>
+                              {fmt(egresos, 'ARS')}
+                              <span className={styles.progressLabelMuted}> de {fmt(ingresos, 'ARS')}</span>
+                            </span>
+                          </div>
+                          <div className={styles.progressTrack}>
+                            <div
+                              className={`${styles.progressFill} ${colorClass} custom-progress-fill`}
+                            />
+                          </div>
+                          <p className={styles.progressContext}>{contexto}</p>
+                        </>
+                      )
+                    })()}
                   </div>
                 </div>
               </div>

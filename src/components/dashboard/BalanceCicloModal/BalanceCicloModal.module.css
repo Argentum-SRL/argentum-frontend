@@ -1,0 +1,26 @@
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.section p {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0;
+}

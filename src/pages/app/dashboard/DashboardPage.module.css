@@ -243,8 +243,8 @@
   padding: 32px;
   color: white;
   position: relative;
-  overflow: hidden;
   box-shadow: 0 12px 24px -8px rgba(var(--primary-rgb), 0.4);
+  container-type: inline-size;
 }
 @media (min-width: 1024px) {
   .balanceCard {
@@ -399,26 +399,159 @@
 .hint {
   opacity: 0.5;
   cursor: help;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   transition: opacity 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
 }
 
 .hint:hover {
   opacity: 1;
 }
 
-.balanceAmount {
-  font-size: 3.5rem;
+.dropdownContainer {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+}
+
+.dropdownTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dropdownTrigger:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.dropdownTriggerActive {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dropdownPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: #1a2f5a;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownHeader {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 12px 16px 8px;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+}
+
+.dropdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-left: 3px solid transparent;
+  text-align: left;
+}
+
+.dropdownItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dropdownItemActive {
+  background: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid var(--primary);
+}
+
+.dropdownItemActive:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dropdownItemName {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.dropdownItemBalance {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.dropdownDivider {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
+}
+
+.saldoLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.saldoAmount {
+  font-size: clamp(2rem, 11cqw, 3.5rem);
   font-weight: 800;
   margin: 0;
   letter-spacing: -1.5px;
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.saldoAmountNegative {
+  color: #fca5a5;
 }
 
 @media (max-width: 767px) {
-  .balanceAmount {
-    font-size: 2.75rem;
+  .dropdownContainer {
+    top: calc(96px + env(safe-area-inset-top));
+    right: 24px;
+  }
+  .saldoAmount {
+    font-size: clamp(1.8rem, 11cqw, 2.8rem);
+    letter-spacing: -1px;
   }
   .balanceCard {
     padding: 24px;
@@ -428,91 +561,6 @@
     border-radius: 0 0 32px 32px;
     padding-top: calc(32px + env(safe-area-inset-top));
   }
-  .balanceBreakdown {
-    gap: 12px;
-  }
-}
-
-.balanceBreakdown {
-  display: flex;
-  gap: 20px;
-  opacity: 0.9;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 16px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.65);
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-.badge svg {
-  width: 16px;
-  height: 16px;
-}
-
-.pos svg { stroke: #4CAF7D; }
-.neg svg { stroke: #FF8A65; }
-
-.variationBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  width: fit-content;
-}
-
-.variationBadge.positive {
-  background: rgba(34, 197, 94, 0.2);
-  color: #86efac;
-}
-
-.variationBadge.negative {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-}
-
-.metricsRow {
-  display: grid;
-  grid-template-columns: 1fr;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-.metricItem {
-  display: flex;
-  flex-direction: column;
-}
-
-.metricLabel {
-  font-size: 10px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
-}
-
-.metricValue {
-  font-size: 20px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.85);
-  letter-spacing: -0.3px;
-  font-variant-numeric: tabular-nums;
-}
-
-.metricSub {
-  font-size: 10px;
-  color: rgba(255,255,255,0.3);
-  margin-top: 2px;
 }
 
 /* ── Grid ─────────────────────────────────────────────────────────── */
@@ -1061,4 +1109,75 @@
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+
+.progressDivider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 16px 0 14px;
+}
+
+.progressSection {
+  display: block;
+}
+
+.progressLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.progressLabelLeft {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.progressLabelRight {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.progressLabelMuted {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.progressTrack {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  height: 6px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.progressFull {
+  width: 100%;
+}
+
+.progressOk {
+  background: #4ade80;
+}
+
+.progressWarn {
+  background: #facc15;
+}
+
+.progressDanger {
+  background: #f87171;
+}
+
+.progressContext {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+  margin: 0;
+  text-align: center;
 }

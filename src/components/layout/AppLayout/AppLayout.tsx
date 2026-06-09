@@ -2,7 +2,8 @@ import { useId, useState, useEffect, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
-  Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, User
+  Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, User,
+  Calculator
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -44,6 +45,7 @@ const NAV_FINANCIAL = [
   { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart  },
   { label: 'Metas',          path: '/app/metas',           Icon: Target    },
   { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: RefreshCw },
+  { label: 'Herramientas',   path: '/app/herramientas',   Icon: Calculator },
 ]
 
 const MOBILE_NAV = [

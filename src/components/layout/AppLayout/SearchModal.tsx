@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   Search, Moon, Sun, User, LogOut, Wallet, Target, 
   PieChart, RefreshCw, LayoutDashboard, ArrowUpDown, 
-  Plus, X
+  Plus, X, Calculator
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -139,6 +139,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     { id: 'nav-pres', title: 'Presupuestos', path: '/app/presupuestos', Icon: PieChart },
     { id: 'nav-meta', title: 'Metas de Ahorro', path: '/app/metas', Icon: Target },
     { id: 'nav-susc', title: 'Suscripciones', path: '/app/suscripciones', Icon: RefreshCw },
+    { id: 'nav-tool', title: 'Herramientas', path: '/app/herramientas', Icon: Calculator },
     { id: 'nav-perf', title: 'Perfil', path: '/app/perfil', Icon: User }
   ]
 

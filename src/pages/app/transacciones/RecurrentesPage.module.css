@@ -352,3 +352,12 @@
   display: flex;
   flex-direction: column;
 }
+
+.container::after,
+.embeddedContainer::after {
+  content: '';
+  display: block;
+  height: 32px;
+  flex-shrink: 0;
+  width: 100%;
+}

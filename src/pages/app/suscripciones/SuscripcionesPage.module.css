@@ -1,5 +1,7 @@
 .root {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .loading {
@@ -431,4 +433,12 @@
   .emptyTitle {
     font-size: 24px;
   }
+}
+
+.root::after {
+  content: '';
+  display: block;
+  height: 32px;
+  flex-shrink: 0;
+  width: 100%;
 }

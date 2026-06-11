@@ -560,3 +560,11 @@
 .tarjetasSection::-webkit-scrollbar-thumb:hover {
   background: var(--text-3);
 }
+
+.container::after {
+  content: '';
+  display: block;
+  height: 32px;
+  flex-shrink: 0;
+  width: 100%;
+}

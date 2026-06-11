@@ -8,9 +8,6 @@
 @media (min-width: 768px) {
   .page {
     gap: 24px;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 8px;
   }
 }
 
@@ -196,4 +193,12 @@
 .skeletonCard {
   height: 380px;
   border-radius: 20px;
+}
+
+.page::after {
+  content: '';
+  display: block;
+  height: 32px;
+  flex-shrink: 0;
+  width: 100%;
 }

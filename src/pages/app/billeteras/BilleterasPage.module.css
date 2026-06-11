@@ -382,3 +382,11 @@
   .skeletonCard { animation: none; background: var(--surface-alt); }
   .nuevaBtn, .showArchivedBtn { transition: none; }
 }
+
+.root::after {
+  content: '';
+  display: block;
+  height: 32px;
+  flex-shrink: 0;
+  width: 100%;
+}

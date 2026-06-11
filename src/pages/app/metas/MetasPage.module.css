@@ -298,3 +298,11 @@
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+.page::after {
+  content: '';
+  display: block;
+  height: 32px;
+  flex-shrink: 0;
+  width: 100%;
+}

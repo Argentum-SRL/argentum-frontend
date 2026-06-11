@@ -352,7 +352,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             />
           </div>
           <div className={styles.headerActions}>
-            <span className={styles.shortcutBadge}>ESC</span>
             <button
               type="button"
               className={styles.closeBtn}

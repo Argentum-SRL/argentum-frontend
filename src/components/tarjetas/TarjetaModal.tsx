@@ -1,4 +1,4 @@
-import React, { useReducer, useRef, useState, useEffect } from 'react'
+import { useReducer, useRef, useEffect } from 'react'
 import {
   X,
   ChevronLeft,
@@ -15,6 +15,7 @@ import type { Billetera, TarjetaCredito, TarjetaCreditoCreate } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from './RealCardPreview'
 import styles from './TarjetaModal.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
 // Logos de redes
 import visaLogo from '@/assets/redes/visa.png'
@@ -127,58 +128,7 @@ function tarjetaReducer(state: TarjetaModalState, action: TarjetaModalAction): T
   }
 }
 
-// ── Componente MontoHero (para límite) ──
-function MontoHero({
-  value, onChange, moneda, label, optional
-}: {
-  value: number | null
-  onChange: (v: number | null) => void
-  moneda: 'ARS' | 'USD'
-  label?: string
-  optional?: boolean
-}) {
-  const [inputValue, setInputValue] = useState(() =>
-    value !== null ? value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''
-  )
 
-  const formatParaMostrar = (str: string) => {
-    const num = str.replace(/\./g, '')
-    const partes = num.split(',')
-    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-    return partes.join(',')
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value
-    if (!raw) { setInputValue(''); onChange(null); return }
-    if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
-    let cleaned = raw.replace(/[^0-9.,]/g, '')
-    const parts = cleaned.split(',')
-    if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
-    const formatted = formatParaMostrar(cleaned)
-    setInputValue(formatted)
-    const numStr = formatted.replace(/\./g, '').replace(',', '.')
-    const n = parseFloat(numStr)
-    onChange(isNaN(n) ? null : n)
-  }
-
-  return (
-    <div className={styles.formField}>
-      <label className={styles.fieldLabel}>{label} {optional && <span className={styles.optionalLabel}>(opcional)</span>}</label>
-      <div className={styles.montoInputWrap}>
-        <span className={styles.monedaPreview}>{moneda === 'ARS' ? '$' : 'USD'}</span>
-        <input
-          className={styles.fieldInputLimit}
-          value={inputValue}
-          onChange={handleChange}
-          placeholder="0"
-          type="text"
-          inputMode="decimal"
-        />
-      </div>
-    </div>
-  )
-}
 
 export default function TarjetaModal() {
   const { getData, close } = useModal()
@@ -350,12 +300,13 @@ export default function TarjetaModal() {
               </div>
 
               {/* FILA 2: Límite */}
-              <MontoHero
+              <MontoInput
                 label="Límite de crédito"
                 optional
                 value={state.limiteCredito}
                 onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'limiteCredito', value: v })}
                 moneda={state.moneda}
+                allowDecimals
               />
 
               {/* FILA 3: Red */}

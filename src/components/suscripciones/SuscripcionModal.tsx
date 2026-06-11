@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useState, useMemo, useRef, useCallback } from 'react'
+import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
 import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Calendar, Layers } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { useToast } from '@/hooks/useToast'
@@ -13,6 +13,7 @@ import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import styles from './SuscripcionModal.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
 interface SuscripcionModalProps {
   open: boolean
@@ -94,92 +95,7 @@ function reducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-// ── Componente MontoHero mejorado ──
-function formatParaMostrar(str: string): string {
-  const num = str.replace(/\./g, '')
-  const partes = num.split(',')
-  partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-  return partes.join(',')
-}
 
-function MontoHero({ value, onChange, moneda, onMonedaChange }: { value: number | null, onChange: (v: number | null) => void, moneda: string, onMonedaChange: (m: string) => void }) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [inputValue, setInputValue] = useState(() =>
-    value !== null ? value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''
-  )
-  const [prevValue, setPrevValue] = useState(value)
-
-  // Ajustar estado durante el render si cambia la prop value (patrón recomendado por React)
-  if (value !== prevValue) {
-    setPrevValue(value)
-    if (value === null) {
-      setInputValue('')
-    } else {
-      const cleaned = inputValue.replace(/\./g, '').replace(',', '.')
-      if (parseFloat(cleaned) !== value) {
-        setInputValue(value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
-      }
-    }
-  }
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value
-    if (!raw) { setInputValue(''); onChange(null); return }
-    if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
-    let cleaned = raw.replace(/[^0-9.,]/g, '')
-    const parts = cleaned.split(',')
-    if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
-    const formatted = formatParaMostrar(cleaned)
-    const start = e.target.selectionStart || 0
-    const oldLen = e.target.value.length
-    setInputValue(formatted)
-    const numStr = formatted.replace(/\./g, '').replace(',', '.')
-    if (numStr.endsWith('.')) { onChange(parseFloat(numStr.slice(0, -1)) || null) }
-    else { const n = parseFloat(numStr); onChange(isNaN(n) ? null : n) }
-    requestAnimationFrame(() => {
-      if (inputRef.current) {
-        const newPos = Math.max(0, start + (inputRef.current.value.length - oldLen))
-        inputRef.current.setSelectionRange(newPos, newPos)
-      }
-    })
-  }, [onChange])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) return
-    if (e.key === ',' || e.key === '.') { if (inputValue.includes(',')) e.preventDefault(); return }
-    if (!/[0-9]/.test(e.key)) e.preventDefault()
-  }, [inputValue])
-
-  return (
-    <div className={styles.montoHero}>
-      <button
-        type="button"
-        className={styles.monedaToggleChip}
-        onClick={() => onMonedaChange(moneda === 'ARS' ? 'USD' : 'ARS')}
-      >
-        <span className={styles.monedaChipFlag}>{moneda === 'ARS' ? '🇦🇷' : '🇺🇸'}</span>
-        <span className={styles.monedaChipLabel}>{moneda}</span>
-      </button>
-
-      <div className={styles.montoDivider} />
-
-      <div className={styles.montoHeroInput}>
-        <span className={styles.montoHeroPrefix}>$</span>
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode="decimal"
-          className={styles.montoHeroField}
-          value={inputValue}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder="0"
-          autoComplete="off"
-        />
-      </div>
-    </div>
-  )
-}
 
 const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, suscripcion, onSuccess }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -439,11 +355,11 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
               </div>
 
               <div className={styles.formBody}>
-                <MontoHero
+                <MontoInput
                   value={state.monto}
                   onChange={(v: number | null) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
                   moneda={state.moneda}
-                  onMonedaChange={(m: string) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
+                  onMonedaChange={(m: 'ARS' | 'USD') => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                 />
 
                 <div className={styles.formField}>
@@ -504,14 +420,14 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                       className={`${styles.pill} ${state.metodoCobro === 'tarjeta' ? styles.pillActive : ''}`}
                       onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'tarjeta' })}
                     >
-                      <CreditCard size={14} /> Tarjeta
+                      <CreditCard size={14} /> Tarjeta de crédito
                     </button>
                     <button
                       type="button"
                       className={`${styles.pill} ${state.metodoCobro === 'debito' ? styles.pillActive : ''}`}
                       onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'debito' })}
                     >
-                      <Wallet size={14} /> Débito
+                      <Wallet size={14} /> Cuenta / Billetera
                     </button>
                   </div>
                 </div>

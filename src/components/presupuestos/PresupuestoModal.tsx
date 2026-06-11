@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useReducer, useRef, useState, useCallback } from 'react'
+import { useMemo, useEffect, useReducer, useState, useCallback } from 'react'
 import {
   Target,
   Calendar,
@@ -17,6 +17,7 @@ import categoriaService from '@/services/categoria.service'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './PresupuestoModal.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
 
 interface PresupuestoModalProps {
@@ -87,99 +88,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-// ── Reutilizando MontoHero de Transacciones ──
-function formatParaMostrar(str: string): string {
-  const num = str.replace(/\./g, '')
-  const partes = num.split(',')
-  partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-  return partes.join(',')
-}
 
-function MontoHero({
-  value, onChange, moneda, onMonedaChange, disabled,
-}: {
-  value: number | null
-  onChange: (v: number | null) => void
-  moneda: 'ARS' | 'USD'
-  onMonedaChange: (m: 'ARS' | 'USD') => void
-  disabled?: boolean
-}) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [inputValue, setInputValue] = useState(() =>
-    value !== null ? value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''
-  )
-  const [prevValue, setPrevValue] = useState(value)
-
-  if (value !== prevValue) {
-    setPrevValue(value)
-    if (value === null) { setInputValue('') }
-    else {
-      const cleaned = inputValue.replace(/\./g, '').replace(',', '.')
-      if (parseFloat(cleaned) !== value) {
-        setInputValue(value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
-      }
-    }
-  }
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value
-    if (!raw) { setInputValue(''); onChange(null); return }
-    if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
-    let cleaned = raw.replace(/[^0-9.,]/g, '')
-    const parts = cleaned.split(',')
-    if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
-    const formatted = formatParaMostrar(cleaned)
-    const start = e.target.selectionStart || 0
-    const oldLen = e.target.value.length
-    setInputValue(formatted)
-    const numStr = formatted.replace(/\./g, '').replace(',', '.')
-    if (numStr.endsWith('.')) { onChange(parseFloat(numStr.slice(0, -1)) || null) }
-    else { const n = parseFloat(numStr); onChange(isNaN(n) ? null : n) }
-    requestAnimationFrame(() => {
-      if (inputRef.current) {
-        const newPos = Math.max(0, start + (inputRef.current.value.length - oldLen))
-        inputRef.current.setSelectionRange(newPos, newPos)
-      }
-    })
-  }, [onChange])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    const navKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Home', 'End']
-    if (navKeys.includes(e.key) || e.ctrlKey || e.metaKey) return
-    if (e.key === ',' || e.key === '.') { if (inputValue.includes(',')) e.preventDefault(); return }
-    if (!/[0-9]/.test(e.key)) e.preventDefault()
-  }, [inputValue])
-
-  return (
-    <div className={styles.montoHero}>
-      <button
-        type="button"
-        className={styles.monedaToggleChip}
-        onClick={() => !disabled && onMonedaChange(moneda === 'ARS' ? 'USD' : 'ARS')}
-        disabled={disabled}
-      >
-        <span className={styles.monedaChipFlag}>{moneda === 'ARS' ? '🇦🇷' : '🇺🇸'}</span>
-        <span className={styles.monedaChipLabel}>{moneda}</span>
-      </button>
-      <div className={styles.montoDivider} />
-      <div className={styles.montoHeroInput}>
-        <span className={styles.montoHeroPrefix}>$</span>
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode="decimal"
-          className={styles.montoHeroField}
-          value={inputValue}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder="0"
-          disabled={disabled}
-          autoComplete="off"
-        />
-      </div>
-    </div>
-  )
-}
 
 export default function PresupuestoModal({
   open, onClose, presupuesto, categorias, onSuccess
@@ -343,12 +252,12 @@ export default function PresupuestoModal({
                 </div>
 
                 <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Monto límite</label>
-                  <MontoHero
+                  <MontoInput
                     value={monto}
                     onChange={v => setField('monto', v)}
                     moneda={moneda}
                     onMonedaChange={m => setField('moneda', m)}
+                    label="Monto límite"
                   />
                   <p className={styles.fieldHint}>Este será el límite máximo de gasto para el periodo seleccionado.</p>
                 </div>

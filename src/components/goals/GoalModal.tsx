@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState, useCallback } from 'react'
+import { useEffect, useReducer, useState, useCallback } from 'react'
 import {
   Target,
   Calendar,
@@ -14,6 +14,7 @@ import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
 import goalsService from '@/services/goals.service'
 import styles from './GoalModal.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
 
 interface GoalModalProps {
@@ -81,98 +82,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-function formatParaMostrar(str: string): string {
-  const num = str.replace(/\./g, '')
-  const partes = num.split(',')
-  partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-  return partes.join(',')
-}
 
-function MontoHero({
-  value, onChange, moneda, onMonedaChange, disabled,
-}: {
-  value: number | null
-  onChange: (v: number | null) => void
-  moneda: 'ARS' | 'USD'
-  onMonedaChange: (m: 'ARS' | 'USD') => void
-  disabled?: boolean
-}) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [inputValue, setInputValue] = useState(() =>
-    value !== null ? value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''
-  )
-  const [prevValue, setPrevValue] = useState(value)
-
-  if (value !== prevValue) {
-    setPrevValue(value)
-    if (value === null) { setInputValue('') }
-    else {
-      const cleaned = inputValue.replace(/\./g, '').replace(',', '.')
-      if (parseFloat(cleaned) !== value) {
-        setInputValue(value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
-      }
-    }
-  }
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value
-    if (!raw) { setInputValue(''); onChange(null); return }
-    if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
-    let cleaned = raw.replace(/[^0-9.,]/g, '')
-    const parts = cleaned.split(',')
-    if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
-    const formatted = formatParaMostrar(cleaned)
-    const start = e.target.selectionStart || 0
-    const oldLen = e.target.value.length
-    setInputValue(formatted)
-    const numStr = formatted.replace(/\./g, '').replace(',', '.')
-    if (numStr.endsWith('.')) { onChange(parseFloat(numStr.slice(0, -1)) || null) }
-    else { const n = parseFloat(numStr); onChange(isNaN(n) ? null : n) }
-    requestAnimationFrame(() => {
-      if (inputRef.current) {
-        const newPos = Math.max(0, start + (inputRef.current.value.length - oldLen))
-        inputRef.current.setSelectionRange(newPos, newPos)
-      }
-    })
-  }, [onChange])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    const navKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Home', 'End']
-    if (navKeys.includes(e.key) || e.ctrlKey || e.metaKey) return
-    if (e.key === ',' || e.key === '.') { if (inputValue.includes(',')) e.preventDefault(); return }
-    if (!/[0-9]/.test(e.key)) e.preventDefault()
-  }, [inputValue])
-
-  return (
-    <div className={styles.montoHero}>
-      <button
-        type="button"
-        className={styles.monedaToggleChip}
-        onClick={() => !disabled && onMonedaChange(moneda === 'ARS' ? 'USD' : 'ARS')}
-        disabled={disabled}
-      >
-        <span className={styles.monedaChipFlag}>{moneda === 'ARS' ? '🇦🇷' : '🇺🇸'}</span>
-        <span className={styles.monedaChipLabel}>{moneda}</span>
-      </button>
-      <div className={styles.montoDivider} />
-      <div className={styles.montoHeroInput}>
-        <span className={styles.montoHeroPrefix}>$</span>
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode="decimal"
-          className={styles.montoHeroField}
-          value={inputValue}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder="0"
-          disabled={disabled}
-          autoComplete="off"
-        />
-      </div>
-    </div>
-  )
-}
 
 export default function GoalModal({
   open, onClose, goal, onSuccess
@@ -250,14 +160,14 @@ export default function GoalModal({
 
   return (
     <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Gestionar meta">
-      <div className={styles.slidesContainer}>
-        {/* Dots */}
-        <div className={styles.stepDots}>
-          {[1, 2].map(s => (
-            <div key={s} className={`${styles.stepDot} ${step === s ? styles.stepDotActive : styles.stepDotInactive}`} />
-          ))}
-        </div>
+      {/* Indicador de pasos */}
+      <div className={styles.stepIndicator} aria-hidden="true">
+        {[1, 2].map(s => (
+          <div key={s} className={`${styles.dot} ${step === s ? styles.dotActive : styles.dotInactive}`} />
+        ))}
+      </div>
 
+      <div className={styles.slidesContainer}>
         {/* STEP 1: Nombre y Monto */}
         {step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
@@ -270,7 +180,7 @@ export default function GoalModal({
             >
               <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>{isEdit ? 'Editar meta' : 'Nueva meta'}</h2>
-                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Cerrar" title="Cerrar"><X size={18} strokeWidth={1.75} /></button>
               </div>
 
               <div className={styles.formBody}>
@@ -297,13 +207,13 @@ export default function GoalModal({
                 </div>
 
                 <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>¿Cuánto necesitás?</label>
-                  <MontoHero
+                  <MontoInput
                     value={monto_objetivo}
                     onChange={v => setField('monto_objetivo', v)}
                     moneda={moneda}
                     onMonedaChange={m => setField('moneda', m)}
                     disabled={isEdit && (goal?.movimientos?.length ?? 0) > 0}
+                    label="¿Cuánto necesitás?"
                   />
                   {(isEdit && (goal?.movimientos?.length ?? 0) > 0) ? (
                     <p className={`${styles.fieldHint} ${styles.warning}`}>
@@ -334,9 +244,9 @@ export default function GoalModal({
               }}
             >
               <div className={styles.formHeader}>
-                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
+                <button type="button" className={styles.backBtn} onClick={goBack} aria-label="Atrás" title="Atrás"><ChevronLeft size={20} strokeWidth={1.75} /></button>
                 <h2 className={styles.headerTitle}>Detalles finales</h2>
-                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Cerrar" title="Cerrar"><X size={18} strokeWidth={1.75} /></button>
               </div>
 
               <div className={styles.formBody}>

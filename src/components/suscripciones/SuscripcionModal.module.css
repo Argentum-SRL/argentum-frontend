@@ -416,7 +416,9 @@
   padding: 14px 40px 24px;
   -ms-overflow-style: none;
   min-width: 100%;
-  justify-content: flex-start;
+  box-sizing: border-box;
+  justify-content: center;
+  justify-content: safe center;
 }
 
 .billeteraSelectWrap {

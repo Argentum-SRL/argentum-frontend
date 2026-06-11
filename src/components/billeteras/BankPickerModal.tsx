@@ -266,7 +266,7 @@ export default function BankPickerModal({
       </div>
 
       {/* Contenedor con transición de slides */}
-      <div className={styles.slidesContainer}>
+      <div className={`${styles.slidesContainer} ${styles[step === 'picker' ? 'pickerStep' : 'formStep']}`}>
         {/* ── PASO 1: PICKER ── */}
         <div
           className={`${styles.slide} ${
@@ -452,37 +452,15 @@ export default function BankPickerModal({
                   />
                 </div>
 
-                {/* Moneda */}
-                <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Moneda</label>
-                  <div className={styles.currencyPills}>
-                    <button
-                      type="button"
-                      className={`${styles.currencyPill} ${moneda === 'ARS' ? styles.pillActive : ''}`}
-                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'moneda', value: 'ARS' })}
-                    >
-                      🇦🇷 ARS
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.currencyPill} ${moneda === 'USD' ? styles.pillActive : ''}`}
-                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'moneda', value: 'USD' })}
-                    >
-                      🇺🇸 USD
-                    </button>
-                  </div>
-                </div>
-
                 {/* Saldo inicial */}
                 <div className={styles.formField}>
                   <MontoInput
                     value={saldo}
                     onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
                     moneda={moneda}
-                    label="Saldo inicial"
+                    onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                     placeholder="0"
                     allowDecimals
-                    optional
                   />
                 </div>
 

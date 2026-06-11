@@ -231,6 +231,8 @@
   display: flex;
   gap: 16px;
   padding: 8px 0 16px;
+  justify-content: center;
+  justify-content: safe center;
 }
 
 .billeteraSelectWrap {

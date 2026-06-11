@@ -80,6 +80,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
           value={formData.precio_contado}
           onChange={(val) => handleChange('precio_contado', val)}
           allowDecimals
+          hideCurrency
         />
         <span className={styles.inputDesc}>Lo que pagarías si pagás todo junto hoy</span>
       </div>
@@ -91,6 +92,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
           value={formData.precio_total_cuotas}
           onChange={(val) => handleChange('precio_total_cuotas', val)}
           allowDecimals
+          hideCurrency
         />
         <span className={styles.inputDesc}>El total que terminarías pagando con todas las cuotas sumadas</span>
       </div>

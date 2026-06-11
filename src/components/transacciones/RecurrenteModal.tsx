@@ -145,29 +145,16 @@ export default function RecurrenteModal({
             </select>
           </div>
 
-          <div>
+          <div className={styles.fullWidth}>
             <MontoInput
               value={formData.monto}
               onChange={(v) => setFormData({ ...formData, monto: v })}
               moneda={formData.moneda}
+              onMonedaChange={(m) => setFormData({ ...formData, moneda: m })}
               label="Monto"
               placeholder="0"
               allowDecimals
             />
-          </div>
-
-          <div>
-            <label htmlFor="form-moneda" className={styles.label}>Moneda</label>
-            <select
-              id="form-moneda"
-              className={styles.select}
-              value={formData.moneda}
-              onChange={(e) => setFormData({ ...formData, moneda: e.target.value as 'ARS' | 'USD' })}
-              title="Moneda"
-            >
-              <option value="ARS">ARS</option>
-              <option value="USD">USD</option>
-            </select>
           </div>
 
           <div>

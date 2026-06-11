@@ -61,30 +61,13 @@ export default function StepPrimeraBilletera({ monedaPrincipal, onNext }: Props)
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Moneda</label>
-          <div className={styles.monedaPills}>
-            {(['ARS', 'USD'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMoneda(m)}
-                className={[styles.pill, moneda === m ? styles.pillActive : ''].filter(Boolean).join(' ')}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className={styles.field}>
           <MontoInput
             value={saldo}
             onChange={setSaldo}
             moneda={moneda}
-            label="Saldo inicial"
+            onMonedaChange={setMoneda}
             placeholder="0"
             allowDecimals
-            optional
           />
         </div>
 

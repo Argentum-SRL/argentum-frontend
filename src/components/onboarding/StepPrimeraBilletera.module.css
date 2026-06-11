@@ -51,29 +51,7 @@
   margin-top: 4px;
 }
 
-/* ── Moneda pills ────────────────────────────── */
-.monedaPills {
-  display: flex;
-  gap: 8px;
-}
 
-.pill {
-  padding: 8px 24px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
-}
-
-.pillActive {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-}
 
 /* ── Saldo input ─────────────────────────────── */
 .saldoWrap {

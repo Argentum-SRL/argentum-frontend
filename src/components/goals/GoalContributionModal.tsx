@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useReducer, useRef, useState, useCallback } from 'react'
+import { useMemo, useEffect, useReducer, useRef } from 'react'
 import {
   X,
   Plus,
@@ -16,6 +16,7 @@ import goalsService from '@/services/goals.service'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import { formatMonto } from '@/utils/format'
 import styles from './GoalContributionModal.module.css'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
 
 interface GoalContributionModalProps {
@@ -72,93 +73,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-// ── MontoHero (Parity with TransaccionModal) ──
-function formatParaMostrar(str: string): string {
-  const num = str.replace(/\./g, '')
-  const partes = num.split(',')
-  partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-  return partes.join(',')
-}
 
-function MontoHero({
-  value, onChange, moneda, onMonedaChange, disabled
-}: {
-  value: number | null
-  onChange: (v: number | null) => void
-  moneda: 'ARS' | 'USD'
-  onMonedaChange: (m: 'ARS' | 'USD') => void
-  disabled?: boolean
-}) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [inputValue, setInputValue] = useState(() =>
-    value !== null ? value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''
-  )
-  const [prevValue, setPrevValue] = useState(value)
-
-  if (value !== prevValue) {
-    setPrevValue(value)
-    if (value === null) setInputValue('')
-    else {
-      const cleaned = inputValue.replace(/\./g, '').replace(',', '.')
-      if (parseFloat(cleaned) !== value) {
-        setInputValue(value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
-      }
-    }
-  }
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value
-    if (!raw) { setInputValue(''); onChange(null); return }
-    if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
-    let cleaned = raw.replace(/[^0-9.,]/g, '')
-    const parts = cleaned.split(',')
-    if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
-    const formatted = formatParaMostrar(cleaned)
-    const start = e.target.selectionStart || 0
-    const oldLen = e.target.value.length
-    setInputValue(formatted)
-    const numStr = formatted.replace(/\./g, '').replace(',', '.')
-    const n = parseFloat(numStr)
-    onChange(isNaN(n) ? null : n)
-    requestAnimationFrame(() => {
-      if (inputRef.current) {
-        const newPos = Math.max(0, start + (inputRef.current.value.length - oldLen))
-        inputRef.current.setSelectionRange(newPos, newPos)
-      }
-    })
-  }, [onChange])
-
-  return (
-    <div className={styles.montoHero}>
-      <button
-        type="button"
-        className={styles.monedaToggleChip}
-        onClick={() => !disabled && onMonedaChange(moneda === 'ARS' ? 'USD' : 'ARS')}
-        disabled={disabled}
-        title="Cambiar moneda"
-      >
-        <span className={styles.monedaChipFlag}>{moneda === 'ARS' ? '🇦🇷' : '🇺🇸'}</span>
-        <span className={styles.monedaChipLabel}>{moneda}</span>
-      </button>
-      <div className={styles.montoDivider} />
-      <div className={styles.montoHeroInput}>
-        <span className={styles.montoHeroPrefix}>$</span>
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode="decimal"
-          className={styles.montoHeroField}
-          value={inputValue}
-          onChange={handleChange}
-          placeholder="0"
-          disabled={disabled}
-          autoComplete="off"
-          autoFocus
-        />
-      </div>
-    </div>
-  )
-}
 
 export default function GoalContributionModal({
   open, onClose, goal, billeteras, onSuccess
@@ -285,7 +200,7 @@ export default function GoalContributionModal({
             </div>
 
             {/* Monto Hero */}
-            <MontoHero
+            <MontoInput
               value={monto}
               onChange={(v) => {
                 dispatch({ type: 'SET_FIELD', field: 'monto', value: v })

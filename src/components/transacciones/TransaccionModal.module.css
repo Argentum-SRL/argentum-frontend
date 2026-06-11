@@ -323,7 +323,9 @@
   padding: 16px 40px; /* Mas padding para que no se corte al escalar/hover */
   -ms-overflow-style: none;
   min-width: 100%;
-  justify-content: flex-start; /* flex-start es mejor para scroll con overflow */
+  box-sizing: border-box;
+  justify-content: center;
+  justify-content: safe center;
 }
 
 .billeterasCarousel::-webkit-scrollbar {

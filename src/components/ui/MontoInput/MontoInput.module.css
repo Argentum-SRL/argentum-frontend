@@ -5,94 +5,132 @@
 }
 
 .label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-2);
-}
-
-.inputWrap {
-  display: flex;
-  align-items: stretch;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: border-color 0.15s;
-  background: var(--surface);
-}
-
-.inputWrapGhost {
-  border-color: transparent !important;
-  background: transparent !important;
-}
-
-.inputWrapGhost .prefix {
-  background: transparent !important;
-  border-right: none !important;
-  padding-left: 0;
-}
-
-.inputWrapGhost:focus-within {
-  border-color: transparent !important;
-}
-
-.inputWrapError {
-  border-color: var(--error);
-}
-
-.inputWrapError:focus-within {
-  border-color: var(--error);
-}
-
-.inputWrapDisabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.prefix {
-  padding: 0 12px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--text-2);
-  background: var(--surface-alt);
-  border-right: 1.5px solid var(--border);
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.input {
-  flex: 1;
-  padding: 10px 12px;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  font-size: 0.9375rem;
-  font-feature-settings: "tnum";
-  outline: none;
-  width: 100%;
-  min-width: 0;
-}
-
-.input::placeholder {
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-3);
-}
-
-.input:disabled {
-  cursor: not-allowed;
-}
-
-.error {
-  font-size: 0.75rem;
-  color: var(--error);
-  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
 }
 
 .fieldOptional {
   font-weight: 400;
-  color: var(--text-3);
   text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-3);
   font-size: 10px;
-  margin-left: 4px;
+  margin-left: 3px;
+}
+
+/* ── Hero container ── */
+.montoHero {
+  background: var(--surface-alt);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1.5px solid transparent;
+  transition: border-color 150ms ease;
+}
+
+.montoHero:focus-within {
+  border-color: var(--primary);
+}
+
+.montoHeroError {
+  border-color: var(--error) !important;
+}
+
+.montoHeroDisabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Chip de moneda ── */
+.monedaToggleChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: none;
+  background: var(--surface);
+  transition: background 140ms ease;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.monedaToggleChip:disabled {
+  cursor: default;
+}
+
+.monedaToggleChip:not(:disabled):hover {
+  background: var(--border);
+}
+
+.monedaChipFlag {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.monedaChipLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-2);
+  letter-spacing: 0.4px;
+}
+
+/* ── Divider vertical ── */
+.montoDivider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Input de número ── */
+.montoHeroInput {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.montoHeroPrefix {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-3);
+  line-height: 1;
+  flex-shrink: 0;
+  letter-spacing: -1px;
+}
+
+.montoHeroField {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  font-family: 'Figtree', sans-serif;
+  line-height: 1;
+}
+
+.montoHeroField::placeholder {
+  color: var(--border);
+}
+
+.montoHeroField:disabled {
+  cursor: not-allowed;
+}
+
+.error {
+  font-size: 12px;
+  color: var(--error);
 }

@@ -102,6 +102,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
           value={formData.precio_total}
           onChange={(val) => handleChange('precio_total', val)}
           allowDecimals
+          hideCurrency
         />
         <span className={styles.inputDesc}>El costo total del producto o servicio</span>
       </div>
@@ -229,6 +230,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
             value={formData.ingreso_manual}
             onChange={(val) => handleChange('ingreso_manual', val)}
             allowDecimals
+            hideCurrency
           />
           <span className={styles.inputDesc}>
             No tenemos ingresos registrados tuyos. Completalo para ver la capacidad de pago.

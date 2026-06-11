@@ -53,16 +53,26 @@
 
 /* ── Ticket Optimizado ── */
 .ticket {
-  background: white;
+  --ticket-bg: #ffffff;
+  --ticket-text: #1a1a1a;
+  --ticket-text-secondary: #555555;
+  --ticket-text-muted: #999999;
+  --ticket-border: #eeeeee;
+  --ticket-dashed-border: #dddddd;
+  --ticket-page-bg: var(--page, #f4f4f4);
+  --ticket-row-bg: #f9f9f9;
+  --ticket-btn-hover: #f0f0f0;
+
+  background: var(--ticket-bg);
   border-radius: 2px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   position: relative;
   padding: 20px 20px 16px; /* Padding reducido */
-  color: #1a1a1a;
+  color: var(--ticket-text);
   display: flex;
   flex-direction: column;
   gap: 14px;
-  border: 1px solid #eee;
+  border: 1px solid var(--ticket-border);
 }
 
 /* Efecto dentado más sutil */
@@ -79,19 +89,19 @@
 
 .ticket::before {
   top: -3px;
-  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
 }
 
 .ticket::after {
   bottom: -3px;
-  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
 }
 
 .ticketHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px dashed #ddd;
+  border-bottom: 1px dashed var(--ticket-dashed-border);
   padding-bottom: 10px;
 }
 
@@ -105,14 +115,14 @@
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
-  color: #999;
+  color: var(--ticket-text-muted);
   letter-spacing: 0.5px;
 }
 
 .ticketDate {
   font-size: 12px;
   font-weight: 700;
-  color: #333;
+  color: var(--ticket-text);
 }
 
 .ticketContent {
@@ -136,13 +146,13 @@
 .itemTitle {
   font-size: 13px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--ticket-text);
   line-height: 1.2;
 }
 
 .itemSub {
   font-size: 10px;
-  color: #888;
+  color: var(--ticket-text-muted);
   font-weight: 500;
 }
 
@@ -156,7 +166,7 @@
 .itemMonto {
   font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--ticket-text);
 }
 
 .itemActions {
@@ -175,7 +185,7 @@
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: #999;
+  color: var(--ticket-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,8 +194,8 @@
 }
 
 .actionBtn:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--ticket-btn-hover);
+  color: var(--ticket-text);
 }
 
 .actionBtn:nth-child(2):hover {
@@ -194,7 +204,7 @@
 }
 
 .ticketFooter {
-  border-top: 1px dashed #ddd;
+  border-top: 1px dashed var(--ticket-dashed-border);
   padding-top: 12px;
   display: flex;
   flex-direction: column;
@@ -211,20 +221,20 @@
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  color: #666;
+  color: var(--ticket-text-secondary);
 }
 
 .totalValue {
   font-size: 20px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--ticket-text);
 }
 
 .vencimientoRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9f9f9;
+  background: var(--ticket-row-bg);
   padding: 6px 10px;
   border-radius: 4px;
 }
@@ -232,14 +242,14 @@
 .vencimientoLabel {
   font-size: 10px;
   font-weight: 700;
-  color: #888;
+  color: var(--ticket-text-secondary);
   text-transform: uppercase;
 }
 
 .vencimientoValue {
   font-size: 11px;
   font-weight: 800;
-  color: #333;
+  color: var(--ticket-text);
 }
 
 .vencimientoUrgent {
@@ -248,9 +258,17 @@
 }
 
 /* Dark mode logic para el ticket (papel) */
-:global(.dark) .ticket {
-  background: #ffffff;
-  color: #1a1a1a;
+[data-theme="dark"] .ticket,
+:global([data-theme="dark"]) .ticket {
+  --ticket-bg: var(--surface, #161b24);
+  --ticket-text: var(--text, #e6ecf2);
+  --ticket-text-secondary: var(--text-2, #8894a8);
+  --ticket-text-muted: var(--text-3, #5a6b78);
+  --ticket-border: var(--border, #1e2530);
+  --ticket-dashed-border: var(--text-3, #5a6b78);
+  --ticket-page-bg: var(--page, #0e1117);
+  --ticket-row-bg: var(--surface-alt, #1e2530);
+  --ticket-btn-hover: var(--surface-alt, #1e2530);
 }
 
 .loadingSkeleton {
@@ -288,7 +306,7 @@
   gap: 6px;
   padding: 10px 0 0;
   width: 100%;
-  border-top: 1px dashed #ddd;
+  border-top: 1px dashed var(--ticket-dashed-border);
   margin-top: 10px;
   transition: color 0.2s ease;
   text-transform: uppercase;
@@ -331,8 +349,8 @@
 }
 
 .payBtn:disabled {
-  background: #f3f4f6;
-  color: #9ca3af;
+  background: var(--surface-alt, #f3f4f6);
+  color: var(--text-3, #9ca3af);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -343,8 +361,8 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: #eafaf1;
-  color: #2ecc71;
+  background: var(--success-bg, #eafaf1);
+  color: var(--success, #2ecc71);
   font-weight: 800;
   font-size: 11px;
   padding: 10px 14px;
@@ -361,8 +379,8 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: #fdfedc;
-  color: #d4a300;
+  background: rgba(168, 144, 90, 0.15);
+  color: var(--gold, #d4a300);
   font-weight: 800;
   font-size: 11px;
   padding: 10px 14px;

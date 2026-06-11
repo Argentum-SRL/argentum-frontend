@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign } from 'lucide-react'
 import type { Billetera, TarjetaCredito, Transaccion, Categoria } from '@/types'
@@ -40,18 +40,23 @@ const BilleteraDetallePage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
-  const bgRef = useRef<HTMLDivElement>(null)
+  const tarjetaIdParam = searchParams.get('tarjeta_id')
+
+  const headerCardRef = useCallback((node: HTMLDivElement | null) => {
+    if (node !== null) {
+      node.style.setProperty('--bdh-bg', background)
+    }
+  }, [background])
 
   // Función para manejar la selección de tarjeta desde URL
   const checkUrlParams = useCallback((cards: TarjetaCredito[]) => {
-    const tid = searchParams.get('tarjeta_id')
-    if (tid && cards.length > 0) {
-      const idx = cards.findIndex(t => t.id === tid)
+    if (tarjetaIdParam && cards.length > 0) {
+      const idx = cards.findIndex(t => t.id === tarjetaIdParam)
       if (idx !== -1) {
         setSelectedTarjetaIndex(idx)
       }
     }
-  }, [searchParams])
+  }, [tarjetaIdParam])
 
   // Resetear la expansion al cambiar de tarjeta
   const [prevTarjetaIndex, setPrevTarjetaIndex] = useState(selectedTarjetaIndex)
@@ -77,11 +82,11 @@ const BilleteraDetallePage: React.FC = () => {
   const background = useMemo(() => {
     if (!billetera) return 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
     if (billetera.es_efectivo) {
-      return EFECTIVO_BG[billetera.moneda]
+      return EFECTIVO_BG[billetera.moneda] || 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
     } else if (bank?.gradiente) {
-      return bank.gradiente
+      return bank.gradiente || 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
     } else if (bank?.colorPrimario) {
-      return bank.colorPrimario
+      return bank.colorPrimario || 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
     } else {
       return 'linear-gradient(135deg, #0D2045 0%, #061228 100%)'
     }
@@ -89,12 +94,7 @@ const BilleteraDetallePage: React.FC = () => {
 
   const isLight = !bank || bank.colorTexto === 'white'
 
-  // Set background variable via ref
-  useEffect(() => {
-    if (bgRef.current && billetera) {
-      bgRef.current.style.setProperty('--bdh-bg', background)
-    }
-  }, [background, billetera])
+
 
   // Cargar billetera inicial
   useEffect(() => {
@@ -171,7 +171,8 @@ const BilleteraDetallePage: React.FC = () => {
     return () => {
       controller.abort()
     }
-  }, [id, billetera, showToast, checkUrlParams])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, billetera?.id, showToast, checkUrlParams])
 
   // Agrupar movimientos por día
   const groupedMovimientos = useMemo(() => {
@@ -330,7 +331,10 @@ const BilleteraDetallePage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerCard} ref={bgRef}>
+      <div 
+        ref={headerCardRef}
+        className={styles.headerCard}
+      >
         {/* Fondo clipeado */}
         <div className={styles.headerBg}>
           <div className={styles.decoA} aria-hidden="true" />

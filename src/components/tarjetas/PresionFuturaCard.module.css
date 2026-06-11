@@ -7,16 +7,29 @@
 }
 
 .ticket {
-  background: white;
+  --ticket-bg: #ffffff;
+  --ticket-text: #1a1a1a;
+  --ticket-text-secondary: #333333;
+  --ticket-text-muted: #999999;
+  --ticket-border: #eeeeee;
+  --ticket-dashed-border: #dddddd;
+  --ticket-page-bg: var(--page, #f4f4f4);
+  --ticket-row-border: #f9f9f9;
+  --ticket-progress-bg: #f3f4f6;
+  --ticket-chip-color: #666666;
+  --ticket-chip-bg: #f5f5f5;
+  --ticket-chip-border: #e5e5e5;
+
+  background: var(--ticket-bg);
   border-radius: 2px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   position: relative;
   padding: 20px 20px 16px;
-  color: #1a1a1a;
+  color: var(--ticket-text);
   display: flex;
   flex-direction: column;
   gap: 14px;
-  border: 1px solid #eee;
+  border: 1px solid var(--ticket-border);
 }
 
 /* Efecto dentado */
@@ -33,19 +46,19 @@
 
 .ticket::before {
   top: -3px;
-  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
 }
 
 .ticket::after {
   bottom: -3px;
-  background-image: radial-gradient(circle, transparent 70%, #f4f4f4 70%);
+  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
 }
 
 .ticketHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px dashed #ddd;
+  border-bottom: 1px dashed var(--ticket-dashed-border);
   padding-bottom: 10px;
 }
 
@@ -59,14 +72,14 @@
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
-  color: #999;
+  color: var(--ticket-text-muted);
   letter-spacing: 0.5px;
 }
 
 .ticketDate {
   font-size: 12px;
   font-weight: 700;
-  color: #333;
+  color: var(--ticket-text);
 }
 
 .ticketContent {
@@ -81,7 +94,7 @@
   flex-direction: column;
   gap: 4px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #f9f9f9;
+  border-bottom: 1px solid var(--ticket-row-border);
 }
 
 .mesRow:last-child {
@@ -99,14 +112,14 @@
 .mesLabel {
   font-size: 12px;
   font-weight: 700;
-  color: #333;
+  color: var(--ticket-text-secondary);
   width: 70px;
 }
 
 .progressContainer {
   flex: 1;
   height: 6px;
-  background-color: #f3f4f6;
+  background-color: var(--ticket-progress-bg);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -122,7 +135,7 @@
 .mesTotal {
   font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--ticket-text);
   text-align: right;
   width: 85px;
 }
@@ -139,17 +152,28 @@
 .chipTarjeta {
   font-size: 10px;
   font-weight: 600;
-  color: #666;
-  background-color: #f5f5f5;
+  color: var(--ticket-chip-color);
+  background-color: var(--ticket-chip-bg);
   padding: 2px 6px;
   border-radius: 4px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--ticket-chip-border);
 }
 
 /* Dark mode logic para el ticket (papel) */
-:global(.dark) .ticket {
-  background: #ffffff;
-  color: #1a1a1a;
+[data-theme="dark"] .ticket,
+:global([data-theme="dark"]) .ticket {
+  --ticket-bg: var(--surface, #161b24);
+  --ticket-text: var(--text, #e6ecf2);
+  --ticket-text-secondary: var(--text-2, #8894a8);
+  --ticket-text-muted: var(--text-3, #5a6b78);
+  --ticket-border: var(--border, #1e2530);
+  --ticket-dashed-border: var(--text-3, #5a6b78);
+  --ticket-page-bg: var(--page, #0e1117);
+  --ticket-row-border: var(--border, #1e2530);
+  --ticket-progress-bg: var(--surface-alt, #1e2530);
+  --ticket-chip-color: var(--text-2, #8894a8);
+  --ticket-chip-bg: var(--surface-alt, #1e2530);
+  --ticket-chip-border: var(--border, #1e2530);
 }
 
 /* Skeleton loader */

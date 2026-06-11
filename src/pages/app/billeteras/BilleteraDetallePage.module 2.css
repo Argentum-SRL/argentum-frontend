@@ -13,6 +13,7 @@
   align-items: center;
   padding: 1rem 1.5rem;
   background-color: rgba(255, 255, 255, 0.02);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
@@ -293,3 +294,16 @@
     font-size: 1.75rem;
   }
 }
+
+/* Hide input number spinners */
+:global(input[type="number"]::-webkit-outer-spin-button),
+:global(input[type="number"]::-webkit-inner-spin-button) {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:global(input[type="number"]) {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+

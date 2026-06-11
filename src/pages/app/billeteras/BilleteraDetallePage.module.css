@@ -30,11 +30,14 @@
   position: relative;
   border-radius: 18px;
   overflow: hidden;
+  height: 72px;        /* altura fija — no cambia entre renders */
+  flex-shrink: 0;      /* no se comprime dentro del flex container padre */
 }
 
 @media (min-width: 768px) {
   .headerCard {
     border-radius: 20px;
+    height: 80px;
   }
 }
 
@@ -59,17 +62,19 @@
 .headerInner {
   position: relative;
   z-index: 1;
-  padding: 16px 20px;
+  height: 100%;                  /* ocupa toda la altura del headerCard */
+  padding: 0 20px;               /* solo padding horizontal, el vertical lo maneja el height */
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: center;           /* centrado vertical */
   justify-content: space-between;
   gap: 14px;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
   .headerInner {
-    padding: 18px 28px;
+    padding: 0 28px;
     gap: 16px;
   }
 }
@@ -202,14 +207,9 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: center;
   flex-shrink: 0;
-  padding-left: 0;
-}
-
-@media (min-width: 768px) {
-  .headerSaldo {
-    gap: 2px;
-  }
+  gap: 2px;
 }
 
 .headerSaldoLabel {
@@ -285,11 +285,13 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 32px;
+  align-items: stretch;
 }
 
 @media (min-width: 1024px) {
   .contentGrid {
     grid-template-columns: 1fr 1fr;
+    align-items: stretch;
   }
 }
 
@@ -435,12 +437,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   gap: 16px;
 }
 
 .sectionHeader h2 {
   display: block;
+  margin: 0;
 }
 
 .cardsGrid {
@@ -457,6 +460,7 @@
   background: var(--surface);
   border-radius: 20px;
   border: 1px dashed var(--surface-alt);
+  flex: 1;
 }
 
 .emptyIcon {
@@ -518,6 +522,9 @@
 .tarjetasSection {
   min-width: 0;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* ── Section Sizing for Desktop ── */
@@ -568,3 +575,16 @@
   flex-shrink: 0;
   width: 100%;
 }
+
+/* Hide input number spinners */
+:global(input[type="number"]::-webkit-outer-spin-button),
+:global(input[type="number"]::-webkit-inner-spin-button) {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:global(input[type="number"]) {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+

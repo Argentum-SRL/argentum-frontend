@@ -271,8 +271,9 @@ export default function BilleterasPage() {
     <div className={styles.root}>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className={styles.pageHeader}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.pageTitle}>Billeteras</h1>
+        <div className={styles.titleGroup}>
+          <h1>Billeteras</h1>
+          <p className={styles.subtitle}>Controlá tus cuentas bancarias, tarjetas y efectivo</p>
         </div>
         <button
           className={styles.nuevaBtn}

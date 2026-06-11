@@ -18,14 +18,13 @@
   justify-content: space-between;
   gap: 12px;
 }
-
-.headerLeft {
+.titleGroup {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.pageTitle {
+.titleGroup h1 {
   font-size: 22px;
   font-weight: 800;
   color: var(--text);
@@ -34,20 +33,14 @@
 }
 
 @media (min-width: 768px) {
-  .pageTitle { font-size: 26px; }
+  .titleGroup h1 { font-size: 26px; }
 }
 
-/* Subtítulo — oculto en mobile */
-.pageSubtitle {
-  display: none;
+.subtitle {
   font-size: 13px;
-  font-weight: 400;
-  color: var(--text-3);
+  font-weight: 500;
+  color: var(--text-2);
   margin: 0;
-}
-
-@media (min-width: 768px) {
-  .pageSubtitle { display: block; }
 }
 
 /* Botón "Nueva" — visible en mobile Y desktop */

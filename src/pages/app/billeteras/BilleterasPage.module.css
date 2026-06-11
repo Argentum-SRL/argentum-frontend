@@ -21,13 +21,13 @@
   gap: 12px;
 }
 
-.headerLeft {
+.titleGroup {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.pageTitle {
+.titleGroup h1 {
   font-size: 22px;
   font-weight: 800;
   color: var(--text);
@@ -36,7 +36,14 @@
 }
 
 @media (min-width: 768px) {
-  .pageTitle { font-size: 26px; }
+  .titleGroup h1 { font-size: 26px; }
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 0;
 }
 
 

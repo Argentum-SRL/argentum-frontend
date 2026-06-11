@@ -38,23 +38,28 @@
   transform: translateX(-2px);
 }
 
-.titleArea {
+.titleGroup {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: 700;
+.titleGroup h1 {
+  font-size: 22px;
+  font-weight: 800;
   color: var(--text);
   margin: 0;
-  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-.desc {
-  font-size: 14px;
-  color: var(--text-3);
+@media (min-width: 768px) {
+  .titleGroup h1 { font-size: 26px; }
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
   margin: 0;
 }
 

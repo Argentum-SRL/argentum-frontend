@@ -226,16 +226,16 @@ const SuscripcionesPage: React.FC = () => {
   return (
     <div className={styles.root}>
       <header className={styles.header}>
-        <div>
-          <h1 className={styles.pageTitle}>Suscripciones</h1>
-          <p className={styles.pageSubtitle}>
+        <div className={styles.titleGroup}>
+          <h1>Suscripciones</h1>
+          <p className={styles.subtitle}>
             {suscripciones.filter(s => s.estado === 'activa').length} activas · Total mensual: {formatMonto(totales?.total_ars || 0, 'ARS')}
           </p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus size={18} />
+        <button className={styles.nuevaBtn} onClick={handleCreate}>
+          <Plus size={16} strokeWidth={2.5} />
           Nueva suscripción
-        </Button>
+        </button>
       </header>
 
       <div className={styles.totalsCard}>

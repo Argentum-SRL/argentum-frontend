@@ -33,6 +33,12 @@
 .primary {
   background: var(--primary);
   color: #fff;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.primary:not(:disabled):hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
 .secondary {

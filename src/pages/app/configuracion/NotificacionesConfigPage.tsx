@@ -141,9 +141,9 @@ const NotificacionesConfigPage: React.FC = () => {
         >
           <ChevronLeft size={20} />
         </button>
-        <div className={pageStyles.titleArea}>
-          <h1 className={pageStyles.title}>Configuración de Notificaciones</h1>
-          <p className={pageStyles.desc}>Personalizá cómo y cuándo querés que te notifiquemos.</p>
+        <div className={pageStyles.titleGroup}>
+          <h1>Configuración de Notificaciones</h1>
+          <p className={pageStyles.subtitle}>Personalizá cómo y cuándo querés que te notifiquemos.</p>
         </div>
       </header>
 

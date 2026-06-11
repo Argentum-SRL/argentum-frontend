@@ -42,12 +42,6 @@ const BilleteraDetallePage: React.FC = () => {
   const [logoErr, setLogoErr] = useState(false)
   const tarjetaIdParam = searchParams.get('tarjeta_id')
 
-  const headerCardRef = useCallback((node: HTMLDivElement | null) => {
-    if (node !== null) {
-      node.style.setProperty('--bdh-bg', background)
-    }
-  }, [background])
-
   // Función para manejar la selección de tarjeta desde URL
   const checkUrlParams = useCallback((cards: TarjetaCredito[]) => {
     if (tarjetaIdParam && cards.length > 0) {
@@ -93,6 +87,12 @@ const BilleteraDetallePage: React.FC = () => {
   }, [billetera, bank])
 
   const isLight = !bank || bank.colorTexto === 'white'
+
+  const headerCardRef = useCallback((node: HTMLDivElement | null) => {
+    if (node !== null) {
+      node.style.setProperty('--bdh-bg', background)
+    }
+  }, [background])
 
 
 

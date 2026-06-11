@@ -49,11 +49,22 @@
   }
 }
 
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .titleGroup h1 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--text);
-  margin: 0 0 4px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .titleGroup h1 { font-size: 26px; }
 }
 
 .subtitle {

@@ -256,9 +256,9 @@ export default function TransaccionesPage() {
       
       {/* ── Page Header ────────────────────────────────────────────────────── */}
       <div className={styles.pageHeader}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.pageTitle}>Transacciones</h1>
-          <p className={styles.pageSubtitle}>{periodoActual.label} · {transacciones.length} movimientos</p>
+        <div className={styles.titleGroup}>
+          <h1>Transacciones</h1>
+          <p className={styles.subtitle}>{periodoActual.label} · {transacciones.length} movimientos</p>
         </div>
         <div className={styles.headerActions}>
           <button className={`${styles.btnGhost} ${styles.desktopOnly}`} title="Próximamente">

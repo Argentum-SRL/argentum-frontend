@@ -187,8 +187,8 @@ export default function PresupuestosPage() {
           <p className={styles.subtitle}>Controlá tus límites de gasto por categoría</p>
         </div>
         <div className={styles.actions}>
-          <button className={`${styles.btnGhost} ${styles.btnPrimary}`} onClick={handleOpenNew}>
-            <Plus size={16} className={styles.btnIcon} />
+          <button className={styles.nuevaBtn} onClick={handleOpenNew}>
+            <Plus size={16} strokeWidth={2.5} />
             Nuevo presupuesto
           </button>
         </div>

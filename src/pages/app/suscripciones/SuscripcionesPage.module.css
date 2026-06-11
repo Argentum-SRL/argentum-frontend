@@ -19,17 +19,29 @@
   animation: slideDown 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.pageTitle {
-  font-size: 32px;
-  font-weight: 800;
-  color: #0D2045;
-  margin: 0;
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.pageSubtitle {
-  font-size: 15px;
-  color: var(--text-3);
-  margin: 4px 0 0;
+.titleGroup h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .titleGroup h1 { font-size: 26px; }
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 0;
 }
 
 .totalsCard {
@@ -442,3 +454,34 @@
   flex-shrink: 0;
   width: 100%;
 }
+
+.nuevaBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.nuevaBtn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+@media (min-width: 768px) {
+  .nuevaBtn {
+    padding: 0 18px;
+    height: 40px;
+  }
+}
+

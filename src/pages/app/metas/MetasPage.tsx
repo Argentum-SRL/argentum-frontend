@@ -150,8 +150,8 @@ export default function MetasPage() {
           <p className={styles.subtitle}>Planificá tu futuro y ahorrá con propósito</p>
         </div>
         <div className={styles.actions}>
-          <button className={`${styles.btnGhost} ${styles.btnPrimary}`} onClick={handleCreate}>
-            <Plus size={16} className={styles.btnIcon} />
+          <button className={styles.nuevaBtn} onClick={handleCreate}>
+            <Plus size={16} strokeWidth={2.5} />
             Nueva meta
           </button>
         </div>

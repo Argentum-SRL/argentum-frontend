@@ -26,11 +26,22 @@
   }
 }
 
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .titleGroup h1 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--text);
-  margin: 0 0 4px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .titleGroup h1 { font-size: 26px; }
 }
 
 .subtitle {
@@ -46,32 +57,34 @@
   gap: 12px;
 }
 
-.btnGhost {
-  background: transparent;
-  color: #52565F;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: background 0.2s;
+.nuevaBtn {
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 0 14px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 120ms ease, transform 120ms ease;
 }
 
-.btnGhost:hover {
-  background: #F5F4F0;
+.nuevaBtn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
-.btnPrimary {
-  background: #0D2045 !important;
-  color: white !important;
-}
-
-.btnIcon {
-  display: inline-block;
+@media (min-width: 768px) {
+  .nuevaBtn {
+    padding: 0 18px;
+    height: 40px;
+  }
 }
 
 /* ── Hero Resumen (Marine) ────────────────────────────────────────────────── */

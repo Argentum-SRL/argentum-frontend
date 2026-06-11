@@ -68,11 +68,17 @@
 }
 
 .title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   margin: 0;
   color: var(--text);
+  line-height: 1.1;
 }
+
+@media (min-width: 768px) {
+  .title { font-size: 26px; }
+}
+
 
 .statusRow {
   display: flex;

@@ -17,7 +17,6 @@ import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import type { TransaccionRecurrente, Billetera, Categoria } from '@/types'
 import { formatMonto } from '@/utils/format'
-import Button from '@/components/ui/Button/Button'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 
@@ -188,10 +187,13 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
     <div className={embedded ? styles.embeddedContainer : styles.container}>
       {!embedded ? (
         <header className={styles.header}>
-          <h1>Recurrentes</h1>
-          <Button onClick={() => handleOpenModal()}>
-            <Plus size={18} /> Nueva recurrente
-          </Button>
+          <div className={styles.titleGroup}>
+            <h1>Recurrentes</h1>
+            <p className={styles.subtitle}>Controlá tus cobros y pagos periódicos</p>
+          </div>
+          <button className={styles.nuevaBtn} onClick={() => handleOpenModal()}>
+            <Plus size={16} strokeWidth={2.5} /> Nueva recurrente
+          </button>
         </header>
       ) : null}
 

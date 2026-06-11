@@ -136,7 +136,7 @@ const BilleteraDetallePage: React.FC = () => {
         // Cargar movimientos (filtramos crédito ya que impactan vía Pago de Resumen)
         const [txs, cats, allBills] = await Promise.all([
           transaccionService.getTransacciones({ billetera_id: id }, controller.signal),
-          categoriaService.getCategorias(controller.signal),
+          categoriaService.getCategorias(),
           billeteraService.list(controller.signal)
         ])
         if (controller.signal.aborted) return

@@ -68,7 +68,7 @@ export default function PresupuestosPage() {
     const controller = new AbortController()
     const loadData = async () => {
       try {
-        const cats = await categoriaService.getCategorias(controller.signal)
+        const cats = await categoriaService.getCategorias()
         if (!controller.signal.aborted) {
           setCategorias(cats.filter(c => c.tipo === 'egreso'))
         }

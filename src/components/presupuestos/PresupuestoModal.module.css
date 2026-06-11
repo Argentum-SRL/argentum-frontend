@@ -98,7 +98,7 @@
 }
 
 .closeBtn:hover, .backBtn:hover {
-  background: #EFEFEF;
+  background: var(--border);
   color: var(--text);
 }
 
@@ -150,7 +150,7 @@
 
 /* Monto Hero */
 .montoHero {
-  background: #F8F9FA;
+  background: var(--surface-alt);
   border-radius: 20px;
   padding: 16px 20px;
   display: flex;
@@ -164,7 +164,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
@@ -227,6 +227,7 @@
   font-size: 14px;
   font-weight: 600;
   width: 100%;
+  color: var(--text);
 }
 .searchBar input:focus { outline: none; }
 
@@ -241,7 +242,7 @@
 }
 
 .catItem {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
@@ -305,7 +306,7 @@
 }
 
 .subList {
-  background: #F9FAFB;
+  background: var(--surface-alt);
   padding: 4px 8px 12px;
   display: flex;
   flex-wrap: wrap;
@@ -314,7 +315,7 @@
 
 .subItem {
   padding: 6px 12px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 12px;
@@ -328,7 +329,7 @@
 }
 
 .subItemActive {
-  background: #E0E7FF;
+  background: rgba(13, 32, 69, 0.12);
   border-color: var(--primary);
   color: var(--primary);
 }
@@ -361,7 +362,7 @@
 
 .periodBtnActive {
   border-color: var(--primary);
-  background: rgba(13, 32, 69, 0.02);
+  background: rgba(72, 120, 184, 0.08);
   color: var(--primary);
 }
 
@@ -386,7 +387,7 @@
 
 .renewalCardActive {
   border-color: var(--primary);
-  background: rgba(13, 32, 69, 0.02);
+  background: rgba(72, 120, 184, 0.08);
 }
 
 .renewalIcon { color: var(--text-3); }
@@ -452,8 +453,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #FEF2F2;
-  border: 1px solid #FEE2E2;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 12px;
   padding: 12px 16px;
   color: #EF4444;

@@ -10,7 +10,7 @@ export const invalidateCategorias = () => {
 }
 
 const categoriaService = {
-  getCategorias: async (signal?: AbortSignal) => {
+  getCategorias: async () => {
     if (categoriesPromise) return categoriesPromise
 
     if (categoriesCache && Date.now() - categoriesCache.timestamp < CATEGORIES_TTL) {
@@ -19,7 +19,7 @@ const categoriaService = {
 
     categoriesPromise = (async () => {
       try {
-        const response = await api.get<Categoria[]>('/categorias', { signal })
+        const response = await api.get<Categoria[]>('/categorias')
         categoriesCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {

@@ -86,103 +86,6 @@
   }
 }
 
-/* ── Hero Summary ────────────────────────────────────────────────────────── */
-.heroSummary {
-  background: #0D2045;
-  border-radius: 24px;
-  padding: 24px 28px;
-  position: relative;
-  overflow: hidden;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  box-shadow: 0 10px 30px -10px rgba(13, 32, 69, 0.3);
-}
-
-@media (min-width: 768px) {
-  .heroSummary {
-    flex-direction: row;
-    align-items: center;
-    gap: 48px;
-  }
-}
-
-.heroSummary::after {
-  content: '';
-  position: absolute;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  background: white;
-  opacity: 0.05;
-  top: -100px;
-  right: -50px;
-  pointer-events: none;
-}
-
-.heroMain {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1.2;
-}
-
-.heroLabel {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.heroBalance {
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  margin: 0;
-}
-
-.heroProgressContainer {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  margin: 14px 0 8px;
-  width: 100%;
-  max-width: 360px;
-  overflow: hidden;
-}
-
-.heroProgressBar {
-  height: 100%;
-  background: #4CAF7D;
-  border-radius: 4px;
-  transition: width 1s ease-out;
-}
-
-.heroSubLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.heroGrid {
-  display: flex;
-  gap: 40px;
-  flex: 1;
-}
-
-.heroMetric {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.heroValue {
-  font-size: 20px;
-  font-weight: 700;
-}
-
 /* ── Toolbar ─────────────────────────────────────────────────────────────── */
 .toolbar {
   display: flex;
@@ -318,4 +221,8 @@
   height: 32px;
   flex-shrink: 0;
   width: 100%;
+}
+
+.summaryBar {
+  margin-top: 0 !important;
 }

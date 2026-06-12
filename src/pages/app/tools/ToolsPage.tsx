@@ -71,33 +71,6 @@ export default function ToolsPage() {
           </button>
         </div>
       </div>
-
-      {/* ── Dynamic Hero Banner ─────────────────────────────────────────── */}
-      <div className={pageStyles.heroBanner}>
-        <span className={pageStyles.heroLabel}>Herramienta Destacada</span>
-        {activeTab === 'conveniencia' ? (
-          <>
-            <h2 className={pageStyles.heroTitle}>
-              Calculadora de Cuotas vs Contado con Inflación
-            </h2>
-            <p className={pageStyles.heroDesc}>
-              Descubrí si te conviene pagar en cuotas o realizar un pago al contado. La calculadora 
-              descuenta el valor real futuro de cada cuota usando la inflación mensual de Argentina.
-            </p>
-          </>
-        ) : (
-          <>
-            <h2 className={pageStyles.heroTitle}>
-              ¿Me lo puedo permitir?
-            </h2>
-            <p className={pageStyles.heroDesc}>
-              Analizá el impacto real de una compra en base a tu situación financiera actual: 
-              ingresos promedio, dinero disponible hoy en billeteras ARS y obligaciones fijas mensuales.
-            </p>
-          </>
-        )}
-      </div>
-
       {/* ── Tab Content ─────────────────────────────────────────────────── */}
       {activeTab === 'conveniencia' && (
         <div className={pageStyles.grid}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Button, PageSummaryBar } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import suscripcionService from '@/services/suscripcion.service'
@@ -223,13 +223,18 @@ const SuscripcionesPage: React.FC = () => {
     )
   }
 
+  const totalMensualARS = totales?.total_ars || 0
+  const totalMensualUSD = totales?.total_usd || 0
+  const suscripcionesActivas = suscripciones.filter(s => s.estado === 'activa')
+  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
+
   return (
     <div className={styles.root}>
       <header className={styles.header}>
         <div className={styles.titleGroup}>
           <h1>Suscripciones</h1>
           <p className={styles.subtitle}>
-            {suscripciones.filter(s => s.estado === 'activa').length} activas · Total mensual: {formatMonto(totales?.total_ars || 0, 'ARS')}
+            {suscripcionesActivas.length} activas · Total mensual: {formatCurrency(totalMensualARS)}
           </p>
         </div>
         <button className={styles.nuevaBtn} onClick={handleCreate}>
@@ -238,22 +243,22 @@ const SuscripcionesPage: React.FC = () => {
         </button>
       </header>
 
-      <div className={styles.totalsCard}>
-        <div className={styles.totalItem}>
-          <span className={styles.totalLabel}>Total Mensual ARS</span>
-          <span className={styles.totalValue}>{formatMonto(totales?.total_ars || 0, 'ARS')}</span>
-        </div>
-        <div className={styles.totalDivider} />
-        <div className={styles.totalItem}>
-          <span className={styles.totalLabel}>Total Mensual USD</span>
-          <span className={styles.totalValue}>{formatMonto(totales?.total_usd || 0, 'USD')}</span>
-        </div>
-        <div className={styles.totalDivider} />
-        <div className={styles.totalItem}>
-          <span className={styles.totalLabel}>Activas</span>
-          <span className={styles.totalValue}>{suscripciones.filter(s => s.estado === 'activa').length}</span>
-        </div>
-      </div>
+      <PageSummaryBar
+        items={[
+          {
+            label: "Total mensual ARS",
+            value: formatCurrency(totalMensualARS),
+          },
+          {
+            label: "Total mensual USD",
+            value: `US$ ${totalMensualUSD.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+          },
+          {
+            label: "Activas",
+            value: String(suscripcionesActivas.length),
+          },
+        ]}
+      />
 
       <div className={styles.sections}>
         {sections.map(section => (

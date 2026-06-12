@@ -7,5 +7,7 @@ import { Toast } from './Toast/Toast.tsx'
 import { Input } from './Input/Input.tsx'
 import { Select } from './Select/Select.tsx'
 import EmptyState from './EmptyState/EmptyState.tsx'
+import PageSummaryBar from './PageSummaryBar'
 
-export { Button, Drawer, Field, MontoInput, Modal, Toast, Input, Select, EmptyState }
+export { Button, Drawer, Field, MontoInput, Modal, Toast, Input, Select, EmptyState, PageSummaryBar }
+

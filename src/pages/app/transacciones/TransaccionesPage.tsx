@@ -16,7 +16,7 @@ import { useModal } from '@/hooks/useModal'
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
 import RecurrentesPage, { type RecurrentesPageRef } from './RecurrentesPage'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
@@ -252,6 +252,13 @@ export default function TransaccionesPage() {
     }
   }, [filteredTransacciones, mainCurrency])
 
+  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
+  const resumen = {
+    balance,
+    ingresos: totalIngresos,
+    egresos: totalEgresos
+  }
+
   return (
     <div className={styles.page}>
       
@@ -302,33 +309,33 @@ export default function TransaccionesPage() {
       {activeTab === 'historial' ? (
         <>
           {/* ── Hero Resumen ───────────────────────────────────────────────────── */}
-          <div className={styles.heroResumen}>
-            <div className={styles.heroMain}>
-              <span className={styles.heroLabel}>Balance del ciclo</span>
-              <h2 className={styles.heroBalance}>{formatMonto(balance, mainCurrency)}</h2>
-            </div>
-            <div className={styles.heroGrid}>
-              <div className={styles.heroMetric}>
-                <span className={styles.heroLabel}>Ingresos</span>
-                <span className={styles.heroValueIngreso}>+{formatMonto(totalIngresos, mainCurrency)}</span>
+          <PageSummaryBar
+            className={styles.summaryBar}
+            leftSlot={
+              <div className={styles.balanceCicloSlot}>
+                <span className={styles.balanceCicloLabel}>Balance del ciclo</span>
+                <span
+                  className={`${styles.balanceCicloValue} ${resumen.balance < 0 ? styles.balanceNegative : styles.balancePositive}`}
+                >
+                  {resumen.balance < 0 ? '-' : '+'}
+                  {formatCurrency(Math.abs(resumen.balance))}
+                </span>
               </div>
-              <div className={styles.heroMetric}>
-                <span className={styles.heroLabel}>Egresos</span>
-                <span className={styles.heroValueEgreso}>-{formatMonto(totalEgresos, mainCurrency)}</span>
-              </div>
-              {pendientesIA.length > 0 && (
-                <div className={styles.heroMetric}>
-                  <span className={styles.heroLabel}>Pendientes IA</span>
-                  <button 
-                    className={`${styles.heroBadgePending} ${styles.heroBadgeBtn}`} 
-                    onClick={handleViewPendientes}
-                  >
-                    {pendientesIA.length} sin revisar
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+            }
+            items={[
+              {
+                label: "Ingresos",
+                value: `+${formatCurrency(resumen.ingresos)}`,
+                valueColor: '#4CAF7D',
+              },
+              {
+                label: "Egresos",
+                value: `-${formatCurrency(Math.abs(resumen.egresos))}`,
+                valueColor: '#FF8A65',
+              },
+            ]}
+          />
+
 
           {/* ── Filter Bar ───────────────────────────────────────────────────── */}
           <FilterBar

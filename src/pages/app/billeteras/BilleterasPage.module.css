@@ -96,141 +96,7 @@
   .btnSuffix { display: inline; }
 }
 
-/* ── Totales hero — card marina ─────────────────────────────────────────────── */
-.totals {
-  background: #0D2045;
-  border-radius: 18px;
-  padding: 18px 20px;
-  position: relative;
-  overflow: hidden;
-}
 
-.totals::before {
-  content: '';
-  position: absolute;
-  width: 260px; height: 260px;
-  border-radius: 50%;
-  background: rgba(138, 149, 168, 0.07);
-  top: -90px; right: -60px;
-  pointer-events: none;
-}
-
-.totals::after {
-  content: '';
-  position: absolute;
-  width: 140px; height: 140px;
-  border-radius: 50%;
-  background: rgba(138, 149, 168, 0.04);
-  bottom: -50px; left: 40px;
-  pointer-events: none;
-}
-
-/* Desktop: flex row */
-@media (min-width: 768px) {
-  .totals {
-    display: flex;
-    align-items: center;
-    border-radius: 20px;
-    padding: 24px 32px;
-  }
-}
-
-/* tmMain — bloque del equivalente total */
-.tmMain {
-  position: relative;
-  z-index: 1;
-}
-
-@media (min-width: 768px) {
-  .tmMain { flex: 1; }
-}
-
-/* Número principal */
-.tmMainVal {
-  font-size: 30px;
-  font-weight: 700;
-  color: white;
-  letter-spacing: -1px;
-  line-height: 1;
-  margin: 6px 0 0;
-}
-
-@media (min-width: 768px) {
-  .tmMainVal { font-size: 36px; letter-spacing: -1.2px; }
-}
-
-/* tmRow — fila ARS + USD */
-.tmRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 12px;
-  margin-top: 14px;
-  position: relative;
-  z-index: 1;
-}
-
-/* Desktop: display:contents — los hijos fluyen al flex padre */
-@media (min-width: 768px) {
-  .tmRow {
-    display: contents;
-  }
-}
-
-/* tmSub — cada columna secundaria */
-.tmSub {
-  display: flex;
-  flex-direction: column;
-}
-
-.tmSub + .tmSub {
-  padding-left: 16px;
-  margin-left: 16px;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-@media (min-width: 768px) {
-  .tmSub {
-    flex: 1;
-    padding-left: 40px;
-    margin-left: 40px;
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .tmSub + .tmSub {
-    padding-left: 40px;
-    margin-left: 40px;
-  }
-}
-
-/* Valor secundario */
-.tmSubVal {
-  font-size: 16px;
-  font-weight: 700;
-  color: white;
-  letter-spacing: -0.4px;
-  margin: 4px 0 0;
-}
-
-@media (min-width: 768px) {
-  .tmSubVal { font-size: 28px; letter-spacing: -0.8px; }
-}
-
-/* Labels, subs y badge compartidos */
-.totalLbl {
-  font-size: 10px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0;
-}
-
-.lblWithIcon {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 
 /* ── Grid de billeteras ────────────────────────────────────────────────────── */
 /* Mobile: columna única con solapamiento */
@@ -421,5 +287,9 @@
 :global(input[type="number"]) {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+.summaryBar {
+  margin-top: 0 !important;
 }
 

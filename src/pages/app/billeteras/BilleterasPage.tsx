@@ -1,7 +1,7 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
-import { Plus, Eye, EyeOff, Info, Wallet } from 'lucide-react'
+import { Plus, Eye, EyeOff, Wallet } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
@@ -13,7 +13,7 @@ import billeteraService from '@/services/billetera.service'
 import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 
@@ -43,49 +43,6 @@ const EstadoVacio = memo(({ onCrear }: { onCrear: () => void }) => {
 })
 EstadoVacio.displayName = 'EstadoVacio'
 
-// ── Totales hero ──────────────────────────────────────────────────────────────
-
-const TotalesHero = memo(({ billeteras, cotizacion }: { billeteras: Billetera[], cotizacion: CotizacionDolar | null }) => {
-  const valorUSD = cotizacion?.venta ?? 0
-  const tipoLabel = cotizacion?.nombre ?? 'Blue'
-  
-  const { totalARS, totalUSD, equivalenteTotal } = useMemo(() => 
-    calcularTotales(billeteras, valorUSD), 
-    [billeteras, valorUSD]
-  )
-
-  return (
-    <div className={styles.totals}>
-      <div className={styles.tmMain}>
-        <p className={styles.totalLbl}>Equivalente total</p>
-        <p className={styles.tmMainVal}>{formatSaldo(equivalenteTotal, 'ARS')}</p>
-      </div>
-
-      <div className={styles.tmRow}>
-        <div className={styles.tmSub}>
-          <p className={styles.totalLbl}>Total ARS</p>
-          <p className={styles.tmSubVal}>{formatSaldo(totalARS, 'ARS')}</p>
-        </div>
-        <div className={styles.tmSub}>
-          <div className={styles.lblWithIcon}>
-            <p className={styles.totalLbl}>Total USD</p>
-            <span 
-              title={`Cotización utilizada: USD ${tipoLabel} · ${formatSaldo(valorUSD, 'ARS')}`}
-              className="inline-flex cursor-help"
-            >
-              <Info 
-                size={12} 
-                color="rgba(255, 255, 255, 0.4)" 
-              />
-            </span>
-          </div>
-          <p className={styles.tmSubVal}>{formatSaldo(totalUSD, 'USD')}</p>
-        </div>
-      </div>
-    </div>
-  )
-})
-TotalesHero.displayName = 'TotalesHero'
 
 // ── Página principal ──────────────────────────────────────────────────────────
 
@@ -158,6 +115,13 @@ export default function BilleterasPage() {
       billeterasEfectivo: activas.filter((b) => b.es_efectivo)
     }
   }, [billeteras])
+
+  const { totalARS, totalUSD } = useMemo(() => {
+    const valorUSD = cotizacion?.venta ?? 0
+    return calcularTotales(billeteras, valorUSD)
+  }, [billeteras, cotizacion])
+
+  const formatCurrency = (monto: number) => formatSaldo(monto, 'ARS')
 
   // Inicializar la tarjeta principal como la que está al frente por defecto
   if (billeterasActivas.length > 0 && !frontCardId) {
@@ -296,8 +260,26 @@ export default function BilleterasPage() {
 
       {/* ── Barra de resumen ───────────────────────────────────────────────── */}
       {!isLoading && billeterasActivas.length > 0 && (
-        <TotalesHero billeteras={billeteras} cotizacion={cotizacion} />
+        <PageSummaryBar
+          className={styles.summaryBar}
+          items={[
+            {
+              label: "Billeteras activas",
+              value: String(billeterasActivas.length),
+              highlight: true,
+            },
+            {
+              label: "Total ARS",
+              value: formatCurrency(totalARS),
+            },
+            {
+              label: "Total USD",
+              value: `USD ${totalUSD.toLocaleString('es-AR')}`,
+            },
+          ]}
+        />
       )}
+
 
       {/* ── Grid / Skeleton / Estado vacío ────────────────────────────────── */}
       {isLoading ? (

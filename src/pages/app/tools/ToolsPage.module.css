@@ -74,65 +74,11 @@
   margin: 0;
 }
 
-/* ── Hero Banner (Igual al de Transacciones/Presupuestos) ─────────────────── */
-.heroBanner {
-  background: #0D2045;
-  border-radius: 20px;
-  padding: 22px 28px;
-  position: relative;
-  overflow: hidden;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 10px 25px -5px rgba(13, 32, 69, 0.3);
-}
-
-:global([data-theme="dark"]) .heroBanner {
-  background: #161B24;
-  border: 1px solid var(--border);
-  box-shadow: none;
-}
-
-.heroBanner::before {
-  content: '';
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: white;
-  opacity: 0.05;
-  top: -80px;
-  right: -50px;
-  pointer-events: none;
-}
-
-.heroLabel {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.heroTitle {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.heroDesc {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 4px 0 0;
-  max-width: 600px;
-}
-
 /* ── Tabs ────────────────────────────────────────────────────────────────── */
 .tabsContainer {
   display: flex;
   justify-content: flex-start;
+  margin-top: 24px;
 }
 
 .tabs {

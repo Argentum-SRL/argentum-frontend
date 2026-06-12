@@ -146,51 +146,7 @@
 }
 
 /* ── Hero Resumen (Card Marino) ──────────────────────────────────────────── */
-.heroResumen {
-  background: #0D2045;
-  border-radius: 20px;
-  padding: 22px 28px;
-  position: relative;
-  overflow: hidden;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
 
-@media (min-width: 768px) {
-  .heroResumen {
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 40px;
-  }
-}
-
-.heroResumen::before {
-  content: '';
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: white;
-  opacity: 0.07;
-  top: -60px;
-  right: -40px;
-  pointer-events: none;
-}
-
-.heroResumen::after {
-  content: '';
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: white;
-  opacity: 0.04;
-  bottom: -40px;
-  left: -20px;
-  pointer-events: none;
-}
 
 .heroMain {
   position: relative;
@@ -216,58 +172,7 @@
   line-height: 1.1;
 }
 
-.heroGrid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  flex: 1;
-}
 
-@media (min-width: 768px) {
-  .heroGrid {
-    display: flex;
-    padding-top: 0;
-    border-top: none;
-    gap: 40px;
-    align-items: flex-end;
-  }
-}
-
-.heroMetric {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.heroValueIngreso {
-  font-size: 18px;
-  font-weight: 700;
-  color: #4CAF7D;
-}
-
-.heroValueEgreso {
-  font-size: 18px;
-  font-weight: 700;
-  color: #FF8A65;
-}
-
-.heroBadgePending {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #F59E0B;
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 6px;
-  align-self: flex-start;
-  margin-top: 4px;
-}
 
 /* ── Pendientes Banner ───────────────────────────────────────────────────── */
 .pendientesBanner {
@@ -385,3 +290,45 @@
 .recurrentesWrapper::-webkit-scrollbar-thumb:hover {
   background: var(--text-3);
 }
+
+.balanceCicloSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.balanceCicloLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.balanceCicloValue {
+  font-size: 22px; /* Mobile size */
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .balanceCicloValue {
+    font-size: 28px; /* Desktop size */
+  }
+}
+
+.summaryBar {
+  margin-top: 0 !important;
+}
+
+.balanceNegative {
+  color: #FF8A65;
+}
+
+.balancePositive {
+  color: rgba(255, 255, 255, 1);
+}
+

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Plus, 
   PieChart
@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import BudgetCard from './BudgetCard'
 import BudgetHistoryModal from './BudgetHistoryModal'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function PresupuestosPage() {
   const { showToast } = useToast()
@@ -178,6 +178,19 @@ export default function PresupuestosPage() {
     }
   }, [presupuestos])
 
+  const totalGastado = totals.totalGastado
+  const totalLimite = totals.totalLimite
+  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
+
+  const porcentajeGlobal = totalLimite > 0 ? (totalGastado / totalLimite) * 100 : 0
+  const activeOnes = presupuestos.filter(p => p.estado === 'activo' && p.periodo_actual)
+  const presupuestosEnRiesgo = activeOnes.filter(p => {
+    const limite = Number(p.periodo_actual?.monto_limite || 0)
+    if (limite <= 0) return false
+    const gastado = Number(p.periodo_actual?.monto_usado || 0)
+    return (gastado / limite) >= 0.8
+  }).length
+
   return (
     <div className={styles.page}>
       
@@ -197,28 +210,27 @@ export default function PresupuestosPage() {
 
       {/* ── Hero Resumen (Marine Language) ──────────────────────────────────── */}
       {activeTab === 'activo' && (
-        <div className={styles.heroResumen}>
-          <div className={styles.heroMain}>
-            <span className={styles.heroLabel}>Gasto total presupuestado</span>
-            <h2 className={styles.heroBalance}>{formatMonto(totals.totalGastado, 'ARS')}</h2>
-            <div className={styles.heroProgress}>
-               <HeroProgressBar percentage={totals.porcentaje} />
-            </div>
-            <span className={styles.heroSubLabel}>{totals.porcentaje.toFixed(1)}% del límite global</span>
-          </div>
-          <div className={styles.heroGrid}>
-            <div className={styles.heroMetric}>
-              <span className={styles.heroLabel}>Límite Global</span>
-              <span className={styles.heroValue}>{formatMonto(totals.totalLimite, 'ARS')}</span>
-            </div>
-            <div className={styles.heroMetric}>
-              <span className={styles.heroLabel}>En Alerta / Superados</span>
-              <span className={`${styles.heroValue} ${totals.superados > 0 ? styles.textError : ''}`}>
-                {totals.superados} presupuestos
-              </span>
-            </div>
-          </div>
-        </div>
+        <PageSummaryBar
+          className={styles.summaryBar}
+          items={[
+            {
+              label: "Gastado este ciclo",
+              value: formatCurrency(totalGastado),
+            },
+            {
+              label: "Del límite total",
+              value: `${porcentajeGlobal.toFixed(1)}%`,
+              valueColor: porcentajeGlobal >= 80 ? '#FF8A65'
+                        : porcentajeGlobal >= 60 ? '#F5A623'
+                        : '#4CAF7D',
+            },
+            {
+              label: "En riesgo",
+              value: `${presupuestosEnRiesgo} ${presupuestosEnRiesgo === 1 ? 'presupuesto' : 'presupuestos'}`,
+              valueColor: presupuestosEnRiesgo > 0 ? '#FF8A65' : '#4CAF7D',
+            },
+          ]}
+        />
       )}
 
       {/* ── Tabs ───────────────────────────────────────────────────────────── */}
@@ -290,15 +302,3 @@ export default function PresupuestosPage() {
     </div>
   )
 }
-
-
-function HeroProgressBar({ percentage }: { percentage: number }) {
-  const barRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (barRef.current) {
-      barRef.current.style.width = `${Math.min(percentage, 100)}%`
-    }
-  }, [percentage])
-  return <div ref={barRef} className={styles.heroProgressBar} />
-}
-

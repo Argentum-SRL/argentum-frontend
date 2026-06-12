@@ -1,0 +1,150 @@
+.container {
+  --text-label: rgba(255, 255, 255, 0.55);
+  --text-value: rgba(255, 255, 255, 1);
+  --text-sub: rgba(255, 255, 255, 0.45);
+  --border-color: rgba(255, 255, 255, 0.12);
+
+  background: var(--primary);
+  border-radius: 16px;
+  width: 100%;
+  margin-top: 16px;
+  box-sizing: border-box;
+
+  /* Mobile default (< 768px) */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 0 20px;
+  min-height: 72px;
+}
+
+.leftSlot {
+  grid-column: span 2;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px 20px;
+  box-sizing: border-box;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.value {
+  font-size: 18px; /* Mobile font-size */
+  font-weight: 700;
+  color: var(--text-value);
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.valueHighlight {
+  font-size: 22px; /* Mobile highlight size */
+}
+
+.subValue {
+  font-size: 12px;
+  color: var(--text-sub);
+  line-height: 1.2;
+}
+
+/* Mobile borders and separators:
+   Left column items (indices 0 and 2) get border-right. */
+.container:not(.hasLeftSlot) .item:nth-child(odd) {
+  border-right: 1px solid var(--border-color);
+}
+
+/* If there are more than 2 items in total, child 1 and 2 get border-bottom. */
+.container:not(.hasLeftSlot) .item:nth-child(1):nth-last-child(n+3),
+.container:not(.hasLeftSlot) .item:nth-child(2):nth-last-child(n+2) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* If hasLeftSlot is present (Transacciones only, has leftSlot + 2 items) */
+.container.hasLeftSlot .item:nth-child(even) {
+  border-right: 1px solid var(--border-color);
+}
+
+/* Tablet (768px - 1023px) and Desktop (>= 1024px) */
+@media (min-width: 768px) {
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    padding: 0 24px; /* Tablet padding */
+    min-height: 88px; /* Desktop min-height (≥768px) */
+  }
+
+  .leftSlot {
+    flex: 1.5;
+    grid-column: unset; /* reset grid */
+    border-bottom: none; /* reset mobile border */
+    padding: 0 28px 0 0;
+  }
+
+  .item {
+    flex: 1;
+    padding: 0 28px;
+    border-right: none !important; /* reset mobile border */
+    border-bottom: none !important; /* reset mobile border */
+  }
+
+  /* Separator logic */
+  .container.hasLeftSlot .item {
+    border-left: 1px solid var(--border-color);
+  }
+  
+  .container:not(.hasLeftSlot) .item:not(.itemFirst) {
+    border-left: 1px solid var(--border-color);
+  }
+
+  /* Padding adjustments */
+  .container:not(.hasLeftSlot) .itemFirst {
+    padding-left: 0;
+  }
+
+  .item:last-of-type {
+    padding-right: 0;
+  }
+
+  .value {
+    font-size: 22px; /* Desktop font-size */
+  }
+
+  .valueHighlight {
+    font-size: 26px; /* Desktop highlight size */
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 32px; /* Desktop padding */
+  }
+}
+
+.colorGreen {
+  color: #4CAF7D !important;
+}
+
+.colorOrange {
+  color: #F5A623 !important;
+}
+
+.colorRed {
+  color: #FF8A65 !important;
+}

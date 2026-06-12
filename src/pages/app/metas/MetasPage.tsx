@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Plus, 
   Target,
@@ -14,7 +14,7 @@ import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import GoalCard from '@/components/goals/GoalCard'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function MetasPage() {
   const { showToast } = useToast()
@@ -133,13 +133,10 @@ export default function MetasPage() {
     navigate(`/app/metas/${id}`)
   }
 
-  const heroBarRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (heroBarRef.current) {
-      heroBarRef.current.style.width = `${Math.min(totals.porcentaje, 100)}%`
-    }
-  }, [totals.porcentaje])
+  const totalAhorrado = totals.totalAhorrado
+  const totalObjetivo = totals.totalObjetivo
+  const metasCompletadas = totals.completadas
+  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
 
   return (
     <div className={styles.page}>
@@ -158,27 +155,25 @@ export default function MetasPage() {
         </div>
       </div>
 
-      {/* ── Hero Summary ────────────────────────────────────────────── */}
-      <div className={styles.heroSummary}>
-        <div className={styles.heroMain}>
-          <span className={styles.heroLabel}>Total ahorrado en metas</span>
-          <h2 className={styles.heroBalance}>{formatMonto(totals.totalAhorrado, 'ARS')}</h2>
-          <div className={styles.heroProgressContainer}>
-            <div ref={heroBarRef} className={styles.heroProgressBar} />
-          </div>
-          <span className={styles.heroSubLabel}>{totals.porcentaje.toFixed(1)}% del objetivo global</span>
-        </div>
-        <div className={styles.heroGrid}>
-          <div className={styles.heroMetric}>
-            <span className={styles.heroLabel}>Objetivo Global</span>
-            <span className={styles.heroValue}>{formatMonto(totals.totalObjetivo, 'ARS')}</span>
-          </div>
-          <div className={styles.heroMetric}>
-            <span className={styles.heroLabel}>Completadas</span>
-            <span className={styles.heroValue}>{totals.completadas} metas</span>
-          </div>
-        </div>
-      </div>
+      {/* ── Barra de resumen ────────────────────────────────────────────── */}
+      <PageSummaryBar
+        className={styles.summaryBar}
+        items={[
+          {
+            label: "Ahorro acumulado",
+            value: formatCurrency(totalAhorrado),
+            highlight: true,
+          },
+          {
+            label: "Objetivo global",
+            value: formatCurrency(totalObjetivo),
+          },
+          {
+            label: "Completadas",
+            value: `${metasCompletadas} meta${metasCompletadas !== 1 ? 's' : ''}`,
+          },
+        ]}
+      />
 
       {/* ── Toolbar ─────────────────────────────────────────────────── */}
       <div className={styles.toolbar}>

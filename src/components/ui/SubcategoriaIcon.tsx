@@ -13,11 +13,15 @@ export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, class
   const visual = getSubcategoriaVisual(nombre)
   let iconSrc = visual.iconSrc
 
-  // 2. Si no hay icono de subcategoría O el nombre es 'general', usamos el del padre
+  // 2. Si no hay icono de subcategoría O el nombre es 'general', usamos el del padre.
+  // Si tampoco hay padre, usamos el icono default.
   if (!iconSrc || nombre?.toLowerCase() === 'general') {
     if (parentCategory) {
       const parentVisual = getCategoriaVisual(parentCategory)
       iconSrc = parentVisual.iconSrc
+    } else {
+      const defaultVisual = getCategoriaVisual('default')
+      iconSrc = defaultVisual.iconSrc
     }
   }
 

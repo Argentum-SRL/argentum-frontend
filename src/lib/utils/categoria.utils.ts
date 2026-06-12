@@ -78,8 +78,9 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'regalos y donaciones': { iconSrc: '/assets/icons/categorias/regalo%20Background%20Removed.png',   label: 'Regalos y donaciones' },
   'ahorro':           { iconSrc: '/assets/icons/categorias/ahorro%20Background%20Removed.png',       label: 'Ahorro' },
   'tarjeta':          { iconSrc: '/assets/icons/categorias/tarjeta%20Background%20Removed.png',      label: 'Tarjeta' },
-  'otros':            { iconSrc: '',                                                  label: 'Otros' },
-  'default':          { iconSrc: '',                                                  label: 'Sin categoría' },
+  'otros':            { iconSrc: '/assets/icons/categorias/herramienta%20Background%20Removed.png',  label: 'Otros' },
+  'otros gastos':     { iconSrc: '/assets/icons/categorias/herramienta%20Background%20Removed.png',  label: 'Otros gastos' },
+  'default':          { iconSrc: '/assets/icons/categorias/herramienta%20Background%20Removed.png',  label: 'Sin categoría' },
 }
 
 export function getCategoriaVisual(nombre?: string | null): CategoriaVisual {

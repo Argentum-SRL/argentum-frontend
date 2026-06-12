@@ -241,7 +241,7 @@ export default function GoalContributionModal({
                       data-active={billetera_id === b.id}
                       ref={el => { if (el) cardRefs.current.set(b.id, el) }}
                     >
-                      <BilleteraCard billetera={b} className={styles.fullHeightCard} />
+                      <BilleteraCard billetera={b} className={styles.fullHeightCard} disableNavigation={true} />
                       <button
                         type="button"
                         className={styles.billeteraOverlay}

@@ -474,7 +474,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                             data-active={state.billeteraId === b.id}
                             ref={(el) => { if (el) cardRefs.current.set(b.id, el); else cardRefs.current.delete(b.id) }}
                           >
-                            <BilleteraCard billetera={b} className={styles.fullHeightCard} />
+                            <BilleteraCard billetera={b} className={styles.fullHeightCard} disableNavigation={true} />
                             <button
                               type="button"
                               className={styles.billeteraOverlay}

@@ -349,7 +349,7 @@ export default function TarjetaModal() {
                             dispatch({ type: 'SET_FIELD', field: 'moneda', value: b.moneda })
                           }}
                         >
-                          <BilleteraCard billetera={b} />
+                          <BilleteraCard billetera={b} disableNavigation={true} />
                         </div>
                       ))}
                     </div>

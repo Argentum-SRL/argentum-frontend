@@ -17,6 +17,7 @@ export interface BilleteraCardProps {
   onEliminar?: (id: string) => void
   onEditar?: (b: Billetera) => void
   className?: string
+  disableNavigation?: boolean
 }
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
@@ -32,7 +33,8 @@ const BilleteraCard = memo(({
   onDesarchivar,
   onEliminar, 
   onEditar,
-  className
+  className,
+  disableNavigation
 }: BilleteraCardProps) => {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -96,6 +98,7 @@ const BilleteraCard = memo(({
         <button
           className={styles.overlayBtn}
           onClick={(e) => {
+            if (disableNavigation) return
             // En mobile, el primer tap trae la tarjeta al frente si no lo está.
             // El segundo tap (cuando ya está al frente) navega al detalle.
             const isTouch = window.matchMedia('(max-width: 767px)').matches

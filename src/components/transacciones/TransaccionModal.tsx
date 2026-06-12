@@ -491,7 +491,7 @@ export default function TransaccionModal({
                                 else cardRefs.current.delete(b.id)
                               }}
                             >
-                              <BilleteraCard billetera={b} className={styles.fullHeightCard} />
+                              <BilleteraCard billetera={b} className={styles.fullHeightCard} disableNavigation={true} />
                               <button
                                 type="button"
                                 className={styles.billeteraOverlay}

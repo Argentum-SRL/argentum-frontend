@@ -11,6 +11,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.wcMenuOpen {
+  z-index: 35 !important;
+}
+
+
 @media (max-width: 767px) {
   .wc {
     height: 210px; /* Tamaño fijo tipo tarjeta solo en mobile */

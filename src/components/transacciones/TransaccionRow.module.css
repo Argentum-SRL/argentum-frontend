@@ -135,3 +135,10 @@
   background: rgba(220, 38, 38, 0.1);
   color: #DC2626;
 }
+
+@media (max-width: 767px) {
+  .metaHoraDivider,
+  .metaHora {
+    display: none !important;
+  }
+}

@@ -139,11 +139,11 @@
   height: 100%;
   -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
 }
 
 .isFlipped {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
   -webkit-transform: rotateY(180deg);
   transform: rotateY(180deg);
 }
@@ -155,21 +155,30 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
   border-radius: 12px;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Activar backface-visibility y optimizaciones GPU solo cuando se voltea */
+.isFlipped .cardFront,
+.isFlipped .cardBack {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .cardFront {
   z-index: 2;
-  -webkit-transform: rotateY(0deg);
-  transform: rotateY(0deg);
+}
+
+.isFlipped .cardFront {
+  -webkit-transform: rotateY(0deg) scale(1.001);
+  transform: rotateY(0deg) scale(1.001);
 }
 
 .cardBack {
-  -webkit-transform: rotateY(180deg);
-  transform: rotateY(180deg);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -178,6 +187,8 @@
   position: relative;
   z-index: 1;
   box-sizing: border-box;
+  -webkit-transform: rotateY(180deg) scale(1.001);
+  transform: rotateY(180deg) scale(1.001);
 }
 
 /* Elementos realistas del dorso de la tarjeta */
@@ -269,6 +280,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   outline: none;
 }

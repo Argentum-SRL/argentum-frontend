@@ -41,12 +41,6 @@ const TransaccionRow = memo(({
     ? `${categoria?.nombre} / ${transaccion.subcategoria.nombre}`
     : (categoria?.nombre || 'General')
 
-  const metaText = [
-    categoriaText,
-    metodoTxt,
-    hora
-  ].filter(Boolean).join(' · ')
-
   return (
     <div 
       onClick={() => onEdit(transaccion.id)}
@@ -82,7 +76,17 @@ const TransaccionRow = memo(({
             )}
           </div>
         </div>
-        <span className={styles.meta}>{metaText}</span>
+        <span className={styles.meta}>
+          <span>{categoriaText}</span>
+          <span> · </span>
+          <span>{metodoTxt}</span>
+          {hora && (
+            <>
+              <span className={styles.metaHoraDivider}> · </span>
+              <span className={styles.metaHora}>{hora}</span>
+            </>
+          )}
+        </span>
       </div>
 
       <div className={styles.amountArea}>

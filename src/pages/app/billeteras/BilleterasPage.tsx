@@ -204,10 +204,29 @@ export default function BilleterasPage() {
         } catch (error: unknown) {
           let msg = 'Error al eliminar la billetera'
           if (error && typeof error === 'object' && 'response' in error) {
-            const axiosErr = error as { response?: { data?: { detail?: string } } }
-            msg = axiosErr.response?.data?.detail || msg
+            const axiosErr = error as { 
+              response?: { 
+                data?: { 
+                  detail?: string | { success?: boolean; error?: { message?: string } } 
+                } 
+              } 
+            }
+            const detail = axiosErr.response?.data?.detail
+            if (typeof detail === 'string') {
+              msg = detail
+            } else if (detail && typeof detail === 'object') {
+              if (detail.error?.message) {
+                msg = detail.error.message
+              } else {
+                const detailObj = detail as Record<string, unknown>
+                if (typeof detailObj.message === 'string') {
+                  msg = detailObj.message
+                }
+              }
+            }
           }
           showToast(msg, 'error')
+          throw error
         }
       },
     })

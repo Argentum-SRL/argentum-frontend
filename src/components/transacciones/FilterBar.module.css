@@ -7,7 +7,11 @@
 
 @media (min-width: 768px) {
   .filterBar {
-    flex-wrap: wrap;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
   }
 }
 
@@ -51,13 +55,20 @@
   font-weight: 600;
   color: var(--text-2);
   background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
   transition: all 0.2s ease;
   position: relative;
+}
+
+@media (min-width: 768px) {
+  .pill {
+    padding: 0 16px;
+    height: 40px;
+  }
 }
 
 .pillActive {
@@ -90,36 +101,86 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-.searchPill {
+/* ── Tabs (Segmented Control matching Goals style) ────────────────────── */
+.tabs {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 14px;
-  height: 38px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
+  background: var(--page);
+  padding: 4px;
   border-radius: 12px;
+  gap: 4px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+}
+
+.tabActive {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* ── Search Container (matching Goals style) ─────────────────────────── */
+.searchContainer {
+  position: relative;
   flex: 1;
-  min-width: 0;
+  max-width: 320px;
 }
 
 @media (min-width: 768px) {
-  .searchPill {
-    height: 34px;
-    border-radius: 20px;
+  .searchContainer {
+    max-width: 320px;
     flex: none;
-    min-width: 180px;
+    width: 320px;
   }
 }
 
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  pointer-events: none;
+}
+
 .searchInput {
-  border: none;
-  background: transparent;
-  font-size: 13px;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 38px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 14px;
   font-weight: 500;
   color: var(--text);
-  width: 100%;
   outline: none;
+  transition: all 0.2s;
+}
+
+@media (min-width: 768px) {
+  .searchInput {
+    height: 40px;
+  }
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.1);
+}
+
+:global([data-theme="dark"]) .searchInput:focus {
+  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.2);
 }
 
 .searchInput::placeholder {
@@ -139,6 +200,26 @@
 
 .clearBtn:hover {
   text-decoration: underline;
+}
+
+.desktopOnlyBtn {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktopOnlyBtn {
+    display: inline-block;
+  }
+}
+
+.mobileOnlyBtn {
+  display: inline-block;
+}
+
+@media (min-width: 768px) {
+  .mobileOnlyBtn {
+    display: none;
+  }
 }
 
 /* Popover genérico para dropdowns */

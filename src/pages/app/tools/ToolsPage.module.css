@@ -137,7 +137,7 @@
 
 .tabs {
   display: flex;
-  background: var(--surface-alt);
+  background: var(--page);
   padding: 4px;
   border-radius: 12px;
   gap: 4px;

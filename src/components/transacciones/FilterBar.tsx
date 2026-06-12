@@ -158,38 +158,26 @@ export default function FilterBar({
           <Filter size={16} />
         </button>
 
-        {/* Search input next to filter button */}
-        <div className={styles.searchPill}>
-          <Search size={16} color="var(--text-2)" />
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="Buscar..."
-            title="Buscar transacción"
-            value={localSearch}
-            onChange={handleSearchChange}
-          />
-        </div>
-
-        {/* Desktop-only filters group */}
+        {/* Desktop-only filters group (Placed FIRST to align to left on desktop) */}
         <div className={styles.desktopFilterGroup}>
-          <div className={styles.pillGroup}>
+          <div className={styles.tabs}>
             <button
-              className={`${styles.typePill} ${!filters.tipo ? styles.typePillActive : ''}`}
+              type="button"
+              className={`${styles.tab} ${!filters.tipo ? styles.tabActive : ''}`}
               onClick={() => handleTipoChange(undefined)}
             >
               Todos
             </button>
-            <div className={styles.separator} />
             <button
-              className={`${styles.typePill} ${filters.tipo === 'egreso' ? styles.typePillActive : ''}`}
+              type="button"
+              className={`${styles.tab} ${filters.tipo === 'egreso' ? styles.tabActive : ''}`}
               onClick={() => handleTipoChange('egreso')}
             >
               Egresos
             </button>
-            <div className={styles.separator} />
             <button
-              className={`${styles.typePill} ${filters.tipo === 'ingreso' ? styles.typePillActive : ''}`}
+              type="button"
+              className={`${styles.tab} ${filters.tipo === 'ingreso' ? styles.tabActive : ''}`}
               onClick={() => handleTipoChange('ingreso')}
             >
               Ingresos
@@ -244,10 +232,30 @@ export default function FilterBar({
               </div>
             )}
           </div>
+
+          {hasActiveFilters && (
+            <button className={`${styles.clearBtn} ${styles.desktopOnlyBtn}`} onClick={onClear}>
+              Limpiar filtros
+            </button>
+          )}
         </div>
 
+        {/* Search input next to filter button (Placed SECOND to align to right on desktop) */}
+        <div className={styles.searchContainer}>
+          <Search size={16} className={styles.searchIcon} />
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="Buscar..."
+            title="Buscar transacción"
+            value={localSearch}
+            onChange={handleSearchChange}
+          />
+        </div>
+
+        {/* Mobile Clear Button (visible only on mobile) */}
         {hasActiveFilters && (
-          <button className={styles.clearBtn} onClick={onClear}>
+          <button className={`${styles.clearBtn} ${styles.mobileOnlyBtn}`} onClick={onClear}>
             Limpiar filtros
           </button>
         )}

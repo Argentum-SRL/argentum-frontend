@@ -14,16 +14,10 @@
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .header {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .titleGroup {
@@ -80,11 +74,14 @@
   transform: translateY(-1px);
 }
 
+.btnSuffix { display: none; }
+
 @media (min-width: 768px) {
   .nuevaBtn {
     padding: 0 18px;
     height: 40px;
   }
+  .btnSuffix { display: inline; }
 }
 
 /* ── Hero Resumen (Marine) ────────────────────────────────────────────────── */
@@ -139,11 +136,17 @@
 }
 
 .heroBalance {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -1px;
   margin: 0;
   line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .heroBalance {
+    font-size: 32px;
+  }
 }
 
 .heroProgress {
@@ -197,8 +200,14 @@
 }
 
 .heroValue {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .heroValue {
+    font-size: 18px;
+  }
 }
 
 .textError { color: #FF8A65; }
@@ -211,7 +220,7 @@
 
 .tabs {
   display: flex;
-  background: var(--page);
+  background: var(--surface-alt);
   padding: 4px;
   border-radius: 12px;
   gap: 4px;
@@ -239,7 +248,7 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 
 @media (min-width: 768px) {
@@ -278,7 +287,16 @@
   100% { background-position: -200% 0; }
 }
 
-.skeletonCard { height: 280px; border-radius: 20px; }
+.skeletonCard {
+  height: 240px;
+  border-radius: 20px;
+}
+
+@media (min-width: 768px) {
+  .skeletonCard {
+    height: 280px;
+  }
+}
 
 /* ── History Drawer Content ──────────────────────────────────────────────── */
 .historyContent {

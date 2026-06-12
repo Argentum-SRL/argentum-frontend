@@ -185,6 +185,7 @@ export default function EditBilleteraModal({
               placeholder="0"
               allowDecimals
               optional
+              compact
             />
           </div>
 

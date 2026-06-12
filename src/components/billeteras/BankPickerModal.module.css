@@ -186,9 +186,6 @@
   flex: 1;
   overflow-y: auto;
   padding: 12px 20px 20px;
-  /* Compatibility for scrollbars */
-  scrollbar-width: thin;
-  scrollbar-color: var(--surface-alt) transparent;
 }
 
 /* For browsers that don't support scrollbar-width/color */
@@ -224,17 +221,37 @@
 
 /* Cada item del picker — background y borde se setean via inline style */
 .pickerItem {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 14px 8px 12px;
   border-radius: 16px;
-  border: 1.5px solid rgba(0, 0, 0, 0.05);
-  border: 1.5px solid color-mix(in srgb, var(--bank-color, transparent) 30%, transparent);
-  background: color-mix(in srgb, var(--bank-color, transparent) 10%, transparent);
   cursor: pointer;
   transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.pickerItem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: var(--bank-color, transparent);
+  opacity: 0.1;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.pickerItem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border: 1.5px solid var(--bank-color, rgba(0, 0, 0, 0.05));
+  opacity: 0.3;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .pickerItem:hover {
@@ -253,13 +270,23 @@
 
 /* ── Picker Logo ──────────────────────────────────────────────────────────── */
 .pickerLogoCircle {
+  position: relative;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   overflow: hidden;
-  background: color-mix(in srgb, var(--bank-color, #8A95A8) 14%, transparent);
+  z-index: 1;
+}
+
+.pickerLogoCircle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bank-color, #8A95A8);
+  opacity: 0.14;
+  z-index: -1;
 }
 
 .pickerLogoInitials {
@@ -397,6 +424,7 @@
 }
 
 .bankPreviewIcon {
+  position: relative;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -404,7 +432,17 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--preview-color, transparent) 14%, transparent);
+  z-index: 1;
+}
+
+.bankPreviewIcon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--preview-color, transparent);
+  opacity: 0.14;
+  z-index: -1;
 }
 
 .bankPreviewIconInitials {
@@ -435,8 +473,6 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--surface-alt) transparent;
 }
 
 .formBody::-webkit-scrollbar {
@@ -759,8 +795,8 @@
 [data-color-hex="#EC0000"] { --custom-color: #EC0000; }
 [data-color-hex="#009EE3"] { --custom-color: #009EE3; }
 
-.bankPreviewIcon {
-  background: color-mix(in srgb, var(--preview-color) 14%, transparent);
+.bankPreviewIcon::before {
+  background: var(--preview-color);
 }
 
 .colorSwatch {

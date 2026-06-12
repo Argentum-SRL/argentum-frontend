@@ -307,6 +307,7 @@ export default function TarjetaModal() {
                 onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'limiteCredito', value: v })}
                 moneda={state.moneda}
                 allowDecimals
+                compact
               />
 
               {/* FILA 3: Red */}

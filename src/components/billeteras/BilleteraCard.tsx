@@ -39,6 +39,13 @@ const BilleteraCard = memo(({
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
+  const kebabBtnRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (kebabBtnRef.current) {
+      kebabBtnRef.current.setAttribute('aria-expanded', menuOpen ? 'true' : 'false')
+    }
+  }, [menuOpen])
 
   const bank = billetera.bank_id
     ? getBankById(billetera.bank_id)
@@ -177,11 +184,11 @@ const BilleteraCard = memo(({
           {/* Kebab — opciones de gestión */}
           <div className={styles.wcKebab}>
             <button
+              ref={kebabBtnRef}
               className={styles.kebabBtn}
               onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p) }}
               aria-label="Opciones"
               aria-haspopup="true"
-              aria-expanded={menuOpen}
             >
               <div className={styles.dot} />
               <div className={styles.dot} />

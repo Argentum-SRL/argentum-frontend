@@ -16,6 +16,7 @@ interface MontoInputProps {
   allowDecimals?: boolean
   optional?: boolean
   hideCurrency?: boolean
+  compact?: boolean
 }
 
 function formatearParaMostrar(str: string): string {
@@ -44,6 +45,7 @@ const MontoInput = memo(({
   allowDecimals = false,
   optional = false,
   hideCurrency = false,
+  compact = false,
 }: MontoInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [prevValue, setPrevValue] = useState(value)
@@ -132,7 +134,12 @@ const MontoInput = memo(({
           {optional && <span className={styles.fieldOptional}> (opcional)</span>}
         </label>
       )}
-      <div className={[styles.montoHero, error ? styles.montoHeroError : '', disabled ? styles.montoHeroDisabled : ''].filter(Boolean).join(' ')}>
+      <div className={[
+        styles.montoHero,
+        compact ? styles.montoHeroCompact : '',
+        error ? styles.montoHeroError : '',
+        disabled ? styles.montoHeroDisabled : ''
+      ].filter(Boolean).join(' ')}>
         {/* Chip de moneda — clickeable solo si onMonedaChange está definido */}
         {!hideCurrency && (
           <>

@@ -459,8 +459,11 @@ export default function BankPickerModal({
                     onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
                     moneda={moneda}
                     onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
+                    label="Saldo inicial"
                     placeholder="0"
                     allowDecimals
+                    optional
+                    compact
                   />
                 </div>
 

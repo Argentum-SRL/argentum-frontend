@@ -44,6 +44,19 @@
   font-weight: 500;
   color: var(--text-2);
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+@media (min-width: 768px) {
+  .subtitle {
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
 }
 
 

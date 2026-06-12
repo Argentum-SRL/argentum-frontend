@@ -190,7 +190,7 @@ export default function PresupuestosPage() {
         <div className={styles.actions}>
           <button className={styles.nuevaBtn} onClick={handleOpenNew}>
             <Plus size={16} strokeWidth={2.5} />
-            Nuevo presupuesto
+            Nuevo<span className={styles.btnSuffix}> presupuesto</span>
           </button>
         </div>
       </div>

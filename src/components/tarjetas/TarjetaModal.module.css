@@ -499,3 +499,138 @@
   font-size: 18px;
   color: var(--text);
 }
+
+/* ── Responsive Mobile (max-width: 767px) ── */
+@media (max-width: 767px) {
+  .baseModalOverride {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 24px 24px 0 0 !important;
+    align-self: flex-end !important;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 85vh;
+    max-height: 85dvh;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.1);
+    animation: slideUpMobileCard 240ms cubic-bezier(0.34, 1.1, 0.64, 1);
+  }
+
+  .modalHeader {
+    padding: 16px 20px 12px;
+  }
+
+  .formBody {
+    padding: 16px 20px;
+  }
+
+  .formBody::-webkit-scrollbar {
+    display: block !important;
+    width: 4px;
+  }
+
+  .formBody::-webkit-scrollbar-thumb {
+    background: var(--surface-alt);
+    border-radius: 4px;
+  }
+
+  .formSection {
+    gap: 16px;
+  }
+
+  .inputGrid3 {
+    gap: 8px;
+  }
+
+  .fieldInputCenter {
+    padding: 0 8px;
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .fieldInput {
+    height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  .fieldLabel {
+    font-size: 10px;
+  }
+
+  .redGrid {
+    justify-content: flex-start;
+    padding: 4px 0;
+  }
+
+  .redBtn {
+    width: 54px;
+    height: 44px;
+  }
+
+  .previewWithArrows {
+    position: relative;
+    padding: 0 44px;
+    box-sizing: border-box;
+  }
+
+  .previewWithArrows .colorArrowLarge {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+
+  .previewWithArrows .colorArrowLarge:first-child {
+    left: 0;
+  }
+
+  .previewWithArrows .colorArrowLarge:last-child {
+    right: 0;
+  }
+
+  .realCard {
+    padding: 12px 16px !important;
+  }
+
+  .cardNumber {
+    font-size: 14px !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .walletNamePreview {
+    font-size: 11px !important;
+  }
+
+  .cardInfoValue {
+    font-size: 8px !important;
+  }
+
+  .chipSvg {
+    width: 30px !important;
+    height: 22px !important;
+  }
+
+  .networkLogo {
+    height: 20px !important;
+  }
+
+  .formFooter {
+    padding: 14px 20px;
+  }
+
+  .btnCancel, .btnSubmit {
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
+@keyframes slideUpMobileCard {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

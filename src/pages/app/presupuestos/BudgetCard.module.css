@@ -1,19 +1,25 @@
 .card {
   background: var(--surface);
   border-radius: 20px;
-  padding: 24px;
+  padding: 16px;
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+@media (min-width: 768px) {
+  .card {
+    padding: 24px;
+    gap: 20px;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  }
 }
 
 .cardTop {
@@ -30,10 +36,16 @@
 }
 
 .cardTitle {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--text);
   margin: 0;
+}
+
+@media (min-width: 768px) {
+  .cardTitle {
+    font-size: 18px;
+  }
 }
 
 .periodBadge {
@@ -61,6 +73,13 @@
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 20px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Progress Section */
@@ -94,9 +113,15 @@
 .badgePause { background: var(--surface-alt); color: var(--text-3); }
 
 .percentValue {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
   letter-spacing: -0.5px;
+}
+
+@media (min-width: 768px) {
+  .percentValue {
+    font-size: 20px;
+  }
 }
 
 .progressContainer {
@@ -134,18 +159,31 @@
 }
 
 .value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--text);
+}
+
+@media (min-width: 768px) {
+  .value {
+    font-size: 14px;
+  }
 }
 
 /* Info */
 .cardInfo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 16px;
+  gap: 6px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
+}
+
+@media (min-width: 768px) {
+  .cardInfo {
+    gap: 8px;
+    padding-top: 16px;
+  }
 }
 
 .infoRow {
@@ -168,7 +206,7 @@
 
 .btnAction {
   flex: 1;
-  height: 40px;
+  height: 36px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -178,6 +216,12 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+@media (min-width: 768px) {
+  .btnAction {
+    height: 40px;
+  }
 }
 
 .btnAction:hover {

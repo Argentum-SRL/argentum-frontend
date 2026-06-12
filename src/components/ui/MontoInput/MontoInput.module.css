@@ -134,3 +134,38 @@
   font-size: 12px;
   color: var(--error);
 }
+
+/* ── Modo compacto — para formularios con múltiples campos ── */
+.montoHeroCompact {
+  padding: 10px 14px;
+  border-radius: 12px;
+  gap: 10px;
+}
+
+.montoHeroCompact .monedaToggleChip {
+  padding: 4px 8px;
+  border-radius: 10px;
+  gap: 2px;
+}
+
+.montoHeroCompact .monedaChipFlag {
+  font-size: 16px;
+}
+
+.montoHeroCompact .monedaChipLabel {
+  font-size: 9px;
+}
+
+.montoHeroCompact .montoDivider {
+  height: 30px;
+}
+
+.montoHeroCompact .montoHeroPrefix {
+  font-size: 18px;
+  letter-spacing: -0.5px;
+}
+
+.montoHeroCompact .montoHeroField {
+  font-size: 18px;
+  letter-spacing: -0.5px;
+}

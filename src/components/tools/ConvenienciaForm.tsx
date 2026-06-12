@@ -56,7 +56,9 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
     formData.cantidad_cuotas < 1 ||
     formData.cantidad_cuotas > 120 ||
     !formData.inflacion_mensual ||
-    parseFloat(formData.inflacion_mensual) < 0;
+    isNaN(parseFloat(formData.inflacion_mensual)) ||
+    parseFloat(formData.inflacion_mensual) < 0 ||
+    parseFloat(formData.inflacion_mensual) > 100;
 
   const getInflationDescription = () => {
     if (ipcLoading) return 'Cargando IPC del INDEC...';
@@ -137,6 +139,9 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
           max="100"
           step="0.1"
         />
+        {formData.inflacion_mensual !== '' && (isNaN(parseFloat(formData.inflacion_mensual)) || parseFloat(formData.inflacion_mensual) < 0 || parseFloat(formData.inflacion_mensual) > 100) && (
+          <span className="text-xs text-red-500 font-medium mt-1">La inflación mensual debe estar entre 0% y 100%</span>
+        )}
         <span className={styles.inputDesc}>{getInflationDescription()}</span>
       </div>
 

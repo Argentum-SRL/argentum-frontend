@@ -19,6 +19,7 @@ import type { TransaccionRecurrente, Billetera, Categoria } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { EmptyState } from '@/components/ui'
 
 interface RecurrentesPageProps {
   embedded?: boolean
@@ -200,23 +201,13 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
       {loading ? (
         <div className={styles.loadingState}>Cargando...</div>
       ) : recurrentes.length === 0 ? (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyStateIconWrapper}>
-            <Clock size={28} className={styles.emptyStateIconNew} />
-          </div>
-          <h3 className={styles.emptyStateTitle}>No hay transacciones recurrentes</h3>
-          <p className={styles.emptyStateSubtext}>
-            Automatizá tus cobros y pagos regulares (alquileres, suscripciones, sueldos) para que se registren solos según la frecuencia que elijas.
-          </p>
-          <button 
-            type="button" 
-            className={styles.emptyStateBtn} 
-            onClick={() => handleOpenModal()}
-          >
-            <Plus size={16} strokeWidth={2.5} />
-            Configurar recurrente
-          </button>
-        </div>
+        <EmptyState
+          icon={Clock}
+          title="No hay transacciones recurrentes"
+          description="Automatizá tus cobros y pagos regulares (alquileres, suscripciones, sueldos) para que se registren solos según la frecuencia que elijas."
+          actionLabel="Configurar recurrente"
+          onActionClick={() => handleOpenModal()}
+        />
 
       ) : (
         <>

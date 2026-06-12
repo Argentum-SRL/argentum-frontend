@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { AlertCircle, ChevronLeft, ChevronRight, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { AlertCircle, ChevronLeft, ChevronRight, Edit2, Trash2, ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
 import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, Categoria } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import { useModal } from '@/hooks/useModal'
 import { useToast } from '@/hooks/useToast'
 import { formatMonto } from '@/utils/format'
+import { EmptyState } from '@/components/ui'
 import styles from './TarjetaSummary.module.css'
 
 interface TarjetaSummaryProps {
@@ -313,7 +314,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                 </div>
               ))
             ) : (
-              <div className={styles.emptyState}>Sin movimientos</div>
+              <EmptyState
+                variant="compact"
+                icon={CreditCard}
+                title="Sin movimientos"
+              />
             )}
           </div>
         )}

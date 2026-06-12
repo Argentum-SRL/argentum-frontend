@@ -16,6 +16,7 @@ import { useModal } from '@/hooks/useModal'
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
 import RecurrentesPage, { type RecurrentesPageRef } from './RecurrentesPage'
+import { EmptyState } from '@/components/ui'
 
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
@@ -360,19 +361,17 @@ export default function TransaccionesPage() {
             {loading ? (
               <div className={styles.loadingState}>Cargando transacciones...</div>
             ) : grupos.length === 0 ? (
-              <div className={styles.emptyState}>
-                {hasActiveFilters ? (
-                  <>
-                    <p>No encontramos transacciones con esos filtros.</p>
-                    <button className={`${styles.btnGhost} ${styles.btnGhostBg}`} onClick={handleClearFilters}>Limpiar filtros</button>
-                  </>
-                ) : (
-                  <>
-                    <p>Todavía no registraste ninguna transacción este ciclo.</p>
-                    <button className={`${styles.btnGhost} ${styles.btnPrimary}`} onClick={openNewTransaccion}>Registrar primera transacción</button>
-                  </>
-                )}
-              </div>
+              <EmptyState
+                icon={ArrowLeftRight}
+                title={hasActiveFilters ? 'No se encontraron resultados' : 'Sin movimientos en este ciclo'}
+                description={
+                  hasActiveFilters 
+                    ? 'No encontramos transacciones con esos filtros.' 
+                    : 'Todavía no registraste ninguna transacción este ciclo.'
+                }
+                actionLabel={hasActiveFilters ? 'Limpiar filtros' : 'Registrar primera transacción'}
+                onActionClick={hasActiveFilters ? handleClearFilters : openNewTransaccion}
+              />
             ) : (
               grupos.map(([fecha, txs]) => (
                 <DayGroup

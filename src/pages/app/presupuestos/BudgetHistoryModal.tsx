@@ -5,6 +5,7 @@ import {
   AlertCircle 
 } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
+import { EmptyState } from '@/components/ui'
 import type { Presupuesto, PeriodoPresupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
 import styles from './BudgetHistoryModal.module.css'
@@ -74,11 +75,12 @@ export default function BudgetHistoryModal({
               <p>Cargando historial...</p>
             </div>
           ) : historial.length === 0 ? (
-            <div className={styles.emptyState}>
-              <History size={64} className={styles.emptyIcon} />
-              <p className={styles.emptyTitle}>Sin periodos cerrados</p>
-              <p>Aún no hay historial para este presupuesto.</p>
-            </div>
+            <EmptyState
+              variant="compact"
+              icon={History}
+              title="Sin periodos cerrados"
+              description="Aún no hay historial para este presupuesto."
+            />
           ) : (
             <div className={styles.historyList}>
               {historial.map(h => (

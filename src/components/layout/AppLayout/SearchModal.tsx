@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useModal } from '@/hooks/useModal'
 import Modal from '@/components/ui/Modal/Modal'
+import { EmptyState } from '@/components/ui'
 import transaccionService from '@/services/transaccion.service'
 import billeteraService from '@/services/billetera.service'
 import goalsService from '@/services/goals.service'
@@ -374,13 +375,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             )}
 
             {results.length === 0 && !loadingTransactions && (
-              <div className={styles.emptyState}>
-                <Search className={styles.emptyIcon} />
-                <h3 className={styles.emptyTitle}>No se encontraron resultados</h3>
-                <p className={styles.emptyText}>
-                  Prueba con otros términos de búsqueda como "Dashboard", "Sueldo" o el nombre de tu banco.
-                </p>
-              </div>
+              <EmptyState
+                variant="compact"
+                icon={Search}
+                title="No se encontraron resultados"
+                description="Prueba con otros términos de búsqueda como 'Dashboard', 'Sueldo' o el nombre de tu banco."
+              />
             )}
 
             {results.length > 0 && (

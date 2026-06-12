@@ -6,7 +6,7 @@ import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import categoriaService from '@/services/categoria.service'
-import { Button } from '@/components/ui'
+import { EmptyState } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
@@ -417,15 +417,11 @@ const BilleteraDetallePage: React.FC = () => {
               <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
             </div>
           ) : movimientos.length === 0 ? (
-            <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>
-                <CreditCard size={48} />
-              </div>
-              <h3 className={styles.emptyTitle}>Sin movimientos</h3>
-              <p className={styles.emptyText}>
-                Esta billetera aún no tiene transacciones registradas.
-              </p>
-            </div>
+            <EmptyState
+              icon={CreditCard}
+              title="Sin movimientos"
+              description="Esta billetera aún no tiene transacciones registradas."
+            />
           ) : (
             <div className={styles.movimientosList}>
               {groupedMovimientos.map(([fecha, txs]) => (
@@ -455,16 +451,13 @@ const BilleteraDetallePage: React.FC = () => {
                 <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
               </div>
             ) : tarjetas.length === 0 ? (
-              <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>
-                  <CreditCard size={48} />
-                </div>
-                <h3 className={styles.emptyTitle}>Sin tarjetas registradas</h3>
-                <p className={styles.emptyText}>
-                  Agregá una tarjeta para que el sistema calcule automáticamente los vencimientos de tus cuotas.
-                </p>
-                <Button onClick={handleCreateTarjeta}>Agregar tarjeta</Button>
-              </div>
+              <EmptyState
+                icon={CreditCard}
+                title="Sin tarjetas registradas"
+                description="Agregá una tarjeta para que el sistema calcule automáticamente los vencimientos de tus cuotas."
+                actionLabel="Agregar tarjeta"
+                onActionClick={handleCreateTarjeta}
+              />
             ) : (
               <>
                 {/* Carousel de tarjetas */}

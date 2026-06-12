@@ -6,7 +6,7 @@ import FinancialContextBanner from '@/components/tools/FinancialContextBanner';
 import CanAffordForm from '@/components/tools/CanAffordForm';
 import CanAffordResult from '@/components/tools/CanAffordResult';
 import pageStyles from './ToolsPage.module.css';
-import componentStyles from '@/components/tools/ToolsComponents.module.css';
+import { EmptyState } from '@/components/ui';
 
 export default function ToolsPage() {
   const {
@@ -124,15 +124,11 @@ export default function ToolsPage() {
             {resultado ? (
               <ConvenienciaResult resultado={resultado} />
             ) : (
-              <div className={`${componentStyles.card} ${componentStyles.emptyStateCard}`}>
-                <div className={componentStyles.emptyStateIconWrapper}>
-                  <Calculator size={32} />
-                </div>
-                <h3 className={componentStyles.cardTitle}>Esperando datos</h3>
-                <p className={`${componentStyles.cardSubtitle} ${componentStyles.emptyStateSubtitle}`}>
-                  Ingresá los datos de la compra a la izquierda y hacé clic en "Calcular conveniencia" para ver el análisis financiero.
-                </p>
-              </div>
+              <EmptyState
+                icon={Calculator}
+                title="Esperando datos"
+                description='Ingresá los datos de la compra a la izquierda y hacé clic en "Calcular conveniencia" para ver el análisis financiero.'
+              />
             )}
           </div>
         </div>
@@ -173,15 +169,11 @@ export default function ToolsPage() {
                   onReset={resetCanAfford}
                 />
               ) : (
-                <div className={`${componentStyles.card} ${componentStyles.emptyStateCard}`}>
-                  <div className={componentStyles.emptyStateIconWrapper}>
-                    <Calculator size={32} />
-                  </div>
-                  <h3 className={componentStyles.cardTitle}>Esperando datos</h3>
-                  <p className={`${componentStyles.cardSubtitle} ${componentStyles.emptyStateSubtitle}`}>
-                    Ingresá los datos de la compra a la izquierda y hacé clic en "Analizar compra" para ver el análisis de salud financiera.
-                  </p>
-                </div>
+                <EmptyState
+                  icon={Calculator}
+                  title="Esperando datos"
+                  description='Ingresá los datos de la compra a la izquierda y hacé clic en "Analizar compra" para ver el análisis de salud financiera.'
+                />
               )}
             </div>
           </div>

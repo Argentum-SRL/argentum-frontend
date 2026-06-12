@@ -1,7 +1,7 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
-import { Plus, Eye, EyeOff, Info } from 'lucide-react'
+import { Plus, Eye, EyeOff, Info, Wallet } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
@@ -13,6 +13,7 @@ import billeteraService from '@/services/billetera.service'
 import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
+import { EmptyState } from '@/components/ui'
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 
@@ -31,24 +32,13 @@ SkeletonGrid.displayName = 'SkeletonGrid'
 
 const EstadoVacio = memo(({ onCrear }: { onCrear: () => void }) => {
   return (
-    <div className={styles.emptyState}>
-      <div className={styles.emptyIcon} aria-hidden="true">
-        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="36" cy="36" r="36" fill="var(--surface-alt)" />
-          <path d="M22 28C22 25.8 23.8 24 26 24H46C48.2 24 50 25.8 50 28V44C50 46.2 48.2 48 46 48H26C23.8 48 22 46.2 22 44V28Z" stroke="var(--silver)" strokeWidth="1.75" fill="none"/>
-          <path d="M22 32H50" stroke="var(--silver)" strokeWidth="1.75"/>
-          <rect x="28" y="38" width="8" height="4" rx="2" fill="var(--silver)" opacity="0.5"/>
-        </svg>
-      </div>
-      <h2 className={styles.emptyTitle}>Todavía no tenés billeteras</h2>
-      <p className={styles.emptySubtitle}>
-        Agregá tu primera billetera para empezar a llevar el control de tu plata.
-      </p>
-      <button className={styles.emptyBtn} onClick={onCrear}>
-        <Plus size={16} strokeWidth={2} />
-        Crear primera billetera
-      </button>
-    </div>
+    <EmptyState
+      icon={Wallet}
+      title="Todavía no tenés billeteras"
+      description="Agregá tu primera billetera para empezar a llevar el control de tu plata."
+      actionLabel="Crear primera billetera"
+      onActionClick={onCrear}
+    />
   )
 })
 EstadoVacio.displayName = 'EstadoVacio'

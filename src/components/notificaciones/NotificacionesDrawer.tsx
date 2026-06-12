@@ -21,6 +21,7 @@ import {
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { Notificacion, TipoNotificacion } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
+import { EmptyState } from '@/components/ui'
 import NotificacionesConfigModal from './NotificacionesConfigModal'
 import styles from './NotificacionesDrawer.module.css'
 
@@ -217,13 +218,12 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                   ))}
                 </div>
               ) : notificaciones.length === 0 ? (
-                <div className={styles.emptyState}>
-                  <Bell className={styles.emptyIcon} />
-                  <h3 className={styles.emptyTitle}>Sin notificaciones</h3>
-                  <p className={styles.emptyText}>
-                    Te mantendremos al tanto de tu actividad financiera y de seguridad cuando ocurra algo.
-                  </p>
-                </div>
+                <EmptyState
+                  variant="compact"
+                  icon={Bell}
+                  title="Sin notificaciones"
+                  description="Te mantendremos al tanto de tu actividad financiera y de seguridad cuando ocurra algo."
+                />
               ) : (
                 Object.entries(groupedNotifications).map(([groupName, items]) => (
                   <div key={groupName} className={styles.group}>

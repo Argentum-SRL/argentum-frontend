@@ -21,6 +21,7 @@ import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario, Billet
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import { EmptyState } from '@/components/ui'
 
 import styles from './DashboardPage.module.css'
 
@@ -204,10 +205,11 @@ const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria
 
   if (!chartData || chartData.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <PieChartIcon size={40} className={styles.emptyIcon} />
-        <p>Sin gastos por ahora</p>
-      </div>
+      <EmptyState
+        variant="compact"
+        icon={PieChartIcon}
+        title="Sin gastos por ahora"
+      />
     )
   }
 
@@ -610,10 +612,11 @@ export default function DashboardPage() {
             {loading ? (
               <ListSkeleton />
             ) : data?.proximos_pagos.length === 0 ? (
-              <div className={styles.emptyState}>
-                <Calendar size={40} className={styles.emptyIcon} />
-                <p>Sin pagos próximos</p>
-              </div>
+              <EmptyState
+                variant="compact"
+                icon={Calendar}
+                title="Sin pagos próximos"
+              />
             ) : (
               <div className={styles.list}>
                 {data?.proximos_pagos.slice(0, 4).map((p) => {
@@ -664,10 +667,11 @@ export default function DashboardPage() {
             {loading ? (
               <ListSkeleton />
             ) : data?.ultimos_movimientos.length === 0 ? (
-              <div className={styles.emptyState}>
-                <ArrowUpDown size={40} className={styles.emptyIcon} />
-                <p>Sin movimientos en este ciclo</p>
-              </div>
+              <EmptyState
+                variant="compact"
+                icon={ArrowUpDown}
+                title="Sin movimientos en este ciclo"
+              />
             ) : (
               <div className={styles.list}>
                 {data?.ultimos_movimientos.map((m) => (

@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import BudgetCard from './BudgetCard'
 import BudgetHistoryModal from './BudgetHistoryModal'
+import { EmptyState } from '@/components/ui'
 
 export default function PresupuestosPage() {
   const { showToast } = useToast()
@@ -251,20 +252,17 @@ export default function PresupuestosPage() {
             {[1, 2, 3].map(i => <div key={i} className={`${styles.card} ${styles.skeletonCard} ${styles.skeleton}`} />)}
           </div>
         ) : presupuestos.length === 0 ? (
-          <div className={styles.emptyState}>
-            <PieChart size={64} className={styles.emptyIcon} />
-            <h3 className={styles.emptyTitle}>Sin presupuestos {activeTab}s</h3>
-            <p className={styles.emptyDesc}>
-              {activeTab === 'activo' 
+          <EmptyState
+            icon={PieChart}
+            title={`Sin presupuestos ${activeTab}s`}
+            description={
+              activeTab === 'activo' 
                 ? 'Definí un límite de gasto para tus categorías y Argentum te avisará si te pasás.' 
-                : `No tenés presupuestos en estado ${activeTab}.`}
-            </p>
-            {activeTab === 'activo' && (
-              <button className={`${styles.btnGhost} ${styles.btnPrimary}`} onClick={handleOpenNew}>
-                Crear mi primer presupuesto
-              </button>
-            )}
-          </div>
+                : `No tenés presupuestos en estado ${activeTab}.`
+            }
+            actionLabel={activeTab === 'activo' ? 'Crear mi primer presupuesto' : undefined}
+            onActionClick={handleOpenNew}
+          />
         ) : (
           <div className={styles.grid}>
             {presupuestos.map(p => (

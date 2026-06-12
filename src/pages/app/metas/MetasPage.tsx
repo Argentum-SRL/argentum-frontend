@@ -14,6 +14,7 @@ import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import GoalCard from '@/components/goals/GoalCard'
+import { EmptyState } from '@/components/ui'
 
 export default function MetasPage() {
   const { showToast } = useToast()
@@ -221,24 +222,19 @@ export default function MetasPage() {
             {[1, 2, 3].map(i => <div key={i} className={styles.skeletonCard} />)}
           </div>
         ) : filteredGoals.length === 0 ? (
-          <div className={styles.emptyState}>
-            <Target size={64} className={styles.emptyIcon} />
-            <h3 className={styles.emptyTitle}>
-              {searchQuery ? 'No se encontraron resultados' : `Sin metas ${activeTab}s`}
-            </h3>
-            <p className={styles.emptyDesc}>
-              {searchQuery 
+          <EmptyState
+            icon={Target}
+            title={searchQuery ? 'No se encontraron resultados' : `Sin metas ${activeTab}s`}
+            description={
+              searchQuery 
                 ? 'Probá con otro nombre o criterio de búsqueda.' 
                 : activeTab === 'activa' 
                   ? '¿Tenés algún objetivo en mente? Creá una meta para empezar a ahorrar.' 
-                  : `No tenés metas en estado ${activeTab}.`}
-            </p>
-            {!searchQuery && activeTab === 'activa' && (
-              <button className={`${styles.btnGhost} ${styles.btnPrimary}`} onClick={handleCreate}>
-                Crear mi primera meta
-              </button>
-            )}
-          </div>
+                  : `No tenés metas en estado ${activeTab}.`
+            }
+            actionLabel={!searchQuery && activeTab === 'activa' ? 'Crear mi primera meta' : undefined}
+            onActionClick={handleCreate}
+          />
         ) : (
           <div className={styles.grid}>
             {filteredGoals.map(g => (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Percent } from 'lucide-react';
-import { Input, Select, Button, MontoInput } from '@/components/ui';
+import { Input, Button, MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import type { IPCData } from '@/types/tools';
 import styles from './ToolsComponents.module.css';
@@ -9,13 +9,13 @@ interface ConvenienciaFormProps {
   formData: {
     precio_contado: number | null;
     precio_total_cuotas: number | null;
-    cantidad_cuotas: number;
+    cantidad_cuotas: number | null;
     inflacion_mensual: string;
   };
   setFormData: React.Dispatch<React.SetStateAction<{
     precio_contado: number | null;
     precio_total_cuotas: number | null;
-    cantidad_cuotas: number;
+    cantidad_cuotas: number | null;
     inflacion_mensual: string;
   }>>;
   calculando: boolean;
@@ -37,10 +37,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
   ipcError
 }) => {
   
-  const cuotasOptions = [1, 2, 3, 4, 6, 9, 10, 12, 15, 18, 24, 30, 36, 48, 60].map(c => ({
-    label: `${c} cuota${c > 1 ? 's' : ''}`,
-    value: c
-  }));
+
 
   const handleChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({
@@ -54,6 +51,10 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
     formData.precio_contado <= 0 ||
     formData.precio_total_cuotas === null ||
     formData.precio_total_cuotas <= 0 ||
+    formData.cantidad_cuotas === null ||
+    isNaN(formData.cantidad_cuotas) ||
+    formData.cantidad_cuotas < 1 ||
+    formData.cantidad_cuotas > 120 ||
     !formData.inflacion_mensual ||
     parseFloat(formData.inflacion_mensual) < 0;
 
@@ -99,12 +100,22 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
 
       <div className={styles.formGroup}>
         <label className={styles.label} htmlFor="cantidad_cuotas">Cantidad de cuotas</label>
-        <Select
+        <Input
           id="cantidad_cuotas"
-          options={cuotasOptions}
-          value={formData.cantidad_cuotas}
-          onChange={(e) => handleChange('cantidad_cuotas', parseInt(e.target.value))}
+          type="number"
+          placeholder="Ej: 12"
+          value={formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) ? '' : formData.cantidad_cuotas}
+          onChange={(e) => {
+            const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
+            handleChange('cantidad_cuotas', val);
+          }}
+          min="1"
+          max="120"
+          step="1"
         />
+        {formData.cantidad_cuotas !== null && !isNaN(formData.cantidad_cuotas) && (formData.cantidad_cuotas < 1 || formData.cantidad_cuotas > 120) && (
+          <span className="text-xs text-red-500 font-medium mt-1">La cantidad de cuotas debe estar entre 1 y 120</span>
+        )}
       </div>
 
       {cuotaCalculada !== null && cuotaCalculada > 0 && (

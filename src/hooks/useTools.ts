@@ -17,7 +17,7 @@ export const useTools = () => {
   const [formData, setFormData] = useState<{
     precio_contado: number | null;
     precio_total_cuotas: number | null;
-    cantidad_cuotas: number;
+    cantidad_cuotas: number | null;
     inflacion_mensual: string;
   }>({
     precio_contado: null,
@@ -57,6 +57,7 @@ export const useTools = () => {
     const contado = formData.precio_contado;
     const cuotasTotal = formData.precio_total_cuotas;
     const inflacion = parseFloat(formData.inflacion_mensual);
+    const cuotas = formData.cantidad_cuotas;
     
     if (contado === null || isNaN(contado) || contado <= 0) {
       showToast('El precio de contado debe ser mayor a 0', 'error');
@@ -64,6 +65,10 @@ export const useTools = () => {
     }
     if (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0) {
       showToast('El precio total en cuotas debe ser mayor a 0', 'error');
+      return;
+    }
+    if (cuotas === null || isNaN(cuotas) || cuotas < 1 || cuotas > 120) {
+      showToast('La cantidad de cuotas debe estar entre 1 y 120', 'error');
       return;
     }
     if (isNaN(inflacion) || inflacion < 0 || inflacion > 100) {
@@ -76,7 +81,7 @@ export const useTools = () => {
       const res = await toolsService.calcularConveniencia({
         precio_contado: contado,
         precio_total_cuotas: cuotasTotal,
-        cantidad_cuotas: formData.cantidad_cuotas,
+        cantidad_cuotas: cuotas,
         inflacion_mensual: inflacion
       });
       setResultado(res);
@@ -107,7 +112,7 @@ export const useTools = () => {
   const [canAffordForm, setCanAffordForm] = useState<{
     precio_total: number | null;
     modo: 'contado' | 'cuotas';
-    cantidad_cuotas: number;
+    cantidad_cuotas: number | null;
     ingreso_manual: number | null;
   }>({
     precio_total: null,
@@ -165,8 +170,8 @@ export const useTools = () => {
       showToast('El precio de la compra debe ser mayor a 0', 'error');
       return;
     }
-    if (canAffordForm.modo === 'cuotas' && (canAffordForm.cantidad_cuotas < 1 || canAffordForm.cantidad_cuotas > 60)) {
-      showToast('La cantidad de cuotas debe estar entre 1 y 60', 'error');
+    if (canAffordForm.modo === 'cuotas' && (canAffordForm.cantidad_cuotas === null || isNaN(canAffordForm.cantidad_cuotas) || canAffordForm.cantidad_cuotas < 2 || canAffordForm.cantidad_cuotas > 120)) {
+      showToast('La cantidad de cuotas debe estar entre 2 y 120', 'error');
       return;
     }
     if (canAffordForm.modo === 'cuotas' && tieneInteres) {
@@ -182,7 +187,7 @@ export const useTools = () => {
       const res = await toolsService.calculateCanAfford({
         precio_total: precio,
         modo: canAffordForm.modo,
-        cantidad_cuotas: canAffordForm.modo === 'cuotas' ? canAffordForm.cantidad_cuotas : 1,
+        cantidad_cuotas: canAffordForm.modo === 'cuotas' ? (canAffordForm.cantidad_cuotas || 2) : 1,
         tiene_interes: canAffordForm.modo === 'cuotas' ? tieneInteres : false,
         tna: canAffordForm.modo === 'cuotas' && tieneInteres && tna ? parseFloat(tna) : undefined,
         ingreso_manual: canAffordForm.ingreso_manual

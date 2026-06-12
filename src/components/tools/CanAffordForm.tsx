@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Calendar, Coins } from 'lucide-react';
-import { Select, Button, MontoInput } from '@/components/ui';
+import { Input, Button, MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import styles from './ToolsComponents.module.css';
 
@@ -10,13 +10,13 @@ interface CanAffordFormProps {
   formData: {
     precio_total: number | null;
     modo: 'contado' | 'cuotas';
-    cantidad_cuotas: number;
+    cantidad_cuotas: number | null;
     ingreso_manual: number | null;
   };
   setFormData: React.Dispatch<React.SetStateAction<{
     precio_total: number | null;
     modo: 'contado' | 'cuotas';
-    cantidad_cuotas: number;
+    cantidad_cuotas: number | null;
     ingreso_manual: number | null;
   }>>;
   calculando: boolean;
@@ -43,10 +43,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   setTna,
   calcularCuotaConInteres
 }) => {
-  const cuotasOptions = [2, 3, 4, 6, 9, 10, 12, 15, 18, 24, 30, 36, 48, 60].map(c => ({
-    label: `${c} cuotas`,
-    value: c
-  }));
+
 
   const handleChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({
@@ -60,7 +57,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   const isFormInvalid = 
     formData.precio_total === null || 
     formData.precio_total <= 0 ||
-    (formData.modo === 'cuotas' && (formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 60)) ||
+    (formData.modo === 'cuotas' && (formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) || formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120)) ||
     (formData.modo === 'cuotas' && tieneInteres && (!tna || isNaN(parseFloat(tna)) || parseFloat(tna) <= 0 || parseFloat(tna) > 3000)) ||
     (showManualIncome && formData.ingreso_manual !== null && formData.ingreso_manual < 0);
 
@@ -77,11 +74,14 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
       }
       return `Representa el ${pct.toFixed(1)}% de tu saldo disponible actual`;
     } else {
-      let cuota = formData.precio_total / formData.cantidad_cuotas;
-      if (tieneInteres && tna && !isNaN(parseFloat(tna)) && parseFloat(tna) > 0) {
-        cuota = calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna));
+      let cuota = 0;
+      if (formData.cantidad_cuotas && formData.cantidad_cuotas > 0) {
+        cuota = formData.precio_total / formData.cantidad_cuotas;
+        if (tieneInteres && tna && !isNaN(parseFloat(tna)) && parseFloat(tna) > 0) {
+          cuota = calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna));
+        }
       }
-      return `La cuota mensual sería de ${formatMonto(cuota, 'ARS')}`;
+      return cuota > 0 ? `La cuota mensual sería de ${formatMonto(cuota, 'ARS')}` : null;
     }
   };
 
@@ -142,12 +142,22 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
       {formData.modo === 'cuotas' && (
         <div className={`${styles.formGroup} animate-fadeIn`}>
           <label className={styles.label} htmlFor="can_afford_cuotas">¿En cuántas cuotas?</label>
-          <Select
+          <Input
             id="can_afford_cuotas"
-            options={cuotasOptions}
-            value={formData.cantidad_cuotas}
-            onChange={(e) => handleChange('cantidad_cuotas', parseInt(e.target.value))}
+            type="number"
+            placeholder="Ej: 12"
+            value={formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) ? '' : formData.cantidad_cuotas}
+            onChange={(e) => {
+              const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
+              handleChange('cantidad_cuotas', val);
+            }}
+            min="2"
+            max="120"
+            step="1"
           />
+          {formData.cantidad_cuotas !== null && !isNaN(formData.cantidad_cuotas) && (formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120) && (
+            <span className="text-xs text-red-500 font-medium mt-1">La cantidad de cuotas debe estar entre 2 y 120</span>
+          )}
         </div>
       )}
 
@@ -209,7 +219,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
             La TNA figura en el contrato o en la web del comercio/banco. Ej: 120% anual.
           </p>
 
-          {tna && parseFloat(tna) > 0 && formData.precio_total && formData.precio_total > 0 && (
+          {tna && parseFloat(tna) > 0 && formData.precio_total && formData.precio_total > 0 && formData.cantidad_cuotas && formData.cantidad_cuotas > 0 && (
             <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 px-4 py-3 mt-1 border border-border">
               <span className="text-xs text-muted-foreground">Cuota estimada: </span>
               <span className="text-sm font-semibold text-foreground">

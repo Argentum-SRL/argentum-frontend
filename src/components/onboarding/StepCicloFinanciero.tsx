@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Calendar, RefreshCw, Loader2 } from 'lucide-react'
-import { guardarCicloFinanciero } from '@/lib/api/onboarding'
+import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/lib/api/onboarding'
 import styles from './StepCicloFinanciero.module.css'
 
 interface Props {
@@ -26,10 +26,56 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
   const [valor, setValor] = useState(datosIniciales.ciclo_valor ?? '1')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [preview, setPreview] = useState<{
+    proxima_fecha_cobro: string
+    es_dia_habil: boolean
+  } | null>(null)
+  
+  const isInitialDiaFijo = (datosIniciales.ciclo_tipo ?? 'dia_fijo') === 'dia_fijo'
+  const initialDiaVal = parseInt(datosIniciales.ciclo_valor ?? '1', 10)
+  const isInitialValValid = !isNaN(initialDiaVal) && initialDiaVal >= 1 && initialDiaVal <= 31
+  const [loadingPreview, setLoadingPreview] = useState(isInitialDiaFijo && isInitialValValid)
+
+  useEffect(() => {
+    if (tipo !== 'dia_fijo') {
+      return
+    }
+
+    const diaNum = parseInt(valor, 10)
+    if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
+      return
+    }
+
+    const controller = new AbortController()
+
+    const timer = setTimeout(async () => {
+      try {
+        const data = await getPreviewFechaCobro(diaNum, controller.signal)
+        setPreview(data)
+      } catch (err) {
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          return
+        }
+        console.error('Error fetching preview fecha cobro:', err)
+        setPreview(null)
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingPreview(false)
+        }
+      }
+    }, 400)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [tipo, valor])
 
   function handleTipoChange(newTipo: string) {
     setTipo(newTipo)
     setValor(newTipo === 'dia_fijo' ? '1' : 'primer_lunes')
+    setPreview(null)
+    setLoadingPreview(newTipo === 'dia_fijo')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -48,10 +94,31 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
   }
 
   const reglaSeleccionada = REGLAS.find((r) => r.id === valor)
-  const hint =
-    tipo === 'dia_fijo'
-      ? `Tu ciclo empieza el día ${valor} de cada mes`
-      : `Tu ciclo empieza el ${reglaSeleccionada?.label.toLowerCase() ?? ''}`
+  
+  const getHint = () => {
+    if (tipo === 'dia_fijo') {
+      if (preview && !loadingPreview) {
+        const calculatedDate = new Date(preview.proxima_fecha_cobro + 'T12:00:00')
+        const fechaFormateada = calculatedDate.toLocaleDateString('es-AR', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long'
+        })
+        const calculatedDay = calculatedDate.getDate()
+        const diaNominal = parseInt(valor, 10)
+        
+        if (calculatedDay !== diaNominal) {
+          return `Tu próximo cobro sería el ${fechaFormateada} (el ${diaNominal} cae en fin de semana o feriado)`
+        } else {
+          return `Tu próximo cobro sería el ${fechaFormateada}`
+        }
+      }
+      return `Tu ciclo empieza el día ${valor} de cada mes`
+    }
+    return `Tu ciclo empieza el ${reglaSeleccionada?.label.toLowerCase() ?? ''}`
+  }
+
+  const hint = getHint()
 
   return (
     <div>
@@ -93,7 +160,13 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
               min="1"
               max="31"
               value={valor}
-              onChange={(e) => setValor(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value
+                setValor(val)
+                setPreview(null)
+                const parsed = parseInt(val, 10)
+                setLoadingPreview(!isNaN(parsed) && parsed >= 1 && parsed <= 31)
+              }}
               className={styles.input}
             />
           ) : (

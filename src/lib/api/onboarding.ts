@@ -35,11 +35,14 @@ export async function guardarMoneda(params: {
   return res.data
 }
 
-export async function crearPrimeraBilletera(params: {
-  nombre: string
-  moneda: string
-  saldo_inicial: number
-}) {
-  const res = await api.post('/onboarding/primera-billetera', params)
+export async function getPreviewFechaCobro(dia: number, signal?: AbortSignal): Promise<{
+  dia_nominal: number
+  proxima_fecha_cobro: string
+  es_dia_habil: boolean
+}> {
+  const res = await api.get('/onboarding/preview-fecha-cobro', { params: { dia }, signal })
   return res.data
 }
+
+
+

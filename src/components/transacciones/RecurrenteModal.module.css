@@ -1,0 +1,452 @@
+/* ── Slides container & animations ───────────────────────────────────────── */
+.slidesContainer {
+  width: 100%;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.slideForward {
+  animation: slideInRight 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slideBack {
+  animation: slideInLeft 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Step Indicator Dots ─────────────────────────────────────────────────── */
+.stepDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px 0;
+  flex-shrink: 0;
+}
+
+.stepDot {
+  height: 5px;
+  border-radius: 99px;
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--surface-alt);
+}
+
+.stepDotActive {
+  background: var(--primary);
+  width: 20px;
+}
+
+.stepDotInactive {
+  width: 6px;
+  opacity: 0.4;
+}
+
+/* ── Formulario Base ─────────────────────────────────────────────────────── */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: visible;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 10px;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.backBtn, .closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease;
+}
+
+.backBtn:hover, .closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.formBody {
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.fieldOptional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-3);
+  font-size: 10px;
+  margin-left: 3px;
+}
+
+.fieldInput {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 150ms ease;
+  font-family: 'Figtree', sans-serif;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+}
+
+/* ── Select Input Overlay ────────────────────────────────────────────────── */
+.selectInput {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E9198' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+/* ── Radio Pills ─────────────────────────────────────────────────────────── */
+.radioGroup {
+  display: flex;
+  gap: 10px;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.radioPill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pillActiveEgreso {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #fecaca !important;
+}
+
+.pillActiveIngreso {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  border-color: #bbf7d0 !important;
+}
+
+/* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
+.billeterasCarouselScroller {
+  overflow-x: auto;
+  overflow-y: visible;
+  -ms-overflow-style: none;
+}
+
+.billeterasCarouselScroller::-webkit-scrollbar {
+  display: none;
+}
+
+.billeterasCarousel {
+  display: flex;
+  gap: 12px;
+  overflow: visible;
+  scroll-snap-type: x mandatory;
+  padding: 16px 40px;
+  -ms-overflow-style: none;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: center;
+  justify-content: safe center;
+}
+
+.billeterasCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+.billeteraSelectWrap {
+  position: relative;
+  width: 280px;
+  aspect-ratio: 1.586 / 1;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: 18px;
+  transform: translateY(0);
+  transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.billeteraSelectWrap[data-active="false"] {
+  transform: translateY(0) scale(0.93);
+  filter: saturate(0.3) brightness(0.7);
+  opacity: 0.7;
+}
+
+.billeteraSelectWrap[data-active="true"] {
+  transform: translateY(-6px) scale(1.02);
+  filter: none;
+  opacity: 1;
+  border-color: transparent;
+  box-shadow: 0 12px 30px rgba(13, 32, 69, 0.12);
+}
+
+.billeteraOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+  border-radius: inherit;
+  border: none;
+  background: transparent;
+}
+
+.billeteraSelectWrap :global(.wcKebab) {
+  display: none !important;
+}
+
+.fullHeightCard {
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+
+.noBilleteras {
+  font-size: 13px;
+  color: var(--text-3);
+  margin: 0;
+  padding: 8px 0;
+}
+
+/* ── Categorías Grid ─────────────────────────────────────────────────────── */
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.catBtn {
+  border-radius: 11px;
+  padding: 9px 6px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.catBtnActive {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+}
+
+.catBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  transform: scale(1.03);
+}
+
+.catName {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.moreCatsIconWrap {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+}
+
+/* ── Categoría Seleccionada Banner ────────────────────────────────────────── */
+.selectedCatBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 8px;
+  animation: slideDown 200ms ease-out;
+}
+
+.selectedCatInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.selectedCatText {
+  display: flex;
+  flex-direction: column;
+}
+
+.selectedCatLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-3);
+  letter-spacing: 0.5px;
+}
+
+.selectedCatName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.changeCatBtn {
+  background: var(--surface-alt);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.changeCatBtn:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Frecuencia y Detalles Grid ───────────────────────────────────────────── */
+.descFrecuenciaGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.frecuenciaRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.formFooter {
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--surface-alt);
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cancelBtn, .btnDelete {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.cancelBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.btnDelete {
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #DC2626;
+}
+
+.btnDelete:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.submitBtn {
+  flex: 2;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.submitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

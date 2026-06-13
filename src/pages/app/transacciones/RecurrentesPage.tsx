@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useCallback, useImperativeHandle } from 'react'
 import { 
   Plus, 
-  ArrowUpRight, 
-  ArrowDownLeft, 
-  Wallet, 
   Pause, 
   Play, 
-  Edit3, 
   Trash2,
   Clock
 } from 'lucide-react'
@@ -125,64 +121,71 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
   const activas = recurrentes.filter(r => r.estado === 'activa')
   const pausadas = recurrentes.filter(r => r.estado === 'pausada')
 
-  const renderCard = (rec: TransaccionRecurrente) => (
-    <div key={rec.id} className={`${styles.card} ${rec.estado === 'pausada' ? styles.pausada : ''}`}>
-      <div className={styles.cardHeader}>
-        <div className={styles.mainInfo}>
-          <div className={`${styles.iconWrapper} ${rec.tipo === 'ingreso' ? styles.ingresoIcon : styles.egresoIcon}`}>
-            {(() => {
-              const cat = categorias.find(c => c.id === rec.categoria_id)
-              if (cat) {
-                return <CategoriaIcon nombre={cat.nombre} size={32} />
-              }
-              const IconComp = rec.tipo === 'ingreso' ? ArrowUpRight : ArrowDownLeft
-              return <IconComp size={20} strokeWidth={1.75} />
-            })()}
-          </div>
-          <div className={styles.titleArea}>
-            <h3>{rec.descripcion}</h3>
-            <span className={styles.monto}>
-              {formatMonto(rec.monto, rec.moneda)}
-            </span>
-          </div>
+  const renderRow = (rec: TransaccionRecurrente) => {
+    const isIngreso = rec.tipo === 'ingreso'
+    const isPausada = rec.estado === 'pausada'
+    const cat = categorias.find(c => c.id === rec.categoria_id)
+    const wallet = billeteras.find(b => b.id === rec.billetera_id)
+
+    return (
+      <div 
+        key={rec.id}
+        onClick={() => handleOpenModal(rec)}
+        className={`${styles.row} ${isPausada ? styles.rowPausada : ''}`}
+      >
+        <div className={styles.iconContainer}>
+          <CategoriaIcon nombre={cat?.nombre || 'general'} size={40} />
         </div>
-        <div className={styles.actions}>
+
+        <div className={styles.content}>
+          <div className={styles.titleRow}>
+            <span className={styles.description}>
+              {rec.descripcion || cat?.nombre || 'Sin descripción'}
+            </span>
+            {isPausada && (
+              <span className={styles.badgePausada}>
+                Pausada
+              </span>
+            )}
+          </div>
+          <span className={styles.meta}>
+            <span>{cat?.nombre || 'General'}</span>
+            <span> · </span>
+            <span>{getFriendlyFrequency(rec)}</span>
+          </span>
+        </div>
+
+        <div className={styles.amountArea}>
+          <span className={`${styles.amount} ${isIngreso ? styles.amountPos : styles.amountNeg}`}>
+            {isIngreso ? '+' : '-'}{formatMonto(rec.monto, rec.moneda)}
+          </span>
+          <span className={styles.walletName}>
+            {wallet?.nombre || 'Billetera eliminada'}
+          </span>
+        </div>
+
+        <div className={styles.rowActions} onClick={(e) => e.stopPropagation()}>
           <button 
-            className={styles.actionButton} 
-            title={rec.estado === 'activa' ? 'Pausar' : 'Reanudar'}
+            className={styles.actionBtn} 
+            title={isPausada ? 'Reanudar' : 'Pausar'}
             onClick={() => handleToggleEstado(rec)}
           >
-            {rec.estado === 'activa' ? <Pause size={16} /> : <Play size={16} />}
+            {isPausada ? <Play size={15} strokeWidth={2} /> : <Pause size={15} strokeWidth={2} />}
+            <span className={styles.btnText}>{isPausada ? 'Reanudar' : 'Pausar'}</span>
           </button>
-          <button 
-            className={styles.actionButton} 
-            onClick={() => handleOpenModal(rec)}
-            title="Editar recurrente"
-          >
-            <Edit3 size={16} />
-          </button>
-          <button 
-            className={`${styles.actionButton} ${styles.deleteAction}`} 
+          <button
+            className={`${styles.actionBtn} ${styles.deleteBtn}`}
             onClick={() => handleDelete(rec)}
+            aria-label="Eliminar recurrente"
             title="Eliminar recurrente"
           >
-            <Trash2 size={16} />
+            <Trash2 size={15} strokeWidth={1.75} />
+            <span className={styles.btnText}>Eliminar</span>
           </button>
         </div>
       </div>
-
-      <div className={styles.frequencyArea}>
-        <div className={styles.detailItem}>
-          <Clock size={14} />
-          <span>{getFriendlyFrequency(rec)}</span>
-        </div>
-        <div className={styles.detailItem}>
-          <Wallet size={14} />
-          <span>{billeteras.find(b => b.id === rec.billetera_id)?.nombre || 'Billetera desconocida'}</span>
-        </div>
-      </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className={embedded ? styles.embeddedContainer : styles.container}>
@@ -215,8 +218,8 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
             <h2>
               Activas <span className={styles.count}>{activas.length}</span>
             </h2>
-            <div className={styles.grid}>
-              {activas.map(renderCard)}
+            <div className={styles.list}>
+              {activas.map(renderRow)}
             </div>
           </section>
 
@@ -225,8 +228,8 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
               <h2>
                 Pausadas <span className={styles.count}>{pausadas.length}</span>
               </h2>
-              <div className={styles.grid}>
-                {pausadas.map(renderCard)}
+              <div className={styles.list}>
+                {pausadas.map(renderRow)}
               </div>
             </section>
           )}

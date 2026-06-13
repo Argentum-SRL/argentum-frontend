@@ -153,6 +153,35 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
       
       {renderMetrics()}
 
+      {resultado.tiene_interes && (
+        <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 grid grid-cols-2 gap-4">
+          <div>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+              Interés total financiado
+            </span>
+            <span className="text-lg font-bold text-foreground">
+              {formatMonto(resultado.interes_total ?? 0, 'ARS')}
+            </span>
+            {resultado.tna_usada && (
+              <span className="text-xs text-muted-foreground block mt-0.5">
+                Calculado a una TNA de {resultado.tna_usada}%
+              </span>
+            )}
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+              Total financiado con interés
+            </span>
+            <span className="text-lg font-bold text-foreground">
+              {formatMonto(resultado.precio_total_cuotas_con_interes ?? 0, 'ARS')}
+            </span>
+            <span className="text-xs text-muted-foreground block mt-0.5">
+              En {cantidad_cuotas} cuotas de {formatMonto(resultado.monto_cuota, 'ARS')}
+            </span>
+          </div>
+        </div>
+      )}
+
       {cantidad_cuotas <= 24 && (
         <DetalleCuotasChart 
           detallePorMes={detalle_por_mes}

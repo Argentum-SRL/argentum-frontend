@@ -1,7 +1,7 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
-import { Plus, Eye, EyeOff, Wallet } from 'lucide-react'
+import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
@@ -14,6 +14,10 @@ import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
+import TransferenciaModal from '@/components/transferencias/TransferenciaModal'
+import TransferenciaRow from '@/components/transferencias/TransferenciaRow'
+import transferenciaService from '@/services/transferencia.service'
+import type { TransferenciaInterna } from '@/types'
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 
@@ -55,6 +59,11 @@ export default function BilleterasPage() {
   const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const [activeTab, setActiveTab] = useState<'billeteras' | 'transferencias'>('billeteras')
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
+  const [transferencias, setTransferencias] = useState<TransferenciaInterna[]>([])
+  const [loadingTransferencias, setLoadingTransferencias] = useState(false)
+
   const fetchPageData = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     try {
@@ -85,6 +94,55 @@ export default function BilleterasPage() {
       }
     }
   }, [showToast])
+
+  const fetchTransferenciasData = useCallback(async (signal?: AbortSignal) => {
+    setLoadingTransferencias(true)
+    try {
+      const data = await transferenciaService.getTransferencias()
+      if (signal?.aborted) return
+      setTransferencias(data)
+    } catch (err) {
+      console.error('Error fetching transferencias:', err)
+      showToast('Error al cargar transferencias', 'error')
+    } finally {
+      if (!signal?.aborted) {
+        setLoadingTransferencias(false)
+      }
+    }
+  }, [showToast])
+
+  useEffect(() => {
+    if (activeTab === 'transferencias') {
+      const controller = new AbortController()
+      const tid = setTimeout(() => {
+        void fetchTransferenciasData(controller.signal)
+      }, 0)
+      return () => {
+        clearTimeout(tid)
+        controller.abort()
+      }
+    }
+  }, [activeTab, fetchTransferenciasData])
+
+  const handleDeleteTransferencia = useCallback((id: string) => {
+    confirm({
+      title: 'Eliminar transferencia',
+      description: '¿Estás seguro de que querés eliminar esta transferencia? Esto revertirá los saldos de las billeteras involucradas.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await transferenciaService.deleteTransferencia(id)
+          showToast('Transferencia eliminada', 'success')
+          void fetchTransferenciasData()
+          void fetchPageData()
+        } catch (e) {
+          console.error(e)
+          showToast('Error al eliminar la transferencia', 'error')
+        }
+      },
+    })
+  }, [confirm, fetchPageData, fetchTransferenciasData, showToast])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -240,6 +298,39 @@ export default function BilleterasPage() {
     setShowArchived(prev => !prev)
   }, [])
 
+  const MESES = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ]
+
+  const getDayLabel = (fechaStr: string): string => {
+    if (!fechaStr) return ''
+    const today = new Date()
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
+
+    if (fechaStr === todayStr) return 'Hoy'
+    if (fechaStr === yesterdayStr) return 'Ayer'
+
+    const [y, m, d] = fechaStr.split('-').map(Number)
+    if (!y || !m || !d) return fechaStr
+    
+    return `${d} de ${MESES[m - 1]}`
+  }
+
+  const gruposTransferencias = useMemo(() => {
+    const gruposObj: Record<string, TransferenciaInterna[]> = {}
+    transferencias.forEach(tx => {
+      const fecha = tx.fecha.split('T')[0]
+      if (!gruposObj[fecha]) gruposObj[fecha] = []
+      gruposObj[fecha].push(tx)
+    })
+    return Object.entries(gruposObj).sort((a, b) => b[0].localeCompare(a[0]))
+  }, [transferencias])
+
   return (
     <div className={styles.root}>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
@@ -248,107 +339,201 @@ export default function BilleterasPage() {
           <h1>Billeteras</h1>
           <p className={styles.subtitle}>Controlá tus cuentas bancarias, tarjetas y efectivo</p>
         </div>
-        <button
-          className={styles.nuevaBtn}
-          onClick={openCrearModal}
-          aria-label="Agregar nueva billetera"
+        <div className={styles.headerActions}>
+          <button 
+            className={`${styles.btnGhost} ${activeTab === 'transferencias' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
+            onClick={() => setActiveTab(prev => prev === 'billeteras' ? 'transferencias' : 'billeteras')}
+          >
+            <ArrowRightLeft size={16} />
+            Pasar plata entre cuentas
+          </button>
+          <button
+            className={styles.nuevaBtn}
+            onClick={activeTab === 'billeteras' ? openCrearModal : () => setIsTransferModalOpen(true)}
+            aria-label={activeTab === 'billeteras' ? 'Agregar nueva billetera' : 'Pasar plata'}
+          >
+            {activeTab === 'billeteras' ? (
+              <>
+                <Plus size={16} strokeWidth={2.5} />
+                Nueva<span className={styles.btnSuffix}> billetera</span>
+              </>
+            ) : (
+              <>
+                <ArrowRightLeft size={16} strokeWidth={2.5} />
+                Pasar plata
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Switch de pestañas solo para mobile */}
+      <div className={styles.tabsContainer}>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'billeteras' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('billeteras')}
         >
-          <Plus size={16} strokeWidth={2.5} />
-          Nueva<span className={styles.btnSuffix}> billetera</span>
+          Mis Billeteras
+        </button>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'transferencias' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('transferencias')}
+        >
+          Pasar entre cuentas
         </button>
       </div>
 
-      {/* ── Barra de resumen ───────────────────────────────────────────────── */}
-      {!isLoading && billeterasActivas.length > 0 && (
-        <PageSummaryBar
-          className={styles.summaryBar}
-          items={[
-            {
-              label: "Billeteras activas",
-              value: String(billeterasActivas.length),
-              highlight: true,
-            },
-            {
-              label: "Total ARS",
-              value: formatCurrency(totalARS),
-            },
-            {
-              label: "Total USD",
-              value: `USD ${totalUSD.toLocaleString('es-AR')}`,
-            },
-          ]}
-        />
-      )}
-
-
-      {/* ── Grid / Skeleton / Estado vacío ────────────────────────────────── */}
-      {isLoading ? (
-        <SkeletonGrid />
-      ) : billeterasActivas.length === 0 ? (
-        <EstadoVacio onCrear={openCrearModal} />
-      ) : (
-        <div className={styles.grid}>
-          {billeterasRegulares.map((b) => (
-            <BilleteraCard
-              key={b.id}
-              billetera={b}
-              isFront={frontCardId === b.id}
-              onSetFront={() => setFrontCardId(b.id)}
-              onArchivar={handleArchivar}
-              onDesarchivar={handleDesarchivar}
-              onEliminar={handleEliminar}
-              onEditar={handleEditar}
+      {activeTab === 'billeteras' ? (
+        <>
+          {/* ── Barra de resumen ───────────────────────────────────────────────── */}
+          {!isLoading && billeterasActivas.length > 0 && (
+            <PageSummaryBar
+              className={styles.summaryBar}
+              items={[
+                {
+                  label: "Billeteras activas",
+                  value: String(billeterasActivas.length),
+                  highlight: true,
+                },
+                {
+                  label: "Total ARS",
+                  value: formatCurrency(totalARS),
+                },
+                {
+                  label: "Total USD",
+                  value: `USD ${totalUSD.toLocaleString('es-AR')}`,
+                },
+              ]}
             />
-          ))}
-          {billeterasEfectivo.map((b) => (
-            <BilleteraCard
-              key={b.id}
-              billetera={b}
-              isFront={frontCardId === b.id}
-              onSetFront={() => setFrontCardId(b.id)}
-              onArchivar={handleArchivar}
-              onDesarchivar={handleDesarchivar}
-              onEliminar={handleEliminar}
-              onEditar={handleEditar}
-            />
-          ))}
-          <NuevaBilleteraCard onClick={openCrearModal} />
-        </div>
-      )}
+          )}
 
-      {/* ── Sección de archivadas ─────────────────────────────────────────── */}
-      {!isLoading && billeterasArchivadas.length > 0 && (
-        <div className={styles.archivedSection}>
-          <div className={styles.archivedHeader}>
-            <h2 className={styles.archivedTitle}>
-              Billeteras archivadas ({billeterasArchivadas.length})
-            </h2>
-            <button 
-              className={styles.showArchivedBtn}
-              onClick={toggleShowArchived}
-            >
-              {showArchived ? (
-                <><EyeOff size={16} /> Ocultar</>
-              ) : (
-                <><Eye size={16} /> Ver todas</>
-              )}
-            </button>
-          </div>
-
-          {showArchived && (
+          {/* ── Grid / Skeleton / Estado vacío ────────────────────────────────── */}
+          {isLoading ? (
+            <SkeletonGrid />
+          ) : billeterasActivas.length === 0 ? (
+            <EstadoVacio onCrear={openCrearModal} />
+          ) : (
             <div className={styles.grid}>
-              {billeterasArchivadas.map((b) => (
+              {billeterasRegulares.map((b) => (
                 <BilleteraCard
                   key={b.id}
                   billetera={b}
+                  isFront={frontCardId === b.id}
+                  onSetFront={() => setFrontCardId(b.id)}
+                  onArchivar={handleArchivar}
                   onDesarchivar={handleDesarchivar}
                   onEliminar={handleEliminar}
                   onEditar={handleEditar}
                 />
               ))}
+              {billeterasEfectivo.map((b) => (
+                <BilleteraCard
+                  key={b.id}
+                  billetera={b}
+                  isFront={frontCardId === b.id}
+                  onSetFront={() => setFrontCardId(b.id)}
+                  onArchivar={handleArchivar}
+                  onDesarchivar={handleDesarchivar}
+                  onEliminar={handleEliminar}
+                  onEditar={handleEditar}
+                />
+              ))}
+              <NuevaBilleteraCard onClick={openCrearModal} />
             </div>
           )}
+
+          {/* ── Sección de archivadas ─────────────────────────────────────────── */}
+          {!isLoading && billeterasArchivadas.length > 0 && (
+            <div className={styles.archivedSection}>
+              <div className={styles.archivedHeader}>
+                <h2 className={styles.archivedTitle}>
+                  Billeteras archivadas ({billeterasArchivadas.length})
+                </h2>
+                <button 
+                  className={styles.showArchivedBtn}
+                  onClick={toggleShowArchived}
+                >
+                  {showArchived ? (
+                    <><EyeOff size={16} /> Ocultar</>
+                  ) : (
+                    <><Eye size={16} /> Ver todas</>
+                  )}
+                </button>
+              </div>
+
+              {showArchived && (
+                <div className={styles.grid}>
+                  {billeterasArchivadas.map((b) => (
+                    <BilleteraCard
+                      key={b.id}
+                      billetera={b}
+                      onDesarchivar={handleDesarchivar}
+                      onEliminar={handleEliminar}
+                      onEditar={handleEditar}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      ) : (
+        <div className={styles.transferenciasList}>
+          {loadingTransferencias ? (
+            <div className={styles.loadingState}>Cargando transferencias...</div>
+          ) : gruposTransferencias.length === 0 ? (
+            <EmptyState
+              icon={ArrowRightLeft}
+              title="Pasar plata entre cuentas"
+              description="Pasá saldo de una cuenta (origen) a otra (destino) de forma simple."
+              actionLabel="Hacer primera transferencia"
+              onActionClick={() => setIsTransferModalOpen(true)}
+            />
+          ) : (
+            gruposTransferencias.map(([fecha, txs]) => (
+              <div key={fecha} className={styles.dayGroupContainer}>
+                <div className={styles.dayGroupHeader}>
+                  <h3 className={styles.dayGroupTitle}>
+                    {getDayLabel(fecha)}
+                  </h3>
+                </div>
+                <div className={styles.dayGroupList}>
+                  {txs.map((tx, idx) => {
+                    const orig = billeteras.find(b => b.id === tx.billetera_origen_id)
+                    const dest = billeteras.find(b => b.id === tx.billetera_destino_id)
+                    return (
+                      <div 
+                        key={tx.id} 
+                        className={idx < txs.length - 1 ? styles.rowWrapperBorder : styles.rowWrapper}
+                      >
+                        <TransferenciaRow
+                          transferencia={tx}
+                          billeteraOrigen={orig}
+                          billeteraDestino={dest}
+                          onDelete={handleDeleteTransferencia}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))
+          )}
         </div>
+      )}
+
+
+      {/* Modal de Transferencia */}
+      {isTransferModalOpen && (
+        <TransferenciaModal
+          isOpen={isTransferModalOpen}
+          onClose={() => setIsTransferModalOpen(false)}
+          onSuccess={() => {
+            void fetchTransferenciasData()
+            void fetchPageData()
+          }}
+          billeteras={billeteras}
+        />
       )}
     </div>
   )

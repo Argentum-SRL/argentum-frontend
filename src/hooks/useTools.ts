@@ -3,6 +3,12 @@ import toolsService from '@/services/toolsService';
 import type { IPCData, ConvenienciaResult, FinancialContext, CanAffordResult } from '@/types/tools';
 import { useToast } from '@/hooks/useToast';
 
+const calcularCuotaConInteres = (capital: number, n: number, tnaVal: number): number => {
+  const i = tnaVal / 100 / 12;
+  if (i === 0) return capital / n;
+  return capital * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1);
+};
+
 export const useTools = () => {
   const { showToast } = useToast();
   
@@ -19,11 +25,15 @@ export const useTools = () => {
     precio_total_cuotas: number | null;
     cantidad_cuotas: number | null;
     inflacion_mensual: string;
+    tiene_interes: boolean;
+    tna: string;
   }>({
     precio_contado: null,
     precio_total_cuotas: null,
     cantidad_cuotas: 12,
-    inflacion_mensual: ''
+    inflacion_mensual: '',
+    tiene_interes: false,
+    tna: ''
   });
   
   const [resultado, setResultado] = useState<ConvenienciaResult | null>(null);
@@ -58,12 +68,14 @@ export const useTools = () => {
     const cuotasTotal = formData.precio_total_cuotas;
     const inflacion = parseFloat(formData.inflacion_mensual);
     const cuotas = formData.cantidad_cuotas;
+    const tiene_interes = formData.tiene_interes;
+    const tnaVal = formData.tna;
     
     if (contado === null || isNaN(contado) || contado <= 0) {
       showToast('El precio de contado debe ser mayor a 0', 'error');
       return;
     }
-    if (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0) {
+    if (!tiene_interes && (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0)) {
       showToast('El precio total en cuotas debe ser mayor a 0', 'error');
       return;
     }
@@ -75,14 +87,23 @@ export const useTools = () => {
       showToast('La inflación mensual debe estar entre 0% y 100%', 'error');
       return;
     }
+    if (tiene_interes) {
+      const parsedTna = parseFloat(tnaVal);
+      if (isNaN(parsedTna) || parsedTna <= 0 || parsedTna > 3000) {
+        showToast('Debe ingresar una TNA válida entre 0.1% y 3000%', 'error');
+        return;
+      }
+    }
     
     setCalculando(true);
     try {
       const res = await toolsService.calcularConveniencia({
         precio_contado: contado,
-        precio_total_cuotas: cuotasTotal,
+        precio_total_cuotas: (tiene_interes || cuotasTotal === null) ? undefined : cuotasTotal,
         cantidad_cuotas: cuotas,
-        inflacion_mensual: inflacion
+        inflacion_mensual: inflacion,
+        tiene_interes,
+        tna: tiene_interes ? parseFloat(tnaVal) : undefined
       });
       setResultado(res);
       showToast('Cálculo realizado con éxito', 'success');
@@ -100,9 +121,15 @@ export const useTools = () => {
     setResultado(null);
   };
 
-  const cuotaCalculada = formData.precio_total_cuotas && formData.cantidad_cuotas
-    ? formData.precio_total_cuotas / formData.cantidad_cuotas
-    : null;
+  const cuotaCalculada = (() => {
+    if (!formData.cantidad_cuotas) return null;
+    if (formData.tiene_interes) {
+      const parsedTna = parseFloat(formData.tna);
+      if (!formData.precio_contado || isNaN(parsedTna) || parsedTna <= 0) return null;
+      return calcularCuotaConInteres(formData.precio_contado, formData.cantidad_cuotas, parsedTna);
+    }
+    return formData.precio_total_cuotas ? formData.precio_total_cuotas / formData.cantidad_cuotas : null;
+  })();
 
   // ── Tab 2: ¿Me lo puedo permitir? ────────────────────────────────────────
   const [financialContext, setFinancialContext] = useState<FinancialContext | null>(null);
@@ -133,11 +160,6 @@ export const useTools = () => {
     }
   };
 
-  const calcularCuotaConInteres = (capital: number, n: number, tnaVal: number): number => {
-    const i = tnaVal / 100 / 12;
-    if (i === 0) return capital / n;
-    return capital * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1);
-  };
 
   const loadFinancialContext = useCallback(async () => {
     setFinancialContextLoading(true);
@@ -152,7 +174,7 @@ export const useTools = () => {
     } finally {
       setFinancialContextLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, setFinancialContextLoading, setFinancialContextError, setFinancialContext]);
 
   useEffect(() => {
     if (activeTab === 'can-afford' && !financialContext && !financialContextLoading) {

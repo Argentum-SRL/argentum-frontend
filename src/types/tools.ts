@@ -23,13 +23,19 @@ export interface ConvenienciaResult {
   cantidad_cuotas: number;
   inflacion_mensual_usada: number;
   detalle_por_mes: DetalleCuota[];
+  tiene_interes?: boolean;
+  tna_usada?: number | null;
+  interes_total?: number | null;
+  precio_total_cuotas_con_interes?: number | null;
 }
 
 export interface ConvenienciaRequest {
   precio_contado: number;
-  precio_total_cuotas: number;
+  precio_total_cuotas?: number;
   cantidad_cuotas: number;
   inflacion_mensual: number;
+  tiene_interes?: boolean;
+  tna?: number;
 }
 
 export interface FinancialContext {

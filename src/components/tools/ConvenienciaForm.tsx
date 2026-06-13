@@ -11,12 +11,16 @@ interface ConvenienciaFormProps {
     precio_total_cuotas: number | null;
     cantidad_cuotas: number | null;
     inflacion_mensual: string;
+    tiene_interes: boolean;
+    tna: string;
   };
   setFormData: React.Dispatch<React.SetStateAction<{
     precio_contado: number | null;
     precio_total_cuotas: number | null;
     cantidad_cuotas: number | null;
     inflacion_mensual: string;
+    tiene_interes: boolean;
+    tna: string;
   }>>;
   calculando: boolean;
   calcular: () => void;
@@ -37,20 +41,25 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
   ipcError
 }) => {
   
-
-
-  const handleChange = (field: string, value: string | number | null) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleChange = (field: string, value: string | number | boolean | null) => {
+    setFormData(prev => {
+      const next = { ...prev, [field]: value };
+      if (field === 'tiene_interes') {
+        if (value === true) {
+          next.precio_total_cuotas = null;
+        } else {
+          next.tna = '';
+        }
+      }
+      return next;
+    });
   };
 
   const isFormInvalid = 
     formData.precio_contado === null || 
     formData.precio_contado <= 0 ||
-    formData.precio_total_cuotas === null ||
-    formData.precio_total_cuotas <= 0 ||
+    (!formData.tiene_interes && (formData.precio_total_cuotas === null || formData.precio_total_cuotas <= 0)) ||
+    (formData.tiene_interes && (!formData.tna || isNaN(parseFloat(formData.tna)) || parseFloat(formData.tna) <= 0 || parseFloat(formData.tna) > 3000)) ||
     formData.cantidad_cuotas === null ||
     isNaN(formData.cantidad_cuotas) ||
     formData.cantidad_cuotas < 1 ||
@@ -88,17 +97,74 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
         <span className={styles.inputDesc}>Lo que pagarías si pagás todo junto hoy</span>
       </div>
 
-      <div className={styles.formGroup}>
-        <MontoInput
-          label="Precio total en cuotas"
-          placeholder="Ej: 1.500.000"
-          value={formData.precio_total_cuotas}
-          onChange={(val) => handleChange('precio_total_cuotas', val)}
-          allowDecimals
-          hideCurrency
-        />
-        <span className={styles.inputDesc}>El total que terminarías pagando con todas las cuotas sumadas</span>
+      {/* ¿Las cuotas tienen interés? */}
+      <div className="flex flex-col gap-2 animate-fadeIn">
+        <label className="text-sm font-medium text-foreground">
+          ¿Las cuotas tienen interés?
+        </label>
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full border border-slate-200 dark:border-slate-700">
+          <button
+            type="button"
+            onClick={() => handleChange('tiene_interes', false)}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
+              !formData.tiene_interes
+                ? 'bg-white dark:bg-slate-700 text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Sin interés
+          </button>
+          <button
+            type="button"
+            onClick={() => handleChange('tiene_interes', true)}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
+              formData.tiene_interes
+                ? 'bg-white dark:bg-slate-700 text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Con interés
+          </button>
+        </div>
       </div>
+
+      {!formData.tiene_interes ? (
+        <div className={styles.formGroup}>
+          <MontoInput
+            label="Precio total en cuotas"
+            placeholder="Ej: 1.500.000"
+            value={formData.precio_total_cuotas}
+            onChange={(val) => handleChange('precio_total_cuotas', val)}
+            allowDecimals
+            hideCurrency
+          />
+          <span className={styles.inputDesc}>El total que terminarías pagando con todas las cuotas sumadas</span>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+          <label className="text-sm font-medium text-foreground">
+            TNA (Tasa Nominal Anual)
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              step="0.1"
+              min="0"
+              max="3000"
+              placeholder="Ej: 120"
+              value={formData.tna}
+              onChange={(e) => handleChange('tna', e.target.value)}
+              className="w-full rounded-lg border border-input bg-background px-4 py-3 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
+              %
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            La TNA para calcular el recargo de cuotas mediante sistema francés.
+          </p>
+        </div>
+      )}
 
       <div className={styles.formGroup}>
         <label className={styles.label} htmlFor="cantidad_cuotas">Cantidad de cuotas</label>

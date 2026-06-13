@@ -11,7 +11,10 @@ import {
   LogOut,
   User,
   Sun,
-  Moon
+  Moon,
+  RefreshCw,
+  CreditCard,
+  Landmark
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -276,6 +279,7 @@ AppleCalendarIcon.displayName = 'AppleCalendarIcon'
 export default function DashboardPage() {
   const { usuario } = useAuth()
   const { open } = useModal()
+  const navigate = useNavigate()
   const [data, setData] = useState<DashboardResumen | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [billeterasSeleccionadas, setBilleterasSeleccionadas] = useState<string[]>(() => {
@@ -604,9 +608,6 @@ export default function DashboardPage() {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>Próximos pagos</h3>
-            <Link to="/app/suscripciones" className={styles.seeAll}>
-              Ver <ChevronRight size={16} />
-            </Link>
           </div>
           <div className={styles.cardContent}>
             {loading ? (
@@ -626,11 +627,66 @@ export default function DashboardPage() {
                   else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
                   else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
 
+                  const handlePagoClick = () => {
+                    if (p.tipo === 'suscripcion') {
+                      navigate('/app/suscripciones')
+                    } else if (p.tipo === 'resumen_tarjeta') {
+                      navigate(p.billetera_id ? `/app/billeteras/${p.billetera_id}` : '/app/billeteras')
+                    } else if (p.tipo === 'cuota') {
+                      navigate('/app/transacciones')
+                    }
+                  }
+
+                  const renderPagoIcon = () => {
+                    const iconClass = styles.pagoIconContainer
+                    switch (p.tipo) {
+                      case 'suscripcion':
+                        return (
+                          <div className={iconClass}>
+                            <RefreshCw size={18} />
+                          </div>
+                        )
+                      case 'resumen_tarjeta':
+                        return (
+                          <div className={iconClass}>
+                            <CreditCard size={18} />
+                            {p.color && (
+                              <svg 
+                                className={styles.colorIndicator} 
+                                viewBox="0 0 12 12"
+                              >
+                                <circle cx="6" cy="6" r="5" fill={p.color} stroke="var(--surface)" strokeWidth="2" />
+                              </svg>
+                            )}
+                          </div>
+                        )
+                      case 'cuota':
+                        return (
+                          <div className={iconClass}>
+                            <Landmark size={18} />
+                          </div>
+                        )
+                      default:
+                        return (
+                          <div className={iconClass}>
+                            <Calendar size={18} />
+                          </div>
+                        )
+                    }
+                  }
+
                   return (
-                    <div key={p.id} className={styles.listItem}>
-                      <AppleCalendarIcon dateStr={p.fecha_cobro} />
+                    <div 
+                      key={p.id} 
+                      className={`${styles.listItem} ${styles.listItemClickable}`}
+                      onClick={handlePagoClick}
+                    >
+                      {renderPagoIcon()}
                       <div className={styles.itemMeta}>
                         <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
+                        <span className={styles.itemTypeBadge}>
+                          {p.tipo === 'suscripcion' ? 'Suscripción' : p.tipo === 'resumen_tarjeta' ? 'Resumen de tarjeta' : 'Cuota'}
+                        </span>
                         <p className={styles.itemSub}>{fechaTxt}</p>
                       </div>
                       <div className={styles.pagoRight}>

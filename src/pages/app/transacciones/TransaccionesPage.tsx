@@ -6,6 +6,7 @@ import type { TransaccionFilters } from '@/services/transaccion.service'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
+import { exportarTransaccionesPDF } from '@/services/exportPdf.service'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { calcularPeriodoActual } from '@/lib/utils/ciclo'
@@ -201,6 +202,7 @@ export default function TransaccionesPage() {
   }, [defaultFilters])
 
 
+
   const openNewRecurrente = useCallback(() => {
     recurrentesRef.current?.openNew()
   }, [])
@@ -252,11 +254,24 @@ export default function TransaccionesPage() {
   }, [filteredTransacciones, mainCurrency])
 
   const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
-  const resumen = {
+  const resumen = useMemo(() => ({
     balance,
     ingresos: totalIngresos,
     egresos: totalEgresos
-  }
+  }), [balance, totalIngresos, totalEgresos])
+
+  const handleExportar = useCallback(() => {
+    exportarTransaccionesPDF({
+      transacciones: filteredTransacciones,
+      resumen: {
+        totalIngresos: resumen.ingresos,
+        totalEgresos: resumen.egresos,
+        balance: resumen.balance
+      },
+      filters,
+      usuario
+    })
+  }, [filteredTransacciones, resumen, filters, usuario])
 
   return (
     <div className={styles.page}>
@@ -268,7 +283,14 @@ export default function TransaccionesPage() {
           <p className={styles.subtitle}>{periodoActual.label} · {transacciones.length} movimientos</p>
         </div>
         <div className={styles.headerActions}>
-          <button className={`${styles.btnGhost} ${styles.desktopOnly}`} title="Próximamente">
+          <button
+            className={`${styles.btnGhost} ${styles.desktopOnly}`}
+            onClick={handleExportar}
+            disabled={filteredTransacciones.length === 0}
+            title={filteredTransacciones.length === 0
+              ? 'No hay transacciones para exportar'
+              : 'Exportar PDF'}
+          >
             <Download size={16} className={styles.btnIcon} />
             Exportar
           </button>

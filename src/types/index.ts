@@ -539,3 +539,24 @@ export interface PresionFuturaData {
   total_comprometido: number;
 }
 
+export interface GrupoCuotasResumen {
+  id: string
+  descripcion: string
+  monto_total: number
+  total_financiado: number
+  cantidad_cuotas: number
+  cantidad_pagadas: number
+  cantidad_pendientes: number
+  monto_cuota: number
+  proximo_vencimiento: string | null
+  total_pagado: number
+  total_pendiente: number
+  moneda: 'ARS' | 'USD'
+  tarjeta_nombre: string | null
+  fecha_compra: string
+  transaccion_padre_id: string
+  tiene_interes: boolean
+  tasa_interes: number | null
+}
+
+

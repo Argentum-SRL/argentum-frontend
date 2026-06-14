@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight } from 'lucide-react'
+import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, RefreshCw } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -16,13 +16,14 @@ import { useModal } from '@/hooks/useModal'
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
 import RecurrentesPage, { type RecurrentesPageRef } from './RecurrentesPage'
+import GruposCuotasTab from '@/components/transacciones/GruposCuotasTab'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
 
-  const [activeTab, setActiveTab] = useState<'historial' | 'recurrentes'>('historial')
+  const [activeTab, setActiveTab] = useState<'historial' | 'recurrentes' | 'cuotas'>('historial')
   const mainCurrency = 'ARS' // Moneda base para el resumen
   
   const periodoActual = useMemo(() => calcularPeriodoActual(usuario), [usuario])
@@ -164,6 +165,7 @@ export default function TransaccionesPage() {
   const handleDelete = useCallback((id: string) => {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
     if (!tx) return
+
     confirm({
       title: 'Eliminar transacción',
       description: '¿Estás seguro de que querés eliminar esta transacción? Esta acción no se puede deshacer.',
@@ -198,9 +200,6 @@ export default function TransaccionesPage() {
     setFilters(defaultFilters)
   }, [defaultFilters])
 
-  const toggleTab = useCallback(() => {
-    setActiveTab(prev => prev === 'historial' ? 'recurrentes' : 'historial')
-  }, [])
 
   const openNewRecurrente = useCallback(() => {
     recurrentesRef.current?.openNew()
@@ -275,17 +274,24 @@ export default function TransaccionesPage() {
           </button>
           <button 
             className={`${styles.btnGhost} ${activeTab === 'recurrentes' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
-            onClick={toggleTab}
+            onClick={() => setActiveTab('recurrentes')}
           >
-            <ArrowLeftRight size={16} className={styles.btnIcon} />
+            <RefreshCw size={16} className={styles.btnIcon} />
             Recurrentes
           </button>
           <button 
+            className={`${styles.btnGhost} ${activeTab === 'cuotas' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
+            onClick={() => setActiveTab('cuotas')}
+          >
+            <CreditCard size={16} className={styles.btnIcon} />
+            Cuotas
+          </button>
+          <button 
             className={styles.nuevaBtn}
-            onClick={activeTab === 'historial' ? openNewTransaccion : openNewRecurrente}
+            onClick={activeTab === 'recurrentes' ? openNewRecurrente : openNewTransaccion}
           >
             <Plus size={16} strokeWidth={2.5} />
-            Nueva<span className={styles.btnSuffix}>{activeTab === 'historial' ? ' transacción' : ' recurrente'}</span>
+            Nueva<span className={styles.btnSuffix}>{activeTab === 'recurrentes' ? ' recurrente' : ' transacción'}</span>
           </button>
         </div>
       </div>
@@ -303,6 +309,12 @@ export default function TransaccionesPage() {
           onClick={() => setActiveTab('recurrentes')}
         >
           Recurrentes
+        </button>
+        <button 
+          className={`${styles.tabBtn} ${activeTab === 'cuotas' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('cuotas')}
+        >
+          Cuotas
         </button>
       </div>
 
@@ -394,10 +406,12 @@ export default function TransaccionesPage() {
             )}
           </div>
         </>
-      ) : (
+      ) : activeTab === 'recurrentes' ? (
         <div className={styles.recurrentesWrapper}>
           <RecurrentesPage ref={recurrentesRef} embedded />
         </div>
+      ) : (
+        <GruposCuotasTab />
       )}
     </div>
   )

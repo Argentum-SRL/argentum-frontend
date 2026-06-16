@@ -2,7 +2,15 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { guardarDatosPersonales } from '@/lib/api/onboarding'
 import styles from './StepDatosPersonales.module.css'
-import { DateInput } from '@/components/ui'
+import { DateInput, SelectInput, type SelectOption } from '@/components/ui'
+
+const OPCIONES_SEXO: SelectOption[] = [
+  { value: '', label: 'Seleccionar' },
+  { value: 'masculino', label: 'Masculino' },
+  { value: 'femenino', label: 'Femenino' },
+  { value: 'no_binario', label: 'No binario' },
+  { value: 'prefiero_no_decir', label: 'Prefiero no decirlo' },
+]
 
 interface Props {
   datosIniciales: { 
@@ -107,20 +115,14 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="sexo" className={styles.label}>Sexo</label>
-          <select
+          <SelectInput
             id="sexo"
+            label="Sexo"
             value={sexo}
-            onChange={(e) => setSexo(e.target.value)}
-            className={[styles.input, sexoError ? styles.inputError : ''].filter(Boolean).join(' ')}
-          >
-            <option value="" disabled>Seleccionar</option>
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
-            <option value="no_binario">No binario</option>
-            <option value="prefiero_no_decir">Prefiero no decirlo</option>
-          </select>
-          {sexoError && <p className={styles.fieldError}>{sexoError}</p>}
+            onChange={setSexo}
+            error={sexoError || undefined}
+            options={OPCIONES_SEXO}
+          />
         </div>
 
         {error && <p className={styles.error}>{error}</p>}

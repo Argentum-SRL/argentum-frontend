@@ -26,8 +26,31 @@ import type { MetodosLogin } from '@/types'
 import * as authService from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { SelectInput, type SelectOption } from '@/components/ui'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
+
+const OPCIONES_REGLA_CICLO: SelectOption[] = [
+  { value: '', label: 'Seleccionar...' },
+  { value: 'primer_lunes', label: 'Primer Lunes' },
+  { value: 'primer_martes', label: 'Primer Martes' },
+  { value: 'primer_miercoles', label: 'Primer Miércoles' },
+  { value: 'primer_jueves', label: 'Primer Jueves' },
+  { value: 'primer_viernes', label: 'Primer Viernes' },
+  { value: 'ultimo_lunes', label: 'Último Lunes' },
+  { value: 'ultimo_martes', label: 'Último Martes' },
+  { value: 'ultimo_miercoles', label: 'Último Miércoles' },
+  { value: 'ultimo_jueves', label: 'Último Jueves' },
+  { value: 'ultimo_viernes', label: 'Último Viernes' },
+]
+
+const OPCIONES_TIPO_DOLAR: SelectOption[] = [
+  { value: 'oficial', label: 'Oficial' },
+  { value: 'blue', label: 'Blue' },
+  { value: 'mep', label: 'MEP' },
+  { value: 'tarjeta', label: 'Tarjeta' },
+]
+
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -811,29 +834,13 @@ export default function PerfilPage() {
                     <p className={styles.exampleText}>Tu ciclo empieza el día {formCiclo.ciclo_valor || '...'} de cada mes</p>
                   </div>
                 ) : (
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-ciclo-regla" className={styles.inputLabel}>Seleccionar Regla</label>
-                    <select 
-                      id="perfil-ciclo-regla"
-                      className={styles.input}
-                      value={formCiclo.ciclo_valor}
-                      onChange={(e) => setFormCiclo({...formCiclo, ciclo_valor: e.target.value})}
-                      required
-                      title="Regla de ciclo financiero"
-                    >
-                      <option value="">Seleccionar...</option>
-                      <option value="primer_lunes">Primer Lunes</option>
-                      <option value="primer_martes">Primer Martes</option>
-                      <option value="primer_miercoles">Primer Miércoles</option>
-                      <option value="primer_jueves">Primer Jueves</option>
-                      <option value="primer_viernes">Primer Viernes</option>
-                      <option value="ultimo_lunes">Último Lunes</option>
-                      <option value="ultimo_martes">Último Martes</option>
-                      <option value="ultimo_miercoles">Último Miércoles</option>
-                      <option value="ultimo_jueves">Último Jueves</option>
-                      <option value="ultimo_viernes">Último Viernes</option>
-                    </select>
-                  </div>
+                  <SelectInput 
+                    id="perfil-ciclo-regla"
+                    label="Seleccionar Regla"
+                    value={formCiclo.ciclo_valor}
+                    onChange={(val) => setFormCiclo({...formCiclo, ciclo_valor: val})}
+                    options={OPCIONES_REGLA_CICLO}
+                  />
                 )}
                 
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
@@ -876,21 +883,13 @@ export default function PerfilPage() {
                 </div>
 
                 {formMoneda.moneda_secundaria_activa && (
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-tipo-dolar" className={styles.inputLabel}>Tipo de Dólar</label>
-                    <select 
-                      id="perfil-tipo-dolar"
-                      className={styles.input}
-                      value={formMoneda.tipo_dolar}
-                      onChange={(e) => setFormMoneda({...formMoneda, tipo_dolar: e.target.value})}
-                      title="Tipo de cambio dólar"
-                    >
-                      <option value="oficial">Oficial</option>
-                      <option value="blue">Blue</option>
-                      <option value="mep">MEP</option>
-                      <option value="tarjeta">Tarjeta</option>
-                    </select>
-                  </div>
+                  <SelectInput 
+                    id="perfil-tipo-dolar"
+                    label="Tipo de Dólar"
+                    value={formMoneda.tipo_dolar}
+                    onChange={(val) => setFormMoneda({...formMoneda, tipo_dolar: val})}
+                    options={OPCIONES_TIPO_DOLAR}
+                  />
                 )}
                 
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>

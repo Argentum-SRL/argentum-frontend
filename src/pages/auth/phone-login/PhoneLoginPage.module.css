@@ -28,18 +28,6 @@
   border-color: var(--error);
 }
 
-.phoneSelect {
-  height: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.9375rem;
-  color: var(--text);
-  cursor: pointer;
-  padding-left: 12px;
-  padding-right: 4px;
-  flex-shrink: 0;
-}
 
 .phoneSep {
   width: 1px;

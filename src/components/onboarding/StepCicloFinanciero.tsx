@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Calendar, RefreshCw, Loader2 } from 'lucide-react'
 import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/lib/api/onboarding'
+import { SelectInput } from '@/components/ui'
 import styles from './StepCicloFinanciero.module.css'
 
 interface Props {
@@ -149,37 +150,33 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="valor_ciclo" className={styles.label}>
-            {tipo === 'dia_fijo' ? 'Día del mes (1–31)' : 'Regla'}
-          </label>
-
           {tipo === 'dia_fijo' ? (
-            <input
-              id="valor_ciclo"
-              type="number"
-              min="1"
-              max="31"
-              value={valor}
-              onChange={(e) => {
-                const val = e.target.value
-                setValor(val)
-                setPreview(null)
-                const parsed = parseInt(val, 10)
-                setLoadingPreview(!isNaN(parsed) && parsed >= 1 && parsed <= 31)
-              }}
-              className={styles.input}
-            />
+            <>
+              <label htmlFor="valor_ciclo" className={styles.label}>Día del mes (1–31)</label>
+              <input
+                id="valor_ciclo"
+                type="number"
+                min="1"
+                max="31"
+                value={valor}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setValor(val)
+                  setPreview(null)
+                  const parsed = parseInt(val, 10)
+                  setLoadingPreview(!isNaN(parsed) && parsed >= 1 && parsed <= 31)
+                }}
+                className={styles.input}
+              />
+            </>
           ) : (
-            <select
+            <SelectInput
               id="valor_ciclo"
+              label="Regla"
               value={valor}
-              onChange={(e) => setValor(e.target.value)}
-              className={styles.select}
-            >
-              {REGLAS.map((r) => (
-                <option key={r.id} value={r.id}>{r.label}</option>
-              ))}
-            </select>
+              onChange={setValor}
+              options={REGLAS.map((r) => ({ value: r.id, label: r.label }))}
+            />
           )}
 
           <p className={styles.hint}>{hint}</p>

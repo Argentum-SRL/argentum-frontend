@@ -8,7 +8,25 @@ import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { ChevronLeft, X, GripHorizontal } from 'lucide-react'
+import { SelectInput, type SelectOption } from '@/components/ui'
 import styles from './RecurrenteModal.module.css'
+
+const OPCIONES_FRECUENCIA: SelectOption[] = [
+  { value: 'semanal', label: 'Semanal' },
+  { value: 'quincenal', label: 'Quincenal' },
+  { value: 'mensual', label: 'Mensual' },
+]
+
+const OPCIONES_DIA_SEMANA: SelectOption[] = [
+  { value: '0', label: 'Lunes' },
+  { value: '1', label: 'Martes' },
+  { value: '2', label: 'Miércoles' },
+  { value: '3', label: 'Jueves' },
+  { value: '4', label: 'Viernes' },
+  { value: '5', label: 'Sábado' },
+  { value: '6', label: 'Domingo' },
+]
+
 
 interface RecurrenteModalProps {
   isOpen: boolean
@@ -335,49 +353,36 @@ export default function RecurrenteModal({
                 {/* Frecuencia y Día */}
                 <div className={styles.descFrecuenciaGrid}>
                   <div className={styles.frecuenciaRow}>
-                    <div className={styles.formField}>
-                      <label htmlFor="form-frecuencia" className={styles.fieldLabel}>Frecuencia</label>
-                      <select
-                        id="form-frecuencia"
-                        className={`${styles.fieldInput} ${styles.selectInput}`}
-                        value={formData.frecuencia}
-                        onChange={(e) => setFormData({ ...formData, frecuencia: e.target.value as 'semanal' | 'quincenal' | 'mensual', dia_registro: 1 })}
-                        title="Frecuencia de registro"
-                      >
-                        <option value="semanal">Semanal</option>
-                        <option value="quincenal">Quincenal</option>
-                        <option value="mensual">Mensual</option>
-                      </select>
-                    </div>
+                    <SelectInput
+                      id="form-frecuencia"
+                      label="Frecuencia"
+                      value={formData.frecuencia}
+                      onChange={(val) => setFormData({ ...formData, frecuencia: val as 'semanal' | 'quincenal' | 'mensual', dia_registro: 1 })}
+                      options={OPCIONES_FRECUENCIA}
+                    />
 
                     <div className={styles.formField}>
-                      <label htmlFor="form-dia" className={styles.fieldLabel}>Día de registro</label>
                       {formData.frecuencia === 'semanal' ? (
-                        <select
+                        <SelectInput
                           id="form-dia"
-                          className={`${styles.fieldInput} ${styles.selectInput}`}
-                          value={formData.dia_registro}
-                          onChange={(e) => setFormData({ ...formData, dia_registro: parseInt(e.target.value) })}
-                          title="Seleccionar día de la semana"
-                        >
-                          <option value={0}>Lunes</option>
-                          <option value={1}>Martes</option>
-                          <option value={2}>Miércoles</option>
-                          <option value={3}>Jueves</option>
-                          <option value={4}>Viernes</option>
-                          <option value={5}>Sábado</option>
-                          <option value={6}>Domingo</option>
-                        </select>
-                      ) : (
-                        <input
-                          id="form-dia"
-                          type="number"
-                          min={1}
-                          max={28}
-                          className={styles.fieldInput}
-                          value={formData.dia_registro}
-                          onChange={(e) => setFormData({ ...formData, dia_registro: parseInt(e.target.value) || 1 })}
+                          label="Día de registro"
+                          value={String(formData.dia_registro)}
+                          onChange={(val) => setFormData({ ...formData, dia_registro: parseInt(val) })}
+                          options={OPCIONES_DIA_SEMANA}
                         />
+                      ) : (
+                        <>
+                          <label htmlFor="form-dia" className={styles.fieldLabel}>Día de registro</label>
+                          <input
+                            id="form-dia"
+                            type="number"
+                            min={1}
+                            max={28}
+                            className={styles.fieldInput}
+                            value={formData.dia_registro}
+                            onChange={(e) => setFormData({ ...formData, dia_registro: parseInt(e.target.value) || 1 })}
+                          />
+                        </>
                       )}
                     </div>
                   </div>

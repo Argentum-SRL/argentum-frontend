@@ -7,6 +7,7 @@ import { enviarCodigoTelefono, verificarCodigoTelefono } from '@/services/auth.s
 import { getToken } from '@/services/api'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
+import { PhoneCountrySelect } from '@/components/ui'
 import styles from './PhoneLoginPage.module.css'
 
 type Step = 'phone' | 'code'
@@ -172,18 +173,11 @@ export default function PhoneLoginPage() {
             <label htmlFor="phone_number" className={styles.label}>Número de teléfono</label>
 
             <div className={[styles.phoneInputWrap, telefonoError ? styles.phoneInputWrapError : ''].filter(Boolean).join(' ')}>
-              <select
+              <PhoneCountrySelect
                 value={codigoPais}
-                onChange={(e) => setCodigoPais(e.target.value)}
-                className={styles.phoneSelect}
-                aria-label="Código de país"
-              >
-                {PAISES.map((p) => (
-                  <option key={p.codigo} value={p.codigo}>
-                    {p.bandera} {p.codigo}
-                  </option>
-                ))}
-              </select>
+                onChange={setCodigoPais}
+                countries={PAISES}
+              />
 
               <div className={styles.phoneSep} />
 

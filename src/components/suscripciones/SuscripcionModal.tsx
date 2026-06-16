@@ -1,8 +1,8 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
-import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Layers } from 'lucide-react'
+import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { useToast } from '@/hooks/useToast'
-import { DateInput } from '@/components/ui'
+import { DateInput, SelectInput, type SelectOption } from '@/components/ui'
 import { CATALOGO_SUSCRIPCIONES, CATEGORIAS_CATALOGO } from '@/lib/constants/suscripciones'
 import type { ServicioCatalogo } from '@/lib/constants/suscripciones'
 import suscripcionService from '@/services/suscripcion.service'
@@ -171,6 +171,11 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     const val = (state.monto / DIVISORES[state.frecuencia])
     return val % 1 === 0 ? val.toString() : val.toFixed(2)
   }, [state.monto, state.frecuencia])
+
+  const opcionesCategorias = useMemo<SelectOption[]>(() => [
+    { value: '', label: 'Seleccionar...' },
+    ...categorias.map(c => ({ value: c.id, label: c.nombre }))
+  ], [categorias])
 
   const handleSelectServicio = (s: ServicioCatalogo) => {
     dispatch({ type: 'SET_FIELD', field: 'servicioId', value: s.id })
@@ -392,21 +397,16 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                     />
                   </div>
                   <div className={styles.formFieldFlex1}>
-                    <label className={styles.fieldLabel} htmlFor="categoria-suscripcion">Categoría</label>
-                    <div className={styles.inputWrapperIcon}>
-                      <Layers size={16} className={styles.inputIconLeftSmall} />
-                      <select
-                        id="categoria-suscripcion"
-                        className={styles.fieldSelectIcon}
-                        value={state.categoriaId}
-                        onChange={e => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: e.target.value })}
-                      >
-                        <option value="">Seleccionar...</option>
-                        {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-                      </select>
-                    </div>
+                    <SelectInput
+                      id="categoria-suscripcion"
+                      label="Categoría"
+                      value={state.categoriaId}
+                      onChange={val => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: val })}
+                      options={opcionesCategorias}
+                    />
                   </div>
                 </div>
+
 
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>¿Cómo se cobra?</label>

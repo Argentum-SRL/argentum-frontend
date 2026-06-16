@@ -1,0 +1,198 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+}
+
+.triggerWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.trigger {
+  width: 100%;
+  height: 40px;
+  padding: 0 36px 0 12px;
+  background: transparent;
+  border: 1px solid var(--surface-alt);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.trigger:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
+}
+
+[data-theme="dark"] .trigger:focus {
+  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
+}
+
+.triggerPlaceholder {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.triggerError {
+  border-color: var(--error) !important;
+}
+
+.triggerDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chevron {
+  position: absolute;
+  right: 10px;
+  color: var(--text-3);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  transition: transform 0.15s, color 0.15s;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+.chevronError {
+  color: var(--error);
+}
+
+.errorMsg {
+  font-size: 11px;
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ─── PANEL DESKTOP ───────────────────────────────── */
+
+.panel {
+  position: fixed;
+  z-index: 9100;
+  background: var(--surface);
+  border: 1px solid var(--surface-alt);
+  border-radius: 12px;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  padding: 4px;
+}
+
+/* ─── MOBILE OVERLAY ──────────────────────────────── */
+
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9200;
+  background: rgba(10, 13, 18, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.mobilePanelWrap {
+  background: var(--surface);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 320px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.mobilePanelTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 14px 16px 8px;
+  border-bottom: 0.5px solid var(--surface-alt);
+}
+
+/* ─── OPCIONES ────────────────────────────────────── */
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid var(--surface-alt);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+  width: 100%;
+}
+
+.option:last-child {
+  border-bottom: none;
+}
+
+.option:hover {
+  background: var(--surface-alt);
+}
+
+.optionSelected {
+  color: var(--primary);
+}
+
+.optionIcon {
+  display: flex;
+  align-items: center;
+  color: var(--text-3);
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+.optionLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionCheck {
+  display: flex;
+  align-items: center;
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-left: auto;
+}

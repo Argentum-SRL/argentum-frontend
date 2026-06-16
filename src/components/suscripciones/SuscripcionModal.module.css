@@ -231,7 +231,6 @@
   padding-right: 4px;
   margin-left: -4px;
   margin-right: -4px;
-  scrollbar-gutter: stable both-edges;
 }
 
 .catalogScroll::-webkit-scrollbar {
@@ -529,12 +528,6 @@
   color: var(--text-3);
 }
 
-.inputIconLeftSmall {
-  position: absolute;
-  left: 12px;
-  color: var(--text-3);
-}
-
 .fieldInputIcon {
   height: 44px;
   padding: 0 14px 0 40px;
@@ -548,19 +541,6 @@
   width: 100%;
 }
 
-.fieldSelectIcon {
-  height: 44px;
-  padding: 0 14px 0 36px;
-  border-radius: 12px;
-  border: 1.5px solid var(--surface-alt);
-  background: var(--page);
-  color: var(--text);
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  width: 100%;
-  appearance: none;
-}
 
 .formRow {
   display: flex;
@@ -615,7 +595,6 @@
 /* ── Modal Custom scrollbar adjustments ───────────────────────────────────── */
 .modalCustom > div[class*="content"],
 .modalCustom > div {
-  scrollbar-gutter: stable;
   padding-left: 20px;
   padding-right: 20px;
 }

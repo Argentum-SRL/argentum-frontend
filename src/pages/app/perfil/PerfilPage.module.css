@@ -1,283 +1,591 @@
+/* ═══════════════════════════════════════════════════
+   PerfilPage.module.css
+   Mismo ritmo visual que BilleterasPage / TransaccionesPage
+═══════════════════════════════════════════════════ */
+
 .root {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  padding-bottom: 32px;
+  gap: 24px;
+  min-height: 100%;
 }
 
-/* ── Profile header card ─────────────────────── */
-.headerCard {
-  background: var(--surface);
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  border: 1px solid var(--border);
+.root::after {
+  content: '';
+  display: block;
+  height: 32px;
+  flex-shrink: 0;
+  width: 100%;
 }
 
-.headerInner {
+/* ── Header ─────────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleGroup {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 32px;
+  gap: 4px;
+}
+
+.titleGroup h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.1;
 }
 
 @media (min-width: 768px) {
-  .headerInner {
-    flex-direction: row;
-  }
+  .titleGroup h1 { font-size: 26px; }
 }
 
-.avatarWrap {
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.editNameBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.editNameBtn:hover {
+  background: var(--page);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ── Hero Card ──────────────────────────────────── */
+.heroCard {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.heroAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #A8905A 0%, #C0A265 45%, var(--primary) 100%);
+  opacity: 0.85;
+  border-radius: 20px 20px 0 0;
+}
+
+.heroInner {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 28px 28px 26px;
   position: relative;
 }
 
-.avatar {
-  width: 128px;
-  height: 128px;
-  border-radius: 50%;
-  background: var(--gold);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 2.25rem;
-  font-weight: 700;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border: 4px solid var(--surface);
-}
-
-.avatarOnline {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 32px;
-  height: 32px;
-  background: var(--success);
-  border: 4px solid var(--surface);
-  border-radius: 50%;
-}
-
-.headerMeta {
-  text-align: center;
-  flex: 1;
-}
-
-@media (min-width: 768px) {
-  .headerMeta {
-    text-align: left;
-  }
-}
-
-.headerName {
-  font-size: 1.875rem;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-
-.headerVerified {
-  color: var(--text-3);
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-@media (min-width: 768px) {
-  .headerVerified {
-    justify-content: flex-start;
-  }
-}
-
-.headerVerifiedIcon {
-  color: var(--success);
-}
-
-.headerBadges {
-  margin-top: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-}
-
-@media (min-width: 768px) {
-  .headerBadges {
-    justify-content: flex-start;
-  }
-}
-
-.badge {
-  padding: 4px 16px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.badgeId {
-  background: var(--surface-alt);
-  color: var(--text-2);
-}
-
-.badgeRole {
-  background: rgba(52, 152, 219, 0.1);
-  color: var(--primary);
-}
-
-/* ── Info grid ───────────────────────────────── */
-.infoGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-}
-
-@media (min-width: 768px) {
-  .infoGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* ── Data card ───────────────────────────────── */
-.dataCard {
-  background: var(--surface);
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  border: 1px solid var(--border);
-}
-
-.dataCardTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.dataCardTitleIcon {
-  color: var(--primary);
-}
-
-.dataRows {
+/* ── Avatar ─────────────────────────────────────── */
+.avatarWrap {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  align-items: center;
+  flex-shrink: 0;
+  padding-bottom: 14px;
 }
 
+.avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 20px;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 2rem;
+  font-weight: 700;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cameraBtn {
+  position: absolute;
+  bottom: 0;
+  right: -8px;
+  width: 28px;
+  height: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  z-index: 10;
+}
+
+.cameraBtn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.deleteFotoBtn {
+  margin-top: 4px;
+  background: none;
+  border: none;
+  color: var(--error);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.65;
+  padding: 0;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.deleteFotoBtn:hover { opacity: 1; }
+
+/* ── Hero Body ──────────────────────────────────── */
+.heroBody {
+  flex: 1;
+  min-width: 0;
+  padding-top: 6px;
+}
+
+.heroName {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 5px 0;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.heroMeta {
+  font-size: 0.875rem;
+  color: var(--text-3);
+  margin: 0 0 14px 0;
+}
+
+.heroBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 0.5px solid transparent;
+}
+
+.heroBadgeOk {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.heroBadgeErr {
+  background: var(--error-bg);
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.heroBadgeNeutral {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 0.5px solid var(--border);
+}
+
+/* ── Grid principal ─────────────────────────────── */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .mainGrid { grid-template-columns: 1fr; }
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Card base ──────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--page);
+}
+
+.cardTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Data rows (Contacto) ───────────────────────── */
 .dataRow {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
 }
 
 .dataRowIcon {
-  padding: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background: var(--page);
-  border-radius: 12px;
-  color: var(--text-3);
-}
-
-.dataRowLabel {
-  font-size: 0.75rem;
-  color: var(--text-3);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-}
-
-.dataRowValue {
-  color: var(--text);
-  font-weight: 500;
-}
-
-/* ── Danger zone ─────────────────────────────── */
-.dangerCard {
-  background: var(--error-bg);
-  border-radius: 24px;
-  padding: 32px;
-  border: 1px solid var(--error);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.dangerTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--error);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.dangerText {
-  color: var(--error);
-  opacity: 0.8;
-  font-size: 0.875rem;
-  margin-bottom: 24px;
-  line-height: 1.6;
-}
-
-.dangerBtn {
-  width: 100%;
-  padding: 16px;
-  background: var(--error);
-  color: #fff;
-  border-radius: 16px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  color: var(--text-3);
+  flex-shrink: 0;
 }
 
-.dangerBtn:hover {
-  opacity: 0.9;
+.dataRowContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dataLabel {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dataValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dataRowAction { flex-shrink: 0; }
+
+/* ── Financiero grid ────────────────────────────── */
+.finGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.finCell {
+  padding: 18px 20px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.finCellHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.finValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.finSub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+/* ── Method rows (Acceso) ───────────────────────── */
+.methodRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.methodIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.methodContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.methodName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.methodDesc {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.methodLink {
+  font-size: 12px;
+  color: var(--primary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: left;
+  transition: opacity 0.15s;
+}
+
+.methodLink:hover { opacity: 0.7; text-decoration: underline; }
+
+.methodLinks { display: flex; gap: 12px; }
+
+.methodBadge {
+  flex-shrink: 0;
+  padding-top: 3px;
+}
+
+/* ── Pills ──────────────────────────────────────── */
+.pillOk {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--success-bg);
+  color: var(--success);
+  border: 0.5px solid var(--success);
+}
+
+.pillNa {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--surface-alt);
+  color: var(--text-3);
+  border: 0.5px solid var(--border);
+}
+
+.pillWarn {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(217,119,6,0.1);
+  color: #d97706;
+  border: 0.5px solid #d97706;
+}
+
+.pillInfo {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--surface-alt);
+  color: var(--primary);
+  border: 0.5px solid var(--primary);
+}
+
+/* ── Danger Card ────────────────────────────────── */
+.dangerCard {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.dangerLeft { flex: 1; min-width: 0; }
+
+.dangerTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+
+.dangerDesc {
+  font-size: 13px;
+  color: var(--error);
+  opacity: 0.75;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .dangerActions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .logoutBtn {
-  width: 100%;
-  padding: 16px;
-  background: transparent;
-  color: var(--error);
-  border-radius: 16px;
-  font-weight: 700;
+  padding: 10px 18px;
   border: 1px solid var(--error);
+  border-radius: 12px;
+  background: none;
+  color: var(--error);
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.logoutBtn:hover { background: rgba(220,38,38,0.06); }
+
+.deleteBtn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: var(--error);
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.deleteBtn:hover { opacity: 0.88; }
+
+@media (max-width: 767px) {
+  .dangerCard { flex-direction: column; align-items: stretch; gap: 16px; }
+  .dangerActions { flex-direction: row; }
+}
+
+/* ── Botón icono inline ─────────────────────────── */
+.iconBtn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  transition: color 0.15s, background 0.15s;
 }
 
-.logoutBtn:hover {
-  background: rgba(231, 76, 60, 0.08);
-  opacity: 0.95;
+.iconBtn:hover {
+  color: var(--primary);
+  background: var(--page);
 }
 
-/* ── Confirm modal ───────────────────────────── */
+.lockIcon {
+  color: var(--text-3);
+  opacity: 0.35;
+}
+
+/* ── Modal ──────────────────────────────────────── */
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -287,159 +595,43 @@
 
 .modalCard {
   background: var(--surface);
-  border-radius: 40px;
-  max-width: 448px;
+  border-radius: 24px;
+  max-width: 420px;
   width: 100%;
-  padding: 32px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+  padding: 28px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.18);
 }
 
-.modalHeaderFlex {
+.modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
-.modalTitleNoMargin {
+.modalTitle {
   margin: 0;
-}
-
-.modalErrorBox {
-  margin-bottom: 16px;
-  text-align: center;
-  padding: 8px;
-  background: rgba(231, 76, 60, 0.1);
-  border-radius: 8px;
-}
-
-.formMethodsActions {
-  display: flex;
-  gap: 12px;
-}
-
-
-
-
-/* ── Success state ───────────────────────────── */
-
-/* ── Camera Button ─────────────────────────── */
-.cameraBtn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 40px;
-  height: 40px;
-  background: var(--gold);
-  border: 4px solid var(--surface);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  cursor: pointer;
-  transition: transform 0.2s;
-  z-index: 2;
-}
-
-.cameraBtn:hover {
-  transform: scale(1.1);
-}
-
-.avatarImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.deleteFotoBtn {
-  margin-top: 8px;
-  background: none;
-  border: none;
-  color: var(--error);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  opacity: 0.7;
-}
-
-.deleteFotoBtn:hover {
-  opacity: 1;
-}
-
-/* ── Edit Icons ─────────────────────────────── */
-.editBtn {
-  background: none;
-  border: none;
-  color: var(--text-3);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.editBtn:hover {
-  color: var(--primary);
-  background: var(--page);
-}
-
-.lockIcon {
-  color: var(--text-3);
-  opacity: 0.5;
-}
-
-.dataRowValueWrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-
-.dataRowHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-/* ── Security Badges ────────────────────────── */
-.verificacionBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 0.6875rem;
+  font-size: 1rem;
   font-weight: 700;
-  text-transform: uppercase;
+  color: var(--text);
 }
 
-.verificado {
-  background: var(--success-bg);
-  color: var(--success);
-}
-
-.noVerificado {
-  background: var(--error-bg);
+.modalError {
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: rgba(220,38,38,0.08);
+  border-radius: 10px;
+  font-size: 0.8125rem;
   color: var(--error);
 }
 
-/* ── Generic Edit Modal ─────────────────────── */
 .modalForm {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
-.inputGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.inputGroup { display: flex; flex-direction: column; gap: 6px; }
 
 .inputLabel {
   font-size: 0.8125rem;
@@ -449,79 +641,63 @@
 
 .input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 12px 14px;
   background: var(--page);
   border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--text);
   font-size: 0.9375rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s;
+  font-family: inherit;
+  box-sizing: border-box;
 }
 
-.input:focus {
-  border-color: var(--primary);
-}
-
-.inputError {
-  border-color: var(--error);
-}
-
-.errorText {
-  color: var(--error);
-  font-size: 0.75rem;
-  margin-top: 4px;
-}
+.input:focus { border-color: var(--primary); }
 
 .saveBtn {
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   background: var(--primary);
   color: #fff;
-  border-radius: 16px;
+  border-radius: 14px;
   font-weight: 700;
+  font-size: 0.9375rem;
   border: none;
   cursor: pointer;
-  transition: opacity 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: opacity 0.15s;
+  font-family: inherit;
 }
 
-.saveBtn:hover {
-  opacity: 0.9;
-}
+.saveBtn:hover { opacity: 0.9; }
+.saveBtn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.saveBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.pwReqs { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
 
-/* ── Password Requirements ─────────────────── */
-.pwRequirements {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 8px;
-}
-
-.requirement {
+.req {
   font-size: 0.75rem;
   color: var(--text-3);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
-.requirementMet {
-  color: var(--success);
+.reqMet { color: var(--success); }
+
+.hint {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  font-style: italic;
+  margin: 0;
 }
 
-/* ── Financial Config ──────────────────────── */
 .selector {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   background: var(--page);
   padding: 4px;
   border-radius: 12px;
@@ -529,145 +705,72 @@
 
 .selectorBtn {
   flex: 1;
-  padding: 8px;
+  padding: 9px;
   border-radius: 8px;
   border: none;
   background: none;
   color: var(--text-3);
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
+  font-family: inherit;
 }
 
 .selectorBtnActive {
   background: var(--surface);
   color: var(--primary);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.exampleText {
-  font-size: 0.8125rem;
-  color: var(--text-3);
-  font-style: italic;
-  margin-top: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
 }
 
 .toggleRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 8px;
 }
 
 .toggle {
   position: relative;
-  width: 48px;
+  width: 44px;
   height: 24px;
   background: var(--border);
   border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
+  flex-shrink: 0;
 }
 
-.toggleActive {
-  background: var(--success);
-}
+.toggleActive { background: var(--success); }
 
 .toggleCircle {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
   background: #fff;
   border-radius: 50%;
   transition: transform 0.2s;
 }
 
-.toggleActive .toggleCircle {
-  transform: translateX(24px);
+.toggleActive .toggleCircle { transform: translateX(20px); }
+
+/* ── Spinner ────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.noBorderBottom {
+  border-bottom: none !important;
 }
 
-/* ── Login methods ──────────────────────────── */
-.metodoActivo {
-  background: rgba(46, 204, 113, 0.1);
-  color: var(--success);
-  padding: 4px 12px;
-  border-radius: 9999px;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.metodoInactivo {
-  background: var(--surface-alt);
-  color: var(--text-3);
-  padding: 4px 12px;
-  border-radius: 9999px;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.metodoWarning {
-  background: rgba(243, 156, 18, 0.1);
-  color: #f39c12;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.metodoRow {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.metodoRowMain {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.metodoInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.metodoDescription {
-  font-size: 0.8125rem;
-  color: var(--text-3);
-  margin-top: 4px;
-  line-height: 1.4;
-}
-
-.actionLink {
-  color: var(--primary);
-  font-weight: 600;
-  font-size: 0.875rem;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.actionLink:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-}
-
-
-.hiddenInput {
-  display: none;
+.noBorderRight {
+  border-right: none !important;
 }

@@ -1,22 +1,16 @@
-import { useState, useRef, useEffect } from 'react'
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Trash2, 
+import { useState, useEffect } from 'react'
+import {
+  Mail,
+  Phone,
+  Trash2,
   AlertTriangle,
-  ShieldCheck,
-  Calendar,
   Edit,
   Camera,
   Lock,
   X,
   Save,
   CheckCircle2,
-  DollarSign,
-  TrendingUp,
-  CreditCard,
-  LogOut
+  LogOut,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import usuarioService from '@/services/usuario.service'
@@ -27,6 +21,7 @@ import * as authService from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { SelectInput, type SelectOption } from '@/components/ui'
+import FotoCropModal from '@/components/perfil/FotoCropModal'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
@@ -51,9 +46,8 @@ const OPCIONES_TIPO_DOLAR: SelectOption[] = [
   { value: 'tarjeta', label: 'Tarjeta' },
 ]
 
-
 const GoogleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
@@ -64,8 +58,7 @@ const GoogleIcon = () => (
 export default function PerfilPage() {
   const { usuario, logout, updateUsuario } = useAuth()
   const navigate = useNavigate()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
+  const [fotoCropOpen, setFotoCropOpen] = useState(false)
   const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
 
   useEffect(() => {
@@ -73,23 +66,16 @@ export default function PerfilPage() {
     const fetchMetodos = async () => {
       try {
         const data = await usuarioService.getMetodosLogin(controller.signal)
-        if (!controller.signal.aborted) {
-          setMetodosLogin(data)
-        }
+        if (!controller.signal.aborted) setMetodosLogin(data)
       } catch (err) {
-        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
-          return
-        }
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) return
         console.error('Error fetching metodos login:', err)
       }
     }
     fetchMetodos()
-    return () => {
-      controller.abort()
-    }
+    return () => controller.abort()
   }, [usuario])
 
-  // Estados de modales
   const [activeModal, setActiveModal] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [modalError, setModalError] = useState<string | null>(null)
@@ -97,181 +83,79 @@ export default function PerfilPage() {
   const { showToast } = useToast()
   const { confirm } = useModal()
 
-  // Formularios
   const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '', fecha_nacimiento: '', sexo: '' })
   const [formTelefono, setFormTelefono] = useState({ telefono_nuevo: '', password_actual: '' })
   const [formPassword, setFormPassword] = useState({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
   const [formCiclo, setFormCiclo] = useState({ ciclo_tipo: 'dia_fijo' as 'dia_fijo' | 'regla', ciclo_valor: '' })
   const [formMoneda, setFormMoneda] = useState({ moneda_principal: 'ARS' as 'ARS' | 'USD', moneda_secundaria_activa: false, tipo_dolar: 'blue' })
 
-  // Inicializar formularios cuando el usuario carga (Sync in render to avoid cascading renders)
   const [prevUsuarioId, setPrevUsuarioId] = useState(usuario?.id)
   if (usuario?.id !== prevUsuarioId) {
     setPrevUsuarioId(usuario?.id)
     if (usuario) {
-      setFormDatos({ 
-        nombre: usuario.nombre || '', 
-        apellido: usuario.apellido || '',
-        fecha_nacimiento: usuario.fecha_nacimiento || '',
-        sexo: usuario.sexo || ''
-      })
+      setFormDatos({ nombre: usuario.nombre || '', apellido: usuario.apellido || '', fecha_nacimiento: usuario.fecha_nacimiento || '', sexo: usuario.sexo || '' })
       setFormTelefono({ telefono_nuevo: usuario.telefono || '', password_actual: '' })
-      setFormCiclo({ 
-        ciclo_tipo: (usuario.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo', 
-        ciclo_valor: usuario.ciclo_valor || '' 
-      })
-      setFormMoneda({
-        moneda_principal: (usuario.moneda_principal as 'ARS' | 'USD') || 'ARS',
-        moneda_secundaria_activa: usuario.moneda_secundaria_activa,
-        tipo_dolar: usuario.tipo_dolar || 'blue'
-      })
+      setFormCiclo({ ciclo_tipo: (usuario.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo', ciclo_valor: usuario.ciclo_valor || '' })
+      setFormMoneda({ moneda_principal: (usuario.moneda_principal as 'ARS' | 'USD') || 'ARS', moneda_secundaria_activa: usuario.moneda_secundaria_activa, tipo_dolar: usuario.tipo_dolar || 'blue' })
     }
   }
 
-  const handleOpenModal = (modal: string) => {
-    setModalError(null)
-    setActiveModal(modal)
-  }
-
-  const handleCloseModal = () => {
-    setActiveModal(null)
-    setModalError(null)
-  }
+  const handleOpenModal = (modal: string) => { setModalError(null); setActiveModal(modal) }
+  const handleCloseModal = () => { setActiveModal(null); setModalError(null) }
 
   const handleSaveDatosPersonales = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
-    setModalError(null)
-    try {
-      const updated = await usuarioService.actualizarDatosPersonales(formDatos)
-      updateUsuario(updated)
-      handleCloseModal()
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
-    } finally {
-      setIsSaving(false)
-    }
+    e.preventDefault(); setIsSaving(true); setModalError(null)
+    try { const updated = await usuarioService.actualizarDatosPersonales(formDatos); updateUsuario(updated); handleCloseModal() }
+    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.') }
+    finally { setIsSaving(false) }
   }
 
   const handleVerificarEmailActual = async () => {
-    if (!usuario?.email) return
-    setIsSaving(true)
+    if (!usuario?.email) return; setIsSaving(true)
     try {
       const res = await authService.enviarCodigoEmail(usuario.email)
-      if ((res as { verificado: boolean }).verificado) {
-        if (usuario) {
-          updateUsuario({ ...usuario, email_verificado: true })
-        }
-        showToast('Email verificado correctamente (Bypass activo).', 'success')
-      } else {
-        navigate('/auth/verificar-email', { state: { email: usuario.email } })
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      showToast(error.response?.data?.detail || 'Error al enviar el código de verificación.', 'error')
-    } finally {
-      setIsSaving(false)
-    }
+      if ((res as { verificado: boolean }).verificado) { if (usuario) updateUsuario({ ...usuario, email_verificado: true }); showToast('Email verificado correctamente.', 'success') }
+      else navigate('/auth/verificar-email', { state: { email: usuario.email } })
+    } catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; showToast(error.response?.data?.detail || 'Error al enviar el código.', 'error') }
+    finally { setIsSaving(false) }
   }
 
   const handleSaveTelefono = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
-    setModalError(null)
+    e.preventDefault(); setIsSaving(true); setModalError(null)
     try {
-      const res = await usuarioService.actualizarTelefono({
-        telefono_nuevo: formTelefono.telefono_nuevo,
-        password_actual: usuario?.auth_provider === 'google' ? undefined : formTelefono.password_actual
-      })
-      if (res.requiere_verificacion_telefono) {
-        navigate('/auth/verificar-telefono')
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
-    } finally {
-      setIsSaving(false)
-    }
+      const res = await usuarioService.actualizarTelefono({ telefono_nuevo: formTelefono.telefono_nuevo, password_actual: usuario?.auth_provider === 'google' ? undefined : formTelefono.password_actual })
+      if (res.requiere_verificacion_telefono) navigate('/auth/verificar-telefono')
+    } catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.') }
+    finally { setIsSaving(false) }
   }
 
   const handleSavePassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
-    setModalError(null)
+    e.preventDefault(); setIsSaving(true); setModalError(null)
     try {
-      // La lógica de si tiene password actual se maneja por usuario?.password_hash en el backend
-      await usuarioService.actualizarPassword({
-        password_actual: formPassword.password_actual || undefined,
-        password_nueva: formPassword.password_nueva,
-        password_nueva_confirmacion: formPassword.password_nueva_confirmacion
-      })
-      showToast('Contraseña actualizada exitosamente', 'success')
-      handleCloseModal()
-      setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
+      await usuarioService.actualizarPassword({ password_actual: formPassword.password_actual || undefined, password_nueva: formPassword.password_nueva, password_nueva_confirmacion: formPassword.password_nueva_confirmacion })
+      showToast('Contraseña actualizada exitosamente', 'success'); handleCloseModal(); setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      const detail = error.response?.data?.detail
-      if (detail?.includes('coinciden')) {
-        setModalError('Las contraseñas nuevas no coinciden.')
-      } else if (detail?.includes('actual incorrecta')) {
-        setModalError('La contraseña actual es incorrecta.')
-      } else if (detail?.includes('8 caracteres')) {
-        setModalError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.')
-      } else {
-        setModalError(detail || 'Algo salió mal al actualizar la contraseña.')
-      }
-    } finally {
-      setIsSaving(false)
+      const error = err as { response?: { data?: { detail?: string } } }; const detail = error.response?.data?.detail
+      if (detail?.includes('coinciden')) setModalError('Las contraseñas nuevas no coinciden.')
+      else if (detail?.includes('actual incorrecta')) setModalError('La contraseña actual es incorrecta.')
+      else if (detail?.includes('8 caracteres')) setModalError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.')
+      else setModalError(detail || 'Algo salió mal.')
     }
+    finally { setIsSaving(false) }
   }
 
   const handleSaveCiclo = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
-    setModalError(null)
-    try {
-      const updated = await usuarioService.actualizarCicloFinanciero(formCiclo)
-      updateUsuario(updated)
-      handleCloseModal()
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
-    } finally {
-      setIsSaving(false)
-    }
+    e.preventDefault(); setIsSaving(true); setModalError(null)
+    try { const updated = await usuarioService.actualizarCicloFinanciero(formCiclo); updateUsuario(updated); handleCloseModal() }
+    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal.') }
+    finally { setIsSaving(false) }
   }
 
   const handleSaveMoneda = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
-    setModalError(null)
-    try {
-      const updated = await usuarioService.actualizarMoneda(formMoneda)
-      updateUsuario(updated)
-      handleCloseModal()
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    try {
-      const res = await usuarioService.subirFoto(file)
-      if (usuario) {
-        updateUsuario({ ...usuario, foto_url: res.foto_url })
-      }
-      showToast('Foto de perfil actualizada', 'success')
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      showToast(error.response?.data?.detail || 'Error al subir la foto', 'error')
-    }
+    e.preventDefault(); setIsSaving(true); setModalError(null)
+    try { const updated = await usuarioService.actualizarMoneda(formMoneda); updateUsuario(updated); handleCloseModal() }
+    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal.') }
+    finally { setIsSaving(false) }
   }
 
   const getFotoUrl = () => {
@@ -280,67 +164,49 @@ export default function PerfilPage() {
     return `${API_URL}${usuario.foto_url}`
   }
 
-
-
-  // Auxiliares de permisos
   const isGoogle = usuario?.auth_provider === 'google'
-
-  // Validaciones password en tiempo real
   const pw = formPassword.password_nueva
-  const pwReqs = {
-    length: pw.length >= 8,
-    upper: /[A-Z]/.test(pw),
-    lower: /[a-z]/.test(pw),
-    number: /[0-9]/.test(pw)
-  }
+  const pwReqs = { length: pw.length >= 8, upper: /[A-Z]/.test(pw), lower: /[a-z]/.test(pw), number: /\d/.test(pw) }
 
   return (
     <div className={styles.root}>
-      {/* Header Perfil */}
-      <div className={styles.headerCard}>
-        <div className={styles.headerInner}>
+
+      {/* HEADER */}
+      <div className={styles.pageHeader}>
+        <div className={styles.titleGroup}>
+          <h1>Mi perfil</h1>
+          <p className={styles.subtitle}>{usuario?.email || ''}</p>
+        </div>
+        <button className={styles.editNameBtn} onClick={() => handleOpenModal('datos-personales')} aria-label="Editar datos personales">
+          <Edit size={15} />
+          Editar nombre
+        </button>
+      </div>
+
+      {/* HERO CARD */}
+      <div className={styles.heroCard}>
+        <div className={styles.heroAccent} />
+        <div className={styles.heroInner}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>
-              {getFotoUrl() ? (
-                <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} referrerPolicy="no-referrer" />
-              ) : (
-                usuario?.nombre?.charAt(0) || 'U'
-              )}
+              {getFotoUrl()
+                ? <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} referrerPolicy="no-referrer" />
+                : usuario?.nombre?.charAt(0) || 'U'
+              }
             </div>
-            <button 
-              className={styles.cameraBtn} 
-              onClick={() => fileInputRef.current?.click()}
-              title="Cambiar foto"
-              aria-label="Cambiar foto de perfil"
-            >
-              <Camera size={18} />
+            <button className={styles.cameraBtn} onClick={() => setFotoCropOpen(true)} title="Cambiar foto" aria-label="Cambiar foto de perfil">
+              <Camera size={14} />
             </button>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className={styles.hiddenInput} 
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileChange}
-              title="Seleccionar imagen de perfil"
-            />
             {usuario?.foto_url && (
-              <button 
-                className={styles.deleteFotoBtn} 
+              <button
+                className={styles.deleteFotoBtn}
                 onClick={() => confirm({
                   title: 'Eliminar foto de perfil',
                   description: '¿Estás seguro de que querés eliminar tu foto de perfil?',
                   variant: 'danger',
                   onConfirm: async () => {
-                    try {
-                      await usuarioService.eliminarFoto()
-                      if (usuario) {
-                        updateUsuario({ ...usuario, foto_url: null })
-                      }
-                      showToast('Foto eliminada', 'success')
-                    } catch (err: unknown) {
-                      const error = err as { response?: { data?: { detail?: string } } }
-                      showToast(error.response?.data?.detail || 'Error al eliminar la foto', 'error')
-                    }
+                    try { await usuarioService.eliminarFoto(); if (usuario) updateUsuario({ ...usuario, foto_url: null }); showToast('Foto eliminada', 'success') }
+                    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; showToast(error.response?.data?.detail || 'Error al eliminar la foto', 'error') }
                   },
                 })}
                 aria-label="Eliminar foto de perfil"
@@ -349,557 +215,316 @@ export default function PerfilPage() {
               </button>
             )}
           </div>
-          
-          <div className={styles.headerMeta}>
-            <div className={styles.dataRowHeader}>
-              <h1 className={styles.headerName}>
-                {usuario?.nombre} {usuario?.apellido}
-              </h1>
-              <button 
-                className={styles.editBtn} 
-                onClick={() => handleOpenModal('datos-personales')}
-                aria-label="Editar datos personales"
-              >
-                <Edit size={18} />
-              </button>
+
+          <div className={styles.heroBody}>
+            <h2 className={styles.heroName}>{usuario?.nombre} {usuario?.apellido}</h2>
+            <p className={styles.heroMeta}>{usuario?.email || 'Sin email'} · {usuario?.telefono || 'Sin teléfono'}</p>
+            <div className={styles.heroBadges}>
+              <span className={`${styles.heroBadge} ${usuario?.email_verificado ? styles.heroBadgeOk : styles.heroBadgeErr}`}>
+                Email {usuario?.email_verificado ? 'verificado' : 'no verificado'}
+              </span>
+              <span className={`${styles.heroBadge} ${usuario?.telefono_verificado ? styles.heroBadgeOk : styles.heroBadgeErr}`}>
+                Teléfono {usuario?.telefono_verificado ? 'verificado' : 'no verificado'}
+              </span>
+              <span className={styles.heroBadgeNeutral}>
+                Ciclo · {usuario?.ciclo_tipo === 'dia_fijo' ? `día ${usuario.ciclo_valor}` : usuario?.ciclo_valor?.replace('_', ' ')}
+              </span>
+              <span className={styles.heroBadgeNeutral}>
+                {usuario?.moneda_principal}{usuario?.moneda_secundaria_activa ? ` · ${usuario.tipo_dolar?.toUpperCase()}` : ''}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className={styles.infoGrid}>
-        {/* Datos de la Cuenta */}
-        <div className={styles.dataCard}>
-          <h2 className={styles.dataCardTitle}>
-            <User className={styles.dataCardTitleIcon} size={20} />
-            Datos de la Cuenta
-          </h2>
-          
-          <div className={styles.dataRows}>
-            <div className={styles.dataRow}>
-              <div className={styles.dataRowIcon}>
-                <Mail size={20} />
-              </div>
-              <div className={styles.dataRowHeader}>
-                <div>
-                  <p className={styles.dataRowLabel}>Email</p>
-                  <p className={styles.dataRowValue}>{usuario?.email || 'No asociado'}</p>
-                </div>
-                {isGoogle ? (
-                  <Lock size={16} className={styles.lockIcon} />
-                ) : (
-                  <button 
-                    className={styles.editBtn} 
-                    onClick={() => handleOpenModal('email')}
-                    aria-label="Editar email"
-                  >
-                    <Edit size={18} />
-                  </button>
-                )}
-              </div>
-            </div>
+      {/* GRID PRINCIPAL */}
+      <div className={styles.mainGrid}>
 
-            <div className={styles.dataRow}>
-              <div className={styles.dataRowIcon}>
-                <Phone size={20} />
-              </div>
-              <div className={styles.dataRowHeader}>
-                <div>
-                  <p className={styles.dataRowLabel}>Teléfono</p>
-                  <p className={styles.dataRowValue}>{usuario?.telefono || 'No asociado'}</p>
-                </div>
-                <button 
-                  className={styles.editBtn} 
-                  onClick={() => handleOpenModal('telefono')}
-                  aria-label="Editar teléfono"
-                >
-                  <Edit size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Métodos de inicio de sesión */}
-        <div className={styles.dataCard}>
-          <h2 className={styles.dataCardTitle}>
-            <ShieldCheck className={styles.dataCardTitleIcon} size={20} />
-            Métodos de inicio de sesión
-          </h2>
-          
-          <div className={styles.dataRows}>
-            {/* Email + Password */}
-            <div className={styles.metodoRow}>
-              <div className={styles.metodoRowMain}>
-                <div className={styles.metodoInfo}>
-                  <div className={styles.dataRowIcon}>
-                    <Mail size={20} />
-                  </div>
-                  <p className={styles.dataRowValue}>Email + Contraseña</p>
-                </div>
-                {metodosLogin?.email_password ? (
-                  <span className={styles.metodoActivo}>Activo</span>
-                ) : metodosLogin?.puede_agregar_password ? (
-                  <span className={styles.metodoInactivo}>Sin contraseña</span>
-                ) : metodosLogin?.puede_agregar_email ? (
-                  <span className={styles.metodoWarning}>Email no verificado</span>
-                ) : (
-                  <span className={styles.metodoInactivo}>No configurado</span>
-                )}
-              </div>
-              <div>
-                {metodosLogin?.email_password && (
-                  <button className={styles.actionLink} onClick={() => handleOpenModal('password')}>
-                    Cambiar contraseña
-                  </button>
-                )}
-                {metodosLogin?.puede_agregar_password && (
-                  <button className={styles.actionLink} onClick={() => handleOpenModal('password')}>
-                    Crear contraseña
-                  </button>
-                )}
-                {metodosLogin?.puede_agregar_email && (
-                  <div className={styles.formMethodsActions}>
-                    <button className={styles.actionLink} onClick={handleVerificarEmailActual}>
-                      Verificar ahora
-                    </button>
-                    <button className={styles.actionLink} onClick={() => handleOpenModal('email')}>
-                      Cambiar email
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+        {/* COLUMNA IZQUIERDA */}
+        <div className={styles.col}>
 
-            {/* Teléfono */}
-            <div className={styles.metodoRow}>
-              <div className={styles.metodoRowMain}>
-                <div className={styles.metodoInfo}>
-                  <div className={styles.dataRowIcon}>
-                    <Phone size={20} />
-                  </div>
-                  <p className={styles.dataRowValue}>WhatsApp</p>
-                </div>
-                {metodosLogin?.telefono ? (
-                  <span className={styles.metodoActivo}>Activo</span>
-                ) : (
-                  <span className={styles.metodoInactivo}>No configurado</span>
-                )}
-              </div>
-              <div>
-                <button className={styles.actionLink} onClick={() => handleOpenModal('telefono')}>
-                  {metodosLogin?.telefono ? 'Cambiar teléfono' : 'Agregar teléfono'}
-                </button>
-              </div>
+          {/* Card Contacto */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <span className={styles.cardTitle}>Contacto</span>
             </div>
-
-            {/* Google */}
-            <div className={styles.metodoRow}>
-              <div className={styles.metodoRowMain}>
-                <div className={styles.metodoInfo}>
-                  <div className={styles.dataRowIcon}>
-                    <GoogleIcon />
-                  </div>
-                  <p className={styles.dataRowValue}>Google</p>
-                </div>
-                {metodosLogin?.google ? (
-                  <span className={styles.metodoActivo}>Disponible</span>
-                ) : (
-                  <span className={styles.metodoInactivo}>No disponible</span>
-                )}
-              </div>
-              <p className={styles.metodoDescription}>
-                {metodosLogin?.google 
-                  ? 'Podés iniciar sesión con tu cuenta de Google si coincide con tu email verificado.'
-                  : 'Verificá tu email para poder usar Google como método de ingreso.'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Seguridad (original, simplificada) */}
-        <div className={styles.dataCard}>
-          <h2 className={styles.dataCardTitle}>
-            <ShieldCheck className={styles.dataCardTitleIcon} size={20} />
-            Estado de Verificación
-          </h2>
-          
-          <div className={styles.dataRows}>
-            <div className={styles.dataRow}>
-              <div className={styles.dataRowIcon}>
-                <ShieldCheck size={20} />
-              </div>
-              <div className={styles.formMethodsActions}>
-                <span className={`${styles.verificacionBadge} ${usuario?.email_verificado ? styles.verificado : styles.noVerificado}`}>
-                  Email {usuario?.email_verificado ? 'verificado' : 'no verificado'}
-                </span>
-                <span className={`${styles.verificacionBadge} ${usuario?.telefono_verificado ? styles.verificado : styles.noVerificado}`}>
-                  Teléfono {usuario?.telefono_verificado ? 'verificado' : 'no verificado'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Configuración Financiera */}
-        <div className={styles.dataCard}>
-          <h2 className={styles.dataCardTitle}>
-            <TrendingUp className={styles.dataCardTitleIcon} size={20} />
-            Configuración Financiera
-          </h2>
-          
-          <div className={styles.dataRows}>
-            <div className={styles.dataRow}>
-              <div className={styles.dataRowIcon}>
-                <Calendar size={20} />
-              </div>
-              <div className={styles.dataRowHeader}>
-                <div>
-                  <p className={styles.dataRowLabel}>Ciclo de cobro</p>
-                  <p className={styles.dataRowValue}>
-                    {usuario?.ciclo_tipo === 'dia_fijo' 
-                      ? `Día ${usuario.ciclo_valor} de cada mes`
-                      : usuario?.ciclo_valor?.replace('_', ' ')}
-                  </p>
-                </div>
-                <button 
-                  className={styles.editBtn} 
-                  onClick={() => handleOpenModal('ciclo')}
-                  aria-label="Editar ciclo de cobro"
-                >
-                  <Edit size={18} />
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.dataRow}>
-              <div className={styles.dataRowIcon}>
-                <DollarSign size={20} />
-              </div>
-              <div className={styles.dataRowHeader}>
-                <div>
-                  <p className={styles.dataRowLabel}>Moneda principal</p>
-                  <p className={styles.dataRowValue}>{usuario?.moneda_principal}</p>
-                </div>
-                <button 
-                  className={styles.editBtn} 
-                  onClick={() => handleOpenModal('moneda')}
-                  aria-label="Editar moneda principal"
-                >
-                  <Edit size={18} />
-                </button>
-              </div>
-            </div>
-
-            {usuario?.moneda_secundaria_activa && (
+            <div className={styles.cardBody}>
               <div className={styles.dataRow}>
-                <div className={styles.dataRowIcon}>
-                  <CreditCard size={20} />
+                <div className={styles.dataRowIcon}><Mail size={16} /></div>
+                <div className={styles.dataRowContent}>
+                  <span className={styles.dataLabel}>Email</span>
+                  <span className={styles.dataValue}>{usuario?.email || 'No asociado'}</span>
                 </div>
-                <div>
-                  <p className={styles.dataRowLabel}>Tipo de dólar</p>
-                  <p className={styles.dataRowValue}>{usuario?.tipo_dolar?.toUpperCase()}</p>
+                <div className={styles.dataRowAction}>
+                  {isGoogle
+                    ? <Lock size={15} className={styles.lockIcon} />
+                    : <button className={styles.iconBtn} onClick={() => handleOpenModal('email')} aria-label="Editar email"><Edit size={15} /></button>
+                  }
                 </div>
               </div>
-            )}
+              <div className={`${styles.dataRow} ${styles.noBorderBottom}`}>
+                <div className={styles.dataRowIcon}><Phone size={16} /></div>
+                <div className={styles.dataRowContent}>
+                  <span className={styles.dataLabel}>Teléfono</span>
+                  <span className={styles.dataValue}>{usuario?.telefono || 'No asociado'}</span>
+                </div>
+                <div className={styles.dataRowAction}>
+                  <button className={styles.iconBtn} onClick={() => handleOpenModal('telefono')} aria-label="Editar teléfono"><Edit size={15} /></button>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Card Financiero */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <span className={styles.cardTitle}>Configuración financiera</span>
+            </div>
+            <div className={styles.finGrid}>
+              <div className={styles.finCell}>
+                <div className={styles.finCellHead}>
+                  <span className={styles.dataLabel}>Ciclo de cobro</span>
+                  <button className={styles.iconBtn} onClick={() => handleOpenModal('ciclo')} aria-label="Editar ciclo"><Edit size={14} /></button>
+                </div>
+                <span className={styles.finValue}>
+                  {usuario?.ciclo_tipo === 'dia_fijo' ? `Día ${usuario.ciclo_valor}` : usuario?.ciclo_valor?.replace('_', ' ')}
+                </span>
+                <span className={styles.finSub}>{usuario?.ciclo_tipo === 'dia_fijo' ? 'de cada mes' : 'regla'}</span>
+              </div>
+              <div className={`${styles.finCell} ${styles.noBorderRight}`}>
+                <div className={styles.finCellHead}>
+                  <span className={styles.dataLabel}>Moneda principal</span>
+                  <button className={styles.iconBtn} onClick={() => handleOpenModal('moneda')} aria-label="Editar moneda"><Edit size={14} /></button>
+                </div>
+                <span className={styles.finValue}>{usuario?.moneda_principal}</span>
+                {usuario?.moneda_secundaria_activa && (
+                  <span className={styles.finSub}>Secundaria: {usuario?.tipo_dolar?.toUpperCase()}</span>
+                )}
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        {/* Zona de Peligro */}
-        <div className={styles.dangerCard}>
-          <div>
-            <h2 className={styles.dangerTitle}>
-              <AlertTriangle size={20} />
-              Zona de Peligro
-            </h2>
-            <p className={styles.dangerText}>
-              Eliminar tu cuenta es una acción **permanente**. Se borrarán todas tus billeteras, transacciones, presupuestos y datos personales. No se puede deshacer.
-            </p>
+        {/* COLUMNA DERECHA */}
+        <div className={styles.col}>
+
+          {/* Card Acceso */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <span className={styles.cardTitle}>Métodos de acceso</span>
+            </div>
+            <div className={styles.cardBody}>
+
+              <div className={styles.methodRow}>
+                <div className={styles.methodIcon}><Mail size={16} /></div>
+                <div className={styles.methodContent}>
+                  <span className={styles.methodName}>Email + contraseña</span>
+                  {metodosLogin?.email_password && <button className={styles.methodLink} onClick={() => handleOpenModal('password')}>Cambiar contraseña</button>}
+                  {metodosLogin?.puede_agregar_password && <button className={styles.methodLink} onClick={() => handleOpenModal('password')}>Crear contraseña</button>}
+                  {metodosLogin?.puede_agregar_email && (
+                    <div className={styles.methodLinks}>
+                      <button className={styles.methodLink} onClick={handleVerificarEmailActual}>Verificar ahora</button>
+                      <button className={styles.methodLink} onClick={() => handleOpenModal('email')}>Cambiar email</button>
+                    </div>
+                  )}
+                </div>
+                <div className={styles.methodBadge}>
+                  {metodosLogin?.email_password ? <span className={styles.pillOk}>Activo</span>
+                    : metodosLogin?.puede_agregar_password ? <span className={styles.pillNa}>Sin contraseña</span>
+                    : metodosLogin?.puede_agregar_email ? <span className={styles.pillWarn}>Sin verificar</span>
+                    : <span className={styles.pillNa}>No configurado</span>}
+                </div>
+              </div>
+
+              <div className={styles.methodRow}>
+                <div className={styles.methodIcon}><Phone size={16} /></div>
+                <div className={styles.methodContent}>
+                  <span className={styles.methodName}>WhatsApp</span>
+                  <button className={styles.methodLink} onClick={() => handleOpenModal('telefono')}>
+                    {metodosLogin?.telefono ? 'Cambiar teléfono' : 'Agregar teléfono'}
+                  </button>
+                </div>
+                <div className={styles.methodBadge}>
+                  {metodosLogin?.telefono ? <span className={styles.pillOk}>Activo</span> : <span className={styles.pillNa}>No configurado</span>}
+                </div>
+              </div>
+
+              <div className={`${styles.methodRow} ${styles.noBorderBottom}`}>
+                <div className={styles.methodIcon}><GoogleIcon /></div>
+                <div className={styles.methodContent}>
+                  <span className={styles.methodName}>Google</span>
+                  <span className={styles.methodDesc}>
+                    {metodosLogin?.google
+                      ? 'Disponible si tu Google coincide con tu email verificado.'
+                      : 'Verificá tu email para habilitar el acceso con Google.'}
+                  </span>
+                </div>
+                <div className={styles.methodBadge}>
+                  {metodosLogin?.google ? <span className={styles.pillInfo}>Disponible</span> : <span className={styles.pillNa}>No disponible</span>}
+                </div>
+              </div>
+
+            </div>
           </div>
 
-          <div className={styles.dangerActions}>
-            <button onClick={() => confirm({
-              title: 'Cerrar sesión',
-              description: '¿Estás seguro de que querés cerrar sesión ahora?',
-              onConfirm: logout,
-            })} className={styles.logoutBtn}>
-              <LogOut size={20} />
-              Cerrar sesión
-            </button>
-
-            <button onClick={() => confirm({
-              title: '¿Estás absolutamente seguro?',
-              description: 'Esta acción borrará definitivamente todos tus datos financieros en Argentum. No se puede deshacer.',
-              variant: 'danger',
-              confirmLabel: 'Confirmar eliminación total',
-              requireTyping: 'ELIMINAR',
-              onConfirm: async () => {
-                try {
-                  await usuarioService.eliminarCuenta()
-                  showToast('Cuenta eliminada exitosamente', 'success')
-                  await logout()
-                } catch (error) {
-                  console.error('Error al eliminar la cuenta:', error)
-                  showToast('Hubo un error al intentar eliminar la cuenta.', 'error')
-                }
-              },
-            })} className={styles.dangerBtn}>
-              <Trash2 size={20} />
-              Eliminar mi cuenta permanentemente
-            </button>
-          </div>
         </div>
       </div>
 
-      {/* Modales de Edición */}
+      {/* ZONA DE PELIGRO */}
+      <div className={styles.dangerCard}>
+        <div className={styles.dangerLeft}>
+          <div className={styles.dangerTitle}><AlertTriangle size={16} />Zona de peligro</div>
+          <p className={styles.dangerDesc}>Eliminar tu cuenta borra permanentemente todas tus billeteras, transacciones, presupuestos y datos personales. No se puede deshacer.</p>
+        </div>
+        <div className={styles.dangerActions}>
+          <button className={styles.logoutBtn} onClick={() => confirm({ title: 'Cerrar sesión', description: '¿Estás seguro de que querés cerrar sesión ahora?', onConfirm: logout })}>
+            <LogOut size={15} />Cerrar sesión
+          </button>
+          <button className={styles.deleteBtn} onClick={() => confirm({
+            title: '¿Estás absolutamente seguro?',
+            description: 'Esta acción borrará definitivamente todos tus datos financieros en Argentum. No se puede deshacer.',
+            variant: 'danger',
+            confirmLabel: 'Confirmar eliminación total',
+            requireTyping: 'ELIMINAR',
+            onConfirm: async () => {
+              try { await usuarioService.eliminarCuenta(); showToast('Cuenta eliminada exitosamente', 'success'); await logout() }
+              catch (error) { console.error('Error al eliminar la cuenta:', error); showToast('Hubo un error al intentar eliminar la cuenta.', 'error') }
+            },
+          })}>
+            <Trash2 size={15} />Eliminar mi cuenta
+          </button>
+        </div>
+      </div>
+
+      {/* MODALES DE EDICIÓN */}
       {activeModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
-            <div className={styles.modalHeaderFlex}>
-              <h3 className={styles.modalTitleNoMargin}>
-                {activeModal === 'datos-personales' && 'Editar Datos Personales'}
-                {activeModal === 'email' && 'Editar Email'}
-                {activeModal === 'telefono' && 'Editar Teléfono'}
-                {activeModal === 'password' && (usuario?.password_hash ? 'Cambiar Contraseña' : 'Crear Contraseña')}
-                {activeModal === 'ciclo' && 'Configurar Ciclo Financiero'}
-                {activeModal === 'moneda' && 'Configurar Moneda'}
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>
+                {activeModal === 'datos-personales' && 'Editar datos personales'}
+                {activeModal === 'email' && 'Editar email'}
+                {activeModal === 'telefono' && 'Editar teléfono'}
+                {activeModal === 'password' && (usuario?.password_hash ? 'Cambiar contraseña' : 'Crear contraseña')}
+                {activeModal === 'ciclo' && 'Configurar ciclo financiero'}
+                {activeModal === 'moneda' && 'Configurar moneda'}
               </h3>
-              <button 
-                className={styles.editBtn} 
-                onClick={handleCloseModal}
-                aria-label="Cerrar modal"
-              >
-                <X size={20} />
-              </button>
+              <button className={styles.iconBtn} onClick={handleCloseModal} aria-label="Cerrar modal"><X size={20} /></button>
             </div>
 
-            {modalError && (
-              <div className={styles.modalErrorBox}>
-                {modalError}
-              </div>
-            )}
+            {modalError && <div className={styles.modalError}>{modalError}</div>}
 
-            {/* Formulario Datos Personales */}
             {activeModal === 'datos-personales' && (
               <form onSubmit={handleSaveDatosPersonales} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
                   <label htmlFor="perfil-nombre" className={styles.inputLabel}>Nombre</label>
-                  <input 
-                    id="perfil-nombre"
-                    type="text" 
-                    className={styles.input} 
-                    value={formDatos.nombre}
-                    onChange={(e) => setFormDatos({...formDatos, nombre: e.target.value})}
-                    required
-                  />
+                  <input id="perfil-nombre" type="text" className={styles.input} value={formDatos.nombre} onChange={(e) => setFormDatos({ ...formDatos, nombre: e.target.value })} required />
                 </div>
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> Guardar Cambios</>}
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar cambios</>}
                 </button>
               </form>
             )}
 
-            {/* Formulario Teléfono */}
             {activeModal === 'telefono' && (
               <form onSubmit={handleSaveTelefono} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-tel" className={styles.inputLabel}>Nuevo Teléfono</label>
-                  <input 
-                    id="perfil-tel"
-                    type="tel" 
-                    className={styles.input} 
-                    placeholder="+549..."
-                    value={formTelefono.telefono_nuevo}
-                    onChange={(e) => setFormTelefono({...formTelefono, telefono_nuevo: e.target.value})}
-                    required
-                  />
+                  <label htmlFor="perfil-tel" className={styles.inputLabel}>Nuevo teléfono</label>
+                  <input id="perfil-tel" type="tel" className={styles.input} placeholder="+549..." value={formTelefono.telefono_nuevo} onChange={(e) => setFormTelefono({ ...formTelefono, telefono_nuevo: e.target.value })} required />
                 </div>
                 {!isGoogle && (
                   <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-tel-pass" className={styles.inputLabel}>Contraseña Actual</label>
-                    <input 
-                      id="perfil-tel-pass"
-                      type="password" 
-                      className={styles.input} 
-                      value={formTelefono.password_actual}
-                      onChange={(e) => setFormTelefono({...formTelefono, password_actual: e.target.value})}
-                      required
-                      placeholder="••••••••"
-                    />
+                    <label htmlFor="perfil-tel-pass" className={styles.inputLabel}>Contraseña actual</label>
+                    <input id="perfil-tel-pass" type="password" className={styles.input} placeholder="••••••••" value={formTelefono.password_actual} onChange={(e) => setFormTelefono({ ...formTelefono, password_actual: e.target.value })} required />
                   </div>
                 )}
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> Actualizar Teléfono</>}
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Actualizar teléfono</>}
                 </button>
               </form>
             )}
 
-            {/* Formulario Password */}
             {activeModal === 'password' && (
               <form onSubmit={handleSavePassword} className={styles.modalForm}>
                 {usuario?.password_hash && (
                   <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-pass-actual" className={styles.inputLabel}>Contraseña Actual</label>
-                    <input 
-                      id="perfil-pass-actual"
-                      type="password" 
-                      className={styles.input} 
-                      value={formPassword.password_actual}
-                      onChange={(e) => setFormPassword({...formPassword, password_actual: e.target.value})}
-                      required
-                      placeholder="••••••••"
-                    />
+                    <label htmlFor="perfil-pass-actual" className={styles.inputLabel}>Contraseña actual</label>
+                    <input id="perfil-pass-actual" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_actual} onChange={(e) => setFormPassword({ ...formPassword, password_actual: e.target.value })} required />
                   </div>
                 )}
                 <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-pass-nueva" className={styles.inputLabel}>Nueva Contraseña</label>
-                  <input 
-                    id="perfil-pass-nueva"
-                    type="password" 
-                    className={styles.input} 
-                    value={formPassword.password_nueva}
-                    onChange={(e) => setFormPassword({...formPassword, password_nueva: e.target.value})}
-                    required
-                    placeholder="••••••••"
-                  />
-                  <div className={styles.pwRequirements}>
-                    <p className={`${styles.requirement} ${pwReqs.length ? styles.requirementMet : ''}`}>
-                      <CheckCircle2 size={12} /> Mínimo 8 caracteres
-                    </p>
-                    <p className={`${styles.requirement} ${pwReqs.upper ? styles.requirementMet : ''}`}>
-                      <CheckCircle2 size={12} /> Una mayúscula
-                    </p>
-                    <p className={`${styles.requirement} ${pwReqs.lower ? styles.requirementMet : ''}`}>
-                      <CheckCircle2 size={12} /> Una minúscula
-                    </p>
-                    <p className={`${styles.requirement} ${pwReqs.number ? styles.requirementMet : ''}`}>
-                      <CheckCircle2 size={12} /> Un número
-                    </p>
+                  <label htmlFor="perfil-pass-nueva" className={styles.inputLabel}>Nueva contraseña</label>
+                  <input id="perfil-pass-nueva" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_nueva} onChange={(e) => setFormPassword({ ...formPassword, password_nueva: e.target.value })} required />
+                  <div className={styles.pwReqs}>
+                    <p className={`${styles.req} ${pwReqs.length ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Mínimo 8 caracteres</p>
+                    <p className={`${styles.req} ${pwReqs.upper ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Una mayúscula</p>
+                    <p className={`${styles.req} ${pwReqs.lower ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Una minúscula</p>
+                    <p className={`${styles.req} ${pwReqs.number ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Un número</p>
                   </div>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-pass-conf" className={styles.inputLabel}>Confirmar Nueva Contraseña</label>
-                  <input 
-                    id="perfil-pass-conf"
-                    type="password" 
-                    className={styles.input} 
-                    value={formPassword.password_nueva_confirmacion}
-                    onChange={(e) => setFormPassword({...formPassword, password_nueva_confirmacion: e.target.value})}
-                    required
-                    placeholder="••••••••"
-                  />
+                  <label htmlFor="perfil-pass-conf" className={styles.inputLabel}>Confirmar nueva contraseña</label>
+                  <input id="perfil-pass-conf" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_nueva_confirmacion} onChange={(e) => setFormPassword({ ...formPassword, password_nueva_confirmacion: e.target.value })} required />
                 </div>
                 <button type="submit" disabled={isSaving || !pwReqs.length || !pwReqs.upper || !pwReqs.lower || !pwReqs.number} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> {usuario?.password_hash ? 'Cambiar Contraseña' : 'Crear Contraseña'}</>}
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />{usuario?.password_hash ? 'Cambiar contraseña' : 'Crear contraseña'}</>}
                 </button>
               </form>
             )}
 
-            {/* Formulario Ciclo */}
             {activeModal === 'ciclo' && (
               <form onSubmit={handleSaveCiclo} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Tipo de Ciclo</label>
+                  <label className={styles.inputLabel}>Tipo de ciclo</label>
                   <div className={styles.selector}>
-                    <button 
-                      type="button" 
-                      className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'dia_fijo' ? styles.selectorBtnActive : ''}`}
-                      onClick={() => setFormCiclo({...formCiclo, ciclo_tipo: 'dia_fijo'})}
-                    >
-                      Día fijo
-                    </button>
-                    <button 
-                      type="button" 
-                      className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'regla' ? styles.selectorBtnActive : ''}`}
-                      onClick={() => setFormCiclo({...formCiclo, ciclo_tipo: 'regla'})}
-                    >
-                      Regla
-                    </button>
+                    <button type="button" className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'dia_fijo' ? styles.selectorBtnActive : ''}`} onClick={() => setFormCiclo({ ...formCiclo, ciclo_tipo: 'dia_fijo' })}>Día fijo</button>
+                    <button type="button" className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'regla' ? styles.selectorBtnActive : ''}`} onClick={() => setFormCiclo({ ...formCiclo, ciclo_tipo: 'regla' })}>Regla</button>
                   </div>
                 </div>
-
                 {formCiclo.ciclo_tipo === 'dia_fijo' ? (
                   <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-ciclo-dia" className={styles.inputLabel}>Día del mes (1-28)</label>
-                    <input 
-                      id="perfil-ciclo-dia"
-                      type="number" 
-                      min="1" max="28"
-                      className={styles.input}
-                      value={formCiclo.ciclo_valor}
-                      onChange={(e) => setFormCiclo({...formCiclo, ciclo_valor: e.target.value})}
-                      required
-                      placeholder="15"
-                    />
-                    <p className={styles.exampleText}>Tu ciclo empieza el día {formCiclo.ciclo_valor || '...'} de cada mes</p>
+                    <label htmlFor="perfil-ciclo-dia" className={styles.inputLabel}>Día del mes (1–28)</label>
+                    <input id="perfil-ciclo-dia" type="number" min="1" max="28" className={styles.input} value={formCiclo.ciclo_valor} placeholder="1" onChange={(e) => setFormCiclo({ ...formCiclo, ciclo_valor: e.target.value })} required />
+                    <p className={styles.hint}>Tu ciclo empieza el día {formCiclo.ciclo_valor || '…'} de cada mes</p>
                   </div>
                 ) : (
-                  <SelectInput 
-                    id="perfil-ciclo-regla"
-                    label="Seleccionar Regla"
-                    value={formCiclo.ciclo_valor}
-                    onChange={(val) => setFormCiclo({...formCiclo, ciclo_valor: val})}
-                    options={OPCIONES_REGLA_CICLO}
-                  />
+                  <SelectInput id="perfil-ciclo-regla" label="Seleccionar regla" value={formCiclo.ciclo_valor} onChange={(val) => setFormCiclo({ ...formCiclo, ciclo_valor: val })} options={OPCIONES_REGLA_CICLO} />
                 )}
-                
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> Guardar Configuración</>}
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar configuración</>}
                 </button>
               </form>
             )}
 
-            {/* Formulario Moneda */}
             {activeModal === 'moneda' && (
               <form onSubmit={handleSaveMoneda} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Moneda Principal</label>
+                  <label className={styles.inputLabel}>Moneda principal</label>
                   <div className={styles.selector}>
-                    <button 
-                      type="button" 
-                      className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'ARS' ? styles.selectorBtnActive : ''}`}
-                      onClick={() => setFormMoneda({...formMoneda, moneda_principal: 'ARS'})}
-                    >
-                      ARS
-                    </button>
-                    <button 
-                      type="button" 
-                      className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'USD' ? styles.selectorBtnActive : ''}`}
-                      onClick={() => setFormMoneda({...formMoneda, moneda_principal: 'USD'})}
-                    >
-                      USD
-                    </button>
+                    <button type="button" className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'ARS' ? styles.selectorBtnActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_principal: 'ARS' })}>ARS</button>
+                    <button type="button" className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'USD' ? styles.selectorBtnActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_principal: 'USD' })}>USD</button>
                   </div>
                 </div>
-
                 <div className={styles.toggleRow}>
-                  <span className={styles.inputLabel}>Moneda Secundaria Activa</span>
-                  <div 
-                    className={`${styles.toggle} ${formMoneda.moneda_secundaria_activa ? styles.toggleActive : ''}`}
-                    onClick={() => setFormMoneda({...formMoneda, moneda_secundaria_activa: !formMoneda.moneda_secundaria_activa})}
-                  >
+                  <span className={styles.inputLabel}>Moneda secundaria activa</span>
+                  <div className={`${styles.toggle} ${formMoneda.moneda_secundaria_activa ? styles.toggleActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_secundaria_activa: !formMoneda.moneda_secundaria_activa })}>
                     <div className={styles.toggleCircle} />
                   </div>
                 </div>
-
                 {formMoneda.moneda_secundaria_activa && (
-                  <SelectInput 
-                    id="perfil-tipo-dolar"
-                    label="Tipo de Dólar"
-                    value={formMoneda.tipo_dolar}
-                    onChange={(val) => setFormMoneda({...formMoneda, tipo_dolar: val})}
-                    options={OPCIONES_TIPO_DOLAR}
-                  />
+                  <SelectInput id="perfil-tipo-dolar" label="Tipo de dólar" value={formMoneda.tipo_dolar} onChange={(val) => setFormMoneda({ ...formMoneda, tipo_dolar: val })} options={OPCIONES_TIPO_DOLAR} />
                 )}
-                
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={18} /> Guardar Configuración</>}
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar configuración</>}
                 </button>
               </form>
             )}
           </div>
         </div>
       )}
+
+      <FotoCropModal open={fotoCropOpen} onClose={() => setFotoCropOpen(false)} onSuccess={() => {}} />
 
     </div>
   )

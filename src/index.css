@@ -59,9 +59,9 @@ p, h1, h2, h3, h4, h5, h6 {
 
   /* Content Layout Tokens */
   --content-max-width: 1200px;
-  --container-px-mobile: 16px;
-  --container-px-tablet: 24px;
-  --container-px-desktop: 32px;
+  --container-px-mobile: 20px;
+  --container-px-tablet: 32px;
+  --container-px-desktop: 48px;
 }
 
 [data-theme="dark"] {

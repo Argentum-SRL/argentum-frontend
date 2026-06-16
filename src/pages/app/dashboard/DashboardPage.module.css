@@ -1,7 +1,7 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
   padding-bottom: 40px;
 }
 
@@ -327,7 +327,7 @@
 .topRow {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 28px;
 }
 @media (min-width: 1024px) {
   .topRow {
@@ -338,7 +338,7 @@
 .bottomRow {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 28px;
   width: 100%;
   min-width: 0;
 }

@@ -6,7 +6,7 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
   min-height: 100%;
 }
 

@@ -12,8 +12,6 @@
 
 html {
   font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -150,6 +148,24 @@ body {
   display: none !important;
 }
 html, body, * {
-  scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
+
+@supports (scrollbar-width: none) {
+  html, body, * {
+    scrollbar-width: none !important;
+  }
+}
+
+/* Remove native number input spinner controls globally */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+

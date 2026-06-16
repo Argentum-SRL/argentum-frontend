@@ -1,0 +1,349 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  height: 40px;
+  padding: 0 36px 0 12px;
+  background: transparent;
+  border: 1px solid var(--surface-alt);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.input::placeholder {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
+}
+
+[data-theme="dark"] .input:focus {
+  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
+}
+
+.inputError {
+  border-color: var(--error) !important;
+}
+
+.inputDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.icon {
+  position: absolute;
+  right: 10px;
+  color: var(--text-3);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.iconError {
+  color: var(--error);
+}
+
+.errorMsg {
+  font-size: 11px;
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ─── POPOVER DESKTOP ─────────────────────────────── */
+
+.popover {
+  position: fixed;
+  z-index: 9100;
+  background: var(--surface);
+  border: 1px solid var(--surface-alt);
+  border-radius: 16px;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.14),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 12px 12px 8px;
+  min-width: 280px;
+}
+
+/* ─── MOBILE OVERLAY ──────────────────────────────── */
+
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9200;
+  background: rgba(10, 13, 18, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.mobileCalendarWrap {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 12px 8px 8px;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ─── FOOTER DEL CALENDARIO ───────────────────────── */
+
+.calendarFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 4px 2px;
+  border-top: 1px solid var(--surface-alt);
+  margin-top: 4px;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--error);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+
+.clearBtn:hover {
+  background: var(--error-bg);
+}
+
+.todayBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+
+.todayBtn:hover {
+  background: var(--surface-alt);
+}
+
+/* ─── REACT-DAY-PICKER CUSTOM STYLES ─────────────── */
+
+.rdpRoot {
+  --rdp-cell-size: 36px;
+  --rdp-accent-color: var(--primary);
+  --rdp-background-color: var(--surface-alt);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  width: 100%;
+}
+
+.rdpMonths {
+  display: flex;
+}
+
+.rdpMonth {
+  width: 100%;
+  min-width: 0;
+}
+
+.rdpCaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 10px;
+}
+
+.rdpCaptionLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.rdpNav {
+  display: flex;
+  gap: 4px;
+}
+
+.rdpNavButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+
+.rdpNavButton:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.rdpTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rdpHeadRow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.rdpHeadCell {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+  padding-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.rdpRow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.rdpCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px;
+  min-width: 0;
+}
+
+.rdpDay {
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 38px;
+  max-height: 38px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, color 0.1s;
+}
+
+.rdpDay:hover:not(.rdpDaySelected):not(.rdpDayDisabled) {
+  background: var(--surface-alt);
+}
+
+.rdpDaySelected {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-radius: 8px;
+}
+
+.rdpDayToday:not(.rdpDaySelected) {
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.rdpDayOutside {
+  color: var(--text-3);
+  opacity: 0.5;
+}
+
+.rdpDayDisabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* ─── RESPONSIVE CALENDAR ─────────────────────────── */
+
+@media (max-width: 360px) {
+  .mobileCalendarWrap {
+    padding: 10px 4px 8px;
+  }
+
+  .rdpHeadCell {
+    font-size: 10px;
+  }
+
+  .rdpDay {
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .rdpCaptionLabel {
+    font-size: 13px;
+  }
+}
+
+/* ─── INTEGRACION CON CONTENEDORES EXTERNOS (DOUBLE BORDER FIX) ─── */
+
+.wrapper[class*="fieldInput"] {
+  padding: 0 !important;
+}
+
+.wrapper[class*="fieldInput"] .input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  height: 44px;
+}
+
+.wrapper[class*="fieldInput"]:focus-within {
+  border-color: var(--primary) !important;
+}
+
+.wrapper[class*="fieldInput"]:has(.inputError) {
+  border-color: var(--error) !important;
+}
+

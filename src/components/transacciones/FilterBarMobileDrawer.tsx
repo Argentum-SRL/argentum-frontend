@@ -7,6 +7,7 @@ import type { Billetera, Categoria } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
 import { calcularPeriodoActual } from '@/lib/utils/ciclo'
 import styles from './FilterBar.module.css'
+import { DateInput } from '@/components/ui'
 
 interface FilterBarMobileDrawerProps {
   isOpen: boolean
@@ -246,26 +247,20 @@ export default function FilterBarMobileDrawer({
           </div>
 
           <div className={styles.dateInputsRowMobile}>
-            <div className={styles.dateFieldMobile}>
-              <label className={styles.dateLabelMobile} htmlFor="mobile-filter-desde">Desde</label>
-              <input
-                id="mobile-filter-desde"
-                type="date"
-                value={localFilters.fecha_desde || ''}
-                onChange={(e) => setLocalFilters((prev) => ({ ...prev, fecha_desde: e.target.value || undefined }))}
-                className={styles.dateInputMobile}
-              />
-            </div>
-            <div className={styles.dateFieldMobile}>
-              <label className={styles.dateLabelMobile} htmlFor="mobile-filter-hasta">Hasta</label>
-              <input
-                id="mobile-filter-hasta"
-                type="date"
-                value={localFilters.fecha_hasta || ''}
-                onChange={(e) => setLocalFilters((prev) => ({ ...prev, fecha_hasta: e.target.value || undefined }))}
-                className={styles.dateInputMobile}
-              />
-            </div>
+            <DateInput
+              id="mobile-filter-desde"
+              label="Desde"
+              value={localFilters.fecha_desde || ''}
+              onChange={(val) => setLocalFilters((prev) => ({ ...prev, fecha_desde: val || undefined }))}
+              className={styles.dateFieldMobile}
+            />
+            <DateInput
+              id="mobile-filter-hasta"
+              label="Hasta"
+              value={localFilters.fecha_hasta || ''}
+              onChange={(val) => setLocalFilters((prev) => ({ ...prev, fecha_hasta: val || undefined }))}
+              className={styles.dateFieldMobile}
+            />
           </div>
         </div>
 

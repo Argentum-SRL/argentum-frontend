@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { guardarDatosPersonales } from '@/lib/api/onboarding'
 import styles from './StepDatosPersonales.module.css'
+import { DateInput } from '@/components/ui'
 
 interface Props {
   datosIniciales: { 
@@ -96,15 +97,13 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="fecha_nacimiento" className={styles.label}>Fecha de nacimiento</label>
-          <input
+          <DateInput
             id="fecha_nacimiento"
-            type="date"
+            label="Fecha de nacimiento"
             value={fechaNacimiento}
-            onChange={(e) => setFechaNacimiento(e.target.value)}
-            className={[styles.input, fechaNacimientoError ? styles.inputError : ''].filter(Boolean).join(' ')}
+            onChange={(val) => setFechaNacimiento(val)}
+            error={fechaNacimientoError || undefined}
           />
-          {fechaNacimientoError && <p className={styles.fieldError}>{fechaNacimientoError}</p>}
         </div>
 
         <div className={styles.field}>

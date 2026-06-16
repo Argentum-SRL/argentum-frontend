@@ -548,19 +548,6 @@
   width: 100%;
 }
 
-.fieldInputIconSmall {
-  height: 44px;
-  padding: 0 14px 0 36px;
-  border-radius: 12px;
-  border: 1.5px solid var(--surface-alt);
-  background: var(--page);
-  color: var(--text);
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  width: 100%;
-}
-
 .fieldSelectIcon {
   height: 44px;
   padding: 0 14px 0 36px;

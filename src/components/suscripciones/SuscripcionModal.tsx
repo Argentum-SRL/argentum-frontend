@@ -1,7 +1,8 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
-import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Calendar, Layers } from 'lucide-react'
+import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Layers } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { useToast } from '@/hooks/useToast'
+import { DateInput } from '@/components/ui'
 import { CATALOGO_SUSCRIPCIONES, CATEGORIAS_CATALOGO } from '@/lib/constants/suscripciones'
 import type { ServicioCatalogo } from '@/lib/constants/suscripciones'
 import suscripcionService from '@/services/suscripcion.service'
@@ -384,16 +385,11 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                 <div className={styles.formRow}>
                   <div className={styles.formFieldFlex1}>
                     <label className={styles.fieldLabel} htmlFor="proximo-cobro">Fecha de facturación</label>
-                    <div className={styles.inputWrapperIcon}>
-                      <Calendar size={16} className={styles.inputIconLeftSmall} />
-                      <input
-                        id="proximo-cobro"
-                        type="date"
-                        className={styles.fieldInputIconSmall}
-                        value={state.proximo_cobro}
-                        onChange={e => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: e.target.value })}
-                      />
-                    </div>
+                    <DateInput
+                      id="proximo-cobro"
+                      value={state.proximo_cobro}
+                      onChange={val => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: val })}
+                    />
                   </div>
                   <div className={styles.formFieldFlex1}>
                     <label className={styles.fieldLabel} htmlFor="categoria-suscripcion">Categoría</label>

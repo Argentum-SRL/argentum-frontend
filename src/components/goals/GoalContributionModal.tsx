@@ -3,7 +3,6 @@ import {
   X,
   Plus,
   Trash2,
-  Calendar,
   AlertCircle,
   TrendingUp,
   ArrowRight
@@ -18,6 +17,7 @@ import { formatMonto } from '@/utils/format'
 import styles from './GoalContributionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
+import { DateInput } from '@/components/ui'
 
 interface GoalContributionModalProps {
   open: boolean
@@ -289,16 +289,10 @@ export default function GoalContributionModal({
             {/* Fecha */}
             <div className={styles.formField}>
               <label className={styles.fieldLabel}>Fecha</label>
-              <div className={styles.inputWrapper}>
-                <Calendar size={18} />
-                <input
-                  type="date"
-                  className={styles.fieldInput}
-                  value={fecha}
-                  onChange={e => dispatch({ type: 'SET_FIELD', field: 'fecha', value: e.target.value })}
-                  title="Seleccionar fecha"
-                />
-              </div>
+              <DateInput
+                value={fecha}
+                onChange={val => dispatch({ type: 'SET_FIELD', field: 'fecha', value: val })}
+              />
             </div>
           </div>
 

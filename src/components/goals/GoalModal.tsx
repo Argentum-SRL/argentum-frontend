@@ -1,7 +1,6 @@
 import { useEffect, useReducer, useState, useCallback } from 'react'
 import {
   Target,
-  Calendar,
   X,
   ChevronLeft,
   Palette,
@@ -16,6 +15,7 @@ import goalsService from '@/services/goals.service'
 import styles from './GoalModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
+import { DateInput } from '@/components/ui'
 
 interface GoalModalProps {
   open: boolean
@@ -260,16 +260,10 @@ export default function GoalModal({
                 <div className={styles.row}>
                   <div className={styles.formField}>
                     <label className={styles.fieldLabel}>Fecha límite (Opcional)</label>
-                    <div className={styles.inputWrapper}>
-                      <Calendar size={18} />
-                      <input
-                        type="date"
-                        className={styles.fieldInput}
-                        value={fecha_limite}
-                        onChange={e => setField('fecha_limite', e.target.value)}
-                        title="Fecha límite para cumplir la meta"
-                      />
-                    </div>
+                    <DateInput
+                      value={fecha_limite}
+                      onChange={val => setField('fecha_limite', val)}
+                    />
                   </div>
                   <div className={styles.formField}>
                     <label className={styles.fieldLabel}>Color distintivo</label>

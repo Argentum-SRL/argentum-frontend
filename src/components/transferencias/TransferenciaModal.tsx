@@ -5,6 +5,7 @@ import type { Billetera } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
 import { useToast } from '@/hooks/useToast'
 import styles from './TransferenciaModal.module.css'
+import { DateInput } from '@/components/ui'
 
 interface TransferenciaModalProps {
   isOpen: boolean
@@ -177,12 +178,11 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
           {/* Fecha */}
           <div className={styles.formField}>
             <label className={styles.fieldLabel} htmlFor="tf-fecha">Fecha</label>
-            <input
+            <DateInput
               id="tf-fecha"
-              type="date"
               className={styles.fieldInput}
               value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
+              onChange={(val) => setFecha(val)}
               required
             />
           </div>

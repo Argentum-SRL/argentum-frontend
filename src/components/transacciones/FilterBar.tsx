@@ -5,6 +5,7 @@ import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { useModal } from '@/hooks/useModal'
+import { DateInput } from '@/components/ui'
 
 interface FilterBarProps {
   filters: TransaccionFilters
@@ -42,6 +43,21 @@ export default function FilterBar({
   const [datePopoverOpen, setDatePopoverOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(filters.busqueda || '')
   const { open } = useModal()
+
+  const [localDesde, setLocalDesde] = useState(filters.fecha_desde || '')
+  const [localHasta, setLocalHasta] = useState(filters.fecha_hasta || '')
+
+  const [prevDesde, setPrevDesde] = useState(filters.fecha_desde || '')
+  if ((filters.fecha_desde || '') !== prevDesde) {
+    setPrevDesde(filters.fecha_desde || '')
+    setLocalDesde(filters.fecha_desde || '')
+  }
+
+  const [prevHasta, setPrevHasta] = useState(filters.fecha_hasta || '')
+  if ((filters.fecha_hasta || '') !== prevHasta) {
+    setPrevHasta(filters.fecha_hasta || '')
+    setLocalHasta(filters.fecha_hasta || '')
+  }
 
   const catRef = useRef<HTMLDivElement>(null)
   const dateRef = useRef<HTMLDivElement>(null)
@@ -84,10 +100,7 @@ export default function FilterBar({
 
   const handleDateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = e.currentTarget
-    const desde = (form.elements.namedItem('desde') as HTMLInputElement).value
-    const hasta = (form.elements.namedItem('hasta') as HTMLInputElement).value
-    onFilterChange({ ...filters, fecha_desde: desde || undefined, fecha_hasta: hasta || undefined })
+    onFilterChange({ ...filters, fecha_desde: localDesde || undefined, fecha_hasta: localHasta || undefined })
     setDatePopoverOpen(false)
   }
 
@@ -123,14 +136,20 @@ export default function FilterBar({
 
   const renderDateForm = () => (
       <form onSubmit={handleDateSubmit} className={styles.dateGroup}>
-      <div>
-        <label className={styles.dateLabel} htmlFor="filter-desde">Desde</label>
-        <input id="filter-desde" type="date" name="desde" defaultValue={filters.fecha_desde} className={styles.dateInputFull} />
-      </div>
-      <div>
-        <label className={styles.dateLabel} htmlFor="filter-hasta">Hasta</label>
-        <input id="filter-hasta" type="date" name="hasta" defaultValue={filters.fecha_hasta} className={styles.dateInputFull} />
-      </div>
+      <DateInput
+        id="filter-desde"
+        label="Desde"
+        name="desde"
+        value={localDesde}
+        onChange={(val) => setLocalDesde(val)}
+      />
+      <DateInput
+        id="filter-hasta"
+        label="Hasta"
+        name="hasta"
+        value={localHasta}
+        onChange={(val) => setLocalHasta(val)}
+      />
       <button type="submit" className={`${styles.typePillActive} ${styles.dateSubmitBtn}`}>
         Aplicar
       </button>

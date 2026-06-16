@@ -326,36 +326,6 @@
   font-weight: 800;
 }
 
-/* ── Inputs ──────────────────────────────────────────────────────────────── */
-.inputWrapper {
-  display: flex;
-  align-items: center;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  height: 52px;
-  padding: 0 16px;
-  gap: 12px;
-  color: var(--text-3);
-  transition: all 0.2s;
-}
-
-.inputWrapper:focus-within {
-  border-color: var(--primary);
-  background: var(--surface);
-  box-shadow: 0 0 0 4px var(--primary-light);
-}
-
-.fieldInput {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 0.9375rem;
-  color: var(--text);
-  font-weight: 500;
-}
-
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .formFooter {
   padding: 16px 24px 24px;

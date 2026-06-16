@@ -8,6 +8,8 @@ import { Input } from './Input/Input.tsx'
 import { Select } from './Select/Select.tsx'
 import EmptyState from './EmptyState/EmptyState.tsx'
 import PageSummaryBar from './PageSummaryBar'
+import { DateInput } from './DateInput/DateInput.tsx'
 
-export { Button, Drawer, Field, MontoInput, Modal, Toast, Input, Select, EmptyState, PageSummaryBar }
+export { Button, Drawer, Field, MontoInput, Modal, Toast, Input, Select, EmptyState, PageSummaryBar, DateInput }
+
 

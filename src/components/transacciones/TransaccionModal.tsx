@@ -23,6 +23,7 @@ import styles from './TransaccionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { DateInput } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
@@ -684,9 +685,9 @@ export default function TransaccionModal({
                   </div>
                   <div className={`${styles.formField} ${styles.flex1}`}>
                     <label className={styles.fieldLabel} htmlFor="tx-fecha">Fecha</label>
-                    <input id="tx-fecha" type="date" className={styles.fieldInput} value={fecha}
-                      onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'fecha', value: e.target.value })}
-                      disabled={isCuotaHija} />
+                    <DateInput id="tx-fecha" value={fecha}
+                      onChange={(val) => dispatch({ type: 'SET_FIELD', field: 'fecha', value: val })}
+                      disabled={isCuotaHija} className={styles.fieldInput} />
                   </div>
                 </div>
 

@@ -284,16 +284,6 @@
   gap: 8px;
 }
 
-.dateInput {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 8px;
-  font-size: 13px;
-  outline: none;
-}
-
 /* Botón mobile para abrir filtros */
 .mobileFilterBtn {
   display: flex;
@@ -327,25 +317,6 @@
   }
 }
 
-.dateInputFull {
-  width: 100%;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 8px;
-  font-size: 13px;
-  outline: none;
-}
-
-.dateLabel {
-  display: block;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-3);
-  margin-bottom: 4px;
-  text-transform: uppercase;
-}
 
 .dateSubmitBtn {
   padding: 8px;
@@ -549,30 +520,6 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-.dateLabelMobile {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.dateInputMobile {
-  width: 100%;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-  outline: none;
-  font-weight: 500;
-}
-
-.dateInputMobile:focus {
-  border-color: var(--primary);
 }
 
 /* Actions Row at Bottom */

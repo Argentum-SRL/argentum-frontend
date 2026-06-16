@@ -1,0 +1,197 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--surface-alt);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.triggerOpen {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.hexDisplay {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+  letter-spacing: 0.04em;
+}
+
+/* ─── PANEL DESKTOP ───────────────────────────────── */
+
+.panel {
+  position: fixed;
+  z-index: 9100;
+  background: var(--surface);
+  border: 1px solid var(--surface-alt);
+  border-radius: 16px;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.panelInner {
+  padding: 0;
+}
+
+/* ─── MOBILE ──────────────────────────────────────── */
+
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9200;
+  background: rgba(10, 13, 18, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.mobilePanelWrap {
+  background: var(--surface);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 280px;
+}
+
+.mobilePanelTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 14px 16px 0;
+}
+
+/* ─── PRESET GRID ─────────────────────────────────── */
+
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  padding: 14px 14px 10px;
+}
+
+.presetBtn {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s, outline-offset 0.1s;
+  outline: 2px solid transparent;
+  outline-offset: 0px;
+}
+
+.presetBtn:hover {
+  transform: scale(1.12);
+}
+
+.presetBtnActive {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── HEX INPUT ───────────────────────────────────── */
+
+.separator {
+  border: none;
+  border-top: 0.5px solid var(--surface-alt);
+  margin: 0 14px;
+}
+
+.hexRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.hexPreview {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.hexInput {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  background: var(--surface-alt);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: border-color 0.15s;
+}
+
+.hexInput:focus {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+/* ─── DONE BUTTON ─────────────────────────────────── */
+
+.doneBtn {
+  display: block;
+  width: calc(100% - 28px);
+  margin: 4px 14px 12px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+
+.doneBtn:hover {
+  opacity: 0.88;
+}

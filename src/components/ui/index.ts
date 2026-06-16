@@ -16,5 +16,8 @@ import type { Country } from './PhoneCountrySelect'
 
 export { Button, Drawer, Field, MontoInput, Modal, Toast, Input, Select, EmptyState, PageSummaryBar, DateInput, SelectInput, type SelectOption, PhoneCountrySelect, type Country }
 
+export { ColorPicker } from './ColorPicker'
+
+
 
 

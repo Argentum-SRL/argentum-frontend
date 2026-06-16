@@ -3,7 +3,6 @@ import {
   Target,
   X,
   ChevronLeft,
-  Palette,
   StickyNote,
   Check,
   AlertCircle
@@ -15,7 +14,7 @@ import goalsService from '@/services/goals.service'
 import styles from './GoalModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
-import { DateInput } from '@/components/ui'
+import { DateInput, ColorPicker } from '@/components/ui'
 
 interface GoalModalProps {
   open: boolean
@@ -266,19 +265,11 @@ export default function GoalModal({
                     />
                   </div>
                   <div className={styles.formField}>
-                    <label className={styles.fieldLabel}>Color distintivo</label>
-                    <div className={styles.colorPickerWrap}>
-                      <Palette size={18} />
-                      <div className={styles.colorPicker}>
-                        <input
-                          type="color"
-                          value={color}
-                          onChange={e => setField('color', e.target.value)}
-                          title="Elegir un color para la meta"
-                        />
-                        <span className={styles.colorHex}>{color}</span>
-                      </div>
-                    </div>
+                    <ColorPicker
+                      label="Color distintivo"
+                      value={color}
+                      onChange={val => setField('color', val)}
+                    />
                   </div>
                 </div>
 

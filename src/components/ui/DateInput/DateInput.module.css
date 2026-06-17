@@ -94,32 +94,55 @@
     0 4px 12px rgba(0, 0, 0, 0.06);
   padding: 12px 12px 8px;
   min-width: 280px;
+  width: 280px;
+  max-height: 380px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ─── MOBILE OVERLAY ──────────────────────────────── */
 
-.mobileOverlay {
+.bottomSheetOverlay {
   position: fixed;
   inset: 0;
   z-index: 9200;
-  background: rgba(10, 13, 18, 0.45);
+  background: rgba(10, 13, 18, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 16px;
 }
 
-.mobileCalendarWrap {
+.bottomSheet {
   background: var(--surface);
-  border-radius: 20px;
-  padding: 12px 8px 8px;
-  box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.2),
-    0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 24px 24px 0 0;
   width: 100%;
-  max-width: 320px;
+  max-width: 480px;
+  max-height: 70dvh;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: slideUpSheet 240ms cubic-bezier(0.34, 1.1, 0.64, 1);
+}
+
+.bottomSheetHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-alt);
+  margin: 10px auto 4px;
+  flex-shrink: 0;
+}
+
+.bottomSheetContent {
+  padding: 0 8px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── FOOTER DEL CALENDARIO ───────────────────────── */
@@ -192,6 +215,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 4px 10px;
+  gap: 8px;
 }
 
 .rdpCaptionLabel {
@@ -345,5 +369,114 @@
 
 .wrapper[class*="fieldInput"]:has(.inputError) {
   border-color: var(--error) !important;
+}
+
+/* ─── YEAR SELECT EN CAPTION ──────────────────────── */
+
+.yearSelect {
+  height: 28px;
+  padding: 0 24px 0 8px;
+  background: var(--surface-alt);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238E9198' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  transition: border-color 0.15s, background-color 0.15s;
+  flex-shrink: 0;
+}
+
+.yearSelect:focus,
+.yearSelect:hover {
+  border-color: var(--primary);
+  background-color: var(--surface);
+}
+
+/* ─── CAPTION CLICKEABLE ──────────────────────────── */
+
+.captionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+
+.captionBtn:hover {
+  background: var(--surface-alt);
+}
+
+.captionChevron {
+  font-size: 12px;
+  color: var(--text-3);
+  transition: transform 0.15s;
+  display: inline-block;
+}
+
+.captionChevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ─── GRILLA DE AÑOS ──────────────────────────────── */
+
+.yearGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 8px 4px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  max-height: 260px;
+}
+
+.yearBtn {
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.yearBtn:hover {
+  background: var(--surface-alt);
+}
+
+.yearBtnSelected {
+  background: var(--primary) !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.yearBtnToday:not(.yearBtnSelected) {
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 

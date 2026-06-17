@@ -39,15 +39,43 @@ export const DateInput: React.FC<DateInputProps> = ({
   required,
   placeholder = 'dd/mm/aaaa',
 }) => {
+  // Parsear min/max
+  const fromDate = min ? parse(min, INTERNAL_FORMAT, new Date()) : undefined
+  const toDate = max ? parse(max, INTERNAL_FORMAT, new Date()) : undefined
+
+  // Parsear value (YYYY-MM-DD) a Date
+  const selectedDate = value
+    ? parse(value, INTERNAL_FORMAT, new Date())
+    : undefined
+  const validSelected = selectedDate && isValid(selectedDate) ? selectedDate : undefined
+
   const [open, setOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({})
+  const [inputText, setInputText] = useState(validSelected ? format(validSelected, DISPLAY_FORMAT) : '')
+  const [calendarMonth, setCalendarMonth] = useState<Date>(validSelected || new Date())
+  const [view, setView] = useState<'days' | 'years'>('days')
+  const [prevValue, setPrevValue] = useState(value)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
+  const yearGridRef = useRef<HTMLDivElement>(null)
+
+  // Ajustar estado cuando cambia el value externo (durante render)
+  if (value !== prevValue) {
+    setPrevValue(value)
+    if (value) {
+      const parsed = parse(value, INTERNAL_FORMAT, new Date())
+      if (isValid(parsed)) {
+        setInputText(format(parsed, DISPLAY_FORMAT))
+        setCalendarMonth(parsed)
+      }
+    } else {
+      setInputText('')
+    }
+  }
 
   // Detectar mobile
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 767)
+    const check = () => setIsMobile(window.innerWidth <= 1024)
     check()
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
@@ -55,7 +83,7 @@ export const DateInput: React.FC<DateInputProps> = ({
 
   // Calcular posición del popover (solo desktop)
   const calcPosition = useCallback(() => {
-    if (isMobile || !wrapperRef.current) return
+    if (isMobile || !wrapperRef.current || !popoverRef.current) return
     const rect = wrapperRef.current.getBoundingClientRect()
     const popoverHeight = 340 // altura estimada del calendario
     const spaceBelow = window.innerHeight - rect.bottom
@@ -72,7 +100,8 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
     if (left < 8) left = 8
 
-    setPopoverStyle({ top, left })
+    popoverRef.current.style.top = `${top}px`
+    popoverRef.current.style.left = `${left}px`
   }, [isMobile])
 
   useEffect(() => {
@@ -88,38 +117,137 @@ export const DateInput: React.FC<DateInputProps> = ({
         popoverRef.current && !popoverRef.current.contains(e.target as Node)
       ) {
         setOpen(false)
+        setView('days')
       }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  // Parsear value (YYYY-MM-DD) a Date
-  const selectedDate = value
-    ? parse(value, INTERNAL_FORMAT, new Date())
-    : undefined
-  const validSelected = selectedDate && isValid(selectedDate) ? selectedDate : undefined
+  // Scroll automático al año seleccionado
+  useEffect(() => {
+    if (view === 'years' && yearGridRef.current) {
+      const selected = yearGridRef.current.querySelector(`.${styles.yearBtnSelected}`)
+      if (selected) {
+        selected.scrollIntoView({ block: 'center', behavior: 'instant' })
+      }
+    }
+  }, [view])
 
-  // Parsear min/max
-  const fromDate = min ? parse(min, INTERNAL_FORMAT, new Date()) : undefined
-  const toDate = max ? parse(max, INTERNAL_FORMAT, new Date()) : undefined
-
-  const displayValue = validSelected
-    ? format(validSelected, DISPLAY_FORMAT)
-    : ''
+  const handleTextInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Solo permitir dígitos y barras
+    const raw = e.target.value.replace(/[^\d/]/g, '')
+    
+    // Auto-insertar barras al escribir
+    // Si el usuario acaba de borrar una barra, borrar también el dígito anterior
+    if (inputText.length > raw.length + 1) {
+      setInputText(raw)
+      return
+    }
+    
+    // Extraer solo dígitos para formatear
+    const digits = raw.replace(/\//g, '')
+    
+    let formatted: string
+    if (digits.length <= 2) {
+      formatted = digits
+    } else if (digits.length <= 4) {
+      formatted = digits.slice(0, 2) + '/' + digits.slice(2)
+    } else {
+      formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4, 8)
+    }
+    
+    setInputText(formatted)
+    
+    // Cuando el texto es una fecha completa válida, comunicar al padre
+    if (formatted.length === 10) {
+      const parsed = parse(formatted, DISPLAY_FORMAT, new Date())
+      if (isValid(parsed)) {
+        // Verificar rango min/max
+        if (fromDate && parsed < fromDate) return
+        if (toDate && parsed > toDate) return
+        onChange(format(parsed, INTERNAL_FORMAT))
+      }
+    } else if (formatted.length === 0) {
+      onChange('')
+    }
+  }
 
   const handleSelect = (date: Date | undefined) => {
     if (date && isValid(date)) {
       onChange(format(date, INTERNAL_FORMAT))
+      setInputText(format(date, DISPLAY_FORMAT))
+      setCalendarMonth(date)
     }
     setOpen(false)
+    setView('days')
   }
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
     onChange('')
+    setInputText('')
     setOpen(false)
+    setView('days')
   }
+
+  // Calcular rango de años disponibles
+  const currentYear = new Date().getFullYear()
+  const minYear = fromDate ? fromDate.getFullYear() : currentYear - 100
+  const maxYear = toDate ? toDate.getFullYear() : currentYear + 10
+  const yearList = Array.from(
+    { length: maxYear - minYear + 1 },
+    (_, i) => maxYear - i  // más reciente primero
+  )
+
+  // Componente MonthCaption custom
+  const MonthCaptionCustom = ({ calendarMonth: cm }: { calendarMonth: { date: Date } }) => {
+    const monthName = format(cm.date, 'MMMM', { locale: es })
+    const year = cm.date.getFullYear()
+    const label = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`
+    return (
+      <div className={styles.rdpCaption}>
+        <button
+          type="button"
+          className={styles.captionBtn}
+          onClick={() => setView(v => v === 'years' ? 'days' : 'years')}
+          aria-label="Seleccionar año"
+        >
+          {label}
+          <span className={[styles.captionChevron, view === 'years' ? styles.captionChevronOpen : ''].filter(Boolean).join(' ')}>
+            ▾
+          </span>
+        </button>
+      </div>
+    )
+  }
+
+  // Vista de selección de año
+  const selectedYear = calendarMonth.getFullYear()
+
+  const yearGridElement = (
+    <div className={styles.yearGrid} ref={yearGridRef}>
+      {yearList.map(y => (
+        <button
+          key={y}
+          type="button"
+          className={[
+            styles.yearBtn,
+            y === selectedYear ? styles.yearBtnSelected : '',
+            y === currentYear ? styles.yearBtnToday : '',
+          ].filter(Boolean).join(' ')}
+          onClick={() => {
+            const newMonth = new Date(calendarMonth)
+            newMonth.setFullYear(y)
+            setCalendarMonth(newMonth)
+            setView('days')
+          }}
+        >
+          {y}
+        </button>
+      ))}
+    </div>
+  )
 
   const disabledMatchers = [];
   if (fromDate) disabledMatchers.push({ before: fromDate });
@@ -134,7 +262,8 @@ export const DateInput: React.FC<DateInputProps> = ({
       disabled={disabledMatchers.length > 0 ? disabledMatchers : undefined}
       startMonth={fromDate}
       endMonth={toDate}
-      defaultMonth={validSelected}
+      month={calendarMonth}
+      onMonthChange={setCalendarMonth}
       classNames={{
         root: styles.rdpRoot,
         months: styles.rdpMonths,
@@ -164,17 +293,28 @@ export const DateInput: React.FC<DateInputProps> = ({
             return <ChevronRight size={16} />
           }
           return <></>
-        }
+        },
+        MonthCaption: MonthCaptionCustom
       }}
     />
   )
 
   const popover = open ? (
     isMobile ? (
-      // Mobile: overlay centrado
-      <div className={styles.mobileOverlay} onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
-        <div className={styles.mobileCalendarWrap} ref={popoverRef}>
-          {dayPickerElement}
+      <div
+        className={styles.bottomSheetOverlay}
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) {
+            setOpen(false)
+            setView('days')
+          }
+        }}
+      >
+        <div className={styles.bottomSheet} ref={popoverRef}>
+          <div className={styles.bottomSheetHandle} />
+          <div className={styles.bottomSheetContent}>
+            {view === 'years' ? yearGridElement : dayPickerElement}
+          </div>
           <div className={styles.calendarFooter}>
             {validSelected && (
               <button className={styles.clearBtn} onClick={handleClear} type="button">
@@ -192,9 +332,8 @@ export const DateInput: React.FC<DateInputProps> = ({
       <div
         ref={popoverRef}
         className={styles.popover}
-        style={popoverStyle}
       >
-        {dayPickerElement}
+        {view === 'years' ? yearGridElement : dayPickerElement}
         <div className={styles.calendarFooter}>
           {validSelected && (
             <button className={styles.clearBtn} onClick={handleClear} type="button">
@@ -216,12 +355,22 @@ export const DateInput: React.FC<DateInputProps> = ({
         <input
           id={id}
           type="text"
-          readOnly
-          value={displayValue}
+          value={inputText}
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          onClick={() => !disabled && setOpen(prev => !prev)}
+          onChange={handleTextInput}
+          onFocus={() => !disabled && setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setOpen(false)
+              setView('days')
+            }
+            if (e.key === 'Tab') {
+              setOpen(false)
+              setView('days')
+            }
+          }}
           className={[
             styles.input,
             error ? styles.inputError : '',

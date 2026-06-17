@@ -124,3 +124,24 @@
   cursor: pointer;
   padding: 0;
 }
+
+/* ── Forgot Password Link ────────────────────── */
+.forgotContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+  margin-bottom: 20px;
+}
+
+.forgotLink {
+  font-size: 0.8125rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}

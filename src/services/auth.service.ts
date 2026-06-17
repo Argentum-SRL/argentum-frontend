@@ -126,3 +126,23 @@ export async function completarPerfil(payload: CompletarPerfilPayload): Promise<
 export async function eliminarCuenta(): Promise<void> {
   await api.delete('/auth/me')
 }
+
+export interface VerificarRecuperacionPayload {
+  email: string
+  codigo: string
+  nueva_password: string
+}
+
+export async function recuperarPassword(email: string): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>('/auth/recuperar-password', { email })
+  return data
+}
+
+export async function verificarRecuperacion(payload: VerificarRecuperacionPayload): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>('/auth/recuperar-password/verificar', {
+    email: payload.email,
+    codigo: payload.codigo,
+    nueva_password: payload.nueva_password,
+  })
+  return data
+}

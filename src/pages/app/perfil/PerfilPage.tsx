@@ -55,9 +55,80 @@ const GoogleIcon = () => (
   </svg>
 )
 
+function useImageColors(imageUrl: string | null) {
+  const [colors, setColors] = useState<{ color1: string; color2: string }>({
+    color1: '#A8905A',
+    color2: 'var(--primary)',
+  })
+
+  useEffect(() => {
+    if (!imageUrl) {
+      const timer = setTimeout(() => {
+        setColors((curr) => {
+          if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') {
+            return curr
+          }
+          return { color1: '#A8905A', color2: 'var(--primary)' }
+        })
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = imageUrl
+
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+        canvas.width = 10
+        canvas.height = 10
+        ctx.drawImage(img, 0, 0, 10, 10)
+        const imageData = ctx.getImageData(0, 0, 10, 10).data
+
+        // Sample two pixels from different parts of the image to get a nice gradient
+        const r1 = imageData[0]
+        const g1 = imageData[1]
+        const b1 = imageData[2]
+
+        const r2 = imageData[360]
+        const g2 = imageData[361]
+        const b2 = imageData[362]
+
+        setColors({
+          color1: `rgb(${r1}, ${g1}, ${b1})`,
+          color2: `rgb(${r2}, ${g2}, ${b2})`,
+        })
+      } catch {
+        setColors((curr) => {
+          if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') {
+            return curr
+          }
+          return { color1: '#A8905A', color2: 'var(--primary)' }
+        })
+      }
+    }
+
+    img.onerror = () => {
+      setColors((curr) => {
+        if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') {
+          return curr
+        }
+        return { color1: '#A8905A', color2: 'var(--primary)' }
+      })
+    }
+  }, [imageUrl])
+
+  return colors
+}
+
 export default function PerfilPage() {
   const { usuario, logout, updateUsuario } = useAuth()
   const navigate = useNavigate()
+  const fotoUrl = usuario?.foto_url ? (usuario.foto_url.startsWith('http') ? usuario.foto_url : `${API_URL}${usuario.foto_url}`) : null
+  const colors = useImageColors(fotoUrl)
   const [fotoCropOpen, setFotoCropOpen] = useState(false)
   const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
 
@@ -84,6 +155,7 @@ export default function PerfilPage() {
   const { confirm } = useModal()
 
   const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '', fecha_nacimiento: '', sexo: '' })
+  const [formEmail, setFormEmail] = useState({ email_nuevo: '', password_actual: '' })
   const [formTelefono, setFormTelefono] = useState({ telefono_nuevo: '', password_actual: '' })
   const [formPassword, setFormPassword] = useState({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
   const [formCiclo, setFormCiclo] = useState({ ciclo_tipo: 'dia_fijo' as 'dia_fijo' | 'regla', ciclo_valor: '' })
@@ -94,6 +166,7 @@ export default function PerfilPage() {
     setPrevUsuarioId(usuario?.id)
     if (usuario) {
       setFormDatos({ nombre: usuario.nombre || '', apellido: usuario.apellido || '', fecha_nacimiento: usuario.fecha_nacimiento || '', sexo: usuario.sexo || '' })
+      setFormEmail({ email_nuevo: usuario.email || '', password_actual: '' })
       setFormTelefono({ telefono_nuevo: usuario.telefono || '', password_actual: '' })
       setFormCiclo({ ciclo_tipo: (usuario.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo', ciclo_valor: usuario.ciclo_valor || '' })
       setFormMoneda({ moneda_principal: (usuario.moneda_principal as 'ARS' | 'USD') || 'ARS', moneda_secundaria_activa: usuario.moneda_secundaria_activa, tipo_dolar: usuario.tipo_dolar || 'blue' })
@@ -118,6 +191,29 @@ export default function PerfilPage() {
       else navigate('/auth/verificar-email', { state: { email: usuario.email } })
     } catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; showToast(error.response?.data?.detail || 'Error al enviar el código.', 'error') }
     finally { setIsSaving(false) }
+  }
+
+  const handleSaveEmail = async (e: React.FormEvent) => {
+    e.preventDefault(); setIsSaving(true); setModalError(null)
+    try {
+      const res = await usuarioService.actualizarEmail({
+        email_nuevo: formEmail.email_nuevo,
+        password_actual: formEmail.password_actual
+      })
+      if (usuario) {
+        updateUsuario({ ...usuario, email: formEmail.email_nuevo, email_verificado: false })
+      }
+      showToast(res.confirmacion || 'Email actualizado. Se envió un código de verificación.', 'success')
+      handleCloseModal()
+      if (res.requiere_verificacion_email) {
+        navigate('/auth/verificar-email', { state: { email: formEmail.email_nuevo } })
+      }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } }
+      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleSaveTelefono = async (e: React.FormEvent) => {
@@ -177,15 +273,17 @@ export default function PerfilPage() {
           <h1>Mi perfil</h1>
           <p className={styles.subtitle}>{usuario?.email || ''}</p>
         </div>
-        <button className={styles.editNameBtn} onClick={() => handleOpenModal('datos-personales')} aria-label="Editar datos personales">
-          <Edit size={15} />
-          Editar nombre
-        </button>
       </div>
 
       {/* HERO CARD */}
       <div className={styles.heroCard}>
-        <div className={styles.heroAccent} />
+        <div
+          className={styles.heroAccent}
+          style={{
+            ['--gradient-start' as string]: colors.color1,
+            ['--gradient-end' as string]: colors.color2,
+          } as React.CSSProperties}
+        />
         <div className={styles.heroInner}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>
@@ -209,15 +307,21 @@ export default function PerfilPage() {
                     catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; showToast(error.response?.data?.detail || 'Error al eliminar la foto', 'error') }
                   },
                 })}
+                title="Eliminar foto de perfil"
                 aria-label="Eliminar foto de perfil"
               >
-                Eliminar foto
+                <Trash2 size={14} />
               </button>
             )}
           </div>
 
           <div className={styles.heroBody}>
-            <h2 className={styles.heroName}>{usuario?.nombre} {usuario?.apellido}</h2>
+            <div className={styles.nameContainer}>
+              <h2 className={styles.heroName}>{usuario?.nombre} {usuario?.apellido}</h2>
+              <button className={styles.editNameBtnInline} onClick={() => handleOpenModal('datos-personales')} aria-label="Editar datos personales">
+                <Edit size={18} />
+              </button>
+            </div>
             <p className={styles.heroMeta}>{usuario?.email || 'Sin email'} · {usuario?.telefono || 'Sin teléfono'}</p>
             <div className={styles.heroBadges}>
               <span className={`${styles.heroBadge} ${usuario?.email_verificado ? styles.heroBadgeOk : styles.heroBadgeErr}`}>
@@ -406,7 +510,7 @@ export default function PerfilPage() {
                 {activeModal === 'datos-personales' && 'Editar datos personales'}
                 {activeModal === 'email' && 'Editar email'}
                 {activeModal === 'telefono' && 'Editar teléfono'}
-                {activeModal === 'password' && (usuario?.password_hash ? 'Cambiar contraseña' : 'Crear contraseña')}
+                {activeModal === 'password' && (usuario?.password_configurada ? 'Cambiar contraseña' : 'Crear contraseña')}
                 {activeModal === 'ciclo' && 'Configurar ciclo financiero'}
                 {activeModal === 'moneda' && 'Configurar moneda'}
               </h3>
@@ -423,6 +527,24 @@ export default function PerfilPage() {
                 </div>
                 <button type="submit" disabled={isSaving} className={styles.saveBtn}>
                   {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar cambios</>}
+                </button>
+              </form>
+            )}
+
+            {activeModal === 'email' && (
+              <form onSubmit={handleSaveEmail} className={styles.modalForm}>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="perfil-email" className={styles.inputLabel}>Nuevo email</label>
+                  <input id="perfil-email" type="email" className={styles.input} placeholder="nombre@ejemplo.com" value={formEmail.email_nuevo} onChange={(e) => setFormEmail({ ...formEmail, email_nuevo: e.target.value })} required />
+                </div>
+                {usuario?.password_configurada && (
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="perfil-email-pass" className={styles.inputLabel}>Contraseña actual</label>
+                    <input id="perfil-email-pass" type="password" className={styles.input} placeholder="••••••••" value={formEmail.password_actual} onChange={(e) => setFormEmail({ ...formEmail, password_actual: e.target.value })} required />
+                  </div>
+                )}
+                <button type="submit" disabled={isSaving} className={styles.saveBtn}>
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Actualizar email</>}
                 </button>
               </form>
             )}
@@ -447,7 +569,7 @@ export default function PerfilPage() {
 
             {activeModal === 'password' && (
               <form onSubmit={handleSavePassword} className={styles.modalForm}>
-                {usuario?.password_hash && (
+                {usuario?.password_configurada && (
                   <div className={styles.inputGroup}>
                     <label htmlFor="perfil-pass-actual" className={styles.inputLabel}>Contraseña actual</label>
                     <input id="perfil-pass-actual" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_actual} onChange={(e) => setFormPassword({ ...formPassword, password_actual: e.target.value })} required />
@@ -468,7 +590,7 @@ export default function PerfilPage() {
                   <input id="perfil-pass-conf" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_nueva_confirmacion} onChange={(e) => setFormPassword({ ...formPassword, password_nueva_confirmacion: e.target.value })} required />
                 </div>
                 <button type="submit" disabled={isSaving || !pwReqs.length || !pwReqs.upper || !pwReqs.lower || !pwReqs.number} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />{usuario?.password_hash ? 'Cambiar contraseña' : 'Crear contraseña'}</>}
+                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />{usuario?.password_configurada ? 'Cambiar contraseña' : 'Crear contraseña'}</>}
                 </button>
               </form>
             )}

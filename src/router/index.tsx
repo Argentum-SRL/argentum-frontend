@@ -12,6 +12,7 @@ const VerificarEmail = lazy(() => import('@/pages/auth/verificar-email/Verificar
 const VerificarTelefono = lazy(() => import('@/pages/auth/verificar-telefono/VerificarTelefono'))
 const CompletarPerfil = lazy(() => import('@/pages/auth/completar-perfil/CompletarPerfil'))
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'))
+const RecuperarPassword = lazy(() => import('@/pages/auth/recuperar-password/RecuperarPassword'))
 const DashboardPage = lazy(() => import('@/pages/app/dashboard/DashboardPage'))
 const BilleterasPage = lazy(() => import('@/pages/app/billeteras/BilleterasPage'))
 const BilleteraDetallePage = lazy(() => import('@/pages/app/billeteras/BilleteraDetallePage'))
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
       { path: '/auth/verificar-email', element: <VerificarEmail /> },
       { path: '/auth/verificar-telefono', element: <VerificarTelefono /> },
       { path: '/auth/completar-perfil', element: <CompletarPerfil /> },
+      { path: '/auth/recuperar-password', element: <RecuperarPassword /> },
 
       // Onboarding: requiere auth, redirige a dashboard si ya lo completó
       {

@@ -123,6 +123,12 @@ export default function LoginPage() {
           }
         />
 
+        <div className={styles.forgotContainer}>
+          <Link to="/auth/recuperar-password" className={styles.forgotLink}>
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+
         {apiError && (
           <div className={styles.errorContainer}>
             <p className={styles.error}>{apiError}</p>

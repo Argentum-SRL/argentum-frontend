@@ -86,38 +86,7 @@
   color: var(--primary);
 }
 
-/* Summary Bar custom styles */
-.summaryBar {
-  margin-top: 0 !important;
-}
 
-.statsLeftSlot {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-}
-
-.statsLeftLabel {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.statsLeftValue {
-  font-size: 22px;
-  font-weight: 700;
-  color: white;
-  line-height: 1.1;
-}
-
-@media (min-width: 768px) {
-  .statsLeftValue {
-    font-size: 28px;
-  }
-}
 
 /* Grid layout (Split like Tools) */
 .grid {
@@ -250,10 +219,10 @@
 }
 
 .th {
-  padding: 16px 20px;
+  padding: 10px 14px;
   background-color: var(--surface-alt);
   color: var(--text-3);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -284,11 +253,11 @@
 }
 
 .td {
-  padding: 16px 20px;
+  padding: 12px 14px;
   color: var(--text);
   vertical-align: middle;
-  white-space: nowrap;
-  font-size: 14px;
+  white-space: normal;
+  font-size: 13px;
 }
 
 /* Custom stacked User cell with Avatar */
@@ -518,73 +487,88 @@
   font-size: 11px;
 }
 
-/* User Card rows */
-.detailCard {
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
+/* Redesigned User Detail fields and status dots */
+.detailFields {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.detailRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.detailIcon {
-  color: var(--text-3);
-  margin-top: 3px;
-}
-
-.detailRowContent {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.detailLabel {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.detailValue {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  word-break: break-all;
-}
-
-.statusSection {
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding-bottom: 20px;
 }
 
-.statusSection h3 {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0 0 10px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.statusPill {
-  display: inline-flex;
+.detailFieldRow {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detailFieldRow:last-child {
+  border-bottom: none;
+}
+
+.detailFieldLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 12px;
-  font-weight: 600;
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.detailFieldLabel svg {
+  color: inherit;
+}
+
+.detailFieldValue {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.statusPillsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotGreen {
+  background: #1D9E75;
+}
+
+.dotRed {
+  background: #A32D2D;
+}
+
+.dotBlue {
+  background: #185FA5;
+}
+
+.dotAmber {
+  background: #BA7517;
+}
+
+.dotGray {
+  background: var(--text-3);
+}
+
+.statusDotLabel {
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 400;
 }
 
 /* Support Actions */
@@ -605,14 +589,8 @@
 
 .actionsGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-}
-
-@media (min-width: 600px) and (max-width: 1023px) {
-  .actionsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 .actionBtn {
@@ -620,9 +598,9 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 9px 12px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -756,4 +734,209 @@
   justify-content: center;
   padding: 40px 10px;
   color: var(--text-3);
+}
+
+/* KPI Strip & Provider Row styling */
+.kpiStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kpiRow {
+  display: grid;
+  gap: 10px;
+}
+
+.kpiRow4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.kpiRow3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 767px) {
+  .kpiRow4,
+  .kpiRow3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kpiItem {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  min-height: 76px;
+}
+
+.kpiDivider {
+  display: none;
+}
+
+.kpiLabel {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+}
+
+.kpiValue {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+
+.kpiValueGreen { color: #1D9E75; }
+.kpiValueAmber { color: #BA7517; }
+.kpiValueBlue  { color: #185FA5; }
+
+.kpiSub {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.providerRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+@media (max-width: 767px) {
+  .providerRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.providerCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.providerIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.providerIconEmail {
+  background: #E6F1FB;
+  color: #185FA5;
+}
+
+.providerIconGoogle {
+  background: #FCEBEB;
+  color: #A32D2D;
+}
+
+.providerIconPhone {
+  background: #E1F5EE;
+  color: #0F6E56;
+}
+
+.providerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.providerName {
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.providerVal {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+
+.providerPct {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* Tabs System */
+.tabBar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-3);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.tabBtn:hover {
+  color: var(--text-2);
+}
+
+.tabBtnActive {
+  color: var(--text);
+  font-weight: 700;
+  border-bottom-color: var(--primary);
+}
+
+.tabContent {
+  padding-top: 20px;
+}
+
+@media (max-width: 767px) {
+  .th:last-child,
+  .td:last-child {
+    display: none;
+  }
+
+  .th:nth-child(2),
+  .td:nth-child(2) {
+    display: none;
+  }
+
+  .td {
+    padding: 10px 12px;
+  }
+
+  .userEmail {
+    max-width: 180px;
+  }
+
+  .tableAvatar {
+    width: 32px;
+    height: 32px;
+  }
 }

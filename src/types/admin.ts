@@ -39,4 +39,9 @@ export interface AdminStats {
   activos: number
   onboarding_completo: number
   whatsapp_vinculados: number
+  nuevos_hoy: number
+  nuevos_7_dias: number
+  activos_7_dias: number
+  admins_total: number
+  por_proveedor: Record<string, number>
 }

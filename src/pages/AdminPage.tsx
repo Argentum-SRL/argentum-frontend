@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import adminService from '@/services/adminService'
 import type { UsuarioAdminResumen, UsuarioAdmin, FiltrosAdmin, AdminStats } from '@/types/admin'
-import { Button, PageSummaryBar, EmptyState, Select } from '@/components/ui'
+import { Button, EmptyState, Select } from '@/components/ui'
 import {
   Search,
   Loader2,
@@ -12,6 +12,7 @@ import {
   KeyRound,
   LogOut,
   MessageSquareOff,
+  MessageSquare,
   RefreshCw,
   XCircle,
   CheckCircle2,
@@ -61,6 +62,9 @@ function TableAvatar({ fotoUrl, nombre }: { fotoUrl: string | null; nombre: stri
 
 export default function AdminPage() {
   const { usuario: currentAdmin } = useAuth()
+  
+  // Tab activa
+  const [activeTab, setActiveTab] = useState<'usuarios' | 'wpp' | 'scheduler'>('usuarios')
   
   // Stats
   const [stats, setStats] = useState<AdminStats | null>(null)
@@ -356,41 +360,119 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* ── PageSummaryBar (Aesthetics like Transacciones) ────────────────────────────── */}
-      <PageSummaryBar
-        className={styles.summaryBar}
-        leftSlot={
-          <div className={styles.statsLeftSlot}>
-            <span className={styles.statsLeftLabel}>Usuarios de la plataforma</span>
-            <span className={styles.statsLeftValue}>
-              {stats ? stats.total : 0}
+      {/* ── KPI Strip (Unified compact bar) ────────────────────────────────────────────── */}
+      <div className={styles.kpiStrip}>
+        <div className={`${styles.kpiRow} ${styles.kpiRow4}`}>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Total usuarios</span>
+            <span className={styles.kpiValue}>{stats?.total ?? 0}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Cuentas activas</span>
+            <span className={`${styles.kpiValue} ${styles.kpiValueGreen}`}>{stats?.activos ?? 0}</span>
+            <span className={styles.kpiSub}>de {stats?.total ?? 0} registradas</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Onboarding completo</span>
+            <span className={`${styles.kpiValue} ${styles.kpiValueAmber}`}>{stats?.onboarding_completo ?? 0}</span>
+            <span className={styles.kpiSub}>
+              {stats?.total ? Math.round((stats.onboarding_completo / stats.total) * 100) : 0}% del total
             </span>
           </div>
-        }
-        items={[
-          {
-            label: "Cuentas Activas",
-            value: `${stats ? stats.activos : 0}`,
-            subValue: `de ${stats ? stats.total : 0} registradas`,
-            highlight: true,
-          },
-          {
-            label: "Onboarding Completado",
-            value: `${stats ? stats.onboarding_completo : 0}`,
-            subValue: `${stats && stats.total ? Math.round((stats.onboarding_completo / stats.total) * 100) : 0}% del total`,
-            valueColor: '#f5a623',
-          },
-          {
-            label: "WhatsApp Vinculados",
-            value: `${stats ? stats.whatsapp_vinculados : 0}`,
-            subValue: `${stats && stats.total ? Math.round((stats.whatsapp_vinculados / stats.total) * 100) : 0}% del total`,
-            valueColor: '#4caf7d',
-          },
-        ]}
-      />
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>WPP vinculados</span>
+            <span className={`${styles.kpiValue} ${styles.kpiValueBlue}`}>{stats?.whatsapp_vinculados ?? 0}</span>
+            <span className={styles.kpiSub}>
+              {stats?.total ? Math.round((stats.whatsapp_vinculados / stats.total) * 100) : 0}% del total
+            </span>
+          </div>
+        </div>
+        <div className={`${styles.kpiRow} ${styles.kpiRow3}`}>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Nuevos hoy</span>
+            <span className={styles.kpiValue}>{stats?.nuevos_hoy ?? 0}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Nuevos 7 días</span>
+            <span className={styles.kpiValue}>{stats?.nuevos_7_dias ?? 0}</span>
+          </div>
+          <div className={styles.kpiItem}>
+            <span className={styles.kpiLabel}>Activos 7 días</span>
+            <span className={styles.kpiValue}>{stats?.activos_7_dias ?? 0}</span>
+            <span className={styles.kpiSub}>por último acceso</span>
+          </div>
+        </div>
+      </div>
 
-      {/* ── Split Grid Layout (Influenced by Tools Page) ────────────────────────────────── */}
-      <div className={`${styles.grid} ${selectedUser ? styles.showDetail : styles.showList}`}>
+      {/* ── Registro por proveedor (Provider Row) ────────────────────────────────────────── */}
+      <div className={styles.providerRow}>
+        <div className={styles.providerCard}>
+          <div className={`${styles.providerIcon} ${styles.providerIconEmail}`}>
+            <Mail size={18} />
+          </div>
+          <div className={styles.providerInfo}>
+            <span className={styles.providerName}>Registro por email</span>
+            <span className={styles.providerVal}>{stats?.por_proveedor?.EMAIL ?? 0}</span>
+            <span className={styles.providerPct}>
+              {stats?.total ? Math.round(((stats.por_proveedor?.EMAIL ?? 0) / stats.total) * 100) : 0}% del total
+            </span>
+          </div>
+        </div>
+        <div className={styles.providerCard}>
+          <div className={`${styles.providerIcon} ${styles.providerIconGoogle}`}>
+            <UserIcon size={18} />
+          </div>
+          <div className={styles.providerInfo}>
+            <span className={styles.providerName}>Registro por Google</span>
+            <span className={styles.providerVal}>{stats?.por_proveedor?.GOOGLE ?? 0}</span>
+            <span className={styles.providerPct}>
+              {stats?.total ? Math.round(((stats.por_proveedor?.GOOGLE ?? 0) / stats.total) * 100) : 0}% del total
+            </span>
+          </div>
+        </div>
+        <div className={styles.providerCard}>
+          <div className={`${styles.providerIcon} ${styles.providerIconPhone}`}>
+            <Phone size={18} />
+          </div>
+          <div className={styles.providerInfo}>
+            <span className={styles.providerName}>Registro por teléfono</span>
+            <span className={styles.providerVal}>{stats?.por_proveedor?.TELEFONO ?? 0}</span>
+            <span className={styles.providerPct}>
+              {stats?.total ? Math.round(((stats.por_proveedor?.TELEFONO ?? 0) / stats.total) * 100) : 0}% del total
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Tab Bar ─────────────────────────────────────────────────────────────────────── */}
+      <div className={styles.tabBar}>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'usuarios' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('usuarios')}
+        >
+          <Users size={16} />
+          <span>Usuarios</span>
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'wpp' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('wpp')}
+        >
+          <MessageSquare size={16} />
+          <span>Monitor WPP / AI</span>
+        </button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'scheduler' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('scheduler')}
+        >
+          <Clock size={16} />
+          <span>Scheduler</span>
+        </button>
+      </div>
+
+      {/* ── Tab Content ─────────────────────────────────────────────────────────────────── */}
+      <div className={styles.tabContent}>
+        {activeTab === 'usuarios' && (
+          <div className={`${styles.grid} ${selectedUser ? styles.showDetail : styles.showList}`}>
         
         {/* Left Column (Master List) */}
         <div className={styles.masterCol}>
@@ -572,79 +654,70 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* Detail Card */}
-              <div className={styles.detailCard}>
-                <div className={styles.detailRow}>
-                  <Mail className={styles.detailIcon} size={16} />
-                  <div className={styles.detailRowContent}>
-                    <span className={styles.detailLabel}>Email</span>
-                    <span className={styles.detailValue}>{selectedUser.email || 'No configurado'}</span>
-                  </div>
+              {/* Detail Fields (Redesigned compact table view) */}
+              <div className={styles.detailFields}>
+                <div className={styles.detailFieldRow}>
+                  <span className={styles.detailFieldLabel}>
+                    <Mail size={14} /> Email
+                  </span>
+                  <span className={styles.detailFieldValue}>
+                    {selectedUser.email || 'No configurado'}
+                  </span>
                 </div>
-                <div className={styles.detailRow}>
-                  <Phone className={styles.detailIcon} size={16} />
-                  <div className={styles.detailRowContent}>
-                    <span className={styles.detailLabel}>Teléfono</span>
-                    <span className={styles.detailValue}>{selectedUser.telefono || 'No configurado'}</span>
-                  </div>
+                <div className={styles.detailFieldRow}>
+                  <span className={styles.detailFieldLabel}>
+                    <Phone size={14} /> Teléfono
+                  </span>
+                  <span className={styles.detailFieldValue}>
+                    {selectedUser.telefono || 'No configurado'}
+                  </span>
                 </div>
-                <div className={styles.detailRow}>
-                  <Calendar className={styles.detailIcon} size={16} />
-                  <div className={styles.detailRowContent}>
-                    <span className={styles.detailLabel}>Fecha Registro</span>
-                    <span className={styles.detailValue}>{new Date(selectedUser.created_at).toLocaleString()}</span>
-                  </div>
+                <div className={styles.detailFieldRow}>
+                  <span className={styles.detailFieldLabel}>
+                    <Calendar size={14} /> Registro
+                  </span>
+                  <span className={styles.detailFieldValue}>
+                    {new Date(selectedUser.created_at).toLocaleDateString()}
+                  </span>
                 </div>
-                <div className={styles.detailRow}>
-                  <Clock className={styles.detailIcon} size={16} />
-                  <div className={styles.detailRowContent}>
-                    <span className={styles.detailLabel}>Última Actividad</span>
-                    <span className={styles.detailValue}>
-                      {selectedUser.ultima_actividad ? new Date(selectedUser.ultima_actividad).toLocaleString() : 'Sin actividad registrada'}
-                    </span>
-                  </div>
+                <div className={styles.detailFieldRow}>
+                  <span className={styles.detailFieldLabel}>
+                    <Clock size={14} /> Última actividad
+                  </span>
+                  <span className={styles.detailFieldValue}>
+                    {selectedUser.ultima_actividad
+                      ? new Date(selectedUser.ultima_actividad).toLocaleString()
+                      : 'Sin actividad'}
+                  </span>
                 </div>
-                <div className={styles.detailRow}>
-                  <UserIcon className={styles.detailIcon} size={16} />
-                  <div className={styles.detailRowContent}>
-                    <span className={styles.detailLabel}>Tipo Cuenta</span>
-                    <span className={styles.detailValue}>{selectedUser.is_admin ? 'Administrador' : 'Usuario estándar'}</span>
-                  </div>
+                <div className={styles.detailFieldRow}>
+                  <span className={styles.detailFieldLabel}>
+                    <UserIcon size={14} /> Tipo de cuenta
+                  </span>
+                  <span className={styles.detailFieldValue}>
+                    {selectedUser.is_admin ? 'Administrador' : 'Usuario estándar'}
+                  </span>
                 </div>
               </div>
 
-              <div className={styles.statusSection}>
-                <h3>Estado Operativo</h3>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <div className={styles.statusPill}>
-                    <span className="text-gray-400">Cuenta:</span>
-                    <span className={`${styles.badge} ${selectedUser.is_active ? styles.badgeActive : styles.badgeInactive}`}>
-                      {selectedUser.is_active ? 'Activa' : 'Inactiva'}
-                    </span>
-                  </div>
-                  <div className={styles.statusPill}>
-                    <span className="text-gray-400">WhatsApp:</span>
-                    <span className={`${styles.badge} ${selectedUser.whatsapp_vinculado ? styles.badgeLinked : styles.badgeUnlinked}`}>
-                      {selectedUser.whatsapp_vinculado ? 'Vinculado' : 'No Vinculado'}
-                    </span>
-                  </div>
-                  <div className={styles.statusPill}>
-                    <span className="text-gray-400">Onboarding:</span>
-                    <span className={`${styles.badge} ${selectedUser.onboarding_completado ? styles.badgeCompleted : styles.badgeIncomplete}`}>
-                      {selectedUser.onboarding_completado ? 'Completo' : 'Incompleto'}
-                    </span>
-                    {!selectedUser.onboarding_completado && selectedUser.paso_onboarding_actual && (
-                      <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 ml-1">
-                        ({selectedUser.paso_onboarding_actual})
-                      </span>
-                    )}
-                  </div>
-                </div>
+              <div className={styles.statusPillsRow}>
+                <div className={`${styles.statusDot} ${selectedUser.is_active ? styles.dotGreen : styles.dotRed}`} />
+                <span className={styles.statusDotLabel}>
+                  Cuenta {selectedUser.is_active ? 'activa' : 'inactiva'}
+                </span>
+                <div className={`${styles.statusDot} ${selectedUser.whatsapp_vinculado ? styles.dotBlue : styles.dotGray}`} />
+                <span className={styles.statusDotLabel}>
+                  WPP {selectedUser.whatsapp_vinculado ? 'vinculado' : 'no vinculado'}
+                </span>
+                <div className={`${styles.statusDot} ${selectedUser.onboarding_completado ? styles.dotAmber : styles.dotGray}`} />
+                <span className={styles.statusDotLabel}>
+                  Onboarding {selectedUser.onboarding_completado ? 'completo' : 'incompleto'}
+                </span>
               </div>
 
               {/* Actions Section */}
               <div className={styles.actionsPanel}>
-                <h3>Acciones de Soporte</h3>
+                <h3>Acciones de soporte</h3>
                 
                 <div className={styles.actionsGrid}>
                   
@@ -790,6 +863,28 @@ export default function AdminPage() {
           )}
         </div>
 
+      </div>
+        )}
+
+        {activeTab === 'wpp' && (
+          <div className={styles.emptyStateContainer}>
+            <EmptyState
+              icon={MessageSquare}
+              title="Monitor de conversaciones"
+              description="Esta sección estará disponible una vez que la plataforma esté desplegada con dominio propio. Mostrará todas las conversaciones de WhatsApp, intents detectados, errores de AI y latencia de respuesta."
+            />
+          </div>
+        )}
+
+        {activeTab === 'scheduler' && (
+          <div className={styles.emptyStateContainer}>
+            <EmptyState
+              icon={Clock}
+              title="Logs del scheduler"
+              description="Próximamente. Mostrará los jobs de APScheduler ejecutados, su estado y los errores ocurridos."
+            />
+          </div>
+        )}
       </div>
     </div>
   )

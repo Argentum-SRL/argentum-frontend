@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Mail,
   Phone,
@@ -131,6 +131,15 @@ export default function PerfilPage() {
   const colors = useImageColors(fotoUrl)
   const [fotoCropOpen, setFotoCropOpen] = useState(false)
   const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
+
+  const heroCardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (heroCardRef.current) {
+      heroCardRef.current.style.setProperty('--gradient-start', colors.color1)
+      heroCardRef.current.style.setProperty('--gradient-end', colors.color2)
+    }
+  }, [colors])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -276,13 +285,7 @@ export default function PerfilPage() {
       </div>
 
       {/* HERO CARD */}
-      <div 
-        className={styles.heroCard}
-        style={{
-          ['--gradient-start' as string]: colors.color1,
-          ['--gradient-end' as string]: colors.color2,
-        } as React.CSSProperties}
-      >
+      <div ref={heroCardRef} className={styles.heroCard}>
         <div className={styles.heroInner}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>

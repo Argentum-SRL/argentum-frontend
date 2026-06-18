@@ -85,17 +85,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const is_admin = useMemo(() => {
+    if (usuario?.is_admin) return true
+    const token = getToken()
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        return !!payload.is_admin
+      } catch {
+        return false
+      }
+    }
+    return false
+  }, [usuario])
+
   const contextValue = useMemo(
     () => ({
       usuario,
       isAuthenticated: !!usuario,
       isLoading,
+      is_admin,
       login,
       logout,
       refreshUser,
       updateUsuario,
     }),
-    [usuario, isLoading, login, logout, refreshUser, updateUsuario]
+    [usuario, isLoading, is_admin, login, logout, refreshUser, updateUsuario]
   )
 
   return (

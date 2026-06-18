@@ -5,6 +5,7 @@ export interface AuthContextValue {
   usuario: Usuario | null
   isAuthenticated: boolean
   isLoading: boolean
+  is_admin: boolean
   login: (respuesta: AuthResponse) => void
   logout: (options?: { state?: unknown }) => Promise<void>
   refreshUser: () => Promise<void>

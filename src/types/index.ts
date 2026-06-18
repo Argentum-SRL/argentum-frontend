@@ -6,6 +6,7 @@ export interface Usuario {
   telefono: string | null
   foto_url: string | null
   rol: 'usuario' | 'admin'
+  is_admin: boolean
   estado: string
   moneda_principal: 'ARS' | 'USD' | null
   moneda_secundaria_activa: boolean

@@ -2,11 +2,11 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 
 interface Props {
-  mode?: 'app' | 'onboarding' | 'auth-only'
+  mode?: 'app' | 'onboarding' | 'auth-only' | 'admin'
 }
 
 export default function ProtectedRoute({ mode = 'app' }: Props) {
-  const { usuario, isAuthenticated, isLoading } = useAuth()
+  const { usuario, isAuthenticated, isLoading, is_admin } = useAuth()
 
   if (isLoading) {
     return (
@@ -18,6 +18,12 @@ export default function ProtectedRoute({ mode = 'app' }: Props) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
+  }
+
+  if (mode === 'admin') {
+    if (!is_admin) {
+      return <Navigate to="/app/dashboard" replace />
+    }
   }
 
   if (mode === 'onboarding' && usuario?.onboarding_completo) {

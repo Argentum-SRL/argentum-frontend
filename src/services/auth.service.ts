@@ -146,3 +146,20 @@ export async function verificarRecuperacion(payload: VerificarRecuperacionPayloa
   })
   return data
 }
+
+export async function validarResetToken(token: string): Promise<{ success: boolean; data: { nombre: string } }> {
+  const { data } = await api.get<{ success: boolean; data: { nombre: string } }>('/auth/reset-password/validar', {
+    params: { token },
+  })
+  return data
+}
+
+export async function confirmarResetPassword(token: string, nuevaPassword: string): Promise<AuthResponse> {
+  const { data } = await api.post<AuthResponse>('/auth/reset-password/confirmar', {
+    token,
+    nueva_password: nuevaPassword,
+  })
+  guardarTokensSiPresentes(data)
+  return data
+}
+

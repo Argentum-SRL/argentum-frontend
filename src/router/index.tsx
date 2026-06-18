@@ -13,6 +13,7 @@ const VerificarTelefono = lazy(() => import('@/pages/auth/verificar-telefono/Ver
 const CompletarPerfil = lazy(() => import('@/pages/auth/completar-perfil/CompletarPerfil'))
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'))
 const RecuperarPassword = lazy(() => import('@/pages/auth/recuperar-password/RecuperarPassword'))
+const ResetPasswordPage = lazy(() => import('@/pages/auth/reset-password/ResetPasswordPage'))
 const DashboardPage = lazy(() => import('@/pages/app/dashboard/DashboardPage'))
 const BilleterasPage = lazy(() => import('@/pages/app/billeteras/BilleterasPage'))
 const BilleteraDetallePage = lazy(() => import('@/pages/app/billeteras/BilleteraDetallePage'))
@@ -24,6 +25,7 @@ const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/Suscripci
 const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const NotificacionesConfigPage = lazy(() => import('@/pages/app/configuracion/NotificacionesConfigPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
+const AdminPage = lazy(() => import('@/pages/AdminPage'))
 
 const router = createBrowserRouter([
   {
@@ -37,12 +39,26 @@ const router = createBrowserRouter([
       { path: '/auth/verificar-telefono', element: <VerificarTelefono /> },
       { path: '/auth/completar-perfil', element: <CompletarPerfil /> },
       { path: '/auth/recuperar-password', element: <RecuperarPassword /> },
+      { path: '/reset-password', element: <ResetPasswordPage /> },
 
       // Onboarding: requiere auth, redirige a dashboard si ya lo completó
       {
         element: <ProtectedRoute mode="onboarding" />,
         children: [
           { path: '/onboarding', element: <OnboardingPage /> },
+        ],
+      },
+
+      // Admin Panel
+      {
+        element: <ProtectedRoute mode="admin" />,
+        children: [
+          {
+            element: <AppWrapper />,
+            children: [
+              { path: '/admin', element: <AdminPage /> },
+            ],
+          },
         ],
       },
 

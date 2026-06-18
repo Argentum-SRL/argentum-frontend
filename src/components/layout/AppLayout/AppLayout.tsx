@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
   Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, User,
-  Calculator
+  Calculator, Shield
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -62,7 +62,7 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { usuario, logout } = useAuth()
+  const { usuario, logout, is_admin } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const { unreadCount } = useNotificaciones()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -109,6 +109,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
     setFotoError(false)
   }
 
+  const desktopNavItems = [...NAV_MAIN, ...NAV_FINANCIAL]
+  if (is_admin) {
+    desktopNavItems.push({ label: 'Admin', path: '/admin', Icon: Shield })
+  }
+
   return (
     <div className={styles.root}>
 
@@ -121,7 +126,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* ── Top Navigation Desktop ──────────────────────── */}
       <div className={styles.topNav}>
         <div className={styles.topNavPill}>
-          {[...NAV_MAIN, ...NAV_FINANCIAL].map(({ label, path, Icon }) => (
+          {desktopNavItems.map(({ label, path, Icon }) => (
             <Link
               key={path}
               to={path}
@@ -264,6 +269,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <span>{label}</span>
               </Link>
             ))}
+
+            {is_admin && (
+              <Link
+                to="/admin"
+                className={[styles.moreItem, isActive('/admin') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+              >
+                <Shield size={22} strokeWidth={1.75} />
+                <span>Módulo Admin</span>
+              </Link>
+            )}
 
             <div className={styles.moreSeparator} />
             

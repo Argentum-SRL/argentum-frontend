@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Camera, X } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import usuarioService from '@/services/usuario.service'
@@ -12,6 +12,10 @@ interface FotoCropModalProps {
   onSuccess: (fotoUrl: string) => void
 }
 
+const CANVAS_SIZE = 560
+const DISPLAY_SIZE = 280
+const RATIO = CANVAS_SIZE / DISPLAY_SIZE // 2
+
 export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModalProps) {
   const { usuario, updateUsuario } = useAuth()
   const { showToast } = useToast()
@@ -23,16 +27,40 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
   const [isSaving, setIsSaving] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const imageRef = useRef<HTMLImageElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const imageObj = useRef<HTMLImageElement | null>(null)
   const dragStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null)
 
+  const drawPreview = useCallback(() => {
+    if (!canvasRef.current || !imageObj.current) return
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const C = CANVAS_SIZE
+
+    ctx.clearRect(0, 0, C, C)
+
+    const img = imageObj.current
+    const fitScale = C / Math.max(img.naturalWidth, img.naturalHeight)
+    const imgW = img.naturalWidth * fitScale
+    const imgH = img.naturalHeight * fitScale
+    const baseX = (C - imgW) / 2
+    const baseY = (C - imgH) / 2
+
+    ctx.save()
+    ctx.translate(C / 2, C / 2)
+    ctx.scale(scale, scale)
+    ctx.translate(-C / 2, -C / 2)
+    ctx.drawImage(img, baseX + offset.x, baseY + offset.y, imgW, imgH)
+    ctx.restore()
+  }, [offset, scale])
+
   useEffect(() => {
-    if (imageRef.current) {
-      imageRef.current.style.transform = `translate(${offset.x}px, ${offset.y}px) scale(${scale})`
-    }
-  }, [offset, scale, imageSrc])
+    drawPreview()
+  }, [drawPreview])
 
   const handleClose = () => {
+    imageObj.current = null
     setImageSrc(null)
     setOffset({ x: 0, y: 0 })
     setScale(1)
@@ -51,7 +79,15 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
 
     const reader = new FileReader()
     reader.onload = () => {
-      setImageSrc(reader.result as string)
+      const src = reader.result as string
+      const img = new Image()
+      img.onload = () => {
+        imageObj.current = img
+        setOffset({ x: 0, y: 0 })
+        setScale(1)
+        setImageSrc(src)
+      }
+      img.src = src
     }
     reader.readAsDataURL(file)
   }
@@ -66,8 +102,8 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!dragStart.current) return
     setOffset({
-      x: dragStart.current.ox + (e.clientX - dragStart.current.x),
-      y: dragStart.current.oy + (e.clientY - dragStart.current.y),
+      x: dragStart.current.ox + (e.clientX - dragStart.current.x) * RATIO,
+      y: dragStart.current.oy + (e.clientY - dragStart.current.y) * RATIO,
     })
   }
 
@@ -88,8 +124,8 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
     if (!dragStart.current || e.touches.length !== 1) return
     const touch = e.touches[0]
     setOffset({
-      x: dragStart.current.ox + (touch.clientX - dragStart.current.x),
-      y: dragStart.current.oy + (touch.clientY - dragStart.current.y),
+      x: dragStart.current.ox + (touch.clientX - dragStart.current.x) * RATIO,
+      y: dragStart.current.oy + (touch.clientY - dragStart.current.y) * RATIO,
     })
   }
 
@@ -98,34 +134,14 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
     setIsDragging(false)
   }
 
-  const getCroppedBlob = async () => {
-    if (!imageRef.current || !imageSrc) return
-    const canvas = document.createElement('canvas')
-    const SIZE = 400
-    canvas.width = SIZE
-    canvas.height = SIZE
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    const img = imageRef.current
-    const displaySize = 280 // cropArea visual size in px
-    const ratio = SIZE / displaySize
-
-    ctx.save()
-    ctx.translate(SIZE / 2, SIZE / 2)
-    ctx.scale(scale, scale)
-    ctx.translate(-SIZE / 2, -SIZE / 2)
-    ctx.drawImage(
-      img,
-      (SIZE - img.naturalWidth * (displaySize / img.naturalHeight) * ratio) / 2 + offset.x * ratio,
-      (SIZE - img.naturalHeight * (displaySize / img.naturalHeight) * ratio) / 2 + offset.y * ratio,
-      img.naturalWidth * (displaySize / img.naturalHeight) * ratio,
-      img.naturalHeight * (displaySize / img.naturalHeight) * ratio,
-    )
-    ctx.restore()
-
-    canvas.toBlob(async (blob) => {
-      if (!blob) return
-      setIsSaving(true)
+  const handleSave = async () => {
+    if (!canvasRef.current || !imageSrc) return
+    setIsSaving(true)
+    canvasRef.current.toBlob(async (blob) => {
+      if (!blob) {
+        setIsSaving(false)
+        return
+      }
       try {
         const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
         const res = await usuarioService.subirFoto(file)
@@ -182,12 +198,11 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
                 >
-                  <img 
-                    ref={imageRef}
-                    src={imageSrc} 
-                    alt="Ajustar avatar" 
-                    className={styles.cropImage}
-                    draggable={false}
+                  <canvas
+                    ref={canvasRef}
+                    width={CANVAS_SIZE}
+                    height={CANVAS_SIZE}
+                    className={styles.cropCanvas}
                   />
                 </div>
 
@@ -211,6 +226,7 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
                   type="button" 
                   className={styles.changeFotoBtn}
                   onClick={() => {
+                    imageObj.current = null
                     setImageSrc(null)
                     setOffset({ x: 0, y: 0 })
                     setScale(1)
@@ -227,7 +243,7 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
             <button 
               type="button" 
               className={styles.submitBtn} 
-              onClick={getCroppedBlob}
+              onClick={handleSave}
               disabled={!imageSrc || isSaving}
             >
               {isSaving ? 'Guardando...' : 'Guardar foto'}

@@ -276,14 +276,13 @@ export default function PerfilPage() {
       </div>
 
       {/* HERO CARD */}
-      <div className={styles.heroCard}>
-        <div
-          className={styles.heroAccent}
-          style={{
-            ['--gradient-start' as string]: colors.color1,
-            ['--gradient-end' as string]: colors.color2,
-          } as React.CSSProperties}
-        />
+      <div 
+        className={styles.heroCard}
+        style={{
+          ['--gradient-start' as string]: colors.color1,
+          ['--gradient-end' as string]: colors.color2,
+        } as React.CSSProperties}
+      >
         <div className={styles.heroInner}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>

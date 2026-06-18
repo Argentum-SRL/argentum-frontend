@@ -165,15 +165,11 @@
   cursor: grabbing !important;
 }
 
-.cropImage {
-  position: absolute;
-  -webkit-user-select: none;
-  user-select: none;
-  pointer-events: none;
-  transform-origin: center center;
-  width: 100%;
-  top: 0;
-  left: 0;
+.cropCanvas {
+  display: block;
+  width: 280px;
+  height: 280px;
+  border-radius: 16px;
 }
 
 .zoomRow {

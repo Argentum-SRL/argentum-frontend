@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
-import { getEstadoOnboarding } from '@/lib/api/onboarding'
+import { getEstadoOnboarding } from '@/services/onboarding.service'
 import type { EstadoOnboarding } from '@/types/index'
 import StepIndicator from '@/components/onboarding/StepIndicator'
 import StepDatosPersonales from '@/components/onboarding/StepDatosPersonales'

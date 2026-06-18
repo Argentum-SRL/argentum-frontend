@@ -43,6 +43,3 @@ export async function getPreviewFechaCobro(dia: number, signal?: AbortSignal): P
   const res = await api.get('/onboarding/preview-fecha-cobro', { params: { dia }, signal })
   return res.data
 }
-
-
-

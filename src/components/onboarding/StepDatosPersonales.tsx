@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { guardarDatosPersonales } from '@/lib/api/onboarding'
+import { guardarDatosPersonales } from '@/services/onboarding.service'
 import styles from './StepDatosPersonales.module.css'
 import { DateInput, SelectInput, type SelectOption } from '@/components/ui'
 

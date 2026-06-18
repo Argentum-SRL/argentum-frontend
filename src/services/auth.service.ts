@@ -123,10 +123,6 @@ export async function completarPerfil(payload: CompletarPerfilPayload): Promise<
   return data
 }
 
-export async function eliminarCuenta(): Promise<void> {
-  await api.delete('/auth/me')
-}
-
 export interface VerificarRecuperacionPayload {
   email: string
   codigo: string

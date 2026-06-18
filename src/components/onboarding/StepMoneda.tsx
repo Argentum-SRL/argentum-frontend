@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { getCotizaciones, guardarMoneda } from '@/lib/api/onboarding'
+import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
 import styles from './StepMoneda.module.css'
 
@@ -89,18 +89,14 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
           <label className={styles.toggleLabel}>
             <div
               className={[styles.toggle, secundaria ? styles.toggleOn : ''].filter(Boolean).join(' ')}
-              onClick={() => setSecundaria((v) => !v)}
-              role="checkbox"
-              aria-checked={secundaria}
-              title="Alternar moneda secundaria"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === ' ' || e.key === 'Enter') {
-                  e.preventDefault()
-                  setSecundaria((v) => !v)
-                }
-              }}
             >
+              <input
+                type="checkbox"
+                checked={secundaria}
+                onChange={(e) => setSecundaria(e.target.checked)}
+                className={styles.checkboxInput}
+                title="Alternar moneda secundaria"
+              />
               <div className={styles.toggleThumb} />
             </div>
             <span className={styles.toggleText}>Mostrar moneda secundaria</span>

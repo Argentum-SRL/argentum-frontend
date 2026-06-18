@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Calendar, RefreshCw, Loader2 } from 'lucide-react'
-import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/lib/api/onboarding'
+import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { SelectInput } from '@/components/ui'
 import styles from './StepCicloFinanciero.module.css'
 

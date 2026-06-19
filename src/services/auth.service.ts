@@ -1,4 +1,4 @@
-import api, { setRefreshToken, setToken } from './api'
+import api, { setToken } from './api'
 import type { AuthResponse } from '@/types'
 
 export type { AuthResponse }
@@ -29,7 +29,6 @@ export interface OkResponse {
 
 function guardarTokensSiPresentes(data: AuthResponse): void {
   if (data.access_token) setToken(data.access_token)
-  if (data.refresh_token) setRefreshToken(data.refresh_token)
 }
 
 export async function loginWithEmail(payload: LoginPayload): Promise<AuthResponse> {

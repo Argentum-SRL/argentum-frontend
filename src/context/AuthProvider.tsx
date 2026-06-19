@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
-import { clearTokens, getToken, setToken, setRefreshToken } from '../services/api'
+import { clearTokens, getToken, setToken } from '../services/api'
 import type { Usuario, AuthResponse } from '../types/index'
 import { AuthContext } from './AuthContext'
 import { setNavigate, setLogoutFn } from '../utils/browserHistory'
@@ -17,11 +17,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [navigate])
 
   const logout = useCallback(async (options?: { state?: unknown }) => {
-    const refreshToken = localStorage.getItem('argentum_refresh_token')
     try {
-      if (refreshToken) {
-        await api.post('/auth/logout', { refresh_token: refreshToken })
-      }
+      await api.post('/auth/logout')
     } catch {
       // Silencioso: igual limpiamos localmente
     } finally {
@@ -37,7 +34,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback((respuesta: AuthResponse) => {
     if (respuesta.access_token) setToken(respuesta.access_token)
-    if (respuesta.refresh_token) setRefreshToken(respuesta.refresh_token)
     if (respuesta.usuario) setUsuario(respuesta.usuario)
   }, [])
 
@@ -58,17 +54,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true
 
     api
-      .get<Usuario>('/usuarios/me', { signal: controller.signal })
-      .then((res) => {
-        const { data } = res
-        if (mounted) setUsuario(data)
+      .post('/auth/refresh', null, { signal: controller.signal })
+      .then(async (refreshRes) => {
+        if (!mounted) return
+        setToken(refreshRes.data.access_token)
+        
+        try {
+          const userRes = await api.get<Usuario>('/usuarios/me', { signal: controller.signal })
+          if (mounted) {
+            setUsuario(userRes.data)
+          }
+        } catch {
+          if (mounted) {
+            clearTokens()
+            setUsuario(null)
+          }
+        }
       })
       .catch((err) => {
         if (err && (err.name === 'AbortError' || err.name === 'CanceledError')) {
           // timeout / aborted
-        } else if (err?.response?.status === 401) {
+          return
+        }
+        if (mounted) {
           clearTokens()
-          if (mounted) setUsuario(null)
+          setUsuario(null)
         }
       })
       .finally(() => {

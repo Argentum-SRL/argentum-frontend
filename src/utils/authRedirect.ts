@@ -1,6 +1,6 @@
 import type { NavigateFunction } from 'react-router-dom'
 import type { AuthResponse } from '@/types'
-import { setToken, setRefreshToken } from '@/services/api'
+import { setToken } from '@/services/api'
 
 export function manejarRespuestaAuth(
   respuesta: AuthResponse,
@@ -8,7 +8,6 @@ export function manejarRespuestaAuth(
   fromPath?: string
 ): void {
   if (respuesta.access_token) setToken(respuesta.access_token)
-  if (respuesta.refresh_token) setRefreshToken(respuesta.refresh_token)
 
   if (respuesta.requiere_telefono) {
     navigate('/auth/verificar-telefono', { replace: true })

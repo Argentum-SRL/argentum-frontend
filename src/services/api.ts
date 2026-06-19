@@ -3,37 +3,19 @@ import { logoutGlobal } from '../utils/browserHistory'
 
 
 
-// Estado en memoria como fallback temporal durante la transición
+// Estado en memoria
 let _tokenMemory: string | null = null
-let _refreshMemory: string | null = null
 
 export const getToken = (): string | null => {
-  // Intentar localStorage por compatibilidad, luego memoria
-  return localStorage.getItem('argentum_access_token') || _tokenMemory
+  return _tokenMemory
 }
 
-export const setToken = (token: string): void => {
+export const setToken = (token: string | null): void => {
   _tokenMemory = token
-  // También guardar en localStorage temporalmente para rehidratación
-  localStorage.setItem('argentum_access_token', token)
-}
-
-export const getRefreshToken = (): string | null => {
-  return localStorage.getItem('argentum_refresh_token') || _refreshMemory
-}
-
-export const setRefreshToken = (token: string): void => {
-  _refreshMemory = token
-  localStorage.setItem('argentum_refresh_token', token)
 }
 
 export const clearTokens = (): void => {
   _tokenMemory = null
-  _refreshMemory = null
-  localStorage.removeItem('argentum_access_token')
-  localStorage.removeItem('argentum_refresh_token')
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
 }
 /** @deprecated usá clearTokens() */
 export const clearToken = clearTokens
@@ -85,7 +67,6 @@ api.interceptors.response.use(
       const { data } = await api.post('/auth/refresh')
 
       setToken(data.access_token)
-      setRefreshToken(data.refresh_token)
 
       processQueue(null)
       return api(originalRequest)

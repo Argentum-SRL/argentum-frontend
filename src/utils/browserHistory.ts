@@ -1,3 +1,5 @@
+import { clearTokens } from '@/services/api'
+
 let navigateFn: ((path: string, options?: { replace?: boolean }) => void) | null = null
 let logoutFn: (() => void) | null = null
 
@@ -23,10 +25,7 @@ export function logoutGlobal() {
     logoutFn()
   } else {
     // fallback: limpiar storage manualmente
-    localStorage.removeItem('argentum_access_token')
-    localStorage.removeItem('argentum_refresh_token')
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    clearTokens()
     window.location.replace('/login')
   }
 }

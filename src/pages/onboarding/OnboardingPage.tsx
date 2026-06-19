@@ -41,7 +41,23 @@ export default function OnboardingPage() {
   const [estado, setEstado] = useState<EstadoOnboarding | null>(null)
   const [pasoActual, setPasoActual] = useState(1)
   const [cargando, setCargando] = useState(true)
+  const [errorCarga, setErrorCarga] = useState(false)
+  const [cargandoReintento, setCargandoReintento] = useState(false)
   const { refreshUser } = useAuth()
+
+  async function handleRefreshAndNavigate() {
+    setCargandoReintento(true)
+    setErrorCarga(false)
+    try {
+      await refreshUser()
+      navigate('/app/dashboard', { replace: true })
+    } catch (error) {
+      console.error('Error al refrescar usuario tras onboarding:', error)
+      setErrorCarga(true)
+    } finally {
+      setCargandoReintento(false)
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -49,12 +65,16 @@ export default function OnboardingPage() {
       .then((res) => {
         if (controller.signal.aborted) return
         if (res.onboarding_completo) {
-          refreshUser().then(() => {
+          return refreshUser().then(() => {
             if (!controller.signal.aborted) {
               navigate('/app/dashboard', { replace: true })
             }
+          }).catch((err) => {
+            if (!controller.signal.aborted) {
+              console.error(err)
+              setErrorCarga(true)
+            }
           })
-          return
         }
         setEstado(res)
         setPasoActual(mapEstadoAPaso(res))
@@ -78,9 +98,7 @@ export default function OnboardingPage() {
 
   function avanzar(siguientePaso: string | null) {
     if (!siguientePaso) {
-      refreshUser().then(() => {
-        navigate('/app/dashboard', { replace: true })
-      })
+      void handleRefreshAndNavigate()
       return
     }
     const next = PASO_NUMERO[siguientePaso]
@@ -113,28 +131,52 @@ export default function OnboardingPage() {
 
         <div className={styles.card}>
           <div key={pasoActual} className={styles.stepWrap}>
-            {pasoActual === 1 && (
-              <StepDatosPersonales
-                datosIniciales={{ 
-                  nombre: datos?.nombre ?? null, 
-                  apellido: datos?.apellido ?? null,
-                  fecha_nacimiento: datos?.fecha_nacimiento ?? null,
-                  sexo: datos?.sexo ?? null
-                }}
-                onNext={avanzar}
-              />
-            )}
-            {pasoActual === 2 && (
-              <StepCicloFinanciero
-                datosIniciales={{ ciclo_tipo: datos?.ciclo_tipo ?? null, ciclo_valor: datos?.ciclo_valor ?? null }}
-                onNext={avanzar}
-              />
-            )}
-            {pasoActual === 3 && (
-              <StepMoneda
-                datosIniciales={{ moneda_principal: datos?.moneda_principal ?? null }}
-                onNext={avanzar}
-              />
+            {errorCarga ? (
+              <div className="text-center">
+                <p className="text-[var(--error)] mb-4">
+                  Hubo un problema al cargar tu cuenta. Por favor intentá de nuevo.
+                </p>
+                <button
+                  onClick={handleRefreshAndNavigate}
+                  disabled={cargandoReintento}
+                  className="w-full h-12 rounded-xl font-semibold text-white bg-[var(--primary)] flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:opacity-90"
+                >
+                  {cargandoReintento ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      Cargando...
+                    </>
+                  ) : (
+                    'Reintentar'
+                  )}
+                </button>
+              </div>
+            ) : (
+              <>
+                {pasoActual === 1 && (
+                  <StepDatosPersonales
+                    datosIniciales={{ 
+                      nombre: datos?.nombre ?? null, 
+                      apellido: datos?.apellido ?? null,
+                      fecha_nacimiento: datos?.fecha_nacimiento ?? null,
+                      sexo: datos?.sexo ?? null
+                    }}
+                    onNext={avanzar}
+                  />
+                )}
+                {pasoActual === 2 && (
+                  <StepCicloFinanciero
+                    datosIniciales={{ ciclo_tipo: datos?.ciclo_tipo ?? null, ciclo_valor: datos?.ciclo_valor ?? null }}
+                    onNext={avanzar}
+                  />
+                )}
+                {pasoActual === 3 && (
+                  <StepMoneda
+                    datosIniciales={{ moneda_principal: datos?.moneda_principal ?? null }}
+                    onNext={avanzar}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>

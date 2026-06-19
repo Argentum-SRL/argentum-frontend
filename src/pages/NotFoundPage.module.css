@@ -1,0 +1,48 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--page);
+  color: var(--text);
+  text-align: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 6rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 8px 0;
+  line-height: 1;
+}
+
+.text {
+  font-size: 1.125rem;
+  color: var(--text-2);
+  margin: 0 0 24px 0;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 24px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--surface);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.button:hover {
+  opacity: 0.9;
+}

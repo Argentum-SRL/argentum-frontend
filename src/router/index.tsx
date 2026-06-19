@@ -26,6 +26,7 @@ const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const NotificacionesConfigPage = lazy(() => import('@/pages/app/configuracion/NotificacionesConfigPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 const router = createBrowserRouter([
   {
@@ -81,12 +82,13 @@ const router = createBrowserRouter([
               { path: '/app/perfil', element: <PerfilPage /> },
               { path: '/app/notificaciones/configuracion', element: <NotificacionesConfigPage /> },
               { path: '/app/herramientas', element: <ToolsPage /> },
+              { path: '/app/*', element: <NotFoundPage /> },
             ],
           },
         ],
       },
 
-      { path: '*', element: <Navigate to="/login" replace /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])

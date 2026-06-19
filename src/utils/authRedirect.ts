@@ -2,7 +2,11 @@ import type { NavigateFunction } from 'react-router-dom'
 import type { AuthResponse } from '@/types'
 import { setToken, setRefreshToken } from '@/services/api'
 
-export function manejarRespuestaAuth(respuesta: AuthResponse, navigate: NavigateFunction): void {
+export function manejarRespuestaAuth(
+  respuesta: AuthResponse,
+  navigate: NavigateFunction,
+  fromPath?: string
+): void {
   if (respuesta.access_token) setToken(respuesta.access_token)
   if (respuesta.refresh_token) setRefreshToken(respuesta.refresh_token)
 
@@ -23,6 +27,7 @@ export function manejarRespuestaAuth(respuesta: AuthResponse, navigate: Navigate
   } else if (respuesta.requiere_onboarding) {
     navigate('/onboarding', { replace: true })
   } else {
-    navigate('/app/dashboard', { replace: true })
+    const target = (fromPath && fromPath.startsWith('/app/')) ? fromPath : '/app/dashboard'
+    navigate(target, { replace: true })
   }
 }

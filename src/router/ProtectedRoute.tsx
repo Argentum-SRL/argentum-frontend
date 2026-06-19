@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 
 interface Props {
@@ -7,6 +7,7 @@ interface Props {
 
 export default function ProtectedRoute({ mode = 'app' }: Props) {
   const { usuario, isAuthenticated, isLoading, is_admin } = useAuth()
+  const location = useLocation()
 
   if (isLoading) {
     return (
@@ -17,7 +18,7 @@ export default function ProtectedRoute({ mode = 'app' }: Props) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   if (mode === 'admin') {

@@ -6,7 +6,6 @@ import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import DashboardMockup from '@/components/mock/DashboardMockup/DashboardMockup'
 import Field from '@/components/ui/Field/Field'
 import { registerWithEmail, loginWithGoogle } from '@/services/auth.service'
-import { getToken } from '@/services/api'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
 import styles from './RegisterPage.module.css'
@@ -21,7 +20,7 @@ const validatePassword = (pwd: string): string | null => {
 }
 
 export default function RegisterPage() {
-  const { login } = useAuth()
+  const { login, isAuthenticated, usuario } = useAuth()
   const navigate = useNavigate()
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -41,8 +40,10 @@ export default function RegisterPage() {
   }
 
   useEffect(() => {
-    if (getToken()) navigate('/app/dashboard', { replace: true })
-  }, [navigate])
+    if (isAuthenticated && usuario) {
+      navigate(usuario.onboarding_completo ? '/app/dashboard' : '/onboarding', { replace: true })
+    }
+  }, [isAuthenticated, usuario, navigate])
 
   const nombreError = hasSubmitted && !nombre.trim() ? 'Ingresá tu nombre.' : null
   const apellidoError = hasSubmitted && !apellido.trim() ? 'Ingresá tu apellido.' : null

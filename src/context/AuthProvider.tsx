@@ -4,6 +4,7 @@ import api from '../services/api'
 import { clearTokens, getToken, setToken, setRefreshToken } from '../services/api'
 import type { Usuario, AuthResponse } from '../types/index'
 import { AuthContext } from './AuthContext'
+import { setNavigate } from '../utils/browserHistory'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
@@ -12,6 +13,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return !!getToken()
   })
   const navigate = useNavigate()
+
+  useEffect(() => {
+    setNavigate(navigate)
+  }, [navigate])
 
   const logout = useCallback(async (options?: { state?: unknown }) => {
     const refreshToken = localStorage.getItem('argentum_refresh_token')
@@ -41,12 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = useCallback(async () => {
     const token = getToken()
     if (!token) return
-    try {
-      const { data } = await api.get<{ usuario: Usuario }>('/auth/me')
-      setUsuario(data.usuario)
-    } catch {
-      // Ignorar
-    }
+    const { data } = await api.get<{ usuario: Usuario }>('/auth/me')
+    setUsuario(data.usuario)
   }, [])
 
   useEffect(() => {

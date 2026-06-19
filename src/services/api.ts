@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { navigateTo } from '../utils/browserHistory'
 
 const ACCESS_KEY = 'argentum_access_token'
 const REFRESH_KEY = 'argentum_refresh_token'
@@ -41,7 +42,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    const isAuthEndpoint = originalRequest.url?.includes('/auth/')
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/') && !originalRequest.url?.includes('/auth/me')
     if (error.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {
       return Promise.reject(error)
     }
@@ -50,7 +51,7 @@ api.interceptors.response.use(
 
     if (!refreshToken) {
       clearTokens()
-      window.location.replace('/login')
+      navigateTo('/login', { replace: true })
       return Promise.reject(error)
     }
 
@@ -87,7 +88,7 @@ api.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null)
       clearTokens()
-      window.location.replace('/login')
+      navigateTo('/login', { replace: true })
       return Promise.reject(refreshError)
     } finally {
       isRefreshing = false

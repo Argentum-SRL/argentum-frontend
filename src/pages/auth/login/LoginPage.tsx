@@ -1,12 +1,11 @@
 import { type FormEvent, useState, useEffect, useCallback } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { useNavigate, Link, useLocation, type Location } from 'react-router-dom'
 import { Eye, EyeOff, Phone, CheckCircle2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
 import Field from '@/components/ui/Field/Field'
 import { loginWithEmail, loginWithGoogle } from '@/services/auth.service'
-import { getToken } from '@/services/api'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
 import styles from './LoginPage.module.css'
@@ -15,6 +14,7 @@ export default function LoginPage() {
   const { login, isAuthenticated, usuario } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const from = (location.state as { from?: Location })?.from?.pathname
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -30,8 +30,11 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    if (getToken() && isAuthenticated && usuario?.onboarding_completo) {
-      navigate('/app/dashboard', { replace: true })
+    if (isAuthenticated && usuario) {
+      navigate(
+        usuario.onboarding_completo ? '/app/dashboard' : '/onboarding',
+        { replace: true }
+      )
     }
   }, [isAuthenticated, usuario, navigate])
 
@@ -47,7 +50,7 @@ export default function LoginPage() {
       setApiError(null)
       const respuesta = await loginWithGoogle(credential)
       login(respuesta)
-      manejarRespuestaAuth(respuesta, navigate)
+      manejarRespuestaAuth(respuesta, navigate, from)
     } catch (err: unknown) {
       logGoogleError('Error al llamar loginWithGoogle', err)
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
@@ -56,7 +59,7 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }, [login, navigate])
+  }, [login, navigate, from])
 
   const handleGoogleError = useCallback(() => {
     if (import.meta.env.DEV) {
@@ -74,7 +77,7 @@ export default function LoginPage() {
     try {
       const respuesta = await loginWithEmail({ email, password })
       login(respuesta)
-      manejarRespuestaAuth(respuesta, navigate)
+      manejarRespuestaAuth(respuesta, navigate, from)
     } catch (err: unknown) {
       if (import.meta.env.DEV) {
         console.error('[Auth][Email][Login] Error visible en UI', err)

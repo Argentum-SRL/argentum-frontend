@@ -20,6 +20,7 @@ import type { MetodosLogin } from '@/types'
 import * as authService from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { SelectInput, type SelectOption } from '@/components/ui'
 import FotoCropModal from '@/components/perfil/FotoCropModal'
 
@@ -88,7 +89,6 @@ function useImageColors(imageUrl: string | null) {
         ctx.drawImage(img, 0, 0, 10, 10)
         const imageData = ctx.getImageData(0, 0, 10, 10).data
 
-        // Sample two pixels from different parts of the image to get a nice gradient
         const r1 = imageData[0]
         const g1 = imageData[1]
         const b1 = imageData[2]
@@ -187,19 +187,35 @@ export default function PerfilPage() {
 
   const handleSaveDatosPersonales = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
-    try { const updated = await usuarioService.actualizarDatosPersonales(formDatos); updateUsuario(updated); handleCloseModal() }
-    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.') }
-    finally { setIsSaving(false) }
+    try { 
+      const updated = await usuarioService.actualizarDatosPersonales(formDatos)
+      updateUsuario(updated)
+      showToast('Tu perfil se actualizó correctamente.', 'success')
+      handleCloseModal() 
+    } catch (err: unknown) { 
+      const msg = getErrorMessage(err, "No pudimos actualizar tu perfil. Intentá de nuevo.")
+      setModalError(msg)
+      showToast(msg, "error") 
+    } finally { 
+      setIsSaving(false) 
+    }
   }
 
   const handleVerificarEmailActual = async () => {
     if (!usuario?.email) return; setIsSaving(true)
     try {
       const res = await authService.enviarCodigoEmail(usuario.email)
-      if ((res as { verificado: boolean }).verificado) { if (usuario) updateUsuario({ ...usuario, email_verificado: true }); showToast('Email verificado correctamente.', 'success') }
-      else navigate('/auth/verificar-email', { state: { email: usuario.email } })
-    } catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; showToast(error.response?.data?.detail || 'Error al enviar el código.', 'error') }
-    finally { setIsSaving(false) }
+      if ((res as { verificado: boolean }).verificado) { 
+        if (usuario) updateUsuario({ ...usuario, email_verificado: true })
+        showToast('Email verificado correctamente.', 'success') 
+      } else {
+        navigate('/auth/verificar-email', { state: { email: usuario.email } })
+      }
+    } catch (err: unknown) { 
+      showToast(getErrorMessage(err, 'Error al enviar el código.'), 'error') 
+    } finally { 
+      setIsSaving(false) 
+    }
   }
 
   const handleSaveEmail = async (e: React.FormEvent) => {
@@ -218,8 +234,9 @@ export default function PerfilPage() {
         navigate('/auth/verificar-email', { state: { email: formEmail.email_nuevo } })
       }
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.')
+      const msg = getErrorMessage(err, 'No pudimos actualizar el email.')
+      setModalError(msg)
+      showToast(msg, 'error')
     } finally {
       setIsSaving(false)
     }
@@ -228,39 +245,68 @@ export default function PerfilPage() {
   const handleSaveTelefono = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
     try {
-      const res = await usuarioService.actualizarTelefono({ telefono_nuevo: formTelefono.telefono_nuevo, password_actual: usuario?.auth_provider === 'google' ? undefined : formTelefono.password_actual })
+      const res = await usuarioService.actualizarTelefono({ 
+        telefono_nuevo: formTelefono.telefono_nuevo, 
+        password_actual: usuario?.auth_provider === 'google' ? undefined : formTelefono.password_actual 
+      })
       if (res.requiere_verificacion_telefono) navigate('/auth/verificar-telefono')
-    } catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal. Intenta de nuevo.') }
-    finally { setIsSaving(false) }
+    } catch (err: unknown) { 
+      const msg = getErrorMessage(err, 'No pudimos actualizar el teléfono.')
+      setModalError(msg) 
+      showToast(msg, 'error')
+    } finally { 
+      setIsSaving(false) 
+    }
   }
 
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
     try {
-      await usuarioService.actualizarPassword({ password_actual: formPassword.password_actual || undefined, password_nueva: formPassword.password_nueva, password_nueva_confirmacion: formPassword.password_nueva_confirmacion })
-      showToast('Contraseña actualizada exitosamente', 'success'); handleCloseModal(); setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
+      await usuarioService.actualizarPassword({ 
+        password_actual: formPassword.password_actual || undefined, 
+        password_nueva: formPassword.password_nueva, 
+        password_nueva_confirmacion: formPassword.password_nueva_confirmacion 
+      })
+      showToast('¡Listo! Tu contraseña se actualizó.', 'success')
+      handleCloseModal()
+      setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }; const detail = error.response?.data?.detail
-      if (detail?.includes('coinciden')) setModalError('Las contraseñas nuevas no coinciden.')
-      else if (detail?.includes('actual incorrecta')) setModalError('La contraseña actual es incorrecta.')
-      else if (detail?.includes('8 caracteres')) setModalError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.')
-      else setModalError(detail || 'Algo salió mal.')
+      const msg = getErrorMessage(err, "No pudimos cambiar tu contraseña. Revisá que la contraseña actual sea correcta.")
+      setModalError(msg)
+      showToast(msg, "error")
+    } finally { 
+      setIsSaving(false) 
     }
-    finally { setIsSaving(false) }
   }
 
   const handleSaveCiclo = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
-    try { const updated = await usuarioService.actualizarCicloFinanciero(formCiclo); updateUsuario(updated); handleCloseModal() }
-    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal.') }
-    finally { setIsSaving(false) }
+    try { 
+      const updated = await usuarioService.actualizarCicloFinanciero(formCiclo)
+      updateUsuario(updated)
+      handleCloseModal() 
+    } catch (err: unknown) { 
+      const msg = getErrorMessage(err, 'No pudimos actualizar el ciclo financiero.')
+      setModalError(msg) 
+      showToast(msg, 'error')
+    } finally { 
+      setIsSaving(false) 
+    }
   }
 
   const handleSaveMoneda = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
-    try { const updated = await usuarioService.actualizarMoneda(formMoneda); updateUsuario(updated); handleCloseModal() }
-    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; setModalError(error.response?.data?.detail || 'Algo salió mal.') }
-    finally { setIsSaving(false) }
+    try { 
+      const updated = await usuarioService.actualizarMoneda(formMoneda)
+      updateUsuario(updated)
+      handleCloseModal() 
+    } catch (err: unknown) { 
+      const msg = getErrorMessage(err, 'No pudimos actualizar la moneda.')
+      setModalError(msg) 
+      showToast(msg, 'error')
+    } finally { 
+      setIsSaving(false) 
+    }
   }
 
   const getFotoUrl = () => {
@@ -301,12 +347,18 @@ export default function PerfilPage() {
               <button
                 className={styles.deleteFotoBtn}
                 onClick={() => confirm({
-                  title: 'Eliminar foto de perfil',
-                  description: '¿Estás seguro de que querés eliminar tu foto de perfil?',
+                  title: '¿Eliminás tu foto de perfil?',
+                  description: 'Se va a borrar y vas a quedar con el avatar por defecto.',
                   variant: 'danger',
+                  confirmLabel: 'Eliminar',
                   onConfirm: async () => {
-                    try { await usuarioService.eliminarFoto(); if (usuario) updateUsuario({ ...usuario, foto_url: null }); showToast('Foto eliminada', 'success') }
-                    catch (err: unknown) { const error = err as { response?: { data?: { detail?: string } } }; showToast(error.response?.data?.detail || 'Error al eliminar la foto', 'error') }
+                    try { 
+                      await usuarioService.eliminarFoto()
+                      if (usuario) updateUsuario({ ...usuario, foto_url: null })
+                      showToast('Foto de perfil eliminada.', 'success') 
+                    } catch (err: unknown) { 
+                      showToast(getErrorMessage(err, 'No pudimos eliminar la foto de perfil.'), 'error') 
+                    }
                   },
                 })}
                 title="Eliminar foto de perfil"
@@ -488,14 +540,20 @@ export default function PerfilPage() {
             <LogOut size={15} />Cerrar sesión
           </button>
           <button className={styles.deleteBtn} onClick={() => confirm({
-            title: '¿Estás absolutamente seguro?',
-            description: 'Esta acción borrará definitivamente todos tus datos financieros en Argentum. No se puede deshacer.',
+            title: '¿Eliminás tu cuenta?',
+            description: 'Esta acción es permanente. Se van a borrar todos tus datos, transacciones y configuración. No hay vuelta atrás.',
             variant: 'danger',
             confirmLabel: 'Confirmar eliminación total',
             requireTyping: 'ELIMINAR',
             onConfirm: async () => {
-              try { await usuarioService.eliminarCuenta(); showToast('Cuenta eliminada exitosamente', 'success'); await logout() }
-              catch (error) { console.error('Error al eliminar la cuenta:', error); showToast('Hubo un error al intentar eliminar la cuenta.', 'error') }
+              try { 
+                await usuarioService.eliminarCuenta()
+                showToast('Cuenta eliminada exitosamente', 'success')
+                await logout() 
+              } catch (error) { 
+                console.error('Error al eliminar la cuenta:', error)
+                showToast(getErrorMessage(error, 'Hubo un error al intentar eliminar la cuenta.'), 'error') 
+              }
             },
           })}>
             <Trash2 size={15} />Eliminar mi cuenta

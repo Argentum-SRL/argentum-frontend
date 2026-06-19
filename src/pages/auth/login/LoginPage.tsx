@@ -8,6 +8,7 @@ import Field from '@/components/ui/Field/Field'
 import { loginWithEmail, loginWithGoogle } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
@@ -44,9 +45,7 @@ export default function LoginPage() {
       manejarRespuestaAuth(respuesta, navigate, from)
     } catch (err: unknown) {
       logGoogleError('Error al llamar loginWithGoogle', err)
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      const message = (err as { message?: string })?.message
-      setApiError(detail || message || 'Falló el login con Google.')
+      setApiError(getErrorMessage(err, 'Falló el login con Google.'))
     } finally {
       setLoading(false)
     }
@@ -73,9 +72,7 @@ export default function LoginPage() {
       if (import.meta.env.DEV) {
         console.error('[Auth][Email][Login] Error visible en UI', err)
       }
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      const message = (err as { message?: string })?.message
-      setApiError(detail || message || 'Algo salió mal. Intentá de nuevo.')
+      setApiError(getErrorMessage(err, "No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo."))
     } finally {
       setLoading(false)
     }
@@ -97,6 +94,7 @@ export default function LoginPage() {
           onChange={setEmail}
           autoFocus
           error={emailError}
+          placeholder="tu@email.com"
         />
 
         <Field
@@ -105,6 +103,7 @@ export default function LoginPage() {
           value={password}
           onChange={setPassword}
           error={passwordError}
+          placeholder="Tu contraseña"
           rightSlot={
             <button
               type="button"

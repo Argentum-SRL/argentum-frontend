@@ -20,6 +20,7 @@ import type { Billetera } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { Button } from '@/components/ui'
 import { 
   AreaChart, 
@@ -79,7 +80,7 @@ export default function MetaDetallePage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      showToast('Error al cargar detalle de la meta', 'error')
+      showToast(getErrorMessage(err, 'No pudimos cargar el detalle de la meta. Intentá de nuevo.'), 'error')
       navigate('/app/metas')
     } finally {
       if (!signal?.aborted) {
@@ -129,18 +130,17 @@ export default function MetaDetallePage() {
     }
 
     confirm({
-      title: 'Eliminar Meta',
-      description: `¿Estás seguro de que querés eliminar "${goal.nombre}"? No se eliminará el dinero de tus billeteras, pero el historial de esta meta se perderá.`,
+      title: '¿Eliminás esta meta?',
+      description: 'Se va a borrar junto con su historial de aportes.',
       variant: 'danger',
+      confirmLabel: 'Eliminar',
       onConfirm: async () => {
         try {
           await goalsService.deleteGoal(goal.id)
-          showToast('Meta eliminada correctamente', 'success')
+          showToast('La meta se eliminó.', 'success')
           navigate('/app/metas')
         } catch (err: unknown) {
-          const error = err as import('axios').AxiosError<{ detail: unknown }>
-          const detail = (error.response?.data?.detail as string) || 'Error al eliminar meta'
-          showToast(typeof detail === 'string' ? detail : 'Error al eliminar meta', 'error')
+          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       }
     })

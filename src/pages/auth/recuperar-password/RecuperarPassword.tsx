@@ -5,11 +5,12 @@ import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import Field from '@/components/ui/Field/Field'
 import { recuperarPassword, verificarRecuperacion } from '@/services/auth.service'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './RecuperarPassword.module.css'
 
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
-  if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
+  if (pwd.length < 8) return 'La contraseña tiene que tener al menos 8 caracteres.'
   if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
   if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
   if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
@@ -44,7 +45,7 @@ export default function RecuperarPassword() {
     ? !confirmarPassword
       ? 'Confirmá tu contraseña.'
       : confirmarPassword !== nuevaPassword
-        ? 'Las contraseñas no coinciden.'
+        ? 'Las contraseñas no coinciden. Revisalas.'
         : null
     : null
 
@@ -61,9 +62,7 @@ export default function RecuperarPassword() {
       setEnviado(true)
       setHasSubmitted(false)
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      const detail = error.response?.data?.detail
-      setApiError(detail || 'Ocurrió un error al enviar el enlace de recuperación.')
+      setApiError(getErrorMessage(err, "No pudimos mandarte el email. Revisá que el email sea correcto e intentá de nuevo."))
     } finally {
       setLoading(false)
     }
@@ -77,7 +76,7 @@ export default function RecuperarPassword() {
     const cpError = !confirmarPassword 
       ? 'Confirmá tu contraseña.' 
       : confirmarPassword !== nuevaPassword 
-        ? 'Las contraseñas no coinciden.' 
+        ? 'Las contraseñas no coinciden. Revisalas.' 
         : null
 
     if (pError || cpError || !codigo || !email.trim()) return
@@ -96,9 +95,7 @@ export default function RecuperarPassword() {
         state: { message: 'Tu contraseña fue restablecida con éxito. Ya podés iniciar sesión.' }
       })
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      const detail = error.response?.data?.detail
-      setApiError(detail || 'El enlace de recuperación es inválido o ha expirado.')
+      setApiError(getErrorMessage(err, "No pudimos cambiar tu contraseña. El enlace puede haber expirado — pedí uno nuevo."))
     } finally {
       setLoading(false)
     }
@@ -180,7 +177,7 @@ export default function RecuperarPassword() {
             <CheckCircle2 size={48} className={styles.successIcon} />
           </div>
           <p className={styles.successMessage}>
-            Te enviamos un correo electrónico a <strong>{email}</strong> con un enlace para restablecer tu contraseña.
+            Si hay una cuenta con ese email, te vamos a mandar un enlace para cambiar tu contraseña.
           </p>
           <p className={styles.instructions}>
             Por favor, revisá tu bandeja de entrada (y la carpeta de correo no deseado/spam) y hacé clic en el botón del correo para continuar.

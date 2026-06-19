@@ -6,6 +6,8 @@ import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import Field from '@/components/ui/Field/Field'
 import { validarResetToken, confirmarResetPassword } from '@/services/auth.service'
 import { useAuth } from '@/hooks/useAuth'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import styles from './ResetPasswordPage.module.css'
 
@@ -20,6 +22,7 @@ const validatePassword = (pwd: string): string | null => {
 
 export default function ResetPasswordPage() {
   const { login } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') || ''
@@ -70,7 +73,7 @@ export default function ResetPasswordPage() {
     ? !confirmarPassword
       ? 'Confirmá tu contraseña.'
       : confirmarPassword !== nuevaPassword
-        ? 'Las contraseñas no coinciden.'
+        ? 'Las contraseñas no coinciden. Revisalas.'
         : null
     : null
 
@@ -83,7 +86,7 @@ export default function ResetPasswordPage() {
     const cpError = !confirmarPassword
       ? 'Confirmá tu contraseña.'
       : confirmarPassword !== nuevaPassword
-        ? 'Las contraseñas no coinciden.'
+        ? 'Las contraseñas no coinciden. Revisalas.'
         : null
 
     if (pError || cpError || !token) return
@@ -93,6 +96,7 @@ export default function ResetPasswordPage() {
 
     try {
       const respuesta = await confirmarResetPassword(token, nuevaPassword)
+      showToast('¡Listo! Tu contraseña se actualizó. Ya podés entrar con la nueva.', 'success')
       login(respuesta)
       setStatus('confirmado')
       setTimeout(() => {
@@ -101,12 +105,13 @@ export default function ResetPasswordPage() {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: { code?: string; message?: string } } } }
       const code = error.response?.data?.error?.code
-      const message = error.response?.data?.error?.message
 
       if (code === 'TOKEN_INVALIDO') {
         setStatus('invalido')
       } else {
-        setApiError(message || 'Ocurrió un error al restablecer la contraseña.')
+        const msg = getErrorMessage(err, "No pudimos cambiar tu contraseña. El enlace puede haber expirado — pedí uno nuevo.")
+        setApiError(msg)
+        showToast(msg, "error")
       }
     } finally {
       setLoading(false)

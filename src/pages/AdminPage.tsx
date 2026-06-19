@@ -3,6 +3,8 @@ import { useAuth } from '@/hooks/useAuth'
 import adminService from '@/services/adminService'
 import type { UsuarioAdminResumen, UsuarioAdmin, FiltrosAdmin, AdminStats } from '@/types/admin'
 import { Button, EmptyState, Select } from '@/components/ui'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import {
   Search,
   Loader2,
@@ -62,6 +64,7 @@ function TableAvatar({ fotoUrl, nombre }: { fotoUrl: string | null; nombre: stri
 
 export default function AdminPage() {
   const { usuario: currentAdmin } = useAuth()
+  const { showToast } = useToast()
   
   // Tab activa
   const [activeTab, setActiveTab] = useState<'usuarios' | 'wpp' | 'scheduler'>('usuarios')
@@ -92,7 +95,8 @@ export default function AdminPage() {
   // Confirmaciones e inline feedback
   const [confirmAction, setConfirmAction] = useState<{
     type: 'estado' | 'reset-password' | 'revocar' | 'wpp' | 'onboarding'
-    message: string
+    title: string
+    description: string
     requireDouble?: boolean
   } | null>(null)
   const [doubleConfirmChecked, setDoubleConfirmChecked] = useState(false)
@@ -146,7 +150,7 @@ export default function AdminPage() {
     } catch (err) {
       const errorObj = err as { name?: string }
       if (errorObj.name !== 'CanceledError' && errorObj.name !== 'AbortError') {
-        setError('Ocurrió un error al obtener la lista de usuarios.')
+        setError(getErrorMessage(err, 'No pudimos cargar la información de los usuarios.'))
       }
     } finally {
       setLoading(false)
@@ -198,9 +202,7 @@ export default function AdminPage() {
         setDetailError('No se pudo obtener el detalle del usuario.')
       }
     } catch (err) {
-      const errorObj = err as { response?: { data?: { error?: { message?: string } } } }
-      const errMsg = errorObj.response?.data?.error?.message || 'Error al obtener el detalle del usuario.'
-      setDetailError(errMsg)
+      setDetailError(getErrorMessage(err, 'No pudimos obtener el detalle del usuario.'))
     } finally {
       setLoadingDetail(false)
     }
@@ -278,9 +280,7 @@ export default function AdminPage() {
       fetchUsuarios()
       fetchStats()
     } catch (err) {
-      const errorObj = err as { response?: { data?: { error?: { message?: string } } } }
-      const errMsg = errorObj.response?.data?.error?.message || 'Ocurrió un error al procesar la acción.'
-      setActionFeedback({ success: false, message: errMsg })
+      showToast(getErrorMessage(err, "No pudimos completar la acción. Intentá de nuevo."), "error")
     } finally {
       setActionLoading(false)
     }
@@ -728,7 +728,10 @@ export default function AdminPage() {
                     onClick={() =>
                       setConfirmAction({
                         type: 'estado',
-                        message: `¿Estás seguro de que querés ${selectedUser.is_active ? 'DESACTIVAR' : 'ACTIVAR'} la cuenta de este usuario?`
+                        title: selectedUser.is_active ? '¿Suspendés este usuario?' : '¿Reactivás este usuario?',
+                        description: selectedUser.is_active
+                          ? 'No va a poder entrar a su cuenta hasta que lo reactives.'
+                          : 'Va a poder volver a acceder a la plataforma.'
                       })
                     }
                     title={selectedUser.id === currentAdmin?.id ? 'No podés desactivar tu propia cuenta' : ''}
@@ -744,7 +747,8 @@ export default function AdminPage() {
                     onClick={() =>
                       setConfirmAction({
                         type: 'reset-password',
-                        message: '¿Querés enviar un correo para que el usuario restablezca su contraseña?'
+                        title: '¿Enviás el reset de contraseña?',
+                        description: 'Le vamos a mandar un email para que cambie su contraseña.'
                       })
                     }
                     title={!selectedUser.email ? 'El usuario no tiene email configurado' : ''}
@@ -760,7 +764,8 @@ export default function AdminPage() {
                     onClick={() =>
                       setConfirmAction({
                         type: 'revocar',
-                        message: '¿Estás seguro de que querés forzar el cierre de todas las sesiones de este usuario? Todos sus dispositivos deberán volver a iniciar sesión.'
+                        title: '¿Forzás el cierre de sesiones?',
+                        description: 'Todos sus dispositivos abiertos van a tener que iniciar sesión de nuevo.'
                       })
                     }
                     title={selectedUser.id === currentAdmin?.id ? 'No podés revocar tus propias sesiones' : ''}
@@ -776,7 +781,8 @@ export default function AdminPage() {
                     onClick={() =>
                       setConfirmAction({
                         type: 'wpp',
-                        message: '¿Estás seguro de que querés desvincular el número de WhatsApp de este usuario? Se perderá la recepción de notificaciones inmediatas.'
+                        title: '¿Desconectás WhatsApp?',
+                        description: 'Se va a desvincular su número y no va a recibir notificaciones por esta vía.'
                       })
                     }
                     title={!selectedUser.whatsapp_vinculado ? 'El usuario no tiene WhatsApp vinculado' : ''}
@@ -792,7 +798,8 @@ export default function AdminPage() {
                     onClick={() =>
                       setConfirmAction({
                         type: 'onboarding',
-                        message: '¿Estás seguro de que querés resetear el onboarding? Esto forzará al usuario a ingresar al flujo de configuración inicial de datos personales, ciclo financiero y moneda. No afectará sus transacciones ni billeteras existentes.',
+                        title: '¿Reseteás el onboarding?',
+                        description: 'El usuario va a tener que completar de nuevo la configuración inicial (datos personales, ciclo financiero y moneda) al ingresar.',
                         requireDouble: true
                       })
                     }
@@ -806,9 +813,12 @@ export default function AdminPage() {
                 {/* Dynamic Confirmation Box */}
                 {confirmAction && (
                   <div className={styles.confirmBox}>
-                    <div className="flex gap-2 text-[var(--gold)]">
-                      <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-                      <span className={styles.confirmText}>{confirmAction.message}</span>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2 text-[var(--gold)] font-semibold">
+                        <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                        <span>{confirmAction.title}</span>
+                      </div>
+                      <span className={styles.confirmText}>{confirmAction.description}</span>
                     </div>
                     
                     {confirmAction.requireDouble && (
@@ -889,5 +899,3 @@ export default function AdminPage() {
     </div>
   )
 }
-
-

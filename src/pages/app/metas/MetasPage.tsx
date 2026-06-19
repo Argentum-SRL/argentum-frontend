@@ -13,6 +13,7 @@ import type { Billetera } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import GoalCard from '@/components/goals/GoalCard'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 
@@ -37,7 +38,7 @@ export default function MetasPage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      showToast('Error al cargar metas', 'error')
+      showToast(getErrorMessage(err, 'No pudimos cargar las metas. Intentá de nuevo.'), 'error')
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
@@ -219,7 +220,7 @@ export default function MetasPage() {
         ) : filteredGoals.length === 0 ? (
           <EmptyState
             icon={Target}
-            title={searchQuery ? 'No se encontraron resultados' : `Sin metas ${activeTab}s`}
+            title={searchQuery ? 'No se encontraron resultados' : activeTab === 'activa' ? 'Todavía no tenés ninguna meta guardada.' : `Sin metas ${activeTab}s`}
             description={
               searchQuery 
                 ? 'Probá con otro nombre o criterio de búsqueda.' 

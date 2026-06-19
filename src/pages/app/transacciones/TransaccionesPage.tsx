@@ -9,6 +9,7 @@ import tarjetaService from '@/services/tarjeta.service'
 import { exportarTransaccionesPDF } from '@/services/exportPdf.service'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { calcularPeriodoActual } from '@/lib/utils/ciclo'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
@@ -70,7 +71,7 @@ export default function TransaccionesPage() {
         return
       }
       console.error(err)
-      showToast('Error al cargar transacciones', 'error')
+      showToast(getErrorMessage(err, 'No pudimos cargar las transacciones. Intentá de nuevo.'), 'error')
     }
   }, [filters, showToast])
 
@@ -168,18 +169,18 @@ export default function TransaccionesPage() {
     if (!tx) return
 
     confirm({
-      title: 'Eliminar transacción',
-      description: '¿Estás seguro de que querés eliminar esta transacción? Esta acción no se puede deshacer.',
+      title: '¿Eliminás esta transacción?',
+      description: 'Se va a borrar para siempre y no hay forma de recuperarla.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(id)
-          showToast('Transacción eliminada', 'success')
+          showToast('La transacción se eliminó.', 'success')
           refresh()
         } catch (e) {
           console.error(e)
-          showToast('Error al eliminar la transacción', 'error')
+          showToast(getErrorMessage(e, 'No pudimos eliminar la transacción. Intentá de nuevo.'), 'error')
         }
       },
     })
@@ -200,8 +201,6 @@ export default function TransaccionesPage() {
   const handleClearFilters = useCallback(() => {
     setFilters(defaultFilters)
   }, [defaultFilters])
-
-
 
   const openNewRecurrente = useCallback(() => {
     recurrentesRef.current?.openNew()
@@ -370,7 +369,6 @@ export default function TransaccionesPage() {
             ]}
           />
 
-
           {/* ── Filter Bar ───────────────────────────────────────────────────── */}
           <FilterBar
             filters={filters}
@@ -408,7 +406,7 @@ export default function TransaccionesPage() {
                 description={
                   hasActiveFilters 
                     ? 'No encontramos transacciones con esos filtros.' 
-                    : 'Todavía no registraste ninguna transacción este ciclo.'
+                    : 'Todavía no registraste ningún movimiento.'
                 }
                 actionLabel={hasActiveFilters ? 'Limpiar filtros' : 'Registrar primera transacción'}
                 onActionClick={hasActiveFilters ? handleClearFilters : openNewTransaccion}

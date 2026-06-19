@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { guardarDatosPersonales } from '@/services/onboarding.service'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepDatosPersonales.module.css'
 import { DateInput, SelectInput, type SelectOption } from '@/components/ui'
 
@@ -23,6 +25,7 @@ interface Props {
 }
 
 export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
+  const { showToast } = useToast()
   const [nombre, setNombre] = useState(datosIniciales.nombre ?? '')
   const [apellido, setApellido] = useState(datosIniciales.apellido ?? '')
   const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales.fecha_nacimiento ?? '')
@@ -36,22 +39,33 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
   
   const getFechaNacimientoError = () => {
     if (!submitted) return null
-    if (!fechaNacimiento) return 'Ingresa tu fecha de nacimiento.'
+    if (!fechaNacimiento) return 'La fecha que ingresaste no es válida.'
     const selectedDate = new Date(fechaNacimiento)
     const today = new Date()
-    if (selectedDate > today) return 'La fecha no puede ser futura.'
+    if (isNaN(selectedDate.getTime())) return 'La fecha que ingresaste no es válida.'
+    if (selectedDate > today) return 'La fecha que ingresaste no es válida.'
+    
+    // Check 18 years
+    let age = today.getFullYear() - selectedDate.getFullYear()
+    const m = today.getMonth() - selectedDate.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < selectedDate.getDate())) {
+      age--
+    }
+    if (age < 18) {
+      return 'Tenés que ser mayor de 18 años para usar Argentum.'
+    }
     return null
   }
   const fechaNacimientoError = getFechaNacimientoError()
   
-  const sexoError = submitted && !sexo ? 'Selecciona una opcion.' : null
+  const sexoError = submitted && !sexo ? 'Seleccioná tu género' : null
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitted(true)
     
     if (!nombre.trim() || !apellido.trim() || !fechaNacimiento || !sexo) return
-    if (new Date(fechaNacimiento) > new Date()) return
+    if (getFechaNacimientoError() !== null) return
 
     setLoading(true)
     setError(null)
@@ -64,8 +78,9 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
       })
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
-      const apiError = err as { response?: { data?: { detail?: string } } }
-      setError(apiError.response?.data?.detail ?? 'Algo salió mal. Intentá de nuevo.')
+      const msg = getErrorMessage(err, "No pudimos guardar tus datos. Intentá de nuevo.")
+      setError(msg)
+      showToast(msg, "error")
     } finally {
       setLoading(false)
     }
@@ -85,6 +100,7 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             className={[styles.input, nombreError ? styles.inputError : ''].filter(Boolean).join(' ')}
+            placeholder="¿Cómo te llamás?"
             autoFocus
             autoComplete="given-name"
           />

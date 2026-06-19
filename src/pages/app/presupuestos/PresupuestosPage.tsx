@@ -14,6 +14,7 @@ import type {
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
 import BudgetHistoryModal from './BudgetHistoryModal'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
@@ -46,7 +47,7 @@ export default function PresupuestosPage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      showToast('Error al cargar presupuestos', 'error')
+      showToast(getErrorMessage(err, 'No pudimos cargar los presupuestos. Intentá de nuevo.'), 'error')
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
@@ -108,43 +109,53 @@ export default function PresupuestosPage() {
 
   const handlePause = (p: Presupuesto) => {
     confirm({
-      title: 'Pausar presupuesto',
-      description: `¿Estás seguro de que querés pausar "${p.nombre}"? Dejará de trackear gastos hasta que lo reanudes.`,
+      title: '¿Pausás este presupuesto?',
+      description: 'No vas a recibir alertas de este presupuesto mientras esté pausado.',
       variant: 'warning',
+      confirmLabel: 'Pausar',
       onConfirm: async () => {
         try {
           await presupuestoService.pausarPresupuesto(p.id)
           showToast('Presupuesto pausado', 'success')
           fetchPresupuestos()
-        } catch {
-          showToast('Error al pausar', 'error')
+        } catch (err: unknown) {
+          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       }
     })
   }
 
-  const handleResume = async (id: string) => {
-    try {
-      await presupuestoService.reanudarPresupuesto(id)
-      showToast('Presupuesto reanudado', 'success')
-      fetchPresupuestos()
-    } catch {
-      showToast('Error al reanudar', 'error')
-    }
+  const handleResume = (id: string) => {
+    confirm({
+      title: '¿Reactivás este presupuesto?',
+      description: 'Vas a volver a recibir alertas cuando te acerques al límite.',
+      variant: 'default',
+      confirmLabel: 'Reactivar',
+      onConfirm: async () => {
+        try {
+          await presupuestoService.reanudarPresupuesto(id)
+          showToast('Presupuesto reanudado', 'success')
+          fetchPresupuestos()
+        } catch (err: unknown) {
+          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+        }
+      }
+    })
   }
 
   const handleDelete = (p: Presupuesto) => {
     confirm({
-      title: 'Finalizar presupuesto',
-      description: `¿Estás seguro de que querés finalizar "${p.nombre}"? No se eliminará tu historial pero el presupuesto dejará de estar activo definitivamente.`,
+      title: '¿Eliminás este presupuesto?',
+      description: 'Se va a borrar para siempre.',
       variant: 'danger',
+      confirmLabel: 'Eliminar',
       onConfirm: async () => {
         try {
           await presupuestoService.eliminarPresupuesto(p.id)
-          showToast('Presupuesto finalizado', 'success')
+          showToast('Presupuesto eliminado', 'success')
           fetchPresupuestos()
-        } catch {
-          showToast('Error al finalizar', 'error')
+        } catch (err: unknown) {
+          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       }
     })
@@ -157,8 +168,8 @@ export default function PresupuestosPage() {
     try {
       const data = await presupuestoService.getHistorial(p.id)
       setHistorial(data)
-    } catch {
-      showToast('Error al cargar historial', 'error')
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'No pudimos cargar el historial. Intentá de nuevo.'), 'error')
     } finally {
       setLoadingHistory(false)
     }
@@ -208,7 +219,7 @@ export default function PresupuestosPage() {
         </div>
       </div>
 
-      {/* ── Hero Resumen (Marine Language) ──────────────────────────────────── */}
+      {/* ── Hero Resumen ────────────────────────────────────────────────────── */}
       {activeTab === 'activo' && (
         <PageSummaryBar
           className={styles.summaryBar}
@@ -266,7 +277,7 @@ export default function PresupuestosPage() {
         ) : presupuestos.length === 0 ? (
           <EmptyState
             icon={PieChart}
-            title={`Sin presupuestos ${activeTab}s`}
+            title={activeTab === 'activo' ? 'Todavía no configuraste ningún presupuesto.' : `Sin presupuestos ${activeTab}s`}
             description={
               activeTab === 'activo' 
                 ? 'Definí un límite de gasto para tus categorías y Argentum te avisará si te pasás.' 

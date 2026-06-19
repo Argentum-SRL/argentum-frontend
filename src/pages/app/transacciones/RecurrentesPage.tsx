@@ -15,6 +15,7 @@ import type { TransaccionRecurrente, Billetera, Categoria } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { EmptyState } from '@/components/ui'
 
 interface RecurrentesPageProps {
@@ -55,7 +56,6 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
     }
   }, [])
 
-
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchInitialData()
@@ -75,34 +75,49 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
   }
 
   const handleToggleEstado = async (rec: TransaccionRecurrente) => {
-    try {
-      if (rec.estado === 'activa') {
-        await recurrenteService.pausarRecurrente(rec.id)
-      } else {
+    if (rec.estado === 'activa') {
+      confirm({
+        title: '¿Pausás esta transacción?',
+        description: 'No se va a registrar hasta que la reactives.',
+        variant: 'danger',
+        confirmLabel: 'Pausar',
+        onConfirm: async () => {
+          try {
+            await recurrenteService.pausarRecurrente(rec.id)
+            showToast('Transacción pausada.', 'success')
+            fetchInitialData()
+          } catch (err) {
+            console.error(err)
+            showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          }
+        }
+      })
+    } else {
+      try {
         await recurrenteService.reanudarRecurrente(rec.id)
+        showToast('Transacción reanudada.', 'success')
+        fetchInitialData()
+      } catch (err) {
+        console.error(err)
+        showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
       }
-      showToast(rec.estado === 'activa' ? 'Recurrente pausada' : 'Recurrente reanudada', 'success')
-      fetchInitialData()
-    } catch (err) {
-      console.error(err)
-      showToast('Error al cambiar el estado', 'error')
     }
   }
 
   const handleDelete = (rec: TransaccionRecurrente) => {
     confirm({
-      title: 'Eliminar recurrente',
-      description: '¿Estás seguro de eliminar esta transacción recurrente? Dejará de generar transacciones automáticas.',
+      title: '¿Eliminás esta transacción recurrente?',
+      description: 'No se va a volver a registrar automáticamente. Las transacciones pasadas se mantienen.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
       onConfirm: async () => {
         try {
           await recurrenteService.deleteRecurrente(rec.id)
-          showToast('Recurrente eliminada', 'success')
+          showToast('La transacción recurrente se eliminó.', 'success')
           fetchInitialData()
         } catch (err) {
           console.error(err)
-          showToast('Error al eliminar', 'error')
+          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       },
     })
@@ -207,7 +222,7 @@ const RecurrentesPage = React.forwardRef<RecurrentesPageRef, RecurrentesPageProp
         <EmptyState
           icon={Clock}
           title="No hay transacciones recurrentes"
-          description="Automatizá tus cobros y pagos regulares (alquileres, suscripciones, sueldos) para que se registren solos según la frecuencia que elijas."
+          description="Todavía no configuraste transacciones recurrentes."
           actionLabel="Configurar recurrente"
           onActionClick={() => handleOpenModal()}
         />

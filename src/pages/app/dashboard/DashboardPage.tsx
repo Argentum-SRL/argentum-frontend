@@ -19,6 +19,8 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useModal } from '@/hooks/useModal'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
 import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario, Billetera } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
@@ -279,6 +281,7 @@ AppleCalendarIcon.displayName = 'AppleCalendarIcon'
 export default function DashboardPage() {
   const { usuario } = useAuth()
   const { open } = useModal()
+  const { showToast } = useToast()
   const navigate = useNavigate()
   const [data, setData] = useState<DashboardResumen | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -335,7 +338,6 @@ export default function DashboardPage() {
     setError(false)
     setLoading(true)
     try {
-      // Endpoint consolidado: trae resumen, billeteras y cotización
       const res = await dashboardService.getResumenCompleto(undefined, undefined, billeterasSeleccionadas, signal)
       if (signal?.aborted) return
       setData(res.resumen)
@@ -346,12 +348,13 @@ export default function DashboardPage() {
       }
       console.error('Error loading dashboard:', err)
       setError(true)
+      showToast(getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.'), 'error')
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
       }
     }
-  }, [billeterasSeleccionadas])
+  }, [billeterasSeleccionadas, showToast])
 
   const handleToggleBilletera = useCallback((id: string | null) => {
     const next = id === null
@@ -374,18 +377,18 @@ export default function DashboardPage() {
         return
       }
       console.error('Error loading proyeccion:', err)
+      showToast(getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.'), 'error')
     } finally {
       if (!signal?.aborted) {
         setLoadingProyeccion(false)
       }
     }
-  }, [])
+  }, [showToast])
 
   useEffect(() => {
     const controller = new AbortController()
 
     const load = async () => {
-      // Esperar un microtask para asegurar ejecución fuera del ciclo de renderizado sincrónico
       await Promise.resolve()
       if (controller.signal.aborted) return
 
@@ -437,7 +440,6 @@ export default function DashboardPage() {
         ) : (
           data && (
             <div className={styles.balanceCard}>
-              {/* Luna Argentum Watermark wrapper to allow overflow on parent card */}
               <div className="absolute inset-0 rounded-[24px] overflow-hidden pointer-events-none">
                 <svg
                   viewBox="0 0 100 100"
@@ -521,10 +523,8 @@ export default function DashboardPage() {
                       const ingresos = data.balance.ingresos
                       const egresos = data.balance.egresos
 
-                      // Caso: sin datos
                       if (ingresos === 0 && egresos === 0) return null
 
-                      // Caso: egresos pero sin ingresos
                       if (ingresos === 0 && egresos > 0) {
                         return (
                           <>
@@ -540,7 +540,6 @@ export default function DashboardPage() {
                         )
                       }
 
-                      // Caso normal: hay ingresos
                       const porcentaje = Math.min((egresos / ingresos) * 100, 100)
                       const colorClass = porcentaje < 70
                         ? styles.progressOk
@@ -625,7 +624,7 @@ export default function DashboardPage() {
                   let fechaTxt = formatFecha(p.fecha_cobro)
                   if (p.dias_restantes === 0) fechaTxt = 'Hoy'
                   else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
-                  else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
+                  else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} days`
 
                   const handlePagoClick = () => {
                     if (p.tipo === 'suscripcion') {
@@ -726,7 +725,7 @@ export default function DashboardPage() {
               <EmptyState
                 variant="compact"
                 icon={ArrowUpDown}
-                title="Sin movimientos en este ciclo"
+                title="Todavía no registraste ningún movimiento."
               />
             ) : (
               <div className={styles.list}>

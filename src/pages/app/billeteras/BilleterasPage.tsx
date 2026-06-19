@@ -5,6 +5,7 @@ import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
@@ -38,7 +39,7 @@ const EstadoVacio = memo(({ onCrear }: { onCrear: () => void }) => {
   return (
     <EmptyState
       icon={Wallet}
-      title="Todavía no tenés billeteras"
+      title="Todavía no creaste ninguna billetera."
       description="Agregá tu primera billetera para empezar a llevar el control de tu plata."
       actionLabel="Crear primera billetera"
       onActionClick={onCrear}
@@ -87,7 +88,7 @@ export default function BilleterasPage() {
         return
       }
       console.error('Error fetching billeteras data:', err)
-      showToast('Error al cargar datos', 'error')
+      showToast(getErrorMessage(err, 'No pudimos cargar los datos. Intentá de nuevo.'), 'error')
     } finally {
       if (!signal?.aborted) {
         setIsLoading(false)
@@ -103,7 +104,7 @@ export default function BilleterasPage() {
       setTransferencias(data)
     } catch (err) {
       console.error('Error fetching transferencias:', err)
-      showToast('Error al cargar transferencias', 'error')
+      showToast(getErrorMessage(err, 'No pudimos cargar las transferencias. Intentá de nuevo.'), 'error')
     } finally {
       if (!signal?.aborted) {
         setLoadingTransferencias(false)
@@ -138,7 +139,7 @@ export default function BilleterasPage() {
           void fetchPageData()
         } catch (e) {
           console.error(e)
-          showToast('Error al eliminar la transferencia', 'error')
+          showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       },
     })
@@ -189,14 +190,23 @@ export default function BilleterasPage() {
 
   const handleArchivar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
-    try {
-      await billeteraService.archivar(id)
-      await fetchPageData()
-      if (b) showToast(`"${b.nombre}" archivada`, 'success')
-    } catch {
-      showToast('Error al archivar la billetera', 'error')
-    }
-  }, [billeteras, fetchPageData, showToast])
+    if (!b) return
+    confirm({
+      title: '¿Archivás esta billetera?',
+      description: 'Va a dejar de aparecer en tu dashboard, pero podés desarchivarla cuando quieras.',
+      variant: 'danger',
+      confirmLabel: 'Archivar',
+      onConfirm: async () => {
+        try {
+          await billeteraService.archivar(id)
+          await fetchPageData()
+          showToast(`"${b.nombre}" archivada`, 'success')
+        } catch (error: unknown) {
+          showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+        }
+      }
+    })
+  }, [billeteras, confirm, fetchPageData, showToast])
 
   const handleDesarchivar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
@@ -204,8 +214,8 @@ export default function BilleterasPage() {
       await billeteraService.desarchivar(id)
       await fetchPageData()
       if (b) showToast(`"${b.nombre}" reactivada`, 'success')
-    } catch {
-      showToast('Error al desarchivar la billetera', 'error')
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
     }
   }, [billeteras, fetchPageData, showToast])
 
@@ -214,50 +224,30 @@ export default function BilleterasPage() {
     if (!b) return
 
     confirm({
-      title: 'Eliminar billetera',
-      description: `¿Estás seguro de que querés eliminar "${b.nombre}"? Esta acción no se puede deshacer.`,
+      title: '¿Eliminás esta billetera?',
+      description: 'Se borran también todas sus transacciones asociadas.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
       onConfirm: async () => {
         try {
           await billeteraService.delete(id)
           await fetchPageData()
-          showToast(`"${b.nombre}" eliminada exitosamente`, 'success')
+          showToast(`"${b.nombre}" se eliminó.`, 'success')
         } catch (error: unknown) {
-          let msg = 'Error al eliminar la billetera'
-          if (error && typeof error === 'object' && 'response' in error) {
-            const axiosErr = error as { 
-              response?: { 
-                data?: { 
-                  detail?: string | { success?: boolean; error?: { message?: string } } 
-                } 
-              } 
-            }
-            const detail = axiosErr.response?.data?.detail
-            if (typeof detail === 'string') {
-              msg = detail
-            } else if (detail && typeof detail === 'object') {
-              if (detail.error?.message) {
-                msg = detail.error.message
-              } else {
-                const detailObj = detail as Record<string, unknown>
-                if (typeof detailObj.message === 'string') {
-                  msg = detailObj.message
-                }
-              }
-            }
-          }
-          showToast(msg, 'error')
-          throw error
+          showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       },
     })
   }, [billeteras, confirm, fetchPageData, showToast])
 
   const handleGuardarEdicion = useCallback(async (id: string, payload: EditPayload) => {
-    await billeteraService.update(id, payload)
-    await fetchPageData()
-    showToast(`Billetera actualizada exitosamente`, 'success')
+    try {
+      await billeteraService.update(id, payload)
+      await fetchPageData()
+      showToast(`Billetera actualizada exitosamente`, 'success')
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+    }
   }, [fetchPageData, showToast])
 
   const handleEditar = useCallback((b: Billetera) => {
@@ -271,15 +261,19 @@ export default function BilleterasPage() {
   }, [billeteras, open, handleGuardarEdicion])
 
   const handleCrear = useCallback(async (payload: CreatePayload) => {
-    await billeteraService.create({
-      nombre: payload.nombre,
-      moneda: payload.moneda,
-      saldo_inicial: payload.saldo_inicial,
-      es_principal: payload.es_principal,
-      bank_id: payload.bank_id,
-    })
-    await fetchPageData()
-    showToast(`"${payload.nombre}" creada exitosamente`, 'success')
+    try {
+      await billeteraService.create({
+        nombre: payload.nombre,
+        moneda: payload.moneda,
+        saldo_inicial: payload.saldo_inicial,
+        es_principal: payload.es_principal,
+        bank_id: payload.bank_id,
+      })
+      await fetchPageData()
+      showToast(`"${payload.nombre}" creada exitosamente`, 'success')
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+    }
   }, [fetchPageData, showToast])
 
   const monedaPrincipal = (usuario?.moneda_principal as 'ARS' | 'USD') ?? 'ARS'

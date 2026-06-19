@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Calendar, RefreshCw, Loader2 } from 'lucide-react'
 import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { SelectInput } from '@/components/ui'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepCicloFinanciero.module.css'
 
 interface Props {
@@ -23,6 +25,7 @@ const REGLAS = [
 ]
 
 export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
+  const { showToast } = useToast()
   const [tipo, setTipo] = useState(datosIniciales.ciclo_tipo ?? 'dia_fijo')
   const [valor, setValor] = useState(datosIniciales.ciclo_valor ?? '1')
   const [loading, setLoading] = useState(false)
@@ -87,8 +90,9 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
       const res = await guardarCicloFinanciero({ ciclo_tipo: tipo, ciclo_valor: valor })
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
-      const apiError = err as { response?: { data?: { detail?: string } } }
-      setError(apiError.response?.data?.detail ?? 'Algo salió mal. Intentá de nuevo.')
+      const msg = getErrorMessage(err, "No pudimos guardar tus preferencias. Intentá de nuevo.")
+      setError(msg)
+      showToast(msg, "error")
     } finally {
       setLoading(false)
     }
@@ -152,7 +156,7 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
         <div className={styles.field}>
           {tipo === 'dia_fijo' ? (
             <>
-              <label htmlFor="valor_ciclo" className={styles.label}>Día del mes (1–31)</label>
+              <label htmlFor="valor_ciclo" className={styles.label}>¿Qué día del mes te depositan el sueldo?</label>
               <input
                 id="valor_ciclo"
                 type="number"

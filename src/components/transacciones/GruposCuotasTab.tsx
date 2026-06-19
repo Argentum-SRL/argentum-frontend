@@ -7,6 +7,7 @@ import type { GrupoCuotasResumen, Billetera } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { EmptyState } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
 
@@ -38,7 +39,7 @@ export default function GruposCuotasTab() {
       setGrupos(data)
     } catch (e) {
       console.error(e)
-      showToast('Error al cargar grupos de cuotas', 'error')
+      showToast(getErrorMessage(e, 'No pudimos cargar los grupos de cuotas. Intentá de nuevo.'), 'error')
     } finally {
       setLoading(false)
     }
@@ -69,8 +70,8 @@ export default function GruposCuotasTab() {
 
   const handleCancelar = (grupo: GrupoCuotasResumenExtended) => {
     confirm({
-      title: '¿Cancelar cuotas?',
-      description: `Se eliminarán las cuotas pendientes de "${grupo.descripcion}". Las cuotas ya pagadas se conservan en tu historial.`,
+      title: '¿Cancelás esta cuota?',
+      description: 'La cuota se va a marcar como cancelada y no se va a cobrar más.',
       variant: 'danger',
       confirmLabel: 'Confirmar',
       onConfirm: async () => {
@@ -80,7 +81,7 @@ export default function GruposCuotasTab() {
           fetchGrupos()
         } catch (e) {
           console.error(e)
-          showToast('No se pudieron cancelar las cuotas', 'error')
+          showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       }
     })
@@ -93,18 +94,26 @@ export default function GruposCuotasTab() {
 
   const confirmarPrepago = async () => {
     if (!grupoPrepago || !billeteraSeleccionada) return
-    setSaving(true)
-    try {
-      await grupoCuotasService.prepagarGrupo(grupoPrepago.id, billeteraSeleccionada)
-      showToast('Prepago realizado correctamente', 'success')
-      setGrupoPrepago(null)
-      fetchGrupos()
-    } catch (e) {
-      console.error(e)
-      showToast('No se pudo realizar el prepago', 'error')
-    } finally {
-      setSaving(false)
-    }
+    confirm({
+      title: '¿Prepagás las cuotas restantes?',
+      description: 'Se van a saldar todas las cuotas pendientes de este grupo.',
+      variant: 'default',
+      confirmLabel: 'Confirmar',
+      onConfirm: async () => {
+        setSaving(true)
+        try {
+          await grupoCuotasService.prepagarGrupo(grupoPrepago.id, billeteraSeleccionada)
+          showToast('¡Listo! Las cuotas restantes se saldaron.', 'success')
+          setGrupoPrepago(null)
+          fetchGrupos()
+        } catch (e) {
+          console.error(e)
+          showToast(getErrorMessage(e, 'No pudimos saldar las cuotas. Intentá de nuevo.'), 'error')
+        } finally {
+          setSaving(false)
+        }
+      }
+    })
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -132,9 +141,7 @@ export default function GruposCuotasTab() {
       fetchGrupos()
     } catch (e: unknown) {
       console.error(e)
-      const axiosError = e as { response?: { data?: { error?: { message?: string } } } }
-      const errorMsg = axiosError.response?.data?.error?.message || 'Error al actualizar la compra'
-      showToast(errorMsg, 'error')
+      showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
     } finally {
       setSaving(false)
     }
@@ -142,7 +149,7 @@ export default function GruposCuotasTab() {
 
   const handleDeleteClick = (id: string) => {
     confirm({
-      title: '¿Eliminar esta compra en cuotas?',
+      title: '¿Eliminás esta compra en cuotas?',
       description: 'Se borran todas las cuotas pendientes. Las ya pagadas quedan en tu historial.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
@@ -153,7 +160,7 @@ export default function GruposCuotasTab() {
           fetchGrupos()
         } catch (e) {
           console.error(e)
-          showToast('Error al eliminar la compra en cuotas', 'error')
+          showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       }
     })

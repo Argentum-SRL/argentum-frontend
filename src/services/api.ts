@@ -42,6 +42,7 @@ function processQueue(error: unknown) {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.error("[API Error]", error?.response?.status, error?.response?.data?.detail);
     const originalRequest = error.config
 
     const isAuthEndpoint = originalRequest.url?.includes('/auth/') && !originalRequest.url?.includes('/auth/me')

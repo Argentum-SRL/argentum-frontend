@@ -5,6 +5,8 @@ import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import { enviarCodigoTelefono, verificarCodigoTelefono } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './VerificarTelefono.module.css'
 
 /**
@@ -16,6 +18,7 @@ import styles from './VerificarTelefono.module.css'
  */
 export default function VerificarTelefono() {
   const { login } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as { telefono?: string; modoVerificacion?: boolean } | null
@@ -56,7 +59,9 @@ export default function VerificarTelefono() {
             return
           }
           if (!controller.signal.aborted) {
-            setApiError('No se pudo enviar el código. Pedí uno nuevo.')
+            const msg = getErrorMessage(err, 'No pudimos mandarte el código. Intentá de nuevo.')
+            setApiError(msg)
+            showToast(msg, 'error')
           }
         }
       }
@@ -65,7 +70,7 @@ export default function VerificarTelefono() {
     return () => {
       controller.abort()
     }
-  }, [modoVerificacion, telefonoInicial, step])
+  }, [modoVerificacion, telefonoInicial, step, showToast])
 
   useEffect(() => {
     if (step === 'code') {
@@ -90,13 +95,15 @@ export default function VerificarTelefono() {
     setApiError(null)
     try {
       await enviarCodigoTelefono(telefono.trim())
+      showToast('Te mandamos el código por WhatsApp.', 'success')
       setStep('code')
       setCodigo('')
       setHasSubmitted(false)
       setCountdown(60)
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'No se pudo enviar el código. Intentá de nuevo.')
+      const msg = getErrorMessage(err, 'No pudimos mandarte el código. Intentá de nuevo.')
+      setApiError(msg)
+      showToast(msg, 'error')
     } finally {
       setLoading(false)
     }
@@ -108,11 +115,13 @@ export default function VerificarTelefono() {
     setApiError(null)
     try {
       await enviarCodigoTelefono(telefono.trim())
+      showToast('Te mandamos un código nuevo por WhatsApp.', 'success')
       setCountdown(60)
       setCodigo('')
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'No se pudo reenviar el código.')
+      const msg = getErrorMessage(err, 'No pudimos mandarte el código. Intentá de nuevo.')
+      setApiError(msg)
+      showToast(msg, 'error')
     } finally {
       setLoading(false)
     }
@@ -128,11 +137,13 @@ export default function VerificarTelefono() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoTelefono(telefono.trim(), codigo.trim())
+      showToast('¡Perfecto! Tu número quedó verificado.', 'success')
       login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'Algo salió mal. Intentá de nuevo.')
+      const msg = getErrorMessage(err, 'El código no es válido. Revisalo o pedí uno nuevo.')
+      setApiError(msg)
+      showToast(msg, 'error')
     } finally {
       setLoading(false)
     }

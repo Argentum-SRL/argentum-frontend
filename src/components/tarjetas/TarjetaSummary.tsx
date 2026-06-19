@@ -5,6 +5,7 @@ import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import { useModal } from '@/hooks/useModal'
 import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { formatMonto } from '@/utils/format'
 import { EmptyState } from '@/components/ui'
 import styles from './TarjetaSummary.module.css'
@@ -75,8 +76,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           if (onRefresh) onRefresh()
         } catch (err: unknown) {
           console.error(err)
-          const errorMsg = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Error al procesar el pago de la tarjeta.'
-          showToast(errorMsg, 'error')
+          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         } finally {
           setIsPaying(false)
         }
@@ -187,8 +187,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           }
         }
       })
-    } catch {
-      showToast('No se pudo cargar la transacción para editar', 'error')
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
     }
   }
 
@@ -204,8 +204,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           showToast('Transacción eliminada correctamente', 'success')
           fetchResumen()
           if (onRefresh) onRefresh()
-        } catch {
-          showToast('Error al eliminar la transacción', 'error')
+        } catch (err: unknown) {
+          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       }
     })

@@ -8,11 +8,12 @@ import Field from '@/components/ui/Field/Field'
 import { registerWithEmail, loginWithGoogle } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './RegisterPage.module.css'
 
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
-  if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
+  if (pwd.length < 8) return 'La contraseña tiene que tener al menos 8 caracteres.'
   if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
   if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
   if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
@@ -54,7 +55,7 @@ export default function RegisterPage() {
     ? !confirmPassword
       ? 'Confirmá tu contraseña.'
       : confirmPassword !== password
-        ? 'Las contraseñas no coinciden.'
+        ? 'Las contraseñas no coinciden. Revisalas.'
         : null
     : null
 
@@ -67,7 +68,7 @@ export default function RegisterPage() {
     const cpError = !confirmPassword 
       ? 'Confirmá tu contraseña.' 
       : confirmPassword !== password 
-        ? 'Las contraseñas no coinciden.' 
+        ? 'Las contraseñas no coinciden. Revisalas.' 
         : null
 
     if (!nombre.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || pError || cpError) {
@@ -87,17 +88,7 @@ export default function RegisterPage() {
       
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
-      const error = err as { response?: { status?: number; data?: { detail?: unknown } } }
-      const detail = error.response?.data?.detail
-      const status = error.response?.status
-      if (typeof detail === 'string') {
-        setApiError(detail)
-      } else if (status === 422 && Array.isArray(detail)) {
-        const msg = (detail[0] as { msg?: string })?.msg
-        setApiError(msg ? msg.replace('Value error, ', '') : 'Verificá los datos ingresados.')
-      } else {
-        setApiError('Algo salió mal. Intentá de nuevo.')
-      }
+      setApiError(getErrorMessage(err, "No pudimos crear tu cuenta. Intentá de nuevo en unos minutos."))
     } finally {
       setLoading(false)
     }
@@ -118,9 +109,7 @@ export default function RegisterPage() {
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       logGoogleError('Error al llamar loginWithGoogle', err)
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      const message = (err as { message?: string })?.message
-      setApiError(detail || message || 'Falló el login con Google.')
+      setApiError(getErrorMessage(err, 'Falló el login con Google.'))
     } finally {
       setLoading(false)
     }

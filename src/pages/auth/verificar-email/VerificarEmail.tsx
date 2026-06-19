@@ -5,10 +5,13 @@ import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import { verificarCodigoEmail, enviarCodigoEmail } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './VerificarEmail.module.css'
 
 export default function VerificarEmail() {
   const { login } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
   
@@ -50,6 +53,7 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoEmail(email, codigo)
+      showToast('¡Tu email quedó verificado! Ya podés entrar a Argentum.', 'success')
       
       // Solo hacemos login si la respuesta ya trae tokens.
       // Si falta verificar el teléfono, no habrá tokens y login() nos rebotaría al Dashboard/Login.
@@ -59,8 +63,9 @@ export default function VerificarEmail() {
       
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'Algo salió mal. Intentá de nuevo.')
+      const msg = getErrorMessage(err, "No pudimos verificar tu email. El enlace puede haber expirado — pedí uno nuevo.")
+      setApiError(msg)
+      showToast(msg, "error")
     } finally {
       setLoading(false)
     }
@@ -72,11 +77,13 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       await enviarCodigoEmail(email)
+      showToast('Te mandamos un código nuevo.', 'success')
       setCountdown(60)
       setCodigo('')
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setApiError(detail || 'No se pudo reenviar el código.')
+      const msg = getErrorMessage(err, 'No pudimos reenviar el código.')
+      setApiError(msg)
+      showToast(msg, 'error')
     } finally {
       setReenvioLoading(false)
     }
@@ -87,7 +94,7 @@ export default function VerificarEmail() {
       <AuthLayout title="¡Email Verificado!">
         <div className={styles.successContainer}>
           <p className={styles.subtitle}>
-            Tu cuenta ha sido verificada con éxito. Ya podés iniciar sesión para configurar tu teléfono.
+            ¡Tu email quedó verificado! Ya podés entrar a Argentum.
           </p>
           <Link to="/login" className={styles.submitBtn} style={{ textDecoration: 'none', textAlign: 'center', display: 'block' }}>
             Ir al Login

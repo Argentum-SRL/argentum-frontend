@@ -3,6 +3,7 @@ import { Plus, Loader2 } from 'lucide-react'
 import { Button, PageSummaryBar } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import suscripcionService from '@/services/suscripcion.service'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
@@ -81,7 +82,7 @@ const SuscripcionesPage: React.FC = () => {
         return
       }
       console.error(error)
-      showToast('Error al cargar suscripciones', 'error')
+      showToast(getErrorMessage(error, 'No pudimos cargar las suscripciones. Intentá de nuevo.'), 'error')
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
@@ -125,14 +126,14 @@ const SuscripcionesPage: React.FC = () => {
       loadData()
     } catch (error: unknown) {
       console.error(error)
-      showToast('Error al procesar acción', 'error')
+      showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
     }
   }
 
   const handleDelete = async (s: Suscripcion) => {
     confirm({
-      title: 'Eliminar suscripción',
-      description: `¿Estás seguro de que querés eliminar "${s.nombre}"? Esta acción no se puede deshacer.`,
+      title: '¿Eliminás esta suscripción?',
+      description: 'Se va a borrar junto con sus recordatorios.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
       onConfirm: async () => {
@@ -145,7 +146,7 @@ const SuscripcionesPage: React.FC = () => {
           loadData()
         } catch (error) {
           console.error(error)
-          showToast('Error al eliminar', 'error')
+          showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
         }
       }
     })
@@ -198,7 +199,7 @@ const SuscripcionesPage: React.FC = () => {
 
           {/* Capa 2: Contenido central con glassmorphism */}
           <div className={styles.emptyContent}>
-            <h1 className={styles.emptyTitle}>Tus suscripciones, en un lugar</h1>
+            <h1 className={styles.emptyTitle}>Todavía no cargaste ninguna suscripción.</h1>
             <p className={styles.emptySubtitle}>
               Agregá Netflix, Spotify, el gimnasio o cualquier servicio con cobro periódico. 
               El sistema calcula cuánto gastás por mes en total.

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
+import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepMoneda.module.css'
 
 interface Props {
@@ -26,6 +28,7 @@ function formatARS(valor: number | null | undefined): string {
 }
 
 export default function StepMoneda({ datosIniciales, onNext }: Props) {
+  const { showToast } = useToast()
   const [moneda, setMoneda] = useState(datosIniciales.moneda_principal ?? 'ARS')
   const [secundaria, setSecundaria] = useState(false)
   const [tipoDolar, setTipoDolar] = useState<'oficial' | 'blue' | 'tarjeta' | 'mep'>('blue')
@@ -55,8 +58,9 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
       })
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
-      const apiError = err as { response?: { data?: { detail?: string } } }
-      setError(apiError.response?.data?.detail ?? 'Algo salió mal. Intentá de nuevo.')
+      const msg = getErrorMessage(err, "No pudimos guardar tu moneda. Intentá de nuevo.")
+      setError(msg)
+      showToast(msg, "error")
     } finally {
       setLoading(false)
     }
@@ -69,7 +73,7 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
 
       <form onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
-          <label className={styles.label}>Moneda principal</label>
+          <label className={styles.label}>Seleccioná tu moneda principal</label>
           <div className={styles.currencyCards}>
             {(['ARS', 'USD'] as const).map((m) => (
               <button

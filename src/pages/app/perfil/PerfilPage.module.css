@@ -1,11 +1,13 @@
 /* ═══════════════════════════════════════════════════
-   PerfilPage.module.css
+   PerfilPage.module.css — Página unificada de perfil
+   (Perfil · Preferencias financieras · Notificaciones)
 ═══════════════════════════════════════════════════ */
 
+/* ── Root ────────────────────────────────────────── */
 .root {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 0;
   min-height: 100%;
 }
 
@@ -23,6 +25,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-bottom: 20px;
 }
 
 .titleGroup {
@@ -50,6 +53,55 @@
   margin: 0;
 }
 
+/* ── Tab Bar ─────────────────────────────────────── */
+.tabBar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  min-height: 44px;
+}
+
+.tabBar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+  margin-bottom: -1px;
+  flex-shrink: 0;
+}
+
+.tab:hover {
+  color: var(--text-2);
+}
+
+.tabActive {
+  color: #4f9cf9 !important;
+  border-bottom-color: #4f9cf9 !important;
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Name container (hero) ───────────────────────── */
 .nameContainer {
   display: flex;
   align-items: center;
@@ -181,8 +233,9 @@
 }
 
 .deleteFotoBtn:hover {
-  color: #ef4444;
-  border-color: #ef4444;
+  color: var(--error);
+  border-color: var(--error);
+  opacity: 0.8;
 }
 
 /* ── Hero Body ──────────────────────────────────── */
@@ -780,6 +833,7 @@
   animation: spin 0.8s linear infinite;
 }
 
+/* ── Utilidades ─────────────────────────────────── */
 .noBorderBottom {
   border-bottom: none !important;
 }

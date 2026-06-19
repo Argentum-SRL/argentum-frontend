@@ -1,4 +1,6 @@
+// v2
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
   Mail,
   Phone,
@@ -11,11 +13,17 @@ import {
   Save,
   CheckCircle2,
   LogOut,
+  Calendar,
+  PieChart,
+  CreditCard,
+  Target,
+  Settings,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import usuarioService from '@/services/usuario.service'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
 import styles from './PerfilPage.module.css'
-import { useNavigate } from 'react-router-dom'
+import notifCardStyles from '@/components/notificaciones/NotificacionesConfigModal.module.css'
 import type { MetodosLogin } from '@/types'
 import * as authService from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
@@ -26,6 +34,7 @@ import FotoCropModal from '@/components/perfil/FotoCropModal'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
+// ─── Opciones de selects ───────────────────────────────────────────────────
 const OPCIONES_REGLA_CICLO: SelectOption[] = [
   { value: '', label: 'Seleccionar...' },
   { value: 'primer_lunes', label: 'Primer Lunes' },
@@ -47,6 +56,43 @@ const OPCIONES_TIPO_DOLAR: SelectOption[] = [
   { value: 'tarjeta', label: 'Tarjeta' },
 ]
 
+// ─── Estado inicial notificaciones ────────────────────────────────────────
+const defaultFormState = {
+  cuota_vence_anticipacion_dias: 3,
+  cuota_vence_web: true,
+  cuota_vence_whatsapp: true,
+  presupuesto_umbral_1: 80,
+  presupuesto_umbral_1_activo: true,
+  presupuesto_umbral_1_web: true,
+  presupuesto_umbral_1_whatsapp: false,
+  presupuesto_umbral_2_web: true,
+  presupuesto_umbral_2_whatsapp: true,
+  suscripcion_hoy_web: true,
+  suscripcion_hoy_whatsapp: true,
+  suscripcion_recordatorio_activo: true,
+  suscripcion_recordatorio_dias: 3,
+  suscripcion_recordatorio_web: true,
+  suscripcion_recordatorio_whatsapp: false,
+  meta_alcanzada_activo: true,
+  meta_alcanzada_web: true,
+  meta_alcanzada_whatsapp: true,
+  saldo_cero_web: true,
+  saldo_cero_whatsapp: true,
+  gasto_inusual_activo: true,
+  gasto_inusual_web: true,
+  gasto_inusual_whatsapp: false,
+  resumen_semanal_activo: false,
+  resumen_semanal_web: true,
+  resumen_semanal_whatsapp: false,
+  inactividad_activo: false,
+  inactividad_dias: 7,
+  inactividad_web: true,
+  inactividad_whatsapp: false,
+  whatsapp_hora_envio: 9,
+  whatsapp_minuto_envio: 0,
+}
+
+// ─── Ícono Google ──────────────────────────────────────────────────────────
 const GoogleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -56,6 +102,7 @@ const GoogleIcon = () => (
   </svg>
 )
 
+// ─── Hook colores de imagen ────────────────────────────────────────────────
 function useImageColors(imageUrl: string | null) {
   const [colors, setColors] = useState<{ color1: string; color2: string }>({
     color1: '#A8905A',
@@ -66,9 +113,7 @@ function useImageColors(imageUrl: string | null) {
     if (!imageUrl) {
       const timer = setTimeout(() => {
         setColors((curr) => {
-          if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') {
-            return curr
-          }
+          if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') return curr
           return { color1: '#A8905A', color2: 'var(--primary)' }
         })
       }, 0)
@@ -103,9 +148,7 @@ function useImageColors(imageUrl: string | null) {
         })
       } catch {
         setColors((curr) => {
-          if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') {
-            return curr
-          }
+          if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') return curr
           return { color1: '#A8905A', color2: 'var(--primary)' }
         })
       }
@@ -113,9 +156,7 @@ function useImageColors(imageUrl: string | null) {
 
     img.onerror = () => {
       setColors((curr) => {
-        if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') {
-          return curr
-        }
+        if (curr.color1 === '#A8905A' && curr.color2 === 'var(--primary)') return curr
         return { color1: '#A8905A', color2: 'var(--primary)' }
       })
     }
@@ -124,14 +165,32 @@ function useImageColors(imageUrl: string | null) {
   return colors
 }
 
+// ─── Componente principal ──────────────────────────────────────────────────
 export default function PerfilPage() {
   const { usuario, logout, updateUsuario } = useAuth()
   const navigate = useNavigate()
-  const fotoUrl = usuario?.foto_url ? (usuario.foto_url.startsWith('http') ? usuario.foto_url : `${API_URL}${usuario.foto_url}`) : null
-  const colors = useImageColors(fotoUrl)
-  const [fotoCropOpen, setFotoCropOpen] = useState(false)
-  const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
+  const location = useLocation()
+  const { showToast } = useToast()
+  const { confirm } = useModal()
 
+  // ── Tab desde URL ────────────────────────────────────────────────────────
+  const _tabParam = new URLSearchParams(location.search).get('tab')
+  const activeTab: 'perfil' | 'financiero' | 'notificaciones' =
+    _tabParam === 'perfil' || _tabParam === 'financiero' || _tabParam === 'notificaciones'
+      ? _tabParam
+      : 'perfil'
+
+  const handleTabChange = (tab: 'perfil' | 'financiero' | 'notificaciones') => {
+    navigate(`/app/perfil?tab=${tab}`, { replace: true })
+  }
+
+  // ── Hero card gradient ───────────────────────────────────────────────────
+  const fotoUrl = usuario?.foto_url
+    ? usuario.foto_url.startsWith('http')
+      ? usuario.foto_url
+      : `${API_URL}${usuario.foto_url}`
+    : null
+  const colors = useImageColors(fotoUrl)
   const heroCardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -140,6 +199,12 @@ export default function PerfilPage() {
       heroCardRef.current.style.setProperty('--gradient-end', colors.color2)
     }
   }, [colors])
+
+  // ── Foto crop modal ──────────────────────────────────────────────────────
+  const [fotoCropOpen, setFotoCropOpen] = useState(false)
+
+  // ── Métodos de login ─────────────────────────────────────────────────────
+  const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -156,13 +221,15 @@ export default function PerfilPage() {
     return () => controller.abort()
   }, [usuario])
 
+  // ── Modal state ──────────────────────────────────────────────────────────
   const [activeModal, setActiveModal] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [modalError, setModalError] = useState<string | null>(null)
 
-  const { showToast } = useToast()
-  const { confirm } = useModal()
+  const handleOpenModal = (modal: string) => { setModalError(null); setActiveModal(modal) }
+  const handleCloseModal = () => { setActiveModal(null); setModalError(null) }
 
+  // ── Forms de perfil ──────────────────────────────────────────────────────
   const [formDatos, setFormDatos] = useState({ nombre: '', apellido: '', fecha_nacimiento: '', sexo: '' })
   const [formEmail, setFormEmail] = useState({ email_nuevo: '', password_actual: '' })
   const [formTelefono, setFormTelefono] = useState({ telefono_nuevo: '', password_actual: '' })
@@ -170,6 +237,7 @@ export default function PerfilPage() {
   const [formCiclo, setFormCiclo] = useState({ ciclo_tipo: 'dia_fijo' as 'dia_fijo' | 'regla', ciclo_valor: '' })
   const [formMoneda, setFormMoneda] = useState({ moneda_principal: 'ARS' as 'ARS' | 'USD', moneda_secundaria_activa: false, tipo_dolar: 'blue' })
 
+  // Sync forms cuando cambia el usuario
   const [prevUsuarioId, setPrevUsuarioId] = useState(usuario?.id)
   if (usuario?.id !== prevUsuarioId) {
     setPrevUsuarioId(usuario?.id)
@@ -182,40 +250,34 @@ export default function PerfilPage() {
     }
   }
 
-  const handleOpenModal = (modal: string) => { setModalError(null); setActiveModal(modal) }
-  const handleCloseModal = () => { setActiveModal(null); setModalError(null) }
-
+  // ── Handlers de perfil ───────────────────────────────────────────────────
   const handleSaveDatosPersonales = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
-    try { 
+    try {
       const updated = await usuarioService.actualizarDatosPersonales(formDatos)
       updateUsuario(updated)
       showToast('Tu perfil se actualizó correctamente.', 'success')
-      handleCloseModal() 
-    } catch (err: unknown) { 
-      const msg = getErrorMessage(err, "No pudimos actualizar tu perfil. Intentá de nuevo.")
+      handleCloseModal()
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, 'No pudimos actualizar tu perfil. Intentá de nuevo.')
       setModalError(msg)
-      showToast(msg, "error") 
-    } finally { 
-      setIsSaving(false) 
-    }
+      showToast(msg, 'error')
+    } finally { setIsSaving(false) }
   }
 
   const handleVerificarEmailActual = async () => {
     if (!usuario?.email) return; setIsSaving(true)
     try {
       const res = await authService.enviarCodigoEmail(usuario.email)
-      if ((res as { verificado: boolean }).verificado) { 
+      if ((res as { verificado: boolean }).verificado) {
         if (usuario) updateUsuario({ ...usuario, email_verificado: true })
-        showToast('Email verificado correctamente.', 'success') 
+        showToast('Email verificado correctamente.', 'success')
       } else {
         navigate('/auth/verificar-email', { state: { email: usuario.email } })
       }
-    } catch (err: unknown) { 
-      showToast(getErrorMessage(err, 'Error al enviar el código.'), 'error') 
-    } finally { 
-      setIsSaving(false) 
-    }
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'Error al enviar el código.'), 'error')
+    } finally { setIsSaving(false) }
   }
 
   const handleSaveEmail = async (e: React.FormEvent) => {
@@ -223,11 +285,9 @@ export default function PerfilPage() {
     try {
       const res = await usuarioService.actualizarEmail({
         email_nuevo: formEmail.email_nuevo,
-        password_actual: formEmail.password_actual
+        password_actual: formEmail.password_actual,
       })
-      if (usuario) {
-        updateUsuario({ ...usuario, email: formEmail.email_nuevo, email_verificado: false })
-      }
+      if (usuario) updateUsuario({ ...usuario, email: formEmail.email_nuevo, email_verificado: false })
       showToast(res.confirmacion || 'Email actualizado. Se envió un código de verificación.', 'success')
       handleCloseModal()
       if (res.requiere_verificacion_email) {
@@ -237,78 +297,69 @@ export default function PerfilPage() {
       const msg = getErrorMessage(err, 'No pudimos actualizar el email.')
       setModalError(msg)
       showToast(msg, 'error')
-    } finally {
-      setIsSaving(false)
-    }
+    } finally { setIsSaving(false) }
   }
 
   const handleSaveTelefono = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
     try {
-      const res = await usuarioService.actualizarTelefono({ 
-        telefono_nuevo: formTelefono.telefono_nuevo, 
-        password_actual: usuario?.auth_provider === 'google' ? undefined : formTelefono.password_actual 
+      const res = await usuarioService.actualizarTelefono({
+        telefono_nuevo: formTelefono.telefono_nuevo,
+        password_actual: usuario?.auth_provider === 'google' ? undefined : formTelefono.password_actual,
       })
       if (res.requiere_verificacion_telefono) navigate('/auth/verificar-telefono')
-    } catch (err: unknown) { 
+    } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No pudimos actualizar el teléfono.')
-      setModalError(msg) 
+      setModalError(msg)
       showToast(msg, 'error')
-    } finally { 
-      setIsSaving(false) 
-    }
+    } finally { setIsSaving(false) }
   }
 
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
     try {
-      await usuarioService.actualizarPassword({ 
-        password_actual: formPassword.password_actual || undefined, 
-        password_nueva: formPassword.password_nueva, 
-        password_nueva_confirmacion: formPassword.password_nueva_confirmacion 
+      await usuarioService.actualizarPassword({
+        password_actual: formPassword.password_actual || undefined,
+        password_nueva: formPassword.password_nueva,
+        password_nueva_confirmacion: formPassword.password_nueva_confirmacion,
       })
       showToast('¡Listo! Tu contraseña se actualizó.', 'success')
       handleCloseModal()
       setFormPassword({ password_actual: '', password_nueva: '', password_nueva_confirmacion: '' })
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, "No pudimos cambiar tu contraseña. Revisá que la contraseña actual sea correcta.")
+      const msg = getErrorMessage(err, 'No pudimos cambiar tu contraseña. Revisá que la contraseña actual sea correcta.')
       setModalError(msg)
-      showToast(msg, "error")
-    } finally { 
-      setIsSaving(false) 
-    }
+      showToast(msg, 'error')
+    } finally { setIsSaving(false) }
   }
 
   const handleSaveCiclo = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
-    try { 
+    try {
       const updated = await usuarioService.actualizarCicloFinanciero(formCiclo)
       updateUsuario(updated)
-      handleCloseModal() 
-    } catch (err: unknown) { 
+      handleCloseModal()
+    } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No pudimos actualizar el ciclo financiero.')
-      setModalError(msg) 
+      setModalError(msg)
       showToast(msg, 'error')
-    } finally { 
-      setIsSaving(false) 
-    }
+    } finally { setIsSaving(false) }
   }
 
   const handleSaveMoneda = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
-    try { 
+    try {
       const updated = await usuarioService.actualizarMoneda(formMoneda)
       updateUsuario(updated)
-      handleCloseModal() 
-    } catch (err: unknown) { 
+      handleCloseModal()
+    } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No pudimos actualizar la moneda.')
-      setModalError(msg) 
+      setModalError(msg)
       showToast(msg, 'error')
-    } finally { 
-      setIsSaving(false) 
-    }
+    } finally { setIsSaving(false) }
   }
 
+  // ── Helpers ──────────────────────────────────────────────────────────────
   const getFotoUrl = () => {
     if (!usuario?.foto_url) return null
     if (usuario.foto_url.startsWith('http')) return usuario.foto_url
@@ -319,6 +370,96 @@ export default function PerfilPage() {
   const pw = formPassword.password_nueva
   const pwReqs = { length: pw.length >= 8, upper: /[A-Z]/.test(pw), lower: /[a-z]/.test(pw), number: /\d/.test(pw) }
 
+  // ── Notificaciones state ─────────────────────────────────────────────────
+  const { config, updateConfig } = useNotificaciones()
+  const [prevConfig, setPrevConfig] = useState<typeof config>(null)
+  const [formNotificaciones, setFormNotificaciones] = useState(defaultFormState)
+  const [isNotifSaving, setIsNotifSaving] = useState(false)
+
+  if (config !== prevConfig) {
+    setPrevConfig(config)
+    if (config) {
+      setFormNotificaciones({
+        cuota_vence_anticipacion_dias: config.cuota_vence_anticipacion_dias,
+        cuota_vence_web: config.cuota_vence_web,
+        cuota_vence_whatsapp: config.cuota_vence_whatsapp,
+        presupuesto_umbral_1: config.presupuesto_umbral_1,
+        presupuesto_umbral_1_activo: config.presupuesto_umbral_1_activo,
+        presupuesto_umbral_1_web: config.presupuesto_umbral_1_web,
+        presupuesto_umbral_1_whatsapp: config.presupuesto_umbral_1_whatsapp,
+        presupuesto_umbral_2_web: config.presupuesto_umbral_2_web,
+        presupuesto_umbral_2_whatsapp: config.presupuesto_umbral_2_whatsapp,
+        suscripcion_hoy_web: config.suscripcion_hoy_web,
+        suscripcion_hoy_whatsapp: config.suscripcion_hoy_whatsapp,
+        suscripcion_recordatorio_activo: config.suscripcion_recordatorio_activo,
+        suscripcion_recordatorio_dias: config.suscripcion_recordatorio_dias,
+        suscripcion_recordatorio_web: config.suscripcion_recordatorio_web,
+        suscripcion_recordatorio_whatsapp: config.suscripcion_recordatorio_whatsapp,
+        meta_alcanzada_activo: config.meta_alcanzada_activo,
+        meta_alcanzada_web: config.meta_alcanzada_web,
+        meta_alcanzada_whatsapp: config.meta_alcanzada_whatsapp,
+        saldo_cero_web: config.saldo_cero_web,
+        saldo_cero_whatsapp: config.saldo_cero_whatsapp,
+        gasto_inusual_activo: config.gasto_inusual_activo,
+        gasto_inusual_web: config.gasto_inusual_web,
+        gasto_inusual_whatsapp: config.gasto_inusual_whatsapp,
+        resumen_semanal_activo: config.resumen_semanal_activo || false,
+        resumen_semanal_web: config.resumen_semanal_web || false,
+        resumen_semanal_whatsapp: config.resumen_semanal_whatsapp || false,
+        inactividad_activo: config.inactividad_activo,
+        inactividad_dias: config.inactividad_dias,
+        inactividad_web: config.inactividad_web,
+        inactividad_whatsapp: config.inactividad_whatsapp,
+        whatsapp_hora_envio: config.whatsapp_hora_envio,
+        whatsapp_minuto_envio: config.whatsapp_minuto_envio,
+      })
+    }
+  }
+
+  const handleCheckboxChange = (field: keyof typeof defaultFormState) => {
+    setFormNotificaciones((prev) => ({ ...prev, [field]: !prev[field] }))
+  }
+
+  const handleNumberChange = (field: keyof typeof defaultFormState, value: number, min: number, max: number) => {
+    const safeValue = Math.max(min, Math.min(max, value || min))
+    setFormNotificaciones((prev) => ({ ...prev, [field]: safeValue }))
+  }
+
+  const formatTimeValue = (hora: number, minuto: number) => {
+    const h = String(hora).padStart(2, '0')
+    const m = String(minuto).padStart(2, '0')
+    return `${h}:${m}`
+  }
+
+  const handleTimeChange = (timeString: string) => {
+    if (!timeString) return
+    const [hStr, mStr] = timeString.split(':')
+    const hora = parseInt(hStr, 10)
+    const minuto = parseInt(mStr, 10)
+    if (!isNaN(hora) && !isNaN(minuto)) {
+      setFormNotificaciones((prev) => ({
+        ...prev,
+        whatsapp_hora_envio: Math.max(0, Math.min(23, hora)),
+        whatsapp_minuto_envio: Math.max(0, Math.min(59, minuto)),
+      }))
+    }
+  }
+
+  const handleSaveNotificaciones = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsNotifSaving(true)
+    try {
+      await updateConfig(formNotificaciones)
+      showToast('Preferencias de notificaciones guardadas exitosamente', 'success')
+    } catch (err) {
+      console.error(err)
+      showToast('Error al guardar las notificaciones', 'error')
+    } finally {
+      setIsNotifSaving(false)
+    }
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div className={styles.root}>
 
@@ -326,114 +467,248 @@ export default function PerfilPage() {
       <div className={styles.pageHeader}>
         <div className={styles.titleGroup}>
           <h1>Mi perfil</h1>
-          <p className={styles.subtitle}>{usuario?.email || ''}</p>
+          <p className={styles.subtitle}>Gestioná tu cuenta, preferencias y notificaciones.</p>
         </div>
       </div>
 
-      {/* HERO CARD */}
-      <div ref={heroCardRef} className={styles.heroCard}>
-        <div className={styles.heroInner}>
-          <div className={styles.avatarWrap}>
-            <div className={styles.avatar}>
-              {getFotoUrl()
-                ? <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} referrerPolicy="no-referrer" />
-                : usuario?.nombre?.charAt(0) || 'U'
-              }
+      {/* TAB BAR */}
+      <div className={styles.tabBar}>
+        <button
+          className={`${styles.tab} ${activeTab === 'perfil' ? styles.tabActive : ''}`}
+          onClick={() => handleTabChange('perfil')}
+        >
+          Perfil
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'financiero' ? styles.tabActive : ''}`}
+          onClick={() => handleTabChange('financiero')}
+        >
+          Preferencias financieras
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'notificaciones' ? styles.tabActive : ''}`}
+          onClick={() => handleTabChange('notificaciones')}
+        >
+          Notificaciones
+        </button>
+      </div>
+
+      {/* TAB CONTENT */}
+      <div className={styles.tabContent}>
+
+        {/* ══════════════════════════════════════════
+            TAB 1: PERFIL
+        ══════════════════════════════════════════ */}
+        {activeTab === 'perfil' && (
+          <>
+            {/* HERO CARD */}
+            <div ref={heroCardRef} className={styles.heroCard}>
+              <div className={styles.heroInner}>
+                <div className={styles.avatarWrap}>
+                  <div className={styles.avatar}>
+                    {getFotoUrl()
+                      ? <img src={getFotoUrl()!} alt="Avatar" className={styles.avatarImage} referrerPolicy="no-referrer" />
+                      : usuario?.nombre?.charAt(0) || 'U'
+                    }
+                  </div>
+                  <button className={styles.cameraBtn} onClick={() => setFotoCropOpen(true)} title="Cambiar foto" aria-label="Cambiar foto de perfil">
+                    <Camera size={14} />
+                  </button>
+                  {usuario?.foto_url && (
+                    <button
+                      className={styles.deleteFotoBtn}
+                      onClick={() => confirm({
+                        title: '¿Eliminás tu foto de perfil?',
+                        description: 'Se va a borrar y vas a quedar con el avatar por defecto.',
+                        variant: 'danger',
+                        confirmLabel: 'Eliminar',
+                        onConfirm: async () => {
+                          try {
+                            await usuarioService.eliminarFoto()
+                            if (usuario) updateUsuario({ ...usuario, foto_url: null })
+                            showToast('Foto de perfil eliminada.', 'success')
+                          } catch (err: unknown) {
+                            showToast(getErrorMessage(err, 'No pudimos eliminar la foto de perfil.'), 'error')
+                          }
+                        },
+                      })}
+                      title="Eliminar foto de perfil"
+                      aria-label="Eliminar foto de perfil"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <div className={styles.heroBody}>
+                  <div className={styles.nameContainer}>
+                    <h2 className={styles.heroName}>{usuario?.nombre} {usuario?.apellido}</h2>
+                    <button className={styles.editNameBtnInline} onClick={() => handleOpenModal('datos-personales')} aria-label="Editar datos personales">
+                      <Edit size={18} />
+                    </button>
+                  </div>
+                  <p className={styles.heroMeta}>{usuario?.email || 'Sin email'} · {usuario?.telefono || 'Sin teléfono'}</p>
+                  <div className={styles.heroBadges}>
+                    <span className={`${styles.heroBadge} ${usuario?.email_verificado ? styles.heroBadgeOk : styles.heroBadgeErr}`}>
+                      Email {usuario?.email_verificado ? 'verificado' : 'no verificado'}
+                    </span>
+                    <span className={`${styles.heroBadge} ${usuario?.telefono_verificado ? styles.heroBadgeOk : styles.heroBadgeErr}`}>
+                      Teléfono {usuario?.telefono_verificado ? 'verificado' : 'no verificado'}
+                    </span>
+                    <span className={styles.heroBadgeNeutral}>
+                      Ciclo · {usuario?.ciclo_tipo === 'dia_fijo' ? `día ${usuario.ciclo_valor}` : usuario?.ciclo_valor?.replace('_', ' ')}
+                    </span>
+                    <span className={styles.heroBadgeNeutral}>
+                      {usuario?.moneda_principal}{usuario?.moneda_secundaria_activa ? ` · ${usuario.tipo_dolar?.toUpperCase()}` : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <button className={styles.cameraBtn} onClick={() => setFotoCropOpen(true)} title="Cambiar foto" aria-label="Cambiar foto de perfil">
-              <Camera size={14} />
-            </button>
-            {usuario?.foto_url && (
-              <button
-                className={styles.deleteFotoBtn}
-                onClick={() => confirm({
-                  title: '¿Eliminás tu foto de perfil?',
-                  description: 'Se va a borrar y vas a quedar con el avatar por defecto.',
+
+            {/* GRID PRINCIPAL */}
+            <div className={styles.mainGrid}>
+
+              {/* COLUMNA IZQUIERDA */}
+              <div className={styles.col}>
+
+                {/* Card Contacto */}
+                <div className={styles.card}>
+                  <div className={styles.cardHeader}>
+                    <span className={styles.cardTitle}>Contacto</span>
+                  </div>
+                  <div className={styles.cardBody}>
+                    <div className={styles.dataRow}>
+                      <div className={styles.dataRowIcon}><Mail size={16} /></div>
+                      <div className={styles.dataRowContent}>
+                        <span className={styles.dataLabel}>Email</span>
+                        <span className={styles.dataValue}>{usuario?.email || 'No asociado'}</span>
+                      </div>
+                      <div className={styles.dataRowAction}>
+                        {isGoogle
+                          ? <Lock size={15} className={styles.lockIcon} />
+                          : <button className={styles.iconBtn} onClick={() => handleOpenModal('email')} aria-label="Editar email"><Edit size={15} /></button>
+                        }
+                      </div>
+                    </div>
+                    <div className={`${styles.dataRow} ${styles.noBorderBottom}`}>
+                      <div className={styles.dataRowIcon}><Phone size={16} /></div>
+                      <div className={styles.dataRowContent}>
+                        <span className={styles.dataLabel}>Teléfono</span>
+                        <span className={styles.dataValue}>{usuario?.telefono || 'No asociado'}</span>
+                      </div>
+                      <div className={styles.dataRowAction}>
+                        <button className={styles.iconBtn} onClick={() => handleOpenModal('telefono')} aria-label="Editar teléfono"><Edit size={15} /></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* COLUMNA DERECHA */}
+              <div className={styles.col}>
+
+                {/* Card Métodos de acceso */}
+                <div className={styles.card}>
+                  <div className={styles.cardHeader}>
+                    <span className={styles.cardTitle}>Métodos de acceso</span>
+                  </div>
+                  <div className={styles.cardBody}>
+
+                    <div className={styles.methodRow}>
+                      <div className={styles.methodIcon}><Mail size={16} /></div>
+                      <div className={styles.methodContent}>
+                        <span className={styles.methodName}>Email + contraseña</span>
+                        {metodosLogin?.email_password && <button className={styles.methodLink} onClick={() => handleOpenModal('password')}>Cambiar contraseña</button>}
+                        {metodosLogin?.puede_agregar_password && <button className={styles.methodLink} onClick={() => handleOpenModal('password')}>Crear contraseña</button>}
+                        {metodosLogin?.puede_agregar_email && (
+                          <div className={styles.methodLinks}>
+                            <button className={styles.methodLink} onClick={handleVerificarEmailActual}>Verificar ahora</button>
+                            <button className={styles.methodLink} onClick={() => handleOpenModal('email')}>Cambiar email</button>
+                          </div>
+                        )}
+                      </div>
+                      <div className={styles.methodBadge}>
+                        {metodosLogin?.email_password ? <span className={styles.pillOk}>Activo</span>
+                          : metodosLogin?.puede_agregar_password ? <span className={styles.pillNa}>Sin contraseña</span>
+                          : metodosLogin?.puede_agregar_email ? <span className={styles.pillWarn}>Sin verificar</span>
+                          : <span className={styles.pillNa}>No configurado</span>}
+                      </div>
+                    </div>
+
+                    <div className={styles.methodRow}>
+                      <div className={styles.methodIcon}><Phone size={16} /></div>
+                      <div className={styles.methodContent}>
+                        <span className={styles.methodName}>WhatsApp</span>
+                        <button className={styles.methodLink} onClick={() => handleOpenModal('telefono')}>
+                          {metodosLogin?.telefono ? 'Cambiar teléfono' : 'Agregar teléfono'}
+                        </button>
+                      </div>
+                      <div className={styles.methodBadge}>
+                        {metodosLogin?.telefono ? <span className={styles.pillOk}>Activo</span> : <span className={styles.pillNa}>No configurado</span>}
+                      </div>
+                    </div>
+
+                    <div className={`${styles.methodRow} ${styles.noBorderBottom}`}>
+                      <div className={styles.methodIcon}><GoogleIcon /></div>
+                      <div className={styles.methodContent}>
+                        <span className={styles.methodName}>Google</span>
+                        <span className={styles.methodDesc}>
+                          {metodosLogin?.google
+                            ? 'Disponible si tu Google coincide con tu email verificado.'
+                            : 'Verificá tu email para habilitar el acceso con Google.'}
+                        </span>
+                      </div>
+                      <div className={styles.methodBadge}>
+                        {metodosLogin?.google ? <span className={styles.pillInfo}>Disponible</span> : <span className={styles.pillNa}>No disponible</span>}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* ZONA DE PELIGRO */}
+            <div className={styles.dangerCard}>
+              <div className={styles.dangerLeft}>
+                <div className={styles.dangerTitle}><AlertTriangle size={16} />Zona de peligro</div>
+                <p className={styles.dangerDesc}>Eliminar tu cuenta borra permanentemente todas tus billeteras, transacciones, presupuestos y datos personales. No se puede deshacer.</p>
+              </div>
+              <div className={styles.dangerActions}>
+                <button className={styles.logoutBtn} onClick={() => confirm({ title: 'Cerrar sesión', description: '¿Estás seguro de que querés cerrar sesión ahora?', onConfirm: logout })}>
+                  <LogOut size={15} />Cerrar sesión
+                </button>
+                <button className={styles.deleteBtn} onClick={() => confirm({
+                  title: '¿Eliminás tu cuenta?',
+                  description: 'Esta acción es permanente. Se van a borrar todos tus datos, transacciones y configuración. No hay vuelta atrás.',
                   variant: 'danger',
-                  confirmLabel: 'Eliminar',
+                  confirmLabel: 'Confirmar eliminación total',
+                  requireTyping: 'ELIMINAR',
                   onConfirm: async () => {
-                    try { 
-                      await usuarioService.eliminarFoto()
-                      if (usuario) updateUsuario({ ...usuario, foto_url: null })
-                      showToast('Foto de perfil eliminada.', 'success') 
-                    } catch (err: unknown) { 
-                      showToast(getErrorMessage(err, 'No pudimos eliminar la foto de perfil.'), 'error') 
+                    try {
+                      await usuarioService.eliminarCuenta()
+                      showToast('Cuenta eliminada exitosamente', 'success')
+                      await logout()
+                    } catch (error) {
+                      console.error('Error al eliminar la cuenta:', error)
+                      showToast(getErrorMessage(error, 'Hubo un error al intentar eliminar la cuenta.'), 'error')
                     }
                   },
-                })}
-                title="Eliminar foto de perfil"
-                aria-label="Eliminar foto de perfil"
-              >
-                <Trash2 size={14} />
-              </button>
-            )}
-          </div>
-
-          <div className={styles.heroBody}>
-            <div className={styles.nameContainer}>
-              <h2 className={styles.heroName}>{usuario?.nombre} {usuario?.apellido}</h2>
-              <button className={styles.editNameBtnInline} onClick={() => handleOpenModal('datos-personales')} aria-label="Editar datos personales">
-                <Edit size={18} />
-              </button>
-            </div>
-            <p className={styles.heroMeta}>{usuario?.email || 'Sin email'} · {usuario?.telefono || 'Sin teléfono'}</p>
-            <div className={styles.heroBadges}>
-              <span className={`${styles.heroBadge} ${usuario?.email_verificado ? styles.heroBadgeOk : styles.heroBadgeErr}`}>
-                Email {usuario?.email_verificado ? 'verificado' : 'no verificado'}
-              </span>
-              <span className={`${styles.heroBadge} ${usuario?.telefono_verificado ? styles.heroBadgeOk : styles.heroBadgeErr}`}>
-                Teléfono {usuario?.telefono_verificado ? 'verificado' : 'no verificado'}
-              </span>
-              <span className={styles.heroBadgeNeutral}>
-                Ciclo · {usuario?.ciclo_tipo === 'dia_fijo' ? `día ${usuario.ciclo_valor}` : usuario?.ciclo_valor?.replace('_', ' ')}
-              </span>
-              <span className={styles.heroBadgeNeutral}>
-                {usuario?.moneda_principal}{usuario?.moneda_secundaria_activa ? ` · ${usuario.tipo_dolar?.toUpperCase()}` : ''}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* GRID PRINCIPAL */}
-      <div className={styles.mainGrid}>
-
-        {/* COLUMNA IZQUIERDA */}
-        <div className={styles.col}>
-
-          {/* Card Contacto */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Contacto</span>
-            </div>
-            <div className={styles.cardBody}>
-              <div className={styles.dataRow}>
-                <div className={styles.dataRowIcon}><Mail size={16} /></div>
-                <div className={styles.dataRowContent}>
-                  <span className={styles.dataLabel}>Email</span>
-                  <span className={styles.dataValue}>{usuario?.email || 'No asociado'}</span>
-                </div>
-                <div className={styles.dataRowAction}>
-                  {isGoogle
-                    ? <Lock size={15} className={styles.lockIcon} />
-                    : <button className={styles.iconBtn} onClick={() => handleOpenModal('email')} aria-label="Editar email"><Edit size={15} /></button>
-                  }
-                </div>
-              </div>
-              <div className={`${styles.dataRow} ${styles.noBorderBottom}`}>
-                <div className={styles.dataRowIcon}><Phone size={16} /></div>
-                <div className={styles.dataRowContent}>
-                  <span className={styles.dataLabel}>Teléfono</span>
-                  <span className={styles.dataValue}>{usuario?.telefono || 'No asociado'}</span>
-                </div>
-                <div className={styles.dataRowAction}>
-                  <button className={styles.iconBtn} onClick={() => handleOpenModal('telefono')} aria-label="Editar teléfono"><Edit size={15} /></button>
-                </div>
+                })}>
+                  <Trash2 size={15} />Eliminar mi cuenta
+                </button>
               </div>
             </div>
-          </div>
+          </>
+        )}
 
-          {/* Card Financiero */}
+        {/* ══════════════════════════════════════════
+            TAB 2: PREFERENCIAS FINANCIERAS
+        ══════════════════════════════════════════ */}
+        {activeTab === 'financiero' && (
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>Configuración financiera</span>
@@ -461,107 +736,427 @@ export default function PerfilPage() {
               </div>
             </div>
           </div>
+        )}
 
-        </div>
+        {/* ══════════════════════════════════════════
+            TAB 3: NOTIFICACIONES
+        ══════════════════════════════════════════ */}
+        {activeTab === 'notificaciones' && (
+          <form onSubmit={handleSaveNotificaciones} className={notifCardStyles.form}>
+            <div className={notifCardStyles.topGrid}>
+              {/* Resumen por WhatsApp */}
+              <section className={notifCardStyles.section}>
+                <h3 className={notifCardStyles.sectionTitle}>
+                  <Settings size={16} /> Resumen por WhatsApp
+                </h3>
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Horario de envío</p>
+                      <p className={notifCardStyles.cardDesc}>
+                        Tus avisos del día se enviarán juntos en un solo mensaje de WhatsApp a la hora que elijas.
+                      </p>
+                    </div>
+                    <div>
+                      <input
+                        type="time"
+                        value={formatTimeValue(formNotificaciones.whatsapp_hora_envio, formNotificaciones.whatsapp_minuto_envio)}
+                        onChange={(e) => handleTimeChange(e.target.value)}
+                        className={notifCardStyles.timeInput}
+                        aria-label="Horario de envío diario"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </section>
 
-        {/* COLUMNA DERECHA */}
-        <div className={styles.col}>
-
-          {/* Card Acceso */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Métodos de acceso</span>
+              {/* Alertas de Cuotas */}
+              <section className={notifCardStyles.section}>
+                <h3 className={notifCardStyles.sectionTitle}>
+                  <Calendar size={16} /> Alertas de Cuotas
+                </h3>
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Vencimiento de tarjetas</p>
+                      <p className={notifCardStyles.cardDesc}>Avisarte antes del vencimiento del resumen de cada tarjeta.</p>
+                    </div>
+                  </div>
+                  <div className={notifCardStyles.cardControls}>
+                    <div className={notifCardStyles.inputGroup}>
+                      <label htmlFor="cuota_vence_anticipacion_dias">Días de anticipación al vencimiento del resumen</label>
+                      <input
+                        type="number"
+                        id="cuota_vence_anticipacion_dias"
+                        value={formNotificaciones.cuota_vence_anticipacion_dias}
+                        onChange={(e) => handleNumberChange('cuota_vence_anticipacion_dias', parseInt(e.target.value), 1, 30)}
+                        className={notifCardStyles.numberInput}
+                        min={1}
+                        max={30}
+                      />
+                      <span>días</span>
+                    </div>
+                    <div className={notifCardStyles.channels}>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.cuota_vence_web} onChange={() => handleCheckboxChange('cuota_vence_web')} className={notifCardStyles.channelCheckbox} />
+                        En la web
+                      </label>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.cuota_vence_whatsapp} onChange={() => handleCheckboxChange('cuota_vence_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                        Por WhatsApp
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </section>
             </div>
-            <div className={styles.cardBody}>
 
-              <div className={styles.methodRow}>
-                <div className={styles.methodIcon}><Mail size={16} /></div>
-                <div className={styles.methodContent}>
-                  <span className={styles.methodName}>Email + contraseña</span>
-                  {metodosLogin?.email_password && <button className={styles.methodLink} onClick={() => handleOpenModal('password')}>Cambiar contraseña</button>}
-                  {metodosLogin?.puede_agregar_password && <button className={styles.methodLink} onClick={() => handleOpenModal('password')}>Crear contraseña</button>}
-                  {metodosLogin?.puede_agregar_email && (
-                    <div className={styles.methodLinks}>
-                      <button className={styles.methodLink} onClick={handleVerificarEmailActual}>Verificar ahora</button>
-                      <button className={styles.methodLink} onClick={() => handleOpenModal('email')}>Cambiar email</button>
+            {/* Alertas de Presupuestos */}
+            <section className={notifCardStyles.section}>
+              <h3 className={notifCardStyles.sectionTitle}>
+                <PieChart size={16} /> Alertas de Presupuestos
+              </h3>
+              <div className={notifCardStyles.grid}>
+                {/* Umbral 1 */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Alerta de límite</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar cuando estés cerca de agotar un presupuesto.</p>
+                    </div>
+                    <label className={notifCardStyles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={formNotificaciones.presupuesto_umbral_1_activo}
+                        onChange={() => handleCheckboxChange('presupuesto_umbral_1_activo')}
+                        aria-label="Activar aviso de límite de presupuesto"
+                      />
+                      <span className={notifCardStyles.slider} />
+                    </label>
+                  </div>
+                  {formNotificaciones.presupuesto_umbral_1_activo && (
+                    <div className={notifCardStyles.cardControls}>
+                      <div className={notifCardStyles.inputGroup}>
+                        <label htmlFor="presupuesto_umbral_1">Porcentaje límite:</label>
+                        <input
+                          type="number"
+                          id="presupuesto_umbral_1"
+                          value={formNotificaciones.presupuesto_umbral_1}
+                          onChange={(e) => handleNumberChange('presupuesto_umbral_1', parseInt(e.target.value), 50, 95)}
+                          className={notifCardStyles.numberInput}
+                          min={50}
+                          max={95}
+                        />
+                        <span>%</span>
+                      </div>
+                      <div className={notifCardStyles.channels}>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.presupuesto_umbral_1_web} onChange={() => handleCheckboxChange('presupuesto_umbral_1_web')} className={notifCardStyles.channelCheckbox} />
+                          En la web
+                        </label>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.presupuesto_umbral_1_whatsapp} onChange={() => handleCheckboxChange('presupuesto_umbral_1_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                          Por WhatsApp
+                        </label>
+                      </div>
                     </div>
                   )}
                 </div>
-                <div className={styles.methodBadge}>
-                  {metodosLogin?.email_password ? <span className={styles.pillOk}>Activo</span>
-                    : metodosLogin?.puede_agregar_password ? <span className={styles.pillNa}>Sin contraseña</span>
-                    : metodosLogin?.puede_agregar_email ? <span className={styles.pillWarn}>Sin verificar</span>
-                    : <span className={styles.pillNa}>No configurado</span>}
+
+                {/* Umbral 2 */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Presupuesto agotado</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar cuando un presupuesto se consuma por completo.</p>
+                    </div>
+                  </div>
+                  <div className={notifCardStyles.cardControls}>
+                    <div className={notifCardStyles.channels}>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.presupuesto_umbral_2_web} onChange={() => handleCheckboxChange('presupuesto_umbral_2_web')} className={notifCardStyles.channelCheckbox} />
+                        En la web
+                      </label>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.presupuesto_umbral_2_whatsapp} onChange={() => handleCheckboxChange('presupuesto_umbral_2_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                        Por WhatsApp
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </section>
 
-              <div className={styles.methodRow}>
-                <div className={styles.methodIcon}><Phone size={16} /></div>
-                <div className={styles.methodContent}>
-                  <span className={styles.methodName}>WhatsApp</span>
-                  <button className={styles.methodLink} onClick={() => handleOpenModal('telefono')}>
-                    {metodosLogin?.telefono ? 'Cambiar teléfono' : 'Agregar teléfono'}
-                  </button>
+            {/* Alertas de Suscripciones */}
+            <section className={notifCardStyles.section}>
+              <h3 className={notifCardStyles.sectionTitle}>
+                <CreditCard size={16} /> Alertas de Suscripciones
+              </h3>
+              <div className={notifCardStyles.grid}>
+                {/* Cobro del día */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Día de cobro</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar el mismo día que se cobra una suscripción.</p>
+                    </div>
+                  </div>
+                  <div className={notifCardStyles.cardControls}>
+                    <div className={notifCardStyles.channels}>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.suscripcion_hoy_web} onChange={() => handleCheckboxChange('suscripcion_hoy_web')} className={notifCardStyles.channelCheckbox} />
+                        En la web
+                      </label>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.suscripcion_hoy_whatsapp} onChange={() => handleCheckboxChange('suscripcion_hoy_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                        Por WhatsApp
+                      </label>
+                    </div>
+                  </div>
                 </div>
-                <div className={styles.methodBadge}>
-                  {metodosLogin?.telefono ? <span className={styles.pillOk}>Activo</span> : <span className={styles.pillNa}>No configurado</span>}
+
+                {/* Recordatorio anticipado */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Aviso anticipado</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar unos días antes del cobro para preparar el pago.</p>
+                    </div>
+                    <label className={notifCardStyles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={formNotificaciones.suscripcion_recordatorio_activo}
+                        onChange={() => handleCheckboxChange('suscripcion_recordatorio_activo')}
+                        aria-label="Activar aviso anticipado de suscripción"
+                      />
+                      <span className={notifCardStyles.slider} />
+                    </label>
+                  </div>
+                  {formNotificaciones.suscripcion_recordatorio_activo && (
+                    <div className={notifCardStyles.cardControls}>
+                      <div className={notifCardStyles.inputGroup}>
+                        <label htmlFor="suscripcion_recordatorio_dias">Anticipación:</label>
+                        <input
+                          type="number"
+                          id="suscripcion_recordatorio_dias"
+                          value={formNotificaciones.suscripcion_recordatorio_dias}
+                          onChange={(e) => handleNumberChange('suscripcion_recordatorio_dias', parseInt(e.target.value), 1, 14)}
+                          className={notifCardStyles.numberInput}
+                          min={1}
+                          max={14}
+                        />
+                        <span>días</span>
+                      </div>
+                      <div className={notifCardStyles.channels}>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.suscripcion_recordatorio_web} onChange={() => handleCheckboxChange('suscripcion_recordatorio_web')} className={notifCardStyles.channelCheckbox} />
+                          En la web
+                        </label>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.suscripcion_recordatorio_whatsapp} onChange={() => handleCheckboxChange('suscripcion_recordatorio_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                          Por WhatsApp
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
+            </section>
 
-              <div className={`${styles.methodRow} ${styles.noBorderBottom}`}>
-                <div className={styles.methodIcon}><GoogleIcon /></div>
-                <div className={styles.methodContent}>
-                  <span className={styles.methodName}>Google</span>
-                  <span className={styles.methodDesc}>
-                    {metodosLogin?.google
-                      ? 'Disponible si tu Google coincide con tu email verificado.'
-                      : 'Verificá tu email para habilitar el acceso con Google.'}
-                  </span>
+            {/* Finanzas y Metas */}
+            <section className={notifCardStyles.section}>
+              <h3 className={notifCardStyles.sectionTitle}>
+                <Target size={16} /> Finanzas y Metas
+              </h3>
+              <div className={notifCardStyles.grid}>
+                {/* Meta cumplida */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Meta cumplida</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar cuando completes una meta de ahorro.</p>
+                    </div>
+                    <label className={notifCardStyles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={formNotificaciones.meta_alcanzada_activo}
+                        onChange={() => handleCheckboxChange('meta_alcanzada_activo')}
+                        aria-label="Activar aviso de meta cumplida"
+                      />
+                      <span className={notifCardStyles.slider} />
+                    </label>
+                  </div>
+                  {formNotificaciones.meta_alcanzada_activo && (
+                    <div className={notifCardStyles.cardControls}>
+                      <div className={notifCardStyles.channels}>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.meta_alcanzada_web} onChange={() => handleCheckboxChange('meta_alcanzada_web')} className={notifCardStyles.channelCheckbox} />
+                          En la web
+                        </label>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.meta_alcanzada_whatsapp} onChange={() => handleCheckboxChange('meta_alcanzada_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                          Por WhatsApp
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className={styles.methodBadge}>
-                  {metodosLogin?.google ? <span className={styles.pillInfo}>Disponible</span> : <span className={styles.pillNa}>No disponible</span>}
+
+                {/* Billetera sin fondos */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Billetera sin fondos</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar cuando una billetera se quede sin dinero.</p>
+                    </div>
+                  </div>
+                  <div className={notifCardStyles.cardControls}>
+                    <div className={notifCardStyles.channels}>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.saldo_cero_web} onChange={() => handleCheckboxChange('saldo_cero_web')} className={notifCardStyles.channelCheckbox} />
+                        En la web
+                      </label>
+                      <label className={notifCardStyles.channelLabel}>
+                        <input type="checkbox" checked={formNotificaciones.saldo_cero_whatsapp} onChange={() => handleCheckboxChange('saldo_cero_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                        Por WhatsApp
+                      </label>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Gasto inusual */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Gasto inusual</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar cuando se registre un gasto llamativamente alto.</p>
+                    </div>
+                    <label className={notifCardStyles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={formNotificaciones.gasto_inusual_activo}
+                        onChange={() => handleCheckboxChange('gasto_inusual_activo')}
+                        aria-label="Activar aviso de gasto inusual"
+                      />
+                      <span className={notifCardStyles.slider} />
+                    </label>
+                  </div>
+                  {formNotificaciones.gasto_inusual_activo && (
+                    <div className={notifCardStyles.cardControls}>
+                      <div className={notifCardStyles.channels}>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.gasto_inusual_web} onChange={() => handleCheckboxChange('gasto_inusual_web')} className={notifCardStyles.channelCheckbox} />
+                          En la web
+                        </label>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.gasto_inusual_whatsapp} onChange={() => handleCheckboxChange('gasto_inusual_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                          Por WhatsApp
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Alerta de inactividad */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Alerta de inactividad</p>
+                      <p className={notifCardStyles.cardDesc}>Avisar si pasaron varios días sin registrar movimientos.</p>
+                    </div>
+                    <label className={notifCardStyles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={formNotificaciones.inactividad_activo}
+                        onChange={() => handleCheckboxChange('inactividad_activo')}
+                        aria-label="Activar aviso de inactividad"
+                      />
+                      <span className={notifCardStyles.slider} />
+                    </label>
+                  </div>
+                  {formNotificaciones.inactividad_activo && (
+                    <div className={notifCardStyles.cardControls}>
+                      <div className={notifCardStyles.inputGroup}>
+                        <label htmlFor="inactividad_dias">Días sin registrar:</label>
+                        <input
+                          type="number"
+                          id="inactividad_dias"
+                          value={formNotificaciones.inactividad_dias}
+                          onChange={(e) => handleNumberChange('inactividad_dias', parseInt(e.target.value), 3, 30)}
+                          className={notifCardStyles.numberInput}
+                          min={3}
+                          max={30}
+                        />
+                        <span>días</span>
+                      </div>
+                      <div className={notifCardStyles.channels}>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.inactividad_web} onChange={() => handleCheckboxChange('inactividad_web')} className={notifCardStyles.channelCheckbox} />
+                          En la web
+                        </label>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.inactividad_whatsapp} onChange={() => handleCheckboxChange('inactividad_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                          Por WhatsApp
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Resumen semanal */}
+                <div className={notifCardStyles.card}>
+                  <div className={notifCardStyles.cardHeader}>
+                    <div className={notifCardStyles.cardMeta}>
+                      <p className={notifCardStyles.cardTitle}>Resumen semanal</p>
+                      <p className={notifCardStyles.cardDesc}>Recibir un resumen detallado de ingresos y egresos al final de la semana.</p>
+                    </div>
+                    <label className={notifCardStyles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={formNotificaciones.resumen_semanal_activo}
+                        onChange={() => handleCheckboxChange('resumen_semanal_activo')}
+                        aria-label="Activar resumen semanal"
+                      />
+                      <span className={notifCardStyles.slider} />
+                    </label>
+                  </div>
+                  {formNotificaciones.resumen_semanal_activo && (
+                    <div className={notifCardStyles.cardControls}>
+                      <div className={notifCardStyles.channels}>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.resumen_semanal_web} onChange={() => handleCheckboxChange('resumen_semanal_web')} className={notifCardStyles.channelCheckbox} />
+                          En la web
+                        </label>
+                        <label className={notifCardStyles.channelLabel}>
+                          <input type="checkbox" checked={formNotificaciones.resumen_semanal_whatsapp} onChange={() => handleCheckboxChange('resumen_semanal_whatsapp')} className={notifCardStyles.channelCheckbox} />
+                          Por WhatsApp
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
               </div>
+            </section>
 
+            {/* Footer acciones */}
+            <div className={notifCardStyles.footer}>
+              <button
+                type="submit"
+                className={notifCardStyles.btnSave}
+                disabled={isNotifSaving}
+              >
+                {isNotifSaving ? 'Guardando...' : 'Guardar preferencias'}
+              </button>
             </div>
-          </div>
+          </form>
+        )}
 
-        </div>
-      </div>
+      </div>{/* fin tabContent */}
 
-      {/* ZONA DE PELIGRO */}
-      <div className={styles.dangerCard}>
-        <div className={styles.dangerLeft}>
-          <div className={styles.dangerTitle}><AlertTriangle size={16} />Zona de peligro</div>
-          <p className={styles.dangerDesc}>Eliminar tu cuenta borra permanentemente todas tus billeteras, transacciones, presupuestos y datos personales. No se puede deshacer.</p>
-        </div>
-        <div className={styles.dangerActions}>
-          <button className={styles.logoutBtn} onClick={() => confirm({ title: 'Cerrar sesión', description: '¿Estás seguro de que querés cerrar sesión ahora?', onConfirm: logout })}>
-            <LogOut size={15} />Cerrar sesión
-          </button>
-          <button className={styles.deleteBtn} onClick={() => confirm({
-            title: '¿Eliminás tu cuenta?',
-            description: 'Esta acción es permanente. Se van a borrar todos tus datos, transacciones y configuración. No hay vuelta atrás.',
-            variant: 'danger',
-            confirmLabel: 'Confirmar eliminación total',
-            requireTyping: 'ELIMINAR',
-            onConfirm: async () => {
-              try { 
-                await usuarioService.eliminarCuenta()
-                showToast('Cuenta eliminada exitosamente', 'success')
-                await logout() 
-              } catch (error) { 
-                console.error('Error al eliminar la cuenta:', error)
-                showToast(getErrorMessage(error, 'Hubo un error al intentar eliminar la cuenta.'), 'error') 
-              }
-            },
-          })}>
-            <Trash2 size={15} />Eliminar mi cuenta
-          </button>
-        </div>
-      </div>
-
-      {/* MODALES DE EDICIÓN */}
+      {/* ══════════════════════════════════════════
+          MODALES DE EDICIÓN
+      ══════════════════════════════════════════ */}
       {activeModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
@@ -579,6 +1174,7 @@ export default function PerfilPage() {
 
             {modalError && <div className={styles.modalError}>{modalError}</div>}
 
+            {/* Modal: datos personales */}
             {activeModal === 'datos-personales' && (
               <form onSubmit={handleSaveDatosPersonales} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
@@ -591,6 +1187,7 @@ export default function PerfilPage() {
               </form>
             )}
 
+            {/* Modal: email */}
             {activeModal === 'email' && (
               <form onSubmit={handleSaveEmail} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
@@ -609,6 +1206,7 @@ export default function PerfilPage() {
               </form>
             )}
 
+            {/* Modal: teléfono */}
             {activeModal === 'telefono' && (
               <form onSubmit={handleSaveTelefono} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
@@ -627,6 +1225,7 @@ export default function PerfilPage() {
               </form>
             )}
 
+            {/* Modal: password */}
             {activeModal === 'password' && (
               <form onSubmit={handleSavePassword} className={styles.modalForm}>
                 {usuario?.password_configurada && (
@@ -655,6 +1254,7 @@ export default function PerfilPage() {
               </form>
             )}
 
+            {/* Modal: ciclo financiero */}
             {activeModal === 'ciclo' && (
               <form onSubmit={handleSaveCiclo} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
@@ -679,6 +1279,7 @@ export default function PerfilPage() {
               </form>
             )}
 
+            {/* Modal: moneda */}
             {activeModal === 'moneda' && (
               <form onSubmit={handleSaveMoneda} className={styles.modalForm}>
                 <div className={styles.inputGroup}>
@@ -706,6 +1307,7 @@ export default function PerfilPage() {
         </div>
       )}
 
+      {/* Foto crop modal */}
       <FotoCropModal open={fotoCropOpen} onClose={() => setFotoCropOpen(false)} onSuccess={() => {}} />
 
     </div>

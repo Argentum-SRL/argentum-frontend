@@ -24,6 +24,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
 import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario, Billetera } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
+import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { EmptyState } from '@/components/ui'
@@ -700,6 +701,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Perfil Financiero */}
+      <PerfilFinancieroCard />
 
       {/* ── Bottom Row (2 Cols) ───────────────────────────────────────────── */}
       <div className={styles.bottomRow}>

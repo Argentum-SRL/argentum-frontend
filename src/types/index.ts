@@ -561,3 +561,38 @@ export interface GrupoCuotasResumen {
 }
 
 
+// ===== PERFIL FINANCIERO =====
+
+export interface PerfilFinanciero {
+  id: string;
+  usuario_id: string;
+  tasa_ahorro: number | null;
+  score_impulsividad: number | null;
+  ratio_cuotas: number | null;
+  cumplimiento_presupuesto: number | null;
+  consistencia_registro: number | null;
+  porcentaje_suscripciones: number | null;
+  ultima_actualizacion: string | null;
+  fecha_creacion: string;
+}
+
+export type NivelIndicador = 'excelente' | 'bien' | 'moderado' | 'bajo' | 'critico' | 'sin_datos';
+
+export interface InterpretacionIndicador {
+  label: string;
+  nivel: NivelIndicador;
+}
+
+export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
+  interpretaciones: {
+    tasa_ahorro: InterpretacionIndicador;
+    score_impulsividad: InterpretacionIndicador;
+    ratio_cuotas: InterpretacionIndicador;
+    cumplimiento_presupuesto: InterpretacionIndicador;
+    consistencia_registro: InterpretacionIndicador;
+    porcentaje_suscripciones: InterpretacionIndicador;
+  };
+}
+
+
+

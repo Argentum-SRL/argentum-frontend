@@ -24,6 +24,22 @@ const grupoCuotasService = {
     invalidateBilleteras()
     invalidatePresupuestos()
     return response.data
+  },
+
+  cancelarGrupo: async (grupoId: string): Promise<GrupoCuotasResumen> => {
+    const response = await api.post<GrupoCuotasResumen>(`/grupos-cuotas/${grupoId}/cancelar`)
+    invalidateResumen()
+    invalidateBilleteras()
+    invalidatePresupuestos()
+    return response.data
+  },
+
+  prepagarGrupo: async (grupoId: string, billeteraId: string): Promise<GrupoCuotasResumen> => {
+    const response = await api.post<GrupoCuotasResumen>(`/grupos-cuotas/${grupoId}/prepagar`, { billetera_id: billeteraId })
+    invalidateResumen()
+    invalidateBilleteras()
+    invalidatePresupuestos()
+    return response.data
   }
 }
 

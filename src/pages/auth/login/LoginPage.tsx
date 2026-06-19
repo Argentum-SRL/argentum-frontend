@@ -1,4 +1,4 @@
-import { type FormEvent, useState, useEffect, useCallback } from 'react'
+import { type FormEvent, useState, useCallback } from 'react'
 import { useNavigate, Link, useLocation, type Location } from 'react-router-dom'
 import { Eye, EyeOff, Phone, CheckCircle2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth'
 import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
-  const { login, isAuthenticated, usuario } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: Location })?.from?.pathname
@@ -28,15 +28,6 @@ export default function LoginPage() {
     if (!import.meta.env.DEV) return
     console.error(`[Auth][Google][Login] ${stage}`, error)
   }
-
-  useEffect(() => {
-    if (isAuthenticated && usuario) {
-      navigate(
-        usuario.onboarding_completo ? '/app/dashboard' : '/onboarding',
-        { replace: true }
-      )
-    }
-  }, [isAuthenticated, usuario, navigate])
 
   const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
   const passwordError = hasSubmitted && !password ? 'Ingresá tu contraseña.' : null

@@ -24,6 +24,7 @@ const MetaDetallePage = lazy(() => import('@/pages/app/metas/MetaDetallePage'))
 const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/SuscripcionesPage'))
 const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const NotificacionesConfigPage = lazy(() => import('@/pages/app/configuracion/NotificacionesConfigPage'))
+const SettingsPage = lazy(() => import('@/pages/app/configuracion/SettingsPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
@@ -80,6 +81,7 @@ const router = createBrowserRouter([
               { path: '/app/metas/:id', element: <MetaDetallePage /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage /> },
               { path: '/app/perfil', element: <PerfilPage /> },
+              { path: '/app/configuracion', element: <SettingsPage /> },
               { path: '/app/notificaciones/configuracion', element: <NotificacionesConfigPage /> },
               { path: '/app/herramientas', element: <ToolsPage /> },
               { path: '/app/*', element: <NotFoundPage /> },

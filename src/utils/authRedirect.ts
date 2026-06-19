@@ -27,7 +27,11 @@ export function manejarRespuestaAuth(
   } else if (respuesta.requiere_onboarding) {
     navigate('/onboarding', { replace: true })
   } else {
-    const target = (fromPath && fromPath.startsWith('/app/')) ? fromPath : '/app/dashboard'
+    const isValidFrom = fromPath && (
+      fromPath.startsWith('/app/') || 
+      fromPath.startsWith('/admin')
+    )
+    const target = isValidFrom ? fromPath : '/app/dashboard'
     navigate(target, { replace: true })
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { getEstadoOnboarding } from '@/services/onboarding.service'
@@ -45,6 +45,55 @@ export default function OnboardingPage() {
   const [cargandoReintento, setCargandoReintento] = useState(false)
   const { refreshUser } = useAuth()
 
+  const cargarEstado = useCallback(async (signal?: AbortSignal) => {
+    try {
+      const res = await getEstadoOnboarding(signal)
+      if (signal?.aborted) return
+      if (res.onboarding_completo) {
+        try {
+          await refreshUser()
+          if (!signal?.aborted) {
+            navigate('/app/dashboard', { replace: true })
+          }
+        } catch (err) {
+          if (!signal?.aborted) {
+            console.error(err)
+            setErrorCarga(true)
+          }
+        }
+        return
+      }
+      if (!signal?.aborted) {
+        setEstado(res)
+        setPasoActual(mapEstadoAPaso(res))
+      }
+    } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
+      if (!signal?.aborted) {
+        console.error(err)
+        setErrorCarga(true)
+      }
+    } finally {
+      if (!signal?.aborted) {
+        setCargando(false)
+      }
+    }
+  }, [navigate, refreshUser])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    Promise.resolve().then(() => {
+      if (!controller.signal.aborted) {
+        cargarEstado(controller.signal)
+      }
+    })
+    return () => {
+      controller.abort()
+    }
+  }, [cargarEstado])
+
   async function handleRefreshAndNavigate() {
     setCargandoReintento(true)
     setErrorCarga(false)
@@ -59,41 +108,15 @@ export default function OnboardingPage() {
     }
   }
 
-  useEffect(() => {
-    const controller = new AbortController()
-    getEstadoOnboarding(controller.signal)
-      .then((res) => {
-        if (controller.signal.aborted) return
-        if (res.onboarding_completo) {
-          return refreshUser().then(() => {
-            if (!controller.signal.aborted) {
-              navigate('/app/dashboard', { replace: true })
-            }
-          }).catch((err) => {
-            if (!controller.signal.aborted) {
-              console.error(err)
-              setErrorCarga(true)
-            }
-          })
-        }
-        setEstado(res)
-        setPasoActual(mapEstadoAPaso(res))
-      })
-      .catch((err) => {
-        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
-          return
-        }
-        console.error(err)
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) {
-          setCargando(false)
-        }
-      })
-    return () => {
-      controller.abort()
+  const handleReintentar = () => {
+    if (!estado) {
+      setCargando(true)
+      setErrorCarga(false)
+      cargarEstado()
+    } else {
+      handleRefreshAndNavigate()
     }
-  }, [navigate, refreshUser])
+  }
 
 
   function avanzar(siguientePaso: string | null) {
@@ -137,11 +160,11 @@ export default function OnboardingPage() {
                   Hubo un problema al cargar tu cuenta. Por favor intentá de nuevo.
                 </p>
                 <button
-                  onClick={handleRefreshAndNavigate}
-                  disabled={cargandoReintento}
+                  onClick={handleReintentar}
+                  disabled={cargandoReintento || cargando}
                   className="w-full h-12 rounded-xl font-semibold text-white bg-[var(--primary)] flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:opacity-90"
                 >
-                  {cargandoReintento ? (
+                  {cargandoReintento || cargando ? (
                     <>
                       <Loader2 className="animate-spin" size={18} />
                       Cargando...

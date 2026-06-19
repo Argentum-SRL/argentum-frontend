@@ -63,6 +63,11 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
+        // Necesario para que las cookies seteadas por el backend (127.0.0.1:8000)
+        // sean aceptadas por el browser como cookies de localhost:5173
+        cookieDomainRewrite: 'localhost',
+        // Previene que el proxy reescriba Secure en cookies cuando corre en HTTP
+        secure: false,
       },
     },
   },

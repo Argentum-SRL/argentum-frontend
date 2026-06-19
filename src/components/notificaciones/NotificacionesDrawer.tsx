@@ -344,7 +344,7 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
               Cerrar
             </button>
             <Link
-              to="/app/notificaciones/configuracion"
+              to="/app/configuracion?tab=notificaciones"
               className={styles.submitBtn}
               onClick={onClose}
             >

@@ -1,23 +1,33 @@
 import { useState, useEffect, useCallback } from 'react'
-import { CreditCard, Trash2, Edit2, AlertTriangle } from 'lucide-react'
+import { CreditCard, Trash2, Edit2, AlertTriangle, XCircle } from 'lucide-react'
 import styles from './GruposCuotasTab.module.css'
 import grupoCuotasService from '@/services/grupoCuotas.service'
-import type { GrupoCuotasResumen } from '@/types'
+import billeteraService from '@/services/billetera.service'
+import type { GrupoCuotasResumen, Billetera } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { EmptyState } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
 
+interface GrupoCuotasResumenExtended extends GrupoCuotasResumen {
+  estado?: 'activo' | 'cancelado' | 'completado'
+}
+
 export default function GruposCuotasTab() {
-  const [grupos, setGrupos] = useState<GrupoCuotasResumen[]>([])
+  const [grupos, setGrupos] = useState<GrupoCuotasResumenExtended[]>([])
   const [loading, setLoading] = useState(true)
-  const [editingGrupo, setEditingGrupo] = useState<GrupoCuotasResumen | null>(null)
+  const [editingGrupo, setEditingGrupo] = useState<GrupoCuotasResumenExtended | null>(null)
   
   // States for the edit form
   const [editDesc, setEditDesc] = useState('')
   const [editMonto, setEditMonto] = useState<number | ''>('')
   const [saving, setSaving] = useState(false)
+
+  // Prepayment & Wallet states
+  const [grupoPrepago, setGrupoPrepago] = useState<GrupoCuotasResumenExtended | null>(null)
+  const [billeteraSeleccionada, setBilleteraSeleccionada] = useState<string>('')
+  const [billeteras, setBilleteras] = useState<Billetera[]>([])
 
   const { showToast } = useToast()
   const { confirm } = useModal()
@@ -34,17 +44,67 @@ export default function GruposCuotasTab() {
     }
   }, [showToast])
 
+  const fetchBilleteras = useCallback(async () => {
+    try {
+      const data = await billeteraService.list()
+      setBilleteras(data.filter(b => b.estado === 'activa'))
+    } catch (e) {
+      console.error(e)
+    }
+  }, [])
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchGrupos()
+      fetchBilleteras()
     }, 0)
     return () => clearTimeout(timer)
-  }, [fetchGrupos])
+  }, [fetchGrupos, fetchBilleteras])
 
-  const handleEditClick = (grupo: GrupoCuotasResumen) => {
+  const handleEditClick = (grupo: GrupoCuotasResumenExtended) => {
     setEditingGrupo(grupo)
     setEditDesc(grupo.descripcion)
     setEditMonto(grupo.monto_total)
+  }
+
+  const handleCancelar = (grupo: GrupoCuotasResumenExtended) => {
+    confirm({
+      title: '¿Cancelar cuotas?',
+      description: `Se eliminarán las cuotas pendientes de "${grupo.descripcion}". Las cuotas ya pagadas se conservan en tu historial.`,
+      variant: 'danger',
+      confirmLabel: 'Confirmar',
+      onConfirm: async () => {
+        try {
+          await grupoCuotasService.cancelarGrupo(grupo.id)
+          showToast('Cuotas canceladas correctamente', 'success')
+          fetchGrupos()
+        } catch (e) {
+          console.error(e)
+          showToast('No se pudieron cancelar las cuotas', 'error')
+        }
+      }
+    })
+  }
+
+  const handlePrepagar = (grupo: GrupoCuotasResumenExtended) => {
+    setGrupoPrepago(grupo)
+    setBilleteraSeleccionada('')
+  }
+
+  const confirmarPrepago = async () => {
+    if (!grupoPrepago || !billeteraSeleccionada) return
+    setSaving(true)
+    try {
+      await grupoCuotasService.prepagarGrupo(grupoPrepago.id, billeteraSeleccionada)
+      showToast('Prepago realizado correctamente', 'success')
+      setGrupoPrepago(null)
+      fetchGrupos()
+    } catch (e) {
+      console.error(e)
+      showToast('No se pudo realizar el prepago', 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -123,6 +183,32 @@ export default function GruposCuotasTab() {
 
   return (
     <div className={styles.container}>
+      <style>{`
+        .canceladaBadge {
+          background-color: rgba(239, 68, 68, 0.1) !important;
+          color: #EF4444 !important;
+        }
+        .prepayInfoPanel {
+          background: var(--surface-alt) !important;
+          border: 1px solid var(--border) !important;
+        }
+        .prepayInfoIcon {
+          color: var(--primary) !important;
+        }
+        .prepayInfoText {
+          color: var(--text) !important;
+        }
+        .redInfoPanel {
+          border: 1px solid rgba(220, 38, 38, 0.2) !important;
+          background: rgba(220, 38, 38, 0.08) !important;
+        }
+        .redInfoIcon {
+          color: #DC2626 !important;
+        }
+        .redInfoText {
+          color: #991B1B !important;
+        }
+      `}</style>
       <div className={styles.grid}>
         {grupos.map((grupo) => {
           const progressPercent = grupo.cantidad_cuotas > 0 
@@ -171,6 +257,8 @@ export default function GruposCuotasTab() {
                     <span className={styles.vencimientoText}>
                       Próximo vencimiento: {formatFecha(grupo.proximo_vencimiento!)}
                     </span>
+                  ) : (grupo.estado === 'cancelado' || grupo.cantidad_pagadas < grupo.cantidad_cuotas) ? (
+                    <span className={`${styles.completedBadge} canceladaBadge`}>Cancelada</span>
                   ) : (
                     <span className={styles.completedBadge}>Completada</span>
                   )}
@@ -195,6 +283,26 @@ export default function GruposCuotasTab() {
 
               {/* ACCIONES */}
               <div className={styles.cardActions}>
+                {grupo.cantidad_pendientes > 0 && (grupo.estado === 'activo' || !grupo.estado) && (
+                  <button 
+                    className={styles.editBtn} 
+                    onClick={() => handlePrepagar(grupo)}
+                  >
+                    <CreditCard size={14} className={styles.actionIcon} />
+                    Prepagar
+                  </button>
+                )}
+
+                {grupo.cantidad_pendientes > 0 && grupo.estado !== 'cancelado' && (
+                  <button 
+                    className={styles.deleteBtn} 
+                    onClick={() => handleCancelar(grupo)}
+                  >
+                    <XCircle size={14} className={styles.actionIcon} />
+                    Cancelar
+                  </button>
+                )}
+
                 <button 
                   className={styles.editBtn} 
                   onClick={() => handleEditClick(grupo)}
@@ -280,6 +388,72 @@ export default function GruposCuotasTab() {
             </div>
 
           </form>
+        )}
+      </Modal>
+
+      {/* MODAL DE PREPAGO */}
+      <Modal 
+        isOpen={!!grupoPrepago} 
+        onClose={() => setGrupoPrepago(null)}
+        title="Prepagar cuotas"
+        size="md"
+      >
+        {grupoPrepago && (
+          <div className={styles.editForm}>
+            <div className={`${styles.modalInfoPanel} prepayInfoPanel`}>
+              <CreditCard size={18} className={`${styles.infoIcon} prepayInfoIcon`} />
+              <p className={`${styles.infoText} prepayInfoText`}>
+                Seleccioná la billetera desde donde se debitará el monto total pendiente de{' '}
+                <strong>{grupoPrepago.cantidad_pendientes} cuotas</strong>:{' '}
+                <strong>{formatMonto(grupoPrepago.total_pendiente, grupoPrepago.moneda)}</strong>
+              </p>
+            </div>
+
+            {billeteras.length === 0 ? (
+              <div className={`${styles.modalInfoPanel} redInfoPanel`}>
+                <AlertTriangle size={18} className={`${styles.infoIcon} redInfoIcon`} />
+                <p className={`${styles.infoText} redInfoText`}>
+                  No tenés billeteras disponibles para realizar el pago.
+                </p>
+              </div>
+            ) : (
+              <div className={styles.formField}>
+                <label htmlFor="select-billetera-prepago" className={styles.fieldLabel}>Billetera de débito</label>
+                <select
+                  id="select-billetera-prepago"
+                  className={styles.fieldInput}
+                  value={billeteraSeleccionada}
+                  onChange={(e) => setBilleteraSeleccionada(e.target.value)}
+                >
+                  <option value="">Seleccioná una billetera</option>
+                  {billeteras.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.nombre} ({formatMonto(b.saldo_actual, b.moneda)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className={styles.formActions}>
+              <button 
+                type="button" 
+                className={styles.cancelBtn} 
+                onClick={() => setGrupoPrepago(null)}
+                disabled={saving}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                className={styles.submitBtn} 
+                onClick={confirmarPrepago}
+                disabled={saving || !billeteraSeleccionada || billeteras.length === 0}
+              >
+                {saving ? 'Procesando...' : 'Confirmar'}
+              </button>
+            </div>
+          </div>
         )}
       </Modal>
     </div>

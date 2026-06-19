@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
   Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, User,
-  Calculator, Shield
+  Calculator, Shield, Settings
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -179,6 +179,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <>
                 <div className={styles.profileOverlay} onClick={() => setIsProfileOpen(false)} />
                 <div className={styles.profileDropdown}>
+                  <Link to="/app/configuracion" className={styles.dropdownItem} onClick={() => setIsProfileOpen(false)}>
+                    <Settings size={16} />
+                    <span>Configuración</span>
+                  </Link>
                   <Link to="/app/perfil" className={styles.dropdownItem} onClick={() => setIsProfileOpen(false)}>
                     <User size={16} />
                     <span>Ver perfil</span>
@@ -282,6 +286,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
             <div className={styles.moreSeparator} />
             
+            <Link 
+              to="/app/configuracion" 
+              className={[styles.moreItem, isActive('/app/configuracion') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+              onClick={() => setIsMoreOpen(false)}
+            >
+              <Settings size={22} strokeWidth={1.75} />
+              <span>Configuración</span>
+            </Link>
+
             <Link 
               to="/app/perfil" 
               className={[styles.moreItem, isActive('/app/perfil') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}

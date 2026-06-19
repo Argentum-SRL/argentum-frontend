@@ -3,7 +3,6 @@ import type { Notificacion, ConfiguracionNotificacion } from '@/types'
 import notificacionService from '@/services/notificacion.service'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
-import { getToken } from '@/services/api'
 import { NotificacionContext } from './NotificacionContextBase'
 
 
@@ -185,15 +184,12 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
 
     const connectSSE = () => {
-      const token = getToken()
-      if (!token) return
-
       const baseUrl = import.meta.env.VITE_API_URL ?? '/api'
       const sseUrl = baseUrl.startsWith('http')
-        ? `${baseUrl}/notificaciones/sse?token=${token}`
-        : `${window.location.origin}${baseUrl}/notificaciones/sse?token=${token}`
+        ? `${baseUrl}/notificaciones/sse`
+        : `${window.location.origin}${baseUrl}/notificaciones/sse`
 
-      eventSource = new EventSource(sseUrl)
+      eventSource = new EventSource(sseUrl, { withCredentials: true })
 
       eventSource.onmessage = (event) => {
         try {

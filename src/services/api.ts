@@ -1,16 +1,39 @@
 import axios from 'axios'
-import { navigateTo } from '../utils/browserHistory'
+import { logoutGlobal } from '../utils/browserHistory'
 
-const ACCESS_KEY = 'argentum_access_token'
-const REFRESH_KEY = 'argentum_refresh_token'
 
-export const getToken = (): string | null => localStorage.getItem(ACCESS_KEY)
-export const setToken = (token: string): void => localStorage.setItem(ACCESS_KEY, token)
-export const getRefreshToken = (): string | null => localStorage.getItem(REFRESH_KEY)
-export const setRefreshToken = (token: string): void => localStorage.setItem(REFRESH_KEY, token)
+
+// Estado en memoria como fallback temporal durante la transición
+let _tokenMemory: string | null = null
+let _refreshMemory: string | null = null
+
+export const getToken = (): string | null => {
+  // Intentar localStorage por compatibilidad, luego memoria
+  return localStorage.getItem('argentum_access_token') || _tokenMemory
+}
+
+export const setToken = (token: string): void => {
+  _tokenMemory = token
+  // También guardar en localStorage temporalmente para rehidratación
+  localStorage.setItem('argentum_access_token', token)
+}
+
+export const getRefreshToken = (): string | null => {
+  return localStorage.getItem('argentum_refresh_token') || _refreshMemory
+}
+
+export const setRefreshToken = (token: string): void => {
+  _refreshMemory = token
+  localStorage.setItem('argentum_refresh_token', token)
+}
+
 export const clearTokens = (): void => {
-  localStorage.removeItem(ACCESS_KEY)
-  localStorage.removeItem(REFRESH_KEY)
+  _tokenMemory = null
+  _refreshMemory = null
+  localStorage.removeItem('argentum_access_token')
+  localStorage.removeItem('argentum_refresh_token')
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
 }
 /** @deprecated usá clearTokens() */
 export const clearToken = clearTokens
@@ -18,22 +41,19 @@ export const clearToken = clearTokens
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? '/api',
   timeout: 15000,
+  withCredentials: true,
 })
 
 
 api.interceptors.request.use((config) => {
-  const token = getToken()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
   return config
 })
 
 let isRefreshing = false
-let pendingQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = []
+let pendingQueue: Array<{ resolve: () => void; reject: (err: unknown) => void }> = []
 
-function processQueue(error: unknown, token: string | null = null) {
-  pendingQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)))
+function processQueue(error: unknown) {
+  pendingQueue.forEach((p) => (error ? p.reject(error) : p.resolve()))
   pendingQueue = []
 }
 
@@ -47,19 +67,10 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    const refreshToken = getRefreshToken()
-
-    if (!refreshToken) {
-      clearTokens()
-      navigateTo('/login', { replace: true })
-      return Promise.reject(error)
-    }
-
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         pendingQueue.push({
-          resolve: (token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
+          resolve: () => {
             resolve(api(originalRequest))
           },
           reject,
@@ -71,24 +82,19 @@ api.interceptors.response.use(
     isRefreshing = true
 
     try {
-      const _apiBase = import.meta.env.VITE_API_URL ?? '/api'
-      const { data } = await axios.post(
-        `${_apiBase}/auth/refresh`,
-        { refresh_token: refreshToken },
-      )
+      const { data } = await api.post('/auth/refresh')
 
       setToken(data.access_token)
       setRefreshToken(data.refresh_token)
 
-      api.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
-      originalRequest.headers.Authorization = `Bearer ${data.access_token}`
-
-      processQueue(null, data.access_token)
+      processQueue(null)
       return api(originalRequest)
     } catch (refreshError) {
-      processQueue(refreshError, null)
-      clearTokens()
-      navigateTo('/login', { replace: true })
+      processQueue(refreshError)
+      const errorWithResponse = refreshError as { response?: { status?: number } }
+      if (errorWithResponse?.response?.status === 401) {
+        logoutGlobal()
+      }
       return Promise.reject(refreshError)
     } finally {
       isRefreshing = false

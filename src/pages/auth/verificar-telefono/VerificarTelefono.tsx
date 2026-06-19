@@ -180,16 +180,14 @@ export default function VerificarTelefono() {
   return (
     <AuthLayout title="Ingresá el código">
       <form onSubmit={handleVerificar} noValidate>
-        {!modoVerificacion && (
-          <button
-            type="button"
-            onClick={() => { setStep('phone'); setCodigo(''); setApiError(null) }}
-            className={styles.backBtn}
-          >
-            <ArrowLeft size={14} />
-            Cambiar número
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => { setStep('phone'); setCodigo(''); setApiError(null) }}
+          className={styles.backBtn}
+        >
+          <ArrowLeft size={14} />
+          Cambiar número
+        </button>
 
         <p className={styles.subtitle}>
           Enviamos un código de 6 dígitos a{' '}

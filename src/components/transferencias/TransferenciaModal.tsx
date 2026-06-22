@@ -5,7 +5,7 @@ import type { Billetera } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
 import { useToast } from '@/hooks/useToast'
 import styles from './TransferenciaModal.module.css'
-import { DateInput } from '@/components/ui'
+import { DateInput, SelectInput } from '@/components/ui'
 
 interface TransferenciaModalProps {
   isOpen: boolean
@@ -134,46 +134,34 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
           </div>
 
           {/* Billetera Origen */}
-          <div className={styles.formField}>
-            <label className={styles.fieldLabel} htmlFor="tf-origen">Desde (Cuenta origen)</label>
-            <select
-              id="tf-origen"
-              className={`${styles.fieldInput} ${styles.selectInput}`}
-              value={billeteraOrigenId}
-              onChange={(e) => setBilleteraOrigenId(e.target.value)}
-              required
-            >
-              <option value="">-- Seleccioná cuenta de origen --</option>
-              {activeWalletsOfCurrency
-                .filter(b => b.id !== billeteraDestinoId)
-                .map(b => (
-                  <option key={b.id} value={b.id}>
-                    {b.nombre} ({moneda} {b.saldo_actual.toLocaleString('es-AR')})
-                  </option>
-                ))}
-            </select>
-          </div>
+          <SelectInput
+            id="tf-origen"
+            label="Desde (Cuenta origen)"
+            placeholder="-- Seleccioná cuenta de origen --"
+            value={billeteraOrigenId}
+            onChange={setBilleteraOrigenId}
+            options={activeWalletsOfCurrency
+              .filter(b => b.id !== billeteraDestinoId)
+              .map(b => ({
+                value: b.id,
+                label: `${b.nombre} (${moneda} ${b.saldo_actual.toLocaleString('es-AR')})`
+              }))}
+          />
 
           {/* Billetera Destino */}
-          <div className={styles.formField}>
-            <label className={styles.fieldLabel} htmlFor="tf-destino">Hacia (Cuenta destino)</label>
-            <select
-              id="tf-destino"
-              className={`${styles.fieldInput} ${styles.selectInput}`}
-              value={billeteraDestinoId}
-              onChange={(e) => setBilleteraDestinoId(e.target.value)}
-              required
-            >
-              <option value="">-- Seleccioná cuenta de destino --</option>
-              {activeWalletsOfCurrency
-                .filter(b => b.id !== billeteraOrigenId)
-                .map(b => (
-                  <option key={b.id} value={b.id}>
-                    {b.nombre} ({moneda} {b.saldo_actual.toLocaleString('es-AR')})
-                  </option>
-                ))}
-            </select>
-          </div>
+          <SelectInput
+            id="tf-destino"
+            label="Hacia (Cuenta destino)"
+            placeholder="-- Seleccioná cuenta de destino --"
+            value={billeteraDestinoId}
+            onChange={setBilleteraDestinoId}
+            options={activeWalletsOfCurrency
+              .filter(b => b.id !== billeteraOrigenId)
+              .map(b => ({
+                value: b.id,
+                label: `${b.nombre} (${moneda} ${b.saldo_actual.toLocaleString('es-AR')})`
+              }))}
+          />
 
           {/* Fecha */}
           <div className={styles.formField}>

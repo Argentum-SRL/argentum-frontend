@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import adminService from '@/services/adminService'
 import type { UsuarioAdminResumen, UsuarioAdmin, FiltrosAdmin, AdminStats } from '@/types/admin'
-import { Button, EmptyState, Select } from '@/components/ui'
+import { Button, EmptyState, SelectInput } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import {
@@ -490,7 +490,7 @@ export default function AdminPage() {
               />
             </div>
             <div className={styles.filtersGroup}>
-              <Select
+              <SelectInput
                 value={estadoFilter || ''}
                 onChange={(val) => {
                   setEstadoFilter(val as FiltrosAdmin['estado'])
@@ -501,7 +501,7 @@ export default function AdminPage() {
                 className={styles.filterSelect}
               />
               
-              <Select
+              <SelectInput
                 value={onboardingFilter || ''}
                 onChange={(val) => {
                   setOnboardingFilter(val as FiltrosAdmin['onboarding'])
@@ -512,7 +512,7 @@ export default function AdminPage() {
                 className={styles.filterSelect}
               />
 
-              <Select
+              <SelectInput
                 value={wppFilter || ''}
                 onChange={(val) => {
                   setWppFilter(val as FiltrosAdmin['wpp'])

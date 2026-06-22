@@ -8,7 +8,7 @@ import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, SelectInput } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
 
 interface GrupoCuotasResumenExtended extends GrupoCuotasResumen {
@@ -424,22 +424,17 @@ export default function GruposCuotasTab() {
                 </p>
               </div>
             ) : (
-              <div className={styles.formField}>
-                <label htmlFor="select-billetera-prepago" className={styles.fieldLabel}>Billetera de débito</label>
-                <select
-                  id="select-billetera-prepago"
-                  className={styles.fieldInput}
-                  value={billeteraSeleccionada}
-                  onChange={(e) => setBilleteraSeleccionada(e.target.value)}
-                >
-                  <option value="">Seleccioná una billetera</option>
-                  {billeteras.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.nombre} ({formatMonto(b.saldo_actual, b.moneda)})
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectInput
+                id="select-billetera-prepago"
+                label="Billetera de débito"
+                placeholder="Seleccioná una billetera"
+                value={billeteraSeleccionada}
+                onChange={setBilleteraSeleccionada}
+                options={billeteras.map((b) => ({
+                  value: b.id,
+                  label: `${b.nombre} (${formatMonto(b.saldo_actual, b.moneda)})`
+                }))}
+              />
             )}
 
             <div className={styles.formActions}>

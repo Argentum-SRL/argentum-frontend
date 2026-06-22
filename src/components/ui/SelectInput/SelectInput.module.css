@@ -155,15 +155,11 @@
   color: var(--text);
   background: transparent;
   border: none;
-  border-bottom: 0.5px solid var(--surface-alt);
   cursor: pointer;
   text-align: left;
-  transition: background 0.1s;
+  transition: background 0.1s, border-radius 0.1s;
   width: 100%;
-}
-
-.option:last-child {
-  border-bottom: none;
+  border-radius: 8px;
 }
 
 .option:hover {

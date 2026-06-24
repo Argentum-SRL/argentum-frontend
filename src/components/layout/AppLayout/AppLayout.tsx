@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
   Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, User,
-  Calculator, Shield
+  Calculator, Shield, Sparkles
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -111,6 +111,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const desktopNavItems = [...NAV_MAIN, ...NAV_FINANCIAL]
   if (is_admin) {
+    desktopNavItems.push({ label: 'Análisis IA', path: '/app/analisis-ia', Icon: Sparkles })
     desktopNavItems.push({ label: 'Admin', path: '/admin', Icon: Shield })
   }
 
@@ -271,13 +272,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
             ))}
 
             {is_admin && (
-              <Link
-                to="/admin"
-                className={[styles.moreItem, isActive('/admin') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
-              >
-                <Shield size={22} strokeWidth={1.75} />
-                <span>Módulo Admin</span>
-              </Link>
+              <>
+                <Link
+                  to="/app/analisis-ia"
+                  className={[styles.moreItem, isActive('/app/analisis-ia') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+                >
+                  <Sparkles size={22} strokeWidth={1.75} />
+                  <span>Análisis IA</span>
+                </Link>
+                <Link
+                  to="/admin"
+                  className={[styles.moreItem, isActive('/admin') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+                >
+                  <Shield size={22} strokeWidth={1.75} />
+                  <span>Módulo Admin</span>
+                </Link>
+              </>
             )}
 
             <div className={styles.moreSeparator} />

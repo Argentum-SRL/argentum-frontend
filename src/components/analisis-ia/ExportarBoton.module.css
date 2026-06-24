@@ -1,0 +1,71 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.success {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.error {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
+.fallbackContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.fallbackLabel {
+  font-size: 11px;
+  color: var(--text-3);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.fallbackTextarea {
+  width: 100%;
+  height: 80px;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 6px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  resize: none;
+}
+
+.warningsList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.warningsTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.warningsList ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.warningItem {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}

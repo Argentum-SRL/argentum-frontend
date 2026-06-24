@@ -1,0 +1,83 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+  padding: 24px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.item:hover {
+  background: var(--surface-alt);
+}
+
+.itemSeleccionado {
+  background: var(--surface-alt);
+  border-left-color: var(--primary);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tipo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.statusCompletado {
+  background: var(--success);
+}
+
+.statusError {
+  background: var(--error);
+}
+
+.statusPendiente {
+  background: var(--text-3);
+}
+
+.itemFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.fecha {
+  font-weight: 400;
+}
+
+.ciclos {
+  font-weight: 500;
+}

@@ -439,6 +439,7 @@ export interface PresupuestoUpdate {
 }
 
 export * from './goals'
+export * from './analisisIA.types'
 
 export type NivelNotificacion = 'CRITICA' | 'FINANCIERA_IMPORTANTE' | 'FINANCIERA_INFORMATIVA' | 'SOFT'
 

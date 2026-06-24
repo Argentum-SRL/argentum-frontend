@@ -25,6 +25,7 @@ const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/Suscripci
 const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
+const AnalisisIAPage = lazy(() => import('@/pages/AnalisisIAPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 const router = createBrowserRouter([
@@ -79,6 +80,7 @@ const router = createBrowserRouter([
               { path: '/app/metas/:id', element: <MetaDetallePage /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage /> },
               { path: '/app/perfil', element: <PerfilPage /> },
+              { path: '/app/analisis-ia', element: <AnalisisIAPage /> },
               // Rutas legacy — redirigen a la página unificada de perfil
               { path: '/app/configuracion', element: <Navigate to="/app/perfil" replace /> },
               { path: '/app/notificaciones/configuracion', element: <Navigate to="/app/perfil?tab=notificaciones" replace /> },

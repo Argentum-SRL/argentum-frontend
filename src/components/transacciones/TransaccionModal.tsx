@@ -394,6 +394,7 @@ export default function TransaccionModal({
                   onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                   disabled={isCuotaHija}
                   autoFocus
+                  allowDecimals
                 />
 
                 {/* 1. Método de Pago */}

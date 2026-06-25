@@ -71,13 +71,13 @@ const MontoInput = memo(({
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value
     if (!raw) { setInputValue(''); onChange(null); return }
-    if (allowDecimals && raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
-    const regex = allowDecimals ? /[^0-9.,]/g : /[^0-9.]/g
-    let cleaned = raw.replace(regex, '')
-    if (allowDecimals) {
-      const parts = cleaned.split(',')
-      if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
-    }
+    // Normalizar punto como decimal → coma (estilo argentino)
+    if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
+    // Siempre permitir coma (separador decimal argentino) y punto (separador de miles)
+    let cleaned = raw.replace(/[^0-9.,]/g, '')
+    // Solo una coma permitida
+    const parts = cleaned.split(',')
+    if (parts.length > 2) cleaned = parts[0] + ',' + parts.slice(1).join('')
     const formatted = formatearParaMostrar(cleaned)
     const start = e.target.selectionStart || 0
     const oldLen = e.target.value.length

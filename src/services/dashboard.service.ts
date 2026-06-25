@@ -1,5 +1,5 @@
 import api from './api'
-import type { DashboardResumen, CotizacionDolar, Proyeccion, Billetera } from '../types'
+import type { DashboardResumen, CotizacionDolar, Proyeccion, Billetera, SubcategoriaGasto } from '../types'
 
 // Cache storage
 let cotizacionCache: { data: CotizacionDolar; timestamp: number } | null = null
@@ -101,6 +101,18 @@ export const dashboardService = {
       params.billetera_ids = billeteraIds.join(',')
     }
     const response = await api.get('/dashboard/resumen-completo', {
+      params,
+      signal
+    })
+    return response.data
+  },
+
+  getSubcategoriasGasto: async (categoriaId: string, billeteraIds?: string[], signal?: AbortSignal): Promise<SubcategoriaGasto[]> => {
+    const params: Record<string, string> = {}
+    if (billeteraIds && billeteraIds.length > 0) {
+      params.billetera_ids = billeteraIds.join(',')
+    }
+    const response = await api.get<SubcategoriaGasto[]>(`/dashboard/categorias/${categoriaId}/subcategorias`, {
       params,
       signal
     })

@@ -14,7 +14,8 @@ import {
   Moon,
   RefreshCw,
   CreditCard,
-  Landmark
+  Landmark,
+  ArrowLeft
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -22,7 +23,7 @@ import { useModal } from '@/hooks/useModal'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario, Billetera } from '@/types'
+import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario, Billetera, SubcategoriaGasto } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -201,7 +202,15 @@ const COLORES_CATEGORIA: Record<string, string> = {
 
 const DEFAULT_COLOR = '#8A95A8'
 
-const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria[], showPercent: boolean }) => {
+const CategoriasChart = memo(({ 
+  data, 
+  showPercent, 
+  onSelectCategory 
+}: { 
+  data: ProyeccionCategoria[], 
+  showPercent: boolean,
+  onSelectCategory: (id: string, nombre: string) => void
+}) => {
   const chartData = useMemo(() => {
     return data
       .filter(c => c.gasto_actual_ciclo > 0)
@@ -235,7 +244,11 @@ const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria
         const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
 
         return (
-          <div key={entry.categoria_id} className={styles.barItem}>
+          <div 
+            key={entry.categoria_id} 
+            className={`${styles.barItem} ${styles.clickable}`}
+            onClick={() => onSelectCategory(entry.categoria_id, entry.categoria_nombre)}
+          >
             <div className={styles.barIconWrap}>
               <SubcategoriaIcon nombre="" parentCategory={entry.categoria_nombre} size={32} />
             </div>
@@ -257,6 +270,73 @@ const CategoriasChart = memo(({ data, showPercent }: { data: ProyeccionCategoria
   )
 })
 CategoriasChart.displayName = 'CategoriasChart'
+
+const SubcategoriasChart = memo(({ 
+  data, 
+  showPercent, 
+  parentCategoryName 
+}: { 
+  data: SubcategoriaGasto[], 
+  showPercent: boolean,
+  parentCategoryName: string
+}) => {
+  const chartData = useMemo(() => {
+    return data.filter(c => c.gasto_actual_ciclo > 0)
+  }, [data])
+
+  if (!chartData || chartData.length === 0) {
+    return (
+      <EmptyState
+        variant="compact"
+        icon={PieChartIcon}
+        title="Sin gastos en subcategorías"
+      />
+    )
+  }
+
+  const maxVal = chartData[0]?.gasto_actual_ciclo || 0
+  const total = chartData.reduce((acc, curr) => acc + curr.gasto_actual_ciclo, 0)
+  const parentColor = COLORES_CATEGORIA[parentCategoryName] ?? DEFAULT_COLOR
+
+  const dynamicCSS = chartData.map((entry) => {
+    const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
+    return `.subbar-fill-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
+  }).join('')
+
+  return (
+    <div className={styles.barChartWrap}>
+      <style>{dynamicCSS}</style>
+      {chartData.map((entry) => {
+        const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
+
+        return (
+          <div key={entry.subcategoria_id} className={styles.barItem}>
+            <div className={styles.barIconWrap}>
+              <SubcategoriaIcon 
+                nombre={entry.subcategoria_nombre === 'Otros' ? null : entry.subcategoria_nombre} 
+                parentCategory={parentCategoryName} 
+                size={32} 
+              />
+            </div>
+            <div className={styles.barContent}>
+              <div className={styles.barHeader}>
+                <span className={styles.barName}>{entry.subcategoria_nombre}</span>
+                <span className={styles.barAmount}>
+                  {showPercent ? `${pct}%` : fmt(entry.gasto_actual_ciclo, 'ARS')}
+                </span>
+              </div>
+              <div className={styles.barTrack}>
+                <div className={`${styles.barFill} subbar-fill-${entry.subcategoria_id}`} />
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+})
+SubcategoriasChart.displayName = 'SubcategoriasChart'
+
 
 const AppleCalendarIcon = memo(({ dateStr }: { dateStr: string }) => {
   const parts = dateStr.split('-')
@@ -296,6 +376,9 @@ export default function DashboardPage() {
   const [proyeccion, setProyeccion] = useState<Proyeccion | null>(null)
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [showChartPercent, setShowChartPercent] = useState(false)
+  const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
+  const [subcategoriasData, setSubcategoriasData] = useState<SubcategoriaGasto[]>([])
+  const [loadingSubcategorias, setLoadingSubcategorias] = useState(false)
 
   const [dropdownAbierto, setDropdownAbierto] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -405,6 +488,40 @@ export default function DashboardPage() {
       controller.abort()
     }
   }, [fetchData, fetchProyeccion, customRange])
+
+  useEffect(() => {
+    if (!selectedCategoria) {
+      setSubcategoriasData([])
+      return
+    }
+
+    const controller = new AbortController()
+    const fetchSubcategorias = async () => {
+      setLoadingSubcategorias(true)
+      try {
+        const data = await dashboardService.getSubcategoriasGasto(
+          selectedCategoria.id, 
+          billeterasSeleccionadas, 
+          controller.signal
+        )
+        setSubcategoriasData(data)
+      } catch (err) {
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          return
+        }
+        console.error('Error fetching subcategories:', err)
+        showToast('No pudimos cargar el detalle de subcategorías.', 'error')
+      } finally {
+        setLoadingSubcategorias(false)
+      }
+    }
+
+    void fetchSubcategorias()
+
+    return () => {
+      controller.abort()
+    }
+  }, [selectedCategoria, billeterasSeleccionadas, showToast])
 
   const handleRetry = useCallback(() => {
     setLoading(true)
@@ -583,7 +700,20 @@ export default function DashboardPage() {
         {/* Col 2: Gastos por Categoría */}
         <div className={styles.card}>
           <div className={`${styles.cardHeader} ${styles.cardHeaderWithToggle}`}>
-            <h3 className={styles.cardTitle}>Gastos por categoría</h3>
+            <div className={styles.cardTitleContainer}>
+              {selectedCategoria ? (
+                <button 
+                  className={styles.backBtn} 
+                  onClick={() => setSelectedCategoria(null)}
+                  title="Volver a categorías"
+                >
+                  <ArrowLeft size={16} />
+                  <span className={styles.cardTitle}>{selectedCategoria.nombre}</span>
+                </button>
+              ) : (
+                <h3 className={styles.cardTitle}>Gastos por categoría</h3>
+              )}
+            </div>
             <div className={styles.toggleGroup}>
               <button 
                 className={`${styles.toggleBtn} ${!showChartPercent ? styles.active : ''}`} 
@@ -600,7 +730,29 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className={styles.chartCardContent}>
-            {loadingProyeccion ? <ListSkeleton /> : proyeccion && <CategoriasChart data={proyeccion.desglose_por_categoria} showPercent={showChartPercent} />}
+            {selectedCategoria ? (
+              loadingSubcategorias ? (
+                <ListSkeleton />
+              ) : (
+                <SubcategoriasChart 
+                  data={subcategoriasData} 
+                  showPercent={showChartPercent} 
+                  parentCategoryName={selectedCategoria.nombre}
+                />
+              )
+            ) : (
+              loadingProyeccion ? (
+                <ListSkeleton />
+              ) : (
+                proyeccion && (
+                  <CategoriasChart 
+                    data={proyeccion.desglose_por_categoria} 
+                    showPercent={showChartPercent} 
+                    onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
+                  />
+                )
+              )
+            )}
           </div>
         </div>
 

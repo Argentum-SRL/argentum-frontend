@@ -1229,4 +1229,46 @@
 
 .listItemClickable {
   cursor: pointer;
-}
+}
+
+.cardTitleContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-2);
+  transition: color 0.2s, transform 0.2s;
+}
+
+.backBtn:hover {
+  color: var(--primary);
+  transform: translateX(-2px);
+}
+
+.backBtn .cardTitle {
+  color: var(--text);
+}
+
+.barItem.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+.barItem.clickable:hover {
+  background-color: var(--surface-alt);
+  transform: translateX(4px);
+}
+

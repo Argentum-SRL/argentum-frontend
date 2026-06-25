@@ -594,5 +594,12 @@ export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
   };
 }
 
+export interface SubcategoriaGasto {
+  subcategoria_id: string
+  subcategoria_nombre: string
+  gasto_actual_ciclo: number
+}
+
+
 
 

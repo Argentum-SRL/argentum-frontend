@@ -12,9 +12,6 @@ import {
   User,
   Sun,
   Moon,
-  RefreshCw,
-  CreditCard,
-  Landmark,
   ArrowLeft,
   TrendingUp,
   TrendingDown
@@ -760,56 +757,15 @@ export default function DashboardPage() {
                     }
                   }
 
-                  const renderPagoIcon = () => {
-                    const iconClass = styles.pagoIconContainer
-                    switch (p.tipo) {
-                      case 'suscripcion':
-                        return (
-                          <div className={iconClass}>
-                            <RefreshCw size={18} />
-                          </div>
-                        )
-                      case 'resumen_tarjeta':
-                        return (
-                          <div className={iconClass}>
-                            <CreditCard size={18} />
-                            {p.color && (
-                              <svg 
-                                className={styles.colorIndicator} 
-                                viewBox="0 0 12 12"
-                              >
-                                <circle cx="6" cy="6" r="5" fill={p.color} stroke="var(--surface)" strokeWidth="2" />
-                              </svg>
-                            )}
-                          </div>
-                        )
-                      case 'cuota':
-                        return (
-                          <div className={iconClass}>
-                            <Landmark size={18} />
-                          </div>
-                        )
-                      default:
-                        return (
-                          <div className={iconClass}>
-                            <Calendar size={18} />
-                          </div>
-                        )
-                    }
-                  }
-
                   return (
                     <div 
                       key={p.id} 
                       className={`${styles.listItem} ${styles.listItemClickable}`}
                       onClick={handlePagoClick}
                     >
-                      {renderPagoIcon()}
+                      <AppleCalendarIcon dateStr={p.fecha_cobro} />
                       <div className={styles.itemMeta}>
                         <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
-                        <span className={styles.itemTypeBadge}>
-                          {p.tipo === 'suscripcion' ? 'Suscripción' : p.tipo === 'resumen_tarjeta' ? 'Resumen de tarjeta' : 'Cuota'}
-                        </span>
                         <p className={styles.itemSub}>{fechaTxt}</p>
                       </div>
                       <div className={styles.pagoRight}>

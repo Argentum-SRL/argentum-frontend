@@ -17,7 +17,15 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       filename: 'pwa-sw.js',
+      // Desactivar el SW en desarrollo para evitar que cachée JS viejo
+      devOptions: {
+        enabled: false,
+      },
       workbox: {
+        // Fuerza al browser a desregistrar el SW viejo en la próxima visita
+        // Eliminar esta opción una vez que todos los clientes hayan actualizado
+        skipWaiting: true,
+        clientsClaim: true,
         navigateFallbackDenylist: [
           /\/node_modules\/.vite\//,
           /\/@vite\//,

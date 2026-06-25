@@ -36,28 +36,36 @@
   gap: 2px;
 }
 
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  width: 100%;
-}
-
-.description {
+.originLine {
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
+}
+
+.destinationLine {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.arrowIcon {
+  color: var(--text-2);
+  flex-shrink: 0;
 }
 
 .meta {
   font-size: 11px;
-  color: var(--text-2);
+  color: var(--text-3);
+  margin-top: 1px;
 }
 
 .amountArea {
@@ -109,9 +117,4 @@
   color: #DC2626;
 }
 
-@media (max-width: 767px) {
-  .metaHoraDivider,
-  .metaHora {
-    display: none !important;
-  }
-}
+

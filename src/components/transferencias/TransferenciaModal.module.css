@@ -1,3 +1,60 @@
+/* ── Slides container & animations ───────────────────────────────────────── */
+.slidesContainer {
+  width: 100%;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.slideForward {
+  animation: slideInRight 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slideBack {
+  animation: slideInLeft 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Step Indicator Dots ─────────────────────────────────────────────────── */
+.stepDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px 0;
+  flex-shrink: 0;
+}
+
+.stepDot {
+  height: 5px;
+  border-radius: 99px;
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--surface-alt);
+}
+
+.stepDotActive {
+  background: var(--primary);
+  width: 20px;
+}
+
+.stepDotInactive {
+  width: 6px;
+  opacity: 0.4;
+}
+
+/* ── Formulario Base ─────────────────────────────────────────────────────── */
 .formContainer {
   display: flex;
   flex-direction: column;
@@ -21,7 +78,7 @@
   letter-spacing: -0.2px;
 }
 
-.closeBtn {
+.backBtn, .closeBtn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -36,7 +93,7 @@
   transition: background 120ms ease;
 }
 
-.closeBtn:hover {
+.backBtn:hover, .closeBtn:hover {
   background: var(--border);
   color: var(--text);
 }
@@ -62,6 +119,15 @@
   letter-spacing: 0.7px;
 }
 
+.fieldOptional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-3);
+  font-size: 10px;
+  margin-left: 3px;
+}
+
 .fieldInput {
   height: 44px;
   padding: 0 14px;
@@ -80,95 +146,87 @@
   border-color: var(--primary);
 }
 
-.selectInput {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E9198' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 40px;
+/* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
+.billeterasCarouselScroller {
+  overflow-x: auto;
+  overflow-y: visible;
+  -ms-overflow-style: none;
 }
 
-/* Hero Monto */
-.montoHero {
-  background: var(--surface-alt);
-  border-radius: 16px;
-  padding: 18px 16px;
+.billeterasCarouselScroller::-webkit-scrollbar {
+  display: none;
+}
+
+.billeterasCarousel {
   display: flex;
-  align-items: center;
   gap: 12px;
+  overflow: visible;
+  scroll-snap-type: x mandatory;
+  padding: 16px 40px;
+  -ms-overflow-style: none;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: center;
+  justify-content: safe center;
 }
 
-.monedaToggleChip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 10px;
-  border-radius: 12px;
-  border: none;
-  background: var(--surface-alt);
+.billeterasCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+.billeteraSelectWrap {
+  position: relative;
+  width: 280px;
+  aspect-ratio: 1.586 / 1;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: 18px;
+  transform: translateY(0);
+  transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.billeteraSelectWrap[data-active="false"] {
+  transform: translateY(0) scale(0.93);
+  filter: saturate(0.3) brightness(0.7);
+  opacity: 0.7;
+}
+
+.billeteraSelectWrap[data-active="true"] {
+  transform: translateY(-6px) scale(1.02);
+  filter: none;
+  opacity: 1;
+  border-color: transparent;
+  box-shadow: 0 12px 30px rgba(13, 32, 69, 0.12);
+}
+
+:global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
+  border-color: transparent;
+}
+
+.billeteraOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
   cursor: pointer;
-  transition: background 140ms ease;
-  flex-shrink: 0;
-}
-
-.monedaToggleChip:hover {
-  background: var(--border);
-}
-
-.monedaChipFlag {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.monedaChipLabel {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--text-2);
-  letter-spacing: 0.4px;
-}
-
-.montoDivider {
-  width: 1px;
-  height: 44px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-.montoHeroInput {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.montoHeroPrefix {
-  font-size: 40px;
-  font-weight: 800;
-  color: var(--text-3);
-  line-height: 1;
-  flex-shrink: 0;
-  letter-spacing: -1.5px;
-}
-
-.montoHeroField {
-  font-size: 40px;
-  font-weight: 800;
-  letter-spacing: -1.5px;
+  border-radius: inherit;
   border: none;
   background: transparent;
-  outline: none;
-  color: var(--text);
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-  font-family: 'Figtree', sans-serif;
-  line-height: 1;
 }
 
-.montoHeroField::placeholder {
-  color: var(--border);
+.billeteraSelectWrap :global(.wcKebab) {
+  display: none !important;
+}
+
+.fullHeightCard {
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+
+.noTarjetas {
+  font-size: 13px;
+  color: var(--text-3);
+  margin: 0;
+  padding: 8px 0;
 }
 
 .formFooter {
@@ -232,4 +290,12 @@
   height: 70px;
   padding: 10px 14px;
   resize: none;
+}
+
+.noCuentasWarning {
+  font-size: 13px;
+  color: var(--red);
+  text-align: center;
+  margin-top: 10px;
+  padding: 8px 0;
 }

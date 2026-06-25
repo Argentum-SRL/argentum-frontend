@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { ArrowRightLeft, Trash2 } from 'lucide-react'
+import { ArrowRightLeft, Trash2, CornerDownRight } from 'lucide-react'
 import type { TransferenciaInterna, Billetera } from '@/types'
 import { formatMonto } from '@/utils/format'
 import styles from './TransferenciaRow.module.css'
@@ -18,13 +18,6 @@ export const TransferenciaRow = memo(({
   onDelete
 }: TransferenciaRowProps) => {
   
-  const formatHora = (fechaStr: string) => {
-    if (!fechaStr.includes('T')) return ''
-    const d = new Date(fechaStr)
-    return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-  }
-  const hora = formatHora(transferencia.fecha_creacion)
-
   const origenNombre = billeteraOrigen?.nombre || 'Billetera origen'
   const destinoNombre = billeteraDestino?.nombre || 'Billetera destino'
 
@@ -35,24 +28,18 @@ export const TransferenciaRow = memo(({
       </div>
 
       <div className={styles.content}>
-        <div className={styles.titleRow}>
-          <span className={styles.description}>
-            {origenNombre} &rarr; {destinoNombre}
-          </span>
+        <div className={styles.originLine}>
+          {origenNombre}
         </div>
-        <span className={styles.meta}>
-          {transferencia.notas ? (
-            <span>{transferencia.notas}</span>
-          ) : (
-            <span>Transferencia interna de fondos</span>
-          )}
-          {hora && (
-            <>
-              <span className={styles.metaHoraDivider}> · </span>
-              <span className={styles.metaHora}>{hora}</span>
-            </>
-          )}
-        </span>
+        <div className={styles.destinationLine}>
+          <CornerDownRight size={14} strokeWidth={2.5} className={styles.arrowIcon} />
+          {destinoNombre}
+        </div>
+        {transferencia.notas && (
+          <span className={styles.meta}>
+            {transferencia.notas}
+          </span>
+        )}
       </div>
 
       <div className={styles.amountArea}>

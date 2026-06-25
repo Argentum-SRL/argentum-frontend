@@ -1,7 +1,7 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
-import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft } from 'lucide-react'
+import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
@@ -57,6 +57,7 @@ export default function BilleterasPage() {
   const { open, confirm } = useModal()
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [frontCardId, setFrontCardId] = useState<string | null>(null)
+  const [prevBilleteras, setPrevBilleteras] = useState<Billetera[]>([])
   const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -182,10 +183,12 @@ export default function BilleterasPage() {
 
   const formatCurrency = (monto: number) => formatSaldo(monto, 'ARS')
 
-  // Inicializar la tarjeta principal como la que está al frente por defecto
-  if (billeterasActivas.length > 0 && !frontCardId) {
+  // Ajustar frontCardId durante el render cuando la lista de billeteras cambia
+  if (billeterasActivas !== prevBilleteras) {
+    setPrevBilleteras(billeterasActivas)
     const principal = billeterasActivas.find(b => b.es_principal)
-    setFrontCardId(principal ? principal.id : billeterasActivas[0].id)
+    const targetId = principal ? principal.id : (billeterasActivas[0]?.id || null)
+    setFrontCardId(targetId)
   }
 
   const handleArchivar = useCallback(async (id: string) => {
@@ -338,8 +341,17 @@ export default function BilleterasPage() {
             className={`${styles.btnGhost} ${activeTab === 'transferencias' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
             onClick={() => setActiveTab(prev => prev === 'billeteras' ? 'transferencias' : 'billeteras')}
           >
-            <ArrowRightLeft size={16} />
-            Pasar plata entre cuentas
+            {activeTab === 'transferencias' ? (
+              <>
+                <ArrowLeft size={16} />
+                Volver a mis billeteras
+              </>
+            ) : (
+              <>
+                <ArrowRightLeft size={16} />
+                Pasar plata entre cuentas
+              </>
+            )}
           </button>
           <button
             className={styles.nuevaBtn}

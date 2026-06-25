@@ -184,7 +184,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
 
     const connectSSE = () => {
-      const baseUrl = import.meta.env.VITE_API_URL ?? '/api'
+      const baseUrl = import.meta.env.VITE_API_URL || '/api'
       const sseUrl = baseUrl.startsWith('http')
         ? `${baseUrl}/notificaciones/sse`
         : `${window.location.origin}${baseUrl}/notificaciones/sse`

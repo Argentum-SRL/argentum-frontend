@@ -20,14 +20,19 @@ export const clearTokens = (): void => {
 /** @deprecated usá clearTokens() */
 export const clearToken = clearTokens
 
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   timeout: 15000,
   withCredentials: true,
 })
 
 
 api.interceptors.request.use((config) => {
+  const token = getToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
   return config
 })
 

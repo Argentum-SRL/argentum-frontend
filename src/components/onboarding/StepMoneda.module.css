@@ -121,31 +121,6 @@
   padding: 0;
 }
 
-/* ── Dólar type pills ────────────────────────── */
-.dolarPills {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.dolarPill {
-  padding: 6px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
-}
-
-.dolarPillActive {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-}
 
 /* ── Cotización cards ────────────────────────── */
 .cotizacionLoading {

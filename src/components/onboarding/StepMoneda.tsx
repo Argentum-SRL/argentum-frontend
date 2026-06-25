@@ -111,19 +111,6 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
           <div className={styles.field}>
             <label className={styles.label}>Tipo de cambio de referencia</label>
 
-            <div className={styles.dolarPills}>
-              {DOLARES.map((d) => (
-                <button
-                  key={d.id}
-                  type="button"
-                  onClick={() => setTipoDolar(d.id)}
-                  className={[styles.dolarPill, tipoDolar === d.id ? styles.dolarPillActive : ''].filter(Boolean).join(' ')}
-                >
-                  {d.label}
-                </button>
-              ))}
-            </div>
-
             {cargando ? (
               <div className={styles.cotizacionLoading}>
                 <Loader2 size={14} className="animate-spin" />

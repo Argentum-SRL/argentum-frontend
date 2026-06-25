@@ -103,12 +103,13 @@ const MontoInput = memo(({
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     const navKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Home', 'End']
     if (navKeys.includes(e.key) || e.ctrlKey || e.metaKey) return
-    if (allowDecimals && (e.key === ',' || e.key === '.')) {
+    // Aceptar coma y punto como separador decimal siempre (handleChange lo sanitiza)
+    if (e.key === ',' || e.key === '.') {
       if (inputValue.includes(',')) e.preventDefault()
       return
     }
     if (!/[0-9]/.test(e.key)) e.preventDefault()
-  }, [allowDecimals, inputValue])
+  }, [inputValue])
 
   const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault()

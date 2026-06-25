@@ -55,8 +55,8 @@
   padding: 6px 10px;
   border-radius: 12px;
   border: none;
-  background: var(--surface);
-  transition: background 140ms ease;
+  background: transparent;
+  transition: none;
   flex-shrink: 0;
   cursor: pointer;
 }
@@ -66,7 +66,7 @@
 }
 
 .monedaToggleChip:not(:disabled):hover {
-  background: var(--border);
+  background: var(--surface);
 }
 
 .monedaChipFlag {
@@ -99,18 +99,18 @@
 }
 
 .montoHeroPrefix {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 800;
   color: var(--text-3);
   line-height: 1;
   flex-shrink: 0;
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
 }
 
 .montoHeroField {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 800;
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
   border: none;
   background: transparent;
   outline: none;

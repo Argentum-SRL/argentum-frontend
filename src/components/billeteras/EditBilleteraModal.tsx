@@ -4,12 +4,10 @@ import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import type { BankDefinition } from '@/lib/constants/banks'
 import styles from './BankPickerModal.module.css'
-import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import Modal from '@/components/ui/Modal/Modal'
 
 export interface EditPayload {
   nombre: string
-  saldo_inicial: number
   es_principal: boolean
 }
 
@@ -55,7 +53,6 @@ function EditLogo({ bank, customNombre }: { bank?: BankDefinition, customNombre?
 
 interface EditState {
   nombre: string
-  saldo: number | null
   esPrincipal: boolean
   isSubmitting: boolean
 }
@@ -69,7 +66,6 @@ function editReducer(state: EditState, action: EditAction): EditState {
     case 'INITIALIZE':
       return {
         nombre: action.billetera.nombre,
-        saldo: action.billetera.saldo_inicial || 0,
         esPrincipal: action.billetera.es_principal,
         isSubmitting: false
       }
@@ -89,12 +85,11 @@ export default function EditBilleteraModal({
 }: EditBilleteraModalProps) {
   const [state, dispatch] = useReducer(editReducer, {
     nombre: '',
-    saldo: null,
     esPrincipal: false,
     isSubmitting: false
   })
 
-  const { nombre, saldo, esPrincipal, isSubmitting } = state
+  const { nombre, esPrincipal, isSubmitting } = state
 
   useEffect(() => {
     if (isOpen && billetera) {
@@ -112,7 +107,6 @@ export default function EditBilleteraModal({
     try {
       await onEditar(billetera.id, {
         nombre: nombre.trim(),
-        saldo_inicial: saldo || 0,
         es_principal: esPrincipal,
       })
       onClose()
@@ -176,18 +170,6 @@ export default function EditBilleteraModal({
             />
           </div>
 
-          <div className={styles.formField}>
-            <MontoInput
-              value={saldo}
-              onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
-              moneda={billetera.moneda}
-              label="Saldo inicial"
-              placeholder="0"
-              allowDecimals
-              optional
-              compact
-            />
-          </div>
 
           <button
             type="button"

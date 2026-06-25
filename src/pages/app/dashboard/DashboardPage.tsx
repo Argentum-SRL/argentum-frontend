@@ -15,7 +15,9 @@ import {
   RefreshCw,
   CreditCard,
   Landmark,
-  ArrowLeft
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -491,7 +493,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!selectedCategoria) {
-      setSubcategoriasData([])
       return
     }
 
@@ -636,60 +637,27 @@ export default function DashboardPage() {
                   <div className={styles.progressDivider} />
 
                   {/* Sección de barra de progreso */}
-                  <div className={styles.progressSection}>
-                    {(() => {
-                      const ingresos = data.balance.ingresos
-                      const egresos = data.balance.egresos
-
-                      if (ingresos === 0 && egresos === 0) return null
-
-                      if (ingresos === 0 && egresos > 0) {
-                        return (
-                          <>
-                            <div className={styles.progressLabelRow}>
-                              <span className={styles.progressLabelLeft}>Gastado este ciclo</span>
-                              <span className={styles.progressLabelRight}>{fmt(egresos, 'ARS')}</span>
-                            </div>
-                            <div className={styles.progressTrack}>
-                              <div className={`${styles.progressFill} ${styles.progressDanger} ${styles.progressFull}`} />
-                            </div>
-                            <p className={styles.progressContext}>Sin ingresos registrados este ciclo</p>
-                          </>
-                        )
-                      }
-
-                      const porcentaje = Math.min((egresos / ingresos) * 100, 100)
-                      const colorClass = porcentaje < 70
-                        ? styles.progressOk
-                        : porcentaje < 90
-                          ? styles.progressWarn
-                          : styles.progressDanger
-
-                      const contexto = porcentaje < 70
-                        ? `Gastaste el ${Math.round(porcentaje)}% de lo que ingresó`
-                        : porcentaje < 90
-                          ? `Vas ajustado — ${Math.round(porcentaje)}% gastado`
-                          : `Gastaste casi todo lo que ingresó`
-
-                      return (
-                        <>
-                          <style>{`.custom-progress-fill{width:${porcentaje}%}`}</style>
-                          <div className={styles.progressLabelRow}>
-                            <span className={styles.progressLabelLeft}>Gastado este ciclo</span>
-                            <span className={styles.progressLabelRight}>
-                              {fmt(egresos, 'ARS')}
-                              <span className={styles.progressLabelMuted}> de {fmt(ingresos, 'ARS')}</span>
-                            </span>
-                          </div>
-                          <div className={styles.progressTrack}>
-                            <div
-                              className={`${styles.progressFill} ${colorClass} custom-progress-fill`}
-                            />
-                          </div>
-                          <p className={styles.progressContext}>{contexto}</p>
-                        </>
-                      )
-                    })()}
+                  <div className={styles.balanceFooter}>
+                    {(data.balance.ingresos > 0 || data.balance.egresos > 0) && (
+                      <div className={styles.balanceTrends}>
+                        <div className={styles.balanceTrendItem}>
+                          <TrendingUp size={15} className={styles.trendUp} />
+                          <span className={styles.trendAmount}>{fmt(data.balance.ingresos, 'ARS')}</span>
+                        </div>
+                        <div className={styles.balanceTrendItem}>
+                          <TrendingDown size={15} className={styles.trendDown} />
+                          <span className={styles.trendAmount}>{fmt(data.balance.egresos, 'ARS')}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className={styles.balanceFooterDivider} />
+                    <div className={styles.disponibleReal}>
+                      <span className={styles.disponibleRealLabel}>DISPONIBLE REAL</span>
+                      <span className={`${styles.disponibleRealAmount} ${data.disponible_real.disponible < 0 ? styles.disponibleRealNegative : ''}`}>
+                        {fmt(data.disponible_real.disponible, 'ARS')}
+                      </span>
+                      <span className={styles.disponibleRealSub}>en billeteras</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -704,7 +672,10 @@ export default function DashboardPage() {
               {selectedCategoria ? (
                 <button 
                   className={styles.backBtn} 
-                  onClick={() => setSelectedCategoria(null)}
+                  onClick={() => {
+                    setSelectedCategoria(null)
+                    setSubcategoriasData([])
+                  }}
                   title="Volver a categorías"
                 >
                   <ArrowLeft size={16} />

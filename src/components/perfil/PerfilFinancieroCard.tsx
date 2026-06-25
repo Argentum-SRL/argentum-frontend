@@ -90,11 +90,34 @@ export const PerfilFinancieroCard: React.FC = () => {
     )
   }
 
+  const INDICADORES_PERFIL = [
+    'tasa_ahorro',
+    'score_impulsividad',
+    'ratio_cuotas',
+    'cumplimiento_presupuesto',
+    'consistencia_registro',
+    'porcentaje_suscripciones',
+  ] as const
+
+  const todosSinDatos = perfil
+    ? INDICADORES_PERFIL.every(
+        (key) => perfil.interpretaciones[key].nivel === 'sin_datos'
+      )
+    : false
+
+  if (todosSinDatos) return null
+
   if (error || !perfil) {
     return (
       <div className={styles.pfErrorContainer}>
         <AlertCircle size={40} color="var(--error)" />
-        <p className={styles.pfErrorText}>No pudimos cargar tu perfil financiero en este momento.</p>
+        <p className={styles.pfErrorText}>
+          <strong>Por ahora no podemos mostrar tu perfil financiero.</strong>
+          <br />
+          <span className={styles.pfErrorSubtext}>
+            Puede ser algo temporal. Esperá unos minutos y volvé a intentarlo.
+          </span>
+        </p>
         <button className={styles.pfRetryBtn} onClick={() => { setLoading(true); void loadData(); }}>
           Reintentar
         </button>

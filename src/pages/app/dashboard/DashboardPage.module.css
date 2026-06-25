@@ -1112,75 +1112,24 @@
 }
 
 .progressDivider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 16px 0 14px;
+  display: none;
 }
 
 .progressSection {
-  display: block;
+  display: none;
 }
 
-.progressLabelRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
-}
-
-.progressLabelLeft {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.progressLabelRight {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.progressLabelMuted {
-  font-size: 12px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.38);
-}
-
-.progressTrack {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  height: 6px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.progressFill {
-  height: 100%;
-  border-radius: 999px;
-  transition: width 0.4s ease;
-}
-
-.progressFull {
-  width: 100%;
-}
-
-.progressOk {
-  background: #4ade80;
-}
-
-.progressWarn {
-  background: #facc15;
-}
-
-.progressDanger {
-  background: #f87171;
-}
-
-.progressContext {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.38);
-  margin: 0;
-  text-align: center;
-}
+.progressLabelRow { display: none; }
+.progressLabelLeft { display: none; }
+.progressLabelRight { display: none; }
+.progressLabelMuted { display: none; }
+.progressTrack { display: none; }
+.progressFill { display: none; }
+.progressFull { display: none; }
+.progressOk { display: none; }
+.progressWarn { display: none; }
+.progressDanger { display: none; }
+.progressContext { display: none; }
 
 .root::after {
   content: '';
@@ -1270,5 +1219,92 @@
 .barItem.clickable:hover {
   background-color: var(--surface-alt);
   transform: translateX(4px);
+}
+
+/* ── Balance Footer ────────────────────────────────────────────── */
+
+.balanceMain {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 8px;
+  animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.balanceFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.balanceTrends {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.balanceTrendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.trendUp {
+  color: #4ade80;
+  flex-shrink: 0;
+}
+
+.trendDown {
+  color: #f87171;
+  flex-shrink: 0;
+}
+
+.trendAmount {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  font-variant-numeric: tabular-nums;
+}
+
+.balanceFooterDivider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 0;
+}
+
+.disponibleReal {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.disponibleRealLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.40);
+  text-transform: uppercase;
+  margin: 0 0 4px 0;
+}
+
+.disponibleRealAmount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.90);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.disponibleRealNegative {
+  color: #fca5a5;
+}
+
+.disponibleRealSub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 3px 0 0 0;
 }
 

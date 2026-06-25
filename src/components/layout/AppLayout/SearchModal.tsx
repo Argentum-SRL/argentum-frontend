@@ -235,7 +235,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     title: b.nombre,
     subtitle: b.es_efectivo ? 'Efectivo' : 'Banco / Cuenta Digital',
     Icon: Wallet,
-    extra: `${b.moneda} ${b.saldo_actual.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+    extra: `${b.moneda} ${b.saldo_actual.toLocaleString('es-AR', { minimumFractionDigits: b.saldo_actual % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })}`,
     path: `/app/billeteras/${b.id}`
   }))
 
@@ -262,7 +262,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   }))
 
   transacciones.forEach(t => {
-    const formatMonto = t.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })
+    const tieneDecimales = t.monto % 1 !== 0
+    const formatMonto = t.monto.toLocaleString('es-AR', {
+      minimumFractionDigits: tieneDecimales ? 2 : 0,
+      maximumFractionDigits: 2
+    })
     results.push({
       type: 'transaccion',
       id: `tx-${t.id}`,

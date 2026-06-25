@@ -252,7 +252,7 @@ const SuscripcionesPage: React.FC = () => {
           },
           {
             label: "Total mensual USD",
-            value: `US$ ${totalMensualUSD.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+            value: `US$ ${totalMensualUSD.toLocaleString('es-AR', { minimumFractionDigits: totalMensualUSD % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })}`,
           },
           {
             label: "Activas",

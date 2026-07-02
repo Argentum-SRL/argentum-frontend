@@ -238,9 +238,7 @@ export default function PerfilPage() {
   const [formMoneda, setFormMoneda] = useState({ moneda_principal: 'ARS' as 'ARS' | 'USD', moneda_secundaria_activa: false, tipo_dolar: 'blue' })
 
   // Sync forms cuando cambia el usuario
-  const [prevUsuarioId, setPrevUsuarioId] = useState(usuario?.id)
-  if (usuario?.id !== prevUsuarioId) {
-    setPrevUsuarioId(usuario?.id)
+  useEffect(() => {
     if (usuario) {
       setFormDatos({ nombre: usuario.nombre || '', apellido: usuario.apellido || '', fecha_nacimiento: usuario.fecha_nacimiento || '', sexo: usuario.sexo || '' })
       setFormEmail({ email_nuevo: usuario.email || '', password_actual: '' })
@@ -248,7 +246,7 @@ export default function PerfilPage() {
       setFormCiclo({ ciclo_tipo: (usuario.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo', ciclo_valor: usuario.ciclo_valor || '' })
       setFormMoneda({ moneda_principal: (usuario.moneda_principal as 'ARS' | 'USD') || 'ARS', moneda_secundaria_activa: usuario.moneda_secundaria_activa, tipo_dolar: usuario.tipo_dolar || 'blue' })
     }
-  }
+  }, [usuario])
 
   // ── Handlers de perfil ───────────────────────────────────────────────────
   const handleSaveDatosPersonales = async (e: React.FormEvent) => {
@@ -1266,8 +1264,8 @@ export default function PerfilPage() {
                 </div>
                 {formCiclo.ciclo_tipo === 'dia_fijo' ? (
                   <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-ciclo-dia" className={styles.inputLabel}>Día del mes (1–28)</label>
-                    <input id="perfil-ciclo-dia" type="number" min="1" max="28" className={styles.input} value={formCiclo.ciclo_valor} placeholder="1" onChange={(e) => setFormCiclo({ ...formCiclo, ciclo_valor: e.target.value })} required />
+                    <label htmlFor="perfil-ciclo-dia" className={styles.inputLabel}>Día del mes (1–31)</label>
+                    <input id="perfil-ciclo-dia" type="number" min="1" max="31" className={styles.input} value={formCiclo.ciclo_valor} placeholder="1" onChange={(e) => setFormCiclo({ ...formCiclo, ciclo_valor: e.target.value })} required />
                     <p className={styles.hint}>Tu ciclo empieza el día {formCiclo.ciclo_valor || '…'} de cada mes</p>
                   </div>
                 ) : (

@@ -29,7 +29,7 @@ import * as authService from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { SelectInput, type SelectOption } from '@/components/ui'
+import { SelectInput, Modal, type SelectOption } from '@/components/ui'
 import FotoCropModal from '@/components/perfil/FotoCropModal'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
@@ -175,12 +175,12 @@ export default function PerfilPage() {
 
   // ── Tab desde URL ────────────────────────────────────────────────────────
   const _tabParam = new URLSearchParams(location.search).get('tab')
-  const activeTab: 'perfil' | 'financiero' | 'notificaciones' =
-    _tabParam === 'perfil' || _tabParam === 'financiero' || _tabParam === 'notificaciones'
+  const activeTab: 'perfil' | 'notificaciones' =
+    _tabParam === 'perfil' || _tabParam === 'notificaciones'
       ? _tabParam
       : 'perfil'
 
-  const handleTabChange = (tab: 'perfil' | 'financiero' | 'notificaciones') => {
+  const handleTabChange = (tab: 'perfil' | 'notificaciones') => {
     navigate(`/app/perfil?tab=${tab}`, { replace: true })
   }
 
@@ -475,13 +475,7 @@ export default function PerfilPage() {
           className={`${styles.tab} ${activeTab === 'perfil' ? styles.tabActive : ''}`}
           onClick={() => handleTabChange('perfil')}
         >
-          Perfil
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'financiero' ? styles.tabActive : ''}`}
-          onClick={() => handleTabChange('financiero')}
-        >
-          Preferencias financieras
+          Mi cuenta
         </button>
         <button
           className={`${styles.tab} ${activeTab === 'notificaciones' ? styles.tabActive : ''}`}
@@ -602,6 +596,41 @@ export default function PerfilPage() {
                   </div>
                 </div>
 
+                {/* Card Preferencias de la cuenta */}
+                <div className={styles.card}>
+                  <div className={styles.cardHeader}>
+                    <span className={styles.cardTitle}>Preferencias de la cuenta</span>
+                  </div>
+                  <div className={styles.cardBody}>
+                    <div className={styles.dataRow}>
+                      <div className={styles.dataRowIcon}><Calendar size={16} /></div>
+                      <div className={styles.dataRowContent}>
+                        <span className={styles.dataLabel}>Ciclo de cobro</span>
+                        <span className={styles.dataValue}>
+                          {usuario?.ciclo_tipo === 'dia_fijo' ? `Día ${usuario.ciclo_valor}` : usuario?.ciclo_valor?.replace('_', ' ')}
+                        </span>
+                        <span className={styles.dataSubVal}>{usuario?.ciclo_tipo === 'dia_fijo' ? 'de cada mes' : 'regla'}</span>
+                      </div>
+                      <div className={styles.dataRowAction}>
+                        <button className={styles.iconBtn} onClick={() => handleOpenModal('ciclo')} aria-label="Editar ciclo"><Edit size={15} /></button>
+                      </div>
+                    </div>
+                    <div className={`${styles.dataRow} ${styles.noBorderBottom}`}>
+                      <div className={styles.dataRowIcon}><PieChart size={16} /></div>
+                      <div className={styles.dataRowContent}>
+                        <span className={styles.dataLabel}>Moneda principal</span>
+                        <span className={styles.dataValue}>{usuario?.moneda_principal}</span>
+                        {usuario?.moneda_secundaria_activa && (
+                          <span className={styles.dataSubVal}>Secundaria: {usuario?.tipo_dolar?.toUpperCase()}</span>
+                        )}
+                      </div>
+                      <div className={styles.dataRowAction}>
+                        <button className={styles.iconBtn} onClick={() => handleOpenModal('moneda')} aria-label="Editar moneda"><Edit size={15} /></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
               {/* COLUMNA DERECHA */}
@@ -701,39 +730,6 @@ export default function PerfilPage() {
               </div>
             </div>
           </>
-        )}
-
-        {/* ══════════════════════════════════════════
-            TAB 2: PREFERENCIAS FINANCIERAS
-        ══════════════════════════════════════════ */}
-        {activeTab === 'financiero' && (
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Configuración financiera</span>
-            </div>
-            <div className={styles.finGrid}>
-              <div className={styles.finCell}>
-                <div className={styles.finCellHead}>
-                  <span className={styles.dataLabel}>Ciclo de cobro</span>
-                  <button className={styles.iconBtn} onClick={() => handleOpenModal('ciclo')} aria-label="Editar ciclo"><Edit size={14} /></button>
-                </div>
-                <span className={styles.finValue}>
-                  {usuario?.ciclo_tipo === 'dia_fijo' ? `Día ${usuario.ciclo_valor}` : usuario?.ciclo_valor?.replace('_', ' ')}
-                </span>
-                <span className={styles.finSub}>{usuario?.ciclo_tipo === 'dia_fijo' ? 'de cada mes' : 'regla'}</span>
-              </div>
-              <div className={`${styles.finCell} ${styles.noBorderRight}`}>
-                <div className={styles.finCellHead}>
-                  <span className={styles.dataLabel}>Moneda principal</span>
-                  <button className={styles.iconBtn} onClick={() => handleOpenModal('moneda')} aria-label="Editar moneda"><Edit size={14} /></button>
-                </div>
-                <span className={styles.finValue}>{usuario?.moneda_principal}</span>
-                {usuario?.moneda_secundaria_activa && (
-                  <span className={styles.finSub}>Secundaria: {usuario?.tipo_dolar?.toUpperCase()}</span>
-                )}
-              </div>
-            </div>
-          </div>
         )}
 
         {/* ══════════════════════════════════════════
@@ -1155,155 +1151,164 @@ export default function PerfilPage() {
       {/* ══════════════════════════════════════════
           MODALES DE EDICIÓN
       ══════════════════════════════════════════ */}
-      {activeModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalCard}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>
-                {activeModal === 'datos-personales' && 'Editar datos personales'}
-                {activeModal === 'email' && 'Editar email'}
-                {activeModal === 'telefono' && 'Editar teléfono'}
-                {activeModal === 'password' && (usuario?.password_configurada ? 'Cambiar contraseña' : 'Crear contraseña')}
-                {activeModal === 'ciclo' && 'Configurar ciclo financiero'}
-                {activeModal === 'moneda' && 'Configurar moneda'}
-              </h3>
-              <button className={styles.iconBtn} onClick={handleCloseModal} aria-label="Cerrar modal"><X size={20} /></button>
+      {/* Modales de Edición */}
+      <Modal 
+        isOpen={!!activeModal} 
+        onClose={handleCloseModal}
+        title={
+          <>
+            {activeModal === 'datos-personales' && 'Editar datos personales'}
+            {activeModal === 'email' && 'Editar email'}
+            {activeModal === 'telefono' && 'Editar teléfono'}
+            {activeModal === 'password' && (usuario?.password_configurada ? 'Cambiar contraseña' : 'Crear contraseña')}
+            {activeModal === 'ciclo' && 'Configurar ciclo financiero'}
+            {activeModal === 'moneda' && 'Configurar moneda'}
+          </>
+        }
+        size="sm"
+      >
+        {modalError && <div className={styles.modalError}>{modalError}</div>}
+
+        {activeModal === 'datos-personales' && (
+          <form onSubmit={handleSaveDatosPersonales} className={styles.modalForm}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-nombre" className={styles.inputLabel}>Nombre</label>
+              <input id="perfil-nombre" type="text" className={styles.input} value={formDatos.nombre} onChange={(e) => setFormDatos({ ...formDatos, nombre: e.target.value })} required />
             </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-apellido" className={styles.inputLabel}>Apellido</label>
+              <input id="perfil-apellido" type="text" className={styles.input} value={formDatos.apellido} onChange={(e) => setFormDatos({ ...formDatos, apellido: e.target.value })} required />
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-nacimiento" className={styles.inputLabel}>Fecha de nacimiento</label>
+              <input id="perfil-nacimiento" type="date" className={styles.input} value={formDatos.fecha_nacimiento} onChange={(e) => setFormDatos({ ...formDatos, fecha_nacimiento: e.target.value })} />
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-sexo" className={styles.inputLabel}>Sexo</label>
+              <select id="perfil-sexo" className={styles.input} value={formDatos.sexo} onChange={(e) => setFormDatos({ ...formDatos, sexo: e.target.value })}>
+                <option value="">Seleccionar...</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+                <option value="no_binario">No binario</option>
+                <option value="prefiero_no_decir">Prefiero no decirlo</option>
+              </select>
+            </div>
+            <button type="submit" disabled={isSaving} className={styles.saveBtn}>
+              {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar cambios</>}
+            </button>
+          </form>
+        )}
 
-            {modalError && <div className={styles.modalError}>{modalError}</div>}
+        {activeModal === 'email' && (
+          <form onSubmit={handleSaveEmail} className={styles.modalForm}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-email-nuevo" className={styles.inputLabel}>Nuevo email</label>
+              <input id="perfil-email-nuevo" type="email" className={styles.input} value={formEmail.email_nuevo} onChange={(e) => setFormEmail({ ...formEmail, email_nuevo: e.target.value })} required />
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-email-pw" className={styles.inputLabel}>Contraseña actual</label>
+              <input id="perfil-email-pw" type="password" className={styles.input} value={formEmail.password_actual} onChange={(e) => setFormEmail({ ...formEmail, password_actual: e.target.value })} required />
+            </div>
+            <button type="submit" disabled={isSaving} className={styles.saveBtn}>
+              {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar cambios</>}
+            </button>
+          </form>
+        )}
 
-            {/* Modal: datos personales */}
-            {activeModal === 'datos-personales' && (
-              <form onSubmit={handleSaveDatosPersonales} className={styles.modalForm}>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-nombre" className={styles.inputLabel}>Nombre</label>
-                  <input id="perfil-nombre" type="text" className={styles.input} value={formDatos.nombre} onChange={(e) => setFormDatos({ ...formDatos, nombre: e.target.value })} required />
-                </div>
-                <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar cambios</>}
-                </button>
-              </form>
+        {activeModal === 'telefono' && (
+          <form onSubmit={handleSaveTelefono} className={styles.modalForm}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-tel-nuevo" className={styles.inputLabel}>Nuevo teléfono</label>
+              <input id="perfil-tel-nuevo" type="tel" className={styles.input} value={formTelefono.telefono_nuevo} placeholder="+549..." onChange={(e) => setFormTelefono({ ...formTelefono, telefono_nuevo: e.target.value })} required />
+            </div>
+            {!isGoogle && (
+              <div className={styles.inputGroup}>
+                <label htmlFor="perfil-tel-pw" className={styles.inputLabel}>Contraseña actual</label>
+                <input id="perfil-tel-pw" type="password" className={styles.input} value={formTelefono.password_actual} onChange={(e) => setFormTelefono({ ...formTelefono, password_actual: e.target.value })} required />
+              </div>
             )}
+            <button type="submit" disabled={isSaving} className={styles.saveBtn}>
+              {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar cambios</>}
+            </button>
+          </form>
+        )}
 
-            {/* Modal: email */}
-            {activeModal === 'email' && (
-              <form onSubmit={handleSaveEmail} className={styles.modalForm}>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-email" className={styles.inputLabel}>Nuevo email</label>
-                  <input id="perfil-email" type="email" className={styles.input} placeholder="nombre@ejemplo.com" value={formEmail.email_nuevo} onChange={(e) => setFormEmail({ ...formEmail, email_nuevo: e.target.value })} required />
-                </div>
-                {usuario?.password_configurada && (
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-email-pass" className={styles.inputLabel}>Contraseña actual</label>
-                    <input id="perfil-email-pass" type="password" className={styles.input} placeholder="••••••••" value={formEmail.password_actual} onChange={(e) => setFormEmail({ ...formEmail, password_actual: e.target.value })} required />
-                  </div>
-                )}
-                <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Actualizar email</>}
-                </button>
-              </form>
+        {activeModal === 'password' && (
+          <form onSubmit={handleSavePassword} className={styles.modalForm}>
+            {usuario?.password_configurada && (
+              <div className={styles.inputGroup}>
+                <label htmlFor="perfil-pw-actual" className={styles.inputLabel}>Contraseña actual</label>
+                <input id="perfil-pw-actual" type="password" className={styles.input} value={formPassword.password_actual} onChange={(e) => setFormPassword({ ...formPassword, password_actual: e.target.value })} required />
+              </div>
             )}
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-pw-nueva" className={styles.inputLabel}>Nueva contraseña</label>
+              <input id="perfil-pw-nueva" type="password" className={styles.input} value={formPassword.password_nueva} onChange={(e) => setFormPassword({ ...formPassword, password_nueva: e.target.value })} required />
+              <div className={styles.pwReqs}>
+                <span className={`${styles.req} ${pwReqs.length ? styles.reqMet : ''}`}>{pwReqs.length ? '✓' : '•'} Mínimo 8 caracteres</span>
+                <span className={`${styles.req} ${pwReqs.upper ? styles.reqMet : ''}`}>{pwReqs.upper ? '✓' : '•'} Una letra mayúscula</span>
+                <span className={`${styles.req} ${pwReqs.lower ? styles.reqMet : ''}`}>{pwReqs.lower ? '✓' : '•'} Una letra minúscula</span>
+                <span className={`${styles.req} ${pwReqs.number ? styles.reqMet : ''}`}>{pwReqs.number ? '✓' : '•'} Al menos un número</span>
+              </div>
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="perfil-pw-nueva-conf" className={styles.inputLabel}>Confirmar nueva contraseña</label>
+              <input id="perfil-pw-nueva-conf" type="password" className={styles.input} value={formPassword.password_nueva_confirmacion} onChange={(e) => setFormPassword({ ...formPassword, password_nueva_confirmacion: e.target.value })} required />
+            </div>
+            <button type="submit" disabled={isSaving || !pwReqs.length || !pwReqs.upper || !pwReqs.lower || !pwReqs.number} className={styles.saveBtn}>
+              {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />{usuario?.password_configurada ? 'Cambiar contraseña' : 'Crear contraseña'}</>}
+            </button>
+          </form>
+        )}
 
-            {/* Modal: teléfono */}
-            {activeModal === 'telefono' && (
-              <form onSubmit={handleSaveTelefono} className={styles.modalForm}>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-tel" className={styles.inputLabel}>Nuevo teléfono</label>
-                  <input id="perfil-tel" type="tel" className={styles.input} placeholder="+549..." value={formTelefono.telefono_nuevo} onChange={(e) => setFormTelefono({ ...formTelefono, telefono_nuevo: e.target.value })} required />
-                </div>
-                {!isGoogle && (
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-tel-pass" className={styles.inputLabel}>Contraseña actual</label>
-                    <input id="perfil-tel-pass" type="password" className={styles.input} placeholder="••••••••" value={formTelefono.password_actual} onChange={(e) => setFormTelefono({ ...formTelefono, password_actual: e.target.value })} required />
-                  </div>
-                )}
-                <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Actualizar teléfono</>}
-                </button>
-              </form>
+        {activeModal === 'ciclo' && (
+          <form onSubmit={handleSaveCiclo} className={styles.modalForm}>
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Tipo de ciclo</label>
+              <div className={styles.selector}>
+                <button type="button" className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'dia_fijo' ? styles.selectorBtnActive : ''}`} onClick={() => setFormCiclo({ ...formCiclo, ciclo_tipo: 'dia_fijo' })}>Día fijo</button>
+                <button type="button" className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'regla' ? styles.selectorBtnActive : ''}`} onClick={() => setFormCiclo({ ...formCiclo, ciclo_tipo: 'regla' })}>Regla</button>
+              </div>
+            </div>
+            {formCiclo.ciclo_tipo === 'dia_fijo' ? (
+              <div className={styles.inputGroup}>
+                <label htmlFor="perfil-ciclo-dia" className={styles.inputLabel}>Día del mes (1–31)</label>
+                <input id="perfil-ciclo-dia" type="number" min="1" max="31" className={styles.input} value={formCiclo.ciclo_valor} placeholder="1" onChange={(e) => setFormCiclo({ ...formCiclo, ciclo_valor: e.target.value })} required />
+                <p className={styles.hint}>Tu ciclo empieza el día {formCiclo.ciclo_valor || '…'} de cada mes</p>
+              </div>
+            ) : (
+              <SelectInput id="perfil-ciclo-regla" label="Seleccionar regla" value={formCiclo.ciclo_valor} onChange={(val) => setFormCiclo({ ...formCiclo, ciclo_valor: val })} options={OPCIONES_REGLA_CICLO} />
             )}
+            <button type="submit" disabled={isSaving} className={styles.saveBtn}>
+              {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar configuración</>}
+            </button>
+          </form>
+        )}
 
-            {/* Modal: password */}
-            {activeModal === 'password' && (
-              <form onSubmit={handleSavePassword} className={styles.modalForm}>
-                {usuario?.password_configurada && (
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-pass-actual" className={styles.inputLabel}>Contraseña actual</label>
-                    <input id="perfil-pass-actual" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_actual} onChange={(e) => setFormPassword({ ...formPassword, password_actual: e.target.value })} required />
-                  </div>
-                )}
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-pass-nueva" className={styles.inputLabel}>Nueva contraseña</label>
-                  <input id="perfil-pass-nueva" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_nueva} onChange={(e) => setFormPassword({ ...formPassword, password_nueva: e.target.value })} required />
-                  <div className={styles.pwReqs}>
-                    <p className={`${styles.req} ${pwReqs.length ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Mínimo 8 caracteres</p>
-                    <p className={`${styles.req} ${pwReqs.upper ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Una mayúscula</p>
-                    <p className={`${styles.req} ${pwReqs.lower ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Una minúscula</p>
-                    <p className={`${styles.req} ${pwReqs.number ? styles.reqMet : ''}`}><CheckCircle2 size={11} />Un número</p>
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="perfil-pass-conf" className={styles.inputLabel}>Confirmar nueva contraseña</label>
-                  <input id="perfil-pass-conf" type="password" className={styles.input} placeholder="••••••••" value={formPassword.password_nueva_confirmacion} onChange={(e) => setFormPassword({ ...formPassword, password_nueva_confirmacion: e.target.value })} required />
-                </div>
-                <button type="submit" disabled={isSaving || !pwReqs.length || !pwReqs.upper || !pwReqs.lower || !pwReqs.number} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />{usuario?.password_configurada ? 'Cambiar contraseña' : 'Crear contraseña'}</>}
-                </button>
-              </form>
+        {activeModal === 'moneda' && (
+          <form onSubmit={handleSaveMoneda} className={styles.modalForm}>
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Moneda principal</label>
+              <div className={styles.selector}>
+                <button type="button" className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'ARS' ? styles.selectorBtnActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_principal: 'ARS' })}>ARS</button>
+                <button type="button" className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'USD' ? styles.selectorBtnActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_principal: 'USD' })}>USD</button>
+              </div>
+            </div>
+            <div className={styles.toggleRow}>
+              <span className={styles.inputLabel}>Moneda secundaria activa</span>
+              <div className={`${styles.toggle} ${formMoneda.moneda_secundaria_activa ? styles.toggleActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_secundaria_activa: !formMoneda.moneda_secundaria_activa })}>
+                <div className={styles.toggleCircle} />
+              </div>
+            </div>
+            {formMoneda.moneda_secundaria_activa && (
+              <SelectInput id="perfil-tipo-dolar" label="Tipo de dólar" value={formMoneda.tipo_dolar} onChange={(val) => setFormMoneda({ ...formMoneda, tipo_dolar: val })} options={OPCIONES_TIPO_DOLAR} />
             )}
-
-            {/* Modal: ciclo financiero */}
-            {activeModal === 'ciclo' && (
-              <form onSubmit={handleSaveCiclo} className={styles.modalForm}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Tipo de ciclo</label>
-                  <div className={styles.selector}>
-                    <button type="button" className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'dia_fijo' ? styles.selectorBtnActive : ''}`} onClick={() => setFormCiclo({ ...formCiclo, ciclo_tipo: 'dia_fijo' })}>Día fijo</button>
-                    <button type="button" className={`${styles.selectorBtn} ${formCiclo.ciclo_tipo === 'regla' ? styles.selectorBtnActive : ''}`} onClick={() => setFormCiclo({ ...formCiclo, ciclo_tipo: 'regla' })}>Regla</button>
-                  </div>
-                </div>
-                {formCiclo.ciclo_tipo === 'dia_fijo' ? (
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="perfil-ciclo-dia" className={styles.inputLabel}>Día del mes (1–31)</label>
-                    <input id="perfil-ciclo-dia" type="number" min="1" max="31" className={styles.input} value={formCiclo.ciclo_valor} placeholder="1" onChange={(e) => setFormCiclo({ ...formCiclo, ciclo_valor: e.target.value })} required />
-                    <p className={styles.hint}>Tu ciclo empieza el día {formCiclo.ciclo_valor || '…'} de cada mes</p>
-                  </div>
-                ) : (
-                  <SelectInput id="perfil-ciclo-regla" label="Seleccionar regla" value={formCiclo.ciclo_valor} onChange={(val) => setFormCiclo({ ...formCiclo, ciclo_valor: val })} options={OPCIONES_REGLA_CICLO} />
-                )}
-                <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar configuración</>}
-                </button>
-              </form>
-            )}
-
-            {/* Modal: moneda */}
-            {activeModal === 'moneda' && (
-              <form onSubmit={handleSaveMoneda} className={styles.modalForm}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Moneda principal</label>
-                  <div className={styles.selector}>
-                    <button type="button" className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'ARS' ? styles.selectorBtnActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_principal: 'ARS' })}>ARS</button>
-                    <button type="button" className={`${styles.selectorBtn} ${formMoneda.moneda_principal === 'USD' ? styles.selectorBtnActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_principal: 'USD' })}>USD</button>
-                  </div>
-                </div>
-                <div className={styles.toggleRow}>
-                  <span className={styles.inputLabel}>Moneda secundaria activa</span>
-                  <div className={`${styles.toggle} ${formMoneda.moneda_secundaria_activa ? styles.toggleActive : ''}`} onClick={() => setFormMoneda({ ...formMoneda, moneda_secundaria_activa: !formMoneda.moneda_secundaria_activa })}>
-                    <div className={styles.toggleCircle} />
-                  </div>
-                </div>
-                {formMoneda.moneda_secundaria_activa && (
-                  <SelectInput id="perfil-tipo-dolar" label="Tipo de dólar" value={formMoneda.tipo_dolar} onChange={(val) => setFormMoneda({ ...formMoneda, tipo_dolar: val })} options={OPCIONES_TIPO_DOLAR} />
-                )}
-                <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-                  {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar configuración</>}
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+            <button type="submit" disabled={isSaving} className={styles.saveBtn}>
+              {isSaving ? <div className={styles.spinner} /> : <><Save size={16} />Guardar configuración</>}
+            </button>
+          </form>
+        )}
+      </Modal>
 
       {/* Foto crop modal */}
       <FotoCropModal open={fotoCropOpen} onClose={() => setFotoCropOpen(false)} onSuccess={() => {}} />

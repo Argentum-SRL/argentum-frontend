@@ -391,6 +391,12 @@
   text-overflow: ellipsis;
 }
 
+.dataSubVal {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 1px;
+}
+
 .dataRowAction { flex-shrink: 0; }
 
 /* ── Financiero grid ────────────────────────────── */

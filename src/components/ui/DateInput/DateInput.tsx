@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { DayPicker } from 'react-day-picker'
+import { createPortal } from 'react-dom'
+import { DayPicker, useDayPicker } from 'react-day-picker'
 import { format, parse, isValid } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { Calendar, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -23,6 +24,58 @@ interface DateInputProps {
   name?: string
   required?: boolean
   placeholder?: string
+}
+
+// ─── Custom MonthCaption: Arrows + Title all in one flex row ───────────────
+function MonthCaptionWithNav({
+  calendarMonth,
+  view,
+  onToggleView,
+}: {
+  calendarMonth: { date: Date }
+  view: 'days' | 'years'
+  onToggleView: () => void
+}) {
+  const { goToMonth, nextMonth, previousMonth } = useDayPicker()
+  const monthName = format(calendarMonth.date, 'MMMM', { locale: es })
+  const year = calendarMonth.date.getFullYear()
+  const label = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`
+
+  return (
+    <div className={styles.calendarHeader}>
+      <button
+        type="button"
+        className={styles.rdpNavButton}
+        onClick={() => previousMonth && goToMonth(previousMonth)}
+        disabled={!previousMonth}
+        aria-label="Mes anterior"
+      >
+        <ChevronLeft size={16} />
+      </button>
+
+      <button
+        type="button"
+        className={styles.captionBtn}
+        onClick={onToggleView}
+        aria-label="Seleccionar año"
+      >
+        {label}
+        <span className={[styles.captionChevron, view === 'years' ? styles.captionChevronOpen : ''].filter(Boolean).join(' ')}>
+          ▾
+        </span>
+      </button>
+
+      <button
+        type="button"
+        className={styles.rdpNavButton}
+        onClick={() => nextMonth && goToMonth(nextMonth)}
+        disabled={!nextMonth}
+        aria-label="Mes siguiente"
+      >
+        <ChevronRight size={16} />
+      </button>
+    </div>
+  )
 }
 
 export const DateInput: React.FC<DateInputProps> = ({
@@ -85,16 +138,15 @@ export const DateInput: React.FC<DateInputProps> = ({
   const calcPosition = useCallback(() => {
     if (isMobile || !wrapperRef.current || !popoverRef.current) return
     const rect = wrapperRef.current.getBoundingClientRect()
-    const popoverHeight = 340 // altura estimada del calendario
+    const popoverHeight = 360
     const spaceBelow = window.innerHeight - rect.bottom
     const spaceAbove = rect.top
     const top = spaceBelow >= popoverHeight || spaceBelow >= spaceAbove
       ? rect.bottom + 6
       : rect.top - popoverHeight - 6
     
-    // Calcular left y asegurar que no se salga de la pantalla
     let left = rect.left
-    const popoverWidth = 280
+    const popoverWidth = 290
     if (left + popoverWidth > window.innerWidth - 8) {
       left = window.innerWidth - popoverWidth - 8
     }
@@ -135,17 +187,13 @@ export const DateInput: React.FC<DateInputProps> = ({
   }, [view])
 
   const handleTextInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Solo permitir dígitos y barras
     const raw = e.target.value.replace(/[^\d/]/g, '')
     
-    // Auto-insertar barras al escribir
-    // Si el usuario acaba de borrar una barra, borrar también el dígito anterior
     if (inputText.length > raw.length + 1) {
       setInputText(raw)
       return
     }
     
-    // Extraer solo dígitos para formatear
     const digits = raw.replace(/\//g, '')
     
     let formatted: string
@@ -159,11 +207,9 @@ export const DateInput: React.FC<DateInputProps> = ({
     
     setInputText(formatted)
     
-    // Cuando el texto es una fecha completa válida, comunicar al padre
     if (formatted.length === 10) {
       const parsed = parse(formatted, DISPLAY_FORMAT, new Date())
       if (isValid(parsed)) {
-        // Verificar rango min/max
         if (fromDate && parsed < fromDate) return
         if (toDate && parsed > toDate) return
         onChange(format(parsed, INTERNAL_FORMAT))
@@ -197,32 +243,9 @@ export const DateInput: React.FC<DateInputProps> = ({
   const maxYear = toDate ? toDate.getFullYear() : currentYear + 10
   const yearList = Array.from(
     { length: maxYear - minYear + 1 },
-    (_, i) => maxYear - i  // más reciente primero
+    (_, i) => maxYear - i
   )
 
-  // Componente MonthCaption custom
-  const MonthCaptionCustom = ({ calendarMonth: cm }: { calendarMonth: { date: Date } }) => {
-    const monthName = format(cm.date, 'MMMM', { locale: es })
-    const year = cm.date.getFullYear()
-    const label = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`
-    return (
-      <div className={styles.rdpCaption}>
-        <button
-          type="button"
-          className={styles.captionBtn}
-          onClick={() => setView(v => v === 'years' ? 'days' : 'years')}
-          aria-label="Seleccionar año"
-        >
-          {label}
-          <span className={[styles.captionChevron, view === 'years' ? styles.captionChevronOpen : ''].filter(Boolean).join(' ')}>
-            ▾
-          </span>
-        </button>
-      </div>
-    )
-  }
-
-  // Vista de selección de año
   const selectedYear = calendarMonth.getFullYear()
 
   const yearGridElement = (
@@ -268,9 +291,9 @@ export const DateInput: React.FC<DateInputProps> = ({
         root: styles.rdpRoot,
         months: styles.rdpMonths,
         month: styles.rdpMonth,
-        month_caption: styles.rdpCaption,
+        month_caption: styles.rdpCaptionHidden, // Ocultamos el caption nativo — usamos el custom
         caption_label: styles.rdpCaptionLabel,
-        nav: styles.rdpNav,
+        nav: styles.rdpNavHidden,              // Ocultamos el nav nativo — está dentro del caption custom
         button_previous: styles.rdpNavButton,
         button_next: styles.rdpNavButton,
         month_grid: styles.rdpTable,
@@ -285,68 +308,42 @@ export const DateInput: React.FC<DateInputProps> = ({
         disabled: styles.rdpDayDisabled,
       }}
       components={{
-        Chevron: (props) => {
-          if (props.orientation === 'left') {
-            return <ChevronLeft size={16} />
-          }
-          if (props.orientation === 'right') {
-            return <ChevronRight size={16} />
-          }
-          return <></>
-        },
-        MonthCaption: MonthCaptionCustom
+        MonthCaption: ({ calendarMonth: cm }) => (
+          <MonthCaptionWithNav
+            calendarMonth={cm}
+            view={view}
+            onToggleView={() => setView(v => v === 'years' ? 'days' : 'years')}
+          />
+        ),
       }}
     />
   )
 
-  const popover = open ? (
-    isMobile ? (
-      <div
-        className={styles.bottomSheetOverlay}
-        onMouseDown={(e) => {
-          if (e.target === e.currentTarget) {
-            setOpen(false)
-            setView('days')
-          }
-        }}
-      >
-        <div className={styles.bottomSheet} ref={popoverRef}>
-          <div className={styles.bottomSheetHandle} />
-          <div className={styles.bottomSheetContent}>
-            {view === 'years' ? yearGridElement : dayPickerElement}
-          </div>
-          <div className={styles.calendarFooter}>
-            {validSelected && (
-              <button className={styles.clearBtn} onClick={handleClear} type="button">
-                Borrar
-              </button>
-            )}
-            <button className={styles.todayBtn} onClick={() => handleSelect(new Date())} type="button">
-              Hoy
+  const calendarContent = (
+    <>
+      {view === 'years' ? (
+        <>
+          {/* Header de años — mismo diseño que el de días */}
+          <div className={styles.calendarHeader}>
+            <div style={{ width: 32 }} />
+            <button
+              type="button"
+              className={styles.captionBtn}
+              onClick={() => setView('days')}
+              aria-label="Volver al calendario"
+            >
+              {calendarMonth.getFullYear()}
+              <span className={[styles.captionChevron, styles.captionChevronOpen].join(' ')}>▾</span>
             </button>
+            <div style={{ width: 32 }} />
           </div>
-        </div>
-      </div>
-    ) : (
-      // Desktop: popover fixed posicionado
-      <div
-        ref={popoverRef}
-        className={styles.popover}
-      >
-        {view === 'years' ? yearGridElement : dayPickerElement}
-        <div className={styles.calendarFooter}>
-          {validSelected && (
-            <button className={styles.clearBtn} onClick={handleClear} type="button">
-              Borrar
-            </button>
-          )}
-          <button className={styles.todayBtn} onClick={() => handleSelect(new Date())} type="button">
-            Hoy
-          </button>
-        </div>
-      </div>
-    )
-  ) : null
+          {yearGridElement}
+        </>
+      ) : (
+        dayPickerElement
+      )}
+    </>
+  )
 
   return (
     <div className={[styles.wrapper, className].filter(Boolean).join(' ')} ref={wrapperRef}>
@@ -362,14 +359,8 @@ export const DateInput: React.FC<DateInputProps> = ({
           onChange={handleTextInput}
           onFocus={() => !disabled && setOpen(true)}
           onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setOpen(false)
-              setView('days')
-            }
-            if (e.key === 'Tab') {
-              setOpen(false)
-              setView('days')
-            }
+            if (e.key === 'Escape') { setOpen(false); setView('days') }
+            if (e.key === 'Tab') { setOpen(false); setView('days') }
           }}
           className={[
             styles.input,
@@ -388,7 +379,48 @@ export const DateInput: React.FC<DateInputProps> = ({
           {error}
         </span>
       )}
-      {popover}
+      {open && createPortal(
+        isMobile ? (
+          <div
+            className={styles.bottomSheetOverlay}
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) { setOpen(false); setView('days') }
+            }}
+          >
+            <div className={styles.bottomSheet} ref={popoverRef}>
+              <div className={styles.bottomSheetHandle} />
+              <div className={styles.bottomSheetContent}>
+                {calendarContent}
+              </div>
+              <div className={styles.calendarFooter}>
+                {validSelected && (
+                  <button className={styles.clearBtn} onClick={handleClear} type="button">
+                    Borrar
+                  </button>
+                )}
+                <button className={styles.todayBtn} onClick={() => handleSelect(new Date())} type="button">
+                  Hoy
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div ref={popoverRef} className={styles.popover}>
+            {calendarContent}
+            <div className={styles.calendarFooter}>
+              {validSelected && (
+                <button className={styles.clearBtn} onClick={handleClear} type="button">
+                  Borrar
+                </button>
+              )}
+              <button className={styles.todayBtn} onClick={() => handleSelect(new Date())} type="button">
+                Hoy
+              </button>
+            </div>
+          </div>
+        ),
+        document.body
+      )}
     </div>
   )
 }

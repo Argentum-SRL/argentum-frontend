@@ -19,6 +19,12 @@ function fmt(d: Date): string {
   return `${d.getDate()} ${MESES[d.getMonth()]}`
 }
 
+function createCappedDate(year: number, month: number, targetDay: number): Date {
+  const lastDay = new Date(year, month + 1, 0).getDate()
+  const day = Math.min(targetDay, lastDay)
+  return new Date(year, month, day)
+}
+
 export function calcularPeriodoActual(
   usuario: Pick<Usuario, 'ciclo_tipo' | 'ciclo_valor'> | null,
 ): { inicio: Date; fin: Date; label: string } {
@@ -26,16 +32,26 @@ export function calcularPeriodoActual(
 
   if (usuario?.ciclo_tipo === 'dia_fijo' && usuario.ciclo_valor) {
     const dia = parseInt(usuario.ciclo_valor, 10)
-    if (!isNaN(dia) && dia >= 1 && dia <= 28) {
+    if (!isNaN(dia) && dia >= 1 && dia <= 31) {
       let y = hoy.getFullYear()
       let m = hoy.getMonth()
-      if (hoy.getDate() < dia) {
+      
+      const inicioEsteMes = createCappedDate(y, m, dia)
+      
+      let inicio: Date
+      if (hoy >= inicioEsteMes) {
+        inicio = inicioEsteMes
+      } else {
         if (m === 0) { m = 11; y-- } else { m-- }
+        inicio = createCappedDate(y, m, dia)
       }
-      const inicio = new Date(y, m, dia)
-      const mFin = (m + 1) % 12
-      const yFin = m + 1 > 11 ? y + 1 : y
-      const fin = new Date(yFin, mFin, dia - 1)
+      
+      let yFin = y
+      let mFin = m
+      if (mFin === 11) { mFin = 0; yFin++ } else { mFin++ }
+      const proximoInicio = createCappedDate(yFin, mFin, dia)
+      const fin = new Date(proximoInicio.getTime() - 24 * 60 * 60 * 1000)
+      
       return { inicio, fin, label: `${fmt(inicio)} — ${fmt(fin)}` }
     }
   }

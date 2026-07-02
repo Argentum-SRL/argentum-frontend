@@ -42,6 +42,16 @@ export default function TransaccionesPage() {
   }), [periodoActual])
 
   const [filters, setFilters] = useState<TransaccionFilters>(defaultFilters)
+
+  // Sincronizar filtros por defecto cuando el usuario cargue o cambie su ciclo
+  const userCycleKey = usuario ? `${usuario.id}-${usuario.ciclo_tipo}-${usuario.ciclo_valor}` : ''
+  const [lastUserCycleKey, setLastUserCycleKey] = useState<string>('')
+  useEffect(() => {
+    if (userCycleKey && userCycleKey !== lastUserCycleKey) {
+      setLastUserCycleKey(userCycleKey)
+      setFilters(defaultFilters)
+    }
+  }, [userCycleKey, lastUserCycleKey, defaultFilters])
   
   const [transacciones, setTransacciones] = useState<Transaccion[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])

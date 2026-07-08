@@ -9,9 +9,7 @@ import {
   Edit,
   Camera,
   Lock,
-  X,
   Save,
-  CheckCircle2,
   LogOut,
   Calendar,
   PieChart,
@@ -237,8 +235,11 @@ export default function PerfilPage() {
   const [formCiclo, setFormCiclo] = useState({ ciclo_tipo: 'dia_fijo' as 'dia_fijo' | 'regla', ciclo_valor: '' })
   const [formMoneda, setFormMoneda] = useState({ moneda_principal: 'ARS' as 'ARS' | 'USD', moneda_secundaria_activa: false, tipo_dolar: 'blue' })
 
+  const [prevUsuario, setPrevUsuario] = useState(usuario)
+
   // Sync forms cuando cambia el usuario
-  useEffect(() => {
+  if (usuario !== prevUsuario) {
+    setPrevUsuario(usuario)
     if (usuario) {
       setFormDatos({ nombre: usuario.nombre || '', apellido: usuario.apellido || '', fecha_nacimiento: usuario.fecha_nacimiento || '', sexo: usuario.sexo || '' })
       setFormEmail({ email_nuevo: usuario.email || '', password_actual: '' })
@@ -246,7 +247,7 @@ export default function PerfilPage() {
       setFormCiclo({ ciclo_tipo: (usuario.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo', ciclo_valor: usuario.ciclo_valor || '' })
       setFormMoneda({ moneda_principal: (usuario.moneda_principal as 'ARS' | 'USD') || 'ARS', moneda_secundaria_activa: usuario.moneda_secundaria_activa, tipo_dolar: usuario.tipo_dolar || 'blue' })
     }
-  }, [usuario])
+  }
 
   // ── Handlers de perfil ───────────────────────────────────────────────────
   const handleSaveDatosPersonales = async (e: React.FormEvent) => {

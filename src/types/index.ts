@@ -600,6 +600,9 @@ export interface SubcategoriaGasto {
   gasto_actual_ciclo: number
 }
 
+export * from './importacion'
+
+
 
 
 

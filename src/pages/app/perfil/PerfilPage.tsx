@@ -252,6 +252,25 @@ export default function PerfilPage() {
   // ── Handlers de perfil ───────────────────────────────────────────────────
   const handleSaveDatosPersonales = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSaving(true); setModalError(null)
+    if (formDatos.fecha_nacimiento) {
+      const selectedDate = new Date(formDatos.fecha_nacimiento)
+      const today = new Date()
+      if (isNaN(selectedDate.getTime()) || selectedDate > today) {
+        setModalError('La fecha que ingresaste no es válida.')
+        setIsSaving(false)
+        return
+      }
+      let age = today.getFullYear() - selectedDate.getFullYear()
+      const m = today.getMonth() - selectedDate.getMonth()
+      if (m < 0 || (m === 0 && today.getDate() < selectedDate.getDate())) {
+        age--
+      }
+      if (age < 18) {
+        setModalError('Tenés que ser mayor de 18 años para crear una cuenta en Argentum.')
+        setIsSaving(false)
+        return
+      }
+    }
     try {
       const updated = await usuarioService.actualizarDatosPersonales(formDatos)
       updateUsuario(updated)

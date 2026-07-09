@@ -26,6 +26,7 @@ const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
+const TermsPage = lazy(() => import('@/pages/TermsPage'))
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       // Rutas públicas
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
+      { path: '/terminos', element: <TermsPage /> },
       { path: '/login/telefono', element: <PhoneLoginPage /> },
       { path: '/auth/verificar-email', element: <VerificarEmail /> },
       { path: '/auth/verificar-telefono', element: <VerificarTelefono /> },

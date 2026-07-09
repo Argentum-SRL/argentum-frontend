@@ -16,10 +16,15 @@ interface FilterBarProps {
   hasActiveFilters: boolean
 }
 
-function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
+function useClickOutside(
+  ref: React.RefObject<HTMLElement | null>,
+  handler: () => void,
+  ignoreSelector?: string
+) {
   useEffect(() => {
     const listener = (e: MouseEvent | TouchEvent) => {
       if (!ref.current || ref.current.contains(e.target as Node)) return
+      if (ignoreSelector && (e.target as HTMLElement).closest(ignoreSelector)) return
       handler()
     }
     document.addEventListener('mousedown', listener)
@@ -28,7 +33,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () =
       document.removeEventListener('mousedown', listener)
       document.removeEventListener('touchstart', listener)
     }
-  }, [ref, handler])
+  }, [ref, handler, ignoreSelector])
 }
 
 export default function FilterBar({
@@ -63,7 +68,7 @@ export default function FilterBar({
   const dateRef = useRef<HTMLDivElement>(null)
 
   useClickOutside(catRef, () => setCatPopoverOpen(false))
-  useClickOutside(dateRef, () => setDatePopoverOpen(false))
+  useClickOutside(dateRef, () => setDatePopoverOpen(false), '[data-portal="date-picker"]')
 
   // Debounce para la búsqueda
   useEffect(() => {

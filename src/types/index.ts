@@ -342,6 +342,7 @@ export interface ResumenFuturo {
   total: number
   moneda: 'ARS' | 'USD'
   cantidad_cuotas: number
+  cuotas?: CuotaResumen[]
 }
 
 export interface ResumenTarjeta {

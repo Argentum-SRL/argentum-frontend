@@ -146,6 +146,26 @@ export default function MetaDetallePage() {
     })
   }
 
+  const handleDeleteMovement = (movementId: string) => {
+    if (!goal) return
+
+    confirm({
+      title: '¿Eliminás este movimiento?',
+      description: 'El saldo de tu billetera y el acumulado de la meta se van a ajustar.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await goalsService.deleteMovement(goal.id, movementId)
+          showToast('El movimiento se eliminó.', 'success')
+          fetchData()
+        } catch (err: unknown) {
+          showToast(getErrorMessage(err, 'No pudimos eliminar el movimiento. Intentá de nuevo.'), 'error')
+        }
+      }
+    })
+  }
+
   if (loading) {
     return <div className={styles.loading}>Cargando...</div>
   }
@@ -293,6 +313,45 @@ export default function MetaDetallePage() {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            <div className={styles.recentActivityCard}>
+              <div className={styles.recentActivityHeader}>
+                <h3 className={styles.cardTitle}>Actividad Reciente</h3>
+                <button className={styles.viewAllBtn} onClick={() => setActiveTab('activity')}>
+                  Ver todo
+                </button>
+              </div>
+              
+              {goal.movimientos && goal.movimientos.length > 0 ? (
+                <div className={styles.recentActivityList}>
+                  {goal.movimientos.slice(0, 3).map((m) => (
+                    <div key={m.id} className={styles.activityItem}>
+                      <div className={`${styles.activityIcon} ${m.tipo === 'aporte' ? styles.iconAporte : styles.iconRetiro}`}>
+                        {m.tipo === 'aporte' ? <Plus size={16} /> : <Trash2 size={16} />}
+                      </div>
+                      <div className={styles.activityInfo}>
+                        <span className={styles.activityType}>
+                          {m.tipo === 'aporte' ? 'Aporte desde' : 'Retiro hacia'} {m.billetera?.nombre}
+                        </span>
+                        <span className={styles.activityDate}>{formatFecha(m.fecha)}</span>
+                      </div>
+                      <div className={`${styles.activityAmount} ${m.tipo === 'aporte' ? styles.amountPositive : styles.amountNegative}`}>
+                        {m.tipo === 'aporte' ? '+' : '-'}{formatMonto(m.monto, m.moneda_movimiento as 'ARS' | 'USD')}
+                      </div>
+                      <button 
+                        className={styles.deleteMovBtn} 
+                        onClick={() => handleDeleteMovement(m.id)}
+                        title="Eliminar movimiento"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.emptyActivity}>No hay movimientos registrados</div>
+              )}
+            </div>
           </div>
         )}
 
@@ -314,6 +373,13 @@ export default function MetaDetallePage() {
                    <div className={`${styles.activityAmount} ${m.tipo === 'aporte' ? styles.amountPositive : styles.amountNegative}`}>
                      {m.tipo === 'aporte' ? '+' : '-'}{formatMonto(m.monto, m.moneda_movimiento as 'ARS' | 'USD')}
                    </div>
+                   <button 
+                     className={styles.deleteMovBtn} 
+                     onClick={() => handleDeleteMovement(m.id)}
+                     title="Eliminar movimiento"
+                   >
+                     <Trash2 size={14} />
+                   </button>
                  </div>
                ))
              ) : (

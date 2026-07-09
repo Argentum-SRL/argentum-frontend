@@ -1,5 +1,8 @@
 import api from './api'
 import type { Goal, GoalMovement, GoalAnalytics, GoalSummary } from '@/types/goals'
+import { invalidateBilleteras } from './billetera.service'
+import { invalidateResumen } from './dashboard.service'
+import { invalidatePresupuestos } from './presupuesto.service'
 
 const goalsService = {
   getGoals: async (activas_solo?: boolean, signal?: AbortSignal): Promise<Goal[]> => {
@@ -28,11 +31,17 @@ const goalsService = {
 
   addMovement: async (id: string, data: Partial<GoalMovement>): Promise<GoalMovement> => {
     const response = await api.post(`/goals/${id}/movimientos`, data)
+    invalidateBilleteras()
+    invalidateResumen()
+    invalidatePresupuestos()
     return response.data
   },
 
   deleteMovement: async (id: string, movementId: string): Promise<void> => {
     await api.delete(`/goals/${id}/movimientos/${movementId}`)
+    invalidateBilleteras()
+    invalidateResumen()
+    invalidatePresupuestos()
   },
 
   getAnalytics: async (id: string, signal?: AbortSignal): Promise<GoalAnalytics> => {

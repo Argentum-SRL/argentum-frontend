@@ -46,12 +46,10 @@ export default function TransaccionesPage() {
   // Sincronizar filtros por defecto cuando el usuario cargue o cambie su ciclo
   const userCycleKey = usuario ? `${usuario.id}-${usuario.ciclo_tipo}-${usuario.ciclo_valor}` : ''
   const [lastUserCycleKey, setLastUserCycleKey] = useState<string>('')
-  useEffect(() => {
-    if (userCycleKey && userCycleKey !== lastUserCycleKey) {
-      setLastUserCycleKey(userCycleKey)
-      setFilters(defaultFilters)
-    }
-  }, [userCycleKey, lastUserCycleKey, defaultFilters])
+  if (userCycleKey && userCycleKey !== lastUserCycleKey) {
+    setLastUserCycleKey(userCycleKey)
+    setFilters(defaultFilters)
+  }
   
   const [transacciones, setTransacciones] = useState<Transaccion[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])

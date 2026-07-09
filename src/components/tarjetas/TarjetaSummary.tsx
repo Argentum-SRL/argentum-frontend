@@ -159,7 +159,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
         title: fut.mes,
         cierre: '',
         vencimiento: '',
-        cuotas: [],
+        cuotas: fut.cuotas || [],
         total: Number(fut.total),
         isFuture: true
       })

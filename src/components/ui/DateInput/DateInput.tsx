@@ -383,6 +383,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         isMobile ? (
           <div
             className={styles.bottomSheetOverlay}
+            data-portal="date-picker"
             onMouseDown={(e) => {
               if (e.target === e.currentTarget) { setOpen(false); setView('days') }
             }}
@@ -405,7 +406,7 @@ export const DateInput: React.FC<DateInputProps> = ({
             </div>
           </div>
         ) : (
-          <div ref={popoverRef} className={styles.popover}>
+          <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
             {calendarContent}
             <div className={styles.calendarFooter}>
               {validSelected && (

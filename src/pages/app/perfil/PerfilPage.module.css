@@ -57,11 +57,9 @@
 .tabBar {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid var(--border);
   margin-bottom: 24px;
   overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   min-height: 44px;
 }
 
@@ -73,7 +71,7 @@
   padding: 12px 18px;
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255,255,255,0.45);
+  color: var(--text-3);
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -87,12 +85,12 @@
 }
 
 .tab:hover {
-  color: var(--text-2);
+  color: var(--text);
 }
 
 .tabActive {
-  color: #4f9cf9 !important;
-  border-bottom-color: #4f9cf9 !important;
+  color: var(--primary) !important;
+  border-bottom-color: var(--primary) !important;
 }
 
 .tabContent {

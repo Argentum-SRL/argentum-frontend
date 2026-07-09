@@ -1,0 +1,337 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.counter {
+  font-size: 14px;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  padding: 10px 16px;
+  border-radius: 10px;
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: 4px;
+}
+
+.counter strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+/* ─── DESKTOP TABLE ────────────────────────────────── */
+
+.tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13.5px;
+}
+
+.table th,
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table th {
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.thCheck {
+  width: 70px;
+  text-align: center;
+}
+
+.thCat {
+  width: 220px;
+}
+
+.thMonto {
+  text-align: right;
+}
+
+.tr {
+  background: var(--surface);
+  transition: background 150ms ease, opacity 150ms ease;
+}
+
+.tr:hover {
+  background: rgba(var(--primary-rgb), 0.02);
+}
+
+.trDisabled {
+  opacity: 0.45;
+  background: rgba(var(--border-rgb), 0.1);
+}
+
+.tdCheck {
+  text-align: center;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.tdFecha {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tdDesc {
+  max-width: 220px;
+}
+
+.descText {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.titularLabel {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  background: var(--surface-alt);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Badges */
+.tagBadge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.tagNueva {
+  background: rgba(13, 32, 69, 0.08);
+  color: var(--primary);
+}
+
+[data-theme="dark"] .tagNueva {
+  background: rgba(72, 120, 184, 0.15);
+  color: var(--primary);
+}
+
+.tagCuota {
+  background: rgba(168, 144, 90, 0.12);
+  color: var(--gold);
+}
+
+.tagCargo {
+  background: rgba(138, 149, 168, 0.15);
+  color: var(--text-2);
+}
+
+.tagDuplicado {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.tdCuota {
+  white-space: nowrap;
+}
+
+.cuotaBadge {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--gold);
+  background: rgba(168, 144, 90, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cuotaNone {
+  color: var(--text-3);
+}
+
+.tdCat {
+  min-width: 180px;
+}
+
+.selectCat {
+  width: 100%;
+}
+
+.tdMonto {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.montoEgreso {
+  color: var(--text);
+}
+
+.montoIngreso {
+  color: var(--success);
+}
+
+/* ─── MOBILE CARDS VIEW (Responsive, max-width: 768px) ─── */
+
+.cardsList {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: opacity 150ms ease, border-color 150ms ease;
+}
+
+.cardDisabled {
+  opacity: 0.5;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.cardFecha {
+  font-size: 12px;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.cardCheckLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.cardCheckText {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardDesc {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cardTitular {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+.cardCatContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.cardLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.selectCatMobile {
+  flex-grow: 1;
+}
+
+.cardMonto {
+  font-size: 16px;
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .tableResponsive {
+    display: none;
+  }
+  .cardsList {
+    display: flex;
+  }
+}

@@ -103,7 +103,7 @@
 
 .tabs {
   display: flex;
-  background: #F5F4F0;
+  background: var(--surface-alt);
   padding: 4px;
   border-radius: 12px;
   gap: 4px;
@@ -123,7 +123,7 @@
 }
 
 .tabActive {
-  background: white;
+  background: var(--surface);
   color: var(--primary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }

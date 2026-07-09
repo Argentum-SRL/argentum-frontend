@@ -34,6 +34,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [aceptaTerminos, setAceptaTerminos] = useState(false)
 
   const logGoogleError = (stage: string, error: unknown) => {
     if (!import.meta.env.DEV) return
@@ -71,7 +72,7 @@ export default function RegisterPage() {
         ? 'Las contraseñas no coinciden. Revisalas.' 
         : null
 
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || pError || cpError) {
+    if (!nombre.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || pError || cpError || !aceptaTerminos) {
       return
     }
     setLoading(true)
@@ -206,9 +207,22 @@ export default function RegisterPage() {
           </div>
         </div>
 
+        <div className={styles.termsRow}>
+          <input
+            id="acepta-terminos"
+            type="checkbox"
+            checked={aceptaTerminos}
+            onChange={(e) => setAceptaTerminos(e.target.checked)}
+            className={styles.checkbox}
+          />
+          <label htmlFor="acepta-terminos" className={styles.checkboxLabel}>
+            Acepto los <Link to="/terminos" target="_blank" rel="noopener noreferrer" className={styles.termsLink}>Términos y Condiciones</Link> y la <Link to="/terminos#politica" target="_blank" rel="noopener noreferrer" className={styles.termsLink}>Política de Privacidad</Link> de Argentum, incluyendo el procesamiento de mis datos financieros mediante servicios de inteligencia artificial de terceros para brindar las funcionalidades del producto, y confirmo que soy mayor de 18 años.
+          </label>
+        </div>
+
         {apiError && <p className={styles.error}>{apiError}</p>}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
+        <button type="submit" disabled={loading || !aceptaTerminos} className={styles.submitBtn}>
           {loading ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>
 

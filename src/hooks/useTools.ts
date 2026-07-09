@@ -12,8 +12,8 @@ const calcularCuotaConInteres = (capital: number, n: number, tnaVal: number): nu
 export const useTools = () => {
   const { showToast } = useToast();
   
-  // Tab switching: 'conveniencia' is the Cuotas vs Contado tab, 'can-afford' is the "¿Me lo puedo permitir?" tab
-  const [activeTab, setActiveTab] = useState<'conveniencia' | 'can-afford'>('conveniencia');
+  // Tab switching: 'conveniencia' is the Cuotas vs Contado tab, 'can-afford' is the "¿Me lo puedo permitir?" tab, 'importar-resumen' is the Importación de resúmenes tab
+  const [activeTab, setActiveTab] = useState<'conveniencia' | 'can-afford' | 'importar-resumen'>('conveniencia');
   
   // ── Tab 1: Cuotas vs Contado ─────────────────────────────────────────────
   const [ipcData, setIpcData] = useState<IPCData | null>(null);

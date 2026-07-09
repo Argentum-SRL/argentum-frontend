@@ -7,6 +7,9 @@ import CanAffordForm from '@/components/tools/CanAffordForm';
 import CanAffordResult from '@/components/tools/CanAffordResult';
 import pageStyles from './ToolsPage.module.css';
 import { EmptyState } from '@/components/ui';
+import { useAuth } from '@/hooks/useAuth';
+import ImportacionResumenSection from '@/components/tools/importacion/ImportacionResumenSection';
+
 
 export default function ToolsPage() {
   const {
@@ -38,6 +41,7 @@ export default function ToolsPage() {
     setTna,
     calcularCuotaConInteres
   } = useTools();
+  const { is_admin } = useAuth();
 
   return (
     <div className={pageStyles.page}>
@@ -69,6 +73,15 @@ export default function ToolsPage() {
           >
             ❓ ¿Me lo puedo permitir?
           </button>
+          {is_admin && (
+            <button
+              className={`${pageStyles.tab} ${activeTab === 'importar-resumen' ? pageStyles.tabActive : ''}`}
+              onClick={() => setActiveTab('importar-resumen')}
+              type="button"
+            >
+              Importar resumen (Admin)
+            </button>
+          )}
         </div>
       </div>
       {/* ── Tab Content ─────────────────────────────────────────────────── */}
@@ -151,6 +164,10 @@ export default function ToolsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {activeTab === 'importar-resumen' && (
+        <ImportacionResumenSection />
       )}
 
     </div>

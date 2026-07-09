@@ -133,3 +133,40 @@
   margin-top: 16px;
   opacity: 0.8;
 }
+
+.termsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+
+.checkboxLabel {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--text-2);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.termsLink {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.termsLink:hover {
+  opacity: 0.8;
+}

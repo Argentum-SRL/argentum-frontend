@@ -40,8 +40,8 @@ const tarjetaService = {
     const { data } = await api.get<ResumenTarjeta>(`/tarjetas/${id}/resumen`, { signal })
     return data
   },
-  pagarResumenTarjeta: async (id: string, fechaPago?: string): Promise<unknown> => {
-    const { data } = await api.post(`/tarjetas/${id}/pagar`, { fecha_pago: fechaPago })
+  pagarResumenTarjeta: async (id: string, fechaPago?: string, fechaResumen?: string): Promise<unknown> => {
+    const { data } = await api.post(`/tarjetas/${id}/pagar`, { fecha_pago: fechaPago, fecha_resumen: fechaResumen })
     return data
   },
   getPresionFutura: async (meses = 6, signal?: AbortSignal): Promise<PresionFuturaData> => {

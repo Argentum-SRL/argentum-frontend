@@ -61,16 +61,18 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
   const { open, confirm } = useModal()
   const { showToast } = useToast()
 
-  const handlePagarTarjeta = () => {
+  const handlePagarTarjeta = (ticket: TicketData) => {
+    const isPast = ticket.isPast;
+    const title = isPast ? `resumen vencido ("${ticket.title}")` : 'resumen actual';
     confirm({
-      title: '¿Confirmar pago de tarjeta?',
-      description: `Se creará una transacción de pago para el resumen actual de "${tarjeta.nombre}" por un total de ${formatMonto(currentTicket.total, tarjeta.moneda)}. Esto restará el saldo de la billetera vinculada y marcará las cuotas como pagadas.`,
+      title: isPast ? '¿Confirmar pago de resumen vencido?' : '¿Confirmar pago de tarjeta?',
+      description: `Se creará una transacción de pago para el ${title} de "${tarjeta.nombre}" por un total de ${formatMonto(ticket.total, tarjeta.moneda)}. Esto restará el saldo de la billetera vinculada y marcará las cuotas como pagadas.`,
       confirmLabel: 'Confirmar pago',
       variant: 'default',
       onConfirm: async () => {
         setIsPaying(true)
         try {
-          await tarjetaService.pagarResumenTarjeta(tarjeta.id)
+          await tarjetaService.pagarResumenTarjeta(tarjeta.id, undefined, ticket.vencimiento)
           showToast('Tarjeta pagada con éxito', 'success')
           fetchResumen()
           if (onRefresh) onRefresh()
@@ -355,7 +357,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                   <button 
                     type="button" 
                     className={styles.payBtn} 
-                    onClick={handlePagarTarjeta}
+                    onClick={() => handlePagarTarjeta(currentTicket)}
                     disabled={isPaying}
                   >
                     {isPaying ? 'Procesando...' : 'Pagar Tarjeta'}
@@ -363,8 +365,18 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                 )
               }
               return (
-                <div className={styles.unpaidBadge}>
-                  ⚠️ Resumen Impago
+                <div className={styles.unpaidContainer}>
+                  <div className={styles.unpaidBadge}>
+                    ⚠️ Resumen Impago
+                  </div>
+                  <button 
+                    type="button" 
+                    className={styles.payBtn} 
+                    onClick={() => handlePagarTarjeta(currentTicket)}
+                    disabled={isPaying}
+                  >
+                    {isPaying ? 'Procesando...' : 'Pagar Resumen'}
+                  </button>
                 </div>
               )
             })()

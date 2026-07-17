@@ -1,5 +1,5 @@
 import api from './api'
-import type { DashboardResumen, CotizacionDolar, Proyeccion, Billetera, SubcategoriaGasto } from '../types'
+import type { DashboardResumen, CotizacionDolar, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '../types'
 
 // Cache storage
 let cotizacionCache: { data: CotizacionDolar; timestamp: number } | null = null
@@ -8,8 +8,8 @@ let cotizacionPromise: Promise<CotizacionDolar> | null = null
 let resumenCache: Record<string, { data: DashboardResumen; timestamp: number }> = {}
 const resumenPromises: Record<string, Promise<DashboardResumen> | undefined> = {}
 
-let proyeccionCache: { data: Proyeccion; timestamp: number } | null = null
-let proyeccionPromise: Promise<Proyeccion> | null = null
+let proyeccionCache: { data: ProyeccionesResponse; timestamp: number } | null = null
+let proyeccionPromise: Promise<ProyeccionesResponse> | null = null
 
 const DEFAULT_TTL = 60 * 1000 // 60 seconds
 
@@ -68,7 +68,7 @@ export const dashboardService = {
     return cotizacionPromise
   },
 
-  getProyeccion: async (signal?: AbortSignal): Promise<Proyeccion> => {
+  getProyeccion: async (signal?: AbortSignal): Promise<ProyeccionesResponse> => {
     if (proyeccionPromise) return proyeccionPromise
 
     if (proyeccionCache && Date.now() - proyeccionCache.timestamp < DEFAULT_TTL) {
@@ -77,7 +77,7 @@ export const dashboardService = {
 
     proyeccionPromise = (async () => {
       try {
-        const response = await api.get<Proyeccion>('/dashboard/proyeccion', { signal })
+        const response = await api.get<ProyeccionesResponse>('/dashboard/proyeccion', { signal })
         proyeccionCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {

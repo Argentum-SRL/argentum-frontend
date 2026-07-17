@@ -1307,4 +1307,85 @@
   color: rgba(255, 255, 255, 0.28);
   margin: 3px 0 0 0;
 }
+
+/* ── Multi-currency Balance & Subcategories layouts ── */
+.balanceTopMulti {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.balanceFooterMulti {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.balanceCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.balanceColDivider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  align-self: stretch;
+}
+
+@media (max-width: 500px) {
+  .balanceTopMulti, .balanceFooterMulti {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .balanceColDivider {
+    height: 1px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.subcategoriasSplit {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.subcategoriasCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.subcategoriasColDivider {
+  height: 1px;
+  width: 100%;
+  background: var(--border);
+}
+
+.subcategoriaMonedaTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-2);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (min-width: 768px) {
+  .subcategoriasSplit {
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 16px;
+  }
+  .subcategoriasColDivider {
+    width: 1px;
+    height: auto;
+    align-self: stretch;
+  }
+}
+
 

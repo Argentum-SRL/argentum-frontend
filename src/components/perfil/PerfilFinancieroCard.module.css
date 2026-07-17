@@ -256,3 +256,51 @@
   margin-top: 12px;
   color: var(--text-3);
 }
+
+.pfIndicatorHeaderMulti {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pfIndicatorMultiContent {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  width: 100%;
+}
+
+.pfIndicatorMultiCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pfIndicatorMultiDivider {
+  width: 1px;
+  background: var(--border);
+  align-self: stretch;
+}
+
+.pfIndicatorCurrencyLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+@media (max-width: 480px) {
+  .pfIndicatorMultiContent {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pfIndicatorMultiDivider {
+    height: 1px;
+    width: 100%;
+  }
+}
+

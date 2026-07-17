@@ -240,15 +240,30 @@ export interface TransaccionRecurrente {
 export interface DashboardResumen {
   periodo: { fecha_inicio: string; fecha_fin: string; primera_transaccion?: string }
   balance: {
-    ingresos: number
-    egresos: number
-    balance: number
-    variacion_vs_ciclo_anterior: number | null
+    ars: {
+      ingresos: number
+      egresos: number
+      balance: number
+      variacion_vs_ciclo_anterior: number | null
+    }
+    usd: {
+      ingresos: number
+      egresos: number
+      balance: number
+      variacion_vs_ciclo_anterior: number | null
+    }
   }
   disponible_real: {
-    total_billeteras: number
-    cuotas_comprometidas_proximo_ciclo: number
-    disponible: number
+    ars: {
+      saldo_billeteras: number
+      cuotas_proximo_ciclo: number
+      disponible: number
+    }
+    usd: {
+      saldo_billeteras: number
+      cuotas_proximo_ciclo: number
+      disponible: number
+    }
   }
   ultimos_movimientos: MovimientoDashboard[]
   proximos_pagos: PagoDashboard[]
@@ -303,6 +318,12 @@ export interface Proyeccion {
   ciclos_analizados: number
   pesos: { historial: number; ciclo_actual: number }
   advertencias: string[]
+  datos_suficientes: boolean
+}
+
+export interface ProyeccionesResponse {
+  ars: Proyeccion
+  usd: Proyeccion
 }
 
 export interface ProyeccionCategoria {
@@ -526,19 +547,26 @@ export interface DetalleTarjetaMes {
   tarjeta_id: string;
   tarjeta_nombre: string;
   total: number;
+  moneda: 'ARS' | 'USD';
 }
 
 export interface MesPresionFutura {
   anio: number;
   mes: number;
   mes_label: string;
-  total: number;
+  total: {
+    ars: number;
+    usd: number;
+  };
   tarjetas: DetalleTarjetaMes[];
 }
 
 export interface PresionFuturaData {
   meses: MesPresionFutura[];
-  total_comprometido: number;
+  total_comprometido: {
+    ars: number;
+    usd: number;
+  };
 }
 
 export interface GrupoCuotasResumen {
@@ -567,12 +595,16 @@ export interface GrupoCuotasResumen {
 export interface PerfilFinanciero {
   id: string;
   usuario_id: string;
-  tasa_ahorro: number | null;
-  score_impulsividad: number | null;
-  ratio_cuotas: number | null;
+  tasa_ahorro_ars: number | null;
+  tasa_ahorro_usd: number | null;
+  score_impulsividad_ars: number | null;
+  score_impulsividad_usd: number | null;
+  ratio_cuotas_ars: number | null;
+  ratio_cuotas_usd: number | null;
   cumplimiento_presupuesto: number | null;
   consistencia_registro: number | null;
-  porcentaje_suscripciones: number | null;
+  porcentaje_suscripciones_ars: number | null;
+  porcentaje_suscripciones_usd: number | null;
   ultima_actualizacion: string | null;
   fecha_creacion: string;
 }
@@ -586,24 +618,26 @@ export interface InterpretacionIndicador {
 
 export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
   interpretaciones: {
-    tasa_ahorro: InterpretacionIndicador;
-    score_impulsividad: InterpretacionIndicador;
-    ratio_cuotas: InterpretacionIndicador;
+    tasa_ahorro_ars: InterpretacionIndicador;
+    tasa_ahorro_usd: InterpretacionIndicador;
+    score_impulsividad_ars: InterpretacionIndicador;
+    score_impulsividad_usd: InterpretacionIndicador;
+    ratio_cuotas_ars: InterpretacionIndicador;
+    ratio_cuotas_usd: InterpretacionIndicador;
     cumplimiento_presupuesto: InterpretacionIndicador;
     consistencia_registro: InterpretacionIndicador;
-    porcentaje_suscripciones: InterpretacionIndicador;
+    porcentaje_suscripciones_ars: InterpretacionIndicador;
+    porcentaje_suscripciones_usd: InterpretacionIndicador;
   };
 }
 
 export interface SubcategoriaGasto {
   subcategoria_id: string
   subcategoria_nombre: string
-  gasto_actual_ciclo: number
+  gasto_actual_ciclo: {
+    ars: number
+    usd: number
+  }
 }
 
 export * from './importacion'
-
-
-
-
-

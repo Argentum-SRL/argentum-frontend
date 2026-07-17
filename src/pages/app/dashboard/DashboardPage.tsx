@@ -22,7 +22,7 @@ import { useModal } from '@/hooks/useModal'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, Proyeccion, ProyeccionCategoria, Usuario, Billetera, SubcategoriaGasto } from '@/types'
+import type { DashboardResumen, ProyeccionCategoria, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -204,10 +204,12 @@ const DEFAULT_COLOR = '#8A95A8'
 const CategoriasChart = memo(({ 
   data, 
   showPercent, 
+  moneda = 'ARS',
   onSelectCategory 
 }: { 
   data: ProyeccionCategoria[], 
   showPercent: boolean,
+  moneda?: 'ARS' | 'USD',
   onSelectCategory: (id: string, nombre: string) => void
 }) => {
   const chartData = useMemo(() => {
@@ -233,7 +235,8 @@ const CategoriasChart = memo(({
   const dynamicCSS = chartData.map((entry) => {
     const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
     const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
-    return `.bar-fill-${entry.categoria_id}{width:${fillPct.toFixed(2)}%;background:${color}}`
+    const classPrefix = moneda === 'ARS' ? 'bar-fill-ars' : 'bar-fill-usd'
+    return `.${classPrefix}-${entry.categoria_id}{width:${fillPct.toFixed(2)}%;background:${color}}`
   }).join('')
 
   return (
@@ -241,6 +244,7 @@ const CategoriasChart = memo(({
       <style>{dynamicCSS}</style>
       {chartData.map((entry) => {
         const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
+        const fillClass = moneda === 'ARS' ? `bar-fill-ars-${entry.categoria_id}` : `bar-fill-usd-${entry.categoria_id}`
 
         return (
           <div 
@@ -255,11 +259,11 @@ const CategoriasChart = memo(({
               <div className={styles.barHeader}>
                 <span className={styles.barName}>{entry.categoria_nombre}</span>
                 <span className={styles.barAmount}>
-                  {showPercent ? `${pct}%` : fmt(entry.gasto_actual_ciclo, 'ARS')}
+                  {showPercent ? `${pct}%` : fmt(entry.gasto_actual_ciclo, moneda)}
                 </span>
               </div>
               <div className={styles.barTrack}>
-                <div className={`${styles.barFill} bar-fill-${entry.categoria_id}`} />
+                <div className={`${styles.barFill} ${fillClass}`} />
               </div>
             </div>
           </div>
@@ -279,11 +283,20 @@ const SubcategoriasChart = memo(({
   showPercent: boolean,
   parentCategoryName: string
 }) => {
-  const chartData = useMemo(() => {
-    return data.filter(c => c.gasto_actual_ciclo > 0)
+  const chartDataArs = useMemo(() => {
+    return data.filter(c => c.gasto_actual_ciclo.ars > 0)
+      .sort((a, b) => b.gasto_actual_ciclo.ars - a.gasto_actual_ciclo.ars)
   }, [data])
 
-  if (!chartData || chartData.length === 0) {
+  const chartDataUsd = useMemo(() => {
+    return data.filter(c => c.gasto_actual_ciclo.usd > 0)
+      .sort((a, b) => b.gasto_actual_ciclo.usd - a.gasto_actual_ciclo.usd)
+  }, [data])
+
+  const hasArs = chartDataArs.length > 0
+  const hasUsd = chartDataUsd.length > 0
+
+  if (!hasArs && !hasUsd) {
     return (
       <EmptyState
         variant="compact"
@@ -293,44 +306,87 @@ const SubcategoriasChart = memo(({
     )
   }
 
-  const maxVal = chartData[0]?.gasto_actual_ciclo || 0
-  const total = chartData.reduce((acc, curr) => acc + curr.gasto_actual_ciclo, 0)
+  const maxValArs = chartDataArs[0]?.gasto_actual_ciclo.ars || 0
+  const totalArs = chartDataArs.reduce((acc, curr) => acc + curr.gasto_actual_ciclo.ars, 0)
+
+  const maxValUsd = chartDataUsd[0]?.gasto_actual_ciclo.usd || 0
+  const totalUsd = chartDataUsd.reduce((acc, curr) => acc + curr.gasto_actual_ciclo.usd, 0)
+
   const parentColor = COLORES_CATEGORIA[parentCategoryName] ?? DEFAULT_COLOR
 
-  const dynamicCSS = chartData.map((entry) => {
-    const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
-    return `.subbar-fill-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
+  const dynamicCSSArs = chartDataArs.map((entry) => {
+    const fillPct = maxValArs > 0 ? (entry.gasto_actual_ciclo.ars / maxValArs) * 100 : 0
+    return `.subbar-fill-ars-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
   }).join('')
+
+  const dynamicCSSUsd = chartDataUsd.map((entry) => {
+    const fillPct = maxValUsd > 0 ? (entry.gasto_actual_ciclo.usd / maxValUsd) * 100 : 0
+    return `.subbar-fill-usd-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
+  }).join('')
+
+  const renderList = (
+    chartData: typeof chartDataArs,
+    total: number,
+    moneda: 'ARS' | 'USD',
+    fillClassPrefix: string
+  ) => {
+    return (
+      <div className={styles.subcategoriaList}>
+        {chartData.map((entry) => {
+          const val = entry.gasto_actual_ciclo[moneda === 'ARS' ? 'ars' : 'usd']
+          const pct = total > 0 ? Math.round((val / total) * 100) : 0
+
+          return (
+            <div key={entry.subcategoria_id} className={styles.barItem}>
+              <div className={styles.barIconWrap}>
+                <SubcategoriaIcon 
+                  nombre={entry.subcategoria_nombre === 'Otros' ? null : entry.subcategoria_nombre} 
+                  parentCategory={parentCategoryName} 
+                  size={32} 
+                />
+              </div>
+              <div className={styles.barContent}>
+                <div className={styles.barHeader}>
+                  <span className={styles.barName}>{entry.subcategoria_nombre}</span>
+                  <span className={styles.barAmount}>
+                    {showPercent ? `${pct}%` : fmt(val, moneda)}
+                  </span>
+                </div>
+                <div className={styles.barTrack}>
+                  <div className={`${styles.barFill} ${fillClassPrefix}-${entry.subcategoria_id}`} />
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  if (hasArs && hasUsd) {
+    return (
+      <div className={styles.subcategoriasSplit}>
+        <style>{dynamicCSSArs + dynamicCSSUsd}</style>
+        <div className={styles.subcategoriasCol}>
+          <h4 className={styles.subcategoriaMonedaTitle}>Gastos ARS</h4>
+          {renderList(chartDataArs, totalArs, 'ARS', 'subbar-fill-ars')}
+        </div>
+        <div className={styles.subcategoriasColDivider} />
+        <div className={styles.subcategoriasCol}>
+          <h4 className={styles.subcategoriaMonedaTitle}>Gastos USD</h4>
+          {renderList(chartDataUsd, totalUsd, 'USD', 'subbar-fill-usd')}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.barChartWrap}>
-      <style>{dynamicCSS}</style>
-      {chartData.map((entry) => {
-        const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
-
-        return (
-          <div key={entry.subcategoria_id} className={styles.barItem}>
-            <div className={styles.barIconWrap}>
-              <SubcategoriaIcon 
-                nombre={entry.subcategoria_nombre === 'Otros' ? null : entry.subcategoria_nombre} 
-                parentCategory={parentCategoryName} 
-                size={32} 
-              />
-            </div>
-            <div className={styles.barContent}>
-              <div className={styles.barHeader}>
-                <span className={styles.barName}>{entry.subcategoria_nombre}</span>
-                <span className={styles.barAmount}>
-                  {showPercent ? `${pct}%` : fmt(entry.gasto_actual_ciclo, 'ARS')}
-                </span>
-              </div>
-              <div className={styles.barTrack}>
-                <div className={`${styles.barFill} subbar-fill-${entry.subcategoria_id}`} />
-              </div>
-            </div>
-          </div>
-        )
-      })}
+      <style>{hasArs ? dynamicCSSArs : dynamicCSSUsd}</style>
+      {hasArs 
+        ? renderList(chartDataArs, totalArs, 'ARS', 'subbar-fill-ars')
+        : renderList(chartDataUsd, totalUsd, 'USD', 'subbar-fill-usd')
+      }
     </div>
   )
 })
@@ -372,7 +428,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const customRange = null
-  const [proyeccion, setProyeccion] = useState<Proyeccion | null>(null)
+  const [proyeccion, setProyeccion] = useState<ProyeccionesResponse | null>(null)
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
   const [showChartPercent, setShowChartPercent] = useState(false)
   const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
@@ -400,9 +456,15 @@ export default function DashboardPage() {
     }
   }, [dropdownAbierto])
 
-  const totalSaldoBilleteras = useMemo(() => {
+  const totalSaldoBilleterasArs = useMemo(() => {
     return billeteras
-      .filter(b => b.estado === 'activa')
+      .filter(b => b.estado === 'activa' && b.moneda === 'ARS')
+      .reduce((acc, curr) => acc + curr.saldo_actual, 0)
+  }, [billeteras])
+
+  const totalSaldoBilleterasUsd = useMemo(() => {
+    return billeteras
+      .filter(b => b.estado === 'activa' && b.moneda === 'USD')
       .reduce((acc, curr) => acc + curr.saldo_actual, 0)
   }, [billeteras])
 
@@ -587,7 +649,7 @@ export default function DashboardPage() {
                     >
                       <span className={styles.dropdownItemName}>Todas las billeteras</span>
                       <span className={styles.dropdownItemBalance}>
-                        {fmt(totalSaldoBilleteras, usuario?.moneda_principal ?? 'ARS')}
+                        {fmt(totalSaldoBilleterasArs, 'ARS')} | {fmt(totalSaldoBilleterasUsd, 'USD')}
                       </span>
                     </button>
                     <div className={styles.dropdownDivider} />
@@ -613,47 +675,95 @@ export default function DashboardPage() {
                 <MobileGreeting usuario={usuario} />
                 <div className={styles.balanceMain}>
                   {/* Top section: Saldo Disponible */}
-                  <div className={styles.balanceTop}>
-                    <div className={styles.labelWithHint}>
-                      <span className={styles.saldoLabel}>Saldo disponible</span>
-                      <button
-                        className={styles.hint}
-                        onClick={() => open('balance_ciclo', {})}
-                        title="¿Qué es el balance del ciclo?"
-                        aria-label="Ver explicación del balance del ciclo"
-                      >
-                        <AlertCircle size={14} />
-                      </button>
+                  <div className={styles.balanceTopMulti}>
+                    <div className={styles.balanceCol}>
+                      <div className={styles.labelWithHint}>
+                        <span className={styles.saldoLabel}>Saldo disp. ARS</span>
+                        <button
+                          className={styles.hint}
+                          onClick={() => open('balance_ciclo', {})}
+                          title="¿Qué es el balance del ciclo?"
+                          aria-label="Ver explicación del balance del ciclo"
+                        >
+                          <AlertCircle size={14} />
+                        </button>
+                      </div>
+                      <h2 className={`${styles.saldoAmount} ${data.disponible_real.ars.disponible < 0 ? styles.saldoAmountNegative : ''}`}>
+                        {fmt(data.disponible_real.ars.disponible, 'ARS')}
+                      </h2>
                     </div>
-                    <h2 className={`${styles.saldoAmount} ${data.disponible_real.disponible < 0 ? styles.saldoAmountNegative : ''}`}>
-                      {fmt(data.disponible_real.disponible, 'ARS')}
-                    </h2>
+
+                    <div className={styles.balanceColDivider} />
+
+                    <div className={styles.balanceCol}>
+                      <div className={styles.labelWithHint}>
+                        <span className={styles.saldoLabel}>Saldo disp. USD</span>
+                        <button
+                          className={styles.hint}
+                          onClick={() => open('balance_ciclo', {})}
+                          title="¿Qué es el balance del ciclo?"
+                          aria-label="Ver explicación del balance del ciclo"
+                        >
+                          <AlertCircle size={14} />
+                        </button>
+                      </div>
+                      <h2 className={`${styles.saldoAmount} ${data.disponible_real.usd.disponible < 0 ? styles.saldoAmountNegative : ''}`}>
+                        {fmt(data.disponible_real.usd.disponible, 'USD')}
+                      </h2>
+                    </div>
                   </div>
 
                   {/* Separador */}
                   <div className={styles.progressDivider} />
 
                   {/* Sección de barra de progreso */}
-                  <div className={styles.balanceFooter}>
-                    {(data.balance.ingresos > 0 || data.balance.egresos > 0) && (
-                      <div className={styles.balanceTrends}>
-                        <div className={styles.balanceTrendItem}>
-                          <TrendingUp size={15} className={styles.trendUp} />
-                          <span className={styles.trendAmount}>{fmt(data.balance.ingresos, 'ARS')}</span>
+                  <div className={styles.balanceFooterMulti}>
+                    <div className={styles.balanceCol}>
+                      {(data.balance.ars.ingresos > 0 || data.balance.ars.egresos > 0) && (
+                        <div className={styles.balanceTrends}>
+                          <div className={styles.balanceTrendItem}>
+                            <TrendingUp size={15} className={styles.trendUp} />
+                            <span className={styles.trendAmount}>{fmt(data.balance.ars.ingresos, 'ARS')}</span>
+                          </div>
+                          <div className={styles.balanceTrendItem}>
+                            <TrendingDown size={15} className={styles.trendDown} />
+                            <span className={styles.trendAmount}>{fmt(data.balance.ars.egresos, 'ARS')}</span>
+                          </div>
                         </div>
-                        <div className={styles.balanceTrendItem}>
-                          <TrendingDown size={15} className={styles.trendDown} />
-                          <span className={styles.trendAmount}>{fmt(data.balance.egresos, 'ARS')}</span>
-                        </div>
+                      )}
+                      <div className={styles.balanceFooterDivider} />
+                      <div className={styles.disponibleReal}>
+                        <span className={styles.disponibleRealLabel}>DISPONIBLE REAL ARS</span>
+                        <span className={`${styles.disponibleRealAmount} ${data.disponible_real.ars.disponible < 0 ? styles.disponibleRealNegative : ''}`}>
+                          {fmt(data.disponible_real.ars.disponible, 'ARS')}
+                        </span>
+                        <span className={styles.disponibleRealSub}>en billeteras</span>
                       </div>
-                    )}
-                    <div className={styles.balanceFooterDivider} />
-                    <div className={styles.disponibleReal}>
-                      <span className={styles.disponibleRealLabel}>DISPONIBLE REAL</span>
-                      <span className={`${styles.disponibleRealAmount} ${data.disponible_real.disponible < 0 ? styles.disponibleRealNegative : ''}`}>
-                        {fmt(data.disponible_real.disponible, 'ARS')}
-                      </span>
-                      <span className={styles.disponibleRealSub}>en billeteras</span>
+                    </div>
+
+                    <div className={styles.balanceColDivider} />
+
+                    <div className={styles.balanceCol}>
+                      {(data.balance.usd.ingresos > 0 || data.balance.usd.egresos > 0) && (
+                        <div className={styles.balanceTrends}>
+                          <div className={styles.balanceTrendItem}>
+                            <TrendingUp size={15} className={styles.trendUp} />
+                            <span className={styles.trendAmount}>{fmt(data.balance.usd.ingresos, 'USD')}</span>
+                          </div>
+                          <div className={styles.balanceTrendItem}>
+                            <TrendingDown size={15} className={styles.trendDown} />
+                            <span className={styles.trendAmount}>{fmt(data.balance.usd.egresos, 'USD')}</span>
+                          </div>
+                        </div>
+                      )}
+                      <div className={styles.balanceFooterDivider} />
+                      <div className={styles.disponibleReal}>
+                        <span className={styles.disponibleRealLabel}>DISPONIBLE REAL USD</span>
+                        <span className={`${styles.disponibleRealAmount} ${data.disponible_real.usd.disponible < 0 ? styles.disponibleRealNegative : ''}`}>
+                          {fmt(data.disponible_real.usd.disponible, 'USD')}
+                        </span>
+                        <span className={styles.disponibleRealSub}>en billeteras</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -712,13 +822,58 @@ export default function DashboardPage() {
               loadingProyeccion ? (
                 <ListSkeleton />
               ) : (
-                proyeccion && (
-                  <CategoriasChart 
-                    data={proyeccion.desglose_por_categoria} 
-                    showPercent={showChartPercent} 
-                    onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
-                  />
-                )
+                proyeccion && (() => {
+                  const hasArs = proyeccion.ars && proyeccion.ars.datos_suficientes
+                  const hasUsd = proyeccion.usd && proyeccion.usd.datos_suficientes
+
+                  if (!hasArs && !hasUsd) {
+                    return (
+                      <EmptyState
+                        variant="compact"
+                        icon={PieChartIcon}
+                        title="Sin proyección por ahora"
+                        description="Necesitamos más historial para proyectar tu ciclo"
+                      />
+                    )
+                  }
+
+                  if (hasArs && hasUsd) {
+                    return (
+                      <div className={styles.subcategoriasSplit}>
+                        <div className={styles.subcategoriasCol}>
+                          <h4 className={styles.subcategoriaMonedaTitle}>Gastos Proyectados ARS</h4>
+                          <CategoriasChart 
+                            data={proyeccion.ars.desglose_por_categoria} 
+                            showPercent={showChartPercent} 
+                            moneda="ARS"
+                            onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
+                          />
+                        </div>
+                        <div className={styles.subcategoriasColDivider} />
+                        <div className={styles.subcategoriasCol}>
+                          <h4 className={styles.subcategoriaMonedaTitle}>Gastos Proyectados USD</h4>
+                          <CategoriasChart 
+                            data={proyeccion.usd.desglose_por_categoria} 
+                            showPercent={showChartPercent} 
+                            moneda="USD"
+                            onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
+                          />
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  const activeProj = hasArs ? proyeccion.ars : proyeccion.usd
+                  const activeMoneda = hasArs ? 'ARS' : 'USD'
+                  return (
+                    <CategoriasChart 
+                      data={activeProj.desglose_por_categoria} 
+                      showPercent={showChartPercent} 
+                      moneda={activeMoneda as 'ARS' | 'USD'}
+                      onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
+                    />
+                  )
+                })()
               )
             )}
           </div>

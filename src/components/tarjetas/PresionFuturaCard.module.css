@@ -221,3 +221,18 @@
   50% { opacity: 1; }
   100% { opacity: 0.5; }
 }
+
+.summaryContainerMulti {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .summaryContainerMulti {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+

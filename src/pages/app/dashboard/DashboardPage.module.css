@@ -365,22 +365,21 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
-  height: 100%;
+  /* Reserve space at bottom for the absolute-positioned controls */
+  padding-bottom: 56px;
 }
 
 .balanceMain {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  gap: 16px;
+  gap: 20px;
   animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
 
 .balanceTop {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .balanceLabel {
@@ -446,7 +445,7 @@
 
 .dropdownPanel {
   position: absolute;
-  top: calc(100% + 8px);
+  bottom: calc(100% + 8px);
   right: 0;
   min-width: 240px;
   background: #1a2f5a;
@@ -522,6 +521,59 @@
 .dropdownDivider {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin: 4px 0;
+}
+
+/* ── Balance Controls (currency toggle + wallet dropdown) ──────────── */
+
+.balanceControls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currencyToggleGroup {
+  display: flex;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.currencyToggleBtn {
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 4px 13px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  letter-spacing: 0.03em;
+}
+
+.currencyToggleBtn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.currencyToggleBtnActive {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 767px) {
+  .balanceControls {
+    bottom: 24px;
+    right: 24px;
+    flex-direction: row;
+  }
 }
 
 .saldoLabel {
@@ -1289,12 +1341,12 @@
 }
 
 .disponibleRealAmount {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.90);
+  color: rgba(255, 255, 255, 0.85);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.5px;
-  line-height: 1.1;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
   margin: 0;
 }
 

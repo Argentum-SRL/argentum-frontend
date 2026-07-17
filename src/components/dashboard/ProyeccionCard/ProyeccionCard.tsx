@@ -139,9 +139,10 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
 interface ProyeccionCardProps {
   data?: ProyeccionesResponse | null;
   loading?: boolean;
+  moneda?: 'ARS' | 'USD';
 }
 
-const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: externalLoading }) => {
+const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: externalLoading, moneda }) => {
   const [internalProyeccion, setInternalProyeccion] = useState<ProyeccionesResponse | null>(null)
   const [internalLoading, setInternalLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -198,7 +199,10 @@ const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: external
   const hasArs = proyeccion.ars && proyeccion.ars.datos_suficientes
   const hasUsd = proyeccion.usd && proyeccion.usd.datos_suficientes
 
-  if (!hasArs && !hasUsd) {
+  const showArs = (!moneda || moneda === 'ARS') && hasArs
+  const showUsd = (!moneda || moneda === 'USD') && hasUsd
+
+  if (!showArs && !showUsd) {
     return (
       <div className={styles.card}>
         <div className={styles.emptyStateContainer}>
@@ -211,8 +215,8 @@ const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: external
 
   return (
     <div className={styles.proyeccionesContainer}>
-      {hasArs && <SingleProyeccionCard proyeccion={proyeccion.ars} moneda="ARS" />}
-      {hasUsd && <SingleProyeccionCard proyeccion={proyeccion.usd} moneda="USD" />}
+      {showArs && <SingleProyeccionCard proyeccion={proyeccion.ars} moneda="ARS" />}
+      {showUsd && <SingleProyeccionCard proyeccion={proyeccion.usd} moneda="USD" />}
     </div>
   )
 }

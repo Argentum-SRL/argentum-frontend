@@ -277,26 +277,25 @@ CategoriasChart.displayName = 'CategoriasChart'
 const SubcategoriasChart = memo(({ 
   data, 
   showPercent, 
-  parentCategoryName 
+  parentCategoryName,
+  moneda = 'ARS'
 }: { 
   data: SubcategoriaGasto[], 
   showPercent: boolean,
-  parentCategoryName: string
+  parentCategoryName: string,
+  moneda?: 'ARS' | 'USD'
 }) => {
-  const chartDataArs = useMemo(() => {
-    return data.filter(c => c.gasto_actual_ciclo.ars > 0)
-      .sort((a, b) => b.gasto_actual_ciclo.ars - a.gasto_actual_ciclo.ars)
-  }, [data])
+  const chartData = useMemo(() => {
+    return data
+      .filter(c => moneda === 'ARS' ? c.gasto_actual_ciclo.ars > 0 : c.gasto_actual_ciclo.usd > 0)
+      .sort((a, b) => {
+        const aVal = moneda === 'ARS' ? a.gasto_actual_ciclo.ars : a.gasto_actual_ciclo.usd
+        const bVal = moneda === 'ARS' ? b.gasto_actual_ciclo.ars : b.gasto_actual_ciclo.usd
+        return bVal - aVal
+      })
+  }, [data, moneda])
 
-  const chartDataUsd = useMemo(() => {
-    return data.filter(c => c.gasto_actual_ciclo.usd > 0)
-      .sort((a, b) => b.gasto_actual_ciclo.usd - a.gasto_actual_ciclo.usd)
-  }, [data])
-
-  const hasArs = chartDataArs.length > 0
-  const hasUsd = chartDataUsd.length > 0
-
-  if (!hasArs && !hasUsd) {
+  if (chartData.length === 0) {
     return (
       <EmptyState
         variant="compact"
@@ -306,87 +305,48 @@ const SubcategoriasChart = memo(({
     )
   }
 
-  const maxValArs = chartDataArs[0]?.gasto_actual_ciclo.ars || 0
-  const totalArs = chartDataArs.reduce((acc, curr) => acc + curr.gasto_actual_ciclo.ars, 0)
-
-  const maxValUsd = chartDataUsd[0]?.gasto_actual_ciclo.usd || 0
-  const totalUsd = chartDataUsd.reduce((acc, curr) => acc + curr.gasto_actual_ciclo.usd, 0)
-
+  const getVal = (entry: SubcategoriaGasto) => moneda === 'ARS' ? entry.gasto_actual_ciclo.ars : entry.gasto_actual_ciclo.usd
+  const maxVal = getVal(chartData[0]) || 0
+  const total = chartData.reduce((acc, curr) => acc + getVal(curr), 0)
   const parentColor = COLORES_CATEGORIA[parentCategoryName] ?? DEFAULT_COLOR
+  const fillPrefix = moneda === 'ARS' ? 'subbar-fill-ars' : 'subbar-fill-usd'
 
-  const dynamicCSSArs = chartDataArs.map((entry) => {
-    const fillPct = maxValArs > 0 ? (entry.gasto_actual_ciclo.ars / maxValArs) * 100 : 0
-    return `.subbar-fill-ars-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
+  const dynamicCSS = chartData.map((entry) => {
+    const val = getVal(entry)
+    const fillPct = maxVal > 0 ? (val / maxVal) * 100 : 0
+    return `.${fillPrefix}-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
   }).join('')
-
-  const dynamicCSSUsd = chartDataUsd.map((entry) => {
-    const fillPct = maxValUsd > 0 ? (entry.gasto_actual_ciclo.usd / maxValUsd) * 100 : 0
-    return `.subbar-fill-usd-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
-  }).join('')
-
-  const renderList = (
-    chartData: typeof chartDataArs,
-    total: number,
-    moneda: 'ARS' | 'USD',
-    fillClassPrefix: string
-  ) => {
-    return (
-      <div className={styles.subcategoriaList}>
-        {chartData.map((entry) => {
-          const val = entry.gasto_actual_ciclo[moneda === 'ARS' ? 'ars' : 'usd']
-          const pct = total > 0 ? Math.round((val / total) * 100) : 0
-
-          return (
-            <div key={entry.subcategoria_id} className={styles.barItem}>
-              <div className={styles.barIconWrap}>
-                <SubcategoriaIcon 
-                  nombre={entry.subcategoria_nombre === 'Otros' ? null : entry.subcategoria_nombre} 
-                  parentCategory={parentCategoryName} 
-                  size={32} 
-                />
-              </div>
-              <div className={styles.barContent}>
-                <div className={styles.barHeader}>
-                  <span className={styles.barName}>{entry.subcategoria_nombre}</span>
-                  <span className={styles.barAmount}>
-                    {showPercent ? `${pct}%` : fmt(val, moneda)}
-                  </span>
-                </div>
-                <div className={styles.barTrack}>
-                  <div className={`${styles.barFill} ${fillClassPrefix}-${entry.subcategoria_id}`} />
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
-
-  if (hasArs && hasUsd) {
-    return (
-      <div className={styles.subcategoriasSplit}>
-        <style>{dynamicCSSArs + dynamicCSSUsd}</style>
-        <div className={styles.subcategoriasCol}>
-          <h4 className={styles.subcategoriaMonedaTitle}>Gastos ARS</h4>
-          {renderList(chartDataArs, totalArs, 'ARS', 'subbar-fill-ars')}
-        </div>
-        <div className={styles.subcategoriasColDivider} />
-        <div className={styles.subcategoriasCol}>
-          <h4 className={styles.subcategoriaMonedaTitle}>Gastos USD</h4>
-          {renderList(chartDataUsd, totalUsd, 'USD', 'subbar-fill-usd')}
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className={styles.barChartWrap}>
-      <style>{hasArs ? dynamicCSSArs : dynamicCSSUsd}</style>
-      {hasArs 
-        ? renderList(chartDataArs, totalArs, 'ARS', 'subbar-fill-ars')
-        : renderList(chartDataUsd, totalUsd, 'USD', 'subbar-fill-usd')
-      }
+      <style>{dynamicCSS}</style>
+      {chartData.map((entry) => {
+        const val = getVal(entry)
+        const pct = total > 0 ? Math.round((val / total) * 100) : 0
+
+        return (
+          <div key={entry.subcategoria_id} className={styles.barItem}>
+            <div className={styles.barIconWrap}>
+              <SubcategoriaIcon 
+                nombre={entry.subcategoria_nombre === 'Otros' ? null : entry.subcategoria_nombre} 
+                parentCategory={parentCategoryName} 
+                size={32} 
+              />
+            </div>
+            <div className={styles.barContent}>
+              <div className={styles.barHeader}>
+                <span className={styles.barName}>{entry.subcategoria_nombre}</span>
+                <span className={styles.barAmount}>
+                  {showPercent ? `${pct}%` : fmt(val, moneda)}
+                </span>
+              </div>
+              <div className={styles.barTrack}>
+                <div className={`${styles.barFill} ${fillPrefix}-${entry.subcategoria_id}`} />
+              </div>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 })
@@ -424,6 +384,9 @@ export default function DashboardPage() {
   const [billeterasSeleccionadas, setBilleterasSeleccionadas] = useState<string[]>(() => {
     const saved = localStorage.getItem('argentum_dashboard_billeteras')
     return saved ? JSON.parse(saved) : []
+  })
+  const [moneda, setMoneda] = useState<'ARS' | 'USD'>(() => {
+    return (localStorage.getItem('argentum_dashboard_moneda') as 'ARS' | 'USD') || 'ARS'
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -510,6 +473,14 @@ export default function DashboardPage() {
     setBilleterasSeleccionadas(next)
     localStorage.setItem('argentum_dashboard_billeteras', JSON.stringify(next))
   }, [billeterasSeleccionadas])
+
+  const handleToggleMoneda = useCallback((m: 'ARS' | 'USD') => {
+    setMoneda(m)
+    localStorage.setItem('argentum_dashboard_moneda', m)
+    // Reset category drill-down when switching currency
+    setSelectedCategoria(null)
+    setSubcategoriasData([])
+  }, [])
 
   const fetchProyeccion = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -628,8 +599,27 @@ export default function DashboardPage() {
                 </svg>
               </div>
 
-              {/* Selector de billeteras dropdown flotante */}
-              <div className={styles.dropdownContainer} ref={dropdownRef}>
+              {/* Controls: currency toggle + wallet dropdown */}
+              <div className={styles.balanceControls} ref={dropdownRef}>
+                {/* Currency toggle */}
+                <div className={styles.currencyToggleGroup}>
+                  <button
+                    className={`${styles.currencyToggleBtn} ${moneda === 'ARS' ? styles.currencyToggleBtnActive : ''}`}
+                    onClick={() => handleToggleMoneda('ARS')}
+                    aria-pressed={moneda === 'ARS'}
+                  >
+                    ARS
+                  </button>
+                  <button
+                    className={`${styles.currencyToggleBtn} ${moneda === 'USD' ? styles.currencyToggleBtnActive : ''}`}
+                    onClick={() => handleToggleMoneda('USD')}
+                    aria-pressed={moneda === 'USD'}
+                  >
+                    USD
+                  </button>
+                </div>
+
+                {/* Wallet dropdown */}
                 <button
                   className={`${styles.dropdownTrigger} ${dropdownAbierto ? styles.dropdownTriggerActive : ''}`}
                   onClick={() => setDropdownAbierto(!dropdownAbierto)}
@@ -643,23 +633,19 @@ export default function DashboardPage() {
                     <div className={styles.dropdownHeader}>BILLETERAS</div>
                     <button
                       className={`${styles.dropdownItem} ${billeterasSeleccionadas.length === 0 ? styles.dropdownItemActive : ''}`}
-                      onClick={() => {
-                        handleToggleBilletera(null)
-                      }}
+                      onClick={() => handleToggleBilletera(null)}
                     >
                       <span className={styles.dropdownItemName}>Todas las billeteras</span>
                       <span className={styles.dropdownItemBalance}>
-                        {fmt(totalSaldoBilleterasArs, 'ARS')} | {fmt(totalSaldoBilleterasUsd, 'USD')}
+                        {fmt(moneda === 'ARS' ? totalSaldoBilleterasArs : totalSaldoBilleterasUsd, moneda)}
                       </span>
                     </button>
                     <div className={styles.dropdownDivider} />
-                    {billeteras.filter(b => b.estado === 'activa').map(b => (
+                    {billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda).map(b => (
                       <button
                         key={b.id}
                         className={`${styles.dropdownItem} ${billeterasSeleccionadas.includes(b.id) ? styles.dropdownItemActive : ''}`}
-                        onClick={() => {
-                          handleToggleBilletera(b.id)
-                        }}
+                        onClick={() => handleToggleBilletera(b.id)}
                       >
                         <span className={styles.dropdownItemName}>{b.nombre}</span>
                         <span className={styles.dropdownItemBalance}>
@@ -674,98 +660,56 @@ export default function DashboardPage() {
               <div className={styles.balanceContent}>
                 <MobileGreeting usuario={usuario} />
                 <div className={styles.balanceMain}>
-                  {/* Top section: Saldo Disponible */}
-                  <div className={styles.balanceTopMulti}>
-                    <div className={styles.balanceCol}>
-                      <div className={styles.labelWithHint}>
-                        <span className={styles.saldoLabel}>Saldo disp. ARS</span>
-                        <button
-                          className={styles.hint}
-                          onClick={() => open('balance_ciclo', {})}
-                          title="¿Qué es el balance del ciclo?"
-                          aria-label="Ver explicación del balance del ciclo"
-                        >
-                          <AlertCircle size={14} />
-                        </button>
-                      </div>
-                      <h2 className={`${styles.saldoAmount} ${data.disponible_real.ars.disponible < 0 ? styles.saldoAmountNegative : ''}`}>
-                        {fmt(data.disponible_real.ars.disponible, 'ARS')}
-                      </h2>
+                  {/* Saldo Disponible — moneda activa */}
+                  <div className={styles.balanceTop}>
+                    <div className={styles.labelWithHint}>
+                      <span className={styles.saldoLabel}>Saldo disponible</span>
+                      <button
+                        className={styles.hint}
+                        onClick={() => open('balance_ciclo', {})}
+                        title="¿Qué es el balance del ciclo?"
+                        aria-label="Ver explicación del balance del ciclo"
+                      >
+                        <AlertCircle size={14} />
+                      </button>
                     </div>
-
-                    <div className={styles.balanceColDivider} />
-
-                    <div className={styles.balanceCol}>
-                      <div className={styles.labelWithHint}>
-                        <span className={styles.saldoLabel}>Saldo disp. USD</span>
-                        <button
-                          className={styles.hint}
-                          onClick={() => open('balance_ciclo', {})}
-                          title="¿Qué es el balance del ciclo?"
-                          aria-label="Ver explicación del balance del ciclo"
-                        >
-                          <AlertCircle size={14} />
-                        </button>
-                      </div>
-                      <h2 className={`${styles.saldoAmount} ${data.disponible_real.usd.disponible < 0 ? styles.saldoAmountNegative : ''}`}>
-                        {fmt(data.disponible_real.usd.disponible, 'USD')}
-                      </h2>
-                    </div>
+                    <h2 className={`${styles.saldoAmount} ${
+                      (moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible) < 0
+                        ? styles.saldoAmountNegative : ''
+                    }`}>
+                      {fmt(
+                        moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible,
+                        moneda
+                      )}
+                    </h2>
+                    <span className={styles.disponibleRealSub}>en billeteras</span>
                   </div>
 
-                  {/* Separador */}
-                  <div className={styles.progressDivider} />
-
-                  {/* Sección de barra de progreso */}
-                  <div className={styles.balanceFooterMulti}>
-                    <div className={styles.balanceCol}>
-                      {(data.balance.ars.ingresos > 0 || data.balance.ars.egresos > 0) && (
-                        <div className={styles.balanceTrends}>
-                          <div className={styles.balanceTrendItem}>
-                            <TrendingUp size={15} className={styles.trendUp} />
-                            <span className={styles.trendAmount}>{fmt(data.balance.ars.ingresos, 'ARS')}</span>
-                          </div>
-                          <div className={styles.balanceTrendItem}>
-                            <TrendingDown size={15} className={styles.trendDown} />
-                            <span className={styles.trendAmount}>{fmt(data.balance.ars.egresos, 'ARS')}</span>
-                          </div>
-                        </div>
-                      )}
-                      <div className={styles.balanceFooterDivider} />
-                      <div className={styles.disponibleReal}>
-                        <span className={styles.disponibleRealLabel}>DISPONIBLE REAL ARS</span>
-                        <span className={`${styles.disponibleRealAmount} ${data.disponible_real.ars.disponible < 0 ? styles.disponibleRealNegative : ''}`}>
-                          {fmt(data.disponible_real.ars.disponible, 'ARS')}
-                        </span>
-                        <span className={styles.disponibleRealSub}>en billeteras</span>
+                  {/* Trends */}
+                  {moneda === 'ARS' && (data.balance.ars.ingresos > 0 || data.balance.ars.egresos > 0) && (
+                    <div className={styles.balanceTrends}>
+                      <div className={styles.balanceTrendItem}>
+                        <TrendingUp size={15} className={styles.trendUp} />
+                        <span className={styles.trendAmount}>{fmt(data.balance.ars.ingresos, 'ARS')}</span>
+                      </div>
+                      <div className={styles.balanceTrendItem}>
+                        <TrendingDown size={15} className={styles.trendDown} />
+                        <span className={styles.trendAmount}>{fmt(data.balance.ars.egresos, 'ARS')}</span>
                       </div>
                     </div>
-
-                    <div className={styles.balanceColDivider} />
-
-                    <div className={styles.balanceCol}>
-                      {(data.balance.usd.ingresos > 0 || data.balance.usd.egresos > 0) && (
-                        <div className={styles.balanceTrends}>
-                          <div className={styles.balanceTrendItem}>
-                            <TrendingUp size={15} className={styles.trendUp} />
-                            <span className={styles.trendAmount}>{fmt(data.balance.usd.ingresos, 'USD')}</span>
-                          </div>
-                          <div className={styles.balanceTrendItem}>
-                            <TrendingDown size={15} className={styles.trendDown} />
-                            <span className={styles.trendAmount}>{fmt(data.balance.usd.egresos, 'USD')}</span>
-                          </div>
-                        </div>
-                      )}
-                      <div className={styles.balanceFooterDivider} />
-                      <div className={styles.disponibleReal}>
-                        <span className={styles.disponibleRealLabel}>DISPONIBLE REAL USD</span>
-                        <span className={`${styles.disponibleRealAmount} ${data.disponible_real.usd.disponible < 0 ? styles.disponibleRealNegative : ''}`}>
-                          {fmt(data.disponible_real.usd.disponible, 'USD')}
-                        </span>
-                        <span className={styles.disponibleRealSub}>en billeteras</span>
+                  )}
+                  {moneda === 'USD' && (data.balance.usd.ingresos > 0 || data.balance.usd.egresos > 0) && (
+                    <div className={styles.balanceTrends}>
+                      <div className={styles.balanceTrendItem}>
+                        <TrendingUp size={15} className={styles.trendUp} />
+                        <span className={styles.trendAmount}>{fmt(data.balance.usd.ingresos, 'USD')}</span>
+                      </div>
+                      <div className={styles.balanceTrendItem}>
+                        <TrendingDown size={15} className={styles.trendDown} />
+                        <span className={styles.trendAmount}>{fmt(data.balance.usd.egresos, 'USD')}</span>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -816,6 +760,7 @@ export default function DashboardPage() {
                   data={subcategoriasData} 
                   showPercent={showChartPercent} 
                   parentCategoryName={selectedCategoria.nombre}
+                  moneda={moneda}
                 />
               )
             ) : (
@@ -823,10 +768,10 @@ export default function DashboardPage() {
                 <ListSkeleton />
               ) : (
                 proyeccion && (() => {
-                  const hasArs = proyeccion.ars && proyeccion.ars.datos_suficientes
-                  const hasUsd = proyeccion.usd && proyeccion.usd.datos_suficientes
+                  const activeProj = moneda === 'ARS' ? proyeccion.ars : proyeccion.usd
+                  const hasDatos = activeProj && activeProj.datos_suficientes
 
-                  if (!hasArs && !hasUsd) {
+                  if (!hasDatos) {
                     return (
                       <EmptyState
                         variant="compact"
@@ -837,39 +782,11 @@ export default function DashboardPage() {
                     )
                   }
 
-                  if (hasArs && hasUsd) {
-                    return (
-                      <div className={styles.subcategoriasSplit}>
-                        <div className={styles.subcategoriasCol}>
-                          <h4 className={styles.subcategoriaMonedaTitle}>Gastos Proyectados ARS</h4>
-                          <CategoriasChart 
-                            data={proyeccion.ars.desglose_por_categoria} 
-                            showPercent={showChartPercent} 
-                            moneda="ARS"
-                            onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
-                          />
-                        </div>
-                        <div className={styles.subcategoriasColDivider} />
-                        <div className={styles.subcategoriasCol}>
-                          <h4 className={styles.subcategoriaMonedaTitle}>Gastos Proyectados USD</h4>
-                          <CategoriasChart 
-                            data={proyeccion.usd.desglose_por_categoria} 
-                            showPercent={showChartPercent} 
-                            moneda="USD"
-                            onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
-                          />
-                        </div>
-                      </div>
-                    )
-                  }
-
-                  const activeProj = hasArs ? proyeccion.ars : proyeccion.usd
-                  const activeMoneda = hasArs ? 'ARS' : 'USD'
                   return (
-                    <CategoriasChart 
-                      data={activeProj.desglose_por_categoria} 
-                      showPercent={showChartPercent} 
-                      moneda={activeMoneda as 'ARS' | 'USD'}
+                    <CategoriasChart
+                      data={activeProj.desglose_por_categoria}
+                      showPercent={showChartPercent}
+                      moneda={moneda}
                       onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
                     />
                   )
@@ -887,64 +804,70 @@ export default function DashboardPage() {
           <div className={styles.cardContent}>
             {loading ? (
               <ListSkeleton />
-            ) : data?.proximos_pagos.length === 0 ? (
-              <EmptyState
-                variant="compact"
-                icon={Calendar}
-                title="Sin pagos próximos"
-              />
-            ) : (
-              <div className={styles.list}>
-                {data?.proximos_pagos.slice(0, 4).map((p) => {
-                  const isUrgente = p.dias_restantes <= 1
-                  let fechaTxt = formatFecha(p.fecha_cobro)
-                  if (p.dias_restantes === 0) fechaTxt = 'Hoy'
-                  else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
-                  else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} days`
+            ) : (() => {
+              const pagosFiltrados = (data?.proximos_pagos ?? []).filter(p => p.moneda === moneda)
+              if (pagosFiltrados.length === 0) {
+                return (
+                  <EmptyState
+                    variant="compact"
+                    icon={Calendar}
+                    title={`Sin pagos próximos en ${moneda}`}
+                  />
+                )
+              }
+              return (
+                <div className={styles.list}>
+                  {pagosFiltrados.slice(0, 4).map((p) => {
+                    const isUrgente = p.dias_restantes <= 1
+                    let fechaTxt = formatFecha(p.fecha_cobro)
+                    if (p.dias_restantes === 0) fechaTxt = 'Hoy'
+                    else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
+                    else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
 
-                  const handlePagoClick = () => {
-                    if (p.tipo === 'suscripcion') {
-                      navigate('/app/suscripciones')
-                    } else if (p.tipo === 'resumen_tarjeta') {
-                      navigate(p.billetera_id ? `/app/billeteras/${p.billetera_id}` : '/app/billeteras')
-                    } else if (p.tipo === 'cuota') {
-                      navigate('/app/transacciones')
+                    const handlePagoClick = () => {
+                      if (p.tipo === 'suscripcion') {
+                        navigate('/app/suscripciones')
+                      } else if (p.tipo === 'resumen_tarjeta') {
+                        navigate(p.billetera_id ? `/app/billeteras/${p.billetera_id}` : '/app/billeteras')
+                      } else if (p.tipo === 'cuota') {
+                        navigate('/app/transacciones')
+                      }
                     }
-                  }
 
-                  return (
-                    <div 
-                      key={p.id} 
-                      className={`${styles.listItem} ${styles.listItemClickable}`}
-                      onClick={handlePagoClick}
-                    >
-                      <AppleCalendarIcon dateStr={p.fecha_cobro} />
-                      <div className={styles.itemMeta}>
-                        <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
-                        <p className={styles.itemSub}>{fechaTxt}</p>
+                    return (
+                      <div
+                        key={p.id}
+                        className={`${styles.listItem} ${styles.listItemClickable}`}
+                        onClick={handlePagoClick}
+                      >
+                        <AppleCalendarIcon dateStr={p.fecha_cobro} />
+                        <div className={styles.itemMeta}>
+                          <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
+                          <p className={styles.itemSub}>{fechaTxt}</p>
+                        </div>
+                        <div className={styles.pagoRight}>
+                          <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
+                          {isUrgente && <span className={styles.urgentBadge}>Urgente</span>}
+                        </div>
                       </div>
-                      <div className={styles.pagoRight}>
-                        <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
-                        {isUrgente && <span className={styles.urgentBadge}>Urgente</span>}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+                    )
+                  })}
+                </div>
+              )
+            })()}
           </div>
         </div>
       </div>
 
       {/* Perfil Financiero */}
-      <PerfilFinancieroCard />
+      <PerfilFinancieroCard moneda={moneda} />
 
       {/* ── Bottom Row (2 Cols) ───────────────────────────────────────────── */}
       <div className={styles.bottomRow}>
         {/* Col 1: Proyección */}
         {!customRange && (
           <div className={styles.proyeccionSection}>
-            <ProyeccionCard data={proyeccion} loading={loadingProyeccion} />
+            <ProyeccionCard data={proyeccion} loading={loadingProyeccion} moneda={moneda} />
           </div>
         )}
 
@@ -959,38 +882,44 @@ export default function DashboardPage() {
           <div className={styles.cardContent}>
             {loading ? (
               <ListSkeleton />
-            ) : data?.ultimos_movimientos.length === 0 ? (
-              <EmptyState
-                variant="compact"
-                icon={ArrowUpDown}
-                title="Todavía no registraste ningún movimiento."
-              />
-            ) : (
-              <div className={styles.list}>
-                {data?.ultimos_movimientos.map((m) => (
-                  <div key={m.id} className={styles.listItem}>
-                    <div className={styles.itemIcon}>
-                      <SubcategoriaIcon 
-                        nombre={m.subcategoria_nombre} 
-                        parentCategory={m.categoria_nombre} 
-                        size={32} 
-                      />
+            ) : (() => {
+              const movsFiltrados = (data?.ultimos_movimientos ?? []).filter(m => m.moneda === moneda)
+              if (movsFiltrados.length === 0) {
+                return (
+                  <EmptyState
+                    variant="compact"
+                    icon={ArrowUpDown}
+                    title={`Sin movimientos en ${moneda}.`}
+                  />
+                )
+              }
+              return (
+                <div className={styles.list}>
+                  {movsFiltrados.map((m) => (
+                    <div key={m.id} className={styles.listItem}>
+                      <div className={styles.itemIcon}>
+                        <SubcategoriaIcon
+                          nombre={m.subcategoria_nombre}
+                          parentCategory={m.categoria_nombre}
+                          size={32}
+                        />
+                      </div>
+                      <div className={styles.itemMeta}>
+                        <p className={styles.itemName}>
+                          {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
+                        </p>
+                        <p className={styles.itemSub}>
+                          {formatFecha(m.fecha)} • {m.billetera_nombre}
+                        </p>
+                      </div>
+                      <div className={`${styles.itemAmount} ${m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg}`}>
+                        {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, m.moneda)}
+                      </div>
                     </div>
-                    <div className={styles.itemMeta}>
-                      <p className={styles.itemName}>
-                        {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
-                      </p>
-                      <p className={styles.itemSub}>
-                        {formatFecha(m.fecha)} • {m.billetera_nombre}
-                      </p>
-                    </div>
-                    <div className={`${styles.itemAmount} ${m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg}`}>
-                      {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, 'ARS')}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )
+            })()}
           </div>
         </div>
       </div>

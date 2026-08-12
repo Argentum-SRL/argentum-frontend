@@ -247,6 +247,9 @@
 .cardBody {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .message {
@@ -255,6 +258,7 @@
   color: var(--text);
   margin: 0 0 6px 0;
   word-wrap: break-word;
+  padding-right: 110px;
 }
 
 .cardUnread .message {
@@ -266,6 +270,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  margin-top: auto;
+  width: 100%;
 }
 
 .time {
@@ -273,30 +279,20 @@
   color: var(--text-3);
 }
 
-.link {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary);
+/* ── Acciones de Card (Desktop) ─────────────────────────────────────────── */
+.desktopActions {
+  position: absolute;
+  top: 14px;
+  right: 16px;
   display: flex;
   align-items: center;
   gap: 4px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-/* ── Acciones de Card ────────────────────────────────────────────────────── */
-.actions {
-  display: flex;
-  gap: 4px;
   opacity: 0;
   transition: opacity 0.2s ease;
+  z-index: 2;
 }
 
-.card:hover .actions {
+.card:hover .desktopActions {
   opacity: 1;
 }
 
@@ -305,12 +301,16 @@
   border: none;
   color: var(--text-3);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   transition: all 0.15s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .btnAction:hover {
@@ -323,16 +323,16 @@
   color: var(--error);
 }
 
-/* Dropdown Menu styling for silence settings */
+/* Dropdown Menu styling for silence settings (Desktop) */
 .silenceMenu {
   position: absolute;
-  bottom: calc(100% + 4px);
+  top: calc(100% + 4px);
   right: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 20;
   min-width: 120px;
   padding: 4px;
   display: flex;
@@ -357,12 +357,142 @@
   color: var(--text);
 }
 
+/* ── Acciones de Card (Mobile Menu) ─────────────────────────────────────── */
+.mobileActions {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+}
+
+.mobileMoreBtn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+  padding: 0;
+}
+
+.mobileMoreBtn:active {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.mobileMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  z-index: 30;
+  min-width: 175px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: popIn 0.15s ease-out;
+}
+
+.mobileMenuOption {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s ease;
+  width: 100%;
+}
+
+.mobileMenuOption:hover,
+.mobileMenuOption:active {
+  background: var(--surface-alt);
+}
+
+.mobileMenuOptionDanger {
+  color: var(--error);
+}
+
+.mobileMenuOptionDanger:hover,
+.mobileMenuOptionDanger:active {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.mobileMenuDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.mobileMenuLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px 2px;
+}
+
+.mobileSilenceRow {
+  display: flex;
+  gap: 4px;
+  padding: 2px 6px 4px;
+}
+
+.mobilePillBtn {
+  flex: 1;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 0;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.mobilePillBtn:active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 /* ── Skeleton Loading ────────────────────────────────────────────────────── */
 .skeletonCard {
   background: var(--surface-alt);
   border-radius: 12px;
   border: 1px solid var(--border);
-  height: 80px;
+  height: 72px;
   animation: pulse 1.5s infinite ease-in-out;
 }
 
@@ -372,67 +502,73 @@
   100% { opacity: 0.6; }
 }
 
-@media (max-width: 768px) {
-  .actions {
-    opacity: 1;
-  }
-}
-
 .cardClickable {
   cursor: pointer;
 }
 
+.cardActiveMenu {
+  z-index: 100 !important;
+}
+
+.menuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: transparent;
+}
+
 .relativeContainer {
   position: relative;
-}
-
-/* ── Footer (Parity with TransaccionModal) ────────────────────────────────── */
-.formFooter {
-  padding: 12px 20px 16px;
-  border-top: 1px solid var(--surface-alt);
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.cancelBtn {
-  flex: 1;
-  height: 44px;
-  border-radius: 12px;
-  border: 1.5px solid var(--surface-alt);
-  background: transparent;
-  color: var(--text-2);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 120ms ease, color 120ms ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.cancelBtn:hover {
-  background: var(--surface-alt);
-  color: var(--text);
-}
+/* ── Responsive Mobile Optimization ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .formHeader {
+    padding: 12px 16px 10px;
+  }
 
-.submitBtn {
-  flex: 1;
-  height: 44px;
-  border-radius: 12px;
-  border: none;
-  background: var(--primary);
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 120ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
+  .actionsSubheader {
+    padding: 8px 16px;
+  }
 
-.submitBtn:hover {
-  opacity: 0.88;
+  .formBody {
+    padding: 10px 14px 16px;
+  }
+
+  .scrollArea {
+    max-height: 72vh;
+    min-height: 200px;
+    gap: 8px;
+    padding-bottom: 90px;
+  }
+
+  .card {
+    padding: 11px 13px;
+    gap: 10px;
+    border-radius: 10px;
+  }
+
+  .iconWrapper {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .message {
+    font-size: 13.5px;
+    line-height: 1.35;
+    padding-right: 30px;
+    margin-bottom: 4px;
+  }
+
+  .desktopActions {
+    display: none !important;
+  }
+
+  .mobileActions {
+    display: flex;
+  }
 }

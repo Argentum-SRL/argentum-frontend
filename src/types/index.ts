@@ -488,7 +488,6 @@ export interface Notificacion {
   nivel: NivelNotificacion
   mensaje: string
   leida: boolean
-  archivada: boolean
   canal_web: boolean
   canal_whatsapp: boolean
   canal_email: boolean

@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   Bell,
   Check,
-  Archive,
   Trash2,
   Clock,
   Settings,
@@ -14,9 +13,9 @@ import {
   CreditCard,
   Target,
   Smile,
-  ExternalLink,
   Info,
   X,
+  MoreVertical,
 } from 'lucide-react'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { Notificacion, TipoNotificacion } from '@/types'
@@ -38,15 +37,14 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
     isLoading,
     marcarLeida,
     marcarNoLeida,
-    archivar,
     silenciar,
     eliminar,
     marcarTodasLeidas,
-    archivarTodas,
   } = useNotificaciones()
 
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const [activeSilenceId, setActiveSilenceId] = useState<string | null>(null)
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
 
   // Agrupar notificaciones por fecha
   const groupedNotifications = useMemo(() => {
@@ -183,27 +181,17 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
           </div>
 
           {/* Subcabecera para acciones masivas */}
-          {notificaciones.length > 0 && (
+          {notificaciones.length > 0 && unreadCount > 0 && (
             <div className={styles.actionsSubheader}>
               <button
                 type="button"
                 className={styles.actionTextBtn}
                 onClick={marcarTodasLeidas}
-                disabled={unreadCount === 0 || isLoading}
+                disabled={isLoading}
                 title="Marcar todas como leídas"
               >
                 <Check size={14} />
-                Marcar leídas
-              </button>
-              <button
-                type="button"
-                className={styles.actionTextBtn}
-                onClick={archivarTodas}
-                disabled={notificaciones.length === 0 || isLoading}
-                title="Archivar notificaciones no críticas"
-              >
-                <Archive size={14} />
-                Archivar todas
+                Marcar todas como leídas
               </button>
             </div>
           )}
@@ -234,7 +222,9 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                           key={n.id}
                           className={`${styles.card} ${!n.leida ? styles.cardUnread : ''} ${
                             styles[`nivel${n.nivel}`]
-                          } ${n.deep_link || !n.leida ? styles.cardClickable : ''}`}
+                          } ${n.deep_link || !n.leida ? styles.cardClickable : ''} ${
+                            activeMenuId === n.id || activeSilenceId === n.id ? styles.cardActiveMenu : ''
+                          }`}
                           onClick={() => handleNotificationClick(n)}
                         >
                           <div className={styles.iconWrapper}>{getIcon(n.tipo)}</div>
@@ -242,15 +232,11 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                             <p className={styles.message}>{n.mensaje}</p>
                             <div className={styles.metaRow}>
                               <span className={styles.time}>{formatTime(n.created_at)}</span>
-                              {n.deep_link && (
-                                <span className={styles.link}>
-                                  Ver detalle <ExternalLink size={10} />
-                                </span>
-                              )}
                             </div>
                           </div>
 
-                          <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
+                          {/* Desktop actions (hover inline icons) */}
+                          <div className={styles.desktopActions} onClick={(e) => e.stopPropagation()}>
                             {!n.leida ? (
                               <button
                                 type="button"
@@ -272,15 +258,6 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                                 <Bell size={14} />
                               </button>
                             )}
-                            <button
-                              type="button"
-                              className={styles.btnAction}
-                              onClick={() => archivar(n.id)}
-                              title="Archivar"
-                              aria-label="Archivar notificación"
-                            >
-                              <Archive size={14} />
-                            </button>
                             <div className={styles.relativeContainer}>
                               <button
                                 type="button"
@@ -317,16 +294,104 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                                 </div>
                               )}
                             </div>
-                            {n.nivel !== 'CRITICA' && (
-                              <button
-                                type="button"
-                                className={`${styles.btnAction} ${styles.btnActionDanger}`}
-                                onClick={() => eliminar(n.id)}
-                                title="Eliminar"
-                                aria-label="Eliminar notificación"
-                              >
-                                <Trash2 size={14} />
-                              </button>
+                            <button
+                              type="button"
+                              className={`${styles.btnAction} ${styles.btnActionDanger}`}
+                              onClick={() => eliminar(n.id)}
+                              title="Eliminar"
+                              aria-label="Eliminar notificación"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+
+                          {/* Mobile actions (3-dots button & dropdown) */}
+                          <div className={styles.mobileActions} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className={styles.mobileMoreBtn}
+                              onClick={() => {
+                                setActiveMenuId(activeMenuId === n.id ? null : n.id)
+                                setActiveSilenceId(null)
+                              }}
+                              aria-label="Opciones de notificación"
+                            >
+                              <MoreVertical size={16} />
+                            </button>
+
+                            {activeMenuId === n.id && (
+                              <div className={styles.mobileMenu}>
+                                {!n.leida ? (
+                                  <button
+                                    type="button"
+                                    className={styles.mobileMenuOption}
+                                    onClick={() => {
+                                      marcarLeida(n.id)
+                                      setActiveMenuId(null)
+                                    }}
+                                  >
+                                    <Check size={14} /> Marcar como leída
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className={styles.mobileMenuOption}
+                                    onClick={() => {
+                                      marcarNoLeida(n.id)
+                                      setActiveMenuId(null)
+                                    }}
+                                  >
+                                    <Bell size={14} /> Marcar no leída
+                                  </button>
+                                )}
+
+                                <div className={styles.mobileMenuDivider} />
+                                <span className={styles.mobileMenuLabel}>Silenciar:</span>
+                                <div className={styles.mobileSilenceRow}>
+                                  <button
+                                    type="button"
+                                    className={styles.mobilePillBtn}
+                                    onClick={(e) => {
+                                      handleSelectSilence(n.id, 1, e)
+                                      setActiveMenuId(null)
+                                    }}
+                                  >
+                                    1h
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={styles.mobilePillBtn}
+                                    onClick={(e) => {
+                                      handleSelectSilence(n.id, 24, e)
+                                      setActiveMenuId(null)
+                                    }}
+                                  >
+                                    24h
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={styles.mobilePillBtn}
+                                    onClick={(e) => {
+                                      handleSelectSilence(n.id, 168, e)
+                                      setActiveMenuId(null)
+                                    }}
+                                  >
+                                    7d
+                                  </button>
+                                </div>
+
+                                <div className={styles.mobileMenuDivider} />
+                                <button
+                                  type="button"
+                                  className={`${styles.mobileMenuOption} ${styles.mobileMenuOptionDanger}`}
+                                  onClick={() => {
+                                    eliminar(n.id)
+                                    setActiveMenuId(null)
+                                  }}
+                                >
+                                  <Trash2 size={14} /> Eliminar
+                                </button>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -336,20 +401,17 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                 ))
               )}
             </div>
-          </div>
 
-          {/* Footer del modal con estética de TransaccionModal */}
-          <div className={styles.formFooter}>
-            <button type="button" className={styles.cancelBtn} onClick={onClose}>
-              Cerrar
-            </button>
-            <Link
-              to="/app/configuracion?tab=notificaciones"
-              className={styles.submitBtn}
-              onClick={onClose}
-            >
-              Configurar preferencias
-            </Link>
+            {(activeMenuId !== null || activeSilenceId !== null) && (
+              <div
+                className={styles.menuBackdrop}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setActiveMenuId(null)
+                  setActiveSilenceId(null)
+                }}
+              />
+            )}
           </div>
         </div>
       </Modal>

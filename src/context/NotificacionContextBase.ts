@@ -12,11 +12,9 @@ export interface NotificacionContextValue {
   updateConfig: (payload: Partial<ConfiguracionNotificacion>) => Promise<void>
   marcarLeida: (id: string) => Promise<void>
   marcarNoLeida: (id: string) => Promise<void>
-  archivar: (id: string) => Promise<void>
   silenciar: (id: string, horas?: number) => Promise<void>
   eliminar: (id: string) => Promise<void>
   marcarTodasLeidas: () => Promise<void>
-  archivarTodas: () => Promise<void>
 }
 
 export const NotificacionContext = createContext<NotificacionContextValue | null>(null)

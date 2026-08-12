@@ -5,7 +5,6 @@ const notificacionService = {
   list: async (
     params?: {
       solo_no_leidas?: boolean
-      incluir_archivadas?: boolean
       limite?: number
       offset?: number
     },
@@ -33,11 +32,6 @@ const notificacionService = {
     return data
   },
 
-  archivar: async (id: string): Promise<Notificacion> => {
-    const { data } = await api.put<Notificacion>(`/notificaciones/${id}/archivar`)
-    return data
-  },
-
   silenciar: async (id: string, horas = 24): Promise<Notificacion> => {
     const { data } = await api.put<Notificacion>(`/notificaciones/${id}/silenciar`, null, {
       params: { horas },
@@ -52,11 +46,6 @@ const notificacionService = {
 
   marcarTodasLeidas: async (): Promise<boolean> => {
     await api.post('/notificaciones/leer-todas')
-    return true
-  },
-
-  archivarTodas: async (): Promise<boolean> => {
-    await api.post('/notificaciones/archivar-todas')
     return true
   },
 

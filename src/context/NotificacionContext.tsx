@@ -25,7 +25,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     if (!isAuthenticated) return
     setIsLoading(true)
     try {
-      const data = await notificacionService.list({ solo_no_leidas: false, incluir_archivadas: false }, signal)
+      const data = await notificacionService.list({ solo_no_leidas: false }, signal)
       setNotificaciones(data)
     } catch (error) {
       if (error && typeof error === 'object' && 'name' in error && (error.name === 'AbortError' || error.name === 'CanceledError')) return
@@ -92,19 +92,6 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const archivar = useCallback(async (id: string) => {
-    try {
-      const notif = notificaciones.find((n) => n.id === id)
-      await notificacionService.archivar(id)
-      setNotificaciones((prev) => prev.filter((n) => n.id !== id))
-      if (notif && !notif.leida) {
-        setUnreadCount((prev) => Math.max(0, prev - 1))
-      }
-    } catch (error) {
-      console.error('Error archiving notification:', error)
-    }
-  }, [notificaciones])
-
   const silenciar = useCallback(async (id: string, horas = 24) => {
     try {
       const notif = notificaciones.find((n) => n.id === id)
@@ -141,18 +128,6 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       showToast('Todas las notificaciones marcadas como leídas', 'success')
     } catch (error) {
       console.error('Error marking all as read:', error)
-    }
-  }, [showToast])
-
-  const archivarTodas = useCallback(async () => {
-    try {
-      await notificacionService.archivarTodas()
-      // Omitir las críticas en el archivado masivo si el backend no las archiva
-      setNotificaciones((prev) => prev.filter((n) => n.nivel === 'CRITICA'))
-      setUnreadCount(0)
-      showToast('Todas las notificaciones archivadas', 'success')
-    } catch (error) {
-      console.error('Error archiving all notifications:', error)
     }
   }, [showToast])
 
@@ -250,11 +225,9 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       updateConfig,
       marcarLeida,
       marcarNoLeida,
-      archivar,
       silenciar,
       eliminar,
       marcarTodasLeidas,
-      archivarTodas,
     }),
     [
       notificaciones,
@@ -267,11 +240,9 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       updateConfig,
       marcarLeida,
       marcarNoLeida,
-      archivar,
       silenciar,
       eliminar,
       marcarTodasLeidas,
-      archivarTodas,
     ]
   )
 

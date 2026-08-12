@@ -676,6 +676,7 @@
 .formFooter {
   padding: 14px 20px;
   border-top: 1px solid var(--surface-alt);
+  background: var(--surface);
   display: flex;
   gap: 8px;
   flex-shrink: 0;

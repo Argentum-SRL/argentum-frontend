@@ -45,11 +45,10 @@
 }
 
 .currencyCard:hover {
-  border-color: var(--silver);
+  background: var(--surface-alt);
 }
 
 .currencyCardActive {
-  border-color: var(--primary);
   background: var(--surface-alt);
 }
 

@@ -35,6 +35,11 @@
 
 .noPadding .content {
   padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 @media (min-width: 768px) {
@@ -104,9 +109,6 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: var(--surface-alt) transparent;
 }
 
 .content::-webkit-scrollbar {

@@ -318,7 +318,17 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 16px;
+  padding: 14px 20px;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-bottom: -20px;
+  border-top: 1px solid var(--surface-alt);
+  background: var(--surface);
+  position: sticky;
+  bottom: -20px;
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .cancelBtn, .submitBtn {

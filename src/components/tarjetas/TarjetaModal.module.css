@@ -117,7 +117,6 @@
 }
 
 .montoInputWrap:focus-within {
-  border-color: var(--primary);
   background: var(--surface);
 }
 

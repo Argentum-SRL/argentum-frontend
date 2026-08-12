@@ -243,8 +243,16 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-bottom: -20px;
+  border-top: 1px solid var(--surface-alt);
+  background: var(--surface);
+  position: sticky;
+  bottom: -20px;
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .btnCancel {

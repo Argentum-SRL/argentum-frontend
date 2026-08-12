@@ -30,11 +30,12 @@
   align-items: center;
   gap: 12px;
   border: 1.5px solid transparent;
-  transition: border-color 150ms ease;
+  transition: background-color 150ms ease;
 }
 
 .montoHero:focus-within {
-  border-color: var(--primary);
+  /* Sin reborde de color al estar activo */
+  border-color: transparent;
 }
 
 .montoHeroError {

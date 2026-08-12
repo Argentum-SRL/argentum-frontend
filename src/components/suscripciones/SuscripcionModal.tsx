@@ -337,7 +337,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   className={styles.submitBtn} 
                   disabled={!state.nombrePersonalizado} 
                 >
-                  Siguiente
+                  Continuar
                 </button>
               </div>
             </form>

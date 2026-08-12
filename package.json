@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ncdai/react-wheel-picker": "^1.2.2",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-slot": "^1.2.4",
@@ -24,7 +25,6 @@
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.11.0",
     "react": "^19.2.5",
-    "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "recharts": "^3.8.1",

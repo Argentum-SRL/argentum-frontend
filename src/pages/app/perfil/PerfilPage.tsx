@@ -27,7 +27,7 @@ import * as authService from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { SelectInput, Modal, type SelectOption } from '@/components/ui'
+import { DateInput, SelectInput, Modal, type SelectOption } from '@/components/ui'
 import FotoCropModal from '@/components/perfil/FotoCropModal'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
@@ -1200,8 +1200,12 @@ export default function PerfilPage() {
               <input id="perfil-apellido" type="text" className={styles.input} value={formDatos.apellido} onChange={(e) => setFormDatos({ ...formDatos, apellido: e.target.value })} required />
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="perfil-nacimiento" className={styles.inputLabel}>Fecha de nacimiento</label>
-              <input id="perfil-nacimiento" type="date" className={styles.input} value={formDatos.fecha_nacimiento} onChange={(e) => setFormDatos({ ...formDatos, fecha_nacimiento: e.target.value })} />
+              <DateInput
+                id="perfil-nacimiento"
+                label="Fecha de nacimiento"
+                value={formDatos.fecha_nacimiento}
+                onChange={(val) => setFormDatos({ ...formDatos, fecha_nacimiento: val })}
+              />
             </div>
             <div className={styles.inputGroup}>
               <label htmlFor="perfil-sexo" className={styles.inputLabel}>Sexo</label>

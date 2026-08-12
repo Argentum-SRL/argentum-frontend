@@ -1,15 +1,38 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { DayPicker, useDayPicker } from 'react-day-picker'
-import { format, parse, isValid } from 'date-fns'
+import { format, parse, isValid, getDaysInMonth, startOfDay } from 'date-fns'
 import { es } from 'date-fns/locale/es'
-import { Calendar, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, AlertCircle } from 'lucide-react'
+import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
+import '@ncdai/react-wheel-picker/style.css'
 import styles from './DateInput.module.css'
 
 // Formato interno (lo que se almacena y comunica al padre)
 const INTERNAL_FORMAT = 'yyyy-MM-dd'
 // Formato de display (lo que ve el usuario)
 const DISPLAY_FORMAT = 'dd/MM/yyyy'
+
+// Sensibilidad de interacción para los tres wheels
+const WHEEL_DRAG_SENSITIVITY = 6
+const WHEEL_SCROLL_SENSITIVITY = 10
+
+// Margen de seguridad contra bordes del viewport
+const VIEWPORT_MARGIN = 12
+
+/**
+ * Dispara feedback háptico sutil (tick de 12ms) al mover un wheel.
+ * NOTA: Safari en iOS y macOS no implementa la Vibration API (navigator.vibrate),
+ * por lo que el feedback táctil solo se activará en navegadores compatibles (ej: Chromium/Android).
+ */
+const triggerHapticFeedback = () => {
+  if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(12)
+    } catch {
+      // Silenciar errores en entornos donde la vibración esté bloqueada
+    }
+  }
+}
 
 interface DateInputProps {
   value: string
@@ -24,58 +47,6 @@ interface DateInputProps {
   name?: string
   required?: boolean
   placeholder?: string
-}
-
-// ─── Custom MonthCaption: Arrows + Title all in one flex row ───────────────
-function MonthCaptionWithNav({
-  calendarMonth,
-  view,
-  onToggleView,
-}: {
-  calendarMonth: { date: Date }
-  view: 'days' | 'years'
-  onToggleView: () => void
-}) {
-  const { goToMonth, nextMonth, previousMonth } = useDayPicker()
-  const monthName = format(calendarMonth.date, 'MMMM', { locale: es })
-  const year = calendarMonth.date.getFullYear()
-  const label = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`
-
-  return (
-    <div className={styles.calendarHeader}>
-      <button
-        type="button"
-        className={styles.rdpNavButton}
-        onClick={() => previousMonth && goToMonth(previousMonth)}
-        disabled={!previousMonth}
-        aria-label="Mes anterior"
-      >
-        <ChevronLeft size={16} />
-      </button>
-
-      <button
-        type="button"
-        className={styles.captionBtn}
-        onClick={onToggleView}
-        aria-label="Seleccionar año"
-      >
-        {label}
-        <span className={[styles.captionChevron, view === 'years' ? styles.captionChevronOpen : ''].filter(Boolean).join(' ')}>
-          ▾
-        </span>
-      </button>
-
-      <button
-        type="button"
-        className={styles.rdpNavButton}
-        onClick={() => nextMonth && goToMonth(nextMonth)}
-        disabled={!nextMonth}
-        aria-label="Mes siguiente"
-      >
-        <ChevronRight size={16} />
-      </button>
-    </div>
-  )
 }
 
 export const DateInput: React.FC<DateInputProps> = ({
@@ -93,71 +64,101 @@ export const DateInput: React.FC<DateInputProps> = ({
   placeholder = 'dd/mm/aaaa',
 }) => {
   // Parsear min/max
-  const fromDate = min ? parse(min, INTERNAL_FORMAT, new Date()) : undefined
-  const toDate = max ? parse(max, INTERNAL_FORMAT, new Date()) : undefined
+  const fromDate = useMemo(() => (min ? parse(min, INTERNAL_FORMAT, new Date()) : undefined), [min])
+  const toDate = useMemo(() => (max ? parse(max, INTERNAL_FORMAT, new Date()) : undefined), [max])
 
   // Parsear value (YYYY-MM-DD) a Date
-  const selectedDate = value
-    ? parse(value, INTERNAL_FORMAT, new Date())
-    : undefined
-  const validSelected = selectedDate && isValid(selectedDate) ? selectedDate : undefined
+  const parsedValueDate = useMemo(() => {
+    if (!value) return undefined
+    const parsed = parse(value, INTERNAL_FORMAT, new Date())
+    return isValid(parsed) ? parsed : undefined
+  }, [value])
 
   const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [inputText, setInputText] = useState(validSelected ? format(validSelected, DISPLAY_FORMAT) : '')
-  const [calendarMonth, setCalendarMonth] = useState<Date>(validSelected || new Date())
-  const [view, setView] = useState<'days' | 'years'>('days')
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 1024)
+  const [inputText, setInputText] = useState(parsedValueDate ? format(parsedValueDate, DISPLAY_FORMAT) : '')
   const [prevValue, setPrevValue] = useState(value)
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const popoverRef = useRef<HTMLDivElement>(null)
-  const yearGridRef = useRef<HTMLDivElement>(null)
 
-  // Ajustar estado cuando cambia el value externo (durante render)
+  // Estado interno para las tres columnas del wheel picker
+  const today = useMemo(() => new Date(), [])
+  const initialDate = parsedValueDate || today
+  const [selectedYear, setSelectedYear] = useState<number>(initialDate.getFullYear())
+  const [selectedMonth, setSelectedMonth] = useState<number>(initialDate.getMonth() + 1)
+  const [selectedDay, setSelectedDay] = useState<number>(initialDate.getDate())
+
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const popoverRef = useRef<HTMLDivElement>(null)
+
+  // Sincronizar estado interno cuando cambia el value externo
   if (value !== prevValue) {
     setPrevValue(value)
     if (value) {
       const parsed = parse(value, INTERNAL_FORMAT, new Date())
       if (isValid(parsed)) {
         setInputText(format(parsed, DISPLAY_FORMAT))
-        setCalendarMonth(parsed)
+        setSelectedYear(parsed.getFullYear())
+        setSelectedMonth(parsed.getMonth() + 1)
+        setSelectedDay(parsed.getDate())
       }
     } else {
       setInputText('')
     }
   }
 
-  // Detectar mobile
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 1024)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
+  // Cerrar y remover foco explícitamente del input
+  const closePicker = useCallback(() => {
+    setOpen(false)
+    inputRef.current?.blur()
   }, [])
 
-  // Calcular posición del popover (solo desktop)
+  // Calcular posición del popover dinámicamente con useLayoutEffect
   const calcPosition = useCallback(() => {
     if (isMobile || !wrapperRef.current || !popoverRef.current) return
-    const rect = wrapperRef.current.getBoundingClientRect()
-    const popoverHeight = 360
-    const spaceBelow = window.innerHeight - rect.bottom
-    const spaceAbove = rect.top
-    const top = spaceBelow >= popoverHeight || spaceBelow >= spaceAbove
-      ? rect.bottom + 6
-      : rect.top - popoverHeight - 6
-    
-    let left = rect.left
-    const popoverWidth = 290
-    if (left + popoverWidth > window.innerWidth - 8) {
-      left = window.innerWidth - popoverWidth - 8
+    const wrapperRect = wrapperRef.current.getBoundingClientRect()
+    const popoverRect = popoverRef.current.getBoundingClientRect()
+
+    const popoverHeight = popoverRect.height || 290
+    const popoverWidth = popoverRect.width || 290
+
+    const spaceBelow = window.innerHeight - wrapperRect.bottom - VIEWPORT_MARGIN
+    const spaceAbove = wrapperRect.top - VIEWPORT_MARGIN
+
+    const top = (spaceBelow >= popoverHeight || spaceBelow >= spaceAbove)
+      ? wrapperRect.bottom + 6
+      : wrapperRect.top - popoverHeight - 6
+
+    let left = wrapperRect.left
+    if (left + popoverWidth > window.innerWidth - VIEWPORT_MARGIN) {
+      left = window.innerWidth - popoverWidth - VIEWPORT_MARGIN
     }
-    if (left < 8) left = 8
+    if (left < VIEWPORT_MARGIN) {
+      left = VIEWPORT_MARGIN
+    }
 
     popoverRef.current.style.top = `${top}px`
     popoverRef.current.style.left = `${left}px`
+    popoverRef.current.style.visibility = 'visible'
   }, [isMobile])
 
-  useEffect(() => {
-    if (open) calcPosition()
+  // Recalcular posición y responsive breakpoints en resize / scroll mientras esté abierto
+  useLayoutEffect(() => {
+    if (!open) return
+
+    const handleWindowChange = () => {
+      setIsMobile(window.innerWidth <= 1024)
+      calcPosition()
+    }
+
+    calcPosition()
+
+    window.addEventListener('resize', handleWindowChange)
+    window.addEventListener('scroll', calcPosition, { capture: true, passive: true })
+
+    return () => {
+      window.removeEventListener('resize', handleWindowChange)
+      window.removeEventListener('scroll', calcPosition, { capture: true })
+    }
   }, [open, calcPosition])
 
   // Cerrar al hacer clic fuera
@@ -168,34 +169,148 @@ export const DateInput: React.FC<DateInputProps> = ({
         wrapperRef.current && !wrapperRef.current.contains(e.target as Node) &&
         popoverRef.current && !popoverRef.current.contains(e.target as Node)
       ) {
-        setOpen(false)
-        setView('days')
+        closePicker()
       }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [open])
+  }, [open, closePicker])
 
-  // Scroll automático al año seleccionado
-  useEffect(() => {
-    if (view === 'years' && yearGridRef.current) {
-      const selected = yearGridRef.current.querySelector(`.${styles.yearBtnSelected}`)
-      if (selected) {
-        selected.scrollIntoView({ block: 'center', behavior: 'instant' })
+  // Rango de años calculado según min/max o default -100 / +10
+  const currentYearNow = new Date().getFullYear()
+  const minYear = fromDate ? fromDate.getFullYear() : currentYearNow - 100
+  const maxYear = toDate ? toDate.getFullYear() : currentYearNow + 10
+
+  const yearOptions = useMemo<WheelPickerOption<number>[]>(() => {
+    const options: WheelPickerOption<number>[] = []
+    for (let y = minYear; y <= maxYear; y++) {
+      let isDisabled = false
+      if (fromDate && y < fromDate.getFullYear()) {
+        isDisabled = true
       }
+      if (toDate && y > toDate.getFullYear()) {
+        isDisabled = true
+      }
+      options.push({
+        value: y,
+        label: String(y),
+        textValue: String(y),
+        disabled: isDisabled,
+      })
     }
-  }, [view])
+    return options
+  }, [minYear, maxYear, fromDate, toDate])
+
+  const monthOptions = useMemo<WheelPickerOption<number>[]>(() => {
+    const options: WheelPickerOption<number>[] = []
+    for (let m = 1; m <= 12; m++) {
+      const rawMonthName = format(new Date(selectedYear, m - 1, 1), 'MMM', { locale: es }).replace('.', '')
+      const monthLabel = rawMonthName.charAt(0).toUpperCase() + rawMonthName.slice(1)
+
+      let isDisabled = false
+      if (fromDate) {
+        if (selectedYear < fromDate.getFullYear()) {
+          isDisabled = true
+        } else if (selectedYear === fromDate.getFullYear() && m < fromDate.getMonth() + 1) {
+          isDisabled = true
+        }
+      }
+      if (toDate) {
+        if (selectedYear > toDate.getFullYear()) {
+          isDisabled = true
+        } else if (selectedYear === toDate.getFullYear() && m > toDate.getMonth() + 1) {
+          isDisabled = true
+        }
+      }
+
+      options.push({
+        value: m,
+        label: monthLabel,
+        textValue: monthLabel,
+        disabled: isDisabled,
+      })
+    }
+    return options
+  }, [selectedYear, fromDate, toDate])
+
+  const daysInSelectedMonth = useMemo(() => {
+    return getDaysInMonth(new Date(selectedYear, selectedMonth - 1, 1))
+  }, [selectedYear, selectedMonth])
+
+  const dayOptions = useMemo<WheelPickerOption<number>[]>(() => {
+    const options: WheelPickerOption<number>[] = []
+    for (let d = 1; d <= daysInSelectedMonth; d++) {
+      const testDate = new Date(selectedYear, selectedMonth - 1, d)
+      let isDisabled = false
+      if (fromDate && startOfDay(testDate) < startOfDay(fromDate)) {
+        isDisabled = true
+      }
+      if (toDate && startOfDay(testDate) > startOfDay(toDate)) {
+        isDisabled = true
+      }
+      options.push({
+        value: d,
+        label: String(d).padStart(2, '0'),
+        textValue: String(d),
+        disabled: isDisabled,
+      })
+    }
+    return options
+  }, [daysInSelectedMonth, selectedYear, selectedMonth, fromDate, toDate])
+
+  // Función para aplicar cambios de fecha desde los wheels
+  const commitWheelChange = useCallback((newYear: number, newMonth: number, newDay: number) => {
+    const maxDays = getDaysInMonth(new Date(newYear, newMonth - 1, 1))
+    const validDay = Math.min(newDay, maxDays)
+
+    let finalDate = new Date(newYear, newMonth - 1, validDay)
+    if (fromDate && startOfDay(finalDate) < startOfDay(fromDate)) {
+      finalDate = fromDate
+    }
+    if (toDate && startOfDay(finalDate) > startOfDay(toDate)) {
+      finalDate = toDate
+    }
+
+    const clampedYear = finalDate.getFullYear()
+    const clampedMonth = finalDate.getMonth() + 1
+    const clampedDay = finalDate.getDate()
+
+    setSelectedYear(clampedYear)
+    setSelectedMonth(clampedMonth)
+    setSelectedDay(clampedDay)
+
+    const internalStr = format(finalDate, INTERNAL_FORMAT)
+    const displayStr = format(finalDate, DISPLAY_FORMAT)
+
+    onChange(internalStr)
+    setInputText(displayStr)
+  }, [fromDate, toDate, onChange])
+
+  const handleDayChange = useCallback((newDay: number) => {
+    triggerHapticFeedback()
+    commitWheelChange(selectedYear, selectedMonth, newDay)
+  }, [commitWheelChange, selectedYear, selectedMonth])
+
+  const handleMonthChange = useCallback((newMonth: number) => {
+    triggerHapticFeedback()
+    commitWheelChange(selectedYear, newMonth, selectedDay)
+  }, [commitWheelChange, selectedYear, selectedDay])
+
+  const handleYearChange = useCallback((newYear: number) => {
+    triggerHapticFeedback()
+    commitWheelChange(newYear, selectedMonth, selectedDay)
+  }, [commitWheelChange, selectedMonth, selectedDay])
 
   const handleTextInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/[^\d/]/g, '')
-    
+
     if (inputText.length > raw.length + 1) {
       setInputText(raw)
       return
     }
-    
+
     const digits = raw.replace(/\//g, '')
-    
+
     let formatted: string
     if (digits.length <= 2) {
       formatted = digits
@@ -204,14 +319,17 @@ export const DateInput: React.FC<DateInputProps> = ({
     } else {
       formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4, 8)
     }
-    
+
     setInputText(formatted)
-    
+
     if (formatted.length === 10) {
       const parsed = parse(formatted, DISPLAY_FORMAT, new Date())
       if (isValid(parsed)) {
-        if (fromDate && parsed < fromDate) return
-        if (toDate && parsed > toDate) return
+        if (fromDate && startOfDay(parsed) < startOfDay(fromDate)) return
+        if (toDate && startOfDay(parsed) > startOfDay(toDate)) return
+        setSelectedYear(parsed.getFullYear())
+        setSelectedMonth(parsed.getMonth() + 1)
+        setSelectedDay(parsed.getDate())
         onChange(format(parsed, INTERNAL_FORMAT))
       }
     } else if (formatted.length === 0) {
@@ -219,130 +337,92 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
   }
 
-  const handleSelect = (date: Date | undefined) => {
-    if (date && isValid(date)) {
-      onChange(format(date, INTERNAL_FORMAT))
-      setInputText(format(date, DISPLAY_FORMAT))
-      setCalendarMonth(date)
-    }
-    setOpen(false)
-    setView('days')
+  const handleToday = () => {
+    const now = new Date()
+    commitWheelChange(now.getFullYear(), now.getMonth() + 1, now.getDate())
+    closePicker()
   }
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
     onChange('')
     setInputText('')
-    setOpen(false)
-    setView('days')
+    closePicker()
   }
 
-  // Calcular rango de años disponibles
-  const currentYear = new Date().getFullYear()
-  const minYear = fromDate ? fromDate.getFullYear() : currentYear - 100
-  const maxYear = toDate ? toDate.getFullYear() : currentYear + 10
-  const yearList = Array.from(
-    { length: maxYear - minYear + 1 },
-    (_, i) => maxYear - i
-  )
+  // Clampear valor seleccionado para evitar que quede fuera de rango durante el render
+  const safeDayValue = useMemo(() => {
+    const exists = dayOptions.some(o => o.value === selectedDay)
+    if (exists) return selectedDay
+    const maxDays = getDaysInMonth(new Date(selectedYear, selectedMonth - 1, 1))
+    return Math.min(selectedDay, maxDays)
+  }, [dayOptions, selectedDay, selectedYear, selectedMonth])
 
-  const selectedYear = calendarMonth.getFullYear()
-
-  const yearGridElement = (
-    <div className={styles.yearGrid} ref={yearGridRef}>
-      {yearList.map(y => (
-        <button
-          key={y}
-          type="button"
-          className={[
-            styles.yearBtn,
-            y === selectedYear ? styles.yearBtnSelected : '',
-            y === currentYear ? styles.yearBtnToday : '',
-          ].filter(Boolean).join(' ')}
-          onClick={() => {
-            const newMonth = new Date(calendarMonth)
-            newMonth.setFullYear(y)
-            setCalendarMonth(newMonth)
-            setView('days')
+  const wheelPickerContent = (
+    <div className={styles.wheelPickerContainer}>
+      <div className={styles.wheelHeaderLabels}>
+        <span className={styles.wheelHeaderLabel}>Día</span>
+        <span className={styles.wheelHeaderLabel}>Mes</span>
+        <span className={styles.wheelHeaderLabel}>Año</span>
+      </div>
+      <WheelPickerWrapper className={styles.wheelWrapper}>
+        <WheelPicker
+          value={safeDayValue}
+          onValueChange={handleDayChange}
+          options={dayOptions}
+          dragSensitivity={WHEEL_DRAG_SENSITIVITY}
+          scrollSensitivity={WHEEL_SCROLL_SENSITIVITY}
+          optionItemHeight={38}
+          visibleCount={16}
+          classNames={{
+            optionItem: styles.wheelOptionItem,
+            highlightWrapper: styles.wheelHighlightWrapper,
+            highlightItem: styles.wheelHighlightItem,
           }}
-        >
-          {y}
-        </button>
-      ))}
+        />
+        <WheelPicker
+          value={selectedMonth}
+          onValueChange={handleMonthChange}
+          options={monthOptions}
+          dragSensitivity={WHEEL_DRAG_SENSITIVITY}
+          scrollSensitivity={WHEEL_SCROLL_SENSITIVITY}
+          optionItemHeight={38}
+          visibleCount={16}
+          classNames={{
+            optionItem: styles.wheelOptionItem,
+            highlightWrapper: styles.wheelHighlightWrapper,
+            highlightItem: styles.wheelHighlightItem,
+          }}
+        />
+        <WheelPicker
+          value={selectedYear}
+          onValueChange={handleYearChange}
+          options={yearOptions}
+          dragSensitivity={WHEEL_DRAG_SENSITIVITY}
+          scrollSensitivity={WHEEL_SCROLL_SENSITIVITY}
+          optionItemHeight={38}
+          visibleCount={16}
+          classNames={{
+            optionItem: styles.wheelOptionItem,
+            highlightWrapper: styles.wheelHighlightWrapper,
+            highlightItem: styles.wheelHighlightItem,
+          }}
+        />
+      </WheelPickerWrapper>
     </div>
   )
 
-  const disabledMatchers = [];
-  if (fromDate) disabledMatchers.push({ before: fromDate });
-  if (toDate) disabledMatchers.push({ after: toDate });
-
-  const dayPickerElement = (
-    <DayPicker
-      mode="single"
-      selected={validSelected}
-      onSelect={handleSelect}
-      locale={es}
-      disabled={disabledMatchers.length > 0 ? disabledMatchers : undefined}
-      startMonth={fromDate}
-      endMonth={toDate}
-      month={calendarMonth}
-      onMonthChange={setCalendarMonth}
-      classNames={{
-        root: styles.rdpRoot,
-        months: styles.rdpMonths,
-        month: styles.rdpMonth,
-        month_caption: styles.rdpCaptionHidden, // Ocultamos el caption nativo — usamos el custom
-        caption_label: styles.rdpCaptionLabel,
-        nav: styles.rdpNavHidden,              // Ocultamos el nav nativo — está dentro del caption custom
-        button_previous: styles.rdpNavButton,
-        button_next: styles.rdpNavButton,
-        month_grid: styles.rdpTable,
-        weekdays: styles.rdpHeadRow,
-        weekday: styles.rdpHeadCell,
-        week: styles.rdpRow,
-        day: styles.rdpCell,
-        day_button: styles.rdpDay,
-        selected: styles.rdpDaySelected,
-        today: styles.rdpDayToday,
-        outside: styles.rdpDayOutside,
-        disabled: styles.rdpDayDisabled,
-      }}
-      components={{
-        MonthCaption: ({ calendarMonth: cm }) => (
-          <MonthCaptionWithNav
-            calendarMonth={cm}
-            view={view}
-            onToggleView={() => setView(v => v === 'years' ? 'days' : 'years')}
-          />
-        ),
-      }}
-    />
-  )
-
-  const calendarContent = (
-    <>
-      {view === 'years' ? (
-        <>
-          {/* Header de años — mismo diseño que el de días */}
-          <div className={styles.calendarHeader}>
-            <div style={{ width: 32 }} />
-            <button
-              type="button"
-              className={styles.captionBtn}
-              onClick={() => setView('days')}
-              aria-label="Volver al calendario"
-            >
-              {calendarMonth.getFullYear()}
-              <span className={[styles.captionChevron, styles.captionChevronOpen].join(' ')}>▾</span>
-            </button>
-            <div style={{ width: 32 }} />
-          </div>
-          {yearGridElement}
-        </>
-      ) : (
-        dayPickerElement
+  const footerContent = (
+    <div className={styles.calendarFooter}>
+      {parsedValueDate && (
+        <button className={styles.clearBtn} onClick={handleClear} type="button">
+          Borrar
+        </button>
       )}
-    </>
+      <button className={styles.todayBtn} onClick={handleToday} type="button">
+        Hoy
+      </button>
+    </div>
   )
 
   return (
@@ -350,6 +430,7 @@ export const DateInput: React.FC<DateInputProps> = ({
       {label && <label htmlFor={id} className={styles.label}>{label}</label>}
       <div className={styles.inputWrap}>
         <input
+          ref={inputRef}
           id={id}
           type="text"
           value={inputText}
@@ -358,9 +439,9 @@ export const DateInput: React.FC<DateInputProps> = ({
           required={required}
           onChange={handleTextInput}
           onFocus={() => !disabled && setOpen(true)}
+          onClick={() => !disabled && setOpen(true)}
           onKeyDown={(e) => {
-            if (e.key === 'Escape') { setOpen(false); setView('days') }
-            if (e.key === 'Tab') { setOpen(false); setView('days') }
+            if (e.key === 'Escape' || e.key === 'Tab') closePicker()
           }}
           className={[
             styles.input,
@@ -385,39 +466,21 @@ export const DateInput: React.FC<DateInputProps> = ({
             className={styles.bottomSheetOverlay}
             data-portal="date-picker"
             onMouseDown={(e) => {
-              if (e.target === e.currentTarget) { setOpen(false); setView('days') }
+              if (e.target === e.currentTarget) closePicker()
             }}
           >
             <div className={styles.bottomSheet} ref={popoverRef}>
               <div className={styles.bottomSheetHandle} />
               <div className={styles.bottomSheetContent}>
-                {calendarContent}
+                {wheelPickerContent}
               </div>
-              <div className={styles.calendarFooter}>
-                {validSelected && (
-                  <button className={styles.clearBtn} onClick={handleClear} type="button">
-                    Borrar
-                  </button>
-                )}
-                <button className={styles.todayBtn} onClick={() => handleSelect(new Date())} type="button">
-                  Hoy
-                </button>
-              </div>
+              {footerContent}
             </div>
           </div>
         ) : (
           <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
-            {calendarContent}
-            <div className={styles.calendarFooter}>
-              {validSelected && (
-                <button className={styles.clearBtn} onClick={handleClear} type="button">
-                  Borrar
-                </button>
-              )}
-              <button className={styles.todayBtn} onClick={() => handleSelect(new Date())} type="button">
-                Hoy
-              </button>
-            </div>
+            {wheelPickerContent}
+            {footerContent}
           </div>
         ),
         document.body

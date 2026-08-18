@@ -118,15 +118,33 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* ── Grid ────────────────────────────────────────────────────────────────── */
+/* ── Grid & Responsive Containers ────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
 }
 
+.mobileChartContainer {
+  display: block;
+}
+
+.desktopGrid {
+  display: none;
+}
+
 @media (min-width: 768px) {
   .grid {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 20px;
+  }
+
+  .mobileChartContainer {
+    display: none;
+  }
+
+  .desktopGrid {
+    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     gap: 20px;
   }

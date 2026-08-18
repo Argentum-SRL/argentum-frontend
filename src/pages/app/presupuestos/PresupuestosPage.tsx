@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
+import BudgetBarChart from './BudgetBarChart'
 import BudgetHistoryModal from './BudgetHistoryModal'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 
@@ -287,19 +288,31 @@ export default function PresupuestosPage() {
             onActionClick={handleOpenNew}
           />
         ) : (
-          <div className={styles.grid}>
-            {presupuestos.map(p => (
-              <BudgetCard 
-                key={p.id} 
-                presupuesto={p} 
-                onEdit={() => handleEdit(p)}
-                onPause={() => handlePause(p)}
-                onResume={() => handleResume(p.id)}
-                onDelete={() => handleDelete(p)}
-                onHistory={() => handleViewHistory(p)}
+          <>
+            <div className={styles.mobileChartContainer}>
+              <BudgetBarChart
+                presupuestos={presupuestos}
+                onEdit={handleEdit}
+                onPause={handlePause}
+                onResume={handleResume}
+                onDelete={handleDelete}
+                onHistory={handleViewHistory}
               />
-            ))}
-          </div>
+            </div>
+            <div className={styles.desktopGrid}>
+              {presupuestos.map(p => (
+                <BudgetCard 
+                  key={p.id} 
+                  presupuesto={p} 
+                  onEdit={() => handleEdit(p)}
+                  onPause={() => handlePause(p)}
+                  onResume={() => handleResume(p.id)}
+                  onDelete={() => handleDelete(p)}
+                  onHistory={() => handleViewHistory(p)}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 

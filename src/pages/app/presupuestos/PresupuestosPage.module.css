@@ -89,7 +89,8 @@
 /* ── Tabs ────────────────────────────────────────────────────────────────── */
 .tabsContainer {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  width: 100%;
 }
 
 .tabs {
@@ -262,12 +263,23 @@
 
 .page::after {
   content: '';
-  display: block;
-  height: 32px;
-  flex-shrink: 0;
-  width: 100%;
+  display: none;
 }
 
 .summaryBar {
+  display: none !important;
   margin-top: 0 !important;
+}
+
+@media (min-width: 768px) {
+  .page::after {
+    display: block;
+    height: 32px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .summaryBar {
+    display: flex !important;
+  }
 }

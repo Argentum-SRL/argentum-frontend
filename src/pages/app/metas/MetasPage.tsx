@@ -156,9 +156,9 @@ export default function MetasPage() {
         </div>
       </div>
 
-      {/* ── Barra de resumen ────────────────────────────────────────────── */}
+      {/* ── Barra de resumen (Desktop) ────────────────────────────────────── */}
       <PageSummaryBar
-        className={styles.summaryBar}
+        className={styles.desktopSummaryBar}
         items={[
           {
             label: "Ahorro acumulado",

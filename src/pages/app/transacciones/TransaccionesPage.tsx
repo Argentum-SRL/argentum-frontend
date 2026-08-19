@@ -349,9 +349,33 @@ export default function TransaccionesPage() {
 
       {activeTab === 'historial' ? (
         <>
-          {/* ── Hero Resumen ───────────────────────────────────────────────────── */}
+          {/* ── Mobile Split Strip Resumen (1 sola fila limpia y compacta) ── */}
+          <div className={styles.mobileSplitStrip}>
+            <div className={styles.splitItem}>
+              <span className={styles.splitLabel}>Balance</span>
+              <span className={`${styles.splitValue} ${resumen.balance < 0 ? styles.colorRed : styles.colorGreen}`}>
+                {resumen.balance < 0 ? '-' : '+'}{formatCurrency(Math.abs(resumen.balance))}
+              </span>
+            </div>
+            <div className={styles.splitDivider} />
+            <div className={styles.splitItem}>
+              <span className={styles.splitLabel}>Ingresos</span>
+              <span className={`${styles.splitValue} ${styles.colorGreen}`}>
+                +{formatCurrency(resumen.ingresos)}
+              </span>
+            </div>
+            <div className={styles.splitDivider} />
+            <div className={styles.splitItem}>
+              <span className={styles.splitLabel}>Gastos</span>
+              <span className={`${styles.splitValue} ${styles.colorRed}`}>
+                -{formatCurrency(Math.abs(resumen.egresos))}
+              </span>
+            </div>
+          </div>
+
+          {/* ── Hero Resumen (Desktop) ────────────────────────────────────────── */}
           <PageSummaryBar
-            className={styles.summaryBar}
+            className={styles.desktopSummaryBar}
             leftSlot={
               <div className={styles.balanceCicloSlot}>
                 <span className={styles.balanceCicloLabel}>Balance del ciclo</span>

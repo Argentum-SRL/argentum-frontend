@@ -1,6 +1,6 @@
 .chartWrapper {
   background: var(--surface);
-  border-radius: 28px;
+  border-radius: 20px;
   padding: 20px 0 16px 0;
   border: 1px solid var(--border);
   display: flex;

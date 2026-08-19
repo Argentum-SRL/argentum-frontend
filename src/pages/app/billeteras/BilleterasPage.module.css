@@ -271,14 +271,81 @@
 
 .root::after {
   content: '';
-  display: block;
-  height: 32px;
-  flex-shrink: 0;
-  width: 100%;
+  display: none;
 }
 
-.summaryBar {
+@media (min-width: 768px) {
+  .root::after {
+    display: block;
+    height: 32px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+}
+
+/* ── Mobile Summary Card (Unified Metric Surface) ── */
+.mobileSummaryCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 4px;
+}
+
+.cardTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.cardBadge {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.cardAmount {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.8px;
+  line-height: 1.1;
+  margin: 6px 0 4px 0;
+}
+
+.cardSubline {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.desktopSummaryBar {
+  display: none !important;
   margin-top: 0 !important;
+}
+
+@media (min-width: 768px) {
+  .mobileSummaryCard {
+    display: none;
+  }
+
+  .desktopSummaryBar {
+    display: flex !important;
+  }
 }
 
 /* ── Switch de pestañas solo para mobile ── */

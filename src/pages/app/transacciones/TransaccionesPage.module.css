@@ -255,10 +255,71 @@
 
 .page::after {
   content: '';
-  display: block;
-  height: 32px;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .page::after {
+    display: block;
+    height: 32px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+}
+
+/* ── Mobile Split Strip (Unified Metric Surface) ── */
+.mobileSplitStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 4px;
+}
+
+.splitItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  text-align: center;
+}
+
+.splitLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.splitValue {
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.splitDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
   flex-shrink: 0;
-  width: 100%;
+}
+
+.colorGreen {
+  color: var(--success, #1A7A4A);
+}
+
+.colorRed {
+  color: var(--error, #C0392B);
 }
 
 .balanceCicloSlot {
@@ -290,8 +351,19 @@
   }
 }
 
-.summaryBar {
+.desktopSummaryBar {
+  display: none !important;
   margin-top: 0 !important;
+}
+
+@media (min-width: 768px) {
+  .mobileSplitStrip {
+    display: none;
+  }
+
+  .desktopSummaryBar {
+    display: flex !important;
+  }
 }
 
 .balanceNegative {

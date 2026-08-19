@@ -244,7 +244,29 @@ const SuscripcionesPage: React.FC = () => {
         </button>
       </header>
 
+      {/* ── Mobile Summary Card (Unified Metric Surface) ────────────────── */}
+      {!loading && suscripciones.length > 0 && (
+        <div className={styles.mobileSummaryCard}>
+          <div className={styles.cardTopRow}>
+            <span className={styles.cardLabel}>Gasto fijo mensual</span>
+            <span className={styles.cardBadge}>
+              {suscripcionesActivas.length} activa{suscripcionesActivas.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <span className={styles.cardAmount}>{formatCurrency(totalMensualARS)}</span>
+          <div className={styles.cardSubline}>
+            <span>
+              {totalMensualUSD > 0 
+                ? `+ US$ ${totalMensualUSD.toLocaleString('es-AR', { minimumFractionDigits: totalMensualUSD % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })} en dólares`
+                : `${suscripcionesActivas.length} suscripciones registradas`}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Barra de resumen (Desktop) ────────────────────────────────────── */}
       <PageSummaryBar
+        className={styles.desktopSummaryBar}
         items={[
           {
             label: "Total mensual ARS",

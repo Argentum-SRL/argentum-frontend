@@ -391,10 +391,26 @@ export default function BilleterasPage() {
 
       {activeTab === 'billeteras' ? (
         <>
-          {/* ── Barra de resumen ───────────────────────────────────────────────── */}
+          {/* ── Mobile Summary Card (Unified Metric Surface) ────────────────── */}
+          {!isLoading && billeterasActivas.length > 0 && (
+            <div className={styles.mobileSummaryCard}>
+              <div className={styles.cardTopRow}>
+                <span className={styles.cardLabel}>Patrimonio total</span>
+                <span className={styles.cardBadge}>
+                  {billeterasActivas.length} {billeterasActivas.length === 1 ? 'cuenta' : 'cuentas'}
+                </span>
+              </div>
+              <span className={styles.cardAmount}>{formatCurrency(totalARS)}</span>
+              <div className={styles.cardSubline}>
+                <span>≈ USD {totalUSD.toLocaleString('es-AR')}</span>
+              </div>
+            </div>
+          )}
+
+          {/* ── Barra de resumen (Desktop) ───────────────────────────────────────── */}
           {!isLoading && billeterasActivas.length > 0 && (
             <PageSummaryBar
-              className={styles.summaryBar}
+              className={styles.desktopSummaryBar}
               items={[
                 {
                   label: "Billeteras activas",

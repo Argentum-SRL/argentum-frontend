@@ -217,12 +217,25 @@
 
 .page::after {
   content: '';
-  display: block;
-  height: 32px;
-  flex-shrink: 0;
-  width: 100%;
+  display: none;
 }
 
-.summaryBar {
+@media (min-width: 768px) {
+  .page::after {
+    display: block;
+    height: 32px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+}
+
+.desktopSummaryBar {
+  display: none !important;
   margin-top: 0 !important;
+}
+
+@media (min-width: 768px) {
+  .desktopSummaryBar {
+    display: flex !important;
+  }
 }

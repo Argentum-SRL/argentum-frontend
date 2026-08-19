@@ -1,3 +1,5 @@
+/* ── GoalsBarChart.module.css ───────────────────────────────────────────────── */
+
 .chartWrapper {
   background: var(--surface);
   border-radius: 20px;
@@ -71,6 +73,11 @@
   user-select: none;
 }
 
+.columnPaused {
+  opacity: 0.6;
+  filter: grayscale(0.5);
+}
+
 /* Main Bar Column Area */
 .barArea {
   width: 82px;
@@ -87,7 +94,7 @@
   transform: scale(0.95);
 }
 
-/* 1. Dashed Frame (Budget Limit) */
+/* 1. Dashed Frame (Target Limit) */
 .dashedFrame {
   position: absolute;
   bottom: 0;
@@ -122,8 +129,8 @@
   box-sizing: border-box;
 }
 
-.solidFillOverflow {
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+.solidFillCompleted {
+  box-shadow: 0 0 16px rgba(202, 138, 4, 0.35);
 }
 
 [data-theme="dark"] .solidFill {
@@ -180,7 +187,28 @@
   color: rgba(248, 250, 252, 0.7);
 }
 
-/* Bottom Label: Budget Name */
+/* Ceiling Tag with Limit */
+.ceilingTag {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.ceilingAmount {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  padding: 2px 7px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+/* Bottom Label: Goal Name */
 .budgetName {
   font-size: 12px;
   font-weight: 700;

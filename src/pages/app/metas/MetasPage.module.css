@@ -11,18 +11,13 @@
   }
 }
 
+/* ── Header ──────────────────────────────────────────────────────────────── */
 .header {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .titleGroup {
@@ -79,26 +74,21 @@
   transform: translateY(-1px);
 }
 
+.btnSuffix { display: none; }
+
 @media (min-width: 768px) {
   .nuevaBtn {
     padding: 0 18px;
     height: 40px;
   }
+  .btnSuffix { display: inline; }
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────────────────── */
-.toolbar {
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+.tabsContainer {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .toolbar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+  justify-content: center;
+  width: 100%;
 }
 
 .tabs {
@@ -107,7 +97,6 @@
   padding: 4px;
   border-radius: 12px;
   gap: 4px;
-  width: fit-content;
 }
 
 .tab {
@@ -128,40 +117,17 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.searchContainer {
-  position: relative;
-  flex: 1;
-  max-width: 320px;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-3);
-}
-
-.searchInput {
-  width: 100%;
-  height: 40px;
-  padding: 0 12px 0 38px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.searchInput:focus {
-  outline: none;
-  border-color: var(--primary-light);
-  box-shadow: 0 0 0 3px var(--primary-light-alpha);
-}
-
 /* ── Grid & Content ──────────────────────────────────────────────────────── */
 .content {
   flex: 1;
+}
+
+.mobileChartContainer {
+  display: block;
+}
+
+.desktopGrid {
+  display: none;
 }
 
 .grid {
@@ -171,6 +137,16 @@
 }
 
 @media (min-width: 768px) {
+  .mobileChartContainer {
+    display: none;
+  }
+
+  .desktopGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: 20px;

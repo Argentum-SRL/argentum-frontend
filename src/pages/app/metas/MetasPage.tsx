@@ -1,32 +1,32 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Plus, 
-  Target,
-  Search
+  Target
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import styles from './MetasPage.module.css'
 import goalsService from '@/services/goals.service'
 import billeteraService from '@/services/billetera.service'
 import type { Goal } from '@/types/goals'
+import { EstadoMeta } from '@/types/goals'
 import type { Billetera } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import GoalCard from '@/components/goals/GoalCard'
+import GoalsBarChart from './GoalsBarChart'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function MetasPage() {
   const { showToast } = useToast()
-  const { open } = useModal()
+  const { open, confirm } = useModal()
   const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState<'activa' | 'completada' | 'pausada'>('activa')
   const [goals, setGoals] = useState<Goal[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
 
   const fetchGoals = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -82,12 +82,8 @@ export default function MetasPage() {
   }, [fetchAll])
 
   const filteredGoals = useMemo(() => {
-    return goals.filter(g => {
-      const matchesTab = g.estado === activeTab
-      const matchesSearch = g.nombre.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesTab && matchesSearch
-    })
-  }, [goals, activeTab, searchQuery])
+    return goals.filter(g => g.estado === activeTab)
+  }, [goals, activeTab])
 
   const totals = useMemo(() => {
     const activeOnes = goals.filter(g => g.estado === 'activa')
@@ -134,6 +130,35 @@ export default function MetasPage() {
     navigate(`/app/metas/${id}`)
   }
 
+  const handleToggleStatus = useCallback(async (g: Goal) => {
+    const nuevoEstado = g.estado === EstadoMeta.ACTIVA ? EstadoMeta.PAUSADA : EstadoMeta.ACTIVA
+    try {
+      await goalsService.updateGoal(g.id, { estado: nuevoEstado })
+      showToast(`Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}`, 'success')
+      void fetchAll()
+    } catch {
+      showToast('Error al cambiar el estado', 'error')
+    }
+  }, [fetchAll, showToast])
+
+  const handleDelete = useCallback((g: Goal) => {
+    confirm({
+      title: '¿Eliminás esta meta?',
+      description: 'Se borrará el seguimiento y el historial de aportes de esta meta.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await goalsService.deleteGoal(g.id)
+          showToast('Meta eliminada', 'success')
+          void fetchAll()
+        } catch {
+          showToast('Error al eliminar la meta', 'error')
+        }
+      }
+    })
+  }, [confirm, fetchAll, showToast])
+
   const totalAhorrado = totals.totalAhorrado
   const totalObjetivo = totals.totalObjetivo
   const metasCompletadas = totals.completadas
@@ -151,7 +176,7 @@ export default function MetasPage() {
         <div className={styles.actions}>
           <button className={styles.nuevaBtn} onClick={handleCreate}>
             <Plus size={16} strokeWidth={2.5} />
-            Nueva meta
+            Nueva<span className={styles.btnSuffix}> meta</span>
           </button>
         </div>
       </div>
@@ -176,8 +201,8 @@ export default function MetasPage() {
         ]}
       />
 
-      {/* ── Toolbar ─────────────────────────────────────────────────── */}
-      <div className={styles.toolbar}>
+      {/* ── Tabs ───────────────────────────────────────────────────────────── */}
+      <div className={styles.tabsContainer}>
         <div className={styles.tabs}>
           <button 
             className={`${styles.tab} ${activeTab === 'activa' ? styles.tabActive : ''}`}
@@ -198,17 +223,6 @@ export default function MetasPage() {
             Pausadas
           </button>
         </div>
-
-        <div className={styles.searchContainer}>
-          <Search size={16} className={styles.searchIcon} />
-          <input 
-            type="text" 
-            placeholder="Buscar meta..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={styles.searchInput}
-          />
-        </div>
       </div>
 
       {/* ── Content ──────────────────────────────────────────────────── */}
@@ -220,30 +234,43 @@ export default function MetasPage() {
         ) : filteredGoals.length === 0 ? (
           <EmptyState
             icon={Target}
-            title={searchQuery ? 'No se encontraron resultados' : activeTab === 'activa' ? 'Todavía no tenés ninguna meta guardada.' : `Sin metas ${activeTab}s`}
+            title={activeTab === 'activa' ? 'Todavía no tenés ninguna meta guardada.' : `Sin metas ${activeTab}s`}
             description={
-              searchQuery 
-                ? 'Probá con otro nombre o criterio de búsqueda.' 
-                : activeTab === 'activa' 
-                  ? '¿Tenés algún objetivo en mente? Creá una meta para empezar a ahorrar.' 
-                  : `No tenés metas en estado ${activeTab}.`
+              activeTab === 'activa' 
+                ? '¿Tenés algún objetivo en mente? Creá una meta para empezar a ahorrar.' 
+                : `No tenés metas en estado ${activeTab}.`
             }
-            actionLabel={!searchQuery && activeTab === 'activa' ? 'Crear mi primera meta' : undefined}
+            actionLabel={activeTab === 'activa' ? 'Crear mi primera meta' : undefined}
             onActionClick={handleCreate}
           />
         ) : (
-          <div className={styles.grid}>
-            {filteredGoals.map(g => (
-              <GoalCard 
-                key={g.id} 
-                goal={g} 
-                onEdit={() => handleEdit(g)}
-                onContribute={() => handleContribute(g)}
-                onDetails={() => handleDetails(g.id)}
-                onRefresh={fetchAll}
+          <>
+            {/* Mobile Comparative Bar Chart (< 768px) */}
+            <div className={styles.mobileChartContainer}>
+              <GoalsBarChart 
+                goals={filteredGoals}
+                onEdit={handleEdit}
+                onContribute={handleContribute}
+                onDetails={handleDetails}
+                onToggleStatus={handleToggleStatus}
+                onDelete={handleDelete}
               />
-            ))}
-          </div>
+            </div>
+
+            {/* Desktop Grid (>= 768px) */}
+            <div className={styles.desktopGrid}>
+              {filteredGoals.map(g => (
+                <GoalCard 
+                  key={g.id} 
+                  goal={g} 
+                  onEdit={() => handleEdit(g)}
+                  onContribute={() => handleContribute(g)}
+                  onDetails={() => handleDetails(g.id)}
+                  onRefresh={fetchAll}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

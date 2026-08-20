@@ -9,7 +9,7 @@ import suscripcionService from '@/services/suscripcion.service'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import categoriaService from '@/services/categoria.service'
-import type { Billetera, TarjetaCredito, Categoria, Suscripcion } from '@/types'
+import type { Billetera, TarjetaCredito, Categoria, Subcategoria, Suscripcion } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
@@ -36,6 +36,7 @@ interface FormState {
   billeteraId: string
   tarjetaId: string
   categoriaId: string
+  subcategoriaId: string
   isEdit: boolean
   isSubmitting: boolean
 }
@@ -58,6 +59,7 @@ const initialState: FormState = {
   billeteraId: '',
   tarjetaId: '',
   categoriaId: '',
+  subcategoriaId: '',
   isEdit: false,
   isSubmitting: false,
 }
@@ -83,7 +85,8 @@ function reducer(state: FormState, action: FormAction): FormState {
           metodoCobro: s.tarjeta_id ? 'tarjeta' : 'debito',
           tarjetaId: s.tarjeta_id || action.defaultTarjetaId || '',
           billeteraId: s.billetera_id || action.defaultBilleteraId || '',
-          categoriaId: s.categoria_id || ''
+          categoriaId: s.categoria_id || '',
+          subcategoriaId: s.subcategoria_id || ''
         }
       }
       return {
@@ -106,6 +109,8 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
+  const [loadingSubcats, setLoadingSubcats] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
@@ -142,6 +147,31 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     }
   }, [open, suscripcion])
 
+  // Cargar subcategorías dinámicamente según la categoría seleccionada
+  useEffect(() => {
+    if (!state.categoriaId) return
+
+    const controller = new AbortController()
+
+    const fetchSubcats = async () => {
+      setLoadingSubcats(true)
+      try {
+        const data = await categoriaService.getSubcategorias(state.categoriaId, controller.signal)
+        setSubcategorias(data)
+      } catch (e: unknown) {
+        if (e instanceof Error && (e.name === 'CanceledError' || e.name === 'AbortError')) return
+        console.error('Error fetching subcategorias:', e)
+      } finally {
+        setLoadingSubcats(false)
+      }
+    }
+
+    fetchSubcats()
+    return () => {
+      controller.abort()
+    }
+  }, [state.categoriaId])
+
   // Scroll to selected card
   useEffect(() => {
     if (!open) return
@@ -177,6 +207,14 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     ...categorias.map(c => ({ value: c.id, label: c.nombre }))
   ], [categorias])
 
+  const opcionesSubcategorias = useMemo<SelectOption[]>(() => {
+    if (!state.categoriaId) return [{ value: '', label: 'Seleccionar (opcional)...' }]
+    return [
+      { value: '', label: 'Seleccionar (opcional)...' },
+      ...subcategorias.map(s => ({ value: s.id, label: s.nombre }))
+    ]
+  }, [subcategorias, state.categoriaId])
+
   const handleSelectServicio = (s: ServicioCatalogo) => {
     dispatch({ type: 'SET_FIELD', field: 'servicioId', value: s.id })
     dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: s.nombre })
@@ -184,7 +222,10 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
     if (s.categoria) {
       const cat = categorias.find(c => c.nombre.toLowerCase() === s.categoria.toLowerCase())
-      if (cat) dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
+      if (cat) {
+        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
+        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+      }
     }
     goNext()
   }
@@ -203,6 +244,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
       const payload = {
         nombre: state.nombrePersonalizado,
         categoria_id: state.categoriaId || undefined,
+        subcategoria_id: state.subcategoriaId || undefined,
         frecuencia: state.frecuencia,
         proximo_cobro: state.proximo_cobro,
         monto: state.monto,
@@ -401,11 +443,27 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                       id="categoria-suscripcion"
                       label="Categoría"
                       value={state.categoriaId}
-                      onChange={val => dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: val })}
+                      onChange={val => {
+                        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: val })
+                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                      }}
                       options={opcionesCategorias}
                     />
                   </div>
                 </div>
+
+                {state.categoriaId && subcategorias.length > 0 && (
+                  <div className={styles.formField}>
+                    <SelectInput
+                      id="subcategoria-suscripcion"
+                      label="Subcategoría (opcional)"
+                      value={state.subcategoriaId}
+                      onChange={val => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: val })}
+                      options={opcionesSubcategorias}
+                      disabled={loadingSubcats}
+                    />
+                  </div>
+                )}
 
 
                 <div className={styles.formField}>

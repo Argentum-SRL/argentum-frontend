@@ -186,17 +186,18 @@ const ListSkeleton = memo(() => (
 ListSkeleton.displayName = 'ListSkeleton'
 
 const COLORES_CATEGORIA: Record<string, string> = {
-  'Alimentación':               '#F97316',  // Naranja
-  'Transporte':                 '#166534',  // Verde oscuro
-  'Salud y cuidado personal':   '#4ADE80',  // Verde claro
-  'Ropa e indumentaria':        '#38BDF8',  // Celeste
-  'Educación':                  '#DC2626',  // Rojo
-  'Vivienda':                   '#3B82F6',  // Azul
-  'Banco':                      '#6B7280',  // Gris
-  'Mascotas':                   '#92400E',  // Marrón
-  'Regalos':                    '#F472B6',  // Rosa
-  'Entretenimiento y salidas':  '#F87171',  // Rojo claro
-  'Servicios digitales':        '#A78BFA',  // Violeta (fallback elegante)
+  'Alimentación':             '#F97316',  // Naranja
+  'Indumentaria':             '#7C3AED',  // Violeta
+  'Servicios':                '#EAB308',  // Dorado / Amarillo
+  'Hogar':                    '#8B5CF6',  // Púrpura
+  'Salud':                    '#10B981',  // Esmeralda
+  'Transporte':               '#0284C7',  // Azul cielo
+  'Comunicación':             '#6366F1',  // Índigo
+  'Recreativo':               '#EC4899',  // Rosa / Magenta
+  'Educación':                '#DC2626',  // Rojo
+  'Restaurantes y delivery':  '#F59E0B',  // Ámbar
+  'Otros':                    '#6B7280',  // Gris neutro
+  'Banco':                    '#64748B',  // Slate / Gris azulado
 }
 
 const DEFAULT_COLOR = '#8A95A8'

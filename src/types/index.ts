@@ -39,6 +39,7 @@ export interface Suscripcion {
   usuario_id: string
   nombre: string
   categoria_id: string | null
+  subcategoria_id: string | null
   frecuencia: 'mensual' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'
   proximo_cobro: string
   estado: 'activa' | 'pausada' | 'cancelada'
@@ -58,6 +59,7 @@ export interface TotalMensualSuscripciones {
 export interface SuscripcionCreate {
   nombre: string
   categoria_id?: string
+  subcategoria_id?: string
   frecuencia: string
   proximo_cobro: string
   monto: number

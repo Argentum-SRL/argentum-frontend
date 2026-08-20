@@ -23,6 +23,7 @@ export const CategoriaIcon = memo(({ nombre, size = 28, className }: CategoriaIc
         alt={visual.label}
         width={size}
         height={size}
+        loading="lazy"
         className={[styles.iconImage, className].filter(Boolean).join(' ')}
       />
     )

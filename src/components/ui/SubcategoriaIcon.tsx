@@ -32,6 +32,7 @@ export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, class
         alt={nombre || 'Icono'}
         width={size}
         height={size}
+        loading="lazy"
         style={{ objectFit: 'contain' }}
         className={className}
       />

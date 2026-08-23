@@ -27,6 +27,7 @@ import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { EmptyState } from '@/components/ui'
 
 import styles from './DashboardPage.module.css'
@@ -254,7 +255,7 @@ const CategoriasChart = memo(({
             onClick={() => onSelectCategory(entry.categoria_id, entry.categoria_nombre)}
           >
             <div className={styles.barIconWrap}>
-              <SubcategoriaIcon nombre="" parentCategory={entry.categoria_nombre} size={32} />
+              <CategoriaIcon nombre={entry.categoria_nombre} size={32} />
             </div>
             <div className={styles.barContent}>
               <div className={styles.barHeader}>

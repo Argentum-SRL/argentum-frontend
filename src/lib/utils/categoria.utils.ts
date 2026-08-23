@@ -28,6 +28,7 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'restaurantes y delivery':  { iconSrc: '/assets/icons/categorias/hamburguesa%20Background%20Removed.png',  label: 'Restaurantes y delivery' },
   'otros':                    { iconSrc: '/assets/icons/categorias/herramienta%20Background%20Removed.png',  label: 'Otros' },
   'otros gastos':             { iconSrc: '/assets/icons/categorias/herramienta%20Background%20Removed.png',  label: 'Otros' },
+  'ahorro':                   { iconSrc: '/assets/icons/categorias/ahorro%20Background%20Removed.png',       label: 'Ahorro' },
   'banco':                    { iconSrc: '/assets/icons/categorias/banco%20Background%20Removed.png',        label: 'Banco' },
 
   'servicios digitales':      { iconSrc: '/assets/icons/categorias/serviciosdigitales%20Background%20Removed.png', label: 'Servicios digitales' },
@@ -172,6 +173,8 @@ export const SUBCATEGORIA_VISUAL: Record<string, SubcategoriaVisual> = {
   'general':                  { iconSrc: '/assets/icons/categorias/herramienta%20Background%20Removed.png', label: 'General' },
 
   // Banco
+  'ahorros':                  { iconSrc: '/assets/icons/subcategorias/ahorro%20Background%20Removed.png', label: 'Ahorros' },
+  'ahorro':                   { iconSrc: '/assets/icons/subcategorias/ahorro%20Background%20Removed.png', label: 'Ahorros' },
   'comisiones y gastos bancarios': { iconSrc: '/assets/icons/categorias/banco%20Background%20Removed.png', label: 'Comisiones y gastos bancarios' },
   'gastos bancarios y comisiones': { iconSrc: '/assets/icons/categorias/banco%20Background%20Removed.png', label: 'Gastos bancarios y comisiones' },
   'prestamos':                { iconSrc: '/assets/icons/subcategorias/prestamos%20Background%20Removed.png', label: 'Préstamos' },

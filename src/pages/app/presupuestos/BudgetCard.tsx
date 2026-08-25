@@ -55,27 +55,31 @@ export default function BudgetCard({
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <div className={styles.cardTop}>
-          <div className={styles.titleInfo}>
-            <h3 className={styles.cardTitle}>{presupuesto.nombre}</h3>
-            <span className={styles.periodBadge}>{presupuesto.periodo}</span>
-          </div>
+        <div className={styles.cardHeaderTop}>
+          <h3 className={styles.cardTitle} title={presupuesto.nombre}>
+            {presupuesto.nombre}
+          </h3>
+          <span className={styles.periodBadge}>{presupuesto.periodo}</span>
+        </div>
+        {presupuesto.categorias && presupuesto.categorias.length > 0 && (
           <div className={styles.categoryChips}>
-            {presupuesto.categorias.slice(0, 2).map((c, i) => (
-              <span key={i} className={styles.chip}>
+            {presupuesto.categorias.slice(0, 3).map((c, i) => (
+              <span key={i} className={styles.chip} title={c.nombre}>
                 <SubcategoriaIcon 
                   nombre={c.es_subcategoria ? c.nombre : null} 
                   parentCategory={c.es_subcategoria ? null : c.nombre} 
                   size={14} 
                 />
-                {c.nombre}
+                <span className={styles.chipText}>{c.nombre}</span>
               </span>
             ))}
-            {presupuesto.categorias.length > 2 && (
-              <span className={styles.chip}>+{presupuesto.categorias.length - 2}</span>
+            {presupuesto.categorias.length > 3 && (
+              <span className={`${styles.chip} ${styles.chipMore}`}>
+                +{presupuesto.categorias.length - 3}
+              </span>
             )}
           </div>
-        </div>
+        )}
       </div>
 
       <div className={styles.progressSection}>

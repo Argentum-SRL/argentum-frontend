@@ -44,6 +44,10 @@
     text-decoration: none;
     color: var(--primary);
     z-index: 40;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
+    flex-shrink: 0;
   }
   
   :global([data-theme="dark"]) .standaloneLogo {
@@ -54,6 +58,18 @@
     font-size: 18px;
     font-weight: 700;
     letter-spacing: -0.01em;
+    white-space: nowrap;
+    line-height: 1;
+    display: inline-block;
+  }
+
+  @media (min-width: 768px) and (max-width: 1180px) {
+    .logoTitle {
+      display: none;
+    }
+    .standaloneLogo {
+      gap: 0;
+    }
   }
 
   .topNav {
@@ -433,6 +449,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+  flex-shrink: 0;
 }
 
 .mobileLogoText {
@@ -440,6 +460,12 @@
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.3px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+:global([data-theme="dark"]) .mobileLogoText {
+  color: #fff;
 }
 
 .mobileActions {

@@ -16,7 +16,21 @@ import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import GoalCard from '@/components/goals/GoalCard'
 import GoalsBarChart from './GoalsBarChart'
-import { EmptyState, PageSummaryBar } from '@/components/ui'
+import { EmptyState, PageSummaryBar, SegmentedControl } from '@/components/ui'
+
+type VistaDesktop = 'tarjetas' | 'comparativa'
+
+const getInitialVista = (): VistaDesktop => {
+  try {
+    const saved = localStorage.getItem('argentum_metas_vista')
+    if (saved === 'comparativa' || saved === 'tarjetas') {
+      return saved
+    }
+  } catch {
+    // localStorage not available
+  }
+  return 'tarjetas'
+}
 
 export default function MetasPage() {
   const { showToast } = useToast()
@@ -24,9 +38,19 @@ export default function MetasPage() {
   const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState<'activa' | 'completada' | 'pausada'>('activa')
+  const [vistaDesktop, setVistaDesktop] = useState<VistaDesktop>(getInitialVista)
   const [goals, setGoals] = useState<Goal[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [loading, setLoading] = useState(true)
+
+  const handleVistaChange = (vista: VistaDesktop) => {
+    setVistaDesktop(vista)
+    try {
+      localStorage.setItem('argentum_metas_vista', vista)
+    } catch {
+      // localStorage error handling
+    }
+  }
 
   const fetchGoals = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -201,8 +225,8 @@ export default function MetasPage() {
         ]}
       />
 
-      {/* ── Tabs ───────────────────────────────────────────────────────────── */}
-      <div className={styles.tabsContainer}>
+      {/* ── Controls Row (Tabs + View Toggle) ──────────────────────────────── */}
+      <div className={styles.controlsRow}>
         <div className={styles.tabs}>
           <button 
             className={`${styles.tab} ${activeTab === 'activa' ? styles.tabActive : ''}`}
@@ -223,6 +247,19 @@ export default function MetasPage() {
             Pausadas
           </button>
         </div>
+
+        {!loading && filteredGoals.length > 0 && (
+          <div className={styles.desktopToggleContainer}>
+            <SegmentedControl
+              options={[
+                { value: 'tarjetas', label: 'Tarjetas' },
+                { value: 'comparativa', label: 'Comparativa' }
+              ]}
+              value={vistaDesktop}
+              onChange={(v) => handleVistaChange(v as VistaDesktop)}
+            />
+          </div>
+        )}
       </div>
 
       {/* ── Content ──────────────────────────────────────────────────── */}
@@ -257,19 +294,32 @@ export default function MetasPage() {
               />
             </div>
 
-            {/* Desktop Grid (>= 768px) */}
-            <div className={styles.desktopGrid}>
-              {filteredGoals.map(g => (
-                <GoalCard 
-                  key={g.id} 
-                  goal={g} 
-                  onEdit={() => handleEdit(g)}
-                  onContribute={() => handleContribute(g)}
-                  onDetails={() => handleDetails(g.id)}
-                  onRefresh={fetchAll}
+            {/* Desktop View (>= 768px) */}
+            {vistaDesktop === 'tarjetas' ? (
+              <div className={styles.desktopGrid}>
+                {filteredGoals.map(g => (
+                  <GoalCard 
+                    key={g.id} 
+                    goal={g} 
+                    onEdit={() => handleEdit(g)}
+                    onContribute={() => handleContribute(g)}
+                    onDetails={() => handleDetails(g.id)}
+                    onRefresh={fetchAll}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className={styles.desktopChartContainer}>
+                <GoalsBarChart 
+                  goals={filteredGoals}
+                  onEdit={handleEdit}
+                  onContribute={handleContribute}
+                  onDetails={handleDetails}
+                  onToggleStatus={handleToggleStatus}
+                  onDelete={handleDelete}
                 />
-              ))}
-            </div>
+              </div>
+            )}
           </>
         )}
       </div>

@@ -389,3 +389,74 @@
 .sheetActionDanger .sheetActionTitle {
   color: var(--error, #EF4444);
 }
+
+/* ── Desktop Scaling (>= 768px) ─────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .chartWrapper {
+    padding: 24px 0 20px 0;
+    border-radius: 24px;
+  }
+
+  .chartHeader {
+    padding: 0 28px 20px 28px;
+  }
+
+  .chartTitle {
+    font-size: 18px;
+  }
+
+  .chartSubtitle {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
+  .scrollContainer {
+    gap: 24px;
+    padding: 32px 36px 24px 36px;
+    scroll-padding: 0 36px;
+  }
+
+  .columnWrapper {
+    flex: 0 0 110px;
+    min-width: 104px;
+  }
+
+  .barArea {
+    width: 104px;
+    border-radius: 36px;
+  }
+
+  .dashedFrame {
+    border-radius: 36px;
+    border-width: 3px;
+  }
+
+  .solidFill {
+    border-radius: 36px;
+  }
+
+  .barContent {
+    padding: 18px 6px 20px 6px;
+    gap: 4px;
+  }
+
+  .iconWrapper {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 4px;
+  }
+
+  .spentAmount {
+    font-size: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  .percentText {
+    font-size: 13px;
+  }
+
+  .budgetName {
+    font-size: 13px;
+    margin-top: 12px;
+  }
+}

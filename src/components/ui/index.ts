@@ -12,8 +12,28 @@ import { SelectInput } from './SelectInput'
 import type { SelectOption } from './SelectInput'
 import { PhoneCountrySelect } from './PhoneCountrySelect'
 import type { Country } from './PhoneCountrySelect'
+import SegmentedControl from './SegmentedControl'
+import type { SegmentedControlOption, SegmentedControlProps } from './SegmentedControl'
 
-export { Button, Drawer, Field, MontoInput, Modal, Toast, Input, EmptyState, PageSummaryBar, DateInput, SelectInput, type SelectOption, PhoneCountrySelect, type Country }
+export { 
+  Button, 
+  Drawer, 
+  Field, 
+  MontoInput, 
+  Modal, 
+  Toast, 
+  Input, 
+  EmptyState, 
+  PageSummaryBar, 
+  DateInput, 
+  SelectInput, 
+  type SelectOption, 
+  PhoneCountrySelect, 
+  type Country,
+  SegmentedControl,
+  type SegmentedControlOption,
+  type SegmentedControlProps
+}
 
 export { ColorPicker } from './ColorPicker'
 

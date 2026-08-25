@@ -18,15 +18,39 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
 import BudgetBarChart from './BudgetBarChart'
 import BudgetHistoryModal from './BudgetHistoryModal'
-import { EmptyState, PageSummaryBar } from '@/components/ui'
+import { EmptyState, PageSummaryBar, SegmentedControl } from '@/components/ui'
+
+type VistaDesktop = 'tarjetas' | 'comparativa'
+
+const getInitialVista = (): VistaDesktop => {
+  try {
+    const saved = localStorage.getItem('argentum_presupuestos_vista')
+    if (saved === 'comparativa' || saved === 'tarjetas') {
+      return saved
+    }
+  } catch {
+    // localStorage not available
+  }
+  return 'tarjetas'
+}
 
 export default function PresupuestosPage() {
   const { showToast } = useToast()
   const { open, confirm } = useModal()
 
   const [activeTab, setActiveTab] = useState<'activo' | 'pausado' | 'finalizado'>('activo')
+  const [vistaDesktop, setVistaDesktop] = useState<VistaDesktop>(getInitialVista)
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([])
   const [loading, setLoading] = useState(true)
+
+  const handleVistaChange = (vista: VistaDesktop) => {
+    setVistaDesktop(vista)
+    try {
+      localStorage.setItem('argentum_presupuestos_vista', vista)
+    } catch {
+      // localStorage error handling
+    }
+  }
   
   // Data for forms
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -245,8 +269,8 @@ export default function PresupuestosPage() {
         />
       )}
 
-      {/* ── Tabs ───────────────────────────────────────────────────────────── */}
-      <div className={styles.tabsContainer}>
+      {/* ── Controls Row (Tabs + View Toggle) ──────────────────────────────── */}
+      <div className={styles.controlsRow}>
         <div className={styles.tabs}>
           <button 
             className={`${styles.tab} ${activeTab === 'activo' ? styles.tabActive : ''}`}
@@ -267,6 +291,19 @@ export default function PresupuestosPage() {
             Finalizados
           </button>
         </div>
+
+        {!loading && presupuestos.length > 0 && (
+          <div className={styles.desktopToggleContainer}>
+            <SegmentedControl
+              options={[
+                { value: 'tarjetas', label: 'Tarjetas' },
+                { value: 'comparativa', label: 'Comparativa' }
+              ]}
+              value={vistaDesktop}
+              onChange={(v) => handleVistaChange(v as VistaDesktop)}
+            />
+          </div>
+        )}
       </div>
 
       {/* ── Content ────────────────────────────────────────────────────────── */}
@@ -299,19 +336,33 @@ export default function PresupuestosPage() {
                 onHistory={handleViewHistory}
               />
             </div>
-            <div className={styles.desktopGrid}>
-              {presupuestos.map(p => (
-                <BudgetCard 
-                  key={p.id} 
-                  presupuesto={p} 
-                  onEdit={() => handleEdit(p)}
-                  onPause={() => handlePause(p)}
-                  onResume={() => handleResume(p.id)}
-                  onDelete={() => handleDelete(p)}
-                  onHistory={() => handleViewHistory(p)}
+
+            {vistaDesktop === 'tarjetas' ? (
+              <div className={styles.desktopGrid}>
+                {presupuestos.map(p => (
+                  <BudgetCard 
+                    key={p.id} 
+                    presupuesto={p} 
+                    onEdit={() => handleEdit(p)}
+                    onPause={() => handlePause(p)}
+                    onResume={() => handleResume(p.id)}
+                    onDelete={() => handleDelete(p)}
+                    onHistory={() => handleViewHistory(p)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className={styles.desktopChartContainer}>
+                <BudgetBarChart
+                  presupuestos={presupuestos}
+                  onEdit={handleEdit}
+                  onPause={handlePause}
+                  onResume={handleResume}
+                  onDelete={handleDelete}
+                  onHistory={handleViewHistory}
                 />
-              ))}
-            </div>
+              </div>
+            )}
           </>
         )}
       </div>

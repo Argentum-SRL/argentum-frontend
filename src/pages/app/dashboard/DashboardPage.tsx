@@ -194,9 +194,11 @@ const COLORES_CATEGORIA: Record<string, string> = {
   'Salud':                    '#10B981',  // Esmeralda
   'Transporte':               '#0284C7',  // Azul cielo
   'Comunicación':             '#6366F1',  // Índigo
-  'Recreativo':               '#EC4899',  // Rosa / Magenta
+  'Entretenimiento':          '#EC4899',  // Rosa / Magenta
+  'Recreativo':               '#EC4899',  // Fallback
   'Educación':                '#DC2626',  // Rojo
-  'Restaurantes y delivery':  '#F59E0B',  // Ámbar
+  'Restaurante':              '#F59E0B',  // Ámbar
+  'Restaurantes y delivery':  '#F59E0B',  // Fallback
   'Otros':                    '#6B7280',  // Gris neutro
   'Banco':                    '#64748B',  // Slate / Gris azulado
 }

@@ -246,9 +246,12 @@ export default function TransaccionModal({
     const mainCats = [
       'alimentacion',
       'transporte',
+      'restaurante',
+      'restaurantes',
       'restaurantes y delivery',
       'salud',
       'servicios',
+      'entretenimiento',
       'recreativo',
       'indumentaria',
       'educacion',

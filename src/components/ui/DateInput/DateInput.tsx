@@ -37,6 +37,7 @@ const triggerHapticFeedback = () => {
 interface DateInputProps {
   value: string
   onChange: (value: string) => void
+  variant?: 'default' | 'compact'
   label?: string
   error?: string | null
   disabled?: boolean
@@ -52,6 +53,7 @@ interface DateInputProps {
 export const DateInput: React.FC<DateInputProps> = ({
   value,
   onChange,
+  variant = 'default',
   label,
   error,
   disabled,
@@ -424,6 +426,72 @@ export const DateInput: React.FC<DateInputProps> = ({
       </button>
     </div>
   )
+
+  if (variant === 'compact') {
+    return (
+      <div className={[styles.compactWrapper, className].filter(Boolean).join(' ')} ref={wrapperRef}>
+        <div
+          id={id}
+          role="button"
+          tabIndex={disabled ? -1 : 0}
+          className={[
+            styles.compactRow,
+            error ? styles.inputError : '',
+            disabled ? styles.compactDisabled : '',
+          ].filter(Boolean).join(' ')}
+          onClick={() => !disabled && setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              if (!disabled) setOpen(true)
+            }
+          }}
+        >
+          {label && <span className={styles.compactLabel}>{label}</span>}
+          <div className={styles.compactValueGroup}>
+            <span className={[styles.compactValue, !inputText ? styles.compactPlaceholder : ''].filter(Boolean).join(' ')}>
+              {inputText || placeholder}
+            </span>
+            <span className={styles.compactIcon}>
+              <Calendar size={15} />
+            </span>
+          </div>
+        </div>
+        {name && <input type="hidden" name={name} value={value} required={required} />}
+        {error && (
+          <span className={styles.errorMsg}>
+            <AlertCircle size={12} />
+            {error}
+          </span>
+        )}
+        {open && createPortal(
+          isMobile ? (
+            <div
+              className={styles.bottomSheetOverlay}
+              data-portal="date-picker"
+              onMouseDown={(e) => {
+                if (e.target === e.currentTarget) closePicker()
+              }}
+            >
+              <div className={styles.bottomSheet} ref={popoverRef}>
+                <div className={styles.bottomSheetHandle} />
+                <div className={styles.bottomSheetContent}>
+                  {wheelPickerContent}
+                </div>
+                {footerContent}
+              </div>
+            </div>
+          ) : (
+            <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
+              {wheelPickerContent}
+              {footerContent}
+            </div>
+          ),
+          document.body
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className={[styles.wrapper, className].filter(Boolean).join(' ')} ref={wrapperRef}>

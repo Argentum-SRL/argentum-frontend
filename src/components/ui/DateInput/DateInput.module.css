@@ -81,6 +81,77 @@
   gap: 4px;
 }
 
+/* ─── COMPACT VARIANT ─────────────────────────────── */
+
+.compactWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  width: 100%;
+}
+
+.compactRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  outline: none;
+  gap: 8px;
+}
+
+.compactRow:hover:not(.compactDisabled) {
+  background: var(--surface-alt);
+}
+
+.compactRow:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.compactDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.compactLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.compactValueGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.compactValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.compactPlaceholder {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.compactIcon {
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+}
+
 /* ─── POPOVER DESKTOP ─────────────────────────────── */
 
 .popover {

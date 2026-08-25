@@ -2,14 +2,14 @@ import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
 import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { useToast } from '@/hooks/useToast'
-import { DateInput, SelectInput, type SelectOption } from '@/components/ui'
+import { DateInput } from '@/components/ui'
 import { CATALOGO_SUSCRIPCIONES, CATEGORIAS_CATALOGO } from '@/lib/constants/suscripciones'
 import type { ServicioCatalogo } from '@/lib/constants/suscripciones'
 import suscripcionService from '@/services/suscripcion.service'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import categoriaService from '@/services/categoria.service'
-import type { Billetera, TarjetaCredito, Categoria, Subcategoria, Suscripcion } from '@/types'
+import type { Billetera, TarjetaCredito, Categoria, Suscripcion } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
@@ -24,7 +24,7 @@ interface SuscripcionModalProps {
 }
 
 interface FormState {
-  step: 1 | 2
+  step: 1 | 2 | 3
   slideDirection: 'forward' | 'back'
   servicioId: string | null
   nombrePersonalizado: string
@@ -42,7 +42,7 @@ interface FormState {
 }
 
 type FormAction =
-  | { type: 'SET_STEP'; step: 1 | 2; direction: 'forward' | 'back' }
+  | { type: 'SET_STEP'; step: 1 | 2 | 3; direction: 'forward' | 'back' }
   | { type: 'SET_FIELD'; field: keyof FormState; value: string | number | boolean | null }
   | { type: 'RESET'; data?: Suscripcion | null; defaultBilleteraId?: string; defaultTarjetaId?: string }
 
@@ -99,8 +99,6 @@ function reducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-
-
 const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, suscripcion, onSuccess }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { showToast } = useToast()
@@ -109,8 +107,6 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
-  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
-  const [loadingSubcats, setLoadingSubcats] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
@@ -147,34 +143,9 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     }
   }, [open, suscripcion])
 
-  // Cargar subcategorías dinámicamente según la categoría seleccionada
-  useEffect(() => {
-    if (!state.categoriaId) return
-
-    const controller = new AbortController()
-
-    const fetchSubcats = async () => {
-      setLoadingSubcats(true)
-      try {
-        const data = await categoriaService.getSubcategorias(state.categoriaId, controller.signal)
-        setSubcategorias(data)
-      } catch (e: unknown) {
-        if (e instanceof Error && (e.name === 'CanceledError' || e.name === 'AbortError')) return
-        console.error('Error fetching subcategorias:', e)
-      } finally {
-        setLoadingSubcats(false)
-      }
-    }
-
-    fetchSubcats()
-    return () => {
-      controller.abort()
-    }
-  }, [state.categoriaId])
-
   // Scroll to selected card
   useEffect(() => {
-    if (!open) return
+    if (!open || state.step !== 2) return
     const idToScroll = state.metodoCobro === 'tarjeta' ? state.tarjetaId : state.billeteraId
     if (!idToScroll) return
 
@@ -186,7 +157,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     }, 150)
 
     return () => clearTimeout(timer)
-  }, [state.billeteraId, state.tarjetaId, state.metodoCobro, open])
+  }, [state.billeteraId, state.tarjetaId, state.metodoCobro, state.step, open])
 
   const filteredCatalogo = useMemo(() => {
     if (!searchTerm) return CATALOGO_SUSCRIPCIONES
@@ -202,36 +173,89 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     return val % 1 === 0 ? val.toString() : val.toFixed(2)
   }, [state.monto, state.frecuencia])
 
-  const opcionesCategorias = useMemo<SelectOption[]>(() => [
-    { value: '', label: 'Seleccionar...' },
-    ...categorias.map(c => ({ value: c.id, label: c.nombre }))
-  ], [categorias])
+  const resolveCategoryAndSubcategory = async (catName: string, subcatName?: string) => {
+    try {
+      let catsList = categorias
+      if (catsList.length === 0) {
+        catsList = await categoriaService.getCategorias()
+        setCategorias(catsList)
+      }
 
-  const opcionesSubcategorias = useMemo<SelectOption[]>(() => {
-    if (!state.categoriaId) return [{ value: '', label: 'Seleccionar (opcional)...' }]
-    return [
-      { value: '', label: 'Seleccionar (opcional)...' },
-      ...subcategorias.map(s => ({ value: s.id, label: s.nombre }))
-    ]
-  }, [subcategorias, state.categoriaId])
+      // 1. Buscar categoría por nombre (case-insensitive)
+      let cat = catsList.find(c => c.nombre.toLowerCase() === catName.toLowerCase())
+      // Fallback a "Otros" si no existe
+      if (!cat) {
+        cat = catsList.find(c => c.nombre.toLowerCase() === 'otros')
+      }
 
-  const handleSelectServicio = (s: ServicioCatalogo) => {
+      if (cat) {
+        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
+
+        // 2. Buscar subcategoría por nombre (case-insensitive)
+        const subcats = await categoriaService.getSubcategorias(cat.id)
+        let subcat = subcatName
+          ? subcats.find(sc => sc.nombre.toLowerCase() === subcatName.toLowerCase())
+          : undefined
+
+        // Fallback a "Otros" dentro de la categoría si no encuentra la subcategoría
+        if (!subcat) {
+          subcat = subcats.find(sc => sc.nombre.toLowerCase() === 'otros')
+        }
+
+        if (subcat) {
+          dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: subcat.id })
+        } else {
+          dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+        }
+      } else {
+        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: '' })
+        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+      }
+    } catch (error) {
+      console.error('Error al resolver categoría/subcategoría:', error)
+    }
+  }
+
+  const handleSelectServicio = async (s: ServicioCatalogo) => {
     dispatch({ type: 'SET_FIELD', field: 'servicioId', value: s.id })
     dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: s.nombre })
     dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: s.frecuenciaDefault })
 
-    if (s.categoria) {
-      const cat = categorias.find(c => c.nombre.toLowerCase() === s.categoria.toLowerCase())
-      if (cat) {
-        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: cat.id })
-        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-      }
+    await resolveCategoryAndSubcategory(s.categoria, s.subcategoria)
+    goNext()
+  }
+
+  const handleSelectOther = () => {
+    dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })
+    resolveCategoryAndSubcategory('Otros', 'Otros')
+  }
+
+  const handleStep1Submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!state.nombrePersonalizado) return
+    if (!state.categoriaId) {
+      await resolveCategoryAndSubcategory('Otros', 'Otros')
     }
     goNext()
   }
 
   const goNext = () => dispatch({ type: 'SET_STEP', step: 2, direction: 'forward' })
-  const goBack = () => dispatch({ type: 'SET_STEP', step: 1, direction: 'back' })
+
+  const goNextFromStep2 = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!state.monto) {
+      showToast('Completá los campos obligatorios', 'error')
+      return
+    }
+    dispatch({ type: 'SET_STEP', step: 3, direction: 'forward' })
+  }
+
+  const goBack = () => {
+    if (state.step > 1) {
+      const prevStep = (state.step - 1) as 1 | 2
+      dispatch({ type: 'SET_STEP', step: prevStep, direction: 'back' })
+    }
+  }
 
   const handleSave = async () => {
     if (!state.monto || !state.nombrePersonalizado) {
@@ -282,6 +306,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
         <div className={styles.stepDots}>
           <div className={`${styles.stepDot} ${state.step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
           <div className={`${styles.stepDot} ${state.step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
+          <div className={`${styles.stepDot} ${state.step === 3 ? styles.stepDotActive : styles.stepDotInactive}`} />
         </div>
 
         {/* PASO 1: Selección de Servicio */}
@@ -289,10 +314,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
           <div className={`${styles.slide} ${animClass}`}>
             <form 
               className={styles.formContainer}
-              onSubmit={(e) => {
-                e.preventDefault()
-                goNext()
-              }}
+              onSubmit={handleStep1Submit}
             >
               <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>¿Qué suscripción querés agregar?</h2>
@@ -350,7 +372,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
                   <div
                     className={`${styles.otherOption} ${state.servicioId === 'other' ? styles.otherOptionActive : ''}`}
-                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })}
+                    onClick={handleSelectOther}
                   >
                     <div className={`${styles.logoFallback} ${styles.otherOptionLogo}`}><Plus size={20} /></div>
                     <div className={styles.flex1}>
@@ -386,15 +408,12 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
           </div>
         )}
 
-        {/* PASO 2: Configuración */}
+        {/* PASO 2: Monto y Método de Cobro */}
         {state.step === 2 && (
           <div className={`${styles.slide} ${animClass}`}>
             <form 
               className={styles.formContainer}
-              onSubmit={(e) => {
-                e.preventDefault()
-                handleSave()
-              }}
+              onSubmit={goNextFromStep2}
             >
               <div className={styles.formHeader}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
@@ -409,62 +428,6 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   moneda={state.moneda}
                   onMonedaChange={(m: 'ARS' | 'USD') => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                 />
-
-                <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Frecuencia de cobro</label>
-                  <div className={styles.radioPills}>
-                    {['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'].map(f => (
-                      <button
-                        key={f}
-                        type="button"
-                        className={`${styles.pill} ${state.frecuencia === f ? styles.pillActive : ''}`}
-                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: f })}
-                      >
-                        {f.charAt(0).toUpperCase() + f.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                  {costoMensual && state.frecuencia !== 'mensual' && (
-                    <p className={styles.previewCosto}>Equivale a {state.moneda === 'ARS' ? '$' : 'u$s'} {costoMensual} por mes</p>
-                  )}
-                </div>
-
-                <div className={styles.formRow}>
-                  <div className={styles.formFieldFlex1}>
-                    <label className={styles.fieldLabel} htmlFor="proximo-cobro">Fecha de facturación</label>
-                    <DateInput
-                      id="proximo-cobro"
-                      value={state.proximo_cobro}
-                      onChange={val => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: val })}
-                    />
-                  </div>
-                  <div className={styles.formFieldFlex1}>
-                    <SelectInput
-                      id="categoria-suscripcion"
-                      label="Categoría"
-                      value={state.categoriaId}
-                      onChange={val => {
-                        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: val })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                      }}
-                      options={opcionesCategorias}
-                    />
-                  </div>
-                </div>
-
-                {state.categoriaId && subcategorias.length > 0 && (
-                  <div className={styles.formField}>
-                    <SelectInput
-                      id="subcategoria-suscripcion"
-                      label="Subcategoría (opcional)"
-                      value={state.subcategoriaId}
-                      onChange={val => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: val })}
-                      options={opcionesSubcategorias}
-                      disabled={loadingSubcats}
-                    />
-                  </div>
-                )}
-
 
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>¿Cómo se cobra?</label>
@@ -541,6 +504,65 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div className={styles.formFooter}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button 
+                  type="submit"
+                  className={styles.submitBtn} 
+                  disabled={!state.monto}
+                >
+                  Continuar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* PASO 3: Frecuencia y Fecha */}
+        {state.step === 3 && (
+          <div className={`${styles.slide} ${animClass}`}>
+            <form 
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSave()
+              }}
+            >
+              <div className={styles.formHeader}>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
+                <h2 className={styles.headerTitle}>Configuración de {state.nombrePersonalizado}</h2>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+              </div>
+
+              <div className={styles.formBody}>
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>Frecuencia de cobro</label>
+                  <div className={styles.radioPills}>
+                    {['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'].map(f => (
+                      <button
+                        key={f}
+                        type="button"
+                        className={`${styles.pill} ${state.frecuencia === f ? styles.pillActive : ''}`}
+                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: f })}
+                      >
+                        {f.charAt(0).toUpperCase() + f.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                  {costoMensual && state.frecuencia !== 'mensual' && (
+                    <p className={styles.previewCosto}>Equivale a {state.moneda === 'ARS' ? '$' : 'u$s'} {costoMensual} por mes</p>
+                  )}
+                </div>
+
+                <DateInput
+                  id="proximo-cobro"
+                  variant="compact"
+                  label="Primer cobro"
+                  value={state.proximo_cobro}
+                  onChange={val => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: val })}
+                />
               </div>
 
               <div className={styles.formFooter}>

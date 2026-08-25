@@ -149,15 +149,22 @@ export default function GoalsBarChart({
                   }}
                 />
 
-                {/* 2. Solid Pastel Fill Bar */}
+                {/* 2. Solid Pastel Fill Bar (wrapped in fillTrack for capsule clipping) */}
                 <div
-                  className={`${styles.solidFill} ${isOverLimit ? styles.solidFillOverflow : ''}`}
+                  className={styles.fillTrack}
                   style={{
-                    height: `${visualFillHeight}px`,
-                    backgroundColor: barBgColor,
-                    opacity: porcentaje <= 0 ? 0 : 1
+                    height: `${isOverLimit ? visualFillHeight : frameHeight}px`,
                   }}
-                />
+                >
+                  <div
+                    className={`${styles.solidFill} ${isOverLimit ? styles.solidFillOverflow : ''} ${isCompleted ? styles.solidFillCompleted : ''}`}
+                    style={{
+                      height: `${visualFillHeight}px`,
+                      backgroundColor: barBgColor,
+                      opacity: porcentaje <= 0 ? 0 : 1
+                    }}
+                  />
+                </div>
 
                 {/* 3. Stacked Content Inside Bottom of the Column: Amount, % */}
                 <div className={styles.barContent}>

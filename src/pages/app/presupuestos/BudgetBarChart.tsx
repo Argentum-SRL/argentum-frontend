@@ -137,15 +137,22 @@ export default function BudgetBarChart({
                   }}
                 />
 
-                {/* 2. Solid Pastel Fill Bar */}
+                {/* 2. Solid Pastel Fill Bar (wrapped in fillTrack for capsule clipping) */}
                 <div
-                  className={`${styles.solidFill} ${isOverLimit ? styles.solidFillOverflow : ''}`}
+                  className={styles.fillTrack}
                   style={{
-                    height: `${visualFillHeight}px`,
-                    backgroundColor: palette.bg,
-                    opacity: porcentaje <= 0 ? 0 : 1
+                    height: `${isOverLimit ? visualFillHeight : frameHeight}px`,
                   }}
-                />
+                >
+                  <div
+                    className={`${styles.solidFill} ${isOverLimit ? styles.solidFillOverflow : ''}`}
+                    style={{
+                      height: `${visualFillHeight}px`,
+                      backgroundColor: palette.bg,
+                      opacity: porcentaje <= 0 ? 0 : 1
+                    }}
+                  />
+                </div>
 
                 {/* 3. Stacked Content Inside Bottom of the Column: Icon, Amount, % */}
                 <div className={styles.barContent}>

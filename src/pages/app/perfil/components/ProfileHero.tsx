@@ -14,7 +14,6 @@ interface ProfileHeroProps {
   usuario: Usuario | null
   updateUsuario: (u: Usuario) => void
   onOpenCrop: () => void
-  onVerifyEmail?: () => void
 }
 
 export const ProfileHero: React.FC<ProfileHeroProps> = ({

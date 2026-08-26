@@ -124,7 +124,7 @@ export interface EditarDatosPersonalesRequest {
 
 export interface EditarEmailRequest {
   email_nuevo: string
-  password_actual: string
+  password_actual?: string
 }
 
 export interface EditarPasswordRequest {

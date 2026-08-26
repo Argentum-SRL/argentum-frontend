@@ -149,7 +149,7 @@ export default function PerfilPage() {
       </div>
 
       {/* ── Tab Views Content ─────────────────────────────────────── */}
-      <main>
+      <main className={styles.mainContent}>
         {activeTab === 'perfil' && (
           <TabGeneral
             usuario={usuario}
@@ -185,9 +185,6 @@ export default function PerfilPage() {
         {activeTab === 'peligro' && (
           <DangerZone />
         )}
-
-        {/* ── Bottom Scroll Breathing Spacer ────────────────────────── */}
-        <div className={styles.bottomSpacer} aria-hidden="true" />
       </main>
 
       {/* ── Unified Edit Modals ────────────────────────────────────── */}

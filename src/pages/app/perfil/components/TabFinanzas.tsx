@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Coins, Calendar, Save, Check } from 'lucide-react'
-import type { Usuario } from '@/types'
+import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
+import { getCotizaciones } from '@/services/onboarding.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { SelectInput, type SelectOption } from '@/components/ui'
@@ -26,12 +27,21 @@ const OPCIONES_REGLA_CICLO: SelectOption[] = [
   { value: 'ultimo_viernes', label: 'Último Viernes de cada mes' },
 ]
 
-const OPCIONES_TIPO_DOLAR: { value: string; label: string; desc: string }[] = [
+const OPCIONES_TIPO_DOLAR: { value: 'blue' | 'mep' | 'oficial' | 'tarjeta'; label: string; desc: string }[] = [
   { value: 'blue', label: 'Dólar Blue', desc: 'Cotización informal de mercado libre' },
   { value: 'mep', label: 'Dólar MEP / Bolsa', desc: 'Cotización financiera mediante bonos' },
   { value: 'oficial', label: 'Dólar Oficial (BNA)', desc: 'Cotización formal del Banco Nación' },
   { value: 'tarjeta', label: 'Dólar Tarjeta', desc: 'Oficial + impuestos para consumos del exterior' },
 ]
+
+function formatARS(valor: number | null | undefined): string {
+  if (valor == null) return ''
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0,
+  }).format(valor)
+}
 
 export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario }) => {
   const { showToast } = useToast()
@@ -44,7 +54,16 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     !!usuario?.moneda_secundaria_activa
   )
   const [tipoDolar, setTipoDolar] = useState(usuario?.tipo_dolar || 'blue')
+  const [cotizaciones, setCotizaciones] = useState<CotizacionesDolarResponse | null>(null)
   const [isSavingMoneda, setIsSavingMoneda] = useState(false)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    getCotizaciones(controller.signal)
+      .then(setCotizaciones)
+      .catch(() => setCotizaciones(null))
+    return () => controller.abort()
+  }, [])
 
   // Cycle form
   const [cicloTipo, setCicloTipo] = useState<'dia_fijo' | 'regla'>(
@@ -98,7 +117,6 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           </div>
           <div className={styles.sectionHeaderText}>
             <h3>Moneda & Divisas</h3>
-            <p>Elegí la moneda base de tus balances y la cotización para conversiones</p>
           </div>
         </div>
 
@@ -161,22 +179,45 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
             <div className={styles.tipoDolarSection}>
               <label className={styles.formGroupLabel}>Cotización de referencia para Dólar</label>
               <div className={styles.dolarOptionsGrid}>
-                {OPCIONES_TIPO_DOLAR.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`${styles.dolarOptionCard} ${
-                      tipoDolar === opt.value ? styles.dolarOptionSelected : ''
-                    }`}
-                    onClick={() => setTipoDolar(opt.value)}
-                  >
-                    <div className={styles.dolarTop}>
-                      <span className={styles.dolarTitle}>{opt.label}</span>
-                      {tipoDolar === opt.value && <Check size={14} className={styles.checkIcon} />}
-                    </div>
-                    <span className={styles.dolarDesc}>{opt.desc}</span>
-                  </button>
-                ))}
+                {OPCIONES_TIPO_DOLAR.map((opt) => {
+                  const cotiz = cotizaciones?.cotizaciones?.[opt.value]
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`${styles.dolarOptionCard} ${
+                        tipoDolar === opt.value ? styles.dolarOptionSelected : ''
+                      }`}
+                      onClick={() => setTipoDolar(opt.value)}
+                    >
+                      <div className={styles.dolarTop}>
+                        <span className={styles.dolarTitle}>{opt.label}</span>
+                        {tipoDolar === opt.value && <Check size={14} className={styles.checkIcon} />}
+                      </div>
+
+                      {cotiz && (cotiz.compra != null || cotiz.venta != null) && (
+                        <div className={styles.dolarRatesRow}>
+                          {cotiz.compra != null && (
+                            <div className={styles.rateCol}>
+                              <span className={styles.rateLabel}>Compra</span>
+                              <span className={styles.rateValue}>{formatARS(cotiz.compra)}</span>
+                            </div>
+                          )}
+                          {cotiz.venta != null && (
+                            <div className={styles.rateCol}>
+                              <span className={styles.rateLabel}>Venta</span>
+                              <span className={`${styles.rateValue} ${styles.rateValuePrimary}`}>
+                                {formatARS(cotiz.venta)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <span className={styles.dolarDesc}>{opt.desc}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -202,7 +243,6 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           </div>
           <div className={styles.sectionHeaderText}>
             <h3>Ciclo de Ingresos y Cobro</h3>
-            <p>Definí cuándo comienza y cierra tu período contable mensual</p>
           </div>
         </div>
 

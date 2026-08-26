@@ -1,11 +1,17 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Save, AlertCircle, MessageSquare } from 'lucide-react'
+import { Save, AlertCircle, MessageSquare, Eye, EyeOff } from 'lucide-react'
 import type { Usuario } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { Modal, DateInput, SelectInput, type SelectOption } from '@/components/ui'
+import {
+  buildPhone,
+  desglosarTelefono,
+  normalizarTelefono,
+  formatearTelefonoVisual,
+} from '@/utils/telefono.utils'
 import styles from '../PerfilPage.module.css'
 
 const OPCIONES_SEXO: SelectOption[] = [
@@ -15,13 +21,6 @@ const OPCIONES_SEXO: SelectOption[] = [
   { value: 'no_binario', label: 'No binario' },
   { value: 'prefiero_no_decir', label: 'Prefiero no decirlo' },
 ]
-
-import {
-  buildPhone,
-  desglosarTelefono,
-  normalizarTelefono,
-  formatearTelefonoVisual,
-} from '@/utils/telefono.utils'
 
 interface EditModalsProps {
   activeModal: 'datos' | 'email' | 'telefono' | null
@@ -52,7 +51,6 @@ const DatosPersonalesForm: React.FC<{
     setIsSaving(true)
     setErrorMsg(null)
 
-    // Validaciones de Nombre y Apellido
     const nombreLimpio = formDatos.nombre.trim()
     const apellidoLimpio = formDatos.apellido.trim()
 
@@ -68,7 +66,6 @@ const DatosPersonalesForm: React.FC<{
       return
     }
 
-    // Validación de Fecha de Nacimiento
     if (formDatos.fecha_nacimiento) {
       const selectedDate = new Date(formDatos.fecha_nacimiento)
       const today = new Date()
@@ -109,37 +106,38 @@ const DatosPersonalesForm: React.FC<{
   }
 
   return (
-    <>
+    <form onSubmit={handleSubmit} className={styles.modalFormContainer}>
       {errorMsg && (
         <div className={styles.modalAlertError}>
-          <AlertCircle size={16} />
+          <AlertCircle size={15} />
           <span>{errorMsg}</span>
         </div>
       )}
-      <form onSubmit={handleSubmit} className={styles.modalFormBox}>
+
+      <div className={styles.modalFormBody}>
         <div className={styles.formRowDual}>
-          <div className={styles.formGroup}>
-            <label htmlFor="modal-nombre" className={styles.formGroupLabel}>
+          <div className={styles.formField}>
+            <label htmlFor="modal-nombre" className={styles.fieldLabel}>
               Nombre *
             </label>
             <input
               id="modal-nombre"
               type="text"
-              className={styles.cleanInput}
+              className={styles.fieldInput}
               value={formDatos.nombre}
               onChange={(e) => setFormDatos({ ...formDatos, nombre: e.target.value })}
               placeholder="Ej: Lucas"
               required
             />
           </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="modal-apellido" className={styles.formGroupLabel}>
+          <div className={styles.formField}>
+            <label htmlFor="modal-apellido" className={styles.fieldLabel}>
               Apellido *
             </label>
             <input
               id="modal-apellido"
               type="text"
-              className={styles.cleanInput}
+              className={styles.fieldInput}
               value={formDatos.apellido}
               onChange={(e) => setFormDatos({ ...formDatos, apellido: e.target.value })}
               placeholder="Ej: González"
@@ -148,7 +146,7 @@ const DatosPersonalesForm: React.FC<{
           </div>
         </div>
 
-        <div className={styles.formGroup}>
+        <div className={styles.formField}>
           <DateInput
             id="modal-nacimiento"
             label="Fecha de nacimiento"
@@ -157,7 +155,7 @@ const DatosPersonalesForm: React.FC<{
           />
         </div>
 
-        <div className={styles.formGroup}>
+        <div className={styles.formField}>
           <SelectInput
             id="modal-sexo"
             label="Sexo / Género"
@@ -166,15 +164,23 @@ const DatosPersonalesForm: React.FC<{
             options={OPCIONES_SEXO}
           />
         </div>
+      </div>
 
-        <div className={styles.modalFooterActions}>
-          <button type="submit" disabled={isSaving} className={styles.saveBtnPrimary}>
-            <Save size={15} />
-            <span>{isSaving ? 'Guardando...' : 'Guardar cambios'}</span>
-          </button>
-        </div>
-      </form>
-    </>
+      <div className={styles.modalFormFooter}>
+        <button
+          type="button"
+          className={styles.modalCancelBtn}
+          onClick={onClose}
+          disabled={isSaving}
+        >
+          Cancelar
+        </button>
+        <button type="submit" disabled={isSaving} className={styles.modalSubmitBtn}>
+          <Save size={15} />
+          <span>{isSaving ? 'Guardando...' : 'Guardar cambios'}</span>
+        </button>
+      </div>
+    </form>
   )
 }
 
@@ -188,6 +194,7 @@ const EmailForm: React.FC<{
   const { showToast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const [emailNuevo, setEmailNuevo] = useState(usuario?.email || '')
   const [passwordActual, setPasswordActual] = useState('')
@@ -223,18 +230,18 @@ const EmailForm: React.FC<{
     try {
       const res = await usuarioService.actualizarEmail({
         email_nuevo: emailLimpio,
-        password_actual: passwordActual,
+        password_actual: hasPassword ? passwordActual : undefined,
       })
       if (usuario) {
         updateUsuario({ ...usuario, email: emailLimpio, email_verificado: false })
       }
-      showToast(res.confirmacion || 'Email actualizado. Te enviamos un código de verificación.', 'success')
+      showToast(res.confirmacion || 'Correo actualizado. Se envió un código de verificación.', 'success')
       onClose()
       if (res.requiere_verificacion_email) {
-        navigate('/auth/verificar-email', { state: { email: emailLimpio } })
+        navigate('/auth/verificar-email')
       }
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No se pudo actualizar el email. Verificá tu contraseña actual.')
+      const msg = getErrorMessage(err, 'No se pudo actualizar el correo. Verificá los datos.')
       setErrorMsg(msg)
       showToast(msg, 'error')
     } finally {
@@ -243,58 +250,80 @@ const EmailForm: React.FC<{
   }
 
   return (
-    <>
+    <form onSubmit={handleSubmit} className={styles.modalFormContainer} autoComplete="off">
       {errorMsg && (
         <div className={styles.modalAlertError}>
-          <AlertCircle size={16} />
+          <AlertCircle size={15} />
           <span>{errorMsg}</span>
         </div>
       )}
-      <form onSubmit={handleSubmit} className={styles.modalFormBox} autoComplete="off">
-        <div className={styles.formGroup}>
-          <label htmlFor="modal-email-nuevo" className={styles.formGroupLabel}>
+
+      <div className={styles.modalFormBody}>
+        <div className={styles.formField}>
+          <label htmlFor="modal-email-nuevo" className={styles.fieldLabel}>
             Nuevo correo electrónico *
           </label>
           <input
             id="modal-email-nuevo"
-            name="new_account_email"
+            name="new_email_address"
             type="email"
             autoComplete="email"
-            className={styles.cleanInput}
+            className={styles.fieldInput}
             value={emailNuevo}
             onChange={(e) => setEmailNuevo(e.target.value)}
-            placeholder="nuevo@correo.com"
+            placeholder="nombre@ejemplo.com"
             required
           />
+          <span className={styles.modalFieldHint}>
+            Enviaremos un código de seguridad de 6 dígitos a esta nueva casilla.
+          </span>
         </div>
 
         {hasPassword && (
-          <div className={styles.formGroup}>
-            <label htmlFor="modal-email-pw" className={styles.formGroupLabel}>
+          <div className={styles.formField}>
+            <label htmlFor="modal-email-pw" className={styles.fieldLabel}>
               Contraseña actual *
             </label>
-            <input
-              id="modal-email-pw"
-              name="current_security_pw"
-              type="password"
-              autoComplete="new-password"
-              className={styles.cleanInput}
-              value={passwordActual}
-              onChange={(e) => setPasswordActual(e.target.value)}
-              placeholder="Ingresá tu contraseña"
-              required
-            />
+            <div className={styles.passwordInputWrap}>
+              <input
+                id="modal-email-pw"
+                name="current_security_pw"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                className={styles.fieldInput}
+                value={passwordActual}
+                onChange={(e) => setPasswordActual(e.target.value)}
+                placeholder="Ingresá tu contraseña"
+                required
+              />
+              <button
+                type="button"
+                className={styles.modalPwEyeBtn}
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
         )}
+      </div>
 
-        <div className={styles.modalFooterActions}>
-          <button type="submit" disabled={isSaving} className={styles.saveBtnPrimary}>
-            <Save size={15} />
-            <span>{isSaving ? 'Actualizando...' : 'Actualizar y verificar email'}</span>
-          </button>
-        </div>
-      </form>
-    </>
+      <div className={styles.modalFormFooter}>
+        <button
+          type="button"
+          className={styles.modalCancelBtn}
+          onClick={onClose}
+          disabled={isSaving}
+        >
+          Cancelar
+        </button>
+        <button type="submit" disabled={isSaving} className={styles.modalSubmitBtn}>
+          <Save size={15} />
+          <span>{isSaving ? 'Actualizando...' : 'Actualizar y verificar'}</span>
+        </button>
+      </div>
+    </form>
   )
 }
 
@@ -308,6 +337,7 @@ const TelefonoForm: React.FC<{
   const { showToast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const initial = desglosarTelefono(usuario?.telefono)
   const [telefonoNumero, setTelefonoNumero] = useState(initial.numeroLocal)
@@ -364,22 +394,23 @@ const TelefonoForm: React.FC<{
   }
 
   return (
-    <>
+    <form onSubmit={handleSubmit} className={styles.modalFormContainer} autoComplete="off">
       {errorMsg && (
         <div className={styles.modalAlertError}>
-          <AlertCircle size={16} />
+          <AlertCircle size={15} />
           <span>{errorMsg}</span>
         </div>
       )}
-      <form onSubmit={handleSubmit} className={styles.modalFormBox} autoComplete="off">
-        <div className={styles.formGroup}>
-          <label htmlFor="modal-tel-num" className={styles.formGroupLabel}>
+
+      <div className={styles.modalFormBody}>
+        <div className={styles.formField}>
+          <label htmlFor="modal-tel-num" className={styles.fieldLabel}>
             Número de WhatsApp *
           </label>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <div className={styles.countryBadgeFixed} title="Código de Argentina">
-              <span>🇦🇷</span>
-              <span>+54 9</span>
+          <div className={styles.phoneInputRow}>
+            <div className={styles.countryBadgeWrap}>
+              <span className={styles.flagIcon}>🇦🇷</span>
+              <span className={styles.countryCode}>+54 9</span>
             </div>
             <input
               id="modal-tel-num"
@@ -387,45 +418,63 @@ const TelefonoForm: React.FC<{
               type="tel"
               inputMode="numeric"
               autoComplete="off"
-              className={styles.cleanInput}
+              className={`${styles.fieldInput} ${styles.phoneInputField}`}
               value={telefonoNumero}
               onChange={(e) => setTelefonoNumero(e.target.value)}
               placeholder="11 1234-5678"
               required
             />
           </div>
-          <p className={styles.fieldHelpText}>
+          <span className={styles.modalFieldHint}>
             Enviaremos el código de verificación a: <strong>{formatearTelefonoVisual(fullPhone) || fullPhone}</strong>
-          </p>
+          </span>
         </div>
 
         {hasPassword && (
-          <div className={styles.formGroup}>
-            <label htmlFor="modal-tel-pw" className={styles.formGroupLabel}>
+          <div className={styles.formField}>
+            <label htmlFor="modal-tel-pw" className={styles.fieldLabel}>
               Contraseña actual *
             </label>
-            <input
-              id="modal-tel-pw"
-              name="current_security_pw"
-              type="password"
-              autoComplete="new-password"
-              className={styles.cleanInput}
-              value={passwordActual}
-              onChange={(e) => setPasswordActual(e.target.value)}
-              placeholder="Ingresá tu contraseña"
-              required
-            />
+            <div className={styles.passwordInputWrap}>
+              <input
+                id="modal-tel-pw"
+                name="current_security_pw"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                className={styles.fieldInput}
+                value={passwordActual}
+                onChange={(e) => setPasswordActual(e.target.value)}
+                placeholder="Ingresá tu contraseña"
+                required
+              />
+              <button
+                type="button"
+                className={styles.modalPwEyeBtn}
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
         )}
+      </div>
 
-        <div className={styles.modalFooterActions}>
-          <button type="submit" disabled={isSaving} className={styles.saveBtnPrimary}>
-            <MessageSquare size={15} />
-            <span>{isSaving ? 'Enviando código...' : usuario?.telefono ? 'Actualizar y verificar' : 'Asociar y verificar'}</span>
-          </button>
-        </div>
-      </form>
-    </>
+      <div className={styles.modalFormFooter}>
+        <button
+          type="button"
+          className={styles.modalCancelBtn}
+          onClick={onClose}
+          disabled={isSaving}
+        >
+          Cancelar
+        </button>
+        <button type="submit" disabled={isSaving} className={styles.modalSubmitBtn}>
+          <MessageSquare size={15} />
+          <span>{isSaving ? 'Enviando código...' : usuario?.telefono ? 'Actualizar y verificar' : 'Asociar y verificar'}</span>
+        </button>
+      </div>
+    </form>
   )
 }
 
@@ -446,14 +495,12 @@ export const EditModals: React.FC<EditModalsProps> = ({
           : activeModal === 'email'
           ? 'Actualizar Correo Electrónico'
           : activeModal === 'telefono'
-          ? (usuario?.telefono ? 'Cambiar Teléfono de WhatsApp' : 'Asociar Teléfono de WhatsApp')
+          ? 'Asociar Teléfono de WhatsApp'
           : ''
       }
-      size="sm"
     >
       {activeModal === 'datos' && (
         <DatosPersonalesForm
-          key="datos-form"
           usuario={usuario}
           onClose={onClose}
           updateUsuario={updateUsuario}
@@ -462,7 +509,6 @@ export const EditModals: React.FC<EditModalsProps> = ({
 
       {activeModal === 'email' && (
         <EmailForm
-          key="email-form"
           usuario={usuario}
           onClose={onClose}
           updateUsuario={updateUsuario}

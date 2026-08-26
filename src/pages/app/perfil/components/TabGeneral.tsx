@@ -2,11 +2,9 @@ import React from 'react'
 import {
   User,
   Mail,
-  Phone,
   Calendar,
   ShieldCheck,
   Edit3,
-  ArrowRight,
   Lock,
   CheckCircle2,
   AlertCircle,
@@ -78,7 +76,6 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
           </div>
           <div className={styles.sectionHeaderText}>
             <h3>Datos personales</h3>
-            <p>Tu información de identidad y perfil para personalizar Argentum</p>
           </div>
           <button
             type="button"
@@ -129,53 +126,49 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
           </div>
           <div className={styles.sectionHeaderText}>
             <h3>Contacto & Vinculación</h3>
-            <p>Medios de comunicación para alertas, soporte y recuperación</p>
           </div>
         </div>
 
         <div className={styles.contactList}>
           {/* Correo Electrónico */}
-          <div className={styles.contactRow}>
-            <div className={styles.contactIconCircle}>
-              <Mail size={18} />
-            </div>
-            <div className={styles.contactDetails}>
-              <div className={styles.contactTop}>
-                <span className={styles.contactType}>Correo Electrónico</span>
+          <div className={styles.contactItemBox}>
+            <div className={styles.contactItemInfo}>
+              <div className={styles.contactItemLabelRow}>
+                <span className={styles.contactItemLabel}>Correo Electrónico</span>
                 {usuario?.email_verificado ? (
-                  <span className={styles.verifiedTag}>
-                    <CheckCircle2 size={12} /> Verificado
+                  <span className={styles.verifiedBadge}>
+                    <CheckCircle2 size={11} /> Verificado
                   </span>
                 ) : (
-                  <span className={styles.unverifiedTag}>
-                    <AlertCircle size={12} /> Sin verificar
+                  <span className={styles.unverifiedBadge}>
+                    <AlertCircle size={11} /> Sin verificar
                   </span>
                 )}
               </div>
-              <span className={styles.contactValue}>{usuario?.email || 'Sin correo asociado'}</span>
+              <span className={styles.contactItemValue}>
+                {usuario?.email || 'Sin correo asociado'}
+              </span>
             </div>
 
-            <div className={styles.contactActions}>
+            <div className={styles.contactItemAction}>
               {!usuario?.email_verificado && usuario?.email && (
                 <button
                   type="button"
                   className={styles.verifyDirectBtn}
                   onClick={onVerificarEmail}
                 >
-                  Verificar ahora <ArrowRight size={13} />
+                  Verificar
                 </button>
               )}
               {isGoogle ? (
-                <div className={styles.lockedBadge} title="Email gestionado por Google">
-                  <Lock size={14} />
-                  <span>Google</span>
-                </div>
+                <span className={styles.lockedTag} title="Email gestionado por Google">
+                  <Lock size={12} /> Google
+                </span>
               ) : (
                 <button
                   type="button"
-                  className={styles.actionBtnOutlineSm}
+                  className={styles.editContactBtn}
                   onClick={onEditEmail}
-                  title="Cambiar correo"
                 >
                   <Edit3 size={13} />
                   <span>Cambiar</span>
@@ -185,32 +178,29 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
           </div>
 
           {/* Teléfono / WhatsApp */}
-          <div className={styles.contactRow}>
-            <div className={styles.contactIconCircle}>
-              <Phone size={18} />
-            </div>
-            <div className={styles.contactDetails}>
-              <div className={styles.contactTop}>
-                <span className={styles.contactType}>WhatsApp / Teléfono</span>
+          <div className={styles.contactItemBox}>
+            <div className={styles.contactItemInfo}>
+              <div className={styles.contactItemLabelRow}>
+                <span className={styles.contactItemLabel}>WhatsApp / Teléfono</span>
                 {usuario?.telefono_verificado ? (
-                  <span className={styles.verifiedTag}>
-                    <CheckCircle2 size={12} /> Vinculado
+                  <span className={styles.verifiedBadge}>
+                    <CheckCircle2 size={11} /> Vinculado
                   </span>
                 ) : (
-                  <span className={styles.unverifiedTag}>
-                    <AlertCircle size={12} /> No vinculado
+                  <span className={styles.unverifiedBadge}>
+                    <AlertCircle size={11} /> No vinculado
                   </span>
                 )}
               </div>
-              <span className={styles.contactValue}>
+              <span className={styles.contactItemValue}>
                 {formatearTelefonoVisual(usuario?.telefono) || 'No asociado todavía'}
               </span>
             </div>
 
-            <div className={styles.contactActions}>
+            <div className={styles.contactItemAction}>
               <button
                 type="button"
-                className={styles.actionBtnOutlineSm}
+                className={styles.editContactBtn}
                 onClick={onEditTelefono}
               >
                 <Edit3 size={13} />

@@ -142,9 +142,17 @@ const NotificacionesForm: React.FC<{
           </div>
           <div className={styles.sectionHeaderText}>
             <h3>Horario de Notificaciones WhatsApp</h3>
-            <p>Tus alertas del día se agruparán y enviarán de forma ordenada en este horario</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto', flexWrap: 'wrap' }}>
+        </div>
+
+        <div className={styles.timeSectionBody}>
+          <div className={styles.timeSectionInfo}>
+            <span className={styles.timeSectionTitle}>Horario diario de envío</span>
+            <span className={styles.timeSectionDesc}>
+              Tus alertas del día se enviarán de forma ordenada en este horario
+            </span>
+          </div>
+          <div className={styles.timeControlsRow}>
             <div className={styles.timeInputBox}>
               <TimeInput
                 value={formatTime(form.whatsapp_hora_envio, form.whatsapp_minuto_envio)}
@@ -158,7 +166,7 @@ const NotificacionesForm: React.FC<{
               disabled={isSaving}
             >
               <Save size={15} />
-              <span>{isSaving ? 'Guardando...' : 'Guardar cambios'}</span>
+              <span>{isSaving ? 'Guardando...' : 'Guardar horario'}</span>
             </button>
           </div>
         </div>
@@ -172,10 +180,7 @@ const NotificacionesForm: React.FC<{
             <div className={styles.notifCardIcon}>
               <CreditCard size={18} />
             </div>
-            <div className={styles.notifCardTitleGroup}>
-              <h4>Vencimiento de Tarjetas</h4>
-              <p>Recordatorio preventivo previo al cierre o pago de resúmenes</p>
-            </div>
+            <h4 className={styles.notifCardTitle}>Vencimiento de Tarjetas</h4>
           </div>
 
           <div className={styles.notifCardBody}>
@@ -222,10 +227,7 @@ const NotificacionesForm: React.FC<{
             <div className={styles.notifCardIcon}>
               <PieChart size={18} />
             </div>
-            <div className={styles.notifCardTitleGroup}>
-              <h4>Límites de Presupuesto</h4>
-              <p>Aviso al acercarte al tope de tus categorías presupuestadas</p>
-            </div>
+            <h4 className={styles.notifCardTitle}>Límites de Presupuesto</h4>
             <label className={styles.switch}>
               <input
                 type="checkbox"
@@ -285,10 +287,7 @@ const NotificacionesForm: React.FC<{
             <div className={styles.notifCardIcon}>
               <Repeat size={18} />
             </div>
-            <div className={styles.notifCardTitleGroup}>
-              <h4>Suscripciones & Recurrentes</h4>
-              <p>Avisos programados previos a cargos automáticos de tus servicios</p>
-            </div>
+            <h4 className={styles.notifCardTitle}>Suscripciones & Recurrentes</h4>
             <label className={styles.switch}>
               <input
                 type="checkbox"
@@ -348,10 +347,7 @@ const NotificacionesForm: React.FC<{
             <div className={styles.notifCardIcon}>
               <Target size={18} />
             </div>
-            <div className={styles.notifCardTitleGroup}>
-              <h4>Metas de Ahorro Alcanzadas</h4>
-              <p>Celebrar y notificar cuando alcances el 100% de un objetivo</p>
-            </div>
+            <h4 className={styles.notifCardTitle}>Metas de Ahorro Alcanzadas</h4>
             <label className={styles.switch}>
               <input
                 type="checkbox"
@@ -393,10 +389,7 @@ const NotificacionesForm: React.FC<{
             <div className={styles.notifCardIcon}>
               <AlertTriangle size={18} />
             </div>
-            <div className={styles.notifCardTitleGroup}>
-              <h4>Detección de Gasto Inusual</h4>
-              <p>Avisar cuando se registre una transacción llamativamente alta</p>
-            </div>
+            <h4 className={styles.notifCardTitle}>Detección de Gasto Inusual</h4>
             <label className={styles.switch}>
               <input
                 type="checkbox"
@@ -438,10 +431,7 @@ const NotificacionesForm: React.FC<{
             <div className={styles.notifCardIcon}>
               <Activity size={18} />
             </div>
-            <div className={styles.notifCardTitleGroup}>
-              <h4>Recordatorio de Registro</h4>
-              <p>Avisarte si pasaron varios días sin asentar nuevos movimientos</p>
-            </div>
+            <h4 className={styles.notifCardTitle}>Recordatorio de Registro</h4>
             <label className={styles.switch}>
               <input
                 type="checkbox"
@@ -492,6 +482,17 @@ const NotificacionesForm: React.FC<{
             </div>
           )}
         </div>
+      </div>
+
+      <div className={styles.notifFooterBar}>
+        <button
+          type="submit"
+          className={styles.saveBtnPrimary}
+          disabled={isSaving}
+        >
+          <Save size={15} />
+          <span>{isSaving ? 'Guardando...' : 'Guardar todas las preferencias'}</span>
+        </button>
       </div>
     </form>
   )

@@ -8,6 +8,7 @@ import { Input } from './Input/Input.tsx'
 import EmptyState from './EmptyState/EmptyState.tsx'
 import PageSummaryBar from './PageSummaryBar'
 import { DateInput } from './DateInput/DateInput.tsx'
+import { TimeInput } from './TimeInput/TimeInput.tsx'
 import { SelectInput } from './SelectInput'
 import type { SelectOption } from './SelectInput'
 import { PhoneCountrySelect } from './PhoneCountrySelect'
@@ -26,6 +27,7 @@ export {
   EmptyState, 
   PageSummaryBar, 
   DateInput, 
+  TimeInput,
   SelectInput, 
   type SelectOption, 
   PhoneCountrySelect, 

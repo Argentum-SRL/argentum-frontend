@@ -743,7 +743,7 @@ export default function AdminPage() {
                   {/* Reset Password */}
                   <button
                     className={styles.actionBtn}
-                    disabled={actionLoading || !selectedUser.email}
+                    disabled={actionLoading || !selectedUser.email || selectedUser.auth_provider === 'google'}
                     onClick={() =>
                       setConfirmAction({
                         type: 'reset-password',
@@ -751,7 +751,13 @@ export default function AdminPage() {
                         description: 'Le vamos a mandar un email para que cambie su contraseña.'
                       })
                     }
-                    title={!selectedUser.email ? 'El usuario no tiene email configurado' : ''}
+                    title={
+                      selectedUser.auth_provider === 'google'
+                        ? 'Usuario autenticado con Google OAuth (No requiere contraseña)'
+                        : !selectedUser.email
+                        ? 'El usuario no tiene email configurado'
+                        : 'Enviar link de recuperación de contraseña'
+                    }
                   >
                     <KeyRound className="w-4 h-4" />
                     <span>Enviar Link Reset</span>

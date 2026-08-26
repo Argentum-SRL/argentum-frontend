@@ -4,6 +4,7 @@ export interface UsuarioAdminResumen {
   apellido: string | null
   email: string | null
   telefono: string | null
+  auth_provider?: string | null
   is_active: boolean
   is_admin: boolean
   onboarding_completado: boolean

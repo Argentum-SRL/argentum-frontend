@@ -7,10 +7,9 @@
   --sb-text: var(--primary);
   --sb-text-hover: var(--primary);
   --sb-hover-bg: rgba(0,0,0,0.05);
-  --sb-active-bg: rgba(0,0,0,0.08);
+  --sb-active-bg: color-mix(in srgb, var(--primary) 12%, transparent);
   --sb-active-text: var(--primary);
   --sb-sep: rgba(0,0,0,0.1);
-  --sb-dot: var(--primary);
 }
 
 :global([data-theme="dark"]) .root {
@@ -20,10 +19,9 @@
   --sb-text: rgba(255,255,255,0.35);
   --sb-text-hover: rgba(255,255,255,0.7);
   --sb-hover-bg: rgba(255,255,255,0.07);
-  --sb-active-bg: rgba(255,255,255,0.12);
+  --sb-active-bg: rgba(255, 255, 255, 0.14);
   --sb-active-text: white;
   --sb-sep: rgba(255,255,255,0.08);
-  --sb-dot: #8A95A8;
 }
 
 /* ── Desktop Sidebar ─────────────────────────────────────────────────────── */
@@ -559,6 +557,7 @@
 
 .mobileNavItemActive {
   color: var(--sb-active-text);
+  background: var(--sb-active-bg);
 }
 
 .mobileNavIcon {
@@ -568,18 +567,6 @@
   width: 18px;
   height: 18px;
   position: relative;
-}
-
-.mobileNavItemActive .mobileNavIcon::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--sb-dot);
 }
 
 /* ── Bottom sheet "Más" ──────────────────────────────────────────────────── */

@@ -36,10 +36,17 @@ export const ERROR_MAP: Record<string, string> = {
   "Categoría no encontrada": "No encontramos esa categoría.",
 
   // Billeteras
+  "No encontramos esa billetera.": "No encontramos esa billetera.",
   "No tienes permiso para acceder a esta billetera": "No tenés permiso para acceder a esa billetera.",
   "No puedes eliminar la billetera principal": "No podés eliminar tu billetera principal.",
   "Billetera con saldo no puede eliminarse": "Para eliminar una billetera tiene que tener saldo en cero.",
   "Nombre de billetera ya existe": "Ya tenés una billetera con ese nombre. Elegí otro.",
+  "El nombre de la billetera no puede estar vacío.": "El nombre de la billetera no puede estar vacío.",
+  "No podés cambiar la moneda de una billetera que ya tiene transacciones o transferencias asociadas.": "No podés cambiar la moneda de una billetera que ya tiene transacciones o transferencias asociadas.",
+  "Las billeteras de efectivo (ARS/USD) no pueden eliminarse": "Las billeteras de efectivo no pueden eliminarse.",
+  "No se puede eliminar la billetera porque tiene transacciones asociadas. Por favor, archivala para mantener el historial.": "No podés eliminar una billetera con transacciones asociadas. Te sugerimos archivarla.",
+  "No se puede eliminar la billetera porque tiene transferencias internas asociadas. Por favor, archivala.": "No podés eliminar una billetera con transferencias asociadas. Te sugerimos archivarla.",
+  "No se puede eliminar la billetera porque tiene suscripciones activas asociadas. Por favor, archivala o cancelá las suscripciones.": "No podés eliminar una billetera con suscripciones activas asociadas.",
 
   // Tarjetas
   "Tarjeta no encontrada": "No encontramos esa tarjeta.",
@@ -57,7 +64,13 @@ export const ERROR_MAP: Record<string, string> = {
   "No se puede cancelar cuota ya pagada": "No podés cancelar una cuota que ya fue pagada.",
 
   // Transferencias
+  "El monto de la transferencia debe ser mayor a cero.": "El monto de la transferencia tiene que ser mayor a cero.",
+  "La billetera de origen y destino no pueden ser la misma.": "La billetera de origen y destino no pueden ser la misma.",
   "No puedes transferir a la misma billetera": "La billetera de origen y destino no pueden ser la misma.",
+  "No encontramos la billetera de origen.": "No encontramos la billetera de origen.",
+  "No encontramos la billetera de destino.": "No encontramos la billetera de destino.",
+  "No se permiten transferencias entre billeteras de distinta moneda.": "No se permiten transferencias entre billeteras de distinta moneda.",
+  "Transferencia no encontrada": "No encontramos esa transferencia.",
   "Saldo insuficiente": "No tenés saldo suficiente en esa billetera para hacer la transferencia.",
   "Monto de transferencia debe ser positivo": "El monto de la transferencia tiene que ser mayor a cero.",
   "Billetera origen no encontrada": "No encontramos la billetera de origen.",
@@ -115,7 +128,17 @@ export function getErrorMessage(
 
   // detail puede ser string o array de objetos (Pydantic ValidationError)
   if (typeof detail === "string") {
-    return ERROR_MAP[detail] ?? fallback;
+    return ERROR_MAP[detail] ?? detail ?? fallback;
+  }
+
+  // detail puede ser un objeto con mensaje anidado { error: { message: ... } } o { message: ... }
+  if (typeof detail === "object" && detail !== null && !Array.isArray(detail)) {
+    const obj = detail as Record<string, unknown>;
+    const nestedError = obj.error as Record<string, unknown> | undefined;
+    const msg = (nestedError?.message || obj.message || obj.detail) as string | undefined;
+    if (typeof msg === "string") {
+      return ERROR_MAP[msg] ?? msg;
+    }
   }
 
   // Pydantic v2 devuelve array de {loc, msg, type}

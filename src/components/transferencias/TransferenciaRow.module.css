@@ -1,33 +1,70 @@
+/* ─── TransferenciaRow.module.css — Ultra Compact & Responsive ─── */
+
 .row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 13px 20px;
-  transition: background 0.2s;
-  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  padding: 12px 18px;
+  background: var(--surface);
+  transition: background 0.15s ease;
+  position: relative;
+  min-height: 54px;
+  box-sizing: border-box;
 }
 
 .row:hover {
   background: var(--surface-alt);
 }
 
-.iconWrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--surface-alt);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ── Dual Overlapping Bank Avatar (38px Compact) ── */
+.dualAvatar {
+  position: relative;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
 }
 
-[data-theme="dark"] .iconWrapper {
-  background: var(--surface-alt);
-  color: var(--primary);
+.avatarOrigen,
+.avatarDestino {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  border: 1.5px solid var(--surface);
 }
 
+.avatarOrigen {
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.avatarDestino {
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.avatarImg {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.avatarOrigen span,
+.avatarDestino span {
+  color: white;
+  font-size: 8.5px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* ── Content (Center) ── */
 .content {
   flex: 1;
   min-width: 0;
@@ -36,61 +73,96 @@
   gap: 2px;
 }
 
-.originLine {
-  font-size: 14px;
-  font-weight: 600;
+.titleRow {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.accountsTitle {
+  font-size: 13.5px;
+  font-weight: 700;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.destinationLine {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-2);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  min-width: 0;
+}
+
+.bankName {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .arrowIcon {
-  color: var(--text-2);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 13px;
   flex-shrink: 0;
 }
 
-.meta {
-  font-size: 11px;
-  color: var(--text-3);
-  margin-top: 1px;
+:global([data-theme="dark"]) .arrowIcon {
+  color: #8bb6f2;
 }
 
+.meta {
+  font-size: 11.5px;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+}
+
+.metaDesc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaDivider {
+  color: var(--text-3);
+}
+
+.metaHora {
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* ── Amount Area (Right) ── */
 .amountArea {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: 1px;
   flex-shrink: 0;
 }
 
 .amount {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14.5px;
+  font-weight: 800;
   color: var(--text);
+  letter-spacing: -0.2px;
+  line-height: 1.2;
 }
 
-.walletName {
-  font-size: 11px;
-  color: var(--text-2);
+.currencyMeta {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
 }
 
+/* ── Delete Button ── */
 .deleteBtn {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   border: none;
   background: transparent;
   color: var(--text-3);
@@ -99,22 +171,51 @@
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
+  transition: all 0.15s ease;
+  opacity: 0.7;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
   opacity: 1;
-  transition: opacity 150ms ease, background 150ms ease, color 150ms ease;
 }
 
 @media (hover: hover) {
   .deleteBtn {
     opacity: 0;
   }
+
   .row:hover .deleteBtn {
+    opacity: 0.7;
+  }
+
+  .row:hover .deleteBtn:hover {
     opacity: 1;
   }
 }
 
-.deleteBtn:hover {
-  background: rgba(220, 38, 38, 0.1);
-  color: #DC2626;
+/* ── Mobile Tweaks (< 480px) ── */
+@media (max-width: 480px) {
+  .row {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .accountsTitle {
+    font-size: 13px;
+    gap: 4px;
+  }
+
+  .amount {
+    font-size: 13.5px;
+  }
+
+  .meta {
+    font-size: 11px;
+  }
+
+  .metaHora {
+    display: none;
+  }
 }
-
-

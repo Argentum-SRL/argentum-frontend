@@ -97,18 +97,26 @@
 
 .btnGhost {
   background: transparent;
-  color: #52565F;
-  border: none;
+  color: var(--text-2);
+  border: 1px solid transparent;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: background 0.2s;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .btnGhost:hover {
-  background: #F5F4F0;
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.btnTabActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* Switch de pestañas solo para mobile */

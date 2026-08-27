@@ -303,14 +303,14 @@ export default function TransaccionesPage() {
           </button>
           <button 
             className={`${styles.btnGhost} ${activeTab === 'recurrentes' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
-            onClick={() => setActiveTab('recurrentes')}
+            onClick={() => setActiveTab(prev => prev === 'recurrentes' ? 'historial' : 'recurrentes')}
           >
             <RefreshCw size={16} className={styles.btnIcon} />
             Recurrentes
           </button>
           <button 
             className={`${styles.btnGhost} ${activeTab === 'cuotas' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
-            onClick={() => setActiveTab('cuotas')}
+            onClick={() => setActiveTab(prev => prev === 'cuotas' ? 'historial' : 'cuotas')}
           >
             <CreditCard size={16} className={styles.btnIcon} />
             Cuotas

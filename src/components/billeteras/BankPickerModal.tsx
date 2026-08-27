@@ -259,14 +259,15 @@ export default function BankPickerModal({
       noPadding
       ariaLabel="Agregar billetera"
     >
-      {/* Indicador de pasos */}
-      <div className={styles.stepIndicator} aria-hidden="true">
-        <div className={`${styles.dot} ${step === 'picker' ? styles.dotActive : styles.dotInactive}`} />
-        <div className={`${styles.dot} ${step === 'form' ? styles.dotActive : styles.dotInactive}`} />
-      </div>
+      <div className={styles.modalRoot}>
+        {/* Indicador de pasos */}
+        <div className={styles.stepIndicator} aria-hidden="true">
+          <div className={`${styles.dot} ${step === 'picker' ? styles.dotActive : styles.dotInactive}`} />
+          <div className={`${styles.dot} ${step === 'form' ? styles.dotActive : styles.dotInactive}`} />
+        </div>
 
-      {/* Contenedor con transición de slides */}
-      <div className={`${styles.slidesContainer} ${styles[step === 'picker' ? 'pickerStep' : 'formStep']}`}>
+        {/* Contenedor con transición de slides */}
+        <div className={`${styles.slidesContainer} ${styles[step === 'picker' ? 'pickerStep' : 'formStep']}`}>
         {/* ── PASO 1: PICKER ── */}
         <div
           className={`${styles.slide} ${
@@ -435,6 +436,19 @@ export default function BankPickerModal({
 
               {/* Cuerpo del form */}
               <div className={styles.formBody}>
+                {/* Saldo inicial (Hero MontoInput full size) */}
+                <div className={styles.montoHeroField}>
+                  <MontoInput
+                    value={saldo}
+                    onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
+                    moneda={moneda}
+                    onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
+                    placeholder="0"
+                    allowDecimals
+                    autoFocus
+                  />
+                </div>
+
                 {/* Nombre */}
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel} htmlFor="bk-nombre">
@@ -448,22 +462,6 @@ export default function BankPickerModal({
                     onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
                     placeholder="Nombre de tu billetera"
                     required
-                    autoFocus
-                  />
-                </div>
-
-                {/* Saldo inicial */}
-                <div className={styles.formField}>
-                  <MontoInput
-                    value={saldo}
-                    onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
-                    moneda={moneda}
-                    onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
-                    label="Saldo inicial"
-                    placeholder="0"
-                    allowDecimals
-                    optional
-                    compact
                   />
                 </div>
 
@@ -536,6 +534,7 @@ export default function BankPickerModal({
             </form>
           )}
         </div>
+      </div>
       </div>
     </Modal>
   )

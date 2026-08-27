@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Coins, Calendar, Save, Check } from 'lucide-react'
+import { Coins, Calendar, Save, Check, ArrowLeft, ArrowRight } from 'lucide-react'
 import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
-import { getCotizaciones } from '@/services/onboarding.service'
+import { getCotizaciones, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { SelectInput, type SelectOption } from '@/components/ui'
@@ -70,7 +70,59 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     (usuario?.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo'
   )
   const [cicloValor, setCicloValor] = useState(usuario?.ciclo_valor || '1')
+  const [cicloAjusteDireccion, setCicloAjusteDireccion] = useState<'anterior' | 'posterior'>(
+    (usuario?.ciclo_ajuste_direccion as 'anterior' | 'posterior') || 'anterior'
+  )
   const [isSavingCiclo, setIsSavingCiclo] = useState(false)
+
+  // Preview state
+  const [preview, setPreview] = useState<{
+    proxima_fecha_cobro: string
+    fue_ajustada: boolean
+  } | null>(null)
+  const [loadingPreview, setLoadingPreview] = useState(false)
+
+  useEffect(() => {
+    let isValid = false
+    if (cicloTipo === 'dia_fijo') {
+      const diaNum = parseInt(cicloValor, 10)
+      isValid = !isNaN(diaNum) && diaNum >= 1 && diaNum <= 31
+    } else if (cicloTipo === 'regla') {
+      isValid = Boolean(cicloValor)
+    }
+
+    if (!isValid) {
+      return
+    }
+
+    const controller = new AbortController()
+
+    const timer = setTimeout(async () => {
+      setLoadingPreview(true)
+      try {
+        const data = await getPreviewFechaCobro({
+          tipo: cicloTipo,
+          valor: cicloValor,
+          direccion: cicloAjusteDireccion,
+        }, controller.signal)
+        setPreview(data)
+      } catch (err) {
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          return
+        }
+        setPreview(null)
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingPreview(false)
+        }
+      }
+    }, 400)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [cicloTipo, cicloValor, cicloAjusteDireccion])
 
   const handleSaveMoneda = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -97,6 +149,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
       const updated = await usuarioService.actualizarCicloFinanciero({
         ciclo_tipo: cicloTipo,
         ciclo_valor: cicloValor,
+        ciclo_ajuste_direccion: cicloAjusteDireccion,
       })
       updateUsuario(updated)
       showToast('Ciclo contable actualizado correctamente', 'success')
@@ -235,7 +288,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
         </form>
       </section>
 
-      {/* 2. Ciclo Financiero */}
+      {/* 2. Ciclo Financiero Rediseñado */}
       <section className={styles.sectionCard}>
         <div className={styles.sectionHeader}>
           <div className={styles.sectionIconWrap}>
@@ -246,67 +299,132 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           </div>
         </div>
 
-        <form onSubmit={handleSaveCiclo} className={styles.formInsideCard}>
-          {/* Selector de modo: Día fijo vs Regla */}
-          <div className={styles.formGroup}>
-            <label className={styles.formGroupLabel}>Tipo de cálculo</label>
-            <div className={styles.segmentedToggle}>
-              <button
-                type="button"
-                className={`${styles.segmentedBtn} ${
-                  cicloTipo === 'dia_fijo' ? styles.segmentedActive : ''
-                }`}
-                onClick={() => setCicloTipo('dia_fijo')}
-              >
-                Día fijo del mes
-              </button>
-              <button
-                type="button"
-                className={`${styles.segmentedBtn} ${
-                  cicloTipo === 'regla' ? styles.segmentedActive : ''
-                }`}
-                onClick={() => setCicloTipo('regla')}
-              >
-                Regla de día hábil
-              </button>
+        <form onSubmit={handleSaveCiclo} className={styles.cicloCompactForm}>
+          <div className={styles.cicloGrid}>
+            {/* Columna 1: Tipo de cálculo y Selección */}
+            <div className={styles.cicloCol}>
+              <div className={styles.compactGroup}>
+                <label className={styles.compactLabel}>Tipo de cálculo</label>
+                <div className={styles.segmentedToggleCompact}>
+                  <button
+                    type="button"
+                    className={`${styles.segmentedBtnCompact} ${
+                      cicloTipo === 'dia_fijo' ? styles.segmentedActiveCompact : ''
+                    }`}
+                    onClick={() => {
+                      setCicloTipo('dia_fijo')
+                      if (!cicloValor || isNaN(Number(cicloValor))) setCicloValor('1')
+                    }}
+                  >
+                    Día fijo
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.segmentedBtnCompact} ${
+                      cicloTipo === 'regla' ? styles.segmentedActiveCompact : ''
+                    }`}
+                    onClick={() => {
+                      setCicloTipo('regla')
+                      if (!cicloValor || !isNaN(Number(cicloValor))) setCicloValor('primer_lunes')
+                    }}
+                  >
+                    Regla semanal
+                  </button>
+                </div>
+              </div>
+
+              {cicloTipo === 'dia_fijo' ? (
+                <div className={styles.compactGroup}>
+                  <label htmlFor="ciclo-dia-input" className={styles.compactLabel}>
+                    Día de corte mensual
+                  </label>
+                  <div className={styles.compactDayWrapper}>
+                    <input
+                      id="ciclo-dia-input"
+                      type="number"
+                      min={1}
+                      max={31}
+                      value={cicloValor}
+                      onChange={(e) => setCicloValor(e.target.value)}
+                      className={styles.compactNumberInput}
+                      required
+                    />
+                    <span className={styles.compactInputSuffix}>de cada mes</span>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.compactGroup}>
+                  <SelectInput
+                    id="ciclo-regla-select"
+                    label="Regla de corte"
+                    value={cicloValor}
+                    onChange={(val) => setCicloValor(val)}
+                    options={OPCIONES_REGLA_CICLO}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Columna 2: Ajuste de día hábil */}
+            <div className={styles.cicloCol}>
+              <div className={styles.compactGroup}>
+                <label className={styles.compactLabel}>
+                  Ajuste si cae fin de semana / feriado
+                </label>
+                <div className={styles.segmentedToggleCompact}>
+                  <button
+                    type="button"
+                    className={`${styles.segmentedBtnCompact} ${
+                      cicloAjusteDireccion === 'anterior' ? styles.segmentedActiveCompact : ''
+                    }`}
+                    onClick={() => setCicloAjusteDireccion('anterior')}
+                  >
+                    <ArrowLeft size={13} />
+                    <span>Hacia atrás</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.segmentedBtnCompact} ${
+                      cicloAjusteDireccion === 'posterior' ? styles.segmentedActiveCompact : ''
+                    }`}
+                    onClick={() => setCicloAjusteDireccion('posterior')}
+                  >
+                    <span>Hacia adelante</span>
+                    <ArrowRight size={13} />
+                  </button>
+                </div>
+              </div>
+
+              <p className={styles.compactExplainer}>
+                {cicloAjusteDireccion === 'anterior'
+                  ? 'Si cae en día no hábil, el cálculo retrocede al día hábil previo.'
+                  : 'Si cae en día no hábil, el cálculo avanza al siguiente día hábil.'}
+              </p>
             </div>
           </div>
 
-          {/* Configuración según modo */}
-          {cicloTipo === 'dia_fijo' ? (
-            <div className={styles.formGroup}>
-              <label htmlFor="ciclo-dia-input" className={styles.formGroupLabel}>
-                Día de corte mensual (1 al 31)
-              </label>
-              <div className={styles.dayInputWrapper}>
-                <input
-                  id="ciclo-dia-input"
-                  type="number"
-                  min={1}
-                  max={31}
-                  value={cicloValor}
-                  onChange={(e) => setCicloValor(e.target.value)}
-                  className={styles.cleanNumberInput}
-                  required
-                />
-                <span className={styles.inputSuffix}>de cada mes</span>
+          {/* Banner de Preview en vivo */}
+          {preview && !loadingPreview && (
+            <div className={styles.cicloPreviewCard}>
+              <div className={styles.previewIconBox}>
+                <Calendar size={15} />
               </div>
-              <p className={styles.fieldHelpText}>
-                Tus presupuestos y balances mensuales se computarán desde el día {cicloValor || '1'} de cada mes.
-              </p>
-            </div>
-          ) : (
-            <div className={styles.formGroup}>
-              <SelectInput
-                id="ciclo-regla-select"
-                label="Regla de inicio"
-                value={cicloValor}
-                onChange={(val) => setCicloValor(val)}
-                options={OPCIONES_REGLA_CICLO}
-              />
-              <p className={styles.fieldHelpText}>
-                Ideal si tus ingresos o cobros varían según el primer o último día de la semana.
-              </p>
+              <div className={styles.previewInfo}>
+                <span className={styles.previewLabel}>Próximo inicio:</span>
+                <span className={styles.previewDate}>
+                  {new Date(preview.proxima_fecha_cobro + 'T12:00:00').toLocaleDateString('es-AR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </span>
+              </div>
+              {preview.fue_ajustada && (
+                <span className={styles.adjustedPill}>
+                  Ajustado por feriado / fin de semana
+                </span>
+              )}
             </div>
           )}
 

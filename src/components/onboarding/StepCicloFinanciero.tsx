@@ -7,7 +7,11 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepCicloFinanciero.module.css'
 
 interface Props {
-  datosIniciales: { ciclo_tipo: string | null; ciclo_valor: string | null }
+  datosIniciales: {
+    ciclo_tipo: string | null
+    ciclo_valor: string | null
+    ciclo_ajuste_direccion?: string | null
+  }
   onNext: (siguientePaso: string | null) => void
 }
 
@@ -28,33 +32,46 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
   const { showToast } = useToast()
   const [tipo, setTipo] = useState(datosIniciales.ciclo_tipo ?? 'dia_fijo')
   const [valor, setValor] = useState(datosIniciales.ciclo_valor ?? '1')
+  const [direccion, setDireccion] = useState<'anterior' | 'posterior'>(
+    (datosIniciales.ciclo_ajuste_direccion as 'anterior' | 'posterior') || 'anterior'
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [preview, setPreview] = useState<{
     proxima_fecha_cobro: string
-    es_dia_habil: boolean
+    fue_ajustada: boolean
   } | null>(null)
   
   const isInitialDiaFijo = (datosIniciales.ciclo_tipo ?? 'dia_fijo') === 'dia_fijo'
   const initialDiaVal = parseInt(datosIniciales.ciclo_valor ?? '1', 10)
   const isInitialValValid = !isNaN(initialDiaVal) && initialDiaVal >= 1 && initialDiaVal <= 31
-  const [loadingPreview, setLoadingPreview] = useState(isInitialDiaFijo && isInitialValValid)
+  const [loadingPreview, setLoadingPreview] = useState(
+    isInitialDiaFijo ? isInitialValValid : Boolean(datosIniciales.ciclo_valor)
+  )
 
   useEffect(() => {
-    if (tipo !== 'dia_fijo') {
-      return
+    let isValid = false
+    if (tipo === 'dia_fijo') {
+      const diaNum = parseInt(valor, 10)
+      isValid = !isNaN(diaNum) && diaNum >= 1 && diaNum <= 31
+    } else if (tipo === 'regla') {
+      isValid = Boolean(valor)
     }
 
-    const diaNum = parseInt(valor, 10)
-    if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
+    if (!isValid) {
       return
     }
 
     const controller = new AbortController()
 
     const timer = setTimeout(async () => {
+      setLoadingPreview(true)
       try {
-        const data = await getPreviewFechaCobro(diaNum, controller.signal)
+        const data = await getPreviewFechaCobro({
+          tipo: tipo as 'dia_fijo' | 'regla',
+          valor,
+          direccion,
+        }, controller.signal)
         setPreview(data)
       } catch (err) {
         if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
@@ -73,13 +90,13 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
       clearTimeout(timer)
       controller.abort()
     }
-  }, [tipo, valor])
+  }, [tipo, valor, direccion])
 
   function handleTipoChange(newTipo: string) {
     setTipo(newTipo)
     setValor(newTipo === 'dia_fijo' ? '1' : 'primer_lunes')
     setPreview(null)
-    setLoadingPreview(newTipo === 'dia_fijo')
+    setLoadingPreview(true)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -87,7 +104,11 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
     setLoading(true)
     setError(null)
     try {
-      const res = await guardarCicloFinanciero({ ciclo_tipo: tipo, ciclo_valor: valor })
+      const res = await guardarCicloFinanciero({
+        ciclo_tipo: tipo,
+        ciclo_valor: valor,
+        ciclo_ajuste_direccion: direccion,
+      })
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
       const msg = getErrorMessage(err, "No pudimos guardar tus preferencias. Intentá de nuevo.")
@@ -101,23 +122,22 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
   const reglaSeleccionada = REGLAS.find((r) => r.id === valor)
   
   const getHint = () => {
-    if (tipo === 'dia_fijo') {
-      if (preview && !loadingPreview) {
-        const calculatedDate = new Date(preview.proxima_fecha_cobro + 'T12:00:00')
-        const fechaFormateada = calculatedDate.toLocaleDateString('es-AR', {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long'
-        })
-        const calculatedDay = calculatedDate.getDate()
-        const diaNominal = parseInt(valor, 10)
-        
-        if (calculatedDay !== diaNominal) {
-          return `Tu próximo cobro sería el ${fechaFormateada} (el ${diaNominal} cae en fin de semana o feriado)`
-        } else {
-          return `Tu próximo cobro sería el ${fechaFormateada}`
-        }
+    if (preview && !loadingPreview) {
+      const calculatedDate = new Date(preview.proxima_fecha_cobro + 'T12:00:00')
+      const fechaFormateada = calculatedDate.toLocaleDateString('es-AR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      })
+
+      if (preview.fue_ajustada) {
+        return `Tu próximo cobro sería el ${fechaFormateada} (ajustado por feriado o fin de semana)`
+      } else {
+        return `Tu próximo cobro sería el ${fechaFormateada}`
       }
+    }
+
+    if (tipo === 'dia_fijo') {
       return `Tu ciclo empieza el día ${valor} de cada mes`
     }
     return `Tu ciclo empieza el ${reglaSeleccionada?.label.toLowerCase() ?? ''}`
@@ -148,8 +168,8 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
             className={[styles.typeCard, tipo === 'regla' ? styles.typeCardActive : ''].filter(Boolean).join(' ')}
           >
             <RefreshCw size={22} className={styles.typeIcon} />
-            <span className={styles.typeLabel}>Día relativo</span>
-            <span className={styles.typeDesc}>Primer o último día hábil</span>
+            <span className={styles.typeLabel}>Regla semanal</span>
+            <span className={styles.typeDesc}>Regla por día de la semana</span>
           </button>
         </div>
 
@@ -178,12 +198,44 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
               id="valor_ciclo"
               label="Regla"
               value={valor}
-              onChange={setValor}
+              onChange={(newVal) => {
+                setValor(newVal)
+                setPreview(null)
+                setLoadingPreview(Boolean(newVal))
+              }}
               options={REGLAS.map((r) => ({ value: r.id, label: r.label }))}
             />
           )}
 
           <p className={styles.hint}>{hint}</p>
+        </div>
+
+        {/* Selector de dirección de ajuste (en ambos modos) */}
+        <div className={styles.field}>
+          <label className={styles.label}>Dirección de ajuste</label>
+          <div className={styles.segmentedToggle}>
+            <button
+              type="button"
+              className={`${styles.segmentedBtn} ${
+                direccion === 'anterior' ? styles.segmentedActive : ''
+              }`}
+              onClick={() => setDireccion('anterior')}
+            >
+              Ajustar hacia atrás
+            </button>
+            <button
+              type="button"
+              className={`${styles.segmentedBtn} ${
+                direccion === 'posterior' ? styles.segmentedActive : ''
+              }`}
+              onClick={() => setDireccion('posterior')}
+            >
+              Ajustar hacia adelante
+            </button>
+          </div>
+          <p className={styles.hint}>
+            Si el día calculado cae en fin de semana o feriado, ¿el cobro se corre para atrás o para adelante?
+          </p>
         </div>
 
         {error && <p className={styles.error}>{error}</p>}

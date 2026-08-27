@@ -1058,7 +1058,185 @@
   line-height: 1.35;
 }
 
-/* Ciclo Financiero Segmented */
+/* Ciclo Financiero Compact Grid */
+.cicloCompactForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.cicloGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 680px) {
+  .cicloGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.cicloCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compactGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compactLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.segmentedToggleCompact {
+  display: flex;
+  background: var(--surface-alt);
+  padding: 3px;
+  border-radius: 10px;
+  height: 38px;
+  border: 1px solid var(--border);
+  gap: 3px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.segmentedBtnCompact {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.segmentedBtnCompact:hover {
+  color: var(--text);
+}
+
+.segmentedActiveCompact {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.compactDayWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.compactNumberInput {
+  width: 72px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.compactNumberInput:focus {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.compactInputSuffix {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.compactExplainer {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--text-3);
+  margin: 0;
+}
+
+/* Live Preview Card */
+.cicloPreviewCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 10px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.previewIconBox {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.previewInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.previewLabel {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.previewDate {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.adjustedPill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  white-space: nowrap;
+}
+
+/* Ciclo Financiero Segmented (Legacy fallback) */
 .segmentedToggle {
   display: flex;
   background: var(--surface-alt);

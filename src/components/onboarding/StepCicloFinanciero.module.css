@@ -129,3 +129,44 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ── Segmented Toggle (Dirección de ajuste) ─────────────────────── */
+.segmentedToggle {
+  display: flex;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 12px;
+  height: 44px;
+  border: 1px solid var(--border);
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.segmentedBtn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.segmentedBtn:hover {
+  color: var(--text);
+}
+
+.segmentedActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+

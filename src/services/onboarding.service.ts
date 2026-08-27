@@ -21,7 +21,11 @@ export async function guardarDatosPersonales(params: {
   return res.data
 }
 
-export async function guardarCicloFinanciero(params: { ciclo_tipo: string; ciclo_valor: string }) {
+export async function guardarCicloFinanciero(params: {
+  ciclo_tipo: string
+  ciclo_valor: string
+  ciclo_ajuste_direccion?: string | null
+}) {
   const res = await api.post('/onboarding/ciclo-financiero', params)
   return res.data
 }
@@ -35,11 +39,21 @@ export async function guardarMoneda(params: {
   return res.data
 }
 
-export async function getPreviewFechaCobro(dia: number, signal?: AbortSignal): Promise<{
-  dia_nominal: number
+export async function getPreviewFechaCobro(
+  params: {
+    tipo: 'dia_fijo' | 'regla'
+    valor: string
+    direccion?: 'anterior' | 'posterior'
+  },
+  signal?: AbortSignal
+): Promise<{
+  tipo: string
+  valor: string
+  direccion: string
   proxima_fecha_cobro: string
-  es_dia_habil: boolean
+  fecha_nominal: string
+  fue_ajustada: boolean
 }> {
-  const res = await api.get('/onboarding/preview-fecha-cobro', { params: { dia }, signal })
+  const res = await api.get('/onboarding/preview-fecha-cobro', { params, signal })
   return res.data
 }

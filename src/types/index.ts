@@ -13,6 +13,7 @@ export interface Usuario {
   tipo_dolar: string
   ciclo_tipo: string | null
   ciclo_valor: string | null
+  ciclo_ajuste_direccion?: 'anterior' | 'posterior' | null
   onboarding_completo: boolean
   email_verificado: boolean
   telefono_verificado: boolean
@@ -141,6 +142,7 @@ export interface EditarTelefonoRequest {
 export interface EditarCicloFinancieroRequest {
   ciclo_tipo: 'dia_fijo' | 'regla'
   ciclo_valor: string
+  ciclo_ajuste_direccion?: 'anterior' | 'posterior' | null
 }
 
 export interface EditarMonedaRequest {

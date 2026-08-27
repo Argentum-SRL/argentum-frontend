@@ -1,50 +1,94 @@
-.container {
-  margin-bottom: 24px;
+/* ═══════════════════════════════════════════════════════════════════
+   DayGroup.module.css — Contenedor de Grupo Diario Premium
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dayGroupWrapper {
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+.dayGroupWrapper:last-child {
+  margin-bottom: 8px;
+}
+
+/* ── Header del Día ─────────────────────────────────────────────────── */
 .header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-end;
-  padding: 0 20px;
-  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendarIcon {
+  color: var(--text-3);
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
 .title {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--text);
   margin: 0;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
-.total {
-  font-size: 13px;
-  font-weight: 600;
+.subtitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.totalText {
-  color: var(--text);
-}
-
-.totalPos {
-  color: #16A34A;
-}
-
-.totalMixed {
-  color: var(--text-2);
-}
-
-.list {
+/* ── Group Card Container ───────────────────────────────────────────── */
+.cardContainer {
   background: var(--surface);
-  border-radius: 20px;
+  border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.015);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.rowWrapper {
-  display: block;
+[data-theme="dark"] .cardContainer {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
-.rowWrapperBorder {
-  border-bottom: 1px solid var(--border);
+@media (max-width: 640px) {
+  .dayGroupWrapper {
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+
+  .cardContainer {
+    border-radius: 14px;
+  }
+
+  .header {
+    padding: 0 2px;
+  }
+
+  .subtitle {
+    display: none;
+  }
 }

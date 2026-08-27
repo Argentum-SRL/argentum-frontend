@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react'
+import { Calendar } from 'lucide-react'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import TransaccionRow from './TransaccionRow'
-import { formatMonto } from '@/utils/format'
 import styles from './DayGroup.module.css'
 
 interface DayGroupProps {
@@ -13,13 +13,22 @@ interface DayGroupProps {
   onDelete: (id: string) => void
 }
 
+const DIAS_SEMANA = [
+  'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+]
+
 const MESES = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
 ]
 
-function getDayLabel(fechaStr: string): string {
-  if (!fechaStr) return ''
+function getFormattedDayInfo(fechaStr: string) {
+  if (!fechaStr) return { title: '', subtitle: '', isToday: false, isYesterday: false }
+  
+  const [y, m, d] = fechaStr.split('-').map(Number)
+  if (!y || !m || !d) return { title: fechaStr, subtitle: '', isToday: false, isYesterday: false }
+
+  const targetDate = new Date(y, m - 1, d)
   const today = new Date()
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   
@@ -27,13 +36,38 @@ function getDayLabel(fechaStr: string): string {
   yesterday.setDate(yesterday.getDate() - 1)
   const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
 
-  if (fechaStr === todayStr) return 'Hoy'
-  if (fechaStr === yesterdayStr) return 'Ayer'
-
-  const [y, m, d] = fechaStr.split('-').map(Number)
-  if (!y || !m || !d) return fechaStr
+  const isToday = fechaStr === todayStr
+  const isYesterday = fechaStr === yesterdayStr
+  const isDifferentYear = y !== today.getFullYear()
   
-  return `${d} de ${MESES[m - 1]}`
+  const diaSemana = DIAS_SEMANA[targetDate.getDay()]
+  const mesNombre = MESES[m - 1]
+  const yearSuffix = isDifferentYear ? `, ${y}` : ''
+
+  if (isToday) {
+    return {
+      title: 'Hoy',
+      subtitle: `${diaSemana}, ${d} de ${mesNombre}${yearSuffix}`,
+      isToday: true,
+      isYesterday: false
+    }
+  }
+
+  if (isYesterday) {
+    return {
+      title: 'Ayer',
+      subtitle: `${diaSemana}, ${d} de ${mesNombre}${yearSuffix}`,
+      isToday: false,
+      isYesterday: true
+    }
+  }
+
+  return {
+    title: `${diaSemana}, ${d} de ${mesNombre}${yearSuffix}`,
+    subtitle: '',
+    isToday: false,
+    isYesterday: false
+  }
 }
 
 const DayGroup = memo(({
@@ -44,77 +78,39 @@ const DayGroup = memo(({
   onEdit,
   onDelete,
 }: DayGroupProps) => {
-  const dayLabel = useMemo(() => getDayLabel(fecha), [fecha])
-
-  const { total, mainCurrency, totalColor } = useMemo(() => {
-    let totalARS = 0
-    let totalUSD = 0
-    let hasIngresos = false
-    let hasEgresos = false
-
-    transacciones.forEach(tx => {
-      const isIngreso = tx.tipo === 'ingreso'
-      if (isIngreso) hasIngresos = true
-      if (!isIngreso) hasEgresos = true
-      
-      const rawMonto = Number(tx.monto) || 0
-      const amount = isIngreso ? rawMonto : -rawMonto
-      if (tx.moneda === 'ARS') totalARS += amount
-      else totalUSD += amount
-    })
-
-    const mainCurr: 'ARS' | 'USD' = totalARS !== 0 || totalUSD === 0 ? 'ARS' : 'USD'
-    const tot = mainCurr === 'ARS' ? totalARS : totalUSD
-
-    let color = 'var(--text)'
-    if (hasEgresos && !hasIngresos) color = 'var(--text)'
-    if (!hasEgresos && hasIngresos) color = '#16A34A'
-    if (hasEgresos && hasIngresos) color = 'var(--text-2)'
-
-    return { total: tot, mainCurrency: mainCurr, totalColor: color }
-  }, [transacciones])
-
-  const totalClass = useMemo(() => {
-    if (totalColor === '#16A34A') return styles.totalPos
-    if (totalColor === 'var(--text-2)') return styles.totalMixed
-    return styles.totalText
-  }, [totalColor])
-
-  const formatTotal = (val: number, cur: 'ARS' | 'USD') => {
-    const sign = val < 0 ? '-' : (val > 0 ? '+' : '')
-    return `${sign}${formatMonto(Math.abs(val), cur)}`
-  }
+  const dayInfo = useMemo(() => getFormattedDayInfo(fecha), [fecha])
 
   if (transacciones.length === 0) return null
 
   return (
-    <div className={styles.container}>
+    <div className={styles.dayGroupWrapper}>
+      {/* ── Day Header ─────────────────────────────────────────────────── */}
       <div className={styles.header}>
-        <h3 className={styles.title}>
-          {dayLabel}
-        </h3>
-        <span className={`${styles.total} ${totalClass}`}>
-          {formatTotal(total, mainCurrency)}
-        </span>
+        <div className={styles.dateInfo}>
+          <div className={styles.titleContainer}>
+            <Calendar size={14} className={styles.calendarIcon} />
+            <h3 className={styles.title}>{dayInfo.title}</h3>
+          </div>
+          {dayInfo.subtitle && (
+            <span className={styles.subtitle}>{dayInfo.subtitle}</span>
+          )}
+        </div>
       </div>
       
-      <div className={styles.list}>
-        {transacciones.map((tx, idx) => {
+      {/* ── Group Card List ────────────────────────────────────────────── */}
+      <div className={styles.cardContainer}>
+        {transacciones.map((tx) => {
           const cat = categorias.find(c => c.id === tx.categoria_id)
           const bill = billeteras.find(b => b.id === tx.billetera_id)
           return (
-            <div 
-              key={tx.id} 
-              className={idx < transacciones.length - 1 ? styles.rowWrapperBorder : styles.rowWrapper}
-            >
-              <TransaccionRow
-                transaccion={tx}
-                categoria={cat}
-                billetera={bill}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            </div>
+            <TransaccionRow
+              key={tx.id}
+              transaccion={tx}
+              categoria={cat}
+              billetera={bill}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           )
         })}
       </div>

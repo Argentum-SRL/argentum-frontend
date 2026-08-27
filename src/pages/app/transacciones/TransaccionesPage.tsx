@@ -260,7 +260,7 @@ export default function TransaccionesPage() {
     }
   }, [filteredTransacciones, mainCurrency])
 
-  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
+  const formatCurrency = (monto: number) => formatMonto(Math.round(monto), 'ARS')
   const resumen = useMemo(() => ({
     balance,
     ingresos: totalIngresos,

@@ -95,7 +95,7 @@ export default function BudgetBarChart({
           const periodo = p.periodo_actual!
           const limite = Number(periodo.monto_limite || p.monto || 0)
           const gastado = Number(periodo.monto_usado || 0)
-          const porcentaje = periodo.porcentaje_usado || (limite > 0 ? (gastado / limite) * 100 : 0)
+          const porcentaje = Number.isFinite(periodo.porcentaje_usado) ? periodo.porcentaje_usado : (limite > 0 ? (gastado / limite) * 100 : 0)
 
           // Relative scaling of dashed frame height against max limit
           const ratio = maxLimite > 0 ? Math.max(limite / maxLimite, 0.1) : 1
@@ -114,7 +114,7 @@ export default function BudgetBarChart({
 
           // Assign pastel palette by index
           const palette = PASTEL_PALETTE[idx % PASTEL_PALETTE.length]
-          const firstCat = p.categorias[0]
+          const firstCat = p.categorias?.[0]
 
           return (
             <div 
@@ -159,7 +159,7 @@ export default function BudgetBarChart({
                   <div className={styles.iconWrapper}>
                     <SubcategoriaIcon
                       nombre={firstCat?.es_subcategoria ? firstCat.nombre : null}
-                      parentCategory={firstCat?.es_subcategoria ? null : firstCat?.nombre}
+                      parentCategory={firstCat?.es_subcategoria ? null : (firstCat?.nombre || null)}
                       size={28}
                     />
                   </div>
@@ -197,8 +197,8 @@ export default function BudgetBarChart({
               <div className={styles.sheetTitleGroup}>
                 <div className={styles.sheetIcon}>
                   <SubcategoriaIcon
-                    nombre={activePresupuesto.categorias[0]?.es_subcategoria ? activePresupuesto.categorias[0].nombre : null}
-                    parentCategory={activePresupuesto.categorias[0]?.es_subcategoria ? null : activePresupuesto.categorias[0]?.nombre}
+                    nombre={activePresupuesto.categorias?.[0]?.es_subcategoria ? activePresupuesto.categorias[0].nombre : null}
+                    parentCategory={activePresupuesto.categorias?.[0]?.es_subcategoria ? null : (activePresupuesto.categorias?.[0]?.nombre || null)}
                     size={32}
                   />
                 </div>

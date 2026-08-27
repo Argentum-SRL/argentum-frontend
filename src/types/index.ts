@@ -457,8 +457,9 @@ export interface PresupuestoCreate {
 export interface PresupuestoUpdate {
   nombre?: string
   monto?: number
-  moneda?: string
-  renovacion?: string
+  moneda?: 'ARS' | 'USD'
+  periodo?: 'semanal' | 'quincenal' | 'mensual'
+  renovacion?: 'automatica' | 'manual'
   categorias?: PresupuestoCategoriaInput[]
 }
 

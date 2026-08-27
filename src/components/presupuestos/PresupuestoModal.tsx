@@ -19,6 +19,7 @@ import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './PresupuestoModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 
 interface PresupuestoModalProps {
   open: boolean
@@ -36,7 +37,7 @@ interface FormState {
   moneda: 'ARS' | 'USD'
   periodo: 'semanal' | 'quincenal' | 'mensual'
   renovacion: 'automatica' | 'manual'
-  selectedCategorias: { categoria_id: string; subcategoria_id: string | null }[]
+  selectedCategorias: { categoria_id: string | null; subcategoria_id: string | null }[]
   searchQuery: string
   localError: string | null
   isSubmitting: boolean
@@ -73,7 +74,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           periodo: action.presupuesto.periodo as FormState['periodo'],
           renovacion: action.presupuesto.renovacion as FormState['renovacion'],
           selectedCategorias: action.presupuesto.categorias.map(c => ({
-            categoria_id: c.categoria_id || '',
+            categoria_id: c.categoria_id || null,
             subcategoria_id: c.subcategoria_id || null
           }))
         }
@@ -129,9 +130,24 @@ export default function PresupuestoModal({
   }, [open, presupuesto, loadSubcategorias])
 
   const goNext = () => {
-    if (step === 1 && (!nombre || !monto)) {
-      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Completá el nombre y el monto para continuar' })
-      return
+    if (step === 1) {
+      const trimmed = nombre.trim()
+      if (!trimmed) {
+        dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un nombre para el presupuesto' })
+        return
+      }
+      if (trimmed.length > 100) {
+        dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El nombre no puede tener más de 100 caracteres' })
+        return
+      }
+      if (monto === null || monto <= 0 || isNaN(monto)) {
+        dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto límite mayor a cero' })
+        return
+      }
+      if (monto > 999_999_999_999) {
+        dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto límite es demasiado grande' })
+        return
+      }
     }
     if (step === 2 && selectedCategorias.length === 0) {
       dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Seleccioná al menos una categoría' })
@@ -173,15 +189,38 @@ export default function PresupuestoModal({
   }
 
   const handleSubmit = async () => {
+    const trimmed = nombre.trim()
+    if (!trimmed) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un nombre para el presupuesto' })
+      return
+    }
+    if (monto === null || monto <= 0 || isNaN(monto)) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto límite mayor a cero' })
+      return
+    }
+    if (selectedCategorias.length === 0) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Seleccioná al menos una categoría' })
+      return
+    }
+
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
+      // Deduplicar categorías seleccionadas
+      const seen = new Set<string>()
+      const dedupedCategorias = selectedCategorias.filter(c => {
+        const key = `${c.categoria_id}_${c.subcategoria_id}`
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+
       const payload = {
-        nombre,
-        monto: monto!,
+        nombre: trimmed,
+        monto,
         moneda,
         periodo,
         renovacion,
-        categorias: selectedCategorias
+        categorias: dedupedCategorias
       }
 
       if (isEdit) {
@@ -193,18 +232,29 @@ export default function PresupuestoModal({
       }
       onSuccess()
       onClose()
-    } catch {
-      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Error al guardar el presupuesto. Reintentá luego.' })
+    } catch (err: unknown) {
+      dispatch({ 
+        type: 'SET_FIELD', 
+        field: 'localError', 
+        value: getErrorMessage(err, 'No pudimos guardar el presupuesto. Intentá de nuevo.') 
+      })
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
   }
 
   const filteredCategorias = useMemo(() => {
-    if (!searchQuery) return categorias.filter(c => c.tipo === 'egreso')
-    const q = searchQuery.toLowerCase()
-    return categorias.filter(c => c.tipo === 'egreso' && c.nombre.toLowerCase().includes(q))
-  }, [categorias, searchQuery])
+    const egresos = categorias.filter(c => c.tipo === 'egreso')
+    if (!searchQuery.trim()) return egresos
+    const q = searchQuery.toLowerCase().trim()
+    return egresos.filter(cat => {
+      const catMatch = cat.nombre.toLowerCase().includes(q)
+      const subMatch = allSubcategorias.some(
+        sub => sub.categoria_id === cat.id && sub.nombre.toLowerCase().includes(q)
+      )
+      return catMatch || subMatch
+    })
+  }, [categorias, allSubcategorias, searchQuery])
 
   return (
     <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Gestionar presupuesto">
@@ -247,6 +297,7 @@ export default function PresupuestoModal({
                     value={nombre}
                     onChange={e => setField('nombre', e.target.value)}
                     placeholder="Ej: Ahorro Vacaciones o Supermercado"
+                    maxLength={100}
                     autoFocus
                   />
                 </div>

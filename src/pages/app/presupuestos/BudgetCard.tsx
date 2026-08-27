@@ -27,7 +27,7 @@ export default function BudgetCard({
   presupuesto, onEdit, onPause, onResume, onDelete, onHistory 
 }: BudgetCardProps) {
   const p = presupuesto.periodo_actual
-  const porcentaje = p ? p.porcentaje_usado : 0
+  const porcentaje = p && Number.isFinite(p.porcentaje_usado) ? p.porcentaje_usado : 0
   const barRef = useRef<HTMLDivElement>(null)
   const percentRef = useRef<HTMLSpanElement>(null)
   

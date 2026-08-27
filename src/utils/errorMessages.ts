@@ -81,6 +81,12 @@ export const ERROR_MAP: Record<string, string> = {
   "Sin permiso para este presupuesto": "No tenés permiso para modificar ese presupuesto.",
   "Monto límite debe ser positivo": "El límite del presupuesto tiene que ser mayor a cero.",
   "Ya existe un presupuesto activo para esta categoría": "Ya tenés un presupuesto activo para esa categoría.",
+  "Debe seleccionar al menos una categoría": "Tenés que seleccionar al menos una categoría.",
+  "Los presupuestos solo pueden asociarse a categorías de egreso": "Los presupuestos solo pueden crearse sobre categorías de gasto.",
+  "El nombre del presupuesto no puede estar vacío": "Escribí un nombre para el presupuesto.",
+  "El nombre no puede superar los 100 caracteres": "El nombre no puede tener más de 100 caracteres.",
+  "Periodo inválido": "El periodo seleccionado no es válido.",
+  "Tipo de renovación inválido": "El tipo de renovación no es válido.",
 
   // Metas
   "Meta no encontrada": "No encontramos esa meta.",

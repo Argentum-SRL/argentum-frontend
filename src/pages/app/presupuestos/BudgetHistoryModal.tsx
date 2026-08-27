@@ -33,7 +33,7 @@ export default function BudgetHistoryModal({
 
   const gastoPromedio = useMemo(() => {
     if (historial.length === 0) return 0
-    const sum = historial.slice(0, 3).reduce((acc, h) => acc + h.monto_usado, 0)
+    const sum = historial.slice(0, 3).reduce((acc, h) => acc + Number(h.monto_usado || 0), 0)
     return sum / Math.min(historial.length, 3)
   }, [historial])
 

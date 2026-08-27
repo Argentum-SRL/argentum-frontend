@@ -21,15 +21,11 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import { EmptyState, SelectInput } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
 
-interface GrupoCuotasResumenExtended extends GrupoCuotasResumen {
-  estado?: 'activo' | 'cancelado' | 'completado'
-}
-
 export default function GruposCuotasTab() {
-  const [grupos, setGrupos] = useState<GrupoCuotasResumenExtended[]>([])
+  const [grupos, setGrupos] = useState<GrupoCuotasResumen[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedGrupo, setSelectedGrupo] = useState<GrupoCuotasResumenExtended | null>(null)
-  const [editingGrupo, setEditingGrupo] = useState<GrupoCuotasResumenExtended | null>(null)
+  const [selectedGrupo, setSelectedGrupo] = useState<GrupoCuotasResumen | null>(null)
+  const [editingGrupo, setEditingGrupo] = useState<GrupoCuotasResumen | null>(null)
   const [search, setSearch] = useState('')
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState<'todas' | 'activas' | 'completadas'>('activas')
@@ -41,7 +37,7 @@ export default function GruposCuotasTab() {
   const [saving, setSaving] = useState(false)
 
   // Prepayment & Wallet states
-  const [grupoPrepago, setGrupoPrepago] = useState<GrupoCuotasResumenExtended | null>(null)
+  const [grupoPrepago, setGrupoPrepago] = useState<GrupoCuotasResumen | null>(null)
   const [billeteraSeleccionada, setBilleteraSeleccionada] = useState<string>('')
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
 
@@ -77,23 +73,22 @@ export default function GruposCuotasTab() {
     return () => clearTimeout(timer)
   }, [fetchGrupos, fetchBilleteras])
 
-  const handleEditClick = (grupo: GrupoCuotasResumenExtended) => {
-    setSelectedGrupo(null)
+  const handleEditClick = (grupo: GrupoCuotasResumen) => {
     setEditingGrupo(grupo)
     setEditDesc(grupo.descripcion)
     setEditMonto(grupo.monto_total)
   }
 
-  const handleCancelar = (grupo: GrupoCuotasResumenExtended) => {
+  const handleCancelar = (grupo: GrupoCuotasResumen) => {
     confirm({
-      title: '¿Cancelás esta cuota?',
-      description: 'La cuota se va a marcar como cancelada y no se va a cobrar más.',
+      title: '¿Cancelás las cuotas restantes?',
+      description: 'Las cuotas que ya pagaste quedan registradas. Las pendientes se cancelan y no se van a cobrar.',
       variant: 'danger',
-      confirmLabel: 'Confirmar',
+      confirmLabel: 'Cancelar cuotas',
       onConfirm: async () => {
         try {
           await grupoCuotasService.cancelarGrupo(grupo.id)
-          showToast('Cuotas canceladas correctamente', 'success')
+          showToast('Compra en cuotas cancelada', 'success')
           setSelectedGrupo(null)
           fetchGrupos()
         } catch (e) {
@@ -104,7 +99,7 @@ export default function GruposCuotasTab() {
     })
   }
 
-  const handlePrepagar = (grupo: GrupoCuotasResumenExtended) => {
+  const handlePrepagar = (grupo: GrupoCuotasResumen) => {
     setSelectedGrupo(null)
     setGrupoPrepago(grupo)
     setBilleteraSeleccionada('')

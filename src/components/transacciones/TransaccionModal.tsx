@@ -366,37 +366,83 @@ export default function TransaccionModal({
     ['ia_wpp', 'ia_chat', 'ia_pdf'].includes(transaccion?.origen ?? '')
 
   const handleSubmit = async () => {
-    // Validaciones básicas
-    if (!monto) { showToast('Ingresá un monto válido', 'error'); return }
-    if (metodoPago === 'credito' && !tarjetaId) { showToast('Seleccioná una tarjeta', 'error'); return }
-    if (metodoPago !== 'credito' && !billeteraId) { showToast('Seleccioná una billetera', 'error'); return }
+    // Validaciones estrictas
+    if (!monto || Number(monto) <= 0) {
+      showToast('El monto debe ser mayor a cero', 'error')
+      return
+    }
+    if (!descripcion.trim()) {
+      showToast('Ingresá una descripción para la transacción', 'error')
+      return
+    }
+
+    let resolvedBilleteraId = billeteraId
+    if (metodoPago === 'credito') {
+      if (!tarjetaId) {
+        showToast('Seleccioná una tarjeta de crédito', 'error')
+        return
+      }
+      const tarjetaSel = tarjetas.find(t => t.id === tarjetaId)
+      if (tarjetaSel?.billetera_id) {
+        resolvedBilleteraId = tarjetaSel.billetera_id
+      }
+      if (!isEdit) {
+        if (!cantidadCuotas || cantidadCuotas < 1 || cantidadCuotas > 120) {
+          showToast('La cantidad de cuotas debe ser entre 1 y 120', 'error')
+          return
+        }
+        if (!cuotaInicial || cuotaInicial < 1 || cuotaInicial > cantidadCuotas) {
+          showToast('La cuota inicial debe estar entre 1 y la cantidad total', 'error')
+          return
+        }
+        if (tasaInteres < 0) {
+          showToast('La tasa de interés no puede ser negativa', 'error')
+          return
+        }
+      }
+    } else {
+      if (!resolvedBilleteraId) {
+        showToast('Seleccioná una billetera', 'error')
+        return
+      }
+    }
 
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
-
       // Sanitización de cuotas para el envío
-      const cant = Math.max(1, cantidadCuotas || 1)
-      const inicial = Math.max(1, cuotaInicial || 1)
+      const cant = Math.max(1, Math.min(120, cantidadCuotas || 1))
+      const inicial = Math.max(1, Math.min(cant, cuotaInicial || 1))
 
-      const payload = {
-        tipo, monto, moneda, descripcion,
-        categoria_id: categoriaId || null,
-        subcategoria_id: subcategoriaId || null,
-        billetera_id: billeteraId, fecha, metodo_pago: metodoPago,
-        tarjeta_id: (metodoPago === 'credito' && tarjetaId) ? tarjetaId : null,
-        origen: isEdit ? undefined : ('manual' as const),
-        es_padre_cuotas: !isEdit && metodoPago === 'credito' ? true : undefined,
-        info_cuotas: !isEdit && metodoPago === 'credito'
-          ? {
-            cantidad_cuotas: cant,
-            cuota_inicial: inicial,
-            tiene_interes: tasaInteres > 0,
-            tasa_interes: tasaInteres,
-            monto_total: monto,
-            proximo_resumen: proximoResumen
+      const payload = isCuotaHija
+        ? {
+            descripcion: descripcion.trim(),
+            categoria_id: categoriaId || null,
+            subcategoria_id: subcategoriaId || null,
           }
-          : undefined,
-      }
+        : {
+            tipo,
+            monto: Number(monto),
+            moneda,
+            descripcion: descripcion.trim(),
+            categoria_id: categoriaId || null,
+            subcategoria_id: subcategoriaId || null,
+            billetera_id: resolvedBilleteraId,
+            fecha,
+            metodo_pago: metodoPago,
+            tarjeta_id: (metodoPago === 'credito' && tarjetaId) ? tarjetaId : null,
+            origen: isEdit ? undefined : ('manual' as const),
+            es_padre_cuotas: !isEdit && metodoPago === 'credito' ? true : undefined,
+            info_cuotas: !isEdit && metodoPago === 'credito'
+              ? {
+                cantidad_cuotas: cant,
+                cuota_inicial: inicial,
+                tiene_interes: tasaInteres > 0,
+                tasa_interes: tasaInteres,
+                monto_total: Number(monto),
+                proximo_resumen: proximoResumen
+              }
+              : undefined,
+          }
       if (!isEdit) {
         await transaccionService.createTransaccion(payload)
         showToast('Transacción creada', 'success')
@@ -410,8 +456,12 @@ export default function TransaccionModal({
         }
       }
       onSuccess(); onClose()
-    } catch (e) { console.error(e); showToast('Error al guardar la transacción', 'error') }
-    finally { dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false }) }
+    } catch (e) {
+      console.error(e)
+      showToast(getErrorMessage(e, 'Error al guardar la transacción'), 'error')
+    } finally {
+      dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
+    }
   }
 
   return (

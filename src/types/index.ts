@@ -588,6 +588,7 @@ export interface GrupoCuotasResumen {
   transaccion_padre_id: string
   tiene_interes: boolean
   tasa_interes: number | null
+  estado: 'activo' | 'cancelado' | 'completado'
 }
 
 

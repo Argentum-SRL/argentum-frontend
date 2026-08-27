@@ -11,6 +11,7 @@ import {
   X,
   Hash,
   Percent,
+  Trash2,
 } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Transaccion, Billetera, Categoria, Subcategoria, TarjetaCredito } from '@/types'
@@ -23,6 +24,7 @@ import styles from './TransaccionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { DateInput } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
@@ -136,19 +138,38 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-
-
 export default function TransaccionModal({
   open, onClose, transaccion, billeteras, categorias, tarjetas, onSuccess,
 }: TransaccionModalProps) {
   const isEdit = !!transaccion
   const { showToast } = useToast()
-  useModal() // Llamamos al hook pero no usamos confirm por ahora
+  const { confirm } = useModal()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const carouselRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
   const [loadingSubcats, setLoadingSubcats] = useState(false)
+
+  const handleDeleteTransaction = () => {
+    if (!transaccion) return
+    confirm({
+      title: '¿Eliminar transacción?',
+      description: 'Esta acción no se puede deshacer y restaurará el saldo correspondiente.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await transaccionService.deleteTransaccion(transaccion.id)
+          showToast('Transacción eliminada correctamente', 'success')
+          onSuccess()
+          onClose()
+        } catch (e) {
+          console.error(e)
+          showToast(getErrorMessage(e, 'No se pudo eliminar la transacción'), 'error')
+        }
+      }
+    })
+  }
 
   const {
     step, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
@@ -179,6 +200,19 @@ export default function TransaccionModal({
 
     fetchSubcats()
   }, [categoriaId])
+
+  const sortedSubcategorias = useMemo(() => {
+    return [...subcategorias].sort((a, b) => {
+      const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+      const aNorm = norm(a.nombre)
+      const bNorm = norm(b.nombre)
+      const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos' || aNorm === 'varios'
+      const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos' || bNorm === 'varios'
+      if (isAOtros && !isBOtros) return 1
+      if (!isAOtros && isBOtros) return -1
+      return aNorm.localeCompare(bNorm)
+    })
+  }, [subcategorias])
 
   useEffect(() => {
     if (open) dispatch({ type: 'RESET', transaccion: transaccion || null, billeteras })
@@ -258,18 +292,28 @@ export default function TransaccionModal({
       'hogar',
       'comunicacion',
       'banco',
-      'otros',
       'empleo',
       'trabajo independiente',
       'inversiones y rentas'
     ]
     return filtered.sort((a, b) => {
       const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
-      const ai = mainCats.indexOf(norm(a.nombre)), bi = mainCats.indexOf(norm(b.nombre))
+      const aNorm = norm(a.nombre)
+      const bNorm = norm(b.nombre)
+
+      const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos'
+      const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos'
+
+      // "Otros" siempre al final absoluto
+      if (isAOtros && !isBOtros) return 1
+      if (!isAOtros && isBOtros) return -1
+      if (isAOtros && isBOtros) return 0
+
+      const ai = mainCats.indexOf(aNorm), bi = mainCats.indexOf(bNorm)
       if (ai !== -1 && bi !== -1) return ai - bi
       if (ai !== -1) return -1
       if (bi !== -1) return 1
-      return norm(a.nombre).localeCompare(norm(b.nombre))
+      return aNorm.localeCompare(bNorm)
     })
   }, [categorias, tipo])
 
@@ -395,7 +439,20 @@ export default function TransaccionModal({
             >
               <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>{isEdit ? 'Editar transacción' : 'Nueva transacción'}</h2>
-                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <div className={styles.headerRightActions}>
+                  {isEdit && (
+                    <button
+                      type="button"
+                      className={styles.deleteHeaderBtn}
+                      onClick={handleDeleteTransaction}
+                      title="Eliminar transacción"
+                      aria-label="Eliminar transacción"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                  <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                </div>
               </div>
 
               <div className={styles.formBody}>
@@ -531,7 +588,13 @@ export default function TransaccionModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+                {isEdit ? (
+                  <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
+                    Eliminar
+                  </button>
+                ) : (
+                  <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
+                )}
                 <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
             </form>
@@ -662,7 +725,20 @@ export default function TransaccionModal({
               <div className={styles.formHeader}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Detalles</h2>
-                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                <div className={styles.headerRightActions}>
+                  {isEdit && (
+                    <button
+                      type="button"
+                      className={styles.deleteHeaderBtn}
+                      onClick={handleDeleteTransaction}
+                      title="Eliminar transacción"
+                      aria-label="Eliminar transacción"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                  <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
+                </div>
               </div>
 
               <div className={styles.formBody}>
@@ -762,7 +838,7 @@ export default function TransaccionModal({
                               <SubcategoriaIcon nombre="general" parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
                               General
                             </button>
-                            {subcategorias.map((sub) => (
+                            {sortedSubcategorias.map((sub) => (
                               <button type="button" key={sub.id} className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
                                 onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: sub.id })}>
                                 <SubcategoriaIcon nombre={sub.nombre} parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
@@ -778,7 +854,13 @@ export default function TransaccionModal({
               </div>
 
               <div className={styles.formFooter}>
-                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                {isEdit ? (
+                  <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
+                    Eliminar
+                  </button>
+                ) : (
+                  <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                )}
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                   {isSubmitting ? 'Guardando...' : isPendienteIA ? 'Confirmar transacción' : 'Guardar transacción'}
                 </button>

@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════════════════════════════
+   GruposCuotasTab.module.css — Diseño TransaccionRow-Style & Mobile UX
+   ═══════════════════════════════════════════════════════════════════ */
+
 .container {
   display: flex;
   flex-direction: column;
@@ -5,82 +9,577 @@
   width: 100%;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  width: 100%;
-}
-
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.card {
+/* ── 1. Resumen Superior (Desktop Only) ─────────────────────────────── */
+.metricsBar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 20px;
+  padding: 12px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+@media (min-width: 768px) {
+  .metricsBar {
+    display: flex;
+  }
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  text-align: center;
+}
+
+.metricLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.metricValue {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.metricRed {
+  color: var(--error, #E11D48);
+}
+
+.metricDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── 2. Controles de Filtro y Búsqueda ──────────────────────────────── */
+.controlsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Mobile Controls Bar (Tabs Centered + Search Button) */
+.mobileControlsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.mobileControlsHidden {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .mobileControlsBar {
+    display: none !important;
+  }
+}
+
+.filterTabsWrapperMobile {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.filterTabs {
+  display: flex;
+  background: var(--surface-alt);
+  padding: 3px;
+  border-radius: 11px;
+  gap: 2px;
+  width: fit-content;
+}
+
+.filterTab {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filterTabActive {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.mobileSearchTriggerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.mobileSearchTriggerBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+/* Mobile Expanded Search Bar with Animation */
+.mobileExpandedSearch {
+  display: none;
+  width: 100%;
+  position: relative;
+  align-items: center;
+  animation: expandSearchCuotas 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes expandSearchCuotas {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mobileExpandedSearchActive {
+  display: flex !important;
+}
+
+@media (min-width: 768px) {
+  .mobileExpandedSearch {
+    display: none !important;
+  }
+}
+
+.mobileExpandedSearchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.mobileExpandedSearchInput {
+  width: 100%;
+  height: 38px;
+  padding: 0 38px 0 36px;
+  border-radius: 12px;
+  border: 1px solid var(--primary);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: none;
+}
+
+.mobileExpandedSearchClose {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: none;
+  cursor: pointer;
+}
+
+/* Desktop Controls */
+.desktopControlsContainer {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktopControlsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .searchBoxDesktop {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 260px;
+  }
+
+  .searchIcon {
+    position: absolute;
+    left: 10px;
+    color: var(--text-3);
+    pointer-events: none;
+  }
+
+  .searchInput {
+    width: 100%;
+    height: 34px;
+    padding: 0 10px 0 32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  .searchInput:focus {
+    border-color: var(--primary);
+    outline: none;
+  }
+}
+
+/* ── 3. Listado de Cuotas (Mini-bloques individuales) ─────────────── */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .listContainer {
+    gap: 10px;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 18px;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+  -webkit-user-select: none;
+  user-select: none;
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .row {
+    padding: 12px 14px;
+    gap: 11px;
+    border-radius: 13px;
+  }
+}
+
+.row:hover {
+  background: var(--surface-alt);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .row {
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .row:hover {
+  background: var(--surface-alt);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.row:active {
+  transform: scale(0.995);
+}
+
+.rowCancelled {
+  opacity: 0.6;
+}
+
+/* Squircle Avatar */
+.rowAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(59, 130, 246, 0.09);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  .rowAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+  }
+}
+
+.row:hover .rowAvatar {
+  transform: scale(1.05);
+}
+
+[data-theme="dark"] .rowAvatar {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.rowAvatarIcon {
+  color: #2563EB;
+}
+
+[data-theme="dark"] .rowAvatarIcon {
+  color: #60A5FA;
+}
+
+/* Row Center Column */
+.rowInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .rowTitle {
+    font-size: 13.5px;
+  }
+}
+
+.cardTag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.badgeCompleted {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  background: rgba(22, 163, 74, 0.1);
+  color: #16A34A;
+  text-transform: uppercase;
+}
+
+.badgeCancelled {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  text-transform: uppercase;
+}
+
+.rowMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+@media (max-width: 640px) {
+  .rowMeta {
+    font-size: 11px;
+  }
+}
+
+.metaCuotas strong {
+  color: var(--text-2);
+}
+
+.metaDot {
+  font-size: 8px;
+  opacity: 0.6;
+}
+
+.metaVencimiento {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mini Progress Bar */
+.miniProgressBar {
+  width: 100%;
+  max-width: 160px;
+  height: 3.5px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 1px;
+}
+
+.miniProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%);
+  border-radius: 2px;
+}
+
+[data-theme="dark"] .miniProgressFill {
+  background: linear-gradient(90deg, #60A5FA 0%, #3B82F6 100%);
+}
+
+/* Row Right Amount Column */
+.rowAmountArea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.rowMonthlyAmount {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .rowMonthlyAmount {
+    font-size: 14px;
+  }
+}
+
+.rowPerMonth {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.rowPendingAmount {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.rowChevron {
+  color: var(--text-3);
+  opacity: 0.3;
+  flex-shrink: 0;
+  display: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .rowChevron {
+    display: block;
+  }
+}
+
+.row:hover .rowChevron {
+  opacity: 0.9;
+  transform: translateX(2px);
+}
+
+.emptyFilterState {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px dashed var(--border);
+}
+
+/* ── 4. Modal de Detalle de Cuota ───────────────────────────────────── */
+.detailModalContent {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 4px 0;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-.cardHeader {
+.detailHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
 }
 
-.headerMain {
+.detailTitleArea {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
   min-width: 0;
 }
 
-.cardTitle {
-  font-size: 16px;
+.detailTitle {
+  font-size: 16.5px;
   font-weight: 700;
   color: var(--text);
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
 }
 
-.badgeRow {
+.detailTags {
   display: flex;
+  align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
-}
-
-.cardBadge {
-  background: var(--surface-alt);
-  color: var(--text-2);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  text-transform: uppercase;
 }
 
 .interesBadge {
@@ -88,154 +587,179 @@
   color: #D97706;
   font-size: 10px;
   font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-  text-transform: uppercase;
-}
-
-.cardTotal {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.cardProgressArea {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
-  background: var(--surface-alt);
-  border-radius: 12px;
-}
-
-.progressBarSvg {
-  width: 100%;
-  height: 6px;
-  display: block;
-}
-
-.progressTextRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.progressText {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-2);
-}
-
-.installmentText {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.vencimientoRow {
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.vencimientoText {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-3);
-}
-
-.completedBadge {
-  background: rgba(22, 163, 74, 0.1);
-  color: #16A34A;
-  font-size: 9px;
-  font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
   text-transform: uppercase;
 }
 
-.cardAmountsRow {
-  display: flex;
-  gap: 16px;
-}
-
-.amountCol {
-  flex: 1;
+.detailTotal {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-end;
+  flex-shrink: 0;
 }
 
-.amountLabel {
+.detailTotalLabel {
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
 }
 
-.amountValue {
-  font-size: 14px;
-  font-weight: 700;
+.detailTotalValue {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.detailProgressCard {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressBarTrack {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%);
+  border-radius: 3px;
+}
+
+.detailProgressTextRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
   color: var(--text-2);
 }
 
-.pendingAmount {
-  color: #E11D48;
-}
-
-.cardActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: auto;
-  border-top: 1px solid var(--border);
-  padding-top: 14px;
-}
-
-.editBtn, .deleteBtn {
+.detailVencimiento {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: background 0.2s, color 0.2s;
-}
-
-.editBtn {
-  background: var(--surface-alt);
-  color: var(--text-2);
-}
-
-.editBtn:hover {
-  background: var(--border);
-}
-
-.deleteBtn {
-  background: transparent;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--text-3);
+  margin-top: 2px;
 }
 
-.deleteBtn:hover {
-  background: rgba(220, 38, 38, 0.08);
+.detailAmountsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.detailAmountBox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.detailAmountLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+
+.detailAmountValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Actions Grid inside Detail Modal (2 filas con 2 columnas de igual tamaño) */
+.detailActionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.detailPrepayBtn,
+.detailEditBtn,
+.detailCancelBtn,
+.detailDeleteBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  width: 100%;
+  padding: 0 10px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.detailPrepayBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.detailPrepayBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.detailEditBtn {
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.detailEditBtn:hover {
+  background: var(--border);
+  transform: translateY(-1px);
+}
+
+.detailCancelBtn {
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+
+.detailCancelBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.detailDeleteBtn {
+  background: rgba(239, 68, 68, 0.08);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.detailDeleteBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
   color: #DC2626;
 }
 
-.actionIcon {
-  flex-shrink: 0;
-}
-
-.loadingState {
-  padding: 60px 20px;
-  text-align: center;
-  color: var(--text-3);
-  font-weight: 600;
-}
-
+/* ── Form Modal Styles ──────────────────────────────────────────────── */
 .editForm {
   display: flex;
   flex-direction: column;
@@ -289,7 +813,7 @@
 }
 
 .inputWithCurrency .fieldInput {
-  padding-left: 52px;
+  padding-left: 58px;
 }
 
 .modalInfoPanel {
@@ -299,19 +823,24 @@
   border: 1px solid rgba(245, 158, 11, 0.2);
   border-radius: 12px;
   padding: 12px 14px;
+  align-items: flex-start;
 }
 
 .infoIcon {
   color: #D97706;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .infoText {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
   color: #B45309;
+}
+
+[data-theme="dark"] .infoText {
+  color: #FBBF24;
 }
 
 .formActions {
@@ -319,21 +848,13 @@
   justify-content: flex-end;
   gap: 12px;
   margin-top: 16px;
-  padding: 14px 20px;
-  margin-left: -20px;
-  margin-right: -20px;
-  margin-bottom: -20px;
-  border-top: 1px solid var(--surface-alt);
-  background: var(--surface);
-  position: sticky;
-  bottom: -20px;
-  z-index: 10;
-  flex-shrink: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 
 .cancelBtn, .submitBtn {
   height: 40px;
-  padding: 0 20px;
+  padding: 0 18px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
@@ -363,4 +884,11 @@
 .submitBtn:disabled, .cancelBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.loadingState {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-3);
+  font-weight: 600;
 }

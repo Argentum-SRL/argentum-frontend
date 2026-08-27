@@ -54,6 +54,8 @@ export default function FilterBar({
   const [catPopoverOpen, setCatPopoverOpen] = useState(false)
   const [datePopoverOpen, setDatePopoverOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(filters.busqueda || '')
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(Boolean(filters.busqueda))
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const { open } = useModal()
 
   const [localDesde, setLocalDesde] = useState(filters.fecha_desde || '')
@@ -93,6 +95,9 @@ export default function FilterBar({
   if ((filters.busqueda || '') !== prevBusqueda) {
     setPrevBusqueda(filters.busqueda || '')
     setLocalSearch(filters.busqueda || '')
+    if (filters.busqueda) {
+      setMobileSearchOpen(true)
+    }
   }
 
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {
@@ -156,6 +161,19 @@ export default function FilterBar({
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSearch(e.target.value)
+  }
+
+  const handleOpenMobileSearch = () => {
+    setMobileSearchOpen(true)
+    setTimeout(() => {
+      searchInputRef.current?.focus()
+    }, 50)
+  }
+
+  const handleCloseMobileSearch = () => {
+    setMobileSearchOpen(false)
+    setLocalSearch('')
+    onFilterChange({ ...filters, busqueda: undefined })
   }
 
   const activeBilletera = billeteras.find(b => b.id === filters.billetera_id)
@@ -259,23 +277,63 @@ export default function FilterBar({
   return (
     <>
       <div className={styles.filterBar}>
-        {/* Mobile Filter Button */}
-        <button
-          className={styles.mobileFilterBtn}
-          onClick={() => open('transaccionFilters', {
-            data: {
-              filters,
-              onFilterChange,
-              onClear,
-              billeteras,
-              categorias,
-              hasActiveFilters,
-            },
-          })}
-          aria-label="Filtrar"
-        >
-          <Filter size={16} />
-        </button>
+        {/* Mobile Filter Controls Bar (Visible only on mobile when search is NOT expanded) */}
+        <div className={`${styles.mobileControlsBar} ${mobileSearchOpen ? styles.mobileControlsHidden : ''}`}>
+          <div className={styles.mobileLeftActions}>
+            <button
+              className={styles.mobileFilterBtn}
+              onClick={() => open('transaccionFilters', {
+                data: {
+                  filters,
+                  onFilterChange,
+                  onClear,
+                  billeteras,
+                  categorias,
+                  hasActiveFilters,
+                },
+              })}
+              aria-label="Abrir filtros"
+            >
+              <Filter size={16} />
+              <span>Filtros</span>
+            </button>
+
+            {hasActiveFilters && (
+              <button className={styles.clearBtnMobileInline} onClick={onClear}>
+                Limpiar
+              </button>
+            )}
+          </div>
+
+          <button
+            className={styles.mobileSearchTriggerBtn}
+            onClick={handleOpenMobileSearch}
+            aria-label="Buscar"
+          >
+            <Search size={16} />
+          </button>
+        </div>
+
+        {/* Mobile Expanded Search Bar */}
+        <div className={`${styles.mobileExpandedSearch} ${mobileSearchOpen ? styles.mobileExpandedSearchActive : ''}`}>
+          <Search size={16} className={styles.mobileExpandedSearchIcon} />
+          <input
+            ref={searchInputRef}
+            type="text"
+            className={styles.mobileExpandedSearchInput}
+            placeholder="Buscar por descripción, banco..."
+            value={localSearch}
+            onChange={handleSearchChange}
+          />
+          <button 
+            type="button" 
+            className={styles.mobileExpandedSearchClose} 
+            onClick={handleCloseMobileSearch}
+            aria-label="Cerrar búsqueda"
+          >
+            <X size={16} />
+          </button>
+        </div>
 
         {/* Desktop-only filters group */}
         <div className={styles.desktopFilterGroup}>
@@ -379,8 +437,8 @@ export default function FilterBar({
           )}
         </div>
 
-        {/* Search input */}
-        <div className={styles.searchContainer}>
+        {/* Search input (Desktop only) */}
+        <div className={styles.searchContainerDesktop}>
           <Search size={16} className={styles.searchIcon} />
           <input
             type="text"
@@ -391,13 +449,6 @@ export default function FilterBar({
             onChange={handleSearchChange}
           />
         </div>
-
-        {/* Mobile Clear Button */}
-        {hasActiveFilters && (
-          <button className={`${styles.clearBtn} ${styles.mobileOnlyBtn}`} onClick={onClear}>
-            Limpiar filtros
-          </button>
-        )}
       </div>
     </>
   )

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, RefreshCw } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -17,7 +17,6 @@ import { useModal } from '@/hooks/useModal'
 
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
-import RecurrentesPage, { type RecurrentesPageRef } from './RecurrentesPage'
 import GruposCuotasTab from '@/components/transacciones/GruposCuotasTab'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 
@@ -25,7 +24,7 @@ export default function TransaccionesPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
 
-  const [activeTab, setActiveTab] = useState<'historial' | 'recurrentes' | 'cuotas'>('historial')
+  const [activeTab, setActiveTab] = useState<'historial' | 'cuotas'>('historial')
   const mainCurrency = 'ARS' // Moneda base para el resumen
   
   const periodoActual = useMemo(() => calcularPeriodoActual(usuario), [usuario])
@@ -59,7 +58,6 @@ export default function TransaccionesPage() {
   const [loading, setLoading] = useState(true)
 
   const { open, confirm } = useModal()
-  const recurrentesRef = useRef<RecurrentesPageRef>(null)
 
   const hasActiveFilters = useMemo(() => Object.entries(filters).some(([k, v]) => {
     if (k === 'fecha_desde' || k === 'fecha_hasta') {
@@ -210,10 +208,6 @@ export default function TransaccionesPage() {
     setFilters(defaultFilters)
   }, [defaultFilters])
 
-  const openNewRecurrente = useCallback(() => {
-    recurrentesRef.current?.openNew()
-  }, [])
-
   const handleViewPendientes = useCallback(() => {
     setFilters(prev => ({
       ...prev,
@@ -302,13 +296,6 @@ export default function TransaccionesPage() {
             Exportar
           </button>
           <button 
-            className={`${styles.btnGhost} ${activeTab === 'recurrentes' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
-            onClick={() => setActiveTab(prev => prev === 'recurrentes' ? 'historial' : 'recurrentes')}
-          >
-            <RefreshCw size={16} className={styles.btnIcon} />
-            Recurrentes
-          </button>
-          <button 
             className={`${styles.btnGhost} ${activeTab === 'cuotas' ? styles.btnTabActive : ''} ${styles.desktopOnly}`} 
             onClick={() => setActiveTab(prev => prev === 'cuotas' ? 'historial' : 'cuotas')}
           >
@@ -317,10 +304,10 @@ export default function TransaccionesPage() {
           </button>
           <button 
             className={styles.nuevaBtn}
-            onClick={activeTab === 'recurrentes' ? openNewRecurrente : openNewTransaccion}
+            onClick={openNewTransaccion}
           >
             <Plus size={16} strokeWidth={2.5} />
-            Nueva<span className={styles.btnSuffix}>{activeTab === 'recurrentes' ? ' recurrente' : ' transacción'}</span>
+            Nueva<span className={styles.btnSuffix}> transacción</span>
           </button>
         </div>
       </div>
@@ -332,12 +319,6 @@ export default function TransaccionesPage() {
           onClick={() => setActiveTab('historial')}
         >
           Historial
-        </button>
-        <button 
-          className={`${styles.tabBtn} ${activeTab === 'recurrentes' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('recurrentes')}
-        >
-          Recurrentes
         </button>
         <button 
           className={`${styles.tabBtn} ${activeTab === 'cuotas' ? styles.tabBtnActive : ''}`}
@@ -458,10 +439,6 @@ export default function TransaccionesPage() {
             )}
           </div>
         </>
-      ) : activeTab === 'recurrentes' ? (
-        <div className={styles.recurrentesWrapper}>
-          <RecurrentesPage ref={recurrentesRef} embedded />
-        </div>
       ) : (
         <GruposCuotasTab />
       )}

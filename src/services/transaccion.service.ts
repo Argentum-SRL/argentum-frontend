@@ -24,7 +24,12 @@ const transaccionService = {
   getTransacciones: async (filters: TransaccionFilters = {}, signal?: AbortSignal) => {
     const params = new URLSearchParams()
     Object.entries(filters).forEach(([key, value]) => {
-      if (key === 'categoria_ids') return // Client-side filtering only
+      if (key === 'categoria_ids') {
+        if (Array.isArray(value) && value.length > 0) {
+          params.append('categoria_ids', value.join(','))
+        }
+        return
+      }
       if (value !== undefined && value !== null && value !== '') {
         params.append(key, value.toString())
       }

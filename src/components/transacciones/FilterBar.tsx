@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { X, Search, ChevronDown, Filter, Calendar } from 'lucide-react'
+import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote } from 'lucide-react'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { useModal } from '@/hooks/useModal'
+import { useAuth } from '@/hooks/useAuth'
+import { calcularPeriodoActual } from '@/lib/utils/ciclo'
+import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import { DateInput } from '@/components/ui'
 
 interface FilterBarProps {
@@ -44,6 +47,10 @@ export default function FilterBar({
   categorias,
   hasActiveFilters
 }: FilterBarProps) {
+  const { usuario } = useAuth()
+  const periodoActual = React.useMemo(() => calcularPeriodoActual(usuario), [usuario])
+
+  const [walletPopoverOpen, setWalletPopoverOpen] = useState(false)
   const [catPopoverOpen, setCatPopoverOpen] = useState(false)
   const [datePopoverOpen, setDatePopoverOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(filters.busqueda || '')
@@ -64,9 +71,11 @@ export default function FilterBar({
     setLocalHasta(filters.fecha_hasta || '')
   }
 
+  const walletRef = useRef<HTMLDivElement>(null)
   const catRef = useRef<HTMLDivElement>(null)
   const dateRef = useRef<HTMLDivElement>(null)
 
+  useClickOutside(walletRef, () => setWalletPopoverOpen(false))
   useClickOutside(catRef, () => setCatPopoverOpen(false))
   useClickOutside(dateRef, () => setDatePopoverOpen(false), '[data-portal="date-picker"]')
 
@@ -90,6 +99,11 @@ export default function FilterBar({
     onFilterChange({ ...filters, tipo })
   }
 
+  const handleBilleteraSelect = (billeteraId?: string) => {
+    onFilterChange({ ...filters, billetera_id: billeteraId })
+    setWalletPopoverOpen(false)
+  }
+
   const handleBilleteraRemove = () => {
     onFilterChange({ ...filters, billetera_id: undefined })
   }
@@ -101,6 +115,37 @@ export default function FilterBar({
       categoria_ids: catId ? [catId] : undefined
     })
     setCatPopoverOpen(false)
+  }
+
+  const handleApplyPreset = (preset: 'ciclo' | 'este_mes' | 'mes_pasado' | 'ultimos_30d') => {
+    const today = new Date()
+    let desde: string
+    let hasta: string
+
+    if (preset === 'ciclo') {
+      desde = periodoActual.inicio.toISOString().split('T')[0]
+      hasta = periodoActual.fin.toISOString().split('T')[0]
+    } else if (preset === 'este_mes') {
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+      desde = firstDay.toISOString().split('T')[0]
+      hasta = lastDay.toISOString().split('T')[0]
+    } else if (preset === 'mes_pasado') {
+      const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+      const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
+      desde = firstDay.toISOString().split('T')[0]
+      hasta = lastDay.toISOString().split('T')[0]
+    } else {
+      const past = new Date()
+      past.setDate(today.getDate() - 30)
+      desde = past.toISOString().split('T')[0]
+      hasta = today.toISOString().split('T')[0]
+    }
+
+    setLocalDesde(desde)
+    setLocalHasta(hasta)
+    onFilterChange({ ...filters, fecha_desde: desde, fecha_hasta: hasta })
+    setDatePopoverOpen(false)
   }
 
   const handleDateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -116,55 +161,105 @@ export default function FilterBar({
   const activeBilletera = billeteras.find(b => b.id === filters.billetera_id)
   const activeCategoria = categorias.find(c => c.id === filters.categoria_id)
 
+  const renderBilleterasList = () => (
+    <div className={styles.popoverList}>
+      <button
+        type="button"
+        className={`${styles.popoverItem} ${!filters.billetera_id ? styles.popoverItemActive : ''}`}
+        onClick={() => handleBilleteraSelect(undefined)}
+      >
+        Todas las billeteras
+      </button>
+      {billeteras.map(bill => {
+        const bank = bill.bank_id ? getBankById(bill.bank_id) : findBankByNombre(bill.nombre)
+        const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
+        return (
+          <button
+            key={bill.id}
+            type="button"
+            className={`${styles.popoverItem} ${filters.billetera_id === bill.id ? styles.popoverItemActive : ''}`}
+            onClick={() => handleBilleteraSelect(bill.id)}
+          >
+            {bill.es_efectivo ? (
+              <Banknote size={15} />
+            ) : logoUrl ? (
+              <img src={logoUrl} alt="" style={{ width: 15, height: 15, objectFit: 'contain' }} />
+            ) : (
+              <Wallet size={15} />
+            )}
+            {bill.nombre}
+          </button>
+        )
+      })}
+    </div>
+  )
+
   const renderCategoriasList = () => (
     <div className={styles.popoverList}>
       <button
         type="button"
-        className={`${styles.popoverItem} ${!filters.categoria_id ? styles.popoverItemActive : ''}`}
+        className={`${styles.popoverItem} ${!filters.categoria_id && (!filters.categoria_ids || filters.categoria_ids.length === 0) ? styles.popoverItemActive : ''}`}
         onClick={() => handleCategoriaSelect(undefined)}
       >
         Todas las categorías
       </button>
       {categorias.map(cat => (
-          <button
-            key={cat.id}
-            type="button"
-            className={`${styles.popoverItem} ${filters.categoria_id === cat.id ? styles.popoverItemActive : ''}`}
-            onClick={() => handleCategoriaSelect(cat.id)}
-          >
-            <CategoriaIcon nombre={cat.nombre} size={16} />
-            {cat.nombre}
-          </button>
-        ))}
+        <button
+          key={cat.id}
+          type="button"
+          className={`${styles.popoverItem} ${filters.categoria_id === cat.id ? styles.popoverItemActive : ''}`}
+          onClick={() => handleCategoriaSelect(cat.id)}
+        >
+          <CategoriaIcon nombre={cat.nombre} size={16} />
+          {cat.nombre}
+        </button>
+      ))}
     </div>
   )
 
   const renderDateForm = () => (
+    <div className={styles.datePopoverContainer}>
+      <div className={styles.desktopPresetsRow}>
+        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('ciclo')}>
+          Este ciclo
+        </button>
+        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('este_mes')}>
+          Este mes
+        </button>
+        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('mes_pasado')}>
+          Mes pasado
+        </button>
+        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('ultimos_30d')}>
+          30 días
+        </button>
+      </div>
+
       <form onSubmit={handleDateSubmit} className={styles.dateGroup}>
-      <DateInput
-        id="filter-desde"
-        label="Desde"
-        name="desde"
-        value={localDesde}
-        onChange={(val) => setLocalDesde(val)}
-      />
-      <DateInput
-        id="filter-hasta"
-        label="Hasta"
-        name="hasta"
-        value={localHasta}
-        onChange={(val) => setLocalHasta(val)}
-      />
-      <button type="submit" className={`${styles.typePillActive} ${styles.dateSubmitBtn}`}>
-        Aplicar
-      </button>
-    </form>
+        <DateInput
+          id="filter-desde"
+          label="Desde"
+          name="desde"
+          value={localDesde}
+          onChange={(val) => setLocalDesde(val)}
+        />
+        <DateInput
+          id="filter-hasta"
+          label="Hasta"
+          name="hasta"
+          value={localHasta}
+          onChange={(val) => setLocalHasta(val)}
+        />
+        <button type="submit" className={`${styles.typePillActive} ${styles.dateSubmitBtn}`}>
+          Aplicar
+        </button>
+      </form>
+    </div>
   )
 
   return (
     <>
       <div className={styles.filterBar}>
-        {/* Mobile Filter Button (only icon on mobile) */}
+        {/* Mobile Filter Button */}
         <button
           className={styles.mobileFilterBtn}
           onClick={() => open('transaccionFilters', {
@@ -182,7 +277,7 @@ export default function FilterBar({
           <Filter size={16} />
         </button>
 
-        {/* Desktop-only filters group (Placed FIRST to align to left on desktop) */}
+        {/* Desktop-only filters group */}
         <div className={styles.desktopFilterGroup}>
           <div className={styles.tabs}>
             <button
@@ -208,24 +303,34 @@ export default function FilterBar({
             </button>
           </div>
 
-          {activeBilletera && (
-            <div className={`${styles.pill} ${styles.pillActive}`}>
-              {activeBilletera.nombre}
-              <button className={styles.pillRemove} onClick={handleBilleteraRemove} aria-label="Remover filtro">
-                <X size={14} />
-              </button>
+          {/* Billetera Popover */}
+          <div className={`${styles.pill} ${styles.pillRelative}`} ref={walletRef}>
+            <div 
+              className={styles.pillIconFlex} 
+              onClick={() => setWalletPopoverOpen(!walletPopoverOpen)}
+            >
+              <Wallet size={14} />
+              {activeBilletera ? activeBilletera.nombre : 'Billetera'}
+              <ChevronDown size={14} />
             </div>
-          )}
-
-          {filters.estado_verificacion === 'pendiente' && (
-            <div className={`${styles.pill} ${styles.pillActive}`}>
-              Pendientes IA
-              <button className={styles.pillRemove} onClick={() => onFilterChange({ ...filters, estado_verificacion: undefined })} aria-label="Remover filtro">
-                <X size={14} />
+            {activeBilletera && (
+              <button 
+                className={styles.pillRemove} 
+                onClick={(e) => { e.stopPropagation(); handleBilleteraRemove(); }} 
+                aria-label="Remover filtro de billetera"
+              >
+                <X size={13} />
               </button>
-            </div>
-          )}
+            )}
+            {walletPopoverOpen && (
+              <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
+                <div className={styles.popoverTitle}>Billetera / Cuenta</div>
+                {renderBilleterasList()}
+              </div>
+            )}
+          </div>
 
+          {/* Categoría Popover */}
           <div className={`${styles.pill} ${styles.pillRelative}`} ref={catRef}>
             <div className={styles.pillIconFlex} onClick={() => setCatPopoverOpen(!catPopoverOpen)}>
               {filters.categoria_ids && filters.categoria_ids.length > 1
@@ -243,6 +348,7 @@ export default function FilterBar({
             )}
           </div>
 
+          {/* Período Popover */}
           <div className={`${styles.pill} ${styles.pillRelative}`} ref={dateRef}>
             <div className={styles.pillIconFlex} onClick={() => setDatePopoverOpen(!datePopoverOpen)}>
               <Calendar size={14} />
@@ -257,6 +363,15 @@ export default function FilterBar({
             )}
           </div>
 
+          {filters.estado_verificacion === 'pendiente' && (
+            <div className={`${styles.pill} ${styles.pillActive}`}>
+              Pendientes IA
+              <button className={styles.pillRemove} onClick={() => onFilterChange({ ...filters, estado_verificacion: undefined })} aria-label="Remover filtro">
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
           {hasActiveFilters && (
             <button className={`${styles.clearBtn} ${styles.desktopOnlyBtn}`} onClick={onClear}>
               Limpiar filtros
@@ -264,20 +379,20 @@ export default function FilterBar({
           )}
         </div>
 
-        {/* Search input next to filter button (Placed SECOND to align to right on desktop) */}
+        {/* Search input */}
         <div className={styles.searchContainer}>
           <Search size={16} className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Buscar..."
+            placeholder="Buscar por descripción, categoría, banco..."
             title="Buscar transacción"
             value={localSearch}
             onChange={handleSearchChange}
           />
         </div>
 
-        {/* Mobile Clear Button (visible only on mobile) */}
+        {/* Mobile Clear Button */}
         {hasActiveFilters && (
           <button className={`${styles.clearBtn} ${styles.mobileOnlyBtn}`} onClick={onClear}>
             Limpiar filtros

@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react'
-import { Check, X } from 'lucide-react'
+import { Check, X, Wallet, Banknote } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
 import { calcularPeriodoActual } from '@/lib/utils/ciclo'
+import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import styles from './FilterBar.module.css'
 import { DateInput } from '@/components/ui'
 
@@ -35,24 +36,23 @@ export default function FilterBarMobileDrawer({
 
   const [localFilters, setLocalFilters] = useState<TransaccionFilters>({ ...filters })
 
-  const activeBilletera = billeteras.find((b) => b.id === localFilters.billetera_id)
-
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {
     setLocalFilters((prev) => ({ ...prev, tipo }))
   }
 
-  const handleBilleteraRemove = () => {
-    setLocalFilters((prev) => ({ ...prev, billetera_id: undefined }))
+  const handleBilleteraSelect = (billeteraId?: string) => {
+    setLocalFilters((prev) => ({ ...prev, billetera_id: billeteraId }))
   }
 
   const handleToggleCategory = (catId: string) => {
     setLocalFilters((prev) => {
-      const current = prev.categoria_ids || []
+      const current = prev.categoria_ids || (prev.categoria_id ? [prev.categoria_id] : [])
       const next = current.includes(catId)
         ? current.filter((id) => id !== catId)
         : [...current, catId]
       return {
         ...prev,
+        categoria_id: next.length === 1 ? next[0] : undefined,
         categoria_ids: next.length > 0 ? next : undefined,
       }
     })
@@ -61,6 +61,7 @@ export default function FilterBarMobileDrawer({
   const handleClearCategories = () => {
     setLocalFilters((prev) => ({
       ...prev,
+      categoria_id: undefined,
       categoria_ids: undefined,
     }))
   }
@@ -98,7 +99,7 @@ export default function FilterBarMobileDrawer({
   }
 
   const handleApply = () => {
-    const catIds = localFilters.categoria_ids || []
+    const catIds = localFilters.categoria_ids || (localFilters.categoria_id ? [localFilters.categoria_id] : [])
     const singleCatId = catIds.length === 1 ? catIds[0] : undefined
 
     onFilterChange({
@@ -119,32 +120,25 @@ export default function FilterBarMobileDrawer({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Filtros">
       <div className={styles.mobileDrawerContainer}>
-        {/* Active Pill Filters (Billetera, Pendientes IA) */}
-        {(activeBilletera || localFilters.estado_verificacion === 'pendiente') && (
+        {/* Active Pill for Pendientes IA */}
+        {localFilters.estado_verificacion === 'pendiente' && (
           <div className={styles.activePillsRowMobile}>
-            {activeBilletera && (
-              <div className={`${styles.pill} ${styles.pillActive}`}>
-                {activeBilletera.nombre}
-                <button className={styles.pillRemove} onClick={handleBilleteraRemove} aria-label="Remover filtro">
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {localFilters.estado_verificacion === 'pendiente' && (
-              <div className={`${styles.pill} ${styles.pillActive}`}>
-                Pendientes IA
-                <button className={styles.pillRemove} onClick={() => setLocalFilters((prev) => ({ ...prev, estado_verificacion: undefined }))} aria-label="Remover filtro">
-                  <X size={14} />
-                </button>
-              </div>
-            )}
+            <div className={`${styles.pill} ${styles.pillActive}`}>
+              Pendientes IA
+              <button 
+                className={styles.pillRemove} 
+                onClick={() => setLocalFilters((prev) => ({ ...prev, estado_verificacion: undefined }))} 
+                aria-label="Remover filtro"
+              >
+                <X size={14} />
+              </button>
+            </div>
           </div>
         )}
 
         {/* Tipo Selector */}
         <div>
-          <div className={styles.popoverTitle}>Tipo</div>
+          <div className={styles.popoverTitle}>Tipo de movimiento</div>
           <div className={styles.pillGroupMobile}>
             <button
               type="button"
@@ -170,6 +164,55 @@ export default function FilterBarMobileDrawer({
           </div>
         </div>
 
+        {/* Billetera Selector */}
+        <div>
+          <div className={styles.popoverTitle}>Billetera / Cuenta</div>
+          <div className={styles.categoriaListMobile}>
+            <button
+              type="button"
+              className={`${styles.categoriaRowMobile} ${!localFilters.billetera_id ? styles.categoriaRowActiveMobile : ''}`}
+              onClick={() => handleBilleteraSelect(undefined)}
+            >
+              <div className={styles.categoriaRowLeftMobile}>
+                <Wallet size={16} />
+                <span>Todas las billeteras</span>
+              </div>
+              <div className={`${styles.checkboxMobile} ${!localFilters.billetera_id ? styles.checkboxCheckedMobile : ''}`}>
+                {!localFilters.billetera_id && <Check size={14} strokeWidth={3} />}
+              </div>
+            </button>
+
+            {billeteras.map((bill) => {
+              const isSelected = localFilters.billetera_id === bill.id
+              const bank = bill.bank_id ? getBankById(bill.bank_id) : findBankByNombre(bill.nombre)
+              const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
+
+              return (
+                <button
+                  key={bill.id}
+                  type="button"
+                  className={`${styles.categoriaRowMobile} ${isSelected ? styles.categoriaRowActiveMobile : ''}`}
+                  onClick={() => handleBilleteraSelect(bill.id)}
+                >
+                  <div className={styles.categoriaRowLeftMobile}>
+                    {bill.es_efectivo ? (
+                      <Banknote size={16} />
+                    ) : logoUrl ? (
+                      <img src={logoUrl} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+                    ) : (
+                      <Wallet size={16} />
+                    )}
+                    <span>{bill.nombre}</span>
+                  </div>
+                  <div className={`${styles.checkboxMobile} ${isSelected ? styles.checkboxCheckedMobile : ''}`}>
+                    {isSelected && <Check size={14} strokeWidth={3} />}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
         {/* Categoría Selector (Multi-selection checklist) */}
         <div>
           <div className={styles.popoverTitle}>Categorías</div>
@@ -189,7 +232,7 @@ export default function FilterBarMobileDrawer({
             </button>
 
             {categorias.map((cat) => {
-              const isSelected = localFilters.categoria_ids?.includes(cat.id) || false
+              const isSelected = localFilters.categoria_ids?.includes(cat.id) || localFilters.categoria_id === cat.id
               return (
                 <button
                   key={cat.id}

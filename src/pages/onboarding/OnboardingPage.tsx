@@ -189,7 +189,11 @@ export default function OnboardingPage() {
                 )}
                 {pasoActual === 2 && (
                   <StepCicloFinanciero
-                    datosIniciales={{ ciclo_tipo: datos?.ciclo_tipo ?? null, ciclo_valor: datos?.ciclo_valor ?? null }}
+                    datosIniciales={{
+                      ciclo_tipo: datos?.ciclo_tipo ?? null,
+                      ciclo_valor: datos?.ciclo_valor ?? null,
+                      ciclo_ajuste_direccion: datos?.ciclo_ajuste_direccion ?? null
+                    }}
                     onNext={avanzar}
                   />
                 )}

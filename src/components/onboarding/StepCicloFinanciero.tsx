@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Calendar, RefreshCw, Loader2 } from 'lucide-react'
 import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/services/onboarding.service'
+import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { SelectInput } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -109,6 +110,7 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
         ciclo_valor: valor,
         ciclo_ajuste_direccion: direccion,
       })
+      invalidateDashboardCache()
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
       const msg = getErrorMessage(err, "No pudimos guardar tus preferencias. Intentá de nuevo.")

@@ -95,6 +95,7 @@ export interface EstadoOnboarding {
     moneda_principal: string | null
     ciclo_tipo: string | null
     ciclo_valor: string | null
+    ciclo_ajuste_direccion?: 'anterior' | 'posterior' | null
     fecha_nacimiento: string | null
     sexo: string | null
   }

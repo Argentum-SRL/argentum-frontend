@@ -5,8 +5,7 @@ import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { useModal } from '@/hooks/useModal'
-import { useAuth } from '@/hooks/useAuth'
-import { calcularPeriodoActual } from '@/lib/utils/ciclo'
+import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import { DateInput } from '@/components/ui'
 
@@ -47,8 +46,7 @@ export default function FilterBar({
   categorias,
   hasActiveFilters
 }: FilterBarProps) {
-  const { usuario } = useAuth()
-  const periodoActual = React.useMemo(() => calcularPeriodoActual(usuario), [usuario])
+  const { periodo: periodoActual } = usePeriodoActual()
 
   const [walletPopoverOpen, setWalletPopoverOpen] = useState(false)
   const [catPopoverOpen, setCatPopoverOpen] = useState(false)
@@ -128,8 +126,15 @@ export default function FilterBar({
     let hasta: string
 
     if (preset === 'ciclo') {
-      desde = periodoActual.inicio.toISOString().split('T')[0]
-      hasta = periodoActual.fin.toISOString().split('T')[0]
+      if (periodoActual) {
+        desde = periodoActual.fecha_inicio
+        hasta = periodoActual.fecha_fin
+      } else {
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+        desde = firstDay.toISOString().split('T')[0]
+        hasta = lastDay.toISOString().split('T')[0]
+      }
     } else if (preset === 'este_mes') {
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)

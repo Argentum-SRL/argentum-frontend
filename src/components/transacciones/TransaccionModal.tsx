@@ -371,10 +371,6 @@ export default function TransaccionModal({
       showToast('El monto debe ser mayor a cero', 'error')
       return
     }
-    if (!descripcion.trim()) {
-      showToast('Ingresá una descripción para la transacción', 'error')
-      return
-    }
 
     let resolvedBilleteraId = billeteraId
     if (metodoPago === 'credito') {
@@ -824,7 +820,7 @@ export default function TransaccionModal({
                 {/* Descripción + Fecha */}
                 <div className={styles.descFechaRow}>
                   <div className={`${styles.formField} ${styles.flex2}`}>
-                    <label className={styles.fieldLabel} htmlFor="tx-desc">Descripción</label>
+                    <label className={styles.fieldLabel} htmlFor="tx-desc">Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
                     <input id="tx-desc" type="text" className={styles.fieldInput} value={descripcion}
                       onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'descripcion', value: e.target.value })}
                       placeholder="Ej: Supermercado" />

@@ -3,6 +3,7 @@ import { Coins, Calendar, Save, Check, ArrowLeft, ArrowRight } from 'lucide-reac
 import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { getCotizaciones, getPreviewFechaCobro } from '@/services/onboarding.service'
+import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { SelectInput, type SelectOption } from '@/components/ui'
@@ -151,6 +152,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
         ciclo_valor: cicloValor,
         ciclo_ajuste_direccion: cicloAjusteDireccion,
       })
+      invalidateDashboardCache()
       updateUsuario(updated)
       showToast('Ciclo contable actualizado correctamente', 'success')
     } catch (err: unknown) {

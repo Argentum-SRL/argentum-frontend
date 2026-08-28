@@ -1,11 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Check, X, Wallet, Banknote } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
-import { useAuth } from '@/hooks/useAuth'
-import { calcularPeriodoActual } from '@/lib/utils/ciclo'
+import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import styles from './FilterBar.module.css'
 import { DateInput } from '@/components/ui'
@@ -31,8 +30,7 @@ export default function FilterBarMobileDrawer({
   categorias,
   hasActiveFilters,
 }: FilterBarMobileDrawerProps) {
-  const { usuario } = useAuth()
-  const periodoActual = useMemo(() => calcularPeriodoActual(usuario), [usuario])
+  const { periodo: periodoActual } = usePeriodoActual()
 
   const [localFilters, setLocalFilters] = useState<TransaccionFilters>({ ...filters })
 
@@ -72,8 +70,15 @@ export default function FilterBarMobileDrawer({
     let hasta: string
 
     if (preset === 'ciclo') {
-      desde = periodoActual.inicio.toISOString().split('T')[0]
-      hasta = periodoActual.fin.toISOString().split('T')[0]
+      if (periodoActual) {
+        desde = periodoActual.fecha_inicio
+        hasta = periodoActual.fecha_fin
+      } else {
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+        desde = firstDay.toISOString().split('T')[0]
+        hasta = lastDay.toISOString().split('T')[0]
+      }
     } else if (preset === 'este_mes') {
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)

@@ -11,9 +11,32 @@ const resumenPromises: Record<string, Promise<DashboardResumen> | undefined> = {
 let proyeccionCache: { data: ProyeccionesResponse; timestamp: number } | null = null
 let proyeccionPromise: Promise<ProyeccionesResponse> | null = null
 
+let periodoActualCache: { data: { fecha_inicio: string; fecha_fin: string }; timestamp: number } | null = null
+let periodoActualPromise: Promise<{ fecha_inicio: string; fecha_fin: string }> | null = null
+
 const DEFAULT_TTL = 60 * 1000 // 60 seconds
 
 export const dashboardService = {
+  getPeriodoActual: async (signal?: AbortSignal): Promise<{ fecha_inicio: string; fecha_fin: string }> => {
+    if (periodoActualPromise) return periodoActualPromise
+
+    if (periodoActualCache && Date.now() - periodoActualCache.timestamp < DEFAULT_TTL) {
+      return periodoActualCache.data
+    }
+
+    periodoActualPromise = (async () => {
+      try {
+        const response = await api.get<{ fecha_inicio: string; fecha_fin: string }>('/dashboard/periodo-actual', { signal })
+        periodoActualCache = { data: response.data, timestamp: Date.now() }
+        return response.data
+      } finally {
+        periodoActualPromise = null
+      }
+    })()
+
+    return periodoActualPromise
+  },
+
   getResumen: async (desde?: string, hasta?: string, billeteraIds?: string[], signal?: AbortSignal): Promise<DashboardResumen> => {
     const key = `${desde || 'all'}-${hasta || 'all'}-${billeteraIds?.join(',') || 'all'}`
     
@@ -124,6 +147,7 @@ export const invalidateDashboardCache = () => {
   resumenCache = {}
   cotizacionCache = null
   proyeccionCache = null
+  periodoActualCache = null
 }
 
 export const invalidateResumen = () => {

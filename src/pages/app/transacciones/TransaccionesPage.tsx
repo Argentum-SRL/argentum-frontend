@@ -10,7 +10,7 @@ import { exportarTransaccionesPDF } from '@/services/exportPdf.service'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { calcularPeriodoActual } from '@/lib/utils/ciclo'
+import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
@@ -23,17 +23,16 @@ import { EmptyState, PageSummaryBar } from '@/components/ui'
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
+  const { periodo: periodoActual } = usePeriodoActual()
 
   const [activeTab, setActiveTab] = useState<'historial' | 'cuotas'>('historial')
   const mainCurrency = 'ARS' // Moneda base para el resumen
   
-  const periodoActual = useMemo(() => calcularPeriodoActual(usuario), [usuario])
-
   const defaultFilters: TransaccionFilters = useMemo(() => ({
     tipo: undefined,
     moneda: undefined,
-    fecha_desde: periodoActual.inicio.toISOString().split('T')[0],
-    fecha_hasta: periodoActual.fin.toISOString().split('T')[0],
+    fecha_desde: periodoActual?.fecha_inicio,
+    fecha_hasta: periodoActual?.fecha_fin,
     billetera_id: undefined,
     categoria_id: undefined,
     estado_verificacion: undefined,
@@ -43,10 +42,10 @@ export default function TransaccionesPage() {
   const [filters, setFilters] = useState<TransaccionFilters>(defaultFilters)
 
   // Sincronizar filtros por defecto cuando el usuario cargue o cambie su ciclo
-  const userCycleKey = usuario ? `${usuario.id}-${usuario.ciclo_tipo}-${usuario.ciclo_valor}` : ''
-  const [lastUserCycleKey, setLastUserCycleKey] = useState<string>('')
-  if (userCycleKey && userCycleKey !== lastUserCycleKey) {
-    setLastUserCycleKey(userCycleKey)
+  const periodoKey = periodoActual ? `${periodoActual.fecha_inicio}_${periodoActual.fecha_fin}` : ''
+  const [lastPeriodoKey, setLastPeriodoKey] = useState<string>('')
+  if (periodoKey && periodoKey !== lastPeriodoKey) {
+    setLastPeriodoKey(periodoKey)
     setFilters(defaultFilters)
   }
   
@@ -281,7 +280,7 @@ export default function TransaccionesPage() {
       <div className={styles.pageHeader}>
         <div className={styles.titleGroup}>
           <h1>Transacciones</h1>
-          <p className={styles.subtitle}>{periodoActual.label} · {transacciones.length} movimientos</p>
+          <p className={styles.subtitle}>{periodoActual?.label ?? 'Cargando período...'} · {transacciones.length} movimientos</p>
         </div>
         <div className={styles.headerActions}>
           <button

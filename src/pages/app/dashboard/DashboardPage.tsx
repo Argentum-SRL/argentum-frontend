@@ -218,8 +218,12 @@ const CategoriasChart = memo(({
 }) => {
   const chartData = useMemo(() => {
     return data
-      .filter(c => c.gasto_actual_ciclo > 0)
-      .sort((a, b) => b.gasto_actual_ciclo - a.gasto_actual_ciclo)
+      .filter(c => c.gasto_actual_ciclo > 0 || c.proyectado > 0)
+      .sort((a, b) => {
+        const aVal = a.gasto_actual_ciclo > 0 ? a.gasto_actual_ciclo : a.proyectado
+        const bVal = b.gasto_actual_ciclo > 0 ? b.gasto_actual_ciclo : b.proyectado
+        return bVal - aVal
+      })
       .slice(0, 6)
   }, [data])
 
@@ -233,11 +237,12 @@ const CategoriasChart = memo(({
     )
   }
 
-  const maxVal = chartData[0]?.gasto_actual_ciclo || 0
-  const total = chartData.reduce((acc, curr) => acc + curr.gasto_actual_ciclo, 0)
+  const maxVal = Math.max(...chartData.map(entry => entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado), 0)
+  const total = chartData.reduce((acc, curr) => acc + (curr.gasto_actual_ciclo > 0 ? curr.gasto_actual_ciclo : curr.proyectado), 0)
 
   const dynamicCSS = chartData.map((entry) => {
-    const fillPct = maxVal > 0 ? (entry.gasto_actual_ciclo / maxVal) * 100 : 0
+    const val = entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado
+    const fillPct = maxVal > 0 ? (val / maxVal) * 100 : 0
     const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
     const classPrefix = moneda === 'ARS' ? 'bar-fill-ars' : 'bar-fill-usd'
     return `.${classPrefix}-${entry.categoria_id}{width:${fillPct.toFixed(2)}%;background:${color}}`
@@ -247,7 +252,9 @@ const CategoriasChart = memo(({
     <div className={styles.barChartWrap}>
       <style>{dynamicCSS}</style>
       {chartData.map((entry) => {
-        const pct = total > 0 ? Math.round((entry.gasto_actual_ciclo / total) * 100) : 0
+        const isProyectado = entry.gasto_actual_ciclo <= 0 && entry.proyectado > 0
+        const val = entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado
+        const pct = total > 0 ? Math.round((val / total) * 100) : 0
         const fillClass = moneda === 'ARS' ? `bar-fill-ars-${entry.categoria_id}` : `bar-fill-usd-${entry.categoria_id}`
 
         return (
@@ -261,13 +268,18 @@ const CategoriasChart = memo(({
             </div>
             <div className={styles.barContent}>
               <div className={styles.barHeader}>
-                <span className={styles.barName}>{entry.categoria_nombre}</span>
-                <span className={styles.barAmount}>
-                  {showPercent ? `${pct}%` : fmt(entry.gasto_actual_ciclo, moneda)}
+                <div className={styles.barTitleGroup}>
+                  <span className={styles.barName}>{entry.categoria_nombre}</span>
+                  {isProyectado && (
+                    <span className={styles.proyBadge}>Proyectado</span>
+                  )}
+                </div>
+                <span className={`${styles.barAmount} ${isProyectado ? styles.barAmountProyectado : ''}`}>
+                  {showPercent ? `${pct}%` : fmt(val, moneda)}
                 </span>
               </div>
               <div className={styles.barTrack}>
-                <div className={`${styles.barFill} ${fillClass}`} />
+                <div className={`${styles.barFill} ${fillClass} ${isProyectado ? styles.barFillProyectado : ''}`} />
               </div>
             </div>
           </div>

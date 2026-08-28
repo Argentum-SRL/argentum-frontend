@@ -765,16 +765,39 @@
   align-items: flex-end;
 }
 
+.barTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .barName {
   font-size: 13px;
   color: var(--text-2);
   font-weight: 500;
 }
 
+.proyBadge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--surface-alt);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
 .barAmount {
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
+}
+
+.barAmountProyectado {
+  color: var(--text-2);
+  font-weight: 600;
 }
 
 .barTrack {
@@ -789,6 +812,10 @@
   height: 100%;
   border-radius: 3px;
   transition: width 0.4s ease;
+}
+
+.barFillProyectado {
+  opacity: 0.6;
 }
 
 /* ── Lists ────────────────────────────────────────────────────────── */

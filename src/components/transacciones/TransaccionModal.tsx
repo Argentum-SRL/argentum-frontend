@@ -372,6 +372,11 @@ export default function TransaccionModal({
       return
     }
 
+    if (!categoriaId) {
+      showToast('Seleccioná una categoría', 'error')
+      return
+    }
+
     let resolvedBilleteraId = billeteraId
     if (metodoPago === 'credito') {
       if (!tarjetaId) {
@@ -412,7 +417,7 @@ export default function TransaccionModal({
       const payload = isCuotaHija
         ? {
             descripcion: descripcion.trim(),
-            categoria_id: categoriaId || null,
+            categoria_id: categoriaId,
             subcategoria_id: subcategoriaId || null,
           }
         : {
@@ -420,7 +425,7 @@ export default function TransaccionModal({
             monto: Number(monto),
             moneda,
             descripcion: descripcion.trim(),
-            categoria_id: categoriaId || null,
+            categoria_id: categoriaId,
             subcategoria_id: subcategoriaId || null,
             billetera_id: resolvedBilleteraId,
             fecha,

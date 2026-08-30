@@ -331,7 +331,7 @@ export default function GruposCuotasTab() {
             ref={searchInputRef}
             type="text"
             className={styles.mobileExpandedSearchInput}
-            placeholder="Buscar por nombre o tarjeta..."
+            placeholder="Buscar cuotas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -376,7 +376,7 @@ export default function GruposCuotasTab() {
             <input
               type="text"
               className={styles.searchInput}
-              placeholder="Buscar por nombre o tarjeta..."
+              placeholder="Buscar cuotas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

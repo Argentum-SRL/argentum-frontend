@@ -326,7 +326,7 @@ export default function FilterBar({
             ref={searchInputRef}
             type="text"
             className={styles.mobileExpandedSearchInput}
-            placeholder="Buscar por descripción, banco..."
+            placeholder="Buscar transacciones..."
             value={localSearch}
             onChange={handleSearchChange}
           />
@@ -448,7 +448,7 @@ export default function FilterBar({
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Buscar por descripción, categoría, banco..."
+            placeholder="Buscar transacciones..."
             title="Buscar transacción"
             value={localSearch}
             onChange={handleSearchChange}

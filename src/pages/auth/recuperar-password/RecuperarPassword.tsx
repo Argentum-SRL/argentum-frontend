@@ -8,9 +8,20 @@ import { recuperarPassword, verificarRecuperacion } from '@/services/auth.servic
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './RecuperarPassword.module.css'
 
+const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+const validateEmail = (val: string): string | null => {
+  const e = val.trim()
+  if (!e) return 'Ingresá tu mail.'
+  if (e.length > 255) return 'El correo electrónico no puede tener más de 255 caracteres.'
+  if (!EMAIL_REGEX.test(e)) return 'Ingresá un correo electrónico válido.'
+  return null
+}
+
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
   if (pwd.length < 8) return 'La contraseña tiene que tener al menos 8 caracteres.'
+  if (pwd.length > 128) return 'La contraseña no puede superar los 128 caracteres.'
   if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
   if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
   if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
@@ -38,7 +49,7 @@ export default function RecuperarPassword() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
 
-  const emailError = hasSubmitted && !tieneParams && !email.trim() ? 'Ingresá tu mail.' : null
+  const emailError = hasSubmitted && !tieneParams ? validateEmail(email) : null
   
   const passwordError = hasSubmitted && tieneParams ? validatePassword(nuevaPassword) : null
   const confirmarPasswordError = hasSubmitted && tieneParams
@@ -52,7 +63,8 @@ export default function RecuperarPassword() {
   async function handleSendCode(e: FormEvent) {
     e.preventDefault()
     setHasSubmitted(true)
-    if (!email.trim()) return
+    const eError = validateEmail(email)
+    if (eError) return
 
     setLoading(true)
     setApiError(null)

@@ -11,9 +11,37 @@ import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './RegisterPage.module.css'
 
+const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+const validateEmail = (val: string): string | null => {
+  const e = val.trim()
+  if (!e) return 'Ingresá tu mail.'
+  if (e.length > 255) return 'El correo electrónico no puede tener más de 255 caracteres.'
+  if (!EMAIL_REGEX.test(e)) return 'Ingresá un correo electrónico válido.'
+  return null
+}
+
+const validateName = (val: string, campo: string): string | null => {
+  const t = val.trim()
+  if (!t) return `Ingresá tu ${campo}.`
+  if (t.length < 2) return `El ${campo} debe tener al menos 2 caracteres.`
+  if (t.length > 100) return `El ${campo} no puede tener más de 100 caracteres.`
+  return null
+}
+
+const validatePhone = (val: string): string | null => {
+  const t = val.trim().replace(/\s+/g, '').replace(/-/g, '')
+  if (!t) return 'Ingresá tu teléfono.'
+  if (t.length < 8) return 'El teléfono debe tener al menos 8 dígitos.'
+  if (t.length > 20) return 'El teléfono no puede tener más de 20 dígitos.'
+  if (!/^\+?[0-9]+$/.test(t)) return 'El teléfono solo debe contener números y el signo +.'
+  return null
+}
+
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
   if (pwd.length < 8) return 'La contraseña tiene que tener al menos 8 caracteres.'
+  if (pwd.length > 128) return 'La contraseña no puede superar los 128 caracteres.'
   if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
   if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
   if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
@@ -47,10 +75,10 @@ export default function RegisterPage() {
     }
   }, [isAuthenticated, usuario, navigate])
 
-  const nombreError = hasSubmitted && !nombre.trim() ? 'Ingresá tu nombre.' : null
-  const apellidoError = hasSubmitted && !apellido.trim() ? 'Ingresá tu apellido.' : null
-  const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
-  const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu teléfono.' : null
+  const nombreError = hasSubmitted ? validateName(nombre, 'nombre') : null
+  const apellidoError = hasSubmitted ? validateName(apellido, 'apellido') : null
+  const emailError = hasSubmitted ? validateEmail(email) : null
+  const telefonoError = hasSubmitted ? validatePhone(telefono) : null
   const passwordError = hasSubmitted ? validatePassword(password) : null
   const confirmPasswordError = hasSubmitted
     ? !confirmPassword
@@ -65,6 +93,10 @@ export default function RegisterPage() {
     setHasSubmitted(true)
     
     // Validaciones directas para evitar problemas de asincronía del estado
+    const nError = validateName(nombre, 'nombre')
+    const aError = validateName(apellido, 'apellido')
+    const eError = validateEmail(email)
+    const telError = validatePhone(telefono)
     const pError = validatePassword(password)
     const cpError = !confirmPassword 
       ? 'Confirmá tu contraseña.' 
@@ -72,7 +104,7 @@ export default function RegisterPage() {
         ? 'Las contraseñas no coinciden. Revisalas.' 
         : null
 
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || !telefono.trim() || pError || cpError || !aceptaTerminos) {
+    if (nError || aError || eError || telError || pError || cpError || !aceptaTerminos) {
       return
     }
     setLoading(true)

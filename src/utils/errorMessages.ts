@@ -209,7 +209,10 @@ export function getErrorMessage(
   if (Array.isArray(detail) && detail.length > 0) {
     const firstMsg = detail[0]?.msg;
     if (typeof firstMsg === "string") {
-      return ERROR_MAP[firstMsg] ?? "Hay campos con errores. Revisá los datos e intentá de nuevo.";
+      const cleanMsg = firstMsg.startsWith("Value error, ")
+        ? firstMsg.replace("Value error, ", "")
+        : firstMsg;
+      return ERROR_MAP[cleanMsg] ?? cleanMsg;
     }
   }
 

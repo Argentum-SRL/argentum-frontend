@@ -8,9 +8,28 @@ import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
 import styles from './CompletarPerfil.module.css'
 
+const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+const validateEmail = (val: string): string | null => {
+  const e = val.trim()
+  if (!e) return 'Ingresá tu mail.'
+  if (e.length > 255) return 'El correo electrónico no puede tener más de 255 caracteres.'
+  if (!EMAIL_REGEX.test(e)) return 'Ingresá un correo electrónico válido.'
+  return null
+}
+
+const validateName = (val: string, campo: string): string | null => {
+  const t = val.trim()
+  if (!t) return `Ingresá tu ${campo}.`
+  if (t.length < 2) return `El ${campo} debe tener al menos 2 caracteres.`
+  if (t.length > 100) return `El ${campo} no puede tener más de 100 caracteres.`
+  return null
+}
+
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
   if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
+  if (pwd.length > 128) return 'La contraseña no puede superar los 128 caracteres.'
   if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
   if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
   if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
@@ -31,9 +50,9 @@ export default function CompletarPerfil() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
 
-  const nombreError = hasSubmitted && !nombre.trim() ? 'Ingresá tu nombre.' : null
-  const apellidoError = hasSubmitted && !apellido.trim() ? 'Ingresá tu apellido.' : null
-  const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
+  const nombreError = hasSubmitted ? validateName(nombre, 'nombre') : null
+  const apellidoError = hasSubmitted ? validateName(apellido, 'apellido') : null
+  const emailError = hasSubmitted ? validateEmail(email) : null
   const passwordError = hasSubmitted ? validatePassword(password) : null
   const confirmPasswordError = hasSubmitted 
     ? (!confirmPassword ? 'Confirmá tu contraseña.' : (password !== confirmPassword ? 'Las contraseñas no coinciden.' : null))
@@ -43,6 +62,9 @@ export default function CompletarPerfil() {
     e.preventDefault()
     setHasSubmitted(true)
 
+    const nError = validateName(nombre, 'nombre')
+    const aError = validateName(apellido, 'apellido')
+    const eError = validateEmail(email)
     const pError = validatePassword(password)
     const cpError = !confirmPassword 
       ? 'Confirmá tu contraseña.' 
@@ -50,7 +72,7 @@ export default function CompletarPerfil() {
         ? 'Las contraseñas no coinciden.' 
         : null
 
-    if (!nombre.trim() || !apellido.trim() || !email.trim() || pError || cpError) {
+    if (nError || aError || eError || pError || cpError) {
       return
     }
     setLoading(true)

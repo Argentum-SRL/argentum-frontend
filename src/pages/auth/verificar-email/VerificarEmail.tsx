@@ -19,6 +19,7 @@ export default function VerificarEmail() {
   const queryParams = new URLSearchParams(location.search)
   const emailFromUrl = queryParams.get('email')
   const verificadoFromUrl = queryParams.get('verificado') === 'true'
+  const errorFromUrl = queryParams.get('error')
   const emailFromState = (location.state as { email?: string })?.email ?? ''
   
   const email = emailFromUrl || emailFromState
@@ -27,7 +28,7 @@ export default function VerificarEmail() {
   const [codigo, setCodigo] = useState('')
   const [loading, setLoading] = useState(false)
   const [reenvioLoading, setReenvioLoading] = useState(false)
-  const [apiError, setApiError] = useState<string | null>(null)
+  const [apiError, setApiError] = useState<string | null>(errorFromUrl || null)
   const [countdown, setCountdown] = useState(60)
   const inputRef = useRef<HTMLInputElement>(null)
 

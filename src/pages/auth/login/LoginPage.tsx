@@ -11,6 +11,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './LoginPage.module.css'
 
+const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -30,7 +32,13 @@ export default function LoginPage() {
     console.error(`[Auth][Google][Login] ${stage}`, error)
   }
 
-  const emailError = hasSubmitted && !email.trim() ? 'Ingresá tu mail.' : null
+  const emailError = hasSubmitted
+    ? !email.trim()
+      ? 'Ingresá tu mail.'
+      : !EMAIL_REGEX.test(email.trim())
+        ? 'Ingresá un correo electrónico válido.'
+        : null
+    : null
   const passwordError = hasSubmitted && !password ? 'Ingresá tu contraseña.' : null
 
   const handleGoogleSuccess = useCallback(async ({ credential }: { credential: string }) => {

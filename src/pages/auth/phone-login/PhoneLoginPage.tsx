@@ -62,8 +62,17 @@ export default function PhoneLoginPage() {
   }, [])
 
   const codigo = digits.join('')
-  const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu número de teléfono.' : null
-  const phonePreview = telefono.trim() ? buildPhone(codigoPais, telefono) : ''
+  const cleanTel = telefono.replace(/\D/g, '').trim()
+  const telefonoError = hasSubmitted
+    ? !cleanTel
+      ? 'Ingresá tu número de teléfono.'
+      : cleanTel.length < 6
+        ? 'El número de teléfono es demasiado corto.'
+        : cleanTel.length > 15
+          ? 'El número de teléfono no puede tener más de 15 dígitos.'
+          : null
+    : null
+  const phonePreview = cleanTel ? buildPhone(codigoPais, cleanTel) : ''
   const activeBox = codigo.length < 6 ? codigo.length : -1
 
   useEffect(() => {

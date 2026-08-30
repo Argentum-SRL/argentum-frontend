@@ -40,15 +40,18 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
   const getFechaNacimientoError = () => {
     if (!submitted) return null
     if (!fechaNacimiento) return 'La fecha que ingresaste no es válida.'
-    const selectedDate = new Date(fechaNacimiento)
+    const parts = fechaNacimiento.split('-').map((v) => parseInt(v, 10))
+    if (parts.length !== 3 || parts.some(isNaN)) return 'La fecha que ingresaste no es válida.'
+    const [year, month, day] = parts
+    const selectedDate = new Date(year, month - 1, day)
     const today = new Date()
-    if (isNaN(selectedDate.getTime())) return 'La fecha que ingresaste no es válida.'
-    if (selectedDate > today) return 'La fecha que ingresaste no es válida.'
+    today.setHours(0, 0, 0, 0)
+    if (isNaN(selectedDate.getTime()) || selectedDate > today) return 'La fecha que ingresaste no es válida.'
     
     // Check 18 years
-    let age = today.getFullYear() - selectedDate.getFullYear()
-    const m = today.getMonth() - selectedDate.getMonth()
-    if (m < 0 || (m === 0 && today.getDate() < selectedDate.getDate())) {
+    let age = today.getFullYear() - year
+    const m = (today.getMonth() + 1) - month
+    if (m < 0 || (m === 0 && today.getDate() < day)) {
       age--
     }
     if (age < 18) {
@@ -86,6 +89,18 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
     }
   }
 
+  const maxBirthDate = (() => {
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - 18)
+    return d.toISOString().split('T')[0]
+  })()
+
+  const minBirthDate = (() => {
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - 120)
+    return d.toISOString().split('T')[0]
+  })()
+
   return (
     <div>
       <h2 className={styles.title}>Contanos quién sos</h2>
@@ -97,6 +112,7 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
           <input
             id="nombre"
             type="text"
+            maxLength={100}
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             className={[styles.input, nombreError ? styles.inputError : ''].filter(Boolean).join(' ')}
@@ -112,6 +128,7 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
           <input
             id="apellido"
             type="text"
+            maxLength={100}
             value={apellido}
             onChange={(e) => setApellido(e.target.value)}
             className={[styles.input, apellidoError ? styles.inputError : ''].filter(Boolean).join(' ')}
@@ -125,6 +142,8 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
             id="fecha_nacimiento"
             label="Fecha de nacimiento"
             value={fechaNacimiento}
+            min={minBirthDate}
+            max={maxBirthDate}
             onChange={(val) => setFechaNacimiento(val)}
             error={fechaNacimientoError || undefined}
           />

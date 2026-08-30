@@ -102,8 +102,22 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
+
+    if (tipo === 'dia_fijo') {
+      const diaNum = parseInt(valor, 10)
+      if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
+        setError('El día de corte debe ser un número entero entre 1 y 31.')
+        return
+      }
+    } else if (tipo === 'regla') {
+      if (!valor || !REGLAS.some((r) => r.id === valor)) {
+        setError('Seleccioná una regla de corte válida.')
+        return
+      }
+    }
+
+    setLoading(true)
     try {
       const res = await guardarCicloFinanciero({
         ciclo_tipo: tipo,

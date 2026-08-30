@@ -199,7 +199,11 @@ export default function OnboardingPage() {
                 )}
                 {pasoActual === 3 && (
                   <StepMoneda
-                    datosIniciales={{ moneda_principal: datos?.moneda_principal ?? null }}
+                    datosIniciales={{
+                      moneda_principal: datos?.moneda_principal ?? null,
+                      moneda_secundaria_activa: datos?.moneda_secundaria_activa ?? false,
+                      tipo_dolar: datos?.tipo_dolar ?? 'blue',
+                    }}
                     onNext={avanzar}
                   />
                 )}

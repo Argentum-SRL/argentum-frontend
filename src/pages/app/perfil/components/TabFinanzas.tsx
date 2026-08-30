@@ -127,6 +127,13 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
 
   const handleSaveMoneda = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (monedaPrincipal === 'USD' || monedaSecundariaActiva) {
+      if (!tipoDolar) {
+        showToast('Debés seleccionar una cotización de referencia para el dólar.', 'error')
+        return
+      }
+    }
+
     setIsSavingMoneda(true)
     try {
       const updated = await usuarioService.actualizarMoneda({
@@ -134,6 +141,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
         moneda_secundaria_activa: monedaSecundariaActiva,
         tipo_dolar: tipoDolar,
       })
+      invalidateDashboardCache()
       updateUsuario(updated)
       showToast('Preferencias de moneda actualizadas correctamente', 'success')
     } catch (err: unknown) {
@@ -145,6 +153,19 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
 
   const handleSaveCiclo = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (cicloTipo === 'dia_fijo') {
+      const diaNum = parseInt(cicloValor, 10)
+      if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
+        showToast('El día de corte debe ser un número entero entre 1 y 31.', 'error')
+        return
+      }
+    } else if (cicloTipo === 'regla') {
+      if (!cicloValor || !OPCIONES_REGLA_CICLO.some((r) => r.value === cicloValor && r.value !== '')) {
+        showToast('Seleccioná una regla de corte válida.', 'error')
+        return
+      }
+    }
+
     setIsSavingCiclo(true)
     try {
       const updated = await usuarioService.actualizarCicloFinanciero({

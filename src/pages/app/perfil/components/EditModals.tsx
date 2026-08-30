@@ -67,20 +67,33 @@ const DatosPersonalesForm: React.FC<{
     }
 
     if (formDatos.fecha_nacimiento) {
-      const selectedDate = new Date(formDatos.fecha_nacimiento)
+      const parts = formDatos.fecha_nacimiento.split('-').map((v) => parseInt(v, 10))
+      if (parts.length !== 3 || parts.some(isNaN)) {
+        setErrorMsg('La fecha de nacimiento no es válida.')
+        setIsSaving(false)
+        return
+      }
+      const [year, month, day] = parts
+      const selectedDate = new Date(year, month - 1, day)
       const today = new Date()
+      today.setHours(0, 0, 0, 0)
       if (isNaN(selectedDate.getTime()) || selectedDate > today) {
         setErrorMsg('La fecha ingresada no puede ser futura ni inválida.')
         setIsSaving(false)
         return
       }
-      let age = today.getFullYear() - selectedDate.getFullYear()
-      const m = today.getMonth() - selectedDate.getMonth()
-      if (m < 0 || (m === 0 && today.getDate() < selectedDate.getDate())) {
+      let age = today.getFullYear() - year
+      const m = (today.getMonth() + 1) - month
+      if (m < 0 || (m === 0 && today.getDate() < day)) {
         age--
       }
       if (age < 18) {
         setErrorMsg('Debés tener al menos 18 años para utilizar Argentum.')
+        setIsSaving(false)
+        return
+      }
+      if (age > 120) {
+        setErrorMsg('La fecha de nacimiento ingresada no es válida.')
         setIsSaving(false)
         return
       }
@@ -105,6 +118,18 @@ const DatosPersonalesForm: React.FC<{
     }
   }
 
+  const maxBirthDate = (() => {
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - 18)
+    return d.toISOString().split('T')[0]
+  })()
+
+  const minBirthDate = (() => {
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - 120)
+    return d.toISOString().split('T')[0]
+  })()
+
   return (
     <form onSubmit={handleSubmit} className={styles.modalFormContainer}>
       {errorMsg && (
@@ -123,6 +148,7 @@ const DatosPersonalesForm: React.FC<{
             <input
               id="modal-nombre"
               type="text"
+              maxLength={100}
               className={styles.fieldInput}
               value={formDatos.nombre}
               onChange={(e) => setFormDatos({ ...formDatos, nombre: e.target.value })}
@@ -137,6 +163,7 @@ const DatosPersonalesForm: React.FC<{
             <input
               id="modal-apellido"
               type="text"
+              maxLength={100}
               className={styles.fieldInput}
               value={formDatos.apellido}
               onChange={(e) => setFormDatos({ ...formDatos, apellido: e.target.value })}
@@ -151,6 +178,8 @@ const DatosPersonalesForm: React.FC<{
             id="modal-nacimiento"
             label="Fecha de nacimiento"
             value={formDatos.fecha_nacimiento}
+            min={minBirthDate}
+            max={maxBirthDate}
             onChange={(val) => setFormDatos({ ...formDatos, fecha_nacimiento: val })}
           />
         </div>
@@ -238,7 +267,7 @@ const EmailForm: React.FC<{
       showToast(res.confirmacion || 'Correo actualizado. Se envió un código de verificación.', 'success')
       onClose()
       if (res.requiere_verificacion_email) {
-        navigate('/auth/verificar-email')
+        navigate('/auth/verificar-email', { state: { email: emailLimpio } })
       }
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No se pudo actualizar el correo. Verificá los datos.')
@@ -382,7 +411,7 @@ const TelefonoForm: React.FC<{
       showToast(res.confirmacion || 'Teléfono actualizado. Se envió un código por WhatsApp.', 'success')
       onClose()
       if (res.requiere_verificacion_telefono) {
-        navigate('/auth/verificar-telefono')
+        navigate('/auth/verificar-telefono', { state: { telefono: fullPhone, modoVerificacion: true } })
       }
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No se pudo actualizar el teléfono. Verificá los datos ingresados.')

@@ -7,7 +7,11 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepMoneda.module.css'
 
 interface Props {
-  datosIniciales: { moneda_principal: string | null }
+  datosIniciales: {
+    moneda_principal: string | null
+    moneda_secundaria_activa?: boolean | null
+    tipo_dolar?: string | null
+  }
   onNext: (siguientePaso: string | null) => void
 }
 
@@ -30,8 +34,10 @@ function formatARS(valor: number | null | undefined): string {
 export default function StepMoneda({ datosIniciales, onNext }: Props) {
   const { showToast } = useToast()
   const [moneda, setMoneda] = useState(datosIniciales.moneda_principal ?? 'ARS')
-  const [secundaria, setSecundaria] = useState(false)
-  const [tipoDolar, setTipoDolar] = useState<'oficial' | 'blue' | 'tarjeta' | 'mep'>('blue')
+  const [secundaria, setSecundaria] = useState(Boolean(datosIniciales.moneda_secundaria_activa))
+  const [tipoDolar, setTipoDolar] = useState<'oficial' | 'blue' | 'tarjeta' | 'mep'>(
+    (datosIniciales.tipo_dolar as 'oficial' | 'blue' | 'tarjeta' | 'mep') || 'blue'
+  )
   const [cotizaciones, setCotizaciones] = useState<CotizacionesDolarResponse | null>(null)
   const [cargando, setCargando] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -48,8 +54,14 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
+
+    if (necesitaDolar && !tipoDolar) {
+      setError('Debés seleccionar una cotización de referencia para el dólar.')
+      return
+    }
+
+    setLoading(true)
     try {
       const res = await guardarMoneda({
         moneda_principal: moneda,

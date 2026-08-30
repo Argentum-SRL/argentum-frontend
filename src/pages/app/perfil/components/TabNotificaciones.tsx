@@ -13,7 +13,6 @@ import {
 } from 'lucide-react'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { ConfiguracionNotificacion } from '@/types'
-import { useToast } from '@/hooks/useToast'
 import { TimeInput } from '@/components/ui'
 import styles from '../PerfilPage.module.css'
 
@@ -500,15 +499,12 @@ const NotificacionesForm: React.FC<{
 
 export const TabNotificaciones: React.FC = () => {
   const { config, updateConfig } = useNotificaciones()
-  const { showToast } = useToast()
 
   const handleSave = async (formValues: typeof defaultFormState) => {
     try {
       await updateConfig(formValues)
-      showToast('Preferencias de notificaciones guardadas exitosamente', 'success')
     } catch (err) {
       console.error(err)
-      showToast('Error al guardar las preferencias de notificaciones', 'error')
     }
   }
 

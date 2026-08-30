@@ -107,6 +107,8 @@ export interface EstadoOnboarding {
     nombre: string | null
     apellido: string | null
     moneda_principal: string | null
+    moneda_secundaria_activa?: boolean | null
+    tipo_dolar?: string | null
     ciclo_tipo: string | null
     ciclo_valor: string | null
     ciclo_ajuste_direccion?: 'anterior' | 'posterior' | null
@@ -649,6 +651,24 @@ export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
     porcentaje_suscripciones_ars: InterpretacionIndicador;
     porcentaje_suscripciones_usd: InterpretacionIndicador;
   };
+}
+
+export interface HistorialPerfilFinanciero {
+  id: string;
+  usuario_id: string;
+  periodo_inicio: string;
+  periodo_fin: string;
+  tasa_ahorro_ars: number | null;
+  tasa_ahorro_usd: number | null;
+  score_impulsividad_ars: number | null;
+  score_impulsividad_usd: number | null;
+  ratio_cuotas_ars: number | null;
+  ratio_cuotas_usd: number | null;
+  cumplimiento_presupuesto: number | null;
+  consistencia_registro: number | null;
+  porcentaje_suscripciones_ars: number | null;
+  porcentaje_suscripciones_usd: number | null;
+  fecha_snapshot: string;
 }
 
 export interface SubcategoriaGasto {

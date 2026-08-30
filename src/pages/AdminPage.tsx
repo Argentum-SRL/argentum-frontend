@@ -232,6 +232,9 @@ export default function AdminPage() {
           const res = await adminService.cambiarEstado(selectedUser.id, newStatus)
           if (res.success) {
             setSelectedUser(res.data)
+            setUsuarios((prev) =>
+              prev.map((u) => (u.id === selectedUser.id ? { ...u, is_active: res.data.is_active } : u))
+            )
             message = res.message || `Usuario ${newStatus ? 'activado' : 'desactivado'} correctamente.`
           }
           break
@@ -254,6 +257,9 @@ export default function AdminPage() {
           const res = await adminService.desconectarWpp(selectedUser.id)
           if (res.success) {
             setSelectedUser(res.data)
+            setUsuarios((prev) =>
+              prev.map((u) => (u.id === selectedUser.id ? { ...u, whatsapp_vinculado: res.data.whatsapp_vinculado } : u))
+            )
             message = res.message || 'WhatsApp desconectado correctamente.'
           }
           break
@@ -266,6 +272,9 @@ export default function AdminPage() {
           const res = await adminService.resetearOnboarding(selectedUser.id)
           if (res.success) {
             setSelectedUser(res.data)
+            setUsuarios((prev) =>
+              prev.map((u) => (u.id === selectedUser.id ? { ...u, onboarding_completado: res.data.onboarding_completado } : u))
+            )
             message = res.message || 'Onboarding reseteado correctamente.'
           }
           break
@@ -486,6 +495,8 @@ export default function AdminPage() {
                 className={styles.searchInput}
                 placeholder="Buscar por nombre, email o teléfono..."
                 value={searchTerm}
+                maxLength={150}
+                aria-label="Buscar usuarios por nombre, email o teléfono"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
@@ -559,7 +570,7 @@ export default function AdminPage() {
                             <TableAvatar fotoUrl={u.foto_url} nombre={u.nombre} />
                             <div className={styles.userInfoStack}>
                               <span className={styles.userName}>
-                                {u.nombre ? `${u.nombre} ${u.apellido || ''}` : <em className="text-gray-400">Sin nombre</em>}
+                                {[u.nombre, u.apellido].filter(Boolean).join(' ') || <em className="text-gray-400">Sin nombre</em>}
                                 {u.is_admin && <span className={styles.adminTag}>Admin</span>}
                               </span>
                               <span className={styles.userEmail}>{u.email || <em className="text-gray-400">Sin email</em>}</span>
@@ -642,7 +653,7 @@ export default function AdminPage() {
               <div className={styles.detailHeader}>
                 <TableAvatar fotoUrl={selectedUser.foto_url} nombre={selectedUser.nombre} />
                 <div className={styles.detailNameGroup}>
-                  <h2>{selectedUser.nombre ? `${selectedUser.nombre} ${selectedUser.apellido || ''}` : 'Usuario sin nombre'}</h2>
+                  <h2>{[selectedUser.nombre, selectedUser.apellido].filter(Boolean).join(' ') || 'Usuario sin nombre'}</h2>
                 </div>
               </div>
 
@@ -711,7 +722,11 @@ export default function AdminPage() {
                 </span>
                 <div className={`${styles.statusDot} ${selectedUser.onboarding_completado ? styles.dotAmber : styles.dotGray}`} />
                 <span className={styles.statusDotLabel}>
-                  Onboarding {selectedUser.onboarding_completado ? 'completo' : 'incompleto'}
+                  Onboarding {selectedUser.onboarding_completado 
+                    ? 'completo' 
+                    : selectedUser.paso_onboarding_actual 
+                      ? `incompleto (${selectedUser.paso_onboarding_actual === 'datos_personales' ? 'Datos personales' : selectedUser.paso_onboarding_actual === 'ciclo_financiero' ? 'Ciclo financiero' : 'Moneda'})`
+                      : 'incompleto'}
                 </span>
               </div>
 

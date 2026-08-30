@@ -53,6 +53,15 @@ const adminService = {
   getStats: async () => {
     const { data } = await api.get<AdminResponseEnvelope<AdminStats>>('/v1/admin/stats')
     return data
+  },
+
+  refreshFeriados: async (anio?: number) => {
+    const { data } = await api.post<AdminResponseEnvelope<{ success: boolean; cantidad: number; error?: string }>>(
+      '/v1/admin/feriados/refresh',
+      null,
+      { params: anio ? { anio } : undefined }
+    )
+    return data
   }
 }
 

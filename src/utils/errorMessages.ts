@@ -75,6 +75,9 @@ export const ERROR_MAP: Record<string, string> = {
   "Monto de transferencia debe ser positivo": "El monto de la transferencia tiene que ser mayor a cero.",
   "Billetera origen no encontrada": "No encontramos la billetera de origen.",
   "Billetera destino no encontrada": "No encontramos la billetera de destino.",
+  "está archivada y no puede usarse para transferencias": "La billetera está archivada y no puede usarse para transferencias.",
+  "La fecha de la transferencia no puede ser futura.": "La transferencia no puede tener una fecha futura.",
+  "La fecha de la transferencia no puede ser más de 2 años anterior a hoy.": "La transferencia no puede ser de más de 2 años atrás.",
 
   // Presupuestos
   "No encontramos ese presupuesto.": "No encontramos ese presupuesto.",

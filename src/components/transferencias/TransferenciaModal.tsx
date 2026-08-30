@@ -35,6 +35,13 @@ function todayLocal(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+function getMinDateLocal(): string {
+  const d = new Date()
+  // Restar 2 años
+  d.setFullYear(d.getFullYear() - 2)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 function getBankVisuals(billetera: Billetera) {
   if (billetera.es_efectivo) {
     return {
@@ -163,7 +170,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   const saldoDestinoActual = billeteraDestino?.saldo_actual ?? 0
   const saldoOrigenProyectado = saldoOrigenActual - montoNum
   const saldoDestinoProyectado = saldoDestinoActual + montoNum
-  const isOverdraft = montoNum > saldoOrigenActual && saldoOrigenActual > 0
+  const isOverdraft = montoNum > saldoOrigenActual
 
   // Envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
@@ -183,6 +190,10 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     }
     if (!monto || monto <= 0) {
       showToast('Ingresá un monto válido mayor a 0', 'error')
+      return
+    }
+    if (isOverdraft) {
+      showToast(`Saldo insuficiente. Disponible: ${formatSaldo(saldoOrigenActual, moneda)}, Solicitado: ${formatSaldo(montoNum, moneda)}`, 'error')
       return
     }
 
@@ -382,6 +393,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   onMonedaChange={handleMonedaChange}
                   autoFocus
                   allowDecimals
+                  max={999999999.99}
                   placeholder="0"
                 />
 
@@ -536,6 +548,8 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     value={fecha}
                     onChange={setFecha}
                     required
+                    min={getMinDateLocal()}
+                    max={todayLocal()}
                     className={styles.dateInputCustom}
                   />
                 </div>
@@ -589,6 +603,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   billeteraOrigenId === billeteraDestinoId ||
                   !monto ||
                   monto <= 0 ||
+                  isOverdraft ||
                   activeWallets.length < 2
                 }
               >

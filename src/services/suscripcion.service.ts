@@ -1,5 +1,5 @@
 import api from './api'
-import type { Suscripcion, SuscripcionCreate, TotalMensualSuscripciones, HistorialSuscripcion } from '../types'
+import type { Suscripcion, SuscripcionCreate, SuscripcionUpdate, TotalMensualSuscripciones, HistorialSuscripcion } from '../types'
 
 const suscripcionService = {
   getSuscripciones: async (estado?: string, signal?: AbortSignal): Promise<Suscripcion[]> => {
@@ -23,7 +23,7 @@ const suscripcionService = {
     return res
   },
 
-  updateSuscripcion: async (id: string, data: Partial<SuscripcionCreate> & { estado?: string }): Promise<Suscripcion> => {
+  updateSuscripcion: async (id: string, data: SuscripcionUpdate): Promise<Suscripcion> => {
     const { data: res } = await api.put<Suscripcion>(`/suscripciones/${id}`, data)
     return res
   },

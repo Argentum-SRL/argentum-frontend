@@ -59,15 +59,29 @@ export interface TotalMensualSuscripciones {
 
 export interface SuscripcionCreate {
   nombre: string
-  categoria_id?: string
-  subcategoria_id?: string
+  categoria_id?: string | null
+  subcategoria_id?: string | null
   frecuencia: string
   proximo_cobro: string
   monto: number
   moneda: string
   vigente_desde?: string
-  billetera_id?: string
-  tarjeta_id?: string
+  billetera_id?: string | null
+  tarjeta_id?: string | null
+}
+
+export interface SuscripcionUpdate {
+  nombre?: string
+  categoria_id?: string | null
+  subcategoria_id?: string | null
+  frecuencia?: string
+  proximo_cobro?: string
+  monto?: number
+  moneda?: string
+  vigente_desde?: string
+  billetera_id?: string | null
+  tarjeta_id?: string | null
+  estado?: string
 }
 
 export interface AuthResponse {

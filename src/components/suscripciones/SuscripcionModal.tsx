@@ -2,6 +2,7 @@ import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
 import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { DateInput } from '@/components/ui'
 import { CATALOGO_SUSCRIPCIONES, CATEGORIAS_CATALOGO } from '@/lib/constants/suscripciones'
 import type { ServicioCatalogo } from '@/lib/constants/suscripciones'
@@ -258,7 +259,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   }
 
   const handleSave = async () => {
-    if (!state.monto || !state.nombrePersonalizado) {
+    if (!state.monto || !state.nombrePersonalizado.trim()) {
       showToast('Completá los campos obligatorios', 'error')
       return
     }
@@ -266,15 +267,15 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       const payload = {
-        nombre: state.nombrePersonalizado,
-        categoria_id: state.categoriaId || undefined,
-        subcategoria_id: state.subcategoriaId || undefined,
+        nombre: state.nombrePersonalizado.trim(),
+        categoria_id: state.categoriaId || null,
+        subcategoria_id: state.subcategoriaId || null,
         frecuencia: state.frecuencia,
         proximo_cobro: state.proximo_cobro,
         monto: state.monto,
         moneda: state.moneda,
-        billetera_id: state.metodoCobro === 'debito' ? state.billeteraId : undefined,
-        tarjeta_id: state.metodoCobro === 'tarjeta' ? state.tarjetaId : undefined
+        billetera_id: state.metodoCobro === 'debito' && state.billeteraId ? state.billeteraId : null,
+        tarjeta_id: state.metodoCobro === 'tarjeta' && state.tarjetaId ? state.tarjetaId : null
       }
 
       if (state.isEdit && suscripcion) {
@@ -287,9 +288,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
       onSuccess()
       onClose()
     } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { detail?: string } } }
-      const msg = axiosError.response?.data?.detail || 'Error al guardar'
-      showToast(msg, 'error')
+      showToast(getErrorMessage(error, 'No pudimos guardar la suscripción. Intentá de nuevo.'), 'error')
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
@@ -386,6 +385,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                         className={`${styles.fieldInput} ${styles.fullWidthInput}`}
                         placeholder="Nombre de la suscripción"
                         value={state.nombrePersonalizado}
+                        maxLength={100}
                         onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
                         autoFocus
                       />
@@ -399,7 +399,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                 <button 
                   type="submit"
                   className={styles.submitBtn} 
-                  disabled={!state.nombrePersonalizado} 
+                  disabled={!state.nombrePersonalizado.trim()} 
                 >
                   Continuar
                 </button>

@@ -138,9 +138,6 @@ const SuscripcionesPage: React.FC = () => {
       confirmLabel: 'Eliminar',
       onConfirm: async () => {
         try {
-          if (s.estado !== 'cancelada') {
-            await suscripcionService.cancelarSuscripcion(s.id)
-          }
           await suscripcionService.deleteSuscripcion(s.id)
           showToast('Suscripción eliminada', 'success')
           loadData()

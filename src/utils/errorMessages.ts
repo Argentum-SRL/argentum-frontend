@@ -117,8 +117,23 @@ export const ERROR_MAP: Record<string, string> = {
   "Meta ya completada": "Esa meta ya está completada.",
 
   // Suscripciones
+  "No encontramos esa suscripción.": "No encontramos esa suscripción.",
   "Suscripción no encontrada": "No encontramos esa suscripción.",
   "Sin permiso para esta suscripción": "No tenés permiso para modificar esa suscripción.",
+  "Una suscripción no puede estar vinculada a una billetera y a una tarjeta al mismo tiempo.": "Una suscripción no puede estar vinculada a una billetera y a una tarjeta al mismo tiempo.",
+  "No se puede reactivar una suscripción cancelada. Creá una nueva.": "No se puede reactivar una suscripción cancelada. Creá una nueva.",
+  "Esta suscripción ya está cancelada.": "Esta suscripción ya está cancelada.",
+  "El nombre de la suscripción no puede estar vacío.": "El nombre de la suscripción no puede estar vacío.",
+  "El nombre de la suscripción no puede superar los 100 caracteres.": "El nombre de la suscripción no puede superar los 100 caracteres.",
+  "El monto debe ser mayor a cero.": "El monto debe ser mayor a cero.",
+  "El monto no puede tener más de 2 decimales.": "El monto no puede tener más de 2 decimales.",
+  "Frecuencia de suscripción no válida.": "La frecuencia seleccionada no es válida.",
+  "Estado de suscripción no válido.": "El estado de la suscripción no es válido.",
+  "Subcategoría no encontrada.": "No encontramos la subcategoría seleccionada.",
+  "La subcategoría seleccionada no pertenece a la categoría.": "La subcategoría no pertenece a la categoría indicada.",
+  "Input should be greater than 0": "El monto tiene que ser mayor a cero.",
+  "Decimal input should have no more than 2 decimal places": "El monto no puede tener más de 2 decimales.",
+  "Decimal input should have no more than 15 digits in total": "El monto ingresado es demasiado grande.",
 
   // Onboarding
   "Onboarding ya completado": "Tu cuenta ya está configurada.",

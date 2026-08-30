@@ -35,6 +35,9 @@ import styles from './DashboardPage.module.css'
 // ── Formatter ────────────────────────────────────────────────────────────
 
 const fmt = (n: number, moneda: 'ARS' | 'USD' = 'ARS') => {
+  if (n === null || n === undefined || isNaN(n)) {
+    return moneda === 'USD' ? 'USD $ 0,00' : '$ 0,00'
+  }
   const abs = Math.abs(n)
   const [int, dec] = abs.toFixed(2).split('.')
   const intFmt = int.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
@@ -242,10 +245,11 @@ const CategoriasChart = memo(({
 
   const dynamicCSS = chartData.map((entry) => {
     const val = entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado
-    const fillPct = maxVal > 0 ? (val / maxVal) * 100 : 0
+    const fillPct = maxVal > 0 ? Math.max(0, Math.min(100, (val / maxVal) * 100)) : 0
     const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
     const classPrefix = moneda === 'ARS' ? 'bar-fill-ars' : 'bar-fill-usd'
-    return `.${classPrefix}-${entry.categoria_id}{width:${fillPct.toFixed(2)}%;background:${color}}`
+    const safeCatId = (entry.categoria_id || entry.categoria_nombre).replace(/[^a-zA-Z0-9_-]/g, '')
+    return `.${classPrefix}-${safeCatId}{width:${fillPct.toFixed(2)}%;background:${color}}`
   }).join('')
 
   return (
@@ -254,14 +258,20 @@ const CategoriasChart = memo(({
       {chartData.map((entry) => {
         const isProyectado = entry.gasto_actual_ciclo <= 0 && entry.proyectado > 0
         const val = entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado
-        const pct = total > 0 ? Math.round((val / total) * 100) : 0
-        const fillClass = moneda === 'ARS' ? `bar-fill-ars-${entry.categoria_id}` : `bar-fill-usd-${entry.categoria_id}`
+        const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((val / total) * 100))) : 0
+        const safeCatId = (entry.categoria_id || entry.categoria_nombre).replace(/[^a-zA-Z0-9_-]/g, '')
+        const fillClass = moneda === 'ARS' ? `bar-fill-ars-${safeCatId}` : `bar-fill-usd-${safeCatId}`
+        const canDrillDown = Boolean(entry.categoria_id)
 
         return (
           <div 
-            key={entry.categoria_id} 
-            className={`${styles.barItem} ${styles.clickable}`}
-            onClick={() => onSelectCategory(entry.categoria_id, entry.categoria_nombre)}
+            key={entry.categoria_id || entry.categoria_nombre} 
+            className={`${styles.barItem} ${canDrillDown ? styles.clickable : ''}`}
+            onClick={() => {
+              if (canDrillDown && entry.categoria_id) {
+                onSelectCategory(entry.categoria_id, entry.categoria_nombre)
+              }
+            }}
           >
             <div className={styles.barIconWrap}>
               <CategoriaIcon nombre={entry.categoria_nombre} size={32} />
@@ -329,8 +339,9 @@ const SubcategoriasChart = memo(({
 
   const dynamicCSS = chartData.map((entry) => {
     const val = getVal(entry)
-    const fillPct = maxVal > 0 ? (val / maxVal) * 100 : 0
-    return `.${fillPrefix}-${entry.subcategoria_id}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
+    const fillPct = maxVal > 0 ? Math.max(0, Math.min(100, (val / maxVal) * 100)) : 0
+    const safeSubId = (entry.subcategoria_id || entry.subcategoria_nombre).replace(/[^a-zA-Z0-9_-]/g, '')
+    return `.${fillPrefix}-${safeSubId}{width:${fillPct.toFixed(2)}%;background:${parentColor}}`
   }).join('')
 
   return (
@@ -338,7 +349,8 @@ const SubcategoriasChart = memo(({
       <style>{dynamicCSS}</style>
       {chartData.map((entry) => {
         const val = getVal(entry)
-        const pct = total > 0 ? Math.round((val / total) * 100) : 0
+        const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((val / total) * 100))) : 0
+        const safeSubId = (entry.subcategoria_id || entry.subcategoria_nombre).replace(/[^a-zA-Z0-9_-]/g, '')
 
         return (
           <div key={entry.subcategoria_id} className={styles.barItem}>
@@ -357,7 +369,7 @@ const SubcategoriasChart = memo(({
                 </span>
               </div>
               <div className={styles.barTrack}>
-                <div className={`${styles.barFill} ${fillPrefix}-${entry.subcategoria_id}`} />
+                <div className={`${styles.barFill} ${fillPrefix}-${safeSubId}`} />
               </div>
             </div>
           </div>
@@ -398,8 +410,13 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardResumen | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [billeterasSeleccionadas, setBilleterasSeleccionadas] = useState<string[]>(() => {
-    const saved = localStorage.getItem('argentum_dashboard_billeteras')
-    return saved ? JSON.parse(saved) : []
+    try {
+      const saved = localStorage.getItem('argentum_dashboard_billeteras')
+      const parsed = saved ? JSON.parse(saved) : []
+      return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []
+    } catch {
+      return []
+    }
   })
   const [moneda, setMoneda] = useState<'ARS' | 'USD'>(() => {
     return (localStorage.getItem('argentum_dashboard_moneda') as 'ARS' | 'USD') || 'ARS'
@@ -448,14 +465,17 @@ export default function DashboardPage() {
   }, [billeteras])
 
   const getDropdownTriggerText = () => {
-    if (billeterasSeleccionadas.length === 0) {
+    const billeterasValidas = billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda)
+    const seleccionadasActivas = billeterasSeleccionadas.filter(id => billeterasValidas.some(b => b.id === id))
+
+    if (seleccionadasActivas.length === 0) {
       return 'Todas las billeteras'
     }
-    if (billeterasSeleccionadas.length === 1) {
-      const selected = billeteras.find(b => b.id === billeterasSeleccionadas[0])
+    if (seleccionadasActivas.length === 1) {
+      const selected = billeterasValidas.find(b => b.id === seleccionadasActivas[0])
       return selected ? selected.nombre : 'Todas las billeteras'
     }
-    return `${billeterasSeleccionadas.length} billeteras`
+    return `${seleccionadasActivas.length} billeteras`
   }
 
   const fetchData = useCallback(async (signal?: AbortSignal) => {
@@ -493,10 +513,19 @@ export default function DashboardPage() {
   const handleToggleMoneda = useCallback((m: 'ARS' | 'USD') => {
     setMoneda(m)
     localStorage.setItem('argentum_dashboard_moneda', m)
+    // Descartar billeteras seleccionadas que no pertenezcan a la nueva moneda
+    setBilleterasSeleccionadas(prev => {
+      const valid = prev.filter(id => {
+        const b = billeteras.find(w => w.id === id)
+        return b && b.moneda === m
+      })
+      localStorage.setItem('argentum_dashboard_billeteras', JSON.stringify(valid))
+      return valid
+    })
     // Reset category drill-down when switching currency
     setSelectedCategoria(null)
     setSubcategoriasData([])
-  }, [])
+  }, [billeteras])
 
   const fetchProyeccion = useCallback(async (signal?: AbortSignal) => {
     try {

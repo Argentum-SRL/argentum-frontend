@@ -18,30 +18,33 @@ const DEFAULT_TTL = 60 * 1000 // 60 seconds
 
 export const dashboardService = {
   getPeriodoActual: async (signal?: AbortSignal): Promise<{ fecha_inicio: string; fecha_fin: string }> => {
-    if (periodoActualPromise) return periodoActualPromise
+    if (!signal && periodoActualPromise) return periodoActualPromise
 
     if (periodoActualCache && Date.now() - periodoActualCache.timestamp < DEFAULT_TTL) {
       return periodoActualCache.data
     }
 
-    periodoActualPromise = (async () => {
+    const fetchPromise = (async () => {
       try {
         const response = await api.get<{ fecha_inicio: string; fecha_fin: string }>('/dashboard/periodo-actual', { signal })
         periodoActualCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {
-        periodoActualPromise = null
+        if (!signal) periodoActualPromise = null
       }
     })()
 
-    return periodoActualPromise
+    if (!signal) periodoActualPromise = fetchPromise
+    return fetchPromise
   },
 
   getResumen: async (desde?: string, hasta?: string, billeteraIds?: string[], signal?: AbortSignal): Promise<DashboardResumen> => {
     const key = `${desde || 'all'}-${hasta || 'all'}-${billeteraIds?.join(',') || 'all'}`
     
-    const pending = resumenPromises[key]
-    if (pending) return pending
+    if (!signal) {
+      const pending = resumenPromises[key]
+      if (pending) return pending
+    }
 
     const cached = resumenCache[key]
     if (cached && Date.now() - cached.timestamp < DEFAULT_TTL) {
@@ -63,52 +66,54 @@ export const dashboardService = {
         resumenCache[key] = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {
-        delete resumenPromises[key]
+        if (!signal) delete resumenPromises[key]
       }
     })()
 
-    resumenPromises[key] = promise
+    if (!signal) resumenPromises[key] = promise
     return promise
   },
 
   getCotizacion: async (signal?: AbortSignal): Promise<CotizacionDolar> => {
-    if (cotizacionPromise) return cotizacionPromise
+    if (!signal && cotizacionPromise) return cotizacionPromise
 
     if (cotizacionCache && Date.now() - cotizacionCache.timestamp < DEFAULT_TTL) {
       return cotizacionCache.data
     }
 
-    cotizacionPromise = (async () => {
+    const fetchPromise = (async () => {
       try {
         const response = await api.get<CotizacionDolar>('/dashboard/cotizacion', { signal })
         cotizacionCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {
-        cotizacionPromise = null
+        if (!signal) cotizacionPromise = null
       }
     })()
 
-    return cotizacionPromise
+    if (!signal) cotizacionPromise = fetchPromise
+    return fetchPromise
   },
 
   getProyeccion: async (signal?: AbortSignal): Promise<ProyeccionesResponse> => {
-    if (proyeccionPromise) return proyeccionPromise
+    if (!signal && proyeccionPromise) return proyeccionPromise
 
     if (proyeccionCache && Date.now() - proyeccionCache.timestamp < DEFAULT_TTL) {
       return proyeccionCache.data
     }
 
-    proyeccionPromise = (async () => {
+    const fetchPromise = (async () => {
       try {
         const response = await api.get<ProyeccionesResponse>('/dashboard/proyeccion', { signal })
         proyeccionCache = { data: response.data, timestamp: Date.now() }
         return response.data
       } finally {
-        proyeccionPromise = null
+        if (!signal) proyeccionPromise = null
       }
     })()
 
-    return proyeccionPromise
+    if (!signal) proyeccionPromise = fetchPromise
+    return fetchPromise
   },
 
   getResumenCompleto: async (desde?: string, hasta?: string, billeteraIds?: string[], signal?: AbortSignal): Promise<{
@@ -116,7 +121,6 @@ export const dashboardService = {
     resumen: DashboardResumen;
     cotizacion: CotizacionDolar;
   }> => {
-    // Esta llamada no usa cache por ahora para asegurar datos frescos al consolidar
     const params: Record<string, string> = {}
     if (desde) params.desde = desde
     if (hasta) params.hasta = hasta

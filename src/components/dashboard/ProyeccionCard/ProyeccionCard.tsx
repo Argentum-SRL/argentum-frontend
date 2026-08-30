@@ -33,8 +33,9 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
   const { open } = useModal()
 
   const { progressPercent } = useMemo(() => {
-    const actual = proyeccion.desglose_por_categoria.reduce((acc, cat) => acc + cat.gasto_actual_ciclo, 0)
-    const percent = Math.min(Math.round((actual / (proyeccion.gasto_proyectado_total || 1)) * 100), 100)
+    const actual = proyeccion.desglose_por_categoria.reduce((acc, cat) => acc + (cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0), 0)
+    const totalProyectado = proyeccion.gasto_proyectado_total > 0 ? proyeccion.gasto_proyectado_total : 1
+    const percent = Math.max(0, Math.min(Math.round((actual / totalProyectado) * 100), 100))
     return { progressPercent: percent }
   }, [proyeccion])
 
@@ -87,7 +88,9 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
           <div className={styles.categoryList}>
             <h3 className={styles.sectionTitle}>Gasto por categoría</h3>
             {desglose_por_categoria.map((cat, i) => {
-              const catProgress = Math.min(Math.round((cat.gasto_actual_ciclo / (cat.proyectado || 1)) * 100), 100)
+              const catActual = cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0
+              const catTotal = cat.proyectado > 0 ? cat.proyectado : 1
+              const catProgress = Math.max(0, Math.min(Math.round((catActual / catTotal) * 100), 100))
               
               return (
                 <div key={cat.categoria_id || `cat-${i}`} className={styles.categoryRow}>

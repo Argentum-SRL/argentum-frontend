@@ -11,12 +11,10 @@ interface ProyeccionModalProps {
 }
 
 const ProyeccionModal: React.FC<ProyeccionModalProps> = ({ isOpen, onClose, proyeccion }) => {
-  const { n_ciclos, pesos, advertencias, nivel_confianza } = {
-    n_ciclos: proyeccion.ciclos_analizados,
-    pesos: proyeccion.pesos,
-    advertencias: proyeccion.advertencias,
-    nivel_confianza: proyeccion.nivel_confianza
-  }
+  const n_ciclos = proyeccion?.ciclos_analizados ?? 0
+  const pesos = proyeccion?.pesos ?? { historial: 0.7, ciclo_actual: 0.3 }
+  const advertencias = proyeccion?.advertencias ?? []
+  const nivel_confianza = proyeccion?.nivel_confianza ?? 'medio'
 
   const getConfianzaLabel = () => {
     switch (nivel_confianza) {

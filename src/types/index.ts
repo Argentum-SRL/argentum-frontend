@@ -278,11 +278,13 @@ export interface DashboardResumen {
     ars: {
       saldo_billeteras: number
       cuotas_proximo_ciclo: number
+      suscripciones_mensuales?: number
       disponible: number
     }
     usd: {
       saldo_billeteras: number
       cuotas_proximo_ciclo: number
+      suscripciones_mensuales?: number
       disponible: number
     }
   }

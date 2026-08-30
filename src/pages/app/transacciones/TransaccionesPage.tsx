@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, Loader2 } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -19,6 +19,8 @@ import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
 import GruposCuotasTab from '@/components/transacciones/GruposCuotasTab'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
+
+const PAGE_SIZE = 50
 
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
@@ -55,7 +57,10 @@ export default function TransaccionesPage() {
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [pendientesIA, setPendientesIA] = useState<Transaccion[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
 
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
   const { open, confirm } = useModal()
 
   const hasActiveFilters = useMemo(() => Object.entries(filters).some(([k, v]) => {
@@ -65,11 +70,17 @@ export default function TransaccionesPage() {
     return v !== undefined && v !== ''
   }), [filters, defaultFilters])
 
-  const fetchTransacciones = useCallback(async (signal?: AbortSignal) => {
+  // Carga inicial (página 0)
+  const fetchInitialTransacciones = useCallback(async (signal?: AbortSignal) => {
     try {
-      const data = await transaccionService.getTransacciones(filters, signal)
+      const data = await transaccionService.getTransacciones({
+        ...filters,
+        skip: 0,
+        limit: PAGE_SIZE
+      }, signal)
       if (!signal?.aborted) {
         setTransacciones(data)
+        setHasMore(data.length === PAGE_SIZE)
       }
     } catch (err) {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
@@ -79,6 +90,35 @@ export default function TransaccionesPage() {
       showToast(getErrorMessage(err, 'No pudimos cargar las transacciones. Intentá de nuevo.'), 'error')
     }
   }, [filters, showToast])
+
+  // Carga de siguientes páginas (scroll infinito)
+  const loadMore = useCallback(async () => {
+    if (loading || loadingMore || !hasMore) return
+    setLoadingMore(true)
+    try {
+      const nextData = await transaccionService.getTransacciones({
+        ...filters,
+        skip: transacciones.length,
+        limit: PAGE_SIZE
+      })
+      if (nextData.length < PAGE_SIZE) {
+        setHasMore(false)
+      }
+      setTransacciones(prev => {
+        const existingIds = new Set(prev.map(t => t.id))
+        const fresh = nextData.filter(t => !existingIds.has(t.id))
+        return [...prev, ...fresh]
+      })
+    } catch (err) {
+      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+        return
+      }
+      console.error(err)
+      showToast(getErrorMessage(err, 'No pudimos cargar más transacciones.'), 'error')
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loading, loadingMore, hasMore, filters, transacciones.length, showToast])
 
   const fetchPendientes = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -99,7 +139,7 @@ export default function TransaccionesPage() {
     setLoading(true)
     try {
       const [, , freshBilleteras] = await Promise.all([
-        fetchTransacciones(),
+        fetchInitialTransacciones(),
         fetchPendientes(),
         billeteraService.list(),
       ])
@@ -107,7 +147,7 @@ export default function TransaccionesPage() {
     } finally {
       setLoading(false)
     }
-  }, [fetchTransacciones, fetchPendientes])
+  }, [fetchInitialTransacciones, fetchPendientes])
 
   // 1. Carga de datos estáticos (Solo al montar)
   useEffect(() => {
@@ -138,9 +178,10 @@ export default function TransaccionesPage() {
     
     const loadDynamic = async () => {
       setLoading(true)
+      setHasMore(true)
       try {
         await Promise.all([
-          fetchTransacciones(controller.signal),
+          fetchInitialTransacciones(controller.signal),
           fetchPendientes(controller.signal)
         ])
       } finally {
@@ -152,7 +193,27 @@ export default function TransaccionesPage() {
     
     loadDynamic()
     return () => controller.abort()
-  }, [fetchTransacciones, fetchPendientes])
+  }, [fetchInitialTransacciones, fetchPendientes])
+
+  // 3. Observer para infinite scroll
+  useEffect(() => {
+    if (loading || !hasMore || loadingMore) return
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore()
+        }
+      },
+      { rootMargin: '250px' }
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [loading, hasMore, loadingMore, loadMore])
+
 
   const handleEdit = useCallback((id: string) => {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
@@ -424,19 +485,38 @@ export default function TransaccionesPage() {
                 onActionClick={hasActiveFilters ? handleClearFilters : openNewTransaccion}
               />
             ) : (
-              grupos.map(([fecha, txs]) => (
-                <DayGroup
-                  key={fecha}
-                  fecha={fecha}
-                  transacciones={txs}
-                  categorias={categorias}
-                  billeteras={billeteras}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))
+              <>
+                {grupos.map(([fecha, txs]) => (
+                  <DayGroup
+                    key={fecha}
+                    fecha={fecha}
+                    transacciones={txs}
+                    categorias={categorias}
+                    billeteras={billeteras}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+
+                {/* Sentinel para IntersectionObserver */}
+                <div ref={sentinelRef} style={{ height: 1, margin: 0, padding: 0 }} />
+
+                {loadingMore && (
+                  <div className={styles.loadingMore}>
+                    <Loader2 size={16} className="animate-spin" />
+                    Cargando más transacciones...
+                  </div>
+                )}
+
+                {!hasMore && transacciones.length > 0 && (
+                  <div className={styles.endOfList}>
+                    Llegaste al final de las transacciones
+                  </div>
+                )}
+              </>
             )}
           </div>
+
         </>
       ) : (
         <GruposCuotasTab />

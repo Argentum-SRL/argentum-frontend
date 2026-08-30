@@ -259,6 +259,27 @@
   font-weight: 500;
 }
 
+.loadingMore {
+  padding: 18px 20px;
+  text-align: center;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.endOfList {
+  padding: 24px 20px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+
 .btnIcon {
   margin-right: 6px;
   display: inline-block;

@@ -33,7 +33,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
   formatValue, 
   resultado 
 }) => {
-  if (active && payload && payload.length) {
+  if (active && payload && payload.length >= 2) {
     const getPresentValueClass = () => {
       if (resultado === 'conviene_cuotas') return styles.tooltipValueCuotas;
       if (resultado === 'conviene_contado') return styles.tooltipValueContado;

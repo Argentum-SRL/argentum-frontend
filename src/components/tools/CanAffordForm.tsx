@@ -57,9 +57,10 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   const isFormInvalid = 
     formData.precio_total === null || 
     formData.precio_total <= 0 ||
+    formData.precio_total > 1_000_000_000_000 ||
     (formData.modo === 'cuotas' && (formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) || formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120)) ||
-    (formData.modo === 'cuotas' && tieneInteres && (!tna || isNaN(parseFloat(tna)) || parseFloat(tna) <= 0 || parseFloat(tna) > 3000)) ||
-    (showManualIncome && formData.ingreso_manual !== null && formData.ingreso_manual < 0);
+    (formData.modo === 'cuotas' && tieneInteres && (!tna || isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000)) ||
+    (showManualIncome && formData.ingreso_manual !== null && (formData.ingreso_manual <= 0 || formData.ingreso_manual > 1_000_000_000_000));
 
   // Real-time calculations for preview
   const getPreviewText = () => {
@@ -204,7 +205,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
             <input
               type="number"
               step="0.1"
-              min="0"
+              min="0.1"
               max="3000"
               placeholder="Ej: 120"
               value={tna}
@@ -215,6 +216,9 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
               %
             </span>
           </div>
+          {tna !== '' && (isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000) && (
+            <span className="text-xs text-red-500 font-medium mt-1">La TNA debe estar entre 0.1% y 3000%</span>
+          )}
           <p className="text-xs text-muted-foreground">
             La TNA figura en el contrato o en la web del comercio/banco. Ej: 120% anual.
           </p>
@@ -242,6 +246,9 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
             allowDecimals
             hideCurrency
           />
+          {formData.ingreso_manual !== null && formData.ingreso_manual <= 0 && (
+            <span className="text-xs text-red-500 font-medium mt-1">El ingreso mensual estimado debe ser mayor a 0</span>
+          )}
           <span className={styles.inputDesc}>
             No tenemos ingresos registrados tuyos. Completalo para ver la capacidad de pago.
           </span>

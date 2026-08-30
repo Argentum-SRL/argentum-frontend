@@ -58,8 +58,9 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
   const isFormInvalid = 
     formData.precio_contado === null || 
     formData.precio_contado <= 0 ||
-    (!formData.tiene_interes && (formData.precio_total_cuotas === null || formData.precio_total_cuotas <= 0)) ||
-    (formData.tiene_interes && (!formData.tna || isNaN(parseFloat(formData.tna)) || parseFloat(formData.tna) <= 0 || parseFloat(formData.tna) > 3000)) ||
+    formData.precio_contado > 1_000_000_000_000 ||
+    (!formData.tiene_interes && (formData.precio_total_cuotas === null || formData.precio_total_cuotas <= 0 || formData.precio_total_cuotas > 1_000_000_000_000)) ||
+    (formData.tiene_interes && (!formData.tna || isNaN(parseFloat(formData.tna)) || parseFloat(formData.tna) < 0.1 || parseFloat(formData.tna) > 3000)) ||
     formData.cantidad_cuotas === null ||
     isNaN(formData.cantidad_cuotas) ||
     formData.cantidad_cuotas < 1 ||
@@ -149,7 +150,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
             <input
               type="number"
               step="0.1"
-              min="0"
+              min="0.1"
               max="3000"
               placeholder="Ej: 120"
               value={formData.tna}
@@ -160,6 +161,9 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
               %
             </span>
           </div>
+          {formData.tna !== '' && (isNaN(parseFloat(formData.tna)) || parseFloat(formData.tna) < 0.1 || parseFloat(formData.tna) > 3000) && (
+            <span className="text-xs text-red-500 font-medium mt-1">La TNA debe estar entre 0.1% y 3000%</span>
+          )}
           <p className="text-xs text-muted-foreground">
             La TNA para calcular el recargo de cuotas mediante sistema francés.
           </p>

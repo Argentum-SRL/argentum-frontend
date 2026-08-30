@@ -38,11 +38,20 @@ export interface ConvenienciaRequest {
   tna?: number;
 }
 
+export interface CurrencyFinancialData {
+  total_billeteras: number;
+  cuotas_comprometidas: number;
+  suscripciones_mensuales: number;
+  saldo_disponible: number;
+}
+
 export interface FinancialContext {
   saldo_disponible: number;
+  carga_mensual_comprometida: number;
+  ars: CurrencyFinancialData;
+  usd: CurrencyFinancialData;
   ingreso_promedio_mensual: number | null;
   ingreso_es_estimacion_parcial: boolean;
-  carga_mensual_comprometida: number;
   gasto_promedio_variable: number;
   ciclos_con_historia: number;
   margen_libre_mensual: number | null;

@@ -75,8 +75,16 @@ export const useTools = () => {
       showToast('El precio de contado debe ser mayor a 0', 'error');
       return;
     }
+    if (contado > 1_000_000_000_000) {
+      showToast('El precio de contado excede el límite permitido', 'error');
+      return;
+    }
     if (!tiene_interes && (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0)) {
       showToast('El precio total en cuotas debe ser mayor a 0', 'error');
+      return;
+    }
+    if (!tiene_interes && cuotasTotal !== null && cuotasTotal > 1_000_000_000_000) {
+      showToast('El precio en cuotas excede el límite permitido', 'error');
       return;
     }
     if (cuotas === null || isNaN(cuotas) || cuotas < 1 || cuotas > 120) {
@@ -89,7 +97,7 @@ export const useTools = () => {
     }
     if (tiene_interes) {
       const parsedTna = parseFloat(tnaVal);
-      if (isNaN(parsedTna) || parsedTna <= 0 || parsedTna > 3000) {
+      if (isNaN(parsedTna) || parsedTna < 0.1 || parsedTna > 3000) {
         showToast('Debe ingresar una TNA válida entre 0.1% y 3000%', 'error');
         return;
       }
@@ -174,16 +182,16 @@ export const useTools = () => {
     } finally {
       setFinancialContextLoading(false);
     }
-  }, [showToast, setFinancialContextLoading, setFinancialContextError, setFinancialContext]);
+  }, [showToast]);
 
   useEffect(() => {
-    if (activeTab === 'can-afford' && !financialContext && !financialContextLoading) {
+    if (activeTab === 'can-afford' && !financialContext && !financialContextLoading && !financialContextError) {
       const timer = setTimeout(() => {
         void loadFinancialContext();
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [activeTab, financialContext, financialContextLoading, loadFinancialContext]);
+  }, [activeTab, financialContext, financialContextLoading, financialContextError, loadFinancialContext]);
 
 
   const canAffordCalcular = async () => {
@@ -192,14 +200,28 @@ export const useTools = () => {
       showToast('El precio de la compra debe ser mayor a 0', 'error');
       return;
     }
+    if (precio > 1_000_000_000_000) {
+      showToast('El precio de la compra excede el límite permitido', 'error');
+      return;
+    }
     if (canAffordForm.modo === 'cuotas' && (canAffordForm.cantidad_cuotas === null || isNaN(canAffordForm.cantidad_cuotas) || canAffordForm.cantidad_cuotas < 2 || canAffordForm.cantidad_cuotas > 120)) {
       showToast('La cantidad de cuotas debe estar entre 2 y 120', 'error');
       return;
     }
     if (canAffordForm.modo === 'cuotas' && tieneInteres) {
       const parsedTna = parseFloat(tna);
-      if (isNaN(parsedTna) || parsedTna <= 0 || parsedTna > 3000) {
+      if (isNaN(parsedTna) || parsedTna < 0.1 || parsedTna > 3000) {
         showToast('Debe ingresar una TNA válida entre 0.1% y 3000%', 'error');
+        return;
+      }
+    }
+    if (canAffordForm.ingreso_manual !== null && canAffordForm.ingreso_manual !== undefined) {
+      if (canAffordForm.ingreso_manual <= 0) {
+        showToast('El ingreso mensual estimado debe ser mayor a 0', 'error');
+        return;
+      }
+      if (canAffordForm.ingreso_manual > 1_000_000_000_000) {
+        showToast('El ingreso mensual estimado excede el límite permitido', 'error');
         return;
       }
     }

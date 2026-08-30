@@ -47,8 +47,22 @@ function processQueue(error: unknown) {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.error("[API Error]", error?.response?.status, error?.response?.data?.detail);
+    if (axios.isCancel(error) || error?.name === 'CanceledError' || error?.name === 'AbortError') {
+      return Promise.reject(error)
+    }
+
+    if (error.response) {
+      console.error("[API Error]", error.response.status, error.response.data?.detail || error.response.statusText);
+    } else if (error.code === 'ECONNABORTED') {
+      console.error("[API Error] Tiempo de espera agotado (Timeout)");
+    } else {
+      console.error("[API Error] Error de conexión o red:", error.message);
+    }
+
     const originalRequest = error.config
+    if (!originalRequest) {
+      return Promise.reject(error)
+    }
 
     const isAuthEndpoint = originalRequest.url?.includes('/auth/') && !originalRequest.url?.includes('/auth/me')
     if (error.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {

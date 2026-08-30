@@ -271,7 +271,7 @@ export default function GoalsBarChart({
 
               {/* Action Buttons List */}
               <div className={styles.sheetActionsList}>
-                {/* 1. Aportar Dinero (Primary Action) */}
+                {/* 1. Aportar / Retirar Dinero (Primary Action) */}
                 <button
                   className={styles.sheetActionItem}
                   onClick={() => {
@@ -279,14 +279,17 @@ export default function GoalsBarChart({
                     setActiveGoal(null)
                     onContribute(g)
                   }}
-                  disabled={isCompleted}
                 >
                   <div className={`${styles.sheetActionIcon} ${styles.actionIconSuccess}`}>
                     <Plus size={18} />
                   </div>
                   <div className={styles.sheetActionText}>
-                    <span className={styles.sheetActionTitle}>Aportar dinero</span>
-                    <span className={styles.sheetActionSubtitle}>Sumar saldo desde una de tus billeteras</span>
+                    <span className={styles.sheetActionTitle}>
+                      {isCompleted ? 'Gestionar fondos' : 'Aportar dinero'}
+                    </span>
+                    <span className={styles.sheetActionSubtitle}>
+                      {isCompleted ? 'Retirar o sumar saldo a la meta' : 'Sumar saldo desde una de tus billeteras'}
+                    </span>
                   </div>
                   <ChevronRight size={16} className={styles.sheetChevron} />
                 </button>

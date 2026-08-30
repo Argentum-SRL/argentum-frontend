@@ -15,6 +15,7 @@ import styles from './GoalModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
 import { DateInput, ColorPicker } from '@/components/ui'
+import { getErrorMessage } from '@/utils/errorMessages'
 
 interface GoalModalProps {
   open: boolean
@@ -107,8 +108,21 @@ export default function GoalModal({
   }, [open, goal])
 
   const goNext = () => {
-    if (step === 1 && (!nombre || !monto_objetivo)) {
-      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Completá el nombre y el monto para continuar' })
+    const trimmedNombre = nombre.trim()
+    if (!trimmedNombre) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Escribí un nombre para la meta' })
+      return
+    }
+    if (trimmedNombre.length > 100) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El nombre no puede superar los 100 caracteres' })
+      return
+    }
+    if (!monto_objetivo || monto_objetivo <= 0) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto objetivo mayor a 0' })
+      return
+    }
+    if (monto_objetivo > 9999999999999.99) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto objetivo es demasiado alto' })
       return
     }
     dispatch({ type: 'SET_FIELD', field: 'localError', value: null })
@@ -122,15 +136,38 @@ export default function GoalModal({
   }
 
   const handleSubmit = async () => {
+    const trimmedNombre = nombre.trim()
+    if (!trimmedNombre) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Escribí un nombre para la meta' })
+      return
+    }
+    if (trimmedNombre.length > 100) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El nombre no puede superar los 100 caracteres' })
+      return
+    }
+    if (!monto_objetivo || monto_objetivo <= 0) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto objetivo mayor a 0' })
+      return
+    }
+    if (monto_objetivo > 9999999999999.99) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto objetivo es demasiado alto' })
+      return
+    }
+    const hoyStr = new Date().toLocaleDateString('en-CA')
+    if (fecha_limite && fecha_limite < hoyStr) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'La fecha límite no puede ser anterior a hoy' })
+      return
+    }
+
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       const payload: Partial<Goal> = {
-        nombre,
-        monto_objetivo: monto_objetivo!,
+        nombre: trimmedNombre,
+        monto_objetivo: monto_objetivo,
         moneda,
         fecha_limite: fecha_limite || null,
         color,
-        nota,
+        nota: nota.trim() || null,
         estado
       }
 
@@ -144,13 +181,7 @@ export default function GoalModal({
       onSuccess()
       onClose()
     } catch (err: unknown) {
-      const error = err as import('axios').AxiosError<{ detail: unknown }>
-      const detail = error.response?.data?.detail
-      const msg = typeof detail === 'string'
-        ? detail
-        : Array.isArray(detail)
-          ? detail[0]?.msg || 'Error de validación'
-          : 'Error al guardar la meta. Reintentá luego.'
+      const msg = getErrorMessage(err, 'Error al guardar la meta. Reintentá luego.')
       dispatch({ type: 'SET_FIELD', field: 'localError', value: msg })
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
@@ -200,6 +231,7 @@ export default function GoalModal({
                       value={nombre}
                       onChange={e => setField('nombre', e.target.value)}
                       placeholder="Ej: Nueva Notebook, Fondo de Emergencia..."
+                      maxLength={100}
                       autoFocus
                     />
                   </div>
@@ -212,6 +244,8 @@ export default function GoalModal({
                     moneda={moneda}
                     onMonedaChange={m => setField('moneda', m)}
                     disabled={isEdit && (goal?.movimientos?.length ?? 0) > 0}
+                    allowDecimals={true}
+                    max={9999999999999.99}
                     label="¿Cuánto necesitás?"
                   />
                   {(isEdit && (goal?.movimientos?.length ?? 0) > 0) ? (
@@ -282,6 +316,7 @@ export default function GoalModal({
                       value={nota}
                       onChange={e => setField('nota', e.target.value)}
                       placeholder="¿Por qué es importante esta meta? ¿Algún detalle extra?"
+                      maxLength={1000}
                     />
                   </div>
                 </div>

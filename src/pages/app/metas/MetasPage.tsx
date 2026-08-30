@@ -160,12 +160,17 @@ export default function MetasPage() {
       await goalsService.updateGoal(g.id, { estado: nuevoEstado })
       showToast(`Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}`, 'success')
       void fetchAll()
-    } catch {
-      showToast('Error al cambiar el estado', 'error')
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'Error al cambiar el estado'), 'error')
     }
   }, [fetchAll, showToast])
 
   const handleDelete = useCallback((g: Goal) => {
+    if (g.monto_actual > 0) {
+      showToast('No podés eliminar una meta que aún tiene fondos. Retirá el dinero primero.', 'info')
+      return
+    }
+
     confirm({
       title: '¿Eliminás esta meta?',
       description: 'Se borrará el seguimiento y el historial de aportes de esta meta.',
@@ -176,8 +181,8 @@ export default function MetasPage() {
           await goalsService.deleteGoal(g.id)
           showToast('Meta eliminada', 'success')
           void fetchAll()
-        } catch {
-          showToast('Error al eliminar la meta', 'error')
+        } catch (err: unknown) {
+          showToast(getErrorMessage(err, 'Error al eliminar la meta'), 'error')
         }
       }
     })

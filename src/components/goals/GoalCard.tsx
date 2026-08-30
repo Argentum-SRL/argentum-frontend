@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import goalsService from '@/services/goals.service'
 import { useToast } from '@/hooks/useToast'
+import { getErrorMessage } from '@/utils/errorMessages'
 import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -26,7 +27,7 @@ interface GoalCardProps {
 
 export default function GoalCard({ goal, onEdit, onContribute, onDetails, onRefresh }: GoalCardProps) {
   const { showToast } = useToast()
-  const porcentaje = (goal.monto_actual / goal.monto_objetivo) * 100
+  const porcentaje = goal.monto_objetivo > 0 ? (goal.monto_actual / goal.monto_objetivo) * 100 : 0
   const barRef = useRef<HTMLDivElement>(null)
   const percentRef = useRef<HTMLSpanElement>(null)
 
@@ -59,8 +60,8 @@ export default function GoalCard({ goal, onEdit, onContribute, onDetails, onRefr
       await goalsService.updateGoal(goal.id, { estado: nuevoEstado })
       showToast(`Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}`, 'success')
       onRefresh?.()
-    } catch {
-      showToast('Error al cambiar el estado', 'error')
+    } catch (err: unknown) {
+      showToast(getErrorMessage(err, 'Error al cambiar el estado'), 'error')
     }
   }
 
@@ -128,10 +129,9 @@ export default function GoalCard({ goal, onEdit, onContribute, onDetails, onRefr
         <button 
           className={`${styles.btnAction} ${styles.btnPrimary}`} 
           onClick={(e) => { e.stopPropagation(); onContribute(); }}
-          disabled={goal.estado === EstadoMeta.COMPLETADA}
         >
           <Plus size={16} className={styles.btnIcon} />
-          Aportar
+          {goal.estado === EstadoMeta.COMPLETADA ? 'Gestionar' : 'Aportar'}
         </button>
 
         {goal.estado !== EstadoMeta.COMPLETADA && (

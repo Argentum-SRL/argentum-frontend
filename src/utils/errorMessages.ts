@@ -95,9 +95,25 @@ export const ERROR_MAP: Record<string, string> = {
   "Moneda inválida": "La moneda seleccionada no es válida.",
 
   // Metas
+  "No encontramos esa meta.": "No encontramos esa meta.",
   "Meta no encontrada": "No encontramos esa meta.",
   "Sin permiso para esta meta": "No tenés permiso para modificar esa meta.",
   "Monto objetivo debe ser positivo": "El monto objetivo tiene que ser mayor a cero.",
+  "El monto objetivo tiene que ser mayor a cero.": "El monto objetivo tiene que ser mayor a cero.",
+  "El nombre de la meta no puede estar vacío.": "El nombre de la meta no puede estar vacío.",
+  "El nombre de la meta no puede superar los 100 caracteres.": "El nombre de la meta no puede tener más de 100 caracteres.",
+  "La fecha límite no puede ser en el pasado.": "La fecha límite no puede ser en el pasado.",
+  "La fecha límite no puede ser anterior a hoy.": "La fecha límite no puede ser anterior a hoy.",
+  "No se puede cambiar la moneda de una meta que ya tiene movimientos registrados.": "No podés cambiar la moneda de una meta que ya tiene movimientos.",
+  "No se puede marcar como completada una meta que no ha alcanzado su objetivo.": "No podés marcar como completada una meta sin alcanzar el objetivo.",
+  "No se puede eliminar una meta que aún tiene fondos. Por favor, retirá el dinero primero.": "No podés eliminar una meta con fondos. Retirá el dinero primero.",
+  "Monto insuficiente en la meta.": "No tenés saldo suficiente en la meta para retirar ese monto.",
+  "Movimiento no encontrado.": "No encontramos ese movimiento.",
+  "El monto del movimiento tiene que ser mayor a cero.": "El monto tiene que ser mayor a cero.",
+  "La cotización debe ser mayor a cero.": "La cotización tiene que ser mayor a cero.",
+  "La cotización no puede tener más de 4 decimales.": "La cotización no puede tener más de 4 decimales.",
+  "Se requiere una cotización válida mayor a 0 para movimientos en moneda distinta a la meta.": "Ingresá una cotización válida mayor a 0.",
+  "La billetera seleccionada no está activa.": "La billetera seleccionada no está activa.",
   "Meta ya completada": "Esa meta ya está completada.",
 
   // Suscripciones
@@ -135,8 +151,29 @@ export function getErrorMessage(
   if (!error) return fallback;
 
   // Error de Axios con respuesta del backend
-  const axiosError = error as { response?: { data?: { detail?: unknown }; status?: number } };
-  const detail = axiosError?.response?.data?.detail;
+  const axiosError = error as { 
+    response?: { 
+      data?: { 
+        detail?: unknown; 
+        error?: { message?: string; code?: string }; 
+        message?: string 
+      }; 
+      status?: number 
+    } 
+  };
+  const data = axiosError?.response?.data;
+
+  // 1. Verificar data.error.message (estándar de Starlette/FastAPI handler del proyecto)
+  if (data?.error?.message && typeof data.error.message === "string") {
+    return ERROR_MAP[data.error.message] ?? data.error.message;
+  }
+
+  // 2. Verificar data.message
+  if (data?.message && typeof data.message === "string") {
+    return ERROR_MAP[data.message] ?? data.message;
+  }
+
+  const detail = data?.detail;
 
   // detail puede ser string o array de objetos (Pydantic ValidationError)
   if (typeof detail === "string") {

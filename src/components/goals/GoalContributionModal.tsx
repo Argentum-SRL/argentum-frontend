@@ -18,6 +18,7 @@ import styles from './GoalContributionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
 import { DateInput } from '@/components/ui'
+import { getErrorMessage } from '@/utils/errorMessages'
 
 interface GoalContributionModalProps {
   open: boolean
@@ -42,12 +43,14 @@ type FormAction =
   | { type: 'RESET'; goal: Goal; billeteras: Billetera[] }
   | { type: 'SET_FIELD'; field: keyof FormState; value: FormState[keyof FormState] }
 
+const getTodayString = () => new Date().toLocaleDateString('en-CA')
+
 const initialState: FormState = {
   tipo: 'aporte',
   monto: null,
   moneda: 'ARS',
   billetera_id: '',
-  fecha: new Date().toISOString().split('T')[0],
+  fecha: getTodayString(),
   cotizacion_usada: 1,
   isSubmitting: false,
   localError: null
@@ -59,11 +62,13 @@ function formReducer(state: FormState, action: FormAction): FormState {
       const bestWallet = action.billeteras.find(b => b.moneda === action.goal.moneda && b.estado === 'activa') 
                       || action.billeteras.find(b => b.estado === 'activa')
                       || action.billeteras[0]
+      const defaultTipo = action.goal.estado === 'completada' ? 'retiro' : 'aporte'
       return {
         ...initialState,
+        tipo: defaultTipo,
         moneda: (bestWallet?.moneda as 'ARS' | 'USD') || (action.goal.moneda as 'ARS' | 'USD'),
         billetera_id: bestWallet?.id || '',
-        fecha: new Date().toISOString().split('T')[0]
+        fecha: getTodayString()
       }
     }
     case 'SET_FIELD':
@@ -89,6 +94,15 @@ export default function GoalContributionModal({
   const selectedBilletera = useMemo(() => billeteras.find(b => b.id === billetera_id), [billeteras, billetera_id])
   const needsExchangeRate = moneda !== goal.moneda
 
+  const resultInGoalCurrency = useMemo(() => {
+    if (!monto) return 0
+    if (!needsExchangeRate) return monto
+    if (cotizacion_usada <= 0) return 0
+    if (moneda === 'USD' && goal.moneda === 'ARS') return monto * cotizacion_usada
+    if (moneda === 'ARS' && goal.moneda === 'USD') return monto / cotizacion_usada
+    return monto
+  }, [monto, needsExchangeRate, cotizacion_usada, moneda, goal.moneda])
+
   useEffect(() => {
     if (open) dispatch({ type: 'RESET', goal, billeteras })
   }, [open, goal, billeteras])
@@ -105,15 +119,40 @@ export default function GoalContributionModal({
 
   const handleSubmit = async () => {
     if (!monto || monto <= 0) {
-      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto válido' })
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto válido mayor a 0' })
+      return
+    }
+    if (monto > 9999999999999.99) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto es demasiado alto' })
       return
     }
     if (!billetera_id) {
       dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Seleccioná una billetera' })
       return
     }
+    const hoyStr = getTodayString()
+    if (fecha > hoyStr) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'La fecha no puede ser futura' })
+      return
+    }
+    if (needsExchangeRate && (!cotizacion_usada || cotizacion_usada <= 0 || cotizacion_usada > 9999999.9999)) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá una cotización válida mayor a 0' })
+      return
+    }
     if (tipo === 'aporte' && selectedBilletera && monto > selectedBilletera.saldo_actual) {
-      dispatch({ type: 'SET_FIELD', field: 'localError', value: `Saldo insuficiente en ${selectedBilletera.nombre}` })
+      dispatch({ 
+        type: 'SET_FIELD', 
+        field: 'localError', 
+        value: `Saldo insuficiente en ${selectedBilletera.nombre}. Tenés disponible ${formatMonto(selectedBilletera.saldo_actual, selectedBilletera.moneda as 'ARS' | 'USD')}` 
+      })
+      return
+    }
+    if (tipo === 'retiro' && resultInGoalCurrency > goal.monto_actual) {
+      dispatch({ 
+        type: 'SET_FIELD', 
+        field: 'localError', 
+        value: `El retiro (${formatMonto(resultInGoalCurrency, goal.moneda as 'ARS' | 'USD')}) supera el saldo acumulado en la meta (${formatMonto(goal.monto_actual, goal.moneda as 'ARS' | 'USD')})` 
+      })
       return
     }
 
@@ -125,32 +164,18 @@ export default function GoalContributionModal({
         billetera_id,
         fecha,
         moneda_movimiento: moneda,
-        cotizacion_usada: needsExchangeRate ? cotizacion_usada : 1
+        cotizacion_usada: needsExchangeRate ? cotizacion_usada : null
       })
       showToast(tipo === 'aporte' ? 'Aporte registrado' : 'Retiro registrado', 'success')
       onSuccess()
       onClose()
     } catch (err: unknown) {
-      const error = err as import('axios').AxiosError<{ detail: unknown }>
-      const detail = error.response?.data?.detail
-      const msg = typeof detail === 'string'
-        ? detail
-        : Array.isArray(detail)
-          ? detail[0]?.msg || 'Error de validación'
-          : 'Error al procesar el movimiento'
+      const msg = getErrorMessage(err, 'Error al procesar el movimiento')
       dispatch({ type: 'SET_FIELD', field: 'localError', value: msg })
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
   }
-
-  const resultInGoalCurrency = useMemo(() => {
-    if (!monto) return 0
-    if (!needsExchangeRate) return monto
-    if (moneda === 'USD' && goal.moneda === 'ARS') return monto * cotizacion_usada
-    if (moneda === 'ARS' && goal.moneda === 'USD') return monto / cotizacion_usada
-    return monto
-  }, [monto, needsExchangeRate, cotizacion_usada, moneda, goal.moneda])
 
   const filteredBilleteras = useMemo(() => {
     return billeteras.filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === billetera_id))
@@ -213,6 +238,8 @@ export default function GoalContributionModal({
                 const first = billeteras.find(b => b.moneda === m && b.estado === 'activa')
                 if (first) dispatch({ type: 'SET_FIELD', field: 'billetera_id', value: first.id })
               }}
+              allowDecimals={true}
+              max={9999999999999.99}
             />
 
             {/* Billetera Selector */}
@@ -269,10 +296,16 @@ export default function GoalContributionModal({
                     <span className={styles.rateUnitLabel}>1 {moneda} =</span>
                     <input
                       type="number"
-                      step="0.01"
+                      step="any"
+                      min="0.0001"
+                      max="9999999"
                       className={styles.rateInput}
                       value={cotizacion_usada || ''}
-                      onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'cotizacion_usada', value: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) => {
+                        const v = parseFloat(e.target.value) || 0
+                        dispatch({ type: 'SET_FIELD', field: 'cotizacion_usada', value: v })
+                        if (localError) dispatch({ type: 'SET_FIELD', field: 'localError', value: null })
+                      }}
                       title="Cotización de la moneda"
                     />
                     <span className={styles.rateUnitLabel}>{goal.moneda}</span>

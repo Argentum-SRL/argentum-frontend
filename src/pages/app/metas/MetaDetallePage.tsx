@@ -158,7 +158,7 @@ export default function MetaDetallePage() {
         try {
           await goalsService.deleteMovement(goal.id, movementId)
           showToast('El movimiento se eliminó.', 'success')
-          fetchData()
+          void fetchData()
         } catch (err: unknown) {
           showToast(getErrorMessage(err, 'No pudimos eliminar el movimiento. Intentá de nuevo.'), 'error')
         }

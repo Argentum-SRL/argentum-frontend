@@ -13,6 +13,7 @@ import type {
 } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
@@ -36,6 +37,7 @@ const getInitialVista = (): VistaDesktop => {
 
 export default function PresupuestosPage() {
   const { showToast } = useToast()
+  const { usuario } = useAuth()
   const { open, confirm } = useModal()
 
   const [activeTab, setActiveTab] = useState<'activo' | 'pausado' | 'finalizado'>('activo')
@@ -169,15 +171,18 @@ export default function PresupuestosPage() {
   }
 
   const handleDelete = (p: Presupuesto) => {
+    const isFinalizado = p.estado === 'finalizado'
     confirm({
-      title: '¿Eliminás este presupuesto?',
-      description: 'Se va a borrar para siempre.',
+      title: isFinalizado ? '¿Eliminás definitivamente este presupuesto?' : '¿Finalizás este presupuesto?',
+      description: isFinalizado 
+        ? 'Se borrará permanentemente de tu historial.' 
+        : 'El presupuesto pasará a la pestaña de finalizados.',
       variant: 'danger',
-      confirmLabel: 'Eliminar',
+      confirmLabel: isFinalizado ? 'Eliminar definitivamente' : 'Finalizar',
       onConfirm: async () => {
         try {
           await presupuestoService.eliminarPresupuesto(p.id)
-          showToast('Presupuesto eliminado', 'success')
+          showToast(isFinalizado ? 'Presupuesto eliminado definitivamente' : 'Presupuesto finalizado', 'success')
           fetchPresupuestos()
         } catch (err: unknown) {
           showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
@@ -202,23 +207,39 @@ export default function PresupuestosPage() {
 
   const totals = useMemo(() => {
     const activeOnes = presupuestos.filter(p => p.estado === 'activo' && p.periodo_actual)
-    const totalLimite = activeOnes.reduce((acc, p) => acc + Number(p.periodo_actual?.monto_limite || 0), 0)
-    const totalGastado = activeOnes.reduce((acc, p) => acc + Number(p.periodo_actual?.monto_usado || 0), 0)
+    const primaryCurrency = (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
+    
+    const totalARS = activeOnes.filter(p => p.moneda === 'ARS').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_usado || 0), 0)
+    const limiteARS = activeOnes.filter(p => p.moneda === 'ARS').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_limite || 0), 0)
+    const totalUSD = activeOnes.filter(p => p.moneda === 'USD').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_usado || 0), 0)
+    const limiteUSD = activeOnes.filter(p => p.moneda === 'USD').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_limite || 0), 0)
+
+    const hasUSD = activeOnes.some(p => p.moneda === 'USD')
+    const hasARS = activeOnes.some(p => p.moneda === 'ARS')
+
+    let gastadoLabel: string
+    if (hasARS && hasUSD) {
+      gastadoLabel = `${formatMonto(totalARS, 'ARS')} + ${formatMonto(totalUSD, 'USD')}`
+    } else if (hasUSD) {
+      gastadoLabel = formatMonto(totalUSD, 'USD')
+    } else if (hasARS) {
+      gastadoLabel = formatMonto(totalARS, 'ARS')
+    } else {
+      gastadoLabel = formatMonto(0, primaryCurrency)
+    }
+
+    const totalGastadoNum = primaryCurrency === 'USD' ? totalUSD : totalARS
+    const totalLimiteNum = primaryCurrency === 'USD' ? limiteUSD : limiteARS
+    const porcentajeGlobal = totalLimiteNum > 0 ? (totalGastadoNum / totalLimiteNum) * 100 : 0
     const superados = activeOnes.filter(p => (p.periodo_actual?.porcentaje_usado || 0) >= 100).length
     
     return {
-      totalLimite,
-      totalGastado,
-      porcentaje: totalLimite > 0 ? (totalGastado / totalLimite) * 100 : 0,
+      gastadoLabel,
+      porcentajeGlobal,
       superados
     }
-  }, [presupuestos])
+  }, [presupuestos, usuario?.moneda_principal])
 
-  const totalGastado = totals.totalGastado
-  const totalLimite = totals.totalLimite
-  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
-
-  const porcentajeGlobal = totalLimite > 0 ? (totalGastado / totalLimite) * 100 : 0
   const activeOnes = presupuestos.filter(p => p.estado === 'activo' && p.periodo_actual)
   const presupuestosEnRiesgo = activeOnes.filter(p => {
     const limite = Number(p.periodo_actual?.monto_limite || 0)
@@ -251,13 +272,13 @@ export default function PresupuestosPage() {
           items={[
             {
               label: "Gastado este ciclo",
-              value: formatCurrency(totalGastado),
+              value: totals.gastadoLabel,
             },
             {
               label: "Del límite total",
-              value: `${porcentajeGlobal.toFixed(1)}%`,
-              valueColor: porcentajeGlobal >= 80 ? '#FF8A65'
-                        : porcentajeGlobal >= 60 ? '#F5A623'
+              value: `${totals.porcentajeGlobal.toFixed(1)}%`,
+              valueColor: totals.porcentajeGlobal >= 80 ? '#FF8A65'
+                        : totals.porcentajeGlobal >= 60 ? '#F5A623'
                         : '#4CAF7D',
             },
             {

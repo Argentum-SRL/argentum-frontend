@@ -70,7 +70,17 @@ export default function BudgetBarChart({
   const validPresupuestos = presupuestos.filter(p => p.periodo_actual !== null)
 
   if (validPresupuestos.length === 0) {
-    return null
+    return (
+      <div className={styles.chartWrapper}>
+        <div className={styles.chartHeader}>
+          <span className={styles.chartTitle}>Presupuestos del ciclo</span>
+          <span className={styles.chartSubtitle}>Sin periodos activos</span>
+        </div>
+        <p style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted, #888)', fontSize: '0.9rem' }}>
+          No hay presupuestos con periodos activos para mostrar en la gráfica comparativa.
+        </p>
+      </div>
+    )
   }
 
   const maxLimite = Math.max(

@@ -77,16 +77,22 @@ export const ERROR_MAP: Record<string, string> = {
   "Billetera destino no encontrada": "No encontramos la billetera de destino.",
 
   // Presupuestos
+  "No encontramos ese presupuesto.": "No encontramos ese presupuesto.",
   "Presupuesto no encontrado": "No encontramos ese presupuesto.",
   "Sin permiso para este presupuesto": "No tenés permiso para modificar ese presupuesto.",
   "Monto límite debe ser positivo": "El límite del presupuesto tiene que ser mayor a cero.",
+  "El monto límite debe ser mayor a cero": "El límite del presupuesto tiene que ser mayor a cero.",
+  "El monto no puede tener más de 2 decimales": "El monto no puede tener más de 2 decimales.",
+  "Ya tenés un presupuesto activo o pausado con ese nombre": "Ya tenés un presupuesto activo o pausado con ese nombre.",
   "Ya existe un presupuesto activo para esta categoría": "Ya tenés un presupuesto activo para esa categoría.",
   "Debe seleccionar al menos una categoría": "Tenés que seleccionar al menos una categoría.",
   "Los presupuestos solo pueden asociarse a categorías de egreso": "Los presupuestos solo pueden crearse sobre categorías de gasto.",
+  "La subcategoría seleccionada no pertenece a la categoría indicada": "La subcategoría seleccionada no pertenece a la categoría indicada.",
   "El nombre del presupuesto no puede estar vacío": "Escribí un nombre para el presupuesto.",
   "El nombre no puede superar los 100 caracteres": "El nombre no puede tener más de 100 caracteres.",
   "Periodo inválido": "El periodo seleccionado no es válido.",
   "Tipo de renovación inválido": "El tipo de renovación no es válido.",
+  "Moneda inválida": "La moneda seleccionada no es válida.",
 
   // Metas
   "Meta no encontrada": "No encontramos esa meta.",

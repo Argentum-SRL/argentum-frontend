@@ -19,6 +19,7 @@ import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './PresupuestoModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
 
 interface PresupuestoModalProps {
@@ -44,7 +45,7 @@ interface FormState {
 }
 
 type FormAction =
-  | { type: 'RESET'; presupuesto: Presupuesto | null }
+  | { type: 'RESET'; presupuesto: Presupuesto | null; defaultMoneda?: 'ARS' | 'USD' }
   | { type: 'SET_STEP'; step: 1 | 2 | 3; direction: 'forward' | 'back' }
   | { type: 'SET_FIELD'; field: keyof FormState; value: FormState[keyof FormState] }
 
@@ -79,7 +80,10 @@ function formReducer(state: FormState, action: FormAction): FormState {
           }))
         }
       }
-      return initialState
+      return {
+        ...initialState,
+        moneda: action.defaultMoneda || 'ARS'
+      }
     case 'SET_STEP':
       return { ...state, step: action.step, slideDirection: action.direction }
     case 'SET_FIELD':
@@ -89,15 +93,15 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-
-
 export default function PresupuestoModal({
   open, onClose, presupuesto, categorias, onSuccess
 }: PresupuestoModalProps) {
   const isEdit = !!presupuesto
   const { showToast } = useToast()
+  const { usuario } = useAuth()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const [animClass, setAnimClass] = useState('')
+  const [fallbackCategorias, setFallbackCategorias] = useState<Categoria[]>([])
   const [allSubcategorias, setAllSubcategorias] = useState<Subcategoria[]>([])
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set())
 
@@ -110,24 +114,33 @@ export default function PresupuestoModal({
     if (localError) dispatch({ type: 'SET_FIELD', field: 'localError', value: null } as FormAction)
   }, [localError])
 
-  const loadSubcategorias = useCallback(async () => {
+  const effectiveCategorias = categorias.length > 0 ? categorias : fallbackCategorias
+
+  const loadData = useCallback(async () => {
     try {
-      const subs = await categoriaService.getAllSubcategorias()
+      const [subs, cats] = await Promise.all([
+        categoriaService.getAllSubcategorias(),
+        categorias.length === 0 ? categoriaService.getCategorias() : Promise.resolve([])
+      ])
       setAllSubcategorias(subs)
+      if (cats && cats.length > 0) {
+        setFallbackCategorias(cats.filter(c => c.tipo === 'egreso'))
+      }
     } catch {
-      console.error('Error loading subcategorias')
+      console.error('Error loading subcategorias/categorias')
     }
-  }, [])
+  }, [categorias.length])
 
   useEffect(() => {
     if (open) {
+      const defaultMoneda = (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
       const timer = setTimeout(() => {
-        dispatch({ type: 'RESET', presupuesto: presupuesto || null })
-        loadSubcategorias()
+        dispatch({ type: 'RESET', presupuesto: presupuesto || null, defaultMoneda })
+        void loadData()
       }, 0)
       return () => clearTimeout(timer)
     }
-  }, [open, presupuesto, loadSubcategorias])
+  }, [open, presupuesto, usuario?.moneda_principal, loadData])
 
   const goNext = () => {
     if (step === 1) {
@@ -144,8 +157,13 @@ export default function PresupuestoModal({
         dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto límite mayor a cero' })
         return
       }
-      if (monto > 999_999_999_999) {
-        dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto límite es demasiado grande' })
+      if (monto > 999_999_999_999.99) {
+        dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto límite no puede superar los 999.999.999.999' })
+        return
+      }
+      const montoStr = monto.toString()
+      if (montoStr.includes('.') && montoStr.split('.')[1].length > 2) {
+        dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto no puede tener más de 2 decimales' })
         return
       }
     }
@@ -165,19 +183,46 @@ export default function PresupuestoModal({
   }
 
   const toggleSelection = (catId: string, subId: string | null) => {
-    const isSelected = selectedCategorias.some(s => s.categoria_id === catId && s.subcategoria_id === subId)
-    if (isSelected) {
-      dispatch({
-        type: 'SET_FIELD',
-        field: 'selectedCategorias',
-        value: selectedCategorias.filter(s => !(s.categoria_id === catId && s.subcategoria_id === subId))
-      })
+    if (subId === null) {
+      // Toggle "Todo"
+      const isTodoSelected = selectedCategorias.some(s => s.categoria_id === catId && s.subcategoria_id === null)
+      if (isTodoSelected) {
+        dispatch({
+          type: 'SET_FIELD',
+          field: 'selectedCategorias',
+          value: selectedCategorias.filter(s => s.categoria_id !== catId)
+        })
+      } else {
+        // Remove individual subcategories for this cat, add "Todo"
+        dispatch({
+          type: 'SET_FIELD',
+          field: 'selectedCategorias',
+          value: [
+            ...selectedCategorias.filter(s => s.categoria_id !== catId),
+            { categoria_id: catId, subcategoria_id: null }
+          ]
+        })
+      }
     } else {
-      dispatch({
-        type: 'SET_FIELD',
-        field: 'selectedCategorias',
-        value: [...selectedCategorias, { categoria_id: catId, subcategoria_id: subId }]
-      })
+      // Toggle specific subcategory
+      const isSubSelected = selectedCategorias.some(s => s.subcategoria_id === subId)
+      if (isSubSelected) {
+        dispatch({
+          type: 'SET_FIELD',
+          field: 'selectedCategorias',
+          value: selectedCategorias.filter(s => s.subcategoria_id !== subId)
+        })
+      } else {
+        // Remove "Todo" for this category if present, add this subcategory
+        dispatch({
+          type: 'SET_FIELD',
+          field: 'selectedCategorias',
+          value: [
+            ...selectedCategorias.filter(s => !(s.categoria_id === catId && s.subcategoria_id === null)),
+            { categoria_id: catId, subcategoria_id: subId }
+          ]
+        })
+      }
     }
   }
 
@@ -194,8 +239,21 @@ export default function PresupuestoModal({
       dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un nombre para el presupuesto' })
       return
     }
+    if (trimmed.length > 100) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El nombre no puede tener más de 100 caracteres' })
+      return
+    }
     if (monto === null || monto <= 0 || isNaN(monto)) {
       dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Ingresá un monto límite mayor a cero' })
+      return
+    }
+    if (monto > 999_999_999_999.99) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto límite no puede superar los 999.999.999.999' })
+      return
+    }
+    const montoStr = monto.toString()
+    if (montoStr.includes('.') && montoStr.split('.')[1].length > 2) {
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: 'El monto no puede tener más de 2 decimales' })
       return
     }
     if (selectedCategorias.length === 0) {
@@ -244,7 +302,7 @@ export default function PresupuestoModal({
   }
 
   const filteredCategorias = useMemo(() => {
-    const egresos = categorias.filter(c => c.tipo === 'egreso')
+    const egresos = effectiveCategorias.filter(c => c.tipo === 'egreso')
     if (!searchQuery.trim()) return egresos
     const q = searchQuery.toLowerCase().trim()
     return egresos.filter(cat => {
@@ -254,7 +312,7 @@ export default function PresupuestoModal({
       )
       return catMatch || subMatch
     })
-  }, [categorias, allSubcategorias, searchQuery])
+  }, [effectiveCategorias, allSubcategorias, searchQuery])
 
   return (
     <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Gestionar presupuesto">
@@ -308,6 +366,8 @@ export default function PresupuestoModal({
                     onChange={v => setField('monto', v)}
                     moneda={moneda}
                     onMonedaChange={m => setField('moneda', m)}
+                    allowDecimals={true}
+                    max={999999999999.99}
                     label="Monto límite"
                   />
                   <p className={styles.fieldHint}>Este será el límite máximo de gasto para el periodo seleccionado.</p>
@@ -384,7 +444,7 @@ export default function PresupuestoModal({
                         {isExpanded && subs.length > 0 && (
                           <div className={styles.subList}>
                             {subs.map(sub => {
-                              const isSubSelected = selectedCategorias.some(s => s.categoria_id === cat.id && s.subcategoria_id === sub.id)
+                              const isSubSelected = selectedCategorias.some(s => s.subcategoria_id === sub.id)
                               return (
                                 <div
                                   key={sub.id}

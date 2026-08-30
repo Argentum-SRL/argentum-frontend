@@ -155,6 +155,34 @@ export default function TarjetaModal() {
     dispatch({ type: 'SET_FIELD', field: 'loading', value: true })
     dispatch({ type: 'SET_FIELD', field: 'error', value: null })
 
+    const diaCierreNum = Number(state.diaCierre)
+    const diaVencimientoNum = Number(state.diaVencimiento)
+
+    if (!state.ultimos4 || state.ultimos4.length !== 4) {
+      dispatch({ type: 'SET_FIELD', field: 'error', value: 'Los últimos 4 dígitos de la tarjeta son obligatorios.' })
+      return
+    }
+
+    if (!state.billeteraId) {
+      dispatch({ type: 'SET_FIELD', field: 'error', value: 'Seleccioná la billetera asociada a la tarjeta.' })
+      return
+    }
+
+    if (!Number.isInteger(diaCierreNum) || diaCierreNum < 1 || diaCierreNum > 28) {
+      dispatch({ type: 'SET_FIELD', field: 'error', value: 'El día de cierre debe estar entre 1 y 28.' })
+      return
+    }
+
+    if (!Number.isInteger(diaVencimientoNum) || diaVencimientoNum < 1 || diaVencimientoNum > 28) {
+      dispatch({ type: 'SET_FIELD', field: 'error', value: 'El día de vencimiento debe estar entre 1 y 28.' })
+      return
+    }
+
+    if (state.limiteCredito !== null && state.limiteCredito !== undefined && state.limiteCredito <= 0) {
+      dispatch({ type: 'SET_FIELD', field: 'error', value: 'El límite de crédito debe ser mayor a cero si se indica.' })
+      return
+    }
+
     try {
       // Convertir color a hex si es un gradiente
       let colorToSend: string | undefined = undefined
@@ -180,9 +208,9 @@ export default function TarjetaModal() {
         red: state.red,
         billetera_id: state.billeteraId,
         moneda: state.moneda,
-        dia_cierre: Number(state.diaCierre),
-        dia_vencimiento: Number(state.diaVencimiento),
-        limite_credito: state.limiteCredito || undefined,
+        dia_cierre: diaCierreNum,
+        dia_vencimiento: diaVencimientoNum,
+        limite_credito: state.limiteCredito !== null && state.limiteCredito !== undefined ? state.limiteCredito : undefined,
         color: colorToSend
       }
 

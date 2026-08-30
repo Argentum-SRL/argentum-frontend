@@ -367,7 +367,7 @@ export default function TransaccionModal({
 
   const handleSubmit = async () => {
     // Validaciones estrictas
-    if (!monto || Number(monto) <= 0) {
+    if (!monto || Number(monto) <= 0 || !Number.isFinite(Number(monto))) {
       showToast('El monto debe ser mayor a cero', 'error')
       return
     }
@@ -388,16 +388,16 @@ export default function TransaccionModal({
         resolvedBilleteraId = tarjetaSel.billetera_id
       }
       if (!isEdit) {
-        if (!cantidadCuotas || cantidadCuotas < 1 || cantidadCuotas > 120) {
-          showToast('La cantidad de cuotas debe ser entre 1 y 120', 'error')
+        if (!Number.isInteger(cantidadCuotas) || cantidadCuotas < 1 || cantidadCuotas > 120) {
+          showToast('La cantidad de cuotas debe ser un número entero entre 1 y 120', 'error')
           return
         }
-        if (!cuotaInicial || cuotaInicial < 1 || cuotaInicial > cantidadCuotas) {
+        if (!Number.isInteger(cuotaInicial) || cuotaInicial < 1 || cuotaInicial > cantidadCuotas) {
           showToast('La cuota inicial debe estar entre 1 y la cantidad total', 'error')
           return
         }
-        if (tasaInteres < 0) {
-          showToast('La tasa de interés no puede ser negativa', 'error')
+        if (!Number.isFinite(tasaInteres) || tasaInteres < 0 || tasaInteres > 1000) {
+          showToast('La tasa de interés debe estar entre 0% y 1000% anual o mensual según la operación.', 'error')
           return
         }
       }

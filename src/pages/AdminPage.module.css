@@ -648,6 +648,17 @@
   color: #D35400;
 }
 
+.actionBtnAdmin {
+  color: var(--primary);
+  border-color: rgba(var(--primary-rgb), 0.25);
+}
+
+.actionBtnAdmin:hover:not(:disabled) {
+  background-color: rgba(var(--primary-rgb), 0.08);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 .colSpanFull {
   grid-column: 1 / -1;
 }
@@ -675,6 +686,59 @@
   color: var(--text-2);
   line-height: 1.5;
   font-weight: 500;
+}
+
+.confirmEmailGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--surface);
+  border: 1px solid rgba(var(--error-rgb, 235, 87, 87), 0.2);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.confirmEmailLabel {
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.confirmEmailTarget {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--error);
+  background: var(--surface-alt);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+.confirmEmailInput {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--page);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.confirmEmailInput:focus {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(235, 87, 87, 0.15);
+  background-color: var(--surface);
+}
+
+.confirmEmailError {
+  font-size: 11.5px;
+  color: var(--error);
+  font-weight: 600;
 }
 
 .confirmCheckboxLabel {

@@ -50,6 +50,20 @@ const adminService = {
     return data
   },
 
+  cambiarRolAdmin: async (id: string, isAdmin: boolean) => {
+    const { data } = await api.patch<AdminResponseEnvelope<UsuarioAdmin>>(`/v1/admin/usuarios/${id}/admin`, {
+      is_admin: isAdmin
+    })
+    return data
+  },
+
+  eliminarCuenta: async (id: string, emailConfirmacion: string) => {
+    const { data } = await api.delete<AdminResponseEnvelope<null>>(`/v1/admin/usuarios/${id}`, {
+      data: { email_confirmacion: emailConfirmacion }
+    })
+    return data
+  },
+
   getStats: async () => {
     const { data } = await api.get<AdminResponseEnvelope<AdminStats>>('/v1/admin/stats')
     return data

@@ -24,7 +24,10 @@ import {
   Phone,
   Mail,
   User as UserIcon,
-  Clock
+  Clock,
+  ShieldCheck,
+  ShieldAlert,
+  Trash2
 } from 'lucide-react'
 import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from './AdminPage.module.css'
@@ -88,12 +91,15 @@ export default function AdminPage() {
   
   // Confirmaciones e inline feedback
   const [confirmAction, setConfirmAction] = useState<{
-    type: 'estado' | 'reset-password' | 'revocar' | 'wpp' | 'onboarding'
+    type: 'estado' | 'reset-password' | 'revocar' | 'wpp' | 'onboarding' | 'cambiar-admin' | 'eliminar'
     title: string
     description: string
     requireDouble?: boolean
+    requireEmail?: boolean
+    expectedEmail?: string
   } | null>(null)
   const [doubleConfirmChecked, setDoubleConfirmChecked] = useState(false)
+  const [emailConfirmInput, setEmailConfirmInput] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
   const [actionFeedback, setActionFeedback] = useState<{ success: boolean; message: string } | null>(null)
 
@@ -188,6 +194,7 @@ export default function AdminPage() {
     setConfirmAction(null)
     setActionFeedback(null)
     setDoubleConfirmChecked(false)
+    setEmailConfirmInput('')
     try {
       const res = await adminService.getUsuario(id)
       if (res.success) {
@@ -273,11 +280,38 @@ export default function AdminPage() {
           }
           break
         }
+        case 'cambiar-admin': {
+          const newAdminStatus = !selectedUser.is_admin
+          const res = await adminService.cambiarRolAdmin(selectedUser.id, newAdminStatus)
+          if (res.success) {
+            setSelectedUser(res.data)
+            setUsuarios((prev) =>
+              prev.map((u) => (u.id === selectedUser.id ? { ...u, is_admin: res.data.is_admin } : u))
+            )
+            message = res.message || (newAdminStatus ? 'Usuario promovido a Administrador.' : 'Rol de Administrador revocado.')
+          }
+          break
+        }
+        case 'eliminar': {
+          const targetEmail = (confirmAction.expectedEmail || '').trim().toLowerCase()
+          if (!emailConfirmInput.trim() || emailConfirmInput.trim().toLowerCase() !== targetEmail) {
+            showToast('El email ingresado no coincide con el email de confirmación.', 'error')
+            setActionLoading(false)
+            return
+          }
+          const res = await adminService.eliminarCuenta(selectedUser.id, emailConfirmInput.trim())
+          if (res.success) {
+            message = res.message || 'Usuario y todos sus datos fueron eliminados correctamente.'
+            setSelectedUser(null)
+          }
+          break
+        }
       }
       
       setActionFeedback({ success: true, message })
       setConfirmAction(null)
       setDoubleConfirmChecked(false)
+      setEmailConfirmInput('')
       
       // Refrescar lista y stats en segundo plano
       fetchUsuarios()
@@ -734,7 +768,8 @@ export default function AdminPage() {
                   <button
                     className={`${styles.actionBtn} ${styles.actionBtnWarning}`}
                     disabled={actionLoading || selectedUser.id === currentAdmin?.id}
-                    onClick={() =>
+                    onClick={() => {
+                      setEmailConfirmInput('')
                       setConfirmAction({
                         type: 'estado',
                         title: selectedUser.is_active ? '¿Suspendés este usuario?' : '¿Reactivás este usuario?',
@@ -742,7 +777,7 @@ export default function AdminPage() {
                           ? 'No va a poder entrar a su cuenta hasta que lo reactives.'
                           : 'Va a poder volver a acceder a la plataforma.'
                       })
-                    }
+                    }}
                     title={selectedUser.id === currentAdmin?.id ? 'No podés desactivar tu propia cuenta' : ''}
                   >
                     {selectedUser.is_active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
@@ -753,13 +788,14 @@ export default function AdminPage() {
                   <button
                     className={styles.actionBtn}
                     disabled={actionLoading || !selectedUser.email || selectedUser.auth_provider === 'google'}
-                    onClick={() =>
+                    onClick={() => {
+                      setEmailConfirmInput('')
                       setConfirmAction({
                         type: 'reset-password',
                         title: '¿Enviás el reset de contraseña?',
                         description: 'Le vamos a mandar un email para que cambie su contraseña.'
                       })
-                    }
+                    }}
                     title={
                       selectedUser.auth_provider === 'google'
                         ? 'Usuario autenticado con Google OAuth (No requiere contraseña)'
@@ -772,17 +808,44 @@ export default function AdminPage() {
                     <span>Enviar Link Reset</span>
                   </button>
 
+                  {/* Hacer Admin / Quitar Rol Admin */}
+                  <button
+                    className={`${styles.actionBtn} ${selectedUser.is_admin ? styles.actionBtnWarning : styles.actionBtnAdmin}`}
+                    disabled={actionLoading || (selectedUser.id === currentAdmin?.id && selectedUser.is_admin)}
+                    onClick={() => {
+                      setEmailConfirmInput('')
+                      setConfirmAction({
+                        type: 'cambiar-admin',
+                        title: selectedUser.is_admin ? '¿Revocar permisos de administrador?' : '¿Promover a Administrador?',
+                        description: selectedUser.is_admin
+                          ? `El usuario ${selectedUser.email || selectedUser.nombre} dejará de tener acceso al panel de administración.`
+                          : `El usuario ${selectedUser.email || selectedUser.nombre} obtendrá acceso completo al panel de administración y a la gestión operativa.`
+                      })
+                    }}
+                    title={
+                      selectedUser.id === currentAdmin?.id && selectedUser.is_admin
+                        ? 'No podés revocar tus propios permisos de administrador'
+                        : selectedUser.is_admin
+                        ? 'Quitar rol de Administrador'
+                        : 'Otorgar permisos de Administrador'
+                    }
+                  >
+                    {selectedUser.is_admin ? <ShieldAlert className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
+                    <span>{selectedUser.is_admin ? 'Quitar Rol Admin' : 'Hacer Admin'}</span>
+                  </button>
+
                   {/* Revocar Sesiones */}
                   <button
                     className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
                     disabled={actionLoading || selectedUser.id === currentAdmin?.id}
-                    onClick={() =>
+                    onClick={() => {
+                      setEmailConfirmInput('')
                       setConfirmAction({
                         type: 'revocar',
                         title: '¿Forzás el cierre de sesiones?',
                         description: 'Todos sus dispositivos abiertos van a tener que iniciar sesión de nuevo.'
                       })
-                    }
+                    }}
                     title={selectedUser.id === currentAdmin?.id ? 'No podés revocar tus propias sesiones' : ''}
                   >
                     <LogOut className="w-4 h-4" />
@@ -793,13 +856,14 @@ export default function AdminPage() {
                   <button
                     className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
                     disabled={actionLoading || !selectedUser.whatsapp_vinculado}
-                    onClick={() =>
+                    onClick={() => {
+                      setEmailConfirmInput('')
                       setConfirmAction({
                         type: 'wpp',
                         title: '¿Desconectás WhatsApp?',
                         description: 'Se va a desvincular su número y no va a recibir notificaciones por esta vía.'
                       })
-                    }
+                    }}
                     title={!selectedUser.whatsapp_vinculado ? 'El usuario no tiene WhatsApp vinculado' : ''}
                   >
                     <MessageSquareOff className="w-4 h-4" />
@@ -808,20 +872,42 @@ export default function AdminPage() {
 
                   {/* Resetear Onboarding */}
                   <button
-                    className={`${styles.actionBtn} ${styles.actionBtnWarning} ${styles.colSpanFull}`}
+                    className={`${styles.actionBtn} ${styles.actionBtnWarning}`}
                     disabled={actionLoading || !selectedUser.onboarding_completado}
-                    onClick={() =>
+                    onClick={() => {
+                      setEmailConfirmInput('')
                       setConfirmAction({
                         type: 'onboarding',
                         title: '¿Reseteás el onboarding?',
                         description: 'El usuario va a tener que completar de nuevo la configuración inicial (datos personales, ciclo financiero y moneda) al ingresar.',
                         requireDouble: true
                       })
-                    }
+                    }}
                     title={!selectedUser.onboarding_completado ? 'El onboarding ya está incompleto' : ''}
                   >
                     <RefreshCw className="w-4 h-4" />
-                    <span>Resetear Configuración Onboarding</span>
+                    <span>Resetear Onboarding</span>
+                  </button>
+
+                  {/* Eliminar Cuenta */}
+                  <button
+                    className={`${styles.actionBtn} ${styles.actionBtnDanger} ${styles.colSpanFull}`}
+                    disabled={actionLoading || selectedUser.id === currentAdmin?.id}
+                    onClick={() => {
+                      const targetEmail = selectedUser.email || selectedUser.telefono || ''
+                      setEmailConfirmInput('')
+                      setConfirmAction({
+                        type: 'eliminar',
+                        title: '¿Eliminar permanentemente esta cuenta?',
+                        description: `Esta acción es IRREVERSIBLE. Se borrarán todas las transacciones, billeteras, presupuestos y datos asociados a ${selectedUser.email || selectedUser.nombre}.`,
+                        requireEmail: true,
+                        expectedEmail: targetEmail
+                      })
+                    }}
+                    title={selectedUser.id === currentAdmin?.id ? 'No podés eliminar tu propia cuenta desde acá' : 'Eliminar permanentemente la cuenta y todos sus datos'}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Eliminar Cuenta</span>
                   </button>
                 </div>
 
@@ -835,6 +921,31 @@ export default function AdminPage() {
                       </div>
                       <span className={styles.confirmText}>{confirmAction.description}</span>
                     </div>
+
+                    {confirmAction.requireEmail && (
+                      <div className={styles.confirmEmailGroup}>
+                        <label htmlFor="confirmEmailInput" className={styles.confirmEmailLabel}>
+                          Para confirmar, escribí el email <span className={styles.confirmEmailTarget}>{confirmAction.expectedEmail}</span>:
+                        </label>
+                        <input
+                          id="confirmEmailInput"
+                          type="text"
+                          className={styles.confirmEmailInput}
+                          value={emailConfirmInput}
+                          onChange={(e) => setEmailConfirmInput(e.target.value)}
+                          placeholder={`Escribí ${confirmAction.expectedEmail}`}
+                          autoComplete="off"
+                          spellCheck={false}
+                          autoFocus
+                        />
+                        {emailConfirmInput.length > 0 &&
+                          emailConfirmInput.trim().toLowerCase() !== confirmAction.expectedEmail?.trim().toLowerCase() && (
+                            <span className={styles.confirmEmailError}>
+                              El correo ingresado no coincide exactamente.
+                            </span>
+                          )}
+                      </div>
+                    )}
                     
                     {confirmAction.requireDouble && (
                       <label className={styles.confirmCheckboxLabel}>
@@ -851,7 +962,12 @@ export default function AdminPage() {
                     <div className={styles.confirmActions}>
                       <Button
                         variant="danger"
-                        disabled={actionLoading || (confirmAction.requireDouble && !doubleConfirmChecked)}
+                        disabled={
+                          actionLoading ||
+                          (confirmAction.requireDouble && !doubleConfirmChecked) ||
+                          (confirmAction.requireEmail &&
+                            emailConfirmInput.trim().toLowerCase() !== (confirmAction.expectedEmail || '').trim().toLowerCase())
+                        }
                         onClick={handleExecuteAction}
                       >
                         {actionLoading ? (
@@ -868,6 +984,7 @@ export default function AdminPage() {
                         onClick={() => {
                           setConfirmAction(null)
                           setDoubleConfirmChecked(false)
+                          setEmailConfirmInput('')
                         }}
                       >
                         Cancelar

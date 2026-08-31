@@ -149,12 +149,14 @@ export async function validarResetToken(token: string): Promise<{ success: boole
   return data
 }
 
-export async function confirmarResetPassword(token: string, nuevaPassword: string): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>('/auth/reset-password/confirmar', {
+export async function confirmarResetPassword(
+  token: string,
+  nuevaPassword: string
+): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post<{ success: boolean; message: string }>('/auth/reset-password/confirmar', {
     token,
     nueva_password: nuevaPassword,
   })
-  guardarTokensSiPresentes(data)
   return data
 }
 

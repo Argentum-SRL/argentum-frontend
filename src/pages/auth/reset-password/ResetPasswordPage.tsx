@@ -5,10 +5,8 @@ import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import Field from '@/components/ui/Field/Field'
 import { validarResetToken, confirmarResetPassword } from '@/services/auth.service'
-import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import styles from './ResetPasswordPage.module.css'
 
 const validatePassword = (pwd: string): string | null => {
@@ -22,7 +20,6 @@ const validatePassword = (pwd: string): string | null => {
 }
 
 export default function ResetPasswordPage() {
-  const { login } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -96,12 +93,14 @@ export default function ResetPasswordPage() {
     setApiError(null)
 
     try {
-      const respuesta = await confirmarResetPassword(token, nuevaPassword)
-      showToast('¡Listo! Tu contraseña se actualizó. Ya podés entrar con la nueva.', 'success')
-      login(respuesta)
+      await confirmarResetPassword(token, nuevaPassword)
+      showToast('¡Listo! Tu contraseña se actualizó. Ya podés iniciar sesión con la nueva.', 'success')
       setStatus('confirmado')
       setTimeout(() => {
-        manejarRespuestaAuth(respuesta, navigate)
+        navigate('/login', {
+          replace: true,
+          state: { message: 'Tu contraseña fue actualizada con éxito. Iniciá sesión con tu nueva contraseña.' },
+        })
       }, 3000)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: { code?: string; message?: string } } } }
@@ -165,9 +164,9 @@ export default function ResetPasswordPage() {
             <CheckCircle2 size={48} />
           </div>
           <p className={styles.message}>
-            Tu contraseña fue cambiada exitosamente. Todas tus sesiones fueron cerradas por seguridad.
+            Tu contraseña fue cambiada exitosamente. Iniciá sesión con tu nueva contraseña.
           </p>
-          <p className={styles.subText}>Serás redirigido en 3 segundos...</p>
+          <p className={styles.subText}>Serás redirigido al inicio de sesión en 3 segundos...</p>
         </div>
       </AuthLayout>
     )

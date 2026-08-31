@@ -144,6 +144,14 @@ export default function LoginPage() {
                 Ingresá con tu teléfono
               </Link>
             )}
+            {apiError.includes('Todavía no verificaste tu cuenta') && (
+              <Link
+                to={`/auth/verificar-email?email=${encodeURIComponent(email)}`}
+                className={styles.errorLink}
+              >
+                Reenviar código de verificación
+              </Link>
+            )}
           </div>
         )}
 

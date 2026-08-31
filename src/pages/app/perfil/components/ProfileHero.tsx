@@ -6,9 +6,8 @@ import { useToast } from '@/hooks/useToast'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
+import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from '../PerfilPage.module.css'
-
-const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 interface ProfileHeroProps {
   usuario: Usuario | null
@@ -24,14 +23,19 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
   const { confirm } = useModal()
   const { showToast } = useToast()
   const [copiedField, setCopiedField] = React.useState<string | null>(null)
+  const [fotoError, setFotoError] = React.useState(false)
 
   const isGoogle = usuario?.auth_provider === 'google'
 
-  const fotoUrl = usuario?.foto_url
-    ? usuario.foto_url.startsWith('http')
-      ? usuario.foto_url
-      : `${API_URL}${usuario.foto_url}`
-    : null
+  const fotoUrlRaw = getFotoUrl(usuario?.foto_url)
+  const [prevFotoUrlRaw, setPrevFotoUrlRaw] = React.useState(fotoUrlRaw)
+
+  if (fotoUrlRaw !== prevFotoUrlRaw) {
+    setPrevFotoUrlRaw(fotoUrlRaw)
+    setFotoError(false)
+  }
+
+  const fotoUrl = fotoError ? null : fotoUrlRaw
 
   const handleCopy = (text: string, label: string) => {
     if (!text) return
@@ -82,6 +86,7 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
                 alt={usuario?.nombre || 'Usuario'}
                 className={styles.avatarImg}
                 referrerPolicy="no-referrer"
+                onError={() => setFotoError(true)}
               />
             ) : (
               <div className={styles.avatarFallback}>

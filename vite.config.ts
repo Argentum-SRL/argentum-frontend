@@ -77,6 +77,12 @@ export default defineConfig({
         // Previene que el proxy reescriba Secure en cookies cuando corre en HTTP
         secure: false,
       },
+      '/media': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        cookieDomainRewrite: 'localhost',
+        secure: false,
+      },
     },
   },
   build: {

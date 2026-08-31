@@ -10,9 +10,8 @@ import { useTheme } from '@/hooks/useTheme'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import NotificacionesDrawer from '@/components/notificaciones/NotificacionesDrawer'
 import SearchModal from './SearchModal'
+import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from './AppLayout.module.css'
-
-const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
@@ -94,13 +93,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const inicial = usuario?.nombre?.charAt(0)?.toUpperCase() ?? 'U'
 
-  const getFotoUrl = () => {
-    if (!usuario?.foto_url) return null
-    if (usuario.foto_url.startsWith('http')) return usuario.foto_url
-    return `${API_URL}${usuario.foto_url}`
-  }
-
-  const fotoUrl = getFotoUrl()
+  const fotoUrl = getFotoUrl(usuario?.foto_url)
   const [fotoError, setFotoError] = useState(false)
 
   const [prevFotoUrl, setPrevFotoUrl] = useState(fotoUrl)

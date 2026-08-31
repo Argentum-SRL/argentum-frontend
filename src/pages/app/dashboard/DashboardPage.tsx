@@ -30,6 +30,7 @@ import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { EmptyState } from '@/components/ui'
 
+import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from './DashboardPage.module.css'
 
 // ── Formatter ────────────────────────────────────────────────────────────
@@ -79,8 +80,6 @@ const Greeting = memo(({ nombre }: { nombre: string | null }) => {
 })
 Greeting.displayName = 'Greeting'
 
-const API_URL = import.meta.env.VITE_API_URL || '/api'
-
 const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   const { logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
@@ -95,7 +94,7 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   }, [])
   
   const inicial = usuario?.nombre?.charAt(0)?.toUpperCase() ?? 'U'
-  const fotoUrlRaw = usuario?.foto_url ? (usuario.foto_url.startsWith('http') ? usuario.foto_url : `${API_URL}${usuario.foto_url}`) : null
+  const fotoUrlRaw = getFotoUrl(usuario?.foto_url)
   const [fotoError, setFotoError] = useState(false)
   const fotoUrl = fotoError ? null : fotoUrlRaw
 

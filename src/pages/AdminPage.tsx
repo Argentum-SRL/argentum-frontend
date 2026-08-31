@@ -26,18 +26,12 @@ import {
   User as UserIcon,
   Clock
 } from 'lucide-react'
+import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from './AdminPage.module.css'
 
 // TableAvatar component to fetch and render user profile picture or fallback initials
 function TableAvatar({ fotoUrl, nombre }: { fotoUrl: string | null; nombre: string | null }) {
   const [error, setError] = useState(false)
-  
-  const getFotoUrl = (url: string | null) => {
-    if (!url) return null
-    if (url.startsWith('http')) return url
-    const API_URL = import.meta.env.VITE_API_URL || '/api'
-    return `${API_URL}${url}`
-  }
   
   const resolvedUrl = getFotoUrl(fotoUrl)
   const inicial = nombre?.charAt(0)?.toUpperCase() ?? 'U'

@@ -192,7 +192,7 @@ export function exportarTransaccionesPDF(params: {
       const hoy = new Date()
       const fechaGen = `Generado el ${hoy.getDate()} ${
         MESES[hoy.getMonth()]} ${hoy.getFullYear()}`
-      doc.text(fechaGen + ' · argentum.app', 16, footerY)
+      doc.text(fechaGen + ' · miargentum.com', 16, footerY)
       doc.text(`${pageNum} / ${pageCount}`, 194, footerY, { align: 'right' })
     }
   })

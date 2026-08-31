@@ -25,6 +25,11 @@ export const UploadPdfResumen: React.FC<UploadPdfResumenProps> = ({
     }
 
     const maxSize = 50 * 1024 * 1024 // 50MB
+    if (file.size === 0) {
+      setError('El archivo seleccionado está vacío.')
+      onFileSelected(null)
+      return
+    }
     if (file.size > maxSize) {
       setError('El tamaño del archivo no puede superar los 50MB.')
       onFileSelected(null)

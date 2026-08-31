@@ -25,9 +25,13 @@ export const TablaPreviewImportacion: React.FC<TablaPreviewImportacionProps> = (
 }) => {
   // Función para determinar si una transacción debe excluirse (no renderizarse)
   const isTxVisible = useCallback((tx: TransaccionParseada) => {
-    // 1. Titulares seleccionados
+    // 1. Titulares seleccionados: si la transacción tiene titular asignado, verificar que esté entre los seleccionados.
+    // Si no tiene titular específico (cargos globales de cuenta/banco), se mantiene visible si hay titulares seleccionados.
     if (decisiones.titulares_seleccionados !== null) {
-      if (!tx.titular_seccion || !decisiones.titulares_seleccionados.includes(tx.titular_seccion)) {
+      if (decisiones.titulares_seleccionados.length === 0) {
+        return false
+      }
+      if (tx.titular_seccion && !decisiones.titulares_seleccionados.includes(tx.titular_seccion)) {
         return false
       }
     }

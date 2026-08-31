@@ -117,8 +117,10 @@ export const ImportacionResumenSection: React.FC = () => {
       setStep(2)
     } catch (err: unknown) {
       console.error('Error al procesar resumen:', err)
-      const error = err as { response?: { data?: { detail?: { error?: { message?: string } } } } }
-      const detail = error.response?.data?.detail?.error?.message || 'No se pudo procesar el resumen. Verificá el archivo e intentá de nuevo.'
+      const error = err as { response?: { data?: { detail?: { error?: { message?: string } } | string } } }
+      const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
+        ? error.response.data.detail.error.message
+        : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'No se pudo procesar el resumen. Verificá el archivo e intentá de nuevo.')
       showToast(detail, 'error')
     } finally {
       clearTimeout(textTimer)
@@ -137,7 +139,7 @@ export const ImportacionResumenSection: React.FC = () => {
 
     try {
       setLoadingPreview(true)
-      const preview = await importacionService.obtenerPreview(importacionResult.importacion_id)
+      const preview = await importacionService.obtenerPreview(importacionResult.importacion_id, selectedTarjetaId)
       setPreviewData(preview)
 
       // Identificar qué modales de decisión corresponden
@@ -168,9 +170,13 @@ export const ImportacionResumenSection: React.FC = () => {
         setCurrentModalIndex(null)
         setStep(3)
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error al obtener la vista previa del resumen:', err)
-      showToast('Error al cargar la vista previa del resumen.', 'error')
+      const error = err as { response?: { data?: { detail?: { error?: { message?: string } } | string } } }
+      const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
+        ? error.response.data.detail.error.message
+        : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'Error al cargar la vista previa del resumen.')
+      showToast(detail, 'error')
     } finally {
       setLoadingPreview(false)
     }
@@ -228,6 +234,12 @@ export const ImportacionResumenSection: React.FC = () => {
   const handleConfirmarImportacion = async () => {
     if (!importacionResult?.importacion_id) return
 
+    const totalAImportar = transaccionesFinales.filter(t => t.incluir).length
+    if (totalAImportar === 0) {
+      showToast('No seleccionaste ninguna transacción para importar. Marcá al menos una para continuar o cancelá la operación.', 'info')
+      return
+    }
+
     setIsConfirming(true)
     try {
       const payload = {
@@ -243,9 +255,13 @@ export const ImportacionResumenSection: React.FC = () => {
       )
       setResultadoConfirmacion(res)
       showToast('Importación confirmada con éxito.', 'success')
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error al confirmar importación:', err)
-      showToast('Error al confirmar la importación del resumen.', 'error')
+      const error = err as { response?: { data?: { detail?: { error?: { message?: string } } | string } } }
+      const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
+        ? error.response.data.detail.error.message
+        : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'Error al confirmar la importación del resumen.')
+      showToast(detail, 'error')
     } finally {
       setIsConfirming(false)
     }

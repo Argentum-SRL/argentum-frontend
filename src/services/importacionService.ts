@@ -23,9 +23,12 @@ const importacionService = {
     return data.data
   },
 
-  obtenerPreview: async (importacionId: string): Promise<PreviewImportacionResponse> => {
+  obtenerPreview: async (importacionId: string, tarjetaId?: string): Promise<PreviewImportacionResponse> => {
     const { data } = await api.get<{ success: boolean; data: PreviewImportacionResponse }>(
-      `/importacion/${importacionId}/preview`
+      `/importacion/${importacionId}/preview`,
+      {
+        params: tarjetaId ? { tarjeta_id: tarjetaId } : undefined,
+      }
     )
     return data.data
   },

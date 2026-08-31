@@ -1,11 +1,17 @@
 import { createContext } from 'react'
 import type { Notificacion, ConfiguracionNotificacion } from '@/types'
 
+export interface DataUpdateEvent {
+  entidad: string
+  timestamp: number
+}
+
 export interface NotificacionContextValue {
   notificaciones: Notificacion[]
   unreadCount: number
   config: ConfiguracionNotificacion | null
   isLoading: boolean
+  lastDataUpdate: DataUpdateEvent | null
   fetchNotifications: (signal?: AbortSignal) => Promise<void>
   fetchUnreadCount: (signal?: AbortSignal) => Promise<void>
   fetchConfig: (signal?: AbortSignal) => Promise<void>

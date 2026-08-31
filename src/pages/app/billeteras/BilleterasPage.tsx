@@ -5,6 +5,7 @@ import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft, ArrowLeft } from 'lucide-rea
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
@@ -55,6 +56,7 @@ export default function BilleterasPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
   const { open, confirm } = useModal()
+  const { lastDataUpdate } = useNotificaciones()
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [frontCardId, setFrontCardId] = useState<string | null>(null)
   const [prevBilleteras, setPrevBilleteras] = useState<Billetera[]>([])
@@ -156,6 +158,21 @@ export default function BilleterasPage() {
       controller.abort()
     }
   }, [fetchPageData])
+
+  // Auto-refresco en vivo ante eventos SSE de actualización de datos
+  useEffect(() => {
+    if (lastDataUpdate?.entidad === 'billeteras' || lastDataUpdate?.entidad === 'transacciones') {
+      const controller = new AbortController()
+      const tid = setTimeout(() => {
+        void fetchPageData(controller.signal)
+        void fetchTransferenciasData(controller.signal)
+      }, 0)
+      return () => {
+        clearTimeout(tid)
+        controller.abort()
+      }
+    }
+  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchPageData, fetchTransferenciasData])
 
   const [showArchived, setShowArchived] = useState(false)
 

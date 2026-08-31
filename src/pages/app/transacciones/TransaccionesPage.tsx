@@ -14,6 +14,7 @@ import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
 
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
@@ -26,6 +27,7 @@ export default function TransaccionesPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
   const { periodo: periodoActual } = usePeriodoActual()
+  const { lastDataUpdate } = useNotificaciones()
 
   const [activeTab, setActiveTab] = useState<'historial' | 'cuotas'>('historial')
   const mainCurrency = 'ARS' // Moneda base para el resumen
@@ -213,6 +215,21 @@ export default function TransaccionesPage() {
     observer.observe(sentinel)
     return () => observer.disconnect()
   }, [loading, hasMore, loadingMore, loadMore])
+
+  // 4. Auto-refresco en vivo ante eventos SSE de actualización de datos
+  useEffect(() => {
+    if (lastDataUpdate?.entidad === 'transacciones') {
+      const controller = new AbortController()
+      const tid = setTimeout(() => {
+        void fetchInitialTransacciones(controller.signal)
+        void fetchPendientes(controller.signal)
+      }, 0)
+      return () => {
+        clearTimeout(tid)
+        controller.abort()
+      }
+    }
+  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchInitialTransacciones, fetchPendientes])
 
 
   const handleEdit = useCallback((id: string) => {

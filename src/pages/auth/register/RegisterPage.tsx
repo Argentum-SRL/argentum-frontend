@@ -29,12 +29,20 @@ const validateName = (val: string, campo: string): string | null => {
   return null
 }
 
+function buildPhone(numero: string): string {
+  let n = numero.trim().replace(/\D/g, '')
+  if (!n) return '+54'
+  if (n.startsWith('54')) n = n.slice(2)
+  if (n.startsWith('0')) n = n.slice(1)
+  if (!n.startsWith('9')) n = '9' + n
+  return '+54' + n
+}
+
 const validatePhone = (val: string): string | null => {
-  const t = val.trim().replace(/\s+/g, '').replace(/-/g, '')
-  if (!t) return 'Ingresá tu teléfono.'
-  if (t.length < 8) return 'El teléfono debe tener al menos 8 dígitos.'
-  if (t.length > 20) return 'El teléfono no puede tener más de 20 dígitos.'
-  if (!/^\+?[0-9]+$/.test(t)) return 'El teléfono solo debe contener números y el signo +.'
+  const clean = val.replace(/\D/g, '').trim()
+  if (!clean) return 'Ingresá tu número de teléfono.'
+  if (clean.length < 6) return 'El número de teléfono es demasiado corto.'
+  if (clean.length > 15) return 'El número de teléfono no puede tener más de 15 dígitos.'
   return null
 }
 
@@ -110,7 +118,7 @@ export default function RegisterPage() {
     setLoading(true)
     setApiError(null)
     try {
-      const respuesta = await registerWithEmail({ nombre, apellido, email, telefono, password })
+      const respuesta = await registerWithEmail({ nombre, apellido, email, telefono: buildPhone(telefono), password })
       
       // Solo activamos el estado de login si ya tenemos tokens (ej: Google)
       // En registro por email, no hay tokens hasta que verifique, por lo que login()
@@ -188,18 +196,29 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <Field
-          id="register-tel"
-          name="tel"
-          autoComplete="tel"
-          label="Teléfono"
-          type="tel"
-          value={telefono}
-          onChange={setTelefono}
-          placeholder="+5491112345678"
-          error={telefonoError}
-          hint="Incluí el código de país, ej: +54"
-        />
+        <div className={styles.phoneFieldWrap}>
+          <label htmlFor="register-tel" className={styles.phoneLabel}>
+            Número de teléfono
+          </label>
+          <div className={[styles.phoneInputWrap, telefonoError ? styles.phoneInputWrapError : ''].filter(Boolean).join(' ')}>
+            <div className={styles.phonePrefix}>
+              <span className={styles.flag} role="img" aria-label="Bandera de Argentina">🇦🇷</span>
+              <span className={styles.countryCode}>+54</span>
+            </div>
+            <input
+              id="register-tel"
+              name="tel"
+              type="tel"
+              autoComplete="tel-national"
+              inputMode="numeric"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+              placeholder="11 1234 5678"
+              className={styles.phoneInput}
+            />
+          </div>
+          {telefonoError && <p className={styles.fieldError}>{telefonoError}</p>}
+        </div>
 
         <Field
           id="register-email"

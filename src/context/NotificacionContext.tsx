@@ -3,21 +3,23 @@ import type { Notificacion, ConfiguracionNotificacion } from '@/types'
 import notificacionService from '@/services/notificacion.service'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
-import { NotificacionContext } from './NotificacionContextBase'
+import { NotificacionContext, type DataUpdateEvent } from './NotificacionContextBase'
 
 
 export function NotificacionProvider({ children }: { children: ReactNode }) {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [config, setConfig] = useState<ConfiguracionNotificacion | null>(null)
+  const [lastDataUpdate, setLastDataUpdate] = useState<DataUpdateEvent | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const { isAuthenticated } = useAuth()
   const { showToast } = useToast()
 
-  if (!isAuthenticated && (notificaciones.length > 0 || unreadCount !== 0 || config !== null)) {
+  if (!isAuthenticated && (notificaciones.length > 0 || unreadCount !== 0 || config !== null || lastDataUpdate !== null)) {
     setNotificaciones([])
     setUnreadCount(0)
     setConfig(null)
+    setLastDataUpdate(null)
   }
 
 
@@ -172,6 +174,14 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
           const data = JSON.parse(event.data)
           if (data.event === 'connected') return
 
+          if (data.event === 'data_update') {
+            setLastDataUpdate({
+              entidad: data.entidad,
+              timestamp: Date.now()
+            })
+            return
+          }
+
           const newNotif = data as Notificacion
 
           setNotificaciones((prev) => {
@@ -218,6 +228,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       notificaciones,
       unreadCount,
       config,
+      lastDataUpdate,
       isLoading,
       fetchNotifications,
       fetchUnreadCount,
@@ -233,6 +244,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       notificaciones,
       unreadCount,
       config,
+      lastDataUpdate,
       isLoading,
       fetchNotifications,
       fetchUnreadCount,

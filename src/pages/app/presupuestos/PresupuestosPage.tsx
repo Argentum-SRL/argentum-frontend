@@ -15,6 +15,7 @@ import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
 import BudgetBarChart from './BudgetBarChart'
@@ -39,6 +40,7 @@ export default function PresupuestosPage() {
   const { showToast } = useToast()
   const { usuario } = useAuth()
   const { open, confirm } = useModal()
+  const { lastDataUpdate } = useNotificaciones()
 
   const [activeTab, setActiveTab] = useState<'activo' | 'pausado' | 'finalizado'>('activo')
   const [vistaDesktop, setVistaDesktop] = useState<VistaDesktop>(getInitialVista)
@@ -92,6 +94,20 @@ export default function PresupuestosPage() {
       controller.abort()
     }
   }, [fetchPresupuestos])
+
+  // Auto-refresco en vivo ante eventos SSE de actualización de datos
+  useEffect(() => {
+    if (lastDataUpdate?.entidad === 'presupuestos' || lastDataUpdate?.entidad === 'transacciones') {
+      const controller = new AbortController()
+      const timer = setTimeout(() => {
+        void fetchPresupuestos(controller.signal)
+      }, 0)
+      return () => {
+        clearTimeout(timer)
+        controller.abort()
+      }
+    }
+  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchPresupuestos])
 
   useEffect(() => {
     const controller = new AbortController()

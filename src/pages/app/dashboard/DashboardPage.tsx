@@ -20,6 +20,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useModal } from '@/hooks/useModal'
 import { useToast } from '@/hooks/useToast'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
 import type { DashboardResumen, ProyeccionCategoria, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '@/types'
@@ -405,6 +406,7 @@ export default function DashboardPage() {
   const { usuario } = useAuth()
   const { open } = useModal()
   const { showToast } = useToast()
+  const { lastDataUpdate } = useNotificaciones()
   const navigate = useNavigate()
   const [data, setData] = useState<DashboardResumen | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -564,6 +566,23 @@ export default function DashboardPage() {
       controller.abort()
     }
   }, [fetchData, fetchProyeccion, customRange])
+
+  // Auto-refresco en vivo ante eventos SSE de actualización de datos
+  useEffect(() => {
+    if (lastDataUpdate?.entidad === 'transacciones' || lastDataUpdate?.entidad === 'billeteras') {
+      const controller = new AbortController()
+      const tid = setTimeout(() => {
+        void fetchData(controller.signal)
+        if (!customRange) {
+          void fetchProyeccion(controller.signal)
+        }
+      }, 0)
+      return () => {
+        clearTimeout(tid)
+        controller.abort()
+      }
+    }
+  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchData, fetchProyeccion, customRange])
 
   useEffect(() => {
     if (!selectedCategoria) {

@@ -7,29 +7,17 @@ import { enviarCodigoTelefono, verificarCodigoTelefono } from '@/services/auth.s
 import { getToken } from '@/services/api'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
-import { PhoneCountrySelect } from '@/components/ui'
 import styles from './PhoneLoginPage.module.css'
 
 type Step = 'phone' | 'code'
 
-const PAISES = [
-  { bandera: '🇦🇷', nombre: 'Argentina', codigo: '+54' },
-  { bandera: '🇺🇾', nombre: 'Uruguay',   codigo: '+598' },
-  { bandera: '🇧🇷', nombre: 'Brasil',    codigo: '+55' },
-  { bandera: '🇨🇱', nombre: 'Chile',     codigo: '+56' },
-  { bandera: '🇲🇽', nombre: 'México',    codigo: '+52' },
-  { bandera: '🇪🇸', nombre: 'España',    codigo: '+34' },
-  { bandera: '🇺🇸', nombre: 'EE.UU.',   codigo: '+1' },
-]
-
-function buildPhone(codigo: string, numero: string): string {
-  let n = numero.trim()
-  if (!n) return codigo
-  if (codigo === '+54') {
-    if (n.startsWith('0')) n = n.slice(1)
-    if (!n.startsWith('9')) n = '9' + n
-  }
-  return codigo + n
+function buildPhone(numero: string): string {
+  let n = numero.trim().replace(/\D/g, '')
+  if (!n) return '+54'
+  if (n.startsWith('54')) n = n.slice(2)
+  if (n.startsWith('0')) n = n.slice(1)
+  if (!n.startsWith('9')) n = '9' + n
+  return '+54' + n
 }
 
 function maskPhone(phone: string): string {
@@ -43,7 +31,6 @@ export default function PhoneLoginPage() {
   const navigate = useNavigate()
 
   const [step, setStep] = useState<Step>('phone')
-  const [codigoPais, setCodigoPais] = useState('+54')
   const [telefono, setTelefono] = useState('')
   const [digits, setDigits] = useState<string[]>(Array(6).fill(''))
   const [loading, setLoading] = useState(false)
@@ -72,7 +59,7 @@ export default function PhoneLoginPage() {
           ? 'El número de teléfono no puede tener más de 15 dígitos.'
           : null
     : null
-  const phonePreview = cleanTel ? buildPhone(codigoPais, cleanTel) : ''
+  const phonePreview = cleanTel ? buildPhone(cleanTel) : ''
   const activeBox = codigo.length < 6 ? codigo.length : -1
 
   useEffect(() => {
@@ -109,7 +96,7 @@ export default function PhoneLoginPage() {
     setLoading(true)
     setApiError(null)
     try {
-      await enviarCodigoTelefono(buildPhone(codigoPais, telefono))
+      await enviarCodigoTelefono(buildPhone(telefono))
       setStep('code')
       setDigits(Array(6).fill(''))
       setHasSubmitted(false)
@@ -127,7 +114,7 @@ export default function PhoneLoginPage() {
     setLoading(true)
     setApiError(null)
     try {
-      await enviarCodigoTelefono(buildPhone(codigoPais, telefono))
+      await enviarCodigoTelefono(buildPhone(telefono))
       setCountdown(60)
       setDigits(Array(6).fill(''))
     } catch (err: unknown) {
@@ -147,7 +134,7 @@ export default function PhoneLoginPage() {
     setLoading(true)
     setApiError(null)
     try {
-      const respuesta = await verificarCodigoTelefono(buildPhone(codigoPais, telefono), codigo)
+      const respuesta = await verificarCodigoTelefono(buildPhone(telefono), codigo)
       login(respuesta)
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
@@ -182,21 +169,20 @@ export default function PhoneLoginPage() {
             <label htmlFor="phone_number" className={styles.label}>Número de teléfono</label>
 
             <div className={[styles.phoneInputWrap, telefonoError ? styles.phoneInputWrapError : ''].filter(Boolean).join(' ')}>
-              <PhoneCountrySelect
-                value={codigoPais}
-                onChange={setCodigoPais}
-                countries={PAISES}
-              />
-
-              <div className={styles.phoneSep} />
+              <div className={styles.phonePrefix}>
+                <span className={styles.flag} role="img" aria-label="Bandera de Argentina">🇦🇷</span>
+                <span className={styles.countryCode}>+54</span>
+              </div>
 
               <input
                 id="phone_number"
+                name="tel"
                 type="tel"
+                autoComplete="tel-national"
                 inputMode="numeric"
                 value={telefono}
                 onChange={(e) => setTelefono(e.target.value)}
-                placeholder="91112345678"
+                placeholder="11 1234 5678"
                 autoFocus
                 className={styles.phoneInput}
               />
@@ -241,7 +227,7 @@ export default function PhoneLoginPage() {
           <p className={styles.codeSubtitle}>
             Te mandamos un código de 6 dígitos por WhatsApp al{' '}
             <span className={styles.phoneHighlight}>
-              {maskPhone(buildPhone(codigoPais, telefono))}
+              {maskPhone(buildPhone(telefono))}
             </span>
           </p>
 

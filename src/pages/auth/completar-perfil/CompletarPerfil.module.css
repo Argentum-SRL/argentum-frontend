@@ -8,7 +8,6 @@
 .nameRow, .passwordRow {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .nameCol, .passwordCol {

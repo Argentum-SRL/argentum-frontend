@@ -25,6 +25,9 @@ interface FormContentProps {
 }
 
 function FormContent({ title, children, compact }: FormContentProps) {
+  const logoCls = [styles.logo, compact ? styles.logoCompact : '']
+    .filter(Boolean)
+    .join(' ')
   const logoTextCls = [styles.logoText, compact ? styles.logoTextCompact : '']
     .filter(Boolean)
     .join(' ')
@@ -34,8 +37,8 @@ function FormContent({ title, children, compact }: FormContentProps) {
 
   return (
     <>
-      <div className={styles.logo}>
-        <MoonIcon size={compact ? 40 : 56} />
+      <div className={logoCls}>
+        <MoonIcon size={compact ? 36 : 56} />
         <span className={logoTextCls}>Argentum</span>
       </div>
       <h1 className={titleCls}>{title}</h1>

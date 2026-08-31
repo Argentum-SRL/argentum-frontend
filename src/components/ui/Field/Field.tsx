@@ -6,6 +6,8 @@ interface FieldProps {
   value: string
   onChange: (v: string) => void
   type?: string
+  name?: string
+  autoComplete?: string
   autoFocus?: boolean
   error?: string | null
   rightSlot?: ReactNode
@@ -21,6 +23,8 @@ const Field = memo(({
   value,
   onChange,
   type = 'text',
+  name,
+  autoComplete,
   autoFocus,
   error,
   rightSlot,
@@ -46,10 +50,12 @@ const Field = memo(({
       <div className={styles.inputWrap}>
         <input
           id={id}
+          name={name}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           autoFocus={autoFocus}
+          autoComplete={autoComplete}
           className={inputCls}
           placeholder={placeholder}
           inputMode={inputMode}

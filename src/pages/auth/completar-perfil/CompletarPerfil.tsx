@@ -99,6 +99,9 @@ export default function CompletarPerfil() {
         <div className={styles.nameRow}>
           <div className={styles.nameCol}>
             <Field
+              id="completar-nombre"
+              name="given-name"
+              autoComplete="given-name"
               label="Nombre"
               type="text"
               value={nombre}
@@ -109,6 +112,9 @@ export default function CompletarPerfil() {
           </div>
           <div className={styles.nameCol}>
             <Field
+              id="completar-apellido"
+              name="family-name"
+              autoComplete="family-name"
               label="Apellido"
               type="text"
               value={apellido}
@@ -119,6 +125,9 @@ export default function CompletarPerfil() {
         </div>
 
         <Field
+          id="completar-email"
+          name="email"
+          autoComplete="email"
           label="Mail"
           type="email"
           value={email}
@@ -129,6 +138,9 @@ export default function CompletarPerfil() {
         <div className={styles.passwordRow}>
           <div className={styles.passwordCol}>
             <Field
+              id="completar-password"
+              name="new-password"
+              autoComplete="new-password"
               label="Contraseña"
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -149,6 +161,9 @@ export default function CompletarPerfil() {
           </div>
           <div className={styles.passwordCol}>
             <Field
+              id="completar-confirm-password"
+              name="confirm-password"
+              autoComplete="new-password"
               label="Repetir contraseña"
               type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}

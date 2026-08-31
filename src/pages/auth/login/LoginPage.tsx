@@ -96,6 +96,9 @@ export default function LoginPage() {
       )}
       <form onSubmit={handleSubmit} noValidate>
         <Field
+          id="login-email"
+          name="email"
+          autoComplete="username email"
           label="Mail"
           type="email"
           value={email}
@@ -106,6 +109,9 @@ export default function LoginPage() {
         />
 
         <Field
+          id="login-password"
+          name="password"
+          autoComplete="current-password"
           label="Contraseña"
           type={showPassword ? 'text' : 'password'}
           value={password}

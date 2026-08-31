@@ -161,26 +161,37 @@ export default function RegisterPage() {
         <div className={styles.nameRow}>
           <div className={styles.nameCol}>
             <Field
+              id="register-nombre"
+              name="given-name"
+              autoComplete="given-name"
               label="Nombre"
               type="text"
               value={nombre}
               onChange={setNombre}
               autoFocus
               error={nombreError}
+              placeholder="Juan"
             />
           </div>
           <div className={styles.nameCol}>
             <Field
+              id="register-apellido"
+              name="family-name"
+              autoComplete="family-name"
               label="Apellido"
               type="text"
               value={apellido}
               onChange={setApellido}
               error={apellidoError}
+              placeholder="Pérez"
             />
           </div>
         </div>
 
         <Field
+          id="register-tel"
+          name="tel"
+          autoComplete="tel"
           label="Teléfono"
           type="tel"
           value={telefono}
@@ -191,16 +202,23 @@ export default function RegisterPage() {
         />
 
         <Field
+          id="register-email"
+          name="email"
+          autoComplete="email"
           label="Mail"
           type="email"
           value={email}
           onChange={setEmail}
           error={emailError}
+          placeholder="tu@email.com"
         />
 
         <div className={styles.passwordRow}>
           <div className={styles.passwordCol}>
             <Field
+              id="register-password"
+              name="new-password"
+              autoComplete="new-password"
               label="Contraseña"
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -220,6 +238,9 @@ export default function RegisterPage() {
           </div>
           <div className={styles.passwordCol}>
             <Field
+              id="register-confirm-password"
+              name="confirm-password"
+              autoComplete="new-password"
               label="Repetir"
               type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}

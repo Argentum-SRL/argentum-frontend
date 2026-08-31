@@ -76,6 +76,7 @@
 /* ── Alt buttons (phone, apple) ──────────────── */
 .altBtn {
   width: 100%;
+  max-width: 400px;
   height: 40px;
   border-radius: 9999px;
   border: 1px solid var(--silver);
@@ -88,9 +89,10 @@
   justify-content: center;
   gap: 12px;
   cursor: pointer;
-  margin-top: 12px;
+  margin: 12px auto 0;
   text-decoration: none;
   transition: border-color 0.15s;
+  box-sizing: border-box;
 }
 
 .altBtn:hover {

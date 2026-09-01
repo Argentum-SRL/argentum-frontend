@@ -30,6 +30,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { getFotoUrl } from '@/utils/fotoUrl'
+import { formatFecha, formatFechaHora } from '@/utils/format'
 import styles from './AdminPage.module.css'
 
 // TableAvatar component to fetch and render user profile picture or fallback initials
@@ -716,7 +717,7 @@ export default function AdminPage() {
                     <Calendar size={14} /> Registro
                   </span>
                   <span className={styles.detailFieldValue}>
-                    {new Date(selectedUser.created_at).toLocaleDateString()}
+                    {formatFecha(selectedUser.created_at)}
                   </span>
                 </div>
                 <div className={styles.detailFieldRow}>
@@ -725,7 +726,7 @@ export default function AdminPage() {
                   </span>
                   <span className={styles.detailFieldValue}>
                     {selectedUser.ultima_actividad
-                      ? new Date(selectedUser.ultima_actividad).toLocaleString()
+                      ? formatFechaHora(selectedUser.ultima_actividad)
                       : 'Sin actividad'}
                   </span>
                 </div>

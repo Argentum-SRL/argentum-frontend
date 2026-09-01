@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatHora } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import styles from './TransaccionRow.module.css'
 
@@ -43,12 +43,7 @@ const TransaccionRow = memo(({
   const hora = useMemo(() => {
     const fecha = transaccion.fecha_creacion || transaccion.fecha
     if (!fecha || !fecha.includes('T')) return ''
-    try {
-      const d = new Date(fecha)
-      return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-    } catch {
-      return ''
-    }
+    return formatHora(fecha)
   }, [transaccion.fecha_creacion, transaccion.fecha])
 
   const metodoLabel = useMemo(() => {

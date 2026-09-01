@@ -21,6 +21,7 @@ import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { Notificacion, TipoNotificacion } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import { EmptyState } from '@/components/ui'
+import { formatHora } from '@/utils/format'
 import NotificacionesConfigModal from './NotificacionesConfigModal'
 import styles from './NotificacionesDrawer.module.css'
 
@@ -116,8 +117,8 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
 
   // Formatear hora local
   const formatTime = (dateStr: string) => {
-    const d = new Date(dateStr)
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' hs'
+    const hora = formatHora(dateStr)
+    return hora ? `${hora} hs` : ''
   }
 
   const handleNotificationClick = async (n: Notificacion) => {

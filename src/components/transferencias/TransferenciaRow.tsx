@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { Trash2 } from 'lucide-react'
 import type { TransferenciaInterna, Billetera } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatHora } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './TransferenciaRow.module.css'
 
@@ -52,12 +52,9 @@ export const TransferenciaRow = memo(({
   const visOrigen = getBankVisuals(billeteraOrigen, 'Origen')
   const visDestino = getBankVisuals(billeteraDestino, 'Destino')
 
-  const formatHora = (fechaStr: string) => {
-    if (!fechaStr || !fechaStr.includes('T')) return ''
-    const d = new Date(fechaStr)
-    return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-  }
-  const hora = formatHora(transferencia.fecha_creacion)
+  const hora = transferencia.fecha_creacion && transferencia.fecha_creacion.includes('T')
+    ? formatHora(transferencia.fecha_creacion)
+    : ''
 
   return (
     <div className={styles.row}>

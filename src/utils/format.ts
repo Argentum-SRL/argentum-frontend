@@ -32,11 +32,35 @@ export function formatFecha(fecha: string | Date): string {
 
 export function formatFechaHora(fecha: string | Date): string {
   const d = typeof fecha === 'string' ? new Date(fecha) : fecha
+  if (isNaN(d.getTime())) return ''
   return new Intl.DateTimeFormat('es-AR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: false
   }).format(d)
 }
+
+export function formatHora(fecha: string | Date): string {
+  let d: Date
+  if (typeof fecha === 'string') {
+    if (fecha.includes('T') || fecha.includes(' ') || fecha.includes(':')) {
+      d = new Date(fecha)
+    } else {
+      return ''
+    }
+  } else {
+    d = fecha
+  }
+
+  if (isNaN(d.getTime())) return ''
+
+  return new Intl.DateTimeFormat('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(d)
+}
+

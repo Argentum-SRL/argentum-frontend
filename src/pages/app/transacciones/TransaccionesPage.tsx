@@ -26,7 +26,7 @@ const PAGE_SIZE = 50
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
   const { showToast } = useToast()
-  const { periodo: periodoActual } = usePeriodoActual()
+  const { periodo: periodoActual, loading: loadingPeriodo } = usePeriodoActual()
   const { lastDataUpdate } = useNotificaciones()
 
   const [activeTab, setActiveTab] = useState<'historial' | 'cuotas'>('historial')
@@ -95,7 +95,7 @@ export default function TransaccionesPage() {
 
   // Carga de siguientes páginas (scroll infinito)
   const loadMore = useCallback(async () => {
-    if (loading || loadingMore || !hasMore) return
+    if (loading || loadingPeriodo || loadingMore || !hasMore) return
     setLoadingMore(true)
     try {
       const nextData = await transaccionService.getTransacciones({
@@ -120,7 +120,7 @@ export default function TransaccionesPage() {
     } finally {
       setLoadingMore(false)
     }
-  }, [loading, loadingMore, hasMore, filters, transacciones.length, showToast])
+  }, [loading, loadingPeriodo, loadingMore, hasMore, filters, transacciones.length, showToast])
 
   const fetchPendientes = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -174,8 +174,10 @@ export default function TransaccionesPage() {
     return () => { isMounted = false }
   }, [])
 
-  // 2. Carga de datos dinámicos (Cuando cambian los filtros)
+  // 2. Carga de datos dinámicos (Cuando cambian los filtros y el período está listo)
   useEffect(() => {
+    if (loadingPeriodo) return
+
     const controller = new AbortController()
     
     const loadDynamic = async () => {
@@ -195,11 +197,11 @@ export default function TransaccionesPage() {
     
     loadDynamic()
     return () => controller.abort()
-  }, [fetchInitialTransacciones, fetchPendientes])
+  }, [loadingPeriodo, fetchInitialTransacciones, fetchPendientes])
 
   // 3. Observer para infinite scroll
   useEffect(() => {
-    if (loading || !hasMore || loadingMore) return
+    if (loading || loadingPeriodo || !hasMore || loadingMore) return
     const sentinel = sentinelRef.current
     if (!sentinel) return
 
@@ -214,10 +216,11 @@ export default function TransaccionesPage() {
 
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [loading, hasMore, loadingMore, loadMore])
+  }, [loading, loadingPeriodo, hasMore, loadingMore, loadMore])
 
   // 4. Auto-refresco en vivo ante eventos SSE de actualización de datos
   useEffect(() => {
+    if (loadingPeriodo) return
     if (lastDataUpdate?.entidad === 'transacciones') {
       const controller = new AbortController()
       const tid = setTimeout(() => {
@@ -229,7 +232,7 @@ export default function TransaccionesPage() {
         controller.abort()
       }
     }
-  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchInitialTransacciones, fetchPendientes])
+  }, [loadingPeriodo, lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchInitialTransacciones, fetchPendientes])
 
 
   const handleEdit = useCallback((id: string) => {
@@ -487,7 +490,7 @@ export default function TransaccionesPage() {
 
           {/* ── Lista ────────────────────────────────────────────────────────── */}
           <div className={styles.listContainer}>
-            {loading ? (
+            {loading || loadingPeriodo ? (
               <div className={styles.loadingState}>Cargando transacciones...</div>
             ) : grupos.length === 0 ? (
               <EmptyState

@@ -259,6 +259,7 @@
 
 @media (max-width: 767px) {
   .balanceCard {
+    overflow: hidden;
     margin-top: -20px;
     margin-left: calc(-1 * var(--container-px-mobile));
     margin-right: calc(-1 * var(--container-px-mobile));

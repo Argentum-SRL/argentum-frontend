@@ -189,3 +189,10 @@ input:-webkit-autofill:active {
   caret-color: #E6ECF2 !important;
 }
 
+@media (max-width: 767px) {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+}
+

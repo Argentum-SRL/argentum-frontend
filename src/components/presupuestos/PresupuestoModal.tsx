@@ -406,14 +406,25 @@ export default function PresupuestoModal({
                   </div>
                 )}
 
-                <div className={styles.searchBar}>
-                  <Search size={16} className={styles.searchIcon} />
+                <div className={styles.catSearchContainer}>
+                  <Search size={18} className={styles.searchIcon} strokeWidth={2} />
                   <input
                     type="text"
+                    className={styles.catSearchInput}
                     placeholder="Buscar categorías..."
                     value={searchQuery}
                     onChange={e => setField('searchQuery', e.target.value)}
                   />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      className={styles.clearSearchBtn}
+                      onClick={() => setField('searchQuery', '')}
+                      title="Limpiar búsqueda"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
                 </div>
 
                 <div className={styles.catList}>

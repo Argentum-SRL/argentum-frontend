@@ -51,7 +51,7 @@ const router = createBrowserRouter([
         ],
       },
 
-      // Admin Panel
+      // Admin Panel y rutas solo para admin (en testing)
       {
         element: <ProtectedRoute mode="admin" />,
         children: [
@@ -59,6 +59,7 @@ const router = createBrowserRouter([
             element: <AppWrapper />,
             children: [
               { path: '/admin', element: <AdminPage /> },
+              { path: '/app/herramientas', element: <ToolsPage /> },
             ],
           },
         ],
@@ -84,7 +85,6 @@ const router = createBrowserRouter([
               // Rutas legacy — redirigen a la página unificada de perfil
               { path: '/app/configuracion', element: <Navigate to="/app/perfil" replace /> },
               { path: '/app/notificaciones/configuracion', element: <Navigate to="/app/perfil?tab=notificaciones" replace /> },
-              { path: '/app/herramientas', element: <ToolsPage /> },
               { path: '/app/*', element: <NotFoundPage /> },
             ],
           },

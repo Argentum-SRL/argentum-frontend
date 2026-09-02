@@ -120,10 +120,6 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.desktopToggleContainer {
-  display: none;
-}
-
 /* ── Grid & Responsive Containers ────────────────────────────────────────── */
 .grid {
   display: grid;
@@ -139,19 +135,9 @@
   display: none;
 }
 
-.desktopChartContainer {
-  display: none;
-}
-
 @media (min-width: 768px) {
   .controlsRow {
-    justify-content: space-between;
-  }
-
-  .desktopToggleContainer {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
+    justify-content: flex-start;
   }
 
   .grid {
@@ -167,11 +153,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     gap: 20px;
-  }
-
-  .desktopChartContainer {
-    display: block;
-    width: 100%;
   }
 }
 

@@ -20,21 +20,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
 import BudgetBarChart from './BudgetBarChart'
 import BudgetHistoryModal from './BudgetHistoryModal'
-import { EmptyState, PageSummaryBar, SegmentedControl } from '@/components/ui'
-
-type VistaDesktop = 'tarjetas' | 'comparativa'
-
-const getInitialVista = (): VistaDesktop => {
-  try {
-    const saved = localStorage.getItem('argentum_presupuestos_vista')
-    if (saved === 'comparativa' || saved === 'tarjetas') {
-      return saved
-    }
-  } catch {
-    // localStorage not available
-  }
-  return 'tarjetas'
-}
+import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function PresupuestosPage() {
   const { showToast } = useToast()
@@ -43,18 +29,8 @@ export default function PresupuestosPage() {
   const { lastDataUpdate } = useNotificaciones()
 
   const [activeTab, setActiveTab] = useState<'activo' | 'pausado' | 'finalizado'>('activo')
-  const [vistaDesktop, setVistaDesktop] = useState<VistaDesktop>(getInitialVista)
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([])
   const [loading, setLoading] = useState(true)
-
-  const handleVistaChange = (vista: VistaDesktop) => {
-    setVistaDesktop(vista)
-    try {
-      localStorage.setItem('argentum_presupuestos_vista', vista)
-    } catch {
-      // localStorage error handling
-    }
-  }
   
   // Data for forms
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -306,7 +282,7 @@ export default function PresupuestosPage() {
         />
       )}
 
-      {/* ── Controls Row (Tabs + View Toggle) ──────────────────────────────── */}
+      {/* ── Controls Row (Tabs) ──────────────────────────────── */}
       <div className={styles.controlsRow}>
         <div className={styles.tabs}>
           <button 
@@ -328,19 +304,6 @@ export default function PresupuestosPage() {
             Finalizados
           </button>
         </div>
-
-        {!loading && presupuestos.length > 0 && (
-          <div className={styles.desktopToggleContainer}>
-            <SegmentedControl
-              options={[
-                { value: 'tarjetas', label: 'Tarjetas' },
-                { value: 'comparativa', label: 'Comparativa' }
-              ]}
-              value={vistaDesktop}
-              onChange={(v) => handleVistaChange(v as VistaDesktop)}
-            />
-          </div>
-        )}
       </div>
 
       {/* ── Content ────────────────────────────────────────────────────────── */}
@@ -363,6 +326,7 @@ export default function PresupuestosPage() {
           />
         ) : (
           <>
+            {/* Mobile Comparative Bar Chart (< 768px) */}
             <div className={styles.mobileChartContainer}>
               <BudgetBarChart
                 presupuestos={presupuestos}
@@ -374,32 +338,20 @@ export default function PresupuestosPage() {
               />
             </div>
 
-            {vistaDesktop === 'tarjetas' ? (
-              <div className={styles.desktopGrid}>
-                {presupuestos.map(p => (
-                  <BudgetCard 
-                    key={p.id} 
-                    presupuesto={p} 
-                    onEdit={() => handleEdit(p)}
-                    onPause={() => handlePause(p)}
-                    onResume={() => handleResume(p.id)}
-                    onDelete={() => handleDelete(p)}
-                    onHistory={() => handleViewHistory(p)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className={styles.desktopChartContainer}>
-                <BudgetBarChart
-                  presupuestos={presupuestos}
-                  onEdit={handleEdit}
-                  onPause={handlePause}
-                  onResume={handleResume}
-                  onDelete={handleDelete}
-                  onHistory={handleViewHistory}
+            {/* Desktop View (>= 768px) - Siempre Tarjetas */}
+            <div className={styles.desktopGrid}>
+              {presupuestos.map(p => (
+                <BudgetCard 
+                  key={p.id} 
+                  presupuesto={p} 
+                  onEdit={() => handleEdit(p)}
+                  onPause={() => handlePause(p)}
+                  onResume={() => handleResume(p.id)}
+                  onDelete={() => handleDelete(p)}
+                  onHistory={() => handleViewHistory(p)}
                 />
-              </div>
-            )}
+              ))}
+            </div>
           </>
         )}
       </div>

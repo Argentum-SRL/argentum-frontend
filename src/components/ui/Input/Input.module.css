@@ -29,9 +29,9 @@
 }
 
 .input:focus {
-  background: white;
+  background: var(--surface);
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+  box-shadow: none;
 }
 
 .withIcon {

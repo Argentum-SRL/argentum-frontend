@@ -44,7 +44,6 @@ const NAV_FINANCIAL = [
   { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart  },
   { label: 'Metas',          path: '/app/metas',           Icon: Target    },
   { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: RefreshCw },
-  { label: 'Herramientas',   path: '/app/herramientas',   Icon: Calculator },
 ]
 
 const MOBILE_NAV = [
@@ -104,6 +103,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const desktopNavItems = [...NAV_MAIN, ...NAV_FINANCIAL]
   if (is_admin) {
+    desktopNavItems.push({ label: 'Herramientas', path: '/app/herramientas', Icon: Calculator })
     desktopNavItems.push({ label: 'Admin', path: '/admin', Icon: Shield })
   }
 
@@ -264,13 +264,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
             ))}
 
             {is_admin && (
-              <Link
-                to="/admin"
-                className={[styles.moreItem, isActive('/admin') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
-              >
-                <Shield size={22} strokeWidth={1.75} />
-                <span>Módulo Admin</span>
-              </Link>
+              <>
+                <Link
+                  to="/app/herramientas"
+                  className={[styles.moreItem, isActive('/app/herramientas') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+                >
+                  <Calculator size={22} strokeWidth={1.75} />
+                  <span>Herramientas</span>
+                </Link>
+                <Link
+                  to="/admin"
+                  className={[styles.moreItem, isActive('/admin') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
+                >
+                  <Shield size={22} strokeWidth={1.75} />
+                  <span>Módulo Admin</span>
+                </Link>
+              </>
             )}
 
             <div className={styles.moreSeparator} />

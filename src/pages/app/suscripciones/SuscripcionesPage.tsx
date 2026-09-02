@@ -176,6 +176,7 @@ const SuscripcionesPage: React.FC = () => {
           <div className={styles.logosLayer}>
             {POSICIONES.map((pos, i) => {
               const s = CATALOGO_SUSCRIPCIONES[i % CATALOGO_SUSCRIPCIONES.length]
+              if (!s || !s.logoPath) return null
               
               return (
                 <img

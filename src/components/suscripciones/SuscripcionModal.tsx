@@ -109,6 +109,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -349,12 +350,12 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                               onClick={() => handleSelectServicio(s)}
                             >
                               <div className={styles.logoWrapper}>
-                                {s.logoPath ? (
+                                {s.logoPath && !failedLogos[s.id] ? (
                                   <img
                                     src={s.logoPath}
                                     alt={s.nombre}
                                     className={styles.logo}
-                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                    onError={() => setFailedLogos(prev => ({ ...prev, [s.id]: true }))}
                                   />
                                 ) : (
                                   <div className={styles.logoFallback}>{s.nombre[0]}</div>

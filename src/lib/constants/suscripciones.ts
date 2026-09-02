@@ -9,7 +9,24 @@ export interface ServicioCatalogo {
   colorTexto: string
 }
 
-const getLogo = (name: string) => `/src/assets/suscripciones/${name}`
+// Carga todos los assets de suscripciones/ (SVG y PNG) como URLs estáticas via Vite glob import.
+const _logoModules = import.meta.glob('@/assets/suscripciones/*.{svg,png,webp,jpg,jpeg}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+
+const _logoMap: Record<string, string> = {}
+for (const [path, url] of Object.entries(_logoModules)) {
+  const filename = path.split('/').pop() ?? ''
+  _logoMap[filename] = url
+}
+
+export function getSubscriptionLogoUrl(logoName: string): string {
+  return _logoMap[logoName] ?? ''
+}
+
+const getLogo = (name: string): string => _logoMap[name] ?? ''
 
 export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = [
   // Streaming video

@@ -96,6 +96,15 @@ function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
     case 'RESET':
       if (action.transaccion) {
+        const wallet = action.billeteras.find(b => b.id === action.transaccion?.billetera_id)
+        const metodoDeducido: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
+          action.transaccion.metodo_pago || (
+            action.transaccion.tarjeta_id
+              ? 'credito'
+              : wallet?.es_efectivo
+                ? 'efectivo'
+                : 'debito'
+          )
         return {
           ...initialState,
           tipo: action.transaccion.tipo,
@@ -107,7 +116,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           billeteraId: action.transaccion.billetera_id,
           tarjetaId: action.transaccion.tarjeta_id || '',
           fecha: action.transaccion.fecha.split('T')[0],
-          metodoPago: action.transaccion.metodo_pago,
+          metodoPago: metodoDeducido,
         }
       } else {
         const activas = action.billeteras.filter(b => b.estado === 'activa')

@@ -87,7 +87,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthLayout title="Bienvenido de vuelta" leftPanel={<WppChatMockup />}>
+    <AuthLayout title="Te damos la bienvenida de vuelta" leftPanel={<WppChatMockup />}>
       {successMessage && (
         <div className={styles.successBanner}>
           <CheckCircle2 size={20} />

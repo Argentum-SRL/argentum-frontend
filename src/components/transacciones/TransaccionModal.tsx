@@ -201,18 +201,69 @@ export default function TransaccionModal({
     fetchSubcats()
   }, [categoriaId])
 
-  const sortedSubcategorias = useMemo(() => {
-    return [...subcategorias].sort((a, b) => {
-      const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
-      const aNorm = norm(a.nombre)
-      const bNorm = norm(b.nombre)
-      const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos' || aNorm === 'varios'
-      const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos' || bNorm === 'varios'
-      if (isAOtros && !isBOtros) return 1
-      if (!isAOtros && isBOtros) return -1
-      return aNorm.localeCompare(bNorm)
-    })
-  }, [subcategorias])
+    const currentCat = useMemo(() => categorias.find(c => c.id === categoriaId), [categorias, categoriaId])
+    const currentCatNorm = useMemo(() => currentCat ? currentCat.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() : '', [currentCat])
+    const hideGeneralSubcat = currentCatNorm === 'empleo' || currentCatNorm === 'trabajo independiente' || currentCatNorm === 'inversiones y rentas'
+
+    const sortedSubcategorias = useMemo(() => {
+      // Mapa de orden de probabilidad canónico por categoría para consistencia inmediata
+      const PROBABILIDAD_SUBCATS: Record<string, string[]> = {
+        transporte: ['taxi / apps', 'transporte publico', 'combustible', 'peajes', 'estacionamiento', 'mantenimiento y seguro del auto'],
+        salud: ['farmacia', 'medico / consulta', 'obra social / prepaga', 'estudios y analisis', 'odontologia', 'terapias'],
+        hogar: ['limpieza', 'reparaciones', 'muebles y electrodomesticos'],
+        servicios: ['luz', 'gas', 'agua', 'alquiler', 'expensas', 'impuestos', 'seguros'],
+        recreativo: ['salidas', 'deportes y gimnasio', 'hobbies y juegos', 'viajes'],
+        alimentacion: ['supermercado', 'kiosco', 'verduleria', 'carniceria'],
+        indumentaria: ['ropa', 'calzado', 'accesorios'],
+        comunicacion: ['celular', 'internet y cable'],
+        educacion: ['cuotas', 'materiales y libros', 'idiomas'],
+        'restaurantes y delivery': ['restaurantes', 'delivery', 'cafeteria'],
+        otros: ['reintegros', 'cuidado personal', 'mascotas', 'regalos'],
+        banco: ['comisiones y gastos bancarios', 'impuesto al cheque / movimientos', 'prestamos', 'intereses pagados'],
+        empleo: ['sueldo', 'bonos y horas extras', 'aguinaldo'],
+        'trabajo independiente': ['honorarios', 'venta de productos/servicios'],
+        'inversiones y rentas': ['dividendos e intereses', 'alquileres cobrados'],
+      }
+
+      const priorityList = PROBABILIDAD_SUBCATS[currentCatNorm] || []
+
+      return [...subcategorias]
+        .filter(s => s.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() !== 'otros')
+        .sort((a, b) => {
+        const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+        const aNorm = norm(a.nombre)
+        const bNorm = norm(b.nombre)
+
+        const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos' || aNorm === 'varios'
+        const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos' || bNorm === 'varios'
+
+        // "Otros" siempre al final absoluto
+        if (isAOtros && !isBOtros) return 1
+        if (!isAOtros && isBOtros) return -1
+        if (isAOtros && isBOtros) return 0
+
+        // Si coincide con la lista de prioridad canónica por probabilidad
+        const ai = priorityList.indexOf(aNorm)
+        const bi = priorityList.indexOf(bNorm)
+        if (ai !== -1 && bi !== -1) return ai - bi
+        if (ai !== -1) return -1
+        if (bi !== -1) return 1
+
+        // Si vienen con campo orden explícito del backend y son diferentes
+        if (a.orden !== undefined && b.orden !== undefined && a.orden !== b.orden) {
+          return a.orden - b.orden
+        }
+
+        return aNorm.localeCompare(bNorm)
+      })
+    }, [subcategorias, currentCatNorm])
+
+    // Si hideGeneralSubcat es true y no hay subcategoriaId seleccionada, preseleccionar la primera (ej. Sueldo)
+    useEffect(() => {
+      if (hideGeneralSubcat && !subcategoriaId && sortedSubcategorias.length > 0) {
+        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: sortedSubcategorias[0].id })
+      }
+    }, [hideGeneralSubcat, subcategoriaId, sortedSubcategorias])
 
   useEffect(() => {
     if (open) dispatch({ type: 'RESET', transaccion: transaccion || null, billeteras })
@@ -884,11 +935,13 @@ export default function TransaccionModal({
                       <div className={styles.subcatGrid}>
                         {loadingSubcats ? <div className={styles.subcatLoading}>Cargando...</div> : (
                           <>
-                            <button type="button" className={`${styles.subcatChip} ${!subcategoriaId ? styles.subcatChipActive : ''}`}
-                              onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })}>
-                              <SubcategoriaIcon nombre="general" parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
-                              General
-                            </button>
+                            {!hideGeneralSubcat && (
+                              <button type="button" className={`${styles.subcatChip} ${!subcategoriaId ? styles.subcatChipActive : ''}`}
+                                onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })}>
+                                <SubcategoriaIcon nombre="general" parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
+                                General
+                              </button>
+                            )}
                             {sortedSubcategorias.map((sub) => (
                               <button type="button" key={sub.id} className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
                                 onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: sub.id })}>

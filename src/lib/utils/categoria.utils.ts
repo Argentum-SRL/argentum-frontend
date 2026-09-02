@@ -20,7 +20,7 @@ export const CATEGORIA_VISUAL: Record<string, CategoriaVisual> = {
   'salud':                    { iconSrc: '/assets/icons/categorias/medicina%20Background%20Removed.png',     label: 'Salud' },
   'salud y cuidado personal': { iconSrc: '/assets/icons/categorias/medicina%20Background%20Removed.png',     label: 'Salud' },
   'transporte':               { iconSrc: '/assets/icons/categorias/transporte%20Background%20Removed.png',   label: 'Transporte' },
-  'comunicacion':             { iconSrc: '/assets/icons/categorias/serviciosdigitales%20Background%20Removed.png', label: 'Comunicación' },
+  'comunicacion':             { iconSrc: '/assets/icons/subcategorias/internet%20Background%20Removed.png', label: 'Comunicación' },
   'entretenimiento':          { iconSrc: '/assets/icons/categorias/entretenimiento%20Background%20Removed.png',    label: 'Entretenimiento' },
   'entretenimiento y salidas':{ iconSrc: '/assets/icons/categorias/entretenimiento%20Background%20Removed.png',    label: 'Entretenimiento' },
   'recreativo':               { iconSrc: '/assets/icons/categorias/entretenimiento%20Background%20Removed.png',    label: 'Entretenimiento' },

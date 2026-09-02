@@ -206,6 +206,7 @@ export interface Subcategoria {
   id: string
   categoria_id: string
   nombre: string
+  orden?: number
   es_global: boolean
   creador_id: string | null
   estado: 'activa' | 'archivada'

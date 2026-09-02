@@ -89,38 +89,85 @@ export function exportarTransaccionesPDF(params: {
   doc.setTextColor(13, 32, 69)
   doc.text(labelPeriodo, 16, 37)
 
+  // --- CÁLCULO COHERENTE DE TOTALES POR MONEDA ---
+  let ingARS = 0, egrARS = 0
+  let ingUSD = 0, egrUSD = 0
+  for (const t of params.transacciones) {
+    const m = Number(t.monto) || 0
+    if (t.moneda === 'USD') {
+      if (t.tipo === 'ingreso') ingUSD += m
+      else egrUSD += m
+    } else {
+      if (t.tipo === 'ingreso') ingARS += m
+      else egrARS += m
+    }
+  }
+  const balARS = ingARS - egrARS
+  const balUSD = ingUSD - egrUSD
+  const tieneUSD = (ingUSD > 0 || egrUSD > 0)
+
   // --- RECUADRO DE RESUMEN ---
+  const boxHeight = tieneUSD ? 25 : 20
   doc.setFillColor(237, 236, 234)
-  doc.roundedRect(16, 42, 178, 20, 2, 2, 'F')
+  doc.roundedRect(16, 42, 178, boxHeight, 2, 2, 'F')
 
   // Fila 1 Labels
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(7)
   doc.setTextColor(82, 86, 95)
-  doc.text('INGRESOS', 24, 49)
-  doc.text('EGRESOS', 88, 49)
-  doc.text('BALANCE', 152, 49)
+  const labelY = tieneUSD ? 48 : 49
+  doc.text('INGRESOS', 24, labelY)
+  doc.text('EGRESOS', 88, labelY)
+  doc.text('BALANCE', 152, labelY)
 
   // Fila 2 Valores
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(10)
+  if (tieneUSD) {
+    doc.setFontSize(8.5)
 
-  // Ingresos
-  doc.setTextColor(26, 61, 40)
-  doc.text(`+$ ${formatMonto(params.resumen.totalIngresos)}`, 24, 57)
-
-  // Egresos
-  doc.setTextColor(180, 40, 40)
-  doc.text(`-$ ${formatMonto(params.resumen.totalEgresos)}`, 88, 57)
-
-  // Balance
-  const bal = params.resumen.balance
-  if (bal >= 0) {
+    // ARS
     doc.setTextColor(26, 61, 40)
-    doc.text(`+$ ${formatMonto(bal)}`, 152, 57)
-  } else {
+    doc.text(`+$ ${formatMonto(ingARS)}`, 24, 54)
     doc.setTextColor(180, 40, 40)
-    doc.text(`-$ ${formatMonto(Math.abs(bal))}`, 152, 57)
+    doc.text(`-$ ${formatMonto(egrARS)}`, 88, 54)
+    if (balARS >= 0) {
+      doc.setTextColor(26, 61, 40)
+      doc.text(`+$ ${formatMonto(balARS)}`, 152, 54)
+    } else {
+      doc.setTextColor(180, 40, 40)
+      doc.text(`-$ ${formatMonto(Math.abs(balARS))}`, 152, 54)
+    }
+
+    // USD
+    doc.setTextColor(26, 61, 40)
+    doc.text(`+US$ ${formatMonto(ingUSD)}`, 24, 61)
+    doc.setTextColor(180, 40, 40)
+    doc.text(`-US$ ${formatMonto(egrUSD)}`, 88, 61)
+    if (balUSD >= 0) {
+      doc.setTextColor(26, 61, 40)
+      doc.text(`+US$ ${formatMonto(balUSD)}`, 152, 61)
+    } else {
+      doc.setTextColor(180, 40, 40)
+      doc.text(`-US$ ${formatMonto(Math.abs(balUSD))}`, 152, 61)
+    }
+  } else {
+    doc.setFontSize(10)
+    // Ingresos
+    doc.setTextColor(26, 61, 40)
+    doc.text(`+$ ${formatMonto(ingARS)}`, 24, 57)
+
+    // Egresos
+    doc.setTextColor(180, 40, 40)
+    doc.text(`-$ ${formatMonto(egrARS)}`, 88, 57)
+
+    // Balance
+    if (balARS >= 0) {
+      doc.setTextColor(26, 61, 40)
+      doc.text(`+$ ${formatMonto(balARS)}`, 152, 57)
+    } else {
+      doc.setTextColor(180, 40, 40)
+      doc.text(`-$ ${formatMonto(Math.abs(balARS))}`, 152, 57)
+    }
   }
 
   // --- TABLA DE MOVIMIENTOS ---
@@ -128,18 +175,19 @@ export function exportarTransaccionesPDF(params: {
     const tx = t as TransaccionConRelaciones
     const catNombre = tx.categoria?.nombre ?? 'General'
     const subNombre = tx.subcategoria?.nombre ?? 'General'
+    const simbolo = tx.moneda === 'USD' ? 'US$ ' : '$ '
     return {
       fecha: fmtFecha(tx.fecha),
       desc: tx.descripcion || tx.subcategoria?.nombre || 'General',
       cat: `${catNombre} / ${subNombre}`,
       bill: tx.billetera?.nombre ?? '—',
-      monto: (tx.tipo === 'ingreso' ? '+' : '-') + '$ ' +
+      monto: (tx.tipo === 'ingreso' ? '+' : '-') + simbolo +
              formatMonto(Number(tx.monto))
     }
   })
 
   autoTable(doc, {
-    startY: 68,
+    startY: tieneUSD ? 73 : 68,
     margin: { left: 16, right: 16 },
     head: [['Fecha', 'Descripción', 'Categoría', 'Billetera', 'Monto']],
     body: filas.map(f => [f.fecha, f.desc, f.cat, f.bill, f.monto]),

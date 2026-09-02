@@ -197,8 +197,6 @@ export interface Categoria {
   tipo: 'ingreso' | 'egreso'
   icono: string | null
   color: string | null
-  es_global: boolean
-  creador_id: string | null
   estado: 'activa' | 'archivada'
 }
 
@@ -207,8 +205,6 @@ export interface Subcategoria {
   categoria_id: string
   nombre: string
   orden?: number
-  es_global: boolean
-  creador_id: string | null
   estado: 'activa' | 'archivada'
 }
 

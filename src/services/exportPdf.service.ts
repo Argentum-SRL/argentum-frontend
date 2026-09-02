@@ -126,12 +126,12 @@ export function exportarTransaccionesPDF(params: {
   // --- TABLA DE MOVIMIENTOS ---
   const filas = params.transacciones.map(t => {
     const tx = t as TransaccionConRelaciones
+    const catNombre = tx.categoria?.nombre ?? 'General'
+    const subNombre = tx.subcategoria?.nombre ?? 'General'
     return {
       fecha: fmtFecha(tx.fecha),
-      desc: tx.descripcion || tx.subcategoria?.nombre || '—',
-      cat: tx.subcategoria?.nombre
-           ? tx.categoria?.nombre ?? '—'
-           : tx.categoria?.nombre ?? '—',
+      desc: tx.descripcion || tx.subcategoria?.nombre || 'General',
+      cat: `${catNombre} / ${subNombre}`,
       bill: tx.billetera?.nombre ?? '—',
       monto: (tx.tipo === 'ingreso' ? '+' : '-') + '$ ' +
              formatMonto(Number(tx.monto))

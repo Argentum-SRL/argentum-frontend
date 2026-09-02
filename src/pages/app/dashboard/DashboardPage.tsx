@@ -356,7 +356,7 @@ const SubcategoriasChart = memo(({
           <div key={entry.subcategoria_id} className={styles.barItem}>
             <div className={styles.barIconWrap}>
               <SubcategoriaIcon 
-                nombre={entry.subcategoria_nombre === 'Otros' ? null : entry.subcategoria_nombre} 
+                nombre={entry.subcategoria_nombre === 'Otros' || entry.subcategoria_nombre === 'General' ? null : entry.subcategoria_nombre} 
                 parentCategory={parentCategoryName} 
                 size={32} 
               />

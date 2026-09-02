@@ -69,7 +69,7 @@ const TransaccionRow = memo(({
 
   const title = transaccion.descripcion || transaccion.subcategoria?.nombre || categoria?.nombre || 'Sin descripción'
   const categoriaNombre = categoria?.nombre || 'General'
-  const subcategoriaNombre = transaccion.subcategoria?.nombre
+  const subcategoriaNombre = transaccion.subcategoria?.nombre || 'General'
   const walletDisplayName = bankInfo?.name || billetera?.nombre || 'Billetera'
 
   return (
@@ -89,7 +89,7 @@ const TransaccionRow = memo(({
       {/* ── 1. Category Squircle Avatar ──────────────────────────────────── */}
       <div className={`${styles.avatarContainer} ${isIngreso ? styles.avatarIngreso : styles.avatarEgreso}`}>
         <SubcategoriaIcon 
-          nombre={subcategoriaNombre} 
+          nombre={transaccion.subcategoria?.nombre} 
           parentCategory={categoriaNombre} 
           size={24}
           className={styles.avatarIcon}
@@ -135,12 +135,8 @@ const TransaccionRow = memo(({
         <div className={`${styles.metaRow} ${styles.desktopOnly}`}>
           <div className={styles.categoryPath}>
             <span className={styles.categoryMain}>{categoriaNombre}</span>
-            {subcategoriaNombre && (
-              <>
-                <span className={styles.categorySeparator}>/</span>
-                <span className={styles.categorySub}>{subcategoriaNombre}</span>
-              </>
-            )}
+            <span className={styles.categorySeparator}>/</span>
+            <span className={styles.categorySub}>{subcategoriaNombre}</span>
           </div>
 
           <div className={styles.metaBullet}>•</div>
@@ -173,7 +169,7 @@ const TransaccionRow = memo(({
         {/* Mobile-Only Clean Subtitle (Solo categoría sin aglomeración) */}
         <div className={`${styles.mobileSubtitleRow} ${styles.mobileOnly}`}>
           <span className={styles.mobileCategoryText}>
-            {subcategoriaNombre && subcategoriaNombre !== title 
+            {subcategoriaNombre !== title 
               ? `${categoriaNombre} · ${subcategoriaNombre}` 
               : categoriaNombre}
           </span>

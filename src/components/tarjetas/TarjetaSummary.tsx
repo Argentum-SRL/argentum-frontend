@@ -289,8 +289,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                     <span className={`${styles.itemTitle} ${cuota.pagada ? styles.itemTitlePaid : ''}`}>{cuota.descripcion}</span>
                     <span className={styles.itemSub}>
                       Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
-                      {cuota.subcategoria_nombre && cuota.subcategoria_nombre !== cuota.descripcion && (
-                        <> • {cuota.subcategoria_nombre}</>
+                      {(cuota.subcategoria_nombre || 'General') !== cuota.descripcion && (
+                        <> • {cuota.subcategoria_nombre || 'General'}</>
                       )}
                     </span>
                   </div>

@@ -327,7 +327,11 @@ export default function TransaccionModal({
   }, [billeteraId, tarjetaId, open, metodoPago])
 
   const activeCategorias = useMemo(() => {
-    const filtered = categorias.filter((c) => c.tipo === tipo)
+    const filtered = categorias.filter((c) => {
+      if (c.tipo !== tipo) return false
+      const norm = c.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+      return norm !== 'ahorro'
+    })
     const mainCats = [
       'alimentacion',
       'transporte',

@@ -134,7 +134,9 @@ export default function PerfilPage() {
             <Bell size={15} />
             <span>Notificaciones</span>
           </button>
+        </div>
 
+        <div className={styles.dangerTabWrapper}>
           <button
             type="button"
             className={`${styles.tab} ${styles.tabDanger} ${

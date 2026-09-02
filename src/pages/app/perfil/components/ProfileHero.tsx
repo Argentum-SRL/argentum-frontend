@@ -1,5 +1,5 @@
 import React from 'react'
-import { Camera, Trash2, CheckCircle2, AlertCircle, Sparkles, Copy, Check } from 'lucide-react'
+import { Camera, Trash2, CheckCircle2, AlertCircle, Copy, Check } from 'lucide-react'
 import type { Usuario } from '@/types'
 import { useModal } from '@/hooks/useModal'
 import { useToast } from '@/hooks/useToast'
@@ -130,9 +130,6 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
                 {usuario?.nombre ? `${usuario.nombre} ${usuario.apellido || ''}` : 'Tu Cuenta'}
               </h2>
             </div>
-            <span className={styles.memberTag}>
-              <Sparkles size={13} /> Cuenta Argentum
-            </span>
           </div>
 
           {/* Contact Details with Copy Actions */}

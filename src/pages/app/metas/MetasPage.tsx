@@ -87,13 +87,16 @@ export default function MetasPage() {
 
   const totals = useMemo(() => {
     const activeOnes = goals.filter(g => g.estado === 'activa')
-    const totalObjetivo = activeOnes.reduce((acc, g) => acc + Number(g.monto_objetivo), 0)
-    const totalAhorrado = activeOnes.reduce((acc, g) => acc + Number(g.monto_actual), 0)
+    const totalObjetivoARS = activeOnes.filter(g => (g.moneda || 'ARS') === 'ARS').reduce((acc, g) => acc + Number(g.monto_objetivo), 0)
+    const totalAhorradoARS = activeOnes.filter(g => (g.moneda || 'ARS') === 'ARS').reduce((acc, g) => acc + Number(g.monto_actual), 0)
+    const totalObjetivoUSD = activeOnes.filter(g => g.moneda === 'USD').reduce((acc, g) => acc + Number(g.monto_objetivo), 0)
+    const totalAhorradoUSD = activeOnes.filter(g => g.moneda === 'USD').reduce((acc, g) => acc + Number(g.monto_actual), 0)
     
     return {
-      totalObjetivo,
-      totalAhorrado,
-      porcentaje: totalObjetivo > 0 ? (totalAhorrado / totalObjetivo) * 100 : 0,
+      totalObjetivoARS,
+      totalAhorradoARS,
+      totalObjetivoUSD,
+      totalAhorradoUSD,
       completadas: goals.filter(g => g.estado === 'completada').length
     }
   }, [goals])
@@ -164,11 +167,6 @@ export default function MetasPage() {
     })
   }, [confirm, fetchAll, showToast])
 
-  const totalAhorrado = totals.totalAhorrado
-  const totalObjetivo = totals.totalObjetivo
-  const metasCompletadas = totals.completadas
-  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
-
   return (
     <div className={styles.page}>
       
@@ -191,17 +189,29 @@ export default function MetasPage() {
         className={styles.desktopSummaryBar}
         items={[
           {
-            label: "Ahorro acumulado",
-            value: formatCurrency(totalAhorrado),
+            label: totals.totalObjetivoUSD > 0 ? "Ahorro acumulado ARS" : "Ahorro acumulado",
+            value: formatMonto(totals.totalAhorradoARS, 'ARS'),
             highlight: true,
           },
-          {
-            label: "Objetivo global",
-            value: formatCurrency(totalObjetivo),
-          },
+          ...(totals.totalObjetivoUSD > 0 || totals.totalAhorradoUSD > 0 ? [
+            {
+              label: "Ahorro acumulado USD",
+              value: formatMonto(totals.totalAhorradoUSD, 'USD'),
+              highlight: true,
+            },
+            {
+              label: "Objetivo global USD",
+              value: formatMonto(totals.totalObjetivoUSD, 'USD'),
+            }
+          ] : [
+            {
+              label: "Objetivo global",
+              value: formatMonto(totals.totalObjetivoARS, 'ARS'),
+            }
+          ]),
           {
             label: "Completadas",
-            value: `${metasCompletadas} meta${metasCompletadas !== 1 ? 's' : ''}`,
+            value: `${totals.completadas} meta${totals.completadas !== 1 ? 's' : ''}`,
           },
         ]}
       />

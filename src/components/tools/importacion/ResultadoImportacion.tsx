@@ -12,7 +12,7 @@ export const ResultadoImportacion: React.FC<ResultadoImportacionProps> = ({
   resultado,
   onReset,
 }) => {
-  const { importadas, duplicadas, sin_billetera_usd, total_procesadas } = resultado
+  const { importadas, duplicadas, sin_billetera_usd, descartadas_manual, total_procesadas } = resultado
 
   return (
     <div className={`${styles.finalStateContainer} ${styles.resultCard}`}>
@@ -43,6 +43,12 @@ export const ResultadoImportacion: React.FC<ResultadoImportacionProps> = ({
           <span>Duplicadas omitidas:</span>
           <strong>{duplicadas}</strong>
         </div>
+        {descartadas_manual !== undefined && descartadas_manual > 0 && (
+          <div className={`${styles.stateDetailItem} ${styles.resultDetailItem}`}>
+            <span>Desmarcadas manualmente:</span>
+            <strong>{descartadas_manual}</strong>
+          </div>
+        )}
         {sin_billetera_usd > 0 && (
           <div className={`${styles.stateDetailItem} ${styles.resultDetailItem}`}>
             <span className={styles.resultItemOmitted}>Omitidas por USD (sin billetera):</span>

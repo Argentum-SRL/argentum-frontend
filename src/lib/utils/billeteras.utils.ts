@@ -47,19 +47,6 @@ export function findBankByNombre(nombre: string): BankDefinition | undefined {
   )
 }
 
-/**
- * Formatea un monto según la moneda.
- * ARS: $ 892.500  (sin decimales si son cero)
- * USD: USD 2.100
- */
-export function formatSaldo(monto: number, moneda: 'ARS' | 'USD'): string {
-  const formatted = new Intl.NumberFormat('es-AR', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(monto)
-
-  return moneda === 'ARS' ? `$ ${formatted}` : `USD ${formatted}`
-}
 
 /**
  * Formatea el input de saldo mientras el usuario escribe.

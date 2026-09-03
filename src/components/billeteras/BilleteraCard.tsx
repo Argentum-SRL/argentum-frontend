@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
 import type { Billetera } from '@/types'
-import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
+import { formatMonto } from '@/utils/format'
 import { getCardLogoUrl, findCardBrandByNombre } from '@/lib/utils/tarjetas.utils'
 import styles from './BilleteraCard.module.css'
 
@@ -254,7 +255,7 @@ const BilleteraCard = memo(({
             {labelNombre} · Saldo actual
           </p>
           <p className={`${styles.wcBalAmt} ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>
-            {formatSaldo(billetera.saldo_actual, billetera.moneda)}
+            {formatMonto(billetera.saldo_actual, billetera.moneda)}
           </p>
         </div>
       </div>

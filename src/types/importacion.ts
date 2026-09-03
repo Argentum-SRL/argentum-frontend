@@ -52,6 +52,7 @@ export interface ConfirmarImportacionResponse {
   importadas: number;
   duplicadas: number;
   sin_billetera_usd: number;
+  descartadas_manual?: number;
   total_procesadas: number;
 }
 

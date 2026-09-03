@@ -7,7 +7,8 @@ import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { calcularTotales, formatSaldo } from '@/lib/utils/billeteras.utils'
+import { calcularTotales } from '@/lib/utils/billeteras.utils'
+import { formatMonto } from '@/utils/format'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
 import type { EditPayload } from '@/components/billeteras/EditBilleteraModal'
@@ -198,7 +199,7 @@ export default function BilleterasPage() {
     return calcularTotales(billeteras, valorUSD)
   }, [billeteras, cotizacion])
 
-  const formatCurrency = (monto: number) => formatSaldo(monto, 'ARS')
+  const formatCurrency = (monto: number) => formatMonto(monto, 'ARS')
 
   // Ajustar frontCardId durante el render cuando la lista de billeteras cambia
   if (billeterasActivas !== prevBilleteras) {
@@ -419,7 +420,7 @@ export default function BilleterasPage() {
               </div>
               <span className={styles.cardAmount}>{formatCurrency(totalARS)}</span>
               <div className={styles.cardSubline}>
-                <span>≈ USD {totalUSD.toLocaleString('es-AR')}</span>
+                <span>≈ {formatMonto(totalUSD, 'USD')}</span>
               </div>
             </div>
           )}
@@ -440,7 +441,7 @@ export default function BilleterasPage() {
                 },
                 {
                   label: "Total USD",
-                  value: `USD ${totalUSD.toLocaleString('es-AR')}`,
+                  value: formatMonto(totalUSD, 'USD'),
                 },
               ]}
             />

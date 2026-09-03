@@ -13,7 +13,8 @@ import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
 import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
 import { PresionFuturaCard } from '@/components/tarjetas/PresionFuturaCard'
-import { formatSaldo, getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
+import { formatMonto } from '@/utils/format'
 import styles from './BilleteraDetallePage.module.css'
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
@@ -384,7 +385,7 @@ const BilleteraDetallePage: React.FC = () => {
           <div className={styles.headerSaldo}>
             <span className={styles.headerSaldoLabel}>Saldo actual</span>
             <div className={`${styles.headerSaldoValue} ${isLight ? styles.textLight : styles.textDark}`}>
-              {formatSaldo(billetera.saldo_actual, billetera.moneda)}
+              {formatMonto(billetera.saldo_actual, billetera.moneda)}
             </div>
           </div>
         </div>

@@ -309,7 +309,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
               </div>
             ) : (
               <div className={styles.montoHeroInputWrapper}>
-                <span className={styles.montoHeroPrefix}>{monedaAPagar === 'USD' ? 'u$s' : '$'}</span>
+                <span className={styles.montoHeroPrefix}>{monedaAPagar === 'USD' ? 'US$' : '$'}</span>
                 <input
                   ref={inputRef}
                   type="number"

@@ -1,9 +1,10 @@
-export function formatMonto(monto: number, moneda: 'ARS' | 'USD'): string {
+export function formatMonto(monto: number, moneda: 'ARS' | 'USD' | string = 'ARS'): string {
   const safeMonto = isNaN(monto) || monto === null || monto === undefined ? 0 : monto
   const tieneDecimales = safeMonto % 1 !== 0
+  const monedaNormalizada = String(moneda || 'ARS').toUpperCase() === 'USD' ? 'USD' : 'ARS'
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
-    currency: moneda,
+    currency: monedaNormalizada,
     minimumFractionDigits: tieneDecimales ? 2 : 0,
     maximumFractionDigits: 2
   }).format(safeMonto)

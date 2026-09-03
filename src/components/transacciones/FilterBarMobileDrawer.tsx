@@ -18,6 +18,7 @@ interface FilterBarMobileDrawerProps {
   billeteras: Billetera[]
   categorias: Categoria[]
   hasActiveFilters: boolean
+  showMonedaFilter?: boolean
 }
 
 export default function FilterBarMobileDrawer({
@@ -29,6 +30,7 @@ export default function FilterBarMobileDrawer({
   billeteras,
   categorias,
   hasActiveFilters,
+  showMonedaFilter = false,
 }: FilterBarMobileDrawerProps) {
   const { periodo: periodoActual } = usePeriodoActual()
 
@@ -168,6 +170,36 @@ export default function FilterBarMobileDrawer({
             </button>
           </div>
         </div>
+
+        {/* Moneda Selector */}
+        {showMonedaFilter && (
+          <div>
+            <div className={styles.popoverTitle}>Moneda</div>
+            <div className={styles.pillGroupMobile}>
+              <button
+                type="button"
+                className={`${styles.typePillMobile} ${!localFilters.moneda ? styles.typePillActiveTodosMobile : ''}`}
+                onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: undefined }))}
+              >
+                Todas
+              </button>
+              <button
+                type="button"
+                className={`${styles.typePillMobile} ${localFilters.moneda === 'ARS' ? styles.typePillActiveTodosMobile : ''}`}
+                onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: 'ARS' }))}
+              >
+                ARS
+              </button>
+              <button
+                type="button"
+                className={`${styles.typePillMobile} ${localFilters.moneda === 'USD' ? styles.typePillActiveTodosMobile : ''}`}
+                onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: 'USD' }))}
+              >
+                USD
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Billetera Selector */}
         <div>

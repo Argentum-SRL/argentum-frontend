@@ -9,11 +9,7 @@ interface Props {
   meses?: number
 }
 
-const formatMontoLocal = (value: number, moneda: 'ARS' | 'USD') => {
-  return moneda === 'USD' 
-    ? 'USD ' + Math.round(value).toLocaleString('es-AR') 
-    : '$' + Math.round(value).toLocaleString('es-AR')
-}
+import { formatMonto } from '@/utils/format'
 
 const ProgressBar: React.FC<{ proporcion: number }> = ({ proporcion }) => {
   const ref = React.useRef<HTMLDivElement>(null)
@@ -102,7 +98,7 @@ export const PresionFuturaCard: React.FC<Props> = ({ meses = 6 }) => {
           <div className={styles.headerLeft}>
             <span className={styles.ticketLabel}>Deuda futura en cuotas ({moneda})</span>
             <span className={styles.ticketDate}>
-              Próximos {meses} · {formatMontoLocal(totalComprometido, moneda)}
+              Próximos {meses} · {formatMonto(Math.round(totalComprometido), moneda)}
             </span>
           </div>
         </div>
@@ -123,14 +119,14 @@ export const PresionFuturaCard: React.FC<Props> = ({ meses = 6 }) => {
                     <ProgressBar proporcion={proporcion} />
                   </div>
                   
-                  <span className={styles.mesTotal}>{formatMontoLocal(mesTotal, moneda)}</span>
+                  <span className={styles.mesTotal}>{formatMonto(Math.round(mesTotal), moneda)}</span>
                 </div>
 
                 {tarjetasFiltradas && tarjetasFiltradas.length > 1 && (
                   <div className={styles.detalleTarjetas}>
                     {tarjetasFiltradas.map(t => (
                       <span key={t.tarjeta_id} className={styles.chipTarjeta}>
-                        {t.tarjeta_nombre}: {formatMontoLocal(t.total, moneda)}
+                        {t.tarjeta_nombre}: {formatMonto(Math.round(t.total), moneda)}
                       </span>
                     ))}
                   </div>

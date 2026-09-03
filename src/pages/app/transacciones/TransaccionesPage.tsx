@@ -30,7 +30,6 @@ export default function TransaccionesPage() {
   const { lastDataUpdate } = useNotificaciones()
 
   const [activeTab, setActiveTab] = useState<'historial' | 'cuotas'>('historial')
-  const mainCurrency = 'ARS' // Moneda base para el resumen
   
   const defaultFilters: TransaccionFilters = useMemo(() => ({
     tipo: undefined,
@@ -44,6 +43,7 @@ export default function TransaccionesPage() {
   }), [periodoActual])
 
   const [filters, setFilters] = useState<TransaccionFilters>(defaultFilters)
+  const mainCurrency = (filters?.moneda as 'ARS' | 'USD') || 'ARS' // Moneda base para el resumen adaptada al filtro activo
 
   // Sincronizar filtros por defecto cuando el usuario cargue o cambie su ciclo
   const periodoKey = periodoActual ? `${periodoActual.fecha_inicio}_${periodoActual.fecha_fin}` : ''
@@ -64,6 +64,10 @@ export default function TransaccionesPage() {
 
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   const { open, confirm } = useModal()
+
+  const showMonedaFilter = useMemo(() => {
+    return billeteras.some(b => b.moneda === 'USD') || transacciones.some(t => t.moneda === 'USD')
+  }, [billeteras, transacciones])
 
   const hasActiveFilters = useMemo(() => Object.entries(filters).some(([k, v]) => {
     if (k === 'fecha_desde' || k === 'fecha_hasta') {
@@ -334,7 +338,7 @@ export default function TransaccionesPage() {
     }
   }, [filteredTransacciones, mainCurrency])
 
-  const formatCurrency = (monto: number) => formatMonto(Math.round(monto), 'ARS')
+  const formatCurrency = (monto: number) => formatMonto(Math.round(monto), mainCurrency)
   const resumen = useMemo(() => ({
     balance,
     ingresos: totalIngresos,
@@ -470,6 +474,7 @@ export default function TransaccionesPage() {
             billeteras={billeteras}
             categorias={categorias}
             hasActiveFilters={hasActiveFilters}
+            showMonedaFilter={showMonedaFilter}
           />
 
           {/* ── Pendientes Banner ────────────────────────────────────────────── */}

@@ -18,6 +18,7 @@ import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
 import type { Billetera, Categoria, TarjetaCredito, Transaccion, Presupuesto } from '@/types'
 import type { Goal } from '@/types/goals'
+import { formatMonto } from '@/utils/format'
 import styles from './SearchModal.module.css'
 
 interface SearchModalProps {
@@ -238,7 +239,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     title: b.nombre,
     subtitle: b.es_efectivo ? 'Efectivo' : 'Banco / Cuenta Digital',
     Icon: Wallet,
-    extra: `${b.moneda} ${b.saldo_actual.toLocaleString('es-AR', { minimumFractionDigits: b.saldo_actual % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })}`,
+    extra: formatMonto(b.saldo_actual, b.moneda),
     path: `/app/billeteras/${b.id}`
   }))
 
@@ -247,7 +248,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     type: 'presupuesto',
     id: `pres-${p.id}`,
     title: p.nombre,
-    subtitle: `Límite: ${p.moneda} ${p.monto.toLocaleString('es-AR')}`,
+    subtitle: `Límite: ${formatMonto(p.monto, p.moneda)}`,
     Icon: PieChart,
     extra: p.periodo_actual ? `${p.periodo_actual.porcentaje_usado.toFixed(0)}%` : '',
     path: '/app/presupuestos'
@@ -258,25 +259,20 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     type: 'meta',
     id: `meta-${g.id}`,
     title: g.nombre,
-    subtitle: `Objetivo: ${g.moneda} ${g.monto_objetivo.toLocaleString('es-AR')}`,
+    subtitle: `Objetivo: ${formatMonto(g.monto_objetivo, g.moneda)}`,
     Icon: Target,
     extra: `${((g.monto_actual / g.monto_objetivo) * 100).toFixed(0)}%`,
     path: `/app/metas/${g.id}`
   }))
 
   transacciones.forEach(t => {
-    const tieneDecimales = t.monto % 1 !== 0
-    const formatMonto = t.monto.toLocaleString('es-AR', {
-      minimumFractionDigits: tieneDecimales ? 2 : 0,
-      maximumFractionDigits: 2
-    })
     results.push({
       type: 'transaccion',
       id: `tx-${t.id}`,
       title: t.descripcion || 'Sin descripción',
       subtitle: `${t.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'} • ${new Date(t.fecha).toLocaleDateString('es-AR')}`,
       Icon: ArrowUpDown,
-      extra: `${t.tipo === 'ingreso' ? '+' : '-'} ${t.moneda} ${formatMonto}`,
+      extra: `${t.tipo === 'ingreso' ? '+' : '-'} ${formatMonto(t.monto, t.moneda)}`,
       extraSub: billeteras.find(b => b.id === t.billetera_id)?.nombre || '',
       action: () => {
         open('transaccion', {

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { SelectInput } from '@/components/ui'
 import type { TarjetaCredito, Billetera } from '@/types'
+import { formatMonto } from '@/utils/format'
 import styles from './ImportacionResumenSection.module.css'
 
 interface SeleccionTarjetaYBilleteraProps {
@@ -56,7 +57,7 @@ export const SeleccionTarjetaYBilletera: React.FC<SeleccionTarjetaYBilleteraProp
 
   const optionsBilleteras = activeArsBilleteras.map(b => ({
     value: b.id,
-    label: `${b.nombre} - Saldo: $${b.saldo_actual.toLocaleString('es-AR')}`,
+    label: `${b.nombre} - Saldo: ${formatMonto(b.saldo_actual, b.moneda)}`,
   }))
 
   return (

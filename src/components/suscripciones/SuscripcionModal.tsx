@@ -553,7 +553,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                     ))}
                   </div>
                   {costoMensual && state.frecuencia !== 'mensual' && (
-                    <p className={styles.previewCosto}>Equivale a {state.moneda === 'ARS' ? '$' : 'u$s'} {costoMensual} por mes</p>
+                    <p className={styles.previewCosto}>Equivale a {state.moneda === 'ARS' ? '$' : 'US$'} {costoMensual} por mes</p>
                   )}
                 </div>
 

@@ -207,22 +207,32 @@ export default function GruposCuotasTab() {
   // Métricas globales (Desktop only)
   const metricas = useMemo(() => {
     let cuotasActivas = 0
-    let cuotaMensualTotal = 0
-    let deudaTotalPendiente = 0
+    let cuotaMensualARS = 0
+    let cuotaMensualUSD = 0
+    let deudaPendienteARS = 0
+    let deudaPendienteUSD = 0
 
     grupos.forEach((g) => {
       const isActiva = g.cantidad_pendientes > 0 && g.estado !== 'cancelado'
       if (isActiva) {
         cuotasActivas++
-        cuotaMensualTotal += Number(g.monto_cuota) || 0
-        deudaTotalPendiente += Number(g.total_pendiente) || 0
+        const moneda = (g.moneda || 'ARS').toUpperCase()
+        if (moneda === 'USD') {
+          cuotaMensualUSD += Number(g.monto_cuota) || 0
+          deudaPendienteUSD += Number(g.total_pendiente) || 0
+        } else {
+          cuotaMensualARS += Number(g.monto_cuota) || 0
+          deudaPendienteARS += Number(g.total_pendiente) || 0
+        }
       }
     })
 
     return {
       cuotasActivas,
-      cuotaMensualTotal,
-      deudaTotalPendiente
+      cuotaMensualARS,
+      cuotaMensualUSD,
+      deudaPendienteARS,
+      deudaPendienteUSD
     }
   }, [grupos])
 
@@ -272,14 +282,16 @@ export default function GruposCuotasTab() {
         <div className={styles.metricItem}>
           <span className={styles.metricLabel}>Compromiso / mes</span>
           <span className={styles.metricValue}>
-            {formatMonto(Math.round(metricas.cuotaMensualTotal), 'ARS')}
+            {formatMonto(Math.round(metricas.cuotaMensualARS), 'ARS')}
+            {metricas.cuotaMensualUSD > 0 && ` + ${formatMonto(Math.round(metricas.cuotaMensualUSD), 'USD')}`}
           </span>
         </div>
         <div className={styles.metricDivider} />
         <div className={styles.metricItem}>
           <span className={styles.metricLabel}>Total pendiente</span>
           <span className={`${styles.metricValue} ${styles.metricRed}`}>
-            {formatMonto(Math.round(metricas.deudaTotalPendiente), 'ARS')}
+            {formatMonto(Math.round(metricas.deudaPendienteARS), 'ARS')}
+            {metricas.deudaPendienteUSD > 0 && ` + ${formatMonto(Math.round(metricas.deudaPendienteUSD), 'USD')}`}
           </span>
         </div>
       </div>

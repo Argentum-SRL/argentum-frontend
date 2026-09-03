@@ -19,7 +19,8 @@ import type { Billetera, CotizacionDolar } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { getBankById, findBankByNombre, getBankLogoUrl, formatSaldo, getInitials } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
+import { formatMonto } from '@/utils/format'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { DateInput } from '@/components/ui'
 import styles from './TransferenciaModal.module.css'
@@ -237,14 +238,14 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     }
     if (isOverdraft) {
       showToast(
-        `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatSaldo(saldoOrigenActual, monedaOrigen)}, Solicitado: ${formatSaldo(debitoTotalOrigen, monedaOrigen)}`,
+        `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatMonto(saldoOrigenActual, monedaOrigen)}, Solicitado: ${formatMonto(debitoTotalOrigen, monedaOrigen)}`,
         'error'
       )
       return
     }
     if (isDestinoOverdraft) {
       showToast(
-        `Saldo insuficiente en ${billeteraDestino?.nombre} para cubrir la comisión de ${formatSaldo(comisionNum, monedaComision)}`,
+        `Saldo insuficiente en ${billeteraDestino?.nombre} para cubrir la comisión de ${formatMonto(comisionNum, monedaComision)}`,
         'error'
       )
       return
@@ -417,7 +418,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       </div>
 
                       <div className={styles.pickerItemBalance}>
-                        <span className={styles.pickerItemAmount}>{formatSaldo(b.saldo_actual, b.moneda)}</span>
+                        <span className={styles.pickerItemAmount}>{formatMonto(b.saldo_actual, b.moneda)}</span>
                         {isCurrent && <Check size={16} className={styles.checkIcon} />}
                       </div>
                     </button>
@@ -493,12 +494,12 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                         </div>
                         <div className={styles.accountBalances}>
                           <span className={styles.currentBalance}>
-                            Saldo: {formatSaldo(saldoOrigenActual, monedaOrigen)}
+                            Saldo: {formatMonto(saldoOrigenActual, monedaOrigen)}
                           </span>
                           {debitoTotalOrigen > 0 && (
                             <span className={styles.projectedDown}>
                               <TrendingDown size={12} />
-                              {formatSaldo(saldoOrigenProyectado, monedaOrigen)}
+                              {formatMonto(saldoOrigenProyectado, monedaOrigen)}
                             </span>
                           )}
                         </div>
@@ -561,12 +562,12 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                         </div>
                         <div className={styles.accountBalances}>
                           <span className={styles.currentBalance}>
-                            Saldo: {formatSaldo(saldoDestinoActual, monedaDestino)}
+                            Saldo: {formatMonto(saldoDestinoActual, monedaDestino)}
                           </span>
                           {montoDestinoNum > 0 && (
                             <span className={styles.projectedUp}>
                               <TrendingUp size={12} />
-                              +{formatSaldo(saldoDestinoProyectado, monedaDestino)}
+                              +{formatMonto(saldoDestinoProyectado, monedaDestino)}
                             </span>
                           )}
                         </div>
@@ -598,7 +599,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     <div className={styles.warningBanner}>
                       <AlertCircle size={14} className={styles.warningIcon} />
                       <span>
-                        El monto supera el saldo disponible en {billeteraOrigen?.nombre} ({formatSaldo(saldoOrigenActual, monedaOrigen)})
+                        El monto supera el saldo disponible en {billeteraOrigen?.nombre} ({formatMonto(saldoOrigenActual, monedaOrigen)})
                       </span>
                     </div>
                   )}
@@ -664,14 +665,14 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     <div className={styles.cotizacionBanner}>
                       <div className={styles.cotizacionText}>
                         {monedaOrigen === 'ARS' ? (
-                          <span>Estás comprando dólares a {formatSaldo(cotizacionImplicita, 'ARS')} pesos</span>
+                          <span>Estás comprando dólares a {formatMonto(cotizacionImplicita, 'ARS')} pesos</span>
                         ) : (
-                          <span>Estás vendiendo dólares a {formatSaldo(cotizacionImplicita, 'ARS')} pesos</span>
+                          <span>Estás vendiendo dólares a {formatMonto(cotizacionImplicita, 'ARS')} pesos</span>
                         )}
                       </div>
                       {cotizacionOficialRef !== null && (
                         <div className={styles.cotizacionRef}>
-                          Referencia oficial: {formatSaldo(cotizacionOficialRef, 'ARS')}
+                          Referencia oficial: {formatMonto(cotizacionOficialRef, 'ARS')}
                         </div>
                       )}
                     </div>
@@ -681,7 +682,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     <div className={styles.warningBanner}>
                       <AlertCircle size={14} className={styles.warningIcon} />
                       <span>
-                        El monto total ({formatSaldo(debitoTotalOrigen, monedaOrigen)}) supera el saldo disponible en {billeteraOrigen?.nombre} ({formatSaldo(saldoOrigenActual, monedaOrigen)})
+                        El monto total ({formatMonto(debitoTotalOrigen, monedaOrigen)}) supera el saldo disponible en {billeteraOrigen?.nombre} ({formatMonto(saldoOrigenActual, monedaOrigen)})
                       </span>
                     </div>
                   )}
@@ -798,15 +799,15 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   <div className={styles.impactSummaryText}>
                     {esMismaMoneda ? (
                       <>
-                        Transferís <strong>{formatSaldo(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> a <strong>{billeteraDestino.nombre}</strong>
+                        Transferís <strong>{formatMonto(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> a <strong>{billeteraDestino.nombre}</strong>
                       </>
                     ) : (
                       <>
-                        Transferís <strong>{formatSaldo(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> y recibís <strong>{formatSaldo(montoDestinoNum, monedaDestino)}</strong> en <strong>{billeteraDestino.nombre}</strong>
+                        Transferís <strong>{formatMonto(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> y recibís <strong>{formatMonto(montoDestinoNum, monedaDestino)}</strong> en <strong>{billeteraDestino.nombre}</strong>
                       </>
                     )}
                     {comisionNum > 0 && (
-                      <span> · Comisión: {formatSaldo(comisionNum, monedaComision)}</span>
+                      <span> · Comisión: {formatMonto(comisionNum, monedaComision)}</span>
                     )}
                   </div>
                 </div>

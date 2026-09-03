@@ -234,6 +234,7 @@ const SuscripcionesPage: React.FC = () => {
           <h1>Suscripciones</h1>
           <p className={styles.subtitle}>
             {suscripcionesActivas.length} activas · Total mensual: {formatCurrency(totalMensualARS)}
+            {totalMensualUSD > 0 && ` + ${formatMonto(totalMensualUSD, 'USD')}`}
           </p>
         </div>
         <button className={styles.nuevaBtn} onClick={handleCreate}>
@@ -255,7 +256,7 @@ const SuscripcionesPage: React.FC = () => {
           <div className={styles.cardSubline}>
             <span>
               {totalMensualUSD > 0 
-                ? `+ US$ ${totalMensualUSD.toLocaleString('es-AR', { minimumFractionDigits: totalMensualUSD % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })} en dólares`
+                ? `+ ${formatMonto(totalMensualUSD, 'USD')} en dólares`
                 : `${suscripcionesActivas.length} suscripciones registradas`}
             </span>
           </div>
@@ -272,7 +273,7 @@ const SuscripcionesPage: React.FC = () => {
           },
           {
             label: "Total mensual USD",
-            value: `US$ ${totalMensualUSD.toLocaleString('es-AR', { minimumFractionDigits: totalMensualUSD % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })}`,
+            value: formatMonto(totalMensualUSD, 'USD'),
           },
           {
             label: "Activas",

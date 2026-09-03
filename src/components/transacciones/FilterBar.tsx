@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote } from 'lucide-react'
+import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign } from 'lucide-react'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
@@ -16,6 +16,7 @@ interface FilterBarProps {
   billeteras: Billetera[]
   categorias: Categoria[]
   hasActiveFilters: boolean
+  showMonedaFilter?: boolean
 }
 
 function useClickOutside(
@@ -44,13 +45,15 @@ export default function FilterBar({
   onClear,
   billeteras,
   categorias,
-  hasActiveFilters
+  hasActiveFilters,
+  showMonedaFilter = false
 }: FilterBarProps) {
   const { periodo: periodoActual } = usePeriodoActual()
 
   const [walletPopoverOpen, setWalletPopoverOpen] = useState(false)
   const [catPopoverOpen, setCatPopoverOpen] = useState(false)
   const [datePopoverOpen, setDatePopoverOpen] = useState(false)
+  const [monedaPopoverOpen, setMonedaPopoverOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(filters.busqueda || '')
   const [mobileSearchOpen, setMobileSearchOpen] = useState(Boolean(filters.busqueda))
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -74,10 +77,12 @@ export default function FilterBar({
   const walletRef = useRef<HTMLDivElement>(null)
   const catRef = useRef<HTMLDivElement>(null)
   const dateRef = useRef<HTMLDivElement>(null)
+  const monedaRef = useRef<HTMLDivElement>(null)
 
   useClickOutside(walletRef, () => setWalletPopoverOpen(false))
   useClickOutside(catRef, () => setCatPopoverOpen(false))
   useClickOutside(dateRef, () => setDatePopoverOpen(false), '[data-portal="date-picker"]')
+  useClickOutside(monedaRef, () => setMonedaPopoverOpen(false))
 
   // Debounce para la búsqueda
   useEffect(() => {
@@ -295,6 +300,7 @@ export default function FilterBar({
                   billeteras,
                   categorias,
                   hasActiveFilters,
+                  showMonedaFilter,
                 },
               })}
               aria-label="Abrir filtros"
@@ -425,6 +431,54 @@ export default function FilterBar({
               </div>
             )}
           </div>
+
+          {/* Moneda Popover */}
+          {showMonedaFilter && (
+            <div className={`${styles.pill} ${styles.pillRelative}`} ref={monedaRef}>
+              <div className={styles.pillIconFlex} onClick={() => setMonedaPopoverOpen(!monedaPopoverOpen)}>
+                <DollarSign size={14} />
+                {filters.moneda ? filters.moneda : 'Moneda'}
+                <ChevronDown size={14} />
+              </div>
+              {filters.moneda && (
+                <button 
+                  className={styles.pillRemove} 
+                  onClick={(e) => { e.stopPropagation(); onFilterChange({ ...filters, moneda: undefined }); }} 
+                  aria-label="Remover filtro de moneda"
+                >
+                  <X size={13} />
+                </button>
+              )}
+              {monedaPopoverOpen && (
+                <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
+                  <div className={styles.popoverTitle}>Moneda</div>
+                  <div className={styles.popoverList}>
+                    <button
+                      type="button"
+                      className={`${styles.popoverItem} ${!filters.moneda ? styles.popoverItemActive : ''}`}
+                      onClick={() => { onFilterChange({ ...filters, moneda: undefined }); setMonedaPopoverOpen(false); }}
+                    >
+                      Todas las monedas
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.popoverItem} ${filters.moneda === 'ARS' ? styles.popoverItemActive : ''}`}
+                      onClick={() => { onFilterChange({ ...filters, moneda: 'ARS' }); setMonedaPopoverOpen(false); }}
+                    >
+                      Pesos (ARS)
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.popoverItem} ${filters.moneda === 'USD' ? styles.popoverItemActive : ''}`}
+                      onClick={() => { onFilterChange({ ...filters, moneda: 'USD' }); setMonedaPopoverOpen(false); }}
+                    >
+                      Dólares (USD)
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {filters.estado_verificacion === 'pendiente' && (
             <div className={`${styles.pill} ${styles.pillActive}`}>

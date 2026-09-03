@@ -42,6 +42,7 @@ export interface ModalPayloadMap {
     billeteras: Billetera[]
     categorias: Categoria[]
     hasActiveFilters: boolean
+    showMonedaFilter?: boolean
   }
   proyeccion: {
     proyeccion: Proyeccion

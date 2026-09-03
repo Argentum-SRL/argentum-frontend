@@ -37,15 +37,7 @@ import styles from './DashboardPage.module.css'
 // ── Formatter ────────────────────────────────────────────────────────────
 
 const fmt = (n: number, moneda: 'ARS' | 'USD' = 'ARS') => {
-  if (n === null || n === undefined || isNaN(n)) {
-    return moneda === 'USD' ? 'USD $ 0,00' : '$ 0,00'
-  }
-  const abs = Math.abs(n)
-  const [int, dec] = abs.toFixed(2).split('.')
-  const intFmt = int.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-  const monto = dec === '00' ? intFmt : `${intFmt},${dec}`
-  const signo = n < 0 ? '-' : ''
-  return moneda === 'USD' ? `${signo}USD $ ${monto}` : `${signo}$ ${monto}`
+  return formatMonto(n, moneda)
 }
 
 // ── Components ───────────────────────────────────────────────────────────

@@ -91,6 +91,7 @@ export function ModalPortal() {
           billeteras={filterDrawerData.billeteras}
           categorias={filterDrawerData.categorias}
           hasActiveFilters={filterDrawerData.hasActiveFilters}
+          showMonedaFilter={filterDrawerData.showMonedaFilter}
         />
       )}
 

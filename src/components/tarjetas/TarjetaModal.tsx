@@ -217,8 +217,15 @@ export default function TarjetaModal() {
       console.log('Payload enviando:', payload)
 
       if (data.tarjeta) {
-        await tarjetaService.updateTarjeta(data.tarjeta.id, payload)
-        showToast('Tarjeta actualizada', 'success')
+        const res = await tarjetaService.updateTarjeta(data.tarjeta.id, payload)
+        if (res?.cuotas_recalculadas && res.cuotas_recalculadas > 0) {
+          showToast(
+            `Tarjeta actualizada. Se recalcularon las fechas de ${res.cuotas_recalculadas} ${res.cuotas_recalculadas === 1 ? 'cuota futura' : 'cuotas futuras'}.`,
+            'success'
+          )
+        } else {
+          showToast('Tarjeta actualizada', 'success')
+        }
       } else {
         await tarjetaService.createTarjeta(payload)
         showToast('Tarjeta guardada', 'success')

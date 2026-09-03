@@ -26,6 +26,9 @@ interface TicketData {
   vencimiento: string
   cuotas: CuotaResumen[]
   total: number
+  totalOriginal?: number
+  totalVencidoAnterior?: number
+  totalAPagar?: number
   isFuture?: boolean
   isPast?: boolean
   pagado?: boolean
@@ -131,7 +134,10 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       cierre: resumen.fecha_cierre_proximo,
       vencimiento: resumen.fecha_vencimiento_proximo,
       cuotas: resumen.cuotas_resumen_actual,
-      total: Number(resumen.total_comprometido_resumen_actual)
+      total: Number(resumen.total_comprometido_resumen_actual),
+      totalOriginal: resumen.total_original_resumen_actual !== undefined ? Number(resumen.total_original_resumen_actual) : undefined,
+      totalVencidoAnterior: resumen.total_deuda_vencida_anterior !== undefined ? Number(resumen.total_deuda_vencida_anterior) : undefined,
+      totalAPagar: resumen.total_a_pagar_resumen_actual !== undefined ? Number(resumen.total_a_pagar_resumen_actual) : undefined
     })
 
     const proxCierre = parseLocalDate(resumen.fecha_cierre_proximo)
@@ -152,7 +158,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       cierre: toLocalYMD(proxCierre),
       vencimiento: toLocalYMD(proxVenc),
       cuotas: resumen.cuotas_resumen_siguiente,
-      total: Number(resumen.total_comprometido_resumen_siguiente)
+      total: Number(resumen.total_comprometido_resumen_siguiente),
+      totalOriginal: resumen.total_original_resumen_siguiente !== undefined ? Number(resumen.total_original_resumen_siguiente) : undefined
     })
 
     // 4. Add future statements
@@ -327,11 +334,32 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
 
         <div className={styles.ticketFooter}>
           <div className={styles.totalRow}>
-            <span className={styles.totalLabel}>Total</span>
+            <span className={styles.totalLabel}>
+              {currentTicket.totalOriginal !== undefined && currentTicket.totalOriginal > currentTicket.total
+                ? 'Total pendiente'
+                : 'Total'}
+            </span>
             <span className={styles.totalValue}>
               {formatMonto(currentTicket.total, tarjeta.moneda)}
             </span>
           </div>
+
+          {currentTicket.totalVencidoAnterior !== undefined && currentTicket.totalVencidoAnterior > 0 && (
+            <>
+              <div className={styles.totalRow}>
+                <span className={styles.totalLabel}>Deuda vencida anterior</span>
+                <span className={styles.totalValue}>
+                  {formatMonto(currentTicket.totalVencidoAnterior, tarjeta.moneda)}
+                </span>
+              </div>
+              <div className={styles.totalRow}>
+                <span className={styles.totalLabel}>Total a pagar</span>
+                <span className={styles.totalValue}>
+                  {formatMonto(currentTicket.totalAPagar ?? (currentTicket.total + currentTicket.totalVencidoAnterior), tarjeta.moneda)}
+                </span>
+              </div>
+            </>
+          )}
           
           {currentTicket.vencimiento && (
             <div className={`${styles.vencimientoRow} ${isVencePronto(currentTicket.vencimiento) ? styles.vencimientoUrgent : ''}`}>
@@ -348,7 +376,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
               if (isPaid) {
                 return (
                   <div className={styles.paidBadge}>
-                    ✓ Resumen Pagado
+                    Resumen Pagado
                   </div>
                 )
               }
@@ -367,7 +395,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
               return (
                 <div className={styles.unpaidContainer}>
                   <div className={styles.unpaidBadge}>
-                    ⚠️ Resumen Impago
+                    Resumen Impago
                   </div>
                   <button 
                     type="button" 

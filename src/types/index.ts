@@ -391,6 +391,10 @@ export interface ResumenTarjeta {
   fecha_vencimiento_proximo: string
   total_comprometido_resumen_actual: number
   total_comprometido_resumen_siguiente: number
+  total_original_resumen_actual?: number
+  total_original_resumen_siguiente?: number
+  total_deuda_vencida_anterior?: number
+  total_a_pagar_resumen_actual?: number
   cuotas_resumen_actual: CuotaResumen[]
   cuotas_resumen_siguiente: CuotaResumen[]
   resumenes_futuros: ResumenFuturo[]
@@ -411,6 +415,7 @@ export interface TarjetaCredito {
   color: string | null
   fecha_creacion: string
   resumen_actual?: ResumenTarjeta
+  cuotas_recalculadas?: number
 }
 
 export interface TarjetaCreditoCreate {

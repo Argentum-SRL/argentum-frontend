@@ -111,9 +111,13 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
     vencDate: string, 
     cuotas: CuotaResumen[], 
     total: number,
-    emptyMsg: string
+    emptyMsg: string,
+    totalOriginal?: number,
+    totalVencidoAnterior?: number,
+    totalAPagar?: number
   ) => {
     const alert = isVencePronto(vencDate)
+    const hayPagadas = totalOriginal !== undefined && totalOriginal > total
     
     return (
       <div className={styles.section}>
@@ -132,9 +136,21 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
 
         <div className={styles.sectionFooter}>
           <div className={styles.totalRow}>
-            <span className={styles.totalLabel}>Total</span>
+            <span className={styles.totalLabel}>{hayPagadas ? 'Total Pendiente' : 'Total'}</span>
             <span className={styles.totalValue}>{formatMonto(total, tarjeta.moneda)}</span>
           </div>
+          {totalVencidoAnterior !== undefined && totalVencidoAnterior > 0 && (
+            <>
+              <div className={styles.totalRow}>
+                <span className={styles.totalLabel}>Deuda vencida anterior</span>
+                <span className={styles.totalValue}>{formatMonto(totalVencidoAnterior, tarjeta.moneda)}</span>
+              </div>
+              <div className={styles.totalRow}>
+                <span className={styles.totalLabel}>Total a pagar</span>
+                <span className={styles.totalValue}>{formatMonto(totalAPagar ?? (total + totalVencidoAnterior), tarjeta.moneda)}</span>
+              </div>
+            </>
+          )}
           <div className={styles.vencimientoInfo}>
             <span className={`${styles.vencimientoDate} ${alert ? styles.vencimientoAlerta : ''}`}>
               Vence el {formatDate(vencDate)}
@@ -190,7 +206,10 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
               resumen.fecha_vencimiento_proximo,
               resumen.cuotas_resumen_actual,
               resumen.total_comprometido_resumen_actual,
-              "Sin gastos en este resumen"
+              "Sin gastos en este resumen",
+              resumen.total_original_resumen_actual,
+              resumen.total_deuda_vencida_anterior,
+              resumen.total_a_pagar_resumen_actual
             )}
 
             {renderSection(
@@ -199,7 +218,8 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
               getProximoMesDateStr(resumen.fecha_vencimiento_proximo),
               resumen.cuotas_resumen_siguiente,
               resumen.total_comprometido_resumen_siguiente,
-              "Sin gastos comprometidos"
+              "Sin gastos comprometidos",
+              resumen.total_original_resumen_siguiente
             )}
 
             {resumen.resumenes_futuros.length > 0 && (

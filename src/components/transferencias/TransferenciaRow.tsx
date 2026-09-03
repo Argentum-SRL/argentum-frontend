@@ -56,6 +56,12 @@ export const TransferenciaRow = memo(({
     ? formatHora(transferencia.fecha_creacion)
     : ''
 
+  const monedaOrigen = transferencia.moneda_origen || billeteraOrigen?.moneda || transferencia.moneda
+  const monedaDestino = transferencia.moneda_destino || billeteraDestino?.moneda || transferencia.moneda
+  const esCrossCurrency = monedaOrigen !== monedaDestino
+  const montoOrigen = transferencia.monto_origen ?? transferencia.monto
+  const montoDestino = transferencia.monto_destino ?? transferencia.monto
+
   return (
     <div className={styles.row}>
       {/* ── Dual Overlapping Bank Avatar (38px Compact) ── */}
@@ -92,6 +98,11 @@ export const TransferenciaRow = memo(({
             <span className={styles.arrowIcon}>→</span>
             <span className={styles.bankName}>{visDestino.nombre}</span>
           </span>
+          {esCrossCurrency && (
+            <span className={styles.exchangeBadge}>
+              {monedaOrigen === 'ARS' ? 'Compra USD' : 'Venta USD'}
+            </span>
+          )}
         </div>
 
         {(transferencia.notas || hora) && (
@@ -113,12 +124,38 @@ export const TransferenciaRow = memo(({
 
       {/* ── Amount Area ── */}
       <div className={styles.amountArea}>
-        <span className={styles.amount}>
-          {formatMonto(transferencia.monto, transferencia.moneda)}
-        </span>
-        <span className={styles.currencyMeta}>
-          {transferencia.moneda}
-        </span>
+        {esCrossCurrency ? (
+          <>
+            <div className={styles.crossCurrencyAmounts}>
+              <span className={styles.amountSale}>-{formatMonto(montoOrigen, monedaOrigen)}</span>
+              <span className={styles.amountArrow}>→</span>
+              <span className={styles.amountEntry}>+{formatMonto(montoDestino, monedaDestino)}</span>
+            </div>
+            <div className={styles.rateMetaRow}>
+              {transferencia.cotizacion ? (
+                <span className={styles.rateBadge}>
+                  1 USD = {formatMonto(transferencia.cotizacion, 'ARS')}
+                </span>
+              ) : (
+                <span className={styles.cambioMonedaBadge}>Cambio de moneda</span>
+              )}
+              {transferencia.monto_comision ? (
+                <span className={styles.comisionBadge}>
+                  Comisión: {formatMonto(transferencia.monto_comision, transferencia.moneda_comision || monedaOrigen)}
+                </span>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <>
+            <span className={styles.amount}>
+              {formatMonto(transferencia.monto, transferencia.moneda)}
+            </span>
+            <span className={styles.currencyMeta}>
+              {transferencia.moneda}
+            </span>
+          </>
+        )}
       </div>
 
       {/* ── Delete Button ── */}

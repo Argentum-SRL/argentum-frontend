@@ -236,6 +236,14 @@ export interface TransferenciaInterna {
   billetera_destino_id: string
   monto: number
   moneda: 'ARS' | 'USD'
+  monto_origen?: number | null
+  monto_destino?: number | null
+  moneda_origen?: 'ARS' | 'USD' | null
+  moneda_destino?: 'ARS' | 'USD' | null
+  cotizacion?: number | null
+  transaccion_comision_id?: string | null
+  monto_comision?: number | null
+  moneda_comision?: 'ARS' | 'USD' | null
   fecha: string
   notas: string | null
   fecha_creacion: string

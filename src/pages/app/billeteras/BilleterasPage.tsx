@@ -572,6 +572,7 @@ export default function BilleterasPage() {
             void fetchPageData()
           }}
           billeteras={billeteras}
+          cotizacionOficial={cotizacion}
         />
       )}
     </div>

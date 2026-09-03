@@ -11,10 +11,11 @@ import {
   AlertCircle,
   TrendingDown,
   TrendingUp,
-  Wallet
+  Wallet,
+  Percent,
 } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
-import type { Billetera } from '@/types'
+import type { Billetera, CotizacionDolar } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -28,6 +29,7 @@ interface TransferenciaModalProps {
   onClose: () => void
   onSuccess: () => void
   billeteras: Billetera[]
+  cotizacionOficial?: CotizacionDolar | null
 }
 
 function todayLocal(): string {
@@ -37,7 +39,6 @@ function todayLocal(): string {
 
 function getMinDateLocal(): string {
   const d = new Date()
-  // Restar 2 años
   d.setFullYear(d.getFullYear() - 2)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
@@ -83,50 +84,40 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   onClose,
   onSuccess,
   billeteras,
+  cotizacionOficial,
 }) => {
   const { showToast } = useToast()
 
-  const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS')
-  const [monto, setMonto] = useState<number | null>(null)
-  const [fecha, setFecha] = useState(todayLocal())
-  const [notas, setNotas] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSwapping, setIsSwapping] = useState(false)
-  const [pickerMode, setPickerMode] = useState<'origen' | 'destino' | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-
-  // Billeteras activas de la moneda seleccionada
+  // Todas las billeteras activas disponibles
   const activeWallets = useMemo(() => {
-    return billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda)
-  }, [billeteras, moneda])
+    return billeteras.filter(b => b.estado === 'activa')
+  }, [billeteras])
 
-  // Selección inicial automática
+  // Selección de billetera origen
   const [billeteraOrigenId, setBilleteraOrigenId] = useState<string>(() => {
-    const active = billeteras.filter(b => b.estado === 'activa' && b.moneda === 'ARS')
-    if (active.length > 0) {
-      const best = active.find(b => b.es_principal && b.saldo_actual > 0) ||
-        active.find(b => b.saldo_actual > 0) ||
-        active.find(b => b.es_principal) ||
-        active[0]
+    const activeARS = activeWallets.filter(b => b.moneda === 'ARS')
+    if (activeARS.length > 0) {
+      const best = activeARS.find(b => b.es_principal && b.saldo_actual > 0) ||
+        activeARS.find(b => b.saldo_actual > 0) ||
+        activeARS.find(b => b.es_principal) ||
+        activeARS[0]
       return best.id
     }
-    return ''
+    return activeWallets[0]?.id || ''
   })
 
+  // Selección de billetera destino
   const [billeteraDestinoId, setBilleteraDestinoId] = useState<string>(() => {
-    const active = billeteras.filter(b => b.estado === 'activa' && b.moneda === 'ARS')
-    if (active.length > 1) {
-      const bestOrigen = active.find(b => b.es_principal && b.saldo_actual > 0) ||
-        active.find(b => b.saldo_actual > 0) ||
-        active.find(b => b.es_principal) ||
-        active[0]
-      const destCandidates = active.filter(b => b.id !== bestOrigen.id)
-      return destCandidates[0]?.id || ''
-    }
-    return ''
+    const origen = activeWallets.find(b => b.id === billeteraOrigenId)
+    // Sugerir primero una billetera de la otra moneda si existe, para facilitar cambio de moneda
+    const opposite = activeWallets.find(b => b.id !== billeteraOrigenId && b.moneda !== origen?.moneda)
+    if (opposite) return opposite.id
+
+    const other = activeWallets.find(b => b.id !== billeteraOrigenId)
+    return other?.id || ''
   })
 
-  // Obtener las entidades seleccionadas
+  // Entidades seleccionadas
   const billeteraOrigen = useMemo(() => {
     return activeWallets.find(b => b.id === billeteraOrigenId)
   }, [activeWallets, billeteraOrigenId])
@@ -135,23 +126,30 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     return activeWallets.find(b => b.id === billeteraDestinoId)
   }, [activeWallets, billeteraDestinoId])
 
-  // Cambio de moneda
-  const handleMonedaChange = useCallback((newMoneda: 'ARS' | 'USD') => {
-    setMoneda(newMoneda)
-    const valid = billeteras.filter(b => b.estado === 'activa' && b.moneda === newMoneda)
-    if (valid.length > 0) {
-      const best = valid.find(b => b.es_principal && b.saldo_actual > 0) ||
-        valid.find(b => b.saldo_actual > 0) ||
-        valid[0]
-      setBilleteraOrigenId(best.id)
+  const monedaOrigen = billeteraOrigen?.moneda || 'ARS'
+  const monedaDestino = billeteraDestino?.moneda || 'ARS'
+  const esMismaMoneda = monedaOrigen === monedaDestino
 
-      const dest = valid.filter(b => b.id !== best.id)
-      setBilleteraDestinoId(dest[0]?.id || '')
-    } else {
-      setBilleteraOrigenId('')
-      setBilleteraDestinoId('')
-    }
-  }, [billeteras])
+  // Montos
+  const [monto, setMonto] = useState<number | null>(null)
+  const [montoDestino, setMontoDestino] = useState<number | null>(null)
+
+  // Comisión opcional
+  const [mostrarComision, setMostrarComision] = useState(false)
+  const [montoComision, setMontoComision] = useState<number | null>(null)
+  const [monedaComisionCustom, setMonedaComisionCustom] = useState<'ARS' | 'USD' | null>(null)
+
+  // Derivar moneda de comisión sin efectos secundarios
+  const monedaComision = (monedaComisionCustom === monedaOrigen || monedaComisionCustom === monedaDestino)
+    ? (monedaComisionCustom ?? monedaOrigen)
+    : monedaOrigen
+
+  const [fecha, setFecha] = useState(todayLocal())
+  const [notas, setNotas] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSwapping, setIsSwapping] = useState(false)
+  const [pickerMode, setPickerMode] = useState<'origen' | 'destino' | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Invertir origen y destino (Swap)
   const handleSwap = useCallback(() => {
@@ -160,17 +158,58 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     setTimeout(() => {
       setBilleteraOrigenId(billeteraDestinoId)
       setBilleteraDestinoId(billeteraOrigenId)
+      // Si se invierten, invertimos también los montos si difieren
+      if (!esMismaMoneda) {
+        setMonto(montoDestino)
+        setMontoDestino(monto)
+      }
       setIsSwapping(false)
     }, 180)
-  }, [billeteraOrigenId, billeteraDestinoId])
+  }, [billeteraOrigenId, billeteraDestinoId, esMismaMoneda, monto, montoDestino])
+
+  // Cálculos en vivo de cotización implícita
+  const cotizacionImplicita = useMemo(() => {
+    if (esMismaMoneda || !monto || monto <= 0 || !montoDestino || montoDestino <= 0) {
+      return null
+    }
+    // Convención: siempre ARS / USD (pesos por cada dólar)
+    if (monedaOrigen === 'ARS' && monedaDestino === 'USD') {
+      return monto / montoDestino
+    } else if (monedaOrigen === 'USD' && monedaDestino === 'ARS') {
+      return montoDestino / monto
+    }
+    return monto / montoDestino
+  }, [esMismaMoneda, monto, montoDestino, monedaOrigen, monedaDestino])
+
+  // Cotización oficial de referencia
+  const cotizacionOficialRef = useMemo(() => {
+    if (esMismaMoneda || !cotizacionOficial) return null
+    if (monedaOrigen === 'ARS' && monedaDestino === 'USD') {
+      return cotizacionOficial.venta || cotizacionOficial.promedio || null
+    }
+    if (monedaOrigen === 'USD' && monedaDestino === 'ARS') {
+      return cotizacionOficial.compra || cotizacionOficial.promedio || null
+    }
+    return null
+  }, [esMismaMoneda, cotizacionOficial, monedaOrigen, monedaDestino])
 
   // Cálculos en vivo de impacto en saldo
   const montoNum = monto || 0
+  const montoDestinoNum = esMismaMoneda ? montoNum : (montoDestino || 0)
+  const comisionNum = mostrarComision && montoComision ? montoComision : 0
+
+  const comisionEnOrigen = monedaComision === monedaOrigen ? comisionNum : 0
+  const comisionEnDestino = monedaComision === monedaDestino ? comisionNum : 0
+
   const saldoOrigenActual = billeteraOrigen?.saldo_actual ?? 0
   const saldoDestinoActual = billeteraDestino?.saldo_actual ?? 0
-  const saldoOrigenProyectado = saldoOrigenActual - montoNum
-  const saldoDestinoProyectado = saldoDestinoActual + montoNum
-  const isOverdraft = montoNum > saldoOrigenActual
+
+  const debitoTotalOrigen = montoNum + comisionEnOrigen
+  const saldoOrigenProyectado = saldoOrigenActual - debitoTotalOrigen
+  const saldoDestinoProyectado = saldoDestinoActual + montoDestinoNum - comisionEnDestino
+
+  const isOverdraft = debitoTotalOrigen > saldoOrigenActual
+  const isDestinoOverdraft = comisionEnDestino > (saldoDestinoActual + montoDestinoNum)
 
   // Envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
@@ -192,8 +231,22 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       showToast('Ingresá un monto válido mayor a 0', 'error')
       return
     }
+    if (!esMismaMoneda && (!montoDestino || montoDestino <= 0)) {
+      showToast('Ingresá el monto a recibir en la cuenta de destino', 'error')
+      return
+    }
     if (isOverdraft) {
-      showToast(`Saldo insuficiente. Disponible: ${formatSaldo(saldoOrigenActual, moneda)}, Solicitado: ${formatSaldo(montoNum, moneda)}`, 'error')
+      showToast(
+        `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatSaldo(saldoOrigenActual, monedaOrigen)}, Solicitado: ${formatSaldo(debitoTotalOrigen, monedaOrigen)}`,
+        'error'
+      )
+      return
+    }
+    if (isDestinoOverdraft) {
+      showToast(
+        `Saldo insuficiente en ${billeteraDestino?.nombre} para cubrir la comisión de ${formatSaldo(comisionNum, monedaComision)}`,
+        'error'
+      )
       return
     }
 
@@ -203,12 +256,25 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
         billetera_origen_id: billeteraOrigenId,
         billetera_destino_id: billeteraDestinoId,
         monto: Number(monto),
-        moneda,
+        moneda: monedaOrigen,
+        monto_origen: Number(monto),
+        monto_destino: esMismaMoneda ? Number(monto) : Number(montoDestino),
+        moneda_origen: monedaOrigen,
+        moneda_destino: monedaDestino,
+        monto_comision: comisionNum > 0 ? Number(comisionNum) : null,
+        moneda_comision: comisionNum > 0 ? monedaComision : null,
         fecha,
         notas: notas.trim() || null,
       })
 
-      showToast('Transferencia realizada con éxito', 'success')
+      showToast(
+        esMismaMoneda
+          ? 'Transferencia realizada con éxito'
+          : monedaOrigen === 'ARS'
+            ? 'Compra de dólares registrada con éxito'
+            : 'Venta de dólares registrada con éxito',
+        'success'
+      )
       onSuccess()
       onClose()
     } catch (err: unknown) {
@@ -226,10 +292,10 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       const q = searchQuery.toLowerCase()
       return (
         b.nombre.toLowerCase().includes(q) ||
+        b.moneda.toLowerCase().includes(q) ||
         (b.bank_id && b.bank_id.toLowerCase().includes(q))
       )
     })
-    // Ordenar: primero la seleccionada, luego con saldo, luego el resto
     return list.sort((a, b) => {
       if (pickerMode === 'origen') {
         if (a.id === billeteraOrigenId) return -1
@@ -266,7 +332,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding ariaLabel="Pasar plata entre cuentas">
       <div className={styles.modalRoot}>
-        {/* ── Vista Picker de Cuentas (Overlay fluído) ── */}
+        {/* ── Vista Picker de Cuentas (Overlay fluido) ── */}
         {pickerMode !== null ? (
           <div className={styles.pickerView}>
             <div className={styles.pickerHeader}>
@@ -275,7 +341,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   {pickerMode === 'origen' ? 'Seleccionar cuenta de origen' : 'Seleccionar cuenta de destino'}
                 </h3>
                 <p className={styles.pickerSubtitle}>
-                  Mostrando cuentas en {moneda}
+                  Seleccioná cualquiera de tus cuentas activas en ARS o USD
                 </p>
               </div>
               <button
@@ -288,13 +354,13 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
               </button>
             </div>
 
-            {/* Buscador rápido si hay más de 3 cuentas */}
+            {/* Buscador rápido */}
             {activeWallets.length > 3 && (
               <div className={styles.searchWrap}>
                 <Search size={16} className={styles.searchIcon} />
                 <input
                   type="text"
-                  placeholder="Buscar cuenta o banco..."
+                  placeholder="Buscar por cuenta, banco o moneda..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={styles.searchInput}
@@ -308,7 +374,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
               {filteredPickerWallets.length === 0 ? (
                 <div className={styles.pickerEmpty}>
                   <Wallet size={28} className={styles.pickerEmptyIcon} />
-                  <p>No se encontraron cuentas en {moneda}</p>
+                  <p>No se encontraron cuentas disponibles</p>
                 </div>
               ) : (
                 filteredPickerWallets.map((b) => {
@@ -337,6 +403,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       <div className={styles.pickerItemInfo}>
                         <div className={styles.pickerItemNameRow}>
                           <span className={styles.pickerItemName}>{b.nombre}</span>
+                          <span className={styles.currencyBadgePicker}>{b.moneda}</span>
                           {b.es_principal && (
                             <span className={styles.badgePrincipal}>Principal</span>
                           )}
@@ -369,8 +436,14 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   <ArrowRightLeft size={16} />
                 </div>
                 <div>
-                  <h2 className={styles.headerTitle}>Pasar plata entre cuentas</h2>
-                  <p className={styles.headerSubtitle}>Traspaso inmediato entre tus billeteras</p>
+                  <h2 className={styles.headerTitle}>
+                    {esMismaMoneda ? 'Pasar plata entre cuentas' : 'Compra y venta de dólares'}
+                  </h2>
+                  <p className={styles.headerSubtitle}>
+                    {esMismaMoneda
+                      ? 'Traspaso inmediato entre tus billeteras'
+                      : 'Transferencia bimonetaria entre tus billeteras propias'}
+                  </p>
                 </div>
               </div>
               <button
@@ -384,31 +457,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
             </div>
 
             <div className={styles.scrollableBody}>
-              {/* ── SECCIÓN 1: Hero Monto & Moneda ── */}
-              <div className={styles.montoSection}>
-                <MontoInput
-                  value={monto}
-                  onChange={setMonto}
-                  moneda={moneda}
-                  onMonedaChange={handleMonedaChange}
-                  autoFocus
-                  allowDecimals
-                  max={999999999.99}
-                  placeholder="0"
-                />
-
-                {/* Alerta de saldo insuficiente si aplica */}
-                {isOverdraft && (
-                  <div className={styles.warningBanner}>
-                    <AlertCircle size={14} className={styles.warningIcon} />
-                    <span>
-                      El monto supera el saldo disponible en {billeteraOrigen?.nombre} ({formatSaldo(saldoOrigenActual, moneda)})
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* ── SECCIÓN 2: Dual Account Selector (Desde ➔ ⇄ ➔ Hacia) ── */}
+              {/* ── SECCIÓN 1: Dual Account Selector (Desde ➔ ⇄ ➔ Hacia) ── */}
               <div className={styles.transferFlowContainer}>
                 {/* Origen Card */}
                 <div
@@ -438,15 +487,18 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       </div>
 
                       <div className={styles.accountCardMeta}>
-                        <span className={styles.accountName}>{billeteraOrigen.nombre}</span>
+                        <div className={styles.pickerItemNameRow}>
+                          <span className={styles.accountName}>{billeteraOrigen.nombre}</span>
+                          <span className={styles.currencyTag}>{billeteraOrigen.moneda}</span>
+                        </div>
                         <div className={styles.accountBalances}>
                           <span className={styles.currentBalance}>
-                            Saldo: {formatSaldo(saldoOrigenActual, moneda)}
+                            Saldo: {formatSaldo(saldoOrigenActual, monedaOrigen)}
                           </span>
-                          {montoNum > 0 && (
+                          {debitoTotalOrigen > 0 && (
                             <span className={styles.projectedDown}>
                               <TrendingDown size={12} />
-                              {formatSaldo(saldoOrigenProyectado, moneda)}
+                              {formatSaldo(saldoOrigenProyectado, monedaOrigen)}
                             </span>
                           )}
                         </div>
@@ -503,15 +555,18 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       </div>
 
                       <div className={styles.accountCardMeta}>
-                        <span className={styles.accountName}>{billeteraDestino.nombre}</span>
+                        <div className={styles.pickerItemNameRow}>
+                          <span className={styles.accountName}>{billeteraDestino.nombre}</span>
+                          <span className={styles.currencyTag}>{billeteraDestino.moneda}</span>
+                        </div>
                         <div className={styles.accountBalances}>
                           <span className={styles.currentBalance}>
-                            Saldo: {formatSaldo(saldoDestinoActual, moneda)}
+                            Saldo: {formatSaldo(saldoDestinoActual, monedaDestino)}
                           </span>
-                          {montoNum > 0 && (
+                          {montoDestinoNum > 0 && (
                             <span className={styles.projectedUp}>
                               <TrendingUp size={12} />
-                              +{formatSaldo(saldoDestinoProyectado, moneda)}
+                              +{formatSaldo(saldoDestinoProyectado, monedaDestino)}
                             </span>
                           )}
                         </div>
@@ -525,17 +580,182 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </div>
               </div>
 
-              {/* Advertencia si no hay suficientes cuentas en la moneda */}
-              {activeWallets.length < 2 && (
-                <div className={styles.insufficientAccountsWarning}>
-                  <AlertCircle size={16} />
-                  <span>
-                    Necesitás al menos 2 cuentas activas en {moneda} para realizar transferencias internas.
-                  </span>
+              {/* ── SECCIÓN 2: Montos & Cotización ── */}
+              {esMismaMoneda ? (
+                /* Monto único para misma moneda */
+                <div className={styles.montoSection}>
+                  <MontoInput
+                    value={monto}
+                    onChange={setMonto}
+                    moneda={monedaOrigen}
+                    autoFocus
+                    allowDecimals
+                    max={999999999.99}
+                    placeholder="0"
+                  />
+
+                  {isOverdraft && (
+                    <div className={styles.warningBanner}>
+                      <AlertCircle size={14} className={styles.warningIcon} />
+                      <span>
+                        El monto supera el saldo disponible en {billeteraOrigen?.nombre} ({formatSaldo(saldoOrigenActual, monedaOrigen)})
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Dos montos para distinta moneda */
+                <div className={styles.montoSection}>
+                  <div className={styles.dualMontoContainer}>
+                    {/* Monto que sale */}
+                    <div className={styles.montoFieldCard}>
+                      <div className={styles.montoFieldLabel}>
+                        <span>Monto que sale ({monedaOrigen})</span>
+                        <span className={styles.currencyTag}>{monedaOrigen}</span>
+                      </div>
+                      <div className={styles.montoInputRow}>
+                        <span className={styles.currencySymbolPrefix}>
+                          {monedaOrigen === 'ARS' ? '$' : 'US$'}
+                        </span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          placeholder="0.00"
+                          value={monto !== null ? monto : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? null : parseFloat(e.target.value)
+                            setMonto(val)
+                          }}
+                          className={styles.montoCustomInput}
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+
+                    {/* Monto que entra */}
+                    <div className={styles.montoFieldCard}>
+                      <div className={styles.montoFieldLabel}>
+                        <span>Monto que entra ({monedaDestino})</span>
+                        <span className={styles.currencyTag}>{monedaDestino}</span>
+                      </div>
+                      <div className={styles.montoInputRow}>
+                        <span className={styles.currencySymbolPrefix}>
+                          {monedaDestino === 'ARS' ? '$' : 'US$'}
+                        </span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          placeholder="0.00"
+                          value={montoDestino !== null ? montoDestino : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? null : parseFloat(e.target.value)
+                            setMontoDestino(val)
+                          }}
+                          className={styles.montoCustomInput}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Banner de cotización implícita en vivo */}
+                  {cotizacionImplicita !== null && (
+                    <div className={styles.cotizacionBanner}>
+                      <div className={styles.cotizacionText}>
+                        {monedaOrigen === 'ARS' ? (
+                          <span>Estás comprando dólares a {formatSaldo(cotizacionImplicita, 'ARS')} pesos</span>
+                        ) : (
+                          <span>Estás vendiendo dólares a {formatSaldo(cotizacionImplicita, 'ARS')} pesos</span>
+                        )}
+                      </div>
+                      {cotizacionOficialRef !== null && (
+                        <div className={styles.cotizacionRef}>
+                          Referencia oficial: {formatSaldo(cotizacionOficialRef, 'ARS')}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {isOverdraft && (
+                    <div className={styles.warningBanner}>
+                      <AlertCircle size={14} className={styles.warningIcon} />
+                      <span>
+                        El monto total ({formatSaldo(debitoTotalOrigen, monedaOrigen)}) supera el saldo disponible en {billeteraOrigen?.nombre} ({formatSaldo(saldoOrigenActual, monedaOrigen)})
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* ── SECCIÓN 3: Detalles de la Operación (Fecha y Notas) ── */}
+              {/* ── SECCIÓN 3: Comisión Opcional ── */}
+              <div className={styles.comisionSection}>
+                {!mostrarComision ? (
+                  <button
+                    type="button"
+                    className={styles.comisionToggleBtn}
+                    onClick={() => setMostrarComision(true)}
+                  >
+                    <Percent size={13} />
+                    + Agregar comisión de la operación
+                  </button>
+                ) : (
+                  <div className={styles.comisionCard}>
+                    <div className={styles.comisionHeader}>
+                      <span className={styles.comisionTitle}>Comisión u honorarios bancarios (opcional)</span>
+                      <button
+                        type="button"
+                        className={styles.iconCircleBtn}
+                        onClick={() => {
+                          setMostrarComision(false)
+                          setMontoComision(null)
+                          setMonedaComisionCustom(null)
+                        }}
+                        aria-label="Quitar comisión"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+
+                    <div className={styles.comisionRow}>
+                      <div className={styles.comisionInputWrap}>
+                        <span className={styles.currencySymbolPrefix}>
+                          {monedaComision === 'ARS' ? '$' : 'US$'}
+                        </span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          placeholder="0.00"
+                          value={montoComision !== null ? montoComision : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? null : parseFloat(e.target.value)
+                            setMontoComision(val)
+                          }}
+                          className={styles.comisionInput}
+                        />
+                      </div>
+
+                      <select
+                        value={monedaComision}
+                        onChange={(e) => setMonedaComisionCustom(e.target.value as 'ARS' | 'USD')}
+                        className={styles.comisionCurrencySelect}
+                      >
+                        <option value={monedaOrigen}>{monedaOrigen}</option>
+                        {monedaDestino !== monedaOrigen && (
+                          <option value={monedaDestino}>{monedaDestino}</option>
+                        )}
+                      </select>
+                    </div>
+
+                    <p className={styles.comisionHelpText}>
+                      Se registrará como un gasto real en Banco → Comisiones y gastos bancarios.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* ── SECCIÓN 4: Detalles de la Operación (Fecha y Notas) ── */}
               <div className={styles.detailsGrid}>
                 {/* Fecha */}
                 <div className={styles.detailField}>
@@ -563,7 +783,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   <input
                     id="transf-notas"
                     type="text"
-                    placeholder="Ej: Traspaso de fondos, ahorro..."
+                    placeholder="Ej: Ahorro en dólares, compra MEP..."
                     value={notas}
                     onChange={(e) => setNotas(e.target.value)}
                     className={styles.textInputCustom}
@@ -576,7 +796,18 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
               {montoNum > 0 && billeteraOrigen && billeteraDestino && (
                 <div className={styles.impactSummaryPill}>
                   <div className={styles.impactSummaryText}>
-                    Transferís <strong>{formatSaldo(montoNum, moneda)}</strong> de <strong>{billeteraOrigen.nombre}</strong> a <strong>{billeteraDestino.nombre}</strong>
+                    {esMismaMoneda ? (
+                      <>
+                        Transferís <strong>{formatSaldo(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> a <strong>{billeteraDestino.nombre}</strong>
+                      </>
+                    ) : (
+                      <>
+                        Transferís <strong>{formatSaldo(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> y recibís <strong>{formatSaldo(montoDestinoNum, monedaDestino)}</strong> en <strong>{billeteraDestino.nombre}</strong>
+                      </>
+                    )}
+                    {comisionNum > 0 && (
+                      <span> · Comisión: {formatSaldo(comisionNum, monedaComision)}</span>
+                    )}
                   </div>
                 </div>
               )}
@@ -603,8 +834,9 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   billeteraOrigenId === billeteraDestinoId ||
                   !monto ||
                   monto <= 0 ||
+                  (!esMismaMoneda && (!montoDestino || montoDestino <= 0)) ||
                   isOverdraft ||
-                  activeWallets.length < 2
+                  isDestinoOverdraft
                 }
               >
                 {isSubmitting ? (

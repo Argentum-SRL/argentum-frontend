@@ -386,6 +386,15 @@ export interface ResumenFuturo {
   cuotas?: CuotaResumen[]
 }
 
+export interface ItemSaldoArrastrado {
+  id: string
+  fecha_vencimiento_origen: string
+  monto_inicial: number
+  monto_restante: number
+  moneda: 'ARS' | 'USD'
+  descripcion: string
+}
+
 export interface ResumenTarjeta {
   fecha_cierre_proximo: string
   fecha_vencimiento_proximo: string
@@ -394,7 +403,12 @@ export interface ResumenTarjeta {
   total_original_resumen_actual?: number
   total_original_resumen_siguiente?: number
   total_deuda_vencida_anterior?: number
+  saldo_arrastrado_impago?: number
+  items_saldo_arrastrado?: ItemSaldoArrastrado[]
   total_a_pagar_resumen_actual?: number
+  pago_minimo_estimado?: number
+  pago_minimo_es_estimado?: boolean
+  pago_minimo_aclaracion?: string
   cuotas_resumen_actual: CuotaResumen[]
   cuotas_resumen_siguiente: CuotaResumen[]
   resumenes_futuros: ResumenFuturo[]

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { AlertCircle, ChevronLeft, ChevronRight, Edit2, Trash2, ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
-import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, Categoria } from '@/types'
+import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, Categoria, ItemSaldoArrastrado } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import { useModal } from '@/hooks/useModal'
@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatMonto } from '@/utils/format'
 import { EmptyState } from '@/components/ui'
+import PagarResumenModal from './PagarResumenModal'
 import styles from './TarjetaSummary.module.css'
 
 interface TarjetaSummaryProps {
@@ -28,7 +29,11 @@ interface TicketData {
   total: number
   totalOriginal?: number
   totalVencidoAnterior?: number
+  saldoArrastrado?: number
+  itemsSaldoArrastrado?: ItemSaldoArrastrado[]
   totalAPagar?: number
+  pagoMinimoEstimado?: number
+  pagoMinimoAclaracion?: string
   isFuture?: boolean
   isPast?: boolean
   pagado?: boolean
@@ -61,32 +66,31 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaying, setIsPaying] = useState(false)
+  const [isPagarModalOpen, setIsPagarModalOpen] = useState(false)
+  const [payingTicket, setPayingTicket] = useState<TicketData | null>(null)
   const { open, confirm } = useModal()
   const { showToast } = useToast()
 
-  const handlePagarTarjeta = (ticket: TicketData) => {
-    const isPast = ticket.isPast;
-    const title = isPast ? `resumen vencido ("${ticket.title}")` : 'resumen actual';
-    confirm({
-      title: isPast ? '¿Confirmar pago de resumen vencido?' : '¿Confirmar pago de tarjeta?',
-      description: `Se creará una transacción de pago para el ${title} de "${tarjeta.nombre}" por un total de ${formatMonto(ticket.total, tarjeta.moneda)}. Esto restará el saldo de la billetera vinculada y marcará las cuotas como pagadas.`,
-      confirmLabel: 'Confirmar pago',
-      variant: 'default',
-      onConfirm: async () => {
-        setIsPaying(true)
-        try {
-          await tarjetaService.pagarResumenTarjeta(tarjeta.id, undefined, ticket.vencimiento)
-          showToast('Tarjeta pagada con éxito', 'success')
-          fetchResumen()
-          if (onRefresh) onRefresh()
-        } catch (err: unknown) {
-          console.error(err)
-          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
-        } finally {
-          setIsPaying(false)
-        }
-      }
-    })
+  const handleOpenPagarModal = (ticket: TicketData) => {
+    setPayingTicket(ticket)
+    setIsPagarModalOpen(true)
+  }
+
+  const handleConfirmarPago = async (monto?: number) => {
+    if (!payingTicket) return
+    setIsPaying(true)
+    try {
+      await tarjetaService.pagarResumenTarjeta(tarjeta.id, undefined, payingTicket.vencimiento, monto)
+      showToast('Pago de resumen registrado con éxito', 'success')
+      setIsPagarModalOpen(false)
+      fetchResumen()
+      if (onRefresh) onRefresh()
+    } catch (err: unknown) {
+      console.error(err)
+      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+    } finally {
+      setIsPaying(false)
+    }
   }
 
   const fetchResumen = useCallback(async () => {
@@ -137,7 +141,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       total: Number(resumen.total_comprometido_resumen_actual),
       totalOriginal: resumen.total_original_resumen_actual !== undefined ? Number(resumen.total_original_resumen_actual) : undefined,
       totalVencidoAnterior: resumen.total_deuda_vencida_anterior !== undefined ? Number(resumen.total_deuda_vencida_anterior) : undefined,
-      totalAPagar: resumen.total_a_pagar_resumen_actual !== undefined ? Number(resumen.total_a_pagar_resumen_actual) : undefined
+      saldoArrastrado: resumen.saldo_arrastrado_impago !== undefined ? Number(resumen.saldo_arrastrado_impago) : 0,
+      itemsSaldoArrastrado: resumen.items_saldo_arrastrado || [],
+      totalAPagar: resumen.total_a_pagar_resumen_actual !== undefined ? Number(resumen.total_a_pagar_resumen_actual) : undefined,
+      pagoMinimoEstimado: resumen.pago_minimo_estimado !== undefined ? Number(resumen.pago_minimo_estimado) : 0,
+      pagoMinimoAclaracion: resumen.pago_minimo_aclaracion
     })
 
     const proxCierre = parseLocalDate(resumen.fecha_cierre_proximo)
@@ -289,6 +297,26 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
 
         {isExpanded && (
           <div className={styles.ticketContent}>
+            {/* Saldo Arrastrado (Financiado) diferenciado de consumos (Tarea 3.2 y 7.5) */}
+            {currentTicket.itemsSaldoArrastrado && currentTicket.itemsSaldoArrastrado.length > 0 && (
+              currentTicket.itemsSaldoArrastrado.map((item) => (
+                <div key={item.id} className={`${styles.itemRow} ${styles.itemRowFinanciado}`}>
+                  <div className={styles.itemInfo}>
+                    <div className={styles.itemTitleWrapper}>
+                      <span className={styles.itemTitle}>{item.descripcion}</span>
+                      <span className={styles.badgeFinanciado}>Deuda refinanciada</span>
+                    </div>
+                    <span className={styles.itemSub}>
+                      Monto inicial: {formatMonto(item.monto_inicial, item.moneda)} • Saldo impago restante
+                    </span>
+                  </div>
+                  <div className={styles.itemMontoContainer}>
+                    <span className={styles.itemMonto}>{formatMonto(item.monto_restante, item.moneda)}</span>
+                  </div>
+                </div>
+              ))
+            )}
+
             {currentTicket.cuotas.length > 0 ? (
               currentTicket.cuotas.map((cuota, idx) => (
                 <div key={idx} className={styles.itemRow}>
@@ -322,13 +350,13 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                   </div>
                 </div>
               ))
-            ) : (
+            ) : (!currentTicket.itemsSaldoArrastrado || currentTicket.itemsSaldoArrastrado.length === 0) ? (
               <EmptyState
                 variant="compact"
                 icon={CreditCard}
                 title="Sin movimientos"
               />
-            )}
+            ) : null}
           </div>
         )}
 
@@ -336,8 +364,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           <div className={styles.totalRow}>
             <span className={styles.totalLabel}>
               {currentTicket.totalOriginal !== undefined && currentTicket.totalOriginal > currentTicket.total
-                ? 'Total pendiente'
-                : 'Total'}
+                ? 'Total cuotas pendiente'
+                : 'Total cuotas'}
             </span>
             <span className={styles.totalValue}>
               {formatMonto(currentTicket.total, tarjeta.moneda)}
@@ -345,20 +373,47 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           </div>
 
           {currentTicket.totalVencidoAnterior !== undefined && currentTicket.totalVencidoAnterior > 0 && (
-            <>
-              <div className={styles.totalRow}>
-                <span className={styles.totalLabel}>Deuda vencida anterior</span>
-                <span className={styles.totalValue}>
-                  {formatMonto(currentTicket.totalVencidoAnterior, tarjeta.moneda)}
+            <div className={styles.totalRow}>
+              <span className={styles.totalLabel}>Deuda vencida anterior</span>
+              <span className={styles.totalValue}>
+                {formatMonto(currentTicket.totalVencidoAnterior, tarjeta.moneda)}
+              </span>
+            </div>
+          )}
+
+          {currentTicket.saldoArrastrado !== undefined && currentTicket.saldoArrastrado > 0 && (
+            <div className={styles.totalRow}>
+              <span className={styles.totalLabel}>Saldo financiado anterior</span>
+              <span className={styles.totalValue}>
+                {formatMonto(currentTicket.saldoArrastrado, tarjeta.moneda)}
+              </span>
+            </div>
+          )}
+
+          {currentTicket.totalAPagar !== undefined && (
+            <div className={styles.totalRow}>
+              <span className={styles.totalLabel}>Total a pagar</span>
+              <span className={styles.totalValue}>
+                {formatMonto(currentTicket.totalAPagar, tarjeta.moneda)}
+              </span>
+            </div>
+          )}
+
+          {currentTicket.pagoMinimoEstimado !== undefined && currentTicket.pagoMinimoEstimado > 0 && (
+            <div className={styles.minimoRow}>
+              <div className={styles.minimoTop}>
+                <span className={styles.minimoLabel}>
+                  Pago mínimo estimado
+                  <span className={styles.minimoTag}>Estimado</span>
+                </span>
+                <span className={styles.minimoVal}>
+                  {formatMonto(currentTicket.pagoMinimoEstimado, tarjeta.moneda)}
                 </span>
               </div>
-              <div className={styles.totalRow}>
-                <span className={styles.totalLabel}>Total a pagar</span>
-                <span className={styles.totalValue}>
-                  {formatMonto(currentTicket.totalAPagar ?? (currentTicket.total + currentTicket.totalVencidoAnterior), tarjeta.moneda)}
-                </span>
-              </div>
-            </>
+              <span className={styles.minimoAclaracion}>
+                {currentTicket.pagoMinimoAclaracion || 'Monto de referencia orientativo. El valor definitivo lo establece la entidad bancaria en el resumen de cuenta.'}
+              </span>
+            </div>
           )}
           
           {currentTicket.vencimiento && (
@@ -372,7 +427,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
 
           {(currentTicket.isPast || currentTicket.title === 'Resumen Actual') && (
             (() => {
-              const isPaid = currentTicket.pagado || (currentTicket.cuotas.length > 0 && currentTicket.cuotas.every(c => c.pagada))
+              const isPaid = currentTicket.pagado || (
+                currentTicket.cuotas.length > 0 && 
+                currentTicket.cuotas.every(c => c.pagada) && 
+                (!currentTicket.saldoArrastrado || currentTicket.saldoArrastrado === 0)
+              )
               if (isPaid) {
                 return (
                   <div className={styles.paidBadge}>
@@ -385,7 +444,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                   <button 
                     type="button" 
                     className={styles.payBtn} 
-                    onClick={() => handlePagarTarjeta(currentTicket)}
+                    onClick={() => handleOpenPagarModal(currentTicket)}
                     disabled={isPaying}
                   >
                     {isPaying ? 'Procesando...' : 'Pagar Tarjeta'}
@@ -400,7 +459,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                   <button 
                     type="button" 
                     className={styles.payBtn} 
-                    onClick={() => handlePagarTarjeta(currentTicket)}
+                    onClick={() => handleOpenPagarModal(currentTicket)}
                     disabled={isPaying}
                   >
                     {isPaying ? 'Procesando...' : 'Pagar Resumen'}
@@ -425,6 +484,22 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
           )}
         </div>
       </div>
+
+      {payingTicket && (
+        <PagarResumenModal
+          isOpen={isPagarModalOpen}
+          onClose={() => setIsPagarModalOpen(false)}
+          tarjeta={tarjeta}
+          totalAPagar={payingTicket.totalAPagar ?? payingTicket.total}
+          cuotasPeriodo={payingTicket.total}
+          deudaVencidaAnterior={payingTicket.totalVencidoAnterior || 0}
+          saldoArrastrado={payingTicket.saldoArrastrado || 0}
+          pagoMinimoEstimado={payingTicket.pagoMinimoEstimado || 0}
+          pagoMinimoAclaracion={payingTicket.pagoMinimoAclaracion}
+          onConfirm={handleConfirmarPago}
+          isPaying={isPaying}
+        />
+      )}
     </div>
   )
 }

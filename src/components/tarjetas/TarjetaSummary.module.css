@@ -404,4 +404,75 @@
   width: 100%;
 }
 
+.itemRowFinanciado {
+  background: color-mix(in srgb, var(--warning, #f59e0b) 6%, transparent);
+  border-left: 3px solid var(--warning, #f59e0b);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+.itemTitleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badgeFinanciado {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--warning, #d97706);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.minimoRow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 0;
+  border-top: 1px dashed var(--ticket-dashed-border);
+}
+
+.minimoTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.minimoLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ticket-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.minimoTag {
+  font-size: 10px;
+  padding: 1px 5px;
+  background: var(--surface-alt, #e5e7eb);
+  color: var(--text-2, #4b5563);
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.minimoVal {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ticket-text);
+}
+
+.minimoAclaracion {
+  font-size: 10px;
+  color: var(--ticket-text-muted);
+  line-height: 1.3;
+}
+
+
 

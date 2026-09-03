@@ -520,6 +520,10 @@ export interface PeriodoPresupuesto {
   superado: boolean
   porcentaje_usado: number
   dias_restantes: number
+  monto_propio?: number
+  monto_convertido?: number
+  monto_sin_cotizacion?: number
+  moneda_sin_cotizacion?: 'ARS' | 'USD' | null
 }
 
 export interface Presupuesto {

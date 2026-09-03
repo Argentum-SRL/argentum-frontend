@@ -7,7 +7,9 @@ import {
   Trash2, 
   RefreshCw, 
   Clock,
-  Target
+  Target,
+  ArrowLeftRight,
+  AlertCircle
 } from 'lucide-react'
 import type { Presupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -109,6 +111,20 @@ export default function BudgetCard({
             <span className={styles.value}>{formatMonto(p?.monto_limite || presupuesto.monto, presupuesto.moneda)}</span>
           </div>
         </div>
+
+        {p && (p.monto_convertido ?? 0) > 0 && (
+          <div className={styles.conversionNotice}>
+            <ArrowLeftRight size={13} />
+            <span>Incluye {formatMonto(p.monto_convertido!, presupuesto.moneda)} convertidos de gastos en otra moneda</span>
+          </div>
+        )}
+
+        {p && (p.monto_sin_cotizacion ?? 0) > 0 && (
+          <div className={styles.uncountedNotice}>
+            <AlertCircle size={13} />
+            <span>Quedaron {formatMonto(p.monto_sin_cotizacion!, (p.moneda_sin_cotizacion === 'USD' || p.moneda_sin_cotizacion === 'ARS') ? p.moneda_sin_cotizacion : (presupuesto.moneda === 'ARS' ? 'USD' : 'ARS'))} sin contabilizar por falta de cotización en esas fechas</span>
+          </div>
+        )}
       </div>
 
       <div className={styles.cardInfo}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { AlertCircle } from 'lucide-react'
-import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, ItemSaldoArrastrado } from '@/types'
+import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, ItemSaldoArrastrado, BloqueResumenMoneda } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import Drawer from '@/components/ui/Drawer/Drawer'
 import RealCardPreview from './RealCardPreview'
@@ -103,11 +103,18 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
     itemsSaldoArrastrado?: ItemSaldoArrastrado[],
     saldoArrastrado?: number,
     pagoMinimoEstimado?: number,
-    pagoMinimoAclaracion?: string
+    pagoMinimoAclaracion?: string,
+    bloquesMoneda?: Record<string, BloqueResumenMoneda>
   ) => {
     const alert = isVencePronto(vencDate)
     const hayPagadas = totalOriginal !== undefined && totalOriginal > total
     
+    const bARS = bloquesMoneda?.ARS
+    const bUSD = bloquesMoneda?.USD
+    const hasARS = bARS && (bARS.total_a_pagar > 0 || bARS.total_cuotas_periodo > 0)
+    const hasUSD = bUSD && (bUSD.total_a_pagar > 0 || bUSD.total_cuotas_periodo > 0)
+    const isBimonetario = hasARS && hasUSD
+
     return (
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
@@ -146,45 +153,148 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
         </div>
 
         <div className={styles.sectionFooter}>
-          <div className={styles.totalRow}>
-            <span className={styles.totalLabel}>{hayPagadas ? 'Total Cuotas Pendiente' : 'Total Cuotas'}</span>
-            <span className={styles.totalValue}>{formatMonto(total, tarjeta.moneda)}</span>
-          </div>
-
-          {totalVencidoAnterior !== undefined && totalVencidoAnterior > 0 && (
-            <div className={styles.totalRow}>
-              <span className={styles.totalLabel}>Deuda vencida anterior</span>
-              <span className={styles.totalValue}>{formatMonto(totalVencidoAnterior, tarjeta.moneda)}</span>
-            </div>
-          )}
-
-          {saldoArrastrado !== undefined && saldoArrastrado > 0 && (
-            <div className={styles.totalRow}>
-              <span className={styles.totalLabel}>Saldo financiado anterior</span>
-              <span className={styles.totalValue}>{formatMonto(saldoArrastrado, tarjeta.moneda)}</span>
-            </div>
-          )}
-
-          {totalAPagar !== undefined && (
-            <div className={styles.totalRow}>
-              <span className={styles.totalLabel}>Total a pagar</span>
-              <span className={styles.totalValue}>{formatMonto(totalAPagar, tarjeta.moneda)}</span>
-            </div>
-          )}
-
-          {pagoMinimoEstimado !== undefined && pagoMinimoEstimado > 0 && (
-            <div className={styles.minimoRow}>
-              <div className={styles.minimoTop}>
-                <span className={styles.minimoLabel}>
-                  Pago mínimo estimado
-                  <span className={styles.minimoTag}>Estimado</span>
-                </span>
-                <span className={styles.minimoVal}>{formatMonto(pagoMinimoEstimado, tarjeta.moneda)}</span>
+          {isBimonetario ? (
+            <>
+              {/* Bloque ARS */}
+              <div className={styles.monedaBlock}>
+                <div className={styles.monedaBlockHeader}>
+                  <span className={styles.monedaBadge}>Pesos (ARS)</span>
+                </div>
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Total Cuotas (ARS)</span>
+                  <span className={styles.totalValue}>{formatMonto(bARS.total_cuotas_periodo, 'ARS')}</span>
+                </div>
+                {bARS.total_deuda_vencida_anterior > 0 && (
+                  <div className={styles.totalRow}>
+                    <span className={styles.totalLabel}>Deuda vencida anterior</span>
+                    <span className={styles.totalValue}>{formatMonto(bARS.total_deuda_vencida_anterior, 'ARS')}</span>
+                  </div>
+                )}
+                {bARS.saldo_arrastrado_impago > 0 && (
+                  <div className={styles.totalRow}>
+                    <span className={styles.totalLabel}>Saldo financiado anterior</span>
+                    <span className={styles.totalValue}>{formatMonto(bARS.saldo_arrastrado_impago, 'ARS')}</span>
+                  </div>
+                )}
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar (ARS)</span>
+                  <span className={styles.totalValue} style={{ fontWeight: 800 }}>{formatMonto(bARS.total_a_pagar, 'ARS')}</span>
+                </div>
+                {bARS.pago_minimo_estimado > 0 && (
+                  <div className={styles.minimoRow}>
+                    <div className={styles.minimoTop}>
+                      <span className={styles.minimoLabel}>
+                        Pago mínimo estimado (ARS)
+                        <span className={styles.minimoTag}>Estimado</span>
+                      </span>
+                      <span className={styles.minimoVal}>{formatMonto(bARS.pago_minimo_estimado, 'ARS')}</span>
+                    </div>
+                  </div>
+                )}
               </div>
-              <span className={styles.minimoAclaracion}>
-                {pagoMinimoAclaracion || 'Monto de referencia orientativo. El valor definitivo lo establece la entidad bancaria en el resumen de cuenta.'}
-              </span>
-            </div>
+
+              {/* Bloque USD */}
+              <div className={styles.monedaBlock}>
+                <div className={styles.monedaBlockHeader}>
+                  <span className={styles.monedaBadge}>Dólares (USD)</span>
+                </div>
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Total Cuotas (USD)</span>
+                  <span className={styles.totalValue}>{formatMonto(bUSD.total_cuotas_periodo, 'USD')}</span>
+                </div>
+                {bUSD.total_deuda_vencida_anterior > 0 && (
+                  <div className={styles.totalRow}>
+                    <span className={styles.totalLabel}>Deuda vencida anterior</span>
+                    <span className={styles.totalValue}>{formatMonto(bUSD.total_deuda_vencida_anterior, 'USD')}</span>
+                  </div>
+                )}
+                {bUSD.saldo_arrastrado_impago > 0 && (
+                  <div className={styles.totalRow}>
+                    <span className={styles.totalLabel}>Saldo financiado anterior</span>
+                    <span className={styles.totalValue}>{formatMonto(bUSD.saldo_arrastrado_impago, 'USD')}</span>
+                  </div>
+                )}
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar (USD)</span>
+                  <span className={styles.totalValue} style={{ fontWeight: 800 }}>{formatMonto(bUSD.total_a_pagar, 'USD')}</span>
+                </div>
+                {bUSD.total_estimado_ars !== undefined && bUSD.total_estimado_ars !== null && (
+                  <div className={styles.monedaEstimacionRow}>
+                    <span className={styles.monedaEstimacionVal}>
+                      ≈ {formatMonto(bUSD.total_estimado_ars, 'ARS')}
+                    </span>
+                    <span className={styles.monedaEstimacionTag}>
+                      (Estimación oficial {bUSD.cotizacion_oficial_estimada ? `$${bUSD.cotizacion_oficial_estimada}` : ''} + {bUSD.porcentaje_percepcion ?? 30}% percepción)
+                    </span>
+                  </div>
+                )}
+                {bUSD.pago_minimo_estimado > 0 && (
+                  <div className={styles.minimoRow}>
+                    <div className={styles.minimoTop}>
+                      <span className={styles.minimoLabel}>
+                        Pago mínimo estimado (USD)
+                        <span className={styles.minimoTag}>Estimado</span>
+                      </span>
+                      <span className={styles.minimoVal}>{formatMonto(bUSD.pago_minimo_estimado, 'USD')}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.totalRow}>
+                <span className={styles.totalLabel}>{hayPagadas ? 'Total Cuotas Pendiente' : 'Total Cuotas'}</span>
+                <span className={styles.totalValue}>{formatMonto(total, (hasUSD && !hasARS) ? 'USD' : tarjeta.moneda)}</span>
+              </div>
+
+              {totalVencidoAnterior !== undefined && totalVencidoAnterior > 0 && (
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Deuda vencida anterior</span>
+                  <span className={styles.totalValue}>{formatMonto(totalVencidoAnterior, (hasUSD && !hasARS) ? 'USD' : tarjeta.moneda)}</span>
+                </div>
+              )}
+
+              {saldoArrastrado !== undefined && saldoArrastrado > 0 && (
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Saldo financiado anterior</span>
+                  <span className={styles.totalValue}>{formatMonto(saldoArrastrado, (hasUSD && !hasARS) ? 'USD' : tarjeta.moneda)}</span>
+                </div>
+              )}
+
+              {totalAPagar !== undefined && (
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Total a pagar</span>
+                  <span className={styles.totalValue}>{formatMonto(totalAPagar, (hasUSD && !hasARS) ? 'USD' : tarjeta.moneda)}</span>
+                </div>
+              )}
+
+              {(hasUSD && !hasARS) && bUSD?.total_estimado_ars !== undefined && bUSD?.total_estimado_ars !== null && (
+                <div className={styles.monedaEstimacionRow}>
+                  <span className={styles.monedaEstimacionVal}>
+                    ≈ {formatMonto(bUSD.total_estimado_ars, 'ARS')}
+                  </span>
+                  <span className={styles.monedaEstimacionTag}>
+                    (Estimación oficial {bUSD.cotizacion_oficial_estimada ? `$${bUSD.cotizacion_oficial_estimada}` : ''} + {bUSD.porcentaje_percepcion ?? 30}% percepción)
+                  </span>
+                </div>
+              )}
+
+              {pagoMinimoEstimado !== undefined && pagoMinimoEstimado > 0 && (
+                <div className={styles.minimoRow}>
+                  <div className={styles.minimoTop}>
+                    <span className={styles.minimoLabel}>
+                      Pago mínimo estimado
+                      <span className={styles.minimoTag}>Estimado</span>
+                    </span>
+                    <span className={styles.minimoVal}>{formatMonto(pagoMinimoEstimado, (hasUSD && !hasARS) ? 'USD' : tarjeta.moneda)}</span>
+                  </div>
+                  <span className={styles.minimoAclaracion}>
+                    {pagoMinimoAclaracion || 'Monto de referencia orientativo. El valor definitivo lo establece la entidad bancaria en el resumen de cuenta.'}
+                  </span>
+                </div>
+              )}
+            </>
           )}
 
           <div className={styles.vencimientoInfo}>
@@ -249,7 +359,8 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
               resumen.items_saldo_arrastrado,
               resumen.saldo_arrastrado_impago,
               resumen.pago_minimo_estimado,
-              resumen.pago_minimo_aclaracion
+              resumen.pago_minimo_aclaracion,
+              resumen.totales_por_moneda
             )}
 
             {renderSection(
@@ -274,7 +385,20 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
                         {fut.mes}
                         <span className={styles.futuroCuotas}>({fut.cantidad_cuotas} {fut.cantidad_cuotas === 1 ? 'cuota' : 'cuotas'})</span>
                       </span>
-                      <span className={styles.futuroTotal}>{formatMonto(fut.total, fut.moneda)}</span>
+                      <span className={styles.futuroTotal}>
+                        {fut.totales_por_moneda && (fut.totales_por_moneda.ARS !== undefined || fut.totales_por_moneda.USD !== undefined) ? (
+                          <>
+                            {fut.totales_por_moneda.ARS !== undefined && fut.totales_por_moneda.ARS > 0 && (
+                              <span>{formatMonto(fut.totales_por_moneda.ARS, 'ARS')} </span>
+                            )}
+                            {fut.totales_por_moneda.USD !== undefined && fut.totales_por_moneda.USD > 0 && (
+                              <span>{formatMonto(fut.totales_por_moneda.USD, 'USD')}</span>
+                            )}
+                          </>
+                        ) : (
+                          formatMonto(fut.total, fut.moneda)
+                        )}
+                      </span>
                     </div>
                   ))}
                 </div>

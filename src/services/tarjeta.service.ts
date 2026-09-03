@@ -1,5 +1,5 @@
 import api from './api'
-import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData } from '@/types'
+import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData, PagarTarjetaPayload, SimularPesificacionResponse } from '@/types'
 
 const tarjetaService = {
   getTarjetas: async (signal?: AbortSignal): Promise<TarjetaCredito[]> => {
@@ -40,8 +40,30 @@ const tarjetaService = {
     const { data } = await api.get<ResumenTarjeta>(`/tarjetas/${id}/resumen`, { signal })
     return data
   },
-  pagarResumenTarjeta: async (id: string, fechaPago?: string, fechaResumen?: string, monto?: number): Promise<unknown> => {
-    const { data } = await api.post(`/tarjetas/${id}/pagar`, { fecha_pago: fechaPago, fecha_resumen: fechaResumen, monto })
+  pagarResumenTarjeta: async (
+    id: string,
+    payloadOrFechaPago?: PagarTarjetaPayload | string,
+    fechaResumen?: string,
+    monto?: number
+  ): Promise<unknown> => {
+    const body: PagarTarjetaPayload =
+      typeof payloadOrFechaPago === 'string' || payloadOrFechaPago === undefined
+        ? { fecha_pago: payloadOrFechaPago, fecha_resumen: fechaResumen, monto }
+        : payloadOrFechaPago
+
+    const { data } = await api.post(`/tarjetas/${id}/pagar`, body)
+    return data
+  },
+  simularPesificacion: async (
+    id: string,
+    fechaResumen?: string,
+    montoUsd?: number,
+    signal?: AbortSignal
+  ): Promise<SimularPesificacionResponse> => {
+    const { data } = await api.get<SimularPesificacionResponse>(`/tarjetas/${id}/simular-pesificacion`, {
+      params: { fecha_resumen: fechaResumen, monto_usd: montoUsd },
+      signal
+    })
     return data
   },
   getPresionFutura: async (meses = 6, signal?: AbortSignal): Promise<PresionFuturaData> => {

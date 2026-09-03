@@ -375,6 +375,9 @@ export interface ResumenAnterior {
   moneda: string
   pagado: boolean
   cuotas: CuotaResumen[]
+  total_ars?: number
+  total_usd?: number
+  totales_por_moneda?: Record<string, number>
 }
 
 export interface ResumenFuturo {
@@ -384,6 +387,9 @@ export interface ResumenFuturo {
   moneda: 'ARS' | 'USD'
   cantidad_cuotas: number
   cuotas?: CuotaResumen[]
+  total_ars?: number
+  total_usd?: number
+  totales_por_moneda?: Record<string, number>
 }
 
 export interface ItemSaldoArrastrado {
@@ -393,6 +399,43 @@ export interface ItemSaldoArrastrado {
   monto_restante: number
   moneda: 'ARS' | 'USD'
   descripcion: string
+}
+
+export interface BloqueResumenMoneda {
+  moneda: 'ARS' | 'USD'
+  total_cuotas_periodo: number
+  total_original_periodo: number
+  total_deuda_vencida_anterior: number
+  saldo_arrastrado_impago: number
+  items_saldo_arrastrado: ItemSaldoArrastrado[]
+  total_a_pagar: number
+  pago_minimo_estimado: number
+  cotizacion_oficial_estimada?: number | null
+  porcentaje_percepcion?: number | null
+  total_estimado_ars?: number | null
+}
+
+export interface SimularPesificacionResponse {
+  fecha_cierre: string
+  monto_usd: number
+  cotizacion_oficial?: number | null
+  cotizacion_disponible: boolean
+  porcentaje_percepcion: number
+  monto_convertido_ars?: number | null
+  monto_percepcion_ars?: number | null
+  total_estimado_ars?: number | null
+}
+
+export interface PagarTarjetaPayload {
+  monto?: number
+  fecha_pago?: string
+  fecha_resumen?: string
+  moneda?: 'ARS' | 'USD'
+  billetera_id?: string
+  pesificar?: boolean
+  cotizacion_personalizada?: number
+  monto_pesos_personalizado?: number
+  monto_percepcion_personalizado?: number
 }
 
 export interface ResumenTarjeta {
@@ -409,6 +452,13 @@ export interface ResumenTarjeta {
   pago_minimo_estimado?: number
   pago_minimo_es_estimado?: boolean
   pago_minimo_aclaracion?: string
+  total_actual_ars?: number
+  total_actual_usd?: number
+  total_siguiente_ars?: number
+  total_siguiente_usd?: number
+  totales_moneda_actual?: Record<string, number>
+  totales_moneda_siguiente?: Record<string, number>
+  totales_por_moneda?: Record<string, BloqueResumenMoneda>
   cuotas_resumen_actual: CuotaResumen[]
   cuotas_resumen_siguiente: CuotaResumen[]
   resumenes_futuros: ResumenFuturo[]
@@ -425,6 +475,7 @@ export interface TarjetaCredito {
   dia_vencimiento: number
   limite_credito: number | null
   moneda: 'ARS' | 'USD'
+  percepcion_moneda_extranjera: number
   estado: 'activa' | 'archivada'
   color: string | null
   fecha_creacion: string
@@ -440,6 +491,7 @@ export interface TarjetaCreditoCreate {
   dia_vencimiento: number
   limite_credito?: number
   moneda: string
+  percepcion_moneda_extranjera?: number
   color?: string
 }
 

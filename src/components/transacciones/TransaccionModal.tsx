@@ -613,7 +613,7 @@ export default function TransaccionModal({
                             const firstWallet = billeteras.find(b => !b.es_efectivo && b.moneda === moneda && b.estado === 'activa')
                             if (firstWallet) dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: firstWallet.id })
                           } else if (key === 'credito') {
-                            const firstCard = tarjetas.filter(t => t.moneda === moneda && t.estado === 'activa')[0]
+                            const firstCard = tarjetas.filter(t => t.estado === 'activa')[0]
                             if (firstCard) dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: firstCard.id })
                           }
                         }}
@@ -634,10 +634,10 @@ export default function TransaccionModal({
                   {metodoPago === 'credito' ? (
                     <div className={styles.billeterasCarouselScroller}>
                       <div className={styles.billeterasCarousel} ref={carouselRef}>
-                        {tarjetas.filter(t => t.moneda === moneda && t.estado === 'activa').length === 0 ? (
-                          <p className={styles.noTarjetas}>No tenés tarjetas en {moneda}.</p>
+                        {tarjetas.filter(t => t.estado === 'activa').length === 0 ? (
+                          <p className={styles.noTarjetas}>No tenés tarjetas activas.</p>
                         ) : (
-                          tarjetas.filter(t => t.moneda === moneda && t.estado === 'activa').map(t => (
+                          tarjetas.filter(t => t.estado === 'activa').map(t => (
                             <div
                               key={t.id}
                               className={styles.billeteraSelectWrap}

@@ -70,6 +70,7 @@ interface TarjetaModalState {
   diaCierre: number | ''
   diaVencimiento: number | ''
   limiteCredito: number | null
+  percepcionMonedaExtranjera: number
   color: string | null
   loading: boolean
   error: string | null
@@ -87,6 +88,7 @@ const initialState: TarjetaModalState = {
   diaCierre: 10,
   diaVencimiento: 3,
   limiteCredito: null,
+  percepcionMonedaExtranjera: 30,
   color: null,
   loading: false,
   error: null
@@ -108,6 +110,7 @@ function tarjetaReducer(state: TarjetaModalState, action: TarjetaModalAction): T
           diaCierre: t.dia_cierre,
           diaVencimiento: t.dia_vencimiento,
           limiteCredito: t.limite_credito,
+          percepcionMonedaExtranjera: t.percepcion_moneda_extranjera !== undefined ? Number(t.percepcion_moneda_extranjera) : 30,
           color: t.color || getBilleteraColor(action.data.billeteras.find(b => b.id === t.billetera_id))
         }
       }
@@ -211,6 +214,7 @@ export default function TarjetaModal() {
         dia_cierre: diaCierreNum,
         dia_vencimiento: diaVencimientoNum,
         limite_credito: state.limiteCredito !== null && state.limiteCredito !== undefined ? state.limiteCredito : undefined,
+        percepcion_moneda_extranjera: Number(state.percepcionMonedaExtranjera),
         color: colorToSend
       }
 
@@ -344,6 +348,30 @@ export default function TarjetaModal() {
                 allowDecimals
                 compact
               />
+
+              {/* Percepción moneda extranjera */}
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel} htmlFor="percepcion-me">
+                  Percepción moneda extranjera (%)
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    id="percepcion-me"
+                    type="number"
+                    min={0}
+                    max={100}
+                    step="0.5"
+                    className={styles.fieldInputCenter}
+                    style={{ width: '100px' }}
+                    value={state.percepcionMonedaExtranjera}
+                    onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'percepcionMonedaExtranjera', value: Number(e.target.value) })}
+                  />
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>%</span>
+                </div>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block', lineHeight: 1.35 }}>
+                  Recargo impositivo (adelanto de Ganancias / Bienes Personales) que aplica el banco al pesificar consumos en dólares. Por defecto 30%.
+                </span>
+              </div>
 
               {/* FILA 3: Red */}
               <div className={styles.formField}>

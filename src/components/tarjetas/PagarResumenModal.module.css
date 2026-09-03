@@ -456,6 +456,77 @@
   box-shadow: none;
 }
 
+/* ── Multimoneda & Pesificación Styles ─────────────────────────────────── */
+.walletSelect {
+  width: 100%;
+  height: 42px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0 12px;
+  color: var(--text);
+  font-size: 13.5px;
+  font-family: 'Figtree', sans-serif;
+  outline: none;
+}
+
+.walletSelect:focus {
+  border-color: var(--primary);
+}
+
+.inlineInput {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  width: 110px;
+  outline: none;
+}
+
+.inlineInput:focus {
+  border-color: var(--primary);
+}
+
+.cotizacionAlert {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--warning, #d97706);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.walletMissingAlert {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--error, #ef4444);
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pesificarSwitchBtn {
+  align-self: flex-start;
+  padding: 6px 12px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 /* ── Responsive Mobile ───────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .modalHeader {

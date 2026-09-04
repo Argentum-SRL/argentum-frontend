@@ -28,6 +28,13 @@ const validatePassword = (pwd: string): string | null => {
   return null
 }
 
+const validateCodigo = (val: string): string | null => {
+  const c = val.trim()
+  if (!c) return 'Ingresá el código de recuperación.'
+  if (!/^\d{6}$/.test(c)) return 'El código debe tener 6 dígitos numéricos.'
+  return null
+}
+
 export default function RecuperarPassword() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -37,9 +44,11 @@ export default function RecuperarPassword() {
   const tieneParams = Boolean(emailParam && codigoParam)
 
   const [email, setEmail] = useState(emailParam)
-  const [codigo] = useState(codigoParam)
+  const [codigo, setCodigo] = useState(codigoParam)
   const [nuevaPassword, setNuevaPassword] = useState('')
   const [confirmarPassword, setConfirmarPassword] = useState('')
+
+  const [modoManual, setModoManual] = useState(false)
   
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -49,10 +58,11 @@ export default function RecuperarPassword() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
 
-  const emailError = hasSubmitted && !tieneParams ? validateEmail(email) : null
+  const emailError = hasSubmitted && (!tieneParams || modoManual) ? validateEmail(email) : null
+  const codigoError = hasSubmitted && modoManual ? validateCodigo(codigo) : null
   
-  const passwordError = hasSubmitted && tieneParams ? validatePassword(nuevaPassword) : null
-  const confirmarPasswordError = hasSubmitted && tieneParams
+  const passwordError = hasSubmitted && (tieneParams || modoManual) ? validatePassword(nuevaPassword) : null
+  const confirmarPasswordError = hasSubmitted && (tieneParams || modoManual)
     ? !confirmarPassword
       ? 'Confirmá tu contraseña.'
       : confirmarPassword !== nuevaPassword
@@ -74,7 +84,7 @@ export default function RecuperarPassword() {
       setEnviado(true)
       setHasSubmitted(false)
     } catch (err: unknown) {
-      setApiError(getErrorMessage(err, "No pudimos mandarte el email. Revisá que el email sea correcto e intentá de nuevo."))
+      setApiError(getErrorMessage(err, "No pudimos enviar el correo de recuperación. Revisá que el email sea correcto e intentá de nuevo."))
     } finally {
       setLoading(false)
     }
@@ -84,6 +94,8 @@ export default function RecuperarPassword() {
     e.preventDefault()
     setHasSubmitted(true)
 
+    const eError = modoManual ? validateEmail(email) : null
+    const cError = modoManual ? validateCodigo(codigo) : null
     const pError = validatePassword(nuevaPassword)
     const cpError = !confirmarPassword 
       ? 'Confirmá tu contraseña.' 
@@ -91,7 +103,7 @@ export default function RecuperarPassword() {
         ? 'Las contraseñas no coinciden. Revisalas.' 
         : null
 
-    if (pError || cpError || !codigo || !email.trim()) return
+    if (eError || cError || pError || cpError || !codigo.trim() || !email.trim()) return
 
     setLoading(true)
     setApiError(null)
@@ -107,7 +119,7 @@ export default function RecuperarPassword() {
         state: { message: 'Tu contraseña fue restablecida con éxito. Ya podés iniciar sesión.' }
       })
     } catch (err: unknown) {
-      setApiError(getErrorMessage(err, "No pudimos cambiar tu contraseña. El enlace puede haber expirado — pedí uno nuevo."))
+      setApiError(getErrorMessage(err, "No pudimos cambiar tu contraseña. El código o enlace puede haber expirado — pedí uno nuevo."))
     } finally {
       setLoading(false)
     }
@@ -181,25 +193,139 @@ export default function RecuperarPassword() {
     )
   }
 
+  if (modoManual) {
+    return (
+      <AuthLayout title="Restablecer contraseña" leftPanel={<WppChatMockup />}>
+        <form onSubmit={handleResetPassword} noValidate>
+          <p className={styles.description}>
+            Ingresá tu mail, el código de 6 dígitos recibido y tu nueva contraseña.
+          </p>
+
+          <Field
+            label="Mail"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            error={emailError}
+          />
+
+          <Field
+            label="Código de recuperación"
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="123456"
+            value={codigo}
+            onChange={(val) => setCodigo(val.replace(/\D/g, '').slice(0, 6))}
+            error={codigoError}
+          />
+
+          <div className={styles.passwordRow}>
+            <div className={styles.passwordCol}>
+              <Field
+                label="Nueva contraseña"
+                type={showPassword ? 'text' : 'password'}
+                value={nuevaPassword}
+                onChange={setNuevaPassword}
+                error={passwordError}
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    className={styles.togglePassword}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                }
+              />
+            </div>
+            <div className={styles.passwordCol}>
+              <Field
+                label="Confirmar"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmarPassword}
+                onChange={setConfirmarPassword}
+                error={confirmarPasswordError}
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    className={styles.togglePassword}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                }
+              />
+            </div>
+          </div>
+
+          {apiError && <p className={styles.error}>{apiError}</p>}
+
+          <button type="submit" disabled={loading} className={styles.submitBtn}>
+            {loading ? 'Restableciendo...' : 'Restablecer contraseña'}
+          </button>
+
+          <div className={styles.manualCodeToggle}>
+            <button
+              type="button"
+              className={styles.manualCodeLink}
+              onClick={() => {
+                setModoManual(false)
+                setHasSubmitted(false)
+                setApiError(null)
+              }}
+            >
+              Volver a solicitar código
+            </button>
+          </div>
+
+          <div className={styles.backToLogin}>
+            <Link to="/login" className={styles.backLink}>
+              <ArrowLeft size={16} />
+              Volver al inicio de sesión
+            </Link>
+          </div>
+        </form>
+      </AuthLayout>
+    )
+  }
+
   if (enviado) {
     return (
-      <AuthLayout title="¡Enlace enviado!" leftPanel={<WppChatMockup />}>
+      <AuthLayout title="Código de recuperación enviado" leftPanel={<WppChatMockup />}>
         <div className={styles.successContainer}>
           <div className={styles.successIconWrap}>
             <CheckCircle2 size={48} className={styles.successIcon} />
           </div>
           <p className={styles.successMessage}>
-            Si hay una cuenta con ese email, te vamos a mandar un enlace para cambiar tu contraseña.
+            Si hay una cuenta con ese email, te enviamos un código y un enlace para cambiar tu contraseña.
           </p>
           <p className={styles.instructions}>
-            Por favor, revisá tu bandeja de entrada (y la carpeta de correo no deseado/spam) y hacé clic en el botón del correo para continuar.
+            Revisá tu casilla de correo (y la carpeta de spam o correo no deseado). Podés hacer clic en el botón del correo o ingresar el código recibido a continuación.
           </p>
           <button
             type="button"
             className={styles.submitBtn}
-            onClick={() => setEnviado(false)}
+            onClick={() => {
+              setModoManual(true)
+              setHasSubmitted(false)
+              setApiError(null)
+            }}
           >
-            Volver a intentar
+            Ingresar código recibido
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryBtn}
+            onClick={() => {
+              setEnviado(false)
+              setHasSubmitted(false)
+              setApiError(null)
+            }}
+          >
+            Reenviar o cambiar email
           </button>
           <div className={styles.backToLogin}>
             <Link to="/login" className={styles.backLink}>
@@ -216,7 +342,7 @@ export default function RecuperarPassword() {
     <AuthLayout title="Restablecer contraseña" leftPanel={<WppChatMockup />}>
       <form onSubmit={handleSendCode} noValidate>
         <p className={styles.description}>
-          Ingresá tu mail y te enviamos un enlace para restablecer tu contraseña de forma segura.
+          Ingresá tu mail y te enviamos un enlace y un código para restablecer tu contraseña de forma segura.
         </p>
 
         <Field
@@ -233,6 +359,20 @@ export default function RecuperarPassword() {
         <button type="submit" disabled={loading} className={styles.submitBtn}>
           {loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
         </button>
+
+        <div className={styles.manualCodeToggle}>
+          <button
+            type="button"
+            className={styles.manualCodeLink}
+            onClick={() => {
+              setModoManual(true)
+              setHasSubmitted(false)
+              setApiError(null)
+            }}
+          >
+            ¿Ya tenés un código de recuperación? Ingresalo acá
+          </button>
+        </div>
 
         <div className={styles.backToLogin}>
           <Link to="/login" className={styles.backLink}>

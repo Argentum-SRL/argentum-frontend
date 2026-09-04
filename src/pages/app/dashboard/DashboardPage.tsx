@@ -424,6 +424,19 @@ export default function DashboardPage() {
   const [subcategoriasData, setSubcategoriasData] = useState<SubcategoriaGasto[]>([])
   const [loadingSubcategorias, setLoadingSubcategorias] = useState(false)
 
+  // Resetear filtros y datos si el usuario autenticado cambia
+  const prevUserIdRef = useRef<string | null>(usuario?.id ?? null)
+  useEffect(() => {
+    if (usuario?.id && prevUserIdRef.current && prevUserIdRef.current !== usuario.id) {
+      setBilleterasSeleccionadas([])
+      setSelectedCategoria(null)
+      setSubcategoriasData([])
+      setData(null)
+      setProyeccion(null)
+    }
+    prevUserIdRef.current = usuario?.id ?? null
+  }, [usuario?.id])
+
   const [dropdownAbierto, setDropdownAbierto] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -479,9 +492,34 @@ export default function DashboardPage() {
       if (signal?.aborted) return
       setData(res.resumen)
       setBilleteras(res.billeteras)
+
+      // Sanitizar billeteras seleccionadas para que no queden IDs ajenos
+      if (billeterasSeleccionadas.length > 0) {
+        const validIds = new Set(res.billeteras.map(b => b.id))
+        const sanitized = billeterasSeleccionadas.filter(id => validIds.has(id))
+        if (sanitized.length !== billeterasSeleccionadas.length) {
+          setBilleterasSeleccionadas(sanitized)
+          localStorage.setItem('argentum_dashboard_billeteras', JSON.stringify(sanitized))
+        }
+      }
     } catch (err) {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
+      }
+      // Si falló por billeteras inválidas heredadas, resetear y reintentar sin filtro
+      const axiosErr = err as { response?: { status?: number; data?: { detail?: string } } }
+      if (axiosErr.response?.status === 400 && billeterasSeleccionadas.length > 0) {
+        setBilleterasSeleccionadas([])
+        localStorage.removeItem('argentum_dashboard_billeteras')
+        try {
+          const retryRes = await dashboardService.getResumenCompleto(undefined, undefined, [], signal)
+          if (signal?.aborted) return
+          setData(retryRes.resumen)
+          setBilleteras(retryRes.billeteras)
+          return
+        } catch {
+          // Continuar al manejo normal de error
+        }
       }
       console.error('Error loading dashboard:', err)
       setError(true)

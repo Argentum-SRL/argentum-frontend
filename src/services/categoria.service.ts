@@ -1,26 +1,29 @@
 import api from './api'
 import type { Categoria, Subcategoria } from '@/types'
+import { createUserCache } from '@/utils/sessionCleanup'
 
-let categoriesCache: { data: Categoria[]; timestamp: number } | null = null
-let categoriesPromise: Promise<Categoria[]> | null = null
 const CATEGORIES_TTL = 5 * 60 * 1000 // 5 minutes, as they rarely change
+const categoriesCache = createUserCache<Categoria[]>(CATEGORIES_TTL)
+let categoriesPromise: Promise<Categoria[]> | null = null
 
 export const invalidateCategorias = () => {
-  categoriesCache = null
+  categoriesCache.clear()
+  categoriesPromise = null
 }
 
 const categoriaService = {
   getCategorias: async () => {
     if (categoriesPromise) return categoriesPromise
 
-    if (categoriesCache && Date.now() - categoriesCache.timestamp < CATEGORIES_TTL) {
-      return categoriesCache.data
+    const cached = categoriesCache.get()
+    if (cached) {
+      return cached
     }
 
     categoriesPromise = (async () => {
       try {
         const response = await api.get<Categoria[]>('/categorias')
-        categoriesCache = { data: response.data, timestamp: Date.now() }
+        categoriesCache.set(response.data)
         return response.data
       } finally {
         categoriesPromise = null

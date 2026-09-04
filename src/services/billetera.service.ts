@@ -1,17 +1,19 @@
 import api from './api'
 import type { Billetera } from '@/types'
+import { createUserCache } from '@/utils/sessionCleanup'
 
-// Cache storage
-let billeterasCache: { data: Billetera[]; timestamp: number } | null = null
-let billeterasPromise: Promise<Billetera[]> | null = null
+// Cache storage con validación automática por usuario autenticado
 const BILLETERAS_TTL = 30 * 1000 // 30 seconds for wallets
+const billeterasCache = createUserCache<Billetera[]>(BILLETERAS_TTL)
+let billeterasPromise: Promise<Billetera[]> | null = null
 
 /**
  * Invalidates the wallets cache.
  * Exported to allow manual invalidation if needed.
  */
 export const invalidateBilleteras = () => {
-  billeterasCache = null
+  billeterasCache.clear()
+  billeterasPromise = null
 }
 
 const billeteraService = {
@@ -19,16 +21,17 @@ const billeteraService = {
     // If there's a request in progress, reuse the promise
     if (billeterasPromise) return billeterasPromise
 
-    // If cache is valid, return cached data
-    if (billeterasCache && Date.now() - billeterasCache.timestamp < BILLETERAS_TTL) {
-      return billeterasCache.data
+    // If cache is valid for current user, return cached data
+    const cached = billeterasCache.get()
+    if (cached) {
+      return cached
     }
 
     // Otherwise, fetch and store in cache
     billeterasPromise = (async () => {
       try {
         const { data } = await api.get<Billetera[]>('/billeteras', { signal })
-        billeterasCache = { data, timestamp: Date.now() }
+        billeterasCache.set(data)
         return data
       } finally {
         billeterasPromise = null

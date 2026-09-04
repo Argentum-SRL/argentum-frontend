@@ -5,26 +5,27 @@ import type {
   PresupuestoUpdate, 
   PeriodoPresupuesto 
 } from '@/types'
+import { createKeyedUserCache } from '@/utils/sessionCleanup'
 
-// Cache storage
-let presupuestosCache: Record<string, { data: Presupuesto[]; timestamp: number }> = {}
+// Cache storage con validación automática por usuario autenticado
 const PRESUPUESTOS_TTL = 30 * 1000 // 30 seconds
+const presupuestosCache = createKeyedUserCache<Presupuesto[]>(PRESUPUESTOS_TTL)
 
 export const invalidatePresupuestos = () => {
-  presupuestosCache = {}
+  presupuestosCache.clear()
 }
 
 const presupuestoService = {
   getPresupuestos: async (estado?: string, signal?: AbortSignal): Promise<Presupuesto[]> => {
     const key = estado || 'all'
-    const cached = presupuestosCache[key]
+    const cached = presupuestosCache.get(key)
     
-    if (cached && Date.now() - cached.timestamp < PRESUPUESTOS_TTL) {
-      return cached.data
+    if (cached) {
+      return cached
     }
 
     const response = await api.get('/presupuestos', { params: { estado }, signal })
-    presupuestosCache[key] = { data: response.data, timestamp: Date.now() }
+    presupuestosCache.set(key, response.data)
     return response.data
   },
 

@@ -5,6 +5,7 @@ import { clearTokens, getToken, setToken } from '../services/api'
 import type { Usuario, AuthResponse } from '../types/index'
 import { AuthContext } from './AuthContext'
 import { setNavigate, setLogoutFn } from '../utils/browserHistory'
+import { limpiarSesionCompleta } from '@/utils/sessionCleanup'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // Silencioso: igual limpiamos localmente
     } finally {
+      limpiarSesionCompleta()
       clearTokens()
       setUsuario(null)
       navigate('/login', { replace: true, state: options?.state })
@@ -33,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [logout])
 
   const login = useCallback((respuesta: AuthResponse) => {
+    limpiarSesionCompleta()
     if (respuesta.access_token) setToken(respuesta.access_token)
     if (respuesta.usuario) setUsuario(respuesta.usuario)
   }, [])
@@ -57,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .post('/auth/refresh', null, { signal: controller.signal })
       .then(async (refreshRes) => {
         if (!mounted) return
+        limpiarSesionCompleta()
         setToken(refreshRes.data.access_token)
         
         try {
@@ -66,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } catch {
           if (mounted) {
+            limpiarSesionCompleta()
             clearTokens()
             setUsuario(null)
           }
@@ -77,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return
         }
         if (mounted) {
+          limpiarSesionCompleta()
           clearTokens()
           setUsuario(null)
         }

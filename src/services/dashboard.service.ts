@@ -1,33 +1,35 @@
 import api from './api'
 import type { DashboardResumen, CotizacionDolar, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '../types'
+import { createUserCache, createKeyedUserCache } from '@/utils/sessionCleanup'
 
-// Cache storage
-let cotizacionCache: { data: CotizacionDolar; timestamp: number } | null = null
+// Cache storage con validación automática por usuario autenticado
+const DEFAULT_TTL = 60 * 1000 // 60 seconds
+
+const cotizacionCache = createUserCache<CotizacionDolar>(DEFAULT_TTL)
 let cotizacionPromise: Promise<CotizacionDolar> | null = null
 
-let resumenCache: Record<string, { data: DashboardResumen; timestamp: number }> = {}
-const resumenPromises: Record<string, Promise<DashboardResumen> | undefined> = {}
+const resumenCache = createKeyedUserCache<DashboardResumen>(DEFAULT_TTL)
+let resumenPromises: Record<string, Promise<DashboardResumen> | undefined> = {}
 
-let proyeccionCache: { data: ProyeccionesResponse; timestamp: number } | null = null
+const proyeccionCache = createUserCache<ProyeccionesResponse>(DEFAULT_TTL)
 let proyeccionPromise: Promise<ProyeccionesResponse> | null = null
 
-let periodoActualCache: { data: { fecha_inicio: string; fecha_fin: string }; timestamp: number } | null = null
+const periodoActualCache = createUserCache<{ fecha_inicio: string; fecha_fin: string }>(DEFAULT_TTL)
 let periodoActualPromise: Promise<{ fecha_inicio: string; fecha_fin: string }> | null = null
-
-const DEFAULT_TTL = 60 * 1000 // 60 seconds
 
 export const dashboardService = {
   getPeriodoActual: async (signal?: AbortSignal): Promise<{ fecha_inicio: string; fecha_fin: string }> => {
     if (!signal && periodoActualPromise) return periodoActualPromise
 
-    if (periodoActualCache && Date.now() - periodoActualCache.timestamp < DEFAULT_TTL) {
-      return periodoActualCache.data
+    const cached = periodoActualCache.get()
+    if (cached) {
+      return cached
     }
 
     const fetchPromise = (async () => {
       try {
         const response = await api.get<{ fecha_inicio: string; fecha_fin: string }>('/dashboard/periodo-actual', { signal })
-        periodoActualCache = { data: response.data, timestamp: Date.now() }
+        periodoActualCache.set(response.data)
         return response.data
       } finally {
         if (!signal) periodoActualPromise = null
@@ -46,9 +48,9 @@ export const dashboardService = {
       if (pending) return pending
     }
 
-    const cached = resumenCache[key]
-    if (cached && Date.now() - cached.timestamp < DEFAULT_TTL) {
-      return cached.data
+    const cached = resumenCache.get(key)
+    if (cached) {
+      return cached
     }
 
     const promise = (async () => {
@@ -63,7 +65,7 @@ export const dashboardService = {
           params,
           signal
         })
-        resumenCache[key] = { data: response.data, timestamp: Date.now() }
+        resumenCache.set(key, response.data)
         return response.data
       } finally {
         if (!signal) delete resumenPromises[key]
@@ -77,14 +79,15 @@ export const dashboardService = {
   getCotizacion: async (signal?: AbortSignal): Promise<CotizacionDolar> => {
     if (!signal && cotizacionPromise) return cotizacionPromise
 
-    if (cotizacionCache && Date.now() - cotizacionCache.timestamp < DEFAULT_TTL) {
-      return cotizacionCache.data
+    const cached = cotizacionCache.get()
+    if (cached) {
+      return cached
     }
 
     const fetchPromise = (async () => {
       try {
         const response = await api.get<CotizacionDolar>('/dashboard/cotizacion', { signal })
-        cotizacionCache = { data: response.data, timestamp: Date.now() }
+        cotizacionCache.set(response.data)
         return response.data
       } finally {
         if (!signal) cotizacionPromise = null
@@ -98,14 +101,15 @@ export const dashboardService = {
   getProyeccion: async (signal?: AbortSignal): Promise<ProyeccionesResponse> => {
     if (!signal && proyeccionPromise) return proyeccionPromise
 
-    if (proyeccionCache && Date.now() - proyeccionCache.timestamp < DEFAULT_TTL) {
-      return proyeccionCache.data
+    const cached = proyeccionCache.get()
+    if (cached) {
+      return cached
     }
 
     const fetchPromise = (async () => {
       try {
         const response = await api.get<ProyeccionesResponse>('/dashboard/proyeccion', { signal })
-        proyeccionCache = { data: response.data, timestamp: Date.now() }
+        proyeccionCache.set(response.data)
         return response.data
       } finally {
         if (!signal) proyeccionPromise = null
@@ -148,16 +152,22 @@ export const dashboardService = {
 }
 
 export const invalidateDashboardCache = () => {
-  resumenCache = {}
-  cotizacionCache = null
-  proyeccionCache = null
-  periodoActualCache = null
+  resumenCache.clear()
+  cotizacionCache.clear()
+  proyeccionCache.clear()
+  periodoActualCache.clear()
+  cotizacionPromise = null
+  proyeccionPromise = null
+  periodoActualPromise = null
+  resumenPromises = {}
 }
 
 export const invalidateResumen = () => {
-  resumenCache = {}
+  resumenCache.clear()
+  resumenPromises = {}
 }
 
 export const invalidateCotizacion = () => {
-  cotizacionCache = null
+  cotizacionCache.clear()
+  cotizacionPromise = null
 }

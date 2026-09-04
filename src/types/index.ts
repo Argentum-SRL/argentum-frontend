@@ -478,6 +478,7 @@ export interface TarjetaCredito {
   usuario_id: string
   billetera_id: string
   nombre: string
+  apodo?: string | null
   red: 'visa' | 'mastercard' | 'amex' | 'naranja' | 'cabal' | 'otro'
   dia_cierre: number
   dia_vencimiento: number
@@ -494,6 +495,7 @@ export interface TarjetaCredito {
 export interface TarjetaCreditoCreate {
   billetera_id: string
   nombre: string
+  apodo?: string | null
   red: string
   dia_cierre: number
   dia_vencimiento: number

@@ -64,6 +64,7 @@ function getBilleteraColor(billetera: Billetera | undefined): string {
 
 interface TarjetaModalState {
   ultimos4: string
+  apodo: string
   red: string
   billeteraId: string
   moneda: 'ARS' | 'USD'
@@ -82,6 +83,7 @@ type TarjetaModalAction =
 
 const initialState: TarjetaModalState = {
   ultimos4: '',
+  apodo: '',
   red: 'visa',
   billeteraId: '',
   moneda: 'ARS',
@@ -104,6 +106,7 @@ function tarjetaReducer(state: TarjetaModalState, action: TarjetaModalAction): T
         return {
           ...initialState,
           ultimos4: t.nombre.replace('•••• ', ''),
+          apodo: t.apodo || '',
           red: t.red,
           billeteraId: t.billetera_id,
           moneda: t.moneda,
@@ -208,6 +211,7 @@ export default function TarjetaModal() {
 
       const payload: TarjetaCreditoCreate = {
         nombre: `•••• ${state.ultimos4}`,
+        apodo: state.apodo && state.apodo.trim() ? state.apodo.trim() : null,
         red: state.red,
         billetera_id: state.billeteraId,
         moneda: state.moneda,
@@ -336,6 +340,25 @@ export default function TarjetaModal() {
                     onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'diaVencimiento', value: e.target.value })}
                   />
                 </div>
+              </div>
+
+              {/* Apodo opcional */}
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel} htmlFor="tarjeta-apodo">
+                  Apodo (opcional)
+                </label>
+                <input
+                  id="tarjeta-apodo"
+                  type="text"
+                  maxLength={50}
+                  className={styles.fieldInput}
+                  value={state.apodo}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'apodo', value: e.target.value })}
+                  placeholder="Ej. La de viajes, Corporativa"
+                />
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', display: 'block', lineHeight: 1.35 }}>
+                  Nombre corto para reconocerla rápido y nombrarla por WhatsApp (ej. &quot;gasté con la de viajes&quot;).
+                </span>
               </div>
 
               {/* FILA 2: Límite */}

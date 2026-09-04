@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import toolsService from '@/services/toolsService';
 import type { IPCData, ConvenienciaResult, FinancialContext, CanAffordResult } from '@/types/tools';
 import { useToast } from '@/hooks/useToast';
+import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 
 const calcularCuotaConInteres = (capital: number, n: number, tnaVal: number): number => {
   const i = tnaVal / 100 / 12;
@@ -75,7 +76,7 @@ export const useTools = () => {
       showToast('El precio de contado debe ser mayor a 0', 'error');
       return;
     }
-    if (contado > 1_000_000_000_000) {
+    if (contado > MAX_MONTO_INTEGRIDAD) {
       showToast('El precio de contado excede el límite permitido', 'error');
       return;
     }
@@ -83,7 +84,7 @@ export const useTools = () => {
       showToast('El precio total en cuotas debe ser mayor a 0', 'error');
       return;
     }
-    if (!tiene_interes && cuotasTotal !== null && cuotasTotal > 1_000_000_000_000) {
+    if (!tiene_interes && cuotasTotal !== null && cuotasTotal > MAX_MONTO_INTEGRIDAD) {
       showToast('El precio en cuotas excede el límite permitido', 'error');
       return;
     }
@@ -200,7 +201,7 @@ export const useTools = () => {
       showToast('El precio de la compra debe ser mayor a 0', 'error');
       return;
     }
-    if (precio > 1_000_000_000_000) {
+    if (precio > MAX_MONTO_INTEGRIDAD) {
       showToast('El precio de la compra excede el límite permitido', 'error');
       return;
     }
@@ -220,7 +221,7 @@ export const useTools = () => {
         showToast('El ingreso mensual estimado debe ser mayor a 0', 'error');
         return;
       }
-      if (canAffordForm.ingreso_manual > 1_000_000_000_000) {
+      if (canAffordForm.ingreso_manual > MAX_MONTO_INTEGRIDAD) {
         showToast('El ingreso mensual estimado excede el límite permitido', 'error');
         return;
       }

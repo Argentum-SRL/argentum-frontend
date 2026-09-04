@@ -3,6 +3,7 @@ import { Percent } from 'lucide-react';
 import { Input, Button, MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import type { IPCData } from '@/types/tools';
+import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import styles from './ToolsComponents.module.css';
 
 interface ConvenienciaFormProps {
@@ -58,8 +59,8 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
   const isFormInvalid = 
     formData.precio_contado === null || 
     formData.precio_contado <= 0 ||
-    formData.precio_contado > 1_000_000_000_000 ||
-    (!formData.tiene_interes && (formData.precio_total_cuotas === null || formData.precio_total_cuotas <= 0 || formData.precio_total_cuotas > 1_000_000_000_000)) ||
+    formData.precio_contado > MAX_MONTO_INTEGRIDAD ||
+    (!formData.tiene_interes && (formData.precio_total_cuotas === null || formData.precio_total_cuotas <= 0 || formData.precio_total_cuotas > MAX_MONTO_INTEGRIDAD)) ||
     (formData.tiene_interes && (!formData.tna || isNaN(parseFloat(formData.tna)) || parseFloat(formData.tna) < 0.1 || parseFloat(formData.tna) > 3000)) ||
     formData.cantidad_cuotas === null ||
     isNaN(formData.cantidad_cuotas) ||

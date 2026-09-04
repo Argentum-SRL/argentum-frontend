@@ -4,6 +4,7 @@ import React from 'react';
 import { Calendar, Coins } from 'lucide-react';
 import { Input, Button, MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
+import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import styles from './ToolsComponents.module.css';
 
 interface CanAffordFormProps {
@@ -57,10 +58,10 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   const isFormInvalid = 
     formData.precio_total === null || 
     formData.precio_total <= 0 ||
-    formData.precio_total > 1_000_000_000_000 ||
+    formData.precio_total > MAX_MONTO_INTEGRIDAD ||
     (formData.modo === 'cuotas' && (formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) || formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120)) ||
     (formData.modo === 'cuotas' && tieneInteres && (!tna || isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000)) ||
-    (showManualIncome && formData.ingreso_manual !== null && (formData.ingreso_manual <= 0 || formData.ingreso_manual > 1_000_000_000_000));
+    (showManualIncome && formData.ingreso_manual !== null && (formData.ingreso_manual <= 0 || formData.ingreso_manual > MAX_MONTO_INTEGRIDAD));
 
   // Real-time calculations for preview
   const getPreviewText = () => {

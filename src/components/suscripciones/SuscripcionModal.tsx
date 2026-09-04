@@ -10,7 +10,8 @@ import suscripcionService from '@/services/suscripcion.service'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import categoriaService from '@/services/categoria.service'
-import type { Billetera, TarjetaCredito, Categoria, Suscripcion } from '@/types'
+import { dashboardService } from '@/services/dashboard.service'
+import type { Billetera, TarjetaCredito, Categoria, Suscripcion, CotizacionDolar } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
@@ -110,20 +111,25 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({})
+  const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
 
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [b, t, c] = await Promise.all([
+        const [b, t, c, cotiz] = (await Promise.all([
           billeteraService.list(),
           tarjetaService.getTarjetas(),
-          categoriaService.getCategorias()
-        ])
+          categoriaService.getCategorias(),
+          dashboardService.getCotizacion().catch(() => null)
+        ])) as [Billetera[], TarjetaCredito[], Categoria[], CotizacionDolar | null]
         const validBilleteras = b.filter(x => !x.es_efectivo && x.estado === 'activa')
         const validTarjetas = t.filter(x => x.estado === 'activa')
         setBilleteras(validBilleteras)
         setTarjetas(validTarjetas)
         setCategorias(c)
+        if (cotiz) {
+          setCotizacion(cotiz)
+        }
 
         const defB = validBilleteras.find(x => x.es_principal)?.id || validBilleteras[0]?.id || ''
         const defT = validTarjetas[0]?.id || ''
@@ -144,6 +150,32 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
       loadInitialData()
     }
   }, [open, suscripcion])
+
+  const selectedMedio = useMemo(() => {
+    if (state.metodoCobro === 'tarjeta') {
+      return tarjetas.find(t => t.id === state.tarjetaId)
+    }
+    return billeteras.find(b => b.id === state.billeteraId)
+  }, [state.metodoCobro, state.tarjetaId, state.billeteraId, tarjetas, billeteras])
+
+  const equivalenteEstimado = useMemo(() => {
+    if (!state.monto || !selectedMedio || !cotizacion) return null
+    const medioMoneda = selectedMedio.moneda
+    if (state.moneda === medioMoneda) return null
+
+    const cotizValor = cotizacion.venta || cotizacion.promedio || cotizacion.compra || 0
+    if (cotizValor <= 0) return null
+
+    if (state.moneda === 'USD' && medioMoneda === 'ARS') {
+      const totalArs = state.monto * cotizValor
+      return `≈ $ ${totalArs.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ARS (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
+    }
+    if (state.moneda === 'ARS' && medioMoneda === 'USD') {
+      const totalUsd = state.monto / cotizValor
+      return `≈ US$ ${totalUsd.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
+    }
+    return null
+  }, [state.monto, state.moneda, selectedMedio, cotizacion])
 
   // Scroll to selected card
   useEffect(() => {
@@ -429,6 +461,13 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   moneda={state.moneda}
                   onMonedaChange={(m: 'ARS' | 'USD') => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                 />
+
+                {equivalenteEstimado && (
+                  <div className={styles.equivalenteEstimado}>
+                    <span className={styles.equivalenteLabel}>Equivalente estimado:</span>
+                    <span className={styles.equivalenteMonto}>{equivalenteEstimado}</span>
+                  </div>
+                )}
 
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>¿Cómo se cobra?</label>

@@ -228,6 +228,7 @@ export interface Transaccion {
   estado_verificacion: 'confirmada' | 'pendiente' | null
   fecha_creacion: string
   subcategoria?: Subcategoria
+  movimiento_meta_id?: string | null
 }
 
 export interface TransferenciaInterna {
@@ -308,6 +309,7 @@ export interface MovimientoDashboard {
   categoria_nombre: string | null
   subcategoria_nombre: string | null
   estado_verificacion: 'confirmada' | 'pendiente' | null
+  movimiento_meta_id?: string | null
 }
 
 export interface PagoDashboard {

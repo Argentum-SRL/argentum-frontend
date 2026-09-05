@@ -326,6 +326,10 @@ export default function TransaccionesPage() {
     const txsMoneda = filteredTransacciones.filter(t => t.moneda === mainCurrency)
 
     txsMoneda.forEach(t => {
+      // Excluir aportes y retiros de metas de los totales de egresos/ingresos
+      if (t.movimiento_meta_id || t.descripcion?.startsWith('Aporte a la meta:') || t.descripcion?.startsWith('Retiro de la meta:')) {
+        return
+      }
       const monto = Number(t.monto) || 0
       if (t.tipo === 'ingreso') ingresos += monto
       else egresos += monto

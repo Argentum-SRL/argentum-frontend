@@ -988,28 +988,42 @@ export default function DashboardPage() {
               }
               return (
                 <div className={styles.list}>
-                  {movsFiltrados.map((m) => (
-                    <div key={m.id} className={styles.listItem}>
-                      <div className={styles.itemIcon}>
-                        <SubcategoriaIcon
-                          nombre={m.subcategoria_nombre}
-                          parentCategory={m.categoria_nombre}
-                          size={32}
-                        />
+                  {movsFiltrados.map((m) => {
+                    const isMeta = Boolean(
+                      m.movimiento_meta_id ||
+                      m.descripcion?.startsWith('Aporte a la meta:') ||
+                      m.descripcion?.startsWith('Retiro de la meta:')
+                    )
+                    const isAporte = isMeta && m.tipo === 'egreso'
+                    const isRetiro = isMeta && m.tipo === 'ingreso'
+
+                    return (
+                      <div key={m.id} className={styles.listItem}>
+                        <div className={styles.itemIcon}>
+                          <SubcategoriaIcon
+                            nombre={isMeta ? 'ahorro' : m.subcategoria_nombre}
+                            parentCategory={isMeta ? 'Ahorro' : m.categoria_nombre}
+                            size={32}
+                          />
+                        </div>
+                        <div className={styles.itemMeta}>
+                          <p className={styles.itemName}>
+                            {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
+                          </p>
+                          <p className={styles.itemSub}>
+                            {formatFecha(m.fecha)} • {m.billetera_nombre}
+                            {isAporte && ' • Apartado para meta'}
+                            {isRetiro && ' • Retiro de meta'}
+                          </p>
+                        </div>
+                        <div className={`${styles.itemAmount} ${
+                          isAporte || isRetiro ? '' : (m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg)
+                        }`}>
+                          {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, m.moneda)}
+                        </div>
                       </div>
-                      <div className={styles.itemMeta}>
-                        <p className={styles.itemName}>
-                          {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
-                        </p>
-                        <p className={styles.itemSub}>
-                          {formatFecha(m.fecha)} • {m.billetera_nombre}
-                        </p>
-                      </div>
-                      <div className={`${styles.itemAmount} ${m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg}`}>
-                        {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, m.moneda)}
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )
             })()}

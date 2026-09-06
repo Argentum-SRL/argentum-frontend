@@ -23,7 +23,7 @@ import { useToast } from '@/hooks/useToast'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
-import type { DashboardResumen, ProyeccionCategoria, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '@/types'
+import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -206,19 +206,15 @@ const CategoriasChart = memo(({
   moneda = 'ARS',
   onSelectCategory 
 }: { 
-  data: ProyeccionCategoria[], 
+  data: CategoriaGastoItem[], 
   showPercent: boolean,
   moneda?: 'ARS' | 'USD',
   onSelectCategory: (id: string, nombre: string) => void
 }) => {
   const chartData = useMemo(() => {
     return data
-      .filter(c => c.gasto_actual_ciclo > 0 || c.proyectado > 0)
-      .sort((a, b) => {
-        const aVal = a.gasto_actual_ciclo > 0 ? a.gasto_actual_ciclo : a.proyectado
-        const bVal = b.gasto_actual_ciclo > 0 ? b.gasto_actual_ciclo : b.proyectado
-        return bVal - aVal
-      })
+      .filter(c => c.monto > 0)
+      .sort((a, b) => b.monto - a.monto)
       .slice(0, 6)
   }, [data])
 
@@ -232,11 +228,11 @@ const CategoriasChart = memo(({
     )
   }
 
-  const maxVal = Math.max(...chartData.map(entry => entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado), 0)
-  const total = chartData.reduce((acc, curr) => acc + (curr.gasto_actual_ciclo > 0 ? curr.gasto_actual_ciclo : curr.proyectado), 0)
+  const maxVal = Math.max(...chartData.map(entry => entry.monto), 0)
+  const total = chartData.reduce((acc, curr) => acc + curr.monto, 0)
 
   const dynamicCSS = chartData.map((entry) => {
-    const val = entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado
+    const val = entry.monto
     const fillPct = maxVal > 0 ? Math.max(0, Math.min(100, (val / maxVal) * 100)) : 0
     const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
     const classPrefix = moneda === 'ARS' ? 'bar-fill-ars' : 'bar-fill-usd'
@@ -248,8 +244,7 @@ const CategoriasChart = memo(({
     <div className={styles.barChartWrap}>
       <style>{dynamicCSS}</style>
       {chartData.map((entry) => {
-        const isProyectado = entry.gasto_actual_ciclo <= 0 && entry.proyectado > 0
-        const val = entry.gasto_actual_ciclo > 0 ? entry.gasto_actual_ciclo : entry.proyectado
+        const val = entry.monto
         const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((val / total) * 100))) : 0
         const safeCatId = (entry.categoria_id || entry.categoria_nombre).replace(/[^a-zA-Z0-9_-]/g, '')
         const fillClass = moneda === 'ARS' ? `bar-fill-ars-${safeCatId}` : `bar-fill-usd-${safeCatId}`
@@ -272,16 +267,13 @@ const CategoriasChart = memo(({
               <div className={styles.barHeader}>
                 <div className={styles.barTitleGroup}>
                   <span className={styles.barName}>{entry.categoria_nombre}</span>
-                  {isProyectado && (
-                    <span className={styles.proyBadge}>Proyectado</span>
-                  )}
                 </div>
-                <span className={`${styles.barAmount} ${isProyectado ? styles.barAmountProyectado : ''}`}>
+                <span className={styles.barAmount}>
                   {showPercent ? `${pct}%` : fmt(val, moneda)}
                 </span>
               </div>
               <div className={styles.barTrack}>
-                <div className={`${styles.barFill} ${fillClass} ${isProyectado ? styles.barFillProyectado : ''}`} />
+                <div className={`${styles.barFill} ${fillClass}`} />
               </div>
             </div>
           </div>
@@ -857,33 +849,15 @@ export default function DashboardPage() {
                 />
               )
             ) : (
-              loadingProyeccion ? (
+              loading ? (
                 <ListSkeleton />
               ) : (
-                proyeccion && (() => {
-                  const activeProj = moneda === 'ARS' ? proyeccion.ars : proyeccion.usd
-                  const hasDatos = activeProj && activeProj.datos_suficientes
-
-                  if (!hasDatos) {
-                    return (
-                      <EmptyState
-                        variant="compact"
-                        icon={PieChartIcon}
-                        title="Sin proyección por ahora"
-                        description="Necesitamos más historial para proyectar tu ciclo"
-                      />
-                    )
-                  }
-
-                  return (
-                    <CategoriasChart
-                      data={activeProj.desglose_por_categoria}
-                      showPercent={showChartPercent}
-                      moneda={moneda}
-                      onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
-                    />
-                  )
-                })()
+                <CategoriasChart
+                  data={data?.gastos_por_categoria?.[moneda === 'ARS' ? 'ars' : 'usd'] ?? []}
+                  showPercent={showChartPercent}
+                  moneda={moneda}
+                  onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
+                />
               )
             )}
           </div>
@@ -911,11 +885,19 @@ export default function DashboardPage() {
               return (
                 <div className={styles.list}>
                   {pagosFiltrados.slice(0, 4).map((p) => {
-                    const isUrgente = p.dias_restantes <= 1
+                    const isVencido = Boolean(p.es_vencido || p.dias_restantes < 0)
+                    const isUrgente = !isVencido && p.dias_restantes <= 1
                     let fechaTxt = formatFecha(p.fecha_cobro)
-                    if (p.dias_restantes === 0) fechaTxt = 'Hoy'
-                    else if (p.dias_restantes === 1) fechaTxt = 'Mañana'
-                    else if (p.dias_restantes <= 7) fechaTxt = `En ${p.dias_restantes} días`
+                    if (isVencido) {
+                      const diasPasados = Math.abs(p.dias_restantes)
+                      fechaTxt = diasPasados === 1 ? 'Venció ayer' : `Venció hace ${diasPasados} días`
+                    } else if (p.dias_restantes === 0) {
+                      fechaTxt = 'Hoy'
+                    } else if (p.dias_restantes === 1) {
+                      fechaTxt = 'Mañana'
+                    } else if (p.dias_restantes <= 7) {
+                      fechaTxt = `En ${p.dias_restantes} días`
+                    }
 
                     const handlePagoClick = () => {
                       if (p.tipo === 'suscripcion') {
@@ -940,7 +922,11 @@ export default function DashboardPage() {
                         </div>
                         <div className={styles.pagoRight}>
                           <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
-                          {isUrgente && <span className={styles.urgentBadge}>Urgente</span>}
+                          {isVencido ? (
+                            <span className={styles.urgentBadge} style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>Vencido</span>
+                          ) : isUrgente ? (
+                            <span className={styles.urgentBadge}>Urgente</span>
+                          ) : null}
                         </div>
                       </div>
                     )

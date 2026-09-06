@@ -294,8 +294,18 @@ export interface DashboardResumen {
       disponible: number
     }
   }
+  gastos_por_categoria?: {
+    ars: CategoriaGastoItem[]
+    usd: CategoriaGastoItem[]
+  }
   ultimos_movimientos: MovimientoDashboard[]
   proximos_pagos: PagoDashboard[]
+}
+
+export interface CategoriaGastoItem {
+  categoria_id: string | null
+  categoria_nombre: string
+  monto: number
 }
 
 export interface MovimientoDashboard {
@@ -325,6 +335,7 @@ export interface PagoDashboard {
   red?: string
   billetera_nombre?: string
   billetera_id?: string
+  es_vencido?: boolean
 }
 
 export interface Proyeccion {

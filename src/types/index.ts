@@ -347,6 +347,8 @@ export interface Proyeccion {
     dias_totales: number
   }
   gasto_proyectado_total: number
+  rango: { piso: number; central: number; techo: number }
+  rango_poco_informativo: boolean
   balance_proyectado: number
   ingresos_proyectados: number
   certezas: {
@@ -355,11 +357,12 @@ export interface Proyeccion {
     total: number
   }
   desglose_por_categoria: ProyeccionCategoria[]
-  nivel_confianza: 'alto' | 'medio' | 'bajo'
+  nivel_confianza: 'alto' | 'medio' | 'bajo' | 'sin_datos' | 'inicial'
   ciclos_analizados: number
   pesos: { historial: number; ciclo_actual: number }
   advertencias: string[]
   datos_suficientes: boolean
+  clasificacion: { comprometidos: number; recurrentes_detectados: number; variables: number }
 }
 
 export interface ProyeccionesResponse {
@@ -373,6 +376,8 @@ export interface ProyeccionCategoria {
   gasto_actual_ciclo: number
   promedio_historico: number
   proyectado: number
+  rango_piso: number
+  rango_techo: number
   fuera_de_patron: boolean
 }
 
@@ -736,6 +741,24 @@ export interface InterpretacionIndicador {
 }
 
 export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
+  perfil_nuevo: {
+    ciclos_con_datos: number
+    ciclos_observados: number
+    nivel_confianza: string
+    cobertura_registro: number
+    ingreso_tipico_ars: number | null
+    estabilidad_ingreso_mad: number | null
+    ingreso_actual_percentil: number | null
+    gasto_comprometido_ars: number
+    gasto_comprometido_ratio: number | null
+    capacidad_ahorro: number | null
+    capacidad_ahorro_percentil: number | null
+    runway_meses: number | null
+    volatilidad_gasto_variable: number | null
+    gasto_actual_percentil: number | null
+    consistencia_registro: number | null
+    metodo: string
+  }
   interpretaciones: {
     tasa_ahorro_ars: InterpretacionIndicador;
     tasa_ahorro_usd: InterpretacionIndicador;

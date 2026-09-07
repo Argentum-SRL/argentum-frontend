@@ -134,6 +134,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ mone
   }
 
   const { interpretaciones } = perfil
+  const perfilNuevo = perfil.perfil_nuevo
 
   const wTasaAhorroArs = Math.max(0, Math.min(100, perfil.tasa_ahorro_ars !== null ? perfil.tasa_ahorro_ars * 100 : 0))
   const wTasaAhorroUsd = Math.max(0, Math.min(100, perfil.tasa_ahorro_usd !== null ? perfil.tasa_ahorro_usd * 100 : 0))
@@ -313,6 +314,33 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ mone
               <div className={`${styles.pfProgressBar} ${styles['pfProgress' + toClassName(moneda === 'ARS' ? interpretaciones.porcentaje_suscripciones_ars.nivel : interpretaciones.porcentaje_suscripciones_usd.nivel)]} pf-bar-6-${moneda.toLowerCase()}`} />
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className={styles.pfBottomRow}>
+        <div className={styles.pfIndicatorBox}>
+          <div className={styles.pfIndicatorHeader}>
+            <span className={styles.pfIndicatorLabel}>Ingreso típico</span>
+            <TrendingUp size={18} color="var(--text-3)" />
+          </div>
+          <span className={styles.pfIndicatorValue}>{perfilNuevo.ingreso_tipico_ars !== null ? `${Math.round(perfilNuevo.ingreso_tipico_ars).toLocaleString('es-AR')}` : '—'}</span>
+          <span className={styles.pfBadge}>Percentil actual {perfilNuevo.ingreso_actual_percentil !== null ? `${Math.round(perfilNuevo.ingreso_actual_percentil * 100)}%` : '—'}</span>
+        </div>
+        <div className={styles.pfIndicatorBox}>
+          <div className={styles.pfIndicatorHeader}>
+            <span className={styles.pfIndicatorLabel}>Gasto comprometido</span>
+            <CreditCard size={18} color="var(--text-3)" />
+          </div>
+          <span className={styles.pfIndicatorValue}>{perfilNuevo.gasto_comprometido_ratio !== null ? `${Math.round(perfilNuevo.gasto_comprometido_ratio * 100)}%` : '—'}</span>
+          <span className={styles.pfBadge}>Relativo a tu ingreso típico</span>
+        </div>
+        <div className={styles.pfIndicatorBox}>
+          <div className={styles.pfIndicatorHeader}>
+            <span className={styles.pfIndicatorLabel}>Confianza del análisis</span>
+            <Activity size={18} color="var(--text-3)" />
+          </div>
+          <span className={styles.pfIndicatorValue}>{perfilNuevo.nivel_confianza}</span>
+          <span className={styles.pfBadge}>{perfilNuevo.ciclos_con_datos} ciclos con datos</span>
         </div>
       </div>
     </div>

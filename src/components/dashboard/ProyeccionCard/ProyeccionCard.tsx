@@ -39,7 +39,7 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
     return { progressPercent: percent }
   }, [proyeccion])
 
-  const { gasto_proyectado_total, balance_proyectado, desglose_por_categoria, certezas } = proyeccion
+  const { gasto_proyectado_total, balance_proyectado, desglose_por_categoria, certezas, rango, nivel_confianza } = proyeccion
 
   return (
     <div className={styles.card}>
@@ -68,6 +68,14 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
           <span className={`${styles.balanceValue} ${balance_proyectado >= 0 ? styles.positive : styles.negative}`}>
             {formatMonto(balance_proyectado, moneda)}
           </span>
+        </div>
+        <div className={styles.statItem}>
+          <span className={styles.statLabel}>Rango probable</span>
+          <span className={styles.statValue}>{formatMonto(rango.piso, moneda)} a {formatMonto(rango.techo, moneda)}</span>
+        </div>
+        <div className={styles.statItem}>
+          <span className={styles.statLabel}>Confianza</span>
+          <span className={styles.statValue}>{nivel_confianza}</span>
         </div>
       </div>
 

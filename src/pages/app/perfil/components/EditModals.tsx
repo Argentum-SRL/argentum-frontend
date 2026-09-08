@@ -1,14 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Save, AlertCircle, MessageSquare, Eye, EyeOff } from 'lucide-react'
+import { Save, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import type { Usuario } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { Modal, DateInput, SelectInput, type SelectOption } from '@/components/ui'
-import {
-  formatearTelefonoVisual,
-} from '@/utils/telefono.utils'
 import styles from '../PerfilPage.module.css'
 
 const OPCIONES_SEXO: SelectOption[] = [
@@ -20,7 +17,7 @@ const OPCIONES_SEXO: SelectOption[] = [
 ]
 
 interface EditModalsProps {
-  activeModal: 'datos' | 'email' | 'telefono' | null
+  activeModal: 'datos' | 'email' | null
   onClose: () => void
   usuario: Usuario | null
   updateUsuario: (u: Usuario) => void
@@ -353,61 +350,6 @@ const EmailForm: React.FC<{
   )
 }
 
-// ── 3. Formulario de Teléfono ─────────────────────────────────────────────
-const TelefonoForm: React.FC<{
-  usuario: Usuario | null
-  onClose: () => void
-  updateUsuario: (u: Usuario) => void
-}> = ({ usuario, onClose }) => {
-  const navigate = useNavigate()
-
-  const handleIrAVinculacion = () => {
-    onClose()
-    navigate('/auth/verificar-telefono')
-  }
-
-  return (
-    <div className={styles.modalFormContainer}>
-      <div className={styles.modalFormBody}>
-        <p className={styles.modalFieldHint} style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: 'var(--text-2)' }}>
-          Por seguridad, tu número de WhatsApp se vincula directamente iniciando una conversación desde tu aplicación de WhatsApp.
-        </p>
-
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, margin: '16px 0' }}>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-3)', marginBottom: 4 }}>
-            Número actual registrado
-          </div>
-          <div style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text)' }}>
-            {formatearTelefonoVisual(usuario?.telefono) || 'Ningún teléfono vinculado'}
-          </div>
-        </div>
-
-        <p className={styles.modalFieldHint} style={{ fontSize: '0.8125rem', color: 'var(--text-3)', lineHeight: 1.4 }}>
-          Al continuar, se generará un código seguro de un solo uso para abrir WhatsApp y vincular tu nuevo número automáticamente.
-        </p>
-      </div>
-
-      <div className={styles.modalFormFooter}>
-        <button
-          type="button"
-          className={styles.modalCancelBtn}
-          onClick={onClose}
-        >
-          Cancelar
-        </button>
-        <button
-          type="button"
-          className={styles.modalSubmitBtn}
-          onClick={handleIrAVinculacion}
-        >
-          <MessageSquare size={15} />
-          <span>{usuario?.telefono_verificado ? 'Cambiar WhatsApp' : 'Vincular WhatsApp'}</span>
-        </button>
-      </div>
-    </div>
-  )
-}
-
 // ── Modal Maestro ─────────────────────────────────────────────────────────
 export const EditModals: React.FC<EditModalsProps> = ({
   activeModal,
@@ -424,8 +366,6 @@ export const EditModals: React.FC<EditModalsProps> = ({
           ? 'Editar Datos Personales'
           : activeModal === 'email'
           ? 'Actualizar Correo Electrónico'
-          : activeModal === 'telefono'
-          ? 'Asociar Teléfono de WhatsApp'
           : ''
       }
     >
@@ -439,15 +379,6 @@ export const EditModals: React.FC<EditModalsProps> = ({
 
       {activeModal === 'email' && (
         <EmailForm
-          usuario={usuario}
-          onClose={onClose}
-          updateUsuario={updateUsuario}
-        />
-      )}
-
-      {activeModal === 'telefono' && (
-        <TelefonoForm
-          key="tel-form"
           usuario={usuario}
           onClose={onClose}
           updateUsuario={updateUsuario}

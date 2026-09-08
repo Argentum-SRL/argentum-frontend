@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock, Edit3 } from 'lucide-react'
 import type { Usuario, MetodosLogin } from '@/types'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
@@ -14,7 +15,6 @@ interface TabSeguridadProps {
   metodosLogin: MetodosLogin | null
   updateUsuario: (u: Usuario) => void
   onEditEmail: () => void
-  onEditTelefono: () => void
   onVerificarEmail: () => void
 }
 
@@ -23,9 +23,9 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
   metodosLogin,
   updateUsuario,
   onEditEmail,
-  onEditTelefono,
   onVerificarEmail,
 }) => {
+  const navigate = useNavigate()
   const { showToast } = useToast()
 
   // Password form state
@@ -129,24 +129,24 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
             </div>
 
             <div className={styles.contactItemAction}>
-              {metodosLogin?.puede_agregar_email && (
-                <>
-                  <button
-                    type="button"
-                    className={styles.verifyDirectBtn}
-                    onClick={onVerificarEmail}
-                  >
-                    Verificar
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.editContactBtn}
-                    onClick={onEditEmail}
-                  >
-                    <Edit3 size={13} />
-                    <span>Cambiar</span>
-                  </button>
-                </>
+              {!usuario?.email_verificado && usuario?.email && (
+                <button
+                  type="button"
+                  className={styles.verifyDirectBtn}
+                  onClick={onVerificarEmail}
+                >
+                  Reenviar código
+                </button>
+              )}
+              {usuario?.auth_provider !== 'google' && (
+                <button
+                  type="button"
+                  className={styles.editContactBtn}
+                  onClick={onEditEmail}
+                >
+                  <Edit3 size={13} />
+                  <span>Cambiar</span>
+                </button>
               )}
             </div>
           </div>
@@ -174,14 +174,24 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
             </div>
 
             <div className={styles.contactItemAction}>
-              <button
-                type="button"
-                className={styles.editContactBtn}
-                onClick={onEditTelefono}
-              >
-                <Edit3 size={13} />
-                <span>{usuario?.telefono ? 'Cambiar' : 'Asociar'}</span>
-              </button>
+              {!usuario?.telefono_verificado ? (
+                <button
+                  type="button"
+                  className={styles.verifyDirectBtn}
+                  onClick={() => navigate('/auth/verificar-telefono')}
+                >
+                  Vincular WhatsApp
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.editContactBtn}
+                  onClick={() => navigate('/auth/verificar-telefono')}
+                >
+                  <Edit3 size={13} />
+                  <span>Cambiar número</span>
+                </button>
+              )}
             </div>
           </div>
 

@@ -62,18 +62,14 @@ export default function PerfilPage() {
 
   // ── 3. Modals Management ─────────────────────────────────────────────────
   const [fotoCropOpen, setFotoCropOpen] = useState(false)
-  const [activeModal, setActiveModal] = useState<'datos' | 'email' | 'telefono' | null>(null)
+  const [activeModal, setActiveModal] = useState<'datos' | 'email' | null>(null)
 
   const handleVerificarEmailActual = async () => {
     if (!usuario?.email) return
     try {
-      const res = await authService.enviarCodigoEmail(usuario.email)
-      if ((res as { verificado: boolean }).verificado) {
-        if (usuario) updateUsuario({ ...usuario, email_verificado: true })
-        showToast('Email verificado correctamente.', 'success')
-      } else {
-        navigate('/auth/verificar-email', { state: { email: usuario.email } })
-      }
+      await authService.enviarCodigoEmail(usuario.email)
+      showToast('Te enviamos un código de verificación a tu correo.', 'success')
+      navigate('/auth/verificar-email', { state: { email: usuario.email, from: '/app/perfil' } })
     } catch (err: unknown) {
       showToast(getErrorMessage(err, 'Error al enviar el código de verificación.'), 'error')
     }
@@ -157,7 +153,6 @@ export default function PerfilPage() {
             usuario={usuario}
             onEditDatos={() => setActiveModal('datos')}
             onEditEmail={() => setActiveModal('email')}
-            onEditTelefono={() => setActiveModal('telefono')}
             onVerificarEmail={handleVerificarEmailActual}
           />
         )}
@@ -175,7 +170,6 @@ export default function PerfilPage() {
             metodosLogin={metodosLogin}
             updateUsuario={updateUsuario}
             onEditEmail={() => setActiveModal('email')}
-            onEditTelefono={() => setActiveModal('telefono')}
             onVerificarEmail={handleVerificarEmailActual}
           />
         )}

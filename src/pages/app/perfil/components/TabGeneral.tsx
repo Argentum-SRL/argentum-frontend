@@ -18,7 +18,6 @@ interface TabGeneralProps {
   usuario: Usuario | null
   onEditDatos: () => void
   onEditEmail: () => void
-  onEditTelefono: () => void
   onVerificarEmail: () => void
 }
 
@@ -26,7 +25,6 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
   usuario,
   onEditDatos,
   onEditEmail,
-  onEditTelefono,
   onVerificarEmail,
 }) => {
   const navigate = useNavigate()
@@ -212,10 +210,10 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
                 <button
                   type="button"
                   className={styles.editContactBtn}
-                  onClick={onEditTelefono}
+                  onClick={() => navigate('/auth/verificar-telefono')}
                 >
                   <Edit3 size={13} />
-                  <span>Cambiar</span>
+                  <span>Cambiar número</span>
                 </button>
               )}
             </div>

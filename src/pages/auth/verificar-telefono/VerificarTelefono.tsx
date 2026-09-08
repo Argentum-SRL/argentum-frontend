@@ -20,6 +20,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { formatearTelefonoVisual } from '@/utils/telefono.utils'
 import styles from './VerificarTelefono.module.css'
 
 export default function VerificarTelefono() {
@@ -197,6 +198,26 @@ export default function VerificarTelefono() {
           Iniciá la conversación desde tu WhatsApp para verificar y asociar tu teléfono de forma
           automática y segura.
         </p>
+
+        {usuario?.telefono && !usuario?.telefono_verificado && (
+          <div className={styles.refPhoneNotice}>
+            <span className={styles.refPhoneLabel}>Número registrado actualmente</span>
+            <span className={styles.refPhoneValue}>{formatearTelefonoVisual(usuario.telefono)}</span>
+            <p className={styles.refPhoneSub}>
+              Se vinculará el número de WhatsApp desde el cual envíes el mensaje. Si es diferente, se actualizará automáticamente.
+            </p>
+          </div>
+        )}
+
+        {usuario?.telefono && usuario?.telefono_verificado && (
+          <div className={styles.refPhoneNotice}>
+            <span className={styles.refPhoneLabel}>Número actualmente vinculado</span>
+            <span className={styles.refPhoneValue}>{formatearTelefonoVisual(usuario.telefono)}</span>
+            <p className={styles.refPhoneSub}>
+              Para cambiarlo, enviá el mensaje desde tu nueva cuenta de WhatsApp. Se actualizará automáticamente.
+            </p>
+          </div>
+        )}
 
         {loading ? (
           <div className={styles.loaderWrap}>

@@ -23,7 +23,9 @@ export default function VerificarEmail() {
   const emailFromUrl = queryParams.get('email')
   const verificadoFromUrl = queryParams.get('verificado') === 'true'
   const errorFromUrl = queryParams.get('error')
-  const emailFromState = (location.state as { email?: string })?.email ?? ''
+  const state = location.state as { email?: string; from?: string } | null
+  const emailFromState = state?.email ?? ''
+  const fromPath = state?.from
   
   const initialEmail = emailFromUrl || emailFromState
   const [email, setEmail] = useState(initialEmail)
@@ -97,7 +99,7 @@ export default function VerificarEmail() {
         login(respuesta)
       }
       
-      manejarRespuestaAuth(respuesta, navigate)
+      manejarRespuestaAuth(respuesta, navigate, fromPath)
     } catch (err: unknown) {
       const msg = getErrorMessage(err, "No pudimos verificar tu email. El enlace puede haber expirado — pedí uno nuevo.")
       setApiError(msg)
@@ -144,9 +146,9 @@ export default function VerificarEmail() {
     return (
       <AuthLayout title="Verificá tu mail">
         <form onSubmit={handlePedirCodigo} noValidate>
-          <button type="button" onClick={() => navigate('/login')} className={styles.backBtn}>
+          <button type="button" onClick={() => navigate(fromPath || '/login')} className={styles.backBtn}>
             <ArrowLeft size={14} />
-            Volver al login
+            {fromPath ? 'Volver al perfil' : 'Volver al login'}
           </button>
 
           <p className={styles.subtitle}>
@@ -185,9 +187,9 @@ export default function VerificarEmail() {
   return (
     <AuthLayout title="Verificá tu mail">
       <form onSubmit={handleVerificar} noValidate>
-        <button type="button" onClick={() => navigate('/login')} className={styles.backBtn}>
+        <button type="button" onClick={() => navigate(fromPath || '/login')} className={styles.backBtn}>
           <ArrowLeft size={14} />
-          Volver al login
+          {fromPath ? 'Volver al perfil' : 'Volver al login'}
         </button>
 
         <p className={styles.subtitle}>

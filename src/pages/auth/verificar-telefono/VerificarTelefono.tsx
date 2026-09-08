@@ -1,249 +1,295 @@
-import { type FormEvent, useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Phone, ArrowLeft, Loader2 } from 'lucide-react'
+import {
+  MessageCircle,
+  Copy,
+  Check,
+  Clock,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+} from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
-import { enviarCodigoTelefono, verificarCodigoTelefono } from '@/services/auth.service'
-import { manejarRespuestaAuth } from '@/utils/authRedirect'
+import {
+  solicitarCodigoVinculacion,
+  type CodigoVinculacionResponse,
+} from '@/services/auth.service'
+import usuarioService from '@/services/usuario.service'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './VerificarTelefono.module.css'
 
-/**
- * Maneja dos escenarios:
- * A) modoVerificacion=true: teléfono ya conocido (flujo email, paso 3).
- *    Muestra directo el input de código.
- * B) modoVerificacion=false/ausente: flujo Google o entrada directa.
- *    Muestra primero el input de teléfono.
- */
 export default function VerificarTelefono() {
-  const { login } = useAuth()
+  const { updateUsuario, refreshUser } = useAuth()
   const { showToast } = useToast()
+  const { lastDataUpdate } = useNotificaciones()
   const navigate = useNavigate()
   const location = useLocation()
-  const state = location.state as { telefono?: string; modoVerificacion?: boolean } | null
-  
-  const queryParams = new URLSearchParams(location.search)
-  const telefonoFromUrl = queryParams.get('telefono')
-  const modoFromUrl = queryParams.get('modoVerificacion') === 'true'
 
-  const telefonoInicial = telefonoFromUrl || state?.telefono || ''
-  const modoVerificacion = modoFromUrl || state?.modoVerificacion || false
-
-  type Step = 'phone' | 'code'
-  const [step, setStep] = useState<Step>(modoVerificacion && telefonoInicial ? 'code' : 'phone')
-  const [telefono, setTelefono] = useState(telefonoInicial)
-  const [codigo, setCodigo] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [codigoData, setCodigoData] = useState<CodigoVinculacionResponse | null>(null)
+  const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState<string | null>(null)
-  const [hasSubmitted, setHasSubmitted] = useState(false)
   const [countdown, setCountdown] = useState(0)
-  const codeInputRef = useRef<HTMLInputElement>(null)
-  const hasTriggered = useRef(false)
+  const [copied, setCopied] = useState(false)
+  const [vinculado, setVinculado] = useState(false)
 
-  // Si llegamos en modo verificación con teléfono ya sabido, enviamos el código automáticamente.
-  // Usamos hasTriggered para evitar doble envío en React StrictMode (Dev).
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startTimeRef = useRef<number>(0)
+  const hasLoadedRef = useRef(false)
+
+  // Obtener código de vinculación desde el backend
+  const cargarCodigo = useCallback(async () => {
+    setLoading(true)
+    setApiError(null)
+    try {
+      const data = await solicitarCodigoVinculacion()
+      setCodigoData(data)
+      setCountdown(data.expira_en_segundos || 15 * 60)
+      startTimeRef.current = Date.now()
+    } catch (err: unknown) {
+      const msg = getErrorMessage(
+        err,
+        'No pudimos generar el código de vinculación. Intentá de nuevo.'
+      )
+      setApiError(msg)
+      showToast(msg, 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [showToast])
+
   useEffect(() => {
-    const controller = new AbortController()
-    if (modoVerificacion && telefonoInicial && step === 'code' && !hasTriggered.current) {
-      hasTriggered.current = true
-      
-      const sendCode = async () => {
-        try {
-          await enviarCodigoTelefono(telefonoInicial)
-          if (!controller.signal.aborted) {
-            setCountdown(60)
-          }
-        } catch (err: unknown) {
-          if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
-            return
-          }
-          if (!controller.signal.aborted) {
-            const msg = getErrorMessage(err, 'No pudimos mandarte el código. Intentá de nuevo.')
-            setApiError(msg)
-            showToast(msg, 'error')
-          }
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true
+      void cargarCodigo()
+    }
+  }, [cargarCodigo])
+
+  // Temporizador de expiración (cuenta regresiva cada 1 segundo)
+  useEffect(() => {
+    if (countdown <= 0 || vinculado) return
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
         }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [countdown, vinculado])
+
+  // Función para verificar si el usuario ya quedó vinculado
+  const verificarEstadoVinculacion = useCallback(async () => {
+    if (vinculado) return
+    try {
+      const me = await usuarioService.getMe()
+      if (me?.telefono_verificado) {
+        setVinculado(true)
+        updateUsuario(me)
+        await refreshUser()
+        showToast('¡Tu cuenta de WhatsApp fue vinculada exitosamente!', 'success')
+
+        // Redirección suave
+        setTimeout(() => {
+          const state = location.state as { from?: string } | null
+          if (state?.from) {
+            navigate(state.from, { replace: true })
+          } else if (!me.onboarding_completo) {
+            navigate('/onboarding', { replace: true })
+          } else {
+            navigate('/app/dashboard', { replace: true })
+          }
+        }, 1500)
       }
-      void sendCode()
+    } catch {
+      // Ignorar errores de red transitorios durante el sondeo
     }
+  }, [vinculado, updateUsuario, refreshUser, showToast, location.state, navigate])
+
+  // 1. Escuchar eventos SSE en tiempo real
+  useEffect(() => {
+    if (lastDataUpdate?.entidad === 'usuario') {
+      const timeoutId = setTimeout(() => {
+        void verificarEstadoVinculacion()
+      }, 0)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, verificarEstadoVinculacion])
+
+  // 2. Consulta periódica cada 3 segundos, con corte a los 15 minutos (900s)
+  useEffect(() => {
+    if (vinculado) return
+
+    pollingRef.current = setInterval(() => {
+      const transcurrido = (Date.now() - startTimeRef.current) / 1000
+      if (transcurrido > 15 * 60) {
+        if (pollingRef.current) clearInterval(pollingRef.current)
+        return
+      }
+      void verificarEstadoVinculacion()
+    }, 3000)
+
     return () => {
-      controller.abort()
+      if (pollingRef.current) clearInterval(pollingRef.current)
     }
-  }, [modoVerificacion, telefonoInicial, step, showToast])
+  }, [vinculado, verificarEstadoVinculacion])
 
-  useEffect(() => {
-    if (step === 'code') {
-      const timer = setTimeout(() => codeInputRef.current?.focus(), 100)
-      return () => clearTimeout(timer)
-    }
-  }, [step])
-
-  useEffect(() => {
-    if (countdown <= 0) return
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
-    return () => clearTimeout(t)
-  }, [countdown])
-
-  const telefonoError = hasSubmitted && !telefono.trim() ? 'Ingresá tu número de teléfono.' : null
-
-  async function handleEnviarCodigo(e: FormEvent) {
-    e.preventDefault()
-    setHasSubmitted(true)
-    if (!telefono.trim()) return
-    setLoading(true)
-    setApiError(null)
+  // Copiar link al portapapeles
+  const handleCopiarEnlace = async () => {
+    if (!codigoData?.link_whatsapp) return
     try {
-      await enviarCodigoTelefono(telefono.trim())
-      showToast('Te mandamos el código por WhatsApp.', 'success')
-      setStep('code')
-      setCodigo('')
-      setHasSubmitted(false)
-      setCountdown(60)
-    } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No pudimos mandarte el código. Intentá de nuevo.')
-      setApiError(msg)
-      showToast(msg, 'error')
-    } finally {
-      setLoading(false)
+      await navigator.clipboard.writeText(codigoData.link_whatsapp)
+      setCopied(true)
+      showToast('Enlace de WhatsApp copiado al portapapeles', 'success')
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      showToast('No se pudo copiar el enlace', 'error')
     }
   }
 
-  async function handleReenviar() {
-    if (countdown > 0) return
-    setLoading(true)
-    setApiError(null)
-    try {
-      await enviarCodigoTelefono(telefono.trim())
-      showToast('Te mandamos un código nuevo por WhatsApp.', 'success')
-      setCountdown(60)
-      setCodigo('')
-    } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No pudimos mandarte el código. Intentá de nuevo.')
-      setApiError(msg)
-      showToast(msg, 'error')
-    } finally {
-      setLoading(false)
-    }
+  // Formato mm:ss
+  const formatCountdown = (segundos: number) => {
+    const mins = Math.floor(segundos / 60)
+    const secs = segundos % 60
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
-  async function handleVerificar(e: FormEvent) {
-    e.preventDefault()
-    if (codigo.length !== 6) {
-      setApiError('Ingresá el código de 6 dígitos.')
-      return
-    }
-    setLoading(true)
-    setApiError(null)
-    try {
-      const respuesta = await verificarCodigoTelefono(telefono.trim(), codigo.trim())
-      showToast('¡Perfecto! Tu número quedó verificado.', 'success')
-      login(respuesta)
-      manejarRespuestaAuth(respuesta, navigate)
-    } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'El código no es válido. Revisalo o pedí uno nuevo.')
-      setApiError(msg)
-      showToast(msg, 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (step === 'phone') {
+  // Si ya se vinculó
+  if (vinculado) {
     return (
-      <AuthLayout title="Verificá tu teléfono">
-        <form onSubmit={handleEnviarCodigo} noValidate>
-          <p className={styles.subtitle}>
-            Necesitamos verificar tu número de teléfono para continuar.
+      <AuthLayout title="¡WhatsApp Vinculado!">
+        <div className={styles.successCard}>
+          <CheckCircle2 size={64} className={styles.successIcon} />
+          <h2 className={styles.successTitle}>¡Vinculación completada!</h2>
+          <p className={styles.successDesc}>
+            Tu número de WhatsApp quedó verificado y asociado a tu cuenta. Ya podés interactuar con
+            Argentum desde tu chat.
           </p>
-
-          <div className="mb-6">
-            <label className={styles.label}>Número de teléfono</label>
-            <div className={styles.phoneInputWrap}>
-              <div className={styles.phoneIcon}>
-                <Phone size={18} />
-              </div>
-              <input
-                type="tel"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                placeholder="+5491112345678"
-                autoFocus
-                className={`${styles.phoneInput} ${telefonoError ? styles.phoneInputError : ''}`}
-              />
-            </div>
-            {telefonoError && <p className={styles.error}>{telefonoError}</p>}
-            <p className={styles.hint}>
-              Incluí el código de país, ej: +54 para Argentina
-            </p>
+          <div className={styles.waitingIndicator}>
+            <Loader2 size={16} className="animate-spin" />
+            <span>Redirigiendo a tu cuenta...</span>
           </div>
-
-          {apiError && <p className={styles.error}>{apiError}</p>}
-
-          <button type="submit" disabled={loading} className={styles.submitBtn}>
-            {loading ? <><Loader2 size={18} className="animate-spin" /> Enviando...</> : 'Enviar código'}
-          </button>
-        </form>
+        </div>
       </AuthLayout>
     )
   }
 
   return (
-    <AuthLayout title="Ingresá el código">
-      <form onSubmit={handleVerificar} noValidate>
-        <button
-          type="button"
-          onClick={() => { setStep('phone'); setCodigo(''); setApiError(null) }}
-          className={styles.backBtn}
-        >
-          <ArrowLeft size={14} />
-          Cambiar número
-        </button>
-
+    <AuthLayout title="Vinculá tu WhatsApp">
+      <div className={styles.contentWrap}>
         <p className={styles.subtitle}>
-          Enviamos un código de 6 dígitos a{' '}
-          <span className={styles.phoneHighlight}>{telefono}</span>
+          Iniciá la conversación desde tu WhatsApp para verificar y asociar tu teléfono de forma
+          automática y segura.
         </p>
 
-        <div className="mb-6">
-          <label className={styles.label}>Código de verificación</label>
-          <input
-            ref={codeInputRef}
-            type="text"
-            inputMode="numeric"
-            maxLength={6}
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            placeholder="000000"
-            className={`${styles.codeInput} ${apiError ? styles.codeInputError : ''}`}
-          />
-        </div>
-
-        {apiError && <p className={styles.error}>{apiError}</p>}
-
-        <button
-          type="submit"
-          disabled={loading || codigo.length !== 6}
-          className={styles.submitBtn}
-        >
-          {loading ? <><Loader2 size={18} className="animate-spin" /> Verificando...</> : 'Verificar'}
-        </button>
-
-        <div className={styles.resendWrap}>
-          {countdown > 0 ? (
-            <p className={styles.countdown}>Reenviar código en {countdown}s</p>
-          ) : (
+        {loading ? (
+          <div className={styles.loaderWrap}>
+            <Loader2 size={32} className="animate-spin text-primary" />
+            <span>Generando código de vinculación...</span>
+          </div>
+        ) : apiError && !codigoData ? (
+          <div className={styles.errorBox}>
+            <p>{apiError}</p>
             <button
               type="button"
-              onClick={handleReenviar}
-              disabled={loading}
-              className={styles.resendBtn}
+              onClick={cargarCodigo}
+              className={styles.renewBtn}
+              style={{ marginTop: 12 }}
             >
-              Reenviar código
+              <RefreshCw size={16} /> Reintentar
             </button>
-          )}
-        </div>
-      </form>
+          </div>
+        ) : codigoData ? (
+          <>
+            {/* Sección QR en pantallas de escritorio */}
+            <div className={styles.qrContainer}>
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                  codigoData.link_whatsapp
+                )}&margin=8`}
+                alt="Código QR para vincular WhatsApp"
+                className={styles.qrImage}
+                loading="eager"
+              />
+              <span className={styles.qrHint}>
+                Escaneá el código QR con la cámara de tu celular para abrir WhatsApp
+              </span>
+            </div>
+
+            {/* Tarjeta de Código */}
+            <div className={styles.codeCard}>
+              <div className={styles.codeLabel}>Código de vinculación único</div>
+              <div className={styles.codeValue}>{codigoData.codigo}</div>
+              <p className={styles.codeExplanation}>
+                Al abrir el enlace, el mensaje ya incluirá este código. Solo tenés que presionar
+                enviar.
+              </p>
+            </div>
+
+            {/* Temporizador / Estado */}
+            {countdown > 0 ? (
+              <div className={styles.timerBadge}>
+                <Clock size={14} />
+                <span>Expira en {formatCountdown(countdown)}</span>
+              </div>
+            ) : (
+              <div className={`${styles.timerBadge} ${styles.timerExpired}`}>
+                <AlertCircle size={14} />
+                <span>El código expiró. Pedí uno nuevo para continuar.</span>
+              </div>
+            )}
+
+            {/* Botones de Acción */}
+            <div className={styles.actionsWrap}>
+              {countdown > 0 ? (
+                <>
+                  <a
+                    href={codigoData.link_whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.whatsappBtn}
+                  >
+                    <MessageCircle size={20} />
+                    <span>Abrir en WhatsApp</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={handleCopiarEnlace}
+                    className={styles.copyBtn}
+                  >
+                    {copied ? <Check size={16} color="#10b981" /> : <Copy size={16} />}
+                    <span>{copied ? '¡Enlace copiado!' : 'Copiar enlace directo'}</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={cargarCodigo}
+                  disabled={loading}
+                  className={styles.renewBtn}
+                >
+                  <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                  <span>Generar nuevo código</span>
+                </button>
+              )}
+            </div>
+
+            {/* Indicador de espera activa */}
+            {countdown > 0 && (
+              <div className={styles.waitingIndicator}>
+                <Loader2 size={14} className="animate-spin" />
+                <span>Esperando que envíes el mensaje en WhatsApp...</span>
+              </div>
+            )}
+          </>
+        ) : null}
+      </div>
     </AuthLayout>
   )
 }

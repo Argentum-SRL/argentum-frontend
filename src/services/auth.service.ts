@@ -95,14 +95,31 @@ export async function loginWithGoogle(token: string): Promise<AuthResponse> {
   }
 }
 
-export async function enviarCodigoTelefono(telefono: string): Promise<void> {
-  await api.post('/auth/telefono/enviar-codigo', { telefono })
+export interface CodigoVinculacionResponse {
+  codigo: string
+  link_whatsapp: string
+  mensaje_precargado: string
+  expiracion: string
+  expira_en_segundos: number
+  telefono_bot: string
 }
 
-export async function verificarCodigoTelefono(telefono: string, codigo: string): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>('/auth/telefono/verificar', { telefono, codigo })
-  guardarTokensSiPresentes(data)
+export async function solicitarCodigoVinculacion(): Promise<CodigoVinculacionResponse> {
+  const { data } = await api.post<CodigoVinculacionResponse>('/auth/telefono/solicitar-vinculacion')
   return data
+}
+
+/** @deprecated Flujo reemplazado por vinculación iniciada por el usuario vía WhatsApp */
+export async function enviarCodigoTelefono(_telefono?: string): Promise<void> {
+  void _telefono
+  throw new Error('Flujo obsoleto. Usar solicitarCodigoVinculacion()')
+}
+
+/** @deprecated Flujo reemplazado por vinculación iniciada por el usuario vía WhatsApp */
+export async function verificarCodigoTelefono(_telefono?: string, _codigo?: string): Promise<AuthResponse> {
+  void _telefono
+  void _codigo
+  throw new Error('Flujo obsoleto. La verificación se realiza automáticamente en el webhook')
 }
 
 export async function enviarCodigoEmail(email: string): Promise<unknown> {

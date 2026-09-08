@@ -7,9 +7,6 @@ import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { Modal, DateInput, SelectInput, type SelectOption } from '@/components/ui'
 import {
-  buildPhone,
-  desglosarTelefono,
-  normalizarTelefono,
   formatearTelefonoVisual,
 } from '@/utils/telefono.utils'
 import styles from '../PerfilPage.module.css'
@@ -361,132 +358,33 @@ const TelefonoForm: React.FC<{
   usuario: Usuario | null
   onClose: () => void
   updateUsuario: (u: Usuario) => void
-}> = ({ usuario, onClose, updateUsuario }) => {
+}> = ({ usuario, onClose }) => {
   const navigate = useNavigate()
-  const { showToast } = useToast()
-  const [isSaving, setIsSaving] = useState(false)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [showPassword, setShowPassword] = useState(false)
 
-  const initial = desglosarTelefono(usuario?.telefono)
-  const [telefonoNumero, setTelefonoNumero] = useState(initial.numeroLocal)
-  const [passwordActual, setPasswordActual] = useState('')
-
-  const hasPassword = !!(usuario?.password_configurada && usuario?.auth_provider !== 'google')
-  const fullPhone = buildPhone('+54', telefonoNumero)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
-    setErrorMsg(null)
-
-    const numLimpio = normalizarTelefono(fullPhone)
-
-    if (!numLimpio || numLimpio.length < 8) {
-      setErrorMsg('Ingresá un número de teléfono válido (código de área + número, mín. 8 dígitos).')
-      setIsSaving(false)
-      return
-    }
-
-    if (usuario?.telefono && fullPhone === usuario.telefono) {
-      setErrorMsg('El número ingresado es idéntico al que ya tenés registrado.')
-      setIsSaving(false)
-      return
-    }
-
-    if (hasPassword && !passwordActual.trim()) {
-      setErrorMsg('Ingresá tu contraseña actual para confirmar el cambio de teléfono.')
-      setIsSaving(false)
-      return
-    }
-
-    try {
-      const res = await usuarioService.actualizarTelefono({
-        telefono_nuevo: fullPhone,
-        password_actual: hasPassword ? passwordActual : undefined,
-      })
-      if (usuario) {
-        updateUsuario({ ...usuario, telefono: fullPhone, telefono_verificado: false })
-      }
-      showToast(res.confirmacion || 'Teléfono actualizado. Se envió un código por WhatsApp.', 'success')
-      onClose()
-      if (res.requiere_verificacion_telefono) {
-        navigate('/auth/verificar-telefono', { state: { telefono: fullPhone, modoVerificacion: true } })
-      }
-    } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No se pudo actualizar el teléfono. Verificá los datos ingresados.')
-      setErrorMsg(msg)
-      showToast(msg, 'error')
-    } finally {
-      setIsSaving(false)
-    }
+  const handleIrAVinculacion = () => {
+    onClose()
+    navigate('/auth/verificar-telefono')
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.modalFormContainer} autoComplete="off">
-      {errorMsg && (
-        <div className={styles.modalAlertError}>
-          <AlertCircle size={15} />
-          <span>{errorMsg}</span>
-        </div>
-      )}
-
+    <div className={styles.modalFormContainer}>
       <div className={styles.modalFormBody}>
-        <div className={styles.formField}>
-          <label htmlFor="modal-tel-num" className={styles.fieldLabel}>
-            Número de WhatsApp *
-          </label>
-          <div className={styles.phoneInputRow}>
-            <div className={styles.countryBadgeWrap}>
-              <span className={styles.flagIcon}>🇦🇷</span>
-              <span className={styles.countryCode}>+54 9</span>
-            </div>
-            <input
-              id="modal-tel-num"
-              name="whatsapp_contact_num"
-              type="tel"
-              inputMode="numeric"
-              autoComplete="off"
-              className={`${styles.fieldInput} ${styles.phoneInputField}`}
-              value={telefonoNumero}
-              onChange={(e) => setTelefonoNumero(e.target.value)}
-              placeholder="11 1234-5678"
-              required
-            />
+        <p className={styles.modalFieldHint} style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: 'var(--text-2)' }}>
+          Por seguridad, tu número de WhatsApp se vincula directamente iniciando una conversación desde tu aplicación de WhatsApp.
+        </p>
+
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, margin: '16px 0' }}>
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-3)', marginBottom: 4 }}>
+            Número actual registrado
           </div>
-          <span className={styles.modalFieldHint}>
-            Enviaremos el código de verificación a: <strong>{formatearTelefonoVisual(fullPhone) || fullPhone}</strong>
-          </span>
+          <div style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text)' }}>
+            {formatearTelefonoVisual(usuario?.telefono) || 'Ningún teléfono vinculado'}
+          </div>
         </div>
 
-        {hasPassword && (
-          <div className={styles.formField}>
-            <label htmlFor="modal-tel-pw" className={styles.fieldLabel}>
-              Contraseña actual *
-            </label>
-            <div className={styles.passwordInputWrap}>
-              <input
-                id="modal-tel-pw"
-                name="current_security_pw"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                className={styles.fieldInput}
-                value={passwordActual}
-                onChange={(e) => setPasswordActual(e.target.value)}
-                placeholder="Ingresá tu contraseña"
-                required
-              />
-              <button
-                type="button"
-                className={styles.modalPwEyeBtn}
-                onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-        )}
+        <p className={styles.modalFieldHint} style={{ fontSize: '0.8125rem', color: 'var(--text-3)', lineHeight: 1.4 }}>
+          Al continuar, se generará un código seguro de un solo uso para abrir WhatsApp y vincular tu nuevo número automáticamente.
+        </p>
       </div>
 
       <div className={styles.modalFormFooter}>
@@ -494,16 +392,19 @@ const TelefonoForm: React.FC<{
           type="button"
           className={styles.modalCancelBtn}
           onClick={onClose}
-          disabled={isSaving}
         >
           Cancelar
         </button>
-        <button type="submit" disabled={isSaving} className={styles.modalSubmitBtn}>
+        <button
+          type="button"
+          className={styles.modalSubmitBtn}
+          onClick={handleIrAVinculacion}
+        >
           <MessageSquare size={15} />
-          <span>{isSaving ? 'Enviando código...' : usuario?.telefono ? 'Actualizar y verificar' : 'Asociar y verificar'}</span>
+          <span>{usuario?.telefono_verificado ? 'Cambiar WhatsApp' : 'Vincular WhatsApp'}</span>
         </button>
       </div>
-    </form>
+    </div>
   )
 }
 

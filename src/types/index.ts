@@ -96,6 +96,15 @@ export interface AuthResponse {
   requiere_onboarding: boolean
 }
 
+export interface CodigoVinculacionResponse {
+  codigo: string
+  link_whatsapp: string
+  mensaje_precargado: string
+  expiracion: string
+  expira_en_segundos: number
+  telefono_bot: string
+}
+
 export interface MeResponse {
   usuario: Usuario
 }

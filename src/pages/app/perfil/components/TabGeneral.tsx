@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   User,
   Mail,
@@ -28,6 +29,7 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
   onEditTelefono,
   onVerificarEmail,
 }) => {
+  const navigate = useNavigate()
   const isGoogle = usuario?.auth_provider === 'google'
 
   // Format birthdate and calculate age
@@ -201,10 +203,16 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
               <button
                 type="button"
                 className={styles.editContactBtn}
-                onClick={onEditTelefono}
+                onClick={() => {
+                  if (!usuario?.telefono_verificado) {
+                    navigate('/auth/verificar-telefono')
+                  } else {
+                    onEditTelefono()
+                  }
+                }}
               >
                 <Edit3 size={13} />
-                <span>{usuario?.telefono ? 'Cambiar' : 'Asociar'}</span>
+                <span>{usuario?.telefono_verificado ? 'Cambiar' : (usuario?.telefono ? 'Verificar' : 'Asociar')}</span>
               </button>
             </div>
           </div>

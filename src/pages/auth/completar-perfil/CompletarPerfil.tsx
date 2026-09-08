@@ -6,6 +6,7 @@ import Field from '@/components/ui/Field/Field'
 import { completarPerfil } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
+import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from './CompletarPerfil.module.css'
 
 const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
@@ -26,15 +27,6 @@ const validateName = (val: string, campo: string): string | null => {
   return null
 }
 
-const validatePassword = (pwd: string): string | null => {
-  if (!pwd) return 'Creá una contraseña.'
-  if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
-  if (pwd.length > 128) return 'La contraseña no puede superar los 128 caracteres.'
-  if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
-  if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
-  if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
-  return null
-}
 
 export default function CompletarPerfil() {
   const { login } = useAuth()
@@ -55,7 +47,7 @@ export default function CompletarPerfil() {
   const emailError = hasSubmitted ? validateEmail(email) : null
   const passwordError = hasSubmitted ? validatePassword(password) : null
   const confirmPasswordError = hasSubmitted 
-    ? (!confirmPassword ? 'Confirmá tu contraseña.' : (password !== confirmPassword ? 'Las contraseñas no coinciden.' : null))
+    ? validatePasswordConfirmation(password, confirmPassword)
     : null
 
   async function handleSubmit(e: FormEvent) {
@@ -66,11 +58,8 @@ export default function CompletarPerfil() {
     const aError = validateName(apellido, 'apellido')
     const eError = validateEmail(email)
     const pError = validatePassword(password)
-    const cpError = !confirmPassword 
-      ? 'Confirmá tu contraseña.' 
-      : password !== confirmPassword 
-        ? 'Las contraseñas no coinciden.' 
-        : null
+    const cpError = validatePasswordConfirmation(password, confirmPassword)
+
 
     if (nError || aError || eError || pError || cpError) {
       return

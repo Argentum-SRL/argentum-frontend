@@ -9,6 +9,7 @@ import { registerWithEmail, loginWithGoogle } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from './RegisterPage.module.css'
 
 const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
@@ -29,17 +30,8 @@ const validateName = (val: string, campo: string): string | null => {
   return null
 }
 
-const validatePassword = (pwd: string): string | null => {
-  if (!pwd) return 'Creá una contraseña.'
-  if (pwd.length < 8) return 'La contraseña tiene que tener al menos 8 caracteres.'
-  if (pwd.length > 128) return 'La contraseña no puede superar los 128 caracteres.'
-  if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
-  if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
-  if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
-  return null
-}
-
 export default function RegisterPage() {
+
   const { login, isAuthenticated, usuario } = useAuth()
   const navigate = useNavigate()
   const [nombre, setNombre] = useState('')
@@ -69,13 +61,7 @@ export default function RegisterPage() {
   const apellidoError = hasSubmitted ? validateName(apellido, 'apellido') : null
   const emailError = hasSubmitted ? validateEmail(email) : null
   const passwordError = hasSubmitted ? validatePassword(password) : null
-  const confirmPasswordError = hasSubmitted
-    ? !confirmPassword
-      ? 'Confirmá tu contraseña.'
-      : confirmPassword !== password
-        ? 'Las contraseñas no coinciden. Revisalas.'
-        : null
-    : null
+  const confirmPasswordError = hasSubmitted ? validatePasswordConfirmation(password, confirmPassword) : null
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -85,11 +71,8 @@ export default function RegisterPage() {
     const aError = validateName(apellido, 'apellido')
     const eError = validateEmail(email)
     const pError = validatePassword(password)
-    const cpError = !confirmPassword 
-      ? 'Confirmá tu contraseña.' 
-      : confirmPassword !== password 
-        ? 'Las contraseñas no coinciden. Revisalas.' 
-        : null
+    const cpError = validatePasswordConfirmation(password, confirmPassword)
+
 
     if (nError || aError || eError || pError || cpError || !aceptaTerminos) {
       return

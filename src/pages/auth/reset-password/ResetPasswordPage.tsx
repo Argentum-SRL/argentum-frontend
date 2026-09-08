@@ -7,17 +7,9 @@ import Field from '@/components/ui/Field/Field'
 import { validarResetToken, confirmarResetPassword } from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from './ResetPasswordPage.module.css'
 
-const validatePassword = (pwd: string): string | null => {
-  if (!pwd) return 'Creá una contraseña.'
-  if (pwd.length < 8) return 'Debe tener al menos 8 caracteres.'
-  if (pwd.length > 128) return 'La contraseña no puede superar los 128 caracteres.'
-  if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
-  if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
-  if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
-  return null
-}
 
 export default function ResetPasswordPage() {
   const { showToast } = useToast()
@@ -67,13 +59,7 @@ export default function ResetPasswordPage() {
 
   // Validaciones inline
   const passwordError = hasSubmitted ? validatePassword(nuevaPassword) : null
-  const confirmarPasswordError = hasSubmitted
-    ? !confirmarPassword
-      ? 'Confirmá tu contraseña.'
-      : confirmarPassword !== nuevaPassword
-        ? 'Las contraseñas no coinciden. Revisalas.'
-        : null
-    : null
+  const confirmarPasswordError = hasSubmitted ? validatePasswordConfirmation(nuevaPassword, confirmarPassword) : null
 
   // 2. Procesar el envío de la nueva contraseña
   async function handleSubmit(e: FormEvent) {
@@ -81,11 +67,8 @@ export default function ResetPasswordPage() {
     setHasSubmitted(true)
 
     const pError = validatePassword(nuevaPassword)
-    const cpError = !confirmarPassword
-      ? 'Confirmá tu contraseña.'
-      : confirmarPassword !== nuevaPassword
-        ? 'Las contraseñas no coinciden. Revisalas.'
-        : null
+    const cpError = validatePasswordConfirmation(nuevaPassword, confirmarPassword)
+
 
     if (pError || cpError || !token) return
 

@@ -1,18 +1,17 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock, Edit3 } from 'lucide-react'
+import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock, Edit3, MessageSquare } from 'lucide-react'
 import type { Usuario, MetodosLogin } from '@/types'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
 import usuarioService from '@/services/usuario.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from '../PerfilPage.module.css'
-
-
 
 interface TabSeguridadProps {
   usuario: Usuario | null
-  metodosLogin: MetodosLogin | null
+  metodosLogin?: MetodosLogin | null
   updateUsuario: (u: Usuario) => void
   onEditEmail: () => void
   onVerificarEmail: () => void
@@ -20,7 +19,6 @@ interface TabSeguridadProps {
 
 export const TabSeguridad: React.FC<TabSeguridadProps> = ({
   usuario,
-  metodosLogin,
   updateUsuario,
   onEditEmail,
   onVerificarEmail,
@@ -38,15 +36,8 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
   const [pwError, setPwError] = useState<string | null>(null)
 
   // Password validations
-  const pw = passwordNueva
-  const reqs = {
-    length: pw.length >= 8,
-    upper: /[A-Z]/.test(pw),
-    lower: /[a-z]/.test(pw),
-    number: /\d/.test(pw),
-    match: pw.length > 0 && pw === passwordConfirm,
-  }
-  const isPwValid = reqs.length && reqs.upper && reqs.lower && reqs.number && reqs.match
+  const reqs = getPasswordRequirements(passwordNueva, passwordConfirm)
+  const isPwValid = reqs.length && reqs.maxLength && reqs.upper && reqs.lower && reqs.number && reqs.match
 
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,8 +53,15 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
       return
     }
 
-    if (!isPwValid) {
-      setPwError('Por favor asegurate de cumplir todos los requisitos de seguridad y que las contraseñas coincidan.')
+    const pErr = validatePassword(passwordNueva)
+    if (pErr) {
+      setPwError(pErr)
+      return
+    }
+
+    const cpErr = validatePasswordConfirmation(passwordNueva, passwordConfirm)
+    if (cpErr) {
+      setPwError(cpErr)
       return
     }
 
@@ -104,61 +102,89 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
         </div>
 
         <div className={styles.contactList}>
-          {/* Email y Contraseña */}
-          <div className={styles.contactItemBox}>
-            <div className={styles.contactItemInfo}>
-              <div className={styles.contactItemLabelRow}>
-                <span className={styles.contactItemLabel}>Email y Contraseña</span>
-                {metodosLogin?.email_password ? (
+          {/* Email y Contraseña: solo si password_configurada es true */}
+          {usuario?.password_configurada && (
+            <div className={styles.contactItemBox}>
+              <div className={styles.contactItemInfo}>
+                <div className={styles.contactItemLabelRow}>
+                  <span className={styles.contactItemLabel}>Email y Contraseña</span>
                   <span className={styles.verifiedBadge}>
                     <CheckCircle2 size={11} /> Activo
                   </span>
-                ) : metodosLogin?.puede_agregar_password ? (
-                  <span className={styles.unverifiedBadge}>
-                    <AlertCircle size={11} /> Sin contraseña
-                  </span>
-                ) : (
-                  <span className={styles.unverifiedBadge}>
-                    <AlertCircle size={11} /> No configurado
-                  </span>
+                </div>
+                <span className={styles.contactItemValue}>
+                  {usuario?.email || 'Sin correo asignado'}
+                </span>
+              </div>
+
+              <div className={styles.contactItemAction}>
+                {!usuario?.email_verificado && usuario?.email && (
+                  <button
+                    type="button"
+                    className={styles.verifyDirectBtn}
+                    onClick={onVerificarEmail}
+                  >
+                    Reenviar código
+                  </button>
+                )}
+                {usuario?.auth_provider !== 'google' && (
+                  <button
+                    type="button"
+                    className={styles.editContactBtn}
+                    onClick={onEditEmail}
+                  >
+                    <Edit3 size={13} />
+                    <span>Cambiar</span>
+                  </button>
                 )}
               </div>
-              <span className={styles.contactItemValue}>
-                {usuario?.email || 'Sin correo asignado'}
-              </span>
             </div>
+          )}
 
-            <div className={styles.contactItemAction}>
-              {!usuario?.email_verificado && usuario?.email && (
-                <button
-                  type="button"
-                  className={styles.verifyDirectBtn}
-                  onClick={onVerificarEmail}
-                >
-                  Reenviar código
-                </button>
-              )}
-              {usuario?.auth_provider !== 'google' && (
-                <button
-                  type="button"
-                  className={styles.editContactBtn}
-                  onClick={onEditEmail}
-                >
-                  <Edit3 size={13} />
-                  <span>Cambiar</span>
-                </button>
-              )}
+          {/* Google OAuth: solo si auth_provider es google */}
+          {usuario?.auth_provider === 'google' && (
+            <div className={styles.contactItemBox}>
+              <div className={styles.contactItemInfo}>
+                <div className={styles.contactItemLabelRow}>
+                  <span className={styles.contactItemLabel}>Google OAuth</span>
+                  <span className={styles.verifiedBadge}>
+                    <CheckCircle2 size={11} /> Vinculado
+                  </span>
+                </div>
+                <span className={styles.contactItemValue}>
+                  {`Vinculado como ${usuario?.email}`}
+                </span>
+              </div>
+
+              <div className={styles.contactItemAction}>
+                <span className={styles.lockedTag} title="Cuenta vinculada con Google">
+                  <Lock size={12} /> Google
+                </span>
+              </div>
             </div>
+          )}
+        </div>
+      </section>
+
+      {/* 2. Vinculación del Asistente WhatsApp */}
+      <section className={styles.sectionCard}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionIconWrap}>
+            <MessageSquare size={18} />
           </div>
+          <div className={styles.sectionHeaderText}>
+            <h3>Asistente de WhatsApp</h3>
+          </div>
+        </div>
 
-          {/* WhatsApp OTP */}
+        <div className={styles.contactList}>
           <div className={styles.contactItemBox}>
             <div className={styles.contactItemInfo}>
               <div className={styles.contactItemLabelRow}>
-                <span className={styles.contactItemLabel}>WhatsApp OTP</span>
-                {metodosLogin?.telefono ? (
+                <span className={styles.contactItemLabel}>Asistente Financiero por WhatsApp</span>
+                {usuario?.telefono_verificado ? (
                   <span className={styles.verifiedBadge}>
-                    <CheckCircle2 size={11} /> Activo
+                    <CheckCircle2 size={11} /> Vinculado
                   </span>
                 ) : (
                   <span className={styles.unverifiedBadge}>
@@ -168,7 +194,9 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
               </div>
               <span className={styles.contactItemValue}>
                 {usuario?.telefono
-                  ? formatearTelefonoVisual(usuario.telefono)
+                  ? usuario?.telefono_verificado
+                    ? formatearTelefonoVisual(usuario.telefono)
+                    : `${formatearTelefonoVisual(usuario.telefono)} (Sin verificar)`
                   : 'Sin WhatsApp asignado'}
               </span>
             </div>
@@ -194,41 +222,10 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
               )}
             </div>
           </div>
-
-          {/* Google OAuth */}
-          <div className={styles.contactItemBox}>
-            <div className={styles.contactItemInfo}>
-              <div className={styles.contactItemLabelRow}>
-                <span className={styles.contactItemLabel}>Google OAuth</span>
-                {metodosLogin?.google ? (
-                  <span className={styles.verifiedBadge}>
-                    <CheckCircle2 size={11} /> Vinculado
-                  </span>
-                ) : (
-                  <span className={styles.unverifiedBadge}>
-                    <AlertCircle size={11} /> No vinculado
-                  </span>
-                )}
-              </div>
-              <span className={styles.contactItemValue}>
-                {usuario?.auth_provider === 'google'
-                  ? `Vinculado como ${usuario.email}`
-                  : 'Ingreso rápido con tu cuenta Google'}
-              </span>
-            </div>
-
-            <div className={styles.contactItemAction}>
-              {usuario?.auth_provider === 'google' && (
-                <span className={styles.lockedTag} title="Cuenta vinculada con Google">
-                  <Lock size={12} /> Google
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* 2. Cambiar o Configurar Contraseña */}
+      {/* 3. Cambiar o Configurar Contraseña */}
       <section className={styles.sectionCard}>
         <div className={styles.sectionHeader}>
           <div className={styles.sectionIconWrap}>
@@ -239,7 +236,7 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
           </div>
         </div>
 
-        {usuario?.auth_provider === 'google' ? (
+        {usuario?.auth_provider === 'google' && (
           <div className={styles.googleAuthInfoBanner}>
             <div className={styles.googleIconBox}>
               <svg width="22" height="22" viewBox="0 0 24 24">
@@ -250,20 +247,21 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
               </svg>
             </div>
             <div className={styles.googleAuthInfoText}>
-              <h4>Cuenta autenticada mediante Google</h4>
+              <h4>Cuenta vinculada con Google</h4>
               <p>
-                Iniciás sesión directamente a través de <strong>Google OAuth</strong>. Tu contraseña, autenticación en dos pasos y recuperación son administradas de forma protegida directamente por Google, por lo que no necesitás una contraseña local en Argentum.
+                Tu cuenta está asociada a <strong>Google OAuth</strong>. Conservás tu acceso con Google en todo momento y además podés gestionar tu contraseña para ingresar con email y contraseña.
               </p>
             </div>
           </div>
-        ) : (
-          <form onSubmit={handleSavePassword} className={styles.formInsideCard}>
-            {pwError && (
-              <div className={styles.formAlertError}>
-                <AlertCircle size={15} />
-                <span>{pwError}</span>
-              </div>
-            )}
+        )}
+
+        <form onSubmit={handleSavePassword} className={styles.formInsideCard}>
+          {pwError && (
+            <div className={styles.formAlertError}>
+              <AlertCircle size={15} />
+              <span>{pwError}</span>
+            </div>
+          )}
 
           {usuario?.password_configurada && (
             <div className={styles.formGroup}>
@@ -386,8 +384,8 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
             </button>
           </div>
         </form>
-        )}
       </section>
     </div>
   )
 }
+

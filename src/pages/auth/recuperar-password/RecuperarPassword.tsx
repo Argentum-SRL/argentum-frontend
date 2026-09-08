@@ -6,6 +6,7 @@ import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import Field from '@/components/ui/Field/Field'
 import { recuperarPassword, verificarRecuperacion } from '@/services/auth.service'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from './RecuperarPassword.module.css'
 
 const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
@@ -18,15 +19,6 @@ const validateEmail = (val: string): string | null => {
   return null
 }
 
-const validatePassword = (pwd: string): string | null => {
-  if (!pwd) return 'Creá una contraseña.'
-  if (pwd.length < 8) return 'La contraseña tiene que tener al menos 8 caracteres.'
-  if (pwd.length > 128) return 'La contraseña no puede superar los 128 caracteres.'
-  if (!/[A-Z]/.test(pwd)) return 'Debe incluir al menos una mayúscula.'
-  if (!/[a-z]/.test(pwd)) return 'Debe incluir al menos una minúscula.'
-  if (!/[0-9]/.test(pwd)) return 'Debe incluir al menos un número.'
-  return null
-}
 
 const validateCodigo = (val: string): string | null => {
   const c = val.trim()
@@ -63,11 +55,7 @@ export default function RecuperarPassword() {
   
   const passwordError = hasSubmitted && (tieneParams || modoManual) ? validatePassword(nuevaPassword) : null
   const confirmarPasswordError = hasSubmitted && (tieneParams || modoManual)
-    ? !confirmarPassword
-      ? 'Confirmá tu contraseña.'
-      : confirmarPassword !== nuevaPassword
-        ? 'Las contraseñas no coinciden. Revisalas.'
-        : null
+    ? validatePasswordConfirmation(nuevaPassword, confirmarPassword)
     : null
 
   async function handleSendCode(e: FormEvent) {
@@ -97,11 +85,8 @@ export default function RecuperarPassword() {
     const eError = modoManual ? validateEmail(email) : null
     const cError = modoManual ? validateCodigo(codigo) : null
     const pError = validatePassword(nuevaPassword)
-    const cpError = !confirmarPassword 
-      ? 'Confirmá tu contraseña.' 
-      : confirmarPassword !== nuevaPassword 
-        ? 'Las contraseñas no coinciden. Revisalas.' 
-        : null
+    const cpError = validatePasswordConfirmation(nuevaPassword, confirmarPassword)
+
 
     if (eError || cError || pError || cpError || !codigo.trim() || !email.trim()) return
 

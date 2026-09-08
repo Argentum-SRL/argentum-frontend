@@ -144,6 +144,7 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
             value={fechaNacimiento}
             min={minBirthDate}
             max={maxBirthDate}
+            defaultYear={2000}
             onChange={(val) => setFechaNacimiento(val)}
             error={fechaNacimientoError || undefined}
           />

@@ -174,6 +174,7 @@ const DatosPersonalesForm: React.FC<{
             value={formDatos.fecha_nacimiento}
             min={minBirthDate}
             max={maxBirthDate}
+            defaultYear={2000}
             onChange={(val) => setFormDatos({ ...formDatos, fecha_nacimiento: val })}
           />
         </div>

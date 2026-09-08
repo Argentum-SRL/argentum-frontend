@@ -48,6 +48,7 @@ interface DateInputProps {
   name?: string
   required?: boolean
   placeholder?: string
+  defaultYear?: number
 }
 
 export const DateInput: React.FC<DateInputProps> = ({
@@ -64,6 +65,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   name,
   required,
   placeholder = 'dd/mm/aaaa',
+  defaultYear,
 }) => {
   // Parsear min/max
   const fromDate = useMemo(() => (min ? parse(min, INTERNAL_FORMAT, new Date()) : undefined), [min])
@@ -81,10 +83,27 @@ export const DateInput: React.FC<DateInputProps> = ({
   const [inputText, setInputText] = useState(parsedValueDate ? format(parsedValueDate, DISPLAY_FORMAT) : '')
   const [prevValue, setPrevValue] = useState(value)
 
+  // Rango de años calculado según min/max o default -100 / +10
+  const currentYearNow = useMemo(() => new Date().getFullYear(), [])
+  const minYear = useMemo(() => (fromDate ? fromDate.getFullYear() : currentYearNow - 100), [fromDate, currentYearNow])
+  const maxYear = useMemo(() => (toDate ? toDate.getFullYear() : currentYearNow + 10), [toDate, currentYearNow])
+
   // Estado interno para las tres columnas del wheel picker
   const today = useMemo(() => new Date(), [])
   const initialDate = parsedValueDate || today
-  const [selectedYear, setSelectedYear] = useState<number>(initialDate.getFullYear())
+
+  const initialYear = useMemo(() => {
+    if (parsedValueDate) return parsedValueDate.getFullYear()
+    if (defaultYear !== undefined) {
+      return Math.min(Math.max(defaultYear, minYear), maxYear)
+    }
+    const currentYear = today.getFullYear()
+    if (currentYear > maxYear) return maxYear
+    if (currentYear < minYear) return minYear
+    return currentYear
+  }, [parsedValueDate, defaultYear, minYear, maxYear, today])
+
+  const [selectedYear, setSelectedYear] = useState<number>(initialYear)
   const [selectedMonth, setSelectedMonth] = useState<number>(initialDate.getMonth() + 1)
   const [selectedDay, setSelectedDay] = useState<number>(initialDate.getDate())
 
@@ -105,6 +124,7 @@ export const DateInput: React.FC<DateInputProps> = ({
       }
     } else {
       setInputText('')
+      setSelectedYear(initialYear)
     }
   }
 
@@ -178,11 +198,6 @@ export const DateInput: React.FC<DateInputProps> = ({
     return () => document.removeEventListener('mousedown', handler)
   }, [open, closePicker])
 
-  // Rango de años calculado según min/max o default -100 / +10
-  const currentYearNow = new Date().getFullYear()
-  const minYear = fromDate ? fromDate.getFullYear() : currentYearNow - 100
-  const maxYear = toDate ? toDate.getFullYear() : currentYearNow + 10
-
   const yearOptions = useMemo<WheelPickerOption<number>[]>(() => {
     const options: WheelPickerOption<number>[] = []
     for (let y = minYear; y <= maxYear; y++) {
@@ -203,24 +218,36 @@ export const DateInput: React.FC<DateInputProps> = ({
     return options
   }, [minYear, maxYear, fromDate, toDate])
 
+  const safeYearValue = useMemo(() => {
+    const exists = yearOptions.some(o => o.value === selectedYear)
+    if (exists) return selectedYear
+    if (defaultYear !== undefined && yearOptions.some(o => o.value === defaultYear)) {
+      return defaultYear
+    }
+    if (yearOptions.some(o => o.value === initialYear)) {
+      return initialYear
+    }
+    return yearOptions[yearOptions.length - 1]?.value ?? selectedYear
+  }, [yearOptions, selectedYear, defaultYear, initialYear])
+
   const monthOptions = useMemo<WheelPickerOption<number>[]>(() => {
     const options: WheelPickerOption<number>[] = []
     for (let m = 1; m <= 12; m++) {
-      const rawMonthName = format(new Date(selectedYear, m - 1, 1), 'MMM', { locale: es }).replace('.', '')
+      const rawMonthName = format(new Date(safeYearValue, m - 1, 1), 'MMM', { locale: es }).replace('.', '')
       const monthLabel = rawMonthName.charAt(0).toUpperCase() + rawMonthName.slice(1)
 
       let isDisabled = false
       if (fromDate) {
-        if (selectedYear < fromDate.getFullYear()) {
+        if (safeYearValue < fromDate.getFullYear()) {
           isDisabled = true
-        } else if (selectedYear === fromDate.getFullYear() && m < fromDate.getMonth() + 1) {
+        } else if (safeYearValue === fromDate.getFullYear() && m < fromDate.getMonth() + 1) {
           isDisabled = true
         }
       }
       if (toDate) {
-        if (selectedYear > toDate.getFullYear()) {
+        if (safeYearValue > toDate.getFullYear()) {
           isDisabled = true
-        } else if (selectedYear === toDate.getFullYear() && m > toDate.getMonth() + 1) {
+        } else if (safeYearValue === toDate.getFullYear() && m > toDate.getMonth() + 1) {
           isDisabled = true
         }
       }
@@ -233,16 +260,16 @@ export const DateInput: React.FC<DateInputProps> = ({
       })
     }
     return options
-  }, [selectedYear, fromDate, toDate])
+  }, [safeYearValue, fromDate, toDate])
 
   const daysInSelectedMonth = useMemo(() => {
-    return getDaysInMonth(new Date(selectedYear, selectedMonth - 1, 1))
-  }, [selectedYear, selectedMonth])
+    return getDaysInMonth(new Date(safeYearValue, selectedMonth - 1, 1))
+  }, [safeYearValue, selectedMonth])
 
   const dayOptions = useMemo<WheelPickerOption<number>[]>(() => {
     const options: WheelPickerOption<number>[] = []
     for (let d = 1; d <= daysInSelectedMonth; d++) {
-      const testDate = new Date(selectedYear, selectedMonth - 1, d)
+      const testDate = new Date(safeYearValue, selectedMonth - 1, d)
       let isDisabled = false
       if (fromDate && startOfDay(testDate) < startOfDay(fromDate)) {
         isDisabled = true
@@ -258,7 +285,7 @@ export const DateInput: React.FC<DateInputProps> = ({
       })
     }
     return options
-  }, [daysInSelectedMonth, selectedYear, selectedMonth, fromDate, toDate])
+  }, [daysInSelectedMonth, safeYearValue, selectedMonth, fromDate, toDate])
 
   // Función para aplicar cambios de fecha desde los wheels
   const commitWheelChange = useCallback((newYear: number, newMonth: number, newDay: number) => {
@@ -290,13 +317,13 @@ export const DateInput: React.FC<DateInputProps> = ({
 
   const handleDayChange = useCallback((newDay: number) => {
     triggerHapticFeedback()
-    commitWheelChange(selectedYear, selectedMonth, newDay)
-  }, [commitWheelChange, selectedYear, selectedMonth])
+    commitWheelChange(safeYearValue, selectedMonth, newDay)
+  }, [commitWheelChange, safeYearValue, selectedMonth])
 
   const handleMonthChange = useCallback((newMonth: number) => {
     triggerHapticFeedback()
-    commitWheelChange(selectedYear, newMonth, selectedDay)
-  }, [commitWheelChange, selectedYear, selectedDay])
+    commitWheelChange(safeYearValue, newMonth, selectedDay)
+  }, [commitWheelChange, safeYearValue, selectedDay])
 
   const handleYearChange = useCallback((newYear: number) => {
     triggerHapticFeedback()
@@ -397,7 +424,7 @@ export const DateInput: React.FC<DateInputProps> = ({
           }}
         />
         <WheelPicker
-          value={selectedYear}
+          value={safeYearValue}
           onValueChange={handleYearChange}
           options={yearOptions}
           dragSensitivity={WHEEL_DRAG_SENSITIVITY}

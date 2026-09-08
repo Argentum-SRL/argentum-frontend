@@ -13,6 +13,8 @@ interface ModalProps {
   className?: string
   autoHeight?: boolean
   ariaLabel?: string
+  closeOnOverlayClick?: boolean
+  closeOnEscape?: boolean
 }
 
 const Modal: React.FC<ModalProps> = ({ 
@@ -27,6 +29,8 @@ const Modal: React.FC<ModalProps> = ({
   className = '',
   autoHeight = false,
   ariaLabel,
+  closeOnOverlayClick = true,
+  closeOnEscape = true,
 }) => {
   useEffect(() => {
     if (isOpen) {
@@ -36,7 +40,7 @@ const Modal: React.FC<ModalProps> = ({
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape' && isOpen && closeOnEscape) {
         onClose()
       }
     }
@@ -46,12 +50,15 @@ const Modal: React.FC<ModalProps> = ({
       document.body.style.overflow = 'unset'
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isOpen, onClose])
+  }, [isOpen, onClose, closeOnEscape])
 
   if (!isOpen) return null
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div 
+      className={styles.overlay} 
+      onClick={closeOnOverlayClick ? onClose : undefined}
+    >
       <div 
         className={`
           ${styles.container} 

@@ -143,7 +143,7 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
                   </span>
                 ) : (
                   <span className={styles.unverifiedBadge}>
-                    <AlertCircle size={11} /> Sin verificar
+                    <AlertCircle size={11} /> Pendiente
                   </span>
                 )}
               </div>
@@ -159,7 +159,7 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
                   className={styles.verifyDirectBtn}
                   onClick={onVerificarEmail}
                 >
-                  Verificar
+                  Reenviar código
                 </button>
               )}
               {isGoogle ? (
@@ -200,20 +200,24 @@ export const TabGeneral: React.FC<TabGeneralProps> = ({
             </div>
 
             <div className={styles.contactItemAction}>
-              <button
-                type="button"
-                className={styles.editContactBtn}
-                onClick={() => {
-                  if (!usuario?.telefono_verificado) {
-                    navigate('/auth/verificar-telefono')
-                  } else {
-                    onEditTelefono()
-                  }
-                }}
-              >
-                <Edit3 size={13} />
-                <span>{usuario?.telefono_verificado ? 'Cambiar' : (usuario?.telefono ? 'Verificar' : 'Asociar')}</span>
-              </button>
+              {!usuario?.telefono_verificado ? (
+                <button
+                  type="button"
+                  className={styles.verifyDirectBtn}
+                  onClick={() => navigate('/auth/verificar-telefono')}
+                >
+                  Vincular WhatsApp
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.editContactBtn}
+                  onClick={onEditTelefono}
+                >
+                  <Edit3 size={13} />
+                  <span>Cambiar</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

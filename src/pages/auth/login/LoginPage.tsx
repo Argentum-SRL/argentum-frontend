@@ -23,6 +23,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
+  const [isEmailNoVerificado, setIsEmailNoVerificado] = useState(false)
   const [hasSubmitted, setHasSubmitted] = useState(false)
 
   const successMessage = location.state?.message
@@ -72,6 +73,7 @@ export default function LoginPage() {
     if (!email.trim() || !password) return
     setLoading(true)
     setApiError(null)
+    setIsEmailNoVerificado(false)
     try {
       const respuesta = await loginWithEmail({ email, password })
       login(respuesta)
@@ -80,7 +82,13 @@ export default function LoginPage() {
       if (import.meta.env.DEV) {
         console.error('[Auth][Email][Login] Error visible en UI', err)
       }
-      setApiError(getErrorMessage(err, "No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo."))
+      const axiosError = err as { response?: { data?: { error?: { code?: string; message?: string } } } }
+      const errCode = axiosError?.response?.data?.error?.code
+      const msg = getErrorMessage(err, "No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo.")
+      if (errCode === 'EMAIL_NO_VERIFICADO' || msg.includes('Todavía no verificaste tu cuenta')) {
+        setIsEmailNoVerificado(true)
+      }
+      setApiError(msg)
     } finally {
       setLoading(false)
     }
@@ -139,17 +147,12 @@ export default function LoginPage() {
         {apiError && (
           <div className={styles.errorContainer}>
             <p className={styles.error}>{apiError}</p>
-            {apiError.includes('contraseña configurada') && (
-              <Link to="/login/telefono" className={styles.errorLink}>
-                Ingresá con tu teléfono
-              </Link>
-            )}
-            {apiError.includes('Todavía no verificaste tu cuenta') && (
+            {isEmailNoVerificado && (
               <Link
-                to={`/auth/verificar-email?email=${encodeURIComponent(email)}`}
+                to={`/auth/verificar-email?email=${encodeURIComponent(email.trim())}`}
                 className={styles.errorLink}
               >
-                Reenviar código de verificación
+                Verificar mi email
               </Link>
             )}
           </div>

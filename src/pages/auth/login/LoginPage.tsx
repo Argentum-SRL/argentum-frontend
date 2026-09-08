@@ -1,6 +1,6 @@
 import { type FormEvent, useState, useCallback } from 'react'
 import { useNavigate, Link, useLocation, type Location } from 'react-router-dom'
-import { Eye, EyeOff, Phone, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
@@ -169,12 +169,6 @@ export default function LoginPage() {
           onSuccess={handleGoogleSuccess}
           onError={handleGoogleError}
         />
-
-        <Link to="/login/telefono" className={styles.altBtn}>
-          <Phone size={18} />
-          Continuar con teléfono
-        </Link>
-
 
         <p className={styles.footer}>
           ¿No tenés cuenta?{' '}

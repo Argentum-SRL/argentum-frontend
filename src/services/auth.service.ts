@@ -12,7 +12,7 @@ export interface RegisterPayload {
   nombre: string
   apellido: string
   email: string
-  telefono: string
+  telefono?: string
   password: string
 }
 
@@ -41,13 +41,16 @@ export async function loginWithEmail(payload: LoginPayload): Promise<AuthRespons
 }
 
 export async function registerWithEmail(payload: RegisterPayload): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>('/auth/register', {
+  const body: Record<string, string> = {
     nombre: payload.nombre.trim(),
     apellido: payload.apellido.trim(),
     email: payload.email.trim(),
-    telefono: payload.telefono.trim(),
     password: payload.password,
-  })
+  }
+  if (payload.telefono?.trim()) {
+    body.telefono = payload.telefono.trim()
+  }
+  const { data } = await api.post<AuthResponse>('/auth/register', body)
   guardarTokensSiPresentes(data)
   return data
 }
@@ -107,19 +110,6 @@ export interface CodigoVinculacionResponse {
 export async function solicitarCodigoVinculacion(): Promise<CodigoVinculacionResponse> {
   const { data } = await api.post<CodigoVinculacionResponse>('/auth/telefono/solicitar-vinculacion')
   return data
-}
-
-/** @deprecated Flujo reemplazado por vinculación iniciada por el usuario vía WhatsApp */
-export async function enviarCodigoTelefono(_telefono?: string): Promise<void> {
-  void _telefono
-  throw new Error('Flujo obsoleto. Usar solicitarCodigoVinculacion()')
-}
-
-/** @deprecated Flujo reemplazado por vinculación iniciada por el usuario vía WhatsApp */
-export async function verificarCodigoTelefono(_telefono?: string, _codigo?: string): Promise<AuthResponse> {
-  void _telefono
-  void _codigo
-  throw new Error('Flujo obsoleto. La verificación se realiza automáticamente en el webhook')
 }
 
 export async function enviarCodigoEmail(email: string): Promise<unknown> {

@@ -23,11 +23,22 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './VerificarTelefono.module.css'
 
 export default function VerificarTelefono() {
-  const { updateUsuario, refreshUser } = useAuth()
+  const { usuario, updateUsuario, refreshUser } = useAuth()
   const { showToast } = useToast()
   const { lastDataUpdate } = useNotificaciones()
   const navigate = useNavigate()
   const location = useLocation()
+
+  const handleContinuar = useCallback(() => {
+    const state = location.state as { from?: string } | null
+    if (state?.from) {
+      navigate(state.from, { replace: true })
+    } else if (usuario && !usuario.onboarding_completo) {
+      navigate('/onboarding', { replace: true })
+    } else {
+      navigate('/app/dashboard', { replace: true })
+    }
+  }, [location.state, navigate, usuario])
 
   const [codigoData, setCodigoData] = useState<CodigoVinculacionResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -203,6 +214,15 @@ export default function VerificarTelefono() {
             >
               <RefreshCw size={16} /> Reintentar
             </button>
+            <div className={styles.skipWrap}>
+              <button
+                type="button"
+                onClick={handleContinuar}
+                className={styles.skipBtn}
+              >
+                Continuar al panel
+              </button>
+            </div>
           </div>
         ) : codigoData ? (
           <>
@@ -287,6 +307,17 @@ export default function VerificarTelefono() {
                 <span>Esperando que envíes el mensaje en WhatsApp...</span>
               </div>
             )}
+
+            {/* Saltear por ahora */}
+            <div className={styles.skipWrap}>
+              <button
+                type="button"
+                onClick={handleContinuar}
+                className={styles.skipBtn}
+              >
+                Vincular más tarde e ir al panel
+              </button>
+            </div>
           </>
         ) : null}
       </div>

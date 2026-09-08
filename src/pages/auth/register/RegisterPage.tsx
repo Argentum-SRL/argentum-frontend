@@ -1,6 +1,6 @@
 import { type FormEvent, useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Eye, EyeOff, Phone } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import DashboardMockup from '@/components/mock/DashboardMockup/DashboardMockup'
@@ -29,23 +29,6 @@ const validateName = (val: string, campo: string): string | null => {
   return null
 }
 
-function buildPhone(numero: string): string {
-  let n = numero.trim().replace(/\D/g, '')
-  if (!n) return '+54'
-  if (n.startsWith('54')) n = n.slice(2)
-  if (n.startsWith('0')) n = n.slice(1)
-  if (!n.startsWith('9')) n = '9' + n
-  return '+54' + n
-}
-
-const validatePhone = (val: string): string | null => {
-  const clean = val.replace(/\D/g, '').trim()
-  if (!clean) return 'Ingresá tu número de teléfono.'
-  if (clean.length < 6) return 'El número de teléfono es demasiado corto.'
-  if (clean.length > 15) return 'El número de teléfono no puede tener más de 15 dígitos.'
-  return null
-}
-
 const validatePassword = (pwd: string): string | null => {
   if (!pwd) return 'Creá una contraseña.'
   if (pwd.length < 8) return 'La contraseña tiene que tener al menos 8 caracteres.'
@@ -62,7 +45,6 @@ export default function RegisterPage() {
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
   const [email, setEmail] = useState('')
-  const [telefono, setTelefono] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -86,7 +68,6 @@ export default function RegisterPage() {
   const nombreError = hasSubmitted ? validateName(nombre, 'nombre') : null
   const apellidoError = hasSubmitted ? validateName(apellido, 'apellido') : null
   const emailError = hasSubmitted ? validateEmail(email) : null
-  const telefonoError = hasSubmitted ? validatePhone(telefono) : null
   const passwordError = hasSubmitted ? validatePassword(password) : null
   const confirmPasswordError = hasSubmitted
     ? !confirmPassword
@@ -100,11 +81,9 @@ export default function RegisterPage() {
     e.preventDefault()
     setHasSubmitted(true)
     
-    // Validaciones directas para evitar problemas de asincronía del estado
     const nError = validateName(nombre, 'nombre')
     const aError = validateName(apellido, 'apellido')
     const eError = validateEmail(email)
-    const telError = validatePhone(telefono)
     const pError = validatePassword(password)
     const cpError = !confirmPassword 
       ? 'Confirmá tu contraseña.' 
@@ -112,17 +91,14 @@ export default function RegisterPage() {
         ? 'Las contraseñas no coinciden. Revisalas.' 
         : null
 
-    if (nError || aError || eError || telError || pError || cpError || !aceptaTerminos) {
+    if (nError || aError || eError || pError || cpError || !aceptaTerminos) {
       return
     }
     setLoading(true)
     setApiError(null)
     try {
-      const respuesta = await registerWithEmail({ nombre, apellido, email, telefono: buildPhone(telefono), password })
+      const respuesta = await registerWithEmail({ nombre, apellido, email, password })
       
-      // Solo activamos el estado de login si ya tenemos tokens (ej: Google)
-      // En registro por email, no hay tokens hasta que verifique, por lo que login()
-      // rompería la lógica y nos mandaría al dashboard prematuramente.
       if (respuesta.access_token) {
         login(respuesta)
       }
@@ -194,30 +170,6 @@ export default function RegisterPage() {
               placeholder="Pérez"
             />
           </div>
-        </div>
-
-        <div className={styles.phoneFieldWrap}>
-          <label htmlFor="register-tel" className={styles.phoneLabel}>
-            Número de teléfono
-          </label>
-          <div className={[styles.phoneInputWrap, telefonoError ? styles.phoneInputWrapError : ''].filter(Boolean).join(' ')}>
-            <div className={styles.phonePrefix}>
-              <span className={styles.flag} role="img" aria-label="Bandera de Argentina">🇦🇷</span>
-              <span className={styles.countryCode}>+54</span>
-            </div>
-            <input
-              id="register-tel"
-              name="tel"
-              type="tel"
-              autoComplete="tel-national"
-              inputMode="numeric"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              placeholder="11 1234 5678"
-              className={styles.phoneInput}
-            />
-          </div>
-          {telefonoError && <p className={styles.fieldError}>{telefonoError}</p>}
         </div>
 
         <Field
@@ -308,14 +260,8 @@ export default function RegisterPage() {
           <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
         </div>
 
-        <Link to="/login/telefono" className={styles.altBtn}>
-          <Phone size={18} />
-          Continuar con teléfono
-        </Link>
-
-
         <p className={styles.infoText}>
-          Una vez registrado, podrás agregar otros métodos de inicio de sesión desde tu perfil.
+          Una vez registrado, podrás asociar tu WhatsApp desde tu perfil para gestionar tus finanzas por chat.
         </p>
 
         <p className={styles.footer}>

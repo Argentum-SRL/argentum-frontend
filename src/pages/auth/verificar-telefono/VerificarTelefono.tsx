@@ -192,7 +192,12 @@ export default function VerificarTelefono() {
   }
 
   return (
-    <AuthLayout title="Vinculá tu WhatsApp">
+    <AuthLayout
+      title="Vinculá tu WhatsApp"
+      cardMaxWidth={700}
+      cardPadding="20px 24px"
+      compact
+    >
       <div className={styles.contentWrap}>
         <p className={styles.subtitle}>
           Iniciá la conversación desde tu WhatsApp para verificar y asociar tu teléfono de forma
@@ -246,100 +251,105 @@ export default function VerificarTelefono() {
             </div>
           </div>
         ) : codigoData ? (
-          <>
-            {/* Sección QR en pantallas de escritorio */}
-            <div className={styles.qrContainer}>
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                  codigoData.link_whatsapp
-                )}&margin=8`}
-                alt="Código QR para vincular WhatsApp"
-                className={styles.qrImage}
-                loading="eager"
-              />
-              <span className={styles.qrHint}>
-                Escaneá el código QR con la cámara de tu celular para abrir WhatsApp
-              </span>
+          <div className={styles.twoColGrid}>
+            {/* Columna Izquierda: QR */}
+            <div className={styles.qrCol}>
+              <div className={styles.qrContainer}>
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+                    codigoData.link_whatsapp
+                  )}&margin=6`}
+                  alt="Código QR para vincular WhatsApp"
+                  className={styles.qrImage}
+                  loading="eager"
+                />
+                <span className={styles.qrHint}>
+                  Escaneá el código QR con la cámara de tu celular para abrir WhatsApp
+                </span>
+              </div>
             </div>
 
-            {/* Tarjeta de Código */}
-            <div className={styles.codeCard}>
-              <div className={styles.codeLabel}>Código de vinculación único</div>
-              <div className={styles.codeValue}>{codigoData.codigo}</div>
-              <p className={styles.codeExplanation}>
-                Al abrir el enlace, el mensaje ya incluirá este código. Solo tenés que presionar
-                enviar.
-              </p>
-            </div>
-
-            {/* Temporizador / Estado */}
-            {countdown > 0 ? (
-              <div className={styles.timerBadge}>
-                <Clock size={14} />
-                <span>Expira en {formatCountdown(countdown)}</span>
+            {/* Columna Derecha: Código de vinculación, temporizador, acciones y estado */}
+            <div className={styles.detailsCol}>
+              {/* Tarjeta de Código */}
+              <div className={styles.codeCard}>
+                <div className={styles.codeLabel}>Código de vinculación único</div>
+                <div className={styles.codeValue}>{codigoData.codigo}</div>
+                <p className={styles.codeExplanation}>
+                  Al abrir el enlace, el mensaje ya incluirá este código. Solo tenés que presionar
+                  enviar.
+                </p>
               </div>
-            ) : (
-              <div className={`${styles.timerBadge} ${styles.timerExpired}`}>
-                <AlertCircle size={14} />
-                <span>El código expiró. Pedí uno nuevo para continuar.</span>
-              </div>
-            )}
 
-            {/* Botones de Acción */}
-            <div className={styles.actionsWrap}>
+              {/* Temporizador / Estado */}
               {countdown > 0 ? (
-                <>
-                  <a
-                    href={codigoData.link_whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.whatsappBtn}
-                  >
-                    <MessageCircle size={20} />
-                    <span>Abrir en WhatsApp</span>
-                  </a>
+                <div className={styles.timerBadge}>
+                  <Clock size={14} />
+                  <span>Expira en {formatCountdown(countdown)}</span>
+                </div>
+              ) : (
+                <div className={`${styles.timerBadge} ${styles.timerExpired}`}>
+                  <AlertCircle size={14} />
+                  <span>El código expiró. Pedí uno nuevo para continuar.</span>
+                </div>
+              )}
 
+              {/* Botones de Acción */}
+              <div className={styles.actionsWrap}>
+                {countdown > 0 ? (
+                  <>
+                    <a
+                      href={codigoData.link_whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.whatsappBtn}
+                    >
+                      <MessageCircle size={20} />
+                      <span>Abrir en WhatsApp</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={handleCopiarEnlace}
+                      className={styles.copyBtn}
+                    >
+                      {copied ? <Check size={16} color="#10b981" /> : <Copy size={16} />}
+                      <span>{copied ? '¡Enlace copiado!' : 'Copiar enlace directo'}</span>
+                    </button>
+                  </>
+                ) : (
                   <button
                     type="button"
-                    onClick={handleCopiarEnlace}
-                    className={styles.copyBtn}
+                    onClick={cargarCodigo}
+                    disabled={loading}
+                    className={styles.renewBtn}
                   >
-                    {copied ? <Check size={16} color="#10b981" /> : <Copy size={16} />}
-                    <span>{copied ? '¡Enlace copiado!' : 'Copiar enlace directo'}</span>
+                    <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                    <span>Generar nuevo código</span>
                   </button>
-                </>
-              ) : (
+                )}
+              </div>
+
+              {/* Indicador de espera activa */}
+              {countdown > 0 && (
+                <div className={styles.waitingIndicator}>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Esperando que envíes el mensaje en WhatsApp...</span>
+                </div>
+              )}
+
+              {/* Saltear por ahora */}
+              <div className={styles.skipWrap}>
                 <button
                   type="button"
-                  onClick={cargarCodigo}
-                  disabled={loading}
-                  className={styles.renewBtn}
+                  onClick={handleContinuar}
+                  className={styles.skipBtn}
                 >
-                  <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-                  <span>Generar nuevo código</span>
+                  Vincular más tarde e ir al panel
                 </button>
-              )}
-            </div>
-
-            {/* Indicador de espera activa */}
-            {countdown > 0 && (
-              <div className={styles.waitingIndicator}>
-                <Loader2 size={14} className="animate-spin" />
-                <span>Esperando que envíes el mensaje en WhatsApp...</span>
               </div>
-            )}
-
-            {/* Saltear por ahora */}
-            <div className={styles.skipWrap}>
-              <button
-                type="button"
-                onClick={handleContinuar}
-                className={styles.skipBtn}
-              >
-                Vincular más tarde e ir al panel
-              </button>
             </div>
-          </>
+          </div>
         ) : null}
       </div>
     </AuthLayout>

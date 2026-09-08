@@ -51,9 +51,19 @@ interface AuthLayoutProps {
   title: string
   children: ReactNode
   leftPanel?: ReactNode
+  cardMaxWidth?: number | string
+  cardPadding?: string
+  compact?: boolean
 }
 
-export default function AuthLayout({ title, children, leftPanel }: AuthLayoutProps) {
+export default function AuthLayout({
+  title,
+  children,
+  leftPanel,
+  cardMaxWidth,
+  cardPadding,
+  compact,
+}: AuthLayoutProps) {
   const { theme, toggleTheme } = useTheme()
 
   const themeBtn = (
@@ -94,8 +104,23 @@ export default function AuthLayout({ title, children, leftPanel }: AuthLayoutPro
   return (
     <div className={styles.standalone}>
       {themeBtn}
-      <div className={styles.standaloneCard}>
-        <FormContent title={title}>{children}</FormContent>
+      <div
+        className={styles.standaloneCard}
+        style={
+          cardMaxWidth || cardPadding
+            ? ({
+                ...(cardMaxWidth
+                  ? {
+                      '--card-max-width':
+                        typeof cardMaxWidth === 'number' ? `${cardMaxWidth}px` : cardMaxWidth,
+                    }
+                  : {}),
+                ...(cardPadding ? { '--card-padding': cardPadding } : {}),
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
+        <FormContent title={title} compact={compact}>{children}</FormContent>
       </div>
     </div>
   )

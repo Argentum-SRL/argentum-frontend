@@ -59,12 +59,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(rootDir, './src'),
-      '@catalogo': path.resolve(rootDir, '../argentum-backend/app/core/catalogo_suscripciones.json'),
+      '@catalogo': path.resolve(rootDir, './src/lib/constants/catalogo_suscripciones.json'),
     },
   },
   server: {
     fs: {
-      allow: [rootDir, path.resolve(rootDir, '../argentum-backend/app/core')],
+      allow: [rootDir],
     },
     watch: {
       usePolling: true,

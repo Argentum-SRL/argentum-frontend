@@ -39,7 +39,17 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
     return { progressPercent: percent }
   }, [proyeccion])
 
-  const { gasto_proyectado_total, balance_proyectado, desglose_por_categoria, certezas, rango, nivel_confianza } = proyeccion
+  const {
+    gasto_proyectado_total,
+    balance_proyectado,
+    desglose_por_categoria,
+    certezas,
+    rango,
+    nivel_confianza,
+    datos_suficientes,
+    mensaje_insuficiente,
+    intervalos,
+  } = proyeccion
 
   return (
     <div className={styles.card}>
@@ -58,70 +68,41 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
         </button>
       </div>
 
-      <div className={styles.mainStats}>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Gasto proyectado</span>
-          <span className={styles.statValue}>{formatMonto(gasto_proyectado_total, moneda)}</span>
-        </div>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Balance estimado</span>
-          <span className={`${styles.balanceValue} ${balance_proyectado >= 0 ? styles.positive : styles.negative}`}>
-            {formatMonto(balance_proyectado, moneda)}
-          </span>
-        </div>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Rango probable</span>
-          <span className={styles.statValue}>{formatMonto(rango.piso, moneda)} a {formatMonto(rango.techo, moneda)}</span>
-        </div>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Confianza</span>
-          <span className={styles.statValue}>{nivel_confianza}</span>
-        </div>
-      </div>
-
-      <div className={styles.progressContainer}>
-        <div className={styles.progressHeader}>
-          <span className={styles.progressLabel}>Gasto actual vs proyectado</span>
-          <span className={styles.progressPercent}>{progressPercent}%</span>
-        </div>
-        <ProgressBar progress={progressPercent} />
-      </div>
-
-      {!expanded ? (
-        <button className={styles.expandButton} onClick={() => setExpanded(true)}>
-          Ver desglose <ChevronDown size={16} />
-        </button>
-      ) : (
-        <div className={styles.expandedContent}>
-          <div className={styles.categoryList}>
-            <h3 className={styles.sectionTitle}>Gasto por categoría</h3>
-            {desglose_por_categoria.map((cat, i) => {
-              const catActual = cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0
-              const catTotal = cat.proyectado > 0 ? cat.proyectado : 1
-              const catProgress = Math.max(0, Math.min(Math.round((catActual / catTotal) * 100), 100))
-              
-              return (
-                <div key={cat.categoria_id || `cat-${i}`} className={styles.categoryRow}>
-                  <div className={styles.categoryIcon}>
-                    <CategoriaIcon nombre={cat.categoria_nombre} size={32} />
-                  </div>
-                  <div className={styles.categoryInfo}>
-                    <div className={styles.categoryName}>
-                      {cat.categoria_nombre}
-                      {cat.fuera_de_patron && <span className={`${styles.badge} ${styles.badgePatron}`}>Fuera de patrón</span>}
-                    </div>
-                    <ProgressBar progress={catProgress} />
-                  </div>
-                  <div className={styles.categoryAmount}>
-                    {formatMonto(cat.proyectado, moneda)}
-                  </div>
-                </div>
-              )
-            })}
+      {!datos_suficientes ? (
+        <>
+          <div style={{
+            padding: '12px 14px',
+            backgroundColor: 'var(--surface-alt)',
+            borderRadius: '10px',
+            fontSize: '0.8125rem',
+            color: 'var(--text-2)',
+            lineHeight: 1.4,
+            borderLeft: '3px solid var(--primary)'
+          }}>
+            {mensaje_insuficiente || 'Mostramos tus compromisos ciertos (cuotas y suscripciones). Se requieren al menos 3 ciclos registrados para proyectar gastos variables con calibración probabilística.'}
           </div>
 
-          <div className={styles.certezasSection}>
-            <h3 className={styles.sectionTitle}>Compromisos fijos</h3>
+          <div className={styles.mainStats}>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Compromisos ciertos</span>
+              <span className={styles.statValue}>{formatMonto(certezas.total, moneda)}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Gasto variable</span>
+              <span className={styles.statValue} style={{ fontSize: '0.9375rem', color: 'var(--text-3)' }}>Sin proyección</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Total cierto</span>
+              <span className={styles.statValue}>{formatMonto(gasto_proyectado_total, moneda)}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Confianza</span>
+              <span className={styles.statValue}>{nivel_confianza}</span>
+            </div>
+          </div>
+
+          <div className={styles.certezasSection} style={{ marginTop: '0.5rem' }}>
+            <h3 className={styles.sectionTitle}>Compromisos ciertos del ciclo</h3>
             <div className={styles.certezaItem}>
               <span className={styles.certezaLabel}>Cuotas pendientes</span>
               <span className={styles.certezaValue}>{formatMonto(certezas.cuotas_restantes, moneda)}</span>
@@ -137,11 +118,147 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
               </span>
             </div>
           </div>
+        </>
+      ) : (
+        <>
+          {proyeccion.calibracion?.pasa_puerta && (
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              borderRadius: '20px',
+              fontSize: '0.75rem',
+              color: '#10b981',
+              fontWeight: 500,
+              marginBottom: '0.5rem',
+              alignSelf: 'flex-start'
+            }}>
+              <span>Calibración validada: {Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% en {proyeccion.calibracion.ciclos_evaluados} ciclos</span>
+            </div>
+          )}
 
-          <button className={styles.expandButton} onClick={() => setExpanded(false)}>
-            Ocultar desglose <ChevronUp size={16} />
-          </button>
-        </div>
+          <div className={styles.mainStats}>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Gasto proyectado (mediana)</span>
+              <span className={styles.statValue}>{formatMonto(gasto_proyectado_total, moneda)}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Balance estimado</span>
+              <span className={`${styles.balanceValue} ${balance_proyectado >= 0 ? styles.positive : styles.negative}`}>
+                {formatMonto(balance_proyectado, moneda)}
+              </span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Rango probable (80%)</span>
+              <span className={styles.statValue}>{formatMonto(rango.piso, moneda)} a {formatMonto(rango.techo, moneda)}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Confianza</span>
+              <span className={styles.statValue}>{nivel_confianza}</span>
+            </div>
+          </div>
+
+          <div className={styles.progressContainer}>
+            <div className={styles.progressHeader}>
+              <span className={styles.progressLabel}>Gasto actual vs proyectado</span>
+              <span className={styles.progressPercent}>{progressPercent}%</span>
+            </div>
+            <ProgressBar progress={progressPercent} />
+          </div>
+
+          {!expanded ? (
+            <button className={styles.expandButton} onClick={() => setExpanded(true)}>
+              Ver desglose e intervalos <ChevronDown size={16} />
+            </button>
+          ) : (
+            <div className={styles.expandedContent}>
+              {intervalos && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Intervalos de probabilidad calibrados</h3>
+                    {proyeccion.calibracion && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-3)' }}>
+                        Validado: {Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% ({proyeccion.calibracion.ciclos_evaluados} ciclos)
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', fontSize: '0.75rem' }}>
+                    <div style={{ padding: '8px', backgroundColor: 'var(--surface-alt)', borderRadius: '8px' }}>
+                      <span style={{ color: 'var(--text-3)', display: 'block' }}>Nivel 50%</span>
+                      <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+                        {formatMonto(intervalos.intervalo_50.piso, moneda)} - {formatMonto(intervalos.intervalo_50.techo, moneda)}
+                      </span>
+                    </div>
+                    <div style={{ padding: '8px', backgroundColor: 'var(--surface-alt)', borderRadius: '8px' }}>
+                      <span style={{ color: 'var(--text-3)', display: 'block' }}>Nivel 80%</span>
+                      <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+                        {formatMonto(intervalos.intervalo_80.piso, moneda)} - {formatMonto(intervalos.intervalo_80.techo, moneda)}
+                      </span>
+                    </div>
+                    <div style={{ padding: '8px', backgroundColor: 'var(--surface-alt)', borderRadius: '8px' }}>
+                      <span style={{ color: 'var(--text-3)', display: 'block' }}>Nivel 95%</span>
+                      <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+                        {formatMonto(intervalos.intervalo_95.piso, moneda)} - {formatMonto(intervalos.intervalo_95.techo, moneda)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.categoryList}>
+                <h3 className={styles.sectionTitle}>Gasto por categoría</h3>
+                {desglose_por_categoria.map((cat, i) => {
+                  const catActual = cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0
+                  const catTotal = cat.proyectado > 0 ? cat.proyectado : 1
+                  const catProgress = Math.max(0, Math.min(Math.round((catActual / catTotal) * 100), 100))
+                  
+                  return (
+                    <div key={cat.categoria_id || `cat-${i}`} className={styles.categoryRow}>
+                      <div className={styles.categoryIcon}>
+                        <CategoriaIcon nombre={cat.categoria_nombre} size={32} />
+                      </div>
+                      <div className={styles.categoryInfo}>
+                        <div className={styles.categoryName}>
+                          {cat.categoria_nombre}
+                          {cat.fuera_de_patron && <span className={`${styles.badge} ${styles.badgePatron}`}>Fuera de patrón</span>}
+                        </div>
+                        <ProgressBar progress={catProgress} />
+                      </div>
+                      <div className={styles.categoryAmount}>
+                        {formatMonto(cat.proyectado, moneda)}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className={styles.certezasSection}>
+                <h3 className={styles.sectionTitle}>Compromisos fijos</h3>
+                <div className={styles.certezaItem}>
+                  <span className={styles.certezaLabel}>Cuotas pendientes</span>
+                  <span className={styles.certezaValue}>{formatMonto(certezas.cuotas_restantes, moneda)}</span>
+                </div>
+                <div className={styles.certezaItem}>
+                  <span className={styles.certezaLabel}>Suscripciones pendientes</span>
+                  <span className={styles.certezaValue}>{formatMonto(certezas.suscripciones_restantes, moneda)}</span>
+                </div>
+                <div className={`${styles.certezaItem} ${styles.certezaTotal}`}>
+                  <span className={styles.certezaLabel}>Total compromisos</span>
+                  <span className={`${styles.certezaValue} ${styles.certezaTotalValue}`}>
+                    {formatMonto(certezas.total, moneda)}
+                  </span>
+                </div>
+              </div>
+
+              <button className={styles.expandButton} onClick={() => setExpanded(false)}>
+                Ocultar desglose <ChevronUp size={16} />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   )
@@ -207,8 +324,22 @@ const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: external
     )
   }
 
-  const hasArs = proyeccion.ars && proyeccion.ars.datos_suficientes
-  const hasUsd = proyeccion.usd && proyeccion.usd.datos_suficientes
+  const hasArs = Boolean(
+    proyeccion.ars && (
+      proyeccion.ars.datos_suficientes ||
+      proyeccion.ars.certezas?.total > 0 ||
+      proyeccion.ars.gasto_proyectado_total > 0 ||
+      proyeccion.ars.ciclos_analizados >= 0
+    )
+  )
+  const hasUsd = Boolean(
+    proyeccion.usd && (
+      proyeccion.usd.datos_suficientes ||
+      proyeccion.usd.certezas?.total > 0 ||
+      proyeccion.usd.gasto_proyectado_total > 0 ||
+      proyeccion.usd.ingresos_proyectados > 0
+    )
+  )
 
   const showArs = (!moneda || moneda === 'ARS') && hasArs
   const showUsd = (!moneda || moneda === 'USD') && hasUsd

@@ -366,12 +366,34 @@ export interface Proyeccion {
     total: number
   }
   desglose_por_categoria: ProyeccionCategoria[]
-  nivel_confianza: 'alto' | 'medio' | 'bajo' | 'sin_datos' | 'inicial'
+  nivel_confianza: 'alto' | 'medio' | 'bajo' | 'sin_datos' | 'inicial' | 'alta' | 'media' | 'baja'
   ciclos_analizados: number
   pesos: { historial: number; ciclo_actual: number }
   advertencias: string[]
   datos_suficientes: boolean
   clasificacion: { comprometidos: number; recurrentes_detectados: number; variables: number }
+  distribucion?: Record<string, number> | null
+  intervalos?: {
+    intervalo_50: { piso: number; techo: number }
+    intervalo_80: { piso: number; techo: number }
+    intervalo_95: { piso: number; techo: number }
+  } | null
+  descomposicion?: {
+    cierto: number
+    recurrente_ya_ocurrido: number
+    variable_proyectado: number
+  } | null
+  mensaje_insuficiente?: string | null
+  calibracion?: {
+    pasa_puerta: boolean
+    ciclos_evaluados: number
+    cobertura_50?: number | null
+    cobertura_80?: number | null
+    cobertura_95?: number | null
+    ancho_medio_80_rel?: number | null
+    motivo?: 'pocos_ciclos' | 'cobertura_insuficiente' | 'intervalo_no_informativo' | null
+    mensaje?: string | null
+  } | null
 }
 
 export interface ProyeccionesResponse {

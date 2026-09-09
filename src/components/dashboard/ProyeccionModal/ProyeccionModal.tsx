@@ -12,7 +12,6 @@ interface ProyeccionModalProps {
 
 const ProyeccionModal: React.FC<ProyeccionModalProps> = ({ isOpen, onClose, proyeccion }) => {
   const n_ciclos = proyeccion?.ciclos_analizados ?? 0
-  const pesos = proyeccion?.pesos ?? { historial: 0.7, ciclo_actual: 0.3 }
   const advertencias = proyeccion?.advertencias ?? []
   const nivel_confianza = proyeccion?.nivel_confianza ?? 'medio'
 
@@ -58,21 +57,32 @@ const ProyeccionModal: React.FC<ProyeccionModalProps> = ({ isOpen, onClose, proy
         <section className={styles.section}>
           <h3>En qué se basa</h3>
           <p>
-            Miramos tus últimos {n_ciclos} {n_ciclos === 1 ? 'ciclo completo' : 'ciclos completos'} y calculamos cuánto gastaste en promedio en cada categoría. Eso es la base de la proyección.
+            Descomponemos tus finanzas en tres partes: compromisos ciertos (cuotas y suscripciones), recurrentes ya debitados, y gastos variables. Para los variables, analizamos tus últimos {n_ciclos} {n_ciclos === 1 ? 'ciclo completo' : 'ciclos completos'} filtrando compras atípicas y calculando una distribución de probabilidad calibrada.
           </p>
         </section>
 
         <section className={styles.section}>
-          <h3>Cómo se combina con este ciclo</h3>
+          <h3>Cómo estimamos el gasto variable</h3>
           <p>
-            Tu comportamiento actual tiene un {Math.round(pesos.ciclo_actual * 100)}% de peso en la proyección. El historial tiene un {Math.round(pesos.historial * 100)}%. Esto evita que un gasto puntual grande distorsione todo.
+            Calculamos tu gasto diario básico descartando el decil superior de compras únicas para no contaminar la proyección. Luego modelamos la variabilidad con cuantiles empíricos ajustados por días restantes del ciclo y calibrados sobre el historial.
           </p>
         </section>
 
         <section className={styles.section}>
           <h3>Los compromisos fijos</h3>
           <p>
-            Las cuotas y suscripciones que ya tenés programadas para los días que quedan del ciclo se suman como número exacto, no como estimación.
+            Las cuotas y suscripciones que ya tenés programadas para los días que quedan del ciclo se suman como número exacto y cierto, nunca como estimación.
+          </p>
+        </section>
+
+        <section className={styles.section}>
+          <h3>Prueba de calibración individual</h3>
+          <p>
+            {proyeccion?.calibracion?.pasa_puerta ? (
+              `Esta proyección superó la prueba de calibración estadística sobre tu propia historia con una cobertura observada del ${Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% en ${proyeccion.calibracion.ciclos_evaluados} ciclos cerrados evaluados en backtest.`
+            ) : (
+              proyeccion?.calibracion?.mensaje || 'Para evitar estimaciones engañosas, la proyección probabilística solo se activa si el modelo demuestra una cobertura empírica mínima del 80% y un rango informativo sobre tus ciclos cerrados.'
+            )}
           </p>
         </section>
 

@@ -3,11 +3,11 @@ import {
   RefreshCw, 
   AlertCircle, 
   TrendingUp, 
-  Zap, 
   CreditCard, 
   Calendar, 
   Activity, 
-  PieChart 
+  ShieldCheck,
+  Coffee
 } from 'lucide-react'
 import { getPerfilFinanciero, recalcularPerfilFinanciero } from '@/services/perfilFinanciero.service'
 import type { PerfilFinancieroConInterpretaciones } from '@/types'
@@ -31,14 +31,11 @@ const formatRelativeTime = (dateStr: string | null) => {
   }
 }
 
-const toClassName = (nivel: string) =>
-  nivel.charAt(0).toUpperCase() + nivel.slice(1).replace(/_([a-z])/g, (_, g: string) => g.toUpperCase())
-
 interface PerfilFinancieroCardProps {
-  moneda?: 'ARS' | 'USD';
+  moneda?: 'ARS' | 'USD'
 }
 
-export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ moneda = 'ARS' }) => {
+export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
   const [perfil, setPerfil] = useState<PerfilFinancieroConInterpretaciones | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -94,27 +91,6 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ mone
     )
   }
 
-  const INDICADORES_PERFIL = [
-    'tasa_ahorro_ars',
-    'tasa_ahorro_usd',
-    'score_impulsividad_ars',
-    'score_impulsividad_usd',
-    'ratio_cuotas_ars',
-    'ratio_cuotas_usd',
-    'cumplimiento_presupuesto',
-    'consistencia_registro',
-    'porcentaje_suscripciones_ars',
-    'porcentaje_suscripciones_usd',
-  ] as const
-
-  const todosSinDatos = perfil
-    ? INDICADORES_PERFIL.every(
-        (key) => perfil.interpretaciones[key].nivel === 'sin_datos'
-      )
-    : false
-
-  if (todosSinDatos) return null
-
   if (error || !perfil) {
     return (
       <div className={styles.pfErrorContainer}>
@@ -133,39 +109,58 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ mone
     )
   }
 
-  const { interpretaciones } = perfil
   const perfilNuevo = perfil.perfil_nuevo
 
-  const wTasaAhorroArs = Math.max(0, Math.min(100, perfil.tasa_ahorro_ars !== null ? perfil.tasa_ahorro_ars * 100 : 0))
-  const wTasaAhorroUsd = Math.max(0, Math.min(100, perfil.tasa_ahorro_usd !== null ? perfil.tasa_ahorro_usd * 100 : 0))
-  const wImpulsividadArs = perfil.score_impulsividad_ars !== null ? perfil.score_impulsividad_ars : 0
-  const wImpulsividadUsd = perfil.score_impulsividad_usd !== null ? perfil.score_impulsividad_usd : 0
-  const wRatioCuotasArs = Math.max(0, Math.min(100, perfil.ratio_cuotas_ars !== null ? perfil.ratio_cuotas_ars * 100 : 0))
-  const wRatioCuotasUsd = Math.max(0, Math.min(100, perfil.ratio_cuotas_usd !== null ? perfil.ratio_cuotas_usd * 100 : 0))
-  
-  const wConsistencia = perfil.consistencia_registro !== null ? perfil.consistencia_registro * 100 : 0
-  const wCumplimiento = perfil.cumplimiento_presupuesto !== null ? perfil.cumplimiento_presupuesto * 100 : 0
-  
-  const wSuscripcionesArs = Math.max(0, Math.min(100, perfil.porcentaje_suscripciones_ars !== null ? perfil.porcentaje_suscripciones_ars * 100 : 0))
-  const wSuscripcionesUsd = Math.max(0, Math.min(100, perfil.porcentaje_suscripciones_usd !== null ? perfil.porcentaje_suscripciones_usd * 100 : 0))
+  // Estado de datos insuficientes (< 3 ciclos)
+  if (!perfilNuevo.datos_suficientes) {
+    const ciclos = perfilNuevo.ciclos_con_datos || 0
+    const pct = Math.min(100, Math.round((ciclos / 3) * 100))
+    return (
+      <div className={styles.pfCard}>
+        <div className={styles.pfCardHeader}>
+          <div className={styles.pfHeaderLeft}>
+            <h2 className={styles.pfTitle}>Tu perfil financiero</h2>
+            <span className={styles.pfUpdateTime}>
+              Última actualización: {formatRelativeTime(perfil.ultima_actualizacion)}
+            </span>
+          </div>
+          <button 
+            className={`${styles.pfRefreshBtn} ${refreshing ? styles.pfRefreshBtnDisabled : ''}`} 
+            onClick={handleRecalcular}
+            disabled={refreshing}
+            aria-label="Actualizar perfil financiero"
+          >
+            <RefreshCw className={refreshing ? styles.pfSpin : ''} size={15} />
+            <span>{refreshing ? 'Actualizando...' : 'Actualizar'}</span>
+          </button>
+        </div>
 
-  const barCSS = [
-    `.pf-bar-1-ars{width:${wTasaAhorroArs.toFixed(2)}%}`,
-    `.pf-bar-1-usd{width:${wTasaAhorroUsd.toFixed(2)}%}`,
-    `.pf-bar-2-ars{width:${wImpulsividadArs.toFixed(2)}%}`,
-    `.pf-bar-2-usd{width:${wImpulsividadUsd.toFixed(2)}%}`,
-    `.pf-bar-3-ars{width:${wRatioCuotasArs.toFixed(2)}%}`,
-    `.pf-bar-3-usd{width:${wRatioCuotasUsd.toFixed(2)}%}`,
-    `.pf-bar-4{width:${wConsistencia.toFixed(2)}%}`,
-    `.pf-bar-5{width:${wCumplimiento.toFixed(2)}%}`,
-    `.pf-bar-6-ars{width:${wSuscripcionesArs.toFixed(2)}%}`,
-    `.pf-bar-6-usd{width:${wSuscripcionesUsd.toFixed(2)}%}`,
-  ].join('')
+        <div className={styles.pfInsufficientContainer}>
+          <Calendar className={styles.pfInsufficientIcon} size={44} />
+          <h3 className={styles.pfInsufficientTitle}>Construyendo tu perfil financiero</h3>
+          <p className={styles.pfInsufficientText}>
+            {perfilNuevo.mensaje_insuficiente || 'Se requieren al menos 3 ciclos mensuales completos de ingresos y gastos para generar métricas confiables.'}
+          </p>
+          <div className={styles.pfInsufficientProgress}>
+            <div className={styles.pfProgressTrack}>
+              <div 
+                className={styles.pfProgressBar} 
+                style={{ width: `${pct}%`, background: 'var(--primary)' }} 
+              />
+            </div>
+            <div className={styles.pfInsufficientSub}>
+              {ciclos} de 3 ciclos completados ({pct}%)
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const interps = perfilNuevo.interpretaciones_relativas || {}
 
   return (
     <div className={styles.pfCard}>
-      <style>{barCSS}</style>
-
       {/* Header */}
       <div className={styles.pfCardHeader}>
         <div className={styles.pfHeaderLeft}>
@@ -185,163 +180,120 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ mone
         </button>
       </div>
 
-      {/* Grid Superior: 3 Indicadores Principales */}
+      {/* Grid Superior: Pilares de Salud Financiera */}
       <div className={styles.pfGrid}>
-        {/* Indicador 1: Tasa de Ahorro */}
+        {/* Indicador 1: Capacidad de Ahorro */}
         <div className={styles.pfIndicatorBox}>
           <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Tasa de ahorro</span>
+            <span className={styles.pfIndicatorLabel}>Capacidad de ahorro</span>
             <TrendingUp size={18} color="var(--text-3)" />
           </div>
           <div className={styles.pfIndicatorValueRow}>
             <span className={styles.pfIndicatorValue}>
-              {moneda === 'ARS'
-                ? (perfil.tasa_ahorro_ars !== null ? `${Math.round(perfil.tasa_ahorro_ars * 100)}%` : '—')
-                : (perfil.tasa_ahorro_usd !== null ? `${Math.round(perfil.tasa_ahorro_usd * 100)}%` : '—')
-              }
+              {perfilNuevo.capacidad_ahorro !== null ? `${Math.round(perfilNuevo.capacidad_ahorro * 100)}%` : '—'}
             </span>
-            <span className={`${styles.pfBadge} ${styles['pfNivel' + toClassName(moneda === 'ARS' ? interpretaciones.tasa_ahorro_ars.nivel : interpretaciones.tasa_ahorro_usd.nivel)]}`}>
-              {moneda === 'ARS' ? interpretaciones.tasa_ahorro_ars.label : interpretaciones.tasa_ahorro_usd.label}
+            <span className={styles.pfIndicatorSubtext}>
+              {interps.capacidad_ahorro || (perfilNuevo.capacidad_ahorro !== null ? `${Math.round(perfilNuevo.capacidad_ahorro * 100)}% de tu ingreso típico` : 'Sin datos de ingreso')}
             </span>
-            <div className={styles.pfProgressTrack}>
-              <div className={`${styles.pfProgressBar} ${styles['pfProgress' + toClassName(moneda === 'ARS' ? interpretaciones.tasa_ahorro_ars.nivel : interpretaciones.tasa_ahorro_usd.nivel)]} pf-bar-1-${moneda.toLowerCase()}`} />
-            </div>
           </div>
         </div>
 
-        {/* Indicador 2: Impulsividad */}
-        <div className={styles.pfIndicatorBox}>
-          <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Impulsividad</span>
-            <Zap size={18} color="var(--text-3)" />
-          </div>
-          <div className={styles.pfIndicatorValueRow}>
-            <span className={styles.pfIndicatorValue}>
-              {moneda === 'ARS'
-                ? (perfil.score_impulsividad_ars !== null ? `${perfil.score_impulsividad_ars}/100` : '—')
-                : (perfil.score_impulsividad_usd !== null ? `${perfil.score_impulsividad_usd}/100` : '—')
-              }
-            </span>
-            <span className={`${styles.pfBadge} ${styles['pfNivel' + toClassName(moneda === 'ARS' ? interpretaciones.score_impulsividad_ars.nivel : interpretaciones.score_impulsividad_usd.nivel)]}`}>
-              {moneda === 'ARS' ? interpretaciones.score_impulsividad_ars.label : interpretaciones.score_impulsividad_usd.label}
-            </span>
-            <div className={styles.pfProgressTrack}>
-              <div className={`${styles.pfProgressBar} ${styles['pfProgress' + toClassName(moneda === 'ARS' ? interpretaciones.score_impulsividad_ars.nivel : interpretaciones.score_impulsividad_usd.nivel)]} pf-bar-2-${moneda.toLowerCase()}`} />
-            </div>
-          </div>
-        </div>
-
-        {/* Indicador 3: Carga de Cuotas */}
-        <div className={styles.pfIndicatorBox}>
-          <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Carga de cuotas</span>
-            <CreditCard size={18} color="var(--text-3)" />
-          </div>
-          <div className={styles.pfIndicatorValueRow}>
-            <span className={styles.pfIndicatorValue}>
-              {moneda === 'ARS'
-                ? (perfil.ratio_cuotas_ars !== null ? `${Math.round(perfil.ratio_cuotas_ars * 100)}%` : '—')
-                : (perfil.ratio_cuotas_usd !== null ? `${Math.round(perfil.ratio_cuotas_usd * 100)}%` : '—')
-              }
-            </span>
-            <span className={`${styles.pfBadge} ${styles['pfNivel' + toClassName(moneda === 'ARS' ? interpretaciones.ratio_cuotas_ars.nivel : interpretaciones.ratio_cuotas_usd.nivel)]}`}>
-              {moneda === 'ARS' ? interpretaciones.ratio_cuotas_ars.label : interpretaciones.ratio_cuotas_usd.label}
-            </span>
-            <div className={styles.pfProgressTrack}>
-              <div className={`${styles.pfProgressBar} ${styles['pfProgress' + toClassName(moneda === 'ARS' ? interpretaciones.ratio_cuotas_ars.nivel : interpretaciones.ratio_cuotas_usd.nivel)]} pf-bar-3-${moneda.toLowerCase()}`} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid Inferior: Consistencia, Presupuestos y Suscripciones */}
-      <div className={styles.pfBottomRow}>
-        {/* Indicador 4: Consistencia de Registro */}
-        <div className={styles.pfIndicatorBox}>
-          <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Consistencia de registro</span>
-            <Activity size={18} color="var(--text-3)" />
-          </div>
-          <div className={styles.pfIndicatorValueRow}>
-            <span className={styles.pfIndicatorValue}>
-              {perfil.consistencia_registro !== null ? `${Math.round(perfil.consistencia_registro * 100)}%` : '—'}
-            </span>
-            <span className={`${styles.pfBadge} ${styles['pfNivel' + toClassName(interpretaciones.consistencia_registro.nivel)]}`}>
-              {interpretaciones.consistencia_registro.label}
-            </span>
-            <div className={styles.pfProgressTrack}>
-              <div className={`${styles.pfProgressBar} ${styles['pfProgress' + toClassName(interpretaciones.consistencia_registro.nivel)]} pf-bar-4`} />
-            </div>
-          </div>
-        </div>
-
-        {/* Indicador 5: Cumplimiento de Presupuestos */}
-        <div className={styles.pfIndicatorBox}>
-          <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Uso de presupuestos</span>
-            <PieChart size={18} color="var(--text-3)" />
-          </div>
-          <div className={styles.pfIndicatorValueRow}>
-            <span className={styles.pfIndicatorValue}>
-              {perfil.cumplimiento_presupuesto !== null ? `${Math.round(perfil.cumplimiento_presupuesto * 100)}%` : '—'}
-            </span>
-            <span className={`${styles.pfBadge} ${styles['pfNivel' + toClassName(interpretaciones.cumplimiento_presupuesto.nivel)]}`}>
-              {interpretaciones.cumplimiento_presupuesto.label}
-            </span>
-            <div className={styles.pfProgressTrack}>
-              <div className={`${styles.pfProgressBar} ${styles['pfProgress' + toClassName(interpretaciones.cumplimiento_presupuesto.nivel)]} pf-bar-5`} />
-            </div>
-          </div>
-        </div>
-
-        {/* Indicador 6: Suscripciones */}
-        <div className={styles.pfIndicatorBox}>
-          <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Gasto en suscripciones</span>
-            <Calendar size={18} color="var(--text-3)" />
-          </div>
-          <div className={styles.pfIndicatorValueRow}>
-            <span className={styles.pfIndicatorValue}>
-              {moneda === 'ARS'
-                ? (perfil.porcentaje_suscripciones_ars !== null ? `${Math.round(perfil.porcentaje_suscripciones_ars * 100)}%` : '—')
-                : (perfil.porcentaje_suscripciones_usd !== null ? `${Math.round(perfil.porcentaje_suscripciones_usd * 100)}%` : '—')
-              }
-            </span>
-            <span className={`${styles.pfBadge} ${styles['pfNivel' + toClassName(moneda === 'ARS' ? interpretaciones.porcentaje_suscripciones_ars.nivel : interpretaciones.porcentaje_suscripciones_usd.nivel)]}`}>
-              {moneda === 'ARS' ? interpretaciones.porcentaje_suscripciones_ars.label : interpretaciones.porcentaje_suscripciones_usd.label}
-            </span>
-            <div className={styles.pfProgressTrack}>
-              <div className={`${styles.pfProgressBar} ${styles['pfProgress' + toClassName(moneda === 'ARS' ? interpretaciones.porcentaje_suscripciones_ars.nivel : interpretaciones.porcentaje_suscripciones_usd.nivel)]} pf-bar-6-${moneda.toLowerCase()}`} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.pfBottomRow}>
-        <div className={styles.pfIndicatorBox}>
-          <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Ingreso típico</span>
-            <TrendingUp size={18} color="var(--text-3)" />
-          </div>
-          <span className={styles.pfIndicatorValue}>{perfilNuevo.ingreso_tipico_ars !== null ? `${Math.round(perfilNuevo.ingreso_tipico_ars).toLocaleString('es-AR')}` : '—'}</span>
-          <span className={styles.pfBadge}>Percentil actual {perfilNuevo.ingreso_actual_percentil !== null ? `${Math.round(perfilNuevo.ingreso_actual_percentil * 100)}%` : '—'}</span>
-        </div>
+        {/* Indicador 2: Gasto Comprometido */}
         <div className={styles.pfIndicatorBox}>
           <div className={styles.pfIndicatorHeader}>
             <span className={styles.pfIndicatorLabel}>Gasto comprometido</span>
             <CreditCard size={18} color="var(--text-3)" />
           </div>
-          <span className={styles.pfIndicatorValue}>{perfilNuevo.gasto_comprometido_ratio !== null ? `${Math.round(perfilNuevo.gasto_comprometido_ratio * 100)}%` : '—'}</span>
-          <span className={styles.pfBadge}>Relativo a tu ingreso típico</span>
+          <div className={styles.pfIndicatorValueRow}>
+            <span className={styles.pfIndicatorValue}>
+              {perfilNuevo.gasto_comprometido_ratio !== null ? `${Math.round(perfilNuevo.gasto_comprometido_ratio * 100)}%` : '—'}
+            </span>
+            <span className={styles.pfIndicatorSubtext}>
+              {interps.gasto_comprometido || `${Math.round((perfilNuevo.gasto_comprometido_ratio || 0) * 100)}% de tu ingreso típico`}
+            </span>
+          </div>
         </div>
+
+        {/* Indicador 3: Gasto en Hábitos */}
         <div className={styles.pfIndicatorBox}>
           <div className={styles.pfIndicatorHeader}>
-            <span className={styles.pfIndicatorLabel}>Confianza del análisis</span>
+            <span className={styles.pfIndicatorLabel}>Gasto en hábitos</span>
+            <Coffee size={18} color="var(--text-3)" />
+          </div>
+          <div className={styles.pfIndicatorValueRow}>
+            <span className={styles.pfIndicatorValue}>
+              {perfilNuevo.gasto_habitos_ratio != null ? `${Math.round(perfilNuevo.gasto_habitos_ratio * 100)}%` : '—'}
+            </span>
+            <span className={styles.pfIndicatorSubtext}>
+              {interps.gasto_habitos || (perfilNuevo.gasto_habitos_ratio != null ? `${Math.round(perfilNuevo.gasto_habitos_ratio * 100)}% de tu ingreso típico` : 'Sin datos')}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid Inferior: Cobertura, Volatilidad e Ingreso */}
+      <div className={styles.pfBottomRow}>
+        {/* Indicador 4: Meses de Cobertura (Runway) */}
+        <div className={styles.pfIndicatorBox}>
+          <div className={styles.pfIndicatorHeader}>
+            <span className={styles.pfIndicatorLabel}>Meses de cobertura</span>
+            <ShieldCheck size={18} color="var(--text-3)" />
+          </div>
+          <div className={styles.pfIndicatorValueRow}>
+            <span className={styles.pfIndicatorValue}>
+              {perfilNuevo.runway_meses !== null ? `${perfilNuevo.runway_meses.toFixed(1)} meses` : '—'}
+            </span>
+            <span className={styles.pfIndicatorSubtext}>
+              {interps.runway || 'Liquidez disponible sobre tu gasto mensual típico'}
+            </span>
+          </div>
+        </div>
+
+        {/* Indicador 5: Volatilidad de Variables */}
+        <div className={styles.pfIndicatorBox}>
+          <div className={styles.pfIndicatorHeader}>
+            <span className={styles.pfIndicatorLabel}>Volatilidad de variables</span>
             <Activity size={18} color="var(--text-3)" />
           </div>
-          <span className={styles.pfIndicatorValue}>{perfilNuevo.nivel_confianza}</span>
-          <span className={styles.pfBadge}>{perfilNuevo.ciclos_con_datos} ciclos con datos</span>
+          <div className={styles.pfIndicatorValueRow}>
+            <span className={styles.pfIndicatorValue}>
+              {perfilNuevo.volatilidad_gasto_variable !== null ? `±${Math.round(perfilNuevo.volatilidad_gasto_variable * 100)}%` : '—'}
+            </span>
+            <span className={styles.pfIndicatorSubtext}>
+              {interps.volatilidad || 'Dispersión típica respecto de tu mediana mensual'}
+            </span>
+          </div>
         </div>
+
+        {/* Indicador 6: Ingreso Típico */}
+        <div className={styles.pfIndicatorBox}>
+          <div className={styles.pfIndicatorHeader}>
+            <span className={styles.pfIndicatorLabel}>Ingreso típico mensual</span>
+            <TrendingUp size={18} color="var(--text-3)" />
+          </div>
+          <div className={styles.pfIndicatorValueRow}>
+            <span className={styles.pfIndicatorValue}>
+              {perfilNuevo.ingreso_tipico_ars !== null ? `$${Math.round(perfilNuevo.ingreso_tipico_ars).toLocaleString('es-AR')}` : '—'}
+            </span>
+            <span className={styles.pfIndicatorSubtext}>
+              {interps.ingreso_tipico || 'Mediana histórica deflactada'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Advertencia metodológica si aplica */}
+      {perfilNuevo.calidad_registro_advertencia && (
+        <div className={styles.pfQualityNotice}>
+          <AlertCircle size={18} />
+          <span>{perfilNuevo.calidad_registro_advertencia}</span>
+        </div>
+      )}
+
+      {/* Footer de confianza del análisis */}
+      <div className={styles.pfConfidenceFooter}>
+        <span>Nivel de confianza: <strong>{perfilNuevo.nivel_confianza.toUpperCase()}</strong></span>
+        <span>{perfilNuevo.ciclos_con_datos} ciclos con datos observados ({Math.round(perfilNuevo.cobertura_registro * 100)}% continuidad activa)</span>
       </div>
     </div>
   )

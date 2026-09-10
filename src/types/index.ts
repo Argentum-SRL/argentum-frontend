@@ -355,23 +355,24 @@ export interface Proyeccion {
     dias_restantes: number
     dias_totales: number
   }
-  gasto_proyectado_total: number
-  rango: { piso: number; central: number; techo: number }
-  rango_poco_informativo: boolean
-  balance_proyectado: number
-  ingresos_proyectados: number
+  gasto_proyectado_total: number | null
+  rango: { piso: number; central: number; techo: number } | null
+  rango_poco_informativo?: boolean | null
+  balance_proyectado: number | null
+  ingresos_proyectados: number | null
   certezas: {
     cuotas_restantes: number
     suscripciones_restantes: number
+    compromisos_restantes?: number
     total: number
   }
-  desglose_por_categoria: ProyeccionCategoria[]
-  nivel_confianza: 'alto' | 'medio' | 'bajo' | 'sin_datos' | 'inicial' | 'alta' | 'media' | 'baja'
-  ciclos_analizados: number
-  pesos: { historial: number; ciclo_actual: number }
-  advertencias: string[]
-  datos_suficientes: boolean
-  clasificacion: { comprometidos: number; recurrentes_detectados: number; variables: number }
+  desglose_por_categoria: ProyeccionCategoria[] | null
+  nivel_confianza?: 'alto' | 'medio' | 'bajo' | 'sin_datos' | 'inicial' | 'alta' | 'media' | 'baja' | null
+  ciclos_analizados?: number
+  pesos?: { historial: number; ciclo_actual: number } | null
+  advertencias?: string[]
+  datos_suficientes?: boolean
+  clasificacion?: { comprometidos: number; recurrentes_detectados: number; variables: number } | null
   distribucion?: Record<string, number> | null
   intervalos?: {
     intervalo_50: { piso: number; techo: number }
@@ -381,9 +382,10 @@ export interface Proyeccion {
   descomposicion?: {
     cierto: number
     recurrente_ya_ocurrido: number
-    variable_proyectado: number
+    variable_proyectado: number | null
   } | null
   mensaje_insuficiente?: string | null
+  mensaje?: string | null
   calibracion?: {
     pasa_puerta: boolean
     ciclos_evaluados: number
@@ -391,7 +393,7 @@ export interface Proyeccion {
     cobertura_80?: number | null
     cobertura_95?: number | null
     ancho_medio_80_rel?: number | null
-    motivo?: 'pocos_ciclos' | 'cobertura_insuficiente' | 'intervalo_no_informativo' | null
+    motivo?: 'pocos_ciclos' | 'cobertura_insuficiente' | 'intervalo_no_informativo' | 'calibracion_pendiente' | string | null
     mensaje?: string | null
   } | null
 }

@@ -32,7 +32,16 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
   const [expanded, setExpanded] = useState(false)
   const { open } = useModal()
 
+  const pasaPuerta = Boolean(
+    proyeccion.calibracion?.pasa_puerta &&
+    proyeccion.datos_suficientes &&
+    proyeccion.gasto_proyectado_total !== null
+  )
+
   const { progressPercent } = useMemo(() => {
+    if (!proyeccion.desglose_por_categoria || proyeccion.gasto_proyectado_total === null) {
+      return { progressPercent: 0 }
+    }
     const actual = proyeccion.desglose_por_categoria.reduce((acc, cat) => acc + (cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0), 0)
     const totalProyectado = proyeccion.gasto_proyectado_total > 0 ? proyeccion.gasto_proyectado_total : 1
     const percent = Math.max(0, Math.min(Math.round((actual / totalProyectado) * 100), 100))
@@ -46,7 +55,6 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
     certezas,
     rango,
     nivel_confianza,
-    datos_suficientes,
     mensaje_insuficiente,
     intervalos,
   } = proyeccion
@@ -68,7 +76,7 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
         </button>
       </div>
 
-      {!datos_suficientes ? (
+      {!pasaPuerta ? (
         <>
           <div style={{
             padding: '12px 14px',
@@ -77,31 +85,13 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
             fontSize: '0.8125rem',
             color: 'var(--text-2)',
             lineHeight: 1.4,
-            borderLeft: '3px solid var(--primary)'
+            borderLeft: '3px solid var(--primary)',
+            marginBottom: '1rem'
           }}>
-            {mensaje_insuficiente || 'Mostramos tus compromisos ciertos (cuotas y suscripciones). Se requieren al menos 3 ciclos registrados para proyectar gastos variables con calibración probabilística.'}
+            {proyeccion.mensaje || mensaje_insuficiente || proyeccion.calibracion?.mensaje || 'Mostramos tus compromisos ciertos (cuotas y suscripciones).'}
           </div>
 
-          <div className={styles.mainStats}>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Compromisos ciertos</span>
-              <span className={styles.statValue}>{formatMonto(certezas.total, moneda)}</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Gasto variable</span>
-              <span className={styles.statValue} style={{ fontSize: '0.9375rem', color: 'var(--text-3)' }}>Sin proyección</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Total cierto</span>
-              <span className={styles.statValue}>{formatMonto(gasto_proyectado_total, moneda)}</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Confianza</span>
-              <span className={styles.statValue}>{nivel_confianza}</span>
-            </div>
-          </div>
-
-          <div className={styles.certezasSection} style={{ marginTop: '0.5rem' }}>
+          <div className={styles.certezasSection}>
             <h3 className={styles.sectionTitle}>Compromisos ciertos del ciclo</h3>
             <div className={styles.certezaItem}>
               <span className={styles.certezaLabel}>Cuotas pendientes</span>
@@ -111,6 +101,12 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
               <span className={styles.certezaLabel}>Suscripciones pendientes</span>
               <span className={styles.certezaValue}>{formatMonto(certezas.suscripciones_restantes, moneda)}</span>
             </div>
+            {(certezas.compromisos_restantes ?? 0) > 0 && (
+              <div className={styles.certezaItem}>
+                <span className={styles.certezaLabel}>Otros compromisos pendientes</span>
+                <span className={styles.certezaValue}>{formatMonto(certezas.compromisos_restantes ?? 0, moneda)}</span>
+              </div>
+            )}
             <div className={`${styles.certezaItem} ${styles.certezaTotal}`}>
               <span className={styles.certezaLabel}>Total compromisos</span>
               <span className={`${styles.certezaValue} ${styles.certezaTotalValue}`}>
@@ -143,17 +139,17 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
           <div className={styles.mainStats}>
             <div className={styles.statItem}>
               <span className={styles.statLabel}>Gasto proyectado (mediana)</span>
-              <span className={styles.statValue}>{formatMonto(gasto_proyectado_total, moneda)}</span>
+              <span className={styles.statValue}>{formatMonto(gasto_proyectado_total ?? 0, moneda)}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statLabel}>Balance estimado</span>
-              <span className={`${styles.balanceValue} ${balance_proyectado >= 0 ? styles.positive : styles.negative}`}>
-                {formatMonto(balance_proyectado, moneda)}
+              <span className={`${styles.balanceValue} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
+                {formatMonto(balance_proyectado ?? 0, moneda)}
               </span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statLabel}>Rango probable (80%)</span>
-              <span className={styles.statValue}>{formatMonto(rango.piso, moneda)} a {formatMonto(rango.techo, moneda)}</span>
+              <span className={styles.statValue}>{formatMonto(rango?.piso ?? 0, moneda)} a {formatMonto(rango?.techo ?? 0, moneda)}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statLabel}>Confianza</span>
@@ -210,7 +206,7 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
 
               <div className={styles.categoryList}>
                 <h3 className={styles.sectionTitle}>Gasto por categoría</h3>
-                {desglose_por_categoria.map((cat, i) => {
+                {(desglose_por_categoria ?? []).map((cat, i) => {
                   const catActual = cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0
                   const catTotal = cat.proyectado > 0 ? cat.proyectado : 1
                   const catProgress = Math.max(0, Math.min(Math.round((catActual / catTotal) * 100), 100))
@@ -245,6 +241,12 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
                   <span className={styles.certezaLabel}>Suscripciones pendientes</span>
                   <span className={styles.certezaValue}>{formatMonto(certezas.suscripciones_restantes, moneda)}</span>
                 </div>
+                {(certezas.compromisos_restantes ?? 0) > 0 && (
+                  <div className={styles.certezaItem}>
+                    <span className={styles.certezaLabel}>Otros compromisos pendientes</span>
+                    <span className={styles.certezaValue}>{formatMonto(certezas.compromisos_restantes ?? 0, moneda)}</span>
+                  </div>
+                )}
                 <div className={`${styles.certezaItem} ${styles.certezaTotal}`}>
                   <span className={styles.certezaLabel}>Total compromisos</span>
                   <span className={`${styles.certezaValue} ${styles.certezaTotalValue}`}>
@@ -328,16 +330,16 @@ const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: external
     proyeccion.ars && (
       proyeccion.ars.datos_suficientes ||
       proyeccion.ars.certezas?.total > 0 ||
-      proyeccion.ars.gasto_proyectado_total > 0 ||
-      proyeccion.ars.ciclos_analizados >= 0
+      (proyeccion.ars.gasto_proyectado_total !== null && (proyeccion.ars.gasto_proyectado_total ?? 0) > 0) ||
+      (proyeccion.ars.ciclos_analizados ?? 0) >= 0
     )
   )
   const hasUsd = Boolean(
     proyeccion.usd && (
       proyeccion.usd.datos_suficientes ||
       proyeccion.usd.certezas?.total > 0 ||
-      proyeccion.usd.gasto_proyectado_total > 0 ||
-      proyeccion.usd.ingresos_proyectados > 0
+      (proyeccion.usd.gasto_proyectado_total !== null && (proyeccion.usd.gasto_proyectado_total ?? 0) > 0) ||
+      (proyeccion.usd.ingresos_proyectados !== null && (proyeccion.usd.ingresos_proyectados ?? 0) > 0)
     )
   )
 

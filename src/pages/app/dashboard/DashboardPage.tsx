@@ -29,7 +29,7 @@ import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
 
 import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from './DashboardPage.module.css'
@@ -939,14 +939,18 @@ export default function DashboardPage() {
       </div>
 
       {/* Perfil Financiero */}
-      <PerfilFinancieroCard moneda={moneda} />
+      <WidgetErrorBoundary title="Perfil financiero">
+        <PerfilFinancieroCard moneda={moneda} />
+      </WidgetErrorBoundary>
 
       {/* ── Bottom Row (2 Cols) ───────────────────────────────────────────── */}
       <div className={styles.bottomRow}>
         {/* Col 1: Proyección */}
         {!customRange && (
           <div className={styles.proyeccionSection}>
-            <ProyeccionCard data={proyeccion} loading={loadingProyeccion} moneda={moneda} />
+            <WidgetErrorBoundary title="Proyección">
+              <ProyeccionCard data={proyeccion} loading={loadingProyeccion} moneda={moneda} />
+            </WidgetErrorBoundary>
           </div>
         )}
 

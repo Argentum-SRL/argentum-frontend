@@ -159,6 +159,21 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
 
   const interps = perfilNuevo.interpretaciones_relativas || {}
 
+  // Normalización defensiva de números (soporta number, string numérico o null)
+  const toNum = (val: unknown): number | null => {
+    if (val === null || val === undefined || val === '') return null
+    const n = Number(val)
+    return isNaN(n) ? null : n
+  }
+
+  const capAhorro = toNum(perfilNuevo.capacidad_ahorro)
+  const gastoCompRatio = toNum(perfilNuevo.gasto_comprometido_ratio)
+  const gastoHabitosRatio = toNum(perfilNuevo.gasto_habitos_ratio)
+  const runway = toNum(perfilNuevo.runway_meses)
+  const volatilidad = toNum(perfilNuevo.volatilidad_gasto_variable)
+  const ingresoTipico = toNum(perfilNuevo.ingreso_tipico_ars)
+  const cobertura = toNum(perfilNuevo.cobertura_registro)
+
   return (
     <div className={styles.pfCard}>
       {/* Header */}
@@ -190,10 +205,10 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
           </div>
           <div className={styles.pfIndicatorValueRow}>
             <span className={styles.pfIndicatorValue}>
-              {perfilNuevo.capacidad_ahorro !== null ? `${Math.round(perfilNuevo.capacidad_ahorro * 100)}%` : '—'}
+              {capAhorro !== null ? `${Math.round(capAhorro * 100)}%` : '—'}
             </span>
             <span className={styles.pfIndicatorSubtext}>
-              {interps.capacidad_ahorro || (perfilNuevo.capacidad_ahorro !== null ? `${Math.round(perfilNuevo.capacidad_ahorro * 100)}% de tu ingreso típico` : 'Sin datos de ingreso')}
+              {interps.capacidad_ahorro || (capAhorro !== null ? `${Math.round(capAhorro * 100)}% de tu ingreso típico` : 'Sin datos de ingreso')}
             </span>
           </div>
         </div>
@@ -206,10 +221,10 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
           </div>
           <div className={styles.pfIndicatorValueRow}>
             <span className={styles.pfIndicatorValue}>
-              {perfilNuevo.gasto_comprometido_ratio !== null ? `${Math.round(perfilNuevo.gasto_comprometido_ratio * 100)}%` : '—'}
+              {gastoCompRatio !== null ? `${Math.round(gastoCompRatio * 100)}%` : '—'}
             </span>
             <span className={styles.pfIndicatorSubtext}>
-              {interps.gasto_comprometido || `${Math.round((perfilNuevo.gasto_comprometido_ratio || 0) * 100)}% de tu ingreso típico`}
+              {interps.gasto_comprometido || `${Math.round((gastoCompRatio || 0) * 100)}% de tu ingreso típico`}
             </span>
           </div>
         </div>
@@ -222,10 +237,10 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
           </div>
           <div className={styles.pfIndicatorValueRow}>
             <span className={styles.pfIndicatorValue}>
-              {perfilNuevo.gasto_habitos_ratio != null ? `${Math.round(perfilNuevo.gasto_habitos_ratio * 100)}%` : '—'}
+              {gastoHabitosRatio !== null ? `${Math.round(gastoHabitosRatio * 100)}%` : '—'}
             </span>
             <span className={styles.pfIndicatorSubtext}>
-              {interps.gasto_habitos || (perfilNuevo.gasto_habitos_ratio != null ? `${Math.round(perfilNuevo.gasto_habitos_ratio * 100)}% de tu ingreso típico` : 'Sin datos')}
+              {interps.gasto_habitos || (gastoHabitosRatio !== null ? `${Math.round(gastoHabitosRatio * 100)}% de tu ingreso típico` : 'Sin datos')}
             </span>
           </div>
         </div>
@@ -241,7 +256,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
           </div>
           <div className={styles.pfIndicatorValueRow}>
             <span className={styles.pfIndicatorValue}>
-              {perfilNuevo.runway_meses !== null ? `${perfilNuevo.runway_meses.toFixed(1)} meses` : '—'}
+              {runway !== null ? `${runway.toFixed(1)} meses` : '—'}
             </span>
             <span className={styles.pfIndicatorSubtext}>
               {interps.runway || 'Liquidez disponible sobre tu gasto mensual típico'}
@@ -257,7 +272,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
           </div>
           <div className={styles.pfIndicatorValueRow}>
             <span className={styles.pfIndicatorValue}>
-              {perfilNuevo.volatilidad_gasto_variable !== null ? `±${Math.round(perfilNuevo.volatilidad_gasto_variable * 100)}%` : '—'}
+              {volatilidad !== null ? `±${Math.round(volatilidad * 100)}%` : '—'}
             </span>
             <span className={styles.pfIndicatorSubtext}>
               {interps.volatilidad || 'Dispersión típica respecto de tu mediana mensual'}
@@ -273,7 +288,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
           </div>
           <div className={styles.pfIndicatorValueRow}>
             <span className={styles.pfIndicatorValue}>
-              {perfilNuevo.ingreso_tipico_ars !== null ? `$${Math.round(perfilNuevo.ingreso_tipico_ars).toLocaleString('es-AR')}` : '—'}
+              {ingresoTipico !== null ? `$${Math.round(ingresoTipico).toLocaleString('es-AR')}` : '—'}
             </span>
             <span className={styles.pfIndicatorSubtext}>
               {interps.ingreso_tipico || 'Mediana histórica deflactada'}
@@ -293,7 +308,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
       {/* Footer de confianza del análisis */}
       <div className={styles.pfConfidenceFooter}>
         <span>Nivel de confianza: <strong>{perfilNuevo.nivel_confianza.toUpperCase()}</strong></span>
-        <span>{perfilNuevo.ciclos_con_datos} ciclos con datos observados ({Math.round(perfilNuevo.cobertura_registro * 100)}% continuidad activa)</span>
+        <span>{perfilNuevo.ciclos_con_datos} ciclos con datos observados ({cobertura !== null ? Math.round(cobertura * 100) : 0}% continuidad activa)</span>
       </div>
     </div>
   )

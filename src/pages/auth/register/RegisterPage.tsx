@@ -1,4 +1,4 @@
-import { type FormEvent, useState, useEffect, useCallback } from 'react'
+import { type FormEvent, useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
@@ -11,6 +11,26 @@ import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from './RegisterPage.module.css'
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement | string,
+        options: {
+          sitekey: string
+          theme?: 'light' | 'dark' | 'auto'
+          callback?: (token: string) => void
+          'expired-callback'?: () => void
+          'error-callback'?: (err?: unknown) => void
+        }
+      ) => string
+      reset: (widgetId?: string) => void
+      remove: (widgetId: string) => void
+      getResponse: (widgetId?: string) => string
+    }
+  }
+}
 
 const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
@@ -45,6 +65,78 @@ export default function RegisterPage() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [aceptaTerminos, setAceptaTerminos] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const turnstileContainerRef = useRef<HTMLDivElement>(null)
+  const widgetIdRef = useRef<string | null>(null)
+  const siteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.TURNSTILE_SITE_KEY || '') as string
+
+  useEffect(() => {
+    let isMounted = true
+
+    const renderWidget = () => {
+      if (!isMounted || !window.turnstile || !turnstileContainerRef.current || widgetIdRef.current || !siteKey) {
+        return
+      }
+      try {
+        widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+          sitekey: siteKey,
+          theme: 'auto',
+          callback: (token: string) => {
+            if (isMounted) {
+              setTurnstileToken(token)
+              setApiError(null)
+            }
+          },
+          'expired-callback': () => {
+            if (isMounted) {
+              setTurnstileToken('')
+            }
+          },
+          'error-callback': () => {
+            if (isMounted) {
+              setTurnstileToken('')
+              setApiError('Error al validar el captcha de Turnstile. Recargá la página.')
+            }
+          },
+        })
+      } catch (e) {
+        if (import.meta.env.DEV) {
+          console.error('[Turnstile] Error rendering widget:', e)
+        }
+      }
+    }
+
+    const scriptId = 'cf-turnstile-script'
+    let script = document.getElementById(scriptId) as HTMLScriptElement | null
+
+    if (!script) {
+      script = document.createElement('script')
+      script.id = scriptId
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      script.async = true
+      script.defer = true
+      script.onload = () => {
+        renderWidget()
+      }
+      document.head.appendChild(script)
+    } else if (window.turnstile) {
+      renderWidget()
+    } else {
+      script.addEventListener('load', renderWidget)
+    }
+
+    return () => {
+      isMounted = false
+      if (widgetIdRef.current && window.turnstile) {
+        try {
+          window.turnstile.remove(widgetIdRef.current)
+        } catch {
+          // ignore
+        }
+        widgetIdRef.current = null
+      }
+    }
+  }, [siteKey])
 
   const logGoogleError = (stage: string, error: unknown) => {
     if (!import.meta.env.DEV) return
@@ -73,14 +165,25 @@ export default function RegisterPage() {
     const pError = validatePassword(password)
     const cpError = validatePasswordConfirmation(password, confirmPassword)
 
-
     if (nError || aError || eError || pError || cpError || !aceptaTerminos) {
       return
     }
+
+    if (!turnstileToken) {
+      setApiError('Por favor completá la verificación de seguridad (captcha).')
+      return
+    }
+
     setLoading(true)
     setApiError(null)
     try {
-      const respuesta = await registerWithEmail({ nombre, apellido, email, password })
+      const respuesta = await registerWithEmail({
+        nombre,
+        apellido,
+        email,
+        password,
+        turnstile_token: turnstileToken,
+      })
       
       if (respuesta.access_token) {
         login(respuesta)
@@ -227,9 +330,13 @@ export default function RegisterPage() {
           </label>
         </div>
 
+        <div className={styles.turnstileWrap}>
+          <div ref={turnstileContainerRef} />
+        </div>
+
         {apiError && <p className={styles.error}>{apiError}</p>}
 
-        <button type="submit" disabled={loading || !aceptaTerminos} className={styles.submitBtn}>
+        <button type="submit" disabled={loading || !aceptaTerminos || !turnstileToken} className={styles.submitBtn}>
           {loading ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>
 

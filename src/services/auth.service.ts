@@ -14,6 +14,7 @@ export interface RegisterPayload {
   email: string
   telefono?: string
   password: string
+  turnstile_token?: string
 }
 
 export interface CompletarPerfilPayload {
@@ -49,6 +50,9 @@ export async function registerWithEmail(payload: RegisterPayload): Promise<AuthR
   }
   if (payload.telefono?.trim()) {
     body.telefono = payload.telefono.trim()
+  }
+  if (payload.turnstile_token?.trim()) {
+    body.turnstile_token = payload.turnstile_token.trim()
   }
   const { data } = await api.post<AuthResponse>('/auth/register', body)
   guardarTokensSiPresentes(data)

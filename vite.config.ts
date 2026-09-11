@@ -12,6 +12,9 @@ const cacheDir = process.env.LOCALAPPDATA
 
 export default defineConfig({
   cacheDir,
+  define: {
+    'import.meta.env.TURNSTILE_SITE_KEY': JSON.stringify(process.env.TURNSTILE_SITE_KEY || process.env.VITE_TURNSTILE_SITE_KEY || ''),
+  },
   plugins: [
     react(),
     VitePWA({

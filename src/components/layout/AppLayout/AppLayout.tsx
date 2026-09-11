@@ -11,6 +11,7 @@ import { useNotificaciones } from '@/hooks/useNotificaciones'
 import NotificacionesDrawer from '@/components/notificaciones/NotificacionesDrawer'
 import SearchModal from './SearchModal'
 import MobileBottomNav from '@/components/layout/MobileBottomNav/MobileBottomNav'
+import MobileMoreSheet from '@/components/layout/MobileBottomNav/MobileMoreSheet'
 import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from './AppLayout.module.css'
 
@@ -216,71 +217,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* ── Mobile bottom nav ────────────────────── */}
       <MobileBottomNav isMoreOpen={isMoreOpen} onToggleMore={() => setIsMoreOpen((v) => !v)} />
 
-      {/* ── Bottom sheet "Más" ───────────────────── */}
-      {isMoreOpen && (
-        <>
-          <div className={styles.moreOverlay} onClick={() => setIsMoreOpen(false)} />
-          <div className={styles.moreSheet}>
-            <p className={styles.moreSheetTitle}>Más opciones</p>
-            {NAV_FINANCIAL.slice(1).map(({ label, path, Icon }) => (
-              <Link
-                key={path}
-                to={path}
-                className={[styles.moreItem, isActive(path) ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
-              >
-                <Icon size={22} strokeWidth={1.75} />
-                <span>{label}</span>
-              </Link>
-            ))}
-
-            {is_admin && (
-              <>
-                <Link
-                  to="/app/herramientas"
-                  className={[styles.moreItem, isActive('/app/herramientas') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
-                >
-                  <Calculator size={22} strokeWidth={1.75} />
-                  <span>Herramientas</span>
-                </Link>
-                <Link
-                  to="/admin"
-                  className={[styles.moreItem, isActive('/admin') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
-                >
-                  <Shield size={22} strokeWidth={1.75} />
-                  <span>Módulo Admin</span>
-                </Link>
-              </>
-            )}
-
-            <div className={styles.moreSeparator} />
-
-            <Link
-              to="/app/perfil"
-              className={[styles.moreItem, isActive('/app/perfil') ? styles.moreItemActive : ''].filter(Boolean).join(' ')}
-              onClick={() => setIsMoreOpen(false)}
-            >
-              <User size={22} strokeWidth={1.75} />
-              <span>Mi perfil</span>
-            </Link>
-
-            <button className={styles.moreItem} onClick={() => toggleTheme()}>
-              {theme === 'dark' ? <Sun size={22} strokeWidth={1.75} /> : <Moon size={22} strokeWidth={1.75} />}
-              <span>Modo {theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
-            </button>
-
-            <button 
-              className={`${styles.moreItem} ${styles.moreItemDanger}`}
-              onClick={() => {
-                setIsMoreOpen(false);
-                void logout();
-              }}
-            >
-              <LogOut size={22} strokeWidth={1.75} />
-              <span>Cerrar Sesión</span>
-            </button>
-          </div>
-        </>
-      )}
+      {/* ── Mobile More Options Sheet ─────────────── */}
+      <MobileMoreSheet
+        isOpen={isMoreOpen}
+        onClose={() => setIsMoreOpen(false)}
+        isAdmin={!!is_admin}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        onLogout={() => void logout()}
+        currentPath={location.pathname}
+      />
 
       {/* ── Main content ─────────────────────────── */}
       <main className={styles.main}>

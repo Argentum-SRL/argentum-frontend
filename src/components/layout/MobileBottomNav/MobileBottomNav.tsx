@@ -33,6 +33,7 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
   const navigate = useNavigate()
 
   const navRef = useRef<HTMLElement | null>(null)
+  const itemsWrapperRef = useRef<HTMLDivElement | null>(null)
   const indicatorRef = useRef<HTMLDivElement | null>(null)
   const itemRefs = useRef<(HTMLElement | null)[]>([])
 
@@ -143,19 +144,19 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
     }
 
     // Direct continuous indicator movement (zero React re-renders for translation)
-    const navEl = navRef.current
+    const wrapperEl = itemsWrapperRef.current
     const indicatorEl = indicatorRef.current
-    if (!navEl || !indicatorEl) return
+    if (!wrapperEl || !indicatorEl) return
 
-    const navRect = navEl.getBoundingClientRect()
-    const fingerX = e.clientX - navRect.left
+    const wrapperRect = wrapperEl.getBoundingClientRect()
+    const fingerX = e.clientX - wrapperRect.left
     const indicatorWidth = indicatorEl.offsetWidth || 52
     const targetX = fingerX - indicatorWidth / 2
 
     const firstItem = itemRefs.current[0]
     const lastItem = itemRefs.current[4]
-    const minX = firstItem ? firstItem.offsetLeft : 4
-    const maxX = lastItem ? lastItem.offsetLeft : 228
+    const minX = firstItem ? firstItem.offsetLeft : 0
+    const maxX = lastItem ? lastItem.offsetLeft : (wrapperRect.width - indicatorWidth)
 
     const clampedX = Math.max(minX, Math.min(maxX, targetX))
     indicatorEl.style.transform = `translate3d(${clampedX}px, 0, 0)`
@@ -305,11 +306,11 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
       onPointerCancel={handlePointerCancel}
       aria-label="Navegación principal inferior"
     >
-      {/* Physical sliding pill indicator */}
-      <div ref={indicatorRef} className={styles.indicator} aria-hidden="true" />
+      <div ref={itemsWrapperRef} className={styles.itemsWrapper}>
+        {/* Physical sliding pill indicator */}
+        <div ref={indicatorRef} className={styles.indicator} aria-hidden="true" />
 
-      {/* Navigation items */}
-      <div className={styles.itemsWrapper}>
+        {/* Navigation items */}
         {MOBILE_NAV.map(({ label, path, Icon }, idx) => {
           const isActive = activeIndex === idx
           const isPreview = previewIndex === idx

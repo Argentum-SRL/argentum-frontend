@@ -5,17 +5,18 @@
   left: 50%;
   transform: translateX(-50%);
   background: var(--sb-bg);
-  border-radius: 26px;
-  padding: 4px;
+  border-radius: 28px;
+  padding: 5px;
   box-shadow: var(--sb-shadow);
   border: 1px solid var(--sb-border);
-  gap: 4px;
   z-index: 40;
   align-items: center;
   touch-action: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 
 @media (min-width: 768px) {
@@ -24,14 +25,23 @@
   }
 }
 
+.itemsWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  height: 46px;
+}
+
 .indicator {
   position: absolute;
-  top: 4px;
+  top: 0;
   left: 0;
   width: 52px;
-  height: 52px;
-  border-radius: 20px;
+  height: 46px;
+  border-radius: 23px;
   background: var(--sb-active-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   z-index: 1;
   pointer-events: none;
   will-change: transform, opacity;
@@ -39,16 +49,12 @@
   transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1), opacity 150ms ease;
 }
 
-.indicatorDragging {
-  transition: none !important;
+:global([data-theme="dark"]) .indicator {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.itemsWrapper {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  position: relative;
-  z-index: 2;
+.indicatorDragging {
+  transition: none !important;
 }
 
 .mobileNavItem {
@@ -56,8 +62,8 @@
   align-items: center;
   justify-content: center;
   width: 52px;
-  height: 52px;
-  border-radius: 20px;
+  height: 46px;
+  border-radius: 23px;
   color: var(--sb-text);
   text-decoration: none;
   background: transparent;
@@ -68,7 +74,7 @@
   -webkit-tap-highlight-color: transparent;
   position: relative;
   z-index: 2;
-  transition: color 150ms ease, transform 150ms ease;
+  transition: color 150ms ease;
 }
 
 .mobileNavItem:focus-visible {

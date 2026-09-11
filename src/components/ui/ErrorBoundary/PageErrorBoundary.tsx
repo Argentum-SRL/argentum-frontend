@@ -11,7 +11,7 @@ export function PageErrorBoundary() {
 
   useEffect(() => {
     reportarErrorFrontend({
-      mensaje: error?.message || String(error) || 'Error al renderizar la página',
+      mensaje: 'Error al renderizar la página',
       stack: error?.stack || null,
       ruta: location.pathname,
       componente: 'PageErrorBoundary',

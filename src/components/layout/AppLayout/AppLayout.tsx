@@ -2,7 +2,7 @@ import { useId, useState, useEffect, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
-  Bell, Search, MoreHorizontal, Sun, Moon, LogOut, ChevronDown, User,
+  Bell, Search, Sun, Moon, LogOut, ChevronDown, User,
   Calculator, Shield
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -10,6 +10,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import NotificacionesDrawer from '@/components/notificaciones/NotificacionesDrawer'
 import SearchModal from './SearchModal'
+import MobileBottomNav from '@/components/layout/MobileBottomNav/MobileBottomNav'
 import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from './AppLayout.module.css'
 
@@ -46,12 +47,6 @@ const NAV_FINANCIAL = [
   { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: RefreshCw },
 ]
 
-const MOBILE_NAV = [
-  { label: 'Inicio',         path: '/app/dashboard',      Icon: LayoutDashboard },
-  { label: 'Billeteras',     path: '/app/billeteras',     Icon: Wallet          },
-  { label: 'Gastos',         path: '/app/transacciones',  Icon: ArrowUpDown     },
-  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart        },
-]
 
 // ── AppLayout ──────────────────────────────────────────────────────────────
 
@@ -219,32 +214,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {/* ── Mobile bottom nav ────────────────────── */}
-      <nav className={styles.mobileNav}>
-        {MOBILE_NAV.map(({ path, Icon }) => {
-          const active = isActive(path)
-          return (
-            <Link
-              key={path}
-              to={path}
-              className={[styles.mobileNavItem, active ? styles.mobileNavItemActive : ''].filter(Boolean).join(' ')}
-            >
-              <span className={styles.mobileNavIcon}>
-                <Icon size={24} strokeWidth={1.75} />
-              </span>
-            </Link>
-          )
-        })}
-
-        <button
-          className={[styles.mobileNavItem, isMoreOpen ? styles.mobileNavItemActive : ''].filter(Boolean).join(' ')}
-          onClick={() => setIsMoreOpen((v) => !v)}
-          aria-label="Más opciones"
-        >
-          <span className={styles.mobileNavIcon}>
-            <MoreHorizontal size={24} strokeWidth={1.75} />
-          </span>
-        </button>
-      </nav>
+      <MobileBottomNav isMoreOpen={isMoreOpen} onToggleMore={() => setIsMoreOpen((v) => !v)} />
 
       {/* ── Bottom sheet "Más" ───────────────────── */}
       {isMoreOpen && (

@@ -24,11 +24,6 @@
   --sb-sep: rgba(255,255,255,0.08);
 }
 
-/* ── Desktop Sidebar ─────────────────────────────────────────────────────── */
-
-.sidebar {
-  display: none;
-}
 
 @media (min-width: 768px) {
   .standaloneLogo {
@@ -280,37 +275,7 @@
 
 /* Decorative circles removed */
 
-/* ── Nav ─────────────────────────────────────────────────────────────────── */
-
-.nav {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-
-.navSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-}
-
-.navSeparator {
-  width: 28px;
-  height: 1px;
-  background: var(--sb-sep);
-  margin: 4px auto;
-  flex-shrink: 0;
-  transition: width 250ms ease;
-}
-.sidebar:hover .navSeparator {
-  width: calc(100% - 24px);
-}
+/* ── Desktop Top Nav Items ───────────────────────────────────────────────── */
 
 .navItem {
   display: flex;
@@ -513,61 +478,7 @@
   display: block;
 }
 
-/* ── Mobile bottom nav ───────────────────────────────────────────────────── */
 
-.mobileNav {
-  display: flex;
-  position: fixed;
-  bottom: calc(24px + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--sb-bg);
-  border-radius: 26px;
-  padding: 4px;
-  box-shadow: var(--sb-shadow);
-  border: 1px solid var(--sb-border);
-  gap: 4px;
-  z-index: 40;
-  align-items: center;
-}
-
-@media (min-width: 768px) {
-  .mobileNav {
-    display: none;
-  }
-}
-
-.mobileNavItem {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 20px;
-  color: var(--sb-text);
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
-  padding: 0;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.mobileNavItemActive {
-  color: var(--sb-active-text);
-  background: var(--sb-active-bg);
-}
-
-.mobileNavIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  position: relative;
-}
 
 /* ── Bottom sheet "Más" ──────────────────────────────────────────────────── */
 

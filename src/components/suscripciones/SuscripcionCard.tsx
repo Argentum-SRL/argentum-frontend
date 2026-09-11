@@ -1,7 +1,7 @@
 import React from 'react'
 import { Edit2, Play, Pause, Trash2, CreditCard, Wallet, Bell, Calendar, TrendingUp } from 'lucide-react'
 import type { Suscripcion, Billetera, TarjetaCredito } from '@/types'
-import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
+import { findServicioCatalogo } from '@/lib/constants/suscripciones'
 import { formatMonto, formatFecha } from '@/utils/format'
 import styles from './SuscripcionCard.module.css'
 
@@ -24,7 +24,8 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
   onToggleEstado, 
   onDelete 
 }) => {
-  const catalogoItem = CATALOGO_SUSCRIPCIONES.find(c => c.nombre === suscripcion.nombre)
+  const [logoError, setLogoError] = React.useState(false)
+  const catalogoItem = findServicioCatalogo(suscripcion.nombre)
   
   const parseLocalDate = (dateStr: string): Date => {
     if (!dateStr) return new Date()
@@ -86,32 +87,24 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
 
       {/* ZONA TOP: Logo, Nombre y Frecuencia */}
       <div className={styles.header}>
-        <div 
-          className={styles.logoWrapper} 
-          ref={el => {
-            if (el) {
-              el.style.backgroundColor = isBrand ? 'rgba(255,255,255,0.15)' : 'var(--surface-alt)'
-            }
-          }}
-        >
-          {catalogoItem?.logoPath ? (
+        <div className={styles.logoWrapper}>
+          {catalogoItem?.logoPath && !logoError ? (
             <img 
               src={catalogoItem.logoPath} 
               alt={suscripcion.nombre} 
               className={styles.logo}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-                const parent = e.currentTarget.parentElement
-                if (parent) {
-                  const fallback = document.createElement('div')
-                  fallback.className = styles.logoFallback
-                  fallback.innerText = suscripcion.nombre[0]
-                  parent.appendChild(fallback)
-                }
-              }}
+              onError={() => setLogoError(true)}
             />
           ) : (
-            <div className={styles.logoFallback}>{suscripcion.nombre[0]}</div>
+            <div 
+              className={styles.logoFallback}
+              style={{
+                backgroundColor: isBrand ? 'rgba(255, 255, 255, 0.2)' : 'var(--surface-alt)',
+                color: isBrand ? 'white' : 'var(--text-2)'
+              }}
+            >
+              {suscripcion.nombre ? suscripcion.nombre[0].toUpperCase() : '?'}
+            </div>
           )}
         </div>
 

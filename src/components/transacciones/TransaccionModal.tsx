@@ -126,8 +126,8 @@ function formReducer(state: FormState, action: FormAction): FormState {
         // 2. Cualquier otra con saldo > 0
         // 3. Principal (aunque sea 0)
         // 4. La primera activa que haya
-        const best = activas.find(b => b.es_principal && b.saldo_actual > 0) ||
-          activas.find(b => b.saldo_actual > 0) ||
+        const best = activas.find(b => b.es_principal && Number(b.saldo_actual) > 0) ||
+          activas.find(b => Number(b.saldo_actual) > 0) ||
           activas.find(b => b.es_principal) ||
           activas[0]
 
@@ -306,7 +306,7 @@ export default function TransaccionModal({
     return filtered.sort((a, b) => {
       if (a.es_principal && !b.es_principal) return -1
       if (!a.es_principal && b.es_principal) return 1
-      return b.saldo_actual - a.saldo_actual
+      return Number(b.saldo_actual) - Number(a.saldo_actual)
     })
   }, [billeteras, moneda, billeteraId, metodoPago])
 

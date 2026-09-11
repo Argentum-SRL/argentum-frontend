@@ -6,22 +6,22 @@ import { invalidatePresupuestos } from './presupuesto.service'
 
 const goalsService = {
   getGoals: async (activas_solo?: boolean, signal?: AbortSignal): Promise<Goal[]> => {
-    const response = await api.get('/goals', { params: { activas_solo }, signal })
+    const response = await api.get<Goal[]>('/goals', { params: { activas_solo }, signal })
     return response.data
   },
 
   getGoal: async (id: string, signal?: AbortSignal): Promise<Goal> => {
-    const response = await api.get(`/goals/${id}`, { signal })
+    const response = await api.get<Goal>(`/goals/${id}`, { signal })
     return response.data
   },
 
   createGoal: async (data: Partial<Goal>): Promise<Goal> => {
-    const response = await api.post('/goals', data)
+    const response = await api.post<Goal>('/goals', data)
     return response.data
   },
 
   updateGoal: async (id: string, data: Partial<Goal>): Promise<Goal> => {
-    const response = await api.patch(`/goals/${id}`, data)
+    const response = await api.patch<Goal>(`/goals/${id}`, data)
     return response.data
   },
 
@@ -30,7 +30,7 @@ const goalsService = {
   },
 
   addMovement: async (id: string, data: Partial<GoalMovement>): Promise<GoalMovement> => {
-    const response = await api.post(`/goals/${id}/movimientos`, data)
+    const response = await api.post<GoalMovement>(`/goals/${id}/movimientos`, data)
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()
@@ -45,12 +45,12 @@ const goalsService = {
   },
 
   getAnalytics: async (id: string, signal?: AbortSignal): Promise<GoalAnalytics> => {
-    const response = await api.get(`/goals/${id}/analytics`, { signal })
+    const response = await api.get<GoalAnalytics>(`/goals/${id}/analytics`, { signal })
     return response.data
   },
 
   getSummary: async (signal?: AbortSignal): Promise<GoalSummary> => {
-    const response = await api.get('/goals/summary', { signal })
+    const response = await api.get<GoalSummary>('/goals/summary', { signal })
     return response.data
   }
 }

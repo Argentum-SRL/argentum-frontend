@@ -228,11 +228,11 @@ const CategoriasChart = memo(({
     )
   }
 
-  const maxVal = Math.max(...chartData.map(entry => entry.monto), 0)
-  const total = chartData.reduce((acc, curr) => acc + curr.monto, 0)
+  const maxVal = Math.max(...chartData.map(entry => Number(entry.monto)), 0)
+  const total = chartData.reduce((acc, curr) => acc + Number(curr.monto), 0)
 
   const dynamicCSS = chartData.map((entry) => {
-    const val = entry.monto
+    const val = Number(entry.monto)
     const fillPct = maxVal > 0 ? Math.max(0, Math.min(100, (val / maxVal) * 100)) : 0
     const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
     const classPrefix = moneda === 'ARS' ? 'bar-fill-ars' : 'bar-fill-usd'
@@ -453,13 +453,13 @@ export default function DashboardPage() {
   const totalSaldoBilleterasArs = useMemo(() => {
     return billeteras
       .filter(b => b.estado === 'activa' && b.moneda === 'ARS')
-      .reduce((acc, curr) => acc + curr.saldo_actual, 0)
+      .reduce((acc, curr) => acc + Number(curr.saldo_actual), 0)
   }, [billeteras])
 
   const totalSaldoBilleterasUsd = useMemo(() => {
     return billeteras
       .filter(b => b.estado === 'activa' && b.moneda === 'USD')
-      .reduce((acc, curr) => acc + curr.saldo_actual, 0)
+      .reduce((acc, curr) => acc + Number(curr.saldo_actual), 0)
   }, [billeteras])
 
   const getDropdownTriggerText = () => {

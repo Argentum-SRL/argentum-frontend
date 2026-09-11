@@ -34,7 +34,7 @@ export function PageErrorBoundary() {
         </div>
         <h2 className={styles.title}>No pudimos cargar esta página</h2>
         <p className={styles.message}>
-          {error?.message || 'Ocurrió un error inesperado al renderizar el contenido. Podés intentar recargarla o volver al inicio.'}
+          Ocurrió un error inesperado al renderizar el contenido. Podés intentar recargarla o volver al inicio.
         </p>
         <div className={styles.actions}>
           <button type="button" className={styles.retryBtn} onClick={handleRetry}>

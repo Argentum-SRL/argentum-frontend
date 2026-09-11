@@ -81,10 +81,10 @@ export function calcularTotales(
   const activas = billeteras.filter((b) => b.estado === 'activa')
   const totalARS = activas
     .filter((b) => b.moneda === 'ARS')
-    .reduce((acc, b) => acc + b.saldo_actual, 0)
+    .reduce((acc, b) => acc + Number(b.saldo_actual), 0)
   const totalUSD = activas
     .filter((b) => b.moneda === 'USD')
-    .reduce((acc, b) => acc + b.saldo_actual, 0)
+    .reduce((acc, b) => acc + Number(b.saldo_actual), 0)
   const equivalenteTotal = totalARS + totalUSD * cotizacionUSD
 
   return { totalARS, totalUSD, equivalenteTotal }

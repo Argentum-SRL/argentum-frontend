@@ -24,36 +24,36 @@ const presupuestoService = {
       return cached
     }
 
-    const response = await api.get('/presupuestos', { params: { estado }, signal })
+    const response = await api.get<Presupuesto[]>('/presupuestos', { params: { estado }, signal })
     presupuestosCache.set(key, response.data)
     return response.data
   },
 
   getPresupuesto: async (id: string, signal?: AbortSignal): Promise<Presupuesto> => {
-    const response = await api.get(`/presupuestos/${id}`, { signal })
+    const response = await api.get<Presupuesto>(`/presupuestos/${id}`, { signal })
     return response.data
   },
 
   createPresupuesto: async (data: PresupuestoCreate): Promise<Presupuesto> => {
-    const response = await api.post('/presupuestos', data)
+    const response = await api.post<Presupuesto>('/presupuestos', data)
     invalidatePresupuestos()
     return response.data
   },
 
   updatePresupuesto: async (id: string, data: PresupuestoUpdate): Promise<Presupuesto> => {
-    const response = await api.put(`/presupuestos/${id}`, data)
+    const response = await api.put<Presupuesto>(`/presupuestos/${id}`, data)
     invalidatePresupuestos()
     return response.data
   },
 
   pausarPresupuesto: async (id: string): Promise<Presupuesto> => {
-    const response = await api.post(`/presupuestos/${id}/pausar`)
+    const response = await api.post<Presupuesto>(`/presupuestos/${id}/pausar`)
     invalidatePresupuestos()
     return response.data
   },
 
   reanudarPresupuesto: async (id: string): Promise<Presupuesto> => {
-    const response = await api.post(`/presupuestos/${id}/reanudar`)
+    const response = await api.post<Presupuesto>(`/presupuestos/${id}/reanudar`)
     invalidatePresupuestos()
     return response.data
   },
@@ -64,7 +64,7 @@ const presupuestoService = {
   },
 
   getHistorial: async (id: string, signal?: AbortSignal): Promise<PeriodoPresupuesto[]> => {
-    const response = await api.get(`/presupuestos/${id}/historial`, { signal })
+    const response = await api.get<PeriodoPresupuesto[]>(`/presupuestos/${id}/historial`, { signal })
     return response.data
   }
 }

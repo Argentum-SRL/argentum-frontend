@@ -238,6 +238,8 @@ export interface Transaccion {
   fecha_creacion: string
   subcategoria?: Subcategoria
   movimiento_meta_id?: string | null
+  monto_original?: number | null
+  cotizacion_aplicada?: number | null
 }
 
 export interface TransferenciaInterna {
@@ -495,6 +497,28 @@ export interface PagarTarjetaPayload {
   cotizacion_personalizada?: number
   monto_pesos_personalizado?: number
   monto_percepcion_personalizado?: number
+}
+
+export interface ResultadoPagoTarjeta {
+  id: string
+  usuario_id: string
+  tipo: string
+  monto: number
+  moneda: string
+  fecha: string
+  descripcion: string
+  categoria_id?: string | null
+  subcategoria_id?: string | null
+  metodo_pago?: string | null
+  billetera_id?: string | null
+  tarjeta_id?: string | null
+  es_recurrente: boolean
+  estado_verificacion?: string | null
+  fecha_creacion?: string | null
+  cuotas_pagadas_count: number
+  moneda_pagada: string
+  monto_pagado: number
+  saldo_arrastrado_generado?: number | null
 }
 
 export interface ResumenTarjeta {

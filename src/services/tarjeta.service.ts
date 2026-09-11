@@ -1,5 +1,5 @@
 import api from './api'
-import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData, PagarTarjetaPayload, SimularPesificacionResponse } from '@/types'
+import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData, PagarTarjetaPayload, SimularPesificacionResponse, ResultadoPagoTarjeta } from '@/types'
 
 const tarjetaService = {
   getTarjetas: async (signal?: AbortSignal): Promise<TarjetaCredito[]> => {
@@ -45,13 +45,13 @@ const tarjetaService = {
     payloadOrFechaPago?: PagarTarjetaPayload | string,
     fechaResumen?: string,
     monto?: number
-  ): Promise<unknown> => {
+  ): Promise<ResultadoPagoTarjeta> => {
     const body: PagarTarjetaPayload =
       typeof payloadOrFechaPago === 'string' || payloadOrFechaPago === undefined
         ? { fecha_pago: payloadOrFechaPago, fecha_resumen: fechaResumen, monto }
         : payloadOrFechaPago
 
-    const { data } = await api.post(`/tarjetas/${id}/pagar`, body)
+    const { data } = await api.post<ResultadoPagoTarjeta>(`/tarjetas/${id}/pagar`, body)
     return data
   },
   simularPesificacion: async (

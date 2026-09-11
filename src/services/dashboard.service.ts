@@ -131,7 +131,11 @@ export const dashboardService = {
     if (billeteraIds && billeteraIds.length > 0) {
       params.billetera_ids = billeteraIds.join(',')
     }
-    const response = await api.get('/dashboard/resumen-completo', {
+    const response = await api.get<{
+      billeteras: Billetera[];
+      resumen: DashboardResumen;
+      cotizacion: CotizacionDolar;
+    }>('/dashboard/resumen-completo', {
       params,
       signal
     })

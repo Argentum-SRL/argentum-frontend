@@ -799,8 +799,8 @@ export default function TransaccionModal({
                     <div className={styles.summaryHeader}>
                       <span className={styles.summaryHint}>
                         {cuotaInicial > 1
-                          ? `Se generarán ${Math.max(0, cantidadCuotas - cuotaInicial + 1)} cuotas (de la ${cuotaInicial} a la ${cantidadCuotas}).`
-                          : `Se generarán ${cantidadCuotas || 0} cuotas.`
+                          ? `Se registran las ${cantidadCuotas} cuotas del plan completo (las cuotas 1 a ${cuotaInicial - 1} quedan marcadas como pagadas).`
+                          : `Se registran las ${cantidadCuotas || 0} cuotas del plan completo.`
                         }
                         {proximoResumen && ` Primera cuota en resumen próximo.`}
                       </span>

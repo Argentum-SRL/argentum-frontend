@@ -250,11 +250,6 @@ export default function GruposCuotasTab() {
     e.preventDefault()
     if (!editingGrupo) return
 
-    if (!editDesc.trim()) {
-      showToast('Ingresá una descripción válida', 'error')
-      return
-    }
-
     if (editMonto === '' || editMonto <= 0) {
       showToast('Ingresá un monto total válido', 'error')
       return
@@ -263,7 +258,7 @@ export default function GruposCuotasTab() {
     setSaving(true)
     try {
       await grupoCuotasService.updateGrupoCuotas(editingGrupo.id, {
-        descripcion: editDesc,
+        descripcion: editDesc.trim(),
         monto_total_nuevo: editMonto,
         categoria_id: editCategoriaId || null,
         subcategoria_id: editSubcategoriaId || null
@@ -366,7 +361,7 @@ export default function GruposCuotasTab() {
 
       if (search.trim()) {
         const query = search.toLowerCase().trim()
-        const matchesDesc = g.descripcion.toLowerCase().includes(query)
+        const matchesDesc = (g.descripcion || '').toLowerCase().includes(query)
         const matchesCard = (g.tarjeta_nombre || '').toLowerCase().includes(query)
         return matchesDesc || matchesCard
       }
@@ -620,7 +615,7 @@ export default function GruposCuotasTab() {
             {/* Header / Main Info */}
             <div className={styles.detailHeader}>
               <div className={styles.detailTitleArea}>
-                <h3 className={styles.detailTitle}>{selectedGrupo.descripcion}</h3>
+                <h3 className={styles.detailTitle}>{selectedGrupo.descripcion?.trim() || 'Compra en cuotas'}</h3>
                 <div className={styles.detailTags}>
                   {selectedGrupo.tarjeta_nombre && (
                     <span className={styles.cardTag}>
@@ -732,14 +727,13 @@ export default function GruposCuotasTab() {
         {editingGrupo && (
           <form onSubmit={handleSave} className={styles.editForm}>
             <div className={styles.formField}>
-              <label className={styles.fieldLabel}>Descripción</label>
+              <label className={styles.fieldLabel}>Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
               <input 
                 type="text" 
                 className={styles.fieldInput} 
                 value={editDesc} 
                 onChange={(e) => setEditDesc(e.target.value)}
                 placeholder="Ej. Smart TV 55"
-                required
               />
             </div>
 

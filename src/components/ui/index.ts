@@ -39,6 +39,9 @@ export {
 
 export { ColorPicker } from './ColorPicker'
 export { WidgetErrorBoundary } from './ErrorBoundary/WidgetErrorBoundary'
+export { PageErrorBoundary } from './ErrorBoundary/PageErrorBoundary'
+export { RootErrorBoundary } from './ErrorBoundary/RootErrorBoundary'
+export { ModalErrorBoundary } from './ErrorBoundary/ModalErrorBoundary'
 
 
 

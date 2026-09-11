@@ -13,41 +13,88 @@ interface ProyeccionModalProps {
 const ProyeccionModal: React.FC<ProyeccionModalProps> = ({ isOpen, onClose, proyeccion }) => {
   const n_ciclos = proyeccion?.ciclos_analizados ?? 0
   const advertencias = proyeccion?.advertencias ?? []
-  const nivel_confianza = proyeccion?.nivel_confianza ?? 'medio'
+  const nivel_confianza = (proyeccion?.nivel_confianza ?? '').toLowerCase().trim()
+  const pasaPuerta = Boolean(proyeccion?.calibracion?.pasa_puerta)
 
   const getConfianzaLabel = () => {
     switch (nivel_confianza) {
-      case 'alto': return 'Alta'
-      case 'medio': return 'Media'
-      case 'bajo': return 'Baja'
-      default: return ''
+      case 'alto':
+      case 'alta':
+        return 'Alta'
+      case 'medio':
+      case 'media':
+        return 'Media'
+      case 'bajo':
+      case 'baja':
+        return 'Baja'
+      case 'sin_datos':
+        return 'Sin datos'
+      case 'insuficiente':
+        return 'Insuficiente'
+      case 'inicial':
+        return 'Inicial'
+      default:
+        return 'En evaluación'
     }
   }
 
   const getConfianzaDesc = () => {
     switch (nivel_confianza) {
-      case 'alto': return 'Proyección confiable, buen historial disponible.'
-      case 'medio': return 'Proyección orientativa, historial en construcción.'
-      case 'bajo': return 'Proyección estimada, sin historial suficiente.'
-      default: return ''
+      case 'alto':
+      case 'alta':
+        return 'Proyección confiable, buen historial disponible.'
+      case 'medio':
+      case 'media':
+        return 'Proyección orientativa, historial en construcción.'
+      case 'bajo':
+      case 'baja':
+        return 'Proyección estimada, historial limitado o datos dispersos.'
+      case 'sin_datos':
+        return 'Sin observaciones históricas suficientes para calcular proyección.'
+      case 'insuficiente':
+        return 'Historial insuficiente para calcular una proyección confiable.'
+      case 'inicial':
+        return 'Primer ciclo registrado, en proceso de recopilación de historial.'
+      default:
+        return 'Nivel de confianza en evaluación sobre tu historial disponible.'
     }
   }
 
   const getConfianzaClass = () => {
     switch (nivel_confianza) {
-      case 'alto': return styles.textAlto
-      case 'medio': return styles.textMedio
-      case 'bajo': return styles.textBajo
-      default: return ''
+      case 'alto':
+      case 'alta':
+        return styles.textAlto
+      case 'medio':
+      case 'media':
+        return styles.textMedio
+      case 'bajo':
+      case 'baja':
+      case 'sin_datos':
+      case 'insuficiente':
+      case 'inicial':
+        return styles.textBajo
+      default:
+        return styles.textMedio
     }
   }
 
   const getIndicatorClass = () => {
     switch (nivel_confianza) {
-      case 'alto': return styles.indicatorAlto
-      case 'medio': return styles.indicatorMedio
-      case 'bajo': return styles.indicatorBajo
-      default: return ''
+      case 'alto':
+      case 'alta':
+        return styles.indicatorAlto
+      case 'medio':
+      case 'media':
+        return styles.indicatorMedio
+      case 'bajo':
+      case 'baja':
+      case 'sin_datos':
+      case 'insuficiente':
+      case 'inicial':
+        return styles.indicatorBajo
+      default:
+        return styles.indicatorMedio
     }
   }
 
@@ -100,15 +147,17 @@ const ProyeccionModal: React.FC<ProyeccionModalProps> = ({ isOpen, onClose, proy
           </section>
         )}
 
-        <footer className={styles.footer}>
-          <div className={styles.confianzaRow}>
-            <div className={`${styles.indicator} ${getIndicatorClass()}`} />
-            <span className={`${styles.confianzaText} ${getConfianzaClass()}`}>
-              Nivel de confianza: {getConfianzaLabel()}
-            </span>
-          </div>
-          <p className={styles.confianzaDesc}>{getConfianzaDesc()}</p>
-        </footer>
+        {pasaPuerta && (
+          <footer className={styles.footer}>
+            <div className={styles.confianzaRow}>
+              <div className={`${styles.indicator} ${getIndicatorClass()}`} />
+              <span className={`${styles.confianzaText} ${getConfianzaClass()}`}>
+                Nivel de confianza: {getConfianzaLabel()}
+              </span>
+            </div>
+            <p className={styles.confianzaDesc}>{getConfianzaDesc()}</p>
+          </footer>
+        )}
       </div>
     </Modal>
   )

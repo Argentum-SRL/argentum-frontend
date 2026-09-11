@@ -12,6 +12,7 @@ import BalanceCicloModal from '@/components/dashboard/BalanceCicloModal/BalanceC
 import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
 import GoalModal from '@/components/goals/GoalModal'
 import GoalContributionModal from '@/components/goals/GoalContributionModal'
+import { ModalErrorBoundary } from '@/components/ui/ErrorBoundary/ModalErrorBoundary'
 
 export function ModalPortal() {
   const context = useContext(ModalContext)
@@ -35,122 +36,146 @@ export function ModalPortal() {
   return (
     <>
       {typedModals.bankPicker?.isOpen && bankPickerData && (
-        <BankPickerModal
-          isOpen={true}
-          onClose={() => closeModal('bankPicker')}
-          onCrear={bankPickerData.onCrear}
-          billeterasActuales={bankPickerData.billeterasActuales}
-          monedaPrincipalUsuario={bankPickerData.monedaPrincipalUsuario}
-        />
+        <ModalErrorBoundary modalName="bankPicker" onClose={() => closeModal('bankPicker')}>
+          <BankPickerModal
+            isOpen={true}
+            onClose={() => closeModal('bankPicker')}
+            onCrear={bankPickerData.onCrear}
+            billeterasActuales={bankPickerData.billeterasActuales}
+            monedaPrincipalUsuario={bankPickerData.monedaPrincipalUsuario}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.editBilletera?.isOpen && editBilleteraData?.billetera && (
-        <EditBilleteraModal
-          isOpen={true}
-          onClose={() => closeModal('editBilletera')}
-          onEditar={editBilleteraData.onEditar}
-          billetera={editBilleteraData.billetera}
-          billeteraPrincipalActual={editBilleteraData.billeteraPrincipalActual}
-        />
+        <ModalErrorBoundary modalName="editBilletera" onClose={() => closeModal('editBilletera')}>
+          <EditBilleteraModal
+            isOpen={true}
+            onClose={() => closeModal('editBilletera')}
+            onEditar={editBilleteraData.onEditar}
+            billetera={editBilleteraData.billetera}
+            billeteraPrincipalActual={editBilleteraData.billeteraPrincipalActual}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.transaccion?.isOpen && transaccionData && (
-        <TransaccionModal
-          open={true}
-          onClose={() => closeModal('transaccion')}
-          transaccion={transaccionData.transaccion}
-          billeteras={transaccionData.billeteras}
-          categorias={transaccionData.categorias}
-          tarjetas={transaccionData.tarjetas}
-          onSuccess={transaccionData.onSuccess}
-        />
+        <ModalErrorBoundary modalName="transaccion" onClose={() => closeModal('transaccion')}>
+          <TransaccionModal
+            open={true}
+            onClose={() => closeModal('transaccion')}
+            transaccion={transaccionData.transaccion}
+            billeteras={transaccionData.billeteras}
+            categorias={transaccionData.categorias}
+            tarjetas={transaccionData.tarjetas}
+            onSuccess={transaccionData.onSuccess}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.tarjeta?.isOpen && tarjetaData && (
-        <TarjetaModal />
+        <ModalErrorBoundary modalName="tarjeta" onClose={() => closeModal('tarjeta')}>
+          <TarjetaModal />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.recurrente?.isOpen && recurrenteData && (
-        <RecurrenteModal
-          isOpen={true}
-          onClose={() => closeModal('recurrente')}
-          recurrente={recurrenteData.recurrente}
-          billeteras={recurrenteData.billeteras}
-          categorias={recurrenteData.categorias}
-          onSuccess={recurrenteData.onSuccess}
-        />
+        <ModalErrorBoundary modalName="recurrente" onClose={() => closeModal('recurrente')}>
+          <RecurrenteModal
+            isOpen={true}
+            onClose={() => closeModal('recurrente')}
+            recurrente={recurrenteData.recurrente}
+            billeteras={recurrenteData.billeteras}
+            categorias={recurrenteData.categorias}
+            onSuccess={recurrenteData.onSuccess}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.transaccionFilters?.isOpen && filterDrawerData && (
-        <FilterBarMobileDrawer
-          isOpen={true}
-          onClose={() => closeModal('transaccionFilters')}
-          filters={filterDrawerData.filters}
-          onFilterChange={filterDrawerData.onFilterChange}
-          onClear={filterDrawerData.onClear}
-          billeteras={filterDrawerData.billeteras}
-          categorias={filterDrawerData.categorias}
-          hasActiveFilters={filterDrawerData.hasActiveFilters}
-          showMonedaFilter={filterDrawerData.showMonedaFilter}
-        />
+        <ModalErrorBoundary modalName="transaccionFilters" onClose={() => closeModal('transaccionFilters')}>
+          <FilterBarMobileDrawer
+            isOpen={true}
+            onClose={() => closeModal('transaccionFilters')}
+            filters={filterDrawerData.filters}
+            onFilterChange={filterDrawerData.onFilterChange}
+            onClear={filterDrawerData.onClear}
+            billeteras={filterDrawerData.billeteras}
+            categorias={filterDrawerData.categorias}
+            hasActiveFilters={filterDrawerData.hasActiveFilters}
+            showMonedaFilter={filterDrawerData.showMonedaFilter}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.proyeccion?.isOpen && proyeccionData?.proyeccion && (
-        <ProyeccionModal
-          isOpen={true}
-          onClose={() => closeModal('proyeccion')}
-          proyeccion={proyeccionData.proyeccion}
-        />
+        <ModalErrorBoundary modalName="proyeccion" onClose={() => closeModal('proyeccion')}>
+          <ProyeccionModal
+            isOpen={true}
+            onClose={() => closeModal('proyeccion')}
+            proyeccion={proyeccionData.proyeccion}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.balance_ciclo?.isOpen && (
-        <BalanceCicloModal
-          isOpen={true}
-          onClose={() => closeModal('balance_ciclo')}
-        />
+        <ModalErrorBoundary modalName="balance_ciclo" onClose={() => closeModal('balance_ciclo')}>
+          <BalanceCicloModal
+            isOpen={true}
+            onClose={() => closeModal('balance_ciclo')}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.presupuesto?.isOpen && presupuestoData && (
-        <PresupuestoModal
-          open={true}
-          onClose={() => closeModal('presupuesto')}
-          presupuesto={presupuestoData.presupuesto}
-          categorias={presupuestoData.categorias}
-          onSuccess={presupuestoData.onSuccess}
-        />
+        <ModalErrorBoundary modalName="presupuesto" onClose={() => closeModal('presupuesto')}>
+          <PresupuestoModal
+            open={true}
+            onClose={() => closeModal('presupuesto')}
+            presupuesto={presupuestoData.presupuesto}
+            categorias={presupuestoData.categorias}
+            onSuccess={presupuestoData.onSuccess}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.goal?.isOpen && goalData && (
-        <GoalModal
-          open={true}
-          onClose={() => closeModal('goal')}
-          goal={goalData.goal}
-          onSuccess={goalData.onSuccess}
-        />
+        <ModalErrorBoundary modalName="goal" onClose={() => closeModal('goal')}>
+          <GoalModal
+            open={true}
+            onClose={() => closeModal('goal')}
+            goal={goalData.goal}
+            onSuccess={goalData.onSuccess}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.goalContribution?.isOpen && goalContributionData && (
-        <GoalContributionModal
-          open={true}
-          onClose={() => closeModal('goalContribution')}
-          goal={goalContributionData.goal}
-          billeteras={goalContributionData.billeteras}
-          onSuccess={goalContributionData.onSuccess}
-        />
+        <ModalErrorBoundary modalName="goalContribution" onClose={() => closeModal('goalContribution')}>
+          <GoalContributionModal
+            open={true}
+            onClose={() => closeModal('goalContribution')}
+            goal={goalContributionData.goal}
+            billeteras={goalContributionData.billeteras}
+            onSuccess={goalContributionData.onSuccess}
+          />
+        </ModalErrorBoundary>
       )}
 
       {typedModals.confirm?.isOpen && confirmData && (
-        <ConfirmModal
-          isOpen={true}
-          onClose={() => closeModal('confirm')}
-          onConfirm={confirmData.onConfirm}
-          title={confirmData.title}
-          description={confirmData.description}
-          confirmLabel={confirmData.confirmLabel}
-          cancelLabel={confirmData.cancelLabel}
-          variant={confirmData.variant}
-          requireTyping={confirmData.requireTyping}
-        />
+        <ModalErrorBoundary modalName="confirm" onClose={() => closeModal('confirm')}>
+          <ConfirmModal
+            isOpen={true}
+            onClose={() => closeModal('confirm')}
+            onConfirm={confirmData.onConfirm}
+            title={confirmData.title}
+            description={confirmData.description}
+            confirmLabel={confirmData.confirmLabel}
+            cancelLabel={confirmData.cancelLabel}
+            variant={confirmData.variant}
+            requireTyping={confirmData.requireTyping}
+          />
+        </ModalErrorBoundary>
       )}
     </>
   )

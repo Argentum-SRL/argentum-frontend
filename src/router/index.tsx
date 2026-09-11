@@ -4,6 +4,8 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import RootLayout from '@/router/RootLayout'
 import ProtectedRoute from '@/router/ProtectedRoute'
 import AppWrapper from '@/components/layout/AppWrapper/AppWrapper'
+import { PageErrorBoundary } from '@/components/ui/ErrorBoundary/PageErrorBoundary'
+import { RootErrorBoundary } from '@/components/ui/ErrorBoundary/RootErrorBoundary'
 
 const LoginPage = lazy(() => import('@/pages/auth/login/LoginPage'))
 const RegisterPage = lazy(() => import('@/pages/auth/register/RegisterPage'))
@@ -31,6 +33,7 @@ const TermsPage = lazy(() => import('@/pages/TermsPage'))
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RootErrorBoundary />,
     children: [
       // Rutas públicas
       { path: '/login', element: <LoginPage /> },
@@ -57,9 +60,10 @@ const router = createBrowserRouter([
         children: [
           {
             element: <AppWrapper />,
+            errorElement: <PageErrorBoundary />,
             children: [
-              { path: '/admin', element: <AdminPage /> },
-              { path: '/app/herramientas', element: <ToolsPage /> },
+              { path: '/admin', element: <AdminPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/herramientas', element: <ToolsPage />, errorElement: <PageErrorBoundary /> },
             ],
           },
         ],
@@ -70,18 +74,19 @@ const router = createBrowserRouter([
         children: [
           {
             element: <AppWrapper />,
+            errorElement: <PageErrorBoundary />,
             children: [
               { index: true, element: <Navigate to="/app/dashboard" replace /> },
-              { path: '/app/dashboard', element: <DashboardPage /> },
-              { path: '/app/billeteras', element: <BilleterasPage /> },
-              { path: '/app/billeteras/:id', element: <BilleteraDetallePage /> },
-              { path: '/app/transacciones', element: <TransaccionesPage /> },
+              { path: '/app/dashboard', element: <DashboardPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/billeteras', element: <BilleterasPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/billeteras/:id', element: <BilleteraDetallePage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/transacciones', element: <TransaccionesPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/transacciones/recurrentes', element: <Navigate to="/app/transacciones" replace /> },
-              { path: '/app/presupuestos', element: <PresupuestosPage /> },
-              { path: '/app/metas', element: <MetasPage /> },
-              { path: '/app/metas/:id', element: <MetaDetallePage /> },
-              { path: '/app/suscripciones', element: <SuscripcionesPage /> },
-              { path: '/app/perfil', element: <PerfilPage /> },
+              { path: '/app/presupuestos', element: <PresupuestosPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/metas', element: <MetasPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/metas/:id', element: <MetaDetallePage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/suscripciones', element: <SuscripcionesPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/perfil', element: <PerfilPage />, errorElement: <PageErrorBoundary /> },
               // Rutas legacy — redirigen a la página unificada de perfil
               { path: '/app/configuracion', element: <Navigate to="/app/perfil" replace /> },
               { path: '/app/notificaciones/configuracion', element: <Navigate to="/app/perfil?tab=notificaciones" replace /> },

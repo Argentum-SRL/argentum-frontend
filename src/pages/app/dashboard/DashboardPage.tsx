@@ -669,273 +669,279 @@ export default function DashboardPage() {
       {/* ── Top Row (3 Cols) ──────────────────────────────────────────────── */}
       <div className={styles.topRow}>
         {/* Col 1: Balance */}
-        {loading ? (
-          <BalanceSkeleton />
-        ) : (
-          data && (
-            <div className={styles.balanceCard}>
-              <div className="absolute inset-0 rounded-[24px] overflow-hidden pointer-events-none">
-                <svg
-                  viewBox="0 0 100 100"
-                  className="absolute -bottom-5 -right-5 w-[120px] h-[120px] opacity-[0.04] pointer-events-none"
-                >
-                  <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
-                  <circle cx="58" cy="50" r="38" fill="#0D2045"/>
-                </svg>
-              </div>
-
-              {/* Controls: currency toggle + wallet dropdown */}
-              <div className={styles.balanceControls} ref={dropdownRef}>
-                {/* Currency toggle */}
-                <div className={styles.currencyToggleGroup}>
-                  <button
-                    className={`${styles.currencyToggleBtn} ${moneda === 'ARS' ? styles.currencyToggleBtnActive : ''}`}
-                    onClick={() => handleToggleMoneda('ARS')}
-                    aria-pressed={moneda === 'ARS'}
+        <WidgetErrorBoundary title="Saldo disponible">
+          {loading ? (
+            <BalanceSkeleton />
+          ) : (
+            data && (
+              <div className={styles.balanceCard}>
+                <div className="absolute inset-0 rounded-[24px] overflow-hidden pointer-events-none">
+                  <svg
+                    viewBox="0 0 100 100"
+                    className="absolute -bottom-5 -right-5 w-[120px] h-[120px] opacity-[0.04] pointer-events-none"
                   >
-                    ARS
-                  </button>
-                  <button
-                    className={`${styles.currencyToggleBtn} ${moneda === 'USD' ? styles.currencyToggleBtnActive : ''}`}
-                    onClick={() => handleToggleMoneda('USD')}
-                    aria-pressed={moneda === 'USD'}
-                  >
-                    USD
-                  </button>
+                    <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
+                    <circle cx="58" cy="50" r="38" fill="#0D2045"/>
+                  </svg>
                 </div>
 
-                {/* Wallet dropdown */}
-                <button
-                  className={`${styles.dropdownTrigger} ${dropdownAbierto ? styles.dropdownTriggerActive : ''}`}
-                  onClick={() => setDropdownAbierto(!dropdownAbierto)}
-                >
-                  <span>{getDropdownTriggerText()}</span>
-                  <ChevronDown size={14} />
-                </button>
-
-                {dropdownAbierto && (
-                  <div className={styles.dropdownPanel}>
-                    <div className={styles.dropdownHeader}>BILLETERAS</div>
+                {/* Controls: currency toggle + wallet dropdown */}
+                <div className={styles.balanceControls} ref={dropdownRef}>
+                  {/* Currency toggle */}
+                  <div className={styles.currencyToggleGroup}>
                     <button
-                      className={`${styles.dropdownItem} ${billeterasSeleccionadas.length === 0 ? styles.dropdownItemActive : ''}`}
-                      onClick={() => handleToggleBilletera(null)}
+                      className={`${styles.currencyToggleBtn} ${moneda === 'ARS' ? styles.currencyToggleBtnActive : ''}`}
+                      onClick={() => handleToggleMoneda('ARS')}
+                      aria-pressed={moneda === 'ARS'}
                     >
-                      <span className={styles.dropdownItemName}>Todas las billeteras</span>
-                      <span className={styles.dropdownItemBalance}>
-                        {fmt(moneda === 'ARS' ? totalSaldoBilleterasArs : totalSaldoBilleterasUsd, moneda)}
-                      </span>
+                      ARS
                     </button>
-                    <div className={styles.dropdownDivider} />
-                    {billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda).map(b => (
+                    <button
+                      className={`${styles.currencyToggleBtn} ${moneda === 'USD' ? styles.currencyToggleBtnActive : ''}`}
+                      onClick={() => handleToggleMoneda('USD')}
+                      aria-pressed={moneda === 'USD'}
+                    >
+                      USD
+                    </button>
+                  </div>
+
+                  {/* Wallet dropdown */}
+                  <button
+                    className={`${styles.dropdownTrigger} ${dropdownAbierto ? styles.dropdownTriggerActive : ''}`}
+                    onClick={() => setDropdownAbierto(!dropdownAbierto)}
+                  >
+                    <span>{getDropdownTriggerText()}</span>
+                    <ChevronDown size={14} />
+                  </button>
+
+                  {dropdownAbierto && (
+                    <div className={styles.dropdownPanel}>
+                      <div className={styles.dropdownHeader}>BILLETERAS</div>
                       <button
-                        key={b.id}
-                        className={`${styles.dropdownItem} ${billeterasSeleccionadas.includes(b.id) ? styles.dropdownItemActive : ''}`}
-                        onClick={() => handleToggleBilletera(b.id)}
+                        className={`${styles.dropdownItem} ${billeterasSeleccionadas.length === 0 ? styles.dropdownItemActive : ''}`}
+                        onClick={() => handleToggleBilletera(null)}
                       >
-                        <span className={styles.dropdownItemName}>{b.nombre}</span>
+                        <span className={styles.dropdownItemName}>Todas las billeteras</span>
                         <span className={styles.dropdownItemBalance}>
-                          {fmt(b.saldo_actual, b.moneda)}
+                          {fmt(moneda === 'ARS' ? totalSaldoBilleterasArs : totalSaldoBilleterasUsd, moneda)}
                         </span>
                       </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className={styles.balanceContent}>
-                <MobileGreeting usuario={usuario} />
-                <div className={styles.balanceMain}>
-                  {/* Saldo Disponible — moneda activa */}
-                  <div className={styles.balanceTop}>
-                    <div className={styles.labelWithHint}>
-                      <span className={styles.saldoLabel}>Saldo disponible</span>
-                      <button
-                        className={styles.hint}
-                        onClick={() => open('balance_ciclo', {})}
-                        title="¿Qué es el balance del ciclo?"
-                        aria-label="Ver explicación del balance del ciclo"
-                      >
-                        <AlertCircle size={14} />
-                      </button>
-                    </div>
-                    <h2 className={`${styles.saldoAmount} ${
-                      (moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible) < 0
-                        ? styles.saldoAmountNegative : ''
-                    }`}>
-                      {fmt(
-                        moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible,
-                        moneda
-                      )}
-                    </h2>
-                    <span className={styles.disponibleRealSub}>en billeteras</span>
-                  </div>
-
-                  {/* Trends */}
-                  {moneda === 'ARS' && (data.balance.ars.ingresos > 0 || data.balance.ars.egresos > 0) && (
-                    <div className={styles.balanceTrends}>
-                      <div className={styles.balanceTrendItem}>
-                        <TrendingUp size={15} className={styles.trendUp} />
-                        <span className={styles.trendAmount}>{fmt(data.balance.ars.ingresos, 'ARS')}</span>
-                      </div>
-                      <div className={styles.balanceTrendItem}>
-                        <TrendingDown size={15} className={styles.trendDown} />
-                        <span className={styles.trendAmount}>{fmt(data.balance.ars.egresos, 'ARS')}</span>
-                      </div>
-                    </div>
-                  )}
-                  {moneda === 'USD' && (data.balance.usd.ingresos > 0 || data.balance.usd.egresos > 0) && (
-                    <div className={styles.balanceTrends}>
-                      <div className={styles.balanceTrendItem}>
-                        <TrendingUp size={15} className={styles.trendUp} />
-                        <span className={styles.trendAmount}>{fmt(data.balance.usd.ingresos, 'USD')}</span>
-                      </div>
-                      <div className={styles.balanceTrendItem}>
-                        <TrendingDown size={15} className={styles.trendDown} />
-                        <span className={styles.trendAmount}>{fmt(data.balance.usd.egresos, 'USD')}</span>
-                      </div>
+                      <div className={styles.dropdownDivider} />
+                      {billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda).map(b => (
+                        <button
+                          key={b.id}
+                          className={`${styles.dropdownItem} ${billeterasSeleccionadas.includes(b.id) ? styles.dropdownItemActive : ''}`}
+                          onClick={() => handleToggleBilletera(b.id)}
+                        >
+                          <span className={styles.dropdownItemName}>{b.nombre}</span>
+                          <span className={styles.dropdownItemBalance}>
+                            {fmt(b.saldo_actual, b.moneda)}
+                          </span>
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
+
+                <div className={styles.balanceContent}>
+                  <MobileGreeting usuario={usuario} />
+                  <div className={styles.balanceMain}>
+                    {/* Saldo Disponible — moneda activa */}
+                    <div className={styles.balanceTop}>
+                      <div className={styles.labelWithHint}>
+                        <span className={styles.saldoLabel}>Saldo disponible</span>
+                        <button
+                          className={styles.hint}
+                          onClick={() => open('balance_ciclo', {})}
+                          title="¿Qué es el balance del ciclo?"
+                          aria-label="Ver explicación del balance del ciclo"
+                        >
+                          <AlertCircle size={14} />
+                        </button>
+                      </div>
+                      <h2 className={`${styles.saldoAmount} ${
+                        (moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible) < 0
+                          ? styles.saldoAmountNegative : ''
+                      }`}>
+                        {fmt(
+                          moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible,
+                          moneda
+                        )}
+                      </h2>
+                      <span className={styles.disponibleRealSub}>en billeteras</span>
+                    </div>
+
+                    {/* Trends */}
+                    {moneda === 'ARS' && (data.balance.ars.ingresos > 0 || data.balance.ars.egresos > 0) && (
+                      <div className={styles.balanceTrends}>
+                        <div className={styles.balanceTrendItem}>
+                          <TrendingUp size={15} className={styles.trendUp} />
+                          <span className={styles.trendAmount}>{fmt(data.balance.ars.ingresos, 'ARS')}</span>
+                        </div>
+                        <div className={styles.balanceTrendItem}>
+                          <TrendingDown size={15} className={styles.trendDown} />
+                          <span className={styles.trendAmount}>{fmt(data.balance.ars.egresos, 'ARS')}</span>
+                        </div>
+                      </div>
+                    )}
+                    {moneda === 'USD' && (data.balance.usd.ingresos > 0 || data.balance.usd.egresos > 0) && (
+                      <div className={styles.balanceTrends}>
+                        <div className={styles.balanceTrendItem}>
+                          <TrendingUp size={15} className={styles.trendUp} />
+                          <span className={styles.trendAmount}>{fmt(data.balance.usd.ingresos, 'USD')}</span>
+                        </div>
+                        <div className={styles.balanceTrendItem}>
+                          <TrendingDown size={15} className={styles.trendDown} />
+                          <span className={styles.trendAmount}>{fmt(data.balance.usd.egresos, 'USD')}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          )
-        )}
+            )
+          )}
+        </WidgetErrorBoundary>
 
         {/* Col 2: Gastos por Categoría */}
-        <div className={styles.card}>
-          <div className={`${styles.cardHeader} ${styles.cardHeaderWithToggle}`}>
-            <div className={styles.cardTitleContainer}>
-              {selectedCategoria ? (
+        <WidgetErrorBoundary title="Gastos por categoría">
+          <div className={styles.card}>
+            <div className={`${styles.cardHeader} ${styles.cardHeaderWithToggle}`}>
+              <div className={styles.cardTitleContainer}>
+                {selectedCategoria ? (
+                  <button 
+                    className={styles.backBtn} 
+                    onClick={() => {
+                      setSelectedCategoria(null)
+                      setSubcategoriasData([])
+                    }}
+                    title="Volver a categorías"
+                  >
+                    <ArrowLeft size={16} />
+                    <span className={styles.cardTitle}>{selectedCategoria.nombre}</span>
+                  </button>
+                ) : (
+                  <h3 className={styles.cardTitle}>Gastos por categoría</h3>
+                )}
+              </div>
+              <div className={styles.toggleGroup}>
                 <button 
-                  className={styles.backBtn} 
-                  onClick={() => {
-                    setSelectedCategoria(null)
-                    setSubcategoriasData([])
-                  }}
-                  title="Volver a categorías"
+                  className={`${styles.toggleBtn} ${!showChartPercent ? styles.active : ''}`} 
+                  onClick={() => setShowChartPercent(false)}
                 >
-                  <ArrowLeft size={16} />
-                  <span className={styles.cardTitle}>{selectedCategoria.nombre}</span>
+                  $
                 </button>
-              ) : (
-                <h3 className={styles.cardTitle}>Gastos por categoría</h3>
-              )}
+                <button 
+                  className={`${styles.toggleBtn} ${showChartPercent ? styles.active : ''}`} 
+                  onClick={() => setShowChartPercent(true)}
+                >
+                  %
+                </button>
+              </div>
             </div>
-            <div className={styles.toggleGroup}>
-              <button 
-                className={`${styles.toggleBtn} ${!showChartPercent ? styles.active : ''}`} 
-                onClick={() => setShowChartPercent(false)}
-              >
-                $
-              </button>
-              <button 
-                className={`${styles.toggleBtn} ${showChartPercent ? styles.active : ''}`} 
-                onClick={() => setShowChartPercent(true)}
-              >
-                %
-              </button>
-            </div>
-          </div>
-          <div className={styles.chartCardContent}>
-            {selectedCategoria ? (
-              loadingSubcategorias ? (
-                <ListSkeleton />
-              ) : (
-                <SubcategoriasChart 
-                  data={subcategoriasData} 
-                  showPercent={showChartPercent} 
-                  parentCategoryName={selectedCategoria.nombre}
-                  moneda={moneda}
-                />
-              )
-            ) : (
-              loading ? (
-                <ListSkeleton />
-              ) : (
-                <CategoriasChart
-                  data={data?.gastos_por_categoria?.[moneda === 'ARS' ? 'ars' : 'usd'] ?? []}
-                  showPercent={showChartPercent}
-                  moneda={moneda}
-                  onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
-                />
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Col 3: Próximos Pagos */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Próximos pagos</h3>
-          </div>
-          <div className={styles.cardContent}>
-            {loading ? (
-              <ListSkeleton />
-            ) : (() => {
-              const pagosFiltrados = (data?.proximos_pagos ?? []).filter(p => p.moneda === moneda)
-              if (pagosFiltrados.length === 0) {
-                return (
-                  <EmptyState
-                    variant="compact"
-                    icon={Calendar}
-                    title={`Sin pagos próximos en ${moneda}`}
+            <div className={styles.chartCardContent}>
+              {selectedCategoria ? (
+                loadingSubcategorias ? (
+                  <ListSkeleton />
+                ) : (
+                  <SubcategoriasChart 
+                    data={subcategoriasData} 
+                    showPercent={showChartPercent} 
+                    parentCategoryName={selectedCategoria.nombre}
+                    moneda={moneda}
                   />
                 )
-              }
-              return (
-                <div className={styles.list}>
-                  {pagosFiltrados.slice(0, 4).map((p) => {
-                    const isVencido = Boolean(p.es_vencido || p.dias_restantes < 0)
-                    const isUrgente = !isVencido && p.dias_restantes <= 1
-                    let fechaTxt = formatFecha(p.fecha_cobro)
-                    if (isVencido) {
-                      const diasPasados = Math.abs(p.dias_restantes)
-                      fechaTxt = diasPasados === 1 ? 'Venció ayer' : `Venció hace ${diasPasados} días`
-                    } else if (p.dias_restantes === 0) {
-                      fechaTxt = 'Hoy'
-                    } else if (p.dias_restantes === 1) {
-                      fechaTxt = 'Mañana'
-                    } else if (p.dias_restantes <= 7) {
-                      fechaTxt = `En ${p.dias_restantes} días`
-                    }
-
-                    const handlePagoClick = () => {
-                      if (p.tipo === 'suscripcion') {
-                        navigate('/app/suscripciones')
-                      } else if (p.tipo === 'resumen_tarjeta') {
-                        navigate(p.billetera_id ? `/app/billeteras/${p.billetera_id}` : '/app/billeteras')
-                      } else if (p.tipo === 'cuota') {
-                        navigate('/app/transacciones')
-                      }
-                    }
-
-                    return (
-                      <div
-                        key={p.id}
-                        className={`${styles.listItem} ${styles.listItemClickable}`}
-                        onClick={handlePagoClick}
-                      >
-                        <AppleCalendarIcon dateStr={p.fecha_cobro} />
-                        <div className={styles.itemMeta}>
-                          <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
-                          <p className={styles.itemSub}>{fechaTxt}</p>
-                        </div>
-                        <div className={styles.pagoRight}>
-                          <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
-                          {isVencido ? (
-                            <span className={styles.urgentBadge} style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>Vencido</span>
-                          ) : isUrgente ? (
-                            <span className={styles.urgentBadge}>Urgente</span>
-                          ) : null}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )
-            })()}
+              ) : (
+                loading ? (
+                  <ListSkeleton />
+                ) : (
+                  <CategoriasChart
+                    data={data?.gastos_por_categoria?.[moneda === 'ARS' ? 'ars' : 'usd'] ?? []}
+                    showPercent={showChartPercent}
+                    moneda={moneda}
+                    onSelectCategory={(id, nombre) => setSelectedCategoria({ id, nombre })}
+                  />
+                )
+              )}
+            </div>
           </div>
-        </div>
+        </WidgetErrorBoundary>
+
+        {/* Col 3: Próximos Pagos */}
+        <WidgetErrorBoundary title="Próximos pagos">
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>Próximos pagos</h3>
+            </div>
+            <div className={styles.cardContent}>
+              {loading ? (
+                <ListSkeleton />
+              ) : (() => {
+                const pagosFiltrados = (data?.proximos_pagos ?? []).filter(p => p.moneda === moneda)
+                if (pagosFiltrados.length === 0) {
+                  return (
+                    <EmptyState
+                      variant="compact"
+                      icon={Calendar}
+                      title={`Sin pagos próximos en ${moneda}`}
+                    />
+                  )
+                }
+                return (
+                  <div className={styles.list}>
+                    {pagosFiltrados.slice(0, 4).map((p) => {
+                      const isVencido = Boolean(p.es_vencido || p.dias_restantes < 0)
+                      const isUrgente = !isVencido && p.dias_restantes <= 1
+                      let fechaTxt = formatFecha(p.fecha_cobro)
+                      if (isVencido) {
+                        const diasPasados = Math.abs(p.dias_restantes)
+                        fechaTxt = diasPasados === 1 ? 'Venció ayer' : `Venció hace ${diasPasados} días`
+                      } else if (p.dias_restantes === 0) {
+                        fechaTxt = 'Hoy'
+                      } else if (p.dias_restantes === 1) {
+                        fechaTxt = 'Mañana'
+                      } else if (p.dias_restantes <= 7) {
+                        fechaTxt = `En ${p.dias_restantes} días`
+                      }
+
+                      const handlePagoClick = () => {
+                        if (p.tipo === 'suscripcion') {
+                          navigate('/app/suscripciones')
+                        } else if (p.tipo === 'resumen_tarjeta') {
+                          navigate(p.billetera_id ? `/app/billeteras/${p.billetera_id}` : '/app/billeteras')
+                        } else if (p.tipo === 'cuota') {
+                          navigate('/app/transacciones')
+                        }
+                      }
+
+                      return (
+                        <div
+                          key={p.id}
+                          className={`${styles.listItem} ${styles.listItemClickable}`}
+                          onClick={handlePagoClick}
+                        >
+                          <AppleCalendarIcon dateStr={p.fecha_cobro} />
+                          <div className={styles.itemMeta}>
+                            <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
+                            <p className={styles.itemSub}>{fechaTxt}</p>
+                          </div>
+                          <div className={styles.pagoRight}>
+                            <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
+                            {isVencido ? (
+                              <span className={styles.urgentBadge} style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>Vencido</span>
+                            ) : isUrgente ? (
+                              <span className={styles.urgentBadge}>Urgente</span>
+                            ) : null}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
+        </WidgetErrorBoundary>
       </div>
 
       {/* Perfil Financiero */}
@@ -955,70 +961,72 @@ export default function DashboardPage() {
         )}
 
         {/* Col 2: Últimos Movimientos */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Últimos movimientos</h3>
-            <Link to="/app/transacciones" className={styles.seeAll}>
-              Ver todos <ChevronRight size={16} />
-            </Link>
-          </div>
-          <div className={styles.cardContent}>
-            {loading ? (
-              <ListSkeleton />
-            ) : (() => {
-              const movsFiltrados = (data?.ultimos_movimientos ?? []).filter(m => m.moneda === moneda)
-              if (movsFiltrados.length === 0) {
+        <WidgetErrorBoundary title="Últimos movimientos">
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>Últimos movimientos</h3>
+              <Link to="/app/transacciones" className={styles.seeAll}>
+                Ver todos <ChevronRight size={16} />
+              </Link>
+            </div>
+            <div className={styles.cardContent}>
+              {loading ? (
+                <ListSkeleton />
+              ) : (() => {
+                const movsFiltrados = (data?.ultimos_movimientos ?? []).filter(m => m.moneda === moneda)
+                if (movsFiltrados.length === 0) {
+                  return (
+                    <EmptyState
+                      variant="compact"
+                      icon={ArrowUpDown}
+                      title={`Sin movimientos en ${moneda}.`}
+                    />
+                  )
+                }
                 return (
-                  <EmptyState
-                    variant="compact"
-                    icon={ArrowUpDown}
-                    title={`Sin movimientos en ${moneda}.`}
-                  />
-                )
-              }
-              return (
-                <div className={styles.list}>
-                  {movsFiltrados.map((m) => {
-                    const isMeta = Boolean(
-                      m.movimiento_meta_id ||
-                      m.descripcion?.startsWith('Aporte a la meta:') ||
-                      m.descripcion?.startsWith('Retiro de la meta:')
-                    )
-                    const isAporte = isMeta && m.tipo === 'egreso'
-                    const isRetiro = isMeta && m.tipo === 'ingreso'
+                  <div className={styles.list}>
+                    {movsFiltrados.map((m) => {
+                      const isMeta = Boolean(
+                        m.movimiento_meta_id ||
+                        m.descripcion?.startsWith('Aporte a la meta:') ||
+                        m.descripcion?.startsWith('Retiro de la meta:')
+                      )
+                      const isAporte = isMeta && m.tipo === 'egreso'
+                      const isRetiro = isMeta && m.tipo === 'ingreso'
 
-                    return (
-                      <div key={m.id} className={styles.listItem}>
-                        <div className={styles.itemIcon}>
-                          <SubcategoriaIcon
-                            nombre={isMeta ? 'ahorro' : m.subcategoria_nombre}
-                            parentCategory={isMeta ? 'Ahorro' : m.categoria_nombre}
-                            size={32}
-                          />
+                      return (
+                        <div key={m.id} className={styles.listItem}>
+                          <div className={styles.itemIcon}>
+                            <SubcategoriaIcon
+                              nombre={isMeta ? 'ahorro' : m.subcategoria_nombre}
+                              parentCategory={isMeta ? 'Ahorro' : m.categoria_nombre}
+                              size={32}
+                            />
+                          </div>
+                          <div className={styles.itemMeta}>
+                            <p className={styles.itemName}>
+                              {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
+                            </p>
+                            <p className={styles.itemSub}>
+                              {formatFecha(m.fecha)} • {m.billetera_nombre}
+                              {isAporte && ' • Apartado para meta'}
+                              {isRetiro && ' • Retiro de meta'}
+                            </p>
+                          </div>
+                          <div className={`${styles.itemAmount} ${
+                            isAporte || isRetiro ? '' : (m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg)
+                          }`}>
+                            {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, m.moneda)}
+                          </div>
                         </div>
-                        <div className={styles.itemMeta}>
-                          <p className={styles.itemName}>
-                            {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
-                          </p>
-                          <p className={styles.itemSub}>
-                            {formatFecha(m.fecha)} • {m.billetera_nombre}
-                            {isAporte && ' • Apartado para meta'}
-                            {isRetiro && ' • Retiro de meta'}
-                          </p>
-                        </div>
-                        <div className={`${styles.itemAmount} ${
-                          isAporte || isRetiro ? '' : (m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg)
-                        }`}>
-                          {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, m.moneda)}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )
-            })()}
+                      )
+                    })}
+                  </div>
+                )
+              })()}
+            </div>
           </div>
-        </div>
+        </WidgetErrorBoundary>
       </div>
     </div>
   )

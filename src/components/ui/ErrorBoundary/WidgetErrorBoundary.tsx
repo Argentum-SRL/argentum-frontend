@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { AlertCircle, RefreshCw } from 'lucide-react'
+import { reportarErrorFrontend } from '@/services/reporteError.service'
 import styles from './WidgetErrorBoundary.module.css'
 
 interface Props {
@@ -27,6 +28,11 @@ export class WidgetErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error(`[WidgetErrorBoundary] Error atrapado en "${this.props.title || 'Widget'}":`, error, errorInfo)
+    reportarErrorFrontend({
+      mensaje: error?.message || String(error),
+      stack: error?.stack || errorInfo?.componentStack || null,
+      componente: `WidgetErrorBoundary(${this.props.title || 'Widget'})`,
+    })
   }
 
   handleReset = (): void => {

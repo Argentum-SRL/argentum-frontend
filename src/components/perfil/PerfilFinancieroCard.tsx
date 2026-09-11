@@ -307,7 +307,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = () => {
 
       {/* Footer de confianza del análisis */}
       <div className={styles.pfConfidenceFooter}>
-        <span>Nivel de confianza: <strong>{perfilNuevo.nivel_confianza.toUpperCase()}</strong></span>
+        <span>Nivel de confianza: <strong>{(perfilNuevo.nivel_confianza || 'en evaluación').toUpperCase()}</strong></span>
         <span>{perfilNuevo.ciclos_con_datos} ciclos con datos observados ({cobertura !== null ? Math.round(cobertura * 100) : 0}% continuidad activa)</span>
       </div>
     </div>

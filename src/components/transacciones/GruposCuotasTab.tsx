@@ -8,17 +8,21 @@ import {
   Sparkles, 
   Search, 
   ChevronRight,
-  X
+  X,
+  GripHorizontal
 } from 'lucide-react'
 import styles from './GruposCuotasTab.module.css'
 import grupoCuotasService from '@/services/grupoCuotas.service'
 import billeteraService from '@/services/billetera.service'
-import type { GrupoCuotasResumen, Billetera } from '@/types'
+import categoriaService from '@/services/categoria.service'
+import type { GrupoCuotasResumen, Billetera, Categoria, Subcategoria } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { EmptyState, SelectInput } from '@/components/ui'
+import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
+import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import Modal from '@/components/ui/Modal/Modal'
 
 export default function GruposCuotasTab() {
@@ -34,7 +38,16 @@ export default function GruposCuotasTab() {
   // States for the edit form
   const [editDesc, setEditDesc] = useState('')
   const [editMonto, setEditMonto] = useState<number | ''>('')
+  const [editCategoriaId, setEditCategoriaId] = useState('')
+  const [prevEditCategoriaId, setPrevEditCategoriaId] = useState('')
+  const [editSubcategoriaId, setEditSubcategoriaId] = useState('')
+  const [showAllCats, setShowAllCats] = useState(false)
+  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
+  const [loadingSubcats, setLoadingSubcats] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  // Categories list
+  const [categorias, setCategorias] = useState<Categoria[]>([])
 
   // Prepayment & Wallet states
   const [grupoPrepago, setGrupoPrepago] = useState<GrupoCuotasResumen | null>(null)
@@ -43,6 +56,11 @@ export default function GruposCuotasTab() {
 
   const { showToast } = useToast()
   const { confirm } = useModal()
+
+  if (editCategoriaId !== prevEditCategoriaId) {
+    setPrevEditCategoriaId(editCategoriaId)
+    setSubcategorias([])
+  }
 
   const fetchGrupos = useCallback(async () => {
     try {
@@ -65,18 +83,117 @@ export default function GruposCuotasTab() {
     }
   }, [])
 
+  const fetchCategorias = useCallback(async () => {
+    try {
+      const data = await categoriaService.getCategorias()
+      setCategorias(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }, [])
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchGrupos()
       fetchBilleteras()
+      fetchCategorias()
     }, 0)
     return () => clearTimeout(timer)
-  }, [fetchGrupos, fetchBilleteras])
+  }, [fetchGrupos, fetchBilleteras, fetchCategorias])
+
+  useEffect(() => {
+    if (!editCategoriaId) return
+
+    let isMounted = true
+    const fetchSubcats = async () => {
+      setLoadingSubcats(true)
+      try {
+        const data = await categoriaService.getSubcategorias(editCategoriaId)
+        if (isMounted) {
+          setSubcategorias(data)
+        }
+      } catch (e) {
+        console.error('Error fetching subcategorias:', e)
+      } finally {
+        if (isMounted) {
+          setLoadingSubcats(false)
+        }
+      }
+    }
+
+    fetchSubcats()
+    return () => {
+      isMounted = false
+    }
+  }, [editCategoriaId])
+
+  const filteredCategorias = useMemo(() => {
+    return categorias.filter(c => c.tipo === 'egreso')
+  }, [categorias])
+
+  const displayCategorias = useMemo(() => {
+    if (showAllCats) return filteredCategorias
+    return filteredCategorias.slice(0, 7)
+  }, [filteredCategorias, showAllCats])
+
+  const hasMoreCats = filteredCategorias.length > 7
+
+  const currentCat = useMemo(() => categorias.find(c => c.id === editCategoriaId), [categorias, editCategoriaId])
+  const currentCatNorm = useMemo(() => currentCat ? currentCat.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() : '', [currentCat])
+  const hideGeneralSubcat = currentCatNorm === 'empleo' || currentCatNorm === 'trabajo independiente' || currentCatNorm === 'inversiones y rentas'
+
+  const sortedSubcategorias = useMemo(() => {
+    const PROBABILIDAD_SUBCATS: Record<string, string[]> = {
+      transporte: ['taxi / apps', 'transporte publico', 'combustible', 'peajes', 'estacionamiento', 'mantenimiento y seguro del auto'],
+      salud: ['farmacia', 'medico / consulta', 'obra social / prepaga', 'estudios y analisis', 'odontologia', 'terapias'],
+      hogar: ['limpieza', 'reparaciones', 'muebles y electrodomesticos'],
+      servicios: ['luz', 'gas', 'agua', 'alquiler', 'expensas', 'impuestos', 'seguros'],
+      recreativo: ['salidas', 'deportes y gimnasio', 'hobbies y juegos', 'viajes'],
+      alimentacion: ['supermercado', 'kiosco', 'verduleria', 'carniceria'],
+      indumentaria: ['ropa', 'calzado', 'accesorios'],
+      comunicacion: ['celular', 'internet y cable'],
+      educacion: ['cuotas', 'materiales y libros', 'idiomas'],
+      'restaurantes y delivery': ['restaurantes', 'delivery', 'cafeteria'],
+      otros: ['reintegros', 'cuidado personal', 'mascotas', 'regalos'],
+      banco: ['comisiones y gastos bancarios', 'impuesto al cheque / movimientos', 'prestamos', 'intereses pagados'],
+      empleo: ['sueldo', 'bonos y horas extras', 'aguinaldo'],
+      'trabajo independiente': ['honorarios', 'venta de productos/servicios'],
+      'inversiones y rentas': ['dividendos e intereses', 'alquileres cobrados'],
+    }
+
+    const priorityList = PROBABILIDAD_SUBCATS[currentCatNorm] || []
+
+    return [...subcategorias]
+      .filter(s => s.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() !== 'otros')
+      .sort((a, b) => {
+        const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+        const aNorm = norm(a.nombre)
+        const bNorm = norm(b.nombre)
+
+        const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos' || aNorm === 'varios'
+        const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos' || bNorm === 'varios'
+
+        if (isAOtros && !isBOtros) return 1
+        if (!isAOtros && isBOtros) return -1
+        if (isAOtros && isBOtros) return 0
+
+        const ai = priorityList.indexOf(aNorm)
+        const bi = priorityList.indexOf(bNorm)
+        if (ai !== -1 && bi !== -1) return ai - bi
+        if (ai !== -1) return -1
+        if (bi !== -1) return 1
+
+        return aNorm.localeCompare(bNorm)
+      })
+  }, [subcategorias, currentCatNorm])
 
   const handleEditClick = (grupo: GrupoCuotasResumen) => {
     setEditingGrupo(grupo)
     setEditDesc(grupo.descripcion)
     setEditMonto(grupo.monto_total)
+    setEditCategoriaId(grupo.categoria_id || '')
+    setEditSubcategoriaId(grupo.subcategoria_id || '')
+    setShowAllCats(false)
   }
 
   const handleCancelar = (grupo: GrupoCuotasResumen) => {
@@ -147,7 +264,9 @@ export default function GruposCuotasTab() {
     try {
       await grupoCuotasService.updateGrupoCuotas(editingGrupo.id, {
         descripcion: editDesc,
-        monto_total_nuevo: editMonto
+        monto_total_nuevo: editMonto,
+        categoria_id: editCategoriaId || null,
+        subcategoria_id: editSubcategoriaId || null
       })
       showToast('Compra en cuotas actualizada', 'success')
       setEditingGrupo(null)
@@ -639,6 +758,94 @@ export default function GruposCuotasTab() {
                 />
               </div>
             </div>
+
+            {/* Categoría y Subcategoría */}
+            {!editCategoriaId ? (
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel}>Categoría</label>
+                <div className={styles.catGrid}>
+                  {displayCategorias.map((cat) => (
+                    <button
+                      type="button"
+                      key={cat.id}
+                      className={`${styles.catBtn} ${editCategoriaId === cat.id ? styles.catBtnActive : ''}`}
+                      onClick={() => {
+                        setEditCategoriaId(cat.id)
+                        setEditSubcategoriaId('')
+                      }}
+                    >
+                      <CategoriaIcon nombre={cat.nombre} size={36} />
+                      <span className={styles.catName}>{cat.nombre}</span>
+                    </button>
+                  ))}
+                  {!showAllCats && hasMoreCats && (
+                    <button
+                      type="button"
+                      className={styles.catBtn}
+                      onClick={() => setShowAllCats(true)}
+                    >
+                      <div className={styles.moreCatsIconWrap}>
+                        <GripHorizontal size={22} strokeWidth={1.5} />
+                      </div>
+                      <span className={styles.catName}>Más</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className={styles.selectedCatBanner}>
+                  <div className={styles.selectedCatInfo}>
+                    <CategoriaIcon nombre={categorias.find(c => c.id === editCategoriaId)?.nombre} size={32} />
+                    <div className={styles.selectedCatText}>
+                      <span className={styles.selectedCatLabel}>Categoría</span>
+                      <span className={styles.selectedCatName}>{categorias.find(c => c.id === editCategoriaId)?.nombre}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.changeCatBtn}
+                    onClick={() => {
+                      setEditCategoriaId('')
+                      setEditSubcategoriaId('')
+                    }}
+                  >
+                    Cambiar
+                  </button>
+                </div>
+
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>Subcategoría</label>
+                  <div className={styles.subcatGrid}>
+                    {loadingSubcats ? <div className={styles.subcatLoading}>Cargando...</div> : (
+                      <>
+                        {!hideGeneralSubcat && (
+                          <button
+                            type="button"
+                            className={`${styles.subcatChip} ${!editSubcategoriaId ? styles.subcatChipActive : ''}`}
+                            onClick={() => setEditSubcategoriaId('')}
+                          >
+                            <SubcategoriaIcon nombre="general" parentCategory={categorias.find(c => c.id === editCategoriaId)?.nombre} size={32} />
+                            General
+                          </button>
+                        )}
+                        {sortedSubcategorias.map((sub) => (
+                          <button
+                            type="button"
+                            key={sub.id}
+                            className={`${styles.subcatChip} ${editSubcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
+                            onClick={() => setEditSubcategoriaId(sub.id)}
+                          >
+                            <SubcategoriaIcon nombre={sub.nombre} parentCategory={categorias.find(c => c.id === editCategoriaId)?.nombre} size={32} />
+                            {sub.nombre}
+                          </button>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className={styles.modalInfoPanel}>
               <CreditCard size={18} className={styles.infoIcon} />

@@ -10,7 +10,12 @@ const grupoCuotasService = {
     return response.data
   },
 
-  updateGrupoCuotas: async (id: string, data: { monto_total_nuevo?: number | null; descripcion?: string | null }) => {
+  updateGrupoCuotas: async (id: string, data: {
+    monto_total_nuevo?: number | null
+    descripcion?: string | null
+    categoria_id?: string | null
+    subcategoria_id?: string | null
+  }) => {
     const response = await api.patch<GrupoCuotasResumen>(`/grupos-cuotas/${id}`, data)
     invalidateResumen()
     invalidateBilleteras()

@@ -768,6 +768,8 @@ export interface GrupoCuotasResumen {
   tiene_interes: boolean
   tasa_interes: number | null
   estado: 'activo' | 'cancelado' | 'completado'
+  categoria_id?: string | null
+  subcategoria_id?: string | null
 }
 
 

@@ -156,6 +156,7 @@ export default function TransaccionModal({
   const [state, dispatch] = useReducer(formReducer, initialState)
   const carouselRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const submittingRef = useRef(false)
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
   const [loadingSubcats, setLoadingSubcats] = useState(false)
 
@@ -275,6 +276,7 @@ export default function TransaccionModal({
     }, [hideGeneralSubcat, subcategoriaId, sortedSubcategorias])
 
   useEffect(() => {
+    submittingRef.current = false
     if (open) dispatch({ type: 'RESET', transaccion: transaccion || null, billeteras })
   }, [open, transaccion, billeteras, isEdit])
 
@@ -430,6 +432,8 @@ export default function TransaccionModal({
     ['ia_wpp', 'ia_chat', 'ia_pdf'].includes(transaccion?.origen ?? '')
 
   const handleSubmit = async () => {
+    if (isSubmitting || submittingRef.current) return
+
     // Validaciones estrictas
     if (!monto || Number(monto) <= 0 || !Number.isFinite(Number(monto))) {
       showToast('El monto debe ser mayor a cero', 'error')
@@ -472,6 +476,7 @@ export default function TransaccionModal({
       }
     }
 
+    submittingRef.current = true
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       // Sanitización de cuotas para el envío
@@ -529,6 +534,7 @@ export default function TransaccionModal({
       console.error(e)
       showToast(getErrorMessage(e, 'Error al guardar la transacción'), 'error')
     } finally {
+      submittingRef.current = false
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }
   }

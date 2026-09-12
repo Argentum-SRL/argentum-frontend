@@ -51,15 +51,22 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
+    const originalRequest = error.config
+    const isExpected401 = error.response?.status === 401 && (
+      originalRequest?.url?.includes('/auth/refresh') ||
+      originalRequest?.url?.includes('/auth/me')
+    )
+
     if (error.response) {
-      console.error("[API Error]", error.response.status, error.response.data?.detail || error.response.statusText);
+      if (!isExpected401) {
+        console.error("[API Error]", error.response.status, error.response.data?.detail || error.response.statusText);
+      }
     } else if (error.code === 'ECONNABORTED') {
       console.error("[API Error] Tiempo de espera agotado (Timeout)");
     } else {
       console.error("[API Error] Error de conexión o red:", error.message);
     }
 
-    const originalRequest = error.config
     if (!originalRequest) {
       return Promise.reject(error)
     }

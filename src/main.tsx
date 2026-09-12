@@ -11,6 +11,15 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+// Silenciar warnings informativos ruidosos de librerías externas (Google Identity Services)
+const filterGsi = (originalFn: (...args: unknown[]) => void) => (...args: unknown[]) => {
+  if (typeof args[0] === 'string' && args[0].includes('[GSI_LOGGER]')) return
+  originalFn(...args)
+}
+console.warn = filterGsi(console.warn)
+console.info = filterGsi(console.info)
+console.error = filterGsi(console.error)
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ModalProvider>

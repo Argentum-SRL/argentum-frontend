@@ -45,53 +45,45 @@ export default function OnboardingPage() {
   const [cargandoReintento, setCargandoReintento] = useState(false)
   const { refreshUser } = useAuth()
 
-  const cargarEstado = useCallback(async (signal?: AbortSignal) => {
+  const cargarEstado = useCallback(async () => {
+    const controller = new AbortController()
+    let timedOut = false
+    const timeoutId = setTimeout(() => {
+      timedOut = true
+      controller.abort()
+    }, 10000)
+
     try {
-      const res = await getEstadoOnboarding(signal)
-      if (signal?.aborted) return
+      const res = await getEstadoOnboarding(controller.signal)
+      clearTimeout(timeoutId)
       if (res.onboarding_completo) {
         try {
           await refreshUser()
-          if (!signal?.aborted) {
-            navigate('/app/dashboard', { replace: true })
-          }
+          navigate('/app/dashboard', { replace: true })
         } catch (err) {
-          if (!signal?.aborted) {
-            console.error(err)
-            setErrorCarga(true)
-          }
+          console.error('Error al refrescar usuario tras onboarding:', err)
+          setErrorCarga(true)
         }
         return
       }
-      if (!signal?.aborted) {
-        setEstado(res)
-        setPasoActual(mapEstadoAPaso(res))
-      }
+      setEstado(res)
+      setPasoActual(mapEstadoAPaso(res))
     } catch (err) {
-      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
-        return
+      clearTimeout(timeoutId)
+      if (timedOut) {
+        console.error('Tiempo de espera agotado al obtener estado de onboarding (>10s)')
+      } else {
+        console.error('Error al obtener estado de onboarding:', err)
       }
-      if (!signal?.aborted) {
-        console.error(err)
-        setErrorCarga(true)
-      }
+      setErrorCarga(true)
     } finally {
-      if (!signal?.aborted) {
-        setCargando(false)
-      }
+      clearTimeout(timeoutId)
+      setCargando(false)
     }
   }, [navigate, refreshUser])
 
   useEffect(() => {
-    const controller = new AbortController()
-    Promise.resolve().then(() => {
-      if (!controller.signal.aborted) {
-        cargarEstado(controller.signal)
-      }
-    })
-    return () => {
-      controller.abort()
-    }
+    cargarEstado()
   }, [cargarEstado])
 
   async function handleRefreshAndNavigate() {

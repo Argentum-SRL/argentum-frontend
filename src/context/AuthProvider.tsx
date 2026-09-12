@@ -68,8 +68,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (mounted) {
             setUsuario(userRes.data)
           }
-        } catch {
-          if (mounted) {
+        } catch (userErr: unknown) {
+          const status = (userErr as { response?: { status?: number } })?.response?.status
+          if (mounted && status === 401) {
             limpiarSesionCompleta()
             clearTokens()
             setUsuario(null)
@@ -81,7 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // timeout / aborted
           return
         }
-        if (mounted) {
+        const status = (err as { response?: { status?: number } })?.response?.status
+        if (mounted && status === 401) {
           limpiarSesionCompleta()
           clearTokens()
           setUsuario(null)

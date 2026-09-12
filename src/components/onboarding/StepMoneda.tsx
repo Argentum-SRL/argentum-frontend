@@ -3,6 +3,8 @@ import { Loader2 } from 'lucide-react'
 import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepMoneda.module.css'
 
@@ -33,6 +35,8 @@ function formatARS(valor: number | null | undefined): string {
 
 export default function StepMoneda({ datosIniciales, onNext }: Props) {
   const { showToast } = useToast()
+  const { refreshUser } = useAuth()
+  const navigate = useNavigate()
   const [moneda, setMoneda] = useState(datosIniciales.moneda_principal ?? 'ARS')
   const [secundaria, setSecundaria] = useState(Boolean(datosIniciales.moneda_secundaria_activa))
   const [tipoDolar, setTipoDolar] = useState<'oficial' | 'blue' | 'tarjeta' | 'mep'>(
@@ -42,6 +46,8 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
   const [cargando, setCargando] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [guardadoExitoso, setGuardadoExitoso] = useState(false)
+  const [siguientePasoGuardado, setSiguientePasoGuardado] = useState<string | null>(null)
 
   useEffect(() => {
     getCotizaciones()
@@ -51,6 +57,15 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
   }, [])
 
   const necesitaDolar = useMemo(() => moneda === 'USD' || secundaria, [moneda, secundaria])
+
+  async function finalizar(paso: string | null) {
+    if (!paso) {
+      await refreshUser()
+      navigate('/app/dashboard', { replace: true })
+    } else {
+      onNext(paso)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -63,14 +78,24 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
 
     setLoading(true)
     try {
-      const res = await guardarMoneda({
-        moneda_principal: moneda,
-        moneda_secundaria_activa: secundaria,
-        tipo_dolar: necesitaDolar ? tipoDolar : null,
-      })
-      onNext(res.siguiente_paso)
+      let paso = siguientePasoGuardado
+      if (!guardadoExitoso) {
+        const res = await guardarMoneda({
+          moneda_principal: moneda,
+          moneda_secundaria_activa: secundaria,
+          tipo_dolar: necesitaDolar ? tipoDolar : null,
+        })
+        paso = res.siguiente_paso
+        setSiguientePasoGuardado(paso)
+        setGuardadoExitoso(true)
+      }
+
+      await finalizar(paso)
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, "No pudimos guardar tu moneda. Intentá de nuevo.")
+      const defaultMsg = guardadoExitoso
+        ? "No pudimos completar la configuración de tu cuenta. Por favor intentá de nuevo."
+        : "No pudimos guardar tu moneda. Intentá de nuevo."
+      const msg = getErrorMessage(err, defaultMsg)
       setError(msg)
       showToast(msg, "error")
     } finally {
@@ -156,7 +181,15 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
         {error && <p className={styles.error}>{error}</p>}
 
         <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? <><Loader2 size={18} className="animate-spin" /> Guardando...</> : 'Continuar'}
+          {loading ? (
+            <>
+              <Loader2 size={18} className="animate-spin" /> {guardadoExitoso ? 'Finalizando...' : 'Guardando...'}
+            </>
+          ) : guardadoExitoso ? (
+            'Reintentar'
+          ) : (
+            'Continuar'
+          )}
         </button>
       </form>
     </div>

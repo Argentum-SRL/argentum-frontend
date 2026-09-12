@@ -772,6 +772,16 @@ export interface GrupoCuotasResumen {
   subcategoria_id?: string | null
 }
 
+export interface GrupoCuotasUpdate {
+  monto_total_nuevo?: number | null
+  descripcion?: string | null
+  categoria_id?: string | null
+  subcategoria_id?: string | null
+  tarjeta_id?: string | null
+  billetera_id?: string | null
+  fecha_referencia?: string | null
+}
+
 
 // ===== PERFIL FINANCIERO =====
 

@@ -15,14 +15,17 @@ import styles from './GruposCuotasTab.module.css'
 import grupoCuotasService from '@/services/grupoCuotas.service'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
-import type { GrupoCuotasResumen, Billetera, Categoria, Subcategoria } from '@/types'
+import tarjetaService from '@/services/tarjeta.service'
+import type { GrupoCuotasResumen, GrupoCuotasUpdate, Billetera, Categoria, Subcategoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { EmptyState, SelectInput } from '@/components/ui'
+import { EmptyState, SelectInput, DateInput } from '@/components/ui'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import RealCardPreview from '@/components/tarjetas/RealCardPreview'
+import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import Modal from '@/components/ui/Modal/Modal'
 
 export default function GruposCuotasTab() {
@@ -48,6 +51,17 @@ export default function GruposCuotasTab() {
 
   // Categories list
   const [categorias, setCategorias] = useState<Categoria[]>([])
+
+  // Tarjetas state
+  const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
+
+  // States for card and reference date in edit form
+  const [editTarjetaId, setEditTarjetaId] = useState('')
+  const [editTarjetaTouched, setEditTarjetaTouched] = useState(false)
+  const [editFechaReferencia, setEditFechaReferencia] = useState('')
+  const [editFechaTouched, setEditFechaTouched] = useState(false)
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const tarjetasCarouselRef = useRef<HTMLDivElement>(null)
 
   // Prepayment & Wallet states
   const [grupoPrepago, setGrupoPrepago] = useState<GrupoCuotasResumen | null>(null)
@@ -92,14 +106,37 @@ export default function GruposCuotasTab() {
     }
   }, [])
 
+  const fetchTarjetas = useCallback(async () => {
+    try {
+      const data = await tarjetaService.getTarjetas()
+      setTarjetas(data.filter(t => t.estado === 'activa'))
+    } catch (e) {
+      console.error(e)
+    }
+  }, [])
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchGrupos()
       fetchBilleteras()
       fetchCategorias()
+      fetchTarjetas()
     }, 0)
     return () => clearTimeout(timer)
-  }, [fetchGrupos, fetchBilleteras, fetchCategorias])
+  }, [fetchGrupos, fetchBilleteras, fetchCategorias, fetchTarjetas])
+
+  useEffect(() => {
+    if (!editingGrupo || !editTarjetaId) return
+
+    const timer = setTimeout(() => {
+      const card = cardRefs.current.get(editTarjetaId)
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [editingGrupo, editTarjetaId])
 
   useEffect(() => {
     if (!editCategoriaId) return
@@ -194,6 +231,14 @@ export default function GruposCuotasTab() {
     setEditCategoriaId(grupo.categoria_id || '')
     setEditSubcategoriaId(grupo.subcategoria_id || '')
     setShowAllCats(false)
+
+    const matchingTarjeta = tarjetas.find(t => t.nombre === grupo.tarjeta_nombre)
+    setEditTarjetaId(matchingTarjeta ? matchingTarjeta.id : (tarjetas[0]?.id || ''))
+    setEditTarjetaTouched(false)
+
+    const fechaComp = grupo.fecha_compra ? grupo.fecha_compra.split('T')[0] : ''
+    setEditFechaReferencia(fechaComp)
+    setEditFechaTouched(false)
   }
 
   const handleCancelar = (grupo: GrupoCuotasResumen) => {
@@ -255,23 +300,53 @@ export default function GruposCuotasTab() {
       return
     }
 
-    setSaving(true)
-    try {
-      await grupoCuotasService.updateGrupoCuotas(editingGrupo.id, {
-        descripcion: editDesc.trim(),
-        monto_total_nuevo: editMonto,
-        categoria_id: editCategoriaId || null,
-        subcategoria_id: editSubcategoriaId || null
-      })
-      showToast('Compra en cuotas actualizada', 'success')
-      setEditingGrupo(null)
-      fetchGrupos()
-    } catch (e: unknown) {
-      console.error(e)
-      showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
-    } finally {
-      setSaving(false)
+    const ejecutarGuardado = async () => {
+      setSaving(true)
+      try {
+        const payload: GrupoCuotasUpdate = {
+          descripcion: editDesc.trim(),
+          monto_total_nuevo: editMonto,
+          categoria_id: editCategoriaId || null,
+          subcategoria_id: editSubcategoriaId || null
+        }
+
+        if (editTarjetaTouched && editTarjetaId) {
+          payload.tarjeta_id = editTarjetaId
+          const selT = tarjetas.find(t => t.id === editTarjetaId)
+          if (selT?.billetera_id) {
+            payload.billetera_id = selT.billetera_id
+          }
+        }
+
+        if (editFechaTouched && editFechaReferencia) {
+          payload.fecha_referencia = editFechaReferencia
+        }
+
+        await grupoCuotasService.updateGrupoCuotas(editingGrupo.id, payload)
+        showToast('Compra en cuotas actualizada', 'success')
+        setEditingGrupo(null)
+        fetchGrupos()
+      } catch (e: unknown) {
+        console.error(e)
+        showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+      } finally {
+        setSaving(false)
+      }
     }
+
+    if (editTarjetaTouched || editFechaTouched) {
+      confirm({
+        title: '¿Confirmar cambios?',
+        description: 'Esto va a recalcular las cuotas pendientes con la tarjeta y fecha elegidas. Las cuotas ya pagadas no se modifican.',
+        variant: 'default',
+        confirmLabel: 'Confirmar',
+        cancelLabel: 'Cancelar',
+        onConfirm: ejecutarGuardado
+      })
+      return
+    }
+
+    await ejecutarGuardado()
   }
 
   const handleDeleteClick = (id: string) => {
@@ -751,6 +826,66 @@ export default function GruposCuotasTab() {
                   required
                 />
               </div>
+            </div>
+
+            {/* Selector de Tarjeta */}
+            <div className={styles.formField}>
+              <label className={styles.fieldLabel}>Tarjeta</label>
+              <div className={styles.billeterasCarouselScroller}>
+                <div className={styles.billeterasCarousel} ref={tarjetasCarouselRef}>
+                  {tarjetas.length === 0 ? (
+                    <p className={styles.noTarjetas}>No tenés tarjetas activas.</p>
+                  ) : (
+                    tarjetas.map((t) => (
+                      <div
+                        key={t.id}
+                        className={styles.billeteraSelectWrap}
+                        data-active={editTarjetaId === t.id}
+                        ref={(el) => {
+                          if (el) cardRefs.current.set(t.id, el)
+                          else cardRefs.current.delete(t.id)
+                        }}
+                      >
+                        <RealCardPreview
+                          ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
+                          red={t.red}
+                          titular={t.nombre}
+                          diaCierre={t.dia_cierre}
+                          diaVencimiento={t.dia_vencimiento}
+                          color={t.color || '#0D2045'}
+                          billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
+                        />
+                        <button
+                          type="button"
+                          className={styles.billeteraOverlay}
+                          onClick={() => {
+                            setEditTarjetaId(t.id)
+                            setEditTarjetaTouched(true)
+                          }}
+                          title={`Seleccionar tarjeta ${t.nombre}`}
+                          aria-label={`Seleccionar tarjeta ${t.nombre}`}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Fecha de Referencia */}
+            <div className={styles.formField}>
+              <label className={styles.fieldLabel} htmlFor="edit-fecha-referencia">
+                Fecha de referencia
+              </label>
+              <DateInput
+                id="edit-fecha-referencia"
+                value={editFechaReferencia}
+                onChange={(val) => {
+                  setEditFechaReferencia(val)
+                  setEditFechaTouched(true)
+                }}
+                className={styles.fieldInput}
+              />
             </div>
 
             {/* Categoría y Subcategoría */}

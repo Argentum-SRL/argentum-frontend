@@ -1,5 +1,5 @@
 import api from './api'
-import type { GrupoCuotasResumen } from '@/types'
+import type { GrupoCuotasResumen, GrupoCuotasUpdate } from '@/types'
 import { invalidateResumen } from './dashboard.service'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidatePresupuestos } from './presupuesto.service'
@@ -10,12 +10,7 @@ const grupoCuotasService = {
     return response.data
   },
 
-  updateGrupoCuotas: async (id: string, data: {
-    monto_total_nuevo?: number | null
-    descripcion?: string | null
-    categoria_id?: string | null
-    subcategoria_id?: string | null
-  }) => {
+  updateGrupoCuotas: async (id: string, data: GrupoCuotasUpdate) => {
     const response = await api.patch<GrupoCuotasResumen>(`/grupos-cuotas/${id}`, data)
     invalidateResumen()
     invalidateBilleteras()

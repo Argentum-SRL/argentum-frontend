@@ -117,11 +117,7 @@ export default function RegisterPage() {
         return
       }
       if (window.turnstile?.render) {
-        if (typeof window.turnstile.ready === 'function') {
-          window.turnstile.ready(doRender)
-        } else {
-          doRender()
-        }
+        doRender()
       } else {
         let attempts = 0
         const interval = setInterval(() => {
@@ -132,11 +128,7 @@ export default function RegisterPage() {
           }
           if (window.turnstile?.render) {
             clearInterval(interval)
-            if (typeof window.turnstile.ready === 'function') {
-              window.turnstile.ready(doRender)
-            } else {
-              doRender()
-            }
+            doRender()
           }
         }, 100)
         retryTimer = setTimeout(() => clearInterval(interval), 5000)

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import os from 'node:os'
@@ -10,11 +10,22 @@ const cacheDir = process.env.LOCALAPPDATA
   ? path.resolve(process.env.LOCALAPPDATA, 'argentum-frontend-vite-cache')
   : path.resolve(os.tmpdir(), 'argentum-frontend-vite-cache')
 
-export default defineConfig({
-  cacheDir,
-  define: {
-    'import.meta.env.TURNSTILE_SITE_KEY': JSON.stringify(process.env.TURNSTILE_SITE_KEY || process.env.VITE_TURNSTILE_SITE_KEY || ''),
-  },
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const turnstileSiteKey =
+    process.env.TURNSTILE_SITE_KEY ||
+    process.env.VITE_TURNSTILE_SITE_KEY ||
+    env.TURNSTILE_SITE_KEY ||
+    env.VITE_TURNSTILE_SITE_KEY ||
+    ''
+
+  return {
+    cacheDir,
+    envPrefix: ['VITE_', 'TURNSTILE_'],
+    define: {
+      'import.meta.env.TURNSTILE_SITE_KEY': JSON.stringify(turnstileSiteKey),
+      'import.meta.env.VITE_TURNSTILE_SITE_KEY': JSON.stringify(turnstileSiteKey),
+    },
   plugins: [
     react(),
     VitePWA({
@@ -115,4 +126,5 @@ export default defineConfig({
       },
     },
   },
+}
 })

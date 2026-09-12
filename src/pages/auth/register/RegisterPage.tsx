@@ -28,6 +28,7 @@ declare global {
       reset: (widgetId?: string) => void
       remove: (widgetId: string) => void
       getResponse: (widgetId?: string) => string
+      ready?: (callback: () => void) => void
     }
   }
 }
@@ -68,13 +69,18 @@ export default function RegisterPage() {
   const [turnstileToken, setTurnstileToken] = useState('')
   const turnstileContainerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
-  const siteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.TURNSTILE_SITE_KEY || '') as string
+  const siteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.TURNSTILE_SITE_KEY || '0x4AAAAAAEw9D_25MtFi7DYX') as string
 
   useEffect(() => {
     let isMounted = true
+    let retryTimer: ReturnType<typeof setTimeout> | null = null
 
-    const renderWidget = () => {
-      if (!isMounted || !window.turnstile || !turnstileContainerRef.current || widgetIdRef.current || !siteKey) {
+    if (!siteKey && import.meta.env.DEV) {
+      console.warn('[Turnstile] TURNSTILE_SITE_KEY no está configurada.')
+    }
+
+    const doRender = () => {
+      if (!isMounted || !window.turnstile?.render || !turnstileContainerRef.current || widgetIdRef.current || !siteKey) {
         return
       }
       try {
@@ -106,6 +112,37 @@ export default function RegisterPage() {
       }
     }
 
+    const renderWidget = () => {
+      if (!isMounted || !turnstileContainerRef.current || widgetIdRef.current || !siteKey) {
+        return
+      }
+      if (window.turnstile?.render) {
+        if (typeof window.turnstile.ready === 'function') {
+          window.turnstile.ready(doRender)
+        } else {
+          doRender()
+        }
+      } else {
+        let attempts = 0
+        const interval = setInterval(() => {
+          attempts++
+          if (!isMounted || widgetIdRef.current || attempts > 50) {
+            clearInterval(interval)
+            return
+          }
+          if (window.turnstile?.render) {
+            clearInterval(interval)
+            if (typeof window.turnstile.ready === 'function') {
+              window.turnstile.ready(doRender)
+            } else {
+              doRender()
+            }
+          }
+        }, 100)
+        retryTimer = setTimeout(() => clearInterval(interval), 5000)
+      }
+    }
+
     const scriptId = 'cf-turnstile-script'
     let script = document.getElementById(scriptId) as HTMLScriptElement | null
 
@@ -119,14 +156,16 @@ export default function RegisterPage() {
         renderWidget()
       }
       document.head.appendChild(script)
-    } else if (window.turnstile) {
+    } else if (window.turnstile?.render) {
       renderWidget()
     } else {
       script.addEventListener('load', renderWidget)
+      renderWidget()
     }
 
     return () => {
       isMounted = false
+      if (retryTimer) clearTimeout(retryTimer)
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current)

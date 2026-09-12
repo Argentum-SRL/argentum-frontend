@@ -20,15 +20,23 @@ import type { GrupoCuotasResumen, GrupoCuotasUpdate, Billetera, Categoria, Subca
 import { formatMonto } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
 import { useModal } from '@/hooks/useModal'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { EmptyState, SelectInput, DateInput } from '@/components/ui'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import Modal from '@/components/ui/Modal/Modal'
 
-export default function GruposCuotasTab() {
+interface GruposCuotasTabProps {
+  refreshTrigger?: number
+  onRefreshNeeded?: () => void
+  onOpenNew?: () => void
+}
+
+export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpenNew }: GruposCuotasTabProps = {}) {
   const [grupos, setGrupos] = useState<GrupoCuotasResumen[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedGrupo, setSelectedGrupo] = useState<GrupoCuotasResumen | null>(null)
@@ -40,7 +48,7 @@ export default function GruposCuotasTab() {
   
   // States for the edit form
   const [editDesc, setEditDesc] = useState('')
-  const [editMonto, setEditMonto] = useState<number | ''>('')
+  const [editMonto, setEditMonto] = useState<number | null>(null)
   const [editCategoriaId, setEditCategoriaId] = useState('')
   const [prevEditCategoriaId, setPrevEditCategoriaId] = useState('')
   const [editSubcategoriaId, setEditSubcategoriaId] = useState('')
@@ -70,6 +78,7 @@ export default function GruposCuotasTab() {
 
   const { showToast } = useToast()
   const { confirm } = useModal()
+  const { lastDataUpdate } = useNotificaciones()
 
   if (editCategoriaId !== prevEditCategoriaId) {
     setPrevEditCategoriaId(editCategoriaId)
@@ -124,6 +133,33 @@ export default function GruposCuotasTab() {
     }, 0)
     return () => clearTimeout(timer)
   }, [fetchGrupos, fetchBilleteras, fetchCategorias, fetchTarjetas])
+
+  // Auto-refresco en vivo ante eventos SSE de actualización de datos
+  useEffect(() => {
+    if (
+      lastDataUpdate?.entidad === 'cuotas' ||
+      lastDataUpdate?.entidad === 'transacciones' ||
+      lastDataUpdate?.entidad === 'tarjetas'
+    ) {
+      const timer = setTimeout(() => {
+        void fetchGrupos()
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchGrupos])
+
+  // Refresco ante cambios en refreshTrigger (ej: creación de transacción)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    const timer = setTimeout(() => {
+      void fetchGrupos()
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [refreshTrigger, fetchGrupos])
 
   useEffect(() => {
     if (!editingGrupo || !editTarjetaId) return
@@ -253,6 +289,7 @@ export default function GruposCuotasTab() {
           showToast('Compra en cuotas cancelada', 'success')
           setSelectedGrupo(null)
           fetchGrupos()
+          onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
           showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
@@ -281,6 +318,7 @@ export default function GruposCuotasTab() {
           showToast('¡Listo! Las cuotas restantes se saldaron.', 'success')
           setGrupoPrepago(null)
           fetchGrupos()
+          onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
           showToast(getErrorMessage(e, 'No pudimos saldar las cuotas. Intentá de nuevo.'), 'error')
@@ -295,7 +333,7 @@ export default function GruposCuotasTab() {
     e.preventDefault()
     if (!editingGrupo) return
 
-    if (editMonto === '' || editMonto <= 0) {
+    if (editMonto === null || editMonto <= 0) {
       showToast('Ingresá un monto total válido', 'error')
       return
     }
@@ -326,6 +364,7 @@ export default function GruposCuotasTab() {
         showToast('Compra en cuotas actualizada', 'success')
         setEditingGrupo(null)
         fetchGrupos()
+        onRefreshNeeded?.()
       } catch (e: unknown) {
         console.error(e)
         showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
@@ -361,6 +400,7 @@ export default function GruposCuotasTab() {
           showToast('Compra en cuotas eliminada', 'success')
           setSelectedGrupo(null)
           fetchGrupos()
+          onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
           showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
@@ -455,6 +495,8 @@ export default function GruposCuotasTab() {
         icon={CreditCard}
         title="No tenés compras en cuotas"
         description="Las compras financiadas con tarjeta aparecerán aquí organizadas."
+        actionLabel={onOpenNew ? "Registrar compra en cuotas" : undefined}
+        onActionClick={onOpenNew}
       />
     )
   }
@@ -814,18 +856,12 @@ export default function GruposCuotasTab() {
 
             <div className={styles.formField}>
               <label className={styles.fieldLabel}>Monto total recalculado</label>
-              <div className={styles.inputWithCurrency}>
-                <span className={styles.currencyPrefix}>{editingGrupo.moneda} $</span>
-                <input 
-                  type="number" 
-                  step="any"
-                  className={styles.fieldInput} 
-                  value={editMonto} 
-                  onChange={(e) => setEditMonto(e.target.value === '' ? '' : Number(e.target.value))}
-                  placeholder="0.00"
-                  required
-                />
-              </div>
+              <MontoInput
+                value={editMonto}
+                onChange={(v) => setEditMonto(v)}
+                moneda={(editingGrupo.moneda as 'ARS' | 'USD') || 'ARS'}
+                allowDecimals
+              />
             </div>
 
             {/* Selector de Tarjeta */}

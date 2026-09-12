@@ -37,7 +37,7 @@ interface TransaccionModalProps {
   billeteras: Billetera[]
   categorias: Categoria[]
   tarjetas: TarjetaCredito[]
-  onSuccess: () => void
+  onSuccess: (tx?: Transaccion | null) => void
 }
 
 interface FormState {
@@ -508,11 +508,15 @@ export default function TransaccionModal({
               }
               : undefined,
           }
+      let savedTx: Transaccion | null = null
       if (!isEdit) {
-        await transaccionService.createTransaccion(payload)
-        showToast('Transacción creada', 'success')
+        savedTx = await transaccionService.createTransaccion(payload)
+        showToast(
+          metodoPago === 'credito' ? 'Compra en cuotas registrada' : 'Transacción creada',
+          'success'
+        )
       } else if (transaccion) {
-        await transaccionService.updateTransaccion(transaccion.id, payload)
+        savedTx = await transaccionService.updateTransaccion(transaccion.id, payload)
         if (isPendienteIA) {
           await transaccionService.confirmarIA(transaccion.id)
           showToast('Transacción confirmada', 'success')
@@ -520,7 +524,7 @@ export default function TransaccionModal({
           showToast('Transacción actualizada', 'success')
         }
       }
-      onSuccess(); onClose()
+      onSuccess(savedTx); onClose()
     } catch (e) {
       console.error(e)
       showToast(getErrorMessage(e, 'Error al guardar la transacción'), 'error')

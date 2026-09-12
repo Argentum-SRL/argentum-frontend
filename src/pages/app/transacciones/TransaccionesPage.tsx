@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, Loader2 } from 'lucide-react'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
@@ -29,7 +30,24 @@ export default function TransaccionesPage() {
   const { periodo: periodoActual, loading: loadingPeriodo } = usePeriodoActual()
   const { lastDataUpdate } = useNotificaciones()
 
-  const [activeTab, setActiveTab] = useState<'historial' | 'cuotas'>('historial')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const activeTab: 'historial' | 'cuotas' = searchParams.get('tab') === 'cuotas' ? 'cuotas' : 'historial'
+
+  const setActiveTab = useCallback((tabOrFn: 'historial' | 'cuotas' | ((prev: 'historial' | 'cuotas') => 'historial' | 'cuotas')) => {
+    setSearchParams(prev => {
+      const currentTab = prev.get('tab') === 'cuotas' ? 'cuotas' : 'historial'
+      const nextTab = typeof tabOrFn === 'function' ? tabOrFn(currentTab) : tabOrFn
+      const next = new URLSearchParams(prev)
+      if (nextTab === 'cuotas') {
+        next.set('tab', 'cuotas')
+      } else {
+        next.delete('tab')
+      }
+      return next
+    }, { replace: true })
+  }, [setSearchParams])
+
+  const [cuotasRefreshTrigger, setCuotasRefreshTrigger] = useState(0)
   
   const defaultFilters: TransaccionFilters = useMemo(() => ({
     tipo: undefined,
@@ -141,8 +159,23 @@ export default function TransaccionesPage() {
   }, [])
 
   // Función para refrescar todo (usada por modales)
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (createdOrUpdatedTx?: Transaccion | null) => {
     setLoading(true)
+    setCuotasRefreshTrigger(prev => prev + 1)
+
+    // Si se creó una transacción con tarjeta de crédito (cuota), cambiar automáticamente a la pestaña 'cuotas'
+    if (createdOrUpdatedTx && (createdOrUpdatedTx.es_padre_cuotas || createdOrUpdatedTx.metodo_pago === 'credito')) {
+      setActiveTab('cuotas')
+    } else if (
+      createdOrUpdatedTx &&
+      createdOrUpdatedTx.metodo_pago !== 'credito' &&
+      !createdOrUpdatedTx.es_padre_cuotas &&
+      activeTab === 'cuotas'
+    ) {
+      // Si estaba en cuotas y creó un movimiento normal (ej. efectivo/débito), volver al historial
+      setActiveTab('historial')
+    }
+
     try {
       const [, , freshBilleteras] = await Promise.all([
         fetchInitialTransacciones(),
@@ -153,7 +186,7 @@ export default function TransaccionesPage() {
     } finally {
       setLoading(false)
     }
-  }, [fetchInitialTransacciones, fetchPendientes])
+  }, [fetchInitialTransacciones, fetchPendientes, setActiveTab, activeTab])
 
   // 1. Carga de datos estáticos (Solo al montar)
   useEffect(() => {
@@ -225,11 +258,16 @@ export default function TransaccionesPage() {
   // 4. Auto-refresco en vivo ante eventos SSE de actualización de datos
   useEffect(() => {
     if (loadingPeriodo) return
-    if (lastDataUpdate?.entidad === 'transacciones') {
+    if (
+      lastDataUpdate?.entidad === 'transacciones' ||
+      lastDataUpdate?.entidad === 'cuotas' ||
+      lastDataUpdate?.entidad === 'tarjetas'
+    ) {
       const controller = new AbortController()
       const tid = setTimeout(() => {
         void fetchInitialTransacciones(controller.signal)
         void fetchPendientes(controller.signal)
+        setCuotasRefreshTrigger(prev => prev + 1)
       }, 0)
       return () => {
         clearTimeout(tid)
@@ -237,6 +275,16 @@ export default function TransaccionesPage() {
       }
     }
   }, [loadingPeriodo, lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchInitialTransacciones, fetchPendientes])
+
+  // 5. Escuchar evento global de transacciones creadas/modificadas localmente
+  useEffect(() => {
+    const handleTxCreated = (e: Event) => {
+      const customEvent = e as CustomEvent<Transaccion | null>
+      void refresh(customEvent.detail)
+    }
+    window.addEventListener('argentum:transaccion-creada', handleTxCreated)
+    return () => window.removeEventListener('argentum:transaccion-creada', handleTxCreated)
+  }, [refresh])
 
 
   const handleEdit = useCallback((id: string) => {
@@ -548,7 +596,11 @@ export default function TransaccionesPage() {
 
         </>
       ) : (
-        <GruposCuotasTab />
+        <GruposCuotasTab
+          refreshTrigger={cuotasRefreshTrigger}
+          onRefreshNeeded={refresh}
+          onOpenNew={openNewTransaccion}
+        />
       )}
     </div>
   )

@@ -53,6 +53,9 @@ const transaccionService = {
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: response.data }))
+    }
     return response.data
   },
 
@@ -61,6 +64,9 @@ const transaccionService = {
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: response.data }))
+    }
     return response.data
   },
 
@@ -69,6 +75,9 @@ const transaccionService = {
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: null }))
+    }
   },
 
   confirmarIA: async (id: string) => {

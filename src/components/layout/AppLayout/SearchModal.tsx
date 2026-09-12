@@ -156,7 +156,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         billeteras,
         categorias,
         tarjetas,
-        onSuccess: () => {}
+        onSuccess: (savedTx) => {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: savedTx }))
+          }
+        }
       }
     })
     onClose()
@@ -281,7 +285,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             billeteras,
             categorias,
             tarjetas,
-            onSuccess: () => {}
+            onSuccess: (savedTx) => {
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: savedTx }))
+              }
+            }
           }
         })
         onClose()

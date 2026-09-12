@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/useToast'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
+import QRCode from 'qrcode'
 import styles from './VerificarTelefono.module.css'
 
 export default function VerificarTelefono() {
@@ -47,20 +48,39 @@ export default function VerificarTelefono() {
   const [countdown, setCountdown] = useState(0)
   const [copied, setCopied] = useState(false)
   const [vinculado, setVinculado] = useState(false)
+  const [qrDataUrl, setQrDataUrl] = useState<string>('')
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
   const hasLoadedRef = useRef(false)
 
-  // Obtener código de vinculación desde el backend
+  // Obtener código de vinculación desde el backend y generar QR localmente
   const cargarCodigo = useCallback(async () => {
     setLoading(true)
     setApiError(null)
+    setQrDataUrl('')
     try {
       const data = await solicitarCodigoVinculacion()
       setCodigoData(data)
       setCountdown(data.expira_en_segundos || 15 * 60)
       startTimeRef.current = Date.now()
+
+      if (data.link_whatsapp) {
+        try {
+          const url = await QRCode.toDataURL(data.link_whatsapp, {
+            width: 180,
+            margin: 1,
+            errorCorrectionLevel: 'M',
+            color: {
+              dark: '#000000',
+              light: '#ffffff',
+            },
+          })
+          setQrDataUrl(url)
+        } catch (qrErr: unknown) {
+          console.error('Error generando QR local:', qrErr)
+        }
+      }
     } catch (err: unknown) {
       const msg = getErrorMessage(
         err,
@@ -255,14 +275,26 @@ export default function VerificarTelefono() {
             {/* Columna Izquierda: QR */}
             <div className={styles.qrCol}>
               <div className={styles.qrContainer}>
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                    codigoData.link_whatsapp
-                  )}&margin=6`}
-                  alt="Código QR para vincular WhatsApp"
-                  className={styles.qrImage}
-                  loading="eager"
-                />
+                {qrDataUrl ? (
+                  <img
+                    src={qrDataUrl}
+                    alt="Código QR para vincular WhatsApp"
+                    className={styles.qrImage}
+                    loading="eager"
+                  />
+                ) : (
+                  <div
+                    className={styles.qrImage}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    <Loader2 size={24} className="animate-spin text-primary" />
+                  </div>
+                )}
                 <span className={styles.qrHint}>
                   Escaneá el código QR con la cámara de tu celular para abrir WhatsApp
                 </span>

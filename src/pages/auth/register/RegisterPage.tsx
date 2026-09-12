@@ -10,6 +10,7 @@ import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
+import { reportarErrorFrontend } from '@/services/reporteError.service'
 import styles from './RegisterPage.module.css'
 
 declare global {
@@ -75,19 +76,29 @@ export default function RegisterPage() {
     let isMounted = true
     let retryTimer: ReturnType<typeof setTimeout> | null = null
 
+    reportarErrorFrontend({ componente: 'TurnstileDiag', mensaje: 'TURNSTILE_DIAG:mount' })
+
     if (!siteKey && import.meta.env.DEV) {
       console.warn('[Turnstile] TURNSTILE_SITE_KEY no está configurada.')
     }
 
     const doRender = () => {
+      reportarErrorFrontend({
+        componente: 'TurnstileDiag',
+        mensaje: `TURNSTILE_DIAG:render_attempt ref=${turnstileContainerRef.current ? 'ok' : 'null'}`,
+      })
       if (!isMounted || !window.turnstile?.render || !turnstileContainerRef.current || widgetIdRef.current || !siteKey) {
         return
       }
       try {
-        widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+        const id = window.turnstile.render(turnstileContainerRef.current, {
           sitekey: siteKey,
           theme: 'auto',
           callback: (token: string) => {
+            reportarErrorFrontend({
+              componente: 'TurnstileDiag',
+              mensaje: `TURNSTILE_DIAG:render_success widgetId=${id}`,
+            })
             if (isMounted) {
               setTurnstileToken(token)
               setApiError(null)
@@ -104,6 +115,11 @@ export default function RegisterPage() {
               setApiError('Error al validar el captcha de Turnstile. Recargá la página.')
             }
           },
+        })
+        widgetIdRef.current = id
+        reportarErrorFrontend({
+          componente: 'TurnstileDiag',
+          mensaje: `TURNSTILE_DIAG:widget_registered widgetId=${id}`,
         })
       } catch (e) {
         if (import.meta.env.DEV) {
@@ -139,20 +155,26 @@ export default function RegisterPage() {
     let script = document.getElementById(scriptId) as HTMLScriptElement | null
 
     if (!script) {
+      reportarErrorFrontend({ componente: 'TurnstileDiag', mensaje: 'TURNSTILE_DIAG:script_created' })
       script = document.createElement('script')
       script.id = scriptId
       script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
       script.async = true
       script.defer = true
       script.onload = () => {
+        reportarErrorFrontend({ componente: 'TurnstileDiag', mensaje: 'TURNSTILE_DIAG:script_loaded' })
         renderWidget()
       }
       document.head.appendChild(script)
     } else if (window.turnstile?.render) {
+      reportarErrorFrontend({ componente: 'TurnstileDiag', mensaje: 'TURNSTILE_DIAG:script_reused' })
       renderWidget()
     } else {
-      script.addEventListener('load', renderWidget)
-      renderWidget()
+      reportarErrorFrontend({ componente: 'TurnstileDiag', mensaje: 'TURNSTILE_DIAG:script_reused' })
+      script.addEventListener('load', () => {
+        reportarErrorFrontend({ componente: 'TurnstileDiag', mensaje: 'TURNSTILE_DIAG:script_loaded' })
+        renderWidget()
+      })
     }
 
     return () => {

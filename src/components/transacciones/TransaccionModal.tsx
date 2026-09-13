@@ -151,6 +151,7 @@ export default function TransaccionModal({
   open, onClose, transaccion, billeteras, categorias, tarjetas, onSuccess,
 }: TransaccionModalProps) {
   const isEdit = !!transaccion
+  const isCuotaHija = isEdit && !!transaccion?.es_cuota_hija
   const { showToast } = useToast()
   const { confirm } = useModal()
   const [state, dispatch] = useReducer(formReducer, initialState)
@@ -162,6 +163,28 @@ export default function TransaccionModal({
 
   const handleDeleteTransaction = () => {
     if (!transaccion) return
+
+    if (isCuotaHija) {
+      confirm({
+        title: '¿Eliminar esta cuota?',
+        description: 'Se eliminará únicamente esta cuota pendiente. El resto de las cuotas y la compra se mantendrán intactas.',
+        variant: 'danger',
+        confirmLabel: 'Eliminar cuota',
+        onConfirm: async () => {
+          try {
+            await transaccionService.deleteCuotaIndividual(transaccion.id)
+            showToast('Cuota eliminada correctamente', 'success')
+            onSuccess()
+            onClose()
+          } catch (e) {
+            console.error(e)
+            showToast(getErrorMessage(e, 'No se pudo eliminar la cuota'), 'error')
+          }
+        }
+      })
+      return
+    }
+
     confirm({
       title: '¿Eliminar transacción?',
       description: 'Esta acción no se puede deshacer y restaurará el saldo correspondiente.',
@@ -279,8 +302,6 @@ export default function TransaccionModal({
     submittingRef.current = false
     if (open) dispatch({ type: 'RESET', transaccion: transaccion || null, billeteras })
   }, [open, transaccion, billeteras, isEdit])
-
-  const isCuotaHija = isEdit && transaccion?.es_cuota_hija
 
 
   // Si cambia la tarjeta seleccionada, actualizar la billeteraId automáticamente
@@ -563,15 +584,15 @@ export default function TransaccionModal({
               }}
             >
               <div className={styles.formHeader}>
-                <h2 className={styles.headerTitle}>{isEdit ? 'Editar transacción' : 'Nueva transacción'}</h2>
+                <h2 className={styles.headerTitle}>{isEdit ? (isCuotaHija ? 'Detalle de cuota' : 'Editar transacción') : 'Nueva transacción'}</h2>
                 <div className={styles.headerRightActions}>
                   {isEdit && (
                     <button
                       type="button"
                       className={styles.deleteHeaderBtn}
                       onClick={handleDeleteTransaction}
-                      title="Eliminar transacción"
-                      aria-label="Eliminar transacción"
+                      title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
+                      aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -715,7 +736,7 @@ export default function TransaccionModal({
               <div className={styles.formFooter}>
                 {isEdit ? (
                   <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
-                    Eliminar
+                    {isCuotaHija ? 'Eliminar cuota' : 'Eliminar'}
                   </button>
                 ) : (
                   <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
@@ -856,8 +877,8 @@ export default function TransaccionModal({
                       type="button"
                       className={styles.deleteHeaderBtn}
                       onClick={handleDeleteTransaction}
-                      title="Eliminar transacción"
-                      aria-label="Eliminar transacción"
+                      title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
+                      aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -983,7 +1004,7 @@ export default function TransaccionModal({
               <div className={styles.formFooter}>
                 {isEdit ? (
                   <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
-                    Eliminar
+                    {isCuotaHija ? 'Eliminar cuota' : 'Eliminar'}
                   </button>
                 ) : (
                   <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>

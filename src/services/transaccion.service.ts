@@ -80,6 +80,16 @@ const transaccionService = {
     }
   },
 
+  deleteCuotaIndividual: async (id: string) => {
+    await api.delete(`/transacciones/${id}/cuota`)
+    invalidateBilleteras()
+    invalidateResumen()
+    invalidatePresupuestos()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: null }))
+    }
+  },
+
   confirmarIA: async (id: string) => {
     const response = await api.post<Transaccion>(`/transacciones/${id}/confirmar`)
     invalidateBilleteras()

@@ -306,6 +306,26 @@ export default function TransaccionesPage() {
     const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
     if (!tx) return
 
+    if (tx.es_cuota_hija) {
+      confirm({
+        title: '¿Eliminás esta cuota?',
+        description: 'Se eliminará únicamente esta cuota pendiente. El resto del plan de cuotas se mantendrá intacto.',
+        variant: 'danger',
+        confirmLabel: 'Eliminar cuota',
+        onConfirm: async () => {
+          try {
+            await transaccionService.deleteCuotaIndividual(id)
+            showToast('La cuota se eliminó correctamente.', 'success')
+            refresh()
+          } catch (e) {
+            console.error(e)
+            showToast(getErrorMessage(e, 'No pudimos eliminar la cuota. Intentá de nuevo.'), 'error')
+          }
+        },
+      })
+      return
+    }
+
     confirm({
       title: '¿Eliminás esta transacción?',
       description: 'Se va a borrar para siempre y no hay forma de recuperarla.',

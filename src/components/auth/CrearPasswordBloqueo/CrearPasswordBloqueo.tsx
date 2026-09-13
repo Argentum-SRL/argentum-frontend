@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react'
+import React, { useState } from 'react'
 import { Shield, Eye, EyeOff, Check, AlertCircle, Save, LogOut, Info } from 'lucide-react'
 import type { Usuario } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
@@ -6,74 +6,11 @@ import { useToast } from '@/hooks/useToast'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
-import { Modal } from '@/components/ui'
+import { Modal, AtmosphericBackground, AtmosphericMoonIcon } from '@/components/ui'
 import styles from './CrearPasswordBloqueo.module.css'
 
 interface Props {
   usuario: Usuario
-}
-
-function MoonIcon({ size }: { size: number }) {
-  const maskId = `m-${useId().replace(/[^a-z0-9]/gi, '')}`
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
-      <defs>
-        <mask id={maskId}>
-          <circle cx="50" cy="50" r="24" fill="white" />
-          <circle cx="58" cy="50" r="19" fill="black" />
-        </mask>
-      </defs>
-      <circle cx="50" cy="50" r="24" fill="var(--silver, #cbd5e1)" mask={`url(#${maskId})`} />
-    </svg>
-  )
-}
-
-interface DecoMoonDef {
-  id: string
-  top: string
-  left?: string
-  right?: string
-  size: number
-  opacity: number
-  anim: string
-}
-
-const DECO_MOONS: DecoMoonDef[] = [
-  { id: 'bg1', top: '8%', right: '10%', size: 90, opacity: 0.08, anim: 'floatSlow 10s ease-in-out infinite' },
-  { id: 'bg2', top: '68%', left: '5%', size: 56, opacity: 0.10, anim: 'floatMedium 8s ease-in-out infinite 1s' },
-  { id: 'bg3', top: '78%', right: '12%', size: 120, opacity: 0.05, anim: 'floatSlow 12s ease-in-out infinite 2s' },
-  { id: 'bg4', top: '22%', left: '4%', size: 40, opacity: 0.12, anim: 'floatMedium 9s ease-in-out infinite 0.5s' },
-]
-
-const reducedMotion =
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-function DecoMoonItem({ id, top, left, right, size, opacity, anim }: DecoMoonDef) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-      className={styles.decoMoon}
-      style={{
-        '--top': top,
-        '--left': left,
-        '--right': right,
-        '--opacity': opacity,
-        '--anim': reducedMotion ? 'none' : anim,
-      } as React.CSSProperties}
-    >
-      <defs>
-        <mask id={`deco-${id}`}>
-          <circle cx="50" cy="50" r="24" fill="white" />
-          <circle cx="58" cy="50" r="19" fill="black" />
-        </mask>
-      </defs>
-      <circle cx="50" cy="50" r="24" fill="var(--silver, #cbd5e1)" mask={`url(#deco-${id})`} />
-    </svg>
-  )
 }
 
 export default function CrearPasswordBloqueo({ usuario }: Props) {
@@ -124,20 +61,11 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
   }
 
   return (
-    <div className={styles.pageRoot}>
-      {/* Ambient background glows */}
-      <div className={styles.ambientGlowTop} aria-hidden="true" />
-      <div className={styles.ambientGlowBottom} aria-hidden="true" />
-
-      {/* Signature Argentum decorative floating moons */}
-      {DECO_MOONS.map((moon) => (
-        <DecoMoonItem key={moon.id} {...moon} />
-      ))}
-
+    <AtmosphericBackground fullScreen centered={false} compensateBottomNav={false} className={styles.pageRoot}>
       {/* Brand header */}
       <header className={styles.bgHeader}>
         <div className={styles.bgLogoWrap}>
-          <MoonIcon size={32} />
+          <AtmosphericMoonIcon size={32} />
           <span className={styles.bgLogoText}>Argentum</span>
         </div>
         <div className={styles.bgBadge}>
@@ -282,6 +210,7 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
           </div>
         </form>
       </Modal>
-    </div>
+    </AtmosphericBackground>
   )
 }
+

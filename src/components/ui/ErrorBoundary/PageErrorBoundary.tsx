@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useRouteError, useNavigate, useLocation } from 'react-router-dom'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 import { reportarErrorFrontend } from '@/services/reporteError.service'
+import { AtmosphericBackground, AtmosphericCard } from '@/components/ui'
 import styles from './PageErrorBoundary.module.css'
 
 export function PageErrorBoundary() {
@@ -27,12 +28,12 @@ export function PageErrorBoundary() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <div className={styles.iconWrapper}>
+    <AtmosphericBackground role="alert" ariaLive="assertive">
+      <AtmosphericCard>
+        <div className={styles.iconWrapper} aria-hidden="true">
           <AlertCircle size={32} />
         </div>
-        <h2 className={styles.title}>No pudimos cargar esta página</h2>
+        <h1 className={styles.title}>No pudimos cargar esta página</h1>
         <p className={styles.message}>
           Ocurrió un error inesperado al renderizar el contenido. Podés intentar recargarla o volver al inicio.
         </p>
@@ -46,8 +47,8 @@ export function PageErrorBoundary() {
             <span>Ir al inicio</span>
           </button>
         </div>
-      </div>
-    </div>
+      </AtmosphericCard>
+    </AtmosphericBackground>
   )
 }
 

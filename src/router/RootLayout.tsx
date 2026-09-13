@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/context/ThemeProvider'
 import { ToastProvider } from '@/context/ToastProvider'
 import { NotificacionProvider } from '@/context/NotificacionContext'
 import { ModalPortal } from '@/components/ui/ModalPortal/ModalPortal'
-import { Loader2 } from 'lucide-react'
+import { AtmosphericLoading } from '@/components/ui'
 
 export default function RootLayout() {
   return (
@@ -13,11 +13,7 @@ export default function RootLayout() {
       <ToastProvider>
         <AuthProvider>
           <NotificacionProvider>
-            <Suspense fallback={
-              <div className="flex items-center justify-center h-screen w-screen">
-                <Loader2 className="animate-spin" size={32} />
-              </div>
-            }>
+            <Suspense fallback={<AtmosphericLoading text="Cargando Argentum..." />}>
               <Outlet />
             </Suspense>
             <ModalPortal />

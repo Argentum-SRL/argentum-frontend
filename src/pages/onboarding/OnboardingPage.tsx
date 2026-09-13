@@ -8,6 +8,7 @@ import StepDatosPersonales from '@/components/onboarding/StepDatosPersonales'
 import StepCicloFinanciero from '@/components/onboarding/StepCicloFinanciero'
 import StepMoneda from '@/components/onboarding/StepMoneda'
 import { useAuth } from '@/hooks/useAuth'
+import { AtmosphericBackground } from '@/components/ui'
 import styles from './OnboardingPage.module.css'
 
 const PASO_NUMERO: Record<string, number> = {
@@ -83,7 +84,19 @@ export default function OnboardingPage() {
   }, [navigate, refreshUser])
 
   useEffect(() => {
-    cargarEstado()
+    let isMounted = true
+
+    const load = async () => {
+      await Promise.resolve()
+      if (!isMounted) return
+      void cargarEstado()
+    }
+
+    void load()
+
+    return () => {
+      isMounted = false
+    }
   }, [cargarEstado])
 
   async function handleRefreshAndNavigate() {
@@ -126,16 +139,16 @@ export default function OnboardingPage() {
 
   if (cargando) {
     return (
-      <div className={styles.loading}>
-        <Loader2 size={32} className="animate-spin" />
-      </div>
+      <AtmosphericBackground fullScreen centered className={styles.loading}>
+        <Loader2 size={32} className="animate-spin text-white" />
+      </AtmosphericBackground>
     )
   }
 
   const datos = estado?.datos_actuales
 
   return (
-    <div className={styles.page}>
+    <AtmosphericBackground fullScreen={false} centered={false} compensateBottomNav={false} className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.header}>
           <MoonIcon size={32} />
@@ -208,6 +221,6 @@ export default function OnboardingPage() {
           Podés cambiar todo esto desde tu perfil en cualquier momento.
         </p>
       </div>
-    </div>
+    </AtmosphericBackground>
   )
 }

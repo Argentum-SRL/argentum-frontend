@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useRouteError } from 'react-router-dom'
-import { AlertTriangle, RotateCcw } from 'lucide-react'
+import { AlertCircle, RotateCcw } from 'lucide-react'
 import { reportarErrorFrontend } from '@/services/reporteError.service'
+import { AtmosphericBackground, AtmosphericCard } from '@/components/ui'
 import styles from './RootErrorBoundary.module.css'
 
 export function RootErrorBoundary() {
@@ -21,10 +22,15 @@ export function RootErrorBoundary() {
   }
 
   return (
-    <div className={styles.root}>
-      <div className={styles.box}>
-        <div className={styles.iconWrapper}>
-          <AlertTriangle size={36} />
+    <AtmosphericBackground
+      role="alert"
+      ariaLive="assertive"
+      zIndex={100}
+      compensateBottomNav={false}
+    >
+      <AtmosphericCard>
+        <div className={styles.iconWrapper} aria-hidden="true">
+          <AlertCircle size={32} />
         </div>
         <h1 className={styles.title}>Algo salió mal en la aplicación</h1>
         <p className={styles.message}>
@@ -34,8 +40,8 @@ export function RootErrorBoundary() {
           <RotateCcw size={16} />
           <span>Recargar aplicación</span>
         </button>
-      </div>
-    </div>
+      </AtmosphericCard>
+    </AtmosphericBackground>
   )
 }
 

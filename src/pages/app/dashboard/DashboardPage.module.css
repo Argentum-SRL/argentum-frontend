@@ -5,6 +5,13 @@
   padding-bottom: 40px;
 }
 
+@media (max-width: 767px) {
+  .root {
+    gap: 16px;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
 @media (min-width: 768px) {
   .root {
     gap: 24px;
@@ -26,9 +33,32 @@
   align-items: flex-start;
 }
 
+.desktopGreeting {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileGreetingHeader {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .desktopGreeting {
     display: none;
+  }
+
+  .mobileGreetingHeader {
+    display: block;
+    width: 100%;
   }
 }
 
@@ -238,13 +268,20 @@
 /* ── Balance Card ─────────────────────────────────────────────────── */
 
 .balanceCard {
-  background: linear-gradient(180deg, #0D2045 0%, #1a3260 100%);
+  background: linear-gradient(150deg, #0D2045 0%, #152C5B 50%, #0E224A 100%);
+  border: none;
   border-radius: 24px;
-  padding: 32px;
-  color: white;
+  padding: 24px 26px;
+  color: #ffffff;
   position: relative;
-  box-shadow: 0 12px 24px -8px rgba(var(--primary-rgb), 0.4);
+  box-shadow: 0 16px 36px -12px rgba(13, 32, 69, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  overflow: visible;
   container-type: inline-size;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 @media (min-width: 1024px) {
   .balanceCard {
@@ -254,74 +291,126 @@
 }
 
 .mobileGreetingWrap {
-  display: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.mobileGreetingText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mobileGreetingSubtitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.mobileGreetingName {
+  font-size: 1.55rem;
+  font-weight: 750;
+  color: var(--text);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.mobileAvatarBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileAvatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease;
+}
+
+.mobileAvatarBtn:active .mobileAvatar {
+  transform: scale(0.94);
+}
+
+.mobileAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 @media (max-width: 767px) {
   .balanceCard {
-    overflow: hidden;
-    margin-top: -20px;
-    margin-left: calc(-1 * var(--container-px-mobile));
-    margin-right: calc(-1 * var(--container-px-mobile));
-    border-radius: 0 0 32px 32px;
-    padding-top: calc(56px + env(safe-area-inset-top));
-    padding-bottom: 32px;
+    padding: 24px 22px;
+    border-radius: 24px;
+    gap: 18px;
+    box-shadow: 0 10px 28px -8px rgba(13, 32, 69, 0.3);
   }
 
-  .mobileGreetingWrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    width: 100%;
-    z-index: 10;
-    position: relative;
-    animation: slideUpFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .mobileGreetingText {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mobileGreetingSubtitle {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.7);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 2px;
-  }
-
-  .mobileGreetingName {
-    font-size: 1.45rem;
-    font-weight: 800;
-    color: #ffffff;
+  .saldoAmount {
+    font-size: clamp(2rem, 9.5cqw, 2.75rem);
+    line-height: 1.15;
     letter-spacing: -0.02em;
-    line-height: 1.1;
   }
 
-  .mobileAvatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 15px;
-    overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease;
+  .balanceBody {
+    gap: 6px;
+    margin: 2px 0;
   }
-  
-  .mobileAvatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+
+  .disponibleSub {
+    font-size: 0.8125rem;
+  }
+
+  .balanceTrends {
+    display: none !important;
+  }
+
+  .walletPillsTrack {
+    padding: 4px 0 6px;
+    gap: 8px;
+    margin: 2px 0;
+  }
+
+  .walletPill {
+    padding: 6px 12px;
+    font-size: 0.8125rem;
+    gap: 7px;
+    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .cardHeader {
+    padding: 16px 18px;
+  }
+
+  .cardHeaderWithToggle {
+    padding: 14px 18px;
+  }
+
+  .chartCardContent {
+    min-height: 175px;
+    padding: 14px 16px;
   }
 }
 
@@ -330,6 +419,13 @@
   grid-template-columns: 1fr;
   gap: 28px;
 }
+
+@media (max-width: 767px) {
+  .topRow, .bottomRow {
+    gap: 16px;
+  }
+}
+
 @media (min-width: 1024px) {
   .topRow {
     grid-template-columns: repeat(3, 1fr);
@@ -349,271 +445,371 @@
   }
 }
 
-.balanceCard::after {
-  content: '';
-  position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
+/* ── Balance Card (Modo Oscuro: Midnight Obsidian Sapphire) ── */
+
+:global([data-theme="dark"]) .balanceCard,
+[data-theme="dark"] .balanceCard {
+  background: linear-gradient(150deg, #131F37 0%, #0D1627 50%, #0A111E 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.75) !important;
 }
 
-.balanceContent {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 1;
-  /* Reserve space at bottom for the absolute-positioned controls */
-  padding-bottom: 56px;
+:global([data-theme="dark"]) .saldoAmount,
+[data-theme="dark"] .saldoAmount {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
 }
 
-.balanceMain {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+:global([data-theme="dark"]) .disponibleSub,
+[data-theme="dark"] .disponibleSub {
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.balanceTop {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+:global([data-theme="dark"]) .currencyTab,
+[data-theme="dark"] .currencyTab {
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
-.balanceLabel {
-  font-size: 0.875rem;
-  font-weight: 500;
-  opacity: 0.8;
+:global([data-theme="dark"]) .currencyTabActive,
+[data-theme="dark"] .currencyTabActive {
+  color: #ffffff !important;
+  border-bottom-color: #ffffff !important;
 }
 
-.labelWithHint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
+:global([data-theme="dark"]) .currencyTabSep,
+[data-theme="dark"] .currencyTabSep {
+  color: rgba(255, 255, 255, 0.25) !important;
 }
 
-.hint {
-  opacity: 0.5;
-  cursor: help;
-  display: inline-flex;
-  align-items: center;
-  transition: opacity 0.2s;
-  background: none;
-  border: none;
-  padding: 0;
-  color: inherit;
+:global([data-theme="dark"]) .balanceHeaderIconBtn,
+[data-theme="dark"] .balanceHeaderIconBtn {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.55) !important;
 }
 
-.hint:hover {
-  opacity: 1;
+:global([data-theme="dark"]) .balanceHeaderIconBtn:hover,
+[data-theme="dark"] .balanceHeaderIconBtn:hover {
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
 }
 
-.dropdownContainer {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 100;
+/* Modo Oscuro para Wallet Pills */
+:global([data-theme="dark"]) .walletPill,
+[data-theme="dark"] .walletPill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
-.dropdownTrigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
+:global([data-theme="dark"]) .walletPill:hover:not(.walletPillActive),
+[data-theme="dark"] .walletPill:hover:not(.walletPillActive) {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
 }
 
-.dropdownTrigger:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
+:global([data-theme="dark"]) .walletPillActive,
+[data-theme="dark"] .walletPillActive {
+  background: #ffffff !important;
+  color: #0A111E !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
 }
 
-.dropdownTriggerActive {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+:global([data-theme="dark"]) .walletPill .walletPillAmount,
+[data-theme="dark"] .walletPill .walletPillAmount {
+  color: rgba(255, 255, 255, 0.55) !important;
 }
 
-.dropdownPanel {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  right: 0;
-  min-width: 240px;
-  background: #1a2f5a;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  animation: dropdownFadeIn 0.15s ease-out;
+:global([data-theme="dark"]) .walletPillActive .walletPillAmount,
+[data-theme="dark"] .walletPillActive .walletPillAmount {
+  color: #37475E !important;
 }
 
-@keyframes dropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+:global([data-theme="dark"]) .walletPill .walletPillCount,
+[data-theme="dark"] .walletPill .walletPillCount {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
-.dropdownHeader {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 12px 16px 8px;
-  color: rgba(255, 255, 255, 0.45);
-  text-transform: uppercase;
+:global([data-theme="dark"]) .walletPillActive .walletPillCount,
+[data-theme="dark"] .walletPillActive .walletPillCount {
+  background: rgba(10, 17, 30, 0.12) !important;
+  color: #0A111E !important;
 }
 
-.dropdownItem {
+:global([data-theme="dark"]) .trendAmount,
+[data-theme="dark"] .trendAmount {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+:global([data-theme="dark"]) .trendUp,
+[data-theme="dark"] .trendUp {
+  color: #34D399 !important;
+}
+
+:global([data-theme="dark"]) .trendDown,
+[data-theme="dark"] .trendDown {
+  color: #F87171 !important;
+}
+
+
+
+/* ── Balance Card Header ──────────────────────────────────────────── */
+
+.balanceCardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   width: 100%;
-  background: transparent;
-  border: none;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-  border-left: 3px solid transparent;
-  text-align: left;
 }
 
-.dropdownItem:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.dropdownItemActive {
-  background: rgba(255, 255, 255, 0.1);
-  border-left: 3px solid var(--primary);
-}
-
-.dropdownItemActive:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.dropdownItemName {
-  font-size: 13px;
-  font-weight: 500;
-  color: #ffffff;
-}
-
-.dropdownItemBalance {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
-  font-variant-numeric: tabular-nums;
-}
-
-.dropdownDivider {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 4px 0;
-}
-
-/* ── Balance Controls (currency toggle + wallet dropdown) ──────────── */
-
-.balanceControls {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  z-index: 100;
+/* Currency Tabs (Minimalista, sin switches toscos) */
+.currencyTabs {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.currencyToggleGroup {
-  display: flex;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  padding: 3px;
-  gap: 2px;
-}
-
-.currencyToggleBtn {
+.currencyTab {
   background: transparent;
   border: none;
-  border-radius: 999px;
-  padding: 4px 13px;
-  font-size: 12px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  transition: all 0.18s ease;
-  letter-spacing: 0.03em;
-}
-
-.currencyToggleBtn:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.currencyToggleBtnActive {
-  background: rgba(255, 255, 255, 0.22);
-  color: #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-}
-
-@media (max-width: 767px) {
-  .balanceControls {
-    bottom: 24px;
-    right: 24px;
-    flex-direction: row;
-  }
-}
-
-.saldoLabel {
-  font-size: 0.875rem;
+  padding: 4px 2px;
+  font-size: 0.8125rem;
   font-weight: 500;
-  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.currencyTab:hover:not(.currencyTabActive) {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.currencyTabActive {
+  color: #ffffff;
+  font-weight: 700;
+  border-bottom: 2px solid #ffffff;
+}
+
+.currencyTabSep {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ── Balance Header Actions ───────────────────────────────────────── */
+
+.balanceHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.balanceHeaderIconBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.balanceHeaderIconBtn:hover {
+  background: transparent;
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.balanceHeaderIconBtn:active {
+  transform: scale(0.92);
+}
+
+/* ── Balance Hero Body ────────────────────────────────────────────── */
+
+.balanceBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0;
 }
 
 .saldoAmount {
-  font-size: clamp(2rem, 11cqw, 3.5rem);
+  font-size: clamp(2.2rem, 11cqw, 3.4rem);
   font-weight: 800;
   margin: 0;
-  letter-spacing: -1.5px;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  white-space: nowrap;
+  font-feature-settings: "tnum";
+  line-height: 1.15;
+  color: #ffffff;
 }
 
 .saldoAmountNegative {
-  color: #fca5a5;
+  color: #F87171 !important;
 }
 
-@media (max-width: 767px) {
-  .dropdownContainer {
-    top: calc(96px + env(safe-area-inset-top));
-    right: 24px;
+.disponibleSub {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.015em;
+}
+
+/* ── Balance Trends (Flechas de Ingresos y Egresos como antes) ─────── */
+
+.balanceTrends {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.balanceTrendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.trendUp {
+  color: #34D399;
+  flex-shrink: 0;
+}
+
+.trendDown {
+  color: #F87171;
+  flex-shrink: 0;
+}
+
+.trendAmount {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Interactive Wallet Pills Strip (100% Nuevo, sin dropdowns) ───── */
+
+.walletPillsTrack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 6px;
+  margin: 2px -2px;
+  -ms-overflow-style: none;
+}
+
+@supports (scrollbar-width: none) {
+  .walletPillsTrack {
+    scrollbar-width: none;
   }
-  .saldoAmount {
-    font-size: clamp(1.8rem, 11cqw, 2.8rem);
-    letter-spacing: -1px;
-  }
-  .balanceCard {
-    padding: 24px;
-    margin-top: -20px;
-    margin-left: calc(-1 * var(--container-px-mobile));
-    margin-right: calc(-1 * var(--container-px-mobile));
-    border-radius: 0 0 32px 32px;
-    padding-top: calc(32px + env(safe-area-inset-top));
-  }
+}
+
+.walletPillsTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.walletPill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 9999px;
+  padding: 6px 13px;
+  font-size: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap !important;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  line-height: 1;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.walletPill:hover:not(.walletPillActive) {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+
+.walletPillActive {
+  background: #ffffff;
+  color: #091224;
+  border-color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.walletPillDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  flex-shrink: 0;
+}
+
+.walletPillName {
+  font-weight: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.walletPillStar {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.walletPillAmount {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.walletPillActive .walletPillAmount {
+  color: #37475E;
+}
+
+.walletPillCount {
+  font-size: 0.625rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 1px 5px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.walletPillActive .walletPillCount {
+  background: rgba(9, 18, 36, 0.1);
+  color: #091224;
 }
 
 /* ── Grid ─────────────────────────────────────────────────────────── */
@@ -711,30 +907,44 @@
   }
 }
 
-.toggleGroup {
+/* Unit Tabs ($ / %) - Misma estética tipográfica minimalista que currencyTabs */
+.unitTabs {
   display: flex;
-  background: var(--surface-alt);
-  border-radius: 8px;
-  padding: 2px;
-  width: fit-content;
+  align-items: center;
+  gap: 6px;
 }
 
-.toggleBtn {
+.unitTab {
   background: transparent;
   border: none;
-  padding: 4px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 6px;
-  color: var(--text-2);
+  padding: 4px 2px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-3);
   cursor: pointer;
-  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  font-family: inherit;
 }
 
-.toggleBtn.active {
-  background: var(--surface);
+.unitTab:hover:not(.unitTabActive) {
+  color: var(--text-2);
+}
+
+.unitTabActive {
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  font-weight: 700;
+  border-bottom: 2px solid var(--text);
+}
+
+.unitTabSep {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  opacity: 0.5;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .barItem {

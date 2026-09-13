@@ -2,6 +2,8 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import CrearPasswordBloqueo from '@/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo'
 
+import { AtmosphericLoading } from '@/components/ui'
+
 interface Props {
   mode?: 'app' | 'onboarding' | 'auth-only' | 'admin'
 }
@@ -11,11 +13,7 @@ export default function ProtectedRoute({ mode = 'app' }: Props) {
   const location = useLocation()
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--page)]">
-        <div className="w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
+    return <AtmosphericLoading text="Verificando sesión..." />
   }
 
   if (!isAuthenticated) {

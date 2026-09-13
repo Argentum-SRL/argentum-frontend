@@ -5,7 +5,6 @@ import {
   ArrowUpDown, 
   Calendar, 
   ChevronRight,
-  ChevronDown,
   AlertCircle,
   PieChart as PieChartIcon,
   LogOut,
@@ -14,11 +13,13 @@ import {
   Moon,
   ArrowLeft,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Eye,
+  EyeOff,
+  Star
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
-import { useModal } from '@/hooks/useModal'
 import { useToast } from '@/hooks/useToast'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -388,7 +389,6 @@ AppleCalendarIcon.displayName = 'AppleCalendarIcon'
 
 export default function DashboardPage() {
   const { usuario } = useAuth()
-  const { open } = useModal()
   const { showToast } = useToast()
   const { lastDataUpdate } = useNotificaciones()
   const navigate = useNavigate()
@@ -429,52 +429,39 @@ export default function DashboardPage() {
     prevUserIdRef.current = usuario?.id ?? null
   }, [usuario?.id])
 
-  const [dropdownAbierto, setDropdownAbierto] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [showBalance, setShowBalance] = useState(() => {
+    return localStorage.getItem('argentum_hide_balance') !== 'true'
+  })
 
-  useEffect(() => {
-    if (!dropdownAbierto) return
-    const handleOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownAbierto(false)
-      }
-    }
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setDropdownAbierto(false)
-    }
-    document.addEventListener('mousedown', handleOutside)
-    document.addEventListener('keydown', handleEsc)
-    return () => {
-      document.removeEventListener('mousedown', handleOutside)
-      document.removeEventListener('keydown', handleEsc)
-    }
-  }, [dropdownAbierto])
+  const handleTogglePrivacy = useCallback(() => {
+    setShowBalance(prev => {
+      const next = !prev
+      localStorage.setItem('argentum_hide_balance', next ? 'false' : 'true')
+      return next
+    })
+  }, [])
 
-  const totalSaldoBilleterasArs = useMemo(() => {
+  const billeterasActivas = useMemo(() => {
     return billeteras
-      .filter(b => b.estado === 'activa' && b.moneda === 'ARS')
-      .reduce((acc, curr) => acc + Number(curr.saldo_actual), 0)
-  }, [billeteras])
+      .filter(b => b.estado === 'activa' && b.moneda === moneda)
+      .sort((a, b) => {
+        // 1. Favorita / Principal primero
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        // 2. Mayor saldo a menor saldo
+        const diff = (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+        if (diff !== 0) return diff
+        // 3. Fallback alfabético
+        return a.nombre.localeCompare(b.nombre)
+      })
+  }, [billeteras, moneda])
 
-  const totalSaldoBilleterasUsd = useMemo(() => {
-    return billeteras
-      .filter(b => b.estado === 'activa' && b.moneda === 'USD')
-      .reduce((acc, curr) => acc + Number(curr.saldo_actual), 0)
-  }, [billeteras])
-
-  const getDropdownTriggerText = () => {
-    const billeterasValidas = billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda)
-    const seleccionadasActivas = billeterasSeleccionadas.filter(id => billeterasValidas.some(b => b.id === id))
-
-    if (seleccionadasActivas.length === 0) {
-      return 'Todas las billeteras'
-    }
-    if (seleccionadasActivas.length === 1) {
-      const selected = billeterasValidas.find(b => b.id === seleccionadasActivas[0])
-      return selected ? selected.nombre : 'Todas las billeteras'
-    }
-    return `${seleccionadasActivas.length} billeteras`
-  }
+  const handleSelectBilletera = useCallback((id: string | null) => {
+    const isAlreadySelected = billeterasSeleccionadas.length === 1 && billeterasSeleccionadas[0] === id
+    const next = id === null || isAlreadySelected ? [] : [id]
+    setBilleterasSeleccionadas(next)
+    localStorage.setItem('argentum_dashboard_billeteras', JSON.stringify(next))
+  }, [billeterasSeleccionadas])
 
   const fetchData = useCallback(async (signal?: AbortSignal) => {
     setError(false)
@@ -661,8 +648,11 @@ export default function DashboardPage() {
     <div className={styles.root}>
       {/* Header */}
       <header className={styles.header}>
-        <div className={styles.headerLeft}>
+        <div className={styles.desktopGreeting}>
           <Greeting nombre={usuario?.nombre ?? null} />
+        </div>
+        <div className={styles.mobileGreetingHeader}>
+          <MobileGreeting usuario={usuario} />
         </div>
       </header>
 
@@ -675,127 +665,127 @@ export default function DashboardPage() {
           ) : (
             data && (
               <div className={styles.balanceCard}>
-                <div className="absolute inset-0 rounded-[24px] overflow-hidden pointer-events-none">
-                  <svg
-                    viewBox="0 0 100 100"
-                    className="absolute -bottom-5 -right-5 w-[120px] h-[120px] opacity-[0.04] pointer-events-none"
-                  >
-                    <circle cx="50" cy="50" r="48" fill="#8A95A8"/>
-                    <circle cx="58" cy="50" r="38" fill="#0D2045"/>
-                  </svg>
-                </div>
-
-                {/* Controls: currency toggle + wallet dropdown */}
-                <div className={styles.balanceControls} ref={dropdownRef}>
-                  {/* Currency toggle */}
-                  <div className={styles.currencyToggleGroup}>
+                {/* Header: Currency Tabs a la izquierda + Acciones a la derecha */}
+                <div className={styles.balanceCardHeader}>
+                  {/* Currency Tabs Minimalistas (ARS / USD) */}
+                  <div className={styles.currencyTabs} role="tablist" aria-label="Moneda">
                     <button
-                      className={`${styles.currencyToggleBtn} ${moneda === 'ARS' ? styles.currencyToggleBtnActive : ''}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={moneda === 'ARS'}
+                      className={`${styles.currencyTab} ${moneda === 'ARS' ? styles.currencyTabActive : ''}`}
                       onClick={() => handleToggleMoneda('ARS')}
-                      aria-pressed={moneda === 'ARS'}
                     >
                       ARS
                     </button>
+                    <span className={styles.currencyTabSep}>/</span>
                     <button
-                      className={`${styles.currencyToggleBtn} ${moneda === 'USD' ? styles.currencyToggleBtnActive : ''}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={moneda === 'USD'}
+                      className={`${styles.currencyTab} ${moneda === 'USD' ? styles.currencyTabActive : ''}`}
                       onClick={() => handleToggleMoneda('USD')}
-                      aria-pressed={moneda === 'USD'}
                     >
                       USD
                     </button>
                   </div>
 
-                  {/* Wallet dropdown */}
-                  <button
-                    className={`${styles.dropdownTrigger} ${dropdownAbierto ? styles.dropdownTriggerActive : ''}`}
-                    onClick={() => setDropdownAbierto(!dropdownAbierto)}
-                  >
-                    <span>{getDropdownTriggerText()}</span>
-                    <ChevronDown size={14} />
-                  </button>
-
-                  {dropdownAbierto && (
-                    <div className={styles.dropdownPanel}>
-                      <div className={styles.dropdownHeader}>BILLETERAS</div>
-                      <button
-                        className={`${styles.dropdownItem} ${billeterasSeleccionadas.length === 0 ? styles.dropdownItemActive : ''}`}
-                        onClick={() => handleToggleBilletera(null)}
-                      >
-                        <span className={styles.dropdownItemName}>Todas las billeteras</span>
-                        <span className={styles.dropdownItemBalance}>
-                          {fmt(moneda === 'ARS' ? totalSaldoBilleterasArs : totalSaldoBilleterasUsd, moneda)}
-                        </span>
-                      </button>
-                      <div className={styles.dropdownDivider} />
-                      {billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda).map(b => (
-                        <button
-                          key={b.id}
-                          className={`${styles.dropdownItem} ${billeterasSeleccionadas.includes(b.id) ? styles.dropdownItemActive : ''}`}
-                          onClick={() => handleToggleBilletera(b.id)}
-                        >
-                          <span className={styles.dropdownItemName}>{b.nombre}</span>
-                          <span className={styles.dropdownItemBalance}>
-                            {fmt(b.saldo_actual, b.moneda)}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  {/* Acciones del Header: Ocultar saldo */}
+                  <div className={styles.balanceHeaderActions}>
+                    <button
+                      type="button"
+                      className={styles.balanceHeaderIconBtn}
+                      onClick={handleTogglePrivacy}
+                      title={showBalance ? "Ocultar saldo" : "Mostrar saldo"}
+                      aria-label={showBalance ? "Ocultar saldo" : "Mostrar saldo"}
+                    >
+                      {showBalance ? <Eye size={15} /> : <EyeOff size={15} />}
+                    </button>
+                  </div>
                 </div>
 
-                <div className={styles.balanceContent}>
-                  <MobileGreeting usuario={usuario} />
-                  <div className={styles.balanceMain}>
-                    {/* Saldo Disponible — moneda activa */}
-                    <div className={styles.balanceTop}>
-                      <div className={styles.labelWithHint}>
-                        <span className={styles.saldoLabel}>Saldo disponible</span>
-                        <button
-                          className={styles.hint}
-                          onClick={() => open('balance_ciclo', {})}
-                          title="¿Qué es el balance del ciclo?"
-                          aria-label="Ver explicación del balance del ciclo"
-                        >
-                          <AlertCircle size={14} />
-                        </button>
-                      </div>
-                      <h2 className={`${styles.saldoAmount} ${
-                        (moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible) < 0
-                          ? styles.saldoAmountNegative : ''
-                      }`}>
-                        {fmt(
-                          moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible,
-                          moneda
-                        )}
-                      </h2>
-                      <span className={styles.disponibleRealSub}>en billeteras</span>
-                    </div>
+                {/* Saldo Principal */}
+                <div className={styles.balanceBody}>
+                  <h2 className={`${styles.saldoAmount} ${
+                    (moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible) < 0
+                      ? styles.saldoAmountNegative : ''
+                  }`}>
+                    {showBalance ? fmt(
+                      moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible,
+                      moneda
+                    ) : '••••••••'}
+                  </h2>
+                  <span className={styles.disponibleSub}>
+                    {billeterasSeleccionadas.length === 0
+                      ? `Total en ${billeterasActivas.length} ${billeterasActivas.length === 1 ? 'billetera' : 'billeteras'}`
+                      : billeterasSeleccionadas.length === 1
+                        ? `Saldo en ${billeterasActivas.find(b => b.id === billeterasSeleccionadas[0])?.nombre ?? 'billetera'}`
+                        : `${billeterasSeleccionadas.length} billeteras seleccionadas`}
+                  </span>
+                </div>
 
-                    {/* Trends */}
-                    {moneda === 'ARS' && (data.balance.ars.ingresos > 0 || data.balance.ars.egresos > 0) && (
-                      <div className={styles.balanceTrends}>
-                        <div className={styles.balanceTrendItem}>
-                          <TrendingUp size={15} className={styles.trendUp} />
-                          <span className={styles.trendAmount}>{fmt(data.balance.ars.ingresos, 'ARS')}</span>
-                        </div>
-                        <div className={styles.balanceTrendItem}>
-                          <TrendingDown size={15} className={styles.trendDown} />
-                          <span className={styles.trendAmount}>{fmt(data.balance.ars.egresos, 'ARS')}</span>
-                        </div>
-                      </div>
-                    )}
-                    {moneda === 'USD' && (data.balance.usd.ingresos > 0 || data.balance.usd.egresos > 0) && (
-                      <div className={styles.balanceTrends}>
-                        <div className={styles.balanceTrendItem}>
-                          <TrendingUp size={15} className={styles.trendUp} />
-                          <span className={styles.trendAmount}>{fmt(data.balance.usd.ingresos, 'USD')}</span>
-                        </div>
-                        <div className={styles.balanceTrendItem}>
-                          <TrendingDown size={15} className={styles.trendDown} />
-                          <span className={styles.trendAmount}>{fmt(data.balance.usd.egresos, 'USD')}</span>
-                        </div>
-                      </div>
-                    )}
+                {/* Wallet Filter Pills (Acceso directo, 1 toque, con saldo en vivo) */}
+                {billeterasActivas.length > 0 && (
+                  <div className={styles.walletPillsTrack} role="tablist" aria-label="Filtrar por billetera">
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={billeterasSeleccionadas.length === 0}
+                      className={`${styles.walletPill} ${billeterasSeleccionadas.length === 0 ? styles.walletPillActive : ''}`}
+                      onClick={() => handleSelectBilletera(null)}
+                      title="Ver todas las billeteras"
+                    >
+                      <span className={styles.walletPillDot} />
+                      <span className={styles.walletPillName}>Todas</span>
+                      <span className={styles.walletPillCount}>{billeterasActivas.length}</span>
+                    </button>
+
+                    {billeterasActivas.map(b => {
+                      const isSelected = billeterasSeleccionadas.includes(b.id)
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={isSelected}
+                          className={`${styles.walletPill} ${isSelected ? styles.walletPillActive : ''}`}
+                          onClick={(e) => {
+                            if (e.metaKey || e.ctrlKey) {
+                              handleToggleBilletera(b.id)
+                            } else {
+                              handleSelectBilletera(b.id)
+                            }
+                          }}
+                          title={`Filtrar por ${b.nombre}${b.es_principal ? ' (Favorita)' : ''}`}
+                        >
+                          <span className={styles.walletPillName}>
+                            {b.nombre}
+                            {b.es_principal && (
+                              <Star size={10} fill="currentColor" className={styles.walletPillStar} />
+                            )}
+                          </span>
+                          <span className={styles.walletPillAmount}>
+                            {showBalance ? fmt(b.saldo_actual, b.moneda) : '••••'}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Flechas de Ingreso y Egreso */}
+                <div className={styles.balanceTrends}>
+                  <div className={styles.balanceTrendItem}>
+                    <TrendingUp size={15} className={styles.trendUp} />
+                    <span className={styles.trendAmount}>
+                      {showBalance ? fmt(moneda === 'ARS' ? (data.balance?.ars?.ingresos ?? 0) : (data.balance?.usd?.ingresos ?? 0), moneda) : '••••'}
+                    </span>
+                  </div>
+                  <div className={styles.balanceTrendItem}>
+                    <TrendingDown size={15} className={styles.trendDown} />
+                    <span className={styles.trendAmount}>
+                      {showBalance ? fmt(moneda === 'ARS' ? (data.balance?.ars?.egresos ?? 0) : (data.balance?.usd?.egresos ?? 0), moneda) : '••••'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -824,15 +814,22 @@ export default function DashboardPage() {
                   <h3 className={styles.cardTitle}>Gastos por categoría</h3>
                 )}
               </div>
-              <div className={styles.toggleGroup}>
+              <div className={styles.unitTabs} role="tablist" aria-label="Unidad de visualización">
                 <button 
-                  className={`${styles.toggleBtn} ${!showChartPercent ? styles.active : ''}`} 
+                  type="button"
+                  role="tab"
+                  aria-selected={!showChartPercent}
+                  className={`${styles.unitTab} ${!showChartPercent ? styles.unitTabActive : ''}`} 
                   onClick={() => setShowChartPercent(false)}
                 >
                   $
                 </button>
+                <span className={styles.unitTabSep}>/</span>
                 <button 
-                  className={`${styles.toggleBtn} ${showChartPercent ? styles.active : ''}`} 
+                  type="button"
+                  role="tab"
+                  aria-selected={showChartPercent}
+                  className={`${styles.unitTab} ${showChartPercent ? styles.unitTabActive : ''}`} 
                   onClick={() => setShowChartPercent(true)}
                 >
                   %

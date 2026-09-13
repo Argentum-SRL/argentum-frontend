@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from 'react'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
+import { AtmosphericBackground } from '@/components/ui'
 import styles from './AuthLayout.module.css'
 
 function MoonIcon({ size }: { size: number }) {
@@ -102,7 +103,12 @@ export default function AuthLayout({
   }
 
   return (
-    <div className={styles.standalone}>
+    <AtmosphericBackground
+      fullScreen={false}
+      centered
+      compensateBottomNav={false}
+      className={styles.standalone}
+    >
       {themeBtn}
       <div
         className={styles.standaloneCard}
@@ -122,6 +128,6 @@ export default function AuthLayout({
       >
         <FormContent title={title} compact={compact}>{children}</FormContent>
       </div>
-    </div>
+    </AtmosphericBackground>
   )
 }

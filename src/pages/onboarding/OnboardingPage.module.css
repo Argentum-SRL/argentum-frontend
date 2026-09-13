@@ -1,15 +1,19 @@
 .page {
   min-height: 100dvh;
-  background: var(--page);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 20px 48px;
+  justify-content: center;
+  padding: 40px 20px 48px;
+  box-sizing: border-box;
 }
 
 .inner {
   width: 100%;
   max-width: 480px;
+  position: relative;
+  z-index: 10;
+  margin: auto 0;
 }
 
 /* ── Header ──────────────────────────────────── */
@@ -17,21 +21,24 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
 .logoText {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--silver, #cbd5e1);
   letter-spacing: -0.3px;
 }
 
 /* ── Card ────────────────────────────────────── */
 .card {
-  background: var(--surface);
-  border-radius: 16px;
-  border: 1px solid var(--border);
+  background: rgba(13, 26, 54, 0.82);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
   padding: 28px 28px 32px;
   margin-bottom: 16px;
   overflow: hidden;
@@ -39,7 +46,7 @@
 
 @media (min-width: 480px) {
   .card {
-    padding: 32px 40px 40px;
+    padding: 36px 40px 40px;
   }
 }
 
@@ -62,7 +69,7 @@
 /* ── Footer ──────────────────────────────────── */
 .footer {
   font-size: 0.8125rem;
-  color: var(--text-3);
+  color: rgba(255, 255, 255, 0.55);
   text-align: center;
 }
 
@@ -72,6 +79,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--page);
-  color: var(--primary);
+  color: #ffffff;
 }

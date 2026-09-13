@@ -374,6 +374,10 @@ export default function TransaccionesPage() {
     const txsMoneda = filteredTransacciones.filter(t => t.moneda === mainCurrency)
 
     txsMoneda.forEach(t => {
+      // Excluir transacciones pendientes de confirmación (alineado con dashboard)
+      if (t.estado_verificacion === 'pendiente') {
+        return
+      }
       // Excluir aportes y retiros de metas de los totales de egresos/ingresos
       if (t.movimiento_meta_id || t.descripcion?.startsWith('Aporte a la meta:') || t.descripcion?.startsWith('Retiro de la meta:')) {
         return

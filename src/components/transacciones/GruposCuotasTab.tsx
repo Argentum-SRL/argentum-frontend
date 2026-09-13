@@ -788,6 +788,43 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
               </div>
             </div>
 
+            {/* Costo Financiero / Tasas (Visible only with interest) */}
+            {selectedGrupo.tiene_interes && (
+              <div className={styles.detailTasasCard}>
+                <div className={styles.detailTasasHeader}>
+                  <span className={styles.detailTasasTitle}>Costo financiero</span>
+                  {selectedGrupo.tasa_interes != null && (
+                    <span className={styles.detailTasaMensualBadge}>
+                      {Number(selectedGrupo.tasa_interes).toFixed(2)}% mensual
+                    </span>
+                  )}
+                </div>
+                <div className={styles.detailTasasGrid}>
+                  <div className={styles.detailTasaItem}>
+                    <span className={styles.detailTasaLabel}>TNA</span>
+                    <span className={styles.detailTasaValue}>
+                      {selectedGrupo.tna != null ? `${Number(selectedGrupo.tna).toFixed(2)}%` : '-'}
+                    </span>
+                  </div>
+                  <div className={styles.detailTasaItem}>
+                    <span className={styles.detailTasaLabel}>TEA</span>
+                    <span className={styles.detailTasaValue}>
+                      {selectedGrupo.tea != null ? `${Number(selectedGrupo.tea).toFixed(2)}%` : '-'}
+                    </span>
+                  </div>
+                  <div className={`${styles.detailTasaItem} ${styles.detailTasaItemHighlight}`}>
+                    <span className={styles.detailTasaLabel}>CFT estimado</span>
+                    <span className={`${styles.detailTasaValue} ${styles.detailCftValue}`}>
+                      {selectedGrupo.cft_estimado != null ? `${Number(selectedGrupo.cft_estimado).toFixed(2)}%` : '-'}
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.detailCftFootnote}>
+                  * CFT estimado con IVA (21%) sobre intereses
+                </div>
+              </div>
+            )}
+
             {/* Actions Grid */}
             <div className={styles.detailActionsGrid}>
               {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (

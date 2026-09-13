@@ -767,6 +767,9 @@ export interface GrupoCuotasResumen {
   transaccion_padre_id: string
   tiene_interes: boolean
   tasa_interes: number | null
+  tna?: number | null
+  tea?: number | null
+  cft_estimado?: number | null
   estado: 'activo' | 'cancelado' | 'completado'
   categoria_id?: string | null
   subcategoria_id?: string | null

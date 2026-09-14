@@ -39,10 +39,43 @@
   }
 }
 
+/* ── Seamless Safe Area Vignettes (Camuflaje para Status Bar y Safari Bar) ── */
+.topVignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top, 44px) + 60px);
+  background: linear-gradient(
+    to bottom,
+    #070f24 0%,
+    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-top, 44px) + 8px),
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+.bottomVignette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-bottom, 24px) + 75px);
+  background: linear-gradient(
+    to top,
+    #070f24 0%,
+    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-bottom, 24px) + 30px),
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
 /* ── Ambient Halos ───────────────────────────────────────────────────────── */
 .ambientGlowTop {
   position: absolute;
-  top: -120px;
+  top: -40px;
   left: 15%;
   width: 500px;
   height: 500px;

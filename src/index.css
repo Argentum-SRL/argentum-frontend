@@ -17,14 +17,14 @@ html {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   height: 100%;
-  background-color: #070f24;
-  color-scheme: dark;
+  background-color: var(--html-bg);
+  color-scheme: light dark;
 }
 
 body {
   min-height: 100%;
   line-height: 1.5;
-  background-color: #070f24;
+  background-color: var(--html-bg);
 }
 
 img, svg, video {
@@ -42,7 +42,7 @@ p, h1, h2, h3, h4, h5, h6 {
 
 
 :root {
-  --html-bg: #070f24;
+  --html-bg: #F5F4F0;
   --primary: #0D2045;
   --silver: #8A95A8;
   --secondary: #1A3D28;
@@ -103,7 +103,7 @@ html {
 }
 
 body {
-  background-color: #070f24;
+  background-color: var(--page);
   color: var(--text);
 }
 

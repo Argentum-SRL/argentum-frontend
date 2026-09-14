@@ -14,7 +14,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   })
 
   const applyTheme = useCallback((newTheme: Theme) => {
-    if (newTheme === 'dark') {
+    const isDark = newTheme === 'dark'
+    const themeColor = isDark ? '#0E1117' : '#F5F4F0'
+    const colorScheme = isDark ? 'dark' : 'light'
+
+    if (isDark) {
       document.documentElement.setAttribute('data-theme', 'dark')
       document.documentElement.classList.add('dark')
     } else {
@@ -22,8 +26,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       document.documentElement.classList.remove('dark')
     }
 
-    // Actualizar la etiqueta meta theme-color dinámicamente para Safari/iOS
-    const themeColor = newTheme === 'dark' ? '#0E1117' : '#0D2045'
+    document.documentElement.style.colorScheme = colorScheme
+    document.documentElement.style.backgroundColor = themeColor
+    document.body.style.backgroundColor = themeColor
+
+    // Actualizar la etiqueta meta theme-color dinámicamente para Safari/iOS y Android
     const existingMetas = document.querySelectorAll('meta[name="theme-color"]')
     existingMetas.forEach(meta => meta.remove())
 

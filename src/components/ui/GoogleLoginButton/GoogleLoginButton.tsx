@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
+import { useTheme } from '@/hooks/useTheme'
 import styles from './GoogleLoginButton.module.css'
 
 interface GoogleLoginButtonProps {
@@ -8,8 +9,11 @@ interface GoogleLoginButtonProps {
 }
 
 const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }: GoogleLoginButtonProps) {
+  const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const [buttonWidth, setButtonWidth] = useState<string | null>(null)
+
+  const googleTheme = theme === 'dark' ? 'filled_black' : 'outline'
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -38,6 +42,7 @@ const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }
     <div ref={containerRef} className={styles.container}>
       {buttonWidth && (
         <GoogleLogin
+          key={`${googleTheme}-${buttonWidth}`}
           onSuccess={(credentialResponse) => {
             if (credentialResponse.credential) {
               onSuccess({ credential: credentialResponse.credential })
@@ -49,7 +54,7 @@ const GoogleLoginButton = memo(function GoogleLoginButton({ onSuccess, onError }
             console.error('[Auth][Google] Error en el componente GoogleLogin')
             onError()
           }}
-          theme="outline"
+          theme={googleTheme}
           size="large"
           shape="pill"
           width={buttonWidth}

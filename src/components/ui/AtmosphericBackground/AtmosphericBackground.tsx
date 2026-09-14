@@ -121,6 +121,9 @@ export function AtmosphericBackground({
       role={role}
       aria-live={ariaLive}
     >
+      {/* Viñeta de camuflaje superior (Status Bar / Dynamic Island) */}
+      <div className={styles.topVignette} aria-hidden="true" />
+
       {/* Resplandores ambientales de Argentum */}
       <div className={styles.ambientGlowTop} aria-hidden="true" />
       <div className={styles.ambientGlowBottom} aria-hidden="true" />
@@ -129,6 +132,9 @@ export function AtmosphericBackground({
       {moons.map((moon) => (
         <DecoMoonItem key={moon.id} {...moon} />
       ))}
+
+      {/* Viñeta de camuflaje inferior (Barra flotante Safari) */}
+      <div className={styles.bottomVignette} aria-hidden="true" />
 
       {children}
     </div>

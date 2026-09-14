@@ -1,8 +1,17 @@
 .container {
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
   max-width: 400px;
   min-height: 40px;
   margin: 0 auto;
+  border-radius: 9999px;
 }
+
+.container > div,
+.container iframe {
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+}
+

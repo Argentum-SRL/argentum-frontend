@@ -8,7 +8,7 @@
 @media (max-width: 767px) {
   .root {
     gap: 16px;
-    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -1345,7 +1345,7 @@
   right: 0;
   background: var(--surface);
   border-radius: 24px 24px 0 0;
-  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
   z-index: 1001;
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);

@@ -78,8 +78,10 @@ export function AtmosphericBackground({
     // Camuflar barra superior (Dynamic Island, notch y status bar en iOS/Safari)
     const prevHtmlBg = document.documentElement.style.backgroundColor
     const prevBodyBg = document.body.style.backgroundColor
+    const prevColorScheme = document.documentElement.style.colorScheme
     document.documentElement.style.backgroundColor = '#070f24'
     document.body.style.backgroundColor = '#070f24'
+    document.documentElement.style.colorScheme = 'dark'
 
     const metas = document.querySelectorAll('meta[name="theme-color"]')
     const prevMetas: { el: Element; content: string }[] = []
@@ -92,6 +94,7 @@ export function AtmosphericBackground({
     return () => {
       document.documentElement.style.backgroundColor = prevHtmlBg
       document.body.style.backgroundColor = prevBodyBg
+      document.documentElement.style.colorScheme = prevColorScheme
       prevMetas.forEach(({ el, content }) => {
         el.setAttribute('content', content)
       })

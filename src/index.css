@@ -17,12 +17,14 @@ html {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   height: 100%;
-  background-color: var(--html-bg);
+  background-color: #070f24;
+  color-scheme: dark;
 }
 
 body {
   min-height: 100%;
   line-height: 1.5;
+  background-color: #070f24;
 }
 
 img, svg, video {
@@ -101,7 +103,7 @@ html {
 }
 
 body {
-  background-color: var(--page);
+  background-color: #070f24;
   color: var(--text);
 }
 

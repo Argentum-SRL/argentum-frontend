@@ -925,7 +925,7 @@ export default function DashboardPage() {
                           <div className={styles.pagoRight}>
                             <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
                             {isVencido ? (
-                              <span className={styles.urgentBadge} style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>Vencido</span>
+                              <span className={styles.vencidoBadge}>Vencido</span>
                             ) : isUrgente ? (
                               <span className={styles.urgentBadge}>Urgente</span>
                             ) : null}

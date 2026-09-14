@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMe
 import { createPortal } from 'react-dom'
 import { format, parse, isValid, getDaysInMonth, startOfDay } from 'date-fns'
 import { es } from 'date-fns/locale/es'
-import { Calendar, AlertCircle } from 'lucide-react'
+import { Calendar, AlertCircle, Keyboard } from 'lucide-react'
 import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
 import '@ncdai/react-wheel-picker/style.css'
 import styles from './DateInput.module.css'
@@ -64,7 +64,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   id,
   name,
   required,
-  placeholder = 'dd/mm/aaaa',
+  placeholder = 'DD/MM/AAAA',
   defaultYear,
 }) => {
   // Parsear min/max
@@ -80,8 +80,16 @@ export const DateInput: React.FC<DateInputProps> = ({
 
   const [open, setOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 1024)
+  const [isFocused, setIsFocused] = useState(false)
   const [inputText, setInputText] = useState(parsedValueDate ? format(parsedValueDate, DISPLAY_FORMAT) : '')
   const [prevValue, setPrevValue] = useState(value)
+
+  // Detectar mobile en resize continuo
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 1024)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Rango de años calculado según min/max o default -100 / +10
   const currentYearNow = useMemo(() => new Date().getFullYear(), [])
@@ -331,22 +339,37 @@ export const DateInput: React.FC<DateInputProps> = ({
   }, [commitWheelChange, selectedMonth, selectedDay])
 
   const handleTextInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^\d/]/g, '')
+    let raw = e.target.value
 
-    if (inputText.length > raw.length + 1) {
-      setInputText(raw)
+    if (raw === '') {
+      setInputText('')
+      onChange('')
       return
     }
 
-    const digits = raw.replace(/\//g, '')
+    // Mantener solo dígitos y barras
+    raw = raw.replace(/[^\d/]/g, '')
+
+    // Si el usuario presiona '/' luego de un dígito individual (ej: '5/'), autopad a '05/'
+    if (raw.endsWith('/') && !inputText.endsWith('/')) {
+      const parts = raw.split('/')
+      const prevSegment = parts[parts.length - 2]
+      if (prevSegment && prevSegment.length === 1) {
+        parts[parts.length - 2] = '0' + prevSegment
+        raw = parts.join('/')
+      }
+    }
+
+    // Extraer dígitos (máximo 8)
+    const digits = raw.replace(/\//g, '').slice(0, 8)
 
     let formatted: string
     if (digits.length <= 2) {
       formatted = digits
     } else if (digits.length <= 4) {
-      formatted = digits.slice(0, 2) + '/' + digits.slice(2)
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`
     } else {
-      formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4, 8)
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`
     }
 
     setInputText(formatted)
@@ -361,9 +384,51 @@ export const DateInput: React.FC<DateInputProps> = ({
         setSelectedDay(parsed.getDate())
         onChange(format(parsed, INTERNAL_FORMAT))
       }
-    } else if (formatted.length === 0) {
-      onChange('')
     }
+  }
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (isMobile) {
+      e.target.blur()
+      if (!disabled) setOpen(true)
+      return
+    }
+    setIsFocused(true)
+    // Auto-seleccionar fecha para sobreescribir fácilmente con el teclado
+    e.target.select()
+  }
+
+  const handleBlur = () => {
+    setIsFocused(false)
+    // Si quedó una fecha incompleta, restaurar valor válido o limpiar
+    if (inputText.length > 0 && inputText.length < 10) {
+      if (parsedValueDate && isValid(parsedValueDate)) {
+        setInputText(format(parsedValueDate, DISPLAY_FORMAT))
+      } else {
+        setInputText('')
+        onChange('')
+      }
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      closePicker()
+    } else if (e.key === 'ArrowDown' || (e.altKey && e.key === 'ArrowDown')) {
+      e.preventDefault()
+      if (!disabled) setOpen(true)
+    } else if (e.key === 'Enter') {
+      if (open) {
+        e.preventDefault()
+        closePicker()
+      }
+    }
+  }
+
+  const handleCalendarToggle = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (disabled) return
+    setOpen(prev => !prev)
   }
 
   const handleToday = () => {
@@ -523,7 +588,14 @@ export const DateInput: React.FC<DateInputProps> = ({
   return (
     <div className={[styles.wrapper, className].filter(Boolean).join(' ')} ref={wrapperRef}>
       {label && <label htmlFor={id} className={styles.label}>{label}</label>}
-      <div className={styles.inputWrap}>
+      <div
+        className={styles.inputWrap}
+        onClick={() => {
+          if (isMobile && !disabled) {
+            setOpen(true)
+          }
+        }}
+      >
         <input
           ref={inputRef}
           id={id}
@@ -532,22 +604,45 @@ export const DateInput: React.FC<DateInputProps> = ({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
+          readOnly={isMobile}
+          inputMode={isMobile ? 'none' : 'text'}
+          tabIndex={isMobile ? -1 : 0}
           onChange={handleTextInput}
-          onFocus={() => !disabled && setOpen(true)}
-          onClick={() => !disabled && setOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape' || e.key === 'Tab') closePicker()
-          }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          title={isMobile ? undefined : "Escribí la fecha (DD/MM/AAAA) o abrí el calendario"}
           className={[
             styles.input,
+            isFocused ? styles.inputFocused : '',
             error ? styles.inputError : '',
             disabled ? styles.inputDisabled : '',
           ].filter(Boolean).join(' ')}
         />
         {name && <input type="hidden" name={name} value={value} required={required} />}
-        <span className={[styles.icon, error ? styles.iconError : ''].filter(Boolean).join(' ')}>
+        
+        <button
+          type="button"
+          tabIndex={-1}
+          className={[
+            styles.calendarBtn,
+            open ? styles.calendarBtnActive : '',
+            error ? styles.calendarBtnError : '',
+          ].filter(Boolean).join(' ')}
+          onClick={handleCalendarToggle}
+          title={open ? "Cerrar calendario" : "Abrir calendario"}
+          aria-label={open ? "Cerrar calendario" : "Abrir calendario"}
+          disabled={disabled}
+        >
           <Calendar size={16} />
-        </span>
+        </button>
+
+        {isFocused && !isMobile && (
+          <div className={styles.formatHintBadge} aria-hidden="true">
+            <Keyboard size={12} className={styles.formatHintIcon} />
+            <span>DD/MM/AAAA</span>
+          </div>
+        )}
       </div>
       {error && (
         <span className={styles.errorMsg}>

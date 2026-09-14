@@ -895,8 +895,8 @@
 .barChartWrap {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 8px 0;
+  gap: 6px;
+  padding: 4px 0;
 }
 @media (min-width: 1024px) {
   .barChartWrap {
@@ -951,6 +951,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .barIconWrap {
@@ -961,6 +966,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .barContent {
@@ -986,6 +992,7 @@
   font-size: 13px;
   color: var(--text-2);
   font-weight: 500;
+  transition: color 0.15s ease;
 }
 
 .proyBadge {
@@ -1123,6 +1130,16 @@
   color: var(--text-3);
 }
 
+.pagoRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
 .itemAmount {
   font-size: 0.9375rem;
   font-weight: 700;
@@ -1148,8 +1165,27 @@
   font-weight: 700;
   background: var(--error-bg);
   color: var(--error);
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.vencidoBadge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
 }
 
 .emptyState {
@@ -1500,15 +1536,27 @@
 
 .barItem.clickable {
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  border-radius: 8px;
-  padding: 4px 8px;
-  margin: -4px -8px;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-.barItem.clickable:hover {
+@media (hover: hover) {
+  .barItem.clickable:hover {
+    background-color: var(--surface-alt);
+  }
+
+  .barItem.clickable:hover .barName {
+    color: var(--text);
+  }
+
+  .barItem.clickable:hover .barIconWrap {
+    transform: scale(1.08);
+  }
+}
+
+.barItem.clickable:active {
   background-color: var(--surface-alt);
-  transform: translateX(4px);
+  transform: scale(0.985);
 }
 
 /* ── Balance Footer ────────────────────────────────────────────── */

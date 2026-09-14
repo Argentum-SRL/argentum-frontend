@@ -106,34 +106,36 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className={styles.root}>
 
-      {/* ── Standalone Logo ──────────────────────── */}
-      <Link to="/app/dashboard" className={styles.standaloneLogo} aria-label="Ir al dashboard" title="Argentum">
-        <MoonIcon size={24} color="currentColor" />
-        <span className={styles.logoTitle}>Argentum</span>
-      </Link>
-
-      {/* ── Top Navigation Desktop ──────────────────────── */}
-      <div className={styles.topNav}>
-        <div className={styles.topNavPill}>
-          {desktopNavItems.map(({ label, path, Icon }) => (
-            <Link
-              key={path}
-              to={path}
-              className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
-            >
-              <span className={styles.navIcon}>
-                <Icon {...SIDEBAR_ICON_PROPS} />
-              </span>
-              <span className={styles.navLabel}>{label}</span>
-            </Link>
-          ))}
+      {/* ── Top Header Desktop & Tablet ─────────────────── */}
+      <header className={styles.desktopHeader}>
+        {/* Left: Brand Logo */}
+        <div className={styles.headerLeft}>
+          <Link to="/app/dashboard" className={styles.standaloneLogo} aria-label="Ir al dashboard" title="Argentum">
+            <MoonIcon size={24} color="currentColor" />
+            <span className={styles.logoTitle}>Argentum</span>
+          </Link>
         </div>
-      </div>
 
-      {/* ── Top Bar Desktop ──────────────────────── */}
-      <div className={styles.topBar}>
-        
-        <div className={styles.topBarActions}>
+        {/* Center: Top Navigation */}
+        <nav className={styles.headerCenter} aria-label="Navegación principal">
+          <div className={styles.topNavPill}>
+            {desktopNavItems.map(({ label, path, Icon }) => (
+              <Link
+                key={path}
+                to={path}
+                className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
+              >
+                <span className={styles.navIcon}>
+                  <Icon {...SIDEBAR_ICON_PROPS} />
+                </span>
+                <span className={styles.navLabel}>{label}</span>
+              </Link>
+            ))}
+          </div>
+        </nav>
+
+        {/* Right: Actions and Profile */}
+        <div className={styles.headerRight}>
           {/* Pill 1: Controls */}
           <div className={styles.actionPill}>
             <button className={styles.topBarBtn} onClick={() => setIsSearchOpen(true)} title="Buscar">
@@ -150,7 +152,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
           {/* Pill 2: User Profile */}
           <div className={styles.profileWrapper}>
-            <button className={styles.profilePill} onClick={() => setIsProfileOpen(!isProfileOpen)}>
+            <button
+              className={styles.profilePill}
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              title={usuario?.nombre ? `${usuario.nombre} (${usuario.email || ''})` : 'Perfil'}
+              aria-expanded={isProfileOpen}
+              aria-haspopup="true"
+            >
               <div className={styles.topBarAvatar}>
                 {fotoUrl && !fotoError
                   ? <img src={fotoUrl} alt="avatar" referrerPolicy="no-referrer" onError={() => setFotoError(true)} />
@@ -181,7 +189,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             )}
           </div>
         </div>
-      </div>
+      </header>
 
       {/* ── Mobile header ────────────────────────── */}
       <header className={styles.mobileHeader}>

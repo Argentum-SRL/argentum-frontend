@@ -25,92 +25,89 @@
 }
 
 
-@media (min-width: 768px) {
-  .standaloneLogo {
-    position: fixed;
-    top: 12px;
-    left: 24px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: var(--primary);
-    z-index: 40;
-    white-space: nowrap;
-    -webkit-user-select: none;
-    user-select: none;
-    flex-shrink: 0;
-  }
-  
-  :global([data-theme="dark"]) .standaloneLogo {
-    color: #fff;
-  }
-  
-  .logoTitle {
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-    line-height: 1;
-    display: inline-block;
-  }
-
-  @media (min-width: 768px) and (max-width: 1180px) {
-    .logoTitle {
-      display: none;
-    }
-    .standaloneLogo {
-      gap: 0;
-    }
-  }
-
-  .topNav {
-    position: fixed;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    height: 56px;           /* <-- agregar: igual que standaloneLogo y topBar */
-    justify-content: center; /* <-- agregar: centrar la pill dentro del contenedor */
-  }
-
-  .topNavPill {
-    display: flex;
-    align-items: center;
-    background: var(--sb-bg);
-    border-radius: 26px;
-    padding: 4px;
-    box-shadow: var(--sb-shadow);
-    gap: 4px;
-  }
-
-  .topBar {
-    position: fixed;
-    top: 12px;
-    right: 24px;
-    height: 56px;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
+/* ── Desktop & Tablet Unified Top Header ─────────────────── */
+.desktopHeader {
+  position: fixed;
+  top: 12px;
+  left: 0;
+  right: 0;
+  height: 56px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 40;
+  pointer-events: none;
+  box-sizing: border-box;
 }
 
 @media (max-width: 767px) {
-  .standaloneLogo,
-  .topNav,
-  .topBar { 
-    display: none; 
+  .desktopHeader {
+    display: none;
   }
 }
 
-.topBarActions {
+.headerLeft {
   display: flex;
   align-items: center;
-  gap: 16px;
+  flex: 0 0 auto;
+  pointer-events: auto;
+}
+
+.standaloneLogo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--primary);
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+:global([data-theme="dark"]) .standaloneLogo {
+  color: #fff;
+}
+
+.logoTitle {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  line-height: 1;
+  display: inline-block;
+}
+
+.headerCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+.topNavPill {
+  display: flex;
+  align-items: center;
+  background: var(--sb-bg);
+  border-radius: 26px;
+  padding: 4px;
+  box-shadow: var(--sb-shadow);
+  border: 1px solid var(--sb-border);
+  gap: 4px;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: 12px;
   pointer-events: auto;
 }
 
@@ -121,8 +118,16 @@
   border-radius: 26px;
   padding: 4px;
   box-shadow: var(--sb-shadow);
-  border: none;
+  border: 1px solid var(--sb-border);
   gap: 4px;
+  flex-shrink: 0;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.profileWrapper {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .profilePill {
@@ -130,12 +135,14 @@
   align-items: center;
   background: var(--sb-bg);
   border-radius: 26px;
-  padding: 4px 16px 4px 4px;
+  padding: 4px 14px 4px 4px;
   box-shadow: var(--sb-shadow);
-  border: none;
-  gap: 10px;
+  border: 1px solid var(--sb-border);
+  gap: 8px;
   cursor: pointer;
   transition: transform 150ms, box-shadow 150ms;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 }
 
 .profilePill:hover {
@@ -214,6 +221,135 @@
   color: var(--sb-text);
   opacity: 0.7;
   margin-left: 4px;
+}
+
+/* ── Media Queries Responsive Overrides (Cascade After Base) ─────────────── */
+
+/* Intermediate screens / Laptops / Tablets in landscape (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .desktopHeader {
+    padding: 0 20px;
+    gap: 12px;
+  }
+
+  .headerRight {
+    gap: 10px;
+  }
+
+  .logoTitle {
+    display: none;
+  }
+
+  .standaloneLogo {
+    gap: 0;
+  }
+
+  .topBarUserEmail {
+    display: none !important;
+  }
+
+  .topBarUserName {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Tablet portrait & narrow landscape (iPad Air 820px, Surface 912px, Fold 882px, etc.) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .desktopHeader {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .logoTitle {
+    display: none;
+  }
+
+  .standaloneLogo {
+    gap: 0;
+  }
+
+  /* Ocultar nombre y email en tablet; perfil como botón circular limpio */
+  .topBarUserInfo {
+    display: none !important;
+  }
+
+  .profileChevron {
+    display: none !important;
+  }
+
+  .profilePill {
+    padding: 3px !important;
+    border-radius: 50% !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .actionPill {
+    padding: 3px !important;
+    gap: 3px !important;
+  }
+
+  .topBarBtn {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .topNavPill {
+    padding: 3px !important;
+    gap: 3px !important;
+  }
+
+  .navItem {
+    width: 34px !important;
+    height: 34px !important;
+    max-width: 34px !important;
+    padding: 0 8px !important;
+  }
+}
+
+/* Compact landscape screens (short viewport height < 520px, like rotated mobile/fold) */
+@media (min-width: 768px) and (max-height: 520px) {
+  .desktopHeader {
+    top: 6px;
+    height: 42px;
+    padding: 0 12px;
+  }
+
+  .topNavPill,
+  .actionPill {
+    padding: 2px !important;
+    gap: 2px !important;
+  }
+
+  .profilePill {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 2px !important;
+  }
+
+  .topBarAvatar {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .navItem,
+  .topBarBtn {
+    height: 30px !important;
+    width: 30px !important;
+    max-width: 30px !important;
+    border-radius: 8px !important;
+  }
+
+  .main {
+    padding-top: 50px !important;
+  }
 }
 
 .profileWrapper {
@@ -296,10 +432,17 @@
   max-width: 36px; /* Solo muestra icono inicialmente */
 }
 
-.navItem:hover {
-  background: var(--sb-hover-bg);
-  color: var(--sb-text-hover);
-  max-width: 160px; /* Expand to show word */
+@media (hover: hover) and (pointer: fine) {
+  .navItem:hover {
+    background: var(--sb-hover-bg);
+    color: var(--sb-text-hover);
+    max-width: 160px; /* Expand to show word */
+  }
+
+  .navItem:hover .navLabel {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .navItemActive {
@@ -328,11 +471,6 @@
   transform: translateX(-4px);
   transition: opacity 200ms ease, transform 200ms ease;
   white-space: nowrap;
-}
-
-.navItem:hover .navLabel {
-  opacity: 1;
-  transform: translateX(0);
 }
 
 .navItemActive .navIcon::after {

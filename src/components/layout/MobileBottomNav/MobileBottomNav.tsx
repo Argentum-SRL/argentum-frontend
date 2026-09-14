@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useLayoutEffect, useEffect, type FC } from 'react'
+import { useRef, useState, useMemo, useLayoutEffect, useEffect, useCallback, type FC } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -84,6 +84,14 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
     return () => window.removeEventListener('resize', handleResize)
   }, [activeIndex])
 
+  const lastToggleTimeRef = useRef(0)
+  const safeToggleMore = useCallback(() => {
+    const now = Date.now()
+    if (now - lastToggleTimeRef.current < 350) return
+    lastToggleTimeRef.current = now
+    onToggleMore()
+  }, [onToggleMore])
+
   // ── Pointer Event Handlers ────────────────────────────────────────────────
 
   const handlePointerDown = (e: React.PointerEvent<HTMLElement>) => {
@@ -96,22 +104,16 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
     startYRef.current = e.clientY
     pointerIdRef.current = e.pointerId
     previewIndexRef.current = activeIndex
-
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId)
-    } catch {
-      // Ignored for environments with restricted pointer capture
-    }
   }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLElement>) => {
     if (!isPointerDownRef.current || isCancelledRef.current) return
 
     const deltaX = Math.abs(e.clientX - startXRef.current)
-    const deltaY = e.clientY - startYRef.current
+    const deltaY = Math.abs(e.clientY - startYRef.current)
 
-    // Vertical threshold check: if dragged > 70px away from the bar, cancel gesture
-    if (Math.abs(deltaY) > 70) {
+    // Vertical threshold check: if dragged > 60px away from the bar, cancel gesture
+    if (deltaY > 60) {
       isCancelledRef.current = true
       isDraggingRef.current = false
       previewIndexRef.current = -1
@@ -129,11 +131,17 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
       return
     }
 
-    // Horizontal threshold to differentiate tap from drag
+    // Horizontal threshold to differentiate tap from drag:
+    // Only engage drag if horizontal motion exceeds 8px and exceeds vertical motion
     if (!isDraggingRef.current) {
-      if (deltaX >= 6) {
+      if (deltaX >= 8 && deltaX > deltaY) {
         isDraggingRef.current = true
         suppressClickRef.current = true
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId)
+        } catch {
+          // Ignored for environments with restricted pointer capture
+        }
         if (indicatorRef.current) {
           indicatorRef.current.classList.add(styles.indicatorDragging)
           indicatorRef.current.style.opacity = '1'
@@ -223,7 +231,7 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
       }
       setTimeout(() => {
         suppressClickRef.current = false
-      }, 50)
+      }, 100)
       return
     }
 
@@ -237,19 +245,61 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
 
       // Execute definitive navigation or modal toggle only on release
       if (finalSlot === 4) {
-        onToggleMore()
+        safeToggleMore()
       } else if (finalSlot >= 0 && finalSlot < 4) {
         const destPath = MOBILE_NAV[finalSlot].path
         if (location.pathname !== destPath) {
           navigate(destPath)
         }
+      } else {
+        // Snapped back to current
+        if (indicatorEl && activeIndex >= 0 && itemRefs.current[activeIndex]) {
+          indicatorEl.style.opacity = '1'
+          indicatorEl.style.transform = `translate3d(${itemRefs.current[activeIndex]!.offsetLeft}px, 0, 0)`
+        }
       }
 
+      suppressClickRef.current = true
       setTimeout(() => {
         suppressClickRef.current = false
-      }, 100)
+      }, 400)
     } else {
-      suppressClickRef.current = false
+      // Fast tap detection directly in pointerUp for instantaneous mobile responsiveness
+      const wrapperEl = itemsWrapperRef.current
+      if (wrapperEl) {
+        const wrapperRect = wrapperEl.getBoundingClientRect()
+        const fingerX = e.clientX - wrapperRect.left
+        let tappedSlot = -1
+        let minDiff = Infinity
+        for (let i = 0; i < 5; i++) {
+          const item = itemRefs.current[i]
+          if (item) {
+            const center = item.offsetLeft + item.offsetWidth / 2
+            const diff = Math.abs(fingerX - center)
+            if (diff < minDiff && diff < (item.offsetWidth / 2 + 12)) {
+              minDiff = diff
+              tappedSlot = i
+            }
+          }
+        }
+
+        if (tappedSlot === 4) {
+          safeToggleMore()
+          suppressClickRef.current = true
+          setTimeout(() => {
+            suppressClickRef.current = false
+          }, 400)
+        } else if (tappedSlot >= 0 && tappedSlot < 4) {
+          const destPath = MOBILE_NAV[tappedSlot].path
+          if (location.pathname !== destPath) {
+            navigate(destPath)
+          }
+          suppressClickRef.current = true
+          setTimeout(() => {
+            suppressClickRef.current = false
+          }, 400)
+        }
+      }
     }
   }
 
@@ -282,7 +332,7 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
 
     setTimeout(() => {
       suppressClickRef.current = false
-    }, 50)
+    }, 100)
   }
 
   const handleClick = (e: React.MouseEvent, index: number) => {
@@ -292,7 +342,7 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
       return
     }
     if (index === 4) {
-      onToggleMore()
+      safeToggleMore()
     }
   }
 

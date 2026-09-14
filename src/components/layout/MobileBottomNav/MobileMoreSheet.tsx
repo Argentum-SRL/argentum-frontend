@@ -44,13 +44,14 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   const navigate = useNavigate()
   const sheetRef = useRef<HTMLDivElement | null>(null)
 
-  // Mounting state to allow smooth enter/exit transitions
+  // Mounting and visibility state for smooth enter/exit transitions
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
   const [shouldRender, setShouldRender] = useState(isOpen)
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(isOpen)
   const [pressedId, setPressedId] = useState<string | null>(null)
 
-  if (prevIsOpen !== isOpen) {
+  // Store information from previous renders to avoid setState in effect body
+  if (isOpen !== prevIsOpen) {
     setPrevIsOpen(isOpen)
     if (isOpen) {
       setShouldRender(true)
@@ -68,23 +69,18 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   const itemTouchStartXRef = useRef(0)
   const itemTouchStartYRef = useRef(0)
 
-  // Trigger open/close animations
   useEffect(() => {
-    let animId: number
-    let timeout: ReturnType<typeof setTimeout>
+    let timer: ReturnType<typeof setTimeout>
     if (isOpen) {
-      animId = requestAnimationFrame(() => {
+      timer = setTimeout(() => {
         setIsVisible(true)
-      })
+      }, 25)
     } else {
-      timeout = setTimeout(() => {
+      timer = setTimeout(() => {
         setShouldRender(false)
-      }, 240)
+      }, 260)
     }
-    return () => {
-      cancelAnimationFrame(animId)
-      clearTimeout(timeout)
-    }
+    return () => clearTimeout(timer)
   }, [isOpen])
 
   // Graceful animated close
@@ -92,7 +88,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
     setIsVisible(false)
     setTimeout(() => {
       onClose()
-    }, 220)
+    }, 240)
   }, [onClose])
 
   // ESC key listener
@@ -177,7 +173,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
     }
   }
 
-  // ── Item interaction handlers (Press and Hold -> Feedback -> Release -> Execute) ───
+  // ── Item interaction handlers (Tactile feedback + reliable selection) ───
 
   const handleItemPointerDown = (id: string, e: React.PointerEvent<HTMLButtonElement>) => {
     if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return
@@ -193,12 +189,6 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
         // Ignore
       }
     }
-
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId)
-    } catch {
-      // Ignore
-    }
   }
 
   const handleItemPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -211,37 +201,21 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
     }
   }
 
-  const handleItemPointerUp = (item: MenuItemConfig, e: React.PointerEvent<HTMLButtonElement>) => {
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      }
-    } catch {
-      // Ignore
-    }
-
+  const handleItemPointerUp = (item: MenuItemConfig) => {
     if (pressedId === item.id) {
       handleItemSelect(item)
     }
   }
 
-  const handleItemPointerCancel = (e: React.PointerEvent<HTMLButtonElement>) => {
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      }
-    } catch {
-      // Ignore
-    }
+  const handleItemPointerCancel = () => {
     setPressedId(null)
   }
 
   const handleItemSelect = (item: MenuItemConfig) => {
-    // Release visual confirmation before action and transition
-    setTimeout(() => {
-      setPressedId(null)
-      triggerClose()
+    setPressedId(null)
+    triggerClose()
 
+    setTimeout(() => {
       if (item.path) {
         if (currentPath !== item.path) {
           navigate(item.path)
@@ -249,7 +223,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
       } else if (item.action) {
         item.action()
       }
-    }, 90)
+    }, 120)
   }
 
   if (!shouldRender) return null
@@ -301,8 +275,9 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
         className={itemClasses}
         onPointerDown={(e) => handleItemPointerDown(item.id, e)}
         onPointerMove={handleItemPointerMove}
-        onPointerUp={(e) => handleItemPointerUp(item, e)}
+        onPointerUp={() => handleItemPointerUp(item)}
         onPointerCancel={handleItemPointerCancel}
+        onClick={() => handleItemSelect(item)}
         aria-label={item.label}
         aria-current={isCurrentActive ? 'page' : undefined}
       >

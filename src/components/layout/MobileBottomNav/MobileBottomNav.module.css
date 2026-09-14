@@ -74,6 +74,7 @@
   -webkit-tap-highlight-color: transparent;
   position: relative;
   z-index: 2;
+  touch-action: manipulation;
   transition: color 150ms ease;
 }
 

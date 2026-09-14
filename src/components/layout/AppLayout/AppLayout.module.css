@@ -514,7 +514,7 @@
 
 @media (max-width: 767px) {
   .content {
-    padding: 24px var(--container-px-mobile);
+    padding: calc(16px + env(safe-area-inset-top, 0px)) var(--container-px-mobile) 24px;
   }
 }
 

@@ -74,6 +74,30 @@ export function AtmosphericBackground({
   ariaLive,
   moons = DEFAULT_DECO_MOONS,
 }: AtmosphericBackgroundProps) {
+  React.useEffect(() => {
+    // Camuflar barra superior (Dynamic Island, notch y status bar en iOS/Safari)
+    const prevHtmlBg = document.documentElement.style.backgroundColor
+    const prevBodyBg = document.body.style.backgroundColor
+    document.documentElement.style.backgroundColor = '#070f24'
+    document.body.style.backgroundColor = '#070f24'
+
+    const metas = document.querySelectorAll('meta[name="theme-color"]')
+    const prevMetas: { el: Element; content: string }[] = []
+    metas.forEach((m) => {
+      const content = m.getAttribute('content') || ''
+      prevMetas.push({ el: m, content })
+      m.setAttribute('content', '#070f24')
+    })
+
+    return () => {
+      document.documentElement.style.backgroundColor = prevHtmlBg
+      document.body.style.backgroundColor = prevBodyBg
+      prevMetas.forEach(({ el, content }) => {
+        el.setAttribute('content', content)
+      })
+    }
+  }, [])
+
   const containerClasses = [
     styles.container,
     fullScreen ? styles.fixed : styles.relative,

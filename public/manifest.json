@@ -5,8 +5,8 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#09090b",
-  "theme_color": "#0D2045",
+  "background_color": "#070f24",
+  "theme_color": "#070f24",
   "icons": [
     {
       "src": "/argentum-app-icon.png",

@@ -432,12 +432,14 @@
 
 /* ── Método de pago ──────────────────────────────────────────────────────── */
 .methodGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 7px;
+  width: 100%;
 }
 
 .methodBtn {
+  flex: 1;
+  min-width: 0;
   border-radius: 11px;
   padding: 9px 6px;
   border: 1.5px solid var(--surface-alt);

@@ -506,16 +506,31 @@ export const DateInput: React.FC<DateInputProps> = ({
     </div>
   )
 
+  const handleConfirm = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    commitWheelChange(safeYearValue, selectedMonth, safeDayValue)
+    closePicker()
+  }
+
   const footerContent = (
     <div className={styles.calendarFooter}>
-      {parsedValueDate && (
-        <button className={styles.clearBtn} onClick={handleClear} type="button">
-          Borrar
+      <div className={styles.footerLeft}>
+        {parsedValueDate && (
+          <button className={styles.clearBtn} onClick={handleClear} type="button">
+            Borrar
+          </button>
+        )}
+      </div>
+      <div className={styles.footerCenter}>
+        <button className={styles.todayBtn} onClick={handleToday} type="button">
+          Hoy
         </button>
-      )}
-      <button className={styles.todayBtn} onClick={handleToday} type="button">
-        Hoy
-      </button>
+      </div>
+      <div className={styles.footerRight}>
+        <button className={styles.confirmBtn} onClick={handleConfirm} type="button">
+          Aceptar
+        </button>
+      </div>
     </div>
   )
 

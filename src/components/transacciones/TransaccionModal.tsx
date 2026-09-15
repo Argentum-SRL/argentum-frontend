@@ -6,7 +6,6 @@ import {
   ArrowRightLeft,
   Layers,
   Banknote,
-  GripHorizontal,
   ChevronLeft,
   X,
   Hash,
@@ -53,7 +52,6 @@ interface FormState {
   tarjetaId: string
   fecha: string
   metodoPago: 'debito' | 'efectivo' | 'credito' | 'transferencia'
-  showAllCats: boolean
   cantidadCuotas: number
   cuotaInicial: number
   proximoResumen: boolean
@@ -84,7 +82,6 @@ const initialState: FormState = {
   tarjetaId: '',
   fecha: todayLocal(),
   metodoPago: 'debito',
-  showAllCats: false,
   cantidadCuotas: 2,
   cuotaInicial: 1,
   proximoResumen: false,
@@ -206,7 +203,7 @@ export default function TransaccionModal({
 
   const {
     step, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
-    billeteraId, tarjetaId, fecha, metodoPago, showAllCats, cantidadCuotas, cuotaInicial, proximoResumen, tasaInteres, isSubmitting,
+    billeteraId, tarjetaId, fecha, metodoPago, cantidadCuotas, cuotaInicial, proximoResumen, tasaInteres, isSubmitting,
   } = state
 
   // Cargar subcategorías cuando cambia la categoría
@@ -404,8 +401,7 @@ export default function TransaccionModal({
     })
   }, [categorias, tipo])
 
-  const displayCategorias = showAllCats ? activeCategorias : activeCategorias.slice(0, 7)
-  const hasMoreCats = activeCategorias.length > 7
+  const displayCategorias = activeCategorias
 
   const calculoCuotas = useMemo(() => {
     const cant = cantidadCuotas || 1
@@ -619,14 +615,51 @@ export default function TransaccionModal({
                   allowDecimals
                 />
 
+                {/* 0. Tipo Ingreso/Egreso */}
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>Tipo</label>
+                  <div className={styles.radioGroup}>
+                    <button
+                      type="button"
+                      className={`${styles.radioPill} ${tipo === 'egreso' ? styles.pillActiveEgreso : ''}`}
+                      onClick={() => {
+                        if (isCuotaHija) return
+                        dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'egreso' })
+                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                      }}
+                      disabled={isCuotaHija}
+                    >
+                      <ArrowUpRight size={15} strokeWidth={2} /> Egreso
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.radioPill} ${tipo === 'ingreso' ? styles.pillActiveIngreso : ''}`}
+                      onClick={() => {
+                        if (isCuotaHija) return
+                        dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })
+                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                        // Crédito no aplica a ingresos: resetear a débito
+                        if (metodoPago === 'credito') {
+                          dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: 'debito' })
+                          const firstWallet = billeteras.find(b => !b.es_efectivo && b.moneda === moneda && b.estado === 'activa')
+                          if (firstWallet) dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: firstWallet.id })
+                        }
+                      }}
+                      disabled={isCuotaHija}
+                    >
+                      <ArrowDownLeft size={15} strokeWidth={2} /> Ingreso
+                    </button>
+                  </div>
+                </div>
+
                 {/* 1. Método de Pago */}
                 <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>¿Cómo pagaste?</label>
+                  <label className={styles.fieldLabel}>{tipo === 'ingreso' ? '¿Cómo recibiste?' : '¿Cómo pagaste?'}</label>
                   <div className={styles.methodGrid}>
                     {([
                       { key: 'debito', icon: <CreditCard size={16} />, label: 'Débito' },
                       { key: 'transferencia', icon: <ArrowRightLeft size={16} />, label: 'Transfer' },
-                      { key: 'credito', icon: <Layers size={16} />, label: 'Crédito' },
+                      ...(tipo === 'egreso' ? [{ key: 'credito' as const, icon: <Layers size={16} />, label: 'Crédito' }] : []),
                       { key: 'efectivo', icon: <Banknote size={16} />, label: 'Efectivo' },
                     ] as const).map(({ key, icon, label }) => (
                       <button
@@ -888,35 +921,6 @@ export default function TransaccionModal({
               </div>
 
               <div className={styles.formBody}>
-                {/* Tipo Ingreso/Egreso */}
-                <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Tipo</label>
-                  <div className={styles.radioGroup}>
-                    <button
-                      type="button"
-                      className={`${styles.radioPill} ${tipo === 'egreso' ? styles.pillActiveEgreso : ''}`}
-                      onClick={() => {
-                        dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'egreso' })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                      }}
-                      disabled={isCuotaHija}
-                    >
-                      <ArrowUpRight size={15} strokeWidth={2} /> Egreso
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.radioPill} ${tipo === 'ingreso' ? styles.pillActiveIngreso : ''}`}
-                      onClick={() => {
-                        dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                      }}
-                      disabled={isCuotaHija}
-                    >
-                      <ArrowDownLeft size={15} strokeWidth={2} /> Ingreso
-                    </button>
-                  </div>
-                </div>
-
                 {/* Descripción + Fecha */}
                 <div className={styles.descFechaRow}>
                   <div className={`${styles.formField} ${styles.flex2}`}>
@@ -948,14 +952,6 @@ export default function TransaccionModal({
                           <span className={styles.catName}>{cat.nombre}</span>
                         </button>
                       ))}
-                      {!showAllCats && hasMoreCats && (
-                        <button type="button" className={styles.catBtn} onClick={() => dispatch({ type: 'SET_FIELD', field: 'showAllCats', value: true })}>
-                          <div className={styles.moreCatsIconWrap}>
-                            <GripHorizontal size={22} strokeWidth={1.5} />
-                          </div>
-                          <span className={styles.catName}>Más</span>
-                        </button>
-                      )}
                     </div>
                   </div>
                 ) : (

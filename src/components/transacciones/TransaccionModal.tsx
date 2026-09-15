@@ -348,7 +348,19 @@ export default function TransaccionModal({
     const timer = setTimeout(() => {
       const card = cardRefs.current.get(idToScroll)
       if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+        if (scroller) {
+          const cardRect = card.getBoundingClientRect()
+          const scrollerRect = scroller.getBoundingClientRect()
+          const currentScroll = scroller.scrollLeft
+          const offset = cardRect.left - scrollerRect.left + currentScroll
+          const targetScrollLeft = offset - (scroller.clientWidth - cardRect.width) / 2
+
+          scroller.scrollTo({
+            left: Math.max(0, targetScrollLeft),
+            behavior: 'smooth',
+          })
+        }
       }
     }, 100)
 

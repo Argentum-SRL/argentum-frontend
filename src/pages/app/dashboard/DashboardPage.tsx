@@ -16,7 +16,8 @@ import {
   TrendingDown,
   Eye,
   EyeOff,
-  Star
+  Star,
+  HelpCircle
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -415,6 +416,7 @@ export default function DashboardPage() {
   const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
   const [subcategoriasData, setSubcategoriasData] = useState<SubcategoriaGasto[]>([])
   const [loadingSubcategorias, setLoadingSubcategorias] = useState(false)
+  const [showDesglose, setShowDesglose] = useState(false)
 
   // Resetear filtros y datos si el usuario autenticado cambia
   const prevUserIdRef = useRef<string | null>(usuario?.id ?? null)
@@ -441,6 +443,20 @@ export default function DashboardPage() {
     })
   }, [])
 
+  // Determinar si entre las billeteras relevantes existe al menos una en USD
+  const tieneBilleterasUsd = useMemo(() => {
+    const relevantes = billeterasSeleccionadas.length === 0
+      ? billeteras.filter(b => b.estado === 'activa')
+      : billeteras.filter(b => billeterasSeleccionadas.includes(b.id))
+    return relevantes.some(b => b.moneda === 'USD')
+  }, [billeteras, billeterasSeleccionadas])
+
+  // Si el switch se oculta y la moneda estaba en USD, forzar a ARS durante el render
+  if (!tieneBilleterasUsd && moneda === 'USD') {
+    setMoneda('ARS')
+    localStorage.setItem('argentum_dashboard_moneda', 'ARS')
+  }
+
   const billeterasActivas = useMemo(() => {
     return billeteras
       .filter(b => b.estado === 'activa' && b.moneda === moneda)
@@ -455,13 +471,6 @@ export default function DashboardPage() {
         return a.nombre.localeCompare(b.nombre)
       })
   }, [billeteras, moneda])
-
-  const handleSelectBilletera = useCallback((id: string | null) => {
-    const isAlreadySelected = billeterasSeleccionadas.length === 1 && billeterasSeleccionadas[0] === id
-    const next = id === null || isAlreadySelected ? [] : [id]
-    setBilleterasSeleccionadas(next)
-    localStorage.setItem('argentum_dashboard_billeteras', JSON.stringify(next))
-  }, [billeterasSeleccionadas])
 
   const fetchData = useCallback(async (signal?: AbortSignal) => {
     setError(false)
@@ -644,6 +653,13 @@ export default function DashboardPage() {
     )
   }
 
+  const monedaKey = moneda === 'ARS' ? 'ars' : 'usd'
+  const saldoInfo = data?.saldo_disponible?.[monedaKey]
+  const saldoTotal = saldoInfo ? Number(saldoInfo.saldo_total) : (moneda === 'ARS' ? (data?.disponible_real.ars.saldo_billeteras ?? 0) : (data?.disponible_real.usd.saldo_billeteras ?? 0))
+  const saldoDisponible = saldoInfo ? Number(saldoInfo.saldo_disponible) : (moneda === 'ARS' ? (data?.disponible_real.ars.disponible ?? 0) : (data?.disponible_real.usd.disponible ?? 0))
+  const cuotasPendientes = saldoInfo ? Number(saldoInfo.cuotas_pendientes) : (moneda === 'ARS' ? (data?.disponible_real.ars.cuotas_proximo_ciclo ?? 0) : (data?.disponible_real.usd.cuotas_proximo_ciclo ?? 0))
+  const suscripcionesPendientes = saldoInfo ? Number(saldoInfo.suscripciones_pendientes) : (moneda === 'ARS' ? (data?.disponible_real.ars.suscripciones_mensuales || 0) : (data?.disponible_real.usd.suscripciones_mensuales || 0))
+
   return (
     <div className={styles.root}>
       {/* Header */}
@@ -667,28 +683,30 @@ export default function DashboardPage() {
               <div className={styles.balanceCard}>
                 {/* Header: Currency Tabs a la izquierda + Acciones a la derecha */}
                 <div className={styles.balanceCardHeader}>
-                  {/* Currency Tabs Minimalistas (ARS / USD) */}
-                  <div className={styles.currencyTabs} role="tablist" aria-label="Moneda">
-                    <button
-                      type="button"
-                      role="tab"
-                      aria-selected={moneda === 'ARS'}
-                      className={`${styles.currencyTab} ${moneda === 'ARS' ? styles.currencyTabActive : ''}`}
-                      onClick={() => handleToggleMoneda('ARS')}
-                    >
-                      ARS
-                    </button>
-                    <span className={styles.currencyTabSep}>/</span>
-                    <button
-                      type="button"
-                      role="tab"
-                      aria-selected={moneda === 'USD'}
-                      className={`${styles.currencyTab} ${moneda === 'USD' ? styles.currencyTabActive : ''}`}
-                      onClick={() => handleToggleMoneda('USD')}
-                    >
-                      USD
-                    </button>
-                  </div>
+                  {/* Currency Tabs Minimalistas (ARS / USD) condicionales */}
+                  {tieneBilleterasUsd ? (
+                    <div className={styles.currencyTabs} role="tablist" aria-label="Moneda">
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={moneda === 'ARS'}
+                        className={`${styles.currencyTab} ${moneda === 'ARS' ? styles.currencyTabActive : ''}`}
+                        onClick={() => handleToggleMoneda('ARS')}
+                      >
+                        ARS
+                      </button>
+                      <span className={styles.currencyTabSep}>/</span>
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={moneda === 'USD'}
+                        className={`${styles.currencyTab} ${moneda === 'USD' ? styles.currencyTabActive : ''}`}
+                        onClick={() => handleToggleMoneda('USD')}
+                      >
+                        USD
+                      </button>
+                    </div>
+                  ) : <div />}
 
                   {/* Acciones del Header: Ocultar saldo */}
                   <div className={styles.balanceHeaderActions}>
@@ -706,14 +724,8 @@ export default function DashboardPage() {
 
                 {/* Saldo Principal */}
                 <div className={styles.balanceBody}>
-                  <h2 className={`${styles.saldoAmount} ${
-                    (moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible) < 0
-                      ? styles.saldoAmountNegative : ''
-                  }`}>
-                    {showBalance ? fmt(
-                      moneda === 'ARS' ? data.disponible_real.ars.disponible : data.disponible_real.usd.disponible,
-                      moneda
-                    ) : '••••••••'}
+                  <h2 className={`${styles.saldoAmount} ${saldoTotal < 0 ? styles.saldoAmountNegative : ''}`}>
+                    {showBalance ? fmt(saldoTotal, moneda) : '••••••••'}
                   </h2>
                   <span className={styles.disponibleSub}>
                     {billeterasSeleccionadas.length === 0
@@ -722,6 +734,51 @@ export default function DashboardPage() {
                         ? `Saldo en ${billeterasActivas.find(b => b.id === billeterasSeleccionadas[0])?.nombre ?? 'billetera'}`
                         : `${billeterasSeleccionadas.length} billeteras seleccionadas`}
                   </span>
+
+                  {/* Disponible para gastar con desglose */}
+                  <div className={styles.disponibleGastarContainer}>
+                    <button
+                      type="button"
+                      className={styles.disponibleGastarRow}
+                      onClick={() => setShowDesglose(prev => !prev)}
+                      aria-expanded={showDesglose}
+                      title="Click para ver desglose de compromisos del ciclo"
+                    >
+                      <div className={styles.disponibleGastarLabelWrap}>
+                        <span className={styles.disponibleGastarLabel}>Disponible para gastar</span>
+                        <HelpCircle size={13} className={styles.disponibleGastarInfoIcon} />
+                      </div>
+                      <span className={`${styles.disponibleGastarValue} ${saldoDisponible < 0 ? styles.disponibleNegative : ''}`}>
+                        {showBalance ? fmt(saldoDisponible, moneda) : '••••••••'}
+                      </span>
+                    </button>
+
+                    {showDesglose && (
+                      <div className={styles.desglosePopover}>
+                        <div className={styles.desgloseItem}>
+                          <span className={styles.desgloseItemLabel}>Saldo total</span>
+                          <span className={styles.desgloseItemValue}>{showBalance ? fmt(saldoTotal, moneda) : '••••'}</span>
+                        </div>
+                        <div className={styles.desgloseItem}>
+                          <span className={styles.desgloseItemLabel}>Cuotas pendientes</span>
+                          <span className={`${styles.desgloseItemValue} ${cuotasPendientes > 0 ? styles.desgloseDeduction : ''}`}>
+                            {showBalance ? (cuotasPendientes > 0 ? `- ${fmt(cuotasPendientes, moneda)}` : fmt(0, moneda)) : '••••'}
+                          </span>
+                        </div>
+                        <div className={styles.desgloseItem}>
+                          <span className={styles.desgloseItemLabel}>Suscripciones pendientes</span>
+                          <span className={`${styles.desgloseItemValue} ${suscripcionesPendientes > 0 ? styles.desgloseDeduction : ''}`}>
+                            {showBalance ? (suscripcionesPendientes > 0 ? `- ${fmt(suscripcionesPendientes, moneda)}` : fmt(0, moneda)) : '••••'}
+                          </span>
+                        </div>
+                        <div className={styles.desgloseDivider} />
+                        <div className={`${styles.desgloseItem} ${styles.desgloseTotalRow}`}>
+                          <span className={styles.desgloseTotalLabel}>Disponible para gastar</span>
+                          <span className={styles.desgloseTotalValue}>{showBalance ? fmt(saldoDisponible, moneda) : '••••'}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Wallet Filter Pills (Acceso directo, 1 toque, con saldo en vivo) */}
@@ -732,7 +789,7 @@ export default function DashboardPage() {
                       role="tab"
                       aria-selected={billeterasSeleccionadas.length === 0}
                       className={`${styles.walletPill} ${billeterasSeleccionadas.length === 0 ? styles.walletPillActive : ''}`}
-                      onClick={() => handleSelectBilletera(null)}
+                      onClick={() => handleToggleBilletera(null)}
                       title="Ver todas las billeteras"
                     >
                       <span className={styles.walletPillDot} />
@@ -749,13 +806,7 @@ export default function DashboardPage() {
                           role="tab"
                           aria-selected={isSelected}
                           className={`${styles.walletPill} ${isSelected ? styles.walletPillActive : ''}`}
-                          onClick={(e) => {
-                            if (e.metaKey || e.ctrlKey) {
-                              handleToggleBilletera(b.id)
-                            } else {
-                              handleSelectBilletera(b.id)
-                            }
-                          }}
+                          onClick={() => handleToggleBilletera(b.id)}
                           title={`Filtrar por ${b.nombre}${b.es_principal ? ' (Favorita)' : ''}`}
                         >
                           <span className={styles.walletPillName}>

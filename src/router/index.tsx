@@ -81,7 +81,6 @@ const router = createBrowserRouter([
               { path: '/app/billeteras', element: <BilleterasPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/billeteras/:id', element: <BilleteraDetallePage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/transacciones', element: <TransaccionesPage />, errorElement: <PageErrorBoundary /> },
-              { path: '/app/transacciones/recurrentes', element: <Navigate to="/app/transacciones" replace /> },
               { path: '/app/presupuestos', element: <PresupuestosPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/metas', element: <MetasPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/metas/:id', element: <MetaDetallePage />, errorElement: <PageErrorBoundary /> },

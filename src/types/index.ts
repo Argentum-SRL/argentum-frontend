@@ -261,20 +261,6 @@ export interface TransferenciaInterna {
   fecha_creacion: string
 }
 
-export interface TransaccionRecurrente {
-  id: string
-  tipo: 'ingreso' | 'egreso'
-  monto: number
-  moneda: 'ARS' | 'USD'
-  descripcion: string
-  categoria_id: string | null
-  billetera_id: string
-  frecuencia: 'semanal' | 'quincenal' | 'mensual'
-  dia_registro: number
-  estado: 'activa' | 'pausada'
-  fecha_creacion: string
-}
-
 export interface DashboardResumen {
   periodo: { fecha_inicio: string; fecha_fin: string; primera_transaccion?: string }
   balance: {
@@ -303,6 +289,20 @@ export interface DashboardResumen {
       cuotas_proximo_ciclo: number
       suscripciones_mensuales?: number
       disponible: number
+    }
+  }
+  saldo_disponible?: {
+    ars: {
+      saldo_total: number | string
+      cuotas_pendientes: number | string
+      suscripciones_pendientes: number | string
+      saldo_disponible: number | string
+    }
+    usd: {
+      saldo_total: number | string
+      cuotas_pendientes: number | string
+      suscripciones_pendientes: number | string
+      saldo_disponible: number | string
     }
   }
   gastos_por_categoria?: {

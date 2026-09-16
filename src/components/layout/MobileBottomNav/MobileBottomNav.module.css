@@ -11,7 +11,7 @@
   border: 1px solid var(--sb-border);
   z-index: 40;
   align-items: center;
-  touch-action: none;
+  touch-action: manipulation;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -75,7 +75,11 @@
   position: relative;
   z-index: 2;
   touch-action: manipulation;
-  transition: color 150ms ease;
+  transition: color 150ms ease, transform 100ms ease;
+}
+
+.mobileNavItem:active {
+  transform: scale(0.92);
 }
 
 .mobileNavItem:focus-visible {

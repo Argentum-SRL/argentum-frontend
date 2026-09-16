@@ -1,5 +1,5 @@
-import { useRef, useState, useMemo, useLayoutEffect, useEffect, useCallback, type FC } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useRef, useMemo, useLayoutEffect, useEffect, useCallback, type FC } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
   Wallet,
@@ -30,25 +30,12 @@ interface MobileBottomNavProps {
 
 export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggleMore }) => {
   const location = useLocation()
-  const navigate = useNavigate()
 
   const navRef = useRef<HTMLElement | null>(null)
   const itemsWrapperRef = useRef<HTMLDivElement | null>(null)
   const indicatorRef = useRef<HTMLDivElement | null>(null)
   const itemRefs = useRef<(HTMLElement | null)[]>([])
-
-  // Touch & gesture tracking refs (direct manipulation, no react state per pixel)
-  const isPointerDownRef = useRef(false)
-  const isDraggingRef = useRef(false)
-  const isCancelledRef = useRef(false)
-  const startXRef = useRef(0)
-  const startYRef = useRef(0)
-  const pointerIdRef = useRef<number | null>(null)
-  const suppressClickRef = useRef(false)
-  const previewIndexRef = useRef<number>(-1)
-
-  // React state for preview feedback on icons (only changes when crossing slot boundary)
-  const [previewIndex, setPreviewIndex] = useState<number>(-1)
+  const lastClickRef = useRef(0)
 
   // Determine active slot index based on router path or "Más" state
   const activeIndex = useMemo(() => {
@@ -56,9 +43,8 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
     return MOBILE_NAV.findIndex(item => location.pathname === item.path)
   }, [isMoreOpen, location.pathname])
 
-  // Synchronize the physical indicator position when activeIndex changes and not dragging
+  // Synchronize the physical indicator position when activeIndex changes
   useLayoutEffect(() => {
-    if (isDraggingRef.current) return
     const indicator = indicatorRef.current
     if (!indicator) return
 
@@ -74,7 +60,6 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
   // Handle window resize or orientation change to adjust indicator position
   useEffect(() => {
     const handleResize = () => {
-      if (isDraggingRef.current) return
       const indicator = indicatorRef.current
       if (indicator && activeIndex >= 0 && itemRefs.current[activeIndex]) {
         indicator.style.transform = `translate3d(${itemRefs.current[activeIndex]!.offsetLeft}px, 0, 0)`
@@ -84,276 +69,30 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
     return () => window.removeEventListener('resize', handleResize)
   }, [activeIndex])
 
-  const lastToggleTimeRef = useRef(0)
-  const safeToggleMore = useCallback(() => {
+  // Immediate, rock-solid toggle for the 3-dots button with debounce protection
+  const handleToggleMore = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     const now = Date.now()
-    if (now - lastToggleTimeRef.current < 350) return
-    lastToggleTimeRef.current = now
+    if (now - lastClickRef.current < 250) return
+    lastClickRef.current = now
+
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(8)
+      } catch {
+        // Ignore
+      }
+    }
+
     onToggleMore()
   }, [onToggleMore])
-
-  // ── Pointer Event Handlers ────────────────────────────────────────────────
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLElement>) => {
-    if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return
-
-    isPointerDownRef.current = true
-    isDraggingRef.current = false
-    isCancelledRef.current = false
-    startXRef.current = e.clientX
-    startYRef.current = e.clientY
-    pointerIdRef.current = e.pointerId
-    previewIndexRef.current = activeIndex
-  }
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLElement>) => {
-    if (!isPointerDownRef.current || isCancelledRef.current) return
-
-    const deltaX = Math.abs(e.clientX - startXRef.current)
-    const deltaY = Math.abs(e.clientY - startYRef.current)
-
-    // Vertical threshold check: if dragged > 60px away from the bar, cancel gesture
-    if (deltaY > 60) {
-      isCancelledRef.current = true
-      isDraggingRef.current = false
-      previewIndexRef.current = -1
-      setPreviewIndex(-1)
-
-      if (indicatorRef.current) {
-        indicatorRef.current.classList.remove(styles.indicatorDragging)
-        if (activeIndex >= 0 && itemRefs.current[activeIndex]) {
-          indicatorRef.current.style.opacity = '1'
-          indicatorRef.current.style.transform = `translate3d(${itemRefs.current[activeIndex]!.offsetLeft}px, 0, 0)`
-        } else {
-          indicatorRef.current.style.opacity = '0'
-        }
-      }
-      return
-    }
-
-    // Horizontal threshold to differentiate tap from drag:
-    // Only engage drag if horizontal motion exceeds 8px and exceeds vertical motion
-    if (!isDraggingRef.current) {
-      if (deltaX >= 8 && deltaX > deltaY) {
-        isDraggingRef.current = true
-        suppressClickRef.current = true
-        try {
-          e.currentTarget.setPointerCapture(e.pointerId)
-        } catch {
-          // Ignored for environments with restricted pointer capture
-        }
-        if (indicatorRef.current) {
-          indicatorRef.current.classList.add(styles.indicatorDragging)
-          indicatorRef.current.style.opacity = '1'
-        }
-      } else {
-        return
-      }
-    }
-
-    // Direct continuous indicator movement (zero React re-renders for translation)
-    const wrapperEl = itemsWrapperRef.current
-    const indicatorEl = indicatorRef.current
-    if (!wrapperEl || !indicatorEl) return
-
-    const wrapperRect = wrapperEl.getBoundingClientRect()
-    const fingerX = e.clientX - wrapperRect.left
-    const indicatorWidth = indicatorEl.offsetWidth || 52
-    const targetX = fingerX - indicatorWidth / 2
-
-    const firstItem = itemRefs.current[0]
-    const lastItem = itemRefs.current[4]
-    const minX = firstItem ? firstItem.offsetLeft : 0
-    const maxX = lastItem ? lastItem.offsetLeft : (wrapperRect.width - indicatorWidth)
-
-    const clampedX = Math.max(minX, Math.min(maxX, targetX))
-    indicatorEl.style.transform = `translate3d(${clampedX}px, 0, 0)`
-
-    // Find nearest slot for preview feedback
-    let closest = 0
-    let minDiff = Infinity
-    for (let i = 0; i < 5; i++) {
-      const item = itemRefs.current[i]
-      if (item) {
-        const center = item.offsetLeft + item.offsetWidth / 2
-        const diff = Math.abs(fingerX - center)
-        if (diff < minDiff) {
-          minDiff = diff
-          closest = i
-        }
-      }
-    }
-
-    if (closest !== previewIndexRef.current) {
-      previewIndexRef.current = closest
-      setPreviewIndex(closest)
-      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        try {
-          navigator.vibrate(8)
-        } catch {
-          // Ignore
-        }
-      }
-    }
-  }
-
-  const handlePointerUp = (e: React.PointerEvent<HTMLElement>) => {
-    if (!isPointerDownRef.current) return
-    isPointerDownRef.current = false
-
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      }
-    } catch {
-      // Ignore
-    }
-
-    const wasDragging = isDraggingRef.current
-    const wasCancelled = isCancelledRef.current
-    const finalSlot = previewIndexRef.current
-
-    isDraggingRef.current = false
-    isCancelledRef.current = false
-    pointerIdRef.current = null
-    previewIndexRef.current = -1
-    setPreviewIndex(-1)
-
-    const indicatorEl = indicatorRef.current
-    if (indicatorEl) {
-      indicatorEl.classList.remove(styles.indicatorDragging)
-    }
-
-    if (wasCancelled) {
-      if (indicatorEl && activeIndex >= 0 && itemRefs.current[activeIndex]) {
-        indicatorEl.style.opacity = '1'
-        indicatorEl.style.transform = `translate3d(${itemRefs.current[activeIndex]!.offsetLeft}px, 0, 0)`
-      }
-      setTimeout(() => {
-        suppressClickRef.current = false
-      }, 100)
-      return
-    }
-
-    if (wasDragging) {
-      // Snap smoothly to the final selected slot
-      const targetItem = itemRefs.current[finalSlot]
-      if (indicatorEl && targetItem) {
-        indicatorEl.style.opacity = '1'
-        indicatorEl.style.transform = `translate3d(${targetItem.offsetLeft}px, 0, 0)`
-      }
-
-      // Execute definitive navigation or modal toggle only on release
-      if (finalSlot === 4) {
-        safeToggleMore()
-      } else if (finalSlot >= 0 && finalSlot < 4) {
-        const destPath = MOBILE_NAV[finalSlot].path
-        if (location.pathname !== destPath) {
-          navigate(destPath)
-        }
-      } else {
-        // Snapped back to current
-        if (indicatorEl && activeIndex >= 0 && itemRefs.current[activeIndex]) {
-          indicatorEl.style.opacity = '1'
-          indicatorEl.style.transform = `translate3d(${itemRefs.current[activeIndex]!.offsetLeft}px, 0, 0)`
-        }
-      }
-
-      suppressClickRef.current = true
-      setTimeout(() => {
-        suppressClickRef.current = false
-      }, 400)
-    } else {
-      // Fast tap detection directly in pointerUp for instantaneous mobile responsiveness
-      const wrapperEl = itemsWrapperRef.current
-      if (wrapperEl) {
-        const wrapperRect = wrapperEl.getBoundingClientRect()
-        const fingerX = e.clientX - wrapperRect.left
-        let tappedSlot = -1
-        let minDiff = Infinity
-        for (let i = 0; i < 5; i++) {
-          const item = itemRefs.current[i]
-          if (item) {
-            const center = item.offsetLeft + item.offsetWidth / 2
-            const diff = Math.abs(fingerX - center)
-            if (diff < minDiff && diff < (item.offsetWidth / 2 + 12)) {
-              minDiff = diff
-              tappedSlot = i
-            }
-          }
-        }
-
-        if (tappedSlot === 4) {
-          safeToggleMore()
-          suppressClickRef.current = true
-          setTimeout(() => {
-            suppressClickRef.current = false
-          }, 400)
-        } else if (tappedSlot >= 0 && tappedSlot < 4) {
-          const destPath = MOBILE_NAV[tappedSlot].path
-          if (location.pathname !== destPath) {
-            navigate(destPath)
-          }
-          suppressClickRef.current = true
-          setTimeout(() => {
-            suppressClickRef.current = false
-          }, 400)
-        }
-      }
-    }
-  }
-
-  const handlePointerCancel = (e: React.PointerEvent<HTMLElement>) => {
-    isPointerDownRef.current = false
-    isDraggingRef.current = false
-    isCancelledRef.current = false
-    pointerIdRef.current = null
-    previewIndexRef.current = -1
-    setPreviewIndex(-1)
-
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      }
-    } catch {
-      // Ignore
-    }
-
-    const indicatorEl = indicatorRef.current
-    if (indicatorEl) {
-      indicatorEl.classList.remove(styles.indicatorDragging)
-      if (activeIndex >= 0 && itemRefs.current[activeIndex]) {
-        indicatorEl.style.opacity = '1'
-        indicatorEl.style.transform = `translate3d(${itemRefs.current[activeIndex]!.offsetLeft}px, 0, 0)`
-      } else {
-        indicatorEl.style.opacity = '0'
-      }
-    }
-
-    setTimeout(() => {
-      suppressClickRef.current = false
-    }, 100)
-  }
-
-  const handleClick = (e: React.MouseEvent, index: number) => {
-    if (suppressClickRef.current) {
-      e.preventDefault()
-      e.stopPropagation()
-      return
-    }
-    if (index === 4) {
-      safeToggleMore()
-    }
-  }
 
   return (
     <nav
       ref={navRef}
       className={styles.mobileNav}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
       aria-label="Navegación principal inferior"
     >
       <div ref={itemsWrapperRef} className={styles.itemsWrapper}>
@@ -363,7 +102,6 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
         {/* Navigation items */}
         {MOBILE_NAV.map(({ label, path, Icon }, idx) => {
           const isActive = activeIndex === idx
-          const isPreview = previewIndex === idx
 
           return (
             <Link
@@ -373,9 +111,12 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
               className={[
                 styles.mobileNavItem,
                 isActive ? styles.mobileNavItemActive : '',
-                isPreview ? styles.mobileNavItemPreview : '',
               ].filter(Boolean).join(' ')}
-              onClick={(e) => handleClick(e, idx)}
+              onClick={() => {
+                if (isMoreOpen) {
+                  onToggleMore()
+                }
+              }}
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
             >
@@ -392,10 +133,10 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
           className={[
             styles.mobileNavItem,
             activeIndex === 4 ? styles.mobileNavItemActive : '',
-            previewIndex === 4 ? styles.mobileNavItemPreview : '',
           ].filter(Boolean).join(' ')}
-          onClick={(e) => handleClick(e, 4)}
+          onClick={handleToggleMore}
           aria-label="Más opciones"
+          aria-expanded={isMoreOpen}
           type="button"
         >
           <span className={styles.mobileNavIcon}>

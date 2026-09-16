@@ -151,6 +151,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
 
     if (finalDelta > 65) {
       // Dismiss
+      sheetRef.current.style.transform = ''
       triggerClose()
     } else {
       // Snap back smoothly

@@ -94,6 +94,7 @@ export default defineConfig(({ mode }) => {
         cookieDomainRewrite: 'localhost',
         // Previene que el proxy reescriba Secure en cookies cuando corre en HTTP
         secure: false,
+        timeout: 60000,
       },
       '/media': {
         target: 'http://127.0.0.1:8000',

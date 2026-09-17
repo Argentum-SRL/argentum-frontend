@@ -76,6 +76,13 @@ const usuarioService = {
   eliminarCuenta: async () => {
     const { data } = await api.delete<{ confirmacion: string }>('/usuarios/me')
     return data
+  },
+
+  marcarModalFinancieroVisto: async () => {
+    const { data } = await api.post<{ ok: boolean; modal_bienvenida_financiera_visto: boolean }>(
+      '/usuarios/me/marcar-modal-financiero-visto'
+    )
+    return data
   }
 }
 

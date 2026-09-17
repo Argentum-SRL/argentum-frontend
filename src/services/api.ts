@@ -23,7 +23,9 @@ export const clearToken = clearTokens
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
-  timeout: 15000,
+  timeout: import.meta.env.VITE_API_TIMEOUT
+    ? Number(import.meta.env.VITE_API_TIMEOUT)
+    : (import.meta.env.DEV ? 60000 : 15000),
   withCredentials: true,
 })
 

@@ -2,20 +2,26 @@
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 20px 24px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  transition: all 0.2s ease;
+  gap: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
   height: 100%;
   width: 100%;
   min-width: 0;
+  animation: proyFadeIn 0.35s ease-out;
 }
 
-@media (min-width: 1024px) {
-  .card {
-    min-height: 0;
-    overflow-y: auto;
+@keyframes proyFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -23,167 +29,338 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
 }
 
 .titleGroup {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .titleIcon {
   color: var(--primary);
+  flex-shrink: 0;
 }
 
 .header h2 {
-  font-size: 1.125rem;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
   margin: 0;
 }
 
+.badgeCalibration {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badgeNotice {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: var(--surface-alt);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
 .infoButton {
-  background: none;
+  background: transparent;
   border: none;
   color: var(--text-3);
   cursor: pointer;
   padding: 4px;
-  border-radius: 50%;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
 }
 
-.infoButton:hover {
+.infoButton:hover,
+.infoButton:focus {
   background-color: var(--surface-alt);
+  color: var(--text);
+  outline: none;
+}
+
+/* ── Caso No Calibrada / Compromisos Ciertos (testingadmin real) ──────── */
+.noticeBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-alt);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+.certezasCompactHero {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.certezasHeroHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.certezasHeroLabel {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.certezasHeroTotal {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.certezasPillsTrack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+}
+
+.certezaPillItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.certezaPillLabel {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.certezaPillValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Split Hero (Propuesta PROY-1 - Calibrada) ─────────────────────────── */
+.splitHero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 2px 0;
+}
+
+.heroMetric {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heroLabel {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.heroValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.heroSubtext {
+  font-size: 11px;
   color: var(--text-2);
 }
 
-.mainStats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.positive {
+  color: var(--success);
 }
 
-.statItem {
+.negative {
+  color: var(--error);
+}
+
+/* ── Barra de Avance y Ritmo del Ciclo ─────────────────────────────────── */
+.paceContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 6px;
 }
 
-.statLabel {
-  font-size: 0.75rem;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-.statValue {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.balanceValue {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.positive { color: #10b981; }
-.negative { color: #ef4444; }
-
-.progressContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.progressHeader {
+.paceHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8125rem;
-}
-
-.progressLabel {
+  font-size: 11px;
   color: var(--text-2);
 }
 
-.progressPercent {
-  font-weight: 600;
+.pacePercent {
+  font-weight: 700;
   color: var(--text);
+  font-feature-settings: "tnum";
 }
 
 .progressBar {
-  height: 8px;
+  height: 6px;
   background-color: var(--surface-alt);
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
   background-color: var(--primary);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.expandButton {
-  background: none;
-  border: none;
-  color: var(--primary);
-  font-size: 0.875rem;
-  font-weight: 600;
+/* ── Acordeón Desplegable Suave ────────────────────────────────────────── */
+.accordionToggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  margin-top: 0.25rem;
-  transition: all 0.2s ease;
+  gap: 6px;
+  padding: 6px 12px;
+  width: 100%;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-.expandButton:hover {
+.accordionToggle:hover,
+.accordionToggle:focus {
   background-color: var(--surface-alt);
-  border-radius: 6px;
+  color: var(--primary);
+  border-color: var(--primary);
+  outline: none;
 }
 
-.expandedContent {
+.accordionGrid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease-out;
+}
+
+.accordionGridOpen {
+  grid-template-rows: 1fr;
+}
+
+.accordionInner {
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding-top: 0.5rem;
+  gap: 14px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
+/* Intervalos */
+.intervalosRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .sectionTitle {
-  font-size: 0.875rem;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
   margin: 0;
 }
 
+.intervalosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.intervaloPill {
+  padding: 8px 10px;
+  background-color: var(--surface-alt);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intervaloPillLabel {
+  font-size: 10px;
+  color: var(--text-3);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.intervaloPillValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  font-feature-settings: "tnum";
+}
+
+/* Categorías */
 .categoryList {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 8px;
 }
 
 .categoryRow {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 1rem;
+  gap: 10px;
   min-width: 0;
   width: 100%;
 }
 
 .categoryIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,150 +371,79 @@
 .categoryInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 4px;
   min-width: 0;
 }
 
 .categoryName {
-  font-size: 0.875rem;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
-.badge {
-  font-size: 0.625rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  text-transform: uppercase;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .badgePatron {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #F59E0B;
 }
 
 .categoryAmount {
-  font-size: 0.875rem;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text);
   text-align: right;
+  font-feature-settings: "tnum";
 }
 
-.certezasSection {
+/* Compromisos fijos dentro del acordeón */
+.certezasList {
   background-color: var(--surface-alt);
   border-radius: 10px;
-  padding: 1rem;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 6px;
 }
 
 .certezaItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8125rem;
-}
-
-.certezaLabel {
+  font-size: 12px;
   color: var(--text-2);
 }
 
 .certezaValue {
+  font-weight: 600;
   color: var(--text);
-  font-weight: 500;
+  font-feature-settings: "tnum";
 }
 
 .certezaTotal {
-  margin-top: 0.25rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
   font-weight: 700;
+  color: var(--text);
 }
 
 .certezaTotalValue {
   color: var(--primary);
 }
 
-.skeleton {
-  animation: pulse 1.5s infinite ease-in-out;
-  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--surface) 50%, var(--surface-alt) 75%);
-  background-size: 200% 100%;
-}
-
-@keyframes pulse {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.skeletonCard {
-  height: 200px;
-  width: 100%;
-  border-radius: 12px;
-}
-
-.errorCard {
-  background-color: rgba(239, 68, 68, 0.05);
-  border-color: rgba(239, 68, 68, 0.2);
-  padding: 1.5rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.errorText {
-  color: #ef4444;
-  font-size: 0.875rem;
-}
-
-.retryButton {
-  background-color: #ef4444;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.retryIcon {
-  margin-right: 6px;
-}
-
-/* Premium scrollbars */
-.card::-webkit-scrollbar {
-  width: 6px;
-}
-.card::-webkit-scrollbar-track {
-  background: transparent;
-}
-.card::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 3px;
-}
-.card:hover::-webkit-scrollbar-thumb {
-  background: var(--border);
-}
-.card::-webkit-scrollbar-thumb:hover {
-  background: var(--text-3);
-}
-
 .proyeccionesContainer {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
 }
 
@@ -347,24 +453,14 @@
   }
 }
 
-.emptyStateContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 20px;
-  gap: 12px;
-}
-
-.emptyIcon {
-  color: var(--text-3);
-  opacity: 0.7;
-}
-
-.emptyText {
-  font-size: 0.875rem;
-  color: var(--text-2);
-  margin: 0;
+/* ── Accessibility: Prefers Reduced Motion ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .progressFill,
+  .accordionGrid,
+  .accordionToggle {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 

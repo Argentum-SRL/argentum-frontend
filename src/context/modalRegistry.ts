@@ -57,6 +57,9 @@ export interface ModalPayloadMap {
     onSuccess: () => Promise<void> | void
   }
   confirm: ConfirmModalOptions
+  bienvenidaFinanciera?: {
+    initialTab?: 'perfil' | 'proyeccion'
+  }
 }
 
 export type ModalId = keyof ModalPayloadMap

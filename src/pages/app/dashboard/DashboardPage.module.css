@@ -445,6 +445,15 @@
   }
 }
 
+.bottomRowSingle {
+  grid-template-columns: 1fr !important;
+}
+
+.cardFullWidth {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
 /* ── Balance Card (Modo Oscuro: Midnight Obsidian Sapphire) ── */
 
 :global([data-theme="dark"]) .balanceCard,

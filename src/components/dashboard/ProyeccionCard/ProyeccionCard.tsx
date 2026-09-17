@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react'
-import { TrendingUp, Info, ChevronDown, ChevronUp, RefreshCcw } from 'lucide-react'
+import { TrendingUp, Info, ChevronDown, ChevronUp } from 'lucide-react'
 import { formatMonto } from '@/utils/format'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { dashboardService } from '@/services/dashboard.service'
 import type { Proyeccion, ProyeccionesResponse } from '@/types'
 import styles from './ProyeccionCard.module.css'
 import { useModal } from '@/hooks/useModal'
+import { hasProyeccionVisible } from './proyeccionUtils'
 
 const ProgressBar = ({ progress }: { progress: number }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -23,6 +24,41 @@ const ProgressBar = ({ progress }: { progress: number }) => {
   )
 }
 
+// Hook count-up suave para valores numéricos, respetando prefers-reduced-motion
+function useCountUp(target: number | null, duration = 600, decimals = 0) {
+  const [current, setCurrent] = useState<number | null>(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return target
+    }
+    return target === null ? null : 0
+  })
+
+  useEffect(() => {
+    if (target === null) return
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return
+    }
+    let startTime: number | null = null
+    let rafId: number
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      const ease = 1 - Math.pow(1 - progress, 3) // cubic ease-out
+      const nextVal = progress === 1 ? target : Number((target * ease).toFixed(decimals))
+      setCurrent(nextVal)
+      if (progress < 1) {
+        rafId = requestAnimationFrame(step)
+      }
+    }
+
+    rafId = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(rafId)
+  }, [target, duration, decimals])
+
+  return target === null ? null : current
+}
+
 interface SingleProyeccionCardProps {
   proyeccion: Proyeccion;
   moneda: 'ARS' | 'USD';
@@ -38,14 +74,14 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
     proyeccion.gasto_proyectado_total !== null
   )
 
-  const { progressPercent } = useMemo(() => {
+  const { progressPercent, actualGasto } = useMemo(() => {
     if (!proyeccion.desglose_por_categoria || proyeccion.gasto_proyectado_total === null) {
-      return { progressPercent: 0 }
+      return { progressPercent: 0, actualGasto: 0 }
     }
     const actual = proyeccion.desglose_por_categoria.reduce((acc, cat) => acc + (cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0), 0)
     const totalProyectado = proyeccion.gasto_proyectado_total > 0 ? proyeccion.gasto_proyectado_total : 1
     const percent = Math.max(0, Math.min(Math.round((actual / totalProyectado) * 100), 100))
-    return { progressPercent: percent }
+    return { progressPercent: percent, actualGasto: actual }
   }, [proyeccion])
 
   const {
@@ -54,149 +90,148 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
     desglose_por_categoria,
     certezas,
     rango,
-    nivel_confianza,
     mensaje_insuficiente,
     intervalos,
   } = proyeccion
 
+  // Count-up animations
+  const totalCertezasAnim = useCountUp(certezas.total ?? 0)
+  const gastoAnim = useCountUp(gasto_proyectado_total)
+  const balanceAnim = useCountUp(balance_proyectado)
+
   return (
     <div className={styles.card}>
+      {/* Header Compacto */}
       <div className={styles.header}>
         <div className={styles.titleGroup}>
-          <TrendingUp size={20} className={styles.titleIcon} />
+          <TrendingUp size={18} className={styles.titleIcon} />
           <h2>Proyección del ciclo ({moneda})</h2>
+          {pasaPuerta && proyeccion.calibracion?.pasa_puerta ? (
+            <span className={styles.badgeCalibration}>
+              Calibrada: {Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% ({proyeccion.calibracion.ciclos_evaluados} ciclos)
+            </span>
+          ) : (
+            <span className={styles.badgeNotice}>
+              Compromisos ciertos
+            </span>
+          )}
         </div>
         <button 
           className={styles.infoButton} 
-          onClick={() => open('proyeccion', { data: { proyeccion } })}
+          onClick={() => open('bienvenidaFinanciera', { data: { initialTab: 'proyeccion' } })}
           title={`Ver explicación de la proyección en ${moneda}`}
           aria-label={`Ver explicación de la proyección en ${moneda}`}
         >
-          <Info size={20} />
+          <Info size={18} />
         </button>
       </div>
 
+      {/* Caso No Calibrada / Compromisos Ciertos (testingadmin real hoy) */}
       {!pasaPuerta ? (
         <>
-          <div style={{
-            padding: '12px 14px',
-            backgroundColor: 'var(--surface-alt)',
-            borderRadius: '10px',
-            fontSize: '0.8125rem',
-            color: 'var(--text-2)',
-            lineHeight: 1.4,
-            borderLeft: '3px solid var(--primary)',
-            marginBottom: '1rem'
-          }}>
-            {proyeccion.mensaje || mensaje_insuficiente || proyeccion.calibracion?.mensaje || 'Mostramos tus compromisos ciertos (cuotas y suscripciones).'}
+          <div className={styles.noticeBox} role="status">
+            <span>{proyeccion.mensaje || mensaje_insuficiente || proyeccion.calibracion?.mensaje || 'Mostramos tus compromisos ciertos (cuotas y suscripciones).'}</span>
           </div>
 
-          <div className={styles.certezasSection}>
-            <h3 className={styles.sectionTitle}>Compromisos ciertos del ciclo</h3>
-            <div className={styles.certezaItem}>
-              <span className={styles.certezaLabel}>Cuotas pendientes</span>
-              <span className={styles.certezaValue}>{formatMonto(certezas.cuotas_restantes, moneda)}</span>
-            </div>
-            <div className={styles.certezaItem}>
-              <span className={styles.certezaLabel}>Suscripciones pendientes</span>
-              <span className={styles.certezaValue}>{formatMonto(certezas.suscripciones_restantes, moneda)}</span>
-            </div>
-            {(certezas.compromisos_restantes ?? 0) > 0 && (
-              <div className={styles.certezaItem}>
-                <span className={styles.certezaLabel}>Otros compromisos pendientes</span>
-                <span className={styles.certezaValue}>{formatMonto(certezas.compromisos_restantes ?? 0, moneda)}</span>
+          <div className={styles.certezasCompactHero}>
+            <div className={styles.certezasHeroHeader}>
+              <span className={styles.certezasHeroLabel}>Total compromisos del ciclo</span>
+              <div className={styles.certezasHeroTotal}>
+                {formatMonto(totalCertezasAnim ?? certezas.total, moneda)}
               </div>
-            )}
-            <div className={`${styles.certezaItem} ${styles.certezaTotal}`}>
-              <span className={styles.certezaLabel}>Total compromisos</span>
-              <span className={`${styles.certezaValue} ${styles.certezaTotalValue}`}>
-                {formatMonto(certezas.total, moneda)}
-              </span>
+            </div>
+
+            <div className={styles.certezasPillsTrack}>
+              <div className={styles.certezaPillItem}>
+                <span className={styles.certezaPillLabel}>Cuotas pendientes</span>
+                <span className={styles.certezaPillValue}>{formatMonto(certezas.cuotas_restantes, moneda)}</span>
+              </div>
+              <div className={styles.certezaPillItem}>
+                <span className={styles.certezaPillLabel}>Suscripciones</span>
+                <span className={styles.certezaPillValue}>{formatMonto(certezas.suscripciones_restantes, moneda)}</span>
+              </div>
+              {(certezas.compromisos_restantes ?? 0) > 0 && (
+                <div className={styles.certezaPillItem}>
+                  <span className={styles.certezaPillLabel}>Otros compromisos</span>
+                  <span className={styles.certezaPillValue}>{formatMonto(certezas.compromisos_restantes ?? 0, moneda)}</span>
+                </div>
+              )}
             </div>
           </div>
         </>
       ) : (
+        /* Caso Calibrada / Proyección Completa (Propuesta PROY-1 Split Hero) */
         <>
-          {proyeccion.calibracion?.pasa_puerta && (
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 10px',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
-              borderRadius: '20px',
-              fontSize: '0.75rem',
-              color: '#10b981',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              alignSelf: 'flex-start'
-            }}>
-              <span>Calibración validada: {Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% en {proyeccion.calibracion.ciclos_evaluados} ciclos</span>
-            </div>
-          )}
-
-          <div className={styles.mainStats}>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Gasto proyectado (mediana)</span>
-              <span className={styles.statValue}>{formatMonto(gasto_proyectado_total ?? 0, moneda)}</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Balance estimado</span>
-              <span className={`${styles.balanceValue} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
-                {formatMonto(balance_proyectado ?? 0, moneda)}
+          <div className={styles.splitHero}>
+            <div className={styles.heroMetric}>
+              <span className={styles.heroLabel}>Gasto proyectado</span>
+              <div className={styles.heroValue}>
+                {formatMonto(gastoAnim ?? (gasto_proyectado_total ?? 0), moneda)}
+              </div>
+              <span className={styles.heroSubtext}>
+                Rango 80%: {formatMonto(rango?.piso ?? 0, moneda)} a {formatMonto(rango?.techo ?? 0, moneda)}
               </span>
             </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Rango probable (80%)</span>
-              <span className={styles.statValue}>{formatMonto(rango?.piso ?? 0, moneda)} a {formatMonto(rango?.techo ?? 0, moneda)}</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Confianza</span>
-              <span className={styles.statValue}>{nivel_confianza}</span>
+
+            <div className={styles.heroMetric}>
+              <span className={styles.heroLabel}>Balance estimado</span>
+              <div className={`${styles.heroValue} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
+                {formatMonto(balanceAnim ?? (balance_proyectado ?? 0), moneda)}
+              </div>
+              <span className={`${styles.heroSubtext} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
+                {(balance_proyectado ?? 0) >= 0 ? 'Superávit probable' : 'Déficit probable'}
+              </span>
             </div>
           </div>
 
-          <div className={styles.progressContainer}>
-            <div className={styles.progressHeader}>
-              <span className={styles.progressLabel}>Gasto actual vs proyectado</span>
-              <span className={styles.progressPercent}>{progressPercent}%</span>
+          <div className={styles.paceContainer}>
+            <div className={styles.paceHeader}>
+              <span>
+                Consumido {formatMonto(actualGasto, moneda)} de {formatMonto(gasto_proyectado_total ?? 0, moneda)}
+                {proyeccion.periodo?.dias_restantes !== undefined && ` • Restan ${proyeccion.periodo.dias_restantes} días`}
+              </span>
+              <span className={styles.pacePercent}>{progressPercent}%</span>
             </div>
             <ProgressBar progress={progressPercent} />
           </div>
 
-          {!expanded ? (
-            <button className={styles.expandButton} onClick={() => setExpanded(true)}>
-              Ver desglose e intervalos <ChevronDown size={16} />
-            </button>
-          ) : (
-            <div className={styles.expandedContent}>
+          <button 
+            className={styles.accordionToggle} 
+            onClick={() => setExpanded(prev => !prev)}
+            aria-expanded={expanded}
+          >
+            <span>{expanded ? 'Ocultar desglose e intervalos' : 'Ver desglose e intervalos'}</span>
+            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+
+          <div className={`${styles.accordionGrid} ${expanded ? styles.accordionGridOpen : ''}`}>
+            <div className={styles.accordionInner}>
               {intervalos && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div className={styles.intervalosRow}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Intervalos de probabilidad calibrados</h3>
+                    <h3 className={styles.sectionTitle}>Intervalos de probabilidad calibrados</h3>
                     {proyeccion.calibracion && (
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-3)' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-3)' }}>
                         Validado: {Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% ({proyeccion.calibracion.ciclos_evaluados} ciclos)
                       </span>
                     )}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', fontSize: '0.75rem' }}>
-                    <div style={{ padding: '8px', backgroundColor: 'var(--surface-alt)', borderRadius: '8px' }}>
-                      <span style={{ color: 'var(--text-3)', display: 'block' }}>Nivel 50%</span>
-                      <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+                  <div className={styles.intervalosGrid}>
+                    <div className={styles.intervaloPill}>
+                      <span className={styles.intervaloPillLabel}>Nivel 50%</span>
+                      <span className={styles.intervaloPillValue}>
                         {formatMonto(intervalos.intervalo_50.piso, moneda)} - {formatMonto(intervalos.intervalo_50.techo, moneda)}
                       </span>
                     </div>
-                    <div style={{ padding: '8px', backgroundColor: 'var(--surface-alt)', borderRadius: '8px' }}>
-                      <span style={{ color: 'var(--text-3)', display: 'block' }}>Nivel 80%</span>
-                      <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+                    <div className={styles.intervaloPill}>
+                      <span className={styles.intervaloPillLabel}>Nivel 80%</span>
+                      <span className={styles.intervaloPillValue}>
                         {formatMonto(intervalos.intervalo_80.piso, moneda)} - {formatMonto(intervalos.intervalo_80.techo, moneda)}
                       </span>
                     </div>
-                    <div style={{ padding: '8px', backgroundColor: 'var(--surface-alt)', borderRadius: '8px' }}>
-                      <span style={{ color: 'var(--text-3)', display: 'block' }}>Nivel 95%</span>
-                      <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+                    <div className={styles.intervaloPill}>
+                      <span className={styles.intervaloPillLabel}>Nivel 95%</span>
+                      <span className={styles.intervaloPillValue}>
                         {formatMonto(intervalos.intervalo_95.piso, moneda)} - {formatMonto(intervalos.intervalo_95.techo, moneda)}
                       </span>
                     </div>
@@ -204,62 +239,60 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
                 </div>
               )}
 
-              <div className={styles.categoryList}>
-                <h3 className={styles.sectionTitle}>Gasto por categoría</h3>
-                {(desglose_por_categoria ?? []).map((cat, i) => {
-                  const catActual = cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0
-                  const catTotal = cat.proyectado > 0 ? cat.proyectado : 1
-                  const catProgress = Math.max(0, Math.min(Math.round((catActual / catTotal) * 100), 100))
-                  
-                  return (
-                    <div key={cat.categoria_id || `cat-${i}`} className={styles.categoryRow}>
-                      <div className={styles.categoryIcon}>
-                        <CategoriaIcon nombre={cat.categoria_nombre} size={32} />
-                      </div>
-                      <div className={styles.categoryInfo}>
-                        <div className={styles.categoryName}>
-                          {cat.categoria_nombre}
-                          {cat.fuera_de_patron && <span className={`${styles.badge} ${styles.badgePatron}`}>Fuera de patrón</span>}
+              {desglose_por_categoria && desglose_por_categoria.length > 0 && (
+                <div className={styles.categoryList}>
+                  <h3 className={styles.sectionTitle}>Gasto por categoría</h3>
+                  {desglose_por_categoria.map((cat, i) => {
+                    const catActual = cat.gasto_actual_ciclo > 0 ? cat.gasto_actual_ciclo : 0
+                    const catTotal = cat.proyectado > 0 ? cat.proyectado : 1
+                    const catProgress = Math.max(0, Math.min(Math.round((catActual / catTotal) * 100), 100))
+                    
+                    return (
+                      <div key={cat.categoria_id || `cat-${i}`} className={styles.categoryRow}>
+                        <div className={styles.categoryIcon}>
+                          <CategoriaIcon nombre={cat.categoria_nombre} size={20} />
                         </div>
-                        <ProgressBar progress={catProgress} />
+                        <div className={styles.categoryInfo}>
+                          <div className={styles.categoryName}>
+                            <span>{cat.categoria_nombre}</span>
+                            {cat.fuera_de_patron && <span className={styles.badgePatron}>Fuera de patrón</span>}
+                          </div>
+                          <ProgressBar progress={catProgress} />
+                        </div>
+                        <div className={styles.categoryAmount}>
+                          {formatMonto(cat.proyectado, moneda)}
+                        </div>
                       </div>
-                      <div className={styles.categoryAmount}>
-                        {formatMonto(cat.proyectado, moneda)}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+                    )
+                  })}
+                </div>
+              )}
 
-              <div className={styles.certezasSection}>
-                <h3 className={styles.sectionTitle}>Compromisos fijos</h3>
+              <div className={styles.certezasList}>
+                <h3 className={styles.sectionTitle} style={{ marginBottom: '4px' }}>Compromisos fijos</h3>
                 <div className={styles.certezaItem}>
-                  <span className={styles.certezaLabel}>Cuotas pendientes</span>
+                  <span>Cuotas pendientes</span>
                   <span className={styles.certezaValue}>{formatMonto(certezas.cuotas_restantes, moneda)}</span>
                 </div>
                 <div className={styles.certezaItem}>
-                  <span className={styles.certezaLabel}>Suscripciones pendientes</span>
+                  <span>Suscripciones pendientes</span>
                   <span className={styles.certezaValue}>{formatMonto(certezas.suscripciones_restantes, moneda)}</span>
                 </div>
                 {(certezas.compromisos_restantes ?? 0) > 0 && (
                   <div className={styles.certezaItem}>
-                    <span className={styles.certezaLabel}>Otros compromisos pendientes</span>
+                    <span>Otros compromisos pendientes</span>
                     <span className={styles.certezaValue}>{formatMonto(certezas.compromisos_restantes ?? 0, moneda)}</span>
                   </div>
                 )}
                 <div className={`${styles.certezaItem} ${styles.certezaTotal}`}>
-                  <span className={styles.certezaLabel}>Total compromisos</span>
+                  <span>Total compromisos</span>
                   <span className={`${styles.certezaValue} ${styles.certezaTotalValue}`}>
                     {formatMonto(certezas.total, moneda)}
                   </span>
                 </div>
               </div>
-
-              <button className={styles.expandButton} onClick={() => setExpanded(false)}>
-                Ocultar desglose <ChevronUp size={16} />
-              </button>
             </div>
-          )}
+          </div>
         </>
       )}
     </div>
@@ -304,63 +337,23 @@ const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: external
     }
   }, [data, fetchProyeccion])
 
-  const handleRetry = () => {
-    setError(false)
-    fetchProyeccion()
+  if (loading || error || !proyeccion) {
+    return null
   }
 
-  if (loading) {
-    return <div className={`${styles.card} ${styles.skeleton} ${styles.skeletonCard}`} />
+  if (!hasProyeccionVisible(proyeccion, moneda)) {
+    return null
   }
 
-  if (error || !proyeccion) {
-    if (data !== undefined) return null
-    return (
-      <div className={`${styles.card} ${styles.errorCard}`}>
-        <p className={styles.errorText}>No pudimos calcular la proyección</p>
-        <button className={styles.retryButton} onClick={handleRetry}>
-          <RefreshCcw size={14} className={styles.retryIcon} />
-          Reintentar
-        </button>
-      </div>
-    )
-  }
-
-  const hasArs = Boolean(
-    proyeccion.ars && (
-      proyeccion.ars.datos_suficientes ||
-      proyeccion.ars.certezas?.total > 0 ||
-      (proyeccion.ars.gasto_proyectado_total !== null && (proyeccion.ars.gasto_proyectado_total ?? 0) > 0) ||
-      (proyeccion.ars.ciclos_analizados ?? 0) >= 0
-    )
-  )
-  const hasUsd = Boolean(
-    proyeccion.usd && (
-      proyeccion.usd.datos_suficientes ||
-      proyeccion.usd.certezas?.total > 0 ||
-      (proyeccion.usd.gasto_proyectado_total !== null && (proyeccion.usd.gasto_proyectado_total ?? 0) > 0) ||
-      (proyeccion.usd.ingresos_proyectados !== null && (proyeccion.usd.ingresos_proyectados ?? 0) > 0)
-    )
-  )
-
-  const showArs = (!moneda || moneda === 'ARS') && hasArs
-  const showUsd = (!moneda || moneda === 'USD') && hasUsd
-
-  if (!showArs && !showUsd) {
-    return (
-      <div className={styles.card}>
-        <div className={styles.emptyStateContainer}>
-          <TrendingUp size={24} className={styles.emptyIcon} />
-          <p className={styles.emptyText}>Necesitamos más historial para proyectar tu ciclo</p>
-        </div>
-      </div>
-    )
-  }
+  const mostrarArs = Boolean(proyeccion.ars?.mostrar_card ?? proyeccion.ars?.datos_suficientes ?? false)
+  const mostrarUsd = Boolean(proyeccion.usd?.mostrar_card ?? proyeccion.usd?.datos_suficientes ?? false)
+  const showArs = (!moneda || moneda === 'ARS') && Boolean(proyeccion.ars && mostrarArs)
+  const showUsd = (!moneda || moneda === 'USD') && Boolean(proyeccion.usd && mostrarUsd)
 
   return (
     <div className={styles.proyeccionesContainer}>
-      {showArs && <SingleProyeccionCard proyeccion={proyeccion.ars} moneda="ARS" />}
-      {showUsd && <SingleProyeccionCard proyeccion={proyeccion.usd} moneda="USD" />}
+      {showArs && proyeccion.ars && <SingleProyeccionCard proyeccion={proyeccion.ars} moneda="ARS" />}
+      {showUsd && proyeccion.usd && <SingleProyeccionCard proyeccion={proyeccion.usd} moneda="USD" />}
     </div>
   )
 }

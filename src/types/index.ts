@@ -398,11 +398,14 @@ export interface Proyeccion {
     motivo?: 'pocos_ciclos' | 'cobertura_insuficiente' | 'intervalo_no_informativo' | 'calibracion_pendiente' | string | null
     mensaje?: string | null
   } | null
+  mostrar_card?: boolean
 }
 
 export interface ProyeccionesResponse {
   ars: Proyeccion
   usd: Proyeccion
+  mostrar_card?: boolean
+  mostrar_modal_bienvenida?: boolean
 }
 
 export interface ProyeccionCategoria {
@@ -813,7 +816,10 @@ export interface InterpretacionIndicador {
 }
 
 export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
+  mostrar_card?: boolean
+  mostrar_modal_bienvenida?: boolean
   perfil_nuevo: {
+    mostrar_card?: boolean
     datos_suficientes?: boolean
     mensaje_insuficiente?: string | null
     calidad_registro_advertencia?: string | null

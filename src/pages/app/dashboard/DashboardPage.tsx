@@ -23,10 +23,13 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useToast } from '@/hooks/useToast'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
+import { useModal } from '@/hooks/useModal'
+import { triggerBienvenidaFinancieraOnce, resetBienvenidaTriggerState } from '@/utils/bienvenidaFinancieraManager'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
 import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
+import { hasProyeccionVisible } from '@/components/dashboard/ProyeccionCard/proyeccionUtils'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
@@ -412,6 +415,18 @@ export default function DashboardPage() {
   const customRange = null
   const [proyeccion, setProyeccion] = useState<ProyeccionesResponse | null>(null)
   const [loadingProyeccion, setLoadingProyeccion] = useState(true)
+  const { open } = useModal()
+
+  // Trigger de primera vez para el modal explicativo si la proyección lo indica
+  useEffect(() => {
+    if (proyeccion?.mostrar_modal_bienvenida) {
+      triggerBienvenidaFinancieraOnce(open, 'proyeccion')
+    }
+  }, [proyeccion?.mostrar_modal_bienvenida, open])
+
+  const tieneProyeccion = useMemo(() => {
+    return Boolean(!customRange && !loadingProyeccion && hasProyeccionVisible(proyeccion, moneda))
+  }, [customRange, loadingProyeccion, proyeccion, moneda])
   const [showChartPercent, setShowChartPercent] = useState(false)
   const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
   const [subcategoriasData, setSubcategoriasData] = useState<SubcategoriaGasto[]>([])
@@ -427,6 +442,7 @@ export default function DashboardPage() {
       setSubcategoriasData([])
       setData(null)
       setProyeccion(null)
+      resetBienvenidaTriggerState()
     }
     prevUserIdRef.current = usuario?.id ?? null
   }, [usuario?.id])
@@ -997,10 +1013,10 @@ export default function DashboardPage() {
         <PerfilFinancieroCard moneda={moneda} />
       </WidgetErrorBoundary>
 
-      {/* ── Bottom Row (2 Cols) ───────────────────────────────────────────── */}
-      <div className={styles.bottomRow}>
+      {/* ── Bottom Row (2 Cols si hay proyección, 1 Col full width si no) ─── */}
+      <div className={`${styles.bottomRow} ${!tieneProyeccion ? styles.bottomRowSingle : ''}`}>
         {/* Col 1: Proyección */}
-        {!customRange && (
+        {tieneProyeccion && (
           <div className={styles.proyeccionSection}>
             <WidgetErrorBoundary title="Proyección">
               <ProyeccionCard data={proyeccion} loading={loadingProyeccion} moneda={moneda} />
@@ -1008,9 +1024,9 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Col 2: Últimos Movimientos */}
+        {/* Col 2 (o Col 1 full width): Últimos Movimientos */}
         <WidgetErrorBoundary title="Últimos movimientos">
-          <div className={styles.card}>
+          <div className={`${styles.card} ${!tieneProyeccion ? styles.cardFullWidth : ''}`}>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>Últimos movimientos</h3>
               <Link to="/app/transacciones" className={styles.seeAll}>

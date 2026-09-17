@@ -11,6 +11,7 @@ import BalanceCicloModal from '@/components/dashboard/BalanceCicloModal/BalanceC
 import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
 import GoalModal from '@/components/goals/GoalModal'
 import GoalContributionModal from '@/components/goals/GoalContributionModal'
+import ExplicativoFinancieroModal from '@/components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal'
 import { ModalErrorBoundary } from '@/components/ui/ErrorBoundary/ModalErrorBoundary'
 
 export function ModalPortal() {
@@ -30,6 +31,7 @@ export function ModalPortal() {
   const goalData = typedModals.goal?.data
   const goalContributionData = typedModals.goalContribution?.data
   const confirmData = typedModals.confirm?.data
+  const bienvenidaData = typedModals.bienvenidaFinanciera?.data
 
   return (
     <>
@@ -160,6 +162,16 @@ export function ModalPortal() {
             cancelLabel={confirmData.cancelLabel}
             variant={confirmData.variant}
             requireTyping={confirmData.requireTyping}
+          />
+        </ModalErrorBoundary>
+      )}
+
+      {typedModals.bienvenidaFinanciera?.isOpen && (
+        <ModalErrorBoundary modalName="bienvenidaFinanciera" onClose={() => closeModal('bienvenidaFinanciera')}>
+          <ExplicativoFinancieroModal
+            isOpen={true}
+            onClose={() => closeModal('bienvenidaFinanciera')}
+            initialTab={bienvenidaData?.initialTab ?? 'perfil'}
           />
         </ModalErrorBoundary>
       )}

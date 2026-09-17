@@ -35,7 +35,6 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
   const itemsWrapperRef = useRef<HTMLDivElement | null>(null)
   const indicatorRef = useRef<HTMLDivElement | null>(null)
   const itemRefs = useRef<(HTMLElement | null)[]>([])
-  const lastClickRef = useRef(0)
 
   // Determine active slot index based on router path or "Más" state
   const activeIndex = useMemo(() => {
@@ -69,15 +68,8 @@ export const MobileBottomNav: FC<MobileBottomNavProps> = ({ isMoreOpen, onToggle
     return () => window.removeEventListener('resize', handleResize)
   }, [activeIndex])
 
-  // Immediate, rock-solid toggle for the 3-dots button with debounce protection
-  const handleToggleMore = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const now = Date.now()
-    if (now - lastClickRef.current < 250) return
-    lastClickRef.current = now
-
+  // Direct toggle for the 3-dots button without artificial debounce or event suppression
+  const handleToggleMore = useCallback(() => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate(8)

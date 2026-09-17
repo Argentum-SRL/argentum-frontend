@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback, type FC, type ReactNode } from 'react'
+import { useRef, useState, useEffect, type FC, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Target,
@@ -44,19 +44,37 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   const navigate = useNavigate()
   const sheetRef = useRef<HTMLDivElement | null>(null)
 
-  // Mounting and visibility state for smooth enter/exit transitions
-  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  // Mounting and visibility state for CSS-driven enter/exit transitions
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isVisible, setIsVisible] = useState(isOpen)
   const [pressedId, setPressedId] = useState<string | null>(null)
 
-  // Store information from previous renders to avoid setState in effect body
-  if (isOpen !== prevIsOpen) {
-    setPrevIsOpen(isOpen)
+  // Single effect managing animation state from the isOpen prop
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>
     if (isOpen) {
-      setShouldRender(true)
+      const frameId = requestAnimationFrame(() => {
+        setShouldRender(true)
+        timer = setTimeout(() => {
+          setIsVisible(true)
+        }, 20)
+      })
+      return () => {
+        cancelAnimationFrame(frameId)
+        clearTimeout(timer)
+      }
     } else {
-      setIsVisible(false)
+      const frameId = requestAnimationFrame(() => {
+        setIsVisible(false)
+      })
+      return () => cancelAnimationFrame(frameId)
+    }
+  }, [isOpen])
+
+  // Native onTransitionEnd callback to unmount only after exit animation finishes
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.target === sheetRef.current && e.propertyName === 'transform' && !isOpen) {
+      setShouldRender(false)
     }
   }
 
@@ -69,39 +87,17 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   const itemTouchStartXRef = useRef(0)
   const itemTouchStartYRef = useRef(0)
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>
-    if (isOpen) {
-      timer = setTimeout(() => {
-        setIsVisible(true)
-      }, 25)
-    } else {
-      timer = setTimeout(() => {
-        setShouldRender(false)
-      }, 260)
-    }
-    return () => clearTimeout(timer)
-  }, [isOpen])
-
-  // Graceful animated close
-  const triggerClose = useCallback(() => {
-    setIsVisible(false)
-    setTimeout(() => {
-      onClose()
-    }, 240)
-  }, [onClose])
-
   // ESC key listener
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        triggerClose()
+        onClose()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, triggerClose])
+  }, [isOpen, onClose])
 
   // ── Drag to dismiss handlers ──────────────────────────────────────────────
 
@@ -150,9 +146,9 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
     sheetDeltaYRef.current = 0
 
     if (finalDelta > 65) {
-      // Dismiss
+      // Dismiss immediately without delay
       sheetRef.current.style.transform = ''
-      triggerClose()
+      onClose()
     } else {
       // Snap back smoothly
       sheetRef.current.style.transform = 'translate3d(0, 0, 0)'
@@ -168,10 +164,9 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
     } catch {
       // Ignore
     }
-    if (sheetRef.current) {
-      sheetRef.current.classList.remove(styles.sheetDragging)
-      sheetRef.current.style.transform = 'translate3d(0, 0, 0)'
-    }
+    if (!sheetRef.current) return
+    sheetRef.current.classList.remove(styles.sheetDragging)
+    sheetRef.current.style.transform = 'translate3d(0, 0, 0)'
   }
 
   // ── Item interaction handlers (Tactile feedback + reliable selection) ───
@@ -202,10 +197,8 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
     }
   }
 
-  const handleItemPointerUp = (item: MenuItemConfig) => {
-    if (pressedId === item.id) {
-      handleItemSelect(item)
-    }
+  const handleItemPointerUp = () => {
+    setPressedId(null)
   }
 
   const handleItemPointerCancel = () => {
@@ -214,7 +207,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
 
   const handleItemSelect = (item: MenuItemConfig) => {
     setPressedId(null)
-    triggerClose()
+    onClose()
 
     setTimeout(() => {
       if (item.path) {
@@ -276,7 +269,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
         className={itemClasses}
         onPointerDown={(e) => handleItemPointerDown(item.id, e)}
         onPointerMove={handleItemPointerMove}
-        onPointerUp={() => handleItemPointerUp(item)}
+        onPointerUp={handleItemPointerUp}
         onPointerCancel={handleItemPointerCancel}
         onClick={() => handleItemSelect(item)}
         aria-label={item.label}
@@ -295,7 +288,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
       {/* Backdrop overlay */}
       <div
         className={`${styles.overlay} ${isVisible ? styles.overlayVisible : ''}`}
-        onClick={triggerClose}
+        onClick={onClose}
         aria-hidden="true"
       />
 
@@ -306,6 +299,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
         aria-modal="true"
         aria-label="Más opciones"
         className={`${styles.sheet} ${isVisible ? styles.sheetVisible : ''}`}
+        onTransitionEnd={handleTransitionEnd}
       >
         {/* Drag handle */}
         <div

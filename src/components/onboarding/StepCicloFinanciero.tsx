@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Calendar, RefreshCw, Loader2 } from 'lucide-react'
+import { Calendar, RefreshCw } from 'lucide-react'
 import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { invalidateDashboardCache } from '@/services/dashboard.service'
-import { SelectInput } from '@/components/ui'
+import { SelectInput, Field, Button, SegmentedControl } from '@/components/ui'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepCicloFinanciero.module.css'
@@ -192,63 +192,52 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
         <div className={styles.field}>
           {tipo === 'dia_fijo' ? (
             <>
-              <label htmlFor="valor_ciclo" className={styles.label}>¿Qué día del mes te depositan el sueldo?</label>
-              <input
+              <Field
                 id="valor_ciclo"
+                label="¿Qué día del mes te depositan el sueldo?"
                 type="number"
-                min="1"
-                max="31"
+                min={1}
+                max={31}
                 value={valor}
-                onChange={(e) => {
-                  const val = e.target.value
+                onChange={(val) => {
                   setValor(val)
                   setPreview(null)
                   const parsed = parseInt(val, 10)
                   setLoadingPreview(!isNaN(parsed) && parsed >= 1 && parsed <= 31)
                 }}
-                className={styles.input}
               />
+              <p className={styles.hint}>{hint}</p>
             </>
           ) : (
-            <SelectInput
-              id="valor_ciclo"
-              label="Regla"
-              value={valor}
-              onChange={(newVal) => {
-                setValor(newVal)
-                setPreview(null)
-                setLoadingPreview(Boolean(newVal))
-              }}
-              options={REGLAS.map((r) => ({ value: r.id, label: r.label }))}
-            />
+            <>
+              <SelectInput
+                id="valor_ciclo"
+                label="Regla"
+                value={valor}
+                onChange={(newVal) => {
+                  setValor(newVal)
+                  setPreview(null)
+                  setLoadingPreview(Boolean(newVal))
+                }}
+                options={REGLAS.map((r) => ({ value: r.id, label: r.label }))}
+              />
+              <p className={styles.hint}>{hint}</p>
+            </>
           )}
-
-          <p className={styles.hint}>{hint}</p>
         </div>
 
         {/* Selector de dirección de ajuste (en ambos modos) */}
         <div className={styles.field}>
           <label className={styles.label}>Dirección de ajuste</label>
-          <div className={styles.segmentedToggle}>
-            <button
-              type="button"
-              className={`${styles.segmentedBtn} ${
-                direccion === 'anterior' ? styles.segmentedActive : ''
-              }`}
-              onClick={() => setDireccion('anterior')}
-            >
-              Ajustar hacia atrás
-            </button>
-            <button
-              type="button"
-              className={`${styles.segmentedBtn} ${
-                direccion === 'posterior' ? styles.segmentedActive : ''
-              }`}
-              onClick={() => setDireccion('posterior')}
-            >
-              Ajustar hacia adelante
-            </button>
-          </div>
+          <SegmentedControl
+            options={[
+              { value: 'anterior', label: 'Ajustar hacia atrás' },
+              { value: 'posterior', label: 'Ajustar hacia adelante' },
+            ]}
+            value={direccion}
+            onChange={(val) => setDireccion(val as 'anterior' | 'posterior')}
+            fullWidth
+          />
           <p className={styles.hint}>
             Si el día calculado cae en fin de semana o feriado, ¿el cobro se corre para atrás o para adelante?
           </p>
@@ -256,9 +245,14 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? <><Loader2 size={18} className="animate-spin" /> Guardando...</> : 'Continuar'}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          Continuar
+        </Button>
       </form>
     </div>
   )

@@ -19,19 +19,36 @@
   width: 100%;
   padding: 10px 14px;
   background: var(--surface-alt);
-  border: 1px solid var(--surface-alt);
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-1);
+  color: var(--text);
   transition: all 0.2s ease;
   outline: none;
+}
+
+@media (max-width: 768px) {
+  .input {
+    font-size: 16px;
+  }
+}
+
+:global([data-theme="dark"]) .input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text);
 }
 
 .input:focus {
   background: var(--surface);
   border-color: var(--primary);
-  box-shadow: none;
+  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
+}
+
+:global([data-theme="dark"]) .input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
 }
 
 .withIcon {

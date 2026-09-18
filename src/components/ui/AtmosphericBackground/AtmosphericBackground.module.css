@@ -1,7 +1,13 @@
 /* ── Page Atmospheric Background (Identidad visual de Argentum) ───────── */
 .container {
-  background: radial-gradient(ellipse at 60% 40%, #1a3a6e 0%, #0D2045 55%, #070f24 100%);
+  background: radial-gradient(ellipse at 60% 30%, #DFEAF8 0%, #EBF0F8 50%, #F5F4F0 100%);
   box-sizing: border-box;
+  color: var(--text);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+:global([data-theme="dark"]) .container {
+  background: radial-gradient(ellipse at 60% 40%, #1a3a6e 0%, #0D2045 55%, #070f24 100%);
 }
 
 .fixed {
@@ -39,6 +45,15 @@
   }
 }
 
+/* ── Capa de decoraciones aislada (evita scroll vertical indebido) ───────── */
+.decorationsLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* ── Seamless Safe Area Vignettes (Camuflaje para Status Bar y Safari Bar) ── */
 .topVignette {
   position: absolute;
@@ -48,12 +63,21 @@
   height: calc(env(safe-area-inset-top, 44px) + 60px);
   background: linear-gradient(
     to bottom,
-    #070f24 0%,
-    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-top, 44px) + 8px),
+    #F5F4F0 0%,
+    rgba(245, 244, 240, 0.96) calc(env(safe-area-inset-top, 44px) + 8px),
     transparent 100%
   );
   pointer-events: none;
   z-index: 5;
+}
+
+:global([data-theme="dark"]) .topVignette {
+  background: linear-gradient(
+    to bottom,
+    #070f24 0%,
+    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-top, 44px) + 8px),
+    transparent 100%
+  );
 }
 
 .bottomVignette {
@@ -64,12 +88,21 @@
   height: calc(env(safe-area-inset-bottom, 24px) + 75px);
   background: linear-gradient(
     to top,
-    #070f24 0%,
-    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-bottom, 24px) + 30px),
+    #F5F4F0 0%,
+    rgba(245, 244, 240, 0.96) calc(env(safe-area-inset-bottom, 24px) + 30px),
     transparent 100%
   );
   pointer-events: none;
   z-index: 5;
+}
+
+:global([data-theme="dark"]) .bottomVignette {
+  background: linear-gradient(
+    to top,
+    #070f24 0%,
+    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-bottom, 24px) + 30px),
+    transparent 100%
+  );
 }
 
 /* ── Ambient Halos ───────────────────────────────────────────────────────── */
@@ -80,9 +113,13 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(72, 120, 184, 0.28) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(72, 120, 184, 0.14) 0%, transparent 70%);
   filter: blur(45px);
   pointer-events: none;
+}
+
+:global([data-theme="dark"]) .ambientGlowTop {
+  background: radial-gradient(circle, rgba(72, 120, 184, 0.28) 0%, transparent 70%);
 }
 
 .ambientGlowBottom {
@@ -92,9 +129,13 @@
   width: 520px;
   height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(168, 144, 90, 0.16) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(168, 144, 90, 0.12) 0%, transparent 70%);
   filter: blur(55px);
   pointer-events: none;
+}
+
+:global([data-theme="dark"]) .ambientGlowBottom {
+  background: radial-gradient(circle, rgba(168, 144, 90, 0.16) 0%, transparent 70%);
 }
 
 /* ── Decorative Floating Moons ───────────────────────────────────────────── */
@@ -106,6 +147,11 @@
   right: var(--right);
   opacity: var(--opacity);
   animation: var(--anim);
+  color: var(--primary);
+}
+
+:global([data-theme="dark"]) .decoMoon {
+  color: var(--silver, #cbd5e1);
 }
 
 @keyframes floatSlow {
@@ -132,7 +178,7 @@
   }
 }
 
-/* ── Shared Obsidian Glassmorphism Card ──────────────────────────────────── */
+/* ── Shared Glassmorphism Card (Adaptable Light / Dark) ─────────────────── */
 .card {
   display: flex;
   flex-direction: column;
@@ -142,15 +188,23 @@
   width: 100%;
   padding: 36px 28px;
   border-radius: 24px;
-  background: rgba(13, 26, 54, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(13, 32, 69, 0.08);
+  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04);
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
   position: relative;
   z-index: 10;
   box-sizing: border-box;
   animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  color: var(--text);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+:global([data-theme="dark"]) .card {
+  background: rgba(13, 26, 54, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
 }
 
 @keyframes cardFadeIn {

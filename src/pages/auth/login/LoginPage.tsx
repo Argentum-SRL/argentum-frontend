@@ -4,7 +4,7 @@ import { Eye, EyeOff, CheckCircle2 } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
-import Field from '@/components/ui/Field/Field'
+import { Field, Button } from '@/components/ui'
 import { loginWithEmail, loginWithGoogle } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
@@ -158,9 +158,14 @@ export default function LoginPage() {
           </div>
         )}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? 'Ingresando...' : 'Ingresar'}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          Ingresar
+        </Button>
 
         <div className={styles.divider}>
           <div className={styles.dividerLine} />

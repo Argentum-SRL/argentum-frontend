@@ -12,10 +12,22 @@ export const getToken = (): string | null => {
 
 export const setToken = (token: string | null): void => {
   _tokenMemory = token
+  if (token) {
+    try {
+      localStorage.setItem('argentum_has_session', 'true')
+    } catch {
+      // ignore
+    }
+  }
 }
 
 export const clearTokens = (): void => {
   _tokenMemory = null
+  try {
+    localStorage.removeItem('argentum_has_session')
+  } catch {
+    // ignore
+  }
 }
 /** @deprecated usá clearTokens() */
 export const clearToken = clearTokens

@@ -51,8 +51,5 @@ export {
   type AtmosphericCardProps,
   type AtmosphericLoadingProps,
 } from './AtmosphericBackground/AtmosphericBackground'
-
-
-
-
+export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle/ThemeToggle'
 

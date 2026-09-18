@@ -4,7 +4,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import DashboardMockup from '@/components/mock/DashboardMockup/DashboardMockup'
-import Field from '@/components/ui/Field/Field'
+import { Field, Button } from '@/components/ui'
 import { registerWithEmail, loginWithGoogle } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
@@ -52,6 +52,11 @@ const validateName = (val: string, campo: string): string | null => {
   return null
 }
 
+const IS_LOCALHOST = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+)
+
 export default function RegisterPage() {
 
   const { login, isAuthenticated, usuario } = useAuth()
@@ -70,7 +75,11 @@ export default function RegisterPage() {
   const [turnstileToken, setTurnstileToken] = useState('')
   const turnstileContainerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
-  const siteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.TURNSTILE_SITE_KEY || '0x4AAAAAAEw9D_25MtFi7DYX') as string
+  const siteKey = (
+    IS_LOCALHOST
+      ? '1x00000000000000000000AA'
+      : (import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.TURNSTILE_SITE_KEY || '0x4AAAAAAEw9D_25MtFi7DYX')
+  ) as string
 
   useEffect(() => {
     let isMounted = true
@@ -109,10 +118,16 @@ export default function RegisterPage() {
               setTurnstileToken('')
             }
           },
-          'error-callback': () => {
+          'error-callback': (err?: unknown) => {
             if (isMounted) {
-              setTurnstileToken('')
-              setApiError('Error al validar el captcha de Turnstile. Recargá la página.')
+              if (IS_LOCALHOST || import.meta.env.DEV) {
+                console.warn('[Turnstile] Error en entorno local, habilitando bypass de desarrollo:', err)
+                setTurnstileToken('dummy-turnstile-token')
+                setApiError(null)
+              } else {
+                setTurnstileToken('')
+                setApiError('Error al validar el captcha de Turnstile. Recargá la página.')
+              }
             }
           },
         })
@@ -389,9 +404,15 @@ export default function RegisterPage() {
 
         {apiError && <p className={styles.error}>{apiError}</p>}
 
-        <button type="submit" disabled={loading || !aceptaTerminos || !turnstileToken} className={styles.submitBtn}>
-          {loading ? 'Creando cuenta...' : 'Crear cuenta'}
-        </button>
+        <Button
+          type="submit"
+          disabled={!aceptaTerminos || !turnstileToken}
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          Crear cuenta
+        </Button>
 
         <div className={styles.divider}>
           <div className={styles.dividerLine} />

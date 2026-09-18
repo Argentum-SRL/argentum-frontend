@@ -8,6 +8,16 @@
   align-items: center;
 }
 
+.fullWidth {
+  display: flex;
+  width: 100%;
+}
+
+.fullWidth .option {
+  flex: 1;
+  text-align: center;
+}
+
 .option {
   display: inline-flex;
   align-items: center;

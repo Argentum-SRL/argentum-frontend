@@ -1,23 +1,6 @@
-import { useId, type ReactNode } from 'react'
-import { Sun, Moon } from 'lucide-react'
-import { useTheme } from '@/hooks/useTheme'
-import { AtmosphericBackground } from '@/components/ui'
+import { type ReactNode } from 'react'
+import { AtmosphericBackground, AtmosphericMoonIcon, ThemeToggle } from '@/components/ui'
 import styles from './AuthLayout.module.css'
-
-function MoonIcon({ size }: { size: number }) {
-  const maskId = `m${useId().replace(/[^a-z0-9]/gi, '')}`
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
-      <defs>
-        <mask id={maskId}>
-          <circle cx="50" cy="50" r="24" fill="white" />
-          <circle cx="58" cy="50" r="19" fill="black" />
-        </mask>
-      </defs>
-      <circle cx="50" cy="50" r="24" fill="var(--silver)" mask={`url(#${maskId})`} />
-    </svg>
-  )
-}
 
 interface FormContentProps {
   title: string
@@ -39,7 +22,7 @@ function FormContent({ title, children, compact }: FormContentProps) {
   return (
     <>
       <div className={logoCls}>
-        <MoonIcon size={compact ? 36 : 56} />
+        <AtmosphericMoonIcon size={compact ? 36 : 56} />
         <span className={logoTextCls}>Argentum</span>
       </div>
       <h1 className={titleCls}>{title}</h1>
@@ -65,17 +48,7 @@ export default function AuthLayout({
   cardPadding,
   compact,
 }: AuthLayoutProps) {
-  const { theme, toggleTheme } = useTheme()
-
-  const themeBtn = (
-    <button
-      className={styles.themeToggle}
-      onClick={toggleTheme}
-      aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-    >
-      {theme === 'dark' ? <Sun size={20} strokeWidth={1.75} /> : <Moon size={20} strokeWidth={1.75} />}
-    </button>
-  )
+  const themeBtn = <ThemeToggle variant="floating" />
 
   if (leftPanel) {
     return (

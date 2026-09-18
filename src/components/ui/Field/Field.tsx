@@ -15,7 +15,13 @@ interface FieldProps {
   hint?: string
   inputMode?: 'text' | 'numeric' | 'tel' | 'email' | 'search' | 'url' | 'none' | 'decimal'
   maxLength?: number
+  min?: number | string
+  max?: number | string
+  step?: number | string
   id?: string
+  disabled?: boolean
+  required?: boolean
+  className?: string
 }
 
 const Field = memo(({
@@ -32,7 +38,13 @@ const Field = memo(({
   hint,
   inputMode,
   maxLength,
+  min,
+  max,
+  step,
   id,
+  disabled,
+  required,
+  className,
 }: FieldProps) => {
   const inputCls = [
     styles.input,
@@ -43,7 +55,7 @@ const Field = memo(({
     .join(' ')
 
   return (
-    <div className={styles.field}>
+    <div className={[styles.field, className].filter(Boolean).join(' ')}>
       <label className={styles.label} htmlFor={id}>
         {label}
       </label>
@@ -60,6 +72,11 @@ const Field = memo(({
           placeholder={placeholder}
           inputMode={inputMode}
           maxLength={maxLength}
+          min={min}
+          max={max}
+          step={step}
+          disabled={disabled}
+          required={required}
         />
         {rightSlot && <div className={styles.rightSlot}>{rightSlot}</div>}
       </div>

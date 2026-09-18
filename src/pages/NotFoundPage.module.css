@@ -14,7 +14,7 @@
 .title {
   font-size: 3.75rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text);
   margin: 0 0 0.25rem 0;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -23,7 +23,7 @@
 .subtitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text);
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.015em;
   line-height: 1.3;
@@ -31,7 +31,7 @@
 
 .text {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--text-2);
   margin: 0 0 1.75rem 0;
   line-height: 1.55;
   max-width: 360px;
@@ -64,16 +64,16 @@
 }
 
 .primaryButton {
-  background: #2563eb;
+  background: var(--primary);
   border: none;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .primaryButton:hover {
-  background: #1d4ed8;
+  opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .primaryButton:active {
@@ -81,17 +81,27 @@
 }
 
 .secondaryButton {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #ffffff;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
+:global([data-theme="dark"]) .secondaryButton {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
 .secondaryButton:hover {
+  background: var(--border);
+  transform: translateY(-1px);
+}
+
+:global([data-theme="dark"]) .secondaryButton:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
 }
 
 .secondaryButton:active {

@@ -11,6 +11,7 @@ export interface SegmentedControlProps<T extends string = string> {
   onChange: (value: T) => void
   className?: string
   ariaLabel?: string
+  fullWidth?: boolean
 }
 
 export default function SegmentedControl<T extends string = string>({
@@ -18,11 +19,16 @@ export default function SegmentedControl<T extends string = string>({
   value,
   onChange,
   className,
-  ariaLabel = 'Opciones de visualización'
+  ariaLabel = 'Opciones de visualización',
+  fullWidth = false,
 }: SegmentedControlProps<T>) {
   return (
     <div 
-      className={`${styles.container} ${className || ''}`}
+      className={[
+        styles.container,
+        fullWidth ? styles.fullWidth : '',
+        className,
+      ].filter(Boolean).join(' ')}
       role="group"
       aria-label={ariaLabel}
     >

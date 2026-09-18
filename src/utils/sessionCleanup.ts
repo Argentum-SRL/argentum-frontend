@@ -202,6 +202,7 @@ export function createKeyedUserCache<T>(defaultTtlMs: number): KeyedUserCache<T>
 export const USER_STORAGE_KEYS = [
   'argentum_dashboard_billeteras',
   'argentum_dashboard_moneda',
+  'argentum_has_session',
 ] as const
 
 export function clearUserStorage(): void {

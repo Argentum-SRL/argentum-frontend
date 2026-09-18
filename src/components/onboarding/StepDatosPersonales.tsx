@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
 import { guardarDatosPersonales } from '@/services/onboarding.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepDatosPersonales.module.css'
-import { DateInput, SelectInput, type SelectOption } from '@/components/ui'
+import { DateInput, SelectInput, Field, Button, type SelectOption } from '@/components/ui'
 
 const OPCIONES_SEXO: SelectOption[] = [
   { value: '', label: 'Seleccionar' },
@@ -107,35 +106,27 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
       <p className={styles.subtitle}>Necesitamos tus datos para personalizar tu experiencia.</p>
 
       <form onSubmit={handleSubmit} noValidate>
-        <div className={styles.field}>
-          <label htmlFor="nombre" className={styles.label}>Nombre</label>
-          <input
-            id="nombre"
-            type="text"
-            maxLength={100}
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className={[styles.input, nombreError ? styles.inputError : ''].filter(Boolean).join(' ')}
-            placeholder="¿Cómo te llamás?"
-            autoFocus
-            autoComplete="given-name"
-          />
-          {nombreError && <p className={styles.fieldError}>{nombreError}</p>}
-        </div>
+        <Field
+          id="nombre"
+          label="Nombre"
+          value={nombre}
+          onChange={setNombre}
+          error={nombreError}
+          placeholder="¿Cómo te llamás?"
+          autoFocus
+          autoComplete="given-name"
+          maxLength={100}
+        />
 
-        <div className={styles.field}>
-          <label htmlFor="apellido" className={styles.label}>Apellido</label>
-          <input
-            id="apellido"
-            type="text"
-            maxLength={100}
-            value={apellido}
-            onChange={(e) => setApellido(e.target.value)}
-            className={[styles.input, apellidoError ? styles.inputError : ''].filter(Boolean).join(' ')}
-            autoComplete="family-name"
-          />
-          {apellidoError && <p className={styles.fieldError}>{apellidoError}</p>}
-        </div>
+        <Field
+          id="apellido"
+          label="Apellido"
+          value={apellido}
+          onChange={setApellido}
+          error={apellidoError}
+          autoComplete="family-name"
+          maxLength={100}
+        />
 
         <div className={styles.field}>
           <DateInput
@@ -163,9 +154,14 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? <><Loader2 size={18} className="animate-spin" /> Guardando...</> : 'Continuar'}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          Continuar
+        </Button>
       </form>
     </div>
   )

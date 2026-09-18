@@ -1,8 +1,8 @@
 import { type FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
-import Field from '@/components/ui/Field/Field'
+import { Field, Button } from '@/components/ui'
 import { completarPerfil } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
@@ -174,9 +174,14 @@ export default function CompletarPerfil() {
 
         {apiError && <p className={styles.error}>{apiError}</p>}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? <><Loader2 size={18} className="animate-spin" /> Guardando...</> : 'Guardar y continuar'}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          Guardar y continuar
+        </Button>
       </form>
     </AuthLayout>
   )

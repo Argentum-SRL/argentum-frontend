@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px 48px;
+  padding: 24px 20px 28px;
   box-sizing: border-box;
 }
 
@@ -13,7 +13,7 @@
   max-width: 480px;
   position: relative;
   z-index: 10;
-  margin: auto 0;
+  margin: 0 auto;
 }
 
 /* ── Header ──────────────────────────────────── */
@@ -21,32 +21,52 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
+}
+
+.headerMoon {
+  color: var(--primary);
+  transition: color 0.2s ease;
+}
+
+:global([data-theme="dark"]) .headerMoon {
+  color: var(--silver, #cbd5e1);
 }
 
 .logoText {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--silver, #cbd5e1);
+  color: var(--primary);
   letter-spacing: -0.3px;
+  transition: color 0.2s ease;
+}
+
+:global([data-theme="dark"]) .logoText {
+  color: var(--silver, #cbd5e1);
 }
 
 /* ── Card ────────────────────────────────────── */
 .card {
-  background: rgba(13, 26, 54, 0.82);
+  background: rgba(255, 255, 255, 0.88);
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(13, 32, 69, 0.08);
+  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04);
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
-  padding: 28px 28px 32px;
+  padding: 24px 24px 28px;
   margin-bottom: 16px;
-  overflow: hidden;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+:global([data-theme="dark"]) .card {
+  background: rgba(13, 26, 54, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
 }
 
 @media (min-width: 480px) {
   .card {
-    padding: 36px 40px 40px;
+    padding: 32px 36px 36px;
   }
 }
 
@@ -69,8 +89,13 @@
 /* ── Footer ──────────────────────────────────── */
 .footer {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-3);
   text-align: center;
+  transition: color 0.2s ease;
+}
+
+:global([data-theme="dark"]) .footer {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ── Loading ─────────────────────────────────── */
@@ -79,5 +104,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--primary);
+}
+
+:global([data-theme="dark"]) .loading {
   color: #ffffff;
 }

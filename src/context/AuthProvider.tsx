@@ -7,10 +7,21 @@ import { AuthContext } from './AuthContext'
 import { setNavigate, setLogoutFn } from '../utils/browserHistory'
 import { limpiarSesionCompleta } from '@/utils/sessionCleanup'
 
+function checkHasSessionMarker(): boolean {
+  return (
+    (typeof document !== 'undefined' && document.cookie.includes('argentum_has_session=true')) ||
+    (typeof localStorage !== 'undefined' && localStorage.getItem('argentum_has_session') === 'true') ||
+    (typeof window !== 'undefined' && (
+      window.location.pathname.startsWith('/app') ||
+      window.location.pathname.startsWith('/onboarding')
+    ))
+  )
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
-  // Siempre arrancamos en loading=true si hay token para verificar, de lo contrario false
-  const [isLoading, setIsLoading] = useState(true)
+  // Si hay señal de sesión previa o ruta autenticada, iniciamos en loading=true; de lo contrario false
+  const [isLoading, setIsLoading] = useState(checkHasSessionMarker)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -23,6 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // Silencioso: igual limpiamos localmente
     } finally {
+      try {
+        localStorage.removeItem('argentum_has_session')
+      } catch {
+        // ignore
+      }
       limpiarSesionCompleta()
       clearTokens()
       setUsuario(null)
@@ -36,7 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback((respuesta: AuthResponse) => {
     limpiarSesionCompleta()
-    if (respuesta.access_token) setToken(respuesta.access_token)
+    if (respuesta.access_token) {
+      setToken(respuesta.access_token)
+      try {
+        localStorage.setItem('argentum_has_session', 'true')
+      } catch {
+        // ignore
+      }
+    }
     if (respuesta.usuario) setUsuario(respuesta.usuario)
   }, [])
 
@@ -52,6 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    // Si no hay señal de sesión activa, no hacemos refresh
+    if (!checkHasSessionMarker()) {
+      return
+    }
+
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000)
     let mounted = true
@@ -62,6 +90,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!mounted) return
         limpiarSesionCompleta()
         setToken(refreshRes.data.access_token)
+        try {
+          localStorage.setItem('argentum_has_session', 'true')
+        } catch {
+          // ignore
+        }
         
         try {
           const userRes = await api.get<Usuario>('/usuarios/me', { signal: controller.signal })
@@ -73,6 +106,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (mounted && status === 401) {
             limpiarSesionCompleta()
             clearTokens()
+            try {
+              localStorage.removeItem('argentum_has_session')
+            } catch {
+              // ignore
+            }
             setUsuario(null)
           }
         }
@@ -86,6 +124,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted && status === 401) {
           limpiarSesionCompleta()
           clearTokens()
+          try {
+            localStorage.removeItem('argentum_has_session')
+          } catch {
+            // ignore
+          }
           setUsuario(null)
         }
       })

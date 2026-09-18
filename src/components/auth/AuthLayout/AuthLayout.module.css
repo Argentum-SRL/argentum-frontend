@@ -86,22 +86,39 @@
   max-width: var(--card-max-width, 480px);
   padding: var(--card-padding, 36px 32px);
   border-radius: 24px;
-  background: rgba(13, 26, 54, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(13, 32, 69, 0.08);
+  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04);
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
   box-sizing: border-box;
   position: relative;
   z-index: 10;
   margin: auto;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+:global([data-theme="dark"]) .standaloneCard {
+  background: rgba(13, 26, 54, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
 }
 
 .standalone .logoText {
+  color: var(--primary);
+  transition: color 0.2s ease;
+}
+
+:global([data-theme="dark"]) .standalone .logoText {
   color: var(--silver, #cbd5e1);
 }
 
 .standalone .title {
+  color: var(--text);
+  transition: color 0.2s ease;
+}
+
+:global([data-theme="dark"]) .standalone .title {
   color: #ffffff;
 }
 

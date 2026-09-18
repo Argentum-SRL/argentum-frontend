@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/useToast'
 import { useAuth } from '@/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { Button } from '@/components/ui'
 import styles from './StepMoneda.module.css'
 
 interface Props {
@@ -180,17 +181,16 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? (
-            <>
-              <Loader2 size={18} className="animate-spin" /> {guardadoExitoso ? 'Finalizando...' : 'Guardando...'}
-            </>
-          ) : guardadoExitoso ? (
-            'Reintentar'
-          ) : (
-            'Continuar'
-          )}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          {loading
+            ? (guardadoExitoso ? 'Finalizando...' : 'Guardando...')
+            : (guardadoExitoso ? 'Reintentar' : 'Continuar')}
+        </Button>
       </form>
     </div>
   )

@@ -1,8 +1,8 @@
 import { type FormEvent, useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
-import Field from '@/components/ui/Field/Field'
+import { Field, Button } from '@/components/ui'
 import { verificarCodigoEmail, enviarCodigoEmail } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
@@ -172,13 +172,15 @@ export default function VerificarEmail() {
 
           {apiError && <p className={styles.error}>{apiError}</p>}
 
-          <button
+          <Button
             type="submit"
-            disabled={reenvioLoading || !email.trim()}
+            disabled={!email.trim()}
+            loading={reenvioLoading}
+            fullWidth
             className={styles.submitBtn}
           >
-            {reenvioLoading ? <><Loader2 size={18} className="animate-spin" /> Enviando...</> : 'Pedir código'}
-          </button>
+            Pedir código
+          </Button>
         </form>
       </AuthLayout>
     )
@@ -226,13 +228,15 @@ export default function VerificarEmail() {
 
         {apiError && <p className={styles.error}>{apiError}</p>}
 
-        <button
+        <Button
           type="submit"
-          disabled={loading || codigo.length !== 6}
+          disabled={codigo.length !== 6}
+          loading={loading}
+          fullWidth
           className={styles.submitBtn}
         >
-          {loading ? <><Loader2 size={18} className="animate-spin" /> Verificando...</> : 'Verificar'}
-        </button>
+          Verificar
+        </Button>
 
         <div className={styles.resendWrap}>
           {countdown > 0 ? (

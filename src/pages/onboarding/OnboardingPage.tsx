@@ -8,7 +8,7 @@ import StepDatosPersonales from '@/components/onboarding/StepDatosPersonales'
 import StepCicloFinanciero from '@/components/onboarding/StepCicloFinanciero'
 import StepMoneda from '@/components/onboarding/StepMoneda'
 import { useAuth } from '@/hooks/useAuth'
-import { AtmosphericBackground } from '@/components/ui'
+import { AtmosphericBackground, ThemeToggle } from '@/components/ui'
 import styles from './OnboardingPage.module.css'
 
 const PASO_NUMERO: Record<string, number> = {
@@ -25,14 +25,14 @@ function mapEstadoAPaso(estado: EstadoOnboarding): number {
 function MoonIcon({ size }: { size: number }) {
   const maskId = `moon-${useId().replace(/[^a-z0-9]/gi, '')}`
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" className={styles.headerMoon}>
       <defs>
         <mask id={maskId}>
           <circle cx="50" cy="50" r="24" fill="white" />
           <circle cx="58" cy="50" r="19" fill="black" />
         </mask>
       </defs>
-      <circle cx="50" cy="50" r="24" fill="var(--silver)" mask={`url(#${maskId})`} />
+      <circle cx="50" cy="50" r="24" fill="currentColor" mask={`url(#${maskId})`} />
     </svg>
   )
 }
@@ -149,6 +149,7 @@ export default function OnboardingPage() {
 
   return (
     <AtmosphericBackground fullScreen={false} centered={false} compensateBottomNav={false} className={styles.page}>
+      <ThemeToggle />
       <div className={styles.inner}>
         <div className={styles.header}>
           <MoonIcon size={32} />

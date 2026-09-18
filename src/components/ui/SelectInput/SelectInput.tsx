@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, Check, AlertCircle } from 'lucide-react'
 import styles from './SelectInput.module.css'
 
@@ -43,29 +44,47 @@ export const SelectInput: React.FC<SelectInputProps> = ({
     return () => window.removeEventListener('resize', check)
   }, [])
 
+  const updatePosition = useCallback(() => {
+    if (isMobile || !wrapperRef.current || !panelElRef.current) return
+    const rect = wrapperRef.current.getBoundingClientRect()
+    const panelHeight = Math.min(options.length * 44 + 8, 280)
+    const spaceBelow = window.innerHeight - rect.bottom
+    const spaceAbove = rect.top
+    const top = spaceBelow >= panelHeight || spaceBelow >= spaceAbove
+      ? rect.bottom + 4
+      : Math.max(8, rect.top - panelHeight - 4)
+
+    let left = rect.left
+    const panelWidth = rect.width
+    if (left + panelWidth > window.innerWidth - 8) {
+      left = window.innerWidth - panelWidth - 8
+    }
+    if (left < 8) left = 8
+
+    panelElRef.current.style.top = `${top}px`
+    panelElRef.current.style.left = `${left}px`
+    panelElRef.current.style.width = `${rect.width}px`
+  }, [isMobile, options.length])
+
   const panelRef = useCallback((node: HTMLDivElement | null) => {
     panelElRef.current = node
-    if (node && !isMobile && wrapperRef.current) {
-      const rect = wrapperRef.current.getBoundingClientRect()
-      const panelHeight = Math.min(options.length * 44 + 8, 280)
-      const spaceBelow = window.innerHeight - rect.bottom
-      const spaceAbove = rect.top
-      const top = spaceBelow >= panelHeight || spaceBelow >= spaceAbove
-        ? rect.bottom + 4
-        : rect.top - panelHeight - 4
-
-      let left = rect.left
-      const panelWidth = rect.width
-      if (left + panelWidth > window.innerWidth - 8) {
-        left = window.innerWidth - panelWidth - 8
-      }
-      if (left < 8) left = 8
-
-      node.style.top = `${top}px`
-      node.style.left = `${left}px`
-      node.style.width = `${rect.width}px`
+    if (node) {
+      updatePosition()
     }
-  }, [isMobile, options.length])
+  }, [updatePosition])
+
+  useEffect(() => {
+    if (!open) return
+    const handleScrollOrResize = () => {
+      updatePosition()
+    }
+    window.addEventListener('resize', handleScrollOrResize)
+    window.addEventListener('scroll', handleScrollOrResize, true)
+    return () => {
+      window.removeEventListener('resize', handleScrollOrResize)
+      window.removeEventListener('scroll', handleScrollOrResize, true)
+    }
+  }, [open, updatePosition])
 
   useEffect(() => {
     if (!open) return
@@ -117,9 +136,12 @@ export const SelectInput: React.FC<SelectInputProps> = ({
     isMobile ? (
       <div
         className={styles.mobileOverlay}
-        onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
+        onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
       >
-        <div className={styles.mobilePanelWrap} ref={panelRef}>
+        <div className={styles.mobileBottomSheet} ref={panelRef}>
+          <div className={styles.handleContainer} onClick={() => setOpen(false)}>
+            <div className={styles.handle} />
+          </div>
           {label && <div className={styles.mobilePanelTitle}>{label}</div>}
           {optionsList}
         </div>
@@ -171,7 +193,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
           {error}
         </span>
       )}
-      {panel}
+      {panel && typeof document !== 'undefined' && createPortal(panel, document.body)}
     </div>
   )
 }

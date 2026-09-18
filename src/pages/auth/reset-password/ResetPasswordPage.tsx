@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Eye, EyeOff, CheckCircle2, ArrowLeft, Loader2, Lock, AlertTriangle } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
-import Field from '@/components/ui/Field/Field'
+import { Field, Button } from '@/components/ui'
 import { validarResetToken, confirmarResetPassword } from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -215,9 +215,14 @@ export default function ResetPasswordPage() {
           </div>
         )}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? 'Restableciendo...' : 'Restablecer contraseña'}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          Restablecer contraseña
+        </Button>
 
         <div className={styles.backToLogin}>
           <Link to="/login" className={styles.backLink}>

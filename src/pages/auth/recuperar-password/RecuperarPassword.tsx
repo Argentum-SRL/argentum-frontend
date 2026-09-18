@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, CheckCircle2, ArrowLeft } from 'lucide-react'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
-import Field from '@/components/ui/Field/Field'
+import { Field, Button } from '@/components/ui'
 import { recuperarPassword, verificarRecuperacion } from '@/services/auth.service'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
@@ -248,9 +248,14 @@ export default function RecuperarPassword() {
 
           {apiError && <p className={styles.error}>{apiError}</p>}
 
-          <button type="submit" disabled={loading} className={styles.submitBtn}>
-            {loading ? 'Restableciendo...' : 'Restablecer contraseña'}
-          </button>
+          <Button
+            type="submit"
+            loading={loading}
+            fullWidth
+            className={styles.submitBtn}
+          >
+            Restablecer contraseña
+          </Button>
 
           <div className={styles.manualCodeToggle}>
             <button
@@ -341,9 +346,14 @@ export default function RecuperarPassword() {
 
         {apiError && <p className={styles.error}>{apiError}</p>}
 
-        <button type="submit" disabled={loading} className={styles.submitBtn}>
-          {loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          fullWidth
+          className={styles.submitBtn}
+        >
+          Enviar enlace de recuperación
+        </Button>
 
         <div className={styles.manualCodeToggle}>
           <button

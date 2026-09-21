@@ -25,3 +25,8 @@ dist-ssr
 *.sln
 *.sw?
 gitleaks-*.json
+
+# Graphify and Antigravity local files
+/graphify-out/
+/.agents/
+

@@ -1,11 +1,11 @@
-
-
 import React from 'react';
 import { Calendar, Coins } from 'lucide-react';
-import { Input, Button, MontoInput } from '@/components/ui';
+import { Button, MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import styles from './ToolsComponents.module.css';
+
+const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
 
 interface CanAffordFormProps {
   formData: {
@@ -44,224 +44,232 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   setTna,
   calcularCuotaConInteres
 }) => {
-
-
   const handleChange = (field: string, value: string | number | null) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const showManualIncome = ingresoPromedioContext === null;
 
-  const isFormInvalid = 
-    formData.precio_total === null || 
+  const isFormInvalid =
+    formData.precio_total === null ||
     formData.precio_total <= 0 ||
     formData.precio_total > MAX_MONTO_INTEGRIDAD ||
-    (formData.modo === 'cuotas' && (formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) || formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120)) ||
-    (formData.modo === 'cuotas' && tieneInteres && (!tna || isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000)) ||
-    (showManualIncome && formData.ingreso_manual !== null && (formData.ingreso_manual <= 0 || formData.ingreso_manual > MAX_MONTO_INTEGRIDAD));
+    (formData.modo === 'cuotas' && (
+      formData.cantidad_cuotas === null ||
+      isNaN(formData.cantidad_cuotas) ||
+      formData.cantidad_cuotas < 2 ||
+      formData.cantidad_cuotas > 120
+    )) ||
+    (formData.modo === 'cuotas' && tieneInteres && (
+      !tna || isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000
+    )) ||
+    (showManualIncome &&
+      formData.ingreso_manual !== null && (
+        formData.ingreso_manual <= 0 || formData.ingreso_manual > MAX_MONTO_INTEGRIDAD
+      ));
 
-  // Real-time calculations for preview
-  const getPreviewText = () => {
+  // Preview text en tiempo real
+  const previewText = (() => {
     if (!formData.precio_total || formData.precio_total <= 0) return null;
-
     if (formData.modo === 'contado') {
-      const pct = saldoDisponibleContext > 0 
-        ? (formData.precio_total / saldoDisponibleContext) * 100 
+      const pct = saldoDisponibleContext > 0
+        ? (formData.precio_total / saldoDisponibleContext) * 100
         : 999;
-      if (pct === 999) {
-        return 'Representa más del 100% de tu saldo disponible';
-      }
-      return `Representa el ${pct.toFixed(1)}% de tu saldo disponible actual`;
-    } else {
-      let cuota = 0;
-      if (formData.cantidad_cuotas && formData.cantidad_cuotas > 0) {
-        cuota = formData.precio_total / formData.cantidad_cuotas;
-        if (tieneInteres && tna && !isNaN(parseFloat(tna)) && parseFloat(tna) > 0) {
-          cuota = calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna));
-        }
-      }
-      return cuota > 0 ? `La cuota mensual sería de ${formatMonto(cuota, 'ARS')}` : null;
+      if (pct >= 999) return 'Representa más del 100% de tu saldo disponible';
+      return `Representa el ${pct.toFixed(1)}% de tu saldo disponible`;
     }
-  };
+    if (formData.cantidad_cuotas && formData.cantidad_cuotas > 0) {
+      let cuota = formData.precio_total / formData.cantidad_cuotas;
+      if (tieneInteres && tna && !isNaN(parseFloat(tna)) && parseFloat(tna) > 0) {
+        cuota = calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna));
+      }
+      if (cuota > 0) return `La cuota mensual sería de ${formatMonto(cuota, 'ARS')}`;
+    }
+    return null;
+  })();
 
   return (
     <div className={styles.card}>
-      <div>
+      <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>¿Qué estás pensando comprar?</h2>
         <p className={styles.cardSubtitle}>
           Analizá si tu situación financiera actual aguanta este nuevo gasto
         </p>
       </div>
 
-      {/* Precio de la compra */}
-      <div className={styles.formGroup}>
-        <MontoInput
-          label="Precio de la compra"
-          placeholder="Ej: 500.000"
-          value={formData.precio_total}
-          onChange={(val) => handleChange('precio_total', val)}
-          allowDecimals
-          hideCurrency
-        />
-        <span className={styles.inputDesc}>El costo total del producto o servicio</span>
-      </div>
-
-      {/* ¿Cómo lo vas a pagar? */}
-      <div className={styles.formGroup}>
-        <label className={styles.label}>¿Cómo lo vas a pagar?</label>
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full border border-slate-200 dark:border-slate-700">
-          <button
-            type="button"
-            onClick={() => handleChange('modo', 'contado')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all ${
-              formData.modo === 'contado'
-                ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-            }`}
-          >
-            <Coins size={14} />
-            <span>De contado</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleChange('modo', 'cuotas')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all ${
-              formData.modo === 'cuotas'
-                ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-            }`}
-          >
-            <Calendar size={14} />
-            <span>En cuotas</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Cantidad de cuotas */}
-      {formData.modo === 'cuotas' && (
-        <div className={`${styles.formGroup} animate-fadeIn`}>
-          <label className={styles.label} htmlFor="can_afford_cuotas">¿En cuántas cuotas?</label>
-          <Input
-            id="can_afford_cuotas"
-            type="number"
-            placeholder="Ej: 12"
-            value={formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) ? '' : formData.cantidad_cuotas}
-            onChange={(e) => {
-              const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
-              handleChange('cantidad_cuotas', val);
-            }}
-            min="2"
-            max="120"
-            step="1"
-          />
-          {formData.cantidad_cuotas !== null && !isNaN(formData.cantidad_cuotas) && (formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120) && (
-            <span className="text-xs text-red-500 font-medium mt-1">La cantidad de cuotas debe estar entre 2 y 120</span>
-          )}
-        </div>
-      )}
-
-      {/* ¿Las cuotas tienen interés? */}
-      {formData.modo === 'cuotas' && (
-        <div className="flex flex-col gap-2 animate-fadeIn">
-          <label className="text-sm font-medium text-foreground">
-            ¿Las cuotas tienen interés?
-          </label>
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full border border-slate-200 dark:border-slate-700">
-            <button
-              type="button"
-              onClick={() => setTieneInteres(false)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
-                !tieneInteres
-                  ? 'bg-white dark:bg-slate-700 text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Sin interés
-            </button>
-            <button
-              type="button"
-              onClick={() => setTieneInteres(true)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
-                tieneInteres
-                  ? 'bg-white dark:bg-slate-700 text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Con interés
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Input de TNA y preview de cuotas con interés */}
-      {formData.modo === 'cuotas' && tieneInteres && (
-        <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
-          <label className="text-sm font-medium text-foreground">
-            TNA (Tasa Nominal Anual)
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              step="0.1"
-              min="0.1"
-              max="3000"
-              placeholder="Ej: 120"
-              value={tna}
-              onChange={(e) => setTna(e.target.value)}
-              className="w-full rounded-lg border border-input bg-background px-4 py-3 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      <div className={styles.formGrid2}>
+        {/* ── Columna Izquierda: Precio & Modo ── */}
+        <div className={styles.formCol}>
+          {/* Precio */}
+          <div className={styles.formGroup}>
+            <MontoInput
+              label="Precio de la compra"
+              placeholder="0"
+              value={formData.precio_total}
+              onChange={(val) => handleChange('precio_total', val)}
+              allowDecimals
+              hideCurrency
+              compact
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
-              %
-            </span>
+            <span className={styles.inputDesc}>El costo total del producto o servicio</span>
           </div>
-          {tna !== '' && (isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000) && (
-            <span className="text-xs text-red-500 font-medium mt-1">La TNA debe estar entre 0.1% y 3000%</span>
-          )}
-          <p className="text-xs text-muted-foreground">
-            La TNA figura en el contrato o en la web del comercio/banco. Ej: 120% anual.
-          </p>
 
-          {tna && parseFloat(tna) > 0 && formData.precio_total && formData.precio_total > 0 && formData.cantidad_cuotas && formData.cantidad_cuotas > 0 && (
-            <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 px-4 py-3 mt-1 border border-border">
-              <span className="text-xs text-muted-foreground">Cuota estimada: </span>
-              <span className="text-sm font-semibold text-foreground">
-                {formatMonto(calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna)), 'ARS')}
-              </span>
-              <span className="text-xs text-muted-foreground ml-1">/ mes</span>
+          {/* Modo pago */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>¿Cómo lo vas a pagar?</label>
+            <div className={styles.pillToggle}>
+              <button
+                type="button"
+                className={`${styles.pillOption} ${formData.modo === 'contado' ? styles.pillOptionActive : ''}`}
+                onClick={() => handleChange('modo', 'contado')}
+              >
+                <Coins size={14} />
+                De contado
+              </button>
+              <button
+                type="button"
+                className={`${styles.pillOption} ${formData.modo === 'cuotas' ? styles.pillOptionActive : ''}`}
+                onClick={() => handleChange('modo', 'cuotas')}
+              >
+                <Calendar size={14} />
+                En cuotas
+              </button>
+            </div>
+          </div>
+
+          {/* Cantidad de cuotas */}
+          {formData.modo === 'cuotas' && (
+            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
+              <label className={styles.label} htmlFor="ca_cuotas">¿En cuántas cuotas?</label>
+
+              <div className={styles.chipsRow}>
+                {QUICK_CUOTAS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={`${styles.chip} ${formData.cantidad_cuotas === n ? styles.chipActive : ''}`}
+                    onClick={() => handleChange('cantidad_cuotas', n)}
+                  >
+                    {n}x
+                  </button>
+                ))}
+              </div>
+
+              <input
+                id="ca_cuotas"
+                type="number"
+                placeholder="Ej: 12"
+                value={formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) ? '' : formData.cantidad_cuotas}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
+                  handleChange('cantidad_cuotas', val);
+                }}
+                min="2"
+                max="120"
+                step="1"
+                className={styles.tnaInput}
+                inputMode="numeric"
+              />
+              {formData.cantidad_cuotas !== null && !isNaN(formData.cantidad_cuotas) &&
+                (formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120) && (
+                  <span className={styles.errorText}>Entre 2 y 120 cuotas</span>
+                )}
             </div>
           )}
         </div>
-      )}
 
-      {/* Ingreso manual si no hay promedio */}
-      {showManualIncome && (
-        <div className={`${styles.formGroup} animate-fadeIn`}>
-          <MontoInput
-            label="Tu ingreso mensual estimado"
-            placeholder="Ej: 800.000"
-            value={formData.ingreso_manual}
-            onChange={(val) => handleChange('ingreso_manual', val)}
-            allowDecimals
-            hideCurrency
-          />
-          {formData.ingreso_manual !== null && formData.ingreso_manual <= 0 && (
-            <span className="text-xs text-red-500 font-medium mt-1">El ingreso mensual estimado debe ser mayor a 0</span>
+        {/* ── Columna Derecha: Interés, Ingreso & Preview ── */}
+        <div className={styles.formCol}>
+          {/* Interés */}
+          {formData.modo === 'cuotas' && (
+            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
+              <label className={styles.label}>¿Las cuotas tienen interés?</label>
+              <div className={styles.pillToggle}>
+                <button
+                  type="button"
+                  className={`${styles.pillOption} ${!tieneInteres ? styles.pillOptionActive : ''}`}
+                  onClick={() => setTieneInteres(false)}
+                >
+                  Sin interés
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.pillOption} ${tieneInteres ? styles.pillOptionActive : ''}`}
+                  onClick={() => setTieneInteres(true)}
+                >
+                  Con interés
+                </button>
+              </div>
+            </div>
           )}
-          <span className={styles.inputDesc}>
-            No tenemos ingresos registrados tuyos. Completalo para ver la capacidad de pago.
-          </span>
-        </div>
-      )}
 
-      {/* Preview en tiempo real */}
-      {getPreviewText() && (
-        <div className={`${styles.realtimeInfo} animate-fadeIn`}>
-          <span>{getPreviewText()}</span>
+          {/* TNA */}
+          {formData.modo === 'cuotas' && tieneInteres && (
+            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
+              <label className={styles.label} htmlFor="ca_tna">TNA (Tasa Nominal Anual)</label>
+              <div className={styles.tnaWrapper}>
+                <input
+                  id="ca_tna"
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  max="3000"
+                  placeholder="Ej: 120"
+                  value={tna}
+                  onChange={(e) => setTna(e.target.value)}
+                  className={styles.tnaInput}
+                  inputMode="decimal"
+                />
+                <span className={styles.tnaUnit}>%</span>
+              </div>
+              {tna !== '' && (isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000) && (
+                <span className={styles.errorText}>TNA debe estar entre 0.1% y 3000%</span>
+              )}
+              <span className={styles.inputDesc}>Figura en la web del comercio. Ej: 120% anual.</span>
+
+              {/* Cuota preview con TNA */}
+              {tna && parseFloat(tna) > 0 && formData.precio_total && formData.precio_total > 0 &&
+                formData.cantidad_cuotas && formData.cantidad_cuotas > 0 && (
+                  <div className={`${styles.cuotaPreview} ${styles.animateFadeIn}`}>
+                    <span>Cuota estimada:</span>
+                    <span className={styles.cuotaPreviewValue}>
+                      {formatMonto(calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna)), 'ARS')}
+                    </span>
+                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>/ mes</span>
+                  </div>
+                )}
+            </div>
+          )}
+
+          {/* Ingreso manual */}
+          {showManualIncome && (
+            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
+              <MontoInput
+                label="Tu ingreso mensual estimado"
+                placeholder="0"
+                value={formData.ingreso_manual}
+                onChange={(val) => handleChange('ingreso_manual', val)}
+                allowDecimals
+                hideCurrency
+                compact
+              />
+              {formData.ingreso_manual !== null && formData.ingreso_manual <= 0 && (
+                <span className={styles.errorText}>El ingreso debe ser mayor a 0</span>
+              )}
+              <span className={styles.inputDesc}>
+                No tenemos ingresos registrados. Completalo para ver la capacidad.
+              </span>
+            </div>
+          )}
+
+          {/* Preview en tiempo real */}
+          {previewText && (
+            <div className={`${styles.realtimeInfo} ${styles.animateFadeIn}`}>
+              <span>{previewText}</span>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       <Button
         variant="primary"

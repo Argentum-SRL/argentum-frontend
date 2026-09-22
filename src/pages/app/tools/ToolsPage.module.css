@@ -1,58 +1,48 @@
+/* ── Root page ─────────────────────────────────────────────────────────────── */
 .page {
   display: flex;
   flex-direction: column;
   gap: 20px;
   min-height: 100%;
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  animation: pageFadeIn 0.35s ease both;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
   .page {
-    gap: 28px;
+    gap: 24px;
+    padding-bottom: 40px;
   }
 }
 
-/* Premium scrollbars */
-.page::-webkit-scrollbar {
-  width: 6px;
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.page::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.page::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.page:hover::-webkit-scrollbar-thumb {
-  background: var(--border);
-}
-
-.page::-webkit-scrollbar-thumb:hover {
-  background: var(--text-3);
-}
-
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
+/* ── Header (Title left, Segmented Switcher right) ───────────────────────── */
 .header {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 20px;
   }
 }
 
 .titleGroup {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  flex-shrink: 0;
 }
 
 .titleGroup h1 {
@@ -60,11 +50,14 @@
   font-weight: 800;
   color: var(--text);
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 @media (min-width: 768px) {
-  .titleGroup h1 { font-size: 26px; }
+  .titleGroup h1 {
+    font-size: 26px;
+  }
 }
 
 .subtitle {
@@ -72,89 +65,154 @@
   font-weight: 500;
   color: var(--text-2);
   margin: 0;
+  max-width: 520px;
+  line-height: 1.4;
 }
 
-/* ── Tabs ────────────────────────────────────────────────────────────────── */
-.tabsContainer {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.tabs {
-  display: flex;
-  background: var(--page);
+/* ── Segmented Tool Switcher (Pill Toolbar) ───────────────────────────────── */
+.tabSwitcher {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
   padding: 4px;
-  border-radius: 12px;
+  border-radius: 16px;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
-.tab {
+@media (max-width: 600px) {
+  .tabSwitcher {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+.toolTabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
   background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  user-select: none;
+  white-space: nowrap;
 }
 
-.tabActive {
+.toolTabBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text);
+}
+
+[data-theme="dark"] .toolTabBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.toolTabBtnActive {
   background: var(--surface);
-  color: var(--primary);
+  border-color: var(--border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.tabDisabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+[data-theme="dark"] .toolTabBtnActive {
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* ── Grid Layout ──────────────────────────────────────────────────────────── */
+.toolTabIconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-2);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.toolTabIconBoxActive {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .toolTabIconBoxActive {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.toolTabTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.toolTabTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.toolTabBtnActive .toolTabTitle {
+  color: var(--primary);
+}
+
+[data-theme="dark"] .toolTabBtnActive .toolTabTitle {
+  color: #60a5fa;
+}
+
+.toolTabSubtitle {
+  display: none;
+}
+
+/* ── 50/50 Split Grid (Form Left, Results Right) ─────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
+  align-items: start;
+  width: 100%;
 }
 
 @media (min-width: 1024px) {
   .grid {
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
     align-items: start;
   }
-  
-  .formCol {
-    grid-column: span 5;
-  }
-  
-  .resultCol {
-    grid-column: span 7;
-  }
 }
 
-/* ── Skeletons ───────────────────────────────────────────────────────────── */
+/* ── Skeletons ────────────────────────────────────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--page) 50%, var(--surface-alt) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--surface-alt) 25%,
+    var(--page) 50%,
+    var(--surface-alt) 75%
+  );
   background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: 12px;
+  animation: shimmer 1.5s infinite;
+  border-radius: 20px;
 }
 
-@keyframes loading {
-  0% { background-position: 200% 0; }
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
 .skeletonCard {
-  height: 380px;
+  height: 420px;
   border-radius: 20px;
-}
-
-.page::after {
-  content: '';
-  display: block;
-  height: 32px;
-  flex-shrink: 0;
-  width: 100%;
 }

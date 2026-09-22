@@ -1,58 +1,62 @@
 import React from 'react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from 'recharts';
 import type { DetalleCuota } from '@/types/tools';
 import styles from './ToolsComponents.module.css';
 
 interface TooltipPayloadItem {
   value: number;
-  payload: {
-    mes: string;
-  };
+  payload: { mes: string; 'Cuota Nominal': number; 'Valor Real': number };
 }
 
 interface CustomTooltipProps {
   active?: boolean;
   payload?: TooltipPayloadItem[];
-  label?: string;
-  formatValue: (value: number) => string;
+  formatValue: (v: number) => string;
   resultado: 'conviene_cuotas' | 'conviene_contado' | 'indiferente';
 }
 
-const CustomTooltip: React.FC<CustomTooltipProps> = ({ 
-  active, 
-  payload, 
-  formatValue, 
-  resultado 
-}) => {
-  if (active && payload && payload.length >= 2) {
-    const getPresentValueClass = () => {
-      if (resultado === 'conviene_cuotas') return styles.tooltipValueCuotas;
-      if (resultado === 'conviene_contado') return styles.tooltipValueContado;
-      return styles.tooltipValueIndiferente;
-    };
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, formatValue, resultado }) => {
+  if (!active || !payload || payload.length < 2) return null;
 
-    return (
-      <div className={styles.chartTooltip}>
-        <p className={styles.tooltipLabel}>{payload[0].payload.mes}</p>
-        <p className={`${styles.tooltipValue} ${styles.tooltipNominal}`}>
-          Nominal: {formatValue(payload[0].value)}
-        </p>
-        <p className={`${styles.tooltipValue} ${getPresentValueClass()}`}>
-          Real a hoy: {formatValue(payload[1].value)}
-        </p>
+  const nominal = payload[0].value;
+  const real = payload[1].value;
+  const diff = Math.abs(nominal - real);
+
+  const realColor =
+    resultado === 'conviene_cuotas'
+      ? 'var(--success)'
+      : resultado === 'conviene_contado'
+      ? 'var(--error)'
+      : 'var(--text-3)';
+
+  return (
+    <div className={styles.chartTooltip}>
+      <p className={styles.tooltipLabel}>{payload[0].payload.mes}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, fontSize: 12 }}>
+          <span style={{ color: 'var(--text-3)' }}>Cuota nominal:</span>
+          <strong style={{ color: 'var(--text)' }}>{formatValue(nominal)}</strong>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, fontSize: 12 }}>
+          <span style={{ color: 'var(--text-3)' }}>Valor real ajustado:</span>
+          <strong style={{ color: realColor }}>{formatValue(real)}</strong>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, fontSize: 12, borderTop: '1px solid var(--border)', paddingTop: 4, marginTop: 2 }}>
+          <span style={{ color: 'var(--text-3)' }}>Diferencia:</span>
+          <strong style={{ color: 'var(--text)' }}>{formatValue(diff)}</strong>
+        </div>
       </div>
-    );
-  }
-  return null;
+    </div>
+  );
 };
 
 interface DetalleCuotasChartProps {
@@ -60,82 +64,63 @@ interface DetalleCuotasChartProps {
   resultado: 'conviene_cuotas' | 'conviene_contado' | 'indiferente';
 }
 
-export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({ 
-  detallePorMes, 
-  resultado 
+export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
+  detallePorMes,
+  resultado,
 }) => {
-
-  // Formateador para pesos argentinos
-  const formatValue = (value: number) => {
-    return new Intl.NumberFormat('es-AR', {
+  const formatValue = (value: number) =>
+    new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(value);
-  };
 
-  // Determinar colores basados en el resultado y el tema
-  const getPresentValueColor = () => {
-    if (resultado === 'conviene_cuotas') {
-      return '#22c55e'; // Verde
-    }
-    if (resultado === 'conviene_contado') {
-      return '#ef4444'; // Rojo/Naranja
-    }
-    return '#8a95a8'; // Gris / Muted
-  };
+  const realBarColor =
+    resultado === 'conviene_cuotas'
+      ? 'var(--success)'
+      : resultado === 'conviene_contado'
+      ? 'var(--error)'
+      : 'var(--text-3)';
 
-  // Convertir los datos a formato plano adecuado para Recharts
-  const chartData = detallePorMes.map(item => ({
+  const nominalBarColor = '#94A3B8';
+
+  const chartData = detallePorMes.map((item) => ({
     mes: `Mes ${item.mes}`,
     'Cuota Nominal': item.cuota_nominal,
-    'Valor Real (A hoy)': item.cuota_valor_presente
+    'Valor Real': item.cuota_valor_presente,
   }));
 
   return (
     <div className={styles.chartContainer}>
-      <h3 className={styles.chartTitle}>Valor real de cada cuota ajustado por inflación</h3>
+      <h3 className={styles.chartTitle}>¿Cómo pierde valor cada cuota con el tiempo?</h3>
       <p className={styles.chartSubtitle}>
-        Las barras coloreadas representan el valor real en pesos de hoy (el poder de compra disminuye)
+        Comparación entre el valor nominal de la cuota y su valor real ajustado por inflación.
       </p>
-      
+
       <div className={styles.chartWrapper}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.06)" />
-            <XAxis 
-              dataKey="mes" 
-              tickLine={false} 
-              axisLine={false} 
-              tick={{ fontSize: 10, fill: 'var(--text-3)' }} 
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -6, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis
+              dataKey="mes"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 11, fill: 'var(--text-3)' }}
             />
-            <YAxis 
-              tickLine={false} 
-              axisLine={false} 
+            <YAxis
+              tickLine={false}
+              axisLine={false}
               tickFormatter={(v) => `$${v.toLocaleString('es-AR')}`}
-              tick={{ fontSize: 9, fill: 'var(--text-3)' }} 
+              tick={{ fontSize: 10, fill: 'var(--text-3)' }}
             />
-            <Tooltip content={<CustomTooltip formatValue={formatValue} resultado={resultado} />} />
-            <Legend 
-              iconSize={10} 
-              iconType="circle"
-              wrapperStyle={{ fontSize: 11, paddingTop: 10 }}
+            <Tooltip
+              content={<CustomTooltip formatValue={formatValue} resultado={resultado} />}
+              cursor={{ fill: 'rgba(0,0,0,0.04)' }}
             />
-            <Bar 
-              dataKey="Cuota Nominal" 
-              fill="#0D2045" 
-              opacity={0.35} 
-              radius={[4, 4, 0, 0]} 
-            />
-            <Bar 
-              dataKey="Valor Real (A hoy)" 
-              fill={getPresentValueColor()} 
-              radius={[4, 4, 0, 0]} 
-            />
+            <Legend iconSize={9} iconType="circle" wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
+            <Bar dataKey="Cuota Nominal" fill={nominalBarColor} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="Valor Real" fill={realBarColor} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -15,35 +15,50 @@ interface CanAffordResultProps {
 interface MetricCardProps {
   label: string;
   value: string;
-  valueClassName?: string;
+  valueClass?: string;
   desc: string;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({
-  label,
-  value,
-  valueClassName = '',
-  desc
-}) => {
-  return (
-    <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-2 min-w-0">
-      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide leading-tight">
-        {label}
-      </span>
-      <span className={`text-xl font-bold text-foreground leading-tight break-words ${valueClassName}`}>
-        {value}
-      </span>
-      <span className="text-xs text-muted-foreground leading-snug">
-        {desc}
-      </span>
-    </div>
-  );
+const MetricCard: React.FC<MetricCardProps> = ({ label, value, valueClass = '', desc }) => (
+  <div className={styles.metricBox}>
+    <span className={styles.metricLabel}>{label}</span>
+    <span className={`${styles.metricValue} ${valueClass}`}>{value}</span>
+    <span className={styles.metricDesc}>{desc}</span>
+  </div>
+);
+
+type Semaforo = 'verde' | 'amarillo' | 'rojo' | 'negro' | 'gris';
+
+const SEM_CONFIG: Record<Semaforo, {
+  bannerClass: string;
+  icon: React.ReactNode;
+}> = {
+  verde: {
+    bannerClass: styles.semVerde,
+    icon: <CheckCircle2 size={22} className={styles.semIcon} />,
+  },
+  amarillo: {
+    bannerClass: styles.semAmarillo,
+    icon: <AlertTriangle size={22} className={styles.semIcon} />,
+  },
+  rojo: {
+    bannerClass: styles.semRojo,
+    icon: <AlertCircle size={22} className={styles.semIcon} />,
+  },
+  negro: {
+    bannerClass: styles.semNegro,
+    icon: <XCircle size={22} className={styles.semIcon} />,
+  },
+  gris: {
+    bannerClass: styles.semGris,
+    icon: <HelpCircle size={22} className={styles.semIcon} />,
+  },
 };
 
 export const CanAffordResult: React.FC<CanAffordResultProps> = ({
   resultado,
   ciclosConHistoria,
-  onReset
+  onReset,
 }) => {
   const {
     modo,
@@ -60,103 +75,45 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
     semaforo,
     mensaje_principal,
     ingreso_promedio_usado,
-    ingreso_es_manual
+    ingreso_es_manual,
   } = resultado;
 
-  const getSemaphoreStyles = () => {
-    switch (semaforo) {
-      case 'verde':
-        return {
-          bg: 'bg-green-50 dark:bg-green-950/30',
-          text: 'text-green-900 dark:text-green-200',
-          descText: 'text-green-600 dark:text-green-500',
-          border: 'border border-green-200 dark:border-green-800',
-          icon: <CheckCircle2 className="w-7 h-7 text-green-600 dark:text-green-400" />
-        };
-      case 'amarillo':
-        return {
-          bg: 'bg-amber-50 dark:bg-amber-950/30',
-          text: 'text-amber-900 dark:text-amber-200',
-          descText: 'text-amber-600 dark:text-amber-500',
-          border: 'border border-amber-200 dark:border-amber-800',
-          icon: <AlertTriangle className="w-7 h-7 text-amber-600 dark:text-amber-400" />
-        };
-      case 'rojo':
-        return {
-          bg: 'bg-red-50 dark:bg-red-950/30',
-          text: 'text-red-900 dark:text-red-200',
-          descText: 'text-red-600 dark:text-red-500',
-          border: 'border border-red-200 dark:border-red-800',
-          icon: <AlertCircle className="w-7 h-7 text-red-600 dark:text-red-400" />
-        };
-      case 'negro':
-        return {
-          bg: 'bg-slate-50 dark:bg-slate-900/60',
-          text: 'text-slate-800 dark:text-slate-200',
-          descText: 'text-slate-500 dark:text-slate-500',
-          border: 'border border-slate-200 dark:border-slate-700',
-          icon: <XCircle className="w-7 h-7 text-slate-500 dark:text-slate-400" />
-        };
-      case 'gris':
-      default:
-        return {
-          bg: 'bg-slate-50 dark:bg-slate-800/40',
-          text: 'text-slate-800 dark:text-slate-200',
-          descText: 'text-slate-500 dark:text-slate-500',
-          border: 'border border-slate-200 dark:border-slate-700/50',
-          icon: <HelpCircle className="w-7 h-7 text-slate-500 dark:text-slate-400" />
-        };
-    }
-  };
+  const sem = SEM_CONFIG[semaforo as Semaforo] ?? SEM_CONFIG.gris;
 
-  const semStyles = getSemaphoreStyles();
+  // Progress bar colour for contado mode
+  const progressClass = (() => {
+    const pct = porcentaje_del_ingreso_mensual ?? 0;
+    if (pct <= 20) return styles.progressGreen;
+    if (pct <= 50) return styles.progressAmbar;
+    return styles.progressRed;
+  })();
 
-  // Progress bar color based on percentage of income (Contado mode)
-  const getProgressBarColor = (pct: number) => {
-    if (pct <= 20) return 'bg-green-500';
-    if (pct <= 50) return 'bg-amber-500';
-    if (pct <= 100) return 'bg-red-500';
-    return 'bg-slate-800 dark:bg-slate-400';
-  };
-
-  // Dynamic Margen Libre color based on its percentage relative to total income
-  const getMargenLibreColor = () => {
-    if (margen_libre_post_compra === null || margen_libre_post_compra === undefined) return 'text-foreground';
-    if (!ingreso_promedio_usado || ingreso_promedio_usado <= 0) return 'text-foreground';
-    
-    if (margen_libre_post_compra > ingreso_promedio_usado * 0.3) {
-      return 'text-green-600 dark:text-green-400';
-    } else if (margen_libre_post_compra > ingreso_promedio_usado * 0.1) {
-      return 'text-amber-600 dark:text-amber-400';
-    } else {
-      return 'text-red-600 dark:text-red-400';
-    }
-  };
+  // Margen libre colour class
+  const margenClass = (() => {
+    if (margen_libre_post_compra === null || margen_libre_post_compra === undefined) return '';
+    if (!ingreso_promedio_usado || ingreso_promedio_usado <= 0) return '';
+    if (margen_libre_post_compra > ingreso_promedio_usado * 0.3) return styles.valueGreen;
+    if (margen_libre_post_compra > ingreso_promedio_usado * 0.1) return '';
+    return styles.valueRed;
+  })();
 
   return (
-    <div className={`${styles.card} animate-fadeIn flex flex-col gap-6`}>
+    <div className={`${styles.card} ${styles.animateFadeIn}`} style={{ gap: 20 }}>
       <h2 className={styles.cardTitle}>Resultado del Análisis</h2>
 
       {/* Semaphore banner */}
-      <div className={`flex items-start gap-4 p-5 rounded-xl border ${semStyles.bg} ${semStyles.border} transition-colors duration-300`}>
-        <div className="flex-shrink-0 mt-0.5">
-          {semStyles.icon}
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <span className={`text-xs font-semibold tracking-wide uppercase ${semStyles.descText}`}>
-            ESTADO DE SALUD FINANCIERA
-          </span>
-          <p className={`text-lg font-bold ${semStyles.text} leading-snug`}>
-            {mensaje_principal}
-          </p>
+      <div className={`${styles.semBanner} ${sem.bannerClass}`}>
+        {sem.icon}
+        <div className={styles.semBody}>
+          <span className={styles.semLabel}>Estado de salud financiera</span>
+          <p className={styles.semTitle}>{mensaje_principal}</p>
         </div>
       </div>
 
-      {/* Metrics Section */}
+      {/* Metrics */}
       {modo === 'contado' ? (
-        <div className="flex flex-col gap-5">
-          {/* Contado Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className={`${styles.metricsGrid} ${styles.metricsGrid3}`} style={{ gridTemplateColumns: undefined }}>
             <MetricCard
               label="Precio de contado"
               value={formatMonto(precio_total, 'ARS')}
@@ -165,7 +122,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
             <MetricCard
               label="Te quedaría"
               value={formatMonto(saldo_restante_post_compra ?? 0, 'ARS')}
-              valueClassName={(saldo_restante_post_compra ?? 0) >= 0 ? '' : 'text-red-600 dark:text-red-400'}
+              valueClass={(saldo_restante_post_compra ?? 0) >= 0 ? '' : styles.valueRed}
               desc="Saldo post-compra"
             />
             <MetricCard
@@ -175,33 +132,29 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
             />
           </div>
 
-          {/* Income progress bar in contado mode */}
           {porcentaje_del_ingreso_mensual !== null && porcentaje_del_ingreso_mensual !== undefined && (
-            <div className="flex flex-col gap-2 mt-2 bg-slate-50 dark:bg-[#161B24] p-5 rounded-xl border border-border">
-              <div className="flex justify-between items-center text-xs font-semibold">
-                <span className="text-muted-foreground">
-                  Equivalencia de ingreso mensual
-                </span>
-                <span className="font-bold text-foreground">
+            <div className={styles.metricBox} style={{ gap: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className={styles.metricLabel}>Equivalencia de ingreso mensual</span>
+                <span className={styles.metricLabel} style={{ color: 'var(--text)' }}>
                   {porcentaje_del_ingreso_mensual.toFixed(1)}%
                 </span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+              <div className={styles.progressTrack}>
                 <div
-                  ref={el => { if (el) el.style.width = `${Math.min(100, porcentaje_del_ingreso_mensual)}%`; }}
-                  className={`h-full ${getProgressBarColor(porcentaje_del_ingreso_mensual)} transition-all duration-500`}
+                  className={`${styles.progressFill} ${progressClass}`}
+                  style={{ width: `${Math.min(100, porcentaje_del_ingreso_mensual)}%` }}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <span className={styles.metricDesc}>
                 Esta compra equivale al {porcentaje_del_ingreso_mensual.toFixed(1)}% de tu ingreso mensual promedio ({formatMonto(ingreso_promedio_usado || 0, 'ARS')}).
-              </p>
+              </span>
             </div>
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
-          {/* Cuotas Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className={`${styles.metricsGrid} ${styles.metricsGrid4}`}>
             <MetricCard
               label="Cuota nueva"
               value={formatMonto(monto_cuota ?? 0, 'ARS')}
@@ -210,7 +163,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
             <MetricCard
               label="Comprometido previo"
               value={formatMonto(carga_mensual_previa ?? 0, 'ARS')}
-              valueClassName="text-muted-foreground"
+              valueClass={styles.valueMuted}
               desc="Cuotas y suscripciones"
             />
             <MetricCard
@@ -220,20 +173,21 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
             />
             <MetricCard
               label="Margen libre"
-              value={margen_libre_post_compra !== null && margen_libre_post_compra !== undefined
-                ? formatMonto(margen_libre_post_compra, 'ARS')
-                : 'N/A'
+              value={
+                margen_libre_post_compra !== null && margen_libre_post_compra !== undefined
+                  ? formatMonto(margen_libre_post_compra, 'ARS')
+                  : 'N/A'
               }
-              valueClassName={getMargenLibreColor()}
+              valueClass={margenClass}
               desc="Sobrante estimado/mes"
             />
           </div>
 
-          {/* Banner de interés total si aplica */}
+          {/* Interés callout */}
           {resultado.tiene_interes && resultado.interes_total !== undefined && resultado.interes_total > 0 && (
-            <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-4 py-3">
-              <Info size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0" />
-              <span className="text-sm text-amber-800 dark:text-amber-300">
+            <div className={styles.interestCallout}>
+              <Info size={16} className={styles.interestCalloutIcon} />
+              <span>
                 Con la TNA de {resultado.tna_usada}%, el costo total financiado es{' '}
                 <strong>{formatMonto(resultado.precio_total_real ?? 0, 'ARS')}</strong>
                 {' '}— pagás{' '}
@@ -243,7 +197,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
             </div>
           )}
 
-          {/* Income Distribution Bar (cuotas mode) */}
+          {/* Distribution bar */}
           {ingreso_promedio_usado !== null && (
             <IncomeDistributionBar
               ingreso={ingreso_promedio_usado}
@@ -256,35 +210,32 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
         </div>
       )}
 
-      {/* Footer Notes */}
-      <div className="flex items-start gap-2 border-t border-border pt-4 mt-2 text-xs text-muted-foreground">
-        <Info size={12} className="mt-0.5 text-muted-foreground flex-shrink-0" />
-        <div className="flex flex-col gap-0.5">
+      {/* Footer */}
+      <div className={styles.footerNote}>
+        <Info size={13} className={styles.footerNoteIcon} />
+        <div>
           <span>
             {ingreso_es_manual
               ? 'Análisis basado en el ingreso que ingresaste manualmente. Registrá tus ingresos en Argentum para un análisis automático.'
               : 'Análisis basado en tu historial real de los últimos 3 ciclos en Argentum.'}
           </span>
           {ciclosConHistoria < 2 && (
-            <span className="text-amber-500 font-semibold mt-0.5">
+            <span className={styles.footerNoteWarn}>
               ⚠️ Tenés poco historial. El análisis se vuelve más preciso con el tiempo.
             </span>
           )}
         </div>
       </div>
 
-      {/* Recalculate Button */}
-      <div className="flex justify-center w-full">
-        <Button 
-          variant="ghost" 
-          onClick={onReset} 
-          type="button" 
-          className="w-full mt-2 text-muted-foreground hover:text-foreground flex items-center justify-center gap-2"
-        >
-          <RotateCcw size={16} />
-          <span>Calcular de nuevo</span>
-        </Button>
-      </div>
+      <Button
+        variant="ghost"
+        onClick={onReset}
+        type="button"
+        fullWidth
+      >
+        <RotateCcw size={15} style={{ marginRight: 6 }} />
+        Calcular de nuevo
+      </Button>
     </div>
   );
 };

@@ -30,3 +30,10 @@ gitleaks-*.json
 /graphify-out/
 /.agents/
 
+# Skills y artefactos de agentes locales
+.claude/skills/
+.agents/skills/
+skills-lock.json
+
+# Skills de agentes locales
+agent/skills/

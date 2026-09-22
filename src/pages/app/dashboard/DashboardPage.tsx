@@ -189,14 +189,17 @@ ListSkeleton.displayName = 'ListSkeleton'
 const COLORES_CATEGORIA: Record<string, string> = {
   'Alimentación':             '#F97316',  // Naranja
   'Indumentaria':             '#7C3AED',  // Violeta
-  'Servicios':                '#EAB308',  // Dorado / Amarillo
-  'Hogar':                    '#8B5CF6',  // Púrpura
+  'Vivienda':                 '#EAB308',  // Dorado / Amarillo
+  'Servicios':                '#EAB308',  // Fallback
+  'Equipamiento del hogar':   '#8B5CF6',  // Púrpura
+  'Hogar':                    '#8B5CF6',  // Fallback
   'Salud':                    '#10B981',  // Esmeralda
   'Transporte':               '#0284C7',  // Azul cielo
   'Comunicación':             '#6366F1',  // Índigo
   'Entretenimiento':          '#EC4899',  // Rosa / Magenta
   'Recreativo':               '#EC4899',  // Fallback
   'Educación':                '#DC2626',  // Rojo
+  'Gastronomía':              '#F59E0B',  // Ámbar
   'Restaurante':              '#F59E0B',  // Ámbar
   'Restaurantes y delivery':  '#F59E0B',  // Fallback
   'Otros':                    '#6B7280',  // Gris neutro

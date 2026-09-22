@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
 import { Button, PageSummaryBar } from '@/components/ui'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import suscripcionService from '@/services/suscripcion.service'
@@ -39,7 +39,6 @@ const SuscripcionesPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedSuscripcion, setSelectedSuscripcion] = useState<Suscripcion | null>(null)
   const [isExiting, setIsExiting] = useState(false)
-  const { showToast } = useToast()
   const { confirm } = useModal()
   
   const internalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -82,13 +81,13 @@ const SuscripcionesPage: React.FC = () => {
         return
       }
       console.error(error)
-      showToast(getErrorMessage(error, 'No pudimos cargar las suscripciones. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(error, 'No pudimos cargar las suscripciones. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
       }
     }
-  }, [showToast])
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -118,15 +117,15 @@ const SuscripcionesPage: React.FC = () => {
     try {
       if (s.estado === 'activa') {
         await suscripcionService.pausarSuscripcion(s.id)
-        showToast('Suscripción pausada', 'success')
+        sileo.success({ title: 'Suscripción pausada' })
       } else {
         await suscripcionService.reactivarSuscripcion(s.id)
-        showToast('Suscripción reactivada', 'success')
+        sileo.success({ title: 'Suscripción reactivada' })
       }
       loadData()
     } catch (error: unknown) {
       console.error(error)
-      showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
     }
   }
 
@@ -139,11 +138,11 @@ const SuscripcionesPage: React.FC = () => {
       onConfirm: async () => {
         try {
           await suscripcionService.deleteSuscripcion(s.id)
-          showToast('Suscripción eliminada', 'success')
+          sileo.success({ title: 'Suscripción eliminada' })
           loadData()
         } catch (error) {
           console.error(error)
-          showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })

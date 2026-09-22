@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
 import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { DateInput } from '@/components/ui'
 import { CATALOGO_SUSCRIPCIONES, CATEGORIAS_CATALOGO } from '@/lib/constants/suscripciones'
@@ -103,7 +103,6 @@ function reducer(state: FormState, action: FormAction): FormState {
 
 const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, suscripcion, onSuccess }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { showToast } = useToast()
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -290,7 +289,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const goNextFromStep2 = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     if (!state.monto) {
-      showToast('Completá los campos obligatorios', 'error')
+      sileo.error({ title: 'Completá los campos obligatorios' })
       return
     }
     dispatch({ type: 'SET_STEP', step: 3, direction: 'forward' })
@@ -305,7 +304,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
   const handleSave = async () => {
     if (!state.monto || !state.nombrePersonalizado.trim()) {
-      showToast('Completá los campos obligatorios', 'error')
+      sileo.error({ title: 'Completá los campos obligatorios' })
       return
     }
 
@@ -325,15 +324,15 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
       if (state.isEdit && suscripcion) {
         await suscripcionService.updateSuscripcion(suscripcion.id, payload)
-        showToast('Suscripción actualizada', 'success')
+        sileo.success({ title: 'Suscripción actualizada' })
       } else {
         await suscripcionService.createSuscripcion(payload)
-        showToast('Suscripción creada', 'success')
+        sileo.success({ title: 'Suscripción creada' })
       }
       onSuccess()
       onClose()
     } catch (error: unknown) {
-      showToast(getErrorMessage(error, 'No pudimos guardar la suscripción. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(error, 'No pudimos guardar la suscripción. Intentá de nuevo.') })
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
     }

@@ -1,6 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import 'sileo/styles.css'
+import './styles/sileo.css'
 import App from './App.tsx'
 import { ModalProvider } from './components/ui/ModalProvider/ModalProvider'
 

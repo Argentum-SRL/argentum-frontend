@@ -12,7 +12,7 @@ import type {
   Categoria
 } from '@/types'
 import { formatMonto } from '@/utils/format'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
@@ -23,7 +23,6 @@ import BudgetHistoryModal from './BudgetHistoryModal'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function PresupuestosPage() {
-  const { showToast } = useToast()
   const { usuario } = useAuth()
   const { open, confirm } = useModal()
   const { lastDataUpdate } = useNotificaciones()
@@ -52,13 +51,13 @@ export default function PresupuestosPage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      showToast(getErrorMessage(err, 'No pudimos cargar los presupuestos. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar los presupuestos. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
       }
     }
-  }, [activeTab, showToast])
+  }, [activeTab])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -135,10 +134,10 @@ export default function PresupuestosPage() {
       onConfirm: async () => {
         try {
           await presupuestoService.pausarPresupuesto(p.id)
-          showToast('Presupuesto pausado', 'success')
+          sileo.success({ title: 'Presupuesto pausado' })
           fetchPresupuestos()
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })
@@ -153,10 +152,10 @@ export default function PresupuestosPage() {
       onConfirm: async () => {
         try {
           await presupuestoService.reanudarPresupuesto(id)
-          showToast('Presupuesto reanudado', 'success')
+          sileo.success({ title: 'Presupuesto reanudado' })
           fetchPresupuestos()
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })
@@ -174,10 +173,10 @@ export default function PresupuestosPage() {
       onConfirm: async () => {
         try {
           await presupuestoService.eliminarPresupuesto(p.id)
-          showToast(isFinalizado ? 'Presupuesto eliminado definitivamente' : 'Presupuesto finalizado', 'success')
+          sileo.success({ title: isFinalizado ? 'Presupuesto eliminado definitivamente' : 'Presupuesto finalizado' })
           fetchPresupuestos()
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })
@@ -191,7 +190,7 @@ export default function PresupuestosPage() {
       const data = await presupuestoService.getHistorial(p.id)
       setHistorial(data)
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'No pudimos cargar el historial. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar el historial. Intentá de nuevo.') })
     } finally {
       setLoadingHistory(false)
     }

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -35,7 +35,6 @@ function formatARS(valor: number | null | undefined): string {
 }
 
 export default function StepMoneda({ datosIniciales, onNext }: Props) {
-  const { showToast } = useToast()
   const { refreshUser } = useAuth()
   const navigate = useNavigate()
   const [moneda, setMoneda] = useState(datosIniciales.moneda_principal ?? 'ARS')
@@ -98,7 +97,7 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
         : "No pudimos guardar tu moneda. Intentá de nuevo."
       const msg = getErrorMessage(err, defaultMsg)
       setError(msg)
-      showToast(msg, "error")
+      sileo.error({ title: msg })
     } finally {
       setLoading(false)
     }

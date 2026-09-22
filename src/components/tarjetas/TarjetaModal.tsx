@@ -5,7 +5,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useAuth } from '@/hooks/useAuth'
 import tarjetaService from '@/services/tarjeta.service'
@@ -139,7 +139,6 @@ function tarjetaReducer(state: TarjetaModalState, action: TarjetaModalAction): T
 export default function TarjetaModal() {
   const { getData, close } = useModal()
   const data = getData('tarjeta')
-  const { showToast } = useToast()
   const { usuario } = useAuth()
   
   const [state, dispatch] = useReducer(tarjetaReducer, initialState)
@@ -227,16 +226,15 @@ export default function TarjetaModal() {
       if (data.tarjeta) {
         const res = await tarjetaService.updateTarjeta(data.tarjeta.id, payload)
         if (res?.cuotas_recalculadas && res.cuotas_recalculadas > 0) {
-          showToast(
-            `Tarjeta actualizada. Se recalcularon las fechas de ${res.cuotas_recalculadas} ${res.cuotas_recalculadas === 1 ? 'cuota futura' : 'cuotas futuras'}.`,
-            'success'
-          )
+          sileo.success({
+            title: `Tarjeta actualizada. Se recalcularon las fechas de ${res.cuotas_recalculadas} ${res.cuotas_recalculadas === 1 ? 'cuota futura' : 'cuotas futuras'}.`
+          })
         } else {
-          showToast('Tarjeta actualizada', 'success')
+          sileo.success({ title: 'Tarjeta actualizada' })
         }
       } else {
         await tarjetaService.createTarjeta(payload)
-        showToast('Tarjeta guardada', 'success')
+        sileo.success({ title: 'Tarjeta guardada' })
       }
 
       data.onSuccess()

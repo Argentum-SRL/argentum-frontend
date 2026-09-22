@@ -5,14 +5,13 @@ import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import { Field, Button } from '@/components/ui'
 import { validarResetToken, confirmarResetPassword } from '@/services/auth.service'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from './ResetPasswordPage.module.css'
 
 
 export default function ResetPasswordPage() {
-  const { showToast } = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') || ''
@@ -77,7 +76,7 @@ export default function ResetPasswordPage() {
 
     try {
       await confirmarResetPassword(token, nuevaPassword)
-      showToast('¡Listo! Tu contraseña se actualizó. Ya podés iniciar sesión con la nueva.', 'success')
+      sileo.success({ title: '¡Listo! Tu contraseña se actualizó. Ya podés iniciar sesión con la nueva.' })
       setStatus('confirmado')
       setTimeout(() => {
         navigate('/login', {
@@ -94,7 +93,7 @@ export default function ResetPasswordPage() {
       } else {
         const msg = getErrorMessage(err, "No pudimos cambiar tu contraseña. El enlace puede haber expirado — pedí uno nuevo.")
         setApiError(msg)
-        showToast(msg, "error")
+        sileo.error({ title: msg })
       }
     } finally {
       setLoading(false)

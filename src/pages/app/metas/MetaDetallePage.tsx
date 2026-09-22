@@ -18,7 +18,7 @@ import billeteraService from '@/services/billetera.service'
 import type { Goal, GoalAnalytics as IGoalAnalytics } from '@/types/goals'
 import type { Billetera } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { Button } from '@/components/ui'
@@ -35,7 +35,6 @@ import {
 export default function MetaDetallePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { showToast } = useToast()
   const { open, confirm } = useModal()
 
   const [goal, setGoal] = useState<Goal | null>(null)
@@ -80,14 +79,14 @@ export default function MetaDetallePage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      showToast(getErrorMessage(err, 'No pudimos cargar el detalle de la meta. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar el detalle de la meta. Intentá de nuevo.') })
       navigate('/app/metas')
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
       }
     }
-  }, [id, navigate, showToast])
+  }, [id, navigate])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -125,7 +124,7 @@ export default function MetaDetallePage() {
     if (!goal) return
     
     if (goal.monto_actual > 0) {
-      showToast('No podés eliminar una meta que aún tiene fondos. Retirá el dinero primero.', 'info')
+      sileo.info({ title: 'No podés eliminar una meta que aún tiene fondos. Retirá el dinero primero.' })
       return
     }
 
@@ -137,10 +136,10 @@ export default function MetaDetallePage() {
       onConfirm: async () => {
         try {
           await goalsService.deleteGoal(goal.id)
-          showToast('La meta se eliminó.', 'success')
+          sileo.success({ title: 'La meta se eliminó.' })
           navigate('/app/metas')
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })
@@ -157,10 +156,10 @@ export default function MetaDetallePage() {
       onConfirm: async () => {
         try {
           await goalsService.deleteMovement(goal.id, movementId)
-          showToast('El movimiento se eliminó.', 'success')
+          sileo.success({ title: 'El movimiento se eliminó.' })
           void fetchData()
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos eliminar el movimiento. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar el movimiento. Intentá de nuevo.') })
         }
       }
     })

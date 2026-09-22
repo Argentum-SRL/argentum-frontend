@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { guardarDatosPersonales } from '@/services/onboarding.service'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepDatosPersonales.module.css'
 import { DateInput, SelectInput, Field, Button, type SelectOption } from '@/components/ui'
@@ -24,7 +24,6 @@ interface Props {
 }
 
 export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
-  const { showToast } = useToast()
   const [nombre, setNombre] = useState(datosIniciales.nombre ?? '')
   const [apellido, setApellido] = useState(datosIniciales.apellido ?? '')
   const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales.fecha_nacimiento ?? '')
@@ -82,7 +81,7 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
     } catch (err: unknown) {
       const msg = getErrorMessage(err, "No pudimos guardar tus datos. Intentá de nuevo.")
       setError(msg)
-      showToast(msg, "error")
+      sileo.error({ title: msg })
     } finally {
       setLoading(false)
     }

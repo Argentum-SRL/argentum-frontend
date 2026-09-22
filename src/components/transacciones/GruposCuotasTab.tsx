@@ -18,7 +18,7 @@ import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
 import type { GrupoCuotasResumen, GrupoCuotasUpdate, Billetera, Categoria, Subcategoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -76,7 +76,6 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const [billeteraSeleccionada, setBilleteraSeleccionada] = useState<string>('')
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
 
-  const { showToast } = useToast()
   const { confirm } = useModal()
   const { lastDataUpdate } = useNotificaciones()
 
@@ -91,11 +90,11 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       setGrupos(data)
     } catch (e) {
       console.error(e)
-      showToast(getErrorMessage(e, 'No pudimos cargar los grupos de cuotas. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(e, 'No pudimos cargar los grupos de cuotas. Intentá de nuevo.') })
     } finally {
       setLoading(false)
     }
-  }, [showToast])
+  }, [])
 
   const fetchBilleteras = useCallback(async () => {
     try {
@@ -301,13 +300,13 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       onConfirm: async () => {
         try {
           await grupoCuotasService.cancelarGrupo(grupo.id)
-          showToast('Compra en cuotas cancelada', 'success')
+          sileo.success({ title: 'Compra en cuotas cancelada' })
           setSelectedGrupo(null)
           fetchGrupos()
           onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
-          showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })
@@ -330,13 +329,13 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         setSaving(true)
         try {
           await grupoCuotasService.prepagarGrupo(grupoPrepago.id, billeteraSeleccionada)
-          showToast('¡Listo! Las cuotas restantes se saldaron.', 'success')
+          sileo.success({ title: '¡Listo! Las cuotas restantes se saldaron.' })
           setGrupoPrepago(null)
           fetchGrupos()
           onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
-          showToast(getErrorMessage(e, 'No pudimos saldar las cuotas. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(e, 'No pudimos saldar las cuotas. Intentá de nuevo.') })
         } finally {
           setSaving(false)
         }
@@ -349,7 +348,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     if (!editingGrupo) return
 
     if (editMonto === null || editMonto <= 0) {
-      showToast('Ingresá un monto total válido', 'error')
+      sileo.error({ title: 'Ingresá un monto total válido' })
       return
     }
 
@@ -376,13 +375,13 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         }
 
         await grupoCuotasService.updateGrupoCuotas(editingGrupo.id, payload)
-        showToast('Compra en cuotas actualizada', 'success')
+        sileo.success({ title: 'Compra en cuotas actualizada' })
         setEditingGrupo(null)
         fetchGrupos()
         onRefreshNeeded?.()
       } catch (e: unknown) {
         console.error(e)
-        showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+        sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
       } finally {
         setSaving(false)
       }
@@ -412,13 +411,13 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       onConfirm: async () => {
         try {
           await grupoCuotasService.deleteGrupoCuotas(id)
-          showToast('Compra en cuotas eliminada', 'success')
+          sileo.success({ title: 'Compra en cuotas eliminada' })
           setSelectedGrupo(null)
           fetchGrupos()
           onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
-          showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })

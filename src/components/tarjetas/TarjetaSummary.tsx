@@ -4,7 +4,7 @@ import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, Categoria
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import { useModal } from '@/hooks/useModal'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatMonto } from '@/utils/format'
 import { EmptyState } from '@/components/ui'
@@ -86,7 +86,6 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
   const [payingTicket, setPayingTicket] = useState<TicketData | null>(null)
   const [payingMoneda, setPayingMoneda] = useState<'ARS' | 'USD'>('ARS')
   const { open, confirm } = useModal()
-  const { showToast } = useToast()
 
   const handleOpenPagarModal = (ticket: TicketData, moneda: 'ARS' | 'USD' = 'ARS') => {
     setPayingTicket(ticket)
@@ -102,13 +101,13 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
         ...payload,
         fecha_resumen: payingTicket.vencimiento
       })
-      showToast('Pago de resumen registrado con éxito', 'success')
+      sileo.success({ title: 'Pago de resumen registrado con éxito' })
       setIsPagarModalOpen(false)
       fetchResumen()
       if (onRefresh) onRefresh()
     } catch (err: unknown) {
       console.error(err)
-      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
     } finally {
       setIsPaying(false)
     }
@@ -250,7 +249,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
         }
       })
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
     }
   }
 
@@ -263,11 +262,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(cuota.id)
-          showToast('Transacción eliminada correctamente', 'success')
+          sileo.success({ title: 'Transacción eliminada correctamente' })
           fetchResumen()
           if (onRefresh) onRefresh()
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })

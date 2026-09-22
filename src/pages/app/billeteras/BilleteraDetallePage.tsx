@@ -7,7 +7,7 @@ import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import categoriaService from '@/services/categoria.service'
 import { EmptyState } from '@/components/ui'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
@@ -26,7 +26,6 @@ const BilleteraDetallePage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { showToast } = useToast()
   const { open, confirm } = useModal()
 
   const [billetera, setBilletera] = useState<Billetera | null>(null)
@@ -112,7 +111,7 @@ const BilleteraDetallePage: React.FC = () => {
           return
         }
         console.error(error)
-        showToast('Billetera no encontrada', 'error')
+        sileo.error({ title: 'Billetera no encontrada' })
         navigate('/app/billeteras')
       } finally {
         if (!controller.signal.aborted) {
@@ -124,7 +123,7 @@ const BilleteraDetallePage: React.FC = () => {
     return () => {
       controller.abort()
     }
-  }, [id, navigate, showToast])
+  }, [id, navigate])
 
   // Cargar datos según el tab activo
   useEffect(() => {
@@ -160,7 +159,7 @@ const BilleteraDetallePage: React.FC = () => {
           return
         }
         console.error(error)
-        showToast('Error al cargar datos', 'error')
+        sileo.error({ title: 'Error al cargar datos' })
       } finally {
         if (!controller.signal.aborted) {
           setLoadingData(false)
@@ -173,7 +172,7 @@ const BilleteraDetallePage: React.FC = () => {
       controller.abort()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, billetera?.id, showToast, checkUrlParams])
+  }, [id, billetera?.id, checkUrlParams])
 
   // Agrupar movimientos por día
   const groupedMovimientos = useMemo(() => {
@@ -232,15 +231,15 @@ const BilleteraDetallePage: React.FC = () => {
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(txId)
-          showToast('Transacción eliminada', 'success')
+          sileo.success({ title: 'Transacción eliminada' })
           refreshData()
         } catch (e) {
           console.error(e)
-          showToast('Error al eliminar la transacción', 'error')
+          sileo.error({ title: 'Error al eliminar la transacción' })
         }
       },
     })
-  }, [movimientos, confirm, showToast, refreshData])
+  }, [movimientos, confirm, refreshData])
 
   const loadTarjetas = async () => {
     if (!id) return
@@ -261,7 +260,7 @@ const BilleteraDetallePage: React.FC = () => {
       })
     } catch (error: unknown) {
       console.error(error)
-      showToast('Error al cargar billeteras', 'error')
+      sileo.error({ title: 'Error al cargar billeteras' })
     }
   }
 
@@ -277,7 +276,7 @@ const BilleteraDetallePage: React.FC = () => {
       })
     } catch (error: unknown) {
       console.error(error)
-      showToast('Error al cargar billeteras', 'error')
+      sileo.error({ title: 'Error al cargar billeteras' })
     }
   }
 
@@ -290,12 +289,12 @@ const BilleteraDetallePage: React.FC = () => {
       onConfirm: async () => {
         try {
           await tarjetaService.archivarTarjeta(tarjeta.id)
-          showToast('Tarjeta archivada', 'success')
+          sileo.success({ title: 'Tarjeta archivada' })
           const data = await tarjetaService.getTarjetasPorBilletera(id!)
           setTarjetas(data)
         } catch (err: unknown) {
           const error = err as { response?: { data?: { detail?: string } } }
-          showToast(error.response?.data?.detail || 'Error al archivar', 'error')
+          sileo.error({ title: error.response?.data?.detail || 'Error al archivar' })
         }
       }
     })
@@ -310,11 +309,11 @@ const BilleteraDetallePage: React.FC = () => {
       onConfirm: async () => {
         try {
           await tarjetaService.deleteTarjeta(tarjeta.id)
-          showToast('Tarjeta eliminada', 'success')
+          sileo.success({ title: 'Tarjeta eliminada' })
           setTarjetas(tarjetas.filter(t => t.id !== tarjeta.id))
         } catch (err: unknown) {
           const error = err as { response?: { data?: { detail?: string } } }
-          showToast(error.response?.data?.detail || 'No se puede eliminar una tarjeta con transacciones', 'error')
+          sileo.error({ title: error.response?.data?.detail || 'No se puede eliminar una tarjeta con transacciones' })
         }
       }
     })

@@ -21,7 +21,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { useModal } from '@/hooks/useModal'
 import { triggerBienvenidaFinancieraOnce, resetBienvenidaTriggerState } from '@/utils/bienvenidaFinancieraManager'
@@ -396,7 +396,6 @@ AppleCalendarIcon.displayName = 'AppleCalendarIcon'
 
 export default function DashboardPage() {
   const { usuario } = useAuth()
-  const { showToast } = useToast()
   const { lastDataUpdate } = useNotificaciones()
   const navigate = useNavigate()
   const [data, setData] = useState<DashboardResumen | null>(null)
@@ -530,13 +529,13 @@ export default function DashboardPage() {
       }
       console.error('Error loading dashboard:', err)
       setError(true)
-      showToast(getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
       }
     }
-  }, [billeterasSeleccionadas, showToast])
+  }, [billeterasSeleccionadas])
 
   const handleToggleBilletera = useCallback((id: string | null) => {
     const next = id === null
@@ -576,13 +575,13 @@ export default function DashboardPage() {
         return
       }
       console.error('Error loading proyeccion:', err)
-      showToast(getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
         setLoadingProyeccion(false)
       }
     }
-  }, [showToast])
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -641,7 +640,7 @@ export default function DashboardPage() {
           return
         }
         console.error('Error fetching subcategories:', err)
-        showToast('No pudimos cargar el detalle de subcategorías.', 'error')
+        sileo.error({ title: 'No pudimos cargar el detalle de subcategorías.' })
       } finally {
         setLoadingSubcategorias(false)
       }
@@ -652,7 +651,7 @@ export default function DashboardPage() {
     return () => {
       controller.abort()
     }
-  }, [selectedCategoria, billeterasSeleccionadas, showToast])
+  }, [selectedCategoria, billeterasSeleccionadas])
 
   const handleRetry = useCallback(() => {
     setLoading(true)

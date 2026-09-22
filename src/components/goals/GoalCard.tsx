@@ -10,7 +10,7 @@ import {
   Play
 } from 'lucide-react'
 import goalsService from '@/services/goals.service'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
@@ -26,7 +26,6 @@ interface GoalCardProps {
 }
 
 export default function GoalCard({ goal, onEdit, onContribute, onDetails, onRefresh }: GoalCardProps) {
-  const { showToast } = useToast()
   const porcentaje = goal.monto_objetivo > 0 ? (goal.monto_actual / goal.monto_objetivo) * 100 : 0
   const barRef = useRef<HTMLDivElement>(null)
   const percentRef = useRef<HTMLSpanElement>(null)
@@ -58,10 +57,10 @@ export default function GoalCard({ goal, onEdit, onContribute, onDetails, onRefr
     const nuevoEstado = goal.estado === EstadoMeta.ACTIVA ? EstadoMeta.PAUSADA : EstadoMeta.ACTIVA
     try {
       await goalsService.updateGoal(goal.id, { estado: nuevoEstado })
-      showToast(`Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}`, 'success')
+      sileo.success({ title: `Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}` })
       onRefresh?.()
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'Error al cambiar el estado'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'Error al cambiar el estado') })
     }
   }
 

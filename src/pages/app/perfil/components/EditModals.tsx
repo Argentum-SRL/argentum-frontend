@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Save, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import type { Usuario } from '@/types'
 import usuarioService from '@/services/usuario.service'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { Modal, DateInput, SelectInput, type SelectOption } from '@/components/ui'
 import styles from '../PerfilPage.module.css'
@@ -29,7 +29,6 @@ const DatosPersonalesForm: React.FC<{
   onClose: () => void
   updateUsuario: (u: Usuario) => void
 }> = ({ usuario, onClose, updateUsuario }) => {
-  const { showToast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
@@ -101,12 +100,12 @@ const DatosPersonalesForm: React.FC<{
         sexo: formDatos.sexo || null,
       })
       updateUsuario(updated)
-      showToast('Datos personales actualizados correctamente', 'success')
+      sileo.success({ title: 'Datos personales actualizados correctamente' })
       onClose()
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No se pudieron actualizar los datos personales.')
       setErrorMsg(msg)
-      showToast(msg, 'error')
+      sileo.error({ title: msg })
     } finally {
       setIsSaving(false)
     }
@@ -215,7 +214,6 @@ const EmailForm: React.FC<{
   updateUsuario: (u: Usuario) => void
 }> = ({ usuario, onClose, updateUsuario }) => {
   const navigate = useNavigate()
-  const { showToast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
@@ -259,7 +257,7 @@ const EmailForm: React.FC<{
       if (usuario) {
         updateUsuario({ ...usuario, email: emailLimpio, email_verificado: false })
       }
-      showToast(res.confirmacion || 'Correo actualizado. Se envió un código de verificación.', 'success')
+      sileo.success({ title: res.confirmacion || 'Correo actualizado. Se envió un código de verificación.' })
       onClose()
       if (res.requiere_verificacion_email) {
         navigate('/auth/verificar-email', { state: { email: emailLimpio } })
@@ -267,7 +265,7 @@ const EmailForm: React.FC<{
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No se pudo actualizar el correo. Verificá los datos.')
       setErrorMsg(msg)
-      showToast(msg, 'error')
+      sileo.error({ title: msg })
     } finally {
       setIsSaving(false)
     }

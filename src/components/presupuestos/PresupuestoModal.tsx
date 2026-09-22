@@ -18,7 +18,7 @@ import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './PresupuestoModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
 
@@ -97,7 +97,6 @@ export default function PresupuestoModal({
   open, onClose, presupuesto, categorias, onSuccess
 }: PresupuestoModalProps) {
   const isEdit = !!presupuesto
-  const { showToast } = useToast()
   const { usuario } = useAuth()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const [animClass, setAnimClass] = useState('')
@@ -283,10 +282,10 @@ export default function PresupuestoModal({
 
       if (isEdit) {
         await presupuestoService.updatePresupuesto(presupuesto!.id, payload)
-        showToast('Presupuesto actualizado', 'success')
+        sileo.success({ title: 'Presupuesto actualizado' })
       } else {
         await presupuestoService.createPresupuesto(payload)
-        showToast('Presupuesto creado', 'success')
+        sileo.success({ title: 'Presupuesto creado' })
       }
       onSuccess()
       onClose()

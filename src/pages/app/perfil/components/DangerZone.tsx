@@ -2,7 +2,7 @@ import React from 'react'
 import { Trash2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from '../PerfilPage.module.css'
@@ -10,7 +10,6 @@ import styles from '../PerfilPage.module.css'
 export const DangerZone: React.FC = () => {
   const { logout } = useAuth()
   const { confirm } = useModal()
-  const { showToast } = useToast()
 
   const handleDeleteAccount = () => {
     confirm({
@@ -23,11 +22,11 @@ export const DangerZone: React.FC = () => {
       onConfirm: async () => {
         try {
           await usuarioService.eliminarCuenta()
-          showToast('Tu cuenta ha sido eliminada exitosamente.', 'success')
+          sileo.success({ title: 'Tu cuenta ha sido eliminada exitosamente.' })
           await logout()
         } catch (error) {
           console.error('Error al eliminar la cuenta:', error)
-          showToast(getErrorMessage(error, 'Hubo un error al intentar eliminar la cuenta.'), 'error')
+          sileo.error({ title: getErrorMessage(error, 'Hubo un error al intentar eliminar la cuenta.') })
         }
       },
     })

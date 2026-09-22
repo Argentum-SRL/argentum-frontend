@@ -1,0 +1,109 @@
+/* ==========================================================================
+   Sileo Toast Theme & Adaptations for Argentum
+   Identidad visual: sobria, elegante, sin animaciones estridentes.
+   ========================================================================== */
+
+:root {
+  /* Duración y animación contenida (sin bounce excesivo) */
+  --sileo-duration: 320ms;
+  --sileo-spring-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --sileo-height: 42px;
+  --sileo-width: 360px;
+
+  /* Estados semánticos mapeados a la paleta de Argentum */
+  --sileo-state-success: var(--success);
+  --sileo-state-error: var(--error);
+  --sileo-state-warning: var(--gold);
+  --sileo-state-info: var(--primary);
+  --sileo-state-action: var(--primary);
+  --sileo-state-loading: var(--silver);
+}
+
+/* Contenedor del Viewport */
+[data-sileo-viewport] {
+  z-index: 99999 !important;
+  pointer-events: none !important;
+}
+
+/* Toast container & border radius moderado */
+[data-sileo-toast] {
+  font-family: inherit;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.12));
+}
+
+[data-theme="dark"] [data-sileo-toast] {
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.45));
+}
+
+/* SVG Canvas background & borders alineados con el tema */
+[data-sileo-svg] rect {
+  fill: var(--surface) !important;
+  stroke: var(--surface-alt) !important;
+  stroke-width: 1px !important;
+}
+
+[data-theme="dark"] [data-sileo-svg] rect {
+  stroke: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Tipografía y textos acordes a Argentum */
+[data-sileo-title] {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none !important;
+  color: var(--text) !important;
+}
+
+[data-sileo-description] {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--text-2) !important;
+}
+
+[data-sileo-button] {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.75rem;
+  border-radius: 8px !important;
+}
+
+/* --------------------------------------------------------------------------
+   Posicionamiento Responsive
+   - Mobile: top-center con safe-area-inset-top para evitar notches / status bars
+   - Desktop: bottom-right (32px offset)
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  [data-sileo-viewport] {
+    top: calc(44px + env(safe-area-inset-top, 0px)) !important;
+    bottom: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    align-items: center !important;
+    flex-direction: column-reverse !important;
+    width: 100% !important;
+    max-width: min(360px, calc(100vw - 32px)) !important;
+    padding: 0 !important;
+    gap: 8px !important;
+    z-index: 99999 !important;
+  }
+}
+
+@media (min-width: 768px) {
+  [data-sileo-viewport] {
+    top: auto !important;
+    bottom: 32px !important;
+    right: 32px !important;
+    left: auto !important;
+    transform: none !important;
+    align-items: flex-end !important;
+    flex-direction: column !important;
+    max-width: 380px !important;
+    padding: 0 !important;
+    gap: 8px !important;
+  }
+}

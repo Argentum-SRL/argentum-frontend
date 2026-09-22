@@ -13,7 +13,7 @@ import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 
@@ -26,7 +26,6 @@ const PAGE_SIZE = 50
 
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
-  const { showToast } = useToast()
   const { periodo: periodoActual, loading: loadingPeriodo } = usePeriodoActual()
   const { lastDataUpdate } = useNotificaciones()
 
@@ -111,9 +110,9 @@ export default function TransaccionesPage() {
         return
       }
       console.error(err)
-      showToast(getErrorMessage(err, 'No pudimos cargar las transacciones. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar las transacciones. Intentá de nuevo.') })
     }
-  }, [filters, showToast])
+  }, [filters])
 
   // Carga de siguientes páginas (scroll infinito)
   const loadMore = useCallback(async () => {
@@ -138,11 +137,11 @@ export default function TransaccionesPage() {
         return
       }
       console.error(err)
-      showToast(getErrorMessage(err, 'No pudimos cargar más transacciones.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar más transacciones.') })
     } finally {
       setLoadingMore(false)
     }
-  }, [loading, loadingPeriodo, loadingMore, hasMore, filters, transacciones.length, showToast])
+  }, [loading, loadingPeriodo, loadingMore, hasMore, filters, transacciones.length])
 
   const fetchPendientes = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -315,11 +314,11 @@ export default function TransaccionesPage() {
         onConfirm: async () => {
           try {
             await transaccionService.deleteCuotaIndividual(id)
-            showToast('La cuota se eliminó correctamente.', 'success')
+            sileo.success({ title: 'La cuota se eliminó correctamente.' })
             refresh()
           } catch (e) {
             console.error(e)
-            showToast(getErrorMessage(e, 'No pudimos eliminar la cuota. Intentá de nuevo.'), 'error')
+            sileo.error({ title: getErrorMessage(e, 'No pudimos eliminar la cuota. Intentá de nuevo.') })
           }
         },
       })
@@ -334,15 +333,15 @@ export default function TransaccionesPage() {
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(id)
-          showToast('La transacción se eliminó.', 'success')
+          sileo.success({ title: 'La transacción se eliminó.' })
           refresh()
         } catch (e) {
           console.error(e)
-          showToast(getErrorMessage(e, 'No pudimos eliminar la transacción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(e, 'No pudimos eliminar la transacción. Intentá de nuevo.') })
         }
       },
     })
-  }, [transacciones, pendientesIA, confirm, refresh, showToast])
+  }, [transacciones, pendientesIA, confirm, refresh])
 
   const openNewTransaccion = useCallback(() => {
     open('transaccion', {

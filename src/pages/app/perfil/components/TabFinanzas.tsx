@@ -4,7 +4,7 @@ import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { getCotizaciones, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { invalidateDashboardCache } from '@/services/dashboard.service'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { SelectInput, type SelectOption } from '@/components/ui'
 import styles from '../PerfilPage.module.css'
@@ -45,8 +45,6 @@ function formatARS(valor: number | null | undefined): string {
 }
 
 export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario }) => {
-  const { showToast } = useToast()
-
   // Currency form
   const [monedaPrincipal, setMonedaPrincipal] = useState<'ARS' | 'USD'>(
     (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
@@ -129,7 +127,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     e.preventDefault()
     if (monedaPrincipal === 'USD' || monedaSecundariaActiva) {
       if (!tipoDolar) {
-        showToast('Debés seleccionar una cotización de referencia para el dólar.', 'error')
+        sileo.error({ title: 'Debés seleccionar una cotización de referencia para el dólar.' })
         return
       }
     }
@@ -143,9 +141,9 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
       })
       invalidateDashboardCache()
       updateUsuario(updated)
-      showToast('Preferencias de moneda actualizadas correctamente', 'success')
+      sileo.success({ title: 'Preferencias de moneda actualizadas correctamente' })
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'No se pudo actualizar la configuración de moneda.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar la configuración de moneda.') })
     } finally {
       setIsSavingMoneda(false)
     }
@@ -156,12 +154,12 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     if (cicloTipo === 'dia_fijo') {
       const diaNum = parseInt(cicloValor, 10)
       if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
-        showToast('El día de corte debe ser un número entero entre 1 y 31.', 'error')
+        sileo.error({ title: 'El día de corte debe ser un número entero entre 1 y 31.' })
         return
       }
     } else if (cicloTipo === 'regla') {
       if (!cicloValor || !OPCIONES_REGLA_CICLO.some((r) => r.value === cicloValor && r.value !== '')) {
-        showToast('Seleccioná una regla de corte válida.', 'error')
+        sileo.error({ title: 'Seleccioná una regla de corte válida.' })
         return
       }
     }
@@ -175,9 +173,9 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
       })
       invalidateDashboardCache()
       updateUsuario(updated)
-      showToast('Ciclo contable actualizado correctamente', 'success')
+      sileo.success({ title: 'Ciclo contable actualizado correctamente' })
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'No se pudo actualizar el ciclo contable.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el ciclo contable.') })
     } finally {
       setIsSavingCiclo(false)
     }

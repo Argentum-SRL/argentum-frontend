@@ -13,7 +13,7 @@ import { EstadoMeta } from '@/types/goals'
 import goalsService from '@/services/goals.service'
 import styles from './GoalModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { DateInput, ColorPicker } from '@/components/ui'
 import { getErrorMessage } from '@/utils/errorMessages'
 
@@ -88,7 +88,6 @@ export default function GoalModal({
   open, onClose, goal, onSuccess
 }: GoalModalProps) {
   const isEdit = !!goal
-  const { showToast } = useToast()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const [animClass, setAnimClass] = useState('')
 
@@ -173,10 +172,10 @@ export default function GoalModal({
 
       if (isEdit) {
         await goalsService.updateGoal(goal!.id, payload)
-        showToast('Meta actualizada', 'success')
+        sileo.success({ title: 'Meta actualizada' })
       } else {
         await goalsService.createGoal(payload)
-        showToast('Meta creada', 'success')
+        sileo.success({ title: 'Meta creada' })
       }
       onSuccess()
       onClose()

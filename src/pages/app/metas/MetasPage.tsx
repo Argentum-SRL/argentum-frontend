@@ -11,7 +11,7 @@ import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
 import type { Billetera } from '@/types'
 import { formatMonto } from '@/utils/format'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import GoalCard from '@/components/goals/GoalCard'
@@ -19,7 +19,6 @@ import GoalsBarChart from './GoalsBarChart'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function MetasPage() {
-  const { showToast } = useToast()
   const { open, confirm } = useModal()
   const navigate = useNavigate()
 
@@ -38,13 +37,13 @@ export default function MetasPage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      showToast(getErrorMessage(err, 'No pudimos cargar las metas. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar las metas. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
       }
     }
-  }, [showToast])
+  }, [])
 
   const fetchBilleteras = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -137,16 +136,16 @@ export default function MetasPage() {
     const nuevoEstado = g.estado === EstadoMeta.ACTIVA ? EstadoMeta.PAUSADA : EstadoMeta.ACTIVA
     try {
       await goalsService.updateGoal(g.id, { estado: nuevoEstado })
-      showToast(`Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}`, 'success')
+      sileo.success({ title: `Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}` })
       void fetchAll()
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'Error al cambiar el estado'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'Error al cambiar el estado') })
     }
-  }, [fetchAll, showToast])
+  }, [fetchAll])
 
   const handleDelete = useCallback((g: Goal) => {
     if (g.monto_actual > 0) {
-      showToast('No podés eliminar una meta que aún tiene fondos. Retirá el dinero primero.', 'info')
+      sileo.info({ title: 'No podés eliminar una meta que aún tiene fondos. Retirá el dinero primero.' })
       return
     }
 
@@ -158,14 +157,14 @@ export default function MetasPage() {
       onConfirm: async () => {
         try {
           await goalsService.deleteGoal(g.id)
-          showToast('Meta eliminada', 'success')
+          sileo.success({ title: 'Meta eliminada' })
           void fetchAll()
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'Error al eliminar la meta'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'Error al eliminar la meta') })
         }
       }
     })
-  }, [confirm, fetchAll, showToast])
+  }, [confirm, fetchAll])
 
   return (
     <div className={styles.page}>

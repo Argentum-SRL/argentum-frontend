@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth'
 import adminService from '@/services/adminService'
 import type { UsuarioAdminResumen, UsuarioAdmin, FiltrosAdmin, AdminStats } from '@/types/admin'
 import { Button, EmptyState, SelectInput } from '@/components/ui'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import {
   Search,
@@ -62,7 +62,6 @@ function TableAvatar({ fotoUrl, nombre }: { fotoUrl: string | null; nombre: stri
 
 export default function AdminPage() {
   const { usuario: currentAdmin } = useAuth()
-  const { showToast } = useToast()
   
   // Tab activa
   const [activeTab, setActiveTab] = useState<'usuarios' | 'wpp' | 'scheduler'>('usuarios')
@@ -296,7 +295,7 @@ export default function AdminPage() {
         case 'eliminar': {
           const targetEmail = (confirmAction.expectedEmail || '').trim().toLowerCase()
           if (!emailConfirmInput.trim() || emailConfirmInput.trim().toLowerCase() !== targetEmail) {
-            showToast('El email ingresado no coincide con el email de confirmación.', 'error')
+            sileo.error({ title: 'El email ingresado no coincide con el email de confirmación.' })
             setActionLoading(false)
             return
           }
@@ -318,7 +317,7 @@ export default function AdminPage() {
       fetchUsuarios()
       fetchStats()
     } catch (err) {
-      showToast(getErrorMessage(err, "No pudimos completar la acción. Intentá de nuevo."), "error")
+      sileo.error({ title: getErrorMessage(err, "No pudimos completar la acción. Intentá de nuevo.") })
     } finally {
       setActionLoading(false)
     }

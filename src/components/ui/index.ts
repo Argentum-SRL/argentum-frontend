@@ -3,7 +3,6 @@ import Drawer from './Drawer/Drawer.tsx'
 import Field from './Field/Field.tsx'
 import MontoInput from './MontoInput/MontoInput.tsx'
 import Modal from './Modal/Modal.tsx'
-import { Toast } from './Toast/Toast.tsx'
 import { Input } from './Input/Input.tsx'
 import EmptyState from './EmptyState/EmptyState.tsx'
 import PageSummaryBar from './PageSummaryBar'
@@ -22,7 +21,6 @@ export {
   Field, 
   MontoInput, 
   Modal, 
-  Toast, 
   Input, 
   EmptyState, 
   PageSummaryBar, 
@@ -52,4 +50,4 @@ export {
   type AtmosphericLoadingProps,
 } from './AtmosphericBackground/AtmosphericBackground'
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle/ThemeToggle'
-
+export { SileoToaster } from './SileoToaster/SileoToaster'

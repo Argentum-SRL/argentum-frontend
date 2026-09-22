@@ -6,7 +6,7 @@ import { Field, Button } from '@/components/ui'
 import { verificarCodigoEmail, enviarCodigoEmail } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './VerificarEmail.module.css'
 
@@ -14,7 +14,6 @@ const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
 export default function VerificarEmail() {
   const { login } = useAuth()
-  const { showToast } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
   
@@ -72,11 +71,11 @@ export default function VerificarEmail() {
       setModoIngresoEmail(false)
       setCountdown(60)
       setCodigo('')
-      showToast('Si tu correo está registrado, te enviamos un nuevo código.', 'success')
+      sileo.success({ title: 'Si tu correo está registrado, te enviamos un nuevo código.' })
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No pudimos enviar el código. Intentá de nuevo.')
       setApiError(msg)
-      showToast(msg, 'error')
+      sileo.error({ title: msg })
     } finally {
       setReenvioLoading(false)
     }
@@ -92,7 +91,7 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoEmail(email.trim(), codigo)
-      showToast('¡Tu email quedó verificado! Ya podés entrar a Argentum.', 'success')
+      sileo.success({ title: '¡Tu email quedó verificado! Ya podés entrar a Argentum.' })
       
       // Solo hacemos login si la respuesta ya trae tokens.
       if (respuesta.access_token) {
@@ -103,7 +102,7 @@ export default function VerificarEmail() {
     } catch (err: unknown) {
       const msg = getErrorMessage(err, "No pudimos verificar tu email. El enlace puede haber expirado — pedí uno nuevo.")
       setApiError(msg)
-      showToast(msg, "error")
+      sileo.error({ title: msg })
     } finally {
       setLoading(false)
     }
@@ -115,13 +114,13 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       await enviarCodigoEmail(email.trim())
-      showToast('Te mandamos un código nuevo.', 'success')
+      sileo.success({ title: 'Te mandamos un código nuevo.' })
       setCountdown(60)
       setCodigo('')
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No pudimos reenviar el código.')
       setApiError(msg)
-      showToast(msg, 'error')
+      sileo.error({ title: msg })
     } finally {
       setReenvioLoading(false)
     }

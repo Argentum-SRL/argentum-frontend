@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -55,7 +55,6 @@ EstadoVacio.displayName = 'EstadoVacio'
 
 export default function BilleterasPage() {
   const { usuario } = useAuth()
-  const { showToast } = useToast()
   const { open, confirm } = useModal()
   const { lastDataUpdate } = useNotificaciones()
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -92,13 +91,13 @@ export default function BilleterasPage() {
         return
       }
       console.error('Error fetching billeteras data:', err)
-      showToast(getErrorMessage(err, 'No pudimos cargar los datos. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar los datos. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
         setIsLoading(false)
       }
     }
-  }, [showToast])
+  }, [])
 
   const fetchTransferenciasData = useCallback(async (signal?: AbortSignal) => {
     setLoadingTransferencias(true)
@@ -108,13 +107,13 @@ export default function BilleterasPage() {
       setTransferencias(data)
     } catch (err) {
       console.error('Error fetching transferencias:', err)
-      showToast(getErrorMessage(err, 'No pudimos cargar las transferencias. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar las transferencias. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
         setLoadingTransferencias(false)
       }
     }
-  }, [showToast])
+  }, [])
 
   useEffect(() => {
     if (activeTab === 'transferencias') {
@@ -138,16 +137,16 @@ export default function BilleterasPage() {
       onConfirm: async () => {
         try {
           await transferenciaService.deleteTransferencia(id)
-          showToast('Transferencia eliminada', 'success')
+          sileo.success({ title: 'Transferencia eliminada' })
           void fetchTransferenciasData()
           void fetchPageData()
         } catch (e) {
           console.error(e)
-          showToast(getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       },
     })
-  }, [confirm, fetchPageData, fetchTransferenciasData, showToast])
+  }, [confirm, fetchPageData, fetchTransferenciasData])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -221,24 +220,24 @@ export default function BilleterasPage() {
         try {
           await billeteraService.archivar(id)
           await fetchPageData()
-          showToast(`"${b.nombre}" archivada`, 'success')
+          sileo.success({ title: `"${b.nombre}" archivada` })
         } catch (error: unknown) {
-          showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       }
     })
-  }, [billeteras, confirm, fetchPageData, showToast])
+  }, [billeteras, confirm, fetchPageData])
 
   const handleDesarchivar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
     try {
       await billeteraService.desarchivar(id)
       await fetchPageData()
-      if (b) showToast(`"${b.nombre}" reactivada`, 'success')
+      if (b) sileo.success({ title: `"${b.nombre}" reactivada` })
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
     }
-  }, [billeteras, fetchPageData, showToast])
+  }, [billeteras, fetchPageData])
 
   const handleEliminar = useCallback(async (id: string) => {
     const b = billeteras.find((b) => b.id === id)
@@ -253,23 +252,23 @@ export default function BilleterasPage() {
         try {
           await billeteraService.delete(id)
           await fetchPageData()
-          showToast(`"${b.nombre}" se eliminó.`, 'success')
+          sileo.success({ title: `"${b.nombre}" se eliminó.` })
         } catch (error: unknown) {
-          showToast(getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+          sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
         }
       },
     })
-  }, [billeteras, confirm, fetchPageData, showToast])
+  }, [billeteras, confirm, fetchPageData])
 
   const handleGuardarEdicion = useCallback(async (id: string, payload: EditPayload) => {
     try {
       await billeteraService.update(id, payload)
       await fetchPageData()
-      showToast(`Billetera actualizada exitosamente`, 'success')
+      sileo.success({ title: 'Billetera actualizada exitosamente' })
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
     }
-  }, [fetchPageData, showToast])
+  }, [fetchPageData])
 
   const handleEditar = useCallback((b: Billetera) => {
     open('editBilletera', {
@@ -291,11 +290,11 @@ export default function BilleterasPage() {
         bank_id: payload.bank_id,
       })
       await fetchPageData()
-      showToast(`"${payload.nombre}" creada exitosamente`, 'success')
+      sileo.success({ title: `"${payload.nombre}" creada exitosamente` })
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
     }
-  }, [fetchPageData, showToast])
+  }, [fetchPageData])
 
   const monedaPrincipal = (usuario?.moneda_principal as 'ARS' | 'USD') ?? 'ARS'
 

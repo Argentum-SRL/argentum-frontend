@@ -8,7 +8,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import * as authService from '@/services/auth.service'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -31,7 +31,6 @@ export default function PerfilPage() {
   const { usuario, updateUsuario } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const { showToast } = useToast()
 
   // ── 1. Tab Routing Sync ──────────────────────────────────────────────────
   const tabParam = new URLSearchParams(location.search).get('tab') as TabType | null
@@ -68,10 +67,10 @@ export default function PerfilPage() {
     if (!usuario?.email) return
     try {
       await authService.enviarCodigoEmail(usuario.email)
-      showToast('Te enviamos un código de verificación a tu correo.', 'success')
+      sileo.success({ title: 'Te enviamos un código de verificación a tu correo.' })
       navigate('/auth/verificar-email', { state: { email: usuario.email, from: '/app/perfil' } })
     } catch (err: unknown) {
-      showToast(getErrorMessage(err, 'Error al enviar el código de verificación.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'Error al enviar el código de verificación.') })
     }
   }
 

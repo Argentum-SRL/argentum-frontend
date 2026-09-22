@@ -17,7 +17,7 @@ import {
 } from '@/services/auth.service'
 import usuarioService from '@/services/usuario.service'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
@@ -26,7 +26,6 @@ import styles from './VerificarTelefono.module.css'
 
 export default function VerificarTelefono() {
   const { usuario, updateUsuario, refreshUser } = useAuth()
-  const { showToast } = useToast()
   const { lastDataUpdate } = useNotificaciones()
   const navigate = useNavigate()
   const location = useLocation()
@@ -89,11 +88,11 @@ export default function VerificarTelefono() {
         'No pudimos generar el código de vinculación. Intentá de nuevo.'
       )
       setApiError(msg)
-      showToast(msg, 'error')
+      sileo.error({ title: msg })
     } finally {
       setLoading(false)
     }
-  }, [showToast])
+  }, [])
 
   useEffect(() => {
     if (!hasLoadedRef.current) {
@@ -129,7 +128,7 @@ export default function VerificarTelefono() {
         setVinculado(true)
         updateUsuario(me)
         await refreshUser()
-        showToast('¡Tu cuenta de WhatsApp fue vinculada exitosamente!', 'success')
+        sileo.success({ title: '¡Tu cuenta de WhatsApp fue vinculada exitosamente!' })
 
         // Redirección suave
         setTimeout(() => {
@@ -146,7 +145,7 @@ export default function VerificarTelefono() {
     } catch {
       // Ignorar errores de red transitorios durante el sondeo
     }
-  }, [vinculado, updateUsuario, refreshUser, showToast, location.state, navigate])
+  }, [vinculado, updateUsuario, refreshUser, location.state, navigate])
 
   // 1. Escuchar eventos SSE en tiempo real
   useEffect(() => {
@@ -182,10 +181,10 @@ export default function VerificarTelefono() {
     try {
       await navigator.clipboard.writeText(codigoData.link_whatsapp)
       setCopied(true)
-      showToast('Enlace de WhatsApp copiado al portapapeles', 'success')
+      sileo.success({ title: 'Enlace de WhatsApp copiado al portapapeles' })
       setTimeout(() => setCopied(false), 2500)
     } catch {
-      showToast('No se pudo copiar el enlace', 'error')
+      sileo.error({ title: 'No se pudo copiar el enlace' })
     }
   }
 

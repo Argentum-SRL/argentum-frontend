@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react
 import type { Notificacion, ConfiguracionNotificacion } from '@/types'
 import notificacionService from '@/services/notificacion.service'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { NotificacionContext, type DataUpdateEvent } from './NotificacionContextBase'
 
 
@@ -13,7 +13,6 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
   const [lastDataUpdate, setLastDataUpdate] = useState<DataUpdateEvent | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const { isAuthenticated } = useAuth()
-  const { showToast } = useToast()
 
   if (!isAuthenticated && (notificaciones.length > 0 || unreadCount !== 0 || config !== null || lastDataUpdate !== null)) {
     setNotificaciones([])
@@ -63,12 +62,12 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     try {
       const updated = await notificacionService.updateConfig(payload)
       setConfig(updated)
-      showToast('Preferencia de notificaciones guardada', 'success')
+      sileo.success({ title: 'Preferencia de notificaciones guardada' })
     } catch (error) {
       console.error('Error updating notifications config:', error)
-      showToast('Error al guardar configuración', 'error')
+      sileo.error({ title: 'Error al guardar configuración' })
     }
-  }, [showToast])
+  }, [])
 
   const marcarLeida = useCallback(async (id: string) => {
     try {
@@ -102,11 +101,11 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       if (notif && !notif.leida) {
         setUnreadCount((prev) => Math.max(0, prev - 1))
       }
-      showToast(`Notificación silenciada por ${horas} horas`, 'success')
+      sileo.success({ title: `Notificación silenciada por ${horas} horas` })
     } catch (error) {
       console.error('Error silencing notification:', error)
     }
-  }, [notificaciones, showToast])
+  }, [notificaciones])
 
   const eliminar = useCallback(async (id: string) => {
     try {
@@ -118,20 +117,20 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Error deleting notification:', error)
-      showToast('No se puede eliminar esta notificación', 'error')
+      sileo.error({ title: 'No se puede eliminar esta notificación' })
     }
-  }, [notificaciones, showToast])
+  }, [notificaciones])
 
   const marcarTodasLeidas = useCallback(async () => {
     try {
       await notificacionService.marcarTodasLeidas()
       setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
       setUnreadCount(0)
-      showToast('Todas las notificaciones marcadas como leídas', 'success')
+      sileo.success({ title: 'Todas las notificaciones marcadas como leídas' })
     } catch (error) {
       console.error('Error marking all as read:', error)
     }
-  }, [showToast])
+  }, [])
 
   // Carga inicial al autenticar
   useEffect(() => {
@@ -193,10 +192,24 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
           setUnreadCount((prev) => prev + 1)
 
           // Decidir el tipo de toast
-          const isCritical = newNotif.nivel === 'CRITICA' || 
-                             ['PRESUPUESTO_AGOTADO', 'SALDO_CERO', 'GASTO_INUSUAL'].includes(newNotif.tipo)
-          const toastType = isCritical ? 'error' : 'success'
-          showToast(newNotif.mensaje, toastType)
+          if (
+            newNotif.nivel === 'CRITICA' || 
+            ['PRESUPUESTO_AGOTADO', 'SALDO_CERO', 'GASTO_INUSUAL'].includes(newNotif.tipo)
+          ) {
+            sileo.error({ title: newNotif.mensaje })
+          } else if (
+            newNotif.nivel === 'FINANCIERA_IMPORTANTE' ||
+            ['PRESUPUESTO_LIMITE', 'CUOTA_VENCE', 'SUSCRIPCION_HOY', 'PROYECCION_NEGATIVA'].includes(newNotif.tipo)
+          ) {
+            sileo.warning({ title: newNotif.mensaje })
+          } else if (
+            newNotif.nivel === 'FINANCIERA_INFORMATIVA' ||
+            ['RESUMEN_SEMANAL', 'RESUMEN_CICLO'].includes(newNotif.tipo)
+          ) {
+            sileo.info({ title: newNotif.mensaje })
+          } else {
+            sileo.success({ title: newNotif.mensaje })
+          }
         } catch (err) {
           console.error('Error parsing SSE event:', err)
         }
@@ -221,7 +234,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
         clearTimeout(reconnectTimeout)
       }
     }
-  }, [isAuthenticated, showToast])
+  }, [isAuthenticated])
 
   const contextValue = useMemo(
     () => ({

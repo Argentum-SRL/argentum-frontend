@@ -16,7 +16,7 @@ import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import { formatMonto } from '@/utils/format'
 import styles from './GoalContributionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { DateInput } from '@/components/ui'
 import { getErrorMessage } from '@/utils/errorMessages'
 
@@ -83,7 +83,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
 export default function GoalContributionModal({
   open, onClose, goal, billeteras, onSuccess
 }: GoalContributionModalProps) {
-  const { showToast } = useToast()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
@@ -180,7 +179,7 @@ export default function GoalContributionModal({
         moneda_movimiento: moneda,
         cotizacion_usada: needsExchangeRate ? cotizacion_usada : null
       })
-      showToast(tipo === 'aporte' ? 'Aporte registrado' : 'Retiro registrado', 'success')
+      sileo.success({ title: tipo === 'aporte' ? 'Aporte registrado' : 'Retiro registrado' })
       onSuccess()
       onClose()
     } catch (err: unknown) {

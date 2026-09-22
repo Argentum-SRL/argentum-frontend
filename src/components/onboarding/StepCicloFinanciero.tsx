@@ -3,7 +3,7 @@ import { Calendar, RefreshCw } from 'lucide-react'
 import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { SelectInput, Field, Button, SegmentedControl } from '@/components/ui'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './StepCicloFinanciero.module.css'
 
@@ -30,7 +30,6 @@ const REGLAS = [
 ]
 
 export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
-  const { showToast } = useToast()
   const [tipo, setTipo] = useState(datosIniciales.ciclo_tipo ?? 'dia_fijo')
   const [valor, setValor] = useState(datosIniciales.ciclo_valor ?? '1')
   const [direccion, setDireccion] = useState<'anterior' | 'posterior'>(
@@ -129,7 +128,7 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
     } catch (err: unknown) {
       const msg = getErrorMessage(err, "No pudimos guardar tus preferencias. Intentá de nuevo.")
       setError(msg)
-      showToast(msg, "error")
+      sileo.error({ title: msg })
     } finally {
       setLoading(false)
     }

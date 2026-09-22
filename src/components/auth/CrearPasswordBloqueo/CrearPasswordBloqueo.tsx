@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Shield, Eye, EyeOff, Check, AlertCircle, Save, LogOut, Info } from 'lucide-react'
 import type { Usuario } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
@@ -15,7 +15,6 @@ interface Props {
 
 export default function CrearPasswordBloqueo({ usuario }: Props) {
   const { updateUsuario, logout } = useAuth()
-  const { showToast } = useToast()
 
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
@@ -49,12 +48,12 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
         password_nueva: password,
         password_nueva_confirmacion: passwordConfirm,
       })
-      showToast('¡Contraseña configurada con éxito!', 'success')
+      sileo.success({ title: '¡Contraseña configurada con éxito!' })
       updateUsuario({ ...usuario, password_configurada: true })
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No se pudo configurar la contraseña. Verificá los datos e intentá de nuevo.')
       setErrorMsg(msg)
-      showToast(msg, 'error')
+      sileo.error({ title: msg })
     } finally {
       setIsSubmitting(false)
     }

@@ -4,7 +4,7 @@ import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock,
 import type { Usuario, MetodosLogin } from '@/types'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
 import usuarioService from '@/services/usuario.service'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
@@ -25,7 +25,6 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
   onVerificarEmail,
 }) => {
   const navigate = useNavigate()
-  const { showToast } = useToast()
   const { confirm } = useModal()
   const [isDesvinculando, setIsDesvinculando] = useState(false)
 
@@ -75,7 +74,7 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
         password_nueva: passwordNueva,
         password_nueva_confirmacion: passwordConfirm,
       })
-      showToast('¡Contraseña actualizada con éxito!', 'success')
+      sileo.success({ title: '¡Contraseña actualizada con éxito!' })
       setPasswordActual('')
       setPasswordNueva('')
       setPasswordConfirm('')
@@ -85,7 +84,7 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
     } catch (err: unknown) {
       const msg = getErrorMessage(err, 'No se pudo actualizar la contraseña. Verificá que la contraseña actual sea correcta.')
       setPwError(msg)
-      showToast(msg, 'error')
+      sileo.error({ title: msg })
     } finally {
       setIsSavingPw(false)
     }
@@ -103,9 +102,9 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
         try {
           const usuarioActualizado = await usuarioService.desvincularTelefono()
           updateUsuario(usuarioActualizado)
-          showToast('Tu cuenta de WhatsApp fue desvinculada exitosamente.', 'success')
+          sileo.success({ title: 'Tu cuenta de WhatsApp fue desvinculada exitosamente.' })
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos desvincular tu cuenta de WhatsApp.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos desvincular tu cuenta de WhatsApp.') })
         } finally {
           setIsDesvinculando(false)
         }

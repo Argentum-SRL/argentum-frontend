@@ -3,7 +3,7 @@ import { Camera, X } from 'lucide-react'
 import Modal from '@/components/ui/Modal/Modal'
 import usuarioService from '@/services/usuario.service'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import styles from './FotoCropModal.module.css'
 
 interface FotoCropModalProps {
@@ -18,7 +18,6 @@ const RATIO = CANVAS_SIZE / DISPLAY_SIZE // 2
 
 export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModalProps) {
   const { usuario, updateUsuario } = useAuth()
-  const { showToast } = useToast()
 
   const [imageSrc, setImageSrc] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -73,7 +72,7 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
     if (!file) return
 
     if (file.size > 5 * 1024 * 1024) {
-      showToast('La foto supera el límite de 5MB', 'error')
+      sileo.error({ title: 'La foto supera el límite de 5MB' })
       return
     }
 
@@ -149,11 +148,11 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
           updateUsuario({ ...usuario, foto_url: res.foto_url })
         }
         onSuccess(res.foto_url)
-        showToast('Foto de perfil actualizada', 'success')
+        sileo.success({ title: 'Foto de perfil actualizada' })
         handleClose()
       } catch (err: unknown) {
         const error = err as { response?: { data?: { detail?: string } } }
-        showToast(error.response?.data?.detail || 'Error al subir la foto', 'error')
+        sileo.error({ title: error.response?.data?.detail || 'Error al subir la foto' })
       } finally {
         setIsSaving(false)
       }

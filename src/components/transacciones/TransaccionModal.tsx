@@ -21,7 +21,7 @@ import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { formatMonto } from '@/utils/format'
 import styles from './TransaccionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { DateInput } from '@/components/ui'
@@ -149,7 +149,6 @@ export default function TransaccionModal({
 }: TransaccionModalProps) {
   const isEdit = !!transaccion
   const isCuotaHija = isEdit && !!transaccion?.es_cuota_hija
-  const { showToast } = useToast()
   const { confirm } = useModal()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const carouselRef = useRef<HTMLDivElement>(null)
@@ -170,12 +169,12 @@ export default function TransaccionModal({
         onConfirm: async () => {
           try {
             await transaccionService.deleteCuotaIndividual(transaccion.id)
-            showToast('Cuota eliminada correctamente', 'success')
+            sileo.success({ title: 'Cuota eliminada correctamente' })
             onSuccess()
             onClose()
           } catch (e) {
             console.error(e)
-            showToast(getErrorMessage(e, 'No se pudo eliminar la cuota'), 'error')
+            sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar la cuota') })
           }
         }
       })
@@ -190,12 +189,12 @@ export default function TransaccionModal({
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(transaccion.id)
-          showToast('Transacción eliminada correctamente', 'success')
+          sileo.success({ title: 'Transacción eliminada correctamente' })
           onSuccess()
           onClose()
         } catch (e) {
           console.error(e)
-          showToast(getErrorMessage(e, 'No se pudo eliminar la transacción'), 'error')
+          sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar la transacción') })
         }
       }
     })
@@ -435,7 +434,7 @@ export default function TransaccionModal({
 
   const goNext = () => {
     if (!monto || (metodoPago === 'credito' ? !tarjetaId : !billeteraId)) {
-      showToast(metodoPago === 'credito' ? 'Seleccioná una tarjeta' : 'Seleccioná una billetera', 'error')
+      sileo.error({ title: metodoPago === 'credito' ? 'Seleccioná una tarjeta' : 'Seleccioná una billetera' })
       return
     }
 
@@ -471,19 +470,19 @@ export default function TransaccionModal({
 
     // Validaciones estrictas
     if (!monto || Number(monto) <= 0 || !Number.isFinite(Number(monto))) {
-      showToast('El monto debe ser mayor a cero', 'error')
+      sileo.error({ title: 'El monto debe ser mayor a cero' })
       return
     }
 
     if (!categoriaId) {
-      showToast('Seleccioná una categoría', 'error')
+      sileo.error({ title: 'Seleccioná una categoría' })
       return
     }
 
     let resolvedBilleteraId = billeteraId
     if (metodoPago === 'credito') {
       if (!tarjetaId) {
-        showToast('Seleccioná una tarjeta de crédito', 'error')
+        sileo.error({ title: 'Seleccioná una tarjeta de crédito' })
         return
       }
       const tarjetaSel = tarjetas.find(t => t.id === tarjetaId)
@@ -492,21 +491,21 @@ export default function TransaccionModal({
       }
       if (!isEdit) {
         if (!Number.isInteger(cantidadCuotas) || cantidadCuotas < 1 || cantidadCuotas > 120) {
-          showToast('La cantidad de cuotas debe ser un número entero entre 1 y 120', 'error')
+          sileo.error({ title: 'La cantidad de cuotas debe ser un número entero entre 1 y 120' })
           return
         }
         if (!Number.isInteger(cuotaInicial) || cuotaInicial < 1 || cuotaInicial > cantidadCuotas) {
-          showToast('La cuota inicial debe estar entre 1 y la cantidad total', 'error')
+          sileo.error({ title: 'La cuota inicial debe estar entre 1 y la cantidad total' })
           return
         }
         if (!Number.isFinite(tasaInteres) || tasaInteres < 0 || tasaInteres > 1000) {
-          showToast('La tasa de interés debe estar entre 0% y 1000% anual o mensual según la operación.', 'error')
+          sileo.error({ title: 'La tasa de interés debe estar entre 0% y 1000% anual o mensual según la operación.' })
           return
         }
       }
     } else {
       if (!resolvedBilleteraId) {
-        showToast('Seleccioná una billetera', 'error')
+        sileo.error({ title: 'Seleccioná una billetera' })
         return
       }
     }
@@ -551,23 +550,22 @@ export default function TransaccionModal({
       let savedTx: Transaccion | null = null
       if (!isEdit) {
         savedTx = await transaccionService.createTransaccion(payload)
-        showToast(
-          metodoPago === 'credito' ? 'Compra en cuotas registrada' : 'Transacción creada',
-          'success'
-        )
+        sileo.success({
+          title: metodoPago === 'credito' ? 'Compra en cuotas registrada' : 'Transacción creada'
+        })
       } else if (transaccion) {
         savedTx = await transaccionService.updateTransaccion(transaccion.id, payload)
         if (isPendienteIA) {
           await transaccionService.confirmarIA(transaccion.id)
-          showToast('Transacción confirmada', 'success')
+          sileo.success({ title: 'Transacción confirmada' })
         } else {
-          showToast('Transacción actualizada', 'success')
+          sileo.success({ title: 'Transacción actualizada' })
         }
       }
       onSuccess(savedTx); onClose()
     } catch (e) {
       console.error(e)
-      showToast(getErrorMessage(e, 'Error al guardar la transacción'), 'error')
+      sileo.error({ title: getErrorMessage(e, 'Error al guardar la transacción') })
     } finally {
       submittingRef.current = false
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })

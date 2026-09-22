@@ -2,7 +2,7 @@ import React from 'react'
 import { Camera, Trash2, CheckCircle2, AlertCircle, Copy, Check } from 'lucide-react'
 import type { Usuario } from '@/types'
 import { useModal } from '@/hooks/useModal'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
@@ -21,7 +21,6 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
   onOpenCrop,
 }) => {
   const { confirm } = useModal()
-  const { showToast } = useToast()
   const [copiedField, setCopiedField] = React.useState<string | null>(null)
   const [fotoError, setFotoError] = React.useState(false)
 
@@ -41,7 +40,7 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
     if (!text) return
     navigator.clipboard.writeText(text)
     setCopiedField(label)
-    showToast(`${label} copiado al portapapeles`, 'info')
+    sileo.info({ title: `${label} copiado al portapapeles` })
     setTimeout(() => setCopiedField(null), 2000)
   }
 
@@ -55,9 +54,9 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
         try {
           await usuarioService.eliminarFoto()
           if (usuario) updateUsuario({ ...usuario, foto_url: null })
-          showToast('Foto de perfil eliminada.', 'success')
+          sileo.success({ title: 'Foto de perfil eliminada' })
         } catch (err: unknown) {
-          showToast(getErrorMessage(err, 'No pudimos eliminar la foto de perfil.'), 'error')
+          sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar la foto de perfil.') })
         }
       },
     })

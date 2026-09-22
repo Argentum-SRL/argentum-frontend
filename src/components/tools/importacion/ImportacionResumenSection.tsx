@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Loader2, AlertTriangle, ShieldAlert } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import tarjetaService from '@/services/tarjeta.service'
 import billeteraService from '@/services/billetera.service'
 import importacionService from '@/services/importacionService'
@@ -28,7 +28,6 @@ import styles from './ImportacionResumenSection.module.css'
 
 export const ImportacionResumenSection: React.FC = () => {
   const { is_admin } = useAuth()
-  const { showToast } = useToast()
 
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -86,7 +85,7 @@ export const ImportacionResumenSection: React.FC = () => {
         }
       } catch (err) {
         console.error('Error al cargar datos de tarjetas/billeteras/categorías:', err)
-        showToast('Error al inicializar los datos de importación.', 'error')
+        sileo.error({ title: 'Error al inicializar los datos de importación.' })
       } finally {
         setLoadingData(false)
       }
@@ -95,7 +94,7 @@ export const ImportacionResumenSection: React.FC = () => {
     if (is_admin) {
       fetchData()
     }
-  }, [is_admin, showToast])
+  }, [is_admin])
 
 
   // Manejo del procesamiento del PDF
@@ -113,7 +112,7 @@ export const ImportacionResumenSection: React.FC = () => {
     try {
       const response = await importacionService.procesarResumen(selectedFile)
       setImportacionResult(response)
-      showToast('Resumen procesado con éxito.', 'success')
+      sileo.success({ title: 'Resumen procesado con éxito.' })
       setStep(2)
     } catch (err: unknown) {
       console.error('Error al procesar resumen:', err)
@@ -121,7 +120,7 @@ export const ImportacionResumenSection: React.FC = () => {
       const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
         ? error.response.data.detail.error.message
         : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'No se pudo procesar el resumen. Verificá el archivo e intentá de nuevo.')
-      showToast(detail, 'error')
+      sileo.error({ title: detail })
     } finally {
       clearTimeout(textTimer)
       setIsProcessing(false)
@@ -131,7 +130,7 @@ export const ImportacionResumenSection: React.FC = () => {
   // Continuar desde el paso 2 y resolver los modales que hagan falta
   const handleContinuarFlujo = async () => {
     if (!selectedTarjetaId || !selectedBilleteraId) {
-      showToast('Por favor, seleccioná una tarjeta y una billetera.', 'error')
+      sileo.error({ title: 'Por favor, seleccioná una tarjeta y una billetera.' })
       return
     }
 
@@ -176,7 +175,7 @@ export const ImportacionResumenSection: React.FC = () => {
       const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
         ? error.response.data.detail.error.message
         : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'Error al cargar la vista previa del resumen.')
-      showToast(detail, 'error')
+      sileo.error({ title: detail })
     } finally {
       setLoadingPreview(false)
     }
@@ -236,7 +235,7 @@ export const ImportacionResumenSection: React.FC = () => {
 
     const totalAImportar = transaccionesFinales.filter(t => t.incluir).length
     if (totalAImportar === 0) {
-      showToast('No seleccionaste ninguna transacción para importar. Marcá al menos una para continuar o cancelá la operación.', 'info')
+      sileo.info({ title: 'No seleccionaste ninguna transacción para importar. Marcá al menos una para continuar o cancelá la operación.' })
       return
     }
 
@@ -254,14 +253,14 @@ export const ImportacionResumenSection: React.FC = () => {
         payload
       )
       setResultadoConfirmacion(res)
-      showToast('Importación confirmada con éxito.', 'success')
+      sileo.success({ title: 'Importación confirmada con éxito.' })
     } catch (err: unknown) {
       console.error('Error al confirmar importación:', err)
       const error = err as { response?: { data?: { detail?: { error?: { message?: string } } | string } } }
       const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
         ? error.response.data.detail.error.message
         : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'Error al confirmar la importación del resumen.')
-      showToast(detail, 'error')
+      sileo.error({ title: detail })
     } finally {
       setIsConfirming(false)
     }

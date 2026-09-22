@@ -17,7 +17,7 @@ import {
 import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera, CotizacionDolar } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
-import { useToast } from '@/hooks/useToast'
+import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
@@ -87,8 +87,6 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   billeteras,
   cotizacionOficial,
 }) => {
-  const { showToast } = useToast()
-
   // Todas las billeteras activas disponibles
   const activeWallets = useMemo(() => {
     return billeteras.filter(b => b.estado === 'activa')
@@ -217,37 +215,35 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     e.preventDefault()
 
     if (!billeteraOrigenId) {
-      showToast('Seleccioná la cuenta de origen', 'error')
+      sileo.error({ title: 'Seleccioná la cuenta de origen' })
       return
     }
     if (!billeteraDestinoId) {
-      showToast('Seleccioná la cuenta de destino', 'error')
+      sileo.error({ title: 'Seleccioná la cuenta de destino' })
       return
     }
     if (billeteraOrigenId === billeteraDestinoId) {
-      showToast('La cuenta de origen y destino no pueden ser la misma', 'error')
+      sileo.error({ title: 'La cuenta de origen y destino no pueden ser la misma' })
       return
     }
     if (!monto || monto <= 0) {
-      showToast('Ingresá un monto válido mayor a 0', 'error')
+      sileo.error({ title: 'Ingresá un monto válido mayor a 0' })
       return
     }
     if (!esMismaMoneda && (!montoDestino || montoDestino <= 0)) {
-      showToast('Ingresá el monto a recibir en la cuenta de destino', 'error')
+      sileo.error({ title: 'Ingresá el monto a recibir en la cuenta de destino' })
       return
     }
     if (isOverdraft) {
-      showToast(
-        `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatMonto(saldoOrigenActual, monedaOrigen)}, Solicitado: ${formatMonto(debitoTotalOrigen, monedaOrigen)}`,
-        'error'
-      )
+      sileo.error({
+        title: `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatMonto(saldoOrigenActual, monedaOrigen)}, Solicitado: ${formatMonto(debitoTotalOrigen, monedaOrigen)}`
+      })
       return
     }
     if (isDestinoOverdraft) {
-      showToast(
-        `Saldo insuficiente en ${billeteraDestino?.nombre} para cubrir la comisión de ${formatMonto(comisionNum, monedaComision)}`,
-        'error'
-      )
+      sileo.error({
+        title: `Saldo insuficiente en ${billeteraDestino?.nombre} para cubrir la comisión de ${formatMonto(comisionNum, monedaComision)}`
+      })
       return
     }
 
@@ -268,19 +264,18 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
         notas: notas.trim() || null,
       })
 
-      showToast(
-        esMismaMoneda
+      sileo.success({
+        title: esMismaMoneda
           ? 'Transferencia realizada con éxito'
           : monedaOrigen === 'ARS'
             ? 'Compra de dólares registrada con éxito'
-            : 'Venta de dólares registrada con éxito',
-        'success'
-      )
+            : 'Venta de dólares registrada con éxito'
+      })
       onSuccess()
       onClose()
     } catch (err: unknown) {
       console.error(err)
-      showToast(getErrorMessage(err, 'Error al procesar la transferencia.'), 'error')
+      sileo.error({ title: getErrorMessage(err, 'Error al procesar la transferencia.') })
     } finally {
       setIsSubmitting(false)
     }

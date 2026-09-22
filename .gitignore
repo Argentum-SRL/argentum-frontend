@@ -37,3 +37,5 @@ skills-lock.json
 
 # Skills de agentes locales
 agent/skills/
+
+agent/

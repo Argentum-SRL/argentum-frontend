@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock, Edit3, MessageSquare } from 'lucide-react'
+import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock, Edit3, MessageSquare, Unlink } from 'lucide-react'
 import type { Usuario, MetodosLogin } from '@/types'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
 import usuarioService from '@/services/usuario.service'
 import { useToast } from '@/hooks/useToast'
+import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from '../PerfilPage.module.css'
@@ -25,6 +26,8 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
 }) => {
   const navigate = useNavigate()
   const { showToast } = useToast()
+  const { confirm } = useModal()
+  const [isDesvinculando, setIsDesvinculando] = useState(false)
 
   // Password form state
   const [passwordActual, setPasswordActual] = useState('')
@@ -86,6 +89,28 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
     } finally {
       setIsSavingPw(false)
     }
+  }
+
+  const handleDesvincular = () => {
+    confirm({
+      title: '¿Desvincular WhatsApp?',
+      description:
+        'Dejarás de recibir notificaciones y no podrás registrar gastos ni consultar tus finanzas desde tu chat de WhatsApp hasta volver a vincular un número.',
+      variant: 'danger',
+      confirmLabel: 'Desvincular WhatsApp',
+      onConfirm: async () => {
+        setIsDesvinculando(true)
+        try {
+          const usuarioActualizado = await usuarioService.desvincularTelefono()
+          updateUsuario(usuarioActualizado)
+          showToast('Tu cuenta de WhatsApp fue desvinculada exitosamente.', 'success')
+        } catch (err: unknown) {
+          showToast(getErrorMessage(err, 'No pudimos desvincular tu cuenta de WhatsApp.'), 'error')
+        } finally {
+          setIsDesvinculando(false)
+        }
+      },
+    })
   }
 
   return (
@@ -206,19 +231,30 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
                 <button
                   type="button"
                   className={styles.verifyDirectBtn}
-                  onClick={() => navigate('/auth/verificar-telefono')}
+                  onClick={() => navigate('/auth/verificar-telefono', { state: { from: '/app/perfil?tab=seguridad' } })}
                 >
                   Vincular WhatsApp
                 </button>
               ) : (
-                <button
-                  type="button"
-                  className={styles.editContactBtn}
-                  onClick={() => navigate('/auth/verificar-telefono')}
-                >
-                  <Edit3 size={13} />
-                  <span>Cambiar número</span>
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className={styles.editContactBtn}
+                    onClick={() => navigate('/auth/verificar-telefono', { state: { from: '/app/perfil?tab=seguridad' } })}
+                  >
+                    <Edit3 size={13} />
+                    <span>Cambiar número</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.unlinkContactBtn}
+                    onClick={handleDesvincular}
+                    disabled={isDesvinculando}
+                  >
+                    <Unlink size={13} />
+                    <span>{isDesvinculando ? 'Desvinculando...' : 'Desvincular'}</span>
+                  </button>
+                </>
               )}
             </div>
           </div>

@@ -47,6 +47,11 @@ const usuarioService = {
     return data
   },
 
+  desvincularTelefono: async () => {
+    const { data } = await api.delete<Usuario>('/usuarios/me/telefono')
+    return data
+  },
+
   actualizarCicloFinanciero: async (datos: EditarCicloFinancieroRequest) => {
     const { data } = await api.put<Usuario>('/usuarios/me/ciclo-financiero', datos)
     return data

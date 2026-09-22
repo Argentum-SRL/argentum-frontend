@@ -738,6 +738,33 @@
   color: var(--primary);
 }
 
+.unlinkContactBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--error, #ef4444);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.unlinkContactBtn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--error, #ef4444);
+}
+
+.unlinkContactBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .lockedTag {
   display: inline-flex;
   align-items: center;

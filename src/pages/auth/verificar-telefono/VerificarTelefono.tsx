@@ -53,6 +53,8 @@ export default function VerificarTelefono() {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
   const hasLoadedRef = useRef(false)
+  const telefonoVerificadoInicialRef = useRef<boolean>(Boolean(usuario?.telefono_verificado))
+  const telefonoInicialRef = useRef<string | null>(usuario?.telefono || null)
 
   // Obtener código de vinculación desde el backend y generar QR localmente
   const cargarCodigo = useCallback(async () => {
@@ -120,7 +122,10 @@ export default function VerificarTelefono() {
     if (vinculado) return
     try {
       const me = await usuarioService.getMe()
-      if (me?.telefono_verificado) {
+      const esPrimeraVinculacion = !telefonoVerificadoInicialRef.current
+      const telefonoCambio = Boolean(me?.telefono && me.telefono !== telefonoInicialRef.current)
+
+      if (me?.telefono_verificado && (esPrimeraVinculacion || telefonoCambio)) {
         setVinculado(true)
         updateUsuario(me)
         await refreshUser()

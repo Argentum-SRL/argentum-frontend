@@ -8,7 +8,8 @@
     "dev:clean": "vite --force",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "graph:update": "graphify . --output graphify-out"
   },
   "dependencies": {
     "@ncdai/react-wheel-picker": "^1.2.2",

@@ -9,6 +9,7 @@ import Modal from '@/components/ui/Modal/Modal'
 export interface EditPayload {
   nombre: string
   es_principal: boolean
+  es_inversion?: boolean
 }
 
 interface EditBilleteraModalProps {
@@ -54,6 +55,7 @@ function EditLogo({ bank, customNombre }: { bank?: BankDefinition, customNombre?
 interface EditState {
   nombre: string
   esPrincipal: boolean
+  esInversion: boolean
   isSubmitting: boolean
 }
 
@@ -67,6 +69,7 @@ function editReducer(state: EditState, action: EditAction): EditState {
       return {
         nombre: action.billetera.nombre,
         esPrincipal: action.billetera.es_principal,
+        esInversion: Boolean(action.billetera.es_inversion),
         isSubmitting: false
       }
     case 'SET_FIELD':
@@ -86,10 +89,11 @@ export default function EditBilleteraModal({
   const [state, dispatch] = useReducer(editReducer, {
     nombre: '',
     esPrincipal: false,
+    esInversion: false,
     isSubmitting: false
   })
 
-  const { nombre, esPrincipal, isSubmitting } = state
+  const { nombre, esPrincipal, esInversion, isSubmitting } = state
 
   useEffect(() => {
     if (isOpen && billetera) {
@@ -108,6 +112,7 @@ export default function EditBilleteraModal({
       await onEditar(billetera.id, {
         nombre: nombre.trim(),
         es_principal: esPrincipal,
+        es_inversion: esInversion,
       })
       onClose()
     } finally {
@@ -203,6 +208,29 @@ export default function EditBilleteraModal({
               </p>
             </div>
           )}
+
+          <button
+            type="button"
+            className={styles.principalRow}
+            onClick={() => dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })}
+            aria-label={esInversion ? 'Desmarcar como billetera de inversión' : 'Marcar como billetera de inversión'}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault()
+                dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })
+              }
+            }}
+          >
+            <div className={`${styles.checkbox} ${esInversion ? styles.checkboxActive : ''}`}>
+              {esInversion && <Check size={11} strokeWidth={3} color="white" />}
+            </div>
+            <div className={styles.principalInfo}>
+              <span className={styles.principalLabel}>Billetera de inversión</span>
+              <span className={styles.principalSub}>
+                Inversión o ahorro a largo plazo
+              </span>
+            </div>
+          </button>
         </div>
 
         <div className={styles.formFooter}>

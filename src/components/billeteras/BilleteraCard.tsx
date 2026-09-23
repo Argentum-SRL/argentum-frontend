@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw } from 'lucide-react'
+import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw, TrendingUp } from 'lucide-react'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
@@ -141,6 +141,12 @@ const BilleteraCard = memo(({
                 <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
                   {billetera.moneda}
                 </span>
+                {billetera.es_inversion && (
+                  <span className={`${styles.chip} ${styles.chipInversion} ${isLight ? styles.chipInversionLight : styles.chipInversionDark}`}>
+                    <TrendingUp size={9} strokeWidth={2.2} />
+                    Inversión
+                  </span>
+                )}
               </div>
             </div>
           ) : (
@@ -175,6 +181,12 @@ const BilleteraCard = memo(({
                   {billetera.es_efectivo && (
                     <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
                       Efectivo
+                    </span>
+                  )}
+                  {billetera.es_inversion && (
+                    <span className={`${styles.chip} ${styles.chipInversion} ${isLight ? styles.chipInversionLight : styles.chipInversionDark}`}>
+                      <TrendingUp size={9} strokeWidth={2.2} />
+                      Inversión
                     </span>
                   )}
                 </div>

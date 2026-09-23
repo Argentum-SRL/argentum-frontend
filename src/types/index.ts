@@ -194,6 +194,7 @@ export interface Billetera {
   saldo_inicial: number
   es_principal: boolean
   es_efectivo: boolean
+  es_inversion?: boolean
   estado: 'activa' | 'archivada'
   fecha_creacion: string
   bank_id?: string | null

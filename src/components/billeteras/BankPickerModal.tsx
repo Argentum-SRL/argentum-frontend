@@ -15,6 +15,7 @@ export interface CreatePayload {
   moneda: 'ARS' | 'USD'
   saldo_inicial: number
   es_principal: boolean
+  es_inversion?: boolean
   bank_id: string | null
 }
 
@@ -118,6 +119,7 @@ interface ModalState {
   moneda: 'ARS' | 'USD'
   saldo: number | null
   esPrincipal: boolean
+  esInversion: boolean
   colorCustom: string
   isSubmitting: boolean
 }
@@ -141,6 +143,7 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
         moneda: action.monedaPrincipal,
         saldo: null,
         esPrincipal: false,
+        esInversion: false,
         colorCustom: CUSTOM_COLORS[0],
         isSubmitting: false,
       }
@@ -185,6 +188,7 @@ export default function BankPickerModal({
     moneda: monedaPrincipalUsuario,
     saldo: null,
     esPrincipal: false,
+    esInversion: false,
     colorCustom: CUSTOM_COLORS[0],
     isSubmitting: false,
   })
@@ -198,6 +202,7 @@ export default function BankPickerModal({
     moneda,
     saldo,
     esPrincipal,
+    esInversion,
     colorCustom,
     isSubmitting
   } = state
@@ -241,6 +246,7 @@ export default function BankPickerModal({
         moneda,
         saldo_inicial: saldo || 0,
         es_principal: esPrincipal,
+        es_inversion: esInversion,
         bank_id: bankSeleccionado.id === 'custom' ? null : bankSeleccionado.id,
       })
       onClose()
@@ -516,6 +522,24 @@ export default function BankPickerModal({
                     </p>
                   </div>
                 )}
+
+                {/* Marcar como inversión */}
+                <button
+                  type="button"
+                  className={styles.principalRow}
+                  onClick={() => dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })}
+                  aria-label="Es una billetera de inversión o ahorro a largo plazo"
+                >
+                  <div className={`${styles.checkbox} ${esInversion ? styles.checkboxActive : ''}`}>
+                    {esInversion && <Check size={11} strokeWidth={3} color="white" />}
+                  </div>
+                  <div className={styles.principalInfo}>
+                    <span className={styles.principalLabel}>Billetera de inversión</span>
+                    <span className={styles.principalSub}>
+                      Inversión o ahorro a largo plazo
+                    </span>
+                  </div>
+                </button>
               </div>
 
               {/* Footer fijo */}

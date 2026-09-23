@@ -46,13 +46,13 @@ const billeteraService = {
     return data
   },
 
-  create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; bank_id?: string | null }) => {
+  create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; es_inversion?: boolean; bank_id?: string | null }) => {
     const { data } = await api.post<Billetera>('/billeteras', payload)
     invalidateBilleteras()
     return data
   },
 
-  update: async (id: string, payload: { nombre?: string; moneda?: string; es_principal?: boolean; estado?: string }) => {
+  update: async (id: string, payload: { nombre?: string; moneda?: string; es_principal?: boolean; es_inversion?: boolean; estado?: string }) => {
     const { data } = await api.put<Billetera>(`/billeteras/${id}`, payload)
     invalidateBilleteras()
     return data

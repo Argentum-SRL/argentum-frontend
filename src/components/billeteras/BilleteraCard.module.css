@@ -195,6 +195,9 @@
 .chipPrincipalLight { background: rgba(255,255,255,0.22); color: white; }
 .chipMonedaDark     { background: rgba(0,0,0,0.10); color: rgba(0,0,0,0.60); }
 .chipPrincipalDark  { background: rgba(0,0,0,0.14); color: rgba(0,0,0,0.80); }
+.chipInversion      { display: inline-flex; align-items: center; gap: 3px; }
+.chipInversionLight { background: rgba(255,255,255,0.20); color: white; }
+.chipInversionDark  { background: rgba(0,0,0,0.12); color: rgba(0,0,0,0.80); }
 
 /* ── Kebab — siempre visible en mobile, hover-only en desktop ─────────────── */
 .wcKebab {

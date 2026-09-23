@@ -232,7 +232,6 @@ export default function TransaccionModal({
 
     const currentCat = useMemo(() => categorias.find(c => c.id === categoriaId), [categorias, categoriaId])
     const currentCatNorm = useMemo(() => currentCat ? currentCat.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() : '', [currentCat])
-    const hideGeneralSubcat = currentCatNorm === 'empleo' || currentCatNorm === 'trabajo independiente' || currentCatNorm === 'inversiones y rentas'
 
     const sortedSubcategorias = useMemo(() => {
       // Mapa de orden de probabilidad canónico por categoría para consistencia inmediata
@@ -290,12 +289,12 @@ export default function TransaccionModal({
       })
     }, [subcategorias, currentCatNorm])
 
-    // Si hideGeneralSubcat es true y no hay subcategoriaId seleccionada, preseleccionar la primera (ej. Sueldo)
+    // Seleccionar automáticamente la primera subcategoría real si no hay ninguna seleccionada
     useEffect(() => {
-      if (hideGeneralSubcat && !subcategoriaId && sortedSubcategorias.length > 0) {
+      if (!subcategoriaId && sortedSubcategorias.length > 0) {
         dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: sortedSubcategorias[0].id })
       }
-    }, [hideGeneralSubcat, subcategoriaId, sortedSubcategorias])
+    }, [subcategoriaId, sortedSubcategorias])
 
   useEffect(() => {
     submittingRef.current = false
@@ -476,6 +475,11 @@ export default function TransaccionModal({
 
     if (!categoriaId) {
       sileo.error({ title: 'Seleccioná una categoría' })
+      return
+    }
+
+    if (!subcategoriaId) {
+      sileo.error({ title: 'Seleccioná una subcategoría' })
       return
     }
 
@@ -990,22 +994,13 @@ export default function TransaccionModal({
                       <label className={styles.fieldLabel}>Subcategoría</label>
                       <div className={styles.subcatGrid}>
                         {loadingSubcats ? <div className={styles.subcatLoading}>Cargando...</div> : (
-                          <>
-                            {!hideGeneralSubcat && (
-                              <button type="button" className={`${styles.subcatChip} ${!subcategoriaId ? styles.subcatChipActive : ''}`}
-                                onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })}>
-                                <SubcategoriaIcon nombre="general" parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
-                                General
-                              </button>
-                            )}
-                            {sortedSubcategorias.map((sub) => (
-                              <button type="button" key={sub.id} className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
-                                onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: sub.id })}>
-                                <SubcategoriaIcon nombre={sub.nombre} parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
-                                {sub.nombre}
-                              </button>
-                            ))}
-                          </>
+                          sortedSubcategorias.map((sub) => (
+                            <button type="button" key={sub.id} className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
+                              onClick={() => dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: sub.id })}>
+                              <SubcategoriaIcon nombre={sub.nombre} parentCategory={categorias.find(c => c.id === categoriaId)?.nombre} size={32} />
+                              {sub.nombre}
+                            </button>
+                          ))
                         )}
                       </div>
                     </div>

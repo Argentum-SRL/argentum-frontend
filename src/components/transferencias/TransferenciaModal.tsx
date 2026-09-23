@@ -69,6 +69,7 @@ function getBankVisuals(billetera: Billetera) {
   if (bank?.tipo === 'billetera_virtual') tipoLabel = 'Billetera virtual'
   else if (bank?.tipo === 'banco_digital') tipoLabel = 'Banco digital'
   else if (bank?.tipo === 'banco_tradicional') tipoLabel = 'Banco tradicional'
+  else if (bank?.tipo === 'plataforma_inversion') tipoLabel = 'Plataforma de inversión'
 
   return {
     nombre: bank?.nombre || billetera.nombre,

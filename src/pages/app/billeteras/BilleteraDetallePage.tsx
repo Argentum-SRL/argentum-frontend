@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign } from 'lucide-react'
-import type { Billetera, TarjetaCredito, Transaccion, Categoria } from '@/types'
+import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign, TrendingUp, Edit2 } from 'lucide-react'
+import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
@@ -13,8 +13,10 @@ import DayGroup from '@/components/transacciones/DayGroup'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
 import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
 import { PresionFuturaCard } from '@/components/tarjetas/PresionFuturaCard'
+import RegistrarRendimientoModal from '@/components/billeteras/RegistrarRendimientoModal'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './BilleteraDetallePage.module.css'
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
@@ -29,6 +31,8 @@ const BilleteraDetallePage: React.FC = () => {
   const { open, confirm } = useModal()
 
   const [billetera, setBilletera] = useState<Billetera | null>(null)
+  const [rendimientoEstimado, setRendimientoEstimado] = useState<RendimientoEstimadoResponse | null>(null)
+  const [isRegistrarModalOpen, setIsRegistrarModalOpen] = useState(false)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [movimientos, setMovimientos] = useState<Transaccion[]>([])
@@ -105,6 +109,15 @@ const BilleteraDetallePage: React.FC = () => {
         const data = await billeteraService.getById(id, controller.signal)
         if (!controller.signal.aborted) {
           setBilletera(data)
+          if (!data.es_efectivo && data.tna != null) {
+            billeteraService.getRendimientoEstimado(data.id, controller.signal)
+              .then(res => {
+                if (!controller.signal.aborted) setRendimientoEstimado(res)
+              })
+              .catch(err => console.error(err))
+          } else {
+            setRendimientoEstimado(null)
+          }
         }
       } catch (error) {
         if (error instanceof Error && (error.name === 'AbortError' || error.name === 'CanceledError')) {
@@ -199,12 +212,41 @@ const BilleteraDetallePage: React.FC = () => {
       setBilletera(bill)
       setTarjetas(cards)
       checkUrlParams(cards)
+      if (!bill.es_efectivo && bill.tna != null) {
+        try {
+          const est = await billeteraService.getRendimientoEstimado(bill.id)
+          setRendimientoEstimado(est)
+        } catch (e) {
+          console.error('Error al cargar rendimiento estimado', e)
+        }
+      } else {
+        setRendimientoEstimado(null)
+      }
     } catch (error) {
       console.error(error)
     } finally {
       setLoadingData(false)
     }
   }, [id, checkUrlParams])
+
+  const handleEditarBilletera = useCallback(() => {
+    if (!billetera) return
+    open('editBilletera', {
+      data: {
+        billetera,
+        billeteraPrincipalActual: billeteras.find((item) => item.es_principal),
+        onEditar: async (billeteraId, payload) => {
+          try {
+            await billeteraService.update(billeteraId, payload)
+            await refreshData()
+            sileo.success({ title: 'Billetera actualizada exitosamente' })
+          } catch (err: unknown) {
+            sileo.error({ title: getErrorMessage(err, 'No pudimos actualizar la billetera.') })
+          }
+        },
+      },
+    })
+  }, [billetera, billeteras, open, refreshData])
 
   const handleEditMovimiento = useCallback((txId: string) => {
     const tx = movimientos.find(t => t.id === txId)
@@ -377,6 +419,15 @@ const BilleteraDetallePage: React.FC = () => {
                 {billetera.es_principal && <span className={styles.principal}>Principal</span>}
                 {billetera.moneda}
               </span>
+              <button
+                type="button"
+                className={styles.headerEditBtn}
+                onClick={handleEditarBilletera}
+                title="Editar billetera"
+                aria-label="Editar billetera"
+              >
+                <Edit2 size={15} />
+              </button>
             </div>
           </div>
 
@@ -389,6 +440,50 @@ const BilleteraDetallePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Bloque Rendimiento Estimado — solo si no es efectivo y billetera.tna existe */}
+      {!billetera.es_efectivo && billetera.tna != null && (
+        <section className={styles.rendimientoSection} aria-label="Rendimiento de la billetera">
+          <div className={styles.rendimientoCard}>
+            <div className={styles.rendimientoLeft}>
+              <div className={styles.rendimientoIconCircle}>
+                <TrendingUp size={20} strokeWidth={2.2} />
+              </div>
+              <div className={styles.rendimientoInfo}>
+                <div className={styles.rendimientoHeaderRow}>
+                  <span className={styles.rendimientoTitle}>Rendimiento estimado</span>
+                  <span className={styles.rendimientoBadgeEstimado}>Estimado</span>
+                  <span className={styles.rendimientoTnaTag}>TNA {billetera.tna}%</span>
+                </div>
+                <div className={styles.rendimientoMontoRow}>
+                  <span className={styles.rendimientoMonto}>
+                    +{formatMonto(rendimientoEstimado?.rendimiento_estimado ?? 0, billetera.moneda)}
+                  </span>
+                  <span className={styles.rendimientoDias}>
+                    {rendimientoEstimado?.dias_transcurridos !== undefined
+                      ? `en ${rendimientoEstimado.dias_transcurridos} día${rendimientoEstimado.dias_transcurridos === 1 ? '' : 's'}`
+                      : 'calculando...'}
+                  </span>
+                </div>
+                <p className={styles.rendimientoDisclaimer}>
+                  Estimación según TNA. No forma parte de tu saldo disponible hasta ser confirmado.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.rendimientoAction}>
+              <button
+                type="button"
+                className={styles.registrarRendimientoBtn}
+                onClick={() => setIsRegistrarModalOpen(true)}
+              >
+                <Plus size={16} strokeWidth={2.5} />
+                Registrar rendimiento
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Switch de pestañas solo para mobile (solo si no es efectivo) */}
       {!billetera.es_efectivo && (
@@ -534,6 +629,16 @@ const BilleteraDetallePage: React.FC = () => {
         )}
       </div>
 
+      <RegistrarRendimientoModal
+        isOpen={isRegistrarModalOpen}
+        onClose={() => setIsRegistrarModalOpen(false)}
+        onSuccess={(updated) => {
+          setBilletera(updated)
+          refreshData()
+        }}
+        billetera={billetera}
+        rendimientoEstimado={rendimientoEstimado?.rendimiento_estimado}
+      />
     </div>
   )
 }

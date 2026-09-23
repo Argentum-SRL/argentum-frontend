@@ -16,6 +16,7 @@ export interface CreatePayload {
   saldo_inicial: number
   es_principal: boolean
   es_inversion?: boolean
+  tna?: number | null
   bank_id: string | null
 }
 
@@ -118,6 +119,7 @@ interface ModalState {
   nombre: string
   moneda: 'ARS' | 'USD'
   saldo: number | null
+  tna: string
   esPrincipal: boolean
   esInversion: boolean
   colorCustom: string
@@ -142,6 +144,7 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
         nombre: '',
         moneda: action.monedaPrincipal,
         saldo: null,
+        tna: '',
         esPrincipal: false,
         esInversion: false,
         colorCustom: CUSTOM_COLORS[0],
@@ -187,6 +190,7 @@ export default function BankPickerModal({
     nombre: '',
     moneda: monedaPrincipalUsuario,
     saldo: null,
+    tna: '',
     esPrincipal: false,
     esInversion: false,
     colorCustom: CUSTOM_COLORS[0],
@@ -201,6 +205,7 @@ export default function BankPickerModal({
     nombre,
     moneda,
     saldo,
+    tna,
     esPrincipal,
     esInversion,
     colorCustom,
@@ -241,12 +246,22 @@ export default function BankPickerModal({
     if (!bankSeleccionado || !nombre.trim() || isSubmitting) return
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
+      let tnaVal: number | null = null
+      const trimmedTna = tna.trim()
+      if (trimmedTna !== '') {
+        const parsed = parseFloat(trimmedTna)
+        if (!isNaN(parsed) && parsed >= 0) {
+          tnaVal = parsed
+        }
+      }
+
       await onCrear({
         nombre: nombre.trim(),
         moneda,
         saldo_inicial: saldo || 0,
         es_principal: esPrincipal,
         es_inversion: esInversion,
+        tna: tnaVal !== null ? tnaVal : undefined,
         bank_id: bankSeleccionado.id === 'custom' ? null : bankSeleccionado.id,
       })
       onClose()
@@ -424,6 +439,7 @@ export default function BankPickerModal({
                     <p className={styles.bankPreviewTipo}>
                       {bankSeleccionado.tipo === 'billetera_virtual' ? 'Billetera virtual'
                         : bankSeleccionado.tipo === 'banco_digital' ? 'Banco digital'
+                        : bankSeleccionado.tipo === 'plataforma_inversion' ? 'Plataforma de inversión'
                         : isCustom ? 'Personalizada'
                         : 'Banco tradicional'}
                     </p>
@@ -468,6 +484,23 @@ export default function BankPickerModal({
                     onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
                     placeholder="Nombre de tu billetera"
                     required
+                  />
+                </div>
+
+                {/* Tasa (TNA %) */}
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel} htmlFor="bk-tna">
+                    Tasa (TNA %) <span className={styles.fieldOptional}>(opcional)</span>
+                  </label>
+                  <input
+                    id="bk-tna"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className={styles.fieldInput}
+                    value={tna}
+                    onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })}
+                    placeholder="Ej: 36.50"
                   />
                 </div>
 

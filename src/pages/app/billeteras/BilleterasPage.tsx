@@ -288,6 +288,7 @@ export default function BilleterasPage() {
         saldo_inicial: payload.saldo_inicial,
         es_principal: payload.es_principal,
         es_inversion: payload.es_inversion,
+        tna: payload.tna,
         bank_id: payload.bank_id,
       })
       await fetchPageData()

@@ -3,7 +3,7 @@
 export interface BankDefinition {
   id: string
   nombre: string
-  tipo: 'billetera_virtual' | 'banco_digital' | 'banco_tradicional' | 'efectivo'
+  tipo: 'billetera_virtual' | 'banco_digital' | 'banco_tradicional' | 'plataforma_inversion' | 'efectivo'
   colorPrimario: string
   colorTexto: 'white' | '#111'
   /** Nombre del archivo dentro de src/assets/banks/ */
@@ -62,7 +62,69 @@ export const BANKS: BankDefinition[] = [
     colorTexto: 'white',
     logoPath: 'paypal.svg',
   },
-
+  {
+    id: 'cocos',
+    nombre: 'Cocos',
+    tipo: 'billetera_virtual',
+    colorPrimario: '#14D883',
+    colorTexto: '#111',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #14D883 0%, #0CB068 100%)',
+  },
+  {
+    id: 'claropay',
+    nombre: 'Claro Pay',
+    tipo: 'billetera_virtual',
+    colorPrimario: '#DA291C',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #DA291C 0%, #A61A0F 100%)',
+  },
+  {
+    id: 'ieb',
+    nombre: 'IEB+',
+    tipo: 'billetera_virtual',
+    colorPrimario: '#002F6C',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #002F6C 0%, #001B40 100%)',
+  },
+  {
+    id: 'n1u',
+    nombre: 'N1U',
+    tipo: 'billetera_virtual',
+    colorPrimario: '#6C5CE7',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #6C5CE7 0%, #4834D4 100%)',
+  },
+  {
+    id: 'astropay',
+    nombre: 'Astropay',
+    tipo: 'billetera_virtual',
+    colorPrimario: '#FF2D55',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #FF2D55 0%, #C41638 100%)',
+  },
+  {
+    id: 'letsbit',
+    nombre: 'LetsBit',
+    tipo: 'billetera_virtual',
+    colorPrimario: '#7B2CBF',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #7B2CBF 0%, #5A189A 100%)',
+  },
+  {
+    id: 'fiwind',
+    nombre: 'Fiwind',
+    tipo: 'billetera_virtual',
+    colorPrimario: '#00D1B2',
+    colorTexto: '#111',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #00D1B2 0%, #009E86 100%)',
+  },
 
   // ── Bancos digitales ───────────────────────────────────────────────────────
   {
@@ -185,12 +247,60 @@ export const BANKS: BankDefinition[] = [
     colorTexto: 'white',
     logoPath: 'bancosantafe.svg',
   },
+  {
+    id: 'credicoop',
+    nombre: 'Banco Credicoop',
+    tipo: 'banco_tradicional',
+    colorPrimario: '#005696',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #005696 0%, #003660 100%)',
+  },
+
+  // ── Plataformas de inversión ───────────────────────────────────────────────
+  {
+    id: 'balanz',
+    nombre: 'Balanz',
+    tipo: 'plataforma_inversion',
+    colorPrimario: '#004A8F',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #004A8F 0%, #002D5C 100%)',
+  },
+  {
+    id: 'iol',
+    nombre: 'IOL (InvertirOnline)',
+    tipo: 'plataforma_inversion',
+    colorPrimario: '#00A3E0',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #00A3E0 0%, #0077A8 100%)',
+  },
+  {
+    id: 'ppi',
+    nombre: 'Portfolio Personal Inversiones',
+    tipo: 'plataforma_inversion',
+    colorPrimario: '#1E293B',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+  },
+  {
+    id: 'cohen',
+    nombre: 'Cohen',
+    tipo: 'plataforma_inversion',
+    colorPrimario: '#1B365D',
+    colorTexto: 'white',
+    logoPath: '',
+    gradiente: 'linear-gradient(135deg, #1B365D 0%, #0B1C33 100%)',
+  },
 ]
 
 export const BANK_SECTIONS: { titulo: string; tipo: BankDefinition['tipo'] }[] = [
   { titulo: 'Billeteras virtuales', tipo: 'billetera_virtual' },
   { titulo: 'Bancos digitales',     tipo: 'banco_digital' },
   { titulo: 'Bancos tradicionales', tipo: 'banco_tradicional' },
+  { titulo: 'Plataformas de inversión', tipo: 'plataforma_inversion' },
 ]
 
 /** Colores predefinidos para billeteras personalizadas ("Otra") */

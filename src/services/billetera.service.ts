@@ -1,5 +1,5 @@
 import api from './api'
-import type { Billetera } from '@/types'
+import type { Billetera, RendimientoEstimadoResponse } from '@/types'
 import { createUserCache } from '@/utils/sessionCleanup'
 
 // Cache storage con validación automática por usuario autenticado
@@ -46,14 +46,25 @@ const billeteraService = {
     return data
   },
 
-  create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; es_inversion?: boolean; bank_id?: string | null }) => {
+  create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; es_inversion?: boolean; tna?: number | null; bank_id?: string | null }) => {
     const { data } = await api.post<Billetera>('/billeteras', payload)
     invalidateBilleteras()
     return data
   },
 
-  update: async (id: string, payload: { nombre?: string; moneda?: string; es_principal?: boolean; es_inversion?: boolean; estado?: string }) => {
+  update: async (id: string, payload: { nombre?: string; moneda?: string; es_principal?: boolean; es_inversion?: boolean; tna?: number | null; estado?: string }) => {
     const { data } = await api.put<Billetera>(`/billeteras/${id}`, payload)
+    invalidateBilleteras()
+    return data
+  },
+
+  getRendimientoEstimado: async (id: string, signal?: AbortSignal): Promise<RendimientoEstimadoResponse> => {
+    const { data } = await api.get<RendimientoEstimadoResponse>(`/billeteras/${id}/rendimiento-estimado`, { signal })
+    return data
+  },
+
+  confirmarRendimiento: async (id: string, payload: { monto: number; fecha?: string }): Promise<Billetera> => {
+    const { data } = await api.post<Billetera>(`/billeteras/${id}/rendimiento`, payload)
     invalidateBilleteras()
     return data
   },

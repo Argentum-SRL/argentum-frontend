@@ -195,10 +195,22 @@ export interface Billetera {
   es_principal: boolean
   es_efectivo: boolean
   es_inversion?: boolean
+  tna?: number | null
+  fecha_ultimo_rendimiento?: string | null
   estado: 'activa' | 'archivada'
   fecha_creacion: string
   bank_id?: string | null
   tiene_transacciones: boolean
+}
+
+export interface RendimientoEstimadoResponse {
+  billetera_id: string
+  tiene_tna: boolean
+  tna: number | null
+  saldo_actual: number
+  dias_transcurridos: number
+  fecha_ultimo_rendimiento: string | null
+  rendimiento_estimado: number
 }
 
 export interface Categoria {

@@ -10,6 +10,7 @@ export interface EditPayload {
   nombre: string
   es_principal: boolean
   es_inversion?: boolean
+  tna?: number | null
 }
 
 interface EditBilleteraModalProps {
@@ -56,6 +57,8 @@ interface EditState {
   nombre: string
   esPrincipal: boolean
   esInversion: boolean
+  tna: string
+  tnaTouched: boolean
   isSubmitting: boolean
 }
 
@@ -70,6 +73,8 @@ function editReducer(state: EditState, action: EditAction): EditState {
         nombre: action.billetera.nombre,
         esPrincipal: action.billetera.es_principal,
         esInversion: Boolean(action.billetera.es_inversion),
+        tna: action.billetera.tna != null ? String(action.billetera.tna) : '',
+        tnaTouched: false,
         isSubmitting: false
       }
     case 'SET_FIELD':
@@ -90,10 +95,12 @@ export default function EditBilleteraModal({
     nombre: '',
     esPrincipal: false,
     esInversion: false,
+    tna: '',
+    tnaTouched: false,
     isSubmitting: false
   })
 
-  const { nombre, esPrincipal, esInversion, isSubmitting } = state
+  const { nombre, esPrincipal, esInversion, tna, tnaTouched, isSubmitting } = state
 
   useEffect(() => {
     if (isOpen && billetera) {
@@ -109,11 +116,25 @@ export default function EditBilleteraModal({
     if (!nombre.trim() || isSubmitting) return
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
-      await onEditar(billetera.id, {
+      const payload: EditPayload = {
         nombre: nombre.trim(),
         es_principal: esPrincipal,
         es_inversion: esInversion,
-      })
+      }
+      if (!billetera.es_efectivo && tnaTouched) {
+        const trimmed = tna.trim()
+        if (trimmed !== '') {
+          const parsed = parseFloat(trimmed)
+          if (!isNaN(parsed) && parsed >= 0) {
+            payload.tna = parsed
+          }
+        } else {
+          if (billetera.tna != null) {
+            payload.tna = null
+          }
+        }
+      }
+      await onEditar(billetera.id, payload)
       onClose()
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })
@@ -174,6 +195,27 @@ export default function EditBilleteraModal({
               autoFocus
             />
           </div>
+
+          {!billetera.es_efectivo && (
+            <div className={styles.formField}>
+              <label className={styles.fieldLabel} htmlFor="edit-tna">
+                Tasa (TNA %) <span className={styles.fieldOptional}>(opcional)</span>
+              </label>
+              <input
+                id="edit-tna"
+                type="number"
+                step="0.01"
+                min="0"
+                className={styles.fieldInput}
+                value={tna}
+                onChange={(e) => {
+                  dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })
+                  dispatch({ type: 'SET_FIELD', field: 'tnaTouched', value: true })
+                }}
+                placeholder="Ej: 36.50"
+              />
+            </div>
+          )}
 
 
           <button

@@ -804,6 +804,18 @@
 [data-bank="hsbc"] { --bank-color: #DB0011; }
 [data-bank="supervielle"] { --bank-color: #E4002B; }
 [data-bank="bancosantafe"] { --bank-color: #005BA1; }
+[data-bank="credicoop"] { --bank-color: #005696; }
+[data-bank="cocos"] { --bank-color: #14D883; }
+[data-bank="claropay"] { --bank-color: #DA291C; }
+[data-bank="ieb"] { --bank-color: #002F6C; }
+[data-bank="n1u"] { --bank-color: #6C5CE7; }
+[data-bank="astropay"] { --bank-color: #FF2D55; }
+[data-bank="letsbit"] { --bank-color: #7B2CBF; }
+[data-bank="fiwind"] { --bank-color: #00D1B2; }
+[data-bank="balanz"] { --bank-color: #004A8F; }
+[data-bank="iol"] { --bank-color: #00A3E0; }
+[data-bank="ppi"] { --bank-color: #1E293B; }
+[data-bank="cohen"] { --bank-color: #1B365D; }
 [data-bank="custom"] { --bank-color: #8A95A8; }
 
 /* ── Custom Colors for "Otra" ─────────────────────────────────────────────── */

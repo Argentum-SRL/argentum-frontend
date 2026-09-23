@@ -17,7 +17,7 @@
 - `BankPickerModal` → usa `useReducer` con `modalReducer` local
 - `EditBilleteraModal` → usa `useReducer` con `editReducer` local
 - `TransaccionModal` → usa `useReducer` con `formReducer` local
-- `RecurrentesPage` → 6 `useState` diferentes
+- `RecurrentesPage` → 6 `useState` diferentes *(Nota 23/09/2026: El módulo de transacciones recurrentes fue eliminado por completo del sistema —base de datos, backend y frontend—; las referencias de este documento a `RecurrentesPage` y `RecurrenteModal` son de carácter histórico).*
 - `PerfilPage` → 8 `useState` para modales
 - `DashboardPage` → `isProyeccionModalOpen` local
 - `ProyeccionCard` → `modalOpen` local

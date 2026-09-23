@@ -176,22 +176,40 @@ export default function BilleterasPage() {
 
   const [showArchived, setShowArchived] = useState(false)
 
+  const monedaUsuario = usuario?.moneda_principal ?? 'ARS'
+
   const { 
     billeterasActivas, 
-    billeterasArchivadas, 
-    billeterasRegulares, 
-    billeterasEfectivo
+    billeterasArchivadas
   } = useMemo(() => {
-    const activas = billeteras.filter((b) => b.estado === 'activa')
-    const archivadas = billeteras.filter((b) => b.estado === 'archivada')
+    const sortFn = (a: Billetera, b: Billetera) => {
+      // 1. La principal siempre es la primera
+      if (a.es_principal && !b.es_principal) return -1
+      if (!a.es_principal && b.es_principal) return 1
+
+      // 2. Agrupar por moneda: primero la moneda principal del usuario
+      const aPrioridad = a.moneda === monedaUsuario ? 0 : 1
+      const bPrioridad = b.moneda === monedaUsuario ? 0 : 1
+      if (aPrioridad !== bPrioridad) {
+        return aPrioridad - bPrioridad
+      }
+
+      return 0
+    }
+
+    const activas = billeteras
+      .filter((b) => b.estado === 'activa')
+      .sort(sortFn)
+
+    const archivadas = billeteras
+      .filter((b) => b.estado === 'archivada')
+      .sort(sortFn)
     
     return {
       billeterasActivas: activas,
-      billeterasArchivadas: archivadas,
-      billeterasRegulares: activas.filter((b) => !b.es_efectivo),
-      billeterasEfectivo: activas.filter((b) => b.es_efectivo)
+      billeterasArchivadas: archivadas
     }
-  }, [billeteras])
+  }, [billeteras, monedaUsuario])
 
   const { totalARS, totalUSD } = useMemo(() => {
     const valorUSD = cotizacion?.venta ?? 0
@@ -455,19 +473,7 @@ export default function BilleterasPage() {
             <EstadoVacio onCrear={openCrearModal} />
           ) : (
             <div className={styles.grid}>
-              {billeterasRegulares.map((b) => (
-                <BilleteraCard
-                  key={b.id}
-                  billetera={b}
-                  isFront={frontCardId === b.id}
-                  onSetFront={() => setFrontCardId(b.id)}
-                  onArchivar={handleArchivar}
-                  onDesarchivar={handleDesarchivar}
-                  onEliminar={handleEliminar}
-                  onEditar={handleEditar}
-                />
-              ))}
-              {billeterasEfectivo.map((b) => (
+              {billeterasActivas.map((b) => (
                 <BilleteraCard
                   key={b.id}
                   billetera={b}

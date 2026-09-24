@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Calendar, PieChart, CreditCard, Target, Settings } from 'lucide-react'
+import { Calendar, PieChart, CreditCard, Target, Settings } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import styles from './NotificacionesConfigModal.module.css'

@@ -4,7 +4,7 @@ import {
   Search, Moon, Sun, User, LogOut, Wallet, Target, 
   PieChart, RefreshCw, LayoutDashboard, ArrowUpDown, 
   Plus, X, Calculator, Shield
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useModal } from '@/hooks/useModal'

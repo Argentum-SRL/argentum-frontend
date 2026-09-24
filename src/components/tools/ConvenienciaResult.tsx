@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Lightbulb, HelpCircle } from 'lucide-react';
+import { CheckCircle, Lightbulb, HelpCircle } from '@/components/ui/icons';
 import { formatMonto } from '@/utils/format';
 import type { ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import DetalleCuotasChart from './DetalleCuotasChart';

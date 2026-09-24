@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera } from '@/types'
 import styles from './ModalesImportacion.module.css'

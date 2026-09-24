@@ -10,7 +10,7 @@ import {
   Target,
   ArrowLeftRight,
   AlertCircle
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import type { Presupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'

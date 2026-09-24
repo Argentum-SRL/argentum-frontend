@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2 } from '@/components/ui/icons'
 import type { TransferenciaInterna, Billetera } from '@/types'
 import { formatMonto, formatHora } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'

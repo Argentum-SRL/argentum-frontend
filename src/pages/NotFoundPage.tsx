@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { Home, ArrowLeft, AlertCircle } from 'lucide-react'
+import { Home, ArrowLeft, AlertCircle } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { AtmosphericBackground, AtmosphericCard } from '@/components/ui'
 import styles from './NotFoundPage.module.css'

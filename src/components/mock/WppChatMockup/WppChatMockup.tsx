@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
-import { MessageCircle, PieChart, Play, RefreshCw } from 'lucide-react'
+import { MessageCircle, PieChart, Play, RefreshCw } from '@/components/ui/icons'
 import styles from './WppChatMockup.module.css'
 
 // ─── Types ────────────────────────────────────────────────────────────────────

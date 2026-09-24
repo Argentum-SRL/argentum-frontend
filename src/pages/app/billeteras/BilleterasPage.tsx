@@ -1,7 +1,7 @@
 // ─── BilleterasPage ───────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
-import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft, ArrowLeft } from 'lucide-react'
+import { Plus, Eye, EyeOff, Wallet, ArrowRightLeft, ArrowLeft } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'

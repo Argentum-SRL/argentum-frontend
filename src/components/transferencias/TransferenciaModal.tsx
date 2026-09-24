@@ -13,7 +13,7 @@ import {
   TrendingUp,
   Wallet,
   Percent,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera, CotizacionDolar } from '@/types'
 import transferenciaService from '@/services/transferencia.service'

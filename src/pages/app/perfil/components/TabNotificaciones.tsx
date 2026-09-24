@@ -10,7 +10,7 @@ import {
   Globe,
   MessageSquare,
   Save,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { ConfiguracionNotificacion } from '@/types'
 import { TimeInput } from '@/components/ui'

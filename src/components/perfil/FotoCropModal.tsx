@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, X } from 'lucide-react'
+import { Camera, X } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import usuarioService from '@/services/usuario.service'
 import { useAuth } from '@/hooks/useAuth'

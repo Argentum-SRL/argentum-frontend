@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
-import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from 'lucide-react'
+import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'

@@ -1,6 +1,6 @@
 import { type FormEvent, useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import { Field, Button } from '@/components/ui'
 import { verificarCodigoEmail, enviarCodigoEmail } from '@/services/auth.service'

@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { Scale, HelpCircle, FileSpreadsheet } from 'lucide-react';
+import { Scale, HelpCircle, FileSpreadsheet } from '@/components/ui/icons';
 import useTools from '@/hooks/useTools';
 import ConvenienciaForm from '@/components/tools/ConvenienciaForm';
 import ConvenienciaResult from '@/components/tools/ConvenienciaResult';

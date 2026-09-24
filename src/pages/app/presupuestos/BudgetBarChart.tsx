@@ -7,7 +7,7 @@ import {
   Trash2,
   X,
   ChevronRight
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Presupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'

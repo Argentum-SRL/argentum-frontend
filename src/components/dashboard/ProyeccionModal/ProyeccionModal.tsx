@@ -1,5 +1,5 @@
 import React from 'react'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import styles from './ProyeccionModal.module.css'
 import type { Proyeccion } from '@/types'

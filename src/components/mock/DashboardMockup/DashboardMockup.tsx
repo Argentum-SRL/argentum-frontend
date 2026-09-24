@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react'
-import { CreditCard, Target, TrendingUp } from 'lucide-react'
+import { CreditCard, Target, TrendingUp } from '@/components/ui/icons'
 import styles from './DashboardMockup.module.css'
 
 // ─── Data ─────────────────────────────────────────────────────────────────────

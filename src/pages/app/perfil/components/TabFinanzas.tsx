@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Coins, Calendar, Save, Check, ArrowLeft, ArrowRight } from 'lucide-react'
+import { Coins, Calendar, Save, Check, ArrowLeft, ArrowRight } from '@/components/ui/icons'
 import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { getCotizaciones, getPreviewFechaCobro } from '@/services/onboarding.service'

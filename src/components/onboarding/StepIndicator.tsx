@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { Check } from '@/components/ui/icons'
 import styles from './StepIndicator.module.css'
 
 interface Props {

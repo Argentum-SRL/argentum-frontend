@@ -1,5 +1,5 @@
 import React from 'react'
-import { CheckCircle2, RefreshCw } from 'lucide-react'
+import { CheckCircle2, RefreshCw } from '@/components/ui/icons'
 import type { ConfirmarImportacionResponse } from '@/types'
 import styles from './ImportacionResumenSection.module.css' // Reutilizar estructura general y botones
 

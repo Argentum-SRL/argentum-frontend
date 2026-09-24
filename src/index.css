@@ -32,6 +32,25 @@ img, svg, video {
   max-width: 100%;
 }
 
+button svg,
+a svg,
+[role="button"] svg {
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+button:hover svg,
+a:hover svg,
+[role="button"]:hover svg {
+  transform: scale(1.12);
+}
+
+button:active svg,
+a:active svg,
+[role="button"]:active svg {
+  transform: scale(0.92);
+}
+
 input, button, textarea, select {
   font: inherit;
 }
@@ -206,4 +225,70 @@ input:-webkit-autofill:active {
     font-size: 16px !important;
   }
 }
+
+/* ── Universal Icon Micro-interactions across ALL buttons, elements & standalone icons ── */
+
+/* 1. Base transition for EVERY SVG and animated icon container in the frontend */
+svg:not(.animate-spin):not([data-no-animate]),
+[data-icon] {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease, opacity 0.15s ease;
+  transform-origin: center center;
+}
+
+/* 2. Standalone icon hover (when hovering directly on ANY icon anywhere in the page) */
+svg:not(.animate-spin):not([data-no-animate]):hover,
+[data-icon]:hover {
+  transform: scale(1.22);
+}
+
+/* 3. Hovering ANY button, clickable element, link, or tab */
+button:hover svg:not(.animate-spin):not([data-no-animate]),
+button:hover [data-icon],
+a:hover svg:not(.animate-spin):not([data-no-animate]),
+a:hover [data-icon],
+[role="button"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[role="tab"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[role="menuitem"]:hover svg:not(.animate-spin):not([data-no-animate]),
+.btn:hover svg:not(.animate-spin):not([data-no-animate]),
+.tab:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="btn"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Btn"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="button"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Button"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="action"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Action"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="close"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Close"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="delete"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Delete"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="drawer"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="modal"]:hover svg:not(.animate-spin):not([data-no-animate]) {
+  transform: scale(1.18);
+}
+
+/* 4. Hovering ANY Card, Row, Pill, Badge or Item */
+[class*="card"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Card"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="row"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Row"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="item"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Item"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="pill"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Pill"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="badge"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="Badge"]:hover svg:not(.animate-spin):not([data-no-animate]),
+[class*="chip"]:hover svg:not(.animate-spin):not([data-no-animate]) {
+  transform: scale(1.14);
+}
+
+/* 5. Active click press sensation */
+button:active svg:not(.animate-spin):not([data-no-animate]),
+a:active svg:not(.animate-spin):not([data-no-animate]),
+[role="button"]:active svg:not(.animate-spin):not([data-no-animate]),
+[class*="btn"]:active svg:not(.animate-spin):not([data-no-animate]),
+[class*="Btn"]:active svg:not(.animate-spin):not([data-no-animate]) {
+  transform: scale(0.9);
+  transition: transform 0.08s ease;
+}
+
 

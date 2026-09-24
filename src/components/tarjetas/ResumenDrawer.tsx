@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle } from '@/components/ui/icons'
 import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, ItemSaldoArrastrado, BloqueResumenMoneda } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import Drawer from '@/components/ui/Drawer/Drawer'

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import styles from './TermsPage.module.css'
 

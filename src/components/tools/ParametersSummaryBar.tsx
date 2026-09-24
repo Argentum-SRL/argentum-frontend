@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, Check, type LucideIcon } from 'lucide-react';
+import { Pencil, Check, type LucideIcon } from '@/components/ui/icons';
 import styles from './ToolsComponents.module.css';
 
 export interface SummaryItem {

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, Check, AlertCircle } from 'lucide-react'
+import { ChevronDown, Check, AlertCircle } from '@/components/ui/icons'
 import styles from './SelectInput.module.css'
 
 export interface SelectOption {

@@ -10,7 +10,7 @@ import {
   X, 
   ChevronRight,
   Eye
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'

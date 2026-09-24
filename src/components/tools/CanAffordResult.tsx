@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, AlertCircle, AlertTriangle, XCircle, HelpCircle, RotateCcw, Info } from 'lucide-react';
+import { CheckCircle2, AlertCircle, AlertTriangle, XCircle, HelpCircle, RotateCcw, Info } from '@/components/ui/icons';
 import { formatMonto } from '@/utils/format';
 import { Button } from '@/components/ui';
 import type { CanAffordResult as ICanAffordResult } from '@/types/tools';

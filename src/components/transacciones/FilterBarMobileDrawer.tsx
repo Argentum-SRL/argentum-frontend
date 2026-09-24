@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, X, Wallet, Banknote } from 'lucide-react'
+import { Check, X, Wallet, Banknote } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'

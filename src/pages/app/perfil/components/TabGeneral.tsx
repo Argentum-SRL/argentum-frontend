@@ -9,7 +9,7 @@ import {
   Lock,
   CheckCircle2,
   AlertCircle,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
 import styles from '../PerfilPage.module.css'

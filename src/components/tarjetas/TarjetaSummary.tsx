@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { AlertCircle, ChevronLeft, ChevronRight, Edit2, Trash2, ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
+import { AlertCircle, ChevronLeft, ChevronRight, Edit2, Trash2, ChevronDown, ChevronUp, CreditCard } from '@/components/ui/icons'
 import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, Categoria, ItemSaldoArrastrado, PagarTarjetaPayload } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'

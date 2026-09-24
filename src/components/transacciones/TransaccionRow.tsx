@@ -8,7 +8,7 @@ import {
   Banknote,
   ChevronRight,
   Target
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { formatMonto, formatHora } from '@/utils/format'

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMe
 import { createPortal } from 'react-dom'
 import { format, parse, isValid, getDaysInMonth, startOfDay } from 'date-fns'
 import { es } from 'date-fns/locale/es'
-import { Calendar, AlertCircle, Keyboard } from 'lucide-react'
+import { Calendar, AlertCircle, Keyboard } from '@/components/ui/icons'
 import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
 import '@ncdai/react-wheel-picker/style.css'
 import styles from './DateInput.module.css'

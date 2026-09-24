@@ -16,7 +16,7 @@ import {
   Info,
   X,
   MoreVertical,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { Notificacion, TipoNotificacion } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'

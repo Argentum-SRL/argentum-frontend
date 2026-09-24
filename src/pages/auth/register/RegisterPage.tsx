@@ -1,6 +1,6 @@
 import { type FormEvent, useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from '@/components/ui/icons'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import DashboardMockup from '@/components/mock/DashboardMockup/DashboardMockup'

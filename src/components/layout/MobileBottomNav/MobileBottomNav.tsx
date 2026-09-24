@@ -7,13 +7,13 @@ import {
   PieChart,
   MoreHorizontal,
   type LucideIcon,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import styles from './MobileBottomNav.module.css'
 
 interface NavItemConfig {
   label: string
   path: string
-  Icon: LucideIcon
+  Icon: LucideIcon | React.ComponentType<{ size?: number; className?: string; strokeWidth?: number; isHovered?: boolean }>
 }
 
 const MOBILE_NAV: NavItemConfig[] = [

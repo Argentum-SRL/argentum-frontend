@@ -1,6 +1,6 @@
 import { useEffect, useId, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from '@/components/ui/icons'
 import { getEstadoOnboarding } from '@/services/onboarding.service'
 import type { EstadoOnboarding } from '@/types/index'
 import StepIndicator from '@/components/onboarding/StepIndicator'

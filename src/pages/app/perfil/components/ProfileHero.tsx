@@ -1,5 +1,5 @@
 import React from 'react'
-import { Camera, Trash2, CheckCircle2, AlertCircle, Copy, Check } from 'lucide-react'
+import { Camera, Trash2, CheckCircle2, AlertCircle, Copy, Check } from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import { useModal } from '@/hooks/useModal'
 import { sileo } from 'sileo'

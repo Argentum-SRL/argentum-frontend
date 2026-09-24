@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { ChevronDown, ChevronUp, Info } from '@/components/ui/icons';
 import styles from './ToolsComponents.module.css';
 
 export const ExplicacionCalculo: React.FC = () => {

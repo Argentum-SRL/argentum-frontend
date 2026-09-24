@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { X, CreditCard, CheckCircle2, Edit3, AlertTriangle, Info, Check, DollarSign, ArrowRightLeft } from 'lucide-react'
+import { X, CreditCard, CheckCircle2, Edit3, AlertTriangle, Info, Check, DollarSign, ArrowRightLeft } from '@/components/ui/icons'
 import type { TarjetaCredito, Billetera, PagarTarjetaPayload } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import { formatMonto } from '@/utils/format'

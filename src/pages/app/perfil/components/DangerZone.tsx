@@ -1,5 +1,5 @@
 import React from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2 } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
 import { sileo } from 'sileo'
@@ -10,6 +10,7 @@ import styles from '../PerfilPage.module.css'
 export const DangerZone: React.FC = () => {
   const { logout } = useAuth()
   const { confirm } = useModal()
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false)
 
   const handleDeleteAccount = () => {
     confirm({
@@ -44,8 +45,10 @@ export const DangerZone: React.FC = () => {
         type="button"
         className={styles.deleteBtnModern}
         onClick={handleDeleteAccount}
+        onMouseEnter={() => setIsBtnHovered(true)}
+        onMouseLeave={() => setIsBtnHovered(false)}
       >
-        <Trash2 size={15} />
+        <Trash2 size={15} isHovered={isBtnHovered} />
         <span>Eliminar mi cuenta</span>
       </button>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { AlertTriangle, Info } from 'lucide-react'
+import { AlertTriangle, Info } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import styles from './ConfirmModal.module.css'
 

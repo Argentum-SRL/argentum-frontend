@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Shield, Eye, EyeOff, Check, AlertCircle, Save, LogOut, Info } from 'lucide-react'
+import { Shield, Eye, EyeOff, Check, AlertCircle, Save, LogOut, Info } from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'

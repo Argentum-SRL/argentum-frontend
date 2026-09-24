@@ -179,6 +179,7 @@
 .topBarBtn:hover { 
   background: var(--sb-hover-bg); 
   color: var(--sb-text-hover);
+  transform: scale(1.06);
 }
 
 .topBarUserInfo {
@@ -461,6 +462,11 @@
   height: 18px;
   flex-shrink: 0;
   position: relative;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.navItem:hover .navIcon {
+  transform: scale(1.18);
 }
 
 .navLabel {

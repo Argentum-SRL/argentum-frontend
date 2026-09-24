@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Coins } from 'lucide-react';
+import { Calendar, Coins } from '@/components/ui/icons';
 import { Button, MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';

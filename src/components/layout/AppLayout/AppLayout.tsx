@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
   Bell, Search, Sun, Moon, LogOut, ChevronDown, User,
   Calculator, Shield
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
@@ -65,6 +65,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [prevPath, setPrevPath] = useState(location.pathname)
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null)
+  const [hoveredBtn, setHoveredBtn] = useState<string | null>(null)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -124,9 +126,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 key={path}
                 to={path}
                 className={[styles.navItem, isActive(path) ? styles.navItemActive : ''].filter(Boolean).join(' ')}
+                onMouseEnter={() => setHoveredNav(path)}
+                onMouseLeave={() => setHoveredNav(null)}
               >
                 <span className={styles.navIcon}>
-                  <Icon {...SIDEBAR_ICON_PROPS} />
+                  <Icon {...SIDEBAR_ICON_PROPS} isHovered={hoveredNav === path} />
                 </span>
                 <span className={styles.navLabel}>{label}</span>
               </Link>
@@ -138,15 +142,37 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className={styles.headerRight}>
           {/* Pill 1: Controls */}
           <div className={styles.actionPill}>
-            <button className={styles.topBarBtn} onClick={() => setIsSearchOpen(true)} title="Buscar">
-              <Search size={18} strokeWidth={1.75} />
+            <button
+              className={styles.topBarBtn}
+              onClick={() => setIsSearchOpen(true)}
+              title="Buscar"
+              onMouseEnter={() => setHoveredBtn('search')}
+              onMouseLeave={() => setHoveredBtn(null)}
+            >
+              <Search size={18} strokeWidth={1.75} isHovered={hoveredBtn === 'search'} />
             </button>
-            <button className={styles.topBarBtn} onClick={() => setIsDrawerOpen(true)} title="Notificaciones">
-              <Bell size={18} strokeWidth={1.75} />
+            <button
+              className={styles.topBarBtn}
+              onClick={() => setIsDrawerOpen(true)}
+              title="Notificaciones"
+              onMouseEnter={() => setHoveredBtn('bell')}
+              onMouseLeave={() => setHoveredBtn(null)}
+            >
+              <Bell size={18} strokeWidth={1.75} isHovered={hoveredBtn === 'bell'} />
               {unreadCount > 0 && <span className={styles.notifDot} />}
             </button>
-            <button className={styles.topBarBtn} onClick={toggleTheme} title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}>
-              {theme === 'dark' ? <Sun size={18} strokeWidth={1.75} /> : <Moon size={18} strokeWidth={1.75} />}
+            <button
+              className={styles.topBarBtn}
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+              onMouseEnter={() => setHoveredBtn('theme')}
+              onMouseLeave={() => setHoveredBtn(null)}
+            >
+              {theme === 'dark' ? (
+                <Sun size={18} strokeWidth={1.75} isHovered={hoveredBtn === 'theme'} />
+              ) : (
+                <Moon size={18} strokeWidth={1.75} isHovered={hoveredBtn === 'theme'} />
+              )}
             </button>
           </div>
 
@@ -158,6 +184,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
               title={usuario?.nombre ? `${usuario.nombre} (${usuario.email || ''})` : 'Perfil'}
               aria-expanded={isProfileOpen}
               aria-haspopup="true"
+              onMouseEnter={() => setHoveredBtn('profile')}
+              onMouseLeave={() => setHoveredBtn(null)}
             >
               <div className={styles.topBarAvatar}>
                 {fotoUrl && !fotoError
@@ -169,7 +197,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <span className={styles.topBarUserName}>{usuario?.nombre}</span>
                 {usuario?.email && <span className={styles.topBarUserEmail}>{usuario.email}</span>}
               </div>
-              <ChevronDown size={16} strokeWidth={1.75} className={styles.profileChevron} />
+              <ChevronDown
+                size={16}
+                strokeWidth={1.75}
+                className={styles.profileChevron}
+                isHovered={hoveredBtn === 'profile'}
+              />
             </button>
             
             {isProfileOpen && (

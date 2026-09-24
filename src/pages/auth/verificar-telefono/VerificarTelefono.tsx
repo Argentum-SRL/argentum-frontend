@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   AlertCircle,
   RefreshCw,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import {
   solicitarCodigoVinculacion,

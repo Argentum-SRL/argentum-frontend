@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock, Edit3, MessageSquare, Unlink } from 'lucide-react'
+import { Shield, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Save, Check, Lock, Edit3, MessageSquare, Unlink } from '@/components/ui/icons'
 import type { Usuario, MetodosLogin } from '@/types'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
 import usuarioService from '@/services/usuario.service'

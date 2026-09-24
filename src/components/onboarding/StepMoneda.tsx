@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from '@/components/ui/icons'
 import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
 import { sileo } from 'sileo'

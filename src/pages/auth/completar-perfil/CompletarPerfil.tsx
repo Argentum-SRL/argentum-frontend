@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import { Field, Button } from '@/components/ui'
 import { completarPerfil } from '@/services/auth.service'

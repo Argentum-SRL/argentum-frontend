@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, Loader2 } from 'lucide-react'
+import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, Loader2 } from '@/components/ui/icons'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'

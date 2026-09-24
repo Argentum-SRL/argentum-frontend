@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign } from 'lucide-react'
+import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign } from '@/components/ui/icons'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'

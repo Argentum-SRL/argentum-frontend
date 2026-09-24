@@ -10,7 +10,7 @@ import {
   ChevronRight,
   X,
   GripHorizontal
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import styles from './GruposCuotasTab.module.css'
 import grupoCuotasService from '@/services/grupoCuotas.service'
 import billeteraService from '@/services/billetera.service'

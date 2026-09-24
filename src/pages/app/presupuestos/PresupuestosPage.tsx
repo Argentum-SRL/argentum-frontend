@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Plus, 
   PieChart
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import styles from './PresupuestosPage.module.css'
 import presupuestoService from '@/services/presupuesto.service'
 import categoriaService from '@/services/categoria.service'

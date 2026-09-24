@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Upload, FileText, X, AlertCircle } from 'lucide-react'
+import { Upload, FileText, X, AlertCircle } from '@/components/ui/icons'
 import styles from './ImportacionResumenSection.module.css'
 
 interface UploadPdfResumenProps {

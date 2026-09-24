@@ -28,7 +28,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   Trash2
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { getFotoUrl } from '@/utils/fotoUrl'
 import { formatFecha, formatFechaHora } from '@/utils/format'
 import styles from './AdminPage.module.css'

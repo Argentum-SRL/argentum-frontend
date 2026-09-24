@@ -11,7 +11,7 @@ import {
   Hash,
   Percent,
   Trash2,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Transaccion, Billetera, Categoria, Subcategoria, TarjetaCredito } from '@/types'
 import transaccionService from '@/services/transaccion.service'

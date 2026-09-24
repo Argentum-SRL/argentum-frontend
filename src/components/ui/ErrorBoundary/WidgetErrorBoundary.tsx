@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import { AlertCircle, RefreshCw } from '@/components/ui/icons'
 import { reportarErrorFrontend } from '@/services/reporteError.service'
 import styles from './WidgetErrorBoundary.module.css'
 

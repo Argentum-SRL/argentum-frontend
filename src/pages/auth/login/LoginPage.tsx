@@ -1,6 +1,6 @@
 import { type FormEvent, useState, useCallback } from 'react'
 import { useNavigate, Link, useLocation, type Location } from 'react-router-dom'
-import { Eye, EyeOff, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle2 } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'

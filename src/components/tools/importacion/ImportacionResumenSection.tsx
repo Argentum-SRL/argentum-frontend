@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Loader2, AlertTriangle, ShieldAlert } from 'lucide-react'
+import { Loader2, AlertTriangle, ShieldAlert } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import tarjetaService from '@/services/tarjeta.service'

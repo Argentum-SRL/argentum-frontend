@@ -3,7 +3,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'

@@ -10,7 +10,7 @@ import {
   Moon,
   LogOut,
   type LucideIcon,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import styles from './MobileMoreSheet.module.css'
 
 interface MobileMoreSheetProps {
@@ -26,7 +26,7 @@ interface MobileMoreSheetProps {
 interface MenuItemConfig {
   id: string
   label: string
-  Icon: LucideIcon
+  Icon: LucideIcon | React.ComponentType<{ size?: number; className?: string; strokeWidth?: number; isHovered?: boolean }>
   path?: string
   action?: () => void
   isDanger?: boolean

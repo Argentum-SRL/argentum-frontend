@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Save, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { Save, AlertCircle, Eye, EyeOff } from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { sileo } from 'sileo'

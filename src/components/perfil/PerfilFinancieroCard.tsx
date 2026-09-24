@@ -4,7 +4,7 @@ import {
   AlertCircle, 
   HelpCircle,
   Info
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { getPerfilFinanciero, recalcularPerfilFinanciero } from '@/services/perfilFinanciero.service'
 import { triggerBienvenidaFinancieraOnce } from '@/utils/bienvenidaFinancieraManager'
 import { useModal } from '@/hooks/useModal'

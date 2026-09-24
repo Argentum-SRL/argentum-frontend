@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react'
-import { X, Check } from 'lucide-react'
+import { X, Check } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import type { BankDefinition } from '@/lib/constants/banks'

@@ -8,7 +8,7 @@ import {
   Target,
   Pause,
   Play
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import goalsService from '@/services/goals.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'

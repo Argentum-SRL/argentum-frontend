@@ -18,7 +18,7 @@ import {
   EyeOff,
   Star,
   HelpCircle
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { sileo } from 'sileo'

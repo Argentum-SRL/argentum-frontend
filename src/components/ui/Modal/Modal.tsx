@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { X } from '@/components/ui/icons'
 import styles from './Modal.module.css'
 
 interface ModalProps {
@@ -80,7 +81,7 @@ const Modal: React.FC<ModalProps> = ({
               onClick={onClose}
               aria-label="Cerrar modal"
             >
-              &times;
+              <X size={18} />
             </button>
           </div>
         )}

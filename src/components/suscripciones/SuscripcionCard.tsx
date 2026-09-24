@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Play, Pause, Trash2, CreditCard, Wallet, Bell, Calendar, TrendingUp } from 'lucide-react'
+import { Edit2, Play, Pause, Trash2, CreditCard, Wallet, Bell, Calendar, TrendingUp } from '@/components/ui/icons'
 import type { Suscripcion, Billetera, TarjetaCredito } from '@/types'
 import { findServicioCatalogo } from '@/lib/constants/suscripciones'
 import { formatMonto, formatFecha } from '@/utils/format'

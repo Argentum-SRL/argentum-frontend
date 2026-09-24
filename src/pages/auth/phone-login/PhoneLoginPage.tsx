@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ShieldAlert, ArrowRight } from 'lucide-react'
+import { ShieldAlert, ArrowRight } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import styles from './PhoneLoginPage.module.css'

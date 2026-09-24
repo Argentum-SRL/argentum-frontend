@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw, TrendingUp } from 'lucide-react'
+import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw, TrendingUp } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'

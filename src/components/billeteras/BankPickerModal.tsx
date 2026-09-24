@@ -1,7 +1,7 @@
 // ─── BankPickerModal — modal de dos pasos para crear billetera ────────────────
 
 import { useState, useMemo, useEffect, useReducer } from 'react'
-import { X, ChevronLeft, Search, Check } from 'lucide-react'
+import { X, ChevronLeft, Search, Check } from '@/components/ui/icons'
 import { BANKS, BANK_SECTIONS, CUSTOM_COLORS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
 import type { Billetera } from '@/types'

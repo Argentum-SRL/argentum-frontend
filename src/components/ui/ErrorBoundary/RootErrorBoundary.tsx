@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useRouteError } from 'react-router-dom'
-import { AlertCircle, RotateCcw } from 'lucide-react'
+import { AlertCircle, RotateCcw } from '@/components/ui/icons'
 import { reportarErrorFrontend } from '@/services/reporteError.service'
 import { AtmosphericBackground, AtmosphericCard } from '@/components/ui'
 import styles from './RootErrorBoundary.module.css'

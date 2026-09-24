@@ -3,7 +3,7 @@ import {
   X, 
   History, 
   AlertCircle 
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { EmptyState } from '@/components/ui'
 import type { Presupuesto, PeriodoPresupuesto } from '@/types'

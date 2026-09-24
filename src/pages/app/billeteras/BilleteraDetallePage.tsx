@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign, TrendingUp, Edit2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign, TrendingUp, Edit2 } from '@/components/ui/icons'
 import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'

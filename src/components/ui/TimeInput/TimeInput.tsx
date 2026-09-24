@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { Clock } from 'lucide-react'
+import { Clock } from '@/components/ui/icons'
 import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
 import '@ncdai/react-wheel-picker/style.css'
 import styles from './TimeInput.module.css'

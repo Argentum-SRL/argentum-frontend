@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { ChevronDown, Check } from 'lucide-react'
+import { ChevronDown, Check } from '@/components/ui/icons'
 import styles from './PhoneCountrySelect.module.css'
 
 export interface Country {

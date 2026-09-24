@@ -1,5 +1,5 @@
 import React from 'react'
-import { X } from 'lucide-react'
+import { X } from '@/components/ui/icons'
 import styles from './Drawer.module.css'
 
 interface DrawerProps {

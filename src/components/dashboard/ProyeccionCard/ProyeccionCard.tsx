@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react'
-import { TrendingUp, Info, ChevronDown, ChevronUp } from 'lucide-react'
+import { TrendingUp, Info, ChevronDown, ChevronUp } from '@/components/ui/icons'
 import { formatMonto } from '@/utils/format'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { dashboardService } from '@/services/dashboard.service'

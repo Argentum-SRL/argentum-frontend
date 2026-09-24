@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react'
-import { Calendar } from 'lucide-react'
+import { Calendar } from '@/components/ui/icons'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import TransaccionRow from './TransaccionRow'
 import styles from './DayGroup.module.css'

@@ -6,7 +6,7 @@ import {
   Shield,
   Bell,
   AlertTriangle,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import * as authService from '@/services/auth.service'
@@ -36,6 +36,8 @@ export default function PerfilPage() {
   const tabParam = new URLSearchParams(location.search).get('tab') as TabType | null
   const validTabs: TabType[] = ['perfil', 'finanzas', 'seguridad', 'notificaciones', 'peligro']
   const activeTab: TabType = validTabs.includes(tabParam as TabType) ? (tabParam as TabType) : 'perfil'
+
+  const [hoveredTab, setHoveredTab] = useState<string | null>(null)
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/app/perfil?tab=${tab}`, { replace: true })
@@ -98,8 +100,10 @@ export default function PerfilPage() {
             type="button"
             className={`${styles.tab} ${activeTab === 'perfil' ? styles.tabActive : ''}`}
             onClick={() => handleTabChange('perfil')}
+            onMouseEnter={() => setHoveredTab('perfil')}
+            onMouseLeave={() => setHoveredTab(null)}
           >
-            <User size={15} />
+            <User size={15} isHovered={hoveredTab === 'perfil'} />
             <span>General</span>
           </button>
 
@@ -107,8 +111,10 @@ export default function PerfilPage() {
             type="button"
             className={`${styles.tab} ${activeTab === 'finanzas' ? styles.tabActive : ''}`}
             onClick={() => handleTabChange('finanzas')}
+            onMouseEnter={() => setHoveredTab('finanzas')}
+            onMouseLeave={() => setHoveredTab(null)}
           >
-            <Coins size={15} />
+            <Coins size={15} isHovered={hoveredTab === 'finanzas'} />
             <span>Finanzas & Moneda</span>
           </button>
 
@@ -116,8 +122,10 @@ export default function PerfilPage() {
             type="button"
             className={`${styles.tab} ${activeTab === 'seguridad' ? styles.tabActive : ''}`}
             onClick={() => handleTabChange('seguridad')}
+            onMouseEnter={() => setHoveredTab('seguridad')}
+            onMouseLeave={() => setHoveredTab(null)}
           >
-            <Shield size={15} />
+            <Shield size={15} isHovered={hoveredTab === 'seguridad'} />
             <span>Seguridad</span>
           </button>
 
@@ -125,8 +133,10 @@ export default function PerfilPage() {
             type="button"
             className={`${styles.tab} ${activeTab === 'notificaciones' ? styles.tabActive : ''}`}
             onClick={() => handleTabChange('notificaciones')}
+            onMouseEnter={() => setHoveredTab('notificaciones')}
+            onMouseLeave={() => setHoveredTab(null)}
           >
-            <Bell size={15} />
+            <Bell size={15} isHovered={hoveredTab === 'notificaciones'} />
             <span>Notificaciones</span>
           </button>
         </div>
@@ -138,8 +148,10 @@ export default function PerfilPage() {
               activeTab === 'peligro' ? styles.tabDangerActive : ''
             }`}
             onClick={() => handleTabChange('peligro')}
+            onMouseEnter={() => setHoveredTab('peligro')}
+            onMouseLeave={() => setHoveredTab(null)}
           >
-            <AlertTriangle size={15} />
+            <AlertTriangle size={15} isHovered={hoveredTab === 'peligro'} />
             <span>Zona de Peligro</span>
           </button>
         </div>

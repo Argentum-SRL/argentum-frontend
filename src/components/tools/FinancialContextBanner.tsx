@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, Info } from '@/components/ui/icons';
 import { formatMonto } from '@/utils/format';
 import type { FinancialContext } from '@/types/tools';
 import styles from './ToolsComponents.module.css';

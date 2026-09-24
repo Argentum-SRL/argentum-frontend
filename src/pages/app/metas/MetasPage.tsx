@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Plus, 
   Target
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { useNavigate } from 'react-router-dom'
 import styles from './MetasPage.module.css'
 import goalsService from '@/services/goals.service'

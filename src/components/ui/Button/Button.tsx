@@ -1,5 +1,5 @@
 import { memo, type ReactNode } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from '@/components/ui/icons'
 import styles from './Button.module.css'
 
 interface ButtonProps {

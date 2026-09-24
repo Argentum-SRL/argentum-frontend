@@ -11,7 +11,7 @@ import {
   Plus,
   Trash2,
   Target
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import styles from './MetaDetallePage.module.css'
 import goalsService from '@/services/goals.service'
 import billeteraService from '@/services/billetera.service'

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import type { PresionFuturaData } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import { EmptyState } from '@/components/ui'
-import { CreditCard } from 'lucide-react'
+import { CreditCard } from '@/components/ui/icons'
 import styles from './PresionFuturaCard.module.css'
 
 interface Props {

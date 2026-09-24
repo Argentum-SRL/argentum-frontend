@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Calendar, RefreshCw } from 'lucide-react'
+import { Calendar, RefreshCw } from '@/components/ui/icons'
 import { guardarCicloFinanciero, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { SelectInput, Field, Button, SegmentedControl } from '@/components/ui'

@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { Eye, EyeOff, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle2, ArrowLeft } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
 import { Field, Button } from '@/components/ui'

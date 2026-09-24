@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2 } from '@/components/ui/icons'
 import { Button, PageSummaryBar } from '@/components/ui'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'

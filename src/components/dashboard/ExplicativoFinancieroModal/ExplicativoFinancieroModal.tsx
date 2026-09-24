@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Sparkles, TrendingUp, Activity, Layers, CheckCircle2 } from 'lucide-react'
+import { X, Sparkles, TrendingUp, Activity, Layers, CheckCircle2 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import styles from './ExplicativoFinancieroModal.module.css'
 

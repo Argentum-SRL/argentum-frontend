@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, TrendingUp } from 'lucide-react'
+import { X, TrendingUp } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import billeteraService from '@/services/billetera.service'

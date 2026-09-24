@@ -9,7 +9,7 @@ import {
   Search,
   Check,
   AlertCircle
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Presupuesto, Categoria, Subcategoria } from '@/types'
 import presupuestoService from '@/services/presupuesto.service'

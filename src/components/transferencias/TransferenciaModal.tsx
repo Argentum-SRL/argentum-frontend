@@ -211,6 +211,12 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   const isOverdraft = debitoTotalOrigen > saldoOrigenActual
   const isDestinoOverdraft = comisionEnDestino > (saldoDestinoActual + montoDestinoNum)
 
+  // Precargar saldo total disponible de la billetera de origen
+  const handleTransferirTodo = useCallback(() => {
+    if (!billeteraOrigenId || saldoOrigenActual <= 0) return
+    setMonto(saldoOrigenActual)
+  }, [billeteraOrigenId, saldoOrigenActual])
+
   // Envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -581,6 +587,29 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
               {esMismaMoneda ? (
                 /* Monto único para misma moneda */
                 <div className={styles.montoSection}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 2px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-2)' }}>Monto a transferir</span>
+                    <button
+                      type="button"
+                      onClick={handleTransferirTodo}
+                      disabled={!billeteraOrigenId || saldoOrigenActual <= 0}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'var(--text-3, #94a3b8)' : 'var(--primary, #0D2045)',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        cursor: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'not-allowed' : 'pointer',
+                        padding: '2px 6px',
+                        borderRadius: '6px',
+                        opacity: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 0.45 : 1,
+                        transition: 'all 0.15s ease',
+                      }}
+                      title="Transferir saldo total disponible"
+                    >
+                      Transferir todo
+                    </button>
+                  </div>
                   <MontoInput
                     value={monto}
                     onChange={setMonto}
@@ -607,7 +636,29 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     {/* Monto que sale */}
                     <div className={styles.montoFieldCard}>
                       <div className={styles.montoFieldLabel}>
-                        <span>Monto que sale ({monedaOrigen})</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span>Monto que sale ({monedaOrigen})</span>
+                          <button
+                            type="button"
+                            onClick={handleTransferirTodo}
+                            disabled={!billeteraOrigenId || saldoOrigenActual <= 0}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'var(--text-3, #94a3b8)' : 'var(--primary, #0D2045)',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              cursor: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'not-allowed' : 'pointer',
+                              padding: '1px 5px',
+                              borderRadius: '4px',
+                              opacity: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 0.45 : 1,
+                              transition: 'all 0.15s ease',
+                            }}
+                            title="Transferir saldo total disponible"
+                          >
+                            Transferir todo
+                          </button>
+                        </div>
                         <span className={styles.currencyTag}>{monedaOrigen}</span>
                       </div>
                       <div className={styles.montoInputRow}>

@@ -104,7 +104,7 @@ const GripHorizontalIcon = forwardRef<
 
   return (
     <div
-      className={cn("transition-transform duration-200 hover:scale-115", "inline-flex items-center justify-center", className)}
+      className={cn("transition-transform duration-200 hover:scale-115", "inline-flex items-center justify-center", Boolean(props.onClick) && "cursor-pointer", className)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}

@@ -68,7 +68,7 @@ const BellIcon = forwardRef<BellIconHandle, BellIconProps>(
     );
     return (
       <div
-        className={cn("inline-flex items-center justify-center select-none cursor-pointer transition-transform duration-200 hover:scale-115", className)}
+        className={cn("inline-flex items-center justify-center select-none transition-transform duration-200 hover:scale-115", Boolean(props.onClick) && "cursor-pointer", className)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}

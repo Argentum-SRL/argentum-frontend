@@ -76,7 +76,7 @@ const PhoneIcon = forwardRef<PhoneIconHandle, PhoneIconProps>(
 
     return (
       <div
-        className={cn("transition-transform duration-200 hover:scale-115", className)}
+        className={cn("transition-transform duration-200 hover:scale-115", Boolean(props.onClick) && "cursor-pointer", className)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}

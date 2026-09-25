@@ -12,39 +12,38 @@ const VARIANTS_MAP: Record<string, Variants> = {
   pop: {
     normal: { scale: 1, rotate: 0, y: 0 },
     animate: {
-      scale: [1, 1.22, 0.94, 1.08, 1],
-      transition: { duration: 0.5, ease: 'easeInOut' },
+      scale: [1, 1.14, 0.96, 1.05, 1],
+      transition: { duration: 0.45, ease: 'easeOut' },
     },
   },
   wiggle: {
     normal: { scale: 1, rotate: 0, y: 0 },
     animate: {
-      scale: [1, 1.15, 1],
-      rotate: [0, -14, 14, -7, 0],
+      rotate: [0, -15, 15, -9, 9, -4, 0],
+      scale: [1, 1.06, 1],
       transition: { duration: 0.55, ease: 'easeInOut' },
     },
   },
   bounce: {
     normal: { scale: 1, y: 0 },
     animate: {
-      y: [0, -4, 2, -1, 0],
-      scale: [1, 1.12, 1],
-      transition: { duration: 0.5, ease: 'easeInOut' },
+      y: [0, -3.5, 1.5, -0.6, 0],
+      transition: { duration: 0.45, ease: 'easeOut' },
     },
   },
   spin: {
     normal: { rotate: 0, scale: 1 },
     animate: {
-      rotate: [0, 180, 360],
-      scale: [1, 1.15, 1],
-      transition: { duration: 0.65, ease: 'easeInOut' },
+      rotate: 360,
+      scale: [1, 1.08, 1],
+      transition: { duration: 0.6, ease: 'easeInOut' },
     },
   },
   pulse: {
     normal: { scale: 1 },
     animate: {
-      scale: [1, 1.25, 0.92, 1.1, 1],
-      transition: { duration: 0.5, ease: 'easeInOut' },
+      scale: [1, 1.15, 0.95, 1.06, 1],
+      transition: { duration: 0.45, ease: 'easeOut' },
     },
   },
 };
@@ -98,7 +97,8 @@ export function createMotionIcon(
       return (
         <div
           className={cn(
-            'inline-flex items-center justify-center select-none cursor-pointer transition-transform duration-200 hover:scale-115',
+            'inline-flex items-center justify-center select-none',
+            Boolean((props as Record<string, unknown>).onClick) && 'cursor-pointer',
             className
           )}
           onMouseEnter={handleMouseEnter}
@@ -107,7 +107,12 @@ export function createMotionIcon(
           <motion.div
             animate={controls}
             variants={VARIANTS_MAP[animationType] || VARIANTS_MAP.pop}
-            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transformOrigin: 'center center',
+            }}
           >
             <BaseIcon
               ref={ref}

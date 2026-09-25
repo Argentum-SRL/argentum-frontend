@@ -589,7 +589,7 @@ function IconWrapper<T extends string>({
       <IconComponent
         size={size}
         className={cn(
-          "transition-transform duration-200 hover:scale-115 cursor-pointer",
+          "transition-transform duration-200 hover:scale-115", Boolean((props as Record<string, unknown>).onClick) && "cursor-pointer",
           className,
           (animationProp === 'path' || animationProp === 'path-loop') &&
             pathClassName,

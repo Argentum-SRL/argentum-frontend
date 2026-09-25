@@ -1,32 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { Coins, Calendar, Save, Check, ArrowLeft, ArrowRight } from '@/components/ui/icons'
+import { Coins, Calendar, Save, Check } from '@/components/ui/icons'
 import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
-import { getCotizaciones, getPreviewFechaCobro } from '@/services/onboarding.service'
+import { getCotizaciones } from '@/services/onboarding.service'
 import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { SelectInput, type SelectOption } from '@/components/ui'
+import { CicloFinancieroSelector, type CicloValue } from '@/components/ciclo/CicloFinancieroSelector'
 import styles from '../PerfilPage.module.css'
 
 interface TabFinanzasProps {
   usuario: Usuario | null
   updateUsuario: (u: Usuario) => void
 }
-
-const OPCIONES_REGLA_CICLO: SelectOption[] = [
-  { value: '', label: 'Seleccionar regla...' },
-  { value: 'primer_lunes', label: 'Primer Lunes de cada mes' },
-  { value: 'primer_martes', label: 'Primer Martes de cada mes' },
-  { value: 'primer_miercoles', label: 'Primer Miércoles de cada mes' },
-  { value: 'primer_jueves', label: 'Primer Jueves de cada mes' },
-  { value: 'primer_viernes', label: 'Primer Viernes de cada mes' },
-  { value: 'ultimo_lunes', label: 'Último Lunes de cada mes' },
-  { value: 'ultimo_martes', label: 'Último Martes de cada mes' },
-  { value: 'ultimo_miercoles', label: 'Último Miércoles de cada mes' },
-  { value: 'ultimo_jueves', label: 'Último Jueves de cada mes' },
-  { value: 'ultimo_viernes', label: 'Último Viernes de cada mes' },
-]
 
 const OPCIONES_TIPO_DOLAR: { value: 'blue' | 'mep' | 'oficial' | 'tarjeta'; label: string; desc: string }[] = [
   { value: 'blue', label: 'Dólar Blue', desc: 'Cotización informal de mercado libre' },
@@ -64,64 +50,16 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     return () => controller.abort()
   }, [])
 
-  // Cycle form
-  const [cicloTipo, setCicloTipo] = useState<'dia_fijo' | 'regla'>(
-    (usuario?.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo'
-  )
-  const [cicloValor, setCicloValor] = useState(usuario?.ciclo_valor || '1')
-  const [cicloAjusteDireccion, setCicloAjusteDireccion] = useState<'anterior' | 'posterior'>(
-    (usuario?.ciclo_ajuste_direccion as 'anterior' | 'posterior') || 'anterior'
-  )
+  // Cycle form state
+  const [ciclo, setCiclo] = useState<CicloValue>({
+    tipo: (usuario?.ciclo_tipo as 'dia_fijo' | 'regla') || 'dia_fijo',
+    valor: usuario?.ciclo_valor || '1',
+    direccion: usuario?.ciclo_tipo === 'regla'
+      ? null
+      : ((usuario?.ciclo_ajuste_direccion as 'anterior' | 'posterior' | null) ?? 'anterior'),
+  })
   const [isSavingCiclo, setIsSavingCiclo] = useState(false)
 
-  // Preview state
-  const [preview, setPreview] = useState<{
-    proxima_fecha_cobro: string
-    fue_ajustada: boolean
-  } | null>(null)
-  const [loadingPreview, setLoadingPreview] = useState(false)
-
-  useEffect(() => {
-    let isValid = false
-    if (cicloTipo === 'dia_fijo') {
-      const diaNum = parseInt(cicloValor, 10)
-      isValid = !isNaN(diaNum) && diaNum >= 1 && diaNum <= 31
-    } else if (cicloTipo === 'regla') {
-      isValid = Boolean(cicloValor)
-    }
-
-    if (!isValid) {
-      return
-    }
-
-    const controller = new AbortController()
-
-    const timer = setTimeout(async () => {
-      setLoadingPreview(true)
-      try {
-        const data = await getPreviewFechaCobro({
-          tipo: cicloTipo,
-          valor: cicloValor,
-          direccion: cicloAjusteDireccion,
-        }, controller.signal)
-        setPreview(data)
-      } catch (err) {
-        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
-          return
-        }
-        setPreview(null)
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoadingPreview(false)
-        }
-      }
-    }, 400)
-
-    return () => {
-      clearTimeout(timer)
-      controller.abort()
-    }
-  }, [cicloTipo, cicloValor, cicloAjusteDireccion])
 
   const handleSaveMoneda = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -151,15 +89,15 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
 
   const handleSaveCiclo = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (cicloTipo === 'dia_fijo') {
-      const diaNum = parseInt(cicloValor, 10)
+    if (ciclo.tipo === 'dia_fijo') {
+      const diaNum = parseInt(ciclo.valor, 10)
       if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
         sileo.error({ title: 'El día de corte debe ser un número entero entre 1 y 31.' })
         return
       }
-    } else if (cicloTipo === 'regla') {
-      if (!cicloValor || !OPCIONES_REGLA_CICLO.some((r) => r.value === cicloValor && r.value !== '')) {
-        sileo.error({ title: 'Seleccioná una regla de corte válida.' })
+    } else if (ciclo.tipo === 'regla') {
+      if (!ciclo.valor) {
+        sileo.error({ title: 'Seleccioná un día hábil válido.' })
         return
       }
     }
@@ -167,15 +105,15 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     setIsSavingCiclo(true)
     try {
       const updated = await usuarioService.actualizarCicloFinanciero({
-        ciclo_tipo: cicloTipo,
-        ciclo_valor: cicloValor,
-        ciclo_ajuste_direccion: cicloAjusteDireccion,
+        ciclo_tipo: ciclo.tipo,
+        ciclo_valor: ciclo.valor,
+        ciclo_ajuste_direccion: ciclo.tipo === 'regla' ? null : ciclo.direccion,
       })
       invalidateDashboardCache()
       updateUsuario(updated)
-      sileo.success({ title: 'Ciclo contable actualizado correctamente' })
+      sileo.success({ title: 'Ciclo financiero actualizado correctamente' })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el ciclo contable.') })
+      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el ciclo financiero.') })
     } finally {
       setIsSavingCiclo(false)
     }
@@ -317,139 +255,18 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           </div>
           <div className={styles.sectionHeaderText}>
             <h3>Ciclo de Ingresos y Cobro</h3>
+            <p>Definí cuándo comienza tu mes financiero para presupuestos y balances</p>
           </div>
         </div>
 
-        <form onSubmit={handleSaveCiclo} className={styles.cicloCompactForm}>
-          <div className={styles.cicloGrid}>
-            {/* Columna 1: Tipo de cálculo y Selección */}
-            <div className={styles.cicloCol}>
-              <div className={styles.compactGroup}>
-                <label className={styles.compactLabel}>Tipo de cálculo</label>
-                <div className={styles.segmentedToggleCompact}>
-                  <button
-                    type="button"
-                    className={`${styles.segmentedBtnCompact} ${
-                      cicloTipo === 'dia_fijo' ? styles.segmentedActiveCompact : ''
-                    }`}
-                    onClick={() => {
-                      setCicloTipo('dia_fijo')
-                      if (!cicloValor || isNaN(Number(cicloValor))) setCicloValor('1')
-                    }}
-                  >
-                    Día fijo
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.segmentedBtnCompact} ${
-                      cicloTipo === 'regla' ? styles.segmentedActiveCompact : ''
-                    }`}
-                    onClick={() => {
-                      setCicloTipo('regla')
-                      if (!cicloValor || !isNaN(Number(cicloValor))) setCicloValor('primer_lunes')
-                    }}
-                  >
-                    Regla semanal
-                  </button>
-                </div>
-              </div>
+        <form onSubmit={handleSaveCiclo} className={styles.formInsideCard}>
+          <CicloFinancieroSelector
+            value={ciclo}
+            onChange={setCiclo}
+            disabled={isSavingCiclo}
+          />
 
-              {cicloTipo === 'dia_fijo' ? (
-                <div className={styles.compactGroup}>
-                  <label htmlFor="ciclo-dia-input" className={styles.compactLabel}>
-                    Día de corte mensual
-                  </label>
-                  <div className={styles.compactDayWrapper}>
-                    <input
-                      id="ciclo-dia-input"
-                      type="number"
-                      min={1}
-                      max={31}
-                      value={cicloValor}
-                      onChange={(e) => setCicloValor(e.target.value)}
-                      className={styles.compactNumberInput}
-                      required
-                    />
-                    <span className={styles.compactInputSuffix}>de cada mes</span>
-                  </div>
-                </div>
-              ) : (
-                <div className={styles.compactGroup}>
-                  <SelectInput
-                    id="ciclo-regla-select"
-                    label="Regla de corte"
-                    value={cicloValor}
-                    onChange={(val) => setCicloValor(val)}
-                    options={OPCIONES_REGLA_CICLO}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Columna 2: Ajuste de día hábil */}
-            <div className={styles.cicloCol}>
-              <div className={styles.compactGroup}>
-                <label className={styles.compactLabel}>
-                  Ajuste si cae fin de semana / feriado
-                </label>
-                <div className={styles.segmentedToggleCompact}>
-                  <button
-                    type="button"
-                    className={`${styles.segmentedBtnCompact} ${
-                      cicloAjusteDireccion === 'anterior' ? styles.segmentedActiveCompact : ''
-                    }`}
-                    onClick={() => setCicloAjusteDireccion('anterior')}
-                  >
-                    <ArrowLeft size={13} />
-                    <span>Hacia atrás</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.segmentedBtnCompact} ${
-                      cicloAjusteDireccion === 'posterior' ? styles.segmentedActiveCompact : ''
-                    }`}
-                    onClick={() => setCicloAjusteDireccion('posterior')}
-                  >
-                    <span>Hacia adelante</span>
-                    <ArrowRight size={13} />
-                  </button>
-                </div>
-              </div>
-
-              <p className={styles.compactExplainer}>
-                {cicloAjusteDireccion === 'anterior'
-                  ? 'Si cae en día no hábil, el cálculo retrocede al día hábil previo.'
-                  : 'Si cae en día no hábil, el cálculo avanza al siguiente día hábil.'}
-              </p>
-            </div>
-          </div>
-
-          {/* Banner de Preview en vivo */}
-          {preview && !loadingPreview && (
-            <div className={styles.cicloPreviewCard}>
-              <div className={styles.previewIconBox}>
-                <Calendar size={15} />
-              </div>
-              <div className={styles.previewInfo}>
-                <span className={styles.previewLabel}>Próximo inicio:</span>
-                <span className={styles.previewDate}>
-                  {new Date(preview.proxima_fecha_cobro + 'T12:00:00').toLocaleDateString('es-AR', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </span>
-              </div>
-              {preview.fue_ajustada && (
-                <span className={styles.adjustedPill}>
-                  Ajustado por feriado / fin de semana
-                </span>
-              )}
-            </div>
-          )}
-
-          <div className={styles.cardFooterActions}>
+          <div className={styles.cardFooterActions} style={{ marginTop: '20px' }}>
             <button
               type="submit"
               disabled={isSavingCiclo}
@@ -464,3 +281,5 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     </div>
   )
 }
+
+export default TabFinanzas

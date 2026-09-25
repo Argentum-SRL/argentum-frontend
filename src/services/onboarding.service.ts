@@ -43,17 +43,24 @@ export async function getPreviewFechaCobro(
   params: {
     tipo: 'dia_fijo' | 'regla'
     valor: string
-    direccion?: 'anterior' | 'posterior'
+    direccion?: 'anterior' | 'posterior' | null
   },
   signal?: AbortSignal
 ): Promise<{
   tipo: string
   valor: string
-  direccion: string
+  direccion: string | null
   proxima_fecha_cobro: string
   fecha_nominal: string
   fue_ajustada: boolean
 }> {
-  const res = await api.get('/onboarding/preview-fecha-cobro', { params, signal })
+  const queryParams: Record<string, string> = {
+    tipo: params.tipo,
+    valor: params.valor,
+  }
+  if (params.direccion) {
+    queryParams.direccion = params.direccion
+  }
+  const res = await api.get('/onboarding/preview-fecha-cobro', { params: queryParams, signal })
   return res.data
 }

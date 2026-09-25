@@ -1,0 +1,563 @@
+/* ==========================================================================
+   CicloFinancieroSelector - Argentum Design System
+   ========================================================================== */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* ── Mode selector cards (Paso 1) ───────────────────────────────────────── */
+.modeGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 520px) {
+  .modeGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.modeCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  outline: none;
+}
+
+.modeCard:hover {
+  border-color: rgba(72, 120, 184, 0.4);
+  background: var(--surface-alt);
+  transform: translateY(-1px);
+}
+
+.modeCardActive {
+  border-color: var(--primary) !important;
+  background: rgba(72, 120, 184, 0.08) !important;
+  box-shadow: 0 4px 14px rgba(72, 120, 184, 0.15);
+}
+
+:global([data-theme="dark"]) .modeCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+:global([data-theme="dark"]) .modeCard:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:global([data-theme="dark"]) .modeCardActive {
+  background: rgba(72, 120, 184, 0.18) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.modeIconWrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.modeCardActive .modeIconWrap {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+:global([data-theme="dark"]) .modeIconWrap {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.modeText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.modeTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modeSubtitle {
+  font-size: 0.775rem;
+  line-height: 1.35;
+  color: var(--text-3);
+}
+
+.checkBadge {
+  color: var(--primary);
+}
+
+/* ── Sección Dinámica (Paso 2) ─────────────────────────────────────────── */
+.sectionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  transition: all 0.2s ease;
+}
+
+:global([data-theme="dark"]) .sectionBlock {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.blockHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.blockTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.blockHint {
+  font-size: 0.75rem;
+  color: var(--text-3);
+}
+
+.highlightPill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(72, 120, 184, 0.12);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* ── Day Picker Grid (1..31) ───────────────────────────────────────────── */
+.dayPickerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quickDaysRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.quickDayBtn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quickDayBtn:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.quickDayBtnActive {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+}
+
+:global([data-theme="dark"]) .quickDayBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 400px) {
+  .dayGrid {
+    gap: 4px;
+  }
+}
+
+.dayBtn {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+.dayBtn:hover {
+  border-color: var(--primary);
+  background: var(--surface-alt);
+  transform: scale(1.05);
+}
+
+.dayBtnActive {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(72, 120, 184, 0.4);
+}
+
+:global([data-theme="dark"]) .dayBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="dark"]) .dayBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Contingency Selector (Ajuste Feriado/Finde) ───────────────────────── */
+.contingencyWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+:global([data-theme="dark"]) .contingencyWrapper {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.contingencyCards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 500px) {
+  .contingencyCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.contingencyCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.contingencyCard:hover {
+  border-color: rgba(72, 120, 184, 0.4);
+  background: var(--surface-alt);
+}
+
+.contingencyCardActive {
+  border-color: var(--primary) !important;
+  background: rgba(72, 120, 184, 0.1) !important;
+}
+
+:global([data-theme="dark"]) .contingencyCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="dark"]) .contingencyCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="dark"]) .contingencyCardActive {
+  background: rgba(72, 120, 184, 0.2) !important;
+  border-color: var(--primary) !important;
+}
+
+.contingencyTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.contingencyDesc {
+  font-size: 0.7rem;
+  line-height: 1.3;
+  color: var(--text-3);
+}
+
+/* ── Business Day Chips Selector ───────────────────────────────────────── */
+.businessDayCards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 520px) {
+  .businessDayCards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.businessCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.businessCard:hover {
+  border-color: rgba(72, 120, 184, 0.4);
+  background: var(--surface-alt);
+  transform: translateY(-1px);
+}
+
+.businessCardActive {
+  border-color: var(--primary) !important;
+  background: rgba(72, 120, 184, 0.09) !important;
+  box-shadow: 0 3px 12px rgba(72, 120, 184, 0.12);
+}
+
+:global([data-theme="dark"]) .businessCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="dark"]) .businessCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+:global([data-theme="dark"]) .businessCardActive {
+  background: rgba(72, 120, 184, 0.18) !important;
+  border-color: var(--primary) !important;
+}
+
+.businessCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.businessCardTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.businessCardSubtitle {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  line-height: 1.3;
+}
+
+.badgePopular {
+  font-size: 0.675rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+/* ── Custom Business Day Sub-Picker (2° al 10°) ────────────────────────── */
+.customDaySelector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 4px;
+}
+
+:global([data-theme="dark"]) .customDaySelector {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.customDayLabel {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.customDayPills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.customDayPill {
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.customDayPill:hover {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.customDayPillActive {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+}
+
+:global([data-theme="dark"]) .customDayPill {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Preview Card en Vivo (Paso 3) ─────────────────────────────────────── */
+.previewCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(72, 120, 184, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
+  border: 1.5px solid rgba(72, 120, 184, 0.25);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  flex-wrap: wrap;
+}
+
+:global([data-theme="dark"]) .previewCard {
+  background: linear-gradient(135deg, rgba(72, 120, 184, 0.12) 0%, rgba(20, 30, 50, 0.4) 100%);
+  border-color: rgba(72, 120, 184, 0.35);
+}
+
+.previewIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(72, 120, 184, 0.3);
+}
+
+.previewContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.previewEyebrow {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.previewDate {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.previewDate::first-letter {
+  text-transform: uppercase;
+}
+
+.previewBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.725rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+:global([data-theme="dark"]) .previewBadge {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.previewLoading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-3);
+  font-size: 0.8125rem;
+  font-style: italic;
+}

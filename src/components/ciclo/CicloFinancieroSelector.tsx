@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Calendar, Building2, Check, AlertCircle, RefreshCw } from '@/components/ui/icons'
 import { getPreviewFechaCobro } from '@/services/onboarding.service'
+import { REGLAS_CICLO } from '@/lib/utils/ciclo'
 import styles from './CicloFinancieroSelector.module.css'
 
 export interface CicloValue {
@@ -17,38 +18,10 @@ interface Props {
 
 const PRESET_DAYS = ['1', '5', '10', '15', '20', '25', '28']
 
-const BUSINESS_DAY_OPTIONS = [
-  {
-    id: 'dia_habil_4',
-    title: '4° día hábil del mes',
-    subtitle: 'Estándar Ley de Contrato de Trabajo (Comercio, Estatales)',
-    badge: 'Más común',
-  },
-  {
-    id: 'ultimo_dia_habil',
-    title: 'Último día hábil del mes',
-    subtitle: 'Liquidación a fin de mes (Bancos, Empresas privadas)',
-    badge: 'Popular',
-  },
-  {
-    id: 'primer_dia_habil',
-    title: '1° día hábil del mes',
-    subtitle: 'Cobro el primer día laborable bancario',
-  },
-]
+// Opciones de reglas de ciclo financiero derivadas de la lista única compartida
+const BUSINESS_DAY_OPTIONS = REGLAS_CICLO.filter((opt) => opt.destacada)
+const OTHER_BUSINESS_DAYS = REGLAS_CICLO.filter((opt) => !opt.destacada)
 
-// Opciones adicionales dentro de "Otro día" (días hábiles específicos y regla de último viernes del mes)
-const OTHER_BUSINESS_DAYS = [
-  { id: 'dia_habil_2', label: '2° día hábil' },
-  { id: 'dia_habil_3', label: '3° día hábil' },
-  { id: 'dia_habil_5', label: '5° día hábil' },
-  { id: 'dia_habil_6', label: '6° día hábil' },
-  { id: 'dia_habil_7', label: '7° día hábil' },
-  { id: 'dia_habil_8', label: '8° día hábil' },
-  { id: 'dia_habil_9', label: '9° día hábil' },
-  { id: 'dia_habil_10', label: '10° día hábil' },
-  { id: 'ultimo_viernes', label: 'Último viernes del mes' },
-]
 
 export const CicloFinancieroSelector: React.FC<Props> = ({
   value,

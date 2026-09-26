@@ -39,7 +39,7 @@ const TransaccionRow = memo(({
 }: TransaccionRowProps) => {
   const isIngreso = transaccion.tipo === 'ingreso'
   const isPendiente = transaccion.estado_verificacion === 'pendiente'
-  const isPendienteIA = isPendiente && ['ia_wpp', 'ia_chat', 'ia_pdf'].includes(transaccion.origen)
+  const isPendienteIA = isPendiente && ['ia_wpp', 'ia_pdf'].includes(transaccion.origen)
 
   const isMeta = Boolean(
     transaccion.movimiento_meta_id ||

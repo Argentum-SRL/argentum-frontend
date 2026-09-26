@@ -246,7 +246,7 @@ export interface Transaccion {
   es_cuota_hija: boolean
   es_padre_cuotas: boolean
   grupo_cuotas_id: string | null
-  origen: 'manual' | 'ia_wpp' | 'ia_chat' | 'ia_pdf' | 'recurrente'
+  origen: 'manual' | 'ia_wpp' | 'ia_pdf' | 'recurrente'
   estado_verificacion: 'confirmada' | 'pendiente' | null
   fecha_creacion: string
   subcategoria?: Subcategoria
@@ -809,14 +809,9 @@ export interface PerfilFinanciero {
   usuario_id: string;
   tasa_ahorro_ars: number | null;
   tasa_ahorro_usd: number | null;
-  score_impulsividad_ars: number | null;
-  score_impulsividad_usd: number | null;
   ratio_cuotas_ars: number | null;
   ratio_cuotas_usd: number | null;
-  cumplimiento_presupuesto: number | null;
   consistencia_registro: number | null;
-  porcentaje_suscripciones_ars: number | null;
-  porcentaje_suscripciones_usd: number | null;
   ultima_actualizacion: string | null;
   fecha_creacion: string;
 }
@@ -863,14 +858,9 @@ export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
   interpretaciones: {
     tasa_ahorro_ars: InterpretacionIndicador;
     tasa_ahorro_usd: InterpretacionIndicador;
-    score_impulsividad_ars: InterpretacionIndicador;
-    score_impulsividad_usd: InterpretacionIndicador;
     ratio_cuotas_ars: InterpretacionIndicador;
     ratio_cuotas_usd: InterpretacionIndicador;
-    cumplimiento_presupuesto: InterpretacionIndicador;
     consistencia_registro: InterpretacionIndicador;
-    porcentaje_suscripciones_ars: InterpretacionIndicador;
-    porcentaje_suscripciones_usd: InterpretacionIndicador;
   };
 }
 
@@ -881,14 +871,9 @@ export interface HistorialPerfilFinanciero {
   periodo_fin: string;
   tasa_ahorro_ars: number | null;
   tasa_ahorro_usd: number | null;
-  score_impulsividad_ars: number | null;
-  score_impulsividad_usd: number | null;
   ratio_cuotas_ars: number | null;
   ratio_cuotas_usd: number | null;
-  cumplimiento_presupuesto: number | null;
   consistencia_registro: number | null;
-  porcentaje_suscripciones_ars: number | null;
-  porcentaje_suscripciones_usd: number | null;
   fecha_snapshot: string;
 }
 

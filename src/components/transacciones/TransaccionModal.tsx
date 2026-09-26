@@ -462,7 +462,7 @@ export default function TransaccionModal({
 
   const isPendienteIA = isEdit &&
     transaccion?.estado_verificacion === 'pendiente' &&
-    ['ia_wpp', 'ia_chat', 'ia_pdf'].includes(transaccion?.origen ?? '')
+    ['ia_wpp', 'ia_pdf'].includes(transaccion?.origen ?? '')
 
   const handleSubmit = async () => {
     if (isSubmitting || submittingRef.current) return

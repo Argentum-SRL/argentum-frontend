@@ -37,6 +37,7 @@ const BUSINESS_DAY_OPTIONS = [
   },
 ]
 
+// Opciones adicionales dentro de "Otro día" (días hábiles específicos y regla de último viernes del mes)
 const OTHER_BUSINESS_DAYS = [
   { id: 'dia_habil_2', label: '2° día hábil' },
   { id: 'dia_habil_3', label: '3° día hábil' },
@@ -46,6 +47,7 @@ const OTHER_BUSINESS_DAYS = [
   { id: 'dia_habil_8', label: '8° día hábil' },
   { id: 'dia_habil_9', label: '9° día hábil' },
   { id: 'dia_habil_10', label: '10° día hábil' },
+  { id: 'ultimo_viernes', label: 'Último viernes del mes' },
 ]
 
 export const CicloFinancieroSelector: React.FC<Props> = ({
@@ -370,7 +372,7 @@ export const CicloFinancieroSelector: React.FC<Props> = ({
               )
             })}
 
-            {/* Opción para otro día hábil */}
+            {/* Opción para otro día (días hábiles específicos o regla semanal último viernes) */}
             <button
               type="button"
               disabled={disabled}
@@ -386,20 +388,20 @@ export const CicloFinancieroSelector: React.FC<Props> = ({
             >
               <div className={styles.businessCardContent}>
                 <div className={styles.businessCardTitle}>
-                  <span>Otro día hábil...</span>
+                  <span>Otro día...</span>
                   {showOtherBusinessDays && <Check size={16} className={styles.checkBadge} />}
                 </div>
                 <span className={styles.businessCardSubtitle}>
-                  Elegí entre el 2° y el 10° día hábil del mes
+                  Elegí entre el 2° y el 10° día hábil o el último viernes del mes
                 </span>
               </div>
             </button>
           </div>
 
-          {/* Sub-picker del 2° al 10° día hábil */}
+          {/* Sub-selector de día hábil o regla específica dentro de Otro día */}
           {showOtherBusinessDays && (
             <div className={styles.customDaySelector}>
-              <span className={styles.customDayLabel}>Día hábil específico:</span>
+              <span className={styles.customDayLabel}>Día o regla específica:</span>
               <div className={styles.customDayPills}>
                 {OTHER_BUSINESS_DAYS.map((o) => {
                   const isSelected = valor === o.id

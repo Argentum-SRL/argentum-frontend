@@ -1,14 +1,6 @@
+// Mapeo de reglas de ciclo financiero para etiquetas legibles (Fase 1c)
 const REGLA_MAP: Record<string, string> = {
-  primer_lunes:    'Primer lunes',
-  primer_martes:   'Primer martes',
-  primer_miercoles:'Primer miércoles',
-  primer_jueves:   'Primer jueves',
-  primer_viernes:  'Primer viernes',
-  ultimo_lunes:    'Último lunes',
-  ultimo_martes:   'Último martes',
-  ultimo_miercoles:'Último miércoles',
-  ultimo_jueves:   'Último jueves',
-  ultimo_viernes:  'Último viernes',
+  ultimo_viernes:  'Último viernes del mes',
 }
 
 export function getCicloLabel(ciclo_tipo: string | null, ciclo_valor: string | null): string {

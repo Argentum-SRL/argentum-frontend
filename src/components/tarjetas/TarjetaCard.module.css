@@ -3,13 +3,13 @@
   border: none;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
   gap: 0;
 }
 
 .card:hover:not(.cardShrunk) {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-4px);
 }
 
 .cardShrunk {
@@ -122,14 +122,23 @@
   gap: 4px;
 }
 
-/* Contenedor de la escena 3D */
+/* Contenedor de la escena */
 .cardScene {
-  perspective: 1000px;
   width: 100%;
   max-width: 320px;
-  aspect-ratio: 1.586 / 1;
+  height: 202px;
   cursor: pointer;
   margin: 0 auto;
+  position: relative;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 350px) {
+  .cardScene {
+    height: auto;
+    aspect-ratio: 1.586 / 1;
+  }
 }
 
 /* Contenedor que rota */
@@ -137,45 +146,125 @@
   position: relative;
   width: 100%;
   height: 100%;
-  -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
 }
 
-.isFlipped {
-  -webkit-transform-style: preserve-3d;
+/* ESTADO 1: FRONT EN REPOSO (100% 2D NATIVO - CERO 3D, CERO BLUR) */
+.isFrontFlat {
+  transform: none !important;
+}
+
+.isFrontFlat .cardFront {
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+}
+
+.isFrontFlat .cardBack {
+  display: none !important;
+}
+
+/* ESTADO 2: BACK EN REPOSO (100% 2D NATIVO - CERO 3D, CERO BLUR) */
+.isFlippedFlat {
+  transform: none !important;
+}
+
+.isFlippedFlat .cardFront {
+  display: none !important;
+}
+
+.isFlippedFlat .cardBack {
+  display: flex !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+}
+
+/* ESTADO 3: ANIMANDO EN 3D FLIP */
+.animatingToBack,
+.animatingToFront {
   transform-style: preserve-3d;
-  -webkit-transform: rotateY(180deg);
-  transform: rotateY(180deg);
+  -webkit-transform-style: preserve-3d;
 }
 
-/* Ambas caras */
-.cardFront,
-.cardBack {
+.animatingToBack {
+  animation: flipToBack 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animatingToFront {
+  animation: flipToFront 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animatingToBack .cardFront,
+.animatingToFront .cardFront,
+.animatingToBack .cardBack,
+.animatingToFront .cardBack {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border-radius: 12px;
   overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Activar backface-visibility y optimizaciones GPU solo cuando se voltea */
-.isFlipped .cardFront,
-.isFlipped .cardBack {
-  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
-.cardFront {
+.animatingToBack .cardFront,
+.animatingToFront .cardFront {
+  display: block;
   z-index: 2;
+  transform: rotateY(0deg);
 }
 
-.isFlipped .cardFront {
-  -webkit-transform: rotateY(0deg) scale(1.001);
-  transform: rotateY(0deg) scale(1.001);
+.animatingToBack .cardBack,
+.animatingToFront .cardBack {
+  display: flex;
+  z-index: 1;
+  transform: rotateY(180deg);
+}
+
+@keyframes flipToBack {
+  0% {
+    transform: perspective(1200px) rotateY(0deg);
+  }
+  100% {
+    transform: perspective(1200px) rotateY(180deg);
+  }
+}
+
+@keyframes flipToFront {
+  0% {
+    transform: perspective(1200px) rotateY(180deg);
+  }
+  100% {
+    transform: perspective(1200px) rotateY(360deg);
+  }
+}
+
+/* Ambas caras base */
+.cardFront,
+.cardBack {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+/* Asegurar que RealCardPreview llene cardFront exactamente sin desbordes ni dobles sombras */
+.cardFront > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: unset !important;
+  box-shadow: none !important;
 }
 
 .cardBack {
@@ -183,21 +272,17 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 16px 20px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
-  position: relative;
-  z-index: 1;
   box-sizing: border-box;
-  -webkit-transform: rotateY(180deg) scale(1.001);
-  transform: rotateY(180deg) scale(1.001);
 }
 
 /* Elementos realistas del dorso de la tarjeta */
 .magneticStripe {
-  background: #111;
+  background: #0f172a;
   height: 32px;
   margin-left: -20px;
   margin-right: -20px;
   margin-top: -4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .signatureStripRow {
@@ -208,51 +293,52 @@
 }
 
 .signatureStrip {
-  background: rgba(255, 255, 255, 0.85);
-  height: 26px;
+  background: #f8fafc;
+  height: 28px;
   flex: 1;
   display: flex;
   align-items: center;
-  padding-left: 10px;
-  border-radius: 3px;
+  padding-left: 12px;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .signatureText {
-  font-family: 'Dancing Script', cursive, sans-serif;
-  font-style: italic;
-  font-size: 11px;
-  color: #333;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  opacity: 0.85;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 700;
+  letter-spacing: 0.1em;
 }
 
 .cvvBox {
-  background: white;
-  height: 26px;
-  width: 44px;
+  background: #ffffff;
+  height: 28px;
+  width: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 3px;
-  border-left: 2px solid #ddd;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .cvvLabel {
-  font-size: 6px;
-  font-weight: 700;
-  color: #888;
+  font-size: 7px;
+  font-weight: 800;
+  color: #64748b;
   text-transform: uppercase;
   line-height: 1;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
+  letter-spacing: 0.05em;
 }
 
 .cvvCode {
-  font-size: 10px;
-  font-weight: 700;
-  color: #222;
-  letter-spacing: 1px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 2px;
   line-height: 1;
 }
 
@@ -271,24 +357,22 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  border: 1.5px solid var(--btn-border, rgba(255, 255, 255, 0.3));
+  background: var(--btn-bg, rgba(255, 255, 255, 0.18));
+  color: var(--card-text, white);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
   outline: none;
 }
 
 .backActionBtn:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+  background: var(--btn-hover-bg, rgba(255, 255, 255, 0.32)) !important;
+  border-color: var(--btn-hover-border, rgba(255, 255, 255, 0.5)) !important;
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .backActionBtn:active {
@@ -296,17 +380,17 @@
 }
 
 .backActionBtnDelete:hover {
-  background: rgba(220, 38, 38, 0.8) !important;
-  border-color: rgba(220, 38, 38, 0.9) !important;
+  background: rgba(220, 38, 38, 0.9) !important;
+  border-color: rgba(220, 38, 38, 1) !important;
   color: white !important;
 }
 
 .flipBackHint {
   text-align: center;
-  font-size: 9px;
-  opacity: 0.6;
+  font-size: 10px;
+  opacity: 0.75;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   pointer-events: none;
-  font-weight: 600;
+  font-weight: 700;
 }

@@ -140,6 +140,7 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
             ref={el => {
               if (el) {
                 el.style.color = textColor
+                el.style.textShadow = isDarkText ? 'none' : '0 1px 3px rgba(0,0,0,0.2)'
               }
             }}
           >
@@ -229,6 +230,7 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
             el.style.letterSpacing = '0.12em'
             el.style.marginBottom = '6px'
             el.style.whiteSpace = 'nowrap'
+            el.style.textShadow = isDarkText ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.25)'
           }
         }}
       >

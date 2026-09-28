@@ -17,6 +17,9 @@ interface TarjetaCardProps {
 
 const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, onArchive, onDelete, isShrunk }) => {
   const [isFlipped, setIsFlipped] = useState(false)
+  const [isFlipping, setIsFlipping] = useState(false)
+  const [flipDirection, setFlipDirection] = useState<'toBack' | 'toFront' | null>(null)
+
   const proximoVencimiento = calcularProximoVencimiento(tarjeta.dia_vencimiento)
   
   const hoy = new Date()
@@ -34,21 +37,51 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
   const isComplex = color.startsWith('linear-gradient')
   const backgroundStyle = isComplex ? color : `linear-gradient(135deg, ${color} 0%, color-mix(in srgb, ${color}, black 25%) 100%)`
   
-  const isDarkText = color.includes('E5E4E2') || color.includes('B4B4B4') || color.includes('D4AF37') || color.includes('C5A028')
-  const textColor = isDarkText ? '#000000' : 'white'
-  const borderLight = isDarkText ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.25)'
-  const bgLight = isDarkText ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.15)'
+  const isDarkText = color.toUpperCase().includes('E5E4E2') || 
+                     color.toUpperCase().includes('B4B4B4') || 
+                     color.toUpperCase().includes('D4AF37') || 
+                     color.toUpperCase().includes('C5A028') ||
+                     color.toLowerCase().includes('gold') ||
+                     color.toLowerCase().includes('silver')
+  const textColor = isDarkText ? '#0f172a' : '#ffffff'
+  const borderLight = isDarkText ? 'rgba(0, 0, 0, 0.22)' : 'rgba(255, 255, 255, 0.35)'
+  const bgLight = isDarkText ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.18)'
+  const btnHoverBg = isDarkText ? 'rgba(0, 0, 0, 0.16)' : 'rgba(255, 255, 255, 0.35)'
+  const btnHoverBorder = isDarkText ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.55)'
 
   const handleCardClick = () => {
-    if (isShrunk) return
-    setIsFlipped(!isFlipped)
+    if (isShrunk || isFlipping) return
+    setIsFlipping(true)
+    if (!isFlipped) {
+      setFlipDirection('toBack')
+      setIsFlipped(true)
+    } else {
+      setFlipDirection('toFront')
+      setIsFlipped(false)
+    }
+  }
+
+  const handleAnimationEnd = (e: React.AnimationEvent) => {
+    if (e.target === e.currentTarget) {
+      setIsFlipping(false)
+      setFlipDirection(null)
+    }
   }
 
   return (
     <div className={`${styles.card} ${isShrunk ? styles.cardShrunk : ''}`}>
       {/* Contenedor 3D Scene */}
       <div className={styles.cardScene} onClick={handleCardClick}>
-        <div className={`${styles.cardInner} ${isFlipped ? styles.isFlipped : ''}`}>
+        <div 
+          className={`
+            ${styles.cardInner}
+            ${isFlipping && flipDirection === 'toBack' ? styles.animatingToBack : ''}
+            ${isFlipping && flipDirection === 'toFront' ? styles.animatingToFront : ''}
+            ${!isFlipping && isFlipped ? styles.isFlippedFlat : ''}
+            ${!isFlipping && !isFlipped ? styles.isFrontFlat : ''}
+          `}
+          onAnimationEnd={handleAnimationEnd}
+        >
           
           {/* Cara Frontal */}
           <div className={styles.cardFront}>
@@ -66,12 +99,15 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
           {/* Cara Posterior */}
           <div 
             className={styles.cardBack} 
-            ref={el => {
-              if (el) {
-                el.style.background = backgroundStyle
-                el.style.color = textColor
-              }
-            }}
+            style={{
+              background: backgroundStyle,
+              color: textColor,
+              '--card-text': textColor,
+              '--btn-border': borderLight,
+              '--btn-bg': bgLight,
+              '--btn-hover-bg': btnHoverBg,
+              '--btn-hover-border': btnHoverBorder,
+            } as React.CSSProperties}
           >
             {/* Banda magnética */}
             <div className={styles.magneticStripe} />
@@ -91,13 +127,6 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
             <div className={styles.backActions}>
               <button 
                 className={styles.backActionBtn}
-                ref={el => {
-                  if (el) {
-                    el.style.color = textColor
-                    el.style.borderColor = borderLight
-                    el.style.background = bgLight
-                  }
-                }}
                 onClick={(e) => { e.stopPropagation(); onEdit(tarjeta) }} 
                 title="Editar"
               >
@@ -107,13 +136,6 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
               
               <button 
                 className={styles.backActionBtn}
-                ref={el => {
-                  if (el) {
-                    el.style.color = textColor
-                    el.style.borderColor = borderLight
-                    el.style.background = bgLight
-                  }
-                }}
                 onClick={(e) => { e.stopPropagation(); onArchive(tarjeta) }} 
                 title="Archivar"
               >
@@ -123,13 +145,6 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
               
               <button 
                 className={`${styles.backActionBtn} ${styles.backActionBtnDelete}`}
-                ref={el => {
-                  if (el) {
-                    el.style.color = textColor
-                    el.style.borderColor = borderLight
-                    el.style.background = bgLight
-                  }
-                }}
                 onClick={(e) => { e.stopPropagation(); onDelete(tarjeta) }} 
                 title="Eliminar"
               >
@@ -141,11 +156,7 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
             {/* Pista de giro */}
             <div 
               className={styles.flipBackHint} 
-              ref={el => {
-                if (el) {
-                  el.style.color = isDarkText ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'
-                }
-              }}
+              style={{ color: textColor }}
             >
               <span>Click para volver</span>
             </div>

@@ -1,0 +1,515 @@
+/* ── BalanceCard.module.css ─────────────────────────────────────────── */
+
+.balanceCard {
+  background: linear-gradient(150deg, #0D2045 0%, #152C5B 50%, #0E224A 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 24px 26px;
+  color: #ffffff;
+  position: relative;
+  box-shadow: 0 16px 36px -12px rgba(13, 32, 69, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: visible;
+  container-type: inline-size;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+:global([data-theme="dark"]) .balanceCard,
+[data-theme="dark"] .balanceCard {
+  background: linear-gradient(150deg, #091427 0%, #0f1f3d 50%, #0a162c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Balance Card Header ──────────────────────────────────────────── */
+
+.balanceCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 28px;
+}
+
+/* Currency Tabs (ARS / USD) */
+.currencyTabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.currencyTab {
+  background: transparent;
+  border: none;
+  padding: 4px 2px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.currencyTab:hover:not(.currencyTabActive) {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.currencyTabActive {
+  color: #ffffff;
+  font-weight: 700;
+  border-bottom: 2px solid #ffffff;
+}
+
+.currencyTabSep {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Currency Badge when no USD exists */
+.currencyBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1;
+}
+
+.currencyBadgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
+  flex-shrink: 0;
+}
+
+/* ── Balance Header Actions ───────────────────────────────────────── */
+
+.balanceHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.balanceHeaderIconBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+.balanceHeaderIconBtn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.06);
+}
+
+.balanceHeaderIconBtn:active {
+  transform: scale(0.94);
+}
+
+/* ── Balance Hero Body ────────────────────────────────────────────── */
+
+.balanceBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saldoAmount {
+  font-size: clamp(2rem, 9.5cqw, 2.9rem);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  line-height: 1.15;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+.saldoAmountNegative {
+  color: #F87171 !important;
+}
+
+/* Subtitle for multiple wallets */
+.disponibleSub {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.015em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Subtitle for single wallet */
+.singleWalletSubtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.singleWalletDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  flex-shrink: 0;
+}
+
+.singleWalletStar {
+  color: #FBBF24;
+  flex-shrink: 0;
+}
+
+/* ── Disponible para gastar & Desglose ── */
+
+.disponibleGastarContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.disponibleGastarRow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: fit-content;
+  max-width: 100%;
+  text-align: left;
+}
+
+.disponibleGastarRow:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.disponibleGastarRow:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.disponibleGastarLabelWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
+}
+
+.disponibleGastarInfoIcon {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.disponibleGastarRow:hover .disponibleGastarInfoIcon {
+  opacity: 1;
+}
+
+.disponibleGastarValue {
+  font-weight: 700;
+  color: #34D399;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.disponibleNegative {
+  color: #F87171 !important;
+}
+
+.desglosePopover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  background: rgba(14, 20, 36, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.5);
+  min-width: 270px;
+  max-width: 320px;
+  animation: popoverIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.desgloseItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.75rem;
+}
+
+.desgloseItemLabel {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.desgloseItemValue {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-variant-numeric: tabular-nums;
+}
+
+.desgloseDeduction {
+  color: #F87171;
+}
+
+.desgloseDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 2px 0;
+}
+
+.desgloseTotalRow {
+  padding-top: 2px;
+}
+
+.desgloseTotalLabel {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.78125rem;
+}
+
+.desgloseTotalValue {
+  color: #34D399;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Interactive Wallet Pills Strip (Only shown when > 1 wallet) ─── */
+
+.walletPillsTrack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 4px;
+  margin: 0 -2px;
+  -ms-overflow-style: none;
+}
+
+@supports (scrollbar-width: none) {
+  .walletPillsTrack {
+    scrollbar-width: none;
+  }
+}
+
+.walletPillsTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.walletPill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 9999px;
+  padding: 6px 13px;
+  font-size: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap !important;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  line-height: 1;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.walletPill:hover:not(.walletPillActive) {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.walletPillActive {
+  background: #ffffff;
+  color: #091224;
+  border-color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.walletPillDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  flex-shrink: 0;
+}
+
+.walletPillName {
+  font-weight: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.walletPillStar {
+  flex-shrink: 0;
+  opacity: 0.9;
+  color: #FBBF24;
+}
+
+.walletPillCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  line-height: 1.1;
+  color: inherit;
+}
+
+.walletPillActive .walletPillCount {
+  background: rgba(9, 18, 36, 0.12);
+  color: #091224;
+}
+
+.walletPillAmount {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+  white-space: nowrap !important;
+}
+
+.walletPillActive .walletPillAmount {
+  color: #091224;
+  font-weight: 600;
+}
+
+/* ── Balance Trends (Ingresos y Egresos) ───────────────────────────── */
+
+.balanceTrends {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.balanceTrendItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.84375rem;
+  font-weight: 600;
+}
+
+.trendUp {
+  color: #34D399;
+  flex-shrink: 0;
+}
+
+.trendDown {
+  color: #F87171;
+  flex-shrink: 0;
+}
+
+.trendAmount {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .balanceCard {
+    padding: 20px 20px;
+    border-radius: 22px;
+    gap: 14px;
+    box-shadow: 0 10px 28px -8px rgba(13, 32, 69, 0.3);
+  }
+
+  .saldoAmount {
+    font-size: clamp(1.85rem, 8.5cqw, 2.45rem);
+    line-height: 1.15;
+  }
+
+  .balanceTrends {
+    gap: 16px;
+    padding-top: 12px;
+  }
+
+  .desglosePopover {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}

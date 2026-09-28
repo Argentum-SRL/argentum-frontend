@@ -265,30 +265,6 @@
   border-color: var(--primary-light);
 }
 
-/* ── Balance Card ─────────────────────────────────────────────────── */
-
-.balanceCard {
-  background: linear-gradient(150deg, #0D2045 0%, #152C5B 50%, #0E224A 100%);
-  border: none;
-  border-radius: 24px;
-  padding: 24px 26px;
-  color: #ffffff;
-  position: relative;
-  box-shadow: 0 16px 36px -12px rgba(13, 32, 69, 0.35);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 20px;
-  overflow: visible;
-  container-type: inline-size;
-  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-@media (min-width: 1024px) {
-  .balanceCard {
-    height: 100%;
-    min-height: 0;
-  }
-}
 
 .mobileGreetingWrap {
   display: flex;
@@ -360,45 +336,6 @@
 }
 
 @media (max-width: 767px) {
-  .balanceCard {
-    padding: 24px 22px;
-    border-radius: 24px;
-    gap: 18px;
-    box-shadow: 0 10px 28px -8px rgba(13, 32, 69, 0.3);
-  }
-
-  .saldoAmount {
-    font-size: clamp(2rem, 9.5cqw, 2.75rem);
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-
-  .balanceBody {
-    gap: 6px;
-    margin: 2px 0;
-  }
-
-  .disponibleSub {
-    font-size: 0.8125rem;
-  }
-
-  .balanceTrends {
-    display: none !important;
-  }
-
-  .walletPillsTrack {
-    padding: 4px 0 6px;
-    gap: 8px;
-    margin: 2px 0;
-  }
-
-  .walletPill {
-    padding: 6px 12px;
-    font-size: 0.8125rem;
-    gap: 7px;
-    white-space: nowrap !important;
-    flex-wrap: nowrap !important;
-  }
 
   .cardHeader {
     padding: 16px 18px;
@@ -454,502 +391,6 @@
   width: 100%;
 }
 
-/* ── Balance Card (Modo Oscuro: Midnight Obsidian Sapphire) ── */
-
-:global([data-theme="dark"]) .balanceCard,
-[data-theme="dark"] .balanceCard {
-  background: linear-gradient(150deg, #131F37 0%, #0D1627 50%, #0A111E 100%) !important;
-  border: none !important;
-  color: #ffffff !important;
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.75) !important;
-}
-
-:global([data-theme="dark"]) .saldoAmount,
-[data-theme="dark"] .saldoAmount {
-  color: #ffffff !important;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
-}
-
-:global([data-theme="dark"]) .disponibleSub,
-[data-theme="dark"] .disponibleSub {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-:global([data-theme="dark"]) .currencyTab,
-[data-theme="dark"] .currencyTab {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-:global([data-theme="dark"]) .currencyTabActive,
-[data-theme="dark"] .currencyTabActive {
-  color: #ffffff !important;
-  border-bottom-color: #ffffff !important;
-}
-
-:global([data-theme="dark"]) .currencyTabSep,
-[data-theme="dark"] .currencyTabSep {
-  color: rgba(255, 255, 255, 0.25) !important;
-}
-
-:global([data-theme="dark"]) .balanceHeaderIconBtn,
-[data-theme="dark"] .balanceHeaderIconBtn {
-  background: transparent !important;
-  border: none !important;
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-:global([data-theme="dark"]) .balanceHeaderIconBtn:hover,
-[data-theme="dark"] .balanceHeaderIconBtn:hover {
-  background: transparent !important;
-  border: none !important;
-  color: #ffffff !important;
-}
-
-/* Modo Oscuro para Wallet Pills */
-:global([data-theme="dark"]) .walletPill,
-[data-theme="dark"] .walletPill {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-
-:global([data-theme="dark"]) .walletPill:hover:not(.walletPillActive),
-[data-theme="dark"] .walletPill:hover:not(.walletPillActive) {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
-  color: #ffffff !important;
-}
-
-:global([data-theme="dark"]) .walletPillActive,
-[data-theme="dark"] .walletPillActive {
-  background: #ffffff !important;
-  color: #0A111E !important;
-  border-color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
-}
-
-:global([data-theme="dark"]) .walletPill .walletPillAmount,
-[data-theme="dark"] .walletPill .walletPillAmount {
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-:global([data-theme="dark"]) .walletPillActive .walletPillAmount,
-[data-theme="dark"] .walletPillActive .walletPillAmount {
-  color: #37475E !important;
-}
-
-:global([data-theme="dark"]) .walletPill .walletPillCount,
-[data-theme="dark"] .walletPill .walletPillCount {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-}
-
-:global([data-theme="dark"]) .walletPillActive .walletPillCount,
-[data-theme="dark"] .walletPillActive .walletPillCount {
-  background: rgba(10, 17, 30, 0.12) !important;
-  color: #0A111E !important;
-}
-
-:global([data-theme="dark"]) .trendAmount,
-[data-theme="dark"] .trendAmount {
-  color: rgba(255, 255, 255, 0.92) !important;
-}
-
-:global([data-theme="dark"]) .trendUp,
-[data-theme="dark"] .trendUp {
-  color: #34D399 !important;
-}
-
-:global([data-theme="dark"]) .trendDown,
-[data-theme="dark"] .trendDown {
-  color: #F87171 !important;
-}
-
-
-
-/* ── Balance Card Header ──────────────────────────────────────────── */
-
-.balanceCardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-/* Currency Tabs (Minimalista, sin switches toscos) */
-.currencyTabs {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.currencyTab {
-  background: transparent;
-  border: none;
-  padding: 4px 2px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
-  letter-spacing: 0.04em;
-  line-height: 1;
-}
-
-.currencyTab:hover:not(.currencyTabActive) {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.currencyTabActive {
-  color: #ffffff;
-  font-weight: 700;
-  border-bottom: 2px solid #ffffff;
-}
-
-.currencyTabSep {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* ── Balance Header Actions ───────────────────────────────────────── */
-
-.balanceHeaderActions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.balanceHeaderIconBtn {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  padding: 0;
-}
-
-.balanceHeaderIconBtn:hover {
-  background: transparent;
-  color: #ffffff;
-  transform: scale(1.08);
-}
-
-.balanceHeaderIconBtn:active {
-  transform: scale(0.92);
-}
-
-/* ── Balance Hero Body ────────────────────────────────────────────── */
-
-.balanceBody {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 2px 0;
-}
-
-.saldoAmount {
-  font-size: clamp(2.2rem, 11cqw, 3.4rem);
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -0.025em;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  line-height: 1.15;
-  color: #ffffff;
-}
-
-.saldoAmountNegative {
-  color: #F87171 !important;
-}
-
-.disponibleSub {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.65);
-  letter-spacing: 0.015em;
-}
-
-/* ── Disponible para gastar & Desglose ── */
-.disponibleGastarContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.disponibleGastarRow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  padding: 6px 12px;
-  color: #ffffff;
-  font-size: 0.8125rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: fit-content;
-  max-width: 100%;
-}
-
-.disponibleGastarRow:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.22);
-}
-
-.disponibleGastarLabelWrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 500;
-}
-
-.disponibleGastarInfoIcon {
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.disponibleGastarRow:hover .disponibleGastarInfoIcon {
-  opacity: 1;
-}
-
-.disponibleGastarValue {
-  font-weight: 700;
-  color: #34D399;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-
-.disponibleNegative {
-  color: #F87171 !important;
-}
-
-.desglosePopover {
-  background: rgba(18, 22, 34, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 12px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-  max-width: 320px;
-  animation: fadeInDown 0.2s ease-out;
-}
-
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.desgloseItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 0.75rem;
-}
-
-.desgloseItemLabel {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.desgloseItemValue {
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  font-variant-numeric: tabular-nums;
-}
-
-.desgloseDeduction {
-  color: #F87171;
-}
-
-.desgloseDivider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 2px 0;
-}
-
-.desgloseTotalRow {
-  padding-top: 2px;
-}
-
-.desgloseTotalLabel {
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 0.78125rem;
-}
-
-.desgloseTotalValue {
-  color: #34D399;
-  font-weight: 700;
-  font-size: 0.8125rem;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Balance Trends (Flechas de Ingresos y Egresos como antes) ─────── */
-
-.balanceTrends {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  flex-wrap: wrap;
-  padding-top: 4px;
-}
-
-.balanceTrendItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.trendUp {
-  color: #34D399;
-  flex-shrink: 0;
-}
-
-.trendDown {
-  color: #F87171;
-  flex-shrink: 0;
-}
-
-.trendAmount {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  color: rgba(255, 255, 255, 0.9);
-}
-
-/* ── Interactive Wallet Pills Strip (100% Nuevo, sin dropdowns) ───── */
-
-.walletPillsTrack {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 4px 0 6px;
-  margin: 2px -2px;
-  -ms-overflow-style: none;
-}
-
-@supports (scrollbar-width: none) {
-  .walletPillsTrack {
-    scrollbar-width: none;
-  }
-}
-
-.walletPillsTrack::-webkit-scrollbar {
-  display: none;
-}
-
-.walletPill {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.85);
-  border-radius: 9999px;
-  padding: 6px 13px;
-  font-size: 0.8125rem;
-  display: inline-flex;
-  align-items: center;
-  flex-direction: row;
-  flex-wrap: nowrap !important;
-  gap: 7px;
-  cursor: pointer;
-  white-space: nowrap !important;
-  flex-shrink: 0;
-  line-height: 1;
-  font-family: inherit;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.walletPill:hover:not(.walletPillActive) {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.28);
-  color: #ffffff;
-}
-
-.walletPillActive {
-  background: #ffffff;
-  color: #091224;
-  border-color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.walletPillDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #34D399;
-  flex-shrink: 0;
-}
-
-.walletPillName {
-  font-weight: inherit;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap !important;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.walletPillStar {
-  flex-shrink: 0;
-  opacity: 0.85;
-}
-
-.walletPillAmount {
-  font-size: 0.6875rem;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.55);
-  font-weight: 500;
-  white-space: nowrap !important;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.walletPillActive .walletPillAmount {
-  color: #37475E;
-}
-
-.walletPillCount {
-  font-size: 0.625rem;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.16);
-  padding: 1px 5px;
-  border-radius: 999px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.walletPillActive .walletPillCount {
-  background: rgba(9, 18, 36, 0.1);
-  color: #091224;
-}
-
 /* ── Grid ─────────────────────────────────────────────────────────── */
 
 .card {
@@ -969,7 +410,7 @@
 }
 
 .cardHeader {
-  padding: 20px 24px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -977,7 +418,7 @@
 }
 
 .cardHeaderWithToggle {
-  padding: 16px 24px;
+  padding: 14px 20px;
 }
 
 .cardTitle {
@@ -1002,7 +443,7 @@
 }
 
 .cardContent {
-  padding: 12px;
+  padding: 12px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1015,12 +456,13 @@
 }
 
 .chartCardContent {
-  padding: 12px;
+  padding: 12px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 220px;
+  justify-content: flex-start;
+  min-height: 0;
+  gap: 6px;
 }
 @media (min-width: 1024px) {
   .chartCardContent {
@@ -1088,18 +530,18 @@
 .barItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 7px 10px;
-  border-radius: 12px;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 10px;
   transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
   box-sizing: border-box;
   width: 100%;
 }
 
 .barIconWrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1111,7 +553,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .barHeader {
@@ -1149,6 +591,7 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 
 .barAmountProyectado {
@@ -1157,7 +600,7 @@
 }
 
 .barTrack {
-  height: 6px;
+  height: 5px;
   background: var(--surface-alt);
   border-radius: 3px;
   overflow: hidden;
@@ -1174,13 +617,76 @@
   opacity: 0.6;
 }
 
+.barItemMore {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px dashed var(--border);
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 2px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.barItemMore:hover {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.04));
+  color: var(--text);
+  border-color: var(--border-hover, var(--border));
+  transform: translateY(-1px);
+}
+
+.barItemMoreLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+}
+
+.barItemMoreAmount {
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.barCollapseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-top: 2px;
+  align-self: center;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.barCollapseBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
 /* ── Lists ────────────────────────────────────────────────────────── */
 
 .appleCalendar {
   display: flex;
   flex-direction: column;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -1192,10 +698,10 @@
 .appleCalendarMonth {
   background: #ff3b30;
   color: white;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
   text-align: center;
-  padding: 2px 0;
+  padding: 1px 0;
   text-transform: uppercase;
 }
 
@@ -1204,7 +710,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
   background: var(--surface-alt);
@@ -1324,6 +830,123 @@
   justify-content: center;
   letter-spacing: 0.02em;
   line-height: 1.2;
+}
+
+.pagosColWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 0;
+}
+
+.pagoItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background 0.18s ease;
+  cursor: pointer;
+}
+
+.pagoItem:hover {
+  background: var(--surface-alt);
+}
+
+.verMasPagosWrap {
+  padding: 6px 12px 2px;
+  display: flex;
+  justify-content: center;
+}
+
+.verMasPagosLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.verMasPagosLink:hover {
+  background: var(--surface-alt);
+  color: var(--primary-dark, var(--primary));
+}
+
+/* Al Día - Empty State Pulido */
+.alDiaEmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 16px;
+  flex: 1;
+  gap: 8px;
+  margin: auto 0;
+}
+
+.alDiaIconCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.12);
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+:global([data-theme="dark"]) .alDiaIconCircle {
+  background: rgba(52, 211, 153, 0.16);
+  color: #34D399;
+}
+
+.alDiaTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.alDiaSubtitle {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  margin: 0;
+  max-width: 230px;
+  line-height: 1.4;
+}
+
+.alDiaLink {
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.alDiaLink:hover {
+  background: var(--surface-alt);
 }
 
 .emptyState {

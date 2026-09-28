@@ -1,510 +1,474 @@
-/* ── BalanceCard.module.css ─────────────────────────────────────────── */
+/* ── BalanceCard.module.css (Saldos Protagonistas & Cuentas Colapsables) ── */
 
-.balanceCard {
-  background: linear-gradient(150deg, #0D2045 0%, #152C5B 50%, #0E224A 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px;
-  padding: 22px 24px;
+.card {
+  background: linear-gradient(165deg, #0C1728 0%, #11223B 60%, #0E1B2E 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 18px 20px;
   color: #ffffff;
   position: relative;
-  box-shadow: 0 16px 36px -12px rgba(13, 32, 69, 0.35);
+  box-shadow: 0 16px 36px -12px rgba(8, 17, 34, 0.4);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: flex-start;
+  gap: 10px;
   width: 100%;
-  min-width: 0;
-  max-width: 100%;
+  height: 100%;
   box-sizing: border-box;
   container-type: inline-size;
-  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+  transition: background 0.25s ease, border-color 0.25s ease, height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-:global([data-theme="dark"]) .balanceCard,
-[data-theme="dark"] .balanceCard {
-  background: linear-gradient(150deg, #091427 0%, #0f1f3d 50%, #0a162c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+:global([data-theme="dark"]) .card,
+[data-theme="dark"] .card {
+  background: linear-gradient(165deg, #08101E 0%, #0C1A2E 60%, #091322 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65);
 }
 
-/* ── Header ───────────────────────────────────────────────────────── */
+/* ── 1. Header (Monedas a la izquierda, Privacidad a la derecha) ──── */
 
-.balanceCardHeader {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 32px;
+  min-height: 28px;
 }
 
-.balanceHeaderLabel {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-/* ── Segmented Control for Multi-currency (Pesos / Dólares) - Apple Glass Style ── */
-.currencySegmented {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  padding: 3px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 2px 8px rgba(0, 0, 0, 0.15);
-  gap: 3px;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.currencySegmentBtn {
-  background: transparent;
-  border: none;
-  padding: 4px 12px;
-  font-size: 0.75rem;
-  font-weight: 550;
-  color: rgba(255, 255, 255, 0.72);
-  cursor: pointer;
-  border-radius: 999px;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  font-family: inherit;
-  white-space: nowrap;
-  -webkit-user-select: none;
-  user-select: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.currencySegmentBtn:hover:not(.currencySegmentBtnActive) {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.currencySegmentBtnActive {
-  background: #ffffff;
-  color: #0D2045;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22), 0 1px 2px rgba(0, 0, 0, 0.15);
-  transform: scale(1.02);
-}
-
-.currencySegmentBtn:active {
-  transform: scale(0.96);
-}
-
-:global([data-theme="dark"]) .currencySegmented {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.10);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.06), 0 2px 8px rgba(0, 0, 0, 0.35);
-}
-
-:global([data-theme="dark"]) .currencySegmentBtnActive {
-  background: #ffffff;
-  color: #091427;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-}
-
-.balanceHeaderActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.privacyBtn {
   margin-left: auto;
-}
-
-.balanceHeaderIconBtn {
   background: transparent;
   border: none;
   outline: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 4px;
   border-radius: 50%;
-  transition: color 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease;
+  transition: all 0.18s ease;
   flex-shrink: 0;
-  box-shadow: none;
 }
 
-.balanceHeaderIconBtn:hover {
-  background: transparent;
+.privacyBtn:hover {
   color: #ffffff;
-  transform: scale(1.14);
-  opacity: 1;
+  transform: scale(1.1);
 }
 
-.balanceHeaderIconBtn:active {
+.privacyBtn:active {
   transform: scale(0.92);
 }
 
-@container (max-width: 360px) {
-  .balanceCardHeader {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .currencySegmentBtn {
-    padding: 3px 9px;
-    font-size: 0.72rem;
-  }
-}
-
-/* ── Hero Balance Body ────────────────────────────────────────────── */
-
-.balanceBody {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  width: 100%;
-}
-
-.saldoAmount {
-  font-size: clamp(1.75rem, 8.5cqw, 2.75rem);
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -0.025em;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  line-height: 1.15;
-  color: #ffffff;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-.saldoAmountNegative {
-  color: #F87171 !important;
-}
-
-/* Subtitle */
-.disponibleSub,
-.singleWalletSubtitle {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.65);
-  letter-spacing: 0.015em;
+.currencyToggle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-width: 0;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 2px;
+  border-radius: 999px;
+  border: none;
 }
 
-.singleWalletDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #34D399;
-  flex-shrink: 0;
-}
-
-.singleWalletName {
-  overflow: hidden;
-  text-overflow: ellipsis;
+.currencyBtn {
+  background: transparent;
+  border: none;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1.2;
+  font-family: inherit;
   white-space: nowrap;
 }
 
-.singleWalletStar {
-  color: #FBBF24;
-  flex-shrink: 0;
+.currencyBtn:hover:not(.currencyBtnActive) {
+  color: #ffffff;
 }
 
-/* ── Caso A: Free Badge (100% Libre sin compromisos) ─────────────── */
-
-.freeBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 11px;
-  border-radius: 10px;
-  background: rgba(52, 211, 153, 0.09);
-  border: 1px solid rgba(52, 211, 153, 0.2);
-  color: #6EE7B7;
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.2;
-  margin-top: 2px;
-  width: fit-content;
-  max-width: 100%;
+.currencyBtnActive {
+  background: #ffffff;
+  color: #0C1728;
+  font-weight: 650;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
-.freeBadgeIcon {
-  flex-shrink: 0;
-  color: #34D399;
+:global([data-theme="dark"]) .currencyBtnActive {
+  background: #ffffff;
+  color: #08101E;
 }
 
-/* ── Caso B: Allocation Card (Compromisos del ciclo) ──────────────── */
+/* ── 2. Los Dos Saldos (Protagonistas Absolutos) ───────────────────── */
 
-.allocationCard {
+.saldosHero {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 10px 12px;
-  margin-top: 4px;
   width: 100%;
-  box-sizing: border-box;
+  min-width: 0;
 }
 
-.allocationRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.allocationCol {
+.saldoMain {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.allocationColRight {
-  align-items: flex-end;
-  text-align: right;
-  margin-left: auto;
-}
-
-.allocationLabel {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.allocationValDisponible {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #34D399;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
-
-.allocationValCompromiso {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #F87171;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
-
-/* Allocation bar meter */
-.allocationTrack {
-  height: 5px;
-  width: 100%;
-  background: rgba(248, 113, 113, 0.4);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.allocationFillFree {
-  height: 100%;
-  background: #34D399;
-  border-radius: 9999px;
-  transition: width 0.4s ease;
-}
-
-/* Micro tags for cuotas / suscripciones */
-.allocationTags {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  padding-top: 2px;
-}
-
-.allocationTag {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 2px 7px;
-  border-radius: 6px;
-  line-height: 1.2;
-}
-
-.allocationTag strong {
-  color: rgba(255, 255, 255, 0.9);
+.saldoLabel {
+  font-size: 0.65rem;
   font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-/* ── Caso C: Deficit Box ───────────────────────────────────────────── */
+.totalAmount {
+  font-size: clamp(1.85rem, 6cqw, 2.35rem);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  line-height: 1.08;
+  color: #ffffff;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 
-.deficitBox {
+.saldoSecondary {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-top: 4px;
-}
-
-.deficitTop {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.deficitIcon {
-  color: #F87171;
-  flex-shrink: 0;
-}
-
-.deficitTitle {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #FCA5A5;
-}
-
-.deficitMetrics {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 0.71875rem;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.deficitDiff {
-  font-weight: 700;
-  color: #F87171;
-}
-
-/* ── Wallet Filter Pills ──────────────────────────────────────────── */
-
-.walletPillsContainer {
-  position: relative;
-  width: 100%;
+  gap: 2px;
   min-width: 0;
 }
 
-.walletPillsTrack {
+.availableRow {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
-  overflow-x: auto;
-  padding: 2px 0 4px;
-  margin: 0 -2px;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
-.walletPillsTrack::-webkit-scrollbar {
-  display: none;
+.availableAmount {
+  font-size: clamp(1.15rem, 4cqw, 1.42rem);
+  font-weight: 700;
+  color: #34D399;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  line-height: 1.15;
 }
 
-.walletPill {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.85);
-  border-radius: 9999px;
-  padding: 5px 11px;
-  font-size: 0.78125rem;
+.availableTrigger {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  line-height: 1;
+  color: inherit;
   font-family: inherit;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  transition: opacity 0.15s ease;
 }
 
-.walletPill:hover:not(.walletPillActive) {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.28);
+.availableTrigger:hover {
+  opacity: 0.9;
+}
+
+.availableTrigger:hover .chevron {
+  color: #34D399;
+}
+
+.dropdownBadge {
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
-  transform: translateY(-1px);
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
-.walletPillActive {
-  background: #ffffff;
-  color: #091224;
-  border-color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-}
-
-.walletPillDot {
-  width: 6px;
-  height: 6px;
+.itemDot {
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: #34D399;
+  background: rgba(255, 255, 255, 0.45);
   flex-shrink: 0;
 }
 
-.walletPillName {
-  font-weight: inherit;
+.compromisoAmount {
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.deficitBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #F87171;
+  background: rgba(239, 68, 68, 0.12);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.amountNegative {
+  color: #F87171 !important;
+}
+
+/* ── 3. Selector de Cuentas (Disimulado e integrado) ─────────────── */
+
+.accountsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.accountsTrigger {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: fit-content;
+  max-width: 100%;
+  transition: opacity 0.18s ease;
+  outline: none;
+}
+
+.accountsTrigger:hover {
+  opacity: 0.95;
+}
+
+.triggerContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: color 0.18s ease;
+}
+
+.accountsTrigger:hover .triggerContent,
+.triggerActive .triggerContent {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.triggerDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #10B981;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.triggerText {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.chevron {
+  color: inherit;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
 }
 
-.walletPillStar {
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Panel Desplegable (Totalmente integrado con el fondo de la card) */
+.accountsDropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  animation: dropdownFadeIn 0.16s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dropdownTitle {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.resetBtn {
+  background: transparent;
+  border: none;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.resetBtn:hover {
+  color: #ffffff;
+}
+
+.resetBtnActive {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.accountsList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 140px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.accountsList::-webkit-scrollbar {
+  width: 3px;
+}
+
+.accountsList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+.accountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 6px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background 0.15s ease, color 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.accountRow:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.rowSelected {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.rowLeft {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.checkbox {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.checkboxChecked {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.accountName {
+  font-size: 0.72rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.starIcon {
   flex-shrink: 0;
   color: #FBBF24;
 }
 
-.walletPillCount {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-  font-size: 0.65625rem;
-  font-weight: 700;
-  padding: 1px 5px;
-  line-height: 1.1;
-  color: inherit;
-}
-
-.walletPillActive .walletPillCount {
-  background: rgba(9, 18, 36, 0.12);
-  color: #091224;
-}
-
-.walletPillAmount {
-  font-size: 0.6875rem;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.65);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.walletPillActive .walletPillAmount {
-  color: #091224;
+.accountAmount {
+  font-size: 0.72rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
-/* ── Balance Trends (Ingresos y Egresos) ───────────────────────────── */
+/* ── 4. Resumen de Flujo (Al pie de la tarjeta) ────────────────────── */
 
-.balanceTrends {
+.trendsBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  padding-top: 14px;
+  padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: auto;
 }
 
-.balanceTrendItem {
+.trendItem {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -512,12 +476,12 @@
   font-weight: 600;
 }
 
-.trendUp {
+.trendUpIcon {
   color: #34D399;
   flex-shrink: 0;
 }
 
-.trendDown {
+.trendDownIcon {
   color: #F87171;
   flex-shrink: 0;
 }
@@ -528,47 +492,29 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* ── Responsive Adaptations ───────────────────────────────────────── */
+/* ── Adaptaciones Responsivas ─────────────────────────────────────── */
 
 @container (max-width: 320px) {
-  .balanceCard {
-    padding: 18px 16px;
+  .card {
+    padding: 16px 14px;
     gap: 14px;
   }
 
-  .saldoAmount {
+  .currencyBtn {
+    padding: 2px 7px;
+    font-size: 0.6875rem;
+  }
+
+  .totalAmount {
     font-size: 1.85rem;
   }
 
-  .allocationRow {
-    flex-direction: column;
-    align-items: flex-start;
+  .availableAmount {
+    font-size: 1.2rem;
   }
 
-  .allocationColRight {
-    align-items: flex-start;
-    text-align: left;
-    margin-left: 0;
-  }
-
-  .balanceTrends {
-    gap: 10px;
-  }
-}
-
-@media (max-width: 767px) {
-  .balanceCard {
-    padding: 20px 18px;
-    border-radius: 20px;
-    gap: 14px;
-  }
-
-  .saldoAmount {
-    font-size: clamp(1.75rem, 8cqw, 2.35rem);
-  }
-
-  .balanceTrends {
-    gap: 12px;
-    padding-top: 12px;
+  .trendsBar {
+    gap: 8px;
+    padding-top: 10px;
   }
 }

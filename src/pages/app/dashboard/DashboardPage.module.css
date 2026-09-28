@@ -355,6 +355,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 28px;
+  align-items: start;
 }
 
 @media (max-width: 767px) {
@@ -366,6 +367,23 @@
 @media (min-width: 1024px) {
   .topRow {
     grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+    transition: height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .topRowCompact {
+    height: 260px;
+  }
+
+  .topRowExpanded {
+    height: 425px;
+  }
+
+  .topRowCompact .card,
+  .topRowExpanded .card {
+    height: 100%;
+    min-height: 0;
+    transition: height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 }
 

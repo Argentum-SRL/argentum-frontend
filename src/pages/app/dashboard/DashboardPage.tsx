@@ -525,6 +525,29 @@ export default function DashboardPage() {
   const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
   const [subcategoriasData, setSubcategoriasData] = useState<SubcategoriaGasto[]>([])
   const [loadingSubcategorias, setLoadingSubcategorias] = useState(false)
+  const [isAccountsOpen, setIsAccountsOpen] = useState(false)
+  const [isCompromisosOpen, setIsCompromisosOpen] = useState(false)
+
+  const handleToggleAccounts = useCallback(() => {
+    setIsAccountsOpen(prev => {
+      const next = !prev
+      if (next) setIsCompromisosOpen(false)
+      return next
+    })
+  }, [])
+
+  const handleToggleCompromisos = useCallback(() => {
+    setIsCompromisosOpen(prev => {
+      const next = !prev
+      if (next) setIsAccountsOpen(false)
+      return next
+    })
+  }, [])
+
+  const handleCloseDropdowns = useCallback(() => {
+    setIsAccountsOpen(false)
+    setIsCompromisosOpen(false)
+  }, [])
 
   // Resetear filtros y datos si el usuario autenticado cambia
   const prevUserIdRef = useRef<string | null>(usuario?.id ?? null)
@@ -749,6 +772,49 @@ export default function DashboardPage() {
     fetchData()
   }, [fetchData])
 
+  const monedaKey = moneda === 'ARS' ? 'ars' : 'usd'
+  const saldoInfo = data?.saldo_disponible?.[monedaKey]
+  const saldoTotal = saldoInfo ? Number(saldoInfo.saldo_total) : (moneda === 'ARS' ? (data?.disponible_real.ars.saldo_billeteras ?? 0) : (data?.disponible_real.usd.saldo_billeteras ?? 0))
+  const saldoDisponible = saldoInfo ? Number(saldoInfo.saldo_disponible) : (moneda === 'ARS' ? (data?.disponible_real.ars.disponible ?? 0) : (data?.disponible_real.usd.disponible ?? 0))
+  const cuotasPendientes = saldoInfo ? Number(saldoInfo.cuotas_pendientes) : (moneda === 'ARS' ? (data?.disponible_real.ars.cuotas_proximo_ciclo ?? 0) : (data?.disponible_real.usd.cuotas_proximo_ciclo ?? 0))
+  const suscripcionesPendientes = saldoInfo ? Number(saldoInfo.suscripciones_pendientes) : (moneda === 'ARS' ? (data?.disponible_real.ars.suscripciones_mensuales || 0) : (data?.disponible_real.usd.suscripciones_mensuales || 0))
+
+  const compromisos = useMemo(() => {
+    const list: Array<{ id: string; nombre: string; monto: number; tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta' }> = []
+    const pagosFiltrados = (data?.proximos_pagos ?? []).filter(p => p.moneda === moneda)
+
+    for (const p of pagosFiltrados) {
+      if (p.tipo === 'suscripcion' || p.tipo === 'cuota' || p.tipo === 'resumen_tarjeta') {
+        list.push({
+          id: p.id,
+          nombre: p.nombre || (p.tipo === 'suscripcion' ? 'Suscripción' : 'Cuota'),
+          monto: Number(p.monto) || 0,
+          tipo: p.tipo,
+        })
+      }
+    }
+
+    if (list.length === 0) {
+      if (suscripcionesPendientes > 0) {
+        list.push({
+          id: 'suscripciones-total',
+          nombre: 'Suscripciones mensuales',
+          monto: suscripcionesPendientes,
+          tipo: 'suscripcion',
+        })
+      }
+      if (cuotasPendientes > 0) {
+        list.push({
+          id: 'cuotas-total',
+          nombre: 'Cuotas de tarjetas',
+          monto: cuotasPendientes,
+          tipo: 'cuota',
+        })
+      }
+    }
+    return list
+  }, [data?.proximos_pagos, moneda, suscripcionesPendientes, cuotasPendientes])
+
   if (error) {
     return (
       <div className={styles.root}>
@@ -762,12 +828,7 @@ export default function DashboardPage() {
     )
   }
 
-  const monedaKey = moneda === 'ARS' ? 'ars' : 'usd'
-  const saldoInfo = data?.saldo_disponible?.[monedaKey]
-  const saldoTotal = saldoInfo ? Number(saldoInfo.saldo_total) : (moneda === 'ARS' ? (data?.disponible_real.ars.saldo_billeteras ?? 0) : (data?.disponible_real.usd.saldo_billeteras ?? 0))
-  const saldoDisponible = saldoInfo ? Number(saldoInfo.saldo_disponible) : (moneda === 'ARS' ? (data?.disponible_real.ars.disponible ?? 0) : (data?.disponible_real.usd.disponible ?? 0))
-  const cuotasPendientes = saldoInfo ? Number(saldoInfo.cuotas_pendientes) : (moneda === 'ARS' ? (data?.disponible_real.ars.cuotas_proximo_ciclo ?? 0) : (data?.disponible_real.usd.cuotas_proximo_ciclo ?? 0))
-  const suscripcionesPendientes = saldoInfo ? Number(saldoInfo.suscripciones_pendientes) : (moneda === 'ARS' ? (data?.disponible_real.ars.suscripciones_mensuales || 0) : (data?.disponible_real.usd.suscripciones_mensuales || 0))
+  const isAnyTopRowExpanded = isAccountsOpen || isCompromisosOpen
 
   return (
     <div className={styles.root}>
@@ -782,7 +843,7 @@ export default function DashboardPage() {
       </header>
 
       {/* ── Top Row (3 Cols) ──────────────────────────────────────────────── */}
-      <div className={styles.topRow}>
+      <div className={`${styles.topRow} ${isAnyTopRowExpanded ? styles.topRowExpanded : styles.topRowCompact}`}>
         {/* Col 1: Balance */}
         <WidgetErrorBoundary title="Saldo disponible">
           {loading ? (
@@ -804,6 +865,12 @@ export default function DashboardPage() {
                 onTogglePrivacy={handleTogglePrivacy}
                 ingresos={moneda === 'ARS' ? (data.balance?.ars?.ingresos ?? 0) : (data.balance?.usd?.ingresos ?? 0)}
                 egresos={moneda === 'ARS' ? (data.balance?.ars?.egresos ?? 0) : (data.balance?.usd?.egresos ?? 0)}
+                isAccountsOpen={isAccountsOpen}
+                onToggleAccounts={handleToggleAccounts}
+                isCompromisosOpen={isCompromisosOpen}
+                onToggleCompromisos={handleToggleCompromisos}
+                onCloseDropdowns={handleCloseDropdowns}
+                compromisos={compromisos}
               />
             )
           )}

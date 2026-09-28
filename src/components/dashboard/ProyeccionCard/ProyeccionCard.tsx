@@ -175,12 +175,25 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
 
             <div className={styles.heroMetric}>
               <span className={styles.heroLabel}>Balance estimado</span>
-              <div className={`${styles.heroValue} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
-                {formatMonto(balanceAnim ?? (balance_proyectado ?? 0), moneda)}
-              </div>
-              <span className={`${styles.heroSubtext} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
-                {(balance_proyectado ?? 0) >= 0 ? 'Superávit probable' : 'Déficit probable'}
-              </span>
+              {balance_proyectado !== null ? (
+                <>
+                  <div className={`${styles.heroValue} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
+                    {formatMonto(balanceAnim ?? (balance_proyectado ?? 0), moneda)}
+                  </div>
+                  <span className={`${styles.heroSubtext} ${(balance_proyectado ?? 0) >= 0 ? styles.positive : styles.negative}`}>
+                    {(balance_proyectado ?? 0) >= 0 ? 'Superávit probable' : 'Déficit probable'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className={styles.heroValue} style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                    Cargá tus cobros para ver esto
+                  </div>
+                  <span className={styles.heroSubtext}>
+                    Faltan cobros para proyectar balance
+                  </span>
+                </>
+              )}
             </div>
           </div>
 

@@ -91,14 +91,12 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
               )}
             </span>
           ) : (
-            <span className={`${styles.contextStatValue} ${styles.contextStatValueMuted}`} style={{ fontSize: 14 }}>
-              Sin ingresos registrados
+            <span className={`${styles.contextStatValue} ${styles.contextStatValueMuted}`} style={{ fontSize: 13 }}>
+              Cargá tus cobros para ver esto
             </span>
           )}
           <span className={styles.contextStatDesc}>
-            {ciclos_con_historia > 0
-              ? `Promedio últimos ${Math.min(ciclos_con_historia, 3)} ciclos`
-              : 'Estimación actual'}
+            Ingreso habitual estimado
           </span>
         </div>
 
@@ -110,8 +108,8 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
               {formatMonto(margen_libre_mensual, 'ARS')}
             </span>
           ) : (
-            <span className={`${styles.contextStatValue} ${styles.contextStatValueMuted}`} style={{ fontSize: 14 }}>
-              No calculable
+            <span className={`${styles.contextStatValue} ${styles.contextStatValueMuted}`} style={{ fontSize: 13 }}>
+              Cargá tus cobros para ver esto
             </span>
           )}
           <span className={styles.contextStatDesc}>Ingreso menos carga y gastos promedio</span>

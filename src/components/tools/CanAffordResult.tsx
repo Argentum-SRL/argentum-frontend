@@ -132,7 +132,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
             />
           </div>
 
-          {porcentaje_del_ingreso_mensual !== null && porcentaje_del_ingreso_mensual !== undefined && (
+          {porcentaje_del_ingreso_mensual !== null && porcentaje_del_ingreso_mensual !== undefined ? (
             <div className={styles.metricBox} style={{ gap: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span className={styles.metricLabel}>Equivalencia de ingreso mensual</span>
@@ -148,6 +148,13 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
               </div>
               <span className={styles.metricDesc}>
                 Esta compra equivale al {porcentaje_del_ingreso_mensual.toFixed(1)}% de tu ingreso mensual promedio ({formatMonto(ingreso_promedio_usado || 0, 'ARS')}).
+              </span>
+            </div>
+          ) : (
+            <div className={styles.metricBox} style={{ gap: 6 }}>
+              <span className={styles.metricLabel}>Equivalencia de ingreso mensual</span>
+              <span className={styles.metricDesc} style={{ color: 'var(--text-muted)' }}>
+                Cargá tus cobros para ver esto
               </span>
             </div>
           )}
@@ -176,7 +183,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
               value={
                 margen_libre_post_compra !== null && margen_libre_post_compra !== undefined
                   ? formatMonto(margen_libre_post_compra, 'ARS')
-                  : 'N/A'
+                  : 'Cargá tus cobros para ver esto'
               }
               valueClass={margenClass}
               desc="Sobrante estimado/mes"
@@ -198,7 +205,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
           )}
 
           {/* Distribution bar */}
-          {ingreso_promedio_usado !== null && (
+          {ingreso_promedio_usado !== null ? (
             <IncomeDistributionBar
               ingreso={ingreso_promedio_usado}
               cargaPrevia={carga_mensual_previa ?? 0}
@@ -206,6 +213,12 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
               gastoVariable={gasto_variable_promedio ?? 0}
               semaforo={semaforo}
             />
+          ) : (
+            <div className={styles.metricBox} style={{ textAlign: 'center', padding: '12px' }}>
+              <span className={styles.metricDesc} style={{ color: 'var(--text-muted)' }}>
+                Cargá tus cobros para ver la distribución sobre ingresos
+              </span>
+            </div>
           )}
         </div>
       )}

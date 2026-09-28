@@ -174,28 +174,28 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ data
       id: 'ahorro',
       title: 'Ahorro',
       valueElement: capAhorroAnim !== null ? `${capAhorroAnim}%` : '—',
-      displayValue: capAhorroRaw !== null ? `${Math.round(capAhorroRaw * 100)}%` : 'Sin datos',
+      displayValue: capAhorroRaw !== null ? `${Math.round(capAhorroRaw * 100)}%` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos'),
       statusClass: capAhorroRaw === null ? styles.statusNeutral : (capAhorroRaw >= 0.2 ? styles.statusGood : (capAhorroRaw >= 0.1 ? styles.statusNeutral : (capAhorroRaw >= 0 ? styles.statusWarning : styles.statusCritical))),
       statusText: capAhorroRaw === null ? 'Sin datos' : (capAhorroRaw >= 0.2 ? 'Saludable' : (capAhorroRaw >= 0.1 ? 'Moderado' : (capAhorroRaw >= 0 ? 'Bajo' : 'Déficit'))),
-      tooltip: interps.capacidad_ahorro || (capAhorroRaw !== null ? `${Math.round(capAhorroRaw * 100)}% de tu ingreso típico regular.` : 'Sin datos suficientes de ingreso.')
+      tooltip: interps.capacidad_ahorro || (capAhorroRaw !== null ? `${Math.round(capAhorroRaw * 100)}% de tu ingreso típico regular.` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos suficientes de ingreso.'))
     },
     {
       id: 'comprometido',
       title: 'Comprometido',
       valueElement: gastoCompRatioAnim !== null ? `${gastoCompRatioAnim}%` : '—',
-      displayValue: gastoCompRatioRaw !== null ? `${Math.round(gastoCompRatioRaw * 100)}%` : 'Sin datos',
+      displayValue: gastoCompRatioRaw !== null ? `${Math.round(gastoCompRatioRaw * 100)}%` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos'),
       statusClass: gastoCompRatioRaw === null ? styles.statusNeutral : (gastoCompRatioRaw <= 0.4 ? styles.statusGood : (gastoCompRatioRaw <= 0.55 ? styles.statusNeutral : styles.statusWarning)),
       statusText: gastoCompRatioRaw === null ? 'Sin datos' : (gastoCompRatioRaw <= 0.4 ? 'Bajo control' : (gastoCompRatioRaw <= 0.55 ? 'Moderado' : 'Elevado')),
-      tooltip: interps.gasto_comprometido || (gastoCompRatioRaw !== null ? `${Math.round(gastoCompRatioRaw * 100)}% de tu ingreso típico comprometido en costos fijos.` : 'Sin compromisos registrados.')
+      tooltip: interps.gasto_comprometido || (gastoCompRatioRaw !== null ? `${Math.round(gastoCompRatioRaw * 100)}% de tu ingreso típico comprometido en costos fijos.` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin compromisos registrados.'))
     },
     {
       id: 'habitos',
       title: 'Hábitos',
       valueElement: gastoHabitosRatioAnim !== null ? `${gastoHabitosRatioAnim}%` : '—',
-      displayValue: gastoHabitosRatioRaw !== null ? `${Math.round(gastoHabitosRatioRaw * 100)}%` : 'Sin datos',
+      displayValue: gastoHabitosRatioRaw !== null ? `${Math.round(gastoHabitosRatioRaw * 100)}%` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos'),
       statusClass: gastoHabitosRatioRaw === null ? styles.statusNeutral : (gastoHabitosRatioRaw <= 0.15 ? styles.statusGood : (gastoHabitosRatioRaw <= 0.3 ? styles.statusNeutral : styles.statusWarning)),
       statusText: gastoHabitosRatioRaw === null ? 'Sin datos' : (gastoHabitosRatioRaw <= 0.15 ? 'Controlado' : (gastoHabitosRatioRaw <= 0.3 ? 'Moderado' : 'Flexible')),
-      tooltip: interps.gasto_habitos || (gastoHabitosRatioRaw !== null ? `${Math.round(gastoHabitosRatioRaw * 100)}% de tu ingreso típico en consumos recurrentes.` : 'Sin consumos de hábitos detectados.')
+      tooltip: interps.gasto_habitos || (gastoHabitosRatioRaw !== null ? `${Math.round(gastoHabitosRatioRaw * 100)}% de tu ingreso típico en consumos recurrentes.` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin consumos de hábitos detectados.'))
     },
     {
       id: 'cobertura',
@@ -222,12 +222,12 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ data
     },
     {
       id: 'ingreso_tipico',
-      title: 'Ingreso Típico',
-      valueElement: ingresoTipicoAnim !== null ? formatMonto(ingresoTipicoAnim, 'ARS') : '—',
-      displayValue: ingresoTipicoRaw !== null ? formatMonto(ingresoTipicoRaw, 'ARS') : 'Sin datos',
+      title: 'Ingreso Habitual',
+      valueElement: ingresoTipicoAnim !== null ? formatMonto(ingresoTipicoAnim, 'ARS') : 'Cargá tus cobros para ver esto',
+      displayValue: ingresoTipicoRaw !== null ? formatMonto(ingresoTipicoRaw, 'ARS') : 'Cargá tus cobros para ver esto',
       statusClass: styles.statusNeutral,
-      statusText: 'Mediana',
-      tooltip: interps.ingreso_tipico || 'Mediana histórica deflactada.'
+      statusText: ingresoTipicoRaw !== null ? 'Habitual' : 'Sin datos',
+      tooltip: interps.ingreso_tipico || (ingresoTipicoRaw !== null ? 'Ingreso habitual estimado en ARS.' : 'Cargá tus cobros para ver esto')
     }
   ]
 

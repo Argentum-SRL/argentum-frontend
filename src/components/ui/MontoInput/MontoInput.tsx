@@ -149,11 +149,11 @@ const MontoInput = memo(({
               className={styles.monedaToggleChip}
               onClick={() => onMonedaChange && !disabled && onMonedaChange(moneda === 'ARS' ? 'USD' : 'ARS')}
               disabled={disabled || !onMonedaChange}
-              aria-label={onMonedaChange ? `Moneda actual: ${moneda}. Click para cambiar.` : `Moneda: ${moneda}`}
+              aria-label={onMonedaChange ? `Moneda actual: ${moneda === 'ARS' ? 'Pesos' : 'Dólares'}. Click para cambiar.` : `Moneda: ${moneda === 'ARS' ? 'Pesos' : 'Dólares'}`}
               title={onMonedaChange ? 'Cambiar moneda' : undefined}
             >
               <span className={styles.monedaChipFlag}>{moneda === 'ARS' ? '🇦🇷' : '🇺🇸'}</span>
-              <span className={styles.monedaChipLabel}>{moneda}</span>
+              <span className={styles.monedaChipLabel}>{moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
             </button>
             <div className={styles.montoDivider} />
           </>

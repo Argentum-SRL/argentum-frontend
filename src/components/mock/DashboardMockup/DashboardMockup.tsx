@@ -9,7 +9,7 @@ const TX_DELAYS = [300, 500, 700]
 
 const TRANSACTIONS = [
   { name: 'Coto Almagro', sub: 'Supermercado', amount: '− $ 12.480',    positive: false },
-  { name: 'Sueldo abril',  sub: 'Ingreso',       amount: '+ USD $ 2.100', positive: true  },
+  { name: 'Sueldo abril',  sub: 'Ingreso',       amount: '+ US$ 2.100',    positive: true  },
   { name: 'SUBE',          sub: 'Transporte',    amount: '− $ 2.000',    positive: false },
 ]
 

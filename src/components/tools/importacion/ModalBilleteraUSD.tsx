@@ -96,7 +96,7 @@ export const ModalBilleteraUSD: React.FC<ModalBilleteraUSDProps> = ({
                 No tenés billeteras en dólares
               </div>
               <p className={styles.alertDesc}>
-                Para importar gastos en USD, necesitás tener creada al menos una billetera en dólares. Se pre-seleccionará la opción de ignorar estas transacciones.
+                Para importar gastos en dólares, necesitás tener creada al menos una billetera en dólares. Se pre-seleccionará la opción de ignorar estas transacciones.
               </p>
             </div>
           ) : (
@@ -121,7 +121,7 @@ export const ModalBilleteraUSD: React.FC<ModalBilleteraUSDProps> = ({
                   <label htmlFor="usd-opt-import" className={styles.checkboxLabel}>Importar los gastos en dólares</label>
                   {option === 'import' && (
                     <div className={styles.walletDropdownSelectContainer} onClick={e => e.stopPropagation()}>
-                      <label htmlFor="usd-wallet-select" className={styles.label}>Seleccionar Billetera USD</label>
+                      <label htmlFor="usd-wallet-select" className={styles.label}>Seleccionar Billetera en Dólares</label>
                       <select
                         id="usd-wallet-select"
                         className={styles.selectField}
@@ -130,7 +130,7 @@ export const ModalBilleteraUSD: React.FC<ModalBilleteraUSDProps> = ({
                       >
                         {usdWallets.map(b => (
                           <option key={b.id} value={b.id}>
-                            {b.nombre} (USD)
+                            {b.nombre} (Dólares)
                           </option>
                         ))}
                       </select>

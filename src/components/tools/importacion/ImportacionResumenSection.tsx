@@ -397,12 +397,12 @@ export const ImportacionResumenSection: React.FC = () => {
                     <strong className={styles.metaItemValue}>{tarjetas.find(t => t.id === selectedTarjetaId)?.nombre || selectedTarjetaId}</strong>
                   </div>
                   <div>
-                    <span className={styles.metaItemLabel}>Billetera ARS:</span>{' '}
+                    <span className={styles.metaItemLabel}>Billetera en Pesos:</span>{' '}
                     <strong className={styles.metaItemValue}>{billeteras.find(b => b.id === selectedBilleteraId)?.nombre || selectedBilleteraId}</strong>
                   </div>
                   {decisiones.billetera_usd_id && (
                     <div>
-                      <span className={styles.metaItemLabel}>Billetera USD:</span>{' '}
+                      <span className={styles.metaItemLabel}>Billetera en Dólares:</span>{' '}
                       <strong className={styles.metaItemValue}>{billeteras.find(b => b.id === decisiones.billetera_usd_id)?.nombre || decisiones.billetera_usd_id}</strong>
                     </div>
                   )}

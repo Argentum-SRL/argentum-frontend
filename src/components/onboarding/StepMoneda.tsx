@@ -119,8 +119,8 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
                 onClick={() => setMoneda(m)}
                 className={[styles.currencyCard, moneda === m ? styles.currencyCardActive : ''].filter(Boolean).join(' ')}
               >
-                <span className={styles.currencyCode}>{m}</span>
-                <span className={styles.currencyName}>{m === 'ARS' ? 'Peso argentino' : 'Dólar'}</span>
+                <span className={styles.currencyCode}>{m === 'ARS' ? 'Pesos' : 'Dólares'}</span>
+                <span className={styles.currencyName}>{m === 'ARS' ? 'Moneda local ($)' : 'Moneda extranjera (US$)'}</span>
               </button>
             ))}
           </div>

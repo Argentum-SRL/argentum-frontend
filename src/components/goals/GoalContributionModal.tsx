@@ -272,7 +272,7 @@ export default function GoalContributionModal({
                   {filteredBilleteras.length === 0 ? (
                     <div className={`${styles.localErrorAlert} ${styles.fullWidth}`}>
                       <AlertCircle size={16} />
-                      <span>No tenés billeteras en {moneda}</span>
+                      <span>No tenés billeteras en {moneda === 'ARS' ? 'pesos' : 'dólares'}</span>
                     </div>
                   ) : filteredBilleteras.map(b => (
                     <div
@@ -306,7 +306,7 @@ export default function GoalContributionModal({
                 </div>
                 <div className={styles.exchangeGrid}>
                   <div className={styles.rateInputWrap}>
-                    <span className={styles.rateUnitLabel}>1 {moneda} =</span>
+                    <span className={styles.rateUnitLabel}>1 {moneda === 'ARS' ? 'peso' : 'dólar'} =</span>
                     <input
                       type="number"
                       step="any"
@@ -321,7 +321,7 @@ export default function GoalContributionModal({
                       }}
                       title="Cotización de la moneda"
                     />
-                    <span className={styles.rateUnitLabel}>{goal.moneda}</span>
+                    <span className={styles.rateUnitLabel}>{goal.moneda === 'ARS' ? 'pesos' : 'dólares'}</span>
                   </div>
                   <ArrowRight size={16} color="var(--primary)" />
                   <div className={styles.resultInfo}>

@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect, memo } from 'react'
+import { memo } from 'react'
 import {
   TrendingUp,
   TrendingDown,
   Eye,
   EyeOff,
   Star,
-  HelpCircle,
+  CheckCircle2,
+  AlertTriangle,
 } from '@/components/ui/icons'
 import { formatMonto } from '@/utils/format'
 import type { Billetera } from '@/types'
@@ -48,75 +49,44 @@ export const BalanceCard = memo(function BalanceCard({
   ingresos,
   egresos,
 }: BalanceCardProps) {
-  const [showDesglose, setShowDesglose] = useState(false)
-  const desgloseContainerRef = useRef<HTMLDivElement>(null)
-
-  // Cerrar el popover de desglose al hacer click afuera o presionar Escape
-  useEffect(() => {
-    if (!showDesglose) return
-
-    const handlePointerDownOutside = (e: MouseEvent | TouchEvent) => {
-      if (
-        desgloseContainerRef.current &&
-        !desgloseContainerRef.current.contains(e.target as Node)
-      ) {
-        setShowDesglose(false)
-      }
-    }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setShowDesglose(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handlePointerDownOutside)
-    document.addEventListener('touchstart', handlePointerDownOutside)
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDownOutside)
-      document.removeEventListener('touchstart', handlePointerDownOutside)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [showDesglose])
-
   const singleWallet = billeterasActivas.length === 1 ? billeterasActivas[0] : null
+  const totalCompromisos = (cuotasPendientes || 0) + (suscripcionesPendientes || 0)
+  const hasCompromisos = totalCompromisos > 0
+  const isDeficit = saldoDisponible < 0
+
+  // Cálculo del porcentaje libre para la barra de asignación (0% a 100%)
+  const ratioDisponible = saldoTotal > 0 ? Math.max(0, Math.min(100, Math.round((saldoDisponible / saldoTotal) * 100))) : 0
 
   return (
     <div className={styles.balanceCard}>
-      {/* ── Header: Currency Tabs / Badge + Privacy Toggle ──────────────── */}
+      {/* ── Header: Título y acciones (Selector de Moneda + Privacidad) ── */}
       <div className={styles.balanceCardHeader}>
-        {tieneBilleterasUsd ? (
-          <div className={styles.currencyTabs} role="tablist" aria-label="Seleccionar moneda">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={moneda === 'ARS'}
-              className={`${styles.currencyTab} ${moneda === 'ARS' ? styles.currencyTabActive : ''}`}
-              onClick={() => onToggleMoneda('ARS')}
-            >
-              ARS
-            </button>
-            <span className={styles.currencyTabSep}>/</span>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={moneda === 'USD'}
-              className={`${styles.currencyTab} ${moneda === 'USD' ? styles.currencyTabActive : ''}`}
-              onClick={() => onToggleMoneda('USD')}
-            >
-              USD
-            </button>
-          </div>
-        ) : (
-          <div className={styles.currencyBadge}>
-            <span className={styles.currencyBadgeDot} />
-            {moneda}
-          </div>
-        )}
+        <span className={styles.balanceHeaderLabel}>Balance general</span>
 
         <div className={styles.balanceHeaderActions}>
+          {tieneBilleterasUsd && (
+            <div className={styles.currencySegmented} role="tablist" aria-label="Seleccionar moneda">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={moneda === 'ARS'}
+                className={`${styles.currencySegmentBtn} ${moneda === 'ARS' ? styles.currencySegmentBtnActive : ''}`}
+                onClick={() => onToggleMoneda('ARS')}
+              >
+                Pesos
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={moneda === 'USD'}
+                className={`${styles.currencySegmentBtn} ${moneda === 'USD' ? styles.currencySegmentBtnActive : ''}`}
+                onClick={() => onToggleMoneda('USD')}
+              >
+                Dólares
+              </button>
+            </div>
+          )}
+
           <button
             type="button"
             className={styles.balanceHeaderIconBtn}
@@ -124,146 +94,146 @@ export const BalanceCard = memo(function BalanceCard({
             title={showBalance ? 'Ocultar saldo' : 'Mostrar saldo'}
             aria-label={showBalance ? 'Ocultar saldo' : 'Mostrar saldo'}
           >
-            {showBalance ? <Eye size={15} /> : <EyeOff size={15} />}
+            {showBalance ? <Eye size={17} strokeWidth={1.85} /> : <EyeOff size={17} strokeWidth={1.85} />}
           </button>
         </div>
       </div>
 
-      {/* ── Balance Principal & Subtítulo ──────────────────────────────── */}
+      {/* ── Balance Hero Body ─────────────────────────────────────────── */}
       <div className={styles.balanceBody}>
         <h2 className={`${styles.saldoAmount} ${saldoTotal < 0 ? styles.saldoAmountNegative : ''}`}>
           {showBalance ? fmt(saldoTotal, moneda) : '••••••••'}
         </h2>
 
-        {/* Subtítulo dinámico: adaptado según si tiene 1 sola billetera o varias */}
+        {/* Subtítulo: 1 sola billetera o selección */}
         {singleWallet ? (
-          <span className={styles.singleWalletSubtitle}>
+          <div className={styles.singleWalletSubtitle}>
             <span className={styles.singleWalletDot} />
-            <span>{singleWallet.nombre}</span>
+            <span className={styles.singleWalletName}>{singleWallet.nombre}</span>
             {singleWallet.es_principal && (
               <Star size={11} fill="currentColor" className={styles.singleWalletStar} />
             )}
-          </span>
+          </div>
         ) : (
-          <span className={styles.disponibleSub}>
+          <div className={styles.disponibleSub}>
             {billeterasActivas.length === 0
-              ? `Sin billeteras en ${moneda}`
+              ? `Sin billeteras en ${moneda === 'ARS' ? 'pesos' : 'dólares'}`
               : billeterasSeleccionadas.length === 0
                 ? `Total en ${billeterasActivas.length} billeteras`
                 : billeterasSeleccionadas.length === 1
                   ? `Saldo en ${billeterasActivas.find(b => b.id === billeterasSeleccionadas[0])?.nombre ?? 'billetera'}`
                   : `${billeterasSeleccionadas.length} billeteras seleccionadas`}
-          </span>
+          </div>
         )}
 
-        {/* ── Disponible para gastar con Desglose Popover ─────────────── */}
-        <div className={styles.disponibleGastarContainer} ref={desgloseContainerRef}>
-          <button
-            type="button"
-            className={styles.disponibleGastarRow}
-            onClick={() => setShowDesglose(prev => !prev)}
-            aria-expanded={showDesglose}
-            title="Click para ver desglose de compromisos del ciclo"
-          >
-            <div className={styles.disponibleGastarLabelWrap}>
-              <span>Disponible para gastar</span>
-              <HelpCircle size={13} className={styles.disponibleGastarInfoIcon} />
+        {/* ── Financial Freedom / Compromisos Insight (Rediseño Zen) ──── */}
+        {!hasCompromisos ? (
+          // Caso A: 100% Libre sin compromisos -> No duplicamos el número, damos paz mental con un pill sutil
+          <div className={styles.freeBadge}>
+            <CheckCircle2 size={13} className={styles.freeBadgeIcon} />
+            <span>100% disponible · Sin compromisos este mes</span>
+          </div>
+        ) : isDeficit ? (
+          // Caso B: Compromisos superan saldo -> Alerta clara y accionable
+          <div className={styles.deficitBox}>
+            <div className={styles.deficitTop}>
+              <AlertTriangle size={14} className={styles.deficitIcon} />
+              <span className={styles.deficitTitle}>Compromisos exceden tu saldo</span>
             </div>
-            <span
-              className={`${styles.disponibleGastarValue} ${saldoDisponible < 0 ? styles.disponibleNegative : ''}`}
-            >
-              {showBalance ? fmt(saldoDisponible, moneda) : '••••••••'}
-            </span>
-          </button>
+            <div className={styles.deficitMetrics}>
+              <span>Comprometido: {showBalance ? fmt(totalCompromisos, moneda) : '••••'}</span>
+              <span className={styles.deficitDiff}>Déficit: {showBalance ? fmt(Math.abs(saldoDisponible), moneda) : '••••'}</span>
+            </div>
+          </div>
+        ) : (
+          // Caso C: Hay compromisos pendientes -> Visual Allocation Strip 100% fluido y responsivo
+          <div className={styles.allocationCard}>
+            <div className={styles.allocationRow}>
+              <div className={styles.allocationCol}>
+                <span className={styles.allocationLabel}>Disponible libre</span>
+                <span className={styles.allocationValDisponible}>
+                  {showBalance ? fmt(saldoDisponible, moneda) : '••••••••'}
+                </span>
+              </div>
+              <div className={`${styles.allocationCol} ${styles.allocationColRight}`}>
+                <span className={styles.allocationLabel}>Comprometido</span>
+                <span className={styles.allocationValCompromiso}>
+                  {showBalance ? `- ${fmt(totalCompromisos, moneda)}` : '••••'}
+                </span>
+              </div>
+            </div>
 
-          {showDesglose && (
-            <div className={styles.desglosePopover} role="tooltip">
-              <div className={styles.desgloseItem}>
-                <span className={styles.desgloseItemLabel}>Saldo total</span>
-                <span className={styles.desgloseItemValue}>
-                  {showBalance ? fmt(saldoTotal, moneda) : '••••'}
-                </span>
-              </div>
-              <div className={styles.desgloseItem}>
-                <span className={styles.desgloseItemLabel}>Cuotas pendientes</span>
-                <span
-                  className={`${styles.desgloseItemValue} ${cuotasPendientes > 0 ? styles.desgloseDeduction : ''}`}
-                >
-                  {showBalance
-                    ? cuotasPendientes > 0
-                      ? `- ${fmt(cuotasPendientes, moneda)}`
-                      : fmt(0, moneda)
-                    : '••••'}
-                </span>
-              </div>
-              <div className={styles.desgloseItem}>
-                <span className={styles.desgloseItemLabel}>Suscripciones pendientes</span>
-                <span
-                  className={`${styles.desgloseItemValue} ${suscripcionesPendientes > 0 ? styles.desgloseDeduction : ''}`}
-                >
-                  {showBalance
-                    ? suscripcionesPendientes > 0
-                      ? `- ${fmt(suscripcionesPendientes, moneda)}`
-                      : fmt(0, moneda)
-                    : '••••'}
-                </span>
-              </div>
-              <div className={styles.desgloseDivider} />
-              <div className={`${styles.desgloseItem} ${styles.desgloseTotalRow}`}>
-                <span className={styles.desgloseTotalLabel}>Disponible para gastar</span>
-                <span className={styles.desgloseTotalValue}>
-                  {showBalance ? fmt(saldoDisponible, moneda) : '••••'}
-                </span>
-              </div>
+            {/* Barra visual proporcional */}
+            <div className={styles.allocationTrack} title={`${ratioDisponible}% libre para gastar`}>
+              <div
+                className={styles.allocationFillFree}
+                style={{ width: `${ratioDisponible}%` }}
+              />
             </div>
-          )}
-        </div>
+
+            {/* Micro-desglose claro de dónde viene el compromiso */}
+            <div className={styles.allocationTags}>
+              {cuotasPendientes > 0 && (
+                <span className={styles.allocationTag}>
+                  Cuotas: <strong>{showBalance ? fmt(cuotasPendientes, moneda) : '••••'}</strong>
+                </span>
+              )}
+              {suscripcionesPendientes > 0 && (
+                <span className={styles.allocationTag}>
+                  Suscripciones: <strong>{showBalance ? fmt(suscripcionesPendientes, moneda) : '••••'}</strong>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ── Wallet Filter Pills Track (Solo si hay MÁS de 1 billetera) ─── */}
+      {/* ── Wallet Filter Pills Track (Solo si hay más de 1 billetera) ─── */}
       {billeterasActivas.length > 1 && (
-        <div className={styles.walletPillsTrack} role="tablist" aria-label="Filtrar por billetera">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={billeterasSeleccionadas.length === 0}
-            className={`${styles.walletPill} ${billeterasSeleccionadas.length === 0 ? styles.walletPillActive : ''}`}
-            onClick={() => onToggleBilletera(null)}
-            title="Ver todas las billeteras"
-          >
-            <span className={styles.walletPillDot} />
-            <span className={styles.walletPillName}>Todas</span>
-            <span className={styles.walletPillCount}>{billeterasActivas.length}</span>
-          </button>
+        <div className={styles.walletPillsContainer}>
+          <div className={styles.walletPillsTrack} role="tablist" aria-label="Filtrar por billetera">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={billeterasSeleccionadas.length === 0}
+              className={`${styles.walletPill} ${billeterasSeleccionadas.length === 0 ? styles.walletPillActive : ''}`}
+              onClick={() => onToggleBilletera(null)}
+              title="Ver todas las billeteras"
+            >
+              <span className={styles.walletPillDot} />
+              <span className={styles.walletPillName}>Todas</span>
+              <span className={styles.walletPillCount}>{billeterasActivas.length}</span>
+            </button>
 
-          {billeterasActivas.map(b => {
-            const isSelected = billeterasSeleccionadas.includes(b.id)
-            return (
-              <button
-                key={b.id}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                className={`${styles.walletPill} ${isSelected ? styles.walletPillActive : ''}`}
-                onClick={() => onToggleBilletera(b.id)}
-                title={`Filtrar por ${b.nombre}${b.es_principal ? ' (Favorita)' : ''}`}
-              >
-                <span className={styles.walletPillName}>
-                  {b.nombre}
-                  {b.es_principal && (
-                    <Star size={10} fill="currentColor" className={styles.walletPillStar} />
-                  )}
-                </span>
-                <span className={styles.walletPillAmount}>
-                  {showBalance ? fmt(b.saldo_actual, b.moneda) : '••••'}
-                </span>
-              </button>
-            )
-          })}
+            {billeterasActivas.map(b => {
+              const isSelected = billeterasSeleccionadas.includes(b.id)
+              return (
+                <button
+                  key={b.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  className={`${styles.walletPill} ${isSelected ? styles.walletPillActive : ''}`}
+                  onClick={() => onToggleBilletera(b.id)}
+                  title={`Filtrar por ${b.nombre}${b.es_principal ? ' (Favorita)' : ''}`}
+                >
+                  <span className={styles.walletPillName}>
+                    {b.nombre}
+                    {b.es_principal && (
+                      <Star size={10} fill="currentColor" className={styles.walletPillStar} />
+                    )}
+                  </span>
+                  <span className={styles.walletPillAmount}>
+                    {showBalance ? fmt(b.saldo_actual, b.moneda) : '••••'}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
 
-      {/* ── Flechas de Ingreso y Egreso ─────────────────────────────────── */}
+      {/* ── Balance Trends (Ingresos y Egresos) ─────────────────────────── */}
       <div className={styles.balanceTrends}>
         <div className={styles.balanceTrendItem} title="Ingresos del ciclo">
           <TrendingUp size={15} className={styles.trendUp} />

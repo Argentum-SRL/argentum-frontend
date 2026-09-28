@@ -72,7 +72,7 @@ export default function GoalCard({ goal, onEdit, onContribute, onDetails, onRefr
 
       <div className={styles.cardHeader}>
         <div className={styles.titleInfo}>
-          <div className={styles.currencyBadge}>{goal.moneda}</div>
+          <div className={styles.currencyBadge}>{goal.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</div>
           <h3 className={styles.cardTitle}>{goal.nombre}</h3>
         </div>
         <button 

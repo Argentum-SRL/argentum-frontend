@@ -300,7 +300,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           {/* Hero Monto Card */}
           <div className={`${styles.montoHeroCard} ${isInputFocused ? styles.montoHeroCardFocus : ''}`}>
             <span className={styles.montoHeroLabel}>
-              {tipoPago === 'total' ? `Total a liquidar (${monedaAPagar})` : `Monto a pagar (${monedaAPagar})`}
+              {tipoPago === 'total' ? `Total a liquidar (${monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})` : `Monto a pagar (${monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})`}
             </span>
 
             {tipoPago === 'total' ? (
@@ -359,7 +359,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
           {/* Desglose previo de la liquidación en moneda original */}
           <div className={styles.breakdownCard}>
-            <span className={styles.breakdownTitle}>Desglose del resumen ({monedaAPagar})</span>
+            <span className={styles.breakdownTitle}>Desglose del resumen ({monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})</span>
             
             <div className={styles.breakdownRow}>
               <span>Cuotas del período</span>
@@ -385,7 +385,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
             <div className={styles.breakdownDivider} />
 
             <div className={styles.breakdownTotalRow}>
-              <span>Total en {monedaAPagar}</span>
+              <span>Total en {monedaAPagar === 'ARS' ? 'pesos' : 'dólares'}</span>
               <span className={styles.breakdownTotalVal}>{formatMonto(totalAPagar, monedaAPagar)}</span>
             </div>
           </div>
@@ -478,7 +478,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
             <div className={styles.minimoBox}>
               <div className={styles.minimoTop}>
                 <div className={styles.minimoLabelGroup}>
-                  <span>Pago mínimo estimado ({monedaAPagar})</span>
+                  <span>Pago mínimo estimado ({monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})</span>
                   <span className={styles.minimoBadge}>Estimado</span>
                 </div>
                 <span className={styles.minimoVal}>{formatMonto(pagoMinimoEstimado, monedaAPagar)}</span>
@@ -492,7 +492,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
             <div className={styles.alertWarning}>
               <Info size={18} className={styles.alertIcon} />
               <span>
-                El saldo restante quedará como saldo financiado en {monedaAPagar} y pasará al próximo resumen. El banco cobrará intereses según las condiciones de la tarjeta.
+                El saldo restante quedará como saldo financiado en {monedaAPagar === 'ARS' ? 'pesos' : 'dólares'} y pasará al próximo resumen. El banco cobrará intereses según las condiciones de la tarjeta.
               </span>
             </div>
           )}

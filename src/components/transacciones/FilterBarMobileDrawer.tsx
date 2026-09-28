@@ -188,14 +188,14 @@ export default function FilterBarMobileDrawer({
                 className={`${styles.typePillMobile} ${localFilters.moneda === 'ARS' ? styles.typePillActiveTodosMobile : ''}`}
                 onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: 'ARS' }))}
               >
-                ARS
+                Pesos
               </button>
               <button
                 type="button"
                 className={`${styles.typePillMobile} ${localFilters.moneda === 'USD' ? styles.typePillActiveTodosMobile : ''}`}
                 onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: 'USD' }))}
               >
-                USD
+                Dólares
               </button>
             </div>
           </div>

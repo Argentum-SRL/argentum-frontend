@@ -14,19 +14,53 @@ import SuscripcionCard from '@/components/suscripciones/SuscripcionCard'
 import SuscripcionModal from '@/components/suscripciones/SuscripcionModal'
 import styles from './SuscripcionesPage.module.css'
 
-const POSICIONES = [
-  { top: '8%',  left: '15%', size: 'mid'  },
-  { top: '5%',  left: '55%', size: 'near' },
-  { top: '12%', left: '82%', size: 'mid'  },
-  { top: '35%', left: '4%',  size: 'near' },
-  { top: '55%', left: '8%',  size: 'far'  },
-  { top: '75%', left: '18%', size: 'mid'  },
-  { top: '85%', left: '48%', size: 'near' },
-  { top: '78%', left: '78%', size: 'mid'  },
-  { top: '55%', left: '88%', size: 'near' },
-  { top: '30%', left: '85%', size: 'far'  },
-  { top: '18%', left: '38%', size: 'far'  },
-  { top: '72%', left: '42%', size: 'far'  },
+interface FloatingItemConfig {
+  dt: string
+  dl: string
+  mt?: string
+  ml?: string
+  size: 'far' | 'mid' | 'near'
+}
+
+const FLOATING_ITEMS: FloatingItemConfig[] = [
+  // ── Sector Izquierdo Exterior (Left Wing Outer)
+  { dt: '12%', dl: '5%',  mt: '5%',  ml: '16%', size: 'mid'  }, // 1: Netflix
+  { dt: '32%', dl: '5%',  mt: '6%',  ml: '82%', size: 'near' }, // 2: HBO Max
+  { dt: '54%', dl: '5%',  mt: '13%', ml: '50%', size: 'far'  }, // 3: Prime Video
+  { dt: '76%', dl: '5%',  mt: '22%', ml: '18%', size: 'near' }, // 4: Paramount+
+
+  // ── Sector Izquierdo Interior (Left Wing Inner)
+  { dt: '18%', dl: '15%', mt: '21%', ml: '82%', size: 'mid'  }, // 5: Apple TV+
+  { dt: '42%', dl: '15%', mt: '38%', ml: '4%',  size: 'far'  }, // 6: Crunchyroll
+  { dt: '66%', dl: '15%', mt: '48%', ml: '96%', size: 'far'  }, // 7: Pluto TV
+
+  // ── Sector Flancos (Flanks)
+  { dt: '10%', dl: '25%', mt: '58%', ml: '4%',  size: 'mid'  }, // 8: Peacock
+  { dt: '84%', dl: '24%', mt: '57%', ml: '96%', size: 'mid'  }, // 9: Spotify
+
+  // ── Sector Superior Desktop / Inferior Mobile
+  { dt: '5%',  dl: '38%', mt: '65%', ml: '20%', size: 'near' }, // 10: Apple Music
+  { dt: '5%',  dl: '62%', mt: '66%', ml: '80%', size: 'mid'  }, // 11: YT Music
+
+  // ── Sector Flancos y Base
+  { dt: '10%', dl: '75%', mt: '73%', ml: '50%', size: 'near' }, // 12: Tidal
+  { dt: '84%', dl: '76%', mt: '80%', ml: '18%', size: 'mid'  }, // 13: Deezer
+
+  // ── Sector Derecho Interior
+  { dt: '18%', dl: '85%', mt: '81%', ml: '82%', size: 'near' }, // 14: iCloud
+  { dt: '42%', dl: '85%', mt: '88%', ml: '30%', size: 'mid'  }, // 15: Google One
+  { dt: '66%', dl: '85%', mt: '88%', ml: '70%', size: 'near' }, // 16: Microsoft 365
+
+  // ── Sector Derecho Exterior
+  { dt: '12%', dl: '95%', mt: '95%', ml: '16%', size: 'far'  }, // 17: Adobe CC
+  { dt: '32%', dl: '95%', mt: '96%', ml: '50%', size: 'mid'  }, // 18: ChatGPT Plus
+  { dt: '54%', dl: '95%', mt: '95%', ml: '84%', size: 'far'  }, // 19: Canva
+  { dt: '76%', dl: '95%', size: 'far'  },                        // 20: Notion
+
+  // ── Sector Inferior Desktop (Base)
+  { dt: '90%', dl: '38%', size: 'mid'  }, // 21: Evernote
+  { dt: '92%', dl: '50%', size: 'near' }, // 22: Dropbox
+  { dt: '90%', dl: '62%', size: 'mid'  }, // 23: Grammarly
 ]
 
 
@@ -169,20 +203,28 @@ const SuscripcionesPage: React.FC = () => {
 
   if (suscripciones.length === 0 || isExiting) {
     return (
-      <div className={styles.root}>
+      <div className={`${styles.root} ${styles.emptyRoot}`}>
         <div className={`${styles.emptyState} ${isExiting ? styles.emptyStateExiting : ''}`}>
           {/* Capa 1: Logos Flotantes con profundidad */}
           <div className={styles.logosLayer}>
-            {POSICIONES.map((pos, i) => {
+            {FLOATING_ITEMS.map((item, i) => {
               const s = CATALOGO_SUSCRIPCIONES[i % CATALOGO_SUSCRIPCIONES.length]
               if (!s || !s.logoPath) return null
               
+              const style = {
+                '--top-dt': item.dt,
+                '--left-dt': item.dl,
+                '--top-m': item.mt,
+                '--left-m': item.ml,
+              } as React.CSSProperties
+
               return (
                 <img
                   key={`${s.id}-${i}`}
                   src={s.logoPath}
-                  alt=""
-                  className={`${styles.logoFlotante} ${styles[pos.size]}`}
+                  alt={s.nombre}
+                  style={style}
+                  className={`${styles.logoFlotante} ${styles[item.size]} ${!item.mt ? styles.hideMobile : ''}`}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none'
                   }}
@@ -203,9 +245,9 @@ const SuscripcionesPage: React.FC = () => {
             </p>
             <Button 
               onClick={handleCreate} 
-              className={`${styles.emptyButton} ${styles.btnLg}`}
+              className={styles.emptyButton}
             >
-              <Plus size={20} />
+              <Plus size={18} />
               Agregar mi primera suscripción
             </Button>
           </div>
@@ -267,11 +309,11 @@ const SuscripcionesPage: React.FC = () => {
         className={styles.desktopSummaryBar}
         items={[
           {
-            label: "Total mensual ARS",
+            label: "Total mensual en Pesos",
             value: formatCurrency(totalMensualARS),
           },
           {
-            label: "Total mensual USD",
+            label: "Total mensual en Dólares",
             value: formatMonto(totalMensualUSD, 'USD'),
           },
           {

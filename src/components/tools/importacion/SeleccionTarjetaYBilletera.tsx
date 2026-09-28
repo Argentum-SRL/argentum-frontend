@@ -52,7 +52,7 @@ export const SeleccionTarjetaYBilletera: React.FC<SeleccionTarjetaYBilleteraProp
   // Opciones formateadas para los SelectInput
   const optionsTarjetas = activeTarjetas.map(t => ({
     value: t.id,
-    label: `${t.nombre} (${t.moneda})`,
+    label: `${t.nombre} (${t.moneda === 'ARS' ? 'Pesos' : 'Dólares'})`,
   }))
 
   const optionsBilleteras = activeArsBilleteras.map(b => ({
@@ -76,7 +76,7 @@ export const SeleccionTarjetaYBilletera: React.FC<SeleccionTarjetaYBilleteraProp
       <div className={styles.formField}>
         <SelectInput
           id="select-billetera"
-          label="Billetera de Pago (ARS)"
+          label="Billetera de Pago (Pesos)"
           placeholder="Seleccioná la billetera de débito..."
           value={selectedBilleteraId}
           onChange={onChangeBilleteraId}

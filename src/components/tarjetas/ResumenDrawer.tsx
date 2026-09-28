@@ -155,13 +155,13 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
         <div className={styles.sectionFooter}>
           {isBimonetario ? (
             <>
-              {/* Bloque ARS */}
+              {/* Bloque Pesos */}
               <div className={styles.monedaBlock}>
                 <div className={styles.monedaBlockHeader}>
-                  <span className={styles.monedaBadge}>Pesos (ARS)</span>
+                  <span className={styles.monedaBadge}>Pesos</span>
                 </div>
                 <div className={styles.totalRow}>
-                  <span className={styles.totalLabel}>Total Cuotas (ARS)</span>
+                  <span className={styles.totalLabel}>Total Cuotas en Pesos</span>
                   <span className={styles.totalValue}>{formatMonto(bARS.total_cuotas_periodo, 'ARS')}</span>
                 </div>
                 {bARS.total_deuda_vencida_anterior > 0 && (
@@ -177,14 +177,14 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
                   </div>
                 )}
                 <div className={styles.totalRow}>
-                  <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar (ARS)</span>
+                  <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar en Pesos</span>
                   <span className={styles.totalValue} style={{ fontWeight: 800 }}>{formatMonto(bARS.total_a_pagar, 'ARS')}</span>
                 </div>
                 {bARS.pago_minimo_estimado > 0 && (
                   <div className={styles.minimoRow}>
                     <div className={styles.minimoTop}>
                       <span className={styles.minimoLabel}>
-                        Pago mínimo estimado (ARS)
+                        Pago mínimo estimado en Pesos
                         <span className={styles.minimoTag}>Estimado</span>
                       </span>
                       <span className={styles.minimoVal}>{formatMonto(bARS.pago_minimo_estimado, 'ARS')}</span>
@@ -193,13 +193,13 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
                 )}
               </div>
 
-              {/* Bloque USD */}
+              {/* Bloque Dólares */}
               <div className={styles.monedaBlock}>
                 <div className={styles.monedaBlockHeader}>
-                  <span className={styles.monedaBadge}>Dólares (USD)</span>
+                  <span className={styles.monedaBadge}>Dólares</span>
                 </div>
                 <div className={styles.totalRow}>
-                  <span className={styles.totalLabel}>Total Cuotas (USD)</span>
+                  <span className={styles.totalLabel}>Total Cuotas en Dólares</span>
                   <span className={styles.totalValue}>{formatMonto(bUSD.total_cuotas_periodo, 'USD')}</span>
                 </div>
                 {bUSD.total_deuda_vencida_anterior > 0 && (
@@ -215,7 +215,7 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
                   </div>
                 )}
                 <div className={styles.totalRow}>
-                  <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar (USD)</span>
+                  <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar en Dólares</span>
                   <span className={styles.totalValue} style={{ fontWeight: 800 }}>{formatMonto(bUSD.total_a_pagar, 'USD')}</span>
                 </div>
                 {bUSD.total_estimado_ars !== undefined && bUSD.total_estimado_ars !== null && (
@@ -232,7 +232,7 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
                   <div className={styles.minimoRow}>
                     <div className={styles.minimoTop}>
                       <span className={styles.minimoLabel}>
-                        Pago mínimo estimado (USD)
+                        Pago mínimo estimado en Dólares
                         <span className={styles.minimoTag}>Estimado</span>
                       </span>
                       <span className={styles.minimoVal}>{formatMonto(bUSD.pago_minimo_estimado, 'USD')}</span>

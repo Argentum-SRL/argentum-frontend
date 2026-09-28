@@ -178,9 +178,9 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
             </div>
 
             <div className={`${styles.statusChip} ${styles.chipInfo}`}>
-              <span>Moneda: <strong>{usuario?.moneda_principal || 'ARS'}</strong></span>
+              <span>Moneda: <strong>{usuario?.moneda_principal === 'USD' ? 'Dólares' : 'Pesos'}</strong></span>
               {usuario?.moneda_secundaria_activa && (
-                <span className={styles.chipSub}>({usuario.tipo_dolar?.toUpperCase() || 'USD'})</span>
+                <span className={styles.chipSub}>({usuario.tipo_dolar?.toUpperCase() || 'Dólar'})</span>
               )}
             </div>
 

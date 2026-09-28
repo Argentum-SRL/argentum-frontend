@@ -105,7 +105,7 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
       <div className={styles.header}>
         <div className={styles.titleGroup}>
           <TrendingUp size={18} className={styles.titleIcon} />
-          <h2>Proyección del ciclo ({moneda})</h2>
+          <h2>Proyección del ciclo ({moneda === 'ARS' ? 'Pesos' : 'Dólares'})</h2>
           {pasaPuerta && proyeccion.calibracion?.pasa_puerta ? (
             <span className={styles.badgeCalibration}>
               Calibrada: {Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% ({proyeccion.calibracion.ciclos_evaluados} ciclos)
@@ -119,8 +119,8 @@ const SingleProyeccionCard: React.FC<SingleProyeccionCardProps> = ({ proyeccion,
         <button 
           className={styles.infoButton} 
           onClick={() => open('bienvenidaFinanciera', { data: { initialTab: 'proyeccion' } })}
-          title={`Ver explicación de la proyección en ${moneda}`}
-          aria-label={`Ver explicación de la proyección en ${moneda}`}
+          title={`Ver explicación de la proyección en ${moneda === 'ARS' ? 'pesos' : 'dólares'}`}
+          aria-label={`Ver explicación de la proyección en ${moneda === 'ARS' ? 'pesos' : 'dólares'}`}
         >
           <Info size={18} />
         </button>

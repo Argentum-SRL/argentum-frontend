@@ -59,7 +59,7 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
           <span className={`${styles.contextStatValue} ${saldo_disponible >= 0 ? '' : styles.contextStatValueNegative}`}>
             {formatMonto(saldo_disponible, 'ARS')}
           </span>
-          <span className={styles.contextStatDesc}>Dinero líquido en billeteras ARS</span>
+          <span className={styles.contextStatDesc}>Dinero líquido en billeteras en pesos</span>
         </div>
 
         {/* Carga mensual comprometida */}

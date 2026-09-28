@@ -455,11 +455,11 @@ export default function BilleterasPage() {
                   highlight: true,
                 },
                 {
-                  label: "Total ARS",
+                  label: "Total en Pesos",
                   value: formatCurrency(totalARS),
                 },
                 {
-                  label: "Total USD",
+                  label: "Total en Dólares",
                   value: formatMonto(totalUSD, 'USD'),
                 },
               ]}

@@ -192,7 +192,7 @@ export default function MetaDetallePage() {
             <h1 className={styles.title}>{goal.nombre}</h1>
             <div className={styles.statusRow}>
               <span className={styles.statusBadge}>{goal.estado}</span>
-              <span className={styles.currencyBadge}>{goal.moneda}</span>
+              <span className={styles.currencyBadge}>{goal.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
             </div>
           </div>
         </div>

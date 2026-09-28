@@ -227,7 +227,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ data
       displayValue: ingresoTipicoRaw !== null ? formatMonto(ingresoTipicoRaw, 'ARS') : 'Cargá tus cobros para ver esto',
       statusClass: styles.statusNeutral,
       statusText: ingresoTipicoRaw !== null ? 'Habitual' : 'Sin datos',
-      tooltip: interps.ingreso_tipico || (ingresoTipicoRaw !== null ? 'Ingreso habitual estimado en ARS.' : 'Cargá tus cobros para ver esto')
+      tooltip: interps.ingreso_tipico || (ingresoTipicoRaw !== null ? 'Ingreso habitual estimado en pesos.' : 'Cargá tus cobros para ver esto')
     }
   ]
 

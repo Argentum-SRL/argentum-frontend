@@ -413,13 +413,13 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
             if (isBimonetario) {
               return (
                 <>
-                  {/* Bloque ARS */}
+                  {/* Bloque Pesos */}
                   <div className={styles.monedaBlock}>
                     <div className={styles.monedaBlockHeader}>
-                      <span className={styles.monedaBadge}>Pesos (ARS)</span>
+                      <span className={styles.monedaBadge}>Pesos</span>
                     </div>
                     <div className={styles.totalRow}>
-                      <span className={styles.totalLabel}>Total cuotas (ARS)</span>
+                      <span className={styles.totalLabel}>Total cuotas en Pesos</span>
                       <span className={styles.totalValue}>{formatMonto(currentTicket.totalARS || 0, 'ARS')}</span>
                     </div>
                     {currentTicket.totalVencidoAnteriorARS !== undefined && currentTicket.totalVencidoAnteriorARS > 0 && (
@@ -435,14 +435,14 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                       </div>
                     )}
                     <div className={styles.totalRow}>
-                      <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar (ARS)</span>
+                      <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar en Pesos</span>
                       <span className={styles.totalValue} style={{ fontWeight: 800 }}>{formatMonto(currentTicket.totalAPagarARS || 0, 'ARS')}</span>
                     </div>
                     {currentTicket.pagoMinimoARS !== undefined && currentTicket.pagoMinimoARS > 0 && (
                       <div className={styles.minimoRow}>
                         <div className={styles.minimoTop}>
                           <span className={styles.minimoLabel}>
-                            Pago mínimo estimado (ARS)
+                            Pago mínimo estimado en Pesos
                             <span className={styles.minimoTag}>Estimado</span>
                           </span>
                           <span className={styles.minimoVal}>{formatMonto(currentTicket.pagoMinimoARS, 'ARS')}</span>
@@ -451,13 +451,13 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                     )}
                   </div>
 
-                  {/* Bloque USD */}
+                  {/* Bloque Dólares */}
                   <div className={styles.monedaBlock}>
                     <div className={styles.monedaBlockHeader}>
-                      <span className={styles.monedaBadge}>Dólares (USD)</span>
+                      <span className={styles.monedaBadge}>Dólares</span>
                     </div>
                     <div className={styles.totalRow}>
-                      <span className={styles.totalLabel}>Total cuotas (USD)</span>
+                      <span className={styles.totalLabel}>Total cuotas en Dólares</span>
                       <span className={styles.totalValue}>{formatMonto(currentTicket.totalUSD || 0, 'USD')}</span>
                     </div>
                     {currentTicket.totalVencidoAnteriorUSD !== undefined && currentTicket.totalVencidoAnteriorUSD > 0 && (
@@ -473,7 +473,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                       </div>
                     )}
                     <div className={styles.totalRow}>
-                      <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar (USD)</span>
+                      <span className={styles.totalLabel} style={{ fontWeight: 800 }}>Total a pagar en Dólares</span>
                       <span className={styles.totalValue} style={{ fontWeight: 800 }}>{formatMonto(currentTicket.totalAPagarUSD || 0, 'USD')}</span>
                     </div>
                     {currentTicket.totalEstimadoARSUSD !== undefined && currentTicket.totalEstimadoARSUSD !== null && (
@@ -490,7 +490,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                       <div className={styles.minimoRow}>
                         <div className={styles.minimoTop}>
                           <span className={styles.minimoLabel}>
-                            Pago mínimo estimado (USD)
+                            Pago mínimo estimado en Dólares
                             <span className={styles.minimoTag}>Estimado</span>
                           </span>
                           <span className={styles.minimoVal}>{formatMonto(currentTicket.pagoMinimoUSD, 'USD')}</span>

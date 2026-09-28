@@ -29,7 +29,7 @@ const ALL_MSGS: Msg[] = [
       <>
         Tu balance actual: ⚖️<br/>
         💵 <strong>$1.247.350,80</strong> en pesos.<br/>
-        💵 <strong>USD $2.100</strong> en dólares.
+        💵 <strong>US$ 2.100</strong> en dólares.
       </>
     )
   },

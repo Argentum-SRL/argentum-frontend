@@ -437,7 +437,7 @@ export default function FilterBar({
             <div className={`${styles.pill} ${styles.pillRelative}`} ref={monedaRef}>
               <div className={styles.pillIconFlex} onClick={() => setMonedaPopoverOpen(!monedaPopoverOpen)}>
                 <DollarSign size={14} />
-                {filters.moneda ? filters.moneda : 'Moneda'}
+                {filters.moneda ? (filters.moneda === 'ARS' ? 'Pesos' : 'Dólares') : 'Moneda'}
                 <ChevronDown size={14} />
               </div>
               {filters.moneda && (
@@ -465,14 +465,14 @@ export default function FilterBar({
                       className={`${styles.popoverItem} ${filters.moneda === 'ARS' ? styles.popoverItemActive : ''}`}
                       onClick={() => { onFilterChange({ ...filters, moneda: 'ARS' }); setMonedaPopoverOpen(false); }}
                     >
-                      Pesos (ARS)
+                      Pesos
                     </button>
                     <button
                       type="button"
                       className={`${styles.popoverItem} ${filters.moneda === 'USD' ? styles.popoverItemActive : ''}`}
                       onClick={() => { onFilterChange({ ...filters, moneda: 'USD' }); setMonedaPopoverOpen(false); }}
                     >
-                      Dólares (USD)
+                      Dólares
                     </button>
                   </div>
                 </div>

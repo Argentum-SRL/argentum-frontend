@@ -188,18 +188,18 @@ export default function MetasPage() {
         className={styles.desktopSummaryBar}
         items={[
           {
-            label: totals.totalObjetivoUSD > 0 ? "Ahorro acumulado ARS" : "Ahorro acumulado",
+            label: totals.totalObjetivoUSD > 0 ? "Ahorro acumulado en Pesos" : "Ahorro acumulado",
             value: formatMonto(totals.totalAhorradoARS, 'ARS'),
             highlight: true,
           },
           ...(totals.totalObjetivoUSD > 0 || totals.totalAhorradoUSD > 0 ? [
             {
-              label: "Ahorro acumulado USD",
+              label: "Ahorro acumulado en Dólares",
               value: formatMonto(totals.totalAhorradoUSD, 'USD'),
               highlight: true,
             },
             {
-              label: "Objetivo global USD",
+              label: "Objetivo global en Dólares",
               value: formatMonto(totals.totalObjetivoUSD, 'USD'),
             }
           ] : [

@@ -96,7 +96,7 @@ export const PresionFuturaCard: React.FC<Props> = ({ meses = 6 }) => {
         {/* Header */}
         <div className={styles.ticketHeader}>
           <div className={styles.headerLeft}>
-            <span className={styles.ticketLabel}>Deuda futura en cuotas ({moneda})</span>
+            <span className={styles.ticketLabel}>Deuda futura en cuotas ({moneda === 'ARS' ? 'Pesos' : 'Dólares'})</span>
             <span className={styles.ticketDate}>
               Próximos {meses} · {formatMonto(Math.round(totalComprometido), moneda)}
             </span>

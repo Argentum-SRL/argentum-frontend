@@ -47,7 +47,7 @@ function getMinDateLocal(): string {
 function getBankVisuals(billetera: Billetera) {
   if (billetera.es_efectivo) {
     return {
-      nombre: `Efectivo ${billetera.moneda}`,
+      nombre: `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`,
       bg: billetera.moneda === 'ARS' ? '#1A3D28' : '#0C3D48',
       colorTexto: 'white' as const,
       logoUrl: '',
@@ -406,7 +406,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       <div className={styles.pickerItemInfo}>
                         <div className={styles.pickerItemNameRow}>
                           <span className={styles.pickerItemName}>{b.nombre}</span>
-                          <span className={styles.currencyBadgePicker}>{b.moneda}</span>
+                          <span className={styles.currencyBadgePicker}>{b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
                           {b.es_principal && (
                             <span className={styles.badgePrincipal}>Principal</span>
                           )}
@@ -492,7 +492,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       <div className={styles.accountCardMeta}>
                         <div className={styles.pickerItemNameRow}>
                           <span className={styles.accountName}>{billeteraOrigen.nombre}</span>
-                          <span className={styles.currencyTag}>{billeteraOrigen.moneda}</span>
+                          <span className={styles.currencyTag}>{billeteraOrigen.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
                         </div>
                         <div className={styles.accountBalances}>
                           <span className={styles.currentBalance}>
@@ -560,7 +560,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       <div className={styles.accountCardMeta}>
                         <div className={styles.pickerItemNameRow}>
                           <span className={styles.accountName}>{billeteraDestino.nombre}</span>
-                          <span className={styles.currencyTag}>{billeteraDestino.moneda}</span>
+                          <span className={styles.currencyTag}>{billeteraDestino.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
                         </div>
                         <div className={styles.accountBalances}>
                           <span className={styles.currentBalance}>
@@ -637,7 +637,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     <div className={styles.montoFieldCard}>
                       <div className={styles.montoFieldLabel}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span>Monto que sale ({monedaOrigen})</span>
+                          <span>Monto que sale ({monedaOrigen === 'ARS' ? 'Pesos' : 'Dólares'})</span>
                           <button
                             type="button"
                             onClick={handleTransferirTodo}
@@ -659,7 +659,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                             Transferir todo
                           </button>
                         </div>
-                        <span className={styles.currencyTag}>{monedaOrigen}</span>
+                        <span className={styles.currencyTag}>{monedaOrigen === 'ARS' ? 'Pesos' : 'Dólares'}</span>
                       </div>
                       <div className={styles.montoInputRow}>
                         <span className={styles.currencySymbolPrefix}>
@@ -684,8 +684,8 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     {/* Monto que entra */}
                     <div className={styles.montoFieldCard}>
                       <div className={styles.montoFieldLabel}>
-                        <span>Monto que entra ({monedaDestino})</span>
-                        <span className={styles.currencyTag}>{monedaDestino}</span>
+                        <span>Monto que entra ({monedaDestino === 'ARS' ? 'Pesos' : 'Dólares'})</span>
+                        <span className={styles.currencyTag}>{monedaDestino === 'ARS' ? 'Pesos' : 'Dólares'}</span>
                       </div>
                       <div className={styles.montoInputRow}>
                         <span className={styles.currencySymbolPrefix}>
@@ -789,9 +789,9 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                         onChange={(e) => setMonedaComisionCustom(e.target.value as 'ARS' | 'USD')}
                         className={styles.comisionCurrencySelect}
                       >
-                        <option value={monedaOrigen}>{monedaOrigen}</option>
+                        <option value={monedaOrigen}>{monedaOrigen === 'ARS' ? 'Pesos' : 'Dólares'}</option>
                         {monedaDestino !== monedaOrigen && (
-                          <option value={monedaDestino}>{monedaDestino}</option>
+                          <option value={monedaDestino}>{monedaDestino === 'ARS' ? 'Pesos' : 'Dólares'}</option>
                         )}
                       </select>
                     </div>

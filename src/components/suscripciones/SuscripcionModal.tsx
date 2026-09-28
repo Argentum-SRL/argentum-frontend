@@ -167,11 +167,11 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
     if (state.moneda === 'USD' && medioMoneda === 'ARS') {
       const totalArs = state.monto * cotizValor
-      return `≈ $ ${totalArs.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ARS (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
+      return `≈ $ ${totalArs.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pesos (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
     }
     if (state.moneda === 'ARS' && medioMoneda === 'USD') {
       const totalUsd = state.monto / cotizValor
-      return `≈ US$ ${totalUsd.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
+      return `≈ US$ ${totalUsd.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} dólares (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
     }
     return null
   }, [state.monto, state.moneda, selectedMedio, cotizacion])

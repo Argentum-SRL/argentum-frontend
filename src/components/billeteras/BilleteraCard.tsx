@@ -72,7 +72,7 @@ const BilleteraCard = memo(({
 
   const isLight = !bank || bank.colorTexto === 'white'
   const labelNombre = billetera.es_efectivo
-    ? `Efectivo ${billetera.moneda}`
+    ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
     : bank?.nombre ?? billetera.nombre
 
   const bgRef = useRef<HTMLDivElement>(null)

@@ -145,7 +145,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
                 onClick={() => setMonedaPrincipal('ARS')}
               >
                 <div className={styles.currencyTop}>
-                  <span className={styles.currencyCode}>ARS ($)</span>
+                  <span className={styles.currencyCode}>Pesos ($)</span>
                   {monedaPrincipal === 'ARS' && <Check size={16} className={styles.checkIcon} />}
                 </div>
                 <span className={styles.currencyName}>Peso Argentino</span>
@@ -159,7 +159,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
                 onClick={() => setMonedaPrincipal('USD')}
               >
                 <div className={styles.currencyTop}>
-                  <span className={styles.currencyCode}>USD (US$)</span>
+                  <span className={styles.currencyCode}>Dólares (US$)</span>
                   {monedaPrincipal === 'USD' && <Check size={16} className={styles.checkIcon} />}
                 </div>
                 <span className={styles.currencyName}>Dólar Estadounidense</span>
@@ -172,7 +172,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
             <div className={styles.featureToggleInfo}>
               <span className={styles.featureToggleTitle}>Activar Moneda Secundaria</span>
               <span className={styles.featureToggleDesc}>
-                Permite registrar transacciones y visualizar balances duales en ARS y USD
+                Permite registrar transacciones y visualizar balances duales en pesos y dólares
               </span>
             </div>
             <label className={styles.switch}>

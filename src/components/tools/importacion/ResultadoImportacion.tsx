@@ -51,7 +51,7 @@ export const ResultadoImportacion: React.FC<ResultadoImportacionProps> = ({
         )}
         {sin_billetera_usd > 0 && (
           <div className={`${styles.stateDetailItem} ${styles.resultDetailItem}`}>
-            <span className={styles.resultItemOmitted}>Omitidas por USD (sin billetera):</span>
+            <span className={styles.resultItemOmitted}>Omitidas en dólares (sin billetera):</span>
             <strong className={styles.resultItemOmitted}>{sin_billetera_usd}</strong>
           </div>
         )}

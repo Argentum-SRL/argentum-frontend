@@ -24,7 +24,7 @@ function getBankVisuals(billetera?: Billetera, fallbackName = 'Cuenta') {
 
   if (billetera.es_efectivo) {
     return {
-      nombre: `Efectivo ${billetera.moneda}`,
+      nombre: `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`,
       bg: billetera.moneda === 'ARS' ? '#1A3D28' : '#0C3D48',
       logoUrl: '',
       initials: 'EF',
@@ -100,7 +100,7 @@ export const TransferenciaRow = memo(({
           </span>
           {esCrossCurrency && (
             <span className={styles.exchangeBadge}>
-              {monedaOrigen === 'ARS' ? 'Compra USD' : 'Venta USD'}
+              {monedaOrigen === 'ARS' ? 'Compra dólares' : 'Venta dólares'}
             </span>
           )}
         </div>

@@ -1,8 +1,8 @@
 import { memo, useMemo } from 'react'
+import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
 import { 
   Sparkles, 
   CreditCard, 
-  RefreshCw, 
   Trash2, 
   Wallet,
   Banknote,
@@ -150,13 +150,7 @@ const TransaccionRow = memo(({
               </span>
             )}
             {Boolean(transaccion.suscripcion_id) && (
-              <span
-                className={`${styles.badge} ${styles.badgeRecurrente}`}
-                title="La app lo anotó sola porque es una suscripción"
-              >
-                <RefreshCw size={10} strokeWidth={2.5} />
-                <span className={styles.badgeText}>Débito automático</span>
-              </span>
+              <DebitoAutomaticoBadge />
             )}
           </div>
         </div>

@@ -1,0 +1,27 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badgeRecurrente {
+  background: #F0FDF4;
+  color: #15803D;
+  border: 1px solid rgba(22, 163, 74, 0.18);
+}
+
+[data-theme="dark"] .badgeRecurrente {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86EFAC;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.badgeText {
+  white-space: nowrap;
+}

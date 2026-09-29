@@ -6,6 +6,7 @@ import Drawer from '@/components/ui/Drawer/Drawer'
 import RealCardPreview from './RealCardPreview'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { formatMonto } from '@/utils/format'
+import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
 import styles from './ResumenDrawer.module.css'
 
 interface ResumenDrawerProps {
@@ -78,7 +79,10 @@ const ResumenDrawer: React.FC<ResumenDrawerProps> = ({ open, onClose, tarjeta })
         <CategoriaIcon nombre={cuota.subcategoria_nombre || 'Tarjeta de crédito'} size={32} />
       </div>
       <div className={styles.cuotaInfo}>
-        <span className={styles.cuotaDesc}>{cuota.descripcion}</span>
+        <span className={styles.cuotaDesc}>
+          {cuota.descripcion}
+          {Boolean(cuota.suscripcion_id) && <DebitoAutomaticoBadge />}
+        </span>
         <span className={styles.cuotaNum}>
           Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
           {cuota.subcategoria_nombre && ` • ${cuota.subcategoria_nombre}`}

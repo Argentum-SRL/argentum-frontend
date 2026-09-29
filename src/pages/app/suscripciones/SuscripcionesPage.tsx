@@ -240,15 +240,14 @@ const SuscripcionesPage: React.FC = () => {
           <div className={styles.emptyContent}>
             <h1 className={styles.emptyTitle}>Todavía no cargaste ninguna suscripción.</h1>
             <p className={styles.emptySubtitle}>
-              Agregá Netflix, Spotify, el gimnasio o cualquier servicio con cobro periódico. 
-              El sistema calcula cuánto gastás por mes en total.
+              Netflix, la prepaga, el gimnasio, el celular: todo lo que se te cobra solo cada mes. Cargalo una vez y lo anotamos cada vez que se cobra. Si lo pagás a mano, no hace falta cargarlo acá.
             </p>
             <Button 
               onClick={handleCreate} 
               className={styles.emptyButton}
             >
               <Plus size={18} />
-              Agregar mi primera suscripción
+              Agregar suscripción o débito
             </Button>
           </div>
         </div>
@@ -274,13 +273,12 @@ const SuscripcionesPage: React.FC = () => {
         <div className={styles.titleGroup}>
           <h1>Suscripciones</h1>
           <p className={styles.subtitle}>
-            {suscripcionesActivas.length} activas · Total mensual: {formatCurrency(totalMensualARS)}
-            {totalMensualUSD > 0 && ` + ${formatMonto(totalMensualUSD, 'USD')}`}
+            Suscripciones y débitos automáticos: lo que se te cobra solo cada mes.
           </p>
         </div>
         <button className={styles.nuevaBtn} onClick={handleCreate}>
           <Plus size={16} strokeWidth={2.5} />
-          Nueva suscripción
+          Agregar suscripción o débito
         </button>
       </header>
 

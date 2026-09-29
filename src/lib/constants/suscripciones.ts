@@ -1,5 +1,18 @@
 import catalogoRaw from '@catalogo'
 
+import type { ElementType } from 'react'
+import { Dumbbell, HeartPulse, Shield, Users, GraduationCap, Wifi, Smartphone } from 'lucide-react'
+
+export const ICONOS_GENERICOS: Record<string, ElementType> = {
+  dumbbell: Dumbbell,
+  'heart-pulse': HeartPulse,
+  shield: Shield,
+  users: Users,
+  'graduation-cap': GraduationCap,
+  wifi: Wifi,
+  smartphone: Smartphone,
+}
+
 export interface RawServicioCatalogo {
   id: string
   nombre: string
@@ -11,7 +24,10 @@ export interface RawServicioCatalogo {
   colorTexto: string
   variantes?: string[]
   categoria_sugerida?: string
+  subcategoria_sugerida?: string | null
   frecuencia_tipica?: string
+  generico?: boolean
+  icono?: string
 }
 
 export interface ServicioCatalogo {
@@ -25,7 +41,10 @@ export interface ServicioCatalogo {
   colorTexto: string
   variantes?: string[]
   categoria_sugerida?: string
+  subcategoria_sugerida?: string | null
   frecuencia_tipica?: string
+  generico?: boolean
+  icono?: string
 }
 
 // Carga todos los assets de suscripciones/ (SVG y PNG) como URLs estáticas via Vite glob import.
@@ -47,7 +66,11 @@ export function getSubscriptionLogoUrl(logoName: string): string {
 
 const getLogo = (name: string): string => _logoMap[name] ?? ''
 
-export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = (catalogoRaw as RawServicioCatalogo[]).map(item => ({
+const rawList = Array.isArray(catalogoRaw)
+  ? catalogoRaw
+  : ((catalogoRaw as unknown as { servicios: RawServicioCatalogo[] }).servicios || [])
+
+export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = (rawList as RawServicioCatalogo[]).map(item => ({
   ...item,
   subcategoria: item.subcategoria ?? undefined,
   logoPath: getLogo(item.logo),

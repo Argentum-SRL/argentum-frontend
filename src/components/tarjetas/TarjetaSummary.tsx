@@ -9,6 +9,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import { formatMonto } from '@/utils/format'
 import { EmptyState } from '@/components/ui'
 import PagarResumenModal from './PagarResumenModal'
+import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
 import styles from './TarjetaSummary.module.css'
 
 interface TarjetaSummaryProps {
@@ -366,6 +367,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                 <div key={idx} className={styles.itemRow}>
                   <div className={styles.itemInfo}>
                     <span className={`${styles.itemTitle} ${cuota.pagada ? styles.itemTitlePaid : ''}`}>{cuota.descripcion}</span>
+                    {Boolean(cuota.suscripcion_id) && <DebitoAutomaticoBadge />}
                     <span className={styles.itemSub}>
                       Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
                       {(cuota.subcategoria_nombre || 'General') !== cuota.descripcion && (

@@ -434,6 +434,7 @@ export interface ProyeccionCategoria {
 
 export interface CuotaResumen {
   id: string
+  suscripcion_id?: string | null
   descripcion: string
   subcategoria_nombre?: string | null
   numero_cuota: number

@@ -149,10 +149,13 @@ const TransaccionRow = memo(({
                 <span className={styles.badgeText}>Cuota</span>
               </span>
             )}
-            {transaccion.es_recurrente && (
-              <span className={`${styles.badge} ${styles.badgeRecurrente}`}>
+            {Boolean(transaccion.suscripcion_id) && (
+              <span
+                className={`${styles.badge} ${styles.badgeRecurrente}`}
+                title="La app lo anotó sola porque es una suscripción"
+              >
                 <RefreshCw size={10} strokeWidth={2.5} />
-                <span className={styles.badgeText}>Recurrente</span>
+                <span className={styles.badgeText}>Débito automático</span>
               </span>
             )}
           </div>

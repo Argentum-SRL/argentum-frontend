@@ -242,7 +242,7 @@ export interface Transaccion {
   metodo_pago: 'efectivo' | 'debito' | 'transferencia' | 'credito'
   billetera_id: string
   tarjeta_id: string | null
-  es_recurrente: boolean
+  suscripcion_id?: string | null
   es_cuota_hija: boolean
   es_padre_cuotas: boolean
   grupo_cuotas_id: string | null
@@ -528,7 +528,7 @@ export interface ResultadoPagoTarjeta {
   metodo_pago?: string | null
   billetera_id?: string | null
   tarjeta_id?: string | null
-  es_recurrente: boolean
+  suscripcion_id?: string | null
   estado_verificacion?: string | null
   fecha_creacion?: string | null
   cuotas_pagadas_count: number

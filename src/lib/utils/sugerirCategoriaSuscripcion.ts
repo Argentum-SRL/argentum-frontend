@@ -10,9 +10,10 @@ export interface ReglaCategoria {
 export interface ServicioCatalogoRaw {
   id: string
   nombre: string
-  categoria_sugerida?: string
-  subcategoria_sugerida?: string | null
+  categoria?: string
+  subcategoria?: string | null
   generico?: boolean
+  variantes?: string[]
 }
 
 export interface CatalogoData {
@@ -44,12 +45,14 @@ export function sugerirCategoriaNombre(nombre: string): {
   // Regla 0: Servicios no genéricos del catálogo
   for (const s of catalogo.servicios) {
     if (s.generico) continue
-    const normServicio = normalizarTexto(s.nombre)
-    if (normServicio && paddedNombre.includes(` ${normServicio} `)) {
-      return {
-        categoria: s.categoria_sugerida || 'Otros',
-        subcategoria: s.subcategoria_sugerida || null,
-        coincidio: true,
+    for (const c of [s.nombre, s.id, ...(s.variantes || [])]) {
+      const cNorm = normalizarTexto(c)
+      if (cNorm && paddedNombre.includes(` ${cNorm} `)) {
+        return {
+          categoria: s.categoria || 'Otros',
+          subcategoria: s.subcategoria || null,
+          coincidio: true,
+        }
       }
     }
   }
@@ -77,6 +80,34 @@ export function sugerirCategoriaNombre(nombre: string): {
   }
 
   return { categoria: 'Otros', subcategoria: null, coincidio: false }
+}
+
+export const nombreInicial = (s?: { nombre?: string } | null): string =>
+  s?.nombre ? s.nombre.replace(/\s*\([^)]*\)/g, '').trim() : ''
+
+export interface ServicioPreseleccionLike {
+  id?: string
+  nombre?: string
+  categoria?: string
+  subcategoria?: string | null
+  generico?: boolean
+}
+
+export function preseleccionCategoria(
+  servicio: ServicioPreseleccionLike | 'other' | null | undefined,
+  nombre = ''
+): { categoria: string; subcategoria: string | null } {
+  if (servicio === 'other' || !servicio) {
+    const sug = sugerirCategoriaNombre(nombre)
+    return { categoria: sug.coincidio ? sug.categoria : 'Otros', subcategoria: sug.coincidio ? sug.subcategoria : null }
+  }
+  if (!servicio.generico || normalizarTexto(nombre) === normalizarTexto(nombreInicial(servicio))) {
+    return { categoria: servicio.categoria || 'Otros', subcategoria: servicio.subcategoria || null }
+  }
+  const sug = sugerirCategoriaNombre(nombre)
+  return sug.coincidio
+    ? { categoria: sug.categoria, subcategoria: sug.subcategoria }
+    : { categoria: servicio.categoria || 'Otros', subcategoria: servicio.subcategoria || null }
 }
 
 export interface CategoriaLike {

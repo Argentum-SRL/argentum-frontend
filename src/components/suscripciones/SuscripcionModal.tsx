@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from '@/components/ui/icons'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
-import { sugerirCategoriaNombre } from '@/lib/utils/sugerirCategoriaSuscripcion'
+import { nombreInicial, preseleccionCategoria } from '@/lib/utils/sugerirCategoriaSuscripcion'
 import { ICONOS_GENERICOS } from '@/lib/constants/suscripciones'
 import Modal from '@/components/ui/Modal/Modal'
 import { sileo } from 'sileo'
@@ -254,18 +254,10 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
     let active = true
     const actualizar = async () => {
-      let cNom = '', sNom: string | null = null
-      if (serv?.generico) {
-        const sug = sugerirCategoriaNombre(nombre)
-        cNom = sug.coincidio ? sug.categoria : serv.categoria
-        sNom = sug.coincidio ? sug.subcategoria : (serv.subcategoria || null)
-      } else if (state.servicioId === 'other') {
-        const sug = sugerirCategoriaNombre(nombre)
-        cNom = sug.categoria
-        sNom = sug.subcategoria
-      }
-      if (cNom) {
-        const res = await resolverIdsCategoria(cNom, sNom)
+      const targetServ = serv || 'other'
+      const pre = preseleccionCategoria(targetServ, nombre)
+      if (pre.categoria) {
+        const res = await resolverIdsCategoria(pre.categoria, pre.subcategoria)
         if (active) {
           dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
           dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
@@ -278,13 +270,14 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   }, [state.nombrePersonalizado, state.servicioId, state.isEdit, state.categoriaModificadaManualmente, categorias, serv, resolverIdsCategoria])
 
   const handleSelectServicio = async (s: ServicioCatalogo) => {
-    const nombreInicial = s.generico ? s.nombre.replace(/\s*\(.*?\)/g, '').trim() : s.nombre
+    const nInicial = nombreInicial(s)
     dispatch({ type: 'SET_FIELD', field: 'servicioId', value: s.id })
-    dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: nombreInicial })
+    dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: nInicial })
     dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: s.frecuenciaDefault })
     dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: false })
 
-    const res = await resolverIdsCategoria(s.categoria, s.subcategoria)
+    const pre = preseleccionCategoria(s, nInicial)
+    const res = await resolverIdsCategoria(pre.categoria, pre.subcategoria)
     dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
     dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
     goNext()
@@ -293,9 +286,10 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const handleSelectOther = async () => {
     dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })
     dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: false })
-    if (state.nombrePersonalizado.trim()) {
-      const sug = sugerirCategoriaNombre(state.nombrePersonalizado.trim())
-      const res = await resolverIdsCategoria(sug.categoria, sug.subcategoria)
+    const nombre = state.nombrePersonalizado.trim()
+    if (nombre) {
+      const pre = preseleccionCategoria('other', nombre)
+      const res = await resolverIdsCategoria(pre.categoria, pre.subcategoria)
       dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
       dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
     }
@@ -303,12 +297,16 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
   const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!state.nombrePersonalizado.trim()) return
-    if (!state.categoriaModificadaManualmente && state.servicioId === 'other') {
-      const sug = sugerirCategoriaNombre(state.nombrePersonalizado.trim())
-      const res = await resolverIdsCategoria(sug.categoria, sug.subcategoria)
-      dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
-      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
+    const nombre = state.nombrePersonalizado.trim()
+    if (!nombre) return
+    if (!state.categoriaModificadaManualmente) {
+      const targetServ = serv || (state.servicioId === 'other' ? 'other' : null)
+      if (targetServ) {
+        const pre = preseleccionCategoria(targetServ, nombre)
+        const res = await resolverIdsCategoria(pre.categoria, pre.subcategoria)
+        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
+        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
+      }
     }
     goNext()
   }

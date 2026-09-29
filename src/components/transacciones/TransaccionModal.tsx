@@ -820,6 +820,7 @@ export default function TransaccionModal({
                   categoriaId={categoriaId}
                   subcategoriaId={subcategoriaId}
                   tipo={tipo}
+                  autoseleccionarPrimeraSubcategoria={true}
                   onSelectCategoria={(id) => {
                     dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: id })
                     dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })

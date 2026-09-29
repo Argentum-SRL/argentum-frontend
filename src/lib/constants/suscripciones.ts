@@ -1,16 +1,16 @@
 import catalogoRaw from '@catalogo'
 
 import type { ElementType } from 'react'
-import { Dumbbell, HeartPulse, Shield, Users, GraduationCap, Wifi, Smartphone } from 'lucide-react'
+import { Dumbbell, HeartPulse, Shield, Users, GraduationCap, Wifi, Smartphone } from '@/components/ui/icons'
 
 export const ICONOS_GENERICOS: Record<string, ElementType> = {
-  dumbbell: Dumbbell,
-  'heart-pulse': HeartPulse,
-  shield: Shield,
-  users: Users,
-  'graduation-cap': GraduationCap,
-  wifi: Wifi,
-  smartphone: Smartphone,
+  Dumbbell,
+  HeartPulse,
+  Shield,
+  Users,
+  GraduationCap,
+  Wifi,
+  Smartphone,
 }
 
 export interface RawServicioCatalogo {

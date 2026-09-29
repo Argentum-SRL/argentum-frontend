@@ -1,7 +1,7 @@
-import React, { useReducer, useEffect, useState, useMemo, useRef } from 'react'
+import React, { useReducer, useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from '@/components/ui/icons'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
-import { sugerirCategoriaSuscripcion } from '@/lib/utils/sugerirCategoriaSuscripcion'
+import { sugerirCategoriaNombre } from '@/lib/utils/sugerirCategoriaSuscripcion'
 import { ICONOS_GENERICOS } from '@/lib/constants/suscripciones'
 import Modal from '@/components/ui/Modal/Modal'
 import { sileo } from 'sileo'
@@ -223,59 +223,92 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     return val % 1 === 0 ? val.toString() : val.toFixed(2)
   }, [state.monto, state.frecuencia])
 
-  const resolveCategoryAndSubcategory = (catName: string, subcatName?: string) => {
-    const res = sugerirCategoriaSuscripcion(subcatName || catName, categorias)
-    dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.categoriaId || '' })
-    dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subcategoriaId || '' })
-  }
+  const serv = useMemo(() => CATALOGO_SUSCRIPCIONES.find(s => s.id === state.servicioId), [state.servicioId])
 
+  const resolverIdsCategoria = useCallback(async (catNombre: string, subcatNombre?: string | null) => {
+    let cats = categorias
+    if (cats.length === 0) {
+      try { cats = await categoriaService.getCategorias(); setCategorias(cats) } catch { return { catId: '', subId: '' } }
+    }
+    const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+    const egresoCats = cats.filter(c => c.tipo === 'egreso')
+    const cat = egresoCats.find(c => norm(c.nombre) === norm(catNombre)) || egresoCats.find(c => norm(c.nombre) === 'otros')
+    if (!cat) return { catId: '', subId: '' }
+
+    let subId = ''
+    if (subcatNombre) {
+      try {
+        const subcats = await categoriaService.getSubcategorias(cat.id)
+        const sub = subcats.find(s => norm(s.nombre) === norm(subcatNombre))
+        if (sub) subId = sub.id
+      } catch { /* ignore */ }
+    }
+    return { catId: cat.id, subId }
+  }, [categorias])
 
   // Sugerencia automática de categoría según nombre mientras no se toque manualmente
   useEffect(() => {
-    if (state.isEdit || state.categoriaModificadaManualmente) return
-    const isOther = state.servicioId === 'other'
-    const serv = CATALOGO_SUSCRIPCIONES.find(s => s.id === state.servicioId)
-    const nombre = isOther ? state.nombrePersonalizado : (serv?.nombre || state.nombrePersonalizado)
+    if (state.isEdit || state.categoriaModificadaManualmente || (!serv && state.servicioId !== 'other')) return
+    const nombre = state.nombrePersonalizado.trim()
     if (!nombre) return
-    const res = sugerirCategoriaSuscripcion(nombre, categorias)
-    if (res.categoriaId) {
-      dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.categoriaId })
-      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subcategoriaId || '' })
-    }
-  }, [state.nombrePersonalizado, state.servicioId, state.isEdit, state.categoriaModificadaManualmente, categorias])
-  const handleSelectServicio = async (s: ServicioCatalogo) => {
-    dispatch({ type: 'SET_FIELD', field: 'servicioId', value: s.id })
-    dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: s.nombre })
-    dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: s.frecuenciaDefault })
 
-    if (s.generico) {
-      dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: false })
-      const res = sugerirCategoriaSuscripcion(s.nombre, categorias)
-      if (res.categoriaId) {
-        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.categoriaId })
-        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subcategoriaId || '' })
+    let active = true
+    const actualizar = async () => {
+      let cNom = '', sNom: string | null = null
+      if (serv?.generico) {
+        const sug = sugerirCategoriaNombre(nombre)
+        cNom = sug.coincidio ? sug.categoria : serv.categoria
+        sNom = sug.coincidio ? sug.subcategoria : (serv.subcategoria || null)
+      } else if (state.servicioId === 'other') {
+        const sug = sugerirCategoriaNombre(nombre)
+        cNom = sug.categoria
+        sNom = sug.subcategoria
       }
-    } else {
-      await resolveCategoryAndSubcategory(s.categoria, s.subcategoria)
+      if (cNom) {
+        const res = await resolverIdsCategoria(cNom, sNom)
+        if (active) {
+          dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
+          dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
+        }
+      }
     }
+
+    void actualizar()
+    return () => { active = false }
+  }, [state.nombrePersonalizado, state.servicioId, state.isEdit, state.categoriaModificadaManualmente, categorias, serv, resolverIdsCategoria])
+
+  const handleSelectServicio = async (s: ServicioCatalogo) => {
+    const nombreInicial = s.generico ? s.nombre.replace(/\s*\(.*?\)/g, '').trim() : s.nombre
+    dispatch({ type: 'SET_FIELD', field: 'servicioId', value: s.id })
+    dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: nombreInicial })
+    dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: s.frecuenciaDefault })
+    dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: false })
+
+    const res = await resolverIdsCategoria(s.categoria, s.subcategoria)
+    dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
+    dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
     goNext()
   }
 
-  const handleSelectOther = () => {
+  const handleSelectOther = async () => {
     dispatch({ type: 'SET_FIELD', field: 'servicioId', value: 'other' })
     dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: false })
-    const res = sugerirCategoriaSuscripcion(state.nombrePersonalizado, categorias)
-    if (res.categoriaId) {
-      dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.categoriaId })
-      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subcategoriaId || '' })
+    if (state.nombrePersonalizado.trim()) {
+      const sug = sugerirCategoriaNombre(state.nombrePersonalizado.trim())
+      const res = await resolverIdsCategoria(sug.categoria, sug.subcategoria)
+      dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
+      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
     }
   }
 
   const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!state.nombrePersonalizado) return
-    if (!state.categoriaId) {
-      await resolveCategoryAndSubcategory('Otros', 'Otros')
+    if (!state.nombrePersonalizado.trim()) return
+    if (!state.categoriaModificadaManualmente && state.servicioId === 'other') {
+      const sug = sugerirCategoriaNombre(state.nombrePersonalizado.trim())
+      const res = await resolverIdsCategoria(sug.categoria, sug.subcategoria)
+      dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.catId })
+      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subId })
     }
     goNext()
   }
@@ -478,36 +511,37 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   </div>
                 )}
 
-                {(state.servicioId === 'other' || CATALOGO_SUSCRIPCIONES.find(s => s.id === state.servicioId)?.generico || state.isEdit) && (
-                  <>
-                    <div className={styles.formField}>
-                      <label className={styles.fieldLabel}>Nombre</label>
-                      <input
-                        className={styles.fieldInput}
-                        value={state.nombrePersonalizado}
-                        maxLength={100}
-                        onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
-                        placeholder="Nombre del servicio o débito"
-                      />
-                    </div>
-                    <div className={styles.formField} style={{ marginTop: '12px' }}>
-                      <CategoriaSelector
-                        categorias={categorias}
-                        categoriaId={state.categoriaId}
-                        subcategoriaId={state.subcategoriaId}
-                        tipo="egreso"
-                        onSelectCategoria={id => {
-                          dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: true })
-                          dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: id })
-                          dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                        }}
-                        onSelectSubcategoria={id => {
-                          dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: true })
-                          dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: id })
-                        }}
-                      />
-                    </div>
-                  </>
+                {(serv?.generico || state.isEdit) && (
+                  <div className={styles.formField}>
+                    <label className={styles.fieldLabel}>Nombre</label>
+                    <input
+                      className={styles.fieldInput}
+                      value={state.nombrePersonalizado}
+                      maxLength={100}
+                      onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
+                      placeholder="Nombre del servicio o débito"
+                    />
+                  </div>
+                )}
+
+                {(serv?.generico || state.servicioId === 'other' || state.isEdit) && (
+                  <div className={styles.formField} style={{ marginTop: '12px' }}>
+                    <CategoriaSelector
+                      categorias={categorias}
+                      categoriaId={state.categoriaId}
+                      subcategoriaId={state.subcategoriaId}
+                      tipo="egreso"
+                      onSelectCategoria={id => {
+                        dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: true })
+                        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: id })
+                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+                      }}
+                      onSelectSubcategoria={id => {
+                        dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: true })
+                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: id })
+                      }}
+                    />
+                  </div>
                 )}
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>¿Cómo se cobra?</label>

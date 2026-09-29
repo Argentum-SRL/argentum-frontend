@@ -5,6 +5,13 @@ import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import categoriaService from '@/services/categoria.service'
 import styles from './CategoriaSelector.module.css'
 
+const MAIN_CATS = [
+  'alimentacion', 'transporte', 'gastronomia', 'restaurante', 'restaurantes', 'restaurantes y delivery',
+  'salud', 'vivienda', 'servicios', 'entretenimiento', 'recreativo', 'indumentaria', 'educacion',
+  'equipamiento del hogar', 'hogar', 'comunicacion', 'banco', 'empleo', 'trabajo independiente', 'inversiones y rentas',
+]
+const normText = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+
 export interface CategoriaSelectorProps {
   categorias: Categoria[]
   categoriaId: string
@@ -12,6 +19,7 @@ export interface CategoriaSelectorProps {
   onSelectCategoria: (id: string) => void
   onSelectSubcategoria: (id: string) => void
   tipo?: 'egreso' | 'ingreso'
+  autoseleccionarPrimeraSubcategoria?: boolean
 }
 
 export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
@@ -21,14 +29,28 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
   onSelectCategoria,
   onSelectSubcategoria,
   tipo = 'egreso',
+  autoseleccionarPrimeraSubcategoria = false,
 }) => {
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
   const [loadingSubcats, setLoadingSubcats] = useState(false)
 
-  const displayCategorias = useMemo(
-    () => categorias.filter(c => !tipo || c.tipo === tipo),
-    [categorias, tipo]
-  )
+  const displayCategorias = useMemo(() => {
+    const filtered = categorias.filter(c => (!tipo || c.tipo === tipo) && normText(c.nombre) !== 'ahorro')
+    return filtered.sort((a, b) => {
+      const aNorm = normText(a.nombre)
+      const bNorm = normText(b.nombre)
+      const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos'
+      const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos'
+      if (isAOtros && !isBOtros) return 1
+      if (!isAOtros && isBOtros) return -1
+      if (isAOtros && isBOtros) return 0
+      const ai = MAIN_CATS.indexOf(aNorm), bi = MAIN_CATS.indexOf(bNorm)
+      if (ai !== -1 && bi !== -1) return ai - bi
+      if (ai !== -1) return -1
+      if (bi !== -1) return 1
+      return aNorm.localeCompare(bNorm)
+    })
+  }, [categorias, tipo])
 
   useEffect(() => {
     if (!categoriaId) return
@@ -57,7 +79,7 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
     [categorias, categoriaId]
   )
   const currentCatNorm = useMemo(
-    () => currentCat ? currentCat.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() : '',
+    () => currentCat ? normText(currentCat.nombre) : '',
     [currentCat]
   )
 
@@ -84,24 +106,37 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
     }
 
     const priorityList = PROBABILIDAD_SUBCATS[currentCatNorm] || []
-
     const currentSubcats = categoriaId ? subcategorias : []
     return [...currentSubcats]
-      .filter(s => s.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() !== 'otros')
+      .filter(s => normText(s.nombre) !== 'otros')
       .sort((a, b) => {
-        const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
-        const aNorm = norm(a.nombre)
-        const bNorm = norm(b.nombre)
+        const aNorm = normText(a.nombre)
+        const bNorm = normText(b.nombre)
+        const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos' || aNorm === 'varios'
+        const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos' || bNorm === 'varios'
+        if (isAOtros && !isBOtros) return 1
+        if (!isAOtros && isBOtros) return -1
+        if (isAOtros && isBOtros) return 0
 
-        const idxA = priorityList.indexOf(aNorm)
-        const idxB = priorityList.indexOf(bNorm)
+        const ai = priorityList.indexOf(aNorm)
+        const bi = priorityList.indexOf(bNorm)
+        if (ai !== -1 && bi !== -1) return ai - bi
+        if (ai !== -1) return -1
+        if (bi !== -1) return 1
 
-        if (idxA !== -1 && idxB !== -1) return idxA - idxB
-        if (idxA !== -1) return -1
-        if (idxB !== -1) return 1
-        return a.nombre.localeCompare(b.nombre)
+        if (a.orden !== undefined && b.orden !== undefined && a.orden !== b.orden) {
+          return a.orden - b.orden
+        }
+
+        return aNorm.localeCompare(bNorm)
       })
   }, [categoriaId, subcategorias, currentCatNorm])
+
+  useEffect(() => {
+    if (autoseleccionarPrimeraSubcategoria && !subcategoriaId && sortedSubcategorias.length > 0) {
+      onSelectSubcategoria(sortedSubcategorias[0].id)
+    }
+  }, [autoseleccionarPrimeraSubcategoria, subcategoriaId, sortedSubcategorias, onSelectSubcategoria])
 
   if (!categoriaId) {
     return (

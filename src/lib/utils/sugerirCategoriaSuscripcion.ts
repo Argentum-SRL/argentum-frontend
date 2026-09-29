@@ -29,10 +29,14 @@ export function normalizarTexto(texto: string): string {
   return soloAlfanum.trim().replace(/\s+/g, ' ')
 }
 
-export function sugerirCategoriaNombre(nombre: string): { categoria: string; subcategoria: string | null } {
+export function sugerirCategoriaNombre(nombre: string): {
+  categoria: string
+  subcategoria: string | null
+  coincidio: boolean
+} {
   const normNombre = normalizarTexto(nombre)
   if (!normNombre) {
-    return { categoria: 'Otros', subcategoria: null }
+    return { categoria: 'Otros', subcategoria: null, coincidio: false }
   }
 
   const paddedNombre = ` ${normNombre} `
@@ -45,6 +49,7 @@ export function sugerirCategoriaNombre(nombre: string): { categoria: string; sub
       return {
         categoria: s.categoria_sugerida || 'Otros',
         subcategoria: s.subcategoria_sugerida || null,
+        coincidio: true,
       }
     }
   }
@@ -66,11 +71,12 @@ export function sugerirCategoriaNombre(nombre: string): { categoria: string; sub
       return {
         categoria: regla.categoria,
         subcategoria: regla.subcategoria,
+        coincidio: true,
       }
     }
   }
 
-  return { categoria: 'Otros', subcategoria: null }
+  return { categoria: 'Otros', subcategoria: null, coincidio: false }
 }
 
 export interface CategoriaLike {
@@ -88,6 +94,7 @@ export function sugerirCategoriaSuscripcion(
   subcategoriaNombre: string | null
   categoriaId: string | null
   subcategoriaId: string | null
+  coincidio: boolean
 } {
   const sug = sugerirCategoriaNombre(nombre)
   const egresoCats = categorias.filter(c => c.tipo === 'egreso')
@@ -112,5 +119,6 @@ export function sugerirCategoriaSuscripcion(
     subcategoriaNombre: sug.subcategoria,
     categoriaId: matchedCat ? matchedCat.id : null,
     subcategoriaId: matchedSubId,
+    coincidio: sug.coincidio,
   }
 }

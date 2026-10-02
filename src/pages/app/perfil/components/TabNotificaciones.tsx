@@ -5,7 +5,6 @@ import {
   PieChart,
   Repeat,
   Target,
-  AlertTriangle,
   Activity,
   Globe,
   MessageSquare,
@@ -382,47 +381,6 @@ const NotificacionesForm: React.FC<{
           )}
         </div>
 
-        {/* Tarjeta E: Gasto Inusual */}
-        <div className={styles.notifCard}>
-          <div className={styles.notifCardHeader}>
-            <div className={styles.notifCardIcon}>
-              <AlertTriangle size={18} />
-            </div>
-            <h4 className={styles.notifCardTitle}>Detección de Gasto Inusual</h4>
-            <label className={styles.switch}>
-              <input
-                type="checkbox"
-                checked={form.gasto_inusual_activo}
-                onChange={() => handleToggle('gasto_inusual_activo')}
-                aria-label="Activar aviso de gasto inusual"
-              />
-              <span className={styles.slider} />
-            </label>
-          </div>
-
-          {form.gasto_inusual_activo && (
-            <div className={styles.notifCardBody}>
-              <div className={styles.channelsGroup}>
-                <button
-                  type="button"
-                  className={`${styles.channelPill} ${form.gasto_inusual_web ? styles.channelActive : ''}`}
-                  onClick={() => handleToggle('gasto_inusual_web')}
-                >
-                  <Globe size={13} />
-                  <span>Web</span>
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.channelPill} ${form.gasto_inusual_whatsapp ? styles.channelActive : ''}`}
-                  onClick={() => handleToggle('gasto_inusual_whatsapp')}
-                >
-                  <MessageSquare size={13} />
-                  <span>WhatsApp</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Tarjeta F: Alerta de Inactividad */}
         <div className={styles.notifCard}>

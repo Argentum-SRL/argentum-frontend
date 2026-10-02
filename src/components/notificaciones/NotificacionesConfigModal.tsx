@@ -493,48 +493,6 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
               </div>
             </div>
 
-            {/* Gasto inusual */}
-            <div className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardMeta}>
-                  <p className={styles.cardTitle}>Gasto inusual</p>
-                  <p className={styles.cardDesc}>Avisar cuando se registre un gasto llamativamente alto.</p>
-                </div>
-                  <label className={styles.switch}>
-                    <input
-                      type="checkbox"
-                      checked={form.gasto_inusual_activo}
-                      onChange={() => handleCheckboxChange('gasto_inusual_activo')}
-                      aria-label="Activar aviso de gasto inusual"
-                    />
-                    <span className={styles.slider} />
-                  </label>
-                </div>
-                {form.gasto_inusual_activo && (
-                  <div className={styles.cardControls}>
-                    <div className={styles.channels}>
-                      <label className={styles.channelLabel}>
-                        <input
-                          type="checkbox"
-                          checked={form.gasto_inusual_web}
-                          onChange={() => handleCheckboxChange('gasto_inusual_web')}
-                          className={styles.channelCheckbox}
-                        />
-                        En la web
-                      </label>
-                      <label className={styles.channelLabel}>
-                        <input
-                          type="checkbox"
-                          checked={form.gasto_inusual_whatsapp}
-                          onChange={() => handleCheckboxChange('gasto_inusual_whatsapp')}
-                          className={styles.channelCheckbox}
-                        />
-                        Por WhatsApp
-                      </label>
-                    </div>
-                  </div>
-                )}
-            </div>
 
             {/* Inactividad */}
             <div className={styles.card}>

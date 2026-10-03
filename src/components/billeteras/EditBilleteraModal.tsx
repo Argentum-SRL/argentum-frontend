@@ -1,10 +1,11 @@
-import { useEffect, useReducer } from 'react'
-import { X, Check } from '@/components/ui/icons'
+import { useEffect, useReducer, useRef, useState } from 'react'
+import { X, Pencil, TrendingUp, Star, Landmark } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import type { BankDefinition } from '@/lib/constants/banks'
 import styles from './BankPickerModal.module.css'
 import Modal from '@/components/ui/Modal/Modal'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 
 export interface EditPayload {
   nombre: string
@@ -21,11 +22,20 @@ interface EditBilleteraModalProps {
   billeteraPrincipalActual: Billetera | undefined
 }
 
-function EditLogo({ bank, customNombre }: { bank?: BankDefinition, customNombre?: string }) {
+function EditLogo({
+  bank,
+  customNombre,
+  esEfectivo,
+}: {
+  bank?: BankDefinition
+  customNombre?: string
+  esEfectivo?: boolean
+}) {
+  const [hasError, setHasError] = useState(false)
   const url = bank ? getBankLogoUrl(bank.logoPath) : ''
-  const id = bank ? bank.id : 'custom'
+  const id = bank ? bank.id : esEfectivo ? 'efectivo' : 'custom'
 
-  if (bank && url) {
+  if (url && !hasError) {
     return (
       <div 
         className={`${styles.pickerLogoCircle} ${styles.size36}`} 
@@ -33,10 +43,11 @@ function EditLogo({ bank, customNombre }: { bank?: BankDefinition, customNombre?
       >
         <img 
           src={url} 
-          alt={bank.nombre} 
+          alt={bank?.nombre || customNombre || 'Billetera'} 
           width={22} 
           height={22} 
           className={styles.pickerLogoImg} 
+          onError={() => setHasError(true)}
         />
       </div>
     )
@@ -48,7 +59,7 @@ function EditLogo({ bank, customNombre }: { bank?: BankDefinition, customNombre?
       className={`${styles.pickerLogoCircle} ${styles.size36}`} 
       data-bank={id}
     >
-      <span className={`${styles.bankPreviewIconInitials} ${styles.initials36}`}>{init}</span>
+      <span className={`${styles.pickerLogoInitials} ${styles.initials36}`}>{init}</span>
     </div>
   )
 }
@@ -60,6 +71,7 @@ interface EditState {
   tna: string
   tnaTouched: boolean
   isSubmitting: boolean
+  isEditingName: boolean
 }
 
 type EditAction = 
@@ -75,7 +87,8 @@ function editReducer(state: EditState, action: EditAction): EditState {
         esInversion: Boolean(action.billetera.es_inversion),
         tna: action.billetera.tna != null ? String(action.billetera.tna) : '',
         tnaTouched: false,
-        isSubmitting: false
+        isSubmitting: false,
+        isEditingName: false,
       }
     case 'SET_FIELD':
       return { ...state, [action.field]: action.value }
@@ -97,10 +110,12 @@ export default function EditBilleteraModal({
     esInversion: false,
     tna: '',
     tnaTouched: false,
-    isSubmitting: false
+    isSubmitting: false,
+    isEditingName: false,
   })
 
-  const { nombre, esPrincipal, esInversion, tna, tnaTouched, isSubmitting } = state
+  const { nombre, esPrincipal, esInversion, tna, tnaTouched, isSubmitting, isEditingName } = state
+  const nameInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (isOpen && billetera) {
@@ -108,16 +123,72 @@ export default function EditBilleteraModal({
     }
   }, [isOpen, billetera])
 
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus()
+      const len = nameInputRef.current.value.length
+      nameInputRef.current.setSelectionRange(len, len)
+    }
+  }, [isEditingName])
+
+  const bank = billetera?.bank_id
+    ? getBankById(billetera.bank_id)
+    : !billetera?.es_efectivo && billetera?.nombre
+      ? findBankByNombre(billetera.nombre)
+      : undefined
+
+  const tipoLabel = billetera?.es_efectivo
+    ? 'Efectivo'
+    : bank?.tipo === 'billetera_virtual'
+    ? 'Billetera virtual'
+    : bank?.tipo === 'banco_digital'
+    ? 'Banco digital'
+    : bank?.tipo === 'plataforma_inversion'
+    ? 'Plataforma de inversión'
+    : bank
+    ? 'Banco tradicional'
+    : 'Personalizada'
+
+  // Estimación de rendimiento diario inteligente según saldo actual
+  const tnaNum = parseFloat(tna) || 0
+  const saldoNum = billetera?.saldo_actual || 0
+  let yieldText = ''
+  if (tnaNum > 0) {
+    const dailyRate = tnaNum / 365
+    if (saldoNum > 0) {
+      const dailyIncome = (saldoNum * (tnaNum / 100)) / 365
+      const formattedIncome = dailyIncome.toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+      yieldText = `+${billetera?.moneda === 'USD' ? 'US$' : '$'} ${formattedIncome}/día (~${dailyRate.toFixed(2)}%)`
+    } else {
+      yieldText = `~${dailyRate.toFixed(2)}% diario estimado`
+    }
+  }
+
+  const muestraAdvertencia = esPrincipal && !billetera?.es_principal && billeteraPrincipalActual
+
+  const {
+    fieldsRef: formBodyRef,
+    footerRef: formFooterRef,
+    containerStyle,
+  } = useAdaptiveModalHeight({
+    enabled: isOpen && !!billetera,
+    deps: [nombre, esPrincipal, esInversion, tna, muestraAdvertencia, isEditingName, yieldText],
+    extraPadding: 4,
+  })
 
   if (!isOpen || !billetera) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!nombre.trim() || isSubmitting) return
+    const trimmedNombre = nombre.trim() || billetera.nombre
+    if (!trimmedNombre || isSubmitting) return
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       const payload: EditPayload = {
-        nombre: nombre.trim(),
+        nombre: trimmedNombre,
         es_principal: esPrincipal,
         es_inversion: esInversion,
       }
@@ -141,14 +212,6 @@ export default function EditBilleteraModal({
     }
   }
 
-  const bank = billetera.bank_id
-    ? getBankById(billetera.bank_id)
-    : !billetera.es_efectivo
-      ? findBankByNombre(billetera.nombre)
-      : undefined
-
-  const muestraAdvertencia = esPrincipal && !billetera.es_principal && billeteraPrincipalActual
-
   return (
     <Modal
       isOpen={isOpen}
@@ -158,124 +221,222 @@ export default function EditBilleteraModal({
       autoHeight
       ariaLabel="Editar billetera"
     >
-      <form onSubmit={handleSubmit} className={`${styles.formContainer} ${styles.formContainerFlex}`}>
-        
-        <div className={styles.formHeader}>
-          <div className={`${styles.bankPreview} ${styles.bankPreviewNoMargin}`}>
-            <EditLogo bank={bank} customNombre={billetera.nombre} />
-            <div className={styles.bankPreviewInfo}>
-              <p className={styles.bankPreviewNombre}>Editar Billetera</p>
-              <p className={styles.bankPreviewTipo}>{billetera.nombre}</p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Cerrar"
-          >
-            <X size={18} strokeWidth={1.75} />
-          </button>
-        </div>
-
-        <div className={styles.formBody}>
-          <div className={styles.formField}>
-            <label className={styles.fieldLabel} htmlFor="edit-nombre">
-              Nombre
-            </label>
-            <input
-              id="edit-nombre"
-              type="text"
-              className={styles.fieldInput}
-              value={nombre}
-              onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
-              placeholder="Nombre de tu billetera"
-              required
-              autoFocus
-            />
-          </div>
-
-          {!billetera.es_efectivo && (
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel} htmlFor="edit-tna">
-                Tasa (TNA %) <span className={styles.fieldOptional}>(opcional)</span>
-              </label>
-              <input
-                id="edit-tna"
-                type="number"
-                step="0.01"
-                min="0"
-                className={styles.fieldInput}
-                value={tna}
-                onChange={(e) => {
-                  dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })
-                  dispatch({ type: 'SET_FIELD', field: 'tnaTouched', value: true })
-                }}
-                placeholder="Ej: 36.50"
+      <form
+        onSubmit={handleSubmit}
+        className={styles.formContainer}
+        style={containerStyle}
+      >
+        {/* Cuerpo scrolleable que incluye el header (arquitectura idéntica a BankPickerModal) */}
+        <div
+          ref={formBodyRef}
+          className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+        >
+          {/* Header del form */}
+          <div className={styles.formHeader}>
+            <div className={styles.bankPreview}>
+              <EditLogo
+                bank={bank}
+                customNombre={billetera.nombre}
+                esEfectivo={billetera.es_efectivo}
               />
+              <div className={styles.bankPreviewInfo}>
+                <div className={styles.bankPreviewNombreRow}>
+                  {isEditingName ? (
+                    <div className={styles.bankPreviewInputWrapper}>
+                      <input
+                        ref={nameInputRef}
+                        type="text"
+                        className={styles.bankPreviewNombreInput}
+                        value={nombre}
+                        onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
+                        onBlur={() => {
+                          if (!nombre.trim()) {
+                            dispatch({ type: 'SET_FIELD', field: 'nombre', value: billetera.nombre })
+                          }
+                          dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: false })
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            if (!nombre.trim()) {
+                              dispatch({ type: 'SET_FIELD', field: 'nombre', value: billetera.nombre })
+                            }
+                            dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: false })
+                          } else if (e.key === 'Escape') {
+                            dispatch({ type: 'SET_FIELD', field: 'nombre', value: billetera.nombre })
+                            dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: false })
+                          }
+                        }}
+                        placeholder={billetera.nombre}
+                        maxLength={40}
+                        autoFocus
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.bankPreviewNombreBtn}
+                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: true })}
+                      title="Editar nombre"
+                    >
+                      <span className={styles.bankPreviewNombreText}>
+                        {nombre.trim() || billetera.nombre}
+                      </span>
+                      <span className={styles.pencilIconWrapper} aria-hidden="true">
+                        <Pencil size={13} strokeWidth={2} />
+                      </span>
+                    </button>
+                  )}
+                </div>
+                <p className={styles.bankPreviewTipo}>
+                  {tipoLabel}
+                </p>
+              </div>
             </div>
-          )}
 
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="Cerrar"
+            >
+              <X size={18} strokeWidth={1.75} />
+            </button>
+          </div>
 
-          <button
-            type="button"
-            className={styles.principalRow}
-            onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
-            aria-label={esPrincipal ? 'Desmarcar como principal' : 'Marcar como principal'}
-            onKeyDown={(e) => {
-              if (e.key === ' ' || e.key === 'Enter') {
-                e.preventDefault()
-                dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })
-              }
-            }}
-          >
-            <div className={`${styles.checkbox} ${esPrincipal ? styles.checkboxActive : ''}`}>
-              {esPrincipal && <Check size={11} strokeWidth={3} color="white" />}
-            </div>
-            <div className={styles.principalInfo}>
-              <span className={styles.principalLabel}>Marcar como principal</span>
-              <span className={styles.principalSub}>
-                Se usa por defecto al registrar transacciones
-              </span>
-            </div>
-          </button>
+          {/* Campos del form agrupados en formFields con padding dedicado */}
+          <div className={styles.formFields}>
+            <div className={styles.settingsCardsList}>
+              {/* Card 1: Rendimiento (TNA) — solo si no es efectivo */}
+              {!billetera.es_efectivo && (
+                <div className={styles.settingCard}>
+                  <div className={`${styles.settingIconBox} ${styles.iconBoxPrimary}`}>
+                    <TrendingUp size={18} strokeWidth={2} />
+                  </div>
+                  <div className={styles.settingInfo}>
+                    <div className={styles.settingLabelRow}>
+                      <label htmlFor="edit-tna" className={styles.settingLabel}>
+                        Rendimiento (TNA)
+                      </label>
+                    </div>
+                    <span className={`${styles.settingSub} ${yieldText ? styles.settingSubHighlight : ''}`}>
+                      {yieldText || 'Rendimiento anual estimado'}
+                    </span>
+                  </div>
+                  <div className={styles.tnaInputBadge}>
+                    <input
+                      id="edit-tna"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="1000"
+                      className={styles.tnaInput}
+                      value={tna}
+                      onChange={(e) => {
+                        dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })
+                        dispatch({ type: 'SET_FIELD', field: 'tnaTouched', value: true })
+                      }}
+                      placeholder="0.0"
+                    />
+                    <span className={styles.tnaSuffix} aria-hidden="true">%</span>
+                  </div>
+                </div>
+              )}
 
-          {muestraAdvertencia && (
-            <div className={styles.warningBox}>
-              <span className={styles.warningIcon}>⚠️</span>
-              <p className={styles.warningText}>
-                Esto va a quitar el estado principal de{' '}
-                <strong>{billeteraPrincipalActual?.nombre}</strong>.
-              </p>
-            </div>
-          )}
+              {/* Card 2: Marcar como principal */}
+              <button
+                type="button"
+                className={`${styles.settingCard} ${styles.settingCardClickable} ${
+                  esPrincipal ? styles.settingCardActiveGold : ''
+                }`}
+                onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
+                role="switch"
+                aria-checked={esPrincipal}
+                aria-label="Marcar como billetera principal"
+              >
+                <div
+                  className={`${styles.settingIconBox} ${
+                    esPrincipal ? styles.iconBoxGold : styles.iconBoxDefault
+                  }`}
+                >
+                  <Star size={18} strokeWidth={2} className={esPrincipal ? styles.starFilled : ''} />
+                </div>
+                <div className={styles.settingInfo}>
+                  <div className={styles.settingLabelRow}>
+                    <span className={styles.settingLabel}>Marcar como principal</span>
+                    {esPrincipal && <span className={styles.badgePillGold}>Principal</span>}
+                  </div>
+                  <span className={styles.settingSub}>
+                    Usar por defecto en transacciones
+                  </span>
+                </div>
+                <div
+                  className={`${styles.customSwitch} ${esPrincipal ? styles.switchActiveGold : ''}`}
+                  aria-hidden="true"
+                >
+                  <div
+                    className={`${styles.customSwitchThumb} ${
+                      esPrincipal ? styles.switchThumbActive : ''
+                    }`}
+                  />
+                </div>
+              </button>
 
-          <button
-            type="button"
-            className={styles.principalRow}
-            onClick={() => dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })}
-            aria-label={esInversion ? 'Desmarcar como billetera de inversión' : 'Marcar como billetera de inversión'}
-            onKeyDown={(e) => {
-              if (e.key === ' ' || e.key === 'Enter') {
-                e.preventDefault()
-                dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })
-              }
-            }}
-          >
-            <div className={`${styles.checkbox} ${esInversion ? styles.checkboxActive : ''}`}>
-              {esInversion && <Check size={11} strokeWidth={3} color="white" />}
+              {/* Card 3: Cuenta de inversión */}
+              <button
+                type="button"
+                className={`${styles.settingCard} ${styles.settingCardClickable} ${
+                  esInversion ? styles.settingCardActiveGreen : ''
+                }`}
+                onClick={() => dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })}
+                role="switch"
+                aria-checked={esInversion}
+                aria-label="Marcar como cuenta de inversión"
+              >
+                <div
+                  className={`${styles.settingIconBox} ${
+                    esInversion ? styles.iconBoxGreen : styles.iconBoxDefault
+                  }`}
+                >
+                  <Landmark size={18} strokeWidth={2} />
+                </div>
+                <div className={styles.settingInfo}>
+                  <div className={styles.settingLabelRow}>
+                    <span className={styles.settingLabel}>Cuenta de inversión</span>
+                    {esInversion && <span className={styles.badgePillGreen}>Inversión</span>}
+                  </div>
+                  <span className={styles.settingSub}>
+                    Para rendimientos o ahorro a largo plazo
+                  </span>
+                </div>
+                <div
+                  className={`${styles.customSwitch} ${esInversion ? styles.switchActiveGreen : ''}`}
+                  aria-hidden="true"
+                >
+                  <div
+                    className={`${styles.customSwitchThumb} ${
+                      esInversion ? styles.switchThumbActive : ''
+                    }`}
+                  />
+                </div>
+              </button>
             </div>
-            <div className={styles.principalInfo}>
-              <span className={styles.principalLabel}>Billetera de inversión</span>
-              <span className={styles.principalSub}>
-                Inversión o ahorro a largo plazo
-              </span>
-            </div>
-          </button>
+
+            {/* Advertencia si ya hay una principal */}
+            {muestraAdvertencia && (
+              <div className={styles.warningBox}>
+                <span className={styles.warningIcon}>⚠️</span>
+                <p className={styles.warningText}>
+                  Esto va a quitar el estado principal de{' '}
+                  <strong>{billeteraPrincipalActual?.nombre}</strong>.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className={styles.formFooter}>
+        {/* Footer fijo */}
+        <div ref={formFooterRef} className={styles.formFooter}>
           <button type="button" className={styles.cancelBtn} onClick={onClose}>
             Cancelar
           </button>

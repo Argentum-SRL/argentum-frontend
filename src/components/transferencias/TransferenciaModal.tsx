@@ -333,7 +333,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   const visualsDestino = billeteraDestino ? getBankVisuals(billeteraDestino) : null
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding ariaLabel="Pasar plata entre cuentas">
+    <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Pasar plata entre cuentas">
       <div className={styles.modalRoot}>
         {/* ── Vista Picker de Cuentas (Overlay fluido) ── */}
         {pickerMode !== null ? (
@@ -750,7 +750,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 ) : (
                   <div className={styles.comisionCard}>
                     <div className={styles.comisionHeader}>
-                      <span className={styles.comisionTitle}>Comisión u honorarios bancarios (opcional)</span>
+                      <span className={styles.comisionTitle}>Comisión u honorarios bancarios</span>
                       <button
                         type="button"
                         className={styles.iconCircleBtn}
@@ -826,7 +826,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 <div className={styles.detailField}>
                   <label className={styles.fieldLabel} htmlFor="transf-notas">
                     <FileText size={13} className={styles.fieldIcon} />
-                    Nota o motivo <span className={styles.fieldOptional}>(opcional)</span>
+                    Nota o motivo
                   </label>
                   <input
                     id="transf-notas"

@@ -370,7 +370,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const currentItemsCount = state.metodoCobro === 'tarjeta' ? tarjetas.length : billeteras.length
 
   return (
-    <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding ariaLabel="Nueva suscripción" className={styles.modalCustom}>
+    <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Nueva suscripción" className={styles.modalCustom}>
       <div className={styles.slidesContainer}>
         {/* Step Indicators */}
         <div className={styles.stepDots}>

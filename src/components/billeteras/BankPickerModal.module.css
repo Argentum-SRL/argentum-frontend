@@ -552,12 +552,14 @@
   color: var(--text-2);
 }
 
-.inlineNameWrap {
+.inlineNameWrap,
+.bankPreviewInputWrapper {
   display: flex;
   align-items: center;
 }
 
-.inlineNameInput {
+.inlineNameInput,
+.bankPreviewNombreInput {
   background: transparent;
   border: none;
   border-bottom: 1.5px solid var(--border);
@@ -575,7 +577,8 @@
   transition: border-color 140ms ease;
 }
 
-.inlineNameInput:focus {
+.inlineNameInput:focus,
+.bankPreviewNombreInput:focus {
   outline: none;
   box-shadow: none;
   border-bottom-color: var(--text-2);
@@ -645,13 +648,6 @@
   letter-spacing: 0.6px;
 }
 
-.fieldOptional {
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--text-3);
-  font-size: 11px;
-}
 
 .fieldInput {
   height: 44px;
@@ -942,6 +938,9 @@
   font-size: 11.5px;
   color: var(--text-3);
   line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: color 150ms ease;
 }
 

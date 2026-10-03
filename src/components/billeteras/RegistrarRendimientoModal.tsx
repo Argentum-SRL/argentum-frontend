@@ -7,6 +7,7 @@ import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
 import styles from './BankPickerModal.module.css'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 
 interface RegistrarRendimientoModalProps {
   isOpen: boolean
@@ -23,12 +24,23 @@ export default function RegistrarRendimientoModal({
   billetera,
   rendimientoEstimado,
 }: RegistrarRendimientoModalProps) {
-  const [prevRendimiento, setPrevRendimiento] = useState(rendimientoEstimado)
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  const [prevRendimiento, setPrevRendimiento] = useState(rendimientoEstimado)
+
   const [monto, setMonto] = useState<string>(
     rendimientoEstimado != null && rendimientoEstimado > 0 ? String(rendimientoEstimado) : ''
   )
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+
+  const {
+    fieldsRef: formBodyRef,
+    footerRef: formFooterRef,
+    containerStyle,
+  } = useAdaptiveModalHeight({
+    enabled: isOpen && !!billetera,
+    deps: [monto, rendimientoEstimado],
+    extraPadding: 4,
+  })
 
   if (prevIsOpen !== isOpen || prevRendimiento !== rendimientoEstimado) {
     setPrevIsOpen(isOpen)
@@ -76,64 +88,73 @@ export default function RegistrarRendimientoModal({
       autoHeight
       ariaLabel="Registrar rendimiento"
     >
-      <form onSubmit={handleSubmit} className={`${styles.formContainer} ${styles.formContainerFlex}`}>
-        <div className={styles.formHeader}>
-          <div className={`${styles.bankPreview} ${styles.bankPreviewNoMargin}`}>
-            <div className={`${styles.pickerLogoCircle} ${styles.size36}`} style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981' }}>
-              <TrendingUp size={20} strokeWidth={2.5} />
+      <form
+        onSubmit={handleSubmit}
+        className={styles.formContainer}
+        style={containerStyle}
+      >
+        <div
+          ref={formBodyRef}
+          className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+        >
+          <div className={styles.formHeader}>
+            <div className={`${styles.bankPreview} ${styles.bankPreviewNoMargin}`}>
+              <div className={`${styles.pickerLogoCircle} ${styles.size36}`} style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981' }}>
+                <TrendingUp size={20} strokeWidth={2.5} />
+              </div>
+              <div className={styles.bankPreviewInfo}>
+                <p className={styles.bankPreviewNombre}>Registrar Rendimiento</p>
+                <p className={styles.bankPreviewTipo}>{billetera.nombre}</p>
+              </div>
             </div>
-            <div className={styles.bankPreviewInfo}>
-              <p className={styles.bankPreviewNombre}>Registrar Rendimiento</p>
-              <p className={styles.bankPreviewTipo}>{billetera.nombre}</p>
-            </div>
+
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="Cerrar"
+            >
+              <X size={18} strokeWidth={1.75} />
+            </button>
           </div>
 
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Cerrar"
-          >
-            <X size={18} strokeWidth={1.75} />
-          </button>
+          <div className={styles.formFields}>
+            <div className={styles.formField}>
+              <label className={styles.fieldLabel} htmlFor="rendimiento-monto">
+                Monto a acreditar
+              </label>
+              <div className={styles.saldoWrap}>
+                <span className={styles.saldoPrefix}>{simboloMoneda}</span>
+                <input
+                  id="rendimiento-monto"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  className={styles.saldoInput}
+                  value={monto}
+                  onChange={(e) => setMonto(e.target.value)}
+                  placeholder="0.00"
+                  required
+                  autoFocus
+                />
+              </div>
+              {rendimientoEstimado != null && (
+                <span className={styles.settingSub} style={{ marginTop: 4 }}>
+                  Estimado según TNA: <strong>+{formatMonto(rendimientoEstimado, billetera.moneda)}</strong>
+                </span>
+              )}
+            </div>
+
+            <div className={styles.warningBox} style={{ background: 'rgba(16, 185, 129, 0.08)', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
+              <span className={styles.warningIcon}>💡</span>
+              <p className={styles.warningText} style={{ color: 'var(--text-2)' }}>
+                Al confirmar, el monto se acreditará directamente en el saldo de la billetera y comenzará un nuevo período de devengamiento.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className={styles.formBody}>
-          <div className={styles.formField}>
-            <label className={styles.fieldLabel} htmlFor="rendimiento-monto">
-              Monto a acreditar
-            </label>
-            <div className={styles.saldoWrap}>
-              <span className={styles.saldoPrefix}>{simboloMoneda}</span>
-              <input
-                id="rendimiento-monto"
-                type="number"
-                step="0.01"
-                min="0.01"
-                className={styles.saldoInput}
-                value={monto}
-                onChange={(e) => setMonto(e.target.value)}
-                placeholder="0.00"
-                required
-                autoFocus
-              />
-            </div>
-            {rendimientoEstimado != null && (
-              <span className={styles.fieldOptional} style={{ marginTop: 4 }}>
-                Estimado según TNA: <strong>+{formatMonto(rendimientoEstimado, billetera.moneda)}</strong>
-              </span>
-            )}
-          </div>
-
-          <div className={styles.warningBox} style={{ background: 'rgba(16, 185, 129, 0.08)', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
-            <span className={styles.warningIcon}>💡</span>
-            <p className={styles.warningText} style={{ color: 'var(--text-2)' }}>
-              Al confirmar, el monto se acreditará directamente en el saldo de la billetera y comenzará un nuevo período de devengamiento.
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.formFooter}>
+        <div ref={formFooterRef} className={styles.formFooter}>
           <button type="button" className={styles.cancelBtn} onClick={onClose}>
             Cancelar
           </button>

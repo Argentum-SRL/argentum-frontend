@@ -891,11 +891,12 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         onClose={() => setEditingGrupo(null)}
         title="Editar compra en cuotas"
         size="md"
+        autoHeight
       >
         {editingGrupo && (
           <form onSubmit={handleSave} className={styles.editForm}>
             <div className={styles.formField}>
-              <label className={styles.fieldLabel}>Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
+              <label className={styles.fieldLabel}>Descripción</label>
               <input 
                 type="text" 
                 className={styles.fieldInput} 

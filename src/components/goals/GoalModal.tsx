@@ -291,7 +291,7 @@ export default function GoalModal({
 
                 <div className={styles.row}>
                   <div className={styles.formField}>
-                    <label className={styles.fieldLabel}>Fecha límite (Opcional)</label>
+                    <label className={styles.fieldLabel}>Fecha límite</label>
                     <DateInput
                       value={fecha_limite}
                       onChange={val => setField('fecha_limite', val)}

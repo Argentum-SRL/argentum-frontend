@@ -276,6 +276,7 @@ export default function TarjetaModal() {
       noPadding={true}
       className={styles.baseModalOverride}
       size="md"
+      autoHeight
     >
       <form 
         className={styles.modal}
@@ -343,7 +344,7 @@ export default function TarjetaModal() {
               {/* Apodo opcional */}
               <div className={styles.formField}>
                 <label className={styles.fieldLabel} htmlFor="tarjeta-apodo">
-                  Apodo (opcional)
+                  Apodo
                 </label>
                 <input
                   id="tarjeta-apodo"

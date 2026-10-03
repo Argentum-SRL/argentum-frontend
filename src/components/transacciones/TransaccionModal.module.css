@@ -1,12 +1,13 @@
 /* ── Slides container & animations ───────────────────────────────────────── */
 .slidesContainer {
+  position: relative;
   width: 100%;
-  height: 100%;
-  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  max-height: 85dvh;
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .slide {
@@ -168,14 +169,6 @@
   letter-spacing: 0.7px;
 }
 
-.fieldOptional {
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--text-3);
-  font-size: 10px;
-  margin-left: 3px;
-}
 
 .fieldInput {
   height: 44px;
@@ -905,7 +898,6 @@
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .formFooter {
   padding: 12px 20px 16px;
-  border-top: 1px solid var(--surface-alt);
   background: var(--surface);
   display: flex;
   gap: 8px;

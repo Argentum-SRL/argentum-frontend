@@ -12,14 +12,6 @@
   letter-spacing: 0.7px;
 }
 
-.fieldOptional {
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--text-3);
-  font-size: 10px;
-  margin-left: 3px;
-}
 
 /* ── Hero container ── */
 .montoHero {

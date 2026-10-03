@@ -1,6 +1,4 @@
-// ─── BankPickerModal — modal de dos pasos para crear billetera ────────────────
-
-import { useState, useMemo, useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+import { useState, useMemo, useEffect, useReducer, useRef } from 'react'
 import { X, ChevronLeft, Search, Check, Pencil, TrendingUp, Star, Landmark } from '@/components/ui/icons'
 import { BANKS, BANK_SECTIONS, CUSTOM_COLORS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
@@ -9,6 +7,7 @@ import { getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BankPickerModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import Modal from '@/components/ui/Modal/Modal'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 
 export interface CreatePayload {
   nombre: string
@@ -218,44 +217,17 @@ export default function BankPickerModal({
   } = state
 
   const nameInputRef = useRef<HTMLInputElement>(null)
-  const formBodyRef = useRef<HTMLDivElement>(null)
-  const formFooterRef = useRef<HTMLDivElement>(null)
-  const [dynamicFormHeight, setDynamicFormHeight] = useState<number | null>(null)
   const isCustom = bankSeleccionado?.id === 'custom'
 
-  useLayoutEffect(() => {
-    if (step !== 'form') return
-
-    const measure = () => {
-      if (formBodyRef.current && formFooterRef.current) {
-        let bodyH = 0
-        for (const child of Array.from(formBodyRef.current.children)) {
-          bodyH += (child as HTMLElement).offsetHeight
-        }
-        const footerH = formFooterRef.current.offsetHeight
-        const maxH = Math.round(window.innerHeight * 0.85)
-        const targetH = Math.min(bodyH + footerH + 4, maxH)
-        setDynamicFormHeight(targetH)
-      }
-    }
-
-    measure()
-
-    const el = formBodyRef.current
-    let observer: ResizeObserver | null = null
-    if (el) {
-      observer = new ResizeObserver(() => {
-        measure()
-      })
-      observer.observe(el)
-    }
-
-    window.addEventListener('resize', measure)
-    return () => {
-      observer?.disconnect()
-      window.removeEventListener('resize', measure)
-    }
-  }, [step, esPrincipal, isCustom, bankSeleccionado])
+  const {
+    fieldsRef: formBodyRef,
+    footerRef: formFooterRef,
+    dynamicHeight: dynamicFormHeight,
+  } = useAdaptiveModalHeight({
+    enabled: step === 'form',
+    deps: [step, esPrincipal, isCustom, bankSeleccionado],
+    extraPadding: 4,
+  })
 
   // Reset cuando se abre
   useEffect(() => {
@@ -626,7 +598,7 @@ export default function BankPickerModal({
                         </label>
                       </div>
                       <span className={`${styles.settingSub} ${yieldText ? styles.settingSubHighlight : ''}`}>
-                        {yieldText || 'Rendimiento anual estimado • Opcional'}
+                        {yieldText || 'Rendimiento anual estimado'}
                       </span>
                     </div>
                     <div className={styles.tnaInputBadge}>

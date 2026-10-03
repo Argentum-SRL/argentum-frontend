@@ -43,7 +43,6 @@ const MontoInput = memo(({
   className,
   max,
   allowDecimals = false,
-  optional = false,
   hideCurrency = false,
   compact = false,
 }: MontoInputProps) => {
@@ -132,7 +131,6 @@ const MontoInput = memo(({
       {label && (
         <label className={styles.label}>
           {label}
-          {optional && <span className={styles.fieldOptional}> (opcional)</span>}
         </label>
       )}
       <div className={[

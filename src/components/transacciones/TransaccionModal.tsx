@@ -21,6 +21,7 @@ import styles from './TransaccionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { DateInput } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
@@ -200,6 +201,17 @@ export default function TransaccionModal({
     step, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
     billeteraId, tarjetaId, fecha, metodoPago, cantidadCuotas, cuotaInicial, proximoResumen, tasaInteres, isSubmitting,
   } = state
+
+  const {
+    headerRef: formHeaderRef,
+    fieldsRef: formBodyRef,
+    footerRef: formFooterRef,
+    dynamicHeight,
+  } = useAdaptiveModalHeight({
+    enabled: open,
+    deps: [step, tipo, metodoPago, isEdit, isCuotaHija, monto, moneda, descripcion, categoriaId, subcategoriaId, cantidadCuotas, proximoResumen],
+    extraPadding: 24,
+  })
 
   // Cargar subcategorías cuando cambia la categoría
 
@@ -434,8 +446,11 @@ export default function TransaccionModal({
   }
 
   return (
-    <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding ariaLabel="Nueva transacción">
-      <div className={styles.slidesContainer}>
+    <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Nueva transacción">
+      <div
+        className={styles.slidesContainer}
+        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
+      >
 
         {/* ── Step Indicator Dots ── */}
         <div className={styles.stepDots}>
@@ -456,7 +471,7 @@ export default function TransaccionModal({
                 goNext()
               }}
             >
-              <div className={styles.formHeader}>
+              <div ref={formHeaderRef} className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>{isEdit ? (isCuotaHija ? 'Detalle de cuota' : 'Editar transacción') : 'Nueva transacción'}</h2>
                 <div className={styles.headerRightActions}>
                   {isEdit && (
@@ -474,7 +489,7 @@ export default function TransaccionModal({
                 </div>
               </div>
 
-              <div className={styles.formBody}>
+              <div ref={formBodyRef} className={styles.formBody}>
                 {isCuotaHija && (
                   <div className={styles.cuotaHijaWarning}>
                     Monto, moneda, tipo y billetera no se pueden cambiar porque esta transacción es parte de una compra en cuotas.
@@ -643,7 +658,7 @@ export default function TransaccionModal({
                 </div>
               </div>
 
-              <div className={styles.formFooter}>
+              <div ref={formFooterRef} className={styles.formFooter}>
                 {isEdit ? (
                   <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
                     {isCuotaHija ? 'Eliminar cuota' : 'Eliminar'}
@@ -667,13 +682,13 @@ export default function TransaccionModal({
                 goNext()
               }}
             >
-              <div className={styles.formHeader}>
+              <div ref={formHeaderRef} className={styles.formHeader}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Financiación</h2>
                 <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
-              <div className={styles.formBody}>
+              <div ref={formBodyRef} className={styles.formBody}>
                 <div className={styles.cuotasSection}>
                   <div className={styles.cuotasGrid}>
                     <div className={styles.cuotasInputGroup}>
@@ -760,7 +775,7 @@ export default function TransaccionModal({
                 </div>
               </div>
 
-              <div className={styles.formFooter}>
+              <div ref={formFooterRef} className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                 <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
@@ -778,7 +793,7 @@ export default function TransaccionModal({
                 handleSubmit()
               }}
             >
-              <div className={styles.formHeader}>
+              <div ref={formHeaderRef} className={styles.formHeader}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
                 <h2 className={styles.headerTitle}>Detalles</h2>
                 <div className={styles.headerRightActions}>
@@ -797,11 +812,11 @@ export default function TransaccionModal({
                 </div>
               </div>
 
-              <div className={styles.formBody}>
+              <div ref={formBodyRef} className={styles.formBody}>
                 {/* Descripción + Fecha */}
                 <div className={styles.descFechaRow}>
                   <div className={`${styles.formField} ${styles.flex2}`}>
-                    <label className={styles.fieldLabel} htmlFor="tx-desc">Descripción <span className={styles.fieldOptional}>(opcional)</span></label>
+                    <label className={styles.fieldLabel} htmlFor="tx-desc">Descripción</label>
                     <input id="tx-desc" type="text" className={styles.fieldInput} value={descripcion}
                       onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'descripcion', value: e.target.value })}
                       placeholder="Ej: Supermercado" />
@@ -829,7 +844,7 @@ export default function TransaccionModal({
                 />
               </div>
 
-              <div className={styles.formFooter}>
+              <div ref={formFooterRef} className={styles.formFooter}>
                 {isEdit ? (
                   <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
                     {isCuotaHija ? 'Eliminar cuota' : 'Eliminar'}

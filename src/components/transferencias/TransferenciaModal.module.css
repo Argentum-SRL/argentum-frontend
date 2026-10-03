@@ -401,11 +401,6 @@
   color: var(--text-3);
 }
 
-.fieldOptional {
-  font-weight: 400;
-  color: var(--text-3);
-  font-size: 11px;
-}
 
 .dateInputCustom {
   height: 42px !important;

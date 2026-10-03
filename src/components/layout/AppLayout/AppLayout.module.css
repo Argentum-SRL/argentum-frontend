@@ -12,10 +12,16 @@
   --sb-sep: rgba(0,0,0,0.1);
 }
 
-:global([data-theme="dark"]) .root {
-  --sb-bg: #0D2045;
-  --sb-shadow: 0 8px 32px rgba(10, 20, 50, 0.35), 0 2px 8px rgba(10, 20, 50, 0.20), inset 0 1px 0 rgba(255,255,255,0.08);
-  --sb-border: rgba(255, 255, 255, 0.10);
+:global([data-theme="dark"]) .root,
+:global(.dark) .root {
+  /* Anterior: #0D2045 */
+  /* Anterior: #091120 */
+  --sb-bg: #0b1729;
+  /* Anterior: --sb-shadow: 0 8px 32px rgba(10, 20, 50, 0.35), 0 2px 8px rgba(10, 20, 50, 0.20), inset 0 1px 0 rgba(255,255,255,0.08); */
+  /* Anterior franja inset: 0 20px 48px -8px rgba(0, 0, 0, 0.75), 0 8px 20px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.40); */
+  --sb-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.75), 0 6px 16px -2px rgba(0, 0, 0, 0.50);
+  /* Anterior: --sb-border: rgba(255, 255, 255, 0.10); */
+  --sb-border: rgba(255, 255, 255, 0.08);
   --sb-text: rgba(255,255,255,0.35);
   --sb-text-hover: rgba(255,255,255,0.7);
   --sb-hover-bg: rgba(255,255,255,0.07);
@@ -67,7 +73,8 @@
   flex-shrink: 0;
 }
 
-:global([data-theme="dark"]) .standaloneLogo {
+:global([data-theme="dark"]) .standaloneLogo,
+:global(.dark) .standaloneLogo {
   color: #fff;
 }
 
@@ -92,6 +99,7 @@
   display: flex;
   align-items: center;
   background: var(--sb-bg);
+  background-clip: padding-box;
   border-radius: 26px;
   padding: 4px;
   box-shadow: var(--sb-shadow);
@@ -99,6 +107,12 @@
   gap: 4px;
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
+}
+
+:global([data-theme="dark"]) .topNavPill,
+:global(.dark) .topNavPill {
+  /* Anterior: var(--sb-bg) / #091120 */
+  background: #0b1729;
 }
 
 .headerRight {
@@ -114,6 +128,7 @@
   display: flex;
   align-items: center;
   background: var(--sb-bg);
+  background-clip: padding-box;
   border-radius: 26px;
   padding: 4px;
   box-shadow: var(--sb-shadow);
@@ -122,6 +137,12 @@
   flex-shrink: 0;
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
+}
+
+:global([data-theme="dark"]) .actionPill,
+:global(.dark) .actionPill {
+  /* Anterior: var(--sb-bg) / #091120 */
+  background: #0b1729;
 }
 
 .profileWrapper {
@@ -133,6 +154,7 @@
   display: flex;
   align-items: center;
   background: var(--sb-bg);
+  background-clip: padding-box;
   border-radius: 26px;
   padding: 4px 14px 4px 4px;
   box-shadow: var(--sb-shadow);
@@ -142,6 +164,12 @@
   transition: transform 150ms, box-shadow 150ms;
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
+}
+
+:global([data-theme="dark"]) .profilePill,
+:global(.dark) .profilePill {
+  /* Anterior: var(--sb-bg) / #091120 */
+  background: #0b1729;
 }
 
 .profilePill:hover {
@@ -165,7 +193,8 @@
 .topBarBtn {
   width: 36px;
   height: 36px;
-  border-radius: 14px;
+  /* Anterior: border-radius: 14px; */
+  border-radius: 18px;
   border: none;
   background: transparent;
   display: flex;
@@ -418,7 +447,8 @@
   align-items: center;
   gap: 10px;
   height: 36px;
-  border-radius: 14px;
+  /* Anterior: border-radius: 14px; */
+  border-radius: 18px;
   color: var(--sb-text);
   text-decoration: none;
   padding: 0 9px;
@@ -565,6 +595,12 @@
   display: none;
 }
 
+:global([data-theme="dark"]) .mobileHeader,
+:global(.dark) .mobileHeader {
+  /* Anterior: sin fondo previo / #091120 */
+  background: #0b1729;
+}
+
 @media (min-width: 768px) {
   .mobileHeader {
     display: none;
@@ -590,7 +626,8 @@
   line-height: 1;
 }
 
-:global([data-theme="dark"]) .mobileLogoText {
+:global([data-theme="dark"]) .mobileLogoText,
+:global(.dark) .mobileLogoText {
   color: #fff;
 }
 

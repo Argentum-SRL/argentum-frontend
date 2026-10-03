@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ['selector', '[data-theme="dark"]'],
+  darkMode: ['selector', '[data-theme="dark"], .dark'],
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -18,6 +18,7 @@ export default {
         page: 'var(--page)',
         surface: 'var(--surface)',
         'surface-alt': 'var(--surface-alt)',
+        border: 'var(--border)',
         text: 'var(--text)',
         'text-2': 'var(--text-2)',
         'text-3': 'var(--text-3)',

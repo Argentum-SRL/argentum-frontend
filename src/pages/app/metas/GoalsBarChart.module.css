@@ -108,6 +108,8 @@
   background: rgba(0, 0, 0, 0.02);
 }
 
+:global([data-theme="dark"]) .dashedFrame,
+:global(.dark) .dashedFrame,
 [data-theme="dark"] .dashedFrame {
   border-color: rgba(255, 255, 255, 0.3) !important;
   background: rgba(255, 255, 255, 0.03);
@@ -143,6 +145,8 @@
   box-shadow: 0 0 16px rgba(202, 138, 4, 0.35);
 }
 
+:global([data-theme="dark"]) .solidFill,
+:global(.dark) .solidFill,
 [data-theme="dark"] .solidFill {
   filter: brightness(0.85) saturate(1.1);
 }
@@ -189,10 +193,14 @@
   line-height: 1;
 }
 
+:global([data-theme="dark"]) .spentAmount,
+:global(.dark) .spentAmount,
 [data-theme="dark"] .spentAmount {
   color: #F8FAFC;
 }
 
+:global([data-theme="dark"]) .percentText,
+:global(.dark) .percentText,
 [data-theme="dark"] .percentText {
   color: rgba(248, 250, 252, 0.7);
 }

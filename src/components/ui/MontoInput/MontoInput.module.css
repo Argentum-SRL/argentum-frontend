@@ -100,7 +100,7 @@
 }
 
 .montoHeroPrefix {
-  font-size: 36px;
+  font-size: 36px !important;
   font-weight: 800;
   color: var(--text-3);
   line-height: 1;
@@ -109,7 +109,7 @@
 }
 
 .montoHeroField {
-  font-size: 36px;
+  font-size: 36px !important;
   font-weight: 800;
   letter-spacing: -1.5px;
   border: none;

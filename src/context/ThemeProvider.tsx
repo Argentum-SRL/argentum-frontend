@@ -7,10 +7,13 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
-    const saved = localStorage.getItem('argentum_theme') as Theme
-    if (saved) return saved
-    
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    try {
+      const saved = localStorage.getItem('argentum_theme')
+      if (saved === 'dark' || saved === 'light') return saved
+    } catch {
+      // Fallback si localStorage no está disponible
+    }
+    return 'light'
   })
 
   const applyTheme = useCallback((newTheme: Theme) => {

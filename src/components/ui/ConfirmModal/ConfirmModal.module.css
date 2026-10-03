@@ -9,13 +9,19 @@
 }
 
 .iconWrapDanger {
-  background: rgba(var(--error-rgb), 0.1);
+  background: var(--error-bg);
   color: var(--error);
 }
 
 .iconWrapWarning {
   background: #FEF3C7;
   color: #D97706;
+}
+
+:global([data-theme="dark"]) .iconWrapWarning,
+:global(.dark) .iconWrapWarning {
+  background: rgba(192, 162, 101, 0.18);
+  color: var(--gold);
 }
 
 .iconWrapDefault {
@@ -103,6 +109,12 @@
 .confirmBtnWarning {
   background: #D97706;
   color: #fff;
+}
+
+:global([data-theme="dark"]) .confirmBtnWarning,
+:global(.dark) .confirmBtnWarning {
+  background: var(--gold);
+  color: #0E1117;
 }
 
 .confirmBtn:disabled { 

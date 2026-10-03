@@ -295,10 +295,21 @@ export default function MetaDetallePage() {
                         <stop offset="95%" stopColor={goal.color || '#3B82F6'} stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                    <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                    <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--text-3)' }} />
                     <YAxis hide />
-                    <Tooltip />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'var(--surface)', 
+                        borderColor: 'var(--border)', 
+                        borderRadius: '12px', 
+                        color: 'var(--text)',
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.25)' 
+                      }} 
+                      itemStyle={{ color: 'var(--text)' }}
+                      labelStyle={{ color: 'var(--text-2)', fontWeight: 600, marginBottom: 4 }}
+                      formatter={(val: unknown) => [formatMonto(Number(val) || 0, goal.moneda), 'Ahorrado']}
+                    />
                     <Area 
                       type="monotone" 
                       dataKey="monto" 

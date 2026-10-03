@@ -31,6 +31,9 @@
   filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.12));
 }
 
+:root.dark [data-sileo-toast],
+:root[data-theme="dark"] [data-sileo-toast],
+.dark [data-sileo-toast],
 [data-theme="dark"] [data-sileo-toast] {
   filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.45));
 }
@@ -42,6 +45,9 @@
   stroke-width: 1px !important;
 }
 
+:root.dark [data-sileo-svg] rect,
+:root[data-theme="dark"] [data-sileo-svg] rect,
+.dark [data-sileo-svg] rect,
 [data-theme="dark"] [data-sileo-svg] rect {
   stroke: rgba(255, 255, 255, 0.08) !important;
 }

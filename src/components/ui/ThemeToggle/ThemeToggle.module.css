@@ -56,17 +56,20 @@
   color: var(--primary);
 }
 
-:global([data-theme="dark"]) .iconMoon {
+:global([data-theme="dark"]) .iconMoon,
+:global(.dark) .iconMoon {
   color: var(--silver, #cbd5e1);
 }
 
-:global([data-theme="dark"]) .toggleBtn {
+:global([data-theme="dark"]) .toggleBtn,
+:global(.dark) .toggleBtn {
   background: rgba(22, 27, 36, 0.85);
   border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
-:global([data-theme="dark"]) .toggleBtn:hover {
+:global([data-theme="dark"]) .toggleBtn:hover,
+:global(.dark) .toggleBtn:hover {
   background: rgba(30, 37, 48, 0.95);
   border-color: rgba(255, 255, 255, 0.2);
 }

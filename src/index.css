@@ -63,20 +63,32 @@ p, h1, h2, h3, h4, h5, h6 {
 :root {
   --html-bg: #F5F4F0;
   --primary: #0D2045;
+  --primary-light: #1A3568;
+  --primary-dark: #08142C;
+  --primary-rgb: 13, 32, 69;
   --silver: #8A95A8;
   --secondary: #1A3D28;
   --gold: #A8905A;
+  --warning: #A8905A;
   --page: #F5F4F0;
   --surface: #FFFFFF;
+  --surface-2: #FBFBFA;
+  --surface-3: #F0EFEA;
   --surface-alt: #EDECEA;
   --text: #0A0D12;
+  --text-1: #0A0D12;
   --text-2: #52565F;
   --text-3: #8E9198;
+  --text-secondary: #52565F;
+  --text-muted: #8E9198;
   --error: #C0392B;
   --error-bg: #FDEDEC;
+  --error-rgb: 192, 57, 43;
   --success: #1A7A4A;
   --success-bg: #EAFAF1;
   --border: var(--surface-alt);
+  --border-color: var(--surface-alt);
+  --border-subtle: rgba(0, 0, 0, 0.06);
 
   /* Content Layout Tokens */
   --content-max-width: 1200px;
@@ -85,22 +97,38 @@ p, h1, h2, h3, h4, h5, h6 {
   --container-px-desktop: 48px;
 }
 
+:root.dark,
+:root[data-theme="dark"],
+.dark,
 [data-theme="dark"] {
   --html-bg: #0E1117;
   --primary: #4878B8;
+  --primary-light: #6B9BD8;
+  --primary-dark: #32588A;
+  --primary-rgb: 72, 120, 184;
   --silver: #A8B4C5;
   --secondary: #2A8A48;
   --gold: #C0A265;
+  --warning: #C0A265;
   --page: #0E1117;
   --surface: #161B24;
+  --surface-2: #1C232E;
+  --surface-3: #232B39;
   --surface-alt: #1E2530;
   --text: #E6ECF2;
+  --text-1: #E6ECF2;
   --text-2: #8894A8;
   --text-3: #5A6B78;
+  --text-secondary: #8894A8;
+  --text-muted: #5A6B78;
   --error: #E74C3C;
-  --error-bg: rgba(231,76,60,0.12);
+  --error-bg: rgba(231, 76, 60, 0.12);
+  --error-rgb: 231, 76, 60;
   --success: #2ECC71;
-  --success-bg: rgba(46,204,113,0.12);
+  --success-bg: rgba(46, 204, 113, 0.12);
+  --border: var(--surface-alt);
+  --border-color: var(--surface-alt);
+  --border-subtle: rgba(255, 255, 255, 0.08);
 }
 
 html {
@@ -201,6 +229,14 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+:root.dark input:-webkit-autofill,
+:root.dark input:-webkit-autofill:hover,
+:root.dark input:-webkit-autofill:focus,
+:root.dark input:-webkit-autofill:active,
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active,
 [data-theme="dark"] input:-webkit-autofill,
 [data-theme="dark"] input:-webkit-autofill:hover,
 [data-theme="dark"] input:-webkit-autofill:focus,
@@ -217,9 +253,9 @@ input:-webkit-autofill:active {
   }
 }
 
-/* Prevenir auto-zoom de iOS Safari en campos de formulario (requiere mínimo 16px) */
+/* Prevenir auto-zoom de iOS Safari en campos de formulario (requiere mínimo 16px, excluyendo inputs de monto hero) */
 @media screen and (max-width: 768px) {
-  input:not([type="checkbox"]):not([type="radio"]),
+  input:not([type="checkbox"]):not([type="radio"]):not([class*="montoHero"]):not([class*="Hero"]),
   select,
   textarea {
     font-size: 16px !important;

@@ -72,13 +72,13 @@ export const BANKS: BankDefinition[] = [
     gradiente: 'linear-gradient(135deg, #14D883 0%, #0CB068 100%)',
   },
   {
-    id: 'claropay',
-    nombre: 'Claro Pay',
+    id: 'arq',
+    nombre: 'ARQ',
     tipo: 'billetera_virtual',
-    colorPrimario: '#DA291C',
+    colorPrimario: '#18181B',
     colorTexto: 'white',
     logoPath: '',
-    gradiente: 'linear-gradient(135deg, #DA291C 0%, #A61A0F 100%)',
+    gradiente: 'linear-gradient(135deg, #27272A 0%, #09090B 100%)',
   },
   {
     id: 'ieb',

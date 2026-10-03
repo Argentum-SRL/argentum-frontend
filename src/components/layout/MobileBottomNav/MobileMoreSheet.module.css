@@ -40,7 +40,8 @@
   user-select: none;
 }
 
-:global([data-theme="dark"]) .sheet {
+:global([data-theme="dark"]) .sheet,
+:global(.dark) .sheet {
   border-top-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.45);
 }

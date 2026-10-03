@@ -43,7 +43,8 @@ export function findBankByNombre(nombre: string): BankDefinition | undefined {
       (b.id === 'mercadopago' && lower.includes('mercado')) ||
       (b.id === 'nacion' && (lower.includes('naci') || lower.includes('bna'))) ||
       (b.id === 'provincia' && lower.includes('provi')) ||
-      (b.id === 'cuentadni' && (lower.includes('dni') || lower.includes('cuenta')))
+      (b.id === 'cuentadni' && (lower.includes('dni') || lower.includes('cuenta'))) ||
+      (b.id === 'arq' && (lower.includes('arq') || lower.includes('dolarapp')))
   )
 }
 
@@ -95,6 +96,9 @@ export function calcularTotales(
  * "Banco Nación" → "BN"
  */
 export function getInitials(nombre: string): string {
+  if (nombre.trim().toUpperCase() === 'ARQ') {
+    return 'ARQ'
+  }
   return nombre
     .trim()
     .split(/\s+/)

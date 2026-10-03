@@ -116,9 +116,9 @@ export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
             />
             <Tooltip
               content={<CustomTooltip formatValue={formatValue} resultado={resultado} />}
-              cursor={{ fill: 'rgba(0,0,0,0.04)' }}
+              cursor={{ fill: 'var(--surface-alt)', opacity: 0.6 }}
             />
-            <Legend iconSize={9} iconType="circle" wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
+            <Legend iconSize={9} iconType="circle" wrapperStyle={{ fontSize: 11, paddingTop: 10, color: 'var(--text-2)' }} />
             <Bar dataKey="Cuota Nominal" fill={nominalBarColor} radius={[4, 4, 0, 0]} />
             <Bar dataKey="Valor Real" fill={realBarColor} radius={[4, 4, 0, 0]} />
           </BarChart>

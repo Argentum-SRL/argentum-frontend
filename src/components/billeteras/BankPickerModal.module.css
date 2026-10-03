@@ -22,8 +22,11 @@
   justify-content: center;
   align-items: center;
   gap: 6px;
-  padding: 14px 24px 0;
+  padding: 14px 24px 10px;
   flex-shrink: 0;
+  background: var(--surface);
+  position: relative;
+  z-index: 10;
 }
 
 .dot {
@@ -42,13 +45,13 @@
   background: var(--surface-alt);
 }
 
-/* ── Slides container ─────────────────────────────────────────────────────── */
+/* ── Slides container con altura adaptativa ────────────────────────────────── */
 .slidesContainer {
   position: relative;
   width: 100%;
   overflow: hidden;
   max-height: 85dvh;
-  transition: height 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pickerStep {
@@ -56,7 +59,35 @@
 }
 
 .formStep {
-  height: 520px;
+  height: 440px;
+}
+
+.formStepCustom {
+  height: 500px;
+}
+
+@media (max-height: 740px) {
+  .pickerStep {
+    height: 75dvh;
+  }
+  .formStep {
+    height: min(440px, 75dvh);
+  }
+  .formStepCustom {
+    height: min(500px, 78dvh);
+  }
+}
+
+@media (max-width: 640px) {
+  .pickerStep {
+    height: 78dvh;
+  }
+  .formStep {
+    height: min(440px, 78dvh);
+  }
+  .formStepCustom {
+    height: min(500px, 80dvh);
+  }
 }
 
 .slide {
@@ -124,7 +155,7 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 .pickerHeader {
-  padding: 16px 20px 0;
+  padding: 16px 0 16px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -200,7 +231,10 @@
 .pickerBody {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 20px 20px;
+  overflow-x: hidden;
+  padding: 0 20px 20px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
 }
 
 /* For browsers that don't support scrollbar-width/color */
@@ -403,7 +437,6 @@
   align-items: center;
   gap: 10px;
   padding: 16px 20px 14px;
-  border-bottom: 1px solid var(--surface-alt);
   flex-shrink: 0;
 }
 
@@ -466,12 +499,86 @@
   color: var(--preview-color, var(--text));
 }
 
+.bankPreviewInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
 .bankPreviewNombre {
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
   margin: 0;
   line-height: 1.2;
+}
+
+.bankPreviewNombreRow {
+  display: flex;
+  align-items: center;
+}
+
+.bankPreviewNombreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.bankPreviewNombreText {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.pencilIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  transition: color 120ms ease;
+  flex-shrink: 0;
+}
+
+.bankPreviewNombreBtn:hover .pencilIconWrapper {
+  color: var(--text-2);
+}
+
+.inlineNameWrap {
+  display: flex;
+  align-items: center;
+}
+
+.inlineNameInput {
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--border);
+  border-radius: 0;
+  padding: 0 0 1px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  font-family: inherit;
+  outline: none;
+  box-shadow: none;
+  min-width: 100px;
+  max-width: 220px;
+  transition: border-color 140ms ease;
+}
+
+.inlineNameInput:focus {
+  outline: none;
+  box-shadow: none;
+  border-bottom-color: var(--text-2);
 }
 
 .bankPreviewTipo {
@@ -484,10 +591,29 @@
 .formBody {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
+}
+
+.formBodyWithHeader {
+  padding: 0;
+  gap: 0;
+}
+
+.formBodyWithHeader .formHeader {
+  padding: 16px 20px 14px;
+}
+
+.formFields {
+  padding: 14px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .formBody::-webkit-scrollbar {
@@ -668,6 +794,281 @@
   color: var(--text-3);
 }
 
+/* ── Panel de configuración inteligente & interactivo ─────────────────────── */
+.settingsCardsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.settingCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-subtle);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  font-family: inherit;
+  position: relative;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+[data-theme="dark"] .settingCard {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.settingCardClickable {
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+}
+
+.settingCardClickable:hover {
+  background: var(--surface-3);
+  border-color: rgba(var(--primary-rgb), 0.2);
+}
+
+[data-theme="dark"] .settingCardClickable:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.settingCardClickable:active {
+  transform: scale(0.992);
+}
+
+/* Estados activos en tarjetas */
+.settingCardActiveGold {
+  border-color: rgba(192, 162, 101, 0.45) !important;
+  background: rgba(192, 162, 101, 0.05) !important;
+}
+
+[data-theme="dark"] .settingCardActiveGold {
+  border-color: rgba(192, 162, 101, 0.4) !important;
+  background: rgba(192, 162, 101, 0.08) !important;
+}
+
+.settingCardActiveGreen {
+  border-color: rgba(46, 204, 113, 0.45) !important;
+  background: rgba(46, 204, 113, 0.05) !important;
+}
+
+[data-theme="dark"] .settingCardActiveGreen {
+  border-color: rgba(46, 204, 113, 0.4) !important;
+  background: rgba(46, 204, 113, 0.08) !important;
+}
+
+/* Icon Box */
+.settingIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.iconBoxDefault {
+  background: var(--surface);
+  color: var(--text-3);
+  border: 1px solid var(--border-subtle);
+}
+
+[data-theme="dark"] .iconBoxDefault {
+  background: var(--surface-3);
+  color: var(--text-3);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.iconBoxPrimary {
+  background: rgba(13, 32, 69, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(13, 32, 69, 0.12);
+}
+
+[data-theme="dark"] .iconBoxPrimary {
+  background: rgba(72, 120, 184, 0.16);
+  color: var(--primary-light);
+  border-color: rgba(72, 120, 184, 0.28);
+}
+
+.iconBoxGold {
+  background: rgba(192, 162, 101, 0.18);
+  color: var(--gold);
+  border: 1px solid rgba(192, 162, 101, 0.35);
+}
+
+.iconBoxGreen {
+  background: rgba(46, 204, 113, 0.18);
+  color: var(--success);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+}
+
+.starFilled {
+  fill: currentColor;
+}
+
+/* Tipografía e info */
+.settingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.settingLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settingLabel {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.settingSub {
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.25;
+  transition: color 150ms ease;
+}
+
+.settingSubHighlight {
+  color: var(--success);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .settingSubHighlight {
+  color: #4ade80;
+}
+
+/* Pills de estado activo */
+.badgePillGold {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(192, 162, 101, 0.2);
+  color: var(--gold);
+  letter-spacing: 0.02em;
+}
+
+.badgePillGreen {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(46, 204, 113, 0.2);
+  color: var(--success);
+  letter-spacing: 0.02em;
+}
+
+/* Badge / Input TNA */
+.tnaInputBadge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px 8px;
+  flex-shrink: 0;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+[data-theme="dark"] .tnaInputBadge {
+  background: var(--surface-3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.tnaInputBadge:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.tnaInput {
+  width: 52px;
+  height: 24px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  appearance: textfield;
+  -moz-appearance: textfield;
+  padding: 0;
+}
+
+.tnaInput::-webkit-outer-spin-button,
+.tnaInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tnaSuffix {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+  margin-left: 3px;
+  pointer-events: none;
+}
+
+/* Switches elegantes */
+.customSwitch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .customSwitch {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.switchActiveGold {
+  background: var(--gold, #C0A265) !important;
+}
+
+.switchActiveGreen {
+  background: var(--success, #2ECC71) !important;
+}
+
+.customSwitchThumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transform: translateX(0);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.switchThumbActive {
+  transform: translateX(16px);
+}
+
 /* Warning box */
 .warningBox {
   display: flex;
@@ -695,7 +1096,6 @@
 /* Footer fijo del form */
 .formFooter {
   padding: 14px 20px;
-  border-top: 1px solid var(--surface-alt);
   background: var(--surface);
   display: flex;
   gap: 8px;
@@ -744,10 +1144,6 @@
 
 /* ── Mobile ─────────────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .slidesContainer {
-    height: 85dvh;
-  }
-
   .pickerGrid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -806,7 +1202,8 @@
 [data-bank="bancosantafe"] { --bank-color: #005BA1; }
 [data-bank="credicoop"] { --bank-color: #005696; }
 [data-bank="cocos"] { --bank-color: #14D883; }
-[data-bank="claropay"] { --bank-color: #DA291C; }
+[data-bank="arq"] { --bank-color: #18181B; }
+[data-theme="dark"] [data-bank="arq"] { --bank-color: #E4E4E7; }
 [data-bank="ieb"] { --bank-color: #002F6C; }
 [data-bank="n1u"] { --bank-color: #6C5CE7; }
 [data-bank="astropay"] { --bank-color: #FF2D55; }

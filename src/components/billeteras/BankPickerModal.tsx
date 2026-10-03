@@ -1,7 +1,7 @@
 // ─── BankPickerModal — modal de dos pasos para crear billetera ────────────────
 
-import { useState, useMemo, useEffect, useReducer } from 'react'
-import { X, ChevronLeft, Search, Check } from '@/components/ui/icons'
+import { useState, useMemo, useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+import { X, ChevronLeft, Search, Check, Pencil, TrendingUp, Star, Landmark } from '@/components/ui/icons'
 import { BANKS, BANK_SECTIONS, CUSTOM_COLORS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
 import type { Billetera } from '@/types'
@@ -124,6 +124,7 @@ interface ModalState {
   esInversion: boolean
   colorCustom: string
   isSubmitting: boolean
+  isEditingName: boolean
 }
 
 type ModalAction = 
@@ -149,6 +150,7 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
         esInversion: false,
         colorCustom: CUSTOM_COLORS[0],
         isSubmitting: false,
+        isEditingName: false,
       }
     case 'SET_STEP':
       return { 
@@ -162,7 +164,8 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
         bankSeleccionado: action.bank,
         nombre: action.bank.id === 'custom' ? '' : action.bank.nombre,
         slideDirection: 'forward',
-        step: 'form'
+        step: 'form',
+        isEditingName: action.bank.id === 'custom',
       }
     case 'SET_SEARCH':
       return { ...state, searchQuery: action.query }
@@ -195,6 +198,7 @@ export default function BankPickerModal({
     esInversion: false,
     colorCustom: CUSTOM_COLORS[0],
     isSubmitting: false,
+    isEditingName: false,
   })
 
   const {
@@ -209,8 +213,49 @@ export default function BankPickerModal({
     esPrincipal,
     esInversion,
     colorCustom,
-    isSubmitting
+    isSubmitting,
+    isEditingName,
   } = state
+
+  const nameInputRef = useRef<HTMLInputElement>(null)
+  const formBodyRef = useRef<HTMLDivElement>(null)
+  const formFooterRef = useRef<HTMLDivElement>(null)
+  const [dynamicFormHeight, setDynamicFormHeight] = useState<number | null>(null)
+  const isCustom = bankSeleccionado?.id === 'custom'
+
+  useLayoutEffect(() => {
+    if (step !== 'form') return
+
+    const measure = () => {
+      if (formBodyRef.current && formFooterRef.current) {
+        let bodyH = 0
+        for (const child of Array.from(formBodyRef.current.children)) {
+          bodyH += (child as HTMLElement).offsetHeight
+        }
+        const footerH = formFooterRef.current.offsetHeight
+        const maxH = Math.round(window.innerHeight * 0.85)
+        const targetH = Math.min(bodyH + footerH + 4, maxH)
+        setDynamicFormHeight(targetH)
+      }
+    }
+
+    measure()
+
+    const el = formBodyRef.current
+    let observer: ResizeObserver | null = null
+    if (el) {
+      observer = new ResizeObserver(() => {
+        measure()
+      })
+      observer.observe(el)
+    }
+
+    window.addEventListener('resize', measure)
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [step, esPrincipal, isCustom, bankSeleccionado])
 
   // Reset cuando se abre
   useEffect(() => {
@@ -218,6 +263,14 @@ export default function BankPickerModal({
       dispatch({ type: 'RESET', monedaPrincipal: monedaPrincipalUsuario })
     }
   }, [isOpen, monedaPrincipalUsuario])
+
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus()
+      const len = nameInputRef.current.value.length
+      nameInputRef.current.setSelectionRange(len, len)
+    }
+  }, [isEditingName])
 
   // Filtrado de bancos
   const bancosFiltrados = useMemo(() => {
@@ -237,13 +290,20 @@ export default function BankPickerModal({
   }
 
   const handleBack = () => {
+    dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: false })
     dispatch({ type: 'SET_STEP', step: 'picker', direction: 'back' })
   }
 
   // Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!bankSeleccionado || !nombre.trim() || isSubmitting) return
+    const finalNombre = nombre.trim() || (!isCustom ? (bankSeleccionado?.nombre || '') : '')
+    if (!bankSeleccionado || !finalNombre || isSubmitting) {
+      if (!finalNombre) {
+        dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: true })
+      }
+      return
+    }
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
       let tnaVal: number | null = null
@@ -270,7 +330,23 @@ export default function BankPickerModal({
     }
   }
 
-  const isCustom = bankSeleccionado?.id === 'custom'
+  // Estimación de rendimiento diario inteligente
+  const tnaNum = parseFloat(tna) || 0
+  const saldoNum = saldo || 0
+  let yieldText = ''
+  if (tnaNum > 0) {
+    const dailyRate = tnaNum / 365
+    if (saldoNum > 0) {
+      const dailyIncome = (saldoNum * (tnaNum / 100)) / 365
+      const formattedIncome = dailyIncome.toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+      yieldText = `+${moneda === 'USD' ? 'US$' : '$'} ${formattedIncome}/día (~${dailyRate.toFixed(2)}%)`
+    } else {
+      yieldText = `~${dailyRate.toFixed(2)}% diario estimado`
+    }
+  }
 
   return (
     <Modal
@@ -278,6 +354,7 @@ export default function BankPickerModal({
       onClose={onClose}
       showHeader={false}
       noPadding
+      autoHeight
       ariaLabel="Agregar billetera"
     >
       <div className={styles.modalRoot}>
@@ -287,8 +364,21 @@ export default function BankPickerModal({
           <div className={`${styles.dot} ${step === 'form' ? styles.dotActive : styles.dotInactive}`} />
         </div>
 
-        {/* Contenedor con transición de slides */}
-        <div className={`${styles.slidesContainer} ${styles[step === 'picker' ? 'pickerStep' : 'formStep']}`}>
+        {/* Contenedor con transición de slides y altura adaptativa */}
+        <div
+          className={`${styles.slidesContainer} ${
+            step === 'picker'
+              ? styles.pickerStep
+              : isCustom
+              ? styles.formStepCustom
+              : styles.formStep
+          }`}
+          style={
+            step === 'form' && dynamicFormHeight
+              ? { height: `${dynamicFormHeight}px` }
+              : undefined
+          }
+        >
         {/* ── PASO 1: PICKER ── */}
         <div
           className={`${styles.slide} ${
@@ -299,48 +389,47 @@ export default function BankPickerModal({
               : styles.slideExitRight
           }`}
         >
-          {/* Header fijo */}
-          <div className={styles.pickerHeader}>
-            <div className={styles.headerTopRow}>
-              <div>
-                <h2 className={styles.pickerTitle}>¿Dónde tenés tu plata?</h2>
-                <p className={styles.pickerSubtitle}>Elegí el banco o billetera para comenzar</p>
-              </div>
-              <button
-                type="button"
-                className={styles.closeBtn}
-                onClick={onClose}
-                aria-label="Cerrar"
-              >
-                <X size={18} strokeWidth={1.75} />
-              </button>
-            </div>
-            {/* Search */}
-            <div className={styles.searchWrap}>
-              <Search size={15} className={styles.searchIcon} strokeWidth={1.75} />
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Buscar banco o billetera..."
-                value={searchQuery}
-                onChange={(e) => dispatch({ type: 'SET_SEARCH', query: e.target.value })}
-                autoFocus
-              />
-              {searchQuery && (
+          {/* Cuerpo scrolleable que incluye el header */}
+          <div className={styles.pickerBody}>
+            {/* Header del picker */}
+            <div className={styles.pickerHeader}>
+              <div className={styles.headerTopRow}>
+                <div>
+                  <h2 className={styles.pickerTitle}>¿Dónde tenés tu plata?</h2>
+                  <p className={styles.pickerSubtitle}>Elegí el banco o billetera para comenzar</p>
+                </div>
                 <button
                   type="button"
-                  className={styles.searchClear}
-                  onClick={() => dispatch({ type: 'SET_SEARCH', query: '' })}
-                  aria-label="Limpiar búsqueda"
+                  className={styles.closeBtn}
+                  onClick={onClose}
+                  aria-label="Cerrar"
                 >
-                  <X size={13} />
+                  <X size={18} strokeWidth={1.75} />
                 </button>
-              )}
+              </div>
+              {/* Search */}
+              <div className={styles.searchWrap}>
+                <Search size={15} className={styles.searchIcon} strokeWidth={1.75} />
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Buscar banco o billetera..."
+                  value={searchQuery}
+                  onChange={(e) => dispatch({ type: 'SET_SEARCH', query: e.target.value })}
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className={styles.searchClear}
+                    onClick={() => dispatch({ type: 'SET_SEARCH', query: '' })}
+                    aria-label="Limpiar búsqueda"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-
-          {/* Cuerpo scrolleable */}
-          <div className={styles.pickerBody}>
             {sinResultados ? (
               <div className={styles.noResults}>
                 <p className={styles.noResultsText}>
@@ -407,8 +496,13 @@ export default function BankPickerModal({
         >
           {bankSeleccionado && (
             <form onSubmit={handleSubmit} className={styles.formContainer}>
-              {/* Header del form */}
-              <div className={styles.formHeader}>
+              {/* Cuerpo scrolleable que incluye el header */}
+              <div
+                ref={formBodyRef}
+                className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+              >
+                {/* Header del form */}
+                <div className={styles.formHeader}>
                 <button
                   type="button"
                   className={styles.backBtn}
@@ -433,9 +527,56 @@ export default function BankPickerModal({
                     <PickerLogo bank={bankSeleccionado} size={36} />
                   )}
                   <div className={styles.bankPreviewInfo}>
-                    <p className={styles.bankPreviewNombre}>
-                      {isCustom ? (nombre || 'Billetera personalizada') : bankSeleccionado.nombre}
-                    </p>
+                    <div className={styles.bankPreviewNombreRow}>
+                      {isEditingName ? (
+                        <div className={styles.inlineNameWrap}>
+                          <input
+                            ref={nameInputRef}
+                            type="text"
+                            className={styles.inlineNameInput}
+                            value={nombre}
+                            onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
+                            onBlur={() => {
+                              if (!nombre.trim() && !isCustom && bankSeleccionado) {
+                                dispatch({ type: 'SET_FIELD', field: 'nombre', value: bankSeleccionado.nombre })
+                              }
+                              dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: false })
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                if (!nombre.trim() && !isCustom && bankSeleccionado) {
+                                  dispatch({ type: 'SET_FIELD', field: 'nombre', value: bankSeleccionado.nombre })
+                                }
+                                dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: false })
+                              } else if (e.key === 'Escape') {
+                                if (!isCustom && bankSeleccionado) {
+                                  dispatch({ type: 'SET_FIELD', field: 'nombre', value: bankSeleccionado.nombre })
+                                }
+                                dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: false })
+                              }
+                            }}
+                            placeholder={isCustom ? 'Nombre de tu billetera' : bankSeleccionado.nombre}
+                            maxLength={40}
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className={styles.bankPreviewNombreBtn}
+                          onClick={() => dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: true })}
+                          title="Editar nombre"
+                        >
+                          <span className={styles.bankPreviewNombreText}>
+                            {nombre.trim() || (isCustom ? 'Billetera personalizada' : bankSeleccionado.nombre)}
+                          </span>
+                          <span className={styles.pencilIconWrapper} aria-hidden="true">
+                            <Pencil size={13} strokeWidth={2} />
+                          </span>
+                        </button>
+                      )}
+                    </div>
                     <p className={styles.bankPreviewTipo}>
                       {bankSeleccionado.tipo === 'billetera_virtual' ? 'Billetera virtual'
                         : bankSeleccionado.tipo === 'banco_digital' ? 'Banco digital'
@@ -456,8 +597,8 @@ export default function BankPickerModal({
                 </button>
               </div>
 
-              {/* Cuerpo del form */}
-              <div className={styles.formBody}>
+              {/* Campos del form */}
+              <div className={styles.formFields}>
                 {/* Saldo inicial (Hero MontoInput full size) */}
                 <div className={styles.montoHeroField}>
                   <MontoInput
@@ -471,37 +612,116 @@ export default function BankPickerModal({
                   />
                 </div>
 
-                {/* Nombre */}
-                <div className={styles.formField}>
-                  <label className={styles.fieldLabel} htmlFor="bk-nombre">
-                    Nombre
-                  </label>
-                  <input
-                    id="bk-nombre"
-                    type="text"
-                    className={styles.fieldInput}
-                    value={nombre}
-                    onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombre', value: e.target.value })}
-                    placeholder="Nombre de tu billetera"
-                    required
-                  />
-                </div>
+                {/* Panel de configuración inteligente & interactivo */}
+                <div className={styles.settingsCardsList}>
+                  {/* Card 1: Tasa (TNA %) */}
+                  <div className={styles.settingCard}>
+                    <div className={`${styles.settingIconBox} ${styles.iconBoxPrimary}`}>
+                      <TrendingUp size={18} strokeWidth={2} />
+                    </div>
+                    <div className={styles.settingInfo}>
+                      <div className={styles.settingLabelRow}>
+                        <label htmlFor="bk-tna" className={styles.settingLabel}>
+                          Rendimiento (TNA)
+                        </label>
+                      </div>
+                      <span className={`${styles.settingSub} ${yieldText ? styles.settingSubHighlight : ''}`}>
+                        {yieldText || 'Rendimiento anual estimado • Opcional'}
+                      </span>
+                    </div>
+                    <div className={styles.tnaInputBadge}>
+                      <input
+                        id="bk-tna"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="1000"
+                        className={styles.tnaInput}
+                        value={tna}
+                        onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })}
+                        placeholder="0.0"
+                      />
+                      <span className={styles.tnaSuffix} aria-hidden="true">%</span>
+                    </div>
+                  </div>
 
-                {/* Tasa (TNA %) */}
-                <div className={styles.formField}>
-                  <label className={styles.fieldLabel} htmlFor="bk-tna">
-                    Tasa (TNA %) <span className={styles.fieldOptional}>(opcional)</span>
-                  </label>
-                  <input
-                    id="bk-tna"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    className={styles.fieldInput}
-                    value={tna}
-                    onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })}
-                    placeholder="Ej: 36.50"
-                  />
+                  {/* Card 2: Marcar como principal */}
+                  <button
+                    type="button"
+                    className={`${styles.settingCard} ${styles.settingCardClickable} ${
+                      esPrincipal ? styles.settingCardActiveGold : ''
+                    }`}
+                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
+                    role="switch"
+                    aria-checked={esPrincipal}
+                    aria-label="Marcar como billetera principal"
+                  >
+                    <div
+                      className={`${styles.settingIconBox} ${
+                        esPrincipal ? styles.iconBoxGold : styles.iconBoxDefault
+                      }`}
+                    >
+                      <Star size={18} strokeWidth={2} className={esPrincipal ? styles.starFilled : ''} />
+                    </div>
+                    <div className={styles.settingInfo}>
+                      <div className={styles.settingLabelRow}>
+                        <span className={styles.settingLabel}>Marcar como principal</span>
+                        {esPrincipal && <span className={styles.badgePillGold}>Principal</span>}
+                      </div>
+                      <span className={styles.settingSub}>
+                        Usar por defecto en transacciones
+                      </span>
+                    </div>
+                    <div
+                      className={`${styles.customSwitch} ${esPrincipal ? styles.switchActiveGold : ''}`}
+                      aria-hidden="true"
+                    >
+                      <div
+                        className={`${styles.customSwitchThumb} ${
+                          esPrincipal ? styles.switchThumbActive : ''
+                        }`}
+                      />
+                    </div>
+                  </button>
+
+                  {/* Card 3: Cuenta de inversión */}
+                  <button
+                    type="button"
+                    className={`${styles.settingCard} ${styles.settingCardClickable} ${
+                      esInversion ? styles.settingCardActiveGreen : ''
+                    }`}
+                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })}
+                    role="switch"
+                    aria-checked={esInversion}
+                    aria-label="Marcar como cuenta de inversión"
+                  >
+                    <div
+                      className={`${styles.settingIconBox} ${
+                        esInversion ? styles.iconBoxGreen : styles.iconBoxDefault
+                      }`}
+                    >
+                      <Landmark size={18} strokeWidth={2} />
+                    </div>
+                    <div className={styles.settingInfo}>
+                      <div className={styles.settingLabelRow}>
+                        <span className={styles.settingLabel}>Cuenta de inversión</span>
+                        {esInversion && <span className={styles.badgePillGreen}>Inversión</span>}
+                      </div>
+                      <span className={styles.settingSub}>
+                        Para rendimientos o ahorro a largo plazo
+                      </span>
+                    </div>
+                    <div
+                      className={`${styles.customSwitch} ${esInversion ? styles.switchActiveGreen : ''}`}
+                      aria-hidden="true"
+                    >
+                      <div
+                        className={`${styles.customSwitchThumb} ${
+                          esInversion ? styles.switchThumbActive : ''
+                        }`}
+                      />
+                    </div>
+                  </button>
                 </div>
 
                 {/* Color — solo para billetera personalizada */}
@@ -527,24 +747,6 @@ export default function BankPickerModal({
                   </div>
                 )}
 
-                {/* Marcar como principal */}
-                <button
-                  type="button"
-                  className={styles.principalRow}
-                  onClick={() => dispatch({ type: 'SET_FIELD', field: 'esPrincipal', value: !esPrincipal })}
-                  aria-label="Marcar como principal"
-                >
-                  <div className={`${styles.checkbox} ${esPrincipal ? styles.checkboxActive : ''}`}>
-                    {esPrincipal && <Check size={11} strokeWidth={3} color="white" />}
-                  </div>
-                  <div className={styles.principalInfo}>
-                    <span className={styles.principalLabel}>Marcar como principal</span>
-                    <span className={styles.principalSub}>
-                      Se usa por defecto al registrar transacciones
-                    </span>
-                  </div>
-                </button>
-
                 {/* Advertencia si ya hay una principal */}
                 {esPrincipal && billeteraPrincipalActual && (
                   <div className={styles.warningBox}>
@@ -555,35 +757,18 @@ export default function BankPickerModal({
                     </p>
                   </div>
                 )}
-
-                {/* Marcar como inversión */}
-                <button
-                  type="button"
-                  className={styles.principalRow}
-                  onClick={() => dispatch({ type: 'SET_FIELD', field: 'esInversion', value: !esInversion })}
-                  aria-label="Es una billetera de inversión o ahorro a largo plazo"
-                >
-                  <div className={`${styles.checkbox} ${esInversion ? styles.checkboxActive : ''}`}>
-                    {esInversion && <Check size={11} strokeWidth={3} color="white" />}
-                  </div>
-                  <div className={styles.principalInfo}>
-                    <span className={styles.principalLabel}>Billetera de inversión</span>
-                    <span className={styles.principalSub}>
-                      Inversión o ahorro a largo plazo
-                    </span>
-                  </div>
-                </button>
               </div>
+            </div>
 
               {/* Footer fijo */}
-              <div className={styles.formFooter}>
+              <div ref={formFooterRef} className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={onClose}>
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   className={styles.crearBtn}
-                  disabled={!nombre.trim() || isSubmitting}
+                  disabled={(!nombre.trim() && isCustom) || isSubmitting}
                 >
                   {isSubmitting ? 'Creando...' : 'Crear billetera'}
                 </button>

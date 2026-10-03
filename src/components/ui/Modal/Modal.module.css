@@ -62,14 +62,16 @@
   }
 }
 
-:global([data-theme="dark"]) .container {
-  background: #141a26;
+:global([data-theme="dark"]) .container,
+:global(.dark) .container {
+  background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
 }
 
 @media (max-width: 767px) {
-  :global([data-theme="dark"]) .container {
+  :global([data-theme="dark"]) .container,
+  :global(.dark) .container {
     border-bottom: none;
   }
 }

@@ -11,27 +11,39 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Argentum" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0E1117" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#0E1117" />
+    <meta name="theme-color" content="#F5F4F0" />
     <link rel="manifest" href="/manifest.json" />
     <title>Argentum</title>
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('argentum_theme');
+          if (saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+            document.documentElement.style.backgroundColor = '#0E1117';
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', '#0E1117');
+          } else {
+            document.documentElement.removeAttribute('data-theme');
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+            document.documentElement.style.backgroundColor = '#F5F4F0';
+          }
+        } catch (e) {}
+      })();
+    </script>
     <style>
       html, body {
         margin: 0;
         padding: 0;
+        background-color: #F5F4F0;
+        color-scheme: light;
       }
-      @media (prefers-color-scheme: dark) {
-        html, body {
-          background-color: #0E1117;
-          color-scheme: dark;
-        }
-      }
-      @media (prefers-color-scheme: light) {
-        html, body {
-          background-color: #F5F4F0;
-          color-scheme: light;
-        }
+      html.dark, html[data-theme="dark"] {
+        background-color: #0E1117 !important;
+        color-scheme: dark !important;
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -38,7 +38,8 @@
   transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
 }
 
-:global([data-theme="dark"]) .trigger {
+:global([data-theme="dark"]) .trigger,
+:global(.dark) .trigger {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.12);
 }
@@ -48,7 +49,8 @@
   box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
 }
 
-:global([data-theme="dark"]) .trigger:focus {
+:global([data-theme="dark"]) .trigger:focus,
+:global(.dark) .trigger:focus {
   box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
 }
 
@@ -108,8 +110,9 @@
   padding: 4px;
 }
 
-:global([data-theme="dark"]) .panel {
-  background: #141a26;
+:global([data-theme="dark"]) .panel,
+:global(.dark) .panel {
+  background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
 }
@@ -152,8 +155,9 @@
   -webkit-overflow-scrolling: touch;
 }
 
-:global([data-theme="dark"]) .mobileBottomSheet {
-  background: #141a26;
+:global([data-theme="dark"]) .mobileBottomSheet,
+:global(.dark) .mobileBottomSheet {
+  background: var(--surface);
   border-top-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5);
 }

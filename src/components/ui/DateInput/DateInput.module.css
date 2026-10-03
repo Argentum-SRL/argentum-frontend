@@ -38,6 +38,8 @@
   text-overflow: ellipsis;
 }
 
+:global([data-theme="dark"]) .input,
+:global(.dark) .input,
 [data-theme="dark"] .input {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.12);
@@ -62,6 +64,10 @@
   box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
 }
 
+:global([data-theme="dark"]) .input:focus,
+:global(.dark) .input:focus,
+:global([data-theme="dark"]) .inputFocused,
+:global(.dark) .inputFocused,
 [data-theme="dark"] .input:focus,
 [data-theme="dark"] .inputFocused {
   box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
@@ -254,8 +260,9 @@
   visibility: hidden;
 }
 
-:global([data-theme="dark"]) .popover {
-  background: #141a26;
+:global([data-theme="dark"]) .popover,
+:global(.dark) .popover {
+  background: var(--surface);
   border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
 }
@@ -290,8 +297,9 @@
   background-clip: padding-box;
 }
 
-:global([data-theme="dark"]) .bottomSheet {
-  background: #141a26;
+:global([data-theme="dark"]) .bottomSheet,
+:global(.dark) .bottomSheet {
+  background: var(--surface);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5);
 }

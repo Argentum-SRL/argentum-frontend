@@ -19,8 +19,9 @@ interface TransaccionRowProps {
   transaccion: Transaccion
   categoria?: Categoria
   billetera?: Billetera
-  onEdit: (id: string) => void
-  onDelete: (id: string) => void
+  onEdit?: (id: string) => void
+  onDelete?: (id: string) => void
+  hideWallet?: boolean
 }
 
 const METODO_PAGO_LABELS: Record<string, string> = {
@@ -35,7 +36,8 @@ const TransaccionRow = memo(({
   categoria,
   billetera,
   onEdit,
-  onDelete
+  onDelete,
+  hideWallet = false
 }: TransaccionRowProps) => {
   const isIngreso = transaccion.tipo === 'ingreso'
   const isPendiente = transaccion.estado_verificacion === 'pendiente'
@@ -81,18 +83,39 @@ const TransaccionRow = memo(({
   const subcategoriaNombre = isMeta ? 'Metas' : (transaccion.subcategoria?.nombre || 'General')
   const walletDisplayName = bankInfo?.name || billetera?.nombre || 'Billetera'
 
+  // Limpieza inteligente de categorías para evitar duplicaciones (ej: "Transporte / Transporte") y recortes innecesarios
+  const categoryDisplayText = useMemo(() => {
+    if (isAporteMeta) return 'Apartado para meta'
+    if (isRetiroMeta) return 'Retiro de meta'
+    
+    const cat = categoriaNombre.trim()
+    const sub = subcategoriaNombre.trim()
+    
+    // Si hay una subcategoría específica distinta de "General" y distinta del nombre de categoría,
+    // mostrar directamente la subcategoría para evitar saturar el espacio.
+    if (sub && sub.toLowerCase() !== 'general' && sub.toLowerCase() !== cat.toLowerCase()) {
+      return sub
+    }
+    
+    return cat
+  }, [isAporteMeta, isRetiroMeta, categoriaNombre, subcategoriaNombre])
+
+  const isClickable = typeof onEdit === 'function'
+
   return (
     <div 
-      onClick={() => onEdit(transaccion.id)}
-      className={`${styles.row} ${isPendiente ? styles.rowPendiente : ''}`}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onEdit(transaccion.id)
-        }
-      }}
+      {...(isClickable ? {
+        onClick: () => onEdit(transaccion.id),
+        role: 'button',
+        tabIndex: 0,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onEdit(transaccion.id)
+          }
+        },
+      } : {})}
+      className={`${styles.row} ${isClickable ? styles.rowClickable : styles.rowStatic} ${isPendiente ? styles.rowPendiente : ''}`}
       aria-label={`Transacción ${title}, monto ${formatMonto(transaccion.monto, transaccion.moneda)}`}
     >
       {/* ── 1. Category Squircle Avatar ──────────────────────────────────── */}
@@ -155,32 +178,32 @@ const TransaccionRow = memo(({
           </div>
         </div>
 
-        {/* Desktop Metadata Row (Ruta categoría + Chip billetera + Hora) */}
+        {/* Desktop Metadata Row (Categoría limpia + Chip billetera opcional + Hora) */}
         <div className={`${styles.metaRow} ${styles.desktopOnly}`}>
-          <div className={styles.categoryPath}>
-            <span className={styles.categoryMain}>{categoriaNombre}</span>
-            <span className={styles.categorySeparator}>/</span>
-            <span className={styles.categorySub}>{subcategoriaNombre}</span>
-          </div>
+          <span className={styles.categoryPath} title={categoryDisplayText}>
+            {categoryDisplayText}
+          </span>
 
-          <div className={styles.metaBullet}>•</div>
-
-          {/* Wallet Chip with mini logo */}
-          <div className={styles.walletChip}>
-            {bankInfo?.isCash ? (
-              <Banknote size={12} className={styles.walletIcon} />
-            ) : bankInfo?.logoUrl ? (
-              <img 
-                src={bankInfo.logoUrl} 
-                alt="" 
-                className={styles.bankLogo}
-                onError={(e) => { e.currentTarget.style.display = 'none' }}
-              />
-            ) : (
-              <Wallet size={12} className={styles.walletIcon} />
-            )}
-            <span className={styles.walletText}>{walletDisplayName}</span>
-          </div>
+          {!hideWallet && (
+            <>
+              <div className={styles.metaBullet}>•</div>
+              <div className={styles.walletChip} title={walletDisplayName}>
+                {bankInfo?.isCash ? (
+                  <Banknote size={12} className={styles.walletIcon} />
+                ) : bankInfo?.logoUrl ? (
+                  <img 
+                    src={bankInfo.logoUrl} 
+                    alt="" 
+                    className={styles.bankLogo}
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                ) : (
+                  <Wallet size={12} className={styles.walletIcon} />
+                )}
+                <span className={styles.walletText}>{walletDisplayName}</span>
+              </div>
+            </>
+          )}
 
           {hora && (
             <>
@@ -190,10 +213,11 @@ const TransaccionRow = memo(({
           )}
         </div>
 
-        {/* Mobile-Only Clean Subtitle (Solo categoría sin aglomeración) */}
+        {/* Mobile-Only Clean Subtitle */}
         <div className={`${styles.mobileSubtitleRow} ${styles.mobileOnly}`}>
-          <span className={styles.mobileCategoryText}>
-            {isAporteMeta ? 'Apartado para meta' : isRetiroMeta ? 'Retiro de meta' : (subcategoriaNombre !== title ? `${categoriaNombre} · ${subcategoriaNombre}` : categoriaNombre)}
+          <span className={styles.mobileCategoryText} title={categoryDisplayText}>
+            {categoryDisplayText}
+            {hora ? ` · ${hora}` : ''}
           </span>
         </div>
       </div>
@@ -212,31 +236,39 @@ const TransaccionRow = memo(({
           {isAporteMeta ? 'Apartado para meta' : isRetiroMeta ? 'Retiro de meta' : metodoLabel}
         </span>
 
-        {/* En Mobile: Nombre de la billetera limpio y claro */}
-        <span className={`${styles.mobileWalletName} ${styles.mobileOnly}`} title={walletDisplayName}>
-          {isAporteMeta ? `Apartado · ${walletDisplayName}` : walletDisplayName}
-        </span>
+        {/* En Mobile: Solo mostrar billetera si no está en la página de la billetera */}
+        {!hideWallet && (
+          <span className={`${styles.mobileWalletName} ${styles.mobileOnly}`} title={walletDisplayName}>
+            {isAporteMeta ? `Apartado · ${walletDisplayName}` : walletDisplayName}
+          </span>
+        )}
       </div>
 
-      {/* ── 4. Desktop Actions (Hover Delete & Chevron) ───────────────────── */}
-      <div className={`${styles.actionsArea} ${styles.desktopOnly}`}>
-        <button
-          type="button"
-          className={styles.deleteBtn}
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete(transaccion.id)
-          }}
-          aria-label="Eliminar transacción"
-          title="Eliminar transacción"
-        >
-          <Trash2 size={15} strokeWidth={1.8} />
-        </button>
+      {/* ── 4. Desktop Actions (Hover Delete opcional & Chevron opcional) ── */}
+      {(onDelete || isClickable) && (
+        <div className={`${styles.actionsArea} ${styles.desktopOnly}`}>
+          {onDelete && (
+            <button
+              type="button"
+              className={styles.deleteBtn}
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(transaccion.id)
+              }}
+              aria-label="Eliminar transacción"
+              title="Eliminar transacción"
+            >
+              <Trash2 size={15} strokeWidth={1.8} />
+            </button>
+          )}
 
-        <div className={styles.chevronAffordance}>
-          <ChevronRight size={16} strokeWidth={2} />
+          {isClickable && (
+            <div className={styles.chevronAffordance}>
+              <ChevronRight size={16} strokeWidth={2} />
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   )
 })

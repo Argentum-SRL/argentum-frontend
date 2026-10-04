@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { X, CreditCard, CheckCircle2, Edit3, AlertTriangle, Info, Check, DollarSign, ArrowRightLeft } from '@/components/ui/icons'
 import type { TarjetaCredito, Billetera, PagarTarjetaPayload } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { formatMonto } from '@/utils/format'
 import styles from './PagarResumenModal.module.css'
 
@@ -41,9 +42,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   isPaying,
 }) => {
   const [tipoPago, setTipoPago] = useState<'total' | 'otro'>('total')
-  const [montoCustom, setMontoCustom] = useState<string>('')
-  const [isInputFocused, setIsInputFocused] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [montoCustom, setMontoCustom] = useState<number | null>(null)
 
   // Multimoneda USD options
   const [modoUSD, setModoUSD] = useState<'dolares' | 'pesificar'>('dolares')
@@ -63,8 +62,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
     setPrevIsOpen(isOpen)
     if (isOpen) {
       setTipoPago('total')
-      setMontoCustom('')
-      setIsInputFocused(false)
+      setMontoCustom(null)
       const defaultUSD = billeterasUSD[0]?.id || ''
       setBilleteraUSDId(defaultUSD)
       const defaultARS = billeterasARS.find(b => b.id === tarjeta.billetera_id)?.id || billeterasARS[0]?.id || ''
@@ -84,7 +82,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
   const numMonto = tipoPago === 'total' 
     ? totalAPagar 
-    : (parseFloat(montoCustom) || 0)
+    : (montoCustom ?? 0)
 
   const isMenorQueTotal = numMonto < totalAPagar && numMonto > 0
   const isMenorQueMinimo = pagoMinimoEstimado > 0 && numMonto < pagoMinimoEstimado && numMonto > 0
@@ -114,16 +112,13 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
   const handleSelectTipo = (tipo: 'total' | 'otro') => {
     setTipoPago(tipo)
-    if (tipo === 'otro') {
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 50)
+    if (tipo === 'otro' && (montoCustom === null || montoCustom === 0)) {
+      setMontoCustom(totalAPagar)
     }
   }
 
   const handleQuickChip = (valor: number) => {
-    setMontoCustom(valor.toFixed(2))
-    inputRef.current?.focus()
+    setMontoCustom(valor)
   }
 
   const handleConfirm = async () => {
@@ -157,13 +152,15 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
     }
   }
 
-  const aclaracionMinimo = pagoMinimoAclaracion || 'Monto de referencia orientativo. El valor definitivo lo establece la entidad bancaria en el resumen de cuenta.'
+  const hasPriorDebt = deudaVencidaAnterior > 0
+  const hasRefinanced = saldoArrastrado > 0
+  const hasBreakdown = hasPriorDebt || hasRefinanced
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="md"
+      className={styles.modalPagarResumen}
       noPadding
       showHeader={false}
       autoHeight
@@ -172,13 +169,16 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         {/* Header */}
         <div className={styles.modalHeader}>
           <div className={styles.headerLeft}>
-            <div className={styles.headerTitleRow}>
-              <h2 className={styles.headerTitle}>
-                Pagar Resumen {monedaAPagar === 'USD' ? '(Dólares)' : '(Pesos)'}
-              </h2>
+            <h2 className={styles.headerTitle}>
+              Pagar Resumen
+            </h2>
+            <div className={styles.headerSubtitleRow}>
               <span className={styles.tarjetaBadge}>
-                <CreditCard size={13} />
-                {tarjeta.nombre}
+                <CreditCard size={12} />
+                <span>{tarjeta.nombre}</span>
+              </span>
+              <span className={styles.monedaBadge}>
+                {monedaAPagar === 'USD' ? 'Dólares' : 'Pesos'}
               </span>
             </div>
           </div>
@@ -187,6 +187,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
             className={styles.closeBtn}
             onClick={onClose}
             disabled={isPaying}
+            title="Cerrar"
             aria-label="Cerrar modal"
           >
             <X size={18} />
@@ -197,22 +198,26 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         <div className={styles.modalBody}>
           {/* Si es USD, Selector de Modo: Dólares vs Pesificar */}
           {monedaAPagar === 'USD' && (
-            <div className={styles.segmentedControl}>
+            <div className={styles.segmentedBar} role="radiogroup" aria-label="Modo de pago en dólares">
               <button
                 type="button"
-                className={`${styles.segmentBtn} ${modoUSD === 'dolares' ? styles.segmentBtnActive : ''}`}
+                role="radio"
+                aria-checked={modoUSD === 'dolares'}
+                className={`${styles.segmentedPill} ${modoUSD === 'dolares' ? styles.segmentedPillActive : ''}`}
                 onClick={() => setModoUSD('dolares')}
               >
-                <DollarSign size={16} />
-                Pagar en dólares
+                <DollarSign size={14} strokeWidth={2.2} />
+                <span>Pagar en dólares</span>
               </button>
               <button
                 type="button"
-                className={`${styles.segmentBtn} ${modoUSD === 'pesificar' ? styles.segmentBtnActive : ''}`}
+                role="radio"
+                aria-checked={modoUSD === 'pesificar'}
+                className={`${styles.segmentedPill} ${modoUSD === 'pesificar' ? styles.segmentedPillActive : ''}`}
                 onClick={() => setModoUSD('pesificar')}
               >
-                <ArrowRightLeft size={16} />
-                Pesificar a pesos
+                <ArrowRightLeft size={14} strokeWidth={2} />
+                <span>Pesificar a pesos</span>
               </button>
             </div>
           )}
@@ -220,12 +225,12 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           {/* Alerta si elige pagar en USD pero no tiene billetera USD */}
           {monedaAPagar === 'USD' && modoUSD === 'dolares' && billeterasUSD.length === 0 && (
             <div className={styles.walletMissingAlert}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertTriangle size={18} />
-                <span>No tenés ninguna billetera en dólares activa.</span>
+              <div className={styles.alertHeaderRow}>
+                <AlertTriangle size={16} />
+                <span>No tenés una cuenta en dólares activa</span>
               </div>
-              <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-2)' }}>
-                Podés pesificar tus consumos en dólares para pagarlos en pesos desde tu cuenta bancaria habitual con la cotización oficial y percepción.
+              <p className={styles.alertDesc}>
+                Podés pesificar tus consumos en dólares para pagarlos en pesos desde tu cuenta bancaria habitual con cotización oficial y percepciones.
               </p>
               <button
                 type="button"
@@ -239,12 +244,12 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
           {/* Selector de billetera para pago en USD */}
           {monedaAPagar === 'USD' && modoUSD === 'dolares' && billeterasUSD.length > 0 && (
-            <div>
-              <label className={styles.breakdownTitle} style={{ display: 'block', marginBottom: '6px' }}>
-                Billetera en dólares para debitar
+            <div className={styles.formField}>
+              <label className={styles.fieldLabel}>
+                Billetera en dólares a debitar
               </label>
               <select
-                className={styles.walletSelect}
+                className={styles.fieldSelect}
                 value={billeteraUSDId}
                 onChange={(e) => setBilleteraUSDId(e.target.value)}
               >
@@ -259,12 +264,12 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
           {/* Selector de billetera para pago Pesificado */}
           {monedaAPagar === 'USD' && modoUSD === 'pesificar' && (
-            <div>
-              <label className={styles.breakdownTitle} style={{ display: 'block', marginBottom: '6px' }}>
-                Cuenta en pesos para debitar
+            <div className={styles.formField}>
+              <label className={styles.fieldLabel}>
+                Cuenta en pesos a debitar
               </label>
               <select
-                className={styles.walletSelect}
+                className={styles.fieldSelect}
                 value={billeteraARSId}
                 onChange={(e) => setBilleteraARSId(e.target.value)}
               >
@@ -278,145 +283,140 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           )}
 
           {/* Segmented Control: Pagar Total vs Otro Monto */}
-          <div className={styles.segmentedControl}>
+          <div className={styles.segmentedBar} role="radiogroup" aria-label="Tipo de pago">
             <button
               type="button"
-              className={`${styles.segmentBtn} ${tipoPago === 'total' ? styles.segmentBtnActive : ''}`}
+              role="radio"
+              aria-checked={tipoPago === 'total'}
+              className={`${styles.segmentedPill} ${tipoPago === 'total' ? styles.segmentedPillActive : ''}`}
               onClick={() => handleSelectTipo('total')}
             >
-              <CheckCircle2 size={16} />
-              Pagar el total
+              <CheckCircle2 size={14} strokeWidth={2.2} />
+              <span>Pagar el total</span>
             </button>
             <button
               type="button"
-              className={`${styles.segmentBtn} ${tipoPago === 'otro' ? styles.segmentBtnActive : ''}`}
+              role="radio"
+              aria-checked={tipoPago === 'otro'}
+              className={`${styles.segmentedPill} ${tipoPago === 'otro' ? styles.segmentedPillActive : ''}`}
               onClick={() => handleSelectTipo('otro')}
             >
-              <Edit3 size={16} />
-              Ingresar otro monto
+              <Edit3 size={14} strokeWidth={2} />
+              <span>Ingresar otro monto</span>
             </button>
           </div>
 
-          {/* Hero Monto Card */}
-          <div className={`${styles.montoHeroCard} ${isInputFocused ? styles.montoHeroCardFocus : ''}`}>
-            <span className={styles.montoHeroLabel}>
-              {tipoPago === 'total' ? `Total a liquidar (${monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})` : `Monto a pagar (${monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})`}
-            </span>
-
-            {tipoPago === 'total' ? (
+          {/* Hero Monto Card / MontoInput */}
+          {tipoPago === 'total' ? (
+            <div className={styles.montoHeroCard}>
+              <span className={styles.montoHeroLabel}>Total a liquidar</span>
               <div className={styles.montoHeroAmountDisplay}>
                 {formatMonto(totalAPagar, monedaAPagar)}
               </div>
-            ) : (
-              <div className={styles.montoHeroInputWrapper}>
-                <span className={styles.montoHeroPrefix}>{monedaAPagar === 'USD' ? 'US$' : '$'}</span>
-                <input
-                  ref={inputRef}
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  max={totalAPagar}
-                  placeholder={`Hasta ${totalAPagar}`}
-                  value={montoCustom}
-                  onChange={(e) => setMontoCustom(e.target.value)}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
-                  className={styles.montoHeroInput}
-                  disabled={isPaying}
-                />
-              </div>
-            )}
+            </div>
+          ) : (
+            <div className={styles.montoCustomSection}>
+              <MontoInput
+                label="Monto a abonar"
+                value={montoCustom}
+                onChange={setMontoCustom}
+                moneda={monedaAPagar}
+                hideCurrency
+                allowDecimals
+                placeholder={`Hasta ${formatMonto(totalAPagar, monedaAPagar)}`}
+                max={totalAPagar}
+                autoFocus
+                disabled={isPaying}
+              />
 
-            {/* Quick chips si elige otro monto */}
-            {tipoPago === 'otro' && totalAPagar > 0 && (
-              <div className={styles.quickChipsRow}>
-                {pagoMinimoEstimado > 0 && pagoMinimoEstimado < totalAPagar && (
+              {/* Quick chips si elige otro monto */}
+              {totalAPagar > 0 && (
+                <div className={styles.quickChipsRow}>
+                  {pagoMinimoEstimado > 0 && pagoMinimoEstimado < totalAPagar && (
+                    <button
+                      type="button"
+                      className={`${styles.quickChip} ${numMonto === pagoMinimoEstimado ? styles.quickChipActive : ''}`}
+                      onClick={() => handleQuickChip(pagoMinimoEstimado)}
+                    >
+                      Mínimo ({formatMonto(pagoMinimoEstimado, monedaAPagar)})
+                    </button>
+                  )}
                   <button
                     type="button"
-                    className={`${styles.quickChip} ${numMonto === pagoMinimoEstimado ? styles.quickChipActive : ''}`}
-                    onClick={() => handleQuickChip(pagoMinimoEstimado)}
+                    className={`${styles.quickChip} ${numMonto === Math.round(totalAPagar * 0.5) ? styles.quickChipActive : ''}`}
+                    onClick={() => handleQuickChip(Math.round(totalAPagar * 0.5))}
                   >
-                    Mínimo ({formatMonto(pagoMinimoEstimado, monedaAPagar)})
+                    50% ({formatMonto(Math.round(totalAPagar * 0.5), monedaAPagar)})
                   </button>
-                )}
-                <button
-                  type="button"
-                  className={`${styles.quickChip} ${numMonto === Math.round(totalAPagar * 0.5) ? styles.quickChipActive : ''}`}
-                  onClick={() => handleQuickChip(Math.round(totalAPagar * 0.5))}
-                >
-                  50% ({formatMonto(Math.round(totalAPagar * 0.5), monedaAPagar)})
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.quickChip} ${numMonto === totalAPagar ? styles.quickChipActive : ''}`}
-                  onClick={() => handleQuickChip(totalAPagar)}
-                >
-                  Total ({formatMonto(totalAPagar, monedaAPagar)})
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Desglose previo de la liquidación en moneda original */}
-          <div className={styles.breakdownCard}>
-            <span className={styles.breakdownTitle}>Desglose del resumen ({monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})</span>
-            
-            <div className={styles.breakdownRow}>
-              <span>Cuotas del período</span>
-              <span className={styles.breakdownVal}>{formatMonto(cuotasPeriodo, monedaAPagar)}</span>
+                </div>
+              )}
             </div>
+          )}
 
-            {deudaVencidaAnterior > 0 && (
-              <div className={styles.breakdownRow}>
-                <span>Deuda vencida anterior</span>
-                <span className={styles.breakdownVal}>{formatMonto(deudaVencidaAnterior, monedaAPagar)}</span>
-              </div>
-            )}
-
-            {saldoArrastrado > 0 && (
-              <div className={styles.breakdownRow}>
-                <span>Saldo financiado anterior</span>
-                <span className={`${styles.breakdownVal} ${styles.breakdownValFinanciado}`}>
-                  {formatMonto(saldoArrastrado, monedaAPagar)}
-                </span>
-              </div>
-            )}
-
-            <div className={styles.breakdownDivider} />
-
-            <div className={styles.breakdownTotalRow}>
-              <span>Total en {monedaAPagar === 'ARS' ? 'pesos' : 'dólares'}</span>
-              <span className={styles.breakdownTotalVal}>{formatMonto(totalAPagar, monedaAPagar)}</span>
-            </div>
-          </div>
-
-          {/* Tarjeta especial de Pesificación con campos editables (Tarea 3.5) */}
-          {monedaAPagar === 'USD' && modoUSD === 'pesificar' && (
-            <div className={styles.breakdownCard} style={{ borderColor: 'var(--primary)' }}>
-              <span className={styles.breakdownTitle} style={{ color: 'var(--primary)' }}>
-                Conversión y Percepción Impositiva
+          {/* Desglose: solo si hay conceptos adicionales (deuda anterior o saldo financiado) */}
+          {hasBreakdown && (
+            <div className={styles.breakdownCard}>
+              <span className={styles.breakdownTitle}>
+                Desglose del resumen
               </span>
+              
+              <div className={styles.breakdownRow}>
+                <span>Cuotas del período</span>
+                <span className={styles.breakdownVal}>{formatMonto(cuotasPeriodo, monedaAPagar)}</span>
+              </div>
 
-              {(!cotizacionOficialPropuesta && !cotizacionCustom) && (
-                <div className={styles.cotizacionAlert}>
-                  <AlertTriangle size={16} />
-                  <span>No hay cotización automática para la fecha de cierre. Ingresá la cotización oficial del día de cierre.</span>
+              {hasPriorDebt && (
+                <div className={styles.breakdownRow}>
+                  <span>Deuda vencida anterior</span>
+                  <span className={styles.debtValue}>+{formatMonto(deudaVencidaAnterior, monedaAPagar)}</span>
                 </div>
               )}
 
-              <div className={styles.breakdownRow}>
-                <span>Monto en dólares</span>
-                <span className={styles.breakdownVal}>{formatMonto(numMonto, 'USD')}</span>
+              {hasRefinanced && (
+                <div className={styles.breakdownRow}>
+                  <span>Saldo financiado anterior</span>
+                  <span className={styles.debtValue}>+{formatMonto(saldoArrastrado, monedaAPagar)}</span>
+                </div>
+              )}
+
+              <div className={styles.breakdownDivider} />
+
+              <div className={styles.breakdownTotalRow}>
+                <span>Total del resumen</span>
+                <span className={styles.breakdownTotalVal}>{formatMonto(totalAPagar, monedaAPagar)}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Tarjeta especial de Pesificación con campos editables */}
+          {monedaAPagar === 'USD' && modoUSD === 'pesificar' && (
+            <div className={styles.pesificacionCard}>
+              <div className={styles.pesificacionHeader}>
+                <span className={styles.pesificacionTitle}>
+                  Conversión oficial y percepción
+                </span>
               </div>
 
-              <div className={styles.breakdownRow}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {(!cotizacionOficialPropuesta && !cotizacionCustom) && (
+                <div className={styles.cotizacionAlert}>
+                  <AlertTriangle size={15} />
+                  <span>Ingresá la cotización oficial del día de cierre del resumen.</span>
+                </div>
+              )}
+
+              <div className={styles.pesificacionRow}>
+                <span>Monto en dólares</span>
+                <span className={styles.pesificacionVal}>{formatMonto(numMonto, 'USD')}</span>
+              </div>
+
+              <div className={styles.pesificacionRow}>
+                <span className={styles.pesificacionLabelWithHelp}>
                   Cotización oficial aplicada
-                  <span title="Dólar oficial vendedor al cierre del resumen" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'help' }}>
+                  <span title="Dólar oficial vendedor al cierre del resumen" className={styles.helpIcon}>
                     <Info size={13} />
                   </span>
                 </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div className={styles.inlineInputWrapper}>
                   <span>$</span>
                   <input
                     type="number"
@@ -429,9 +429,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                 </div>
               </div>
 
-              <div className={styles.breakdownRow}>
-                <span>Monto convertido en pesos</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div className={styles.pesificacionRow}>
+                <span>Monto convertido</span>
+                <div className={styles.inlineInputWrapper}>
                   <span>$</span>
                   <input
                     type="number"
@@ -444,9 +444,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                 </div>
               </div>
 
-              <div className={styles.breakdownRow}>
+              <div className={styles.pesificacionRow}>
                 <span>Percepción impositiva ({percPercent}%)</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div className={styles.inlineInputWrapper}>
                   <span>$</span>
                   <input
                     type="number"
@@ -461,38 +461,34 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
               <div className={styles.breakdownDivider} />
 
-              <div className={styles.breakdownTotalRow}>
-                <span style={{ color: 'var(--primary)', fontWeight: 800 }}>Total final a debitar en pesos</span>
-                <span style={{ color: 'var(--primary)', fontSize: '16px', fontWeight: 800 }}>
+              <div className={styles.pesificacionTotalRow}>
+                <span className={styles.pesificacionTotalLabel}>Total final a debitar</span>
+                <span className={styles.pesificacionTotalVal}>
                   {formatMonto(totalPesosFinal, 'ARS')}
                 </span>
               </div>
-              <span style={{ fontSize: '11px', color: 'var(--text-3)', lineHeight: 1.3 }}>
-                Se debitarán {formatMonto(totalPesosFinal, 'ARS')} de tu billetera: {formatMonto(subtotalPesosFinal, 'ARS')} de pago de tarjeta y {formatMonto(percepcionFinal, 'ARS')} como gasto impositivo (Banco / Impuestos).
-              </span>
             </div>
           )}
 
           {/* Box de Pago Mínimo Estimado */}
           {pagoMinimoEstimado > 0 && (
-            <div className={styles.minimoBox}>
+            <div className={styles.minimoBox} title={pagoMinimoAclaracion || 'Monto de referencia orientativo bancario'}>
               <div className={styles.minimoTop}>
                 <div className={styles.minimoLabelGroup}>
-                  <span>Pago mínimo estimado ({monedaAPagar === 'ARS' ? 'Pesos' : 'Dólares'})</span>
+                  <span>Pago mínimo</span>
                   <span className={styles.minimoBadge}>Estimado</span>
                 </div>
                 <span className={styles.minimoVal}>{formatMonto(pagoMinimoEstimado, monedaAPagar)}</span>
               </div>
-              <span className={styles.minimoAclaracion}>{aclaracionMinimo}</span>
             </div>
           )}
 
           {/* Advertencia si monto < total */}
           {isMenorQueTotal && (
             <div className={styles.alertWarning}>
-              <Info size={18} className={styles.alertIcon} />
+              <Info size={16} className={styles.alertIcon} />
               <span>
-                El saldo restante quedará como saldo financiado en {monedaAPagar === 'ARS' ? 'pesos' : 'dólares'} y pasará al próximo resumen. El banco cobrará intereses según las condiciones de la tarjeta.
+                El saldo restante quedará como saldo financiado y pasará al próximo resumen generando intereses bancarios.
               </span>
             </div>
           )}
@@ -500,9 +496,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           {/* Advertencia si monto < mínimo estimado */}
           {isMenorQueMinimo && (
             <div className={styles.alertDanger}>
-              <AlertTriangle size={18} className={styles.alertIcon} />
+              <AlertTriangle size={16} className={styles.alertIcon} />
               <span>
-                El monto ingresado es menor al pago mínimo estimado. Pagar menos del mínimo podría generar intereses punitorios.
+                El monto es menor al pago mínimo estimado. Esto podría generar intereses punitorios en tu cuenta.
               </span>
             </div>
           )}
@@ -528,11 +524,13 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
               'Procesando...'
             ) : (
               <>
-                <Check size={16} />
-                {monedaAPagar === 'USD' && modoUSD === 'pesificar'
-                  ? `Confirmar pago (${formatMonto(totalPesosFinal, 'ARS')})`
-                  : `Confirmar pago (${formatMonto(numMonto, monedaAPagar)})`
-                }
+                <Check size={16} strokeWidth={2.5} />
+                <span>
+                  {monedaAPagar === 'USD' && modoUSD === 'pesificar'
+                    ? `Confirmar (${formatMonto(totalPesosFinal, 'ARS')})`
+                    : `Confirmar pago (${formatMonto(numMonto, monedaAPagar)})`
+                  }
+                </span>
               </>
             )}
           </button>

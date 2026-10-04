@@ -9,8 +9,9 @@ interface DayGroupProps {
   transacciones: Transaccion[]
   categorias: Categoria[]
   billeteras: Billetera[]
-  onEdit: (id: string) => void
-  onDelete: (id: string) => void
+  onEdit?: (id: string) => void
+  onDelete?: (id: string) => void
+  hideWallet?: boolean
 }
 
 const DIAS_SEMANA = [
@@ -77,6 +78,7 @@ const DayGroup = memo(({
   billeteras,
   onEdit,
   onDelete,
+  hideWallet = false,
 }: DayGroupProps) => {
   const dayInfo = useMemo(() => getFormattedDayInfo(fecha), [fecha])
 
@@ -110,6 +112,7 @@ const DayGroup = memo(({
               billetera={bill}
               onEdit={onEdit}
               onDelete={onDelete}
+              hideWallet={hideWallet}
             />
           )
         })}

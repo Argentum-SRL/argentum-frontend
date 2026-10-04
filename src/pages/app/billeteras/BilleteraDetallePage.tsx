@@ -248,40 +248,6 @@ const BilleteraDetallePage: React.FC = () => {
     })
   }, [billetera, billeteras, open, refreshData])
 
-  const handleEditMovimiento = useCallback((txId: string) => {
-    const tx = movimientos.find(t => t.id === txId)
-    if (!tx || !billetera) return
-    open('transaccion', {
-      data: {
-        transaccion: tx,
-        billeteras: billeteras,
-        categorias,
-        tarjetas,
-        onSuccess: refreshData,
-      },
-    })
-  }, [movimientos, billetera, billeteras, categorias, tarjetas, open, refreshData])
-
-  const handleDeleteMovimiento = useCallback((txId: string) => {
-    const tx = movimientos.find(t => t.id === txId)
-    if (!tx) return
-    confirm({
-      title: 'Eliminar transacción',
-      description: '¿Estás seguro de que querés eliminar esta transacción? Esta acción no se puede deshacer.',
-      variant: 'danger',
-      confirmLabel: 'Eliminar',
-      onConfirm: async () => {
-        try {
-          await transaccionService.deleteTransaccion(txId)
-          sileo.success({ title: 'Transacción eliminada' })
-          refreshData()
-        } catch (e) {
-          console.error(e)
-          sileo.error({ title: 'Error al eliminar la transacción' })
-        }
-      },
-    })
-  }, [movimientos, confirm, refreshData])
 
   const loadTarjetas = async () => {
     if (!id) return
@@ -410,30 +376,34 @@ const BilleteraDetallePage: React.FC = () => {
               )}
             </div>
 
-            {/* Nombre y detalle */}
+            {/* Nombre y badge */}
             <div className={styles.headerIdentity}>
               <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
                 {billetera.es_efectivo ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : billetera.nombre}
               </h1>
-              <span className={`${styles.headerDetail} ${isLight ? styles.textLight : styles.textDark}`}>
-                {billetera.es_principal && <span className={styles.principal}>Principal</span>}
-                {billetera.moneda === 'USD' ? 'Dólares' : 'Pesos'}
-              </span>
-              <button
-                type="button"
-                className={styles.headerEditBtn}
-                onClick={handleEditarBilletera}
-                title="Editar billetera"
-                aria-label="Editar billetera"
-              >
-                <Edit2 size={15} />
-              </button>
+              {billetera.es_principal && (
+                <span className={`${styles.principal} ${isLight ? styles.textLight : styles.textDark}`}>
+                  Principal
+                </span>
+              )}
             </div>
+
+            <button
+              type="button"
+              className={styles.headerEditBtn}
+              onClick={handleEditarBilletera}
+              title="Editar billetera"
+              aria-label="Editar billetera"
+            >
+              <Edit2 size={14} />
+            </button>
           </div>
 
           {/* Saldo */}
           <div className={styles.headerSaldo}>
-            <span className={styles.headerSaldoLabel}>Saldo actual</span>
+            <span className={`${styles.headerSaldoLabel} ${isLight ? styles.textLight : styles.textDark}`}>
+              Saldo actual
+            </span>
             <div className={`${styles.headerSaldoValue} ${isLight ? styles.textLight : styles.textDark}`}>
               {formatMonto(billetera.saldo_actual, billetera.moneda)}
             </div>
@@ -487,14 +457,20 @@ const BilleteraDetallePage: React.FC = () => {
 
       {/* Switch de pestañas solo para mobile (solo si no es efectivo) */}
       {!billetera.es_efectivo && (
-        <div className={styles.tabsContainer}>
+        <div className={styles.tabsContainer} role="tablist" aria-label="Secciones de la billetera">
           <button 
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'movimientos'}
             className={`${styles.tabBtn} ${activeTab === 'movimientos' ? styles.tabBtnActive : ''}`}
             onClick={() => setActiveTab('movimientos')}
           >
             Movimientos
           </button>
           <button 
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'credito'}
             className={`${styles.tabBtn} ${activeTab === 'credito' ? styles.tabBtnActive : ''}`}
             onClick={() => setActiveTab('credito')}
           >
@@ -526,8 +502,7 @@ const BilleteraDetallePage: React.FC = () => {
                   transacciones={txs}
                   categorias={categorias}
                   billeteras={[billetera]}
-                  onEdit={handleEditMovimiento}
-                  onDelete={handleDeleteMovimiento}
+                  hideWallet={true}
                 />
               ))}
             </div>
@@ -594,22 +569,7 @@ const BilleteraDetallePage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Resumen de la tarjeta seleccionada — solo si no es el slide ghost */}
-                {tarjetas.length > 0 && selectedTarjetaIndex < tarjetas.length && (
-                  <div className={styles.tarjetaSummary}>
-                    <TarjetaSummary 
-                      tarjeta={tarjetas[selectedTarjetaIndex]} 
-                      billeteras={billeteras}
-                      categorias={categorias}
-                      todasLasTarjetas={tarjetas}
-                      onRefresh={refreshData}
-                      isExpanded={isResumenExpanded}
-                      onToggleExpand={() => setIsResumenExpanded(!isResumenExpanded)}
-                    />
-                  </div>
-                )}
-
-                {/* Indicador de posición */}
+                {/* Indicador de posición del carrusel */}
                 <div className={styles.carouselIndicator}>
                   {[...Array(tarjetas.length + 1)].map((_, index) => (
                     <button
@@ -621,8 +581,27 @@ const BilleteraDetallePage: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Nuevo componente de presión financiera futura */}
-                <PresionFuturaCard meses={6} />
+                {/* Resumen de la tarjeta seleccionada — solo si no es el slide ghost */}
+                {tarjetas.length > 0 && selectedTarjetaIndex < tarjetas.length && (
+                  <div className={styles.tarjetaSummary}>
+                    <TarjetaSummary 
+                      tarjeta={tarjetas[selectedTarjetaIndex]} 
+                      billeteras={billeteras}
+                      onRefresh={refreshData}
+                      isExpanded={isResumenExpanded}
+                      onToggleExpand={() => setIsResumenExpanded(!isResumenExpanded)}
+                    />
+                  </div>
+                )}
+
+                {/* Componente de compromisos de cuotas futuras de la tarjeta actual */}
+                {selectedTarjetaIndex < tarjetas.length && (
+                  <PresionFuturaCard 
+                    tarjetaId={tarjetas[selectedTarjetaIndex].id}
+                    tarjetaNombre={tarjetas[selectedTarjetaIndex].nombre}
+                    meses={6} 
+                  />
+                )}
               </>
             )}
           </section>

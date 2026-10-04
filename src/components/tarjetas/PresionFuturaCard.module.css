@@ -1,238 +1,318 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PresionFuturaCard.module.css — Clean FinTech & Design System Card
+   ═══════════════════════════════════════════════════════════════════ */
+
 .summaryContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px 0;
-  width: 100%;
-}
-
-.ticket {
-  --ticket-bg: #ffffff;
-  --ticket-text: #1a1a1a;
-  --ticket-text-secondary: #333333;
-  --ticket-text-muted: #999999;
-  --ticket-border: #eeeeee;
-  --ticket-dashed-border: #dddddd;
-  --ticket-page-bg: var(--page, #f4f4f4);
-  --ticket-row-border: #f9f9f9;
-  --ticket-progress-bg: #f3f4f6;
-  --ticket-chip-color: #666666;
-  --ticket-chip-bg: #f5f5f5;
-  --ticket-chip-border: #e5e5e5;
-
-  background: var(--ticket-bg);
-  border-radius: 2px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  position: relative;
-  padding: 20px 20px 16px;
-  color: var(--ticket-text);
-  display: flex;
-  flex-direction: column;
   gap: 14px;
-  border: 1px solid var(--ticket-border);
-}
-
-/* Efecto dentado */
-.ticket::before,
-.ticket::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background-size: 12px 12px;
-  z-index: 2;
-}
-
-.ticket::before {
-  top: -3px;
-  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
-}
-
-.ticket::after {
-  bottom: -3px;
-  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
-}
-
-.ticketHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px dashed var(--ticket-dashed-border);
-  padding-bottom: 10px;
-}
-
-.headerLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.ticketLabel {
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--ticket-text-muted);
-  letter-spacing: 0.5px;
-}
-
-.ticketDate {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ticket-text);
-}
-
-.ticketContent {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Fila de mes */
-.mesRow {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--ticket-row-border);
-}
-
-.mesRow:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.mesRowMain {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.mesLabel {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ticket-text-secondary);
-  width: 70px;
-}
-
-.progressContainer {
-  flex: 1;
-  height: 6px;
-  background-color: var(--ticket-progress-bg);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progressBar {
-  height: 100%;
-  background-color: var(--primary, #1e3a8a);
-  border-radius: 3px;
-  width: 0%;
-  transition: width 0.3s ease;
-}
-
-.mesTotal {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ticket-text);
-  text-align: right;
-  width: 85px;
-}
-
-/* Detalle por tarjeta */
-.detalleTarjetas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-left: 70px; /* alinear con el inicio de la barra */
-  margin-top: 2px;
-}
-
-.chipTarjeta {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--ticket-chip-color);
-  background-color: var(--ticket-chip-bg);
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--ticket-chip-border);
-}
-
-/* Dark mode logic para el ticket (papel) */
-[data-theme="dark"] .ticket,
-:global([data-theme="dark"]) .ticket {
-  --ticket-bg: var(--surface, #161b24);
-  --ticket-text: var(--text, #e6ecf2);
-  --ticket-text-secondary: var(--text-2, #8894a8);
-  --ticket-text-muted: var(--text-3, #5a6b78);
-  --ticket-border: var(--border, #1e2530);
-  --ticket-dashed-border: var(--text-3, #5a6b78);
-  --ticket-page-bg: var(--page, #0e1117);
-  --ticket-row-border: var(--border, #1e2530);
-  --ticket-progress-bg: var(--surface-alt, #1e2530);
-  --ticket-chip-color: var(--text-2, #8894a8);
-  --ticket-chip-bg: var(--surface-alt, #1e2530);
-  --ticket-chip-border: var(--border, #1e2530);
-}
-
-/* Skeleton loader */
-.skeletonRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 32px;
-}
-
-.skeletonItem {
-  background: #f3f4f6;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-.skeletonHeaderLabel {
-  width: 120px;
-  height: 12px;
-  margin-bottom: 6px;
-}
-
-.skeletonHeaderDetail {
-  width: 200px;
-  height: 14px;
-}
-
-.skeletonLabel {
-  width: 60px;
-  height: 12px;
-}
-
-.skeletonBar {
-  flex: 1;
-  height: 6px;
-}
-
-.skeletonTotal {
-  width: 70px;
-  height: 12px;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
+  width: 100%;
 }
 
 .summaryContainerMulti {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
 }
 
 @media (min-width: 1024px) {
   .summaryContainerMulti {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: stretch;
   }
 }
 
+/* ── Tarjeta Principal (Design System Card) ─────────────────────── */
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.headerIcon {
+  color: var(--primary, #2563EB);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.mesesTag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+.cardSubtitle {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-3);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  flex-shrink: 0;
+  gap: 1px;
+}
+
+.totalLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.totalValue {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ── Lista de Meses / Barras ────────────────────────────────────── */
+.monthsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.monthRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.monthRow:hover {
+  background: var(--surface-alt);
+}
+
+.monthLabelCol {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.monthLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.barArea {
+  flex: 1;
+  min-width: 0;
+}
+
+.barTrack {
+  height: 7px;
+  background: var(--surface-alt);
+  border-radius: 9999px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.barFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary, #2563EB) 0%, #3B82F6 100%);
+  border-radius: 9999px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.monthTotalCol {
+  width: 85px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.monthTotal {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Empty State Limpio ─────────────────────────────────────────── */
+.emptyCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.emptyIconCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+.emptyInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.emptyTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.emptyDesc {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-3);
+  line-height: 1.35;
+}
+
+/* ── Skeleton Loading ───────────────────────────────────────────── */
+.skeletonCard {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.skeletonItem {
+  background: var(--surface-alt);
+  border-radius: 6px;
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.skeletonHeaderLabel {
+  width: 110px;
+  height: 14px;
+  margin-bottom: 4px;
+}
+
+.skeletonHeaderDetail {
+  width: 160px;
+  height: 11px;
+}
+
+.skeletonTotalLabel {
+  width: 70px;
+  height: 10px;
+  margin-bottom: 4px;
+}
+
+.skeletonTotalValue {
+  width: 80px;
+  height: 14px;
+}
+
+.skeletonLabel {
+  width: 50px;
+  height: 12px;
+}
+
+.skeletonBar {
+  flex: 1;
+  height: 7px;
+  border-radius: 9999px;
+}
+
+.skeletonTotal {
+  width: 65px;
+  height: 12px;
+}
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 14px 14px;
+  }
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .headerRight {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .monthLabelCol {
+    width: 50px;
+  }
+  .monthTotalCol {
+    width: 75px;
+  }
+}

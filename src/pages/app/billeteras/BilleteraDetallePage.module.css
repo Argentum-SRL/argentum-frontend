@@ -5,6 +5,12 @@
   gap: 18px;
 }
 
+@media (max-width: 767px) {
+  .container {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 @media (min-width: 768px) {
   .container {
     gap: 24px;
@@ -25,18 +31,27 @@
   padding: 40px;
 }
 
-/* ── Header Card — similar a BilleteraCard ───────────────────────────────── */
+/* ── Header Card — adaptativo y sin desbordes ───────────────────────────── */
 .headerCard {
   position: relative;
   border-radius: 18px;
   overflow: hidden;
-  height: 72px;        /* altura fija — no cambia entre renders */
-  flex-shrink: 0;      /* no se comprime dentro del flex container padre */
+  height: auto;
+  min-height: 84px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+@media (min-width: 640px) {
+  .headerCard {
+    border-radius: 20px;
+    height: 76px;
+    min-height: unset;
+  }
 }
 
 @media (min-width: 768px) {
   .headerCard {
-    border-radius: 20px;
     height: 80px;
   }
 }
@@ -58,38 +73,49 @@
   display: none;
 }
 
-/* ── Inner — contenido sobre el fondo EN UNA LINEA ─────────────────────── */
+/* ── Inner — adaptable en mobile y fila limpia en desktop ─────────────────── */
 .headerInner {
   position: relative;
   z-index: 1;
-  height: 100%;                  /* ocupa toda la altura del headerCard */
-  padding: 0 20px;               /* solo padding horizontal, el vertical lo maneja el height */
+  padding: 14px 16px;
   display: flex;
-  flex-direction: row;
-  align-items: center;           /* centrado vertical */
+  flex-direction: column;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   box-sizing: border-box;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .headerInner {
+    height: 100%;
+    padding: 0 24px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
 }
 
 @media (min-width: 768px) {
   .headerInner {
     padding: 0 28px;
-    gap: 16px;
   }
 }
 
 .headerLeftCol {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1;
+  gap: 10px;
+  width: 100%;
   min-width: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .headerLeftCol {
-    gap: 16px;
+    gap: 14px;
+    flex: 1;
+    width: auto;
   }
 }
 
@@ -103,25 +129,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   border: none;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
   flex-shrink: 0;
 }
 
 .backBtn:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.24);
   color: white;
+  transform: scale(1.04);
 }
 
 /* ── Header Logo circular ────────────────────────────────────────────────── */
 .headerLogo {
-  width: 40px; height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -129,11 +157,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
 }
 
 .headerLogo img {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -144,29 +173,30 @@
   letter-spacing: -0.3px;
 }
 
-/* ── Header Identity — nombre y detalle ──────────────────────────────────── */
+/* ── Header Identity — nombre y badge ────────────────────────────────────── */
 .headerIdentity {
   flex: 1;
   min-width: 0;
   display: flex;
   align-items: center;
-}
-
-@media (min-width: 768px) {
-  .headerIdentity {
-    gap: 8px;
-  }
+  gap: 8px;
+  overflow: hidden;
 }
 
 .headerName {
-  font-size: 18px;
+  font-size: 16.5px;
   font-weight: 700;
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .headerName {
+    font-size: 18px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -175,62 +205,90 @@
   }
 }
 
-.headerDetail {
-  display: none;
+.principal {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
-  .headerDetail {
-    display: inline-flex;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0.9;
-    white-space: nowrap;
+/* ── Header Edit Button ──────────────────────────────────────────────────── */
+.headerEditBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.headerEditBtn:hover {
+  background: rgba(255, 255, 255, 0.24);
+  color: white;
+  transform: scale(1.05);
+}
+
+@media (min-width: 640px) {
+  .headerEditBtn {
+    margin-left: 0;
   }
 }
 
-.principal {
-  display: inline-block;
-  padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-right: 6px;
-}
-
-/* ── Header Saldo — derecha ──────────────────────────────────────────────── */
+/* ── Header Saldo — adaptable ────────────────────────────────────────────── */
 .headerSaldo {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
-  gap: 2px;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .headerSaldo {
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    width: auto;
+    padding-top: 0;
+    border-top: none;
+    gap: 2px;
+  }
 }
 
 .headerSaldoLabel {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .headerSaldoLabel {
-    display: block;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    opacity: 0.75;
-  }
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+  white-space: nowrap;
 }
 
 .headerSaldoValue {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 @media (min-width: 768px) {
@@ -241,10 +299,11 @@
 
 .tabsContainer {
   display: flex;
-  background: var(--surface-alt);
-  border-radius: 12px;
-  padding: 4px;
   width: 100%;
+  background: transparent;
+  padding: 0;
+  border: none;
+  gap: 8px;
   box-sizing: border-box;
 }
 
@@ -256,22 +315,79 @@
 
 .tabBtn {
   flex: 1;
-  border: none;
-  background: transparent;
-  padding: 10px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-3);
-  border-radius: 9px;
+  min-width: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: center;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.tabBtn:active {
+  transform: scale(0.975);
 }
 
 .tabBtnActive {
-  background: var(--surface);
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  border-color: var(--border) !important;
+  z-index: 2;
+}
+
+:global([data-theme="dark"]) .tabBtn,
+:global(.dark) .tabBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-2);
+}
+
+:global([data-theme="dark"]) .tabBtn:hover,
+:global(.dark) .tabBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
   color: var(--text);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="dark"]) .tabBtnActive,
+:global(.dark) .tabBtnActive {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 420px) {
+  .tabsContainer {
+    gap: 6px;
+  }
+  .tabBtn {
+    font-size: 12px;
+    gap: 4px;
+    padding: 0 4px;
+    height: 38px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -314,9 +430,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px; /* Reducido de 16px */
-  margin-bottom: 20px;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 20px auto;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .carouselContainer {
+    gap: 8px;
+    max-width: 100%;
+  }
 }
 
 .carouselContainerShrunk {
@@ -332,7 +458,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 50%; /* Más circular */
+  border-radius: 50%;
   background: var(--surface);
   border: 1px solid var(--surface-alt);
   color: var(--text-3);
@@ -342,25 +468,38 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
+@media (max-width: 360px) {
+  .carouselBtn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
 .carouselBtn:hover {
   background: var(--surface-alt);
   color: var(--primary);
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .carouselBtn:active {
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 
 /* ── Carousel Preview ────────────────────────────────────────────────────── */
 .carouselPreview {
-  flex: 0 1 320px;
+  flex: 1 1 360px;
+  max-width: 360px;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .nuevaTarjetaGhost {
   width: 100%;
+  max-width: 360px;
   aspect-ratio: 1.586 / 1;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 2px dashed var(--surface-alt);
   background: var(--surface);
   cursor: pointer;
@@ -369,6 +508,7 @@
   justify-content: center;
   transition: all 0.2s ease;
   color: var(--text-3);
+  box-sizing: border-box;
 }
 
 .nuevaTarjetaGhost:hover {
@@ -382,36 +522,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: clamp(8px, 3cqi, 12px);
 }
 
 .ghostInner span {
-  font-size: 13px;
+  font-size: clamp(11px, 3.6cqi, 13px);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-/* ── Tarjeta Summary ─────────────────────────────────────────────────────── */
-.tarjetaSummary {
-  margin-bottom: 16px;
 }
 
 /* ── Carousel Indicator ──────────────────────────────────────────────────── */
 .carouselIndicator {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 6px;
+  margin-top: 4px;
+  margin-bottom: 14px;
 }
 
 .indicator {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--surface-alt);
-  border: none;
+  border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
 }
 
 .indicator:hover {
@@ -420,8 +559,14 @@
 
 .indicatorActive {
   background: var(--primary);
-  width: 24px;
+  border-color: var(--primary);
+  width: 22px;
   border-radius: 4px;
+}
+
+/* ── Tarjeta Summary ─────────────────────────────────────────────────────── */
+.tarjetaSummary {
+  margin-bottom: 14px;
 }
 
 /* ── Text colors ─────────────────────────────────────────────────────────── */
@@ -583,19 +728,23 @@
   justify-content: center;
   background: rgba(255, 255, 255, 0.12);
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
   flex-shrink: 0;
-  margin-left: 6px;
 }
 
 .headerEditBtn:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.24);
   color: white;
+  transform: scale(1.05);
+}
+
+.headerEditBtn:active {
+  transform: scale(0.95);
 }
 
 /* ── Rendimiento Estimado Banner / Card ─────────────────────────────────── */

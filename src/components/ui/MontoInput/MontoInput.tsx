@@ -157,7 +157,7 @@ const MontoInput = memo(({
           </>
         )}
         <div className={styles.montoHeroInput}>
-          <span className={styles.montoHeroPrefix}>$</span>
+          <span className={styles.montoHeroPrefix}>{moneda === 'USD' ? 'US$' : '$'}</span>
           <input
             ref={inputRef}
             type="text"

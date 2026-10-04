@@ -472,14 +472,20 @@ export default function TransaccionesPage() {
       </div>
 
       {/* Switch de pestañas solo para mobile */}
-      <div className={styles.tabsContainer}>
+      <div className={styles.tabsContainer} role="tablist" aria-label="Secciones de transacciones">
         <button 
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'historial'}
           className={`${styles.tabBtn} ${activeTab === 'historial' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('historial')}
         >
           Historial
         </button>
         <button 
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'cuotas'}
           className={`${styles.tabBtn} ${activeTab === 'cuotas' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('cuotas')}
         >

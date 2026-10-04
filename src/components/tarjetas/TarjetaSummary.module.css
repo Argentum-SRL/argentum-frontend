@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px 0;
   width: 100%;
 }
 
@@ -11,271 +10,552 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px; /* Flechas más cerca del título */
-  margin-bottom: 4px;
+  gap: 16px;
+  margin-bottom: 2px;
 }
 
 .navBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border-subtle);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--surface-alt);
   color: var(--text-2);
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .navBtn:hover:not(:disabled) {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+  background: var(--surface-alt);
+  color: var(--primary);
+  border-color: var(--border);
+  transform: scale(1.06);
+}
+
+.navBtn:active:not(:disabled) {
+  transform: scale(0.94);
 }
 
 .navBtn:disabled {
-  opacity: 0.2;
+  opacity: 0.3;
   cursor: not-allowed;
+  transform: none;
+}
+
+.navCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 150px;
 }
 
 .monthTitle {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   color: var(--text);
   margin: 0;
-  min-width: 140px;
   text-align: center;
+  line-height: 1.2;
 }
 
-/* ── Ticket Optimizado ── */
-.ticket {
-  --ticket-bg: #ffffff;
-  --ticket-text: #1a1a1a;
-  --ticket-text-secondary: #555555;
-  --ticket-text-muted: #999999;
-  --ticket-border: #eeeeee;
-  --ticket-dashed-border: #dddddd;
-  --ticket-page-bg: var(--page, #f4f4f4);
-  --ticket-row-bg: #f9f9f9;
-  --ticket-btn-hover: #f0f0f0;
+.navSubtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+}
 
-  background: var(--ticket-bg);
-  border-radius: 2px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  position: relative;
-  padding: 20px 20px 16px; /* Padding reducido */
-  color: var(--ticket-text);
+/* ── Tarjeta de Resumen (Clean FinTech Card) ── */
+.summaryCard {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border);
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  border: 1px solid var(--ticket-border);
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-/* Efecto dentado más sutil */
-.ticket::before,
-.ticket::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background-size: 12px 12px;
-  z-index: 2;
+@media (max-width: 480px) {
+  .summaryCard {
+    padding: 14px 14px;
+    border-radius: 14px;
+    gap: 12px;
+  }
 }
 
-.ticket::before {
-  top: -3px;
-  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
-}
-
-.ticket::after {
-  bottom: -3px;
-  background-image: radial-gradient(circle, transparent 70%, var(--ticket-page-bg) 70%);
-}
-
-.ticketHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px dashed var(--ticket-dashed-border);
-  padding-bottom: 10px;
-}
-
-.headerLeft {
+/* ── Lista de Ítems / Consumos ── */
+.itemListContainer {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 10px;
+  border-bottom: 1px solid var(--surface-alt);
+  padding-bottom: 14px;
 }
 
-.ticketLabel {
-  font-size: 9px;
+.itemsHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.itemsHeaderTitle {
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--ticket-text-muted);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
 }
 
-.ticketDate {
-  font-size: 12px;
+.itemsCountBadge {
+  font-size: 10px;
   font-weight: 700;
-  color: var(--ticket-text);
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text-2);
 }
 
-.ticketContent {
+.itemList {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Menos espacio entre items */
+  gap: 4px;
 }
 
 .itemRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: transparent;
+  transition: background 0.15s ease;
+  gap: 10px;
 }
 
-.itemInfo {
+.itemRow:hover {
+  background: var(--surface-alt);
+}
+
+.itemRowFinanciado {
+  background: color-mix(in srgb, var(--warning, #f59e0b) 8%, transparent);
+  border-left: 3px solid var(--warning, #f59e0b);
+}
+
+.itemMain {
   display: flex;
   flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.itemTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .itemTitle {
   font-size: 13px;
   font-weight: 600;
-  color: var(--ticket-text);
-  line-height: 1.2;
+  color: var(--text);
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.itemTitlePaid {
+  text-decoration: line-through;
+  opacity: 0.5;
 }
 
 .itemSub {
-  font-size: 10px;
-  color: var(--ticket-text-muted);
+  font-size: 11px;
+  color: var(--text-3);
   font-weight: 500;
+  line-height: 1.2;
 }
 
-.itemMontoContainer {
+.badgeFinanciado {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--warning, #d97706);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.itemRight {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .itemMonto {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: var(--ticket-text);
+  color: var(--text);
+  white-space: nowrap;
 }
 
-.itemActions {
-  display: flex;
-  gap: 6px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.itemRow:hover .itemActions {
-  opacity: 1;
-}
-
-.actionBtn {
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: var(--ticket-text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.actionBtn:hover {
-  background: var(--ticket-btn-hover);
-  color: var(--ticket-text);
-}
-
-.actionBtn:nth-child(2):hover {
-  background: #fee2e2;
-  color: #ef4444;
-}
-
-.ticketFooter {
-  border-top: 1px dashed var(--ticket-dashed-border);
-  padding-top: 12px;
+/* ── Footer y Liquidación ── */
+.summaryFooter {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
-.totalRow {
+.singleMonedaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0 6px;
+  border-bottom: 1px solid var(--surface-alt);
+}
+
+.breakdownRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.debtValue {
+  color: var(--warning, #d97706);
+  font-weight: 600;
+}
+
+/* Total Principal (Hero) */
+.heroTotalRow {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  padding: 2px 0;
 }
 
-.totalLabel {
-  font-size: 11px;
+.heroTotalLabel {
+  font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--ticket-text-secondary);
+  letter-spacing: 0.06em;
+  color: var(--text-2);
 }
 
-.totalValue {
-  font-size: 20px;
+.heroTotalValue {
+  font-size: 22px;
   font-weight: 800;
-  color: var(--ticket-text);
+  color: var(--text);
+  letter-spacing: -0.02em;
 }
 
+@media (max-width: 480px) {
+  .heroTotalValue {
+    font-size: 20px;
+  }
+}
+
+/* Pago Mínimo Compacto */
+.minimoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+}
+
+.minimoLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.minimoTag {
+  font-size: 9px;
+  padding: 1px 5px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-3);
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+:global([data-theme="dark"]) .minimoTag {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.minimoVal {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── Multimoneda ── */
+.bimonedaContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.monedaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--surface-alt);
+  border-radius: 10px;
+}
+
+.monedaBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monedaBadge {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.monedaEstimacionRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.monedaEstimacionVal {
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.monedaEstimacionTag {
+  color: var(--text-3);
+  font-size: 10px;
+}
+
+/* Fila de Vencimiento */
 .vencimientoRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--ticket-row-bg);
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  transition: all 0.2s ease;
+}
+
+.vencimientoLeft {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.vencimientoIcon {
+  color: var(--text-3);
 }
 
 .vencimientoLabel {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--ticket-text-secondary);
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .vencimientoValue {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  color: var(--ticket-text);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .vencimientoUrgent {
+  background: rgba(239, 68, 68, 0.1);
   color: #dc2626;
-  background: #fee2e2;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* Dark mode logic para el ticket (papel) */
-[data-theme="dark"] .ticket,
-:global([data-theme="dark"]) .ticket {
-  --ticket-bg: var(--surface, #161b24);
-  --ticket-text: var(--text, #e6ecf2);
-  --ticket-text-secondary: var(--text-2, #8894a8);
-  --ticket-text-muted: var(--text-3, #5a6b78);
-  --ticket-border: var(--border, #1e2530);
-  --ticket-dashed-border: var(--text-3, #5a6b78);
-  --ticket-page-bg: var(--page, #0e1117);
-  --ticket-row-bg: var(--surface-alt, #1e2530);
-  --ticket-btn-hover: var(--surface-alt, #1e2530);
+.vencimientoUrgent .vencimientoIcon {
+  color: #dc2626;
+}
+
+.vencimientoUrgent .vencimientoValue {
+  color: #dc2626;
+}
+
+.urgentBadge {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #dc2626;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Botones de Pago */
+.buttonsRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.payBtn {
+  background: var(--primary, #0D2045);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.payBtn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+
+.payBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.payBtn:disabled {
+  background: var(--surface-alt);
+  color: var(--text-3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.payBtnSecondary {
+  flex: 1;
+  background: #059669;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 11px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.payBtnSecondary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.paidBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-sizing: border-box;
+}
+
+:global([data-theme="dark"]) .paidBadge {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+/* Botón Expandir / Contraer */
+.expandBtn {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0 0;
+  width: 100%;
+  border-top: 1px solid var(--surface-alt);
+  margin-top: 2px;
+  transition: color 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.expandBtn:hover {
+  color: var(--text);
 }
 
 .loadingSkeleton {
-  height: 240px;
+  height: 200px;
   width: 100%;
   background: var(--surface-alt);
-  border-radius: 12px;
+  border-radius: 16px;
   animation: pulse 1.5s infinite;
 }
 
@@ -285,270 +565,31 @@
   100% { opacity: 0.5; }
 }
 
-.emptyState {
-  padding: 24px 0;
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
   text-align: center;
-  color: #aaa;
-  font-size: 12px;
-  font-style: italic;
 }
 
-.expandBtn {
-  background: transparent;
-  border: none;
-  color: var(--primary);
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 0 0;
-  width: 100%;
-  border-top: 1px dashed var(--ticket-dashed-border);
-  margin-top: 10px;
-  transition: color 0.2s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.expandBtn:hover {
-  color: var(--text-2);
-}
-
-.payBtn {
-  background: var(--primary, #1e3a8a);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 12px;
-  width: 100%;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.payBtn:hover:not(:disabled) {
-  background: var(--primary-hover, #1d4ed8);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-}
-
-.payBtn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.payBtn:disabled {
-  background: var(--surface-alt, #f3f4f6);
-  color: var(--text-3, #9ca3af);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.paidBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: var(--success-bg, #eafaf1);
-  color: var(--success, #2ecc71);
-  font-weight: 800;
-  font-size: 11px;
-  padding: 10px 14px;
-  border-radius: 6px;
-  border: 1.5px solid rgba(46, 204, 113, 0.2);
-  margin-top: 12px;
-  width: 100%;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-
-.unpaidBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: rgba(168, 144, 90, 0.15);
-  color: var(--gold, #d4a300);
-  font-weight: 800;
-  font-size: 11px;
-  padding: 10px 14px;
-  border-radius: 6px;
-  border: 1.5px solid rgba(212, 163, 0, 0.2);
-  margin-top: 12px;
-  width: 100%;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-
-.itemTitlePaid {
-  text-decoration: line-through;
-  opacity: 0.55;
-}
-
-.unpaidContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.itemRowFinanciado {
-  background: color-mix(in srgb, var(--warning, #f59e0b) 6%, transparent);
-  border-left: 3px solid var(--warning, #f59e0b);
-  border-radius: 4px;
-  padding: 8px 10px;
-}
-
-.itemTitleWrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.badgeFinanciado {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(245, 158, 11, 0.18);
-  color: var(--warning, #d97706);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.minimoRow {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 8px 0;
-  border-top: 1px dashed var(--ticket-dashed-border);
-}
-
-.minimoTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.minimoLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ticket-text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.minimoTag {
-  font-size: 10px;
-  padding: 1px 5px;
-  background: var(--surface-alt, #e5e7eb);
-  color: var(--text-2, #4b5563);
-  border-radius: 3px;
-  font-weight: 500;
-}
-
-.minimoVal {
+.errorText {
   font-size: 13px;
-  font-weight: 700;
-  color: var(--ticket-text);
-}
-
-.minimoAclaracion {
-  font-size: 10px;
-  color: var(--ticket-text-muted);
-  line-height: 1.3;
-}
-
-/* ── Multimoneda en Ticket ── */
-.monedaBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 0;
-  border-top: 1px dashed var(--ticket-dashed-border);
-}
-
-.monedaBlockHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2px;
-}
-
-.monedaBadge {
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: var(--surface-alt, #e5e7eb);
-  color: var(--text-2, #374151);
-}
-
-.monedaEstimacionRow {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 4px 0;
-}
-
-.monedaEstimacionVal {
-  font-size: 12px;
+  color: var(--error);
   font-weight: 600;
-  color: var(--ticket-text-secondary);
 }
 
-.monedaEstimacionTag {
-  font-size: 10.5px;
-  color: var(--ticket-text-muted);
-  font-style: italic;
-}
-
-.buttonsRow {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-  margin-top: 8px;
-}
-
-.payBtnSecondary {
-  flex: 1;
-  background: #10b981;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
+.retryBtn {
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 10px 12px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: opacity 0.2s ease;
 }
-
-.payBtnSecondary:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-
-

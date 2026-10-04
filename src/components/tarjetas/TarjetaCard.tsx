@@ -165,33 +165,26 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
         </div>
       </div>
 
-      <div className={styles.content}>
-        <div className={styles.divider} />
+      {((mostrarAlerta && !isFlipped) || (tarjeta.resumen_actual && tarjeta.resumen_actual.total_comprometido_resumen_actual > 0)) && (
+        <div className={styles.content}>
+          <div className={styles.divider} />
 
-        <div className="flex justify-between items-center">
-          {mostrarAlerta && !isFlipped && (
-            <div className={styles.chipAlerta}>
-              <Clock size={12} />
-              <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
-            </div>
-          )}
-          
-          {tarjeta.resumen_actual && tarjeta.resumen_actual.total_comprometido_resumen_actual > 0 && (
-            <span 
-              ref={el => {
-                if (el) {
-                  el.style.fontSize = '12px'
-                  el.style.fontWeight = '600'
-                  el.style.color = 'var(--text-3)'
-                  el.style.marginLeft = 'auto'
-                }
-              }}
-            >
-              Resumen: {formatMonto(tarjeta.resumen_actual.total_comprometido_resumen_actual, tarjeta.moneda)}
-            </span>
-          )}
+          <div className="flex justify-between items-center">
+            {mostrarAlerta && !isFlipped && (
+              <div className={styles.chipAlerta}>
+                <Clock size={12} />
+                <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
+              </div>
+            )}
+            
+            {tarjeta.resumen_actual && tarjeta.resumen_actual.total_comprometido_resumen_actual > 0 && (
+              <span className={styles.resumenMontoLabel}>
+                Resumen: {formatMonto(tarjeta.resumen_actual.total_comprometido_resumen_actual, tarjeta.moneda)}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -1,60 +1,163 @@
-.modal {
+/* ─── TarjetaModal.module.css — 100% Matched to TransferenciaModal / TransaccionModal ─── */
+
+/* ── Modal Dialog Size (Desktop 540px vs Mobile 100% Bottom Sheet) ── */
+@media (min-width: 768px) {
+  .modalTarjeta {
+    width: 540px !important;
+    max-width: min(540px, calc(100vw - 32px)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .modalTarjeta {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+.modalTarjeta :global(.content) {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* ── Slides container & animations ───────────────────────────────────────── */
+.slidesContainer {
+  position: relative;
   width: 100%;
-  max-width: 440px;
-  height: auto;
-  max-height: 85vh;
-  background: var(--surface);
-  border-radius: 28px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  position: relative;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-.baseModalOverride {
-  background: transparent !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  overflow: visible !important;
-  animation: none !important;
-  width: auto !important;
-  max-width: none !important;
-  display: flex !important;
-  justify-content: center !important;
-}
-
-.modalHeader {
-  padding: 24px 24px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--surface-alt);
+  min-height: 0;
+  overflow: hidden;
+  max-height: 90dvh;
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
   background: var(--surface);
-  z-index: 10;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.slideForward {
+  animation: slideInRight 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slideBack {
+  animation: slideInLeft 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Step Indicator Dots (Funden fluidamente con el body) ────────────────── */
+.stepDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 20px 4px;
+  background: var(--surface);
   flex-shrink: 0;
 }
 
-.formBody {
+.stepDot {
+  height: 5px;
+  border-radius: 99px;
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--surface-alt);
+}
+
+.stepDotActive {
+  background: var(--primary);
+  width: 20px;
+}
+
+.stepDotInactive {
+  width: 6px;
+  opacity: 0.4;
+}
+
+/* ── Formulario Base ─────────────────────────────────────────────────────── */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 8px;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.backBtn, .closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease;
+}
+
+.backBtn:hover, .closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.formBody {
+  padding: 4px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 20px 24px;
-  -ms-overflow-style: none;
+  overscroll-behavior-y: contain;
 }
 
 .formBody::-webkit-scrollbar {
-  display: none;
+  width: 4px;
 }
 
-.stepWrapper {
-  width: 100%;
-}
-
-/* ── Campos de Formulario ────────────────────────────────────────────────── */
-.formSection {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.formBody::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
 }
 
 .formField {
@@ -65,267 +168,563 @@
 
 .fieldLabel {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.7px;
 }
 
 .fieldInput {
-  width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  background: var(--surface-alt);
-  border: 1.5px solid transparent;
-  border-radius: 14px;
-  font-size: 15px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
   color: var(--text);
-  transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 150ms ease, background 150ms ease;
+  font-family: inherit;
+  width: 100%;
 }
 
 .fieldInput:focus {
-  outline: none;
-  border-color: var(--primary);
+  border-color: var(--border);
   background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.inputGrid3 {
+.fieldHint {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+/* ── Redes Grid & Apple-Style Interactive Brand Tiles ───────────────────────── */
+.redGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  width: 100%;
+  padding: 8px 2px 14px;
+  overflow: visible;
 }
 
-/* ── MontoHero (Límite) ──────────────────────────────────────────────────── */
-.montoContainer {
+.redTile {
+  position: relative;
+  height: 68px;
+  border-radius: 16px;
+  border: none;
+  background: var(--page);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px 4px 6px;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateY(3px) scale(0.93);
+  opacity: 0.52;
+  filter: saturate(0.65) brightness(0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 240ms ease,
+              filter 240ms ease,
+              background 240ms ease;
 }
 
-.montoInputWrap {
+@media (hover: hover) and (pointer: fine) {
+  .redTile[data-active="false"]:hover {
+    transform: translateY(0px) scale(0.98);
+    opacity: 0.82;
+    filter: saturate(0.9) brightness(0.96);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+    background: var(--surface);
+  }
+}
+
+/* Active Tile: Popping forward toward the user in 3D, elevated & radiant (Apple Depth Model) */
+.redTile[data-active="true"] {
+  transform: translateY(-4px) scale(1.04);
+  opacity: 1;
+  filter: saturate(1.05) brightness(1.01);
+  background: var(--surface);
+  z-index: 5;
+  box-shadow: 0 8px 20px -2px rgba(0, 0, 0, 0.12),
+              0 3px 6px -1px rgba(0, 0, 0, 0.06);
+}
+
+:global([data-theme="dark"]) .redTile[data-active="true"] {
+  background: #1e293b;
+  box-shadow: 0 10px 24px -2px rgba(0, 0, 0, 0.45),
+              0 4px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Subtle gloss reflection overlay */
+.redTile[data-active="true"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.08) 100%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+/* Tactile Spring Press */
+.redTile:active {
+  transform: translateY(-3px) scale(1.02);
+  transition-duration: 80ms;
+}
+
+.redLogoWrapper {
+  height: 28px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+
+.networkLogoImg {
+  max-height: 24px;
+  max-width: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
+  transition: transform 200ms ease;
+}
+
+.redTile[data-active="true"] .networkLogoImg {
+  transform: scale(1.05);
+}
+
+.redTileLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1;
+  transition: color 200ms ease;
+  white-space: nowrap;
+}
+
+.redTile[data-active="true"] .redTileLabel {
+  color: var(--text);
+  font-weight: 800;
+}
+
+/* ── Digits Input Hero (Estrictamente en un único renglón) ────────────────── */
+.cardDigitsHero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 14px;
+  padding: 0 14px;
   height: 48px;
   width: 100%;
-  padding: 0 16px;
-  background: var(--surface-alt);
-  border: 1.5px solid transparent;
-  border-radius: 14px;
-  transition: all 0.2s ease;
+  box-sizing: border-box;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  overflow: hidden;
+  transition: border-color 150ms ease, background 150ms ease;
 }
 
-.montoInputWrap:focus-within {
+.cardDigitsHero:focus-within {
+  border-color: var(--border);
   background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.montoInput {
-  background: transparent;
-  border: none;
-  font-family: 'Figtree', sans-serif;
-  font-weight: 400;
-  color: var(--text);
-  padding: 0;
+.cardDigitsPrefix {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+  font-family: 'Courier New', monospace;
+  user-select: none;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+.cardDigitsInput {
   flex: 1;
   min-width: 0;
-}
-
-.montoInput:focus {
+  background: transparent;
+  border: none;
   outline: none;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  padding: 0;
+  white-space: nowrap !important;
 }
 
-.montoInput:focus {
-  outline: none;
+.cardDigitsInput::placeholder {
+  color: var(--text-3);
+  opacity: 0.4;
 }
 
-/* ── Redes Grid ──────────────────────────────────────────────────────────── */
-.redGrid {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
+/* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
+.billeterasCarouselScroller {
   overflow-x: auto;
-  padding: 8px 0;
+  overflow-y: visible;
   -ms-overflow-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  padding: 16px 0 24px;
+  margin-top: -8px;
+  margin-bottom: -14px;
 }
 
-.redGrid::-webkit-scrollbar {
+.billeterasCarouselScroller::-webkit-scrollbar {
   display: none;
 }
 
-.redBtn {
-  flex: 0 0 auto;
-  width: 60px;
-  height: 50px;
-  background: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  padding: 0;
-  opacity: 0.4;
-  filter: grayscale(1);
-}
-
-.redBtnActive {
-  opacity: 1;
-  filter: grayscale(0) drop-shadow(0 8px 16px rgba(0,0,0,0.12));
-  transform: translateY(-4px) scale(1.15);
-}
-
-/* ── Billeteras Carousel ──────────────────────────────────────────────────── */
 .billeterasCarousel {
   display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 4px 0 12px;
+  gap: 16px;
+  overflow: visible;
+  scroll-snap-type: x mandatory;
+  padding: 4px 16px 8px;
   -ms-overflow-style: none;
-  justify-content: center;
+  scrollbar-width: none;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start;
   justify-content: safe center;
+  align-items: center;
+}
+
+.billeterasCarousel::-webkit-scrollbar {
+  display: none;
 }
 
 .billeteraSelectWrap {
-  min-width: 260px;
+  position: relative;
+  width: 260px;
+  height: 148px;
   flex-shrink: 0;
+  scroll-snap-align: center;
   border-radius: 20px;
-  cursor: pointer;
+  transform: translateY(0);
   transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
               opacity 240ms ease,
               filter 240ms ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
 }
 
 .billeteraSelectWrap[data-active="false"] {
   transform: translateY(3px) scale(0.93);
-  opacity: 0.5;
-  filter: saturate(0.65) brightness(0.7);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  filter: saturate(0.65) brightness(0.65);
+  opacity: 0.48;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .billeteraSelectWrap[data-active="false"]:hover {
+    opacity: 0.72;
+    filter: saturate(0.85) brightness(0.8);
+    transform: translateY(1px) scale(0.96);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+  }
 }
 
 .billeteraSelectWrap[data-active="true"] {
   transform: translateY(-6px) scale(1.03);
+  filter: saturate(1.05) brightness(1.01);
   opacity: 1;
-  filter: saturate(1.06) brightness(1.02);
   z-index: 10;
-  box-shadow: 0 20px 40px -6px rgba(15, 23, 42, 0.28),
-              0 8px 16px -3px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.18),
+              0 4px 10px -2px rgba(0, 0, 0, 0.08);
 }
 
 :global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
-  box-shadow: 0 22px 44px -6px rgba(0, 0, 0, 0.6),
-              0 8px 18px -3px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.5),
+              0 6px 14px -2px rgba(0, 0, 0, 0.35);
 }
 
-/* ── Color Picker ────────────────────────────────────────────────────────── */
-.colorPicker {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 16px;
-  gap: 20px;
+.billeteraSelectWrap:active {
+  transform: translateY(-4px) scale(1.01);
+  transition-duration: 80ms;
 }
 
-.colorArrow {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--surface-alt);
-  background: var(--surface);
-  color: var(--text-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.billeteraOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
   cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: inherit;
+  border: none;
+  background: transparent;
 }
 
-.colorArrow:hover {
-  background: var(--surface-alt);
-  color: var(--text);
+.billeteraSelectWrap :global(.wcKebab) {
+  display: none !important;
 }
 
-.currentColorDisplay {
+.billeteraSelectWrap :global(.chipMoneda) {
+  display: none !important;
+}
+
+.fullHeightCard {
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  border-radius: 20px !important;
+}
+
+/* ── Solapa 2: Ciclo de Facturación Dual Card ─────────────────────────────── */
+.cycleDualCard {
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.cycleDualCard:focus-within {
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cycleCol {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  min-width: 120px;
+  gap: 6px;
 }
 
-.colorLabel {
-  font-size: 11px;
+.cycleColLabel {
+  font-size: 10px;
   font-weight: 800;
-  color: var(--text-3);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.6px;
+  color: var(--text-3);
+  text-align: center;
+  white-space: nowrap;
 }
 
-/* ── Preview Real Card ───────────────────────────────────────────────────── */
-.previewSection {
-  margin-top: 0;
+.cycleValueRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.cycleValuePrefix {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  user-select: none;
+}
+
+.cycleValueInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text);
+  width: 48px;
+  text-align: center;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+}
+
+.cycleDivider {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  color: var(--text-3);
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+.cycleDividerLine {
+  width: 1px;
+  height: 38px;
+  background: var(--surface-alt);
+}
+
+/* ── Solapa 2: Percepción Moneda Extranjera Row Card ──────────────────────── */
+.percepcionCard {
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.percepcionCard:focus-within {
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.percepcionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.percepcionTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.percepcionSubtitle {
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.3;
+}
+
+.percepcionBadgeInput {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0 10px;
+  height: 38px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="dark"]) .percepcionBadgeInput {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.percepcionInputNumber {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  width: 36px;
+  text-align: right;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+}
+
+.percepcionSuffixText {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-2);
+  margin-left: 2px;
+  user-select: none;
+}
+
+/* ── Step 3: Card Preview & Customization ────────────────────────────────── */
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .previewWithArrows {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
   width: 100%;
 }
 
 .colorArrowLarge {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 2px solid var(--border);
+  border: 1.5px solid var(--surface-alt);
   background: var(--surface);
   color: var(--text-2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 150ms ease;
   flex-shrink: 0;
 }
 
 .colorArrowLarge:hover {
   background: var(--surface-alt);
   color: var(--text);
-  border-color: var(--primary);
+  border-color: var(--border);
 }
 
+/* Realistic physical card representation */
 .realCard {
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
   aspect-ratio: 1.586 / 1;
-  border-radius: 12px;
+  border-radius: clamp(10px, 4cqi, 16px);
   position: relative;
   overflow: hidden;
-  padding: 18px 22px;
+  padding: clamp(12px, 4.8cqi, 18px) clamp(14px, 5.8cqi, 22px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.22), 0 4px 12px -2px rgba(0, 0, 0, 0.08);
   font-size: 0.9em;
+  transition: background 300ms ease, box-shadow 300ms ease;
+  user-select: none;
+  box-sizing: border-box;
+  container-type: inline-size;
 }
 
 .cardTop {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   z-index: 2;
+  min-height: clamp(18px, 6.5cqi, 26px);
+}
+
+.bankLogoImg {
+  height: clamp(18px, 6.8cqi, 26px);
+  max-width: clamp(75px, 28cqi, 110px);
+  object-fit: contain;
 }
 
 .walletNamePreview {
-  font-size: 13px;
+  font-size: clamp(10.5px, 3.6cqi, 13px);
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.95);
   letter-spacing: 0.05em;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  line-height: 1.2;
 }
 
 .cardMid {
@@ -340,13 +739,13 @@
 .chipContainer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(6px, 2.2cqi, 8px);
   margin-left: 2px;
 }
 
 .chipSvg {
-  width: 38px;
-  height: 28px;
+  width: clamp(28px, 9.5cqi, 36px);
+  height: clamp(20px, 7cqi, 26px);
   flex-shrink: 0;
   display: block;
 }
@@ -358,13 +757,21 @@
   flex-shrink: 0;
 }
 
+.contactlessSvg {
+  width: clamp(13px, 4.8cqi, 18px);
+  height: clamp(13px, 4.8cqi, 18px);
+}
+
 .cardNumber {
-  font-family: 'Courier New', monospace;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  letter-spacing: 0.15em;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-family: 'SF Mono', 'Courier New', monospace;
+  font-size: clamp(12.5px, 4.3cqi, 16.5px);
+  font-weight: 700;
+  letter-spacing: clamp(0.08em, 0.12cqi, 0.14em);
+  margin-bottom: clamp(2px, 1cqi, 4px);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: color 200ms ease;
+  z-index: 2;
 }
 
 .cardBottom {
@@ -374,276 +781,287 @@
   z-index: 2;
 }
 
-.cardInfoCol {
-  display: flex;
-  flex-direction: column;
-}
-
 .cardInfoRow {
   display: flex;
-  gap: 20px;
+  gap: clamp(10px, 3.8cqi, 16px);
 }
 
 .cardInfoGroup {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .cardInfoLabel {
-  font-size: 7px;
+  font-size: clamp(7px, 2.2cqi, 8.5px);
   font-weight: 800;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.5px;
 }
 
 .cardInfoValue {
-  font-size: 10px;
+  font-size: clamp(9px, 2.8cqi, 11px);
   font-weight: 700;
-  color: white;
+  white-space: nowrap;
+}
+
+.networkLogoWrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .networkLogo {
-  height: 30px;
+  height: clamp(18px, 6.8cqi, 26px);
   width: auto;
+  max-width: clamp(45px, 16cqi, 65px);
   object-fit: contain;
+}
+
+/* Swatches Grid */
+.colorSwatchesGrid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 4px 14px;
+}
+
+.colorSwatchBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px 4px;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateY(2px) scale(0.92);
+  opacity: 0.55;
+  filter: saturate(0.75) brightness(0.9);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 240ms ease,
+              filter 240ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .colorSwatchBtn[data-active="false"]:hover {
+    transform: translateY(0px) scale(1.0);
+    opacity: 0.85;
+    filter: saturate(0.95) brightness(0.98);
+  }
+}
+
+/* Active Swatch: Popping forward in 3D without outer colored rings */
+.colorSwatchBtn[data-active="true"] {
+  transform: translateY(-5px) scale(1.16);
+  opacity: 1;
+  filter: saturate(1.15) brightness(1.05);
+  z-index: 5;
+}
+
+.colorSwatchCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.colorSwatchBtn[data-active="true"] .colorSwatchCircle {
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.38),
+              0 4px 10px rgba(0, 0, 0, 0.15),
+              inset 0 1px 1.5px rgba(255, 255, 255, 0.45);
+}
+
+.colorSwatchLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  transition: color 200ms ease, font-weight 200ms ease;
+  white-space: nowrap;
+}
+
+.colorSwatchBtn[data-active="true"] .colorSwatchLabel {
+  color: var(--text);
+  font-weight: 800;
+}
+
+/* ── Resumen Box (Paso 3) ─────────────────────────────────────────────────── */
+.summaryBox {
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.summaryLbl {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.summaryVal {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
 }
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .formFooter {
-  padding: 16px 24px 24px;
-  display: flex;
-  gap: 12px;
-  border-top: 1px solid var(--surface-alt);
+  padding: 10px 20px 14px;
   background: var(--surface);
-  flex-shrink: 0;
-  z-index: 10;
-}
-
-.closeBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: var(--surface-alt);
-  color: var(--text-2);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-.btnCancel {
+.cancelBtn {
   flex: 1;
-  height: 48px;
-  border-radius: 14px;
+  height: 44px;
+  border-radius: 12px;
   border: 1.5px solid var(--surface-alt);
   background: transparent;
   color: var(--text-2);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  font-family: inherit;
 }
 
-.btnSubmit {
+.cancelBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.submitBtn {
   flex: 2;
-  height: 48px;
-  border-radius: 14px;
+  height: 44px;
+  border-radius: 12px;
   border: none;
   background: var(--primary);
   color: white;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  transition: opacity 120ms ease;
+  font-family: inherit;
 }
 
-.btnSubmit:disabled {
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.submitBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-
-.monedaPreview {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--text-3);
-}
-
-.fieldInputCenter {
-  width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  background: transparent;
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  font-size: 15px;
-  letter-spacing: 0.1em;
-  text-align: center;
-  font-weight: 800;
-  color: var(--text);
-  transition: all 0.2s ease;
-}
-
-.fieldInputCenter:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: transparent;
-}
-
-.fieldInputLimit {
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  text-align: left;
-  width: 100%;
-  padding: 0 12px;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.networkLogoSmall {
-  height: 32px;
-}
-
-.headerTitleLarge {
-  font-weight: 800;
-  font-size: 18px;
-  color: var(--text);
-}
-
-/* ── Responsive Mobile (max-width: 767px) ── */
+/* ── Responsive Mobile (<768px) ──────────────────────────────────────────── */
 @media (max-width: 767px) {
-  .baseModalOverride {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    border-radius: 24px 24px 0 0 !important;
-    align-self: flex-end !important;
+  .stepDots {
+    padding: 10px 16px 2px;
   }
 
-  .modal {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    max-height: 85vh;
-    max-height: 85dvh;
-    border-radius: 24px 24px 0 0;
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.1);
-    animation: slideUpMobileCard 240ms cubic-bezier(0.34, 1.1, 0.64, 1);
-  }
-
-  .modalHeader {
-    padding: 16px 20px 12px;
+  .formHeader {
+    padding: 2px 0 6px;
   }
 
   .formBody {
-    padding: 16px 20px;
-  }
-
-  .formBody::-webkit-scrollbar {
-    display: block !important;
-    width: 4px;
-  }
-
-  .formBody::-webkit-scrollbar-thumb {
-    background: var(--surface-alt);
-    border-radius: 4px;
-  }
-
-  .formSection {
-    gap: 16px;
-  }
-
-  .inputGrid3 {
-    gap: 8px;
-  }
-
-  .fieldInputCenter {
-    padding: 0 8px;
-    height: 42px;
-    font-size: 14px;
-  }
-
-  .fieldInput {
-    height: 44px;
-    padding: 0 12px;
-    font-size: 14px;
-  }
-
-  .fieldLabel {
-    font-size: 10px;
+    padding: 4px 16px 10px;
+    gap: 12px;
   }
 
   .redGrid {
-    justify-content: flex-start;
-    padding: 4px 0;
+    gap: 8px;
+    padding: 6px 0 12px;
   }
 
-  .redBtn {
-    width: 54px;
-    height: 44px;
+  .redTile {
+    height: 62px;
+    border-radius: 14px;
+    padding: 6px 2px 4px;
   }
 
-  .previewWithArrows {
-    position: relative;
-    padding: 0 44px;
-    box-sizing: border-box;
+  .redLogoWrapper {
+    height: 24px;
   }
 
-  .previewWithArrows .colorArrowLarge {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
+  .networkLogoImg {
+    max-height: 20px;
+    max-width: 36px;
   }
 
-  .previewWithArrows .colorArrowLarge:first-child {
-    left: 0;
+  .redTileLabel {
+    font-size: 9.5px;
   }
 
-  .previewWithArrows .colorArrowLarge:last-child {
-    right: 0;
+  .billeterasCarouselScroller {
+    padding: 14px 0 20px;
+    margin: -6px -16px -12px;
   }
 
-  .realCard {
-    padding: 12px 16px !important;
+  .billeterasCarousel {
+    padding: 4px 16px 8px;
+    gap: 14px;
   }
 
-  .cardNumber {
-    font-size: 14px !important;
-    letter-spacing: 0.08em !important;
-  }
-
-  .walletNamePreview {
-    font-size: 11px !important;
-  }
-
-  .cardInfoValue {
-    font-size: 8px !important;
-  }
-
-  .chipSvg {
-    width: 30px !important;
-    height: 22px !important;
-  }
-
-  .networkLogo {
-    height: 20px !important;
+  .billeteraSelectWrap {
+    width: 245px;
+    height: 138px;
   }
 
   .formFooter {
-    padding: 14px 20px;
+    padding: 10px 16px max(14px, env(safe-area-inset-bottom, 14px));
+    gap: 8px;
   }
 
-  .btnCancel, .btnSubmit {
-    height: 44px;
+  .cancelBtn {
+    height: 46px;
     font-size: 14px;
   }
-}
 
-@keyframes slideUpMobileCard {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  .submitBtn {
+    height: 46px;
+    font-size: 14.5px;
+  }
+
+  .fieldLabel {
+    font-size: 10.5px;
+  }
+
+  .cardDigitsHero {
+    padding: 0 10px;
+    gap: 6px;
+  }
+
+  .cardDigitsPrefix {
+    font-size: 14px;
+    letter-spacing: 0.08em;
+  }
+
+  .cardDigitsInput {
+    font-size: 16px;
+    letter-spacing: 0.12em;
+  }
+
+  .realCard {
+    max-width: 340px;
+  }
 }

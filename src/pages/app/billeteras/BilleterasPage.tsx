@@ -383,14 +383,20 @@ export default function BilleterasPage() {
       </div>
 
       {/* Switch de pestañas solo para mobile */}
-      <div className={styles.tabsContainer}>
+      <div className={styles.tabsContainer} role="tablist" aria-label="Secciones de billeteras">
         <button 
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'billeteras'}
           className={`${styles.tabBtn} ${activeTab === 'billeteras' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('billeteras')}
         >
           Mis Billeteras
         </button>
         <button 
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'transferencias'}
           className={`${styles.tabBtn} ${activeTab === 'transferencias' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('transferencias')}
         >

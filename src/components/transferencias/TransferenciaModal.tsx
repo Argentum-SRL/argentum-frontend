@@ -753,7 +753,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 {/* Descripción/Nota + Fecha (Idéntico a Paso 3 de TransaccionModal) */}
                 <div className={styles.descFechaRow}>
                   <div className={`${styles.formField} ${styles.flex2}`}>
-                    <label className={styles.fieldLabel} htmlFor="tx-nota">Concepto / Nota (opcional)</label>
+                    <label className={styles.fieldLabel} htmlFor="tx-nota">Concepto / Nota</label>
                     <input
                       id="tx-nota"
                       type="text"

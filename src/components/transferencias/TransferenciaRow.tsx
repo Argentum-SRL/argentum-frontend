@@ -158,7 +158,7 @@ export const TransferenciaRow = memo(({
               {formatMonto(transferencia.monto, transferencia.moneda)}
             </span>
             <span className={styles.currencyMeta}>
-              {transferencia.moneda}
+              {(transferencia.moneda || '').toUpperCase() === 'USD' ? 'Dólares' : 'Pesos'}
             </span>
           </>
         )}

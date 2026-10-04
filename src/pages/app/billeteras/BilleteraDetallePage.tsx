@@ -413,11 +413,11 @@ const BilleteraDetallePage: React.FC = () => {
             {/* Nombre y detalle */}
             <div className={styles.headerIdentity}>
               <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
-                {billetera.nombre}
+                {billetera.es_efectivo ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : billetera.nombre}
               </h1>
               <span className={`${styles.headerDetail} ${isLight ? styles.textLight : styles.textDark}`}>
                 {billetera.es_principal && <span className={styles.principal}>Principal</span>}
-                {billetera.moneda}
+                {billetera.moneda === 'USD' ? 'Dólares' : 'Pesos'}
               </span>
               <button
                 type="button"

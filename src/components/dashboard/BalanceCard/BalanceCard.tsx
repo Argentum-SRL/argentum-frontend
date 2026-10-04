@@ -274,7 +274,11 @@ export const BalanceCard = memo(function BalanceCard({
                 {billeterasSeleccionadas.length === 0
                   ? `Todas las cuentas (${billeterasActivas.length})`
                   : billeterasSeleccionadas.length === 1
-                    ? billeterasActivas.find(b => b.id === billeterasSeleccionadas[0])?.nombre ?? '1 cuenta'
+                    ? (() => {
+                        const b = billeterasActivas.find(x => x.id === billeterasSeleccionadas[0])
+                        if (!b) return '1 cuenta'
+                        return b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre
+                      })()
                     : `${billeterasSeleccionadas.length} cuentas seleccionadas`}
               </span>
               <ChevronDown
@@ -316,7 +320,7 @@ export const BalanceCard = memo(function BalanceCard({
                         <div className={`${styles.checkbox} ${isExplicitlyFiltered ? styles.checkboxChecked : ''}`}>
                           {isExplicitlyFiltered && <Check size={10} strokeWidth={3} />}
                         </div>
-                        <span className={styles.accountName}>{b.nombre}</span>
+                        <span className={styles.accountName}>{b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}</span>
                         {b.es_principal && (
                           <Star size={10} fill="currentColor" className={styles.starIcon} />
                         )}

@@ -44,17 +44,23 @@ function getContainerIntrinsicHeight(container: HTMLElement): number {
   const borderBottom = parseFloat(style.borderBottomWidth) || 0
   const rowGap = parseFloat(style.rowGap || style.gap) || 0
 
-  const children = Array.from(container.children) as HTMLElement[]
-  if (children.length === 0) {
+  // Filtrar solo elementos visibles en el flujo de render (ignora display:none y position:absolute)
+  const visibleChildren = (Array.from(container.children) as HTMLElement[]).filter((child) => {
+    if (child.nodeType !== Node.ELEMENT_NODE) return false
+    const s = window.getComputedStyle(child)
+    return s.display !== 'none' && s.position !== 'absolute'
+  })
+
+  if (visibleChildren.length === 0) {
     return container.offsetHeight
   }
 
   let childrenH = 0
-  for (const child of children) {
+  for (const child of visibleChildren) {
     childrenH += getElementOuterHeight(child)
   }
 
-  const gapsH = children.length > 1 ? (children.length - 1) * rowGap : 0
+  const gapsH = visibleChildren.length > 1 ? (visibleChildren.length - 1) * rowGap : 0
   return Math.ceil(paddingTop + paddingBottom + borderTop + borderBottom + childrenH + gapsH)
 }
 
@@ -143,11 +149,24 @@ export function useAdaptiveModalHeight(
     if (footerEl) observer.observe(footerEl)
     if (containerEl && !bodyEl) observer.observe(containerEl)
 
+    // Detectar cambios en la lista de hijos (por ej. aparición de alertas o subsecciones)
+    let mutationObserver: MutationObserver | null = null
+    if (bodyEl) {
+      mutationObserver = new MutationObserver(() => {
+        measure()
+        for (const child of Array.from(bodyEl.children)) {
+          observer.observe(child)
+        }
+      })
+      mutationObserver.observe(bodyEl, { childList: true, subtree: false })
+    }
+
     window.addEventListener('resize', measure)
     window.visualViewport?.addEventListener('resize', measure)
 
     return () => {
       observer.disconnect()
+      mutationObserver?.disconnect()
       window.removeEventListener('resize', measure)
       window.visualViewport?.removeEventListener('resize', measure)
     }

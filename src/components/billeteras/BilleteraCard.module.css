@@ -298,6 +298,8 @@
 .wcBalance {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
 }
 
 .wcBalLbl {
@@ -307,22 +309,32 @@
   letter-spacing: 0.08em;
   margin: 0 0 5px;
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .balLblLight { color: rgba(255,255,255,0.45); }
 .balLblDark  { color: rgba(0,0,0,0.40); }
 
 .wcBalAmt {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -1px;
-  line-height: 1;
+  letter-spacing: -0.8px;
+  line-height: 1.1;
   margin: 0;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 @media (min-width: 768px) {
   .wcBalAmt {
-    font-size: 34px;
+    font-size: 32px;
+    letter-spacing: -1px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 }
 

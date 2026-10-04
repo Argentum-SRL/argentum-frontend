@@ -107,16 +107,22 @@ export const TransferenciaRow = memo(({
 
         {(transferencia.notas || hora) && (
           <div className={styles.meta}>
-            {transferencia.notas && (
-              <span className={styles.metaDesc}>
-                {transferencia.notas}
-              </span>
-            )}
-            {transferencia.notas && hora && (
-              <span className={styles.metaDivider}> · </span>
-            )}
-            {hora && (
-              <span className={styles.metaHora}>{hora}</span>
+            {transferencia.notas ? (
+              <>
+                <span className={styles.metaDesc} title={transferencia.notas}>
+                  {transferencia.notas}
+                </span>
+                {hora && (
+                  <span className={`${styles.metaDivider} ${styles.desktopOnly}`}> · </span>
+                )}
+                {hora && (
+                  <span className={`${styles.metaHora} ${styles.desktopOnly}`}>{hora}</span>
+                )}
+              </>
+            ) : (
+              hora && (
+                <span className={styles.metaHora}>{hora}</span>
+              )
             )}
           </div>
         )}

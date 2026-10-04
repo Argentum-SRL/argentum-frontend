@@ -215,7 +215,7 @@ export default function FilterBar({
             ) : (
               <Wallet size={15} />
             )}
-            {bill.nombre}
+            {bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}
           </button>
         )
       })}

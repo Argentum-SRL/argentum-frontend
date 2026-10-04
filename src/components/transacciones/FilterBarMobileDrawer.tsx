@@ -239,7 +239,7 @@ export default function FilterBarMobileDrawer({
                     ) : (
                       <Wallet size={16} />
                     )}
-                    <span>{bill.nombre}</span>
+                    <span>{bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}</span>
                   </div>
                   <div className={`${styles.checkboxMobile} ${isSelected ? styles.checkboxCheckedMobile : ''}`}>
                     {isSelected && <Check size={14} strokeWidth={3} />}

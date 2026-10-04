@@ -381,26 +381,39 @@
   scroll-snap-align: center;
   border-radius: 18px; /* Cambiado a 18px para coincidir con la BilleteraCard interior */
   transform: translateY(0);
-  transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 240ms ease,
+              filter 240ms ease;
   /* Sin padding ni bordes transparentes para no dejar colar la sombra */
 }
 
 .billeteraSelectWrap[data-active="false"] {
-  transform: translateY(0) scale(0.93);
-  filter: saturate(0.3) brightness(0.7);
-  opacity: 0.7;
+  transform: translateY(3px) scale(0.92);
+  filter: saturate(0.65) brightness(0.65);
+  opacity: 0.48;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
 }
 
 .billeteraSelectWrap[data-active="true"] {
-  transform: translateY(-6px) scale(1.02);
-  filter: none;
+  transform: translateY(-8px) scale(1.04);
+  filter: saturate(1.08) brightness(1.02);
   opacity: 1;
-  border-color: transparent; /* Removemos el borde de seleccion */
-  box-shadow: 0 12px 30px rgba(13, 32, 69, 0.12);
+  z-index: 10;
+  box-shadow: 0 20px 42px -6px rgba(15, 23, 42, 0.28),
+              0 8px 18px -3px rgba(15, 23, 42, 0.18),
+              inset 0 1px 1px rgba(255, 255, 255, 0.45);
 }
 
 :global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
-  border-color: transparent;
+  box-shadow: 0 24px 48px -6px rgba(0, 0, 0, 0.62),
+              0 10px 22px -3px rgba(0, 0, 0, 0.45),
+              inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+.billeteraSelectWrap:active {
+  transform: translateY(-5px) scale(1.02);
+  transition-duration: 80ms;
 }
 
 .billeteraOverlay {
@@ -418,9 +431,27 @@
   display: none !important;
 }
 
+.billeteraSelectWrap :global(.chipMoneda) {
+  display: none !important;
+}
+
 .fullHeightCard {
   height: 100% !important;
   aspect-ratio: auto !important; /* Desactivar el de la card interna */
+}
+
+.billeteraSelectWrap :global(.wcBalance) {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.billeteraSelectWrap :global(.wcBalAmt) {
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.3px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 /* ── Método de pago ──────────────────────────────────────────────────────── */

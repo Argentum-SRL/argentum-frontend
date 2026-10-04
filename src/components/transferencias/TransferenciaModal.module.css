@@ -1,1035 +1,984 @@
-/* ─── TransferenciaModal.module.css — Senior Fintech Design ─── */
+/* ─── TransferenciaModal.module.css — 100% Matched to TransaccionModal.module.css ─── */
 
-.modalRoot {
-  width: 100%;
-  max-width: 520px;
-  background: var(--surface);
-  border-radius: 24px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
-  transition: all 0.25s ease;
-}
-
-@media (max-width: 640px) {
-  .modalRoot {
-    max-width: 100%;
-    border-radius: 20px 20px 0 0;
-    max-height: 92dvh;
+/* ── Modal Dialog Size (Desktop 540px vs Mobile 100% Bottom Sheet) ── */
+@media (min-width: 768px) {
+  .modalTransferencia {
+    width: 540px !important;
+    max-width: min(540px, calc(100vw - 32px)) !important;
   }
 }
 
-/* ── Header ── */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
+@media (max-width: 767px) {
+  .modalTransferencia {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+  }
 }
 
-.headerTitleWrap {
+/* ── Slides container & animations ───────────────────────────────────────── */
+.slidesContainer {
+  position: relative;
+  width: 100%;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  max-height: 90dvh;
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.headerIconPill {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: rgba(var(--primary-rgb, 13, 32, 69), 0.08);
-  color: var(--primary);
+.slide {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.slideForward {
+  animation: slideInRight 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slideBack {
+  animation: slideInLeft 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Step Indicator Dots ─────────────────────────────────────────────────── */
+.stepDots {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  padding: 12px 20px 0;
   flex-shrink: 0;
 }
 
-:global([data-theme="dark"]) .headerIconPill {
-  background: rgba(72, 120, 184, 0.15);
-  color: var(--primary-light, #73a5e8);
+.stepDot {
+  height: 5px;
+  border-radius: 99px;
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--surface-alt);
+}
+
+.stepDotActive {
+  background: var(--primary);
+  width: 20px;
+}
+
+.stepDotInactive {
+  width: 6px;
+  opacity: 0.4;
+}
+
+/* ── Formulario Base ─────────────────────────────────────────────────────── */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 8px;
+  flex-shrink: 0;
 }
 
 .headerTitle {
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 700;
   color: var(--text);
   margin: 0;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
+  letter-spacing: -0.2px;
 }
 
-.headerSubtitle {
-  font-size: 12px;
-  color: var(--text-2);
-  margin: 2px 0 0;
-  font-weight: 500;
-}
-
-.iconCircleBtn {
+.backBtn, .closeBtn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid var(--border);
+  border: none;
   background: var(--surface-alt);
   color: var(--text-2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
   flex-shrink: 0;
+  transition: background 120ms ease;
 }
 
-.iconCircleBtn:hover {
+.backBtn:hover, .closeBtn:hover {
   background: var(--border);
   color: var(--text);
-  transform: scale(1.05);
 }
 
-/* ── Scrollable Body ── */
-.scrollableBody {
-  padding: 20px 24px;
+.formBody {
+  padding: 4px 20px 12px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  max-height: calc(88dvh - 140px);
+  overscroll-behavior-y: contain;
 }
 
-.scrollableBody::-webkit-scrollbar {
-  width: 5px;
+/* En el Paso 1 todo el contenido cabe perfectamente, por lo que se elimina el scroll vertical */
+.formBodyStep1 {
+  overflow-y: hidden;
 }
 
-.scrollableBody::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 99px;
-}
-
-/* ── Sección Monto Hero ── */
-.montoSection {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.warningBanner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.3;
-  animation: fadeIn 0.2s ease;
-}
-
-.warningIcon {
-  flex-shrink: 0;
-}
-
-/* ── SECCIÓN: Dual Account Flow (Desde ➔ ⇄ ➔ Hacia) ── */
-.transferFlowContainer {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--page);
-  padding: 6px;
-  gap: 2px;
-}
-
-.accountCard {
-  background: var(--surface);
-  border-radius: 14px;
-  padding: 14px 16px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  outline: none;
-}
-
-.accountCard:hover,
-.accountCard:focus-visible {
-  border-color: var(--primary);
-  background: var(--surface-alt);
-  transform: scale(1.008);
-}
-
-.accountCardEmpty {
-  border: 1px dashed var(--border);
-  background: var(--surface-alt);
-}
-
-.accountCardTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.accountCardTag {
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-3);
-}
-
-.changeAction {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  opacity: 0.85;
-}
-
-.accountCard:hover .changeAction {
-  opacity: 1;
-  transform: translateX(2px);
-  transition: transform 0.15s ease;
-}
-
-.accountCardContent {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.bankAvatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-
-.bankAvatarImg {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.bankAvatarText {
-  color: white;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.accountCardMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.accountName {
-  font-size: 14.5px;
-  font-weight: 700;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.accountBalances {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.currentBalance {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text-2);
-}
-
-.projectedDown {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ef4444;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  background: rgba(239, 68, 68, 0.08);
-  padding: 1px 6px;
-  border-radius: 6px;
-}
-
-.projectedUp {
-  font-size: 12px;
-  font-weight: 700;
-  color: #10b981;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  background: rgba(16, 185, 129, 0.08);
-  padding: 1px 6px;
-  border-radius: 6px;
-}
-
-.emptyCardContent {
-  padding: 10px 0;
-  color: var(--text-3);
-  font-size: 13.5px;
-  font-weight: 600;
-  text-align: center;
-}
-
-/* ── Swap Button & Line ── */
-.swapWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  height: 24px;
-  margin: -4px 0;
-  z-index: 5;
-}
-
-.swapDividerLine {
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.swapButton {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  flex-shrink: 0;
-  margin: 0 10px;
-}
-
-.swapButton:hover:not(:disabled) {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-  transform: scale(1.12);
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb, 13, 32, 69), 0.25);
-}
-
-.swapButtonActive {
-  transform: rotate(180deg) scale(1.15) !important;
-}
-
-.swapButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* ── Insufficient Accounts Warning ── */
-.insufficientAccountsWarning {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  color: #d97706;
-  font-size: 12.5px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-:global([data-theme="dark"]) .insufficientAccountsWarning {
-  color: #fbbf24;
-}
-
-/* ── Detalles Grid (Fecha & Notas) ── */
-.detailsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 12px;
-}
-
-@media (max-width: 480px) {
-  .detailsGrid {
-    grid-template-columns: 1fr;
+@media (max-height: 620px) {
+  .formBodyStep1 {
+    overflow-y: auto;
   }
 }
 
-.detailField {
+.formBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.formBody::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
+
+.formField {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .fieldLabel {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-2);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.fieldIcon {
   color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
 }
 
-
-.dateInputCustom {
-  height: 42px !important;
-  border-radius: 12px !important;
-  font-size: 13.5px !important;
-  background: var(--page) !important;
-  border: 1px solid var(--border) !important;
-}
-
-.textInputCustom {
-  height: 42px;
+.fieldInput {
+  height: 44px;
   padding: 0 14px;
   border-radius: 12px;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--surface-alt);
   background: var(--page);
   color: var(--text);
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 500;
   outline: none;
+  transition: border-color 150ms ease;
   font-family: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.textInputCustom:focus {
+.fieldInput:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 13, 32, 69), 0.08);
 }
 
-/* ── Live Impact Summary Pill ── */
-.impactSummaryPill {
+/* ── Radio Pills / Solapas (Idéntico a TransaccionModal) ─────────────────── */
+.radioGroup {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.radioPill {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 14px;
+  gap: 6px;
+  height: 42px;
+  padding: 0 12px;
   border-radius: 12px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  animation: fadeIn 0.2s ease;
-}
-
-.impactSummaryText {
-  font-size: 12.5px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-2);
-  text-align: center;
-  line-height: 1.4;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: inherit;
+  white-space: nowrap;
 }
 
-.impactSummaryText strong {
+.radioPill:hover {
+  background: var(--surface);
+  border-color: var(--border);
   color: var(--text);
-  font-weight: 700;
 }
 
-/* ── Footer & CTA ── */
-.footer {
+.pillActivePrimary {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.pillActiveEgreso {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #fecaca !important;
+}
+
+.pillActiveIngreso {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  border-color: #bbf7d0 !important;
+}
+
+/* ── Operation Bar (3 botones directos sin contenedor envolvente) ─────────── */
+.segmentedBar {
+  display: flex;
+  width: 100%;
+  background: transparent;
+  padding: 0;
+  border: none;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.segmentedPill {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 16px 24px;
-  border-top: 1px solid var(--border);
+  justify-content: center;
+  gap: 6px;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.segmentedPill:hover {
   background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.segmentedPill:active {
+  transform: scale(0.975);
+}
+
+/* Efecto de profundidad física y popping up (sin contenedor externo ni bordes de color) */
+.segmentedPillActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-color: var(--border) !important;
+  z-index: 2;
+}
+
+:global([data-theme="dark"]) .segmentedPill,
+:global(.dark) .segmentedPill {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-2);
+}
+
+:global([data-theme="dark"]) .segmentedPill:hover,
+:global(.dark) .segmentedPill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+}
+
+:global([data-theme="dark"]) .segmentedPillActive,
+:global(.dark) .segmentedPillActive {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 420px) {
+  .segmentedBar {
+    gap: 6px;
+  }
+  .segmentedPill {
+    font-size: 12px;
+    gap: 4px;
+    padding: 0 4px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 360px) {
+  .segmentedPill {
+    font-size: 11px;
+    gap: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segmentedPill,
+  .segmentedPillActive {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
+.billeterasCarouselScroller {
+  overflow-x: auto;
+  overflow-y: visible;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  padding: 16px 0 24px;
+  margin-top: -8px;
+  margin-bottom: -14px;
+}
+
+.billeterasCarouselScroller::-webkit-scrollbar {
+  display: none;
+}
+
+.billeterasCarousel {
+  display: flex;
+  gap: 16px;
+  overflow: visible;
+  scroll-snap-type: x mandatory;
+  padding: 4px 16px 8px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start;
+  justify-content: safe center;
+  align-items: center;
+}
+
+.billeterasCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+.billeteraSelectWrap {
+  position: relative;
+  width: 260px;
+  height: 148px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: 20px;
+  transform: translateY(0);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 240ms ease,
+              filter 240ms ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+/* Inactive Card: Receding in 3D depth, sitting lower, dimmed and soft */
+.billeteraSelectWrap[data-active="false"] {
+  transform: translateY(4px) scale(0.92);
+  filter: saturate(0.65) brightness(0.65);
+  opacity: 0.48;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .billeteraSelectWrap[data-active="false"]:hover {
+    opacity: 0.72;
+    filter: saturate(0.85) brightness(0.8);
+    transform: translateY(1px) scale(0.95);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+    z-index: 2;
+  }
+}
+
+/* Active Card: Popping forward toward user (Apple Wallet depth), elevated and radiant */
+.billeteraSelectWrap[data-active="true"] {
+  transform: translateY(-8px) scale(1.04);
+  filter: saturate(1.08) brightness(1.02);
+  opacity: 1;
+  z-index: 10;
+  box-shadow: 0 20px 42px -6px rgba(15, 23, 42, 0.28),
+              0 8px 18px -3px rgba(15, 23, 42, 0.18),
+              inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+:global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
+  box-shadow: 0 24px 48px -6px rgba(0, 0, 0, 0.62),
+              0 10px 22px -3px rgba(0, 0, 0, 0.45),
+              inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+.billeteraSelectWrap:active {
+  transform: translateY(-5px) scale(1.02);
+  transition-duration: 80ms;
+}
+
+.billeteraOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+  border-radius: inherit;
+  border: none;
+  background: transparent;
+}
+
+.billeteraSelectWrap :global(.wcKebab) {
+  display: none !important;
+}
+
+.billeteraSelectWrap :global(.chipMoneda) {
+  display: none !important;
+}
+
+.fullHeightCard {
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  border-radius: 20px !important;
+}
+
+/* Tactile specular sheen on card surface */
+.billeteraSelectWrap :global(.wc) {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+.billeteraSelectWrap :global(.wcBg)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(0, 0, 0, 0.16) 100%);
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Card inner layout: top header + centered balance */
+.billeteraSelectWrap :global(.wcInner) {
+  padding: 16px 18px !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  box-sizing: border-box !important;
+}
+
+.billeteraSelectWrap :global(.wcTop) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+.billeteraSelectWrap :global(.wcLogo) {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.billeteraSelectWrap :global(.wcCardLogo) {
+  max-width: 88px !important;
+}
+
+/* Horizontal alignment of Name + Principal Badge */
+.billeteraSelectWrap :global(.wcIdentity) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  gap: 8px !important;
+}
+
+.billeteraSelectWrap :global(.wcName) {
+  font-size: 16.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.3px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.billeteraSelectWrap :global(.wcChipRow) {
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.billeteraSelectWrap :global(.chip) {
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  padding: 2.5px 8px !important;
+  border-radius: 9999px !important;
+  letter-spacing: 0.3px !important;
+  text-transform: uppercase !important;
+}
+
+/* Hero Center Balance */
+.billeteraSelectWrap :global(.wcBalance) {
+  min-width: 0 !important;
+  width: 100% !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 6px 0 0 !important;
+}
+
+.billeteraSelectWrap :global(.wcBalAmt) {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.9px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  display: block !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.billeteraSelectWrap :global(.balAmtLight) {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+}
+
+.billeteraSelectWrap :global(.balAmtDark) {
+  color: #0f172a !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+.billeteraSelectWrap :global(.wcBalLbl) {
+  display: none !important;
+}
+
+.billeteraSelectWrap :global(.wcChipRow) {
+  margin-top: 2px !important;
+}
+
+.noWalletsText {
+  font-size: 13px;
+  color: var(--text-3);
+  padding: 16px;
+  text-align: center;
+}
+
+/* ── Method / Cotizaciones Grid ─────────────────────────────────────────── */
+.methodGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.methodBtn {
+  height: 50px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
+
+.methodBtnTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  line-height: 1;
+}
+
+.methodBtnRate {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.methodBtn:hover {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.methodBtnActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.methodBtnActive .methodBtnTitle {
+  color: var(--primary) !important;
+}
+
+.methodBtnActive .methodBtnRate {
+  color: var(--primary) !important;
+}
+
+:global([data-theme="dark"]) .methodBtn,
+:global(.dark) .methodBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="dark"]) .methodBtn:hover,
+:global(.dark) .methodBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+:global([data-theme="dark"]) .methodBtnActive,
+:global(.dark) .methodBtnActive {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+:global([data-theme="dark"]) .methodBtnActive .methodBtnTitle,
+:global(.dark) .methodBtnActive .methodBtnTitle {
+  color: #94a3b8 !important;
+}
+
+:global([data-theme="dark"]) .methodBtnActive .methodBtnRate,
+:global(.dark) .methodBtnActive .methodBtnRate {
+  color: #38bdf8 !important;
+}
+
+@media (max-width: 420px) {
+  .methodGrid {
+    gap: 6px;
+  }
+  .methodBtn {
+    height: 46px;
+    padding: 2px 4px;
+  }
+  .methodBtnTitle {
+    font-size: 10px;
+  }
+  .methodBtnRate {
+    font-size: 11.5px;
+  }
+}
+
+/* ── Fila Fecha y Nota (Idéntico a TransaccionModal) ─────────────────────── */
+.descFechaRow {
+  display: flex;
+  gap: 10px;
+}
+
+.flex2 {
+  flex: 2;
+}
+
+.flex1 {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .descFechaRow {
+    flex-direction: column;
+  }
+}
+
+/* ── Resumen Financiero (Inspirado en cuotasSummary de TransaccionModal) ──── */
+.summaryBox {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.summaryCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summaryLbl {
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.summaryVal {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryColRight {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.ratePill {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--surface);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  align-self: flex-start;
+}
+
+/* ── Overdraft Warning ──────────────────────────────────────────────────── */
+.overdraftWarning {
+  font-size: 12px;
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Footer (Idéntico a TransaccionModal) ────────────────────────────────── */
+.formFooter {
+  padding: 10px 20px 14px;
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .cancelBtn {
-  height: 42px;
-  padding: 0 18px;
+  flex: 1;
+  height: 44px;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
+  border: 1.5px solid var(--surface-alt);
+  background: transparent;
   color: var(--text-2);
-  font-size: 13.5px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 120ms ease, color 120ms ease;
+  font-family: inherit;
 }
 
-.cancelBtn:hover:not(:disabled) {
-  background: var(--border);
+.cancelBtn:hover {
+  background: var(--surface-alt);
   color: var(--text);
 }
 
 .submitBtn {
-  height: 42px;
-  padding: 0 24px;
+  flex: 2;
+  height: 44px;
   border-radius: 12px;
   border: none;
   background: var(--primary);
   color: white;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 14px rgba(var(--primary-rgb, 13, 32, 69), 0.25);
-  transition: all 0.15s ease;
+  transition: opacity 120ms ease;
+  font-family: inherit;
 }
 
 .submitBtn:hover:not(:disabled) {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(var(--primary-rgb, 13, 32, 69), 0.35);
+  opacity: 0.88;
 }
 
 .submitBtn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── Picker View (Selector Modal Integrado) ── */
-/* ══════════════════════════════════════════════════════════════════════════ */
-
-.pickerView {
-  display: flex;
-  flex-direction: column;
-  max-height: 85dvh;
-  min-height: 420px;
-  background: var(--surface);
-  animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.pickerHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-.pickerTitleGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pickerTitle {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--text);
-  margin: 0;
-  letter-spacing: -0.2px;
-}
-
-.pickerSubtitle {
-  font-size: 12px;
-  color: var(--text-2);
-  margin: 0;
-  font-weight: 500;
-}
-
-.searchWrap {
-  padding: 12px 24px 4px;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 36px;
-  color: var(--text-3);
-  pointer-events: none;
-}
-
-.searchInput {
-  width: 100%;
-  height: 38px;
-  padding: 0 14px 0 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--page);
-  color: var(--text);
-  font-size: 13.5px;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.15s ease;
-}
-
-.searchInput:focus {
-  border-color: var(--primary);
-}
-
-.pickerList {
-  padding: 14px 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  max-height: 400px;
-}
-
-.pickerItem {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s ease;
-}
-
-.pickerItem:hover {
-  background: var(--surface-alt);
-  border-color: var(--primary);
-  transform: translateX(2px);
-}
-
-.pickerItemActive {
-  background: rgba(var(--primary-rgb, 13, 32, 69), 0.05);
-  border-color: var(--primary);
-}
-
-:global([data-theme="dark"]) .pickerItemActive {
-  background: rgba(72, 120, 184, 0.12);
-  border-color: var(--primary-light, #73a5e8);
-}
-
-.pickerItemOpposite {
-  opacity: 0.65;
-}
-
-.pickerItemInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.pickerItemNameRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.pickerItemName {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.badgePrincipal {
-  font-size: 10px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: rgba(var(--primary-rgb, 13, 32, 69), 0.1);
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-:global([data-theme="dark"]) .badgePrincipal {
-  background: rgba(72, 120, 184, 0.2);
-  color: #8bb6f2;
-}
-
-.badgeOpposite {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: var(--surface-alt);
-  color: var(--text-3);
-}
-
-.pickerItemType {
-  font-size: 11.5px;
-  color: var(--text-2);
-  font-weight: 500;
-}
-
-.pickerItemBalance {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.pickerItemAmount {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.checkIcon {
-  color: var(--primary);
-}
-
-.pickerEmpty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 40px 20px;
-  color: var(--text-3);
-  font-size: 13.5px;
-  font-weight: 500;
-}
-
-.pickerEmptyIcon {
-  opacity: 0.5;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════════ */
-/* ── Mobile Responsive Overrides (< 640px) ── */
-/* ══════════════════════════════════════════════════════════════════ */
-@media (max-width: 640px) {
-  .header {
-    padding: 16px 18px;
+/* ── Mobile Responsive Bottom Sheet Refinements (<768px) ─────────────────── */
+@media (max-width: 767px) {
+  .stepDots {
+    padding: 6px 16px 2px;
   }
 
-  .scrollableBody {
-    padding: 16px 18px;
+  .formHeader {
+    padding: 10px 16px 6px;
+  }
+
+  .headerTitle {
+    font-size: 15px;
+  }
+
+  .formBody {
+    padding: 4px 16px 10px;
+    gap: 12px;
+  }
+
+  .billeterasCarouselScroller {
+    padding: 14px 0 20px;
+    margin: -6px -16px -12px;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .billeterasCarousel {
+    padding: 4px 16px 8px;
     gap: 14px;
+    scroll-padding: 0 16px;
+    overflow: visible;
+    align-items: center;
   }
 
-  .footer {
-    padding: 12px 18px;
+  .billeteraSelectWrap {
+    width: 245px;
+    height: 138px;
+    border-radius: 18px;
+  }
+
+  .billeteraSelectWrap[data-active="false"] {
+    transform: translateY(3px) scale(0.92);
+    opacity: 0.46;
+    filter: saturate(0.65) brightness(0.65);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .billeteraSelectWrap[data-active="true"] {
+    transform: translateY(-6px) scale(1.04);
+    opacity: 1;
+    filter: saturate(1.08) brightness(1.02);
+    box-shadow: 0 16px 34px -4px rgba(15, 23, 42, 0.28),
+                0 6px 14px -2px rgba(15, 23, 42, 0.16);
+  }
+
+  :global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
+    box-shadow: 0 18px 38px -4px rgba(0, 0, 0, 0.58),
+                0 6px 16px -2px rgba(0, 0, 0, 0.42);
+  }
+
+  .billeteraSelectWrap:active {
+    transform: translateY(-3px) scale(1.02);
+    transition-duration: 80ms;
+  }
+
+  .billeteraSelectWrap :global(.wcInner) {
+    padding: 13px 15px !important;
+  }
+
+  .billeteraSelectWrap :global(.wcLogo) {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+  }
+
+  .billeteraSelectWrap :global(.wcName) {
+    font-size: 15px !important;
+  }
+
+  .billeteraSelectWrap :global(.wcBalAmt) {
+    font-size: 24px !important;
+    letter-spacing: -0.7px !important;
+  }
+
+  .formFooter {
+    padding: 10px 16px max(14px, env(safe-area-inset-bottom, 14px));
     gap: 8px;
   }
 
   .cancelBtn {
-    height: 40px;
-    padding: 0 14px;
+    height: 46px;
+    border-radius: 12px;
+    font-size: 14px;
   }
 
   .submitBtn {
+    height: 46px;
+    border-radius: 12px;
+    font-size: 14.5px;
+  }
+
+  .radioPill {
     height: 40px;
-    padding: 0 16px;
-    flex: 1;
+    font-size: 12.5px;
+    padding: 0 8px;
+    gap: 5px;
   }
 
-  .accountCard {
+  .fieldLabel {
+    font-size: 10.5px;
+  }
+
+  .summaryBox {
     padding: 12px 14px;
-  }
-
-  .bankAvatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-  }
-
-  .accountName {
-    font-size: 13.5px;
-  }
-
-  .currentBalance {
-    font-size: 12px;
-  }
-
-  .projectedDown,
-  .projectedUp {
-    font-size: 11px;
-    padding: 1px 5px;
-  }
-
-  .pickerHeader {
-    padding: 16px 18px 12px;
-  }
-
-  .searchWrap {
-    padding: 10px 18px 4px;
-  }
-
-  .pickerList {
-    padding: 10px 14px 20px;
+    gap: 8px;
   }
 }
-
-/* ══════════════════════════════════════════════════════════════════ */
-/* ── Bimonetary & Commission Transfer UI Additions ── */
-/* ══════════════════════════════════════════════════════════════════ */
-
-.dualMontoContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 480px) {
-  .dualMontoContainer {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-.montoFieldCard {
-  background: var(--page);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: border-color 0.15s ease;
-}
-
-.montoFieldCard:focus-within {
-  border-color: var(--primary);
-}
-
-.montoFieldLabel {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-2);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.currencyTag {
-  font-size: 10px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: rgba(var(--primary-rgb, 13, 32, 69), 0.08);
-  color: var(--primary);
-  letter-spacing: 0.3px;
-}
-
-:global([data-theme="dark"]) .currencyTag {
-  background: rgba(72, 120, 184, 0.15);
-  color: #8bb6f2;
-}
-
-.montoInputRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.currencySymbolPrefix {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text-2);
-}
-
-.montoCustomInput {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text);
-  outline: none;
-  width: 100%;
-  font-family: inherit;
-  letter-spacing: -0.3px;
-}
-
-.montoCustomInput::placeholder {
-  color: var(--text-3);
-  opacity: 0.5;
-}
-
-/* ── Cotización Banner ── */
-.cotizacionBanner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(var(--primary-rgb, 13, 32, 69), 0.05);
-  border: 1px solid rgba(var(--primary-rgb, 13, 32, 69), 0.14);
-  animation: fadeIn 0.15s ease;
-}
-
-:global([data-theme="dark"]) .cotizacionBanner {
-  background: rgba(72, 120, 184, 0.1);
-  border-color: rgba(72, 120, 184, 0.25);
-}
-
-.cotizacionText {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.cotizacionRef {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-2);
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-/* ── Comisión Section ── */
-.comisionSection {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.comisionToggleBtn {
-  background: transparent;
-  border: none;
-  color: var(--primary);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 0;
-  width: fit-content;
-  transition: opacity 0.15s ease;
-}
-
-:global([data-theme="dark"]) .comisionToggleBtn {
-  color: #8bb6f2;
-}
-
-.comisionToggleBtn:hover {
-  opacity: 0.85;
-}
-
-.comisionCard {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
-  background: var(--page);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  animation: fadeIn 0.15s ease;
-}
-
-.comisionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.comisionTitle {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-2);
-}
-
-.comisionRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.comisionInputWrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 6px 12px;
-}
-
-.comisionInputWrap:focus-within {
-  border-color: var(--primary);
-}
-
-.comisionInput {
-  background: transparent;
-  border: none;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-  outline: none;
-  width: 100%;
-  font-family: inherit;
-}
-
-.comisionCurrencySelect {
-  height: 38px;
-  padding: 0 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  outline: none;
-  font-family: inherit;
-}
-
-.comisionHelpText {
-  font-size: 11px;
-  color: var(--text-3);
-  margin: 0;
-}
-
-.currencyBadgePicker {
-  font-size: 10px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: var(--surface-alt);
-  color: var(--text-2);
-  border: 1px solid var(--border);
-  margin-left: 4px;
-}
-

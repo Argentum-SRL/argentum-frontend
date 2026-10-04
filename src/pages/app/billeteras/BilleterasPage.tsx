@@ -17,8 +17,7 @@ import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
-import TransferenciaModal from '@/components/transferencias/TransferenciaModal'
-import TransferenciaRow from '@/components/transferencias/TransferenciaRow'
+import { TransferenciaModal, TransferenciasTab } from '@/components/transferencias'
 import transferenciaService from '@/services/transferencia.service'
 import type { TransferenciaInterna } from '@/types'
 
@@ -332,46 +331,19 @@ export default function BilleterasPage() {
     setShowArchived(prev => !prev)
   }, [])
 
-  const MESES = [
-    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-  ]
 
-  const getDayLabel = (fechaStr: string): string => {
-    if (!fechaStr) return ''
-    const today = new Date()
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-    
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
-    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
-
-    if (fechaStr === todayStr) return 'Hoy'
-    if (fechaStr === yesterdayStr) return 'Ayer'
-
-    const [y, m, d] = fechaStr.split('-').map(Number)
-    if (!y || !m || !d) return fechaStr
-    
-    return `${d} de ${MESES[m - 1]}`
-  }
-
-  const gruposTransferencias = useMemo(() => {
-    const gruposObj: Record<string, TransferenciaInterna[]> = {}
-    transferencias.forEach(tx => {
-      const fecha = tx.fecha.split('T')[0]
-      if (!gruposObj[fecha]) gruposObj[fecha] = []
-      gruposObj[fecha].push(tx)
-    })
-    return Object.entries(gruposObj).sort((a, b) => b[0].localeCompare(a[0]))
-  }, [transferencias])
 
   return (
     <div className={styles.root}>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className={styles.pageHeader}>
         <div className={styles.titleGroup}>
-          <h1>Billeteras</h1>
-          <p className={styles.subtitle}>Controlá tus cuentas bancarias, tarjetas y efectivo</p>
+          <h1>{activeTab === 'transferencias' ? 'Movimientos entre cuentas' : 'Billeteras'}</h1>
+          <p className={styles.subtitle}>
+            {activeTab === 'transferencias'
+              ? 'Pasá plata entre tus cuentas, extraé efectivo o registrá compra y venta de dólares'
+              : 'Controlá tus cuentas bancarias, tarjetas y efectivo'}
+          </p>
         </div>
         <div className={styles.headerActions}>
           <button 
@@ -386,14 +358,14 @@ export default function BilleterasPage() {
             ) : (
               <>
                 <ArrowRightLeft size={16} />
-                Pasar plata entre cuentas
+                Transferir entre cuentas
               </>
             )}
           </button>
           <button
             className={styles.nuevaBtn}
             onClick={activeTab === 'billeteras' ? openCrearModal : () => setIsTransferModalOpen(true)}
-            aria-label={activeTab === 'billeteras' ? 'Agregar nueva billetera' : 'Pasar plata'}
+            aria-label={activeTab === 'billeteras' ? 'Agregar nueva billetera' : 'Transferir'}
           >
             {activeTab === 'billeteras' ? (
               <>
@@ -403,7 +375,7 @@ export default function BilleterasPage() {
             ) : (
               <>
                 <ArrowRightLeft size={16} strokeWidth={2.5} />
-                Pasar plata
+                Transferir
               </>
             )}
           </button>
@@ -422,7 +394,7 @@ export default function BilleterasPage() {
           className={`${styles.tabBtn} ${activeTab === 'transferencias' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('transferencias')}
         >
-          Pasar entre cuentas
+          Transferencias
         </button>
       </div>
 
@@ -525,48 +497,13 @@ export default function BilleterasPage() {
           )}
         </>
       ) : (
-        <div className={styles.transferenciasList}>
-          {loadingTransferencias ? (
-            <div className={styles.loadingState}>Cargando transferencias...</div>
-          ) : gruposTransferencias.length === 0 ? (
-            <EmptyState
-              icon={ArrowRightLeft}
-              title="Pasar plata entre cuentas"
-              description="Pasá saldo de una cuenta (origen) a otra (destino) de forma simple."
-              actionLabel="Hacer primera transferencia"
-              onActionClick={() => setIsTransferModalOpen(true)}
-            />
-          ) : (
-            gruposTransferencias.map(([fecha, txs]) => (
-              <div key={fecha} className={styles.dayGroupContainer}>
-                <div className={styles.dayGroupHeader}>
-                  <h3 className={styles.dayGroupTitle}>
-                    {getDayLabel(fecha)}
-                  </h3>
-                </div>
-                <div className={styles.dayGroupList}>
-                  {txs.map((tx, idx) => {
-                    const orig = billeteras.find(b => b.id === tx.billetera_origen_id)
-                    const dest = billeteras.find(b => b.id === tx.billetera_destino_id)
-                    return (
-                      <div 
-                        key={tx.id} 
-                        className={idx < txs.length - 1 ? styles.rowWrapperBorder : styles.rowWrapper}
-                      >
-                        <TransferenciaRow
-                          transferencia={tx}
-                          billeteraOrigen={orig}
-                          billeteraDestino={dest}
-                          onDelete={handleDeleteTransferencia}
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <TransferenciasTab
+          transferencias={transferencias}
+          billeteras={billeterasActivas}
+          loading={loadingTransferencias}
+          onDelete={handleDeleteTransferencia}
+          onOpenTransferModal={() => setIsTransferModalOpen(true)}
+        />
       )}
 
 

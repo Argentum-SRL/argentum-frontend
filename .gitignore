@@ -29,13 +29,14 @@ gitleaks-*.json
 # Graphify and Antigravity local files
 /graphify-out/
 /.agents/
+/.agents/skills/
+/.agent/skills/
+.agents/skills/
+.agent/skills/
 
 # Skills y artefactos de agentes locales
-.claude/skills/
-.agents/skills/
-skills-lock.json
-
-# Skills de agentes locales
-agent/skills/
-
+.claude/
+.codex/
+.impeccable/
 agent/
+skills-lock.json

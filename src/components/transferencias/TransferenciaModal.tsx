@@ -1,28 +1,23 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import {
-  X,
   ArrowRightLeft,
-  ArrowDownUp,
-  Calendar,
-  FileText,
-  Check,
-  Search,
-  ChevronRight,
+  ArrowUpRight,
+  ArrowDownLeft,
+  ChevronLeft,
+  X,
   AlertCircle,
-  TrendingDown,
-  TrendingUp,
-  Wallet,
-  Percent,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
-import type { Billetera, CotizacionDolar } from '@/types'
-import transferenciaService from '@/services/transferencia.service'
-import { sileo } from 'sileo'
-import { getErrorMessage } from '@/utils/errorMessages'
-import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
-import { formatMonto } from '@/utils/format'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { DateInput } from '@/components/ui'
+import BilleteraCard from '@/components/billeteras/BilleteraCard'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
+import type { Billetera, CotizacionDolar, CotizacionesDolarResponse } from '@/types'
+import transferenciaService from '@/services/transferencia.service'
+import { getCotizaciones } from '@/services/onboarding.service'
+import { formatMonto } from '@/utils/format'
+import { getErrorMessage } from '@/utils/errorMessages'
+import { sileo } from 'sileo'
 import styles from './TransferenciaModal.module.css'
 
 interface TransferenciaModalProps {
@@ -38,49 +33,6 @@ function todayLocal(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function getMinDateLocal(): string {
-  const d = new Date()
-  d.setFullYear(d.getFullYear() - 2)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-function getBankVisuals(billetera: Billetera) {
-  if (billetera.es_efectivo) {
-    return {
-      nombre: `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`,
-      bg: billetera.moneda === 'ARS' ? '#1A3D28' : '#0C3D48',
-      colorTexto: 'white' as const,
-      logoUrl: '',
-      initials: 'EF',
-      tipoLabel: 'Efectivo',
-    }
-  }
-
-  const bank = billetera.bank_id
-    ? getBankById(billetera.bank_id)
-    : findBankByNombre(billetera.nombre)
-
-  const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
-  const bg = bank?.colorPrimario || '#0D2045'
-  const colorTexto = bank?.colorTexto || 'white'
-  const initials = getInitials(bank?.nombre || billetera.nombre)
-  
-  let tipoLabel = 'Cuenta'
-  if (bank?.tipo === 'billetera_virtual') tipoLabel = 'Billetera virtual'
-  else if (bank?.tipo === 'banco_digital') tipoLabel = 'Banco digital'
-  else if (bank?.tipo === 'banco_tradicional') tipoLabel = 'Banco tradicional'
-  else if (bank?.tipo === 'plataforma_inversion') tipoLabel = 'Plataforma de inversión'
-
-  return {
-    nombre: bank?.nombre || billetera.nombre,
-    bg,
-    colorTexto,
-    logoUrl,
-    initials,
-    tipoLabel,
-  }
-}
-
 export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   isOpen,
   onClose,
@@ -88,36 +40,140 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   billeteras,
   cotizacionOficial,
 }) => {
-  // Todas las billeteras activas disponibles
+  // Cuentas activas
   const activeWallets = useMemo(() => {
     return billeteras.filter(b => b.estado === 'activa')
   }, [billeteras])
 
-  // Selección de billetera origen
-  const [billeteraOrigenId, setBilleteraOrigenId] = useState<string>(() => {
-    const activeARS = activeWallets.filter(b => b.moneda === 'ARS')
-    if (activeARS.length > 0) {
-      const best = activeARS.find(b => b.es_principal && b.saldo_actual > 0) ||
-        activeARS.find(b => b.saldo_actual > 0) ||
-        activeARS.find(b => b.es_principal) ||
-        activeARS[0]
-      return best.id
+  // Tipos de Operación: Solo 2 solapas principales (Detección automática)
+  const [tipoOperacion, setTipoOperacion] = useState<'entre_cuentas' | 'fx'>('entre_cuentas')
+  const [fxDirection, setFxDirection] = useState<'compra' | 'venta'>('compra') // compra: ARS -> USD, venta: USD -> ARS
+
+  // Moneda base del monto en Paso 1
+  const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS')
+  const [monto, setMonto] = useState<number | null>(null)
+
+  // Cuentas seleccionadas explícitamente por el usuario
+  const [selectedOrigenId, setSelectedOrigenId] = useState<string>('')
+  const [selectedDestinoId, setSelectedDestinoId] = useState<string>('')
+
+  // Cotizaciones Dólar (Oficial, MEP, Blue, Personalizado)
+  const [cotizacionesData, setCotizacionesData] = useState<CotizacionesDolarResponse['cotizaciones'] | null>(null)
+  const [tipoCotizacion, setTipoCotizacion] = useState<'oficial' | 'mep' | 'blue' | 'manual'>('mep')
+  const [cotizacionManual, setCotizacionManual] = useState<number | null>(null)
+
+  // Fecha y Nota
+  const [fecha, setFecha] = useState(todayLocal)
+  const [notas, setNotas] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Pasos y Animación
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
+  const [animClass, setAnimClass] = useState('')
+
+  // Referencias para scroll centrado del carrusel de billeteras
+  const carouselOrigenRef = useRef<HTMLDivElement>(null)
+  const carouselDestinoRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+
+  // Cargar cotizaciones completas al montar/abrir
+  useEffect(() => {
+    if (!isOpen) return
+    let active = true
+    getCotizaciones()
+      .then(res => {
+        if (active && res?.cotizaciones) {
+          setCotizacionesData(res.cotizaciones)
+        }
+      })
+      .catch(() => {
+        // Silenciar error en carga secundaria de cotizaciones
+      })
+    return () => {
+      active = false
     }
-    return activeWallets[0]?.id || ''
-  })
+  }, [isOpen])
 
-  // Selección de billetera destino
-  const [billeteraDestinoId, setBilleteraDestinoId] = useState<string>(() => {
-    const origen = activeWallets.find(b => b.id === billeteraOrigenId)
-    // Sugerir primero una billetera de la otra moneda si existe, para facilitar cambio de moneda
-    const opposite = activeWallets.find(b => b.id !== billeteraOrigenId && b.moneda !== origen?.moneda)
-    if (opposite) return opposite.id
+  // Moneda efectiva según la operación
+  const effectiveMoneda = tipoOperacion === 'fx' ? (fxDirection === 'compra' ? 'ARS' : 'USD') : moneda
 
-    const other = activeWallets.find(b => b.id !== billeteraOrigenId)
-    return other?.id || ''
-  })
+  // Lista de billeteras de origen según operación y moneda (Principal primera, luego mayor a menor saldo)
+  const billeterasOrigenDisponibles = useMemo(() => {
+    const list = tipoOperacion === 'fx'
+      ? activeWallets.filter(b => b.moneda === (fxDirection === 'compra' ? 'ARS' : 'USD'))
+      : activeWallets.filter(b => b.moneda === effectiveMoneda)
 
-  // Entidades seleccionadas
+    return list.slice().sort((a, b) => {
+      if (a.es_principal && !b.es_principal) return -1
+      if (!a.es_principal && b.es_principal) return 1
+      return Number(b.saldo_actual) - Number(a.saldo_actual)
+    })
+  }, [activeWallets, tipoOperacion, fxDirection, effectiveMoneda])
+
+  // Resolver ID de origen efectivo
+  const billeteraOrigenId = useMemo(() => {
+    if (selectedOrigenId && billeterasOrigenDisponibles.some(b => b.id === selectedOrigenId)) {
+      return selectedOrigenId
+    }
+    const bestOrigen =
+      billeterasOrigenDisponibles.find(b => b.es_principal) ||
+      billeterasOrigenDisponibles[0]
+    return bestOrigen?.id || ''
+  }, [selectedOrigenId, billeterasOrigenDisponibles])
+
+  // Lista de billeteras de destino según operación y origen (Principal primera, luego mayor a menor saldo)
+  const billeterasDestinoDisponibles = useMemo(() => {
+    const list = tipoOperacion === 'fx'
+      ? activeWallets.filter(b => b.moneda === (fxDirection === 'compra' ? 'USD' : 'ARS') && b.id !== billeteraOrigenId)
+      : activeWallets.filter(b => b.moneda === effectiveMoneda && b.id !== billeteraOrigenId)
+
+    return list.slice().sort((a, b) => {
+      if (a.es_principal && !b.es_principal) return -1
+      if (!a.es_principal && b.es_principal) return 1
+      return Number(b.saldo_actual) - Number(a.saldo_actual)
+    })
+  }, [activeWallets, tipoOperacion, fxDirection, effectiveMoneda, billeteraOrigenId])
+
+  // Resolver ID de destino efectivo
+  const billeteraDestinoId = useMemo(() => {
+    if (selectedDestinoId && billeterasDestinoDisponibles.some(b => b.id === selectedDestinoId)) {
+      return selectedDestinoId
+    }
+    const bestDestino =
+      billeterasDestinoDisponibles.find(b => b.es_principal) ||
+      billeterasDestinoDisponibles[0]
+    return bestDestino?.id || ''
+  }, [selectedDestinoId, billeterasDestinoDisponibles])
+
+  // Scroll automático centrado en la billetera seleccionada (igual a TransaccionModal)
+  useEffect(() => {
+    if (!isOpen) return
+    const idToScroll = step === 1 ? billeteraOrigenId : (step === 2 ? billeteraDestinoId : null)
+    if (!idToScroll) return
+
+    const timer = setTimeout(() => {
+      const card = cardRefs.current.get(idToScroll)
+      if (card) {
+        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+        if (scroller) {
+          const cardRect = card.getBoundingClientRect()
+          const scrollerRect = scroller.getBoundingClientRect()
+          const currentScroll = scroller.scrollLeft
+          const offset = cardRect.left - scrollerRect.left + currentScroll
+          const targetScrollLeft = offset - (scroller.clientWidth - cardRect.width) / 2
+
+          scroller.scrollTo({
+            left: Math.max(0, targetScrollLeft),
+            behavior: 'smooth',
+          })
+        }
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [step, billeteraOrigenId, billeteraDestinoId, isOpen])
+
+  // Entidades activas seleccionadas
   const billeteraOrigen = useMemo(() => {
     return activeWallets.find(b => b.id === billeteraOrigenId)
   }, [activeWallets, billeteraOrigenId])
@@ -126,157 +182,205 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     return activeWallets.find(b => b.id === billeteraDestinoId)
   }, [activeWallets, billeteraDestinoId])
 
-  const monedaOrigen = billeteraOrigen?.moneda || 'ARS'
-  const monedaDestino = billeteraDestino?.moneda || 'ARS'
-  const esMismaMoneda = monedaOrigen === monedaDestino
-
-  // Montos
-  const [monto, setMonto] = useState<number | null>(null)
-  const [montoDestino, setMontoDestino] = useState<number | null>(null)
-
-  // Comisión opcional
-  const [mostrarComision, setMostrarComision] = useState(false)
-  const [montoComision, setMontoComision] = useState<number | null>(null)
-  const [monedaComisionCustom, setMonedaComisionCustom] = useState<'ARS' | 'USD' | null>(null)
-
-  // Derivar moneda de comisión sin efectos secundarios
-  const monedaComision = (monedaComisionCustom === monedaOrigen || monedaComisionCustom === monedaDestino)
-    ? (monedaComisionCustom ?? monedaOrigen)
-    : monedaOrigen
-
-  const [fecha, setFecha] = useState(todayLocal())
-  const [notas, setNotas] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSwapping, setIsSwapping] = useState(false)
-  const [pickerMode, setPickerMode] = useState<'origen' | 'destino' | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-
-  // Invertir origen y destino (Swap)
-  const handleSwap = useCallback(() => {
-    if (!billeteraOrigenId || !billeteraDestinoId) return
-    setIsSwapping(true)
-    setTimeout(() => {
-      setBilleteraOrigenId(billeteraDestinoId)
-      setBilleteraDestinoId(billeteraOrigenId)
-      // Si se invierten, invertimos también los montos si difieren
-      if (!esMismaMoneda) {
-        setMonto(montoDestino)
-        setMontoDestino(monto)
+  // Obtener cotización numérica para un tipo de cambio dado
+  const getRateValue = useCallback((tipoRate: 'oficial' | 'mep' | 'blue' | 'manual'): number | null => {
+    if (tipoRate === 'manual') return cotizacionManual
+    if (cotizacionesData && cotizacionesData[tipoRate]) {
+      const item = cotizacionesData[tipoRate]
+      if (fxDirection === 'compra') {
+        return item.venta ?? item.promedio ?? item.compra ?? null
       }
-      setIsSwapping(false)
-    }, 180)
-  }, [billeteraOrigenId, billeteraDestinoId, esMismaMoneda, monto, montoDestino])
+      return item.compra ?? item.promedio ?? item.venta ?? null
+    }
+    if (tipoRate === 'oficial' && cotizacionOficial) {
+      if (fxDirection === 'compra') {
+        return cotizacionOficial.venta ?? cotizacionOficial.promedio ?? cotizacionOficial.compra ?? 1090
+      }
+      return cotizacionOficial.compra ?? cotizacionOficial.promedio ?? cotizacionOficial.venta ?? 1050
+    }
+    // Valores de referencia de mercado si aún no cargó la API
+    if (tipoRate === 'oficial') return fxDirection === 'compra' ? 1090 : 1050
+    if (tipoRate === 'mep') return fxDirection === 'compra' ? 1415 : 1410
+    if (tipoRate === 'blue') return fxDirection === 'compra' ? 1440 : 1420
+    return null
+  }, [cotizacionesData, fxDirection, cotizacionOficial, cotizacionManual])
 
-  // Cálculos en vivo de cotización implícita
-  const cotizacionImplicita = useMemo(() => {
-    if (esMismaMoneda || !monto || monto <= 0 || !montoDestino || montoDestino <= 0) {
+  // Cotización activa calculada
+  const cotizacionActivaValor = useMemo(() => {
+    if (tipoOperacion !== 'fx') return null
+    if (tipoCotizacion === 'manual') {
+      return cotizacionManual ?? 1440
+    }
+    return getRateValue(tipoCotizacion) ?? cotizacionManual ?? 1440
+  }, [tipoOperacion, tipoCotizacion, cotizacionManual, getRateValue])
+
+  // Cálculo del monto en destino si es FX
+  const montoDestinoCalculado = useMemo(() => {
+    if (tipoOperacion !== 'fx' || !monto || monto <= 0 || !cotizacionActivaValor) {
       return null
     }
-    // Convención: siempre ARS / USD (pesos por cada dólar)
-    if (monedaOrigen === 'ARS' && monedaDestino === 'USD') {
-      return monto / montoDestino
-    } else if (monedaOrigen === 'USD' && monedaDestino === 'ARS') {
-      return montoDestino / monto
+
+    if (fxDirection === 'compra') {
+      // Paga ARS, recibe USD
+      return Number((monto / cotizacionActivaValor).toFixed(2))
     }
-    return monto / montoDestino
-  }, [esMismaMoneda, monto, montoDestino, monedaOrigen, monedaDestino])
+    // Entrega USD, recibe ARS
+    return Number((monto * cotizacionActivaValor).toFixed(2))
+  }, [tipoOperacion, fxDirection, monto, cotizacionActivaValor])
 
-  // Cotización oficial de referencia
-  const cotizacionOficialRef = useMemo(() => {
-    if (esMismaMoneda || !cotizacionOficial) return null
-    if (monedaOrigen === 'ARS' && monedaDestino === 'USD') {
-      return cotizacionOficial.venta || cotizacionOficial.promedio || null
-    }
-    if (monedaOrigen === 'USD' && monedaDestino === 'ARS') {
-      return cotizacionOficial.compra || cotizacionOficial.promedio || null
-    }
-    return null
-  }, [esMismaMoneda, cotizacionOficial, monedaOrigen, monedaDestino])
+  // Detección automática del tipo de movimiento (Opción 1)
+  const tipoMovimientoDetectado = useMemo<'extraccion' | 'deposito' | 'transferencia' | 'fx'>(() => {
+    if (tipoOperacion === 'fx') return 'fx'
+    if (billeteraOrigen?.es_efectivo && !billeteraDestino?.es_efectivo) return 'deposito'
+    if (!billeteraOrigen?.es_efectivo && billeteraDestino?.es_efectivo) return 'extraccion'
+    return 'transferencia'
+  }, [tipoOperacion, billeteraOrigen, billeteraDestino])
 
-  // Cálculos en vivo de impacto en saldo
-  const montoNum = monto || 0
-  const montoDestinoNum = esMismaMoneda ? montoNum : (montoDestino || 0)
-  const comisionNum = mostrarComision && montoComision ? montoComision : 0
-
-  const comisionEnOrigen = monedaComision === monedaOrigen ? comisionNum : 0
-  const comisionEnDestino = monedaComision === monedaDestino ? comisionNum : 0
-
+  // Saldos e impacto
   const saldoOrigenActual = billeteraOrigen?.saldo_actual ?? 0
-  const saldoDestinoActual = billeteraDestino?.saldo_actual ?? 0
+  const isOverdraft = Boolean(monto && monto > saldoOrigenActual)
 
-  const debitoTotalOrigen = montoNum + comisionEnOrigen
-  const saldoOrigenProyectado = saldoOrigenActual - debitoTotalOrigen
-  const saldoDestinoProyectado = saldoDestinoActual + montoDestinoNum - comisionEnDestino
+  // Título del botón de confirmación
+  const submitTitle = useMemo(() => {
+    if (tipoOperacion === 'fx') {
+      return fxDirection === 'compra' ? 'Confirmar compra Dólares' : 'Confirmar venta Dólares'
+    }
+    if (tipoMovimientoDetectado === 'extraccion') {
+      return 'Confirmar extracción'
+    }
+    if (tipoMovimientoDetectado === 'deposito') {
+      return 'Confirmar depósito'
+    }
+    return 'Confirmar transferencia'
+  }, [tipoOperacion, fxDirection, tipoMovimientoDetectado])
 
-  const isOverdraft = debitoTotalOrigen > saldoOrigenActual
-  const isDestinoOverdraft = comisionEnDestino > (saldoDestinoActual + montoDestinoNum)
+  // Mensaje de éxito del toast
+  const successToastTitle = useMemo(() => {
+    if (tipoOperacion === 'fx') {
+      return fxDirection === 'compra' ? 'Compra de dólares registrada' : 'Venta de dólares registrada'
+    }
+    if (tipoMovimientoDetectado === 'extraccion') {
+      return 'Extracción de efectivo registrada'
+    }
+    if (tipoMovimientoDetectado === 'deposito') {
+      return 'Depósito registrado con éxito'
+    }
+    return 'Transferencia realizada con éxito'
+  }, [tipoOperacion, fxDirection, tipoMovimientoDetectado])
 
-  // Precargar saldo total disponible de la billetera de origen
-  const handleTransferirTodo = useCallback(() => {
-    if (!billeteraOrigenId || saldoOrigenActual <= 0) return
-    setMonto(saldoOrigenActual)
-  }, [billeteraOrigenId, saldoOrigenActual])
+  // Placeholder de nota según movimiento detectado
+  const placeholderNota = useMemo(() => {
+    if (tipoOperacion === 'fx') {
+      return fxDirection === 'compra' ? 'Compra dólares MEP / Ahorro' : 'Venta de dólares'
+    }
+    if (tipoMovimientoDetectado === 'extraccion') {
+      return 'Extracción por cajero automático'
+    }
+    if (tipoMovimientoDetectado === 'deposito') {
+      return 'Depósito por terminal / ventanilla'
+    }
+    return 'Ej: Ahorro, traspaso, etc.'
+  }, [tipoOperacion, fxDirection, tipoMovimientoDetectado])
 
-  // Envío del formulario
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Navegación de Pasos
+  const goNext = () => {
+    if (step === 1) {
+      if (!monto || monto <= 0) {
+        sileo.error({ title: 'Ingresá un monto válido mayor a 0' })
+        return
+      }
+      if (!billeteraOrigenId) {
+        sileo.error({ title: 'Seleccioná la cuenta de origen' })
+        return
+      }
+      if (isOverdraft) {
+        sileo.error({
+          title: `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatMonto(saldoOrigenActual, effectiveMoneda)}`,
+        })
+        return
+      }
 
-    if (!billeteraOrigenId) {
-      sileo.error({ title: 'Seleccioná la cuenta de origen' })
-      return
+      setAnimClass(styles.slideForward)
+      setStep(2)
+    } else if (step === 2) {
+      if (!billeteraDestinoId) {
+        sileo.error({ title: 'Seleccioná la cuenta de destino' })
+        return
+      }
+      setAnimClass(styles.slideForward)
+      if (tipoOperacion === 'fx') {
+        setStep(3)
+      } else {
+        setStep(4)
+      }
+    } else if (step === 3) {
+      if (!cotizacionActivaValor || cotizacionActivaValor <= 0) {
+        sileo.error({ title: 'Ingresá una cotización válida' })
+        return
+      }
+      setAnimClass(styles.slideForward)
+      setStep(4)
     }
-    if (!billeteraDestinoId) {
-      sileo.error({ title: 'Seleccioná la cuenta de destino' })
-      return
+  }
+
+  const goBack = () => {
+    setAnimClass(styles.slideBack)
+    if (step === 4) {
+      if (tipoOperacion === 'fx') {
+        setStep(3)
+      } else {
+        setStep(2)
+      }
+    } else if (step === 3) {
+      setStep(2)
+    } else if (step === 2) {
+      setStep(1)
     }
-    if (billeteraOrigenId === billeteraDestinoId) {
-      sileo.error({ title: 'La cuenta de origen y destino no pueden ser la misma' })
-      return
-    }
-    if (!monto || monto <= 0) {
-      sileo.error({ title: 'Ingresá un monto válido mayor a 0' })
-      return
-    }
-    if (!esMismaMoneda && (!montoDestino || montoDestino <= 0)) {
-      sileo.error({ title: 'Ingresá el monto a recibir en la cuenta de destino' })
-      return
-    }
-    if (isOverdraft) {
-      sileo.error({
-        title: `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatMonto(saldoOrigenActual, monedaOrigen)}, Solicitado: ${formatMonto(debitoTotalOrigen, monedaOrigen)}`
-      })
-      return
-    }
-    if (isDestinoOverdraft) {
-      sileo.error({
-        title: `Saldo insuficiente en ${billeteraDestino?.nombre} para cubrir la comisión de ${formatMonto(comisionNum, monedaComision)}`
-      })
-      return
-    }
+  }
+
+  // Hook de altura adaptativa (idéntico a TransaccionModal)
+  const {
+    headerRef: formHeaderRef,
+    fieldsRef: formBodyRef,
+    footerRef: formFooterRef,
+    dynamicHeight,
+  } = useAdaptiveModalHeight({
+    enabled: isOpen,
+    deps: [step, tipoOperacion, fxDirection, effectiveMoneda, monto, billeteraOrigenId, billeteraDestinoId, tipoCotizacion, cotizacionActivaValor, billeterasOrigenDisponibles.length, billeterasDestinoDisponibles.length],
+    extraPadding: 22,
+    maxHeightRatio: 0.90,
+  })
+
+  // Envío final
+  const handleSubmit = async () => {
+    if (isSubmitting || !billeteraOrigenId || !billeteraDestinoId || !monto) return
 
     setIsSubmitting(true)
     try {
+      const monedaOrigen = billeteraOrigen?.moneda || effectiveMoneda
+      const monedaDestino = billeteraDestino?.moneda || (tipoOperacion === 'fx' ? (fxDirection === 'compra' ? 'USD' : 'ARS') : effectiveMoneda)
+      const esMismaMoneda = monedaOrigen === monedaDestino
+
+      const finalMontoDestino = esMismaMoneda ? Number(monto) : Number(montoDestinoCalculado || monto)
+
       await transferenciaService.createTransferencia({
         billetera_origen_id: billeteraOrigenId,
         billetera_destino_id: billeteraDestinoId,
         monto: Number(monto),
         moneda: monedaOrigen,
         monto_origen: Number(monto),
-        monto_destino: esMismaMoneda ? Number(monto) : Number(montoDestino),
+        monto_destino: finalMontoDestino,
         moneda_origen: monedaOrigen,
         moneda_destino: monedaDestino,
-        monto_comision: comisionNum > 0 ? Number(comisionNum) : null,
-        moneda_comision: comisionNum > 0 ? monedaComision : null,
+        cotizacion: esMismaMoneda ? null : (cotizacionActivaValor ? Number(cotizacionActivaValor) : null),
+        monto_comision: null,
+        moneda_comision: null,
         fecha,
         notas: notas.trim() || null,
       })
 
       sileo.success({
-        title: esMismaMoneda
-          ? 'Transferencia realizada con éxito'
-          : monedaOrigen === 'ARS'
-            ? 'Compra de dólares registrada con éxito'
-            : 'Venta de dólares registrada con éxito'
+        title: successToastTitle,
       })
       onSuccess()
       onClose()
@@ -288,616 +392,454 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     }
   }
 
-  // Cuentas filtradas para el picker modal
-  const filteredPickerWallets = useMemo(() => {
-    const list = activeWallets.filter(b => {
-      if (!searchQuery.trim()) return true
-      const q = searchQuery.toLowerCase()
-      return (
-        b.nombre.toLowerCase().includes(q) ||
-        b.moneda.toLowerCase().includes(q) ||
-        (b.bank_id && b.bank_id.toLowerCase().includes(q))
-      )
-    })
-    return list.sort((a, b) => {
-      if (pickerMode === 'origen') {
-        if (a.id === billeteraOrigenId) return -1
-        if (b.id === billeteraOrigenId) return 1
-      } else {
-        if (a.id === billeteraDestinoId) return -1
-        if (b.id === billeteraDestinoId) return 1
-      }
-      return b.saldo_actual - a.saldo_actual
-    })
-  }, [activeWallets, searchQuery, pickerMode, billeteraOrigenId, billeteraDestinoId])
-
-  const handleSelectPickerWallet = (id: string) => {
-    if (pickerMode === 'origen') {
-      setBilleteraOrigenId(id)
-      if (id === billeteraDestinoId) {
-        const next = activeWallets.find(b => b.id !== id)
-        setBilleteraDestinoId(next?.id || '')
-      }
-    } else if (pickerMode === 'destino') {
-      setBilleteraDestinoId(id)
-      if (id === billeteraOrigenId) {
-        const next = activeWallets.find(b => b.id !== id)
-        setBilleteraOrigenId(next?.id || '')
-      }
-    }
-    setPickerMode(null)
-    setSearchQuery('')
-  }
-
-  const visualsOrigen = billeteraOrigen ? getBankVisuals(billeteraOrigen) : null
-  const visualsDestino = billeteraDestino ? getBankVisuals(billeteraDestino) : null
+  if (!isOpen) return null
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Pasar plata entre cuentas">
-      <div className={styles.modalRoot}>
-        {/* ── Vista Picker de Cuentas (Overlay fluido) ── */}
-        {pickerMode !== null ? (
-          <div className={styles.pickerView}>
-            <div className={styles.pickerHeader}>
-              <div className={styles.pickerTitleGroup}>
-                <h3 className={styles.pickerTitle}>
-                  {pickerMode === 'origen' ? 'Seleccionar cuenta de origen' : 'Seleccionar cuenta de destino'}
-                </h3>
-                <p className={styles.pickerSubtitle}>
-                  Seleccioná cualquiera de tus cuentas activas en ARS o USD
-                </p>
-              </div>
-              <button
-                type="button"
-                className={styles.iconCircleBtn}
-                onClick={() => { setPickerMode(null); setSearchQuery('') }}
-                aria-label="Volver"
-              >
-                <X size={18} />
-              </button>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      showHeader={false}
+      noPadding
+      autoHeight
+      className={styles.modalTransferencia}
+      ariaLabel="Transferir y Cambiar"
+    >
+      <div
+        className={styles.slidesContainer}
+        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
+      >
+        {/* ── Step Indicator Dots (Idéntico a TransaccionModal) ── */}
+        <div className={styles.stepDots}>
+          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
+          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
+          {tipoOperacion === 'fx' && (
+            <div className={`${styles.stepDot} ${step === 3 ? styles.stepDotActive : styles.stepDotInactive}`} />
+          )}
+          <div className={`${styles.stepDot} ${step === 4 ? styles.stepDotActive : styles.stepDotInactive}`} />
+        </div>
 
-            {/* Buscador rápido */}
-            {activeWallets.length > 3 && (
-              <div className={styles.searchWrap}>
-                <Search size={16} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder="Buscar por cuenta, banco o moneda..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={styles.searchInput}
+        {/* ════════════════════ PASO 1: Monto, Operación y Origen ════════════════════ */}
+        {step === 1 && (
+          <div className={`${styles.slide} ${animClass}`}>
+            <form
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
+              <div ref={formHeaderRef} className={styles.formHeader}>
+                <h2 className={styles.headerTitle}>Transferir y Cambiar</h2>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep1}`}>
+                {/* Selector de Operación (3 Solapas Directas Apple Style) */}
+                <div className={styles.segmentedBar} role="radiogroup" aria-label="Tipo de operación">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={tipoOperacion === 'entre_cuentas'}
+                    className={`${styles.segmentedPill} ${tipoOperacion === 'entre_cuentas' ? styles.segmentedPillActive : ''}`}
+                    onClick={() => setTipoOperacion('entre_cuentas')}
+                  >
+                    <ArrowRightLeft size={14} strokeWidth={2} />
+                    <span>Entre cuentas</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={tipoOperacion === 'fx' && fxDirection === 'compra'}
+                    className={`${styles.segmentedPill} ${tipoOperacion === 'fx' && fxDirection === 'compra' ? styles.segmentedPillActive : ''}`}
+                    onClick={() => {
+                      setTipoOperacion('fx')
+                      setFxDirection('compra')
+                      setMoneda('ARS')
+                    }}
+                  >
+                    <ArrowDownLeft size={14} strokeWidth={2.2} />
+                    <span>Comprar</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={tipoOperacion === 'fx' && fxDirection === 'venta'}
+                    className={`${styles.segmentedPill} ${tipoOperacion === 'fx' && fxDirection === 'venta' ? styles.segmentedPillActive : ''}`}
+                    onClick={() => {
+                      setTipoOperacion('fx')
+                      setFxDirection('venta')
+                      setMoneda('USD')
+                    }}
+                  >
+                    <ArrowUpRight size={14} strokeWidth={2.2} />
+                    <span>Vender</span>
+                  </button>
+                </div>
+
+                {/* Hero Monto */}
+                <MontoInput
+                  value={monto}
+                  onChange={setMonto}
+                  moneda={effectiveMoneda}
+                  onMonedaChange={setMoneda}
                   autoFocus
+                  allowDecimals
                 />
-              </div>
-            )}
 
-            {/* Lista de billeteras */}
-            <div className={styles.pickerList}>
-              {filteredPickerWallets.length === 0 ? (
-                <div className={styles.pickerEmpty}>
-                  <Wallet size={28} className={styles.pickerEmptyIcon} />
-                  <p>No se encontraron cuentas disponibles</p>
-                </div>
-              ) : (
-                filteredPickerWallets.map((b) => {
-                  const vis = getBankVisuals(b)
-                  const isCurrent = pickerMode === 'origen' ? b.id === billeteraOrigenId : b.id === billeteraDestinoId
-                  const isOpposite = pickerMode === 'origen' ? b.id === billeteraDestinoId : b.id === billeteraOrigenId
+                {/* Cuenta de Origen con Carrusel idéntico a TransaccionModal */}
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>
+                    {tipoOperacion === 'fx'
+                      ? fxDirection === 'compra'
+                        ? '¿De qué cuenta salen los pesos?'
+                        : '¿De qué cuenta salen los dólares?'
+                      : '¿De qué cuenta sale el dinero?'}
+                  </label>
 
-                  return (
-                    <button
-                      key={b.id}
-                      type="button"
-                      className={`${styles.pickerItem} ${isCurrent ? styles.pickerItemActive : ''} ${isOpposite ? styles.pickerItemOpposite : ''}`}
-                      onClick={() => handleSelectPickerWallet(b.id)}
-                    >
-                      <div
-                        className={styles.bankAvatar}
-                        style={{ background: vis.bg }}
-                      >
-                        {vis.logoUrl ? (
-                          <img src={vis.logoUrl} alt={vis.nombre} className={styles.bankAvatarImg} />
-                        ) : (
-                          <span className={styles.bankAvatarText}>{vis.initials}</span>
-                        )}
-                      </div>
-
-                      <div className={styles.pickerItemInfo}>
-                        <div className={styles.pickerItemNameRow}>
-                          <span className={styles.pickerItemName}>{b.nombre}</span>
-                          <span className={styles.currencyBadgePicker}>{b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
-                          {b.es_principal && (
-                            <span className={styles.badgePrincipal}>Principal</span>
-                          )}
-                          {isOpposite && (
-                            <span className={styles.badgeOpposite}>
-                              {pickerMode === 'origen' ? 'Destino actual' : 'Origen actual'}
-                            </span>
-                          )}
-                        </div>
-                        <span className={styles.pickerItemType}>{vis.tipoLabel}</span>
-                      </div>
-
-                      <div className={styles.pickerItemBalance}>
-                        <span className={styles.pickerItemAmount}>{formatMonto(b.saldo_actual, b.moneda)}</span>
-                        {isCurrent && <Check size={16} className={styles.checkIcon} />}
-                      </div>
-                    </button>
-                  )
-                })
-              )}
-            </div>
-          </div>
-        ) : (
-          /* ── Vista Principal del Formulario de Transferencia ── */
-          <form className={styles.mainForm} onSubmit={handleSubmit}>
-            {/* Header */}
-            <div className={styles.header}>
-              <div className={styles.headerTitleWrap}>
-                <div className={styles.headerIconPill}>
-                  <ArrowRightLeft size={16} />
-                </div>
-                <div>
-                  <h2 className={styles.headerTitle}>
-                    {esMismaMoneda ? 'Pasar plata entre cuentas' : 'Compra y venta de dólares'}
-                  </h2>
-                  <p className={styles.headerSubtitle}>
-                    {esMismaMoneda
-                      ? 'Traspaso inmediato entre tus billeteras'
-                      : 'Transferencia bimonetaria entre tus billeteras propias'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className={styles.iconCircleBtn}
-                onClick={onClose}
-                aria-label="Cerrar modal"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className={styles.scrollableBody}>
-              {/* ── SECCIÓN 1: Dual Account Selector (Desde ➔ ⇄ ➔ Hacia) ── */}
-              <div className={styles.transferFlowContainer}>
-                {/* Origen Card */}
-                <div
-                  className={`${styles.accountCard} ${!billeteraOrigenId ? styles.accountCardEmpty : ''}`}
-                  onClick={() => setPickerMode('origen')}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className={styles.accountCardTop}>
-                    <span className={styles.accountCardTag}>Desde (Origen)</span>
-                    <span className={styles.changeAction}>
-                      Cambiar <ChevronRight size={14} />
-                    </span>
-                  </div>
-
-                  {billeteraOrigen && visualsOrigen ? (
-                    <div className={styles.accountCardContent}>
-                      <div
-                        className={styles.bankAvatar}
-                        style={{ background: visualsOrigen.bg }}
-                      >
-                        {visualsOrigen.logoUrl ? (
-                          <img src={visualsOrigen.logoUrl} alt={visualsOrigen.nombre} className={styles.bankAvatarImg} />
-                        ) : (
-                          <span className={styles.bankAvatarText}>{visualsOrigen.initials}</span>
-                        )}
-                      </div>
-
-                      <div className={styles.accountCardMeta}>
-                        <div className={styles.pickerItemNameRow}>
-                          <span className={styles.accountName}>{billeteraOrigen.nombre}</span>
-                          <span className={styles.currencyTag}>{billeteraOrigen.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
-                        </div>
-                        <div className={styles.accountBalances}>
-                          <span className={styles.currentBalance}>
-                            Saldo: {formatMonto(saldoOrigenActual, monedaOrigen)}
-                          </span>
-                          {debitoTotalOrigen > 0 && (
-                            <span className={styles.projectedDown}>
-                              <TrendingDown size={12} />
-                              {formatMonto(saldoOrigenProyectado, monedaOrigen)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                  {billeterasOrigenDisponibles.length === 0 ? (
+                    <p className={styles.noWalletsText}>No tenés cuentas disponibles para este tipo de operación.</p>
                   ) : (
-                    <div className={styles.emptyCardContent}>
-                      <span>Elegir cuenta de origen</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Botón Swap Interactivo */}
-                <div className={styles.swapWrap}>
-                  <div className={styles.swapDividerLine} />
-                  <button
-                    type="button"
-                    className={`${styles.swapButton} ${isSwapping ? styles.swapButtonActive : ''}`}
-                    onClick={handleSwap}
-                    disabled={!billeteraOrigenId || !billeteraDestinoId}
-                    title="Invertir cuentas (Origen ⇄ Destino)"
-                    aria-label="Invertir cuentas"
-                  >
-                    <ArrowDownUp size={16} />
-                  </button>
-                  <div className={styles.swapDividerLine} />
-                </div>
-
-                {/* Destino Card */}
-                <div
-                  className={`${styles.accountCard} ${!billeteraDestinoId ? styles.accountCardEmpty : ''}`}
-                  onClick={() => setPickerMode('destino')}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className={styles.accountCardTop}>
-                    <span className={styles.accountCardTag}>Hacia (Destino)</span>
-                    <span className={styles.changeAction}>
-                      Cambiar <ChevronRight size={14} />
-                    </span>
-                  </div>
-
-                  {billeteraDestino && visualsDestino ? (
-                    <div className={styles.accountCardContent}>
-                      <div
-                        className={styles.bankAvatar}
-                        style={{ background: visualsDestino.bg }}
-                      >
-                        {visualsDestino.logoUrl ? (
-                          <img src={visualsDestino.logoUrl} alt={visualsDestino.nombre} className={styles.bankAvatarImg} />
-                        ) : (
-                          <span className={styles.bankAvatarText}>{visualsDestino.initials}</span>
-                        )}
-                      </div>
-
-                      <div className={styles.accountCardMeta}>
-                        <div className={styles.pickerItemNameRow}>
-                          <span className={styles.accountName}>{billeteraDestino.nombre}</span>
-                          <span className={styles.currencyTag}>{billeteraDestino.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</span>
-                        </div>
-                        <div className={styles.accountBalances}>
-                          <span className={styles.currentBalance}>
-                            Saldo: {formatMonto(saldoDestinoActual, monedaDestino)}
-                          </span>
-                          {montoDestinoNum > 0 && (
-                            <span className={styles.projectedUp}>
-                              <TrendingUp size={12} />
-                              +{formatMonto(saldoDestinoProyectado, monedaDestino)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles.emptyCardContent}>
-                      <span>Elegir cuenta de destino</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* ── SECCIÓN 2: Montos & Cotización ── */}
-              {esMismaMoneda ? (
-                /* Monto único para misma moneda */
-                <div className={styles.montoSection}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 2px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-2)' }}>Monto a transferir</span>
-                    <button
-                      type="button"
-                      onClick={handleTransferirTodo}
-                      disabled={!billeteraOrigenId || saldoOrigenActual <= 0}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'var(--text-3, #94a3b8)' : 'var(--primary, #0D2045)',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        cursor: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'not-allowed' : 'pointer',
-                        padding: '2px 6px',
-                        borderRadius: '6px',
-                        opacity: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 0.45 : 1,
-                        transition: 'all 0.15s ease',
-                      }}
-                      title="Transferir saldo total disponible"
-                    >
-                      Transferir todo
-                    </button>
-                  </div>
-                  <MontoInput
-                    value={monto}
-                    onChange={setMonto}
-                    moneda={monedaOrigen}
-                    autoFocus
-                    allowDecimals
-                    max={999999999.99}
-                    placeholder="0"
-                  />
-
-                  {isOverdraft && (
-                    <div className={styles.warningBanner}>
-                      <AlertCircle size={14} className={styles.warningIcon} />
-                      <span>
-                        El monto supera el saldo disponible en {billeteraOrigen?.nombre} ({formatMonto(saldoOrigenActual, monedaOrigen)})
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                /* Dos montos para distinta moneda */
-                <div className={styles.montoSection}>
-                  <div className={styles.dualMontoContainer}>
-                    {/* Monto que sale */}
-                    <div className={styles.montoFieldCard}>
-                      <div className={styles.montoFieldLabel}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span>Monto que sale ({monedaOrigen === 'ARS' ? 'Pesos' : 'Dólares'})</span>
-                          <button
-                            type="button"
-                            onClick={handleTransferirTodo}
-                            disabled={!billeteraOrigenId || saldoOrigenActual <= 0}
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              color: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'var(--text-3, #94a3b8)' : 'var(--primary, #0D2045)',
-                              fontSize: '11px',
-                              fontWeight: 700,
-                              cursor: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 'not-allowed' : 'pointer',
-                              padding: '1px 5px',
-                              borderRadius: '4px',
-                              opacity: (!billeteraOrigenId || saldoOrigenActual <= 0) ? 0.45 : 1,
-                              transition: 'all 0.15s ease',
+                    <div className={styles.billeterasCarouselScroller}>
+                      <div className={styles.billeterasCarousel} ref={carouselOrigenRef}>
+                        {billeterasOrigenDisponibles.map(b => (
+                          <div
+                            key={b.id}
+                            className={styles.billeteraSelectWrap}
+                            data-active={billeteraOrigenId === b.id}
+                            ref={(el) => {
+                              if (el) cardRefs.current.set(b.id, el)
+                              else cardRefs.current.delete(b.id)
                             }}
-                            title="Transferir saldo total disponible"
                           >
-                            Transferir todo
-                          </button>
-                        </div>
-                        <span className={styles.currencyTag}>{monedaOrigen === 'ARS' ? 'Pesos' : 'Dólares'}</span>
+                            <BilleteraCard
+                              billetera={b}
+                              className={styles.fullHeightCard}
+                              disableNavigation={true}
+                              hideCurrencyChip={true}
+                            />
+                            <button
+                              type="button"
+                              className={styles.billeteraOverlay}
+                              onClick={() => setSelectedOrigenId(b.id)}
+                              title={`Seleccionar ${b.nombre}`}
+                              aria-label={`Seleccionar ${b.nombre}`}
+                            />
+                          </div>
+                        ))}
                       </div>
-                      <div className={styles.montoInputRow}>
-                        <span className={styles.currencySymbolPrefix}>
-                          {monedaOrigen === 'ARS' ? '$' : 'US$'}
-                        </span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          placeholder="0.00"
-                          value={monto !== null ? monto : ''}
-                          onChange={(e) => {
-                            const val = e.target.value === '' ? null : parseFloat(e.target.value)
-                            setMonto(val)
-                          }}
-                          className={styles.montoCustomInput}
-                          autoFocus
-                        />
-                      </div>
-                    </div>
-
-                    {/* Monto que entra */}
-                    <div className={styles.montoFieldCard}>
-                      <div className={styles.montoFieldLabel}>
-                        <span>Monto que entra ({monedaDestino === 'ARS' ? 'Pesos' : 'Dólares'})</span>
-                        <span className={styles.currencyTag}>{monedaDestino === 'ARS' ? 'Pesos' : 'Dólares'}</span>
-                      </div>
-                      <div className={styles.montoInputRow}>
-                        <span className={styles.currencySymbolPrefix}>
-                          {monedaDestino === 'ARS' ? '$' : 'US$'}
-                        </span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          placeholder="0.00"
-                          value={montoDestino !== null ? montoDestino : ''}
-                          onChange={(e) => {
-                            const val = e.target.value === '' ? null : parseFloat(e.target.value)
-                            setMontoDestino(val)
-                          }}
-                          className={styles.montoCustomInput}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Banner de cotización implícita en vivo */}
-                  {cotizacionImplicita !== null && (
-                    <div className={styles.cotizacionBanner}>
-                      <div className={styles.cotizacionText}>
-                        {monedaOrigen === 'ARS' ? (
-                          <span>Estás comprando dólares a {formatMonto(cotizacionImplicita, 'ARS')} pesos</span>
-                        ) : (
-                          <span>Estás vendiendo dólares a {formatMonto(cotizacionImplicita, 'ARS')} pesos</span>
-                        )}
-                      </div>
-                      {cotizacionOficialRef !== null && (
-                        <div className={styles.cotizacionRef}>
-                          Referencia oficial: {formatMonto(cotizacionOficialRef, 'ARS')}
-                        </div>
-                      )}
                     </div>
                   )}
+                </div>
 
-                  {isOverdraft && (
-                    <div className={styles.warningBanner}>
-                      <AlertCircle size={14} className={styles.warningIcon} />
-                      <span>
-                        El monto total ({formatMonto(debitoTotalOrigen, monedaOrigen)}) supera el saldo disponible en {billeteraOrigen?.nombre} ({formatMonto(saldoOrigenActual, monedaOrigen)})
+                {/* Alerta de saldo insuficiente */}
+                {isOverdraft && (
+                  <div className={styles.overdraftWarning}>
+                    <AlertCircle size={15} />
+                    El monto supera el saldo disponible ({formatMonto(saldoOrigenActual, effectiveMoneda)})
+                  </div>
+                )}
+              </div>
+
+              <div ref={formFooterRef} className={styles.formFooter}>
+                <button type="button" className={styles.cancelBtn} onClick={onClose}>
+                  Cancelar
+                </button>
+                <button type="submit" className={styles.submitBtn}>
+                  Continuar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ════════════════════ PASO 2: Cuenta Destino ════════════════════ */}
+        {step === 2 && (
+          <div className={`${styles.slide} ${animClass}`}>
+            <form
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
+              <div ref={formHeaderRef} className={styles.formHeader}>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
+                  <ChevronLeft size={20} />
+                </button>
+                <h2 className={styles.headerTitle}>Cuenta de destino</h2>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div ref={formBodyRef} className={styles.formBody}>
+                {/* Selector de Billetera de Destino (Carrusel) */}
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>
+                    {tipoOperacion === 'fx'
+                      ? fxDirection === 'compra'
+                        ? '¿A qué cuenta ingresan los dólares?'
+                        : '¿A qué cuenta ingresan los pesos?'
+                      : '¿A qué cuenta ingresa el dinero?'}
+                  </label>
+
+                  {billeterasDestinoDisponibles.length === 0 ? (
+                    <p className={styles.noWalletsText}>No tenés otras cuentas disponibles para este destino.</p>
+                  ) : (
+                    <div className={styles.billeterasCarouselScroller}>
+                      <div className={styles.billeterasCarousel} ref={carouselDestinoRef}>
+                        {billeterasDestinoDisponibles.map(b => (
+                          <div
+                            key={b.id}
+                            className={styles.billeteraSelectWrap}
+                            data-active={billeteraDestinoId === b.id}
+                            ref={(el) => {
+                              if (el) cardRefs.current.set(b.id, el)
+                              else cardRefs.current.delete(b.id)
+                            }}
+                          >
+                            <BilleteraCard
+                              billetera={b}
+                              className={styles.fullHeightCard}
+                              disableNavigation={true}
+                              hideCurrencyChip={true}
+                            />
+                            <button
+                              type="button"
+                              className={styles.billeteraOverlay}
+                              onClick={() => setSelectedDestinoId(b.id)}
+                              title={`Seleccionar ${b.nombre}`}
+                              aria-label={`Seleccionar ${b.nombre}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div ref={formFooterRef} className={styles.formFooter}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>
+                  Atrás
+                </button>
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                  Continuar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ════════════════════ PASO 3: Tipo de Cambio y Cotización (Solo FX) ════════════════════ */}
+        {step === 3 && (
+          <div className={`${styles.slide} ${animClass}`}>
+            <form
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                goNext()
+              }}
+            >
+              <div ref={formHeaderRef} className={styles.formHeader}>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
+                  <ChevronLeft size={20} />
+                </button>
+                <h2 className={styles.headerTitle}>Tipo de cambio y Cotización</h2>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div ref={formBodyRef} className={styles.formBody}>
+                {/* Selector de Tipos de Cambio para Dólares (FX) */}
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>Tipo de cambio de referencia</label>
+                  <div className={styles.methodGrid}>
+                    {(['oficial', 'mep', 'blue', 'manual'] as const).map(tipoRate => {
+                      const getRateDisplay = () => {
+                        if (tipoRate === 'manual') {
+                          return cotizacionManual ? `$ ${Number(cotizacionManual).toLocaleString('es-AR')}` : 'Manual'
+                        }
+                        const v = getRateValue(tipoRate)
+                        return v ? `$ ${Number(v).toLocaleString('es-AR')}` : '-'
+                      }
+                      const rateDisplay = getRateDisplay()
+
+                      return (
+                        <button
+                          key={tipoRate}
+                          type="button"
+                          className={`${styles.methodBtn} ${tipoCotizacion === tipoRate ? styles.methodBtnActive : ''}`}
+                          onClick={() => {
+                            setTipoCotizacion(tipoRate)
+                            if (tipoRate !== 'manual') {
+                              const v = getRateValue(tipoRate)
+                              if (v) setCotizacionManual(v)
+                            }
+                          }}
+                        >
+                          <span className={styles.methodBtnTitle}>{tipoRate.toUpperCase()}</span>
+                          <span className={styles.methodBtnRate}>{rateDisplay}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Input de Cotización con diseño Hero MontoInput */}
+                <div className={styles.formField}>
+                  <label className={styles.fieldLabel}>Cotización aplicada (1 Dólar = $)</label>
+                  <MontoInput
+                    value={cotizacionActivaValor}
+                    onChange={(val) => {
+                      setTipoCotizacion('manual')
+                      setCotizacionManual(val)
+                    }}
+                    moneda="ARS"
+                    placeholder="0"
+                    allowDecimals
+                  />
+                </div>
+
+                {/* Monto proyectado a recibir */}
+                <div className={styles.summaryBox}>
+                  <div className={styles.summaryRow}>
+                    <span className={styles.summaryLbl}>Recibís en destino:</span>
+                    <span className={styles.summaryVal} style={{ color: '#16a34a', fontSize: 16 }}>
+                      {formatMonto(montoDestinoCalculado || 0, fxDirection === 'compra' ? 'USD' : 'ARS')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div ref={formFooterRef} className={styles.formFooter}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>
+                  Atrás
+                </button>
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                  Continuar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ════════════════════ PASO 4: Fecha, Nota y Confirmación (Para Entre Cuentas y FX) ════════════════════ */}
+        {step === 4 && (
+          <div className={`${styles.slide} ${animClass}`}>
+            <form
+              className={styles.formContainer}
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSubmit()
+              }}
+            >
+              <div ref={formHeaderRef} className={styles.formHeader}>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
+                  <ChevronLeft size={20} />
+                </button>
+                <h2 className={styles.headerTitle}>Detalles y Confirmación</h2>
+                <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div ref={formBodyRef} className={styles.formBody}>
+                {/* Descripción/Nota + Fecha (Idéntico a Paso 3 de TransaccionModal) */}
+                <div className={styles.descFechaRow}>
+                  <div className={`${styles.formField} ${styles.flex2}`}>
+                    <label className={styles.fieldLabel} htmlFor="tx-nota">Concepto / Nota (opcional)</label>
+                    <input
+                      id="tx-nota"
+                      type="text"
+                      className={styles.fieldInput}
+                      value={notas}
+                      onChange={e => setNotas(e.target.value)}
+                      placeholder={placeholderNota}
+                    />
+                  </div>
+                  <div className={`${styles.formField} ${styles.flex1}`}>
+                    <label className={styles.fieldLabel} htmlFor="tx-fecha">Fecha</label>
+                    <DateInput
+                      id="tx-fecha"
+                      value={fecha}
+                      onChange={setFecha}
+                      className={styles.fieldInput}
+                    />
+                  </div>
+                </div>
+
+                {/* Resumen Financiero Completo con Detección Automática */}
+                <div className={styles.summaryBox}>
+                  <div className={styles.summaryHeader}>
+                    <span>
+                      {tipoMovimientoDetectado === 'extraccion'
+                        ? 'Extracción de efectivo'
+                        : tipoMovimientoDetectado === 'deposito'
+                          ? 'Depósito en cuenta'
+                          : tipoMovimientoDetectado === 'fx'
+                            ? fxDirection === 'compra'
+                              ? 'Compra de dólares (FX)'
+                              : 'Venta de dólares (FX)'
+                            : 'Transferencia entre cuentas'}
+                    </span>
+                    {tipoOperacion === 'fx' && cotizacionActivaValor && (
+                      <span className={styles.ratePill}>
+                        1 Dólar = $ {cotizacionActivaValor} ({tipoCotizacion.toUpperCase()})
+                      </span>
+                    )}
+                  </div>
+
+                  <div className={styles.summaryRow}>
+                    <div className={styles.summaryCol}>
+                      <span className={styles.summaryLbl}>
+                        {tipoMovimientoDetectado === 'deposito' ? 'Efectivo a entregar' : 'Cuenta de origen'}
+                      </span>
+                      <span className={styles.summaryVal}>{billeteraOrigen?.nombre}</span>
+                    </div>
+                    <div className={`${styles.summaryCol} ${styles.summaryColRight}`}>
+                      <span className={styles.summaryLbl}>Importe a debitar</span>
+                      <span className={styles.summaryVal} style={{ color: '#ef4444' }}>
+                        - {formatMonto(monto || 0, billeteraOrigen?.moneda || effectiveMoneda)}
                       </span>
                     </div>
-                  )}
-                </div>
-              )}
+                  </div>
 
-              {/* ── SECCIÓN 3: Comisión Opcional ── */}
-              <div className={styles.comisionSection}>
-                {!mostrarComision ? (
-                  <button
-                    type="button"
-                    className={styles.comisionToggleBtn}
-                    onClick={() => setMostrarComision(true)}
-                  >
-                    <Percent size={13} />
-                    + Agregar comisión de la operación
-                  </button>
-                ) : (
-                  <div className={styles.comisionCard}>
-                    <div className={styles.comisionHeader}>
-                      <span className={styles.comisionTitle}>Comisión u honorarios bancarios</span>
-                      <button
-                        type="button"
-                        className={styles.iconCircleBtn}
-                        onClick={() => {
-                          setMostrarComision(false)
-                          setMontoComision(null)
-                          setMonedaComisionCustom(null)
-                        }}
-                        aria-label="Quitar comisión"
-                      >
-                        <X size={14} />
-                      </button>
+                  <div className={styles.summaryRow}>
+                    <div className={styles.summaryCol}>
+                      <span className={styles.summaryLbl}>
+                        {tipoMovimientoDetectado === 'extraccion' ? 'Efectivo a recibir' : 'Cuenta de destino'}
+                      </span>
+                      <span className={styles.summaryVal}>{billeteraDestino?.nombre}</span>
                     </div>
-
-                    <div className={styles.comisionRow}>
-                      <div className={styles.comisionInputWrap}>
-                        <span className={styles.currencySymbolPrefix}>
-                          {monedaComision === 'ARS' ? '$' : 'US$'}
-                        </span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          placeholder="0.00"
-                          value={montoComision !== null ? montoComision : ''}
-                          onChange={(e) => {
-                            const val = e.target.value === '' ? null : parseFloat(e.target.value)
-                            setMontoComision(val)
-                          }}
-                          className={styles.comisionInput}
-                        />
-                      </div>
-
-                      <select
-                        value={monedaComision}
-                        onChange={(e) => setMonedaComisionCustom(e.target.value as 'ARS' | 'USD')}
-                        className={styles.comisionCurrencySelect}
-                      >
-                        <option value={monedaOrigen}>{monedaOrigen === 'ARS' ? 'Pesos' : 'Dólares'}</option>
-                        {monedaDestino !== monedaOrigen && (
-                          <option value={monedaDestino}>{monedaDestino === 'ARS' ? 'Pesos' : 'Dólares'}</option>
+                    <div className={`${styles.summaryCol} ${styles.summaryColRight}`}>
+                      <span className={styles.summaryLbl}>Importe a acreditar</span>
+                      <span className={styles.summaryVal} style={{ color: '#16a34a' }}>
+                        + {formatMonto(
+                          tipoOperacion === 'fx' ? (montoDestinoCalculado || 0) : (monto || 0),
+                          billeteraDestino?.moneda || effectiveMoneda
                         )}
-                      </select>
+                      </span>
                     </div>
-
-                    <p className={styles.comisionHelpText}>
-                      Se registrará como un gasto real en Banco → Comisiones y gastos bancarios.
-                    </p>
                   </div>
-                )}
-              </div>
-
-              {/* ── SECCIÓN 4: Detalles de la Operación (Fecha y Notas) ── */}
-              <div className={styles.detailsGrid}>
-                {/* Fecha */}
-                <div className={styles.detailField}>
-                  <label className={styles.fieldLabel} htmlFor="transf-fecha">
-                    <Calendar size={13} className={styles.fieldIcon} />
-                    Fecha
-                  </label>
-                  <DateInput
-                    id="transf-fecha"
-                    value={fecha}
-                    onChange={setFecha}
-                    required
-                    min={getMinDateLocal()}
-                    max={todayLocal()}
-                    className={styles.dateInputCustom}
-                  />
-                </div>
-
-                {/* Nota / Concepto */}
-                <div className={styles.detailField}>
-                  <label className={styles.fieldLabel} htmlFor="transf-notas">
-                    <FileText size={13} className={styles.fieldIcon} />
-                    Nota o motivo
-                  </label>
-                  <input
-                    id="transf-notas"
-                    type="text"
-                    placeholder="Ej: Ahorro en dólares, compra MEP..."
-                    value={notas}
-                    onChange={(e) => setNotas(e.target.value)}
-                    className={styles.textInputCustom}
-                    maxLength={100}
-                  />
                 </div>
               </div>
 
-              {/* ── Resumen de Impacto en Vivo ── */}
-              {montoNum > 0 && billeteraOrigen && billeteraDestino && (
-                <div className={styles.impactSummaryPill}>
-                  <div className={styles.impactSummaryText}>
-                    {esMismaMoneda ? (
-                      <>
-                        Transferís <strong>{formatMonto(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> a <strong>{billeteraDestino.nombre}</strong>
-                      </>
-                    ) : (
-                      <>
-                        Transferís <strong>{formatMonto(montoNum, monedaOrigen)}</strong> de <strong>{billeteraOrigen.nombre}</strong> y recibís <strong>{formatMonto(montoDestinoNum, monedaDestino)}</strong> en <strong>{billeteraDestino.nombre}</strong>
-                      </>
-                    )}
-                    {comisionNum > 0 && (
-                      <span> · Comisión: {formatMonto(comisionNum, monedaComision)}</span>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* ── Footer / CTA ── */}
-            <div className={styles.footer}>
-              <button
-                type="button"
-                className={styles.cancelBtn}
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="submit"
-                className={styles.submitBtn}
-                disabled={
-                  isSubmitting ||
-                  !billeteraOrigenId ||
-                  !billeteraDestinoId ||
-                  billeteraOrigenId === billeteraDestinoId ||
-                  !monto ||
-                  monto <= 0 ||
-                  (!esMismaMoneda && (!montoDestino || montoDestino <= 0)) ||
-                  isOverdraft ||
-                  isDestinoOverdraft
-                }
-              >
-                {isSubmitting ? (
-                  <>Procesando...</>
-                ) : (
-                  <>
-                    <ArrowRightLeft size={16} strokeWidth={2.5} />
-                    Confirmar transferencia
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+              <div ref={formFooterRef} className={styles.formFooter}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack}>
+                  Atrás
+                </button>
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                  {isSubmitting ? 'Procesando...' : submitTitle}
+                </button>
+              </div>
+            </form>
+          </div>
         )}
       </div>
     </Modal>

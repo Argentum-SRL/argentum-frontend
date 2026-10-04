@@ -6,7 +6,6 @@ import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw, TrendingUp } from 
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
-import { getCardLogoUrl, findCardBrandByNombre } from '@/lib/utils/tarjetas.utils'
 import styles from './BilleteraCard.module.css'
 
 export interface BilleteraCardProps {
@@ -19,6 +18,7 @@ export interface BilleteraCardProps {
   onEditar?: (b: Billetera) => void
   className?: string
   disableNavigation?: boolean
+  hideCurrencyChip?: boolean
 }
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
@@ -35,7 +35,8 @@ const BilleteraCard = memo(({
   onEliminar, 
   onEditar,
   className,
-  disableNavigation
+  disableNavigation,
+  hideCurrencyChip = false
 }: BilleteraCardProps) => {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -54,9 +55,6 @@ const BilleteraCard = memo(({
       ? findBankByNombre(billetera.nombre)
       : undefined
 
-  // Logo de tarjeta (assets/cards/) tiene prioridad sobre el del banco (assets/banks/)
-  const cardBrand = bank ? findCardBrandByNombre(bank.nombre) : undefined
-  const cardLogoUrl = cardBrand ? getCardLogoUrl(cardBrand.logoPath) : ''
   const bankLogoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
 
   let background: string
@@ -94,15 +92,15 @@ const BilleteraCard = memo(({
 
   return (
     <div 
-      className={`${styles.wc} ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''} ${isFront ? styles.frontCard : ''} ${className || ''}`}
+      className={`${styles.wc} wc ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''} ${isFront ? styles.frontCard : ''} ${className || ''}`}
     >
       {/* Fondo clipeado */}
-      <div className={styles.wcBg} ref={bgRef}>
+      <div className={`${styles.wcBg} wcBg`} ref={bgRef}>
         <div className={styles.decoA} aria-hidden="true" />
         <div className={styles.decoB} aria-hidden="true" />
       </div>
 
-      <div className={styles.wcInner}>
+      <div className={`${styles.wcInner} wcInner`}>
         <button
           className={styles.overlayBtn}
           onClick={(e) => {
@@ -122,80 +120,53 @@ const BilleteraCard = memo(({
           aria-label={`Ver detalles de ${billetera.nombre}`}
         />
         {/* ── TOP ─────────────────────────────────────────────────────── */}
-        <div className={styles.wcTop}>
-          {/* ── Con logo de tarjeta: logo grande + chips debajo, sin nombre ── */}
-          {cardLogoUrl && !logoErr ? (
-            <div className={styles.wcCardLogoCol}>
-              <img
-                src={cardLogoUrl}
-                alt={bank?.nombre}
-                onError={() => setLogoErr(true)}
-                className={styles.wcCardLogo}
-              />
-              <div className={styles.wcChipRow}>
-                {billetera.es_principal && (
-                  <span className={`${styles.chip} ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
-                    Principal
-                  </span>
-                )}
-                <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
-                  {billetera.moneda}
-                </span>
-                {billetera.es_inversion && (
-                  <span className={`${styles.chip} ${styles.chipInversion} ${isLight ? styles.chipInversionLight : styles.chipInversionDark}`}>
-                    <TrendingUp size={9} strokeWidth={2.2} />
-                    Inversión
-                  </span>
-                )}
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* ── Sin logo de tarjeta: layout original ── */}
-              <div className={styles.wcLogo}>
-                {billetera.es_efectivo ? (
-                  <DollarSign size={18} strokeWidth={1.75} color="white" />
-                ) : bankLogoUrl && !logoErr ? (
-                  <img src={bankLogoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
-                ) : (
-                  <span className={styles.logoFallback}>
-                    {getInitials(bank?.nombre ?? billetera.nombre)}
-                  </span>
-                )}
-              </div>
+        <div className={`${styles.wcTop} wcTop`}>
+          <div className={`${styles.wcLogo} wcLogo`}>
+            {billetera.es_efectivo ? (
+              <DollarSign size={18} strokeWidth={1.75} color="white" />
+            ) : bankLogoUrl && !logoErr ? (
+              <img src={bankLogoUrl} alt={bank?.nombre} onError={() => setLogoErr(true)} />
+            ) : (
+              <span className={`${styles.logoFallback} logoFallback`}>
+                {getInitials(bank?.nombre ?? billetera.nombre)}
+              </span>
+            )}
+          </div>
 
-              {/* Identidad */}
-              <div className={styles.wcIdentity}>
-                <div className={`${styles.wcName} ${isLight ? styles.textLight : styles.textDark}`}>
-                  {billetera.nombre}
-                </div>
-                <div className={styles.wcChipRow}>
-                  {billetera.es_principal && (
-                    <span className={`${styles.chip} ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
-                      Principal
-                    </span>
-                  )}
-                  <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
-                    {billetera.moneda}
-                  </span>
-                  {billetera.es_efectivo && (
-                    <span className={`${styles.chip} ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
-                      Efectivo
-                    </span>
-                  )}
-                  {billetera.es_inversion && (
-                    <span className={`${styles.chip} ${styles.chipInversion} ${isLight ? styles.chipInversionLight : styles.chipInversionDark}`}>
-                      <TrendingUp size={9} strokeWidth={2.2} />
-                      Inversión
-                    </span>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
+          {/* Identidad */}
+          <div className={`${styles.wcIdentity} wcIdentity`}>
+            <div className={`${styles.wcName} wcName ${isLight ? styles.textLight : styles.textDark}`}>
+              {billetera.es_efectivo
+                ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
+                : billetera.nombre}
+            </div>
+            <div className={`${styles.wcChipRow} wcChipRow`}>
+              {billetera.es_principal && (
+                <span className={`${styles.chip} chip ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
+                  Principal
+                </span>
+              )}
+              {!hideCurrencyChip && (
+                <span className={`${styles.chip} chip chipMoneda ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                  {billetera.moneda === 'USD' ? 'Dólares' : 'Pesos'}
+                </span>
+              )}
+              {billetera.es_efectivo && (
+                <span className={`${styles.chip} chip ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                  Efectivo
+                </span>
+              )}
+              {billetera.es_inversion && (
+                <span className={`${styles.chip} chip ${styles.chipInversion} ${isLight ? styles.chipInversionLight : styles.chipInversionDark}`}>
+                  <TrendingUp size={9} strokeWidth={2.2} />
+                  Inversión
+                </span>
+              )}
+            </div>
+          </div>
 
           {/* Kebab — opciones de gestión */}
-          <div className={styles.wcKebab}>
+          <div className={`${styles.wcKebab} wcKebab`}>
             <button
               ref={kebabBtnRef}
               className={styles.kebabBtn}
@@ -262,11 +233,11 @@ const BilleteraCard = memo(({
         </div>
 
         {/* ── BALANCE ──────────────────────────────────────────────────── */}
-        <div className={styles.wcBalance}>
-          <p className={`${styles.wcBalLbl} ${isLight ? styles.balLblLight : styles.balLblDark}`}>
-            {labelNombre} · Saldo actual
+        <div className={`${styles.wcBalance} wcBalance`}>
+          <p className={`${styles.wcBalLbl} wcBalLbl ${isLight ? styles.balLblLight : styles.balLblDark}`}>
+            {labelNombre}
           </p>
-          <p className={`${styles.wcBalAmt} ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>
+          <p className={`${styles.wcBalAmt} wcBalAmt ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>
             {formatMonto(billetera.saldo_actual, billetera.moneda)}
           </p>
         </div>

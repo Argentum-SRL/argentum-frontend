@@ -1,0 +1,50 @@
+/* ─── TransferenciasTab.module.css ─── */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.dayGroupContainer {
+  margin-bottom: 24px;
+}
+
+.dayGroupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+
+.dayGroupTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.dayGroupList {
+  background: var(--surface);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.rowWrapper {
+  display: block;
+}
+
+.rowWrapperBorder {
+  display: block;
+  border-bottom: 1px solid var(--border);
+}
+
+.loadingState {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-3);
+  font-weight: 500;
+}

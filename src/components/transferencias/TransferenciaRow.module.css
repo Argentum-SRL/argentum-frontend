@@ -113,14 +113,14 @@
 .meta {
   font-size: 11.5px;
   color: var(--text-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  min-width: 0;
   display: flex;
   align-items: center;
 }
 
 .metaDesc {
+  color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -128,11 +128,18 @@
 
 .metaDivider {
   color: var(--text-3);
+  margin: 0 4px;
+  flex-shrink: 0;
 }
 
 .metaHora {
   color: var(--text-3);
   flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.desktopOnly {
+  display: inline;
 }
 
 /* ── Amount Area (Right) ── */
@@ -264,11 +271,24 @@
   font-size: 10px;
 }
 
-/* ── Mobile Tweaks (< 480px) ── */
-@media (max-width: 480px) {
+/* ── Mobile Tweaks (< 640px) ── */
+@media (max-width: 640px) {
+  .desktopOnly {
+    display: none !important;
+  }
+
   .row {
-    padding: 10px 14px;
+    padding: 11px 14px;
     gap: 10px;
+    min-height: 56px;
+  }
+
+  .dualAvatar {
+    align-self: center;
+  }
+
+  .content {
+    gap: 3px;
   }
 
   .accountsTitle {
@@ -290,12 +310,39 @@
     gap: 3px;
   }
 
-  .meta {
-    font-size: 11px;
+  .amountArea {
+    align-self: center;
   }
 
-  .metaHora {
-    display: none;
+  .deleteBtn {
+    align-self: center;
+    opacity: 0.55;
+  }
+
+  .deleteBtn:hover,
+  .deleteBtn:active {
+    opacity: 1;
+  }
+
+  .meta {
+    font-size: 11.5px;
+    line-height: 1.35;
+    display: block;
+    white-space: normal;
+  }
+
+  .metaDesc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    color: var(--text-2);
+    font-size: 11.5px;
+    line-height: 1.35;
   }
 }
 

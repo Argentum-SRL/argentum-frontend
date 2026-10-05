@@ -56,6 +56,11 @@ export interface ModalPayloadMap {
     billeteras: Billetera[]
     onSuccess: () => Promise<void> | void
   }
+  goalDetail: {
+    goal: Goal
+    billeteras: Billetera[]
+    onSuccess?: () => Promise<void> | void
+  }
   confirm: ConfirmModalOptions
   bienvenidaFinanciera?: {
     initialTab?: 'perfil' | 'proyeccion'

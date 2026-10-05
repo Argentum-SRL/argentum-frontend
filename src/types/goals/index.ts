@@ -41,18 +41,3 @@ export interface GoalMovement {
   fecha_creacion: string
   billetera?: import('@/types').Billetera
 }
-
-export interface GoalAnalytics {
-  chart_data: { mes: string; monto: number }[]
-  velocidad_mensual: number
-  meses_restantes: number | null
-  fecha_estimada_finalizacion: string | null
-  porcentaje_progreso: number
-  monto_faltante: number
-}
-
-export interface GoalSummary {
-  total_metas: number
-  completadas: number
-  proximo_vencimiento: string | null
-}

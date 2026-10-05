@@ -266,7 +266,15 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     subtitle: `Objetivo: ${formatMonto(g.monto_objetivo, g.moneda)}`,
     Icon: Target,
     extra: `${((g.monto_actual / g.monto_objetivo) * 100).toFixed(0)}%`,
-    path: `/app/metas/${g.id}`
+    action: () => {
+      open('goalDetail', {
+        data: {
+          goal: g,
+          billeteras,
+        }
+      })
+      onClose()
+    }
   }))
 
   transacciones.forEach(t => {
@@ -317,13 +325,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   }
 
   const handleTriggerItem = (item: SearchResultItem) => {
-    if ((item.type === 'nav' || item.type === 'billetera' || item.type === 'meta' || item.type === 'presupuesto') && item.path) {
+    if (item.action) {
+      item.action()
+    } else if (item.path) {
       navigate(item.path)
       onClose()
-    } else if (item.type === 'action' && item.action) {
-      item.action()
-    } else if (item.type === 'transaccion' && item.action) {
-      item.action()
     }
   }
 

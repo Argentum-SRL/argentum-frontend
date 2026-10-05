@@ -1,17 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useMemo } from 'react'
 import { 
-  TrendingUp, 
   Calendar, 
-  MoreHorizontal, 
   Plus,
   Trophy,
   Target,
-  Pause,
-  Play
+  CheckCircle2
 } from '@/components/ui/icons'
-import goalsService from '@/services/goals.service'
-import { sileo } from 'sileo'
-import { getErrorMessage } from '@/utils/errorMessages'
 import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -19,130 +13,160 @@ import styles from './GoalCard.module.css'
 
 interface GoalCardProps {
   goal: Goal
-  onEdit: () => void
   onContribute: () => void
   onDetails: () => void
+  onEdit?: () => void
   onRefresh?: () => void
 }
 
-export default function GoalCard({ goal, onEdit, onContribute, onDetails, onRefresh }: GoalCardProps) {
-  const porcentaje = goal.monto_objetivo > 0 ? (goal.monto_actual / goal.monto_objetivo) * 100 : 0
-  const barRef = useRef<HTMLDivElement>(null)
-  const percentRef = useRef<HTMLSpanElement>(null)
+export default function GoalCard({ goal, onContribute, onDetails }: GoalCardProps) {
+  const objetivo = Number(goal.monto_objetivo || 1)
+  const actual = Number(goal.monto_actual || 0)
+  const porcentaje = objetivo > 0 ? (actual / objetivo) * 100 : 0
+  const restante = Math.max(0, objetivo - actual)
+  const isCompleted = porcentaje >= 100 || goal.estado === EstadoMeta.COMPLETADA
+  const isPaused = goal.estado === EstadoMeta.PAUSADA
+  const goalColor = goal.color || 'var(--primary)'
 
-  const getProgressColor = (pct: number) => {
-    if (pct < 30) return '#6366F1' // Indigo
-    if (pct < 70) return '#3B82F6' // Blue
-    if (pct < 100) return '#10B981' // Emerald
-    return '#8B5CF6' // Violet (Completed)
-  }
+  // Dynamic progress bar styling
+  const progressFillStyle = useMemo(() => {
+    return {
+      width: `${Math.min(porcentaje, 100)}%`,
+      backgroundColor: isCompleted ? 'var(--success)' : goalColor,
+    }
+  }, [porcentaje, isCompleted, goalColor])
 
-  const progressColor = getProgressColor(porcentaje)
-
-  useEffect(() => {
-    if (barRef.current) {
-      barRef.current.style.width = `${Math.min(porcentaje, 100)}%`
-      barRef.current.style.backgroundColor = progressColor
-      if (goal.color) {
-        barRef.current.style.boxShadow = `0 0 10px ${goal.color}44`
+  // Avatar tint styling
+  const avatarStyle = useMemo(() => {
+    if (isCompleted) {
+      return {
+        backgroundColor: 'rgba(26, 122, 74, 0.12)',
+        color: 'var(--success)',
+        borderColor: 'rgba(26, 122, 74, 0.25)'
       }
     }
-    if (percentRef.current) {
-      percentRef.current.style.color = progressColor
+    return {
+      backgroundColor: goal.color ? `${goal.color}15` : 'var(--surface-alt)',
+      color: goal.color || 'var(--primary)',
+      borderColor: goal.color ? `${goal.color}30` : 'var(--border)'
     }
-  }, [porcentaje, progressColor, goal.color])
-
-  const handleToggleStatus = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    const nuevoEstado = goal.estado === EstadoMeta.ACTIVA ? EstadoMeta.PAUSADA : EstadoMeta.ACTIVA
-    try {
-      await goalsService.updateGoal(goal.id, { estado: nuevoEstado })
-      sileo.success({ title: `Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}` })
-      onRefresh?.()
-    } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'Error al cambiar el estado') })
-    }
-  }
+  }, [isCompleted, goal.color])
 
   return (
-    <div className={styles.card} onClick={onDetails}>
-      <span className={`${styles.statusBadge} ${styles[`badge${goal.estado.charAt(0).toUpperCase() + goal.estado.slice(1)}`]}`}>
-        {goal.estado}
-      </span>
-
-      <div className={styles.cardHeader}>
-        <div className={styles.titleInfo}>
-          <div className={styles.currencyBadge}>{goal.moneda === 'ARS' ? 'Pesos' : 'Dólares'}</div>
-          <h3 className={styles.cardTitle}>{goal.nombre}</h3>
-        </div>
-        <button 
-          className={styles.btnMenu} 
-          onClick={(e) => { e.stopPropagation(); onEdit(); }}
-          title="Editar meta"
-        >
-          <MoreHorizontal size={16} />
-        </button>
-      </div>
-
-      <div className={styles.progressSection}>
-        <div className={styles.progressHeader}>
-          <span ref={percentRef} className={styles.percentValue}>{porcentaje.toFixed(1)}%</span>
-          {goal.estado === EstadoMeta.COMPLETADA ? (
-            <Trophy size={20} className={`${styles.velocity} ${styles.completedIcon}`} />
-          ) : (
-            <div className={styles.velocity}>
-              <TrendingUp size={14} />
-              <span>A buen ritmo</span>
+    <div 
+      className={`${styles.card} ${isPaused ? styles.cardPaused : ''} ${isCompleted ? styles.cardCompleted : ''}`} 
+      onClick={onDetails}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onDetails()
+        }
+      }}
+    >
+      {/* ── Card Header ────────────────────────────────────────── */}
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <div className={styles.goalAvatar} style={avatarStyle}>
+            {isCompleted ? (
+              <Trophy size={18} strokeWidth={2.2} />
+            ) : (
+              <Target size={18} strokeWidth={2.2} />
+            )}
+          </div>
+          <div className={styles.headerText}>
+            <div className={styles.titleRow}>
+              <h3 className={styles.goalTitle} title={goal.nombre}>
+                {goal.nombre}
+              </h3>
+              <span className={styles.currencyTag}>
+                {goal.moneda === 'USD' ? 'USD' : 'ARS'}
+              </span>
             </div>
+            <div className={styles.metaRow}>
+              <Calendar size={12} className={styles.metaIcon} />
+              <span>{goal.fecha_limite ? formatFecha(goal.fecha_limite) : 'Sin vencimiento'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Status indicator */}
+        <div className={styles.headerRight}>
+          {isPaused && (
+            <span className={styles.statusPillPaused}>Pausada</span>
+          )}
+          {isCompleted && (
+            <span className={styles.statusPillCompleted}>
+              <CheckCircle2 size={11} strokeWidth={2.5} />
+              Completada
+            </span>
           )}
         </div>
-        
-        <div className={styles.progressContainer}>
-          <div ref={barRef} className={styles.progressBar} />
+      </div>
+
+      {/* ── Financial Hero Metrics ─────────────────────────────── */}
+      <div className={styles.metricsSection}>
+        <div className={styles.amountsRow}>
+          <div className={styles.savedGroup}>
+            <span className={styles.metricsLabel}>Ahorrado</span>
+            <div className={styles.savedValue}>
+              {formatMonto(actual, goal.moneda as 'ARS' | 'USD')}
+            </div>
+          </div>
+
+          <div className={styles.targetGroup}>
+            <span className={styles.metricsLabel}>Objetivo</span>
+            <div className={styles.targetValue}>
+              {formatMonto(objetivo, goal.moneda as 'ARS' | 'USD')}
+            </div>
+          </div>
         </div>
-        
-        <div className={styles.progressLabels}>
-          <div className={styles.labelGroup}>
-            <span className={styles.label}>Ahorrado</span>
-            <span className={styles.value}>{formatMonto(goal.monto_actual, goal.moneda as 'ARS' | 'USD')}</span>
-          </div>
-          <div className={`${styles.labelGroup} ${styles.labelGroupRight}`}>
-            <span className={styles.label}>Objetivo</span>
-            <span className={styles.value}>{formatMonto(goal.monto_objetivo, goal.moneda as 'ARS' | 'USD')}</span>
-          </div>
+
+        {/* Progress Track */}
+        <div className={styles.progressTrack}>
+          <div 
+            className={styles.progressFill} 
+            style={progressFillStyle}
+          />
+        </div>
+
+        {/* Progress Sub-bar (Percentage + Delta) */}
+        <div className={styles.progressMeta}>
+          <span className={styles.percentBadge}>
+            {porcentaje.toFixed(1)}%
+          </span>
+          <span className={styles.remainingText}>
+            {isCompleted ? (
+              <span className={styles.completedNote}>¡Objetivo alcanzado!</span>
+            ) : (
+              <>Faltan <span className={styles.remainingAmount}>{formatMonto(restante, goal.moneda as 'ARS' | 'USD')}</span></>
+            )}
+          </span>
         </div>
       </div>
 
-      <div className={styles.cardInfo}>
-        <div className={styles.infoRow}>
-          <Calendar size={14} />
-          <span>{goal.fecha_limite ? formatFecha(goal.fecha_limite) : 'Sin límite'}</span>
-        </div>
-        <div className={styles.infoRow}>
-          <Target size={14} />
-          <span>Faltan {formatMonto(Math.max(0, goal.monto_objetivo - goal.monto_actual), goal.moneda as 'ARS' | 'USD')}</span>
-        </div>
-      </div>
-
-      <div className={styles.cardActions}>
+      {/* ── Card Footer / CTA ──────────────────────────────────── */}
+      <div className={styles.cardFooter}>
         <button 
-          className={`${styles.btnAction} ${styles.btnPrimary}`} 
+          type="button"
+          className={`${styles.primaryBtn} ${isCompleted ? styles.completedBtn : ''}`}
           onClick={(e) => { e.stopPropagation(); onContribute(); }}
         >
-          <Plus size={16} className={styles.btnIcon} />
-          {goal.estado === EstadoMeta.COMPLETADA ? 'Gestionar' : 'Aportar'}
+          {isCompleted ? (
+            <>
+              <Trophy size={14} />
+              <span>Gestionar fondos</span>
+            </>
+          ) : (
+            <>
+              <Plus size={14} strokeWidth={2.5} />
+              <span>Aportar dinero</span>
+            </>
+          )}
         </button>
-
-        {goal.estado !== EstadoMeta.COMPLETADA && (
-          <button 
-            className={styles.btnAction} 
-            onClick={handleToggleStatus}
-            title={goal.estado === EstadoMeta.ACTIVA ? 'Pausar meta' : 'Reanudar meta'}
-          >
-            {goal.estado === EstadoMeta.ACTIVA ? <Pause size={16} /> : <Play size={16} />}
-          </button>
-        )}
       </div>
     </div>
   )
 }
+

@@ -11,6 +11,7 @@ import BalanceCicloModal from '@/components/dashboard/BalanceCicloModal/BalanceC
 import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
 import GoalModal from '@/components/goals/GoalModal'
 import GoalContributionModal from '@/components/goals/GoalContributionModal'
+import GoalDetailModal from '@/components/goals/GoalDetailModal'
 import ExplicativoFinancieroModal from '@/components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal'
 import { ModalErrorBoundary } from '@/components/ui/ErrorBoundary/ModalErrorBoundary'
 
@@ -30,6 +31,7 @@ export function ModalPortal() {
   const presupuestoData = typedModals.presupuesto?.data
   const goalData = typedModals.goal?.data
   const goalContributionData = typedModals.goalContribution?.data
+  const goalDetailData = typedModals.goalDetail?.data
   const confirmData = typedModals.confirm?.data
   const bienvenidaData = typedModals.bienvenidaFinanciera?.data
 
@@ -146,6 +148,18 @@ export function ModalPortal() {
             goal={goalContributionData.goal}
             billeteras={goalContributionData.billeteras}
             onSuccess={goalContributionData.onSuccess}
+          />
+        </ModalErrorBoundary>
+      )}
+
+      {typedModals.goalDetail?.isOpen && goalDetailData && (
+        <ModalErrorBoundary modalName="goalDetail" onClose={() => closeModal('goalDetail')}>
+          <GoalDetailModal
+            open={true}
+            onClose={() => closeModal('goalDetail')}
+            goal={goalDetailData.goal}
+            billeteras={goalDetailData.billeteras}
+            onSuccess={goalDetailData.onSuccess}
           />
         </ModalErrorBoundary>
       )}

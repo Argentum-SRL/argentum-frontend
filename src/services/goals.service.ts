@@ -1,5 +1,5 @@
 import api from './api'
-import type { Goal, GoalMovement, GoalAnalytics, GoalSummary } from '@/types/goals'
+import type { Goal, GoalMovement } from '@/types/goals'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
 import { invalidatePresupuestos } from './presupuesto.service'
@@ -42,16 +42,6 @@ const goalsService = {
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()
-  },
-
-  getAnalytics: async (id: string, signal?: AbortSignal): Promise<GoalAnalytics> => {
-    const response = await api.get<GoalAnalytics>(`/goals/${id}/analytics`, { signal })
-    return response.data
-  },
-
-  getSummary: async (signal?: AbortSignal): Promise<GoalSummary> => {
-    const response = await api.get<GoalSummary>('/goals/summary', { signal })
-    return response.data
   }
 }
 

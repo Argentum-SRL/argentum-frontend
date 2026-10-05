@@ -285,18 +285,21 @@ export default function PresupuestosPage() {
       <div className={styles.controlsRow}>
         <div className={styles.tabs}>
           <button 
+            type="button"
             className={`${styles.tab} ${activeTab === 'activo' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('activo')}
           >
             Activos
           </button>
           <button 
+            type="button"
             className={`${styles.tab} ${activeTab === 'pausado' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('pausado')}
           >
             Pausados
           </button>
           <button 
+            type="button"
             className={`${styles.tab} ${activeTab === 'finalizado' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('finalizado')}
           >

@@ -649,14 +649,14 @@ export default function PresupuestoModal({
                     className={`${styles.presetPill} ${isPresetActive('esenciales') ? styles.presetPillActive : ''}`}
                     onClick={() => applyPreset('esenciales')}
                   >
-                    <span>🏠 Fijos & Esenciales</span>
+                    <span>Fijos & Esenciales</span>
                   </button>
                   <button
                     type="button"
                     className={`${styles.presetPill} ${isPresetActive('ocio') ? styles.presetPillActive : ''}`}
                     onClick={() => applyPreset('ocio')}
                   >
-                    <span>🎉 Variables & Ocio</span>
+                    <span>Variables & Ocio</span>
                   </button>
                   {selectedCategorias.length > 0 && (
                     <button

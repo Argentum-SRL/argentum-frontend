@@ -3,7 +3,6 @@ import {
   Plus, 
   Target
 } from '@/components/ui/icons'
-import { useNavigate } from 'react-router-dom'
 import styles from './MetasPage.module.css'
 import goalsService from '@/services/goals.service'
 import billeteraService from '@/services/billetera.service'
@@ -20,7 +19,6 @@ import { EmptyState, PageSummaryBar } from '@/components/ui'
 
 export default function MetasPage() {
   const { open, confirm } = useModal()
-  const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState<'activa' | 'completada' | 'pausada'>('activa')
   const [goals, setGoals] = useState<Goal[]>([])
@@ -118,7 +116,7 @@ export default function MetasPage() {
     })
   }
 
-  const handleContribute = (g: Goal) => {
+  const handleContribute = useCallback((g: Goal) => {
     open('goalContribution', {
       data: {
         goal: g,
@@ -126,10 +124,16 @@ export default function MetasPage() {
         onSuccess: fetchAll
       }
     })
-  }
+  }, [open, billeteras, fetchAll])
 
-  const handleDetails = (id: string) => {
-    navigate(`/app/metas/${id}`)
+  const handleDetails = (g: Goal) => {
+    open('goalDetail', {
+      data: {
+        goal: g,
+        billeteras,
+        onSuccess: fetchAll
+      }
+    })
   }
 
   const handleToggleStatus = useCallback(async (g: Goal) => {
@@ -145,15 +149,25 @@ export default function MetasPage() {
 
   const handleDelete = useCallback((g: Goal) => {
     if (g.monto_actual > 0) {
-      sileo.info({ title: 'No podés eliminar una meta que aún tiene fondos. Retirá el dinero primero.' })
+      confirm({
+        title: 'Meta con fondos acumulados',
+        description: `Esta meta todavía tiene ${formatMonto(g.monto_actual, g.moneda as 'ARS' | 'USD')} ahorrados. Tenés que retirar el saldo antes de poder eliminarla.`,
+        variant: 'warning',
+        confirmLabel: 'Retirar fondos',
+        cancelLabel: 'Cerrar',
+        onConfirm: () => {
+          handleContribute(g)
+        }
+      })
       return
     }
 
     confirm({
-      title: '¿Eliminás esta meta?',
-      description: 'Se borrará el seguimiento y el historial de aportes de esta meta.',
+      title: `¿Eliminar "${g.nombre}"?`,
+      description: 'Se borrará permanentemente la meta y todo su historial de movimientos. Esta acción no se puede deshacer.',
       variant: 'danger',
-      confirmLabel: 'Eliminar',
+      confirmLabel: 'Eliminar meta',
+      cancelLabel: 'Cancelar',
       onConfirm: async () => {
         try {
           await goalsService.deleteGoal(g.id)
@@ -164,7 +178,7 @@ export default function MetasPage() {
         }
       }
     })
-  }, [confirm, fetchAll])
+  }, [confirm, fetchAll, handleContribute])
 
   return (
     <div className={styles.page}>
@@ -219,18 +233,21 @@ export default function MetasPage() {
       <div className={styles.controlsRow}>
         <div className={styles.tabs}>
           <button 
+            type="button"
             className={`${styles.tab} ${activeTab === 'activa' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('activa')}
           >
             Activas
           </button>
           <button 
+            type="button"
             className={`${styles.tab} ${activeTab === 'completada' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('completada')}
           >
             Completadas
           </button>
           <button 
+            type="button"
             className={`${styles.tab} ${activeTab === 'pausada' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('pausada')}
           >
@@ -265,7 +282,10 @@ export default function MetasPage() {
                 goals={filteredGoals}
                 onEdit={handleEdit}
                 onContribute={handleContribute}
-                onDetails={handleDetails}
+                onDetails={(id) => {
+                  const found = goals.find(g => g.id === id)
+                  if (found) handleDetails(found)
+                }}
                 onToggleStatus={handleToggleStatus}
                 onDelete={handleDelete}
               />
@@ -277,10 +297,8 @@ export default function MetasPage() {
                 <GoalCard 
                   key={g.id} 
                   goal={g} 
-                  onEdit={() => handleEdit(g)}
                   onContribute={() => handleContribute(g)}
-                  onDetails={() => handleDetails(g.id)}
-                  onRefresh={fetchAll}
+                  onDetails={() => handleDetails(g)}
                 />
               ))}
             </div>

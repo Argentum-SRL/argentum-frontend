@@ -22,7 +22,6 @@ const BilleteraDetallePage = lazy(() => import('@/pages/app/billeteras/Billetera
 const TransaccionesPage = lazy(() => import('@/pages/app/transacciones/TransaccionesPage'))
 const PresupuestosPage = lazy(() => import('@/pages/app/presupuestos/PresupuestosPage'))
 const MetasPage = lazy(() => import('@/pages/app/metas/MetasPage'))
-const MetaDetallePage = lazy(() => import('@/pages/app/metas/MetaDetallePage'))
 const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/SuscripcionesPage'))
 const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
@@ -83,7 +82,7 @@ const router = createBrowserRouter([
               { path: '/app/transacciones', element: <TransaccionesPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/presupuestos', element: <PresupuestosPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/metas', element: <MetasPage />, errorElement: <PageErrorBoundary /> },
-              { path: '/app/metas/:id', element: <MetaDetallePage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/metas/:id', element: <Navigate to="/app/metas" replace /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/perfil', element: <PerfilPage />, errorElement: <PageErrorBoundary /> },
               // Rutas legacy — redirigen a la página unificada de perfil

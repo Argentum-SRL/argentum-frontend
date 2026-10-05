@@ -1,8 +1,10 @@
+/* ─── TRIGGER WRAPPER ────────────────────────────── */
 .wrapper {
   display: flex;
   flex-direction: column;
   gap: 4px;
   position: relative;
+  width: 100%;
 }
 
 .label {
@@ -23,8 +25,13 @@
   border-radius: 12px;
   cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s ease, background 0.15s ease;
   width: 100%;
+}
+
+.trigger:hover {
+  background: var(--surface);
+  border-color: var(--border);
 }
 
 .triggerOpen {
@@ -37,7 +44,7 @@
   height: 22px;
   border-radius: 6px;
   border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
 }
 
@@ -50,123 +57,240 @@
   letter-spacing: 0.04em;
 }
 
-/* ─── PANEL DESKTOP ───────────────────────────────── */
-
+/* ─── DESKTOP POPOVER ─────────────────────────────── */
 .panel {
   position: fixed;
-  z-index: 9100;
+  z-index: 9300;
   background: var(--surface);
-  border: 1px solid var(--surface-alt);
+  border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.12),
+    0 12px 36px rgba(0, 0, 0, 0.14),
     0 2px 8px rgba(0, 0, 0, 0.06);
   overflow: hidden;
+  animation: popoverFadeIn 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-theme="dark"]) .panel,
+:global(.dark) .panel {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 .panelInner {
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ─── MOBILE ──────────────────────────────────────── */
-
-.mobileOverlay {
+/* ─── MOBILE BOTTOM SHEET ─────────────────────────── */
+.bottomSheetOverlay {
   position: fixed;
   inset: 0;
-  z-index: 9200;
-  background: rgba(10, 13, 18, 0.45);
+  z-index: 9300;
+  background: rgba(10, 13, 18, 0.55);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  animation: fadeIn 180ms ease;
+}
+
+.bottomSheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--border);
+  box-shadow:
+    0 -4px 24px rgba(0, 0, 0, 0.12),
+    0 -12px 48px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  animation: slideUpMobile 240ms cubic-bezier(0.34, 1.1, 0.64, 1);
+  background-clip: padding-box;
+}
+
+:global([data-theme="dark"]) .bottomSheet,
+:global(.dark) .bottomSheet {
+  background: var(--surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.dragHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  margin: 10px auto 4px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.bottomSheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 10px;
+  flex-shrink: 0;
+}
+
+.bottomSheetTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
 }
 
-.mobilePanelWrap {
-  background: var(--surface);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.2),
-    0 4px 16px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 280px;
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
 }
 
-.mobilePanelTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-2);
-  padding: 14px 16px 0;
+.contentWrap {
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── PRESET GRID ─────────────────────────────────── */
-
 .presetGrid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  gap: 6px;
-  padding: 14px 14px 10px;
+  gap: 8px;
+  padding: 12px 0 14px;
+}
+
+@media (min-width: 768px) {
+  .presetGrid {
+    padding: 14px 14px 10px;
+    gap: 6px;
+  }
 }
 
 .presetBtn {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: transform 0.1s, outline-offset 0.1s;
-  outline: 2px solid transparent;
-  outline-offset: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.presetBtn:active {
+  transform: scale(0.92);
 }
 
 .presetBtn:hover {
-  transform: scale(1.12);
+  transform: scale(1.1);
+  z-index: 1;
 }
 
 .presetBtnActive {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary) !important;
+  transform: scale(1.05);
+  z-index: 2;
 }
 
-/* ─── HEX INPUT ───────────────────────────────────── */
+.checkIcon {
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
 
+/* ─── HEX ROW ─────────────────────────────────────── */
 .separator {
   border: none;
-  border-top: 0.5px solid var(--surface-alt);
-  margin: 0 14px;
+  border-top: 1px solid var(--surface-alt);
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .separator {
+    margin: 0 14px;
+  }
 }
 
 .hexRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 14px 0;
+}
+
+@media (min-width: 768px) {
+  .hexRow {
+    padding: 10px 14px;
+    gap: 8px;
+  }
 }
 
 .hexPreview {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .hexPreview {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
 }
 
 .hexInput {
   flex: 1;
-  height: 32px;
-  padding: 0 10px;
+  height: 42px;
+  padding: 0 12px;
   background: var(--surface-alt);
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 12px;
   font-family: 'JetBrains Mono', 'Fira Mono', monospace;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
   outline: none;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .hexInput {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
 }
 
 .hexInput:focus {
@@ -175,23 +299,74 @@
 }
 
 /* ─── DONE BUTTON ─────────────────────────────────── */
-
 .doneBtn {
-  display: block;
-  width: calc(100% - 28px);
-  margin: 4px 14px 12px;
-  height: 34px;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  margin: 4px 0 0;
+  border-radius: 12px;
   border: none;
   background: var(--primary);
   color: #fff;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.12s;
+  transition: opacity 0.12s ease, transform 0.1s ease;
+}
+
+@media (min-width: 768px) {
+  .doneBtn {
+    width: calc(100% - 28px);
+    margin: 4px 14px 12px;
+    height: 34px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
 }
 
 .doneBtn:hover {
-  opacity: 0.88;
+  opacity: 0.92;
+}
+
+.doneBtn:active {
+  transform: scale(0.98);
+}
+
+/* ─── ANIMATIONS ──────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottomSheetOverlay,
+  .bottomSheet,
+  .panel {
+    animation: none !important;
+  }
 }

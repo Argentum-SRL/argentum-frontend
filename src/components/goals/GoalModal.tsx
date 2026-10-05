@@ -1,9 +1,7 @@
 import { useEffect, useReducer, useState, useCallback } from 'react'
 import {
-  Target,
   X,
   ChevronLeft,
-  StickyNote,
   Check,
   AlertCircle
 } from '@/components/ui/icons'
@@ -16,6 +14,8 @@ import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { DateInput, ColorPicker } from '@/components/ui'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
+import { useAuth } from '@/hooks/useAuth'
 
 interface GoalModalProps {
   open: boolean
@@ -39,7 +39,7 @@ interface FormState {
 }
 
 type FormAction =
-  | { type: 'RESET'; goal: Goal | null }
+  | { type: 'RESET'; goal: Goal | null; defaultMoneda: 'ARS' | 'USD' }
   | { type: 'SET_STEP'; step: 1 | 2; direction: 'forward' | 'back' }
   | { type: 'SET_FIELD'; field: keyof FormState; value: FormState[keyof FormState] }
 
@@ -72,7 +72,10 @@ function formReducer(state: FormState, action: FormAction): FormState {
           estado: action.goal.estado
         }
       }
-      return initialState
+      return {
+        ...initialState,
+        moneda: action.defaultMoneda,
+      }
     case 'SET_STEP':
       return { ...state, step: action.step, slideDirection: action.direction }
     case 'SET_FIELD':
@@ -82,11 +85,10 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-
-
 export default function GoalModal({
   open, onClose, goal, onSuccess
 }: GoalModalProps) {
+  const { usuario } = useAuth()
   const isEdit = !!goal
   const [state, dispatch] = useReducer(formReducer, initialState)
   const [animClass, setAnimClass] = useState('')
@@ -102,9 +104,37 @@ export default function GoalModal({
 
   useEffect(() => {
     if (open) {
-      dispatch({ type: 'RESET', goal: goal || null })
+      const defaultMoneda = (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
+      const timer = setTimeout(() => {
+        dispatch({ type: 'RESET', goal: goal || null, defaultMoneda })
+        setAnimClass('')
+      }, 0)
+      return () => clearTimeout(timer)
     }
-  }, [open, goal])
+  }, [open, goal, usuario?.moneda_principal])
+
+  // Hook universal de altura adaptativa (Auto-Hugging)
+  const {
+    headerRef: formHeaderRef,
+    fieldsRef: formBodyRef,
+    footerRef: formFooterRef,
+    dynamicHeight,
+  } = useAdaptiveModalHeight({
+    enabled: open,
+    extraPadding: 28,
+    deps: [
+      step,
+      animClass,
+      nombre,
+      monto_objetivo,
+      moneda,
+      fecha_limite,
+      color,
+      nota,
+      estado,
+      localError,
+    ],
+  })
 
   const goNext = () => {
     const trimmedNombre = nombre.trim()
@@ -188,16 +218,26 @@ export default function GoalModal({
   }
 
   return (
-    <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Gestionar meta">
-      {/* Indicador de pasos */}
-      <div className={styles.stepIndicator} aria-hidden="true">
-        {[1, 2].map(s => (
-          <div key={s} className={`${styles.dot} ${step === s ? styles.dotActive : styles.dotInactive}`} />
-        ))}
-      </div>
+    <Modal
+      isOpen={open}
+      onClose={onClose}
+      showHeader={false}
+      noPadding
+      autoHeight
+      className={styles.modalGoal}
+      ariaLabel="Gestionar meta"
+    >
+      <div
+        className={styles.slidesContainer}
+        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
+      >
+        {/* Indicador de pasos superior centrado (Pill Dots) */}
+        <div className={styles.stepDots} aria-hidden="true">
+          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
+          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
+        </div>
 
-      <div className={styles.slidesContainer}>
-        {/* STEP 1: Nombre y Monto */}
+        {/* ──── STEP 1: Nombre y Monto Objetivo ──── */}
         {step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
             <form 
@@ -207,12 +247,18 @@ export default function GoalModal({
                 goNext()
               }}
             >
-              <div className={styles.formHeader}>
-                <h2 className={styles.headerTitle}>{isEdit ? 'Editar meta' : 'Nueva meta'}</h2>
-                <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Cerrar" title="Cerrar"><X size={18} strokeWidth={1.75} /></button>
+              <div ref={formHeaderRef} className={styles.formHeader}>
+                <div className={styles.headerLeft}>
+                  <h2 className={styles.headerTitle}>{isEdit ? 'Editar meta' : 'Nueva meta'}</h2>
+                </div>
+                <div className={styles.headerRightActions}>
+                  <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
+                    <X size={18} strokeWidth={1.75} />
+                  </button>
+                </div>
               </div>
 
-              <div className={styles.formBody}>
+              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep1}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -222,18 +268,15 @@ export default function GoalModal({
 
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Nombre de la meta</label>
-                  <div className={styles.inputWrapper}>
-                    <Target size={18} />
-                    <input
-                      type="text"
-                      className={styles.fieldInput}
-                      value={nombre}
-                      onChange={e => setField('nombre', e.target.value)}
-                      placeholder="Ej: Nueva Notebook, Fondo de Emergencia..."
-                      maxLength={100}
-                      autoFocus
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    className={styles.fieldInput}
+                    value={nombre}
+                    onChange={e => setField('nombre', e.target.value)}
+                    placeholder="Ej: Nueva Notebook, Fondo de Emergencia..."
+                    maxLength={100}
+                    autoFocus
+                  />
                 </div>
 
                 <div className={styles.formField}>
@@ -247,25 +290,27 @@ export default function GoalModal({
                     max={9999999999999.99}
                     label="¿Cuánto necesitás?"
                   />
-                  {(isEdit && (goal?.movimientos?.length ?? 0) > 0) ? (
+                  {isEdit && (goal?.movimientos?.length ?? 0) > 0 && (
                     <p className={`${styles.fieldHint} ${styles.warning}`}>
                       No podés cambiar la moneda porque ya hay movimientos registrados.
                     </p>
-                  ) : (
-                    <p className={styles.fieldHint}>Este será el objetivo total a alcanzar.</p>
                   )}
                 </div>
               </div>
 
-              <div className={styles.formFooter}>
-                <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
-                <button type="submit" className={styles.submitBtn}>Continuar</button>
+              <div ref={formFooterRef} className={styles.formFooter}>
+                <button type="button" className={styles.cancelBtn} onClick={onClose}>
+                  Cancelar
+                </button>
+                <button type="submit" className={styles.submitBtn}>
+                  Continuar
+                </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* STEP 2: Detalles */}
+        {/* ──── STEP 2: Detalles Finales ──── */}
         {step === 2 && (
           <div className={`${styles.slide} ${animClass}`}>
             <form 
@@ -275,13 +320,21 @@ export default function GoalModal({
                 handleSubmit()
               }}
             >
-              <div className={styles.formHeader}>
-                <button type="button" className={styles.backBtn} onClick={goBack} aria-label="Atrás" title="Atrás"><ChevronLeft size={20} strokeWidth={1.75} /></button>
-                <h2 className={styles.headerTitle}>Detalles finales</h2>
-                <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Cerrar" title="Cerrar"><X size={18} strokeWidth={1.75} /></button>
+              <div ref={formHeaderRef} className={styles.formHeader}>
+                <div className={styles.headerLeft}>
+                  <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
+                    <ChevronLeft size={18} strokeWidth={2} />
+                  </button>
+                  <h2 className={styles.headerTitle}>Detalles finales</h2>
+                </div>
+                <div className={styles.headerRightActions}>
+                  <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
+                    <X size={18} strokeWidth={1.75} />
+                  </button>
+                </div>
               </div>
 
-              <div className={styles.formBody}>
+              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep2}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -298,8 +351,8 @@ export default function GoalModal({
                     />
                   </div>
                   <div className={styles.formField}>
+                    <label className={styles.fieldLabel}>Color distintivo</label>
                     <ColorPicker
-                      label="Color distintivo"
                       value={color}
                       onChange={val => setField('color', val)}
                     />
@@ -308,32 +361,32 @@ export default function GoalModal({
 
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Notas o motivación</label>
-                  <div className={styles.textareaWrapper}>
-                    <StickyNote size={18} className={styles.textareaIcon} />
-                    <textarea
-                      className={styles.textarea}
-                      value={nota}
-                      onChange={e => setField('nota', e.target.value)}
-                      placeholder="¿Por qué es importante esta meta? ¿Algún detalle extra?"
-                      maxLength={1000}
-                    />
-                  </div>
+                  <textarea
+                    className={styles.textarea}
+                    value={nota}
+                    onChange={e => setField('nota', e.target.value)}
+                    placeholder="¿Por qué es importante esta meta? ¿Algún detalle extra?"
+                    maxLength={1000}
+                    rows={1}
+                  />
                 </div>
 
                 {isEdit && (
                   <div className={styles.formField}>
                     <label className={styles.fieldLabel}>Estado de la meta</label>
-                    <div className={styles.statusGrid}>
+                    <div className={styles.segmentedBar} role="radiogroup" aria-label="Estado de la meta">
                       {(['activa', 'pausada'] as const).map(s => (
                         <button
                           key={s}
                           type="button"
-                          className={`${styles.statusBtn} ${estado === s ? styles.statusBtnActive : ''}`}
+                          role="radio"
+                          aria-checked={estado === s}
+                          className={`${styles.segmentedPill} ${estado === s ? styles.segmentedPillActive : ''}`}
                           onClick={() => setField('estado', s)}
                           disabled={estado === EstadoMeta.COMPLETADA}
                         >
-                          {estado === s && <Check size={14} />}
-                          {s.charAt(0).toUpperCase() + s.slice(1)}
+                          {estado === s && <Check size={14} strokeWidth={2.2} />}
+                          <span>{s.charAt(0).toUpperCase() + s.slice(1)}</span>
                         </button>
                       ))}
                     </div>
@@ -347,8 +400,10 @@ export default function GoalModal({
                 )}
               </div>
 
-              <div className={styles.formFooter}>
-                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+              <div ref={formFooterRef} className={styles.formFooter}>
+                <button type="button" className={styles.cancelBtn} onClick={goBack} disabled={isSubmitting}>
+                  Atrás
+                </button>
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                   {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Crear meta'}
                 </button>

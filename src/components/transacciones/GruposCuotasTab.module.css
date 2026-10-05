@@ -99,29 +99,61 @@
 
 .filterTabs {
   display: flex;
-  background: var(--surface-alt);
+  background: var(--page);
   padding: 3px;
-  border-radius: 11px;
-  gap: 2px;
+  border-radius: 12px;
+  gap: 3px;
   width: fit-content;
+  flex-shrink: 0;
+}
+
+@media (min-width: 1100px) {
+  .filterTabs {
+    padding: 4px;
+    gap: 4px;
+  }
 }
 
 .filterTab {
   padding: 6px 12px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
-  color: var(--text-3);
+  color: var(--text-2);
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+  font-family: inherit;
+}
+
+@media (min-width: 1100px) {
+  .filterTab {
+    padding: 7px 15px;
+    font-size: 13px;
+  }
+}
+
+.filterTab:hover:not(.filterTabActive) {
+  color: var(--text);
+}
+
+.filterTab:active {
+  transform: scale(0.97);
 }
 
 .filterTabActive {
   background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="dark"]) .filterTabActive {
+  background: var(--surface-alt);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .mobileSearchTriggerBtn {

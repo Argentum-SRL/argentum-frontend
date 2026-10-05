@@ -1,0 +1,665 @@
+/* ─── GoalDetailModal.module.css — Clean Goal Detail & History Modal ───────── */
+
+/* ── Modal Dialog Size (Desktop 520px vs Mobile 100% Bottom Sheet) ── */
+@media (min-width: 768px) {
+  .modalDialog {
+    width: 520px !important;
+    max-width: min(520px, calc(100vw - 32px)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .modalDialog {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+.modalContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 88dvh;
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Figtree', sans-serif;
+  overflow: hidden;
+}
+
+/* ── Header (Integrado en el Body) ────────────────────────────────────────── */
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 2px;
+  border-bottom: none;
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.headerRightActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+  border: none;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* ── Body Content ──────────────────────────────────────────────────────────── */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 20px 8px;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+
+/* ── Goal Identity Card (Inside Body) ──────────────────────────────────────── */
+.identityCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+}
+
+.goalAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.identityInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.goalName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.currencyPill {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  padding: 1.5px 5.5px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.statusPillPaused {
+  font-size: 10.5px;
+  font-weight: 600;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  padding: 1.5px 7px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.statusPillCompleted {
+  font-size: 10.5px;
+  font-weight: 600;
+  background: var(--success-bg);
+  color: var(--success);
+  padding: 1.5px 7px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.dateMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.dateIcon {
+  color: var(--text-3);
+}
+
+/* ── Hero Card ─────────────────────────────────────────────────────────────── */
+.heroCard {
+  background: var(--page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.heroAmounts {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.amountBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.targetBlock {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.amountLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.currentAmount {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.targetAmount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.progressTrackContainer {
+  height: 7px;
+  background: var(--surface-alt);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 1px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heroFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+}
+
+.percentDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.percentNumber {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  font-feature-settings: "tnum";
+}
+
+.percentText {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.deltaDisplay {
+  font-size: 11.5px;
+  color: var(--text-2);
+}
+
+.successNote {
+  color: var(--success);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.excessNote {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.remainingNote {
+  color: var(--text-3);
+}
+
+.remainingStrong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.noteBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  margin-top: 2px;
+}
+
+.noteIcon {
+  color: var(--text-3);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.noteText {
+  font-size: 11.5px;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Movements Section ─────────────────────────────────────────────────────── */
+.movementsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleWithBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
+.countBadge {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.movementsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toggleMovementsBtn {
+  width: 100%;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--page);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 4px;
+}
+
+.toggleMovementsBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.toggleMovementsBtn:active {
+  transform: scale(0.98);
+}
+
+.movementItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 11px;
+  background: var(--page);
+  border: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+}
+
+.movementItem:hover {
+  background: var(--surface-alt);
+}
+
+.movIconWrap {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.movIconAporte {
+  background: rgba(26, 122, 74, 0.12);
+  color: var(--success);
+}
+
+.movIconRetiro {
+  background: rgba(217, 119, 6, 0.12);
+  color: #D97706;
+}
+
+:global([data-theme="dark"]) .movIconRetiro {
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+}
+
+.movDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.movTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movMeta {
+  font-size: 10.5px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.movAmountGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.movAmount {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-feature-settings: "tnum";
+}
+
+.amountPositive {
+  color: var(--success);
+}
+
+.amountNegative {
+  color: var(--text-2);
+}
+
+.deleteMovBtn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.deleteMovBtn:hover {
+  background: var(--error-bg);
+  color: var(--error);
+  border-color: rgba(192, 57, 43, 0.2);
+}
+
+.deleteMovBtn:active {
+  transform: scale(0.92);
+}
+
+/* ── Empty State ───────────────────────────────────────────────────────────── */
+.emptyMovementsState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px 12px;
+  gap: 4px;
+  color: var(--text-3);
+  background: var(--page);
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+}
+
+.emptyIconCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}
+
+.emptyMovTitle {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.emptyMovSubtitle {
+  font-size: 11.5px;
+  color: var(--text-3);
+  max-width: 260px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Footer (Transición suave sin línea divisoria) ────────────────────────── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 16px;
+  border-top: none;
+  background: var(--surface);
+  flex-shrink: 0;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: -18px;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background: linear-gradient(to top, var(--surface), transparent);
+  pointer-events: none;
+}
+
+.footerSecondaryGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footerIconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--page);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.footerIconBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+  border-color: var(--text-3);
+}
+
+.footerIconBtn:active {
+  transform: scale(0.94);
+}
+
+.dangerIconBtn:hover {
+  background: var(--error-bg);
+  color: var(--error);
+  border-color: rgba(192, 57, 43, 0.25);
+}
+
+.primaryBtn {
+  flex: 1;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.primaryBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.primaryBtn:active {
+  transform: scale(0.98);
+}
+
+.completedBtn {
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.completedBtn:hover {
+  background: var(--page);
+  border-color: var(--text-3);
+  opacity: 1;
+}

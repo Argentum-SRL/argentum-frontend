@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign, TrendingUp, Edit2 } from '@/components/ui/icons'
-import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse } from '@/types'
+import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2 } from '@/components/ui/icons'
+import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
@@ -14,10 +14,21 @@ import TarjetaCard from '@/components/tarjetas/TarjetaCard'
 import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
 import { PresionFuturaCard } from '@/components/tarjetas/PresionFuturaCard'
 import RegistrarRendimientoModal from '@/components/billeteras/RegistrarRendimientoModal'
+import ActualizarSaldoModal from '@/components/billeteras/ActualizarSaldoModal'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './BilleteraDetallePage.module.css'
+
+function formatDiaMesAnio(fechaStr: string | null | undefined): string {
+  if (!fechaStr) return ''
+  const clean = fechaStr.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`
+  }
+  return clean
+}
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
   ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
@@ -33,6 +44,8 @@ const BilleteraDetallePage: React.FC = () => {
   const [billetera, setBilletera] = useState<Billetera | null>(null)
   const [rendimientoEstimado, setRendimientoEstimado] = useState<RendimientoEstimadoResponse | null>(null)
   const [isRegistrarModalOpen, setIsRegistrarModalOpen] = useState(false)
+  const [isActualizarModalOpen, setIsActualizarModalOpen] = useState(false)
+  const [ajustesData, setAjustesData] = useState<AjustesBilleteraResponse | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [movimientos, setMovimientos] = useState<Transaccion[]>([])
@@ -98,17 +111,19 @@ const BilleteraDetallePage: React.FC = () => {
     }
   }, [background])
 
-
-
   // Cargar billetera inicial
   useEffect(() => {
     const controller = new AbortController()
     const loadBilletera = async () => {
       if (!id) return
       try {
-        const data = await billeteraService.getById(id, controller.signal)
+        const [data, ajustesRes] = await Promise.all([
+          billeteraService.getById(id, controller.signal),
+          billeteraService.getAjustes(id, controller.signal),
+        ])
         if (!controller.signal.aborted) {
           setBilletera(data)
+          setAjustesData(ajustesRes)
           if (!data.es_efectivo && data.tna != null) {
             billeteraService.getRendimientoEstimado(data.id, controller.signal)
               .then(res => {
@@ -202,15 +217,17 @@ const BilleteraDetallePage: React.FC = () => {
     if (!id) return
     setLoadingData(true)
     try {
-      const [txs, bill, cards] = await Promise.all([
+      const [txs, bill, cards, ajustesRes] = await Promise.all([
         transaccionService.getTransacciones({ billetera_id: id }),
         billeteraService.getById(id),
-        tarjetaService.getTarjetasPorBilletera(id)
+        tarjetaService.getTarjetasPorBilletera(id),
+        billeteraService.getAjustes(id),
       ])
       const movimientosBilletera = txs.filter(tx => tx.metodo_pago !== 'credito')
       setMovimientos(movimientosBilletera)
       setBilletera(bill)
       setTarjetas(cards)
+      setAjustesData(ajustesRes)
       checkUrlParams(cards)
       if (!bill.es_efectivo && bill.tna != null) {
         try {
@@ -228,6 +245,47 @@ const BilleteraDetallePage: React.FC = () => {
       setLoadingData(false)
     }
   }, [id, checkUrlParams])
+
+  const handleCargarMovimiento = useCallback(() => {
+    open('transaccion', {
+      data: {
+        transaccion: null,
+        billeteras,
+        categorias,
+        tarjetas,
+        onSuccess: refreshData,
+      },
+    })
+  }, [open, billeteras, categorias, tarjetas, refreshData])
+
+  const handleEliminarAjuste = useCallback((ajuste: AjusteSaldo) => {
+    if (!billetera) return
+    const nombreBilletera = billetera.es_efectivo
+      ? (billetera.moneda === 'ARS' ? 'Efectivo Pesos' : 'Efectivo Dólares')
+      : billetera.nombre
+
+    const montoNum = ajuste.monto
+    const cambio = -montoNum
+    const cambioTexto = montoNum !== 0
+      ? `El saldo de ${nombreBilletera} cambia en ${cambio > 0 ? '+' : ''}${formatMonto(cambio, billetera.moneda)}.`
+      : ''
+
+    confirm({
+      title: '¿Borrar este control?',
+      description: cambioTexto,
+      variant: 'danger',
+      confirmLabel: 'Borrar',
+      onConfirm: async () => {
+        try {
+          await billeteraService.eliminarAjuste(billetera.id, ajuste.id)
+          sileo.success({ title: 'Control eliminado' })
+          await refreshData()
+        } catch (err: unknown) {
+          sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar el control.') })
+        }
+      },
+    })
+  }, [billetera, confirm, refreshData])
 
   const handleEditarBilletera = useCallback(() => {
     if (!billetera) return
@@ -247,7 +305,6 @@ const BilleteraDetallePage: React.FC = () => {
       },
     })
   }, [billetera, billeteras, open, refreshData])
-
 
   const loadTarjetas = async () => {
     if (!id) return
@@ -397,6 +454,19 @@ const BilleteraDetallePage: React.FC = () => {
             >
               <Edit2 size={14} />
             </button>
+
+            {billetera.estado !== 'archivada' && (
+              <button
+                type="button"
+                className={styles.headerActualizarBtn}
+                onClick={() => setIsActualizarModalOpen(true)}
+                title="Actualizar saldo"
+                aria-label="Actualizar saldo"
+              >
+                <RefreshCw size={13} />
+                <span>Actualizar saldo</span>
+              </button>
+            )}
           </div>
 
           {/* Saldo */}
@@ -505,6 +575,42 @@ const BilleteraDetallePage: React.FC = () => {
                   hideWallet={true}
                 />
               ))}
+            </div>
+          )}
+          {/* Sección Controles de Saldo — visible solo si hay ajustes */}
+          {ajustesData && ajustesData.ajustes.length > 0 && (
+            <div className={styles.controlesSection}>
+              <h3 className={styles.controlesTitle}>Controles de saldo</h3>
+              {ajustesData.cobertura.mostrar && ajustesData.cobertura.desde && (
+                <p className={styles.coberturaFrase}>
+                  Desde el {formatDiaMesAnio(ajustesData.cobertura.desde)}, de cada $100 que salieron de {billetera.es_efectivo ? (billetera.moneda === 'ARS' ? 'Efectivo Pesos' : 'Efectivo Dólares') : billetera.nombre}, cargaste ${ajustesData.cobertura.por_cada_100}.
+                </p>
+              )}
+              <div className={styles.controlesList}>
+                {ajustesData.ajustes.map((ajuste) => {
+                  const montoNum = ajuste.monto
+                  const montoLabel = montoNum === 0
+                    ? 'Sin diferencia'
+                    : `Ajuste de ${montoNum > 0 ? '+' : ''}${formatMonto(montoNum, billetera.moneda)}`
+                  return (
+                    <div key={ajuste.id} className={styles.controlRow}>
+                      <div className={styles.controlInfo}>
+                        <span className={styles.controlFecha}>{formatDiaMesAnio(ajuste.fecha)}</span>
+                        <span className={styles.controlMonto}>{montoLabel}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.deleteControlBtn}
+                        onClick={() => handleEliminarAjuste(ajuste)}
+                        title="Borrar control"
+                        aria-label="Borrar control"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
         </section>
@@ -617,6 +723,14 @@ const BilleteraDetallePage: React.FC = () => {
         }}
         billetera={billetera}
         rendimientoEstimado={rendimientoEstimado?.rendimiento_estimado}
+      />
+
+      <ActualizarSaldoModal
+        billetera={billetera}
+        isOpen={isActualizarModalOpen}
+        onClose={() => setIsActualizarModalOpen(false)}
+        onActualizado={refreshData}
+        onCargarMovimiento={handleCargarMovimiento}
       />
     </div>
   )

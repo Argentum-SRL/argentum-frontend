@@ -213,6 +213,62 @@ export interface RendimientoEstimadoResponse {
   rendimiento_estimado: number
 }
 
+export interface HuecoRead {
+  desde: string
+  hasta: string
+  dias: number
+}
+
+export interface DuplicadoRead {
+  fecha: string
+  monto: number
+  cantidad: number
+  descripciones: string[]
+}
+
+export interface ControlSaldoPreview {
+  billetera_id: string
+  moneda: 'ARS' | 'USD'
+  saldo_registrado: number
+  saldo_declarado: number
+  diferencia: number
+  rendimiento_propuesto: number | null
+  resto_con_rendimiento: number | null
+  es_grande: boolean
+  salida_semanal_tipica: number | null
+  semanas_con_historia: number
+  ultimo_movimiento: string | null
+  huecos: HuecoRead[]
+  posibles_duplicados: DuplicadoRead[]
+}
+
+export interface ActualizarSaldoPayload {
+  saldo_declarado: number
+  rendimiento?: number | null
+}
+
+export interface AjusteSaldo {
+  id: string
+  billetera_id: string
+  monto: number
+  saldo_anterior: number
+  saldo_declarado: number
+  fecha: string
+  fecha_creacion: string
+}
+
+export interface CoberturaSaldo {
+  mostrar: boolean
+  por_cada_100: number | null
+  desde: string | null
+  hasta: string | null
+}
+
+export interface AjustesBilleteraResponse {
+  ajustes: AjusteSaldo[]
+  cobertura: CoberturaSaldo
+}
+
 export interface Categoria {
   id: string
   nombre: string

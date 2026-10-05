@@ -1,0 +1,523 @@
+/* ─── ActualizarSaldoModal.module.css ────────────────────────────────────── */
+
+/* ── Modal Dialog Size (Desktop 520px vs Mobile 100% Bottom Sheet) ── */
+@media (min-width: 768px) {
+  .modalActualizarSaldo {
+    width: 520px !important;
+    max-width: min(520px, calc(100vw - 32px)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .modalActualizarSaldo {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+.modalActualizarSaldo :global(.content) {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* ── Modal Container ──────────────────────────────────────────────────────── */
+.modalContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: 90dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Figtree', sans-serif;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px 6px;
+  border-bottom: none;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.headerTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.headerSubtitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.billeteraBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+}
+
+.monedaBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+.modalBody {
+  padding: 14px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.modalBody::-webkit-scrollbar {
+  width: 5px;
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.montoHeroSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ── Paso 2: Coincidencia (Diferencia = 0) ─────────────────────────────────── */
+.matchCard {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1.5px solid rgba(16, 185, 129, 0.25);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.matchIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  flex-shrink: 0;
+}
+
+.matchIcon {
+  color: #10B981;
+}
+
+.matchTextContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.matchTitle {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.matchSubtitle {
+  font-size: 12.5px;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Paso 2: Diferencia (Breakdown Card) ──────────────────────────────────── */
+.diffBreakdownCard {
+  background: var(--surface-alt);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.diffRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.diffLabel {
+  color: var(--text-2);
+}
+
+.diffVal {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.diffValBold {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.diffDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+.diffStatusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 2px;
+}
+
+.diffStatusLabel {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.diffMissingBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  font-size: 13px;
+  font-weight: 800;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.diffSurplusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  font-size: 13px;
+  font-weight: 800;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* ── Rendimiento Card ─────────────────────────────────────────────────────── */
+.rendimientoCard {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxInput {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkboxText {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.restoNote {
+  font-size: 12px;
+  color: var(--text-2);
+  margin: 0 0 0 26px;
+  line-height: 1.4;
+}
+
+/* ── Ayuda Card (cuando es_grande) ───────────────────────────────────────── */
+.ayudaCard {
+  background: rgba(217, 119, 6, 0.08);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ayudaHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #D97706;
+}
+
+.ayudaIcon {
+  flex-shrink: 0;
+}
+
+.ayudaTitle {
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+  color: #D97706;
+}
+
+.ayudaContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ayudaSubtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ayudaList {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ayudaItem {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.modalFooter {
+  padding: 14px 22px 18px;
+  border-top: none;
+  background: var(--surface);
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.footerStep2Container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.footerRow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 46px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 120ms ease;
+  font-family: inherit;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitBtn {
+  flex: 1.5;
+  height: 46px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary, #0D2045);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 120ms ease, transform 120ms ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  font-family: inherit;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.footerHelpText {
+  font-size: 11.5px;
+  color: var(--text-3);
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.volverLinkBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin: 0 auto;
+  transition: color 120ms ease;
+  font-family: inherit;
+}
+
+.volverLinkBtn:hover {
+  color: var(--text);
+}
+
+/* ── Responsive Mobile ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .modalHeader {
+    padding: 14px 16px 10px;
+  }
+
+  .modalBody {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .modalFooter {
+    padding: 12px 16px 16px;
+  }
+
+  .cancelBtn,
+  .submitBtn {
+    height: 44px;
+    font-size: 13.5px;
+  }
+}

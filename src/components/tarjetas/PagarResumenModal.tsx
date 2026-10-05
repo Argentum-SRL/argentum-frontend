@@ -4,6 +4,7 @@ import type { TarjetaCredito, Billetera, PagarTarjetaPayload } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { formatMonto } from '@/utils/format'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import styles from './PagarResumenModal.module.css'
 
 export interface PagarResumenModalProps {
@@ -173,6 +174,31 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   const hasRefinanced = saldoArrastrado > 0
   const hasBreakdown = hasPriorDebt || hasRefinanced
 
+  const {
+    headerRef,
+    fieldsRef: formBodyRef,
+    footerRef: formFooterRef,
+    containerStyle,
+  } = useAdaptiveModalHeight({
+    enabled: isOpen && !!tarjeta,
+    deps: [
+      tipoPago,
+      montoCustom,
+      modoUSD,
+      billeteraUSDId,
+      billeteraARSId,
+      cotizacionCustom,
+      montoPesosCustom,
+      montoPercepcionCustom,
+      totalAPagar,
+      hasBreakdown,
+      hasPriorDebt,
+      hasRefinanced,
+    ],
+    extraPadding: 8,
+    maxHeightRatio: 0.90,
+  })
+
   return (
     <Modal
       isOpen={isOpen}
@@ -182,9 +208,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
       showHeader={false}
       autoHeight
     >
-      <div className={styles.modalContainer}>
+      <div className={styles.modalContainer} style={containerStyle}>
         {/* Header */}
-        <div className={styles.modalHeader}>
+        <div ref={headerRef} className={styles.modalHeader}>
           <div className={styles.headerLeft}>
             <h2 className={styles.headerTitle}>
               Pagar Resumen
@@ -212,7 +238,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className={styles.modalBody}>
+        <div ref={formBodyRef} className={styles.modalBody}>
           {/* Si es USD, Selector de Modo: Dólares vs Pesificar */}
           {monedaAPagar === 'USD' && (
             <div className={styles.segmentedBar} role="radiogroup" aria-label="Modo de pago en dólares">
@@ -522,7 +548,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className={styles.modalFooter}>
+        <div ref={formFooterRef} className={styles.modalFooter}>
           <button
             type="button"
             className={styles.cancelBtn}

@@ -1,5 +1,11 @@
 import api from './api'
-import type { Billetera, RendimientoEstimadoResponse } from '@/types'
+import type {
+  Billetera,
+  RendimientoEstimadoResponse,
+  ControlSaldoPreview,
+  ActualizarSaldoPayload,
+  AjustesBilleteraResponse,
+} from '@/types'
 import { createUserCache } from '@/utils/sessionCleanup'
 
 // Cache storage con validación automática por usuario autenticado
@@ -69,6 +75,31 @@ const billeteraService = {
     return data
   },
 
+  getControlSaldo: async (billeteraId: string, saldo: number, signal?: AbortSignal): Promise<ControlSaldoPreview> => {
+    const { data } = await api.get<ControlSaldoPreview>(`/billeteras/${billeteraId}/control-saldo`, {
+      params: { saldo },
+      signal,
+    })
+    return data
+  },
+
+  actualizarSaldo: async (billeteraId: string, payload: ActualizarSaldoPayload): Promise<Billetera> => {
+    const { data } = await api.post<Billetera>(`/billeteras/${billeteraId}/ajustes`, payload)
+    invalidateBilleteras()
+    return data
+  },
+
+  getAjustes: async (billeteraId: string, signal?: AbortSignal): Promise<AjustesBilleteraResponse> => {
+    const { data } = await api.get<AjustesBilleteraResponse>(`/billeteras/${billeteraId}/ajustes`, { signal })
+    return data
+  },
+
+  eliminarAjuste: async (billeteraId: string, ajusteId: string): Promise<boolean> => {
+    await api.delete(`/billeteras/${billeteraId}/ajustes/${ajusteId}`)
+    invalidateBilleteras()
+    return true
+  },
+
   delete: async (id: string) => {
     await api.delete(`/billeteras/${id}`)
     invalidateBilleteras()
@@ -89,3 +120,4 @@ const billeteraService = {
 }
 
 export default billeteraService
+

@@ -1,74 +1,97 @@
+/* ─── PresupuestoModal.module.css — 100% Matched to TransferenciaModal / TransaccionModal ─── */
+
+/* ── Modal Dialog Size (Desktop 520px vs Mobile 100% Bottom Sheet) ── */
+@media (min-width: 768px) {
+  .modalPresupuesto {
+    width: 520px !important;
+    max-width: min(520px, calc(100vw - 32px)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .modalPresupuesto {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+/* ── Slides container & animations ───────────────────────────────────────── */
 .slidesContainer {
   position: relative;
   width: 100%;
-  height: 100%;
-  max-height: 90dvh;
-  background: var(--surface);
-  border-radius: 24px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
   min-height: 0;
+  overflow: hidden;
+  max-height: 88dvh;
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Figtree', sans-serif;
 }
 
-/* Dots */
-.stepDots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 0 0;
-  flex-shrink: 0;
-}
-
-.stepDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  transition: all 0.3s;
-}
-
-.stepDotActive {
-  background: var(--primary);
-  width: 20px;
-  border-radius: 4px;
-}
-
-.stepDotInactive {
-  background: var(--border);
-}
-
-/* Animations */
 .slide {
   display: flex;
   flex-direction: column;
-  animation-duration: 0.4s;
-  animation-fill-mode: both;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
 .slideForward {
-  animation-name: slideInRight;
+  animation: slideInRight 280ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slideBack {
-  animation-name: slideInLeft;
+  animation: slideInLeft 280ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideInRight {
-  from { transform: translateX(30px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInLeft {
-  from { transform: translateX(-30px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-/* Layout */
+/* ── Step Indicator Dots (Pills) ─────────────────────────────────────────── */
+.stepDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 20px 4px;
+  flex-shrink: 0;
+  background: var(--surface);
+  position: relative;
+  z-index: 10;
+}
+
+.stepDot {
+  height: 5px;
+  border-radius: 99px;
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--surface-alt);
+}
+
+.stepDotActive {
+  background: var(--primary);
+  width: 20px;
+}
+
+.stepDotInactive {
+  width: 6px;
+  opacity: 0.4;
+}
+
+/* ── Formulario Base ─────────────────────────────────────────────────────── */
 .formContainer {
   display: flex;
   flex-direction: column;
@@ -76,54 +99,96 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  padding: 24px 32px 24px;
-  gap: 12px;
 }
 
 .formHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  padding: 10px 20px 8px;
   flex-shrink: 0;
 }
 
-.headerTitle {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text);
-  margin: 0;
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.closeBtn, .backBtn {
+.headerRightActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deleteHeaderBtn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  border: none;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 120ms ease;
+}
+
+.deleteHeaderBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #DC2626;
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.backBtn, .closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   border: none;
   background: var(--surface-alt);
   color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
   flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
 }
 
-.closeBtn:hover, .backBtn:hover {
+.backBtn:hover, .closeBtn:hover {
   background: var(--border);
   color: var(--text);
 }
 
 .formBody {
+  flex: 1;
+  padding: 4px 20px 10px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 20px;
-  padding: 16px 0 0;
-  flex: 1;
+  gap: 12px;
   min-height: 0;
-  overflow-y: auto;
+}
+
+.formBodyStep1,
+.formBodyStep3 {
+  overflow: visible;
+}
+
+.formBodyStep2 {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  min-height: 220px;
+  max-height: calc(88dvh - 140px);
+  padding-right: 16px;
 }
 
 .formBody::-webkit-scrollbar {
@@ -135,126 +200,71 @@
   border-radius: 4px;
 }
 
+@media (max-width: 480px) {
+  .formHeader {
+    padding: 8px 16px 6px;
+  }
+  .formBody {
+    padding: 4px 16px 10px;
+    gap: 10px;
+  }
+}
+
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
 .fieldLabel {
-  font-size: 13px;
+  font-size: 10.5px;
   font-weight: 700;
-  color: var(--text-2);
-  margin-left: 4px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
 }
 
 .fieldInput {
-  background: var(--surface-alt);
-  border: 1.5px solid transparent;
-  border-radius: 14px;
-  padding: 12px 16px;
-  font-size: 15px;
-  font-weight: 600;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
   color: var(--text);
-  transition: all 0.2s;
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 150ms ease, background 150ms ease;
+  font-family: 'Figtree', sans-serif;
+  box-sizing: border-box;
 }
 
 .fieldInput:focus {
-  outline: none;
   background: var(--surface);
   border-color: var(--primary);
-  box-shadow: none;
 }
 
 .fieldHint {
   font-size: 12px;
   color: var(--text-3);
-  margin: 0;
-  padding: 0 4px;
+  margin: 4px 0 0;
+  padding: 0 2px;
+  line-height: 1.35;
 }
 
-/* Monto Hero */
-.montoHero {
-  background: var(--surface-alt);
-  border-radius: 20px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border: 1px solid var(--border);
-}
-
-.monedaToggleChip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.monedaToggleChip:hover {
-  background: var(--surface-alt);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.monedaChipFlag { font-size: 16px; }
-.monedaChipLabel { font-size: 13px; font-weight: 800; color: var(--text); }
-
-.montoDivider {
-  width: 1px;
-  height: 32px;
-  background: var(--border);
-}
-
-.montoHeroInput {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  flex: 1;
-}
-
-.montoHeroPrefix {
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--text-3);
-  line-height: 1;
-}
-
-.montoHeroField {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--text);
-  outline: none;
-  padding: 0;
-  font-family: inherit;
-  line-height: 1;
-}
-
-.montoHeroField::placeholder {
-  color: var(--text-3);
-  opacity: 0.3;
-}
-
-/* Step 2: Categorías */
+/* ── Step 2: Categorías, Presets & Grilla Interactiva ──────────────────────── */
 .catSearchContainer {
   position: relative;
   width: 100%;
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  margin-bottom: 4px;
 }
 
 .searchIcon {
   position: absolute;
-  left: 14px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-3);
@@ -263,23 +273,23 @@
 
 .catSearchInput {
   width: 100%;
-  height: 44px;
-  padding: 0 38px 0 42px;
+  height: 38px;
+  padding: 0 34px 0 36px;
   border-radius: 12px;
-  border: 1.5px solid transparent;
-  background: var(--surface-alt);
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
   color: var(--text);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   outline: none;
-  transition: all 0.2s;
+  transition: border-color 150ms ease, background 150ms ease;
+  font-family: 'Figtree', sans-serif;
   box-sizing: border-box;
 }
 
 .catSearchInput:focus {
   background: var(--surface);
   border-color: var(--primary);
-  box-shadow: none;
 }
 
 .catSearchInput::placeholder {
@@ -288,141 +298,400 @@
 
 .clearSearchBtn {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: none;
-  background: var(--border);
+  background: var(--surface-alt);
   color: var(--text-2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 120ms ease;
   padding: 0;
 }
 
 .clearSearchBtn:hover {
-  background: var(--text-3);
-  color: var(--surface);
+  background: var(--border);
+  color: var(--text);
 }
 
+/* ── Barra de Atajos y Presets ────────────────────────────────────────────── */
+.presetsBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0 4px;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.presetsBar::-webkit-scrollbar {
+  display: none;
+}
+
+.presetPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 11px;
+  border-radius: 99px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text-2);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 140ms ease;
+  font-family: 'Figtree', sans-serif;
+  user-select: none;
+}
+
+.presetPill:hover {
+  background: var(--surface);
+  border-color: var(--silver);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.presetPill:active {
+  transform: scale(0.97);
+}
+
+.presetPillActive {
+  background: rgba(var(--primary-rgb), 0.12) !important;
+  color: var(--primary) !important;
+  border-color: rgba(var(--primary-rgb), 0.35) !important;
+}
+
+.presetPillClear {
+  margin-left: auto;
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.presetPillClear:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #DC2626;
+}
+
+/* ── Lista Espaciosa de Categorías ────────────────────────────────────────── */
 .catList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-  max-height: 480px;
-  padding-right: 4px;
-}
-
-.catItem {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
+  gap: 7px;
+  padding-bottom: 6px;
   width: 100%;
 }
 
-.catItem:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+.emptyCatList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13.5px;
+  font-weight: 600;
+  gap: 6px;
 }
 
-.catMain {
-  padding: 16px 20px;
+/* ── Tarjeta de Categoría (Fila Completa, Tactil y Espaciosa) ─────────────── */
+.catCard {
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 160ms ease;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.catCard:hover {
+  border-color: var(--silver);
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+
+.catCardSelected {
+  border-color: rgba(var(--primary-rgb), 0.4);
+  background: var(--surface);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+:global([data-theme="dark"]) .catCardSelected,
+:global(.dark) .catCardSelected {
+  border-color: rgba(var(--primary-rgb), 0.5);
+}
+
+.catCardExpanded {
+  border-color: var(--silver);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.catCardTop {
+  padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  min-height: 80px;
-  height: auto;
+  min-height: 54px;
+  gap: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 120ms ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.catInfo { 
-  display: flex; 
-  align-items: center; 
-  gap: 16px;
+.catCardTop:active {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.catCardLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   min-width: 0;
-}
-.catName { 
-  font-size: 16px; 
-  font-weight: 800; 
-  color: var(--text); 
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1;
 }
 
-.selectBtn {
+.catIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.catCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.catCardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.catCardSubtitle {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  line-height: 1.2;
+}
+
+.subtextSuccess {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.subtextPartial {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.catCardRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.customSubcatBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 9px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-alt);
-  font-size: 13px;
-  font-weight: 800;
+  color: var(--text-2);
+  font-size: 11.5px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  min-width: 80px;
+  transition: all 140ms ease;
+  font-family: 'Figtree', sans-serif;
+  user-select: none;
+  white-space: nowrap;
 }
 
-.selectBtnActive {
+.customSubcatBtn:hover {
+  background: var(--border);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.customSubcatBtnActive {
   background: var(--primary);
-  color: white;
-  border-color: transparent;
+  color: #ffffff;
+  border-color: var(--primary);
 }
 
-.subList {
+.checkCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  color: white;
+  flex-shrink: 0;
+}
+
+.checkCircleActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.35);
+  transform: scale(1.05);
+}
+
+.checkCirclePartial {
   background: var(--surface-alt);
-  padding: 4px 8px 12px;
+  border-color: var(--primary);
+}
+
+.partialDash {
+  width: 8px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+
+/* ── Bandeja de Subcategorías ────────────────────────────────────────────── */
+.subcatTray {
+  background: var(--surface-alt);
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.04));
+  animation: fadeInSub 180ms ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@keyframes fadeInSub {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.subcatTrayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.subcatTrayTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.subcatSelectAllBtn {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: opacity 120ms ease;
+  font-family: 'Figtree', sans-serif;
+}
+
+.subcatSelectAllBtn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.subcatChipsGrid {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.subItem {
-  padding: 6px 12px;
-  background: var(--surface);
+.subcatChip {
+  padding: 6px 10px;
+  background: var(--page);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: 9px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--text-2);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 140ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: 'Figtree', sans-serif;
 }
 
-.subItemActive {
-  background: var(--surface-alt);
+.subcatChip:hover {
+  border-color: var(--silver);
   color: var(--text);
+  transform: translateY(-1px);
+}
+
+.subcatChipActive {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
   font-weight: 700;
-  border-color: var(--border);
+  box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.25);
 }
 
-.subInfo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.subcatChipName {
+  line-height: 1.2;
 }
 
-/* Step 3: Frecuencia */
-.periodGrid {
+.subcatCheck {
+  flex-shrink: 0;
+}
+
+/* ── Step 3: Frecuencia & Periodos (Estilo BankPickerModal) ──────────────── */
+.periodSegmentedWrap {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 4px;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.05));
+}
+
+[data-theme="dark"] .periodSegmentedWrap,
+.dark .periodSegmentedWrap {
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .periodBtn {
@@ -430,164 +699,228 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 14px 10px;
-  border-radius: 14px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
+  gap: 4px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--text-2);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Figtree', sans-serif;
+  user-select: none;
 }
 
 .periodBtn:hover {
-  background: var(--surface-alt);
   color: var(--text);
-  transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .periodBtn:hover,
+.dark .periodBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .periodBtnActive {
-  background: var(--surface-alt);
-  color: var(--primary);
-  border-color: var(--primary);
+  background: var(--surface) !important;
+  color: var(--primary) !important;
   font-weight: 700;
+  border-color: rgba(var(--primary-rgb), 0.15) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .periodBtnActive,
+.dark .periodBtnActive {
+  background: var(--surface-3, #1e293b) !important;
+  color: var(--primary-light, #93c5fd) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.periodBtnIcon {
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .periodBtnLabel {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
+/* ── Opciones de Renovación (Estilo SettingCard de BankPickerModal) ────────── */
 .renewalOptions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  width: 100%;
 }
 
 .renewalCard {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.05));
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+  user-select: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .renewalCard:hover {
-  background: var(--surface-alt);
-  border-color: var(--border-hover, var(--border));
+  background: var(--surface);
+  border-color: rgba(var(--primary-rgb), 0.2);
   transform: translateY(-1px);
 }
 
-.renewalCardActive {
-  background: var(--surface-alt);
-  border-color: var(--primary);
+[data-theme="dark"] .renewalCard,
+.dark .renewalCard {
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
-.renewalIcon {
+[data-theme="dark"] .renewalCard:hover,
+.dark .renewalCard:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.renewalCardActive {
+  background: rgba(var(--primary-rgb), 0.04) !important;
+  border-color: rgba(var(--primary-rgb), 0.35) !important;
+}
+
+[data-theme="dark"] .renewalCardActive,
+.dark .renewalCardActive {
+  background: rgba(72, 120, 184, 0.1) !important;
+  border-color: rgba(72, 120, 184, 0.35) !important;
+}
+
+.renewalLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.renewalIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.06));
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-3);
   flex-shrink: 0;
+  transition: all 180ms ease;
 }
 
-.renewalCardActive .renewalIcon {
-  color: var(--primary);
-}
-
-.renewalInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.renewalTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.renewalDesc {
-  font-size: 12px;
-  color: var(--text-2);
-  margin: 0;
-  line-height: 1.35;
+[data-theme="dark"] .renewalIconWrap,
+.dark .renewalIconWrap {
+  background: var(--surface-3, rgba(255, 255, 255, 0.04));
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 @media (max-width: 480px) {
-  .periodGrid {
-    gap: 6px;
-  }
-
   .periodBtn {
-    padding: 12px 6px;
-    gap: 6px;
+    padding: 8px 4px;
+    gap: 3px;
   }
 
   .periodBtnLabel {
-    font-size: 12px;
+    font-size: 11.5px;
   }
 
   .renewalCard {
-    padding: 12px 14px;
-    gap: 12px;
+    padding: 9px 12px;
+    gap: 10px;
   }
 }
 
-/* Footer */
+/* ── Footer ──────────────────────────────────────────────────────────────── */
 .formFooter {
-  padding-top: 12px;
-  margin-top: auto;
-  border-top: 1px solid var(--surface-alt);
+  padding: 10px 20px 14px;
   background: var(--surface);
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
   flex-shrink: 0;
+  border-top: 1px solid var(--surface-alt);
+}
+
+.formFooterStep2 {
+  justify-content: space-between;
+}
+
+.selectedCount {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-3);
+  padding-left: 4px;
+}
+
+.footerButtonsGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .cancelBtn {
   flex: 1;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
+  height: 42px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
   background: transparent;
-  font-size: 14px;
-  font-weight: 700;
   color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  font-family: 'Figtree', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancelBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
 }
 
 .submitBtn {
   flex: 2;
-  padding: 14px;
-  border-radius: 14px;
+  height: 42px;
+  border-radius: 12px;
   border: none;
   background: var(--primary);
   color: white;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: opacity 120ms ease, transform 120ms ease;
+  font-family: 'Figtree', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .submitBtn:hover:not(:disabled) {
-  background: #1A2E55;
+  opacity: 0.9;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .submitBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
-}
-
-.selectedCount {
-  flex: 1;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-3);
 }
 
 .localErrorAlert {
@@ -597,11 +930,11 @@
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   color: #EF4444;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
 

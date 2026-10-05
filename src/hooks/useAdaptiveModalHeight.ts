@@ -54,7 +54,7 @@ function getContainerIntrinsicHeight(container: HTMLElement): number {
   })
 
   if (visibleChildren.length === 0) {
-    return container.offsetHeight
+    return Math.ceil(container.offsetHeight)
   }
 
   let childrenH = 0
@@ -63,7 +63,8 @@ function getContainerIntrinsicHeight(container: HTMLElement): number {
   }
 
   const gapsH = visibleChildren.length > 1 ? (visibleChildren.length - 1) * rowGap : 0
-  return Math.ceil(paddingTop + paddingBottom + borderTop + borderBottom + childrenH + gapsH)
+  const calculatedH = Math.ceil(paddingTop + paddingBottom + borderTop + borderBottom + childrenH + gapsH)
+  return calculatedH
 }
 
 /**

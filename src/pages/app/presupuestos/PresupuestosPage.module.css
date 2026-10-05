@@ -45,6 +45,12 @@
   margin: 0;
 }
 
+@media (max-width: 640px) {
+  .subtitle {
+    display: none;
+  }
+}
+
 .actions {
   display: flex;
   align-items: center;

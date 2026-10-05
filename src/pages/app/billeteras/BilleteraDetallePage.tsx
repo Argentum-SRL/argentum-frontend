@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2 } from '@/components/ui/icons'
-import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo } from '@/types'
+import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo, EntidadTasa } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
@@ -60,6 +60,7 @@ const BilleteraDetallePage: React.FC = () => {
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [movimientos, setMovimientos] = useState<Transaccion[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [entidades, setEntidades] = useState<EntidadTasa[]>([])
   const [selectedTarjetaIndex, setSelectedTarjetaIndex] = useState<number>(0)
   const [isResumenExpanded, setIsResumenExpanded] = useState(false)
   const [activeTab, setActiveTab] = useState<'movimientos' | 'credito'>('movimientos')
@@ -68,6 +69,10 @@ const BilleteraDetallePage: React.FC = () => {
   const [loadingData, setLoadingData] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
   const tarjetaIdParam = searchParams.get('tarjeta_id')
+
+  useEffect(() => {
+    billeteraService.getEntidades().then(setEntidades).catch(console.error)
+  }, [])
 
   // Función para manejar la selección de tarjeta desde URL
   const checkUrlParams = useCallback((cards: TarjetaCredito[]) => {
@@ -264,6 +269,19 @@ const BilleteraDetallePage: React.FC = () => {
     }
     return bank?.nombre || billetera?.nombre || ''
   }, [rendimientoEstimado?.entidad_id, billetera, bank])
+
+  const tasaFuenteNombre = useMemo(() => {
+    const entId = rendimientoEstimado?.entidad_id || billetera?.bank_id || billetera?.entidad_efectiva
+    const baseEntidad = entId ? entidades.find((e) => e.id === entId) : null
+
+    const esBase = Boolean(
+      baseEntidad?.clave_base && rendimientoEstimado?.clave_tasa === baseEntidad.clave_base
+    )
+    if (!esBase && rendimientoEstimado?.etiqueta_tasa) {
+      return rendimientoEstimado.etiqueta_tasa
+    }
+    return entidadNombre
+  }, [entidades, rendimientoEstimado, billetera, entidadNombre])
 
   const handleUsarTasaAutomatica = useCallback(async () => {
     if (!billetera) return
@@ -559,7 +577,7 @@ const BilleteraDetallePage: React.FC = () => {
                     </div>
                   ) : (
                     <span>
-                      {billetera.tna}% TNA · tasa de hoy de {entidadNombre}
+                      {billetera.tna}% TNA · tasa de hoy de {tasaFuenteNombre}
                       {rendimientoEstimado?.fecha_dato_tasa ? ` (dato del ${formatDiaMes(rendimientoEstimado.fecha_dato_tasa)})` : ''}
                       {rendimientoEstimado?.tope != null && rendimientoEstimado.tope > 0 ? `. Rinde hasta ${formatMonto(rendimientoEstimado.tope, billetera.moneda)}.` : ''}
                     </span>

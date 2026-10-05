@@ -207,6 +207,8 @@ export interface Billetera {
 
 export interface OpcionTasa {
   clave: string
+  tipo: 'cuenta' | 'fci'
+  etiqueta: string
   tna: number | null
   tope: number | null
   condiciones: string | null
@@ -248,6 +250,7 @@ export interface RendimientoEstimadoResponse {
   tope?: number | null
   entidad_id?: string | null
   clave_tasa?: string | null
+  etiqueta_tasa?: string | null
   tna_automatica?: number | null
 }
 

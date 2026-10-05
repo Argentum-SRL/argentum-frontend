@@ -181,7 +181,6 @@ export default function EditBilleteraModal({
 
   const tieneNiveles = Boolean(
     entidadSeleccionada &&
-    entidadSeleccionada.tipo_fuente &&
     entidadSeleccionada.opciones.length > 0 &&
     (entidadSeleccionada.opciones.length > 1 || entidadSeleccionada.clave_base === null)
   )
@@ -194,14 +193,15 @@ export default function EditBilleteraModal({
     const opts: SelectOption[] = []
     opts.push({
       value: '',
-      label: entidadSeleccionada.clave_base ? 'Tasa base' : 'No cumplo la condición',
+      label: entidadSeleccionada.clave_base ? 'Tasa base' : 'Ninguna de estas',
     })
     entidadSeleccionada.opciones
       .filter((opt) => opt.clave !== entidadSeleccionada.clave_base)
       .forEach((opt) => {
+        const tnaTexto = opt.tna != null ? `${opt.tna}% TNA` : 'sin dato'
         opts.push({
           value: opt.clave,
-          label: `${opt.clave}${opt.tna != null ? ` · ${opt.tna}% TNA` : ''}`,
+          label: `${opt.etiqueta || opt.clave} · ${tnaTexto}`,
         })
       })
     return opts

@@ -271,7 +271,7 @@ export default function BankPickerModal({
   }, [entidades, bankSeleccionado])
 
   const estimacionValida = useMemo(() => {
-    if (step !== 'form' || !bankSeleccionado || bankSeleccionado.id === 'custom' || !entidadInfo?.tipo_fuente) {
+    if (step !== 'form' || !bankSeleccionado || bankSeleccionado.id === 'custom' || !entidadInfo || entidadInfo.opciones.length === 0) {
       return null
     }
     return estimacion
@@ -279,7 +279,7 @@ export default function BankPickerModal({
 
   // Estimación de rendimiento con debounce de 400ms al cambiar saldo o cambio de entidad
   useEffect(() => {
-    if (step !== 'form' || !bankSeleccionado || bankSeleccionado.id === 'custom' || !entidadInfo?.tipo_fuente) {
+    if (step !== 'form' || !bankSeleccionado || bankSeleccionado.id === 'custom' || !entidadInfo || entidadInfo.opciones.length === 0) {
       return
     }
 
@@ -353,7 +353,7 @@ export default function BankPickerModal({
   }
 
   const mostrarTarjetaRendimiento = Boolean(
-    bankSeleccionado && bankSeleccionado.id !== 'custom' && bankSeleccionado.tipo !== 'efectivo' && entidadInfo?.tipo_fuente
+    bankSeleccionado && bankSeleccionado.id !== 'custom' && bankSeleccionado.tipo !== 'efectivo' && entidadInfo && entidadInfo.opciones.length > 0
   )
 
 
@@ -639,7 +639,7 @@ export default function BankPickerModal({
                           </span>
                         ) : entidadInfo?.clave_base === null && (!estimacionValida || estimacionValida.tna == null) ? (
                           <span className={styles.tasaDatoSmall}>
-                            Si cumplís la condición ({entidadInfo.opciones[0]?.condiciones || ''}), elegí tu tasa después en Editar &gt; Opciones avanzadas.
+                            Podés elegir tu tasa después en Editar &gt; Opciones avanzadas.
                           </span>
                         ) : (
                           <>

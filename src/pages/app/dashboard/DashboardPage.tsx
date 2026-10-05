@@ -14,6 +14,8 @@ import {
   Sun,
   Moon,
   ArrowLeft,
+  MessageSquare,
+  X,
 } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -567,6 +569,15 @@ export default function DashboardPage() {
     return localStorage.getItem('argentum_hide_balance') !== 'true'
   })
 
+  const [bannerDismissed, setBannerDismissed] = useState(() => {
+    return sessionStorage.getItem('argentum_dismiss_whatsapp_banner') === 'true'
+  })
+
+  const handleDismissBanner = useCallback(() => {
+    sessionStorage.setItem('argentum_dismiss_whatsapp_banner', 'true')
+    setBannerDismissed(true)
+  }, [])
+
   const handleTogglePrivacy = useCallback(() => {
     setShowBalance(prev => {
       const next = !prev
@@ -841,6 +852,44 @@ export default function DashboardPage() {
           <MobileGreeting usuario={usuario} />
         </div>
       </header>
+
+      {/* ── WhatsApp Linking Banner ─────────────────────────────────────────── */}
+      {!usuario?.telefono_verificado && !bannerDismissed && (
+        <div className={styles.whatsappBanner}>
+          <Link to="/auth/verificar-telefono" className={styles.whatsappBannerMainLink}>
+            <div className={styles.whatsappBannerIconBox}>
+              <MessageSquare size={16} className={styles.whatsappBannerIcon} />
+            </div>
+            <div className={styles.whatsappBannerText}>
+              <div className={styles.whatsappBannerTitleRow}>
+                <span className={styles.whatsappBannerTitle}>Vinculá tu WhatsApp</span>
+                <span className={styles.whatsappBannerBadge}>Nuevo</span>
+              </div>
+              <p className={styles.whatsappBannerSubtitle}>
+                Registrá gastos al instante enviando audios o mensajes a tu asistente inteligente.
+              </p>
+            </div>
+            <div className={styles.whatsappBannerActionMobile}>
+              <span className={styles.whatsappBannerActionMobileText}>Vincular</span>
+              <ChevronRight size={14} className={styles.whatsappBannerArrow} />
+            </div>
+          </Link>
+          <div className={styles.whatsappBannerActionsDesktop}>
+            <Link to="/auth/verificar-telefono" className={styles.whatsappBannerBtn}>
+              Vincular ahora
+            </Link>
+          </div>
+          <button
+            type="button"
+            className={styles.whatsappBannerCloseBtn}
+            onClick={handleDismissBanner}
+            aria-label="Cerrar aviso"
+            title="Cerrar aviso"
+          >
+            <X size={15} />
+          </button>
+        </div>
+      )}
 
       {/* ── Top Row (3 Cols) ──────────────────────────────────────────────── */}
       <div className={`${styles.topRow} ${isAnyTopRowExpanded ? styles.topRowExpanded : styles.topRowCompact}`}>

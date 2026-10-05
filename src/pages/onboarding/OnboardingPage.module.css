@@ -14,6 +14,13 @@
   position: relative;
   z-index: 10;
   margin: 0 auto;
+  transition: max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 768px) {
+  .innerWide {
+    max-width: 700px;
+  }
 }
 
 /* ── Header ──────────────────────────────────── */

@@ -18,11 +18,6 @@ export function manejarRespuestaAuth(
       replace: true,
       state: { email: respuesta.usuario?.email },
     })
-  } else if (respuesta.requiere_verificacion_telefono) {
-    navigate('/auth/verificar-telefono', {
-      replace: true,
-      state: { telefono: respuesta.usuario?.telefono, modoVerificacion: true },
-    })
   } else if (respuesta.requiere_onboarding) {
     navigate('/onboarding', { replace: true })
   } else {

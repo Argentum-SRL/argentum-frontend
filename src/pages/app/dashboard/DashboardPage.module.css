@@ -1461,4 +1461,198 @@
   }
 }
 
+/* ── WhatsApp Linking Banner ──────────────────────────────────────────────── */
+.whatsappBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px 6px 12px;
+  background: var(--surface-card, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-left: 3px solid var(--primary, #00bb7d);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.whatsappBanner:hover {
+  border-color: var(--border-hover, rgba(0, 187, 125, 0.3));
+}
+
+.whatsappBannerMainLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.whatsappBannerIconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 187, 125, 0.12);
+  color: var(--primary, #00bb7d);
+  flex-shrink: 0;
+}
+
+.whatsappBannerIcon {
+  flex-shrink: 0;
+}
+
+.whatsappBannerText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.whatsappBannerTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.whatsappBannerTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, #fff);
+  line-height: 1.25;
+}
+
+.whatsappBannerBadge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(0, 187, 125, 0.16);
+  color: var(--primary, #00bb7d);
+}
+
+.whatsappBannerSubtitle {
+  font-size: 0.8125rem;
+  color: var(--text-2, rgba(255, 255, 255, 0.6));
+  margin: 0;
+  line-height: 1.35;
+}
+
+.whatsappBannerActionMobile {
+  display: none;
+}
+
+.whatsappBannerActionsDesktop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.whatsappBannerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary, #00bb7d);
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.whatsappBannerBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.whatsappBannerCloseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-3, rgba(255, 255, 255, 0.4));
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.whatsappBannerCloseBtn:hover {
+  color: var(--text, #fff);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 640px) {
+  .whatsappBanner {
+    padding: 6px 8px 6px 10px;
+    gap: 8px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+
+  .whatsappBannerMainLink {
+    gap: 10px;
+  }
+
+  .whatsappBannerIconBox {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+  }
+
+  .whatsappBannerTitle {
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .whatsappBannerBadge {
+    display: none;
+  }
+
+  .whatsappBannerSubtitle {
+    display: none;
+  }
+
+  .whatsappBannerActionsDesktop {
+    display: none;
+  }
+
+  .whatsappBannerActionMobile {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary, #00bb7d);
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .whatsappBannerArrow {
+    color: var(--primary, #00bb7d);
+  }
+
+  .whatsappBannerCloseBtn {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+
 

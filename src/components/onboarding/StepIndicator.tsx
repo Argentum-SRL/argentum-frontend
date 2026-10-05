@@ -6,7 +6,7 @@ interface Props {
   current: number
 }
 
-const LABELS = ['Datos', 'Ciclo', 'Moneda', 'Billetera']
+const LABELS = ['Datos', 'Ciclo', 'Moneda', 'WhatsApp']
 
 export default function StepIndicator({ total, current }: Props) {
   return (

@@ -3,8 +3,6 @@ import { Loader2 } from '@/components/ui/icons'
 import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
 import { sileo } from 'sileo'
-import { useAuth } from '@/hooks/useAuth'
-import { useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { Button } from '@/components/ui'
 import styles from './StepMoneda.module.css'
@@ -35,8 +33,6 @@ function formatARS(valor: number | null | undefined): string {
 }
 
 export default function StepMoneda({ datosIniciales, onNext }: Props) {
-  const { refreshUser } = useAuth()
-  const navigate = useNavigate()
   const [moneda, setMoneda] = useState(datosIniciales.moneda_principal ?? 'ARS')
   const [secundaria, setSecundaria] = useState(Boolean(datosIniciales.moneda_secundaria_activa))
   const [tipoDolar, setTipoDolar] = useState<'oficial' | 'blue' | 'tarjeta' | 'mep'>(
@@ -59,12 +55,7 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
   const necesitaDolar = useMemo(() => moneda === 'USD' || secundaria, [moneda, secundaria])
 
   async function finalizar(paso: string | null) {
-    if (!paso) {
-      await refreshUser()
-      navigate('/app/dashboard', { replace: true })
-    } else {
-      onNext(paso)
-    }
+    onNext(paso)
   }
 
   async function handleSubmit(e: React.FormEvent) {

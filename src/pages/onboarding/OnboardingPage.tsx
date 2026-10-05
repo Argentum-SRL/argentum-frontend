@@ -7,6 +7,7 @@ import StepIndicator from '@/components/onboarding/StepIndicator'
 import StepDatosPersonales from '@/components/onboarding/StepDatosPersonales'
 import StepCicloFinanciero from '@/components/onboarding/StepCicloFinanciero'
 import StepMoneda from '@/components/onboarding/StepMoneda'
+import StepWhatsApp from '@/components/onboarding/StepWhatsApp'
 import { useAuth } from '@/hooks/useAuth'
 import { AtmosphericBackground, ThemeToggle } from '@/components/ui'
 import styles from './OnboardingPage.module.css'
@@ -15,6 +16,7 @@ const PASO_NUMERO: Record<string, number> = {
   datos_personales:  1,
   ciclo_financiero:  2,
   moneda:            3,
+  whatsapp:          4,
 }
 
 function mapEstadoAPaso(estado: EstadoOnboarding): number {
@@ -44,7 +46,8 @@ export default function OnboardingPage() {
   const [cargando, setCargando] = useState(true)
   const [errorCarga, setErrorCarga] = useState(false)
   const [cargandoReintento, setCargandoReintento] = useState(false)
-  const { refreshUser } = useAuth()
+  const { usuario, refreshUser } = useAuth()
+  const totalPasos = usuario?.telefono_verificado ? 3 : 4
 
   const cargarEstado = useCallback(async () => {
     const controller = new AbortController()
@@ -125,7 +128,16 @@ export default function OnboardingPage() {
 
 
   function avanzar(siguientePaso: string | null) {
-    if (!siguientePaso) {
+    if (pasoActual === 3) {
+      if (!usuario?.telefono_verificado) {
+        setPasoActual(4)
+        return
+      } else {
+        void handleRefreshAndNavigate()
+        return
+      }
+    }
+    if (pasoActual >= 4 || !siguientePaso) {
       void handleRefreshAndNavigate()
       return
     }
@@ -146,17 +158,18 @@ export default function OnboardingPage() {
   }
 
   const datos = estado?.datos_actuales
+  const isStepWide = pasoActual === 4
 
   return (
     <AtmosphericBackground fullScreen={false} centered={false} compensateBottomNav={false} className={styles.page}>
       <ThemeToggle />
-      <div className={styles.inner}>
+      <div className={[styles.inner, isStepWide ? styles.innerWide : ''].filter(Boolean).join(' ')}>
         <div className={styles.header}>
           <MoonIcon size={32} />
           <span className={styles.logoText}>Argentum</span>
         </div>
 
-        <StepIndicator total={3} current={pasoActual} />
+        <StepIndicator total={totalPasos} current={pasoActual} />
 
         <div className={styles.card}>
           <div key={pasoActual} className={styles.stepWrap}>
@@ -212,6 +225,9 @@ export default function OnboardingPage() {
                     }}
                     onNext={avanzar}
                   />
+                )}
+                {pasoActual === 4 && (
+                  <StepWhatsApp onNext={avanzar} />
                 )}
               </>
             )}

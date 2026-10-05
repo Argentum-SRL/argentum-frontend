@@ -67,6 +67,8 @@ export function ModalPortal() {
             open={true}
             onClose={() => closeModal('transaccion')}
             transaccion={transaccionData.transaccion}
+            billeteraInicialId={transaccionData.billeteraInicialId}
+            tipoInicial={transaccionData.tipoInicial}
             billeteras={transaccionData.billeteras}
             categorias={transaccionData.categorias}
             tarjetas={transaccionData.tarjetas}

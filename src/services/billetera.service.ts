@@ -5,6 +5,8 @@ import type {
   ControlSaldoPreview,
   ActualizarSaldoPayload,
   AjustesBilleteraResponse,
+  EntidadTasa,
+  EstimacionRendimiento,
 } from '@/types'
 import { createUserCache } from '@/utils/sessionCleanup'
 
@@ -52,13 +54,42 @@ const billeteraService = {
     return data
   },
 
+  getEntidades: async (signal?: AbortSignal): Promise<EntidadTasa[]> => {
+    const { data } = await api.get<EntidadTasa[]>('/billeteras/entidades', { signal })
+    return data
+  },
+
+  estimarRendimiento: async (
+    params: { saldo: number; entidad_id?: string | null; nivel?: string | null; tna?: number | null },
+    signal?: AbortSignal
+  ): Promise<EstimacionRendimiento> => {
+    const { data } = await api.get<EstimacionRendimiento>('/billeteras/estimar-rendimiento', {
+      params,
+      signal,
+    })
+    return data
+  },
+
   create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; es_inversion?: boolean; tna?: number | null; bank_id?: string | null }) => {
     const { data } = await api.post<Billetera>('/billeteras', payload)
     invalidateBilleteras()
     return data
   },
 
-  update: async (id: string, payload: { nombre?: string; moneda?: string; es_principal?: boolean; es_inversion?: boolean; tna?: number | null; estado?: string }) => {
+  update: async (
+    id: string,
+    payload: {
+      nombre?: string
+      moneda?: string
+      es_principal?: boolean
+      es_efectivo?: boolean
+      es_inversion?: boolean
+      tna?: number | null
+      estado?: string
+      bank_id?: string | null
+      nivel_tasa?: string | null
+    }
+  ) => {
     const { data } = await api.put<Billetera>(`/billeteras/${id}`, payload)
     invalidateBilleteras()
     return data
@@ -74,6 +105,7 @@ const billeteraService = {
     invalidateBilleteras()
     return data
   },
+
 
   getControlSaldo: async (billeteraId: string, saldo: number, signal?: AbortSignal): Promise<ControlSaldoPreview> => {
     const { data } = await api.get<ControlSaldoPreview>(`/billeteras/${billeteraId}/control-saldo`, {

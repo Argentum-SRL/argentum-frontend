@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
   Plus,
   Minus,
+  Lightbulb,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
@@ -34,6 +35,8 @@ interface TransaccionModalProps {
   open: boolean
   onClose: () => void
   transaccion?: Transaccion | null
+  billeteraInicialId?: string
+  tipoInicial?: 'egreso' | 'ingreso'
   billeteras: Billetera[]
   categorias: Categoria[]
   tarjetas: TarjetaCredito[]
@@ -61,7 +64,13 @@ interface FormState {
 }
 
 type FormAction =
-  | { type: 'RESET'; transaccion: Transaccion | null; billeteras: Billetera[] }
+  | {
+      type: 'RESET'
+      transaccion: Transaccion | null
+      billeteras: Billetera[]
+      billeteraInicialId?: string
+      tipoInicial?: 'egreso' | 'ingreso'
+    }
   | { type: 'SET_STEP'; step: 1 | 2 | 3; direction: 'forward' | 'back' }
   | { [K in keyof FormState]: { type: 'SET_FIELD'; field: K; value: FormState[K] } }[keyof FormState]
 
@@ -126,15 +135,20 @@ function formReducer(state: FormState, action: FormAction): FormState {
           return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
         })
 
-        const best = sorted[0]
+        const chosenWallet = action.billeteraInicialId
+          ? action.billeteras.find(b => b.id === action.billeteraInicialId)
+          : undefined
+
+        const best = chosenWallet || sorted[0]
         const monedaInicial = best?.moneda || 'ARS'
-        const bestForCurrency = sorted.find(b => b.moneda === monedaInicial) || best
+        const bestForCurrency = chosenWallet || sorted.find(b => b.moneda === monedaInicial) || best
         const hasBancosInMoneda = sorted.some(b => !b.es_efectivo && b.moneda === monedaInicial)
         const metodoInicial: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
           (!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'debito'
 
         return {
           ...initialState,
+          tipo: action.tipoInicial || 'egreso',
           fecha: todayLocal(),
           billeteraId: bestForCurrency?.id || '',
           moneda: monedaInicial,
@@ -151,7 +165,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
 }
 
 export default function TransaccionModal({
-  open, onClose, transaccion, billeteras, categorias, tarjetas, onSuccess,
+  open, onClose, transaccion, billeteraInicialId, tipoInicial, billeteras, categorias, tarjetas, onSuccess,
 }: TransaccionModalProps) {
   const isEdit = !!transaccion
   const isCuotaHija = isEdit && !!transaccion?.es_cuota_hija
@@ -229,8 +243,16 @@ export default function TransaccionModal({
 
   useEffect(() => {
     submittingRef.current = false
-    if (open) dispatch({ type: 'RESET', transaccion: transaccion || null, billeteras })
-  }, [open, transaccion, billeteras, isEdit])
+    if (open) {
+      dispatch({
+        type: 'RESET',
+        transaccion: transaccion || null,
+        billeteras,
+        billeteraInicialId,
+        tipoInicial,
+      })
+    }
+  }, [open, transaccion, billeteras, billeteraInicialId, tipoInicial, isEdit])
 
 
   // Si cambia la tarjeta seleccionada, actualizar la billeteraId automáticamente
@@ -1012,7 +1034,8 @@ export default function TransaccionModal({
                       </div>
                       {selectedTarjeta && selectedTarjeta.dia_cierre > 0 && (
                         <p className={styles.timingCardHint}>
-                          💡 Tu <strong>{selectedTarjeta.nombre || 'tarjeta'}</strong> cierra el día <strong>{selectedTarjeta.dia_cierre}</strong> de cada mes.
+                          <Lightbulb size={13} strokeWidth={2} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 5, color: '#C9A227' }} />
+                          Tu <strong>{selectedTarjeta.nombre || 'tarjeta'}</strong> cierra el día <strong>{selectedTarjeta.dia_cierre}</strong> de cada mes.
                         </p>
                       )}
                     </div>

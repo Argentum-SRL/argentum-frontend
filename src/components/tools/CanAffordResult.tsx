@@ -234,7 +234,8 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
           </span>
           {ciclosConHistoria < 2 && (
             <span className={styles.footerNoteWarn}>
-              ⚠️ Tenés poco historial. El análisis se vuelve más preciso con el tiempo.
+              <AlertTriangle size={12} strokeWidth={2} style={{ display: 'inline', verticalAlign: '-1.5px', marginRight: 4 }} />
+              Tenés poco historial. El análisis se vuelve más preciso con el tiempo.
             </span>
           )}
         </div>

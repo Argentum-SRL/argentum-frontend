@@ -841,13 +841,13 @@
 
 /* Estados activos en tarjetas */
 .settingCardActiveGold {
-  border-color: rgba(192, 162, 101, 0.45) !important;
-  background: rgba(192, 162, 101, 0.05) !important;
+  border-color: rgba(201, 162, 39, 0.45) !important;
+  background: rgba(201, 162, 39, 0.06) !important;
 }
 
 [data-theme="dark"] .settingCardActiveGold {
-  border-color: rgba(192, 162, 101, 0.4) !important;
-  background: rgba(192, 162, 101, 0.08) !important;
+  border-color: rgba(229, 184, 42, 0.45) !important;
+  background: rgba(229, 184, 42, 0.08) !important;
 }
 
 .settingCardActiveGreen {
@@ -897,9 +897,15 @@
 }
 
 .iconBoxGold {
-  background: rgba(192, 162, 101, 0.18);
-  color: var(--gold);
-  border: 1px solid rgba(192, 162, 101, 0.35);
+  background: rgba(201, 162, 39, 0.16);
+  color: var(--gold, #C9A227);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+}
+
+[data-theme="dark"] .iconBoxGold {
+  background: rgba(229, 184, 42, 0.18);
+  color: var(--gold, #E5B82A);
+  border-color: rgba(229, 184, 42, 0.35);
 }
 
 .iconBoxGreen {
@@ -956,12 +962,17 @@
 /* Pills de estado activo */
 .badgePillGold {
   font-size: 10px;
-  font-weight: 600;
-  padding: 1px 6px;
+  font-weight: 700;
+  padding: 1px 7px;
   border-radius: 5px;
-  background: rgba(192, 162, 101, 0.2);
-  color: var(--gold);
+  background: rgba(201, 162, 39, 0.16);
+  color: #A37E10;
   letter-spacing: 0.02em;
+}
+
+[data-theme="dark"] .badgePillGold {
+  background: rgba(229, 184, 42, 0.2);
+  color: #FCD34D;
 }
 
 .badgePillGreen {
@@ -1047,7 +1058,7 @@
 }
 
 .switchActiveGold {
-  background: var(--gold, #C0A265) !important;
+  background: var(--gold, #C9A227) !important;
 }
 
 .switchActiveGreen {
@@ -1072,24 +1083,40 @@
 .warningBox {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: #FFF8E6;
-  border: 1px solid #F7A800;
+  background: rgba(201, 162, 39, 0.08);
+  border: 1px solid rgba(201, 162, 39, 0.25);
+}
+
+[data-theme="dark"] .warningBox {
+  background: rgba(229, 184, 42, 0.1);
+  border-color: rgba(229, 184, 42, 0.28);
 }
 
 .warningIcon {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #C9A227;
   flex-shrink: 0;
-  line-height: 1.4;
+  margin-top: 1px;
+}
+
+[data-theme="dark"] .warningIcon {
+  color: #E5B82A;
 }
 
 .warningText {
   font-size: 13px;
-  color: #7A5500;
+  color: #8C6D13;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+[data-theme="dark"] .warningText {
+  color: #F3CA40;
 }
 
 /* Footer fijo del form */
@@ -1218,7 +1245,7 @@
 [data-color-hex="#0D2045"] { --custom-color: #0D2045; }
 [data-color-hex="#1A3D28"] { --custom-color: #1A3D28; }
 [data-color-hex="#8A95A8"] { --custom-color: #8A95A8; }
-[data-color-hex="#A8905A"] { --custom-color: #A8905A; }
+[data-color-hex="#C9A227"] { --custom-color: #C9A227; }
 [data-color-hex="#00C9B1"] { --custom-color: #00C9B1; }
 [data-color-hex="#5C2D91"] { --custom-color: #5C2D91; }
 [data-color-hex="#EC0000"] { --custom-color: #EC0000; }
@@ -1231,3 +1258,12 @@
 .colorSwatch {
   background: var(--swatch-color);
 }
+
+/* ── Estilos de Rendimiento (Fase 4a_4) ─────────────────────────────────── */
+.tasaDatoSmall {
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+

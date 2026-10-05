@@ -68,8 +68,9 @@ p, h1, h2, h3, h4, h5, h6 {
   --primary-rgb: 13, 32, 69;
   --silver: #8A95A8;
   --secondary: #1A3D28;
-  --gold: #A8905A;
-  --warning: #A8905A;
+  --gold: #C9A227;
+  --gold-rgb: 201, 162, 39;
+  --warning: #C9A227;
   --page: #F5F4F0;
   --surface: #FFFFFF;
   --surface-2: #FBFBFA;
@@ -108,8 +109,9 @@ p, h1, h2, h3, h4, h5, h6 {
   --primary-rgb: 72, 120, 184;
   --silver: #A8B4C5;
   --secondary: #2A8A48;
-  --gold: #C0A265;
-  --warning: #C0A265;
+  --gold: #E5B82A;
+  --gold-rgb: 229, 184, 42;
+  --warning: #E5B82A;
   --page: #0E1117;
   --surface: #161B24;
   --surface-2: #1C232E;

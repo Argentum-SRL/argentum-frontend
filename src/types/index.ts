@@ -200,7 +200,38 @@ export interface Billetera {
   estado: 'activa' | 'archivada'
   fecha_creacion: string
   bank_id?: string | null
+  nivel_tasa?: string | null
+  entidad_efectiva?: string | null
   tiene_transacciones: boolean
+}
+
+export interface OpcionTasa {
+  clave: string
+  tna: number | null
+  tope: number | null
+  condiciones: string | null
+  fecha_dato: string | null
+  vieja: boolean
+}
+
+export interface EntidadTasa {
+  id: string
+  nombre: string
+  tipo_fuente: 'cuenta' | 'fci' | null
+  clave_base: string | null
+  opciones: OpcionTasa[]
+}
+
+export interface EstimacionRendimiento {
+  entidad_id: string | null
+  tna: number | null
+  origen: 'manual' | 'automatica' | null
+  clave: string | null
+  fecha_dato: string | null
+  vieja: boolean
+  tope: number | null
+  por_dia: number | null
+  por_mes: number | null
 }
 
 export interface RendimientoEstimadoResponse {
@@ -211,7 +242,15 @@ export interface RendimientoEstimadoResponse {
   dias_transcurridos: number
   fecha_ultimo_rendimiento: string | null
   rendimiento_estimado: number
+  origen_tasa?: 'manual' | 'automatica' | null
+  fecha_dato_tasa?: string | null
+  tasa_vieja?: boolean
+  tope?: number | null
+  entidad_id?: string | null
+  clave_tasa?: string | null
+  tna_automatica?: number | null
 }
+
 
 export interface HuecoRead {
   desde: string

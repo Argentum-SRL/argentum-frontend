@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, TrendingUp } from '@/components/ui/icons'
+import { X, TrendingUp, Lightbulb } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import billeteraService from '@/services/billetera.service'
@@ -146,7 +146,9 @@ export default function RegistrarRendimientoModal({
             </div>
 
             <div className={styles.warningBox} style={{ background: 'rgba(16, 185, 129, 0.08)', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
-              <span className={styles.warningIcon}>💡</span>
+              <span className={styles.warningIcon} style={{ color: '#10B981' }} aria-hidden="true">
+                <Lightbulb size={15} strokeWidth={2} />
+              </span>
               <p className={styles.warningText} style={{ color: 'var(--text-2)' }}>
                 Al confirmar, el monto se acreditará directamente en el saldo de la billetera y comenzará un nuevo período de devengamiento.
               </p>

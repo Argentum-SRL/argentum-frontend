@@ -308,7 +308,7 @@ export const CUSTOM_COLORS = [
   '#0D2045',   // primary
   '#1A3D28',   // secondary
   '#8A95A8',   // silver
-  '#A8905A',   // gold
+  '#C9A227',   // gold
   '#00C9B1',   // teal
   '#5C2D91',   // purple
   '#EC0000',   // red

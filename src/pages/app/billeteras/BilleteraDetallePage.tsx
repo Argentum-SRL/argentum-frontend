@@ -30,6 +30,16 @@ function formatDiaMesAnio(fechaStr: string | null | undefined): string {
   return clean
 }
 
+function formatDiaMes(fechaStr: string | null | undefined): string {
+  if (!fechaStr) return ''
+  const clean = fechaStr.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length >= 3) {
+    return `${parts[2]}/${parts[1]}`
+  }
+  return clean
+}
+
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
   ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
   USD: 'linear-gradient(135deg, #0D2045 0%, #070f24 100%)',
@@ -246,23 +256,44 @@ const BilleteraDetallePage: React.FC = () => {
     }
   }, [id, checkUrlParams])
 
-  const handleCargarMovimiento = useCallback(() => {
+  const entidadNombre = useMemo(() => {
+    const entId = rendimientoEstimado?.entidad_id || billetera?.bank_id || billetera?.entidad_efectiva
+    if (entId) {
+      const b = getBankById(entId)
+      if (b) return b.nombre
+    }
+    return bank?.nombre || billetera?.nombre || ''
+  }, [rendimientoEstimado?.entidad_id, billetera, bank])
+
+  const handleUsarTasaAutomatica = useCallback(async () => {
+    if (!billetera) return
+    try {
+      await billeteraService.update(billetera.id, { tna: null })
+      sileo.success({ title: 'Tasa actualizada a la automática' })
+      await refreshData()
+    } catch (err: unknown) {
+      sileo.error({ title: getErrorMessage(err, 'No pudimos actualizar la tasa.') })
+    }
+  }, [billetera, refreshData])
+
+  const handleCargarMovimiento = useCallback((tipo?: 'egreso' | 'ingreso') => {
+    if (!billetera) return
     open('transaccion', {
       data: {
         transaccion: null,
+        billeteraInicialId: billetera.id,
+        tipoInicial: tipo,
         billeteras,
         categorias,
         tarjetas,
         onSuccess: refreshData,
       },
     })
-  }, [open, billeteras, categorias, tarjetas, refreshData])
+  }, [open, billetera, billeteras, categorias, tarjetas, refreshData])
 
   const handleEliminarAjuste = useCallback((ajuste: AjusteSaldo) => {
     if (!billetera) return
-    const nombreBilletera = billetera.es_efectivo
-      ? (billetera.moneda === 'ARS' ? 'Efectivo Pesos' : 'Efectivo Dólares')
-      : billetera.nombre
+    const nombreBilletera = billetera.nombre
 
     const montoNum = ajuste.monto
     const cambio = -montoNum
@@ -436,7 +467,7 @@ const BilleteraDetallePage: React.FC = () => {
             {/* Nombre y badge */}
             <div className={styles.headerIdentity}>
               <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
-                {billetera.es_efectivo ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : billetera.nombre}
+                {billetera.nombre}
               </h1>
               {billetera.es_principal && (
                 <span className={`${styles.principal} ${isLight ? styles.textLight : styles.textDark}`}>
@@ -505,9 +536,35 @@ const BilleteraDetallePage: React.FC = () => {
                       : 'calculando...'}
                   </span>
                 </div>
-                <p className={styles.rendimientoDisclaimer}>
-                  Estimación según TNA. No forma parte de tu saldo disponible hasta ser confirmado.
-                </p>
+                <div className={styles.rendimientoDisclaimer}>
+                  {rendimientoEstimado?.tasa_vieja ? (
+                    <span>
+                      No tenemos la tasa actualizada de {entidadNombre} (último dato del {formatDiaMesAnio(rendimientoEstimado.fecha_dato_tasa)}). Cuando te paguen, anotalo con «Registrar rendimiento».
+                    </span>
+                  ) : rendimientoEstimado?.origen_tasa === 'manual' ? (
+                    <div className={styles.rendimientoManualRow}>
+                      <span>
+                        {billetera.tna}% TNA · tasa que cargaste.
+                        {rendimientoEstimado.tna_automatica != null && ` La de hoy de ${entidadNombre} es ${rendimientoEstimado.tna_automatica}%. `}
+                      </span>
+                      {rendimientoEstimado.tna_automatica != null && (
+                        <button
+                          type="button"
+                          className={styles.usarAutomaticaBtn}
+                          onClick={handleUsarTasaAutomatica}
+                        >
+                          Usar la automática
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <span>
+                      {billetera.tna}% TNA · tasa de hoy de {entidadNombre}
+                      {rendimientoEstimado?.fecha_dato_tasa ? ` (dato del ${formatDiaMes(rendimientoEstimado.fecha_dato_tasa)})` : ''}
+                      {rendimientoEstimado?.tope != null && rendimientoEstimado.tope > 0 ? `. Rinde hasta ${formatMonto(rendimientoEstimado.tope, billetera.moneda)}.` : ''}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -583,7 +640,7 @@ const BilleteraDetallePage: React.FC = () => {
               <h3 className={styles.controlesTitle}>Controles de saldo</h3>
               {ajustesData.cobertura.mostrar && ajustesData.cobertura.desde && (
                 <p className={styles.coberturaFrase}>
-                  Desde el {formatDiaMesAnio(ajustesData.cobertura.desde)}, de cada $100 que salieron de {billetera.es_efectivo ? (billetera.moneda === 'ARS' ? 'Efectivo Pesos' : 'Efectivo Dólares') : billetera.nombre}, cargaste ${ajustesData.cobertura.por_cada_100}.
+                  Desde el {formatDiaMesAnio(ajustesData.cobertura.desde)}, de cada $100 que salieron de {billetera.nombre}, cargaste ${ajustesData.cobertura.por_cada_100}.
                 </p>
               )}
               <div className={styles.controlesList}>

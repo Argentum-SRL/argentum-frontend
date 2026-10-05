@@ -18,6 +18,8 @@ export interface ModalPayloadMap {
   }
   transaccion: {
     transaccion: Transaccion | null
+    billeteraInicialId?: string
+    tipoInicial?: 'egreso' | 'ingreso'
     billeteras: Billetera[]
     categorias: Categoria[]
     tarjetas: TarjetaCredito[]

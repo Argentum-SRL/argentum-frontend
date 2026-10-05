@@ -9,7 +9,8 @@ import {
   ChevronRight,
   ChevronLeft,
   X,
-  Wallet
+  Wallet,
+  Lightbulb,
 } from '@/components/ui/icons'
 import styles from './GruposCuotasTab.module.css'
 import grupoCuotasService from '@/services/grupoCuotas.service'
@@ -1139,7 +1140,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
 
                         {/* 3. Notice */}
                         <div className={styles.prepayNoticeTip}>
-                          <span>💡</span>
+                          <Lightbulb size={15} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2, color: '#C9A227' }} aria-hidden="true" />
                           <span>
                             Al confirmar el pago, las <strong>{selectedGrupo.cantidad_pendientes} cuotas pendientes</strong> se registrarán como pagadas inmediatamente y se debitarán de tu cuenta.
                           </span>
@@ -1392,7 +1393,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
 
                       {/* Recalculation Notice */}
                       <div className={styles.editRecalcNotice}>
-                        <span>💡</span>
+                        <Lightbulb size={15} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2, color: '#C9A227' }} aria-hidden="true" />
                         <span>
                           Al modificar el monto total o tarjeta, se recalcularán automáticamente las <strong>{editingGrupo.cantidad_pendientes} cuotas pendientes</strong>.
                         </span>

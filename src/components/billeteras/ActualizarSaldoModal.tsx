@@ -70,11 +70,7 @@ export default function ActualizarSaldoModal({
 
   if (!isOpen || !billetera) return null
 
-  const nombreBilletera = billetera.es_efectivo
-    ? billetera.moneda === 'ARS'
-      ? 'Efectivo Pesos'
-      : 'Efectivo Dólares'
-    : billetera.nombre
+  const nombreBilletera = billetera.nombre
 
   const isMontoValid = monto !== null && !isNaN(monto) && monto >= 0
 

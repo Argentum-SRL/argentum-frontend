@@ -1,13 +1,15 @@
 import { useState, useMemo, useEffect, useReducer, useRef } from 'react'
-import { X, ChevronLeft, Search, Check, Pencil, TrendingUp, Star, Landmark } from '@/components/ui/icons'
+import { X, ChevronLeft, Search, Check, Pencil, TrendingUp, Star, Landmark, AlertTriangle } from '@/components/ui/icons'
 import { BANKS, BANK_SECTIONS, CUSTOM_COLORS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
-import type { Billetera } from '@/types'
+import type { Billetera, EntidadTasa, EstimacionRendimiento } from '@/types'
 import { getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BankPickerModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import Modal from '@/components/ui/Modal/Modal'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
+import billeteraService from '@/services/billetera.service'
+import { formatMonto } from '@/utils/format'
 
 export interface CreatePayload {
   nombre: string
@@ -15,8 +17,18 @@ export interface CreatePayload {
   saldo_inicial: number
   es_principal: boolean
   es_inversion?: boolean
-  tna?: number | null
   bank_id: string | null
+  tna?: number | null
+}
+
+function formatDiaMes(fechaStr?: string | null): string {
+  if (!fechaStr) return ''
+  const clean = fechaStr.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}`
+  }
+  return clean
 }
 
 // ── Tipos internos ────────────────────────────────────────────────────────────
@@ -118,7 +130,6 @@ interface ModalState {
   nombre: string
   moneda: 'ARS' | 'USD'
   saldo: number | null
-  tna: string
   esPrincipal: boolean
   esInversion: boolean
   colorCustom: string
@@ -144,7 +155,6 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
         nombre: '',
         moneda: action.monedaPrincipal,
         saldo: null,
-        tna: '',
         esPrincipal: false,
         esInversion: false,
         colorCustom: CUSTOM_COLORS[0],
@@ -192,13 +202,15 @@ export default function BankPickerModal({
     nombre: '',
     moneda: monedaPrincipalUsuario,
     saldo: null,
-    tna: '',
     esPrincipal: false,
     esInversion: false,
     colorCustom: CUSTOM_COLORS[0],
     isSubmitting: false,
     isEditingName: false,
   })
+
+  const [entidades, setEntidades] = useState<EntidadTasa[]>([])
+  const [estimacion, setEstimacion] = useState<EstimacionRendimiento | null>(null)
 
   const {
     step,
@@ -208,7 +220,6 @@ export default function BankPickerModal({
     nombre,
     moneda,
     saldo,
-    tna,
     esPrincipal,
     esInversion,
     colorCustom,
@@ -219,22 +230,31 @@ export default function BankPickerModal({
   const nameInputRef = useRef<HTMLInputElement>(null)
   const isCustom = bankSeleccionado?.id === 'custom'
 
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  if (prevIsOpen !== isOpen) {
+    setPrevIsOpen(isOpen)
+    if (isOpen) {
+      dispatch({ type: 'RESET', monedaPrincipal: monedaPrincipalUsuario })
+      setEstimacion(null)
+    }
+  }
+
   const {
     fieldsRef: formBodyRef,
     footerRef: formFooterRef,
     dynamicHeight: dynamicFormHeight,
   } = useAdaptiveModalHeight({
     enabled: step === 'form',
-    deps: [step, esPrincipal, isCustom, bankSeleccionado],
+    deps: [step, esPrincipal, isCustom, bankSeleccionado, estimacion],
     extraPadding: 4,
   })
 
-  // Reset cuando se abre
+  // Cargar entidades una sola vez al abrir
   useEffect(() => {
     if (isOpen) {
-      dispatch({ type: 'RESET', monedaPrincipal: monedaPrincipalUsuario })
+      billeteraService.getEntidades().then(setEntidades).catch(console.error)
     }
-  }, [isOpen, monedaPrincipalUsuario])
+  }, [isOpen])
 
   useEffect(() => {
     if (isEditingName && nameInputRef.current) {
@@ -243,6 +263,46 @@ export default function BankPickerModal({
       nameInputRef.current.setSelectionRange(len, len)
     }
   }, [isEditingName])
+
+  // Entidad info según catálogo
+  const entidadInfo = useMemo(() => {
+    if (!bankSeleccionado || bankSeleccionado.id === 'custom') return null
+    return entidades.find((e) => e.id === bankSeleccionado.id) || null
+  }, [entidades, bankSeleccionado])
+
+  const estimacionValida = useMemo(() => {
+    if (step !== 'form' || !bankSeleccionado || bankSeleccionado.id === 'custom' || !entidadInfo?.tipo_fuente) {
+      return null
+    }
+    return estimacion
+  }, [step, bankSeleccionado, entidadInfo, estimacion])
+
+  // Estimación de rendimiento con debounce de 400ms al cambiar saldo o cambio de entidad
+  useEffect(() => {
+    if (step !== 'form' || !bankSeleccionado || bankSeleccionado.id === 'custom' || !entidadInfo?.tipo_fuente) {
+      return
+    }
+
+    let active = true
+    const timer = setTimeout(async () => {
+      try {
+        const res = await billeteraService.estimarRendimiento({
+          saldo: saldo || 0,
+          entidad_id: bankSeleccionado.id,
+        })
+        if (active) {
+          setEstimacion(res)
+        }
+      } catch (err) {
+        console.error('Error al estimar rendimiento', err)
+      }
+    }, 400)
+
+    return () => {
+      active = false
+      clearTimeout(timer)
+    }
+  }, [step, bankSeleccionado, entidadInfo, saldo])
 
   // Filtrado de bancos
   const bancosFiltrados = useMemo(() => {
@@ -278,22 +338,12 @@ export default function BankPickerModal({
     }
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
-      let tnaVal: number | null = null
-      const trimmedTna = tna.trim()
-      if (trimmedTna !== '') {
-        const parsed = parseFloat(trimmedTna)
-        if (!isNaN(parsed) && parsed >= 0) {
-          tnaVal = parsed
-        }
-      }
-
       await onCrear({
         nombre: nombre.trim(),
         moneda,
         saldo_inicial: saldo || 0,
         es_principal: esPrincipal,
         es_inversion: esInversion,
-        tna: tnaVal !== null ? tnaVal : undefined,
         bank_id: bankSeleccionado.id === 'custom' ? null : bankSeleccionado.id,
       })
       onClose()
@@ -302,23 +352,10 @@ export default function BankPickerModal({
     }
   }
 
-  // Estimación de rendimiento diario inteligente
-  const tnaNum = parseFloat(tna) || 0
-  const saldoNum = saldo || 0
-  let yieldText = ''
-  if (tnaNum > 0) {
-    const dailyRate = tnaNum / 365
-    if (saldoNum > 0) {
-      const dailyIncome = (saldoNum * (tnaNum / 100)) / 365
-      const formattedIncome = dailyIncome.toLocaleString('es-AR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
-      yieldText = `+${moneda === 'USD' ? 'US$' : '$'} ${formattedIncome}/día (~${dailyRate.toFixed(2)}%)`
-    } else {
-      yieldText = `~${dailyRate.toFixed(2)}% diario estimado`
-    }
-  }
+  const mostrarTarjetaRendimiento = Boolean(
+    bankSeleccionado && bankSeleccionado.id !== 'custom' && bankSeleccionado.tipo !== 'efectivo' && entidadInfo?.tipo_fuente
+  )
+
 
   return (
     <Modal
@@ -549,13 +586,6 @@ export default function BankPickerModal({
                         </button>
                       )}
                     </div>
-                    <p className={styles.bankPreviewTipo}>
-                      {bankSeleccionado.tipo === 'billetera_virtual' ? 'Billetera virtual'
-                        : bankSeleccionado.tipo === 'banco_digital' ? 'Banco digital'
-                        : bankSeleccionado.tipo === 'plataforma_inversion' ? 'Plataforma de inversión'
-                        : isCustom ? 'Personalizada'
-                        : 'Banco tradicional'}
-                    </p>
                   </div>
                 </div>
 
@@ -586,36 +616,49 @@ export default function BankPickerModal({
 
                 {/* Panel de configuración inteligente & interactivo */}
                 <div className={styles.settingsCardsList}>
-                  {/* Card 1: Tasa (TNA %) */}
-                  <div className={styles.settingCard}>
-                    <div className={`${styles.settingIconBox} ${styles.iconBoxPrimary}`}>
-                      <TrendingUp size={18} strokeWidth={2} />
-                    </div>
-                    <div className={styles.settingInfo}>
-                      <div className={styles.settingLabelRow}>
-                        <label htmlFor="bk-tna" className={styles.settingLabel}>
-                          Rendimiento (TNA)
-                        </label>
+                  {/* Card 1: Rendimiento (TNA) automático */}
+                  {mostrarTarjetaRendimiento && (
+                    <div className={styles.settingCard}>
+                      <div className={`${styles.settingIconBox} ${styles.iconBoxPrimary}`}>
+                        <TrendingUp size={18} strokeWidth={2} />
                       </div>
-                      <span className={`${styles.settingSub} ${yieldText ? styles.settingSubHighlight : ''}`}>
-                        {yieldText || 'Rendimiento anual estimado'}
-                      </span>
+                      <div className={styles.settingInfo}>
+                        <div className={styles.settingLabelRow}>
+                          <span className={styles.settingLabel}>
+                            Rendimiento (TNA)
+                          </span>
+                          {estimacionValida?.tna != null && !estimacionValida.vieja && (
+                            <span className={styles.badgePillGold}>
+                              {estimacionValida.tna}% TNA
+                            </span>
+                          )}
+                        </div>
+                        {estimacionValida?.vieja ? (
+                          <span className={styles.settingSub}>
+                            No tenemos la tasa actualizada de {entidadInfo?.nombre || bankSeleccionado.nombre}.
+                          </span>
+                        ) : entidadInfo?.clave_base === null && (!estimacionValida || estimacionValida.tna == null) ? (
+                          <span className={styles.tasaDatoSmall}>
+                            Si cumplís la condición ({entidadInfo.opciones[0]?.condiciones || ''}), elegí tu tasa después en Editar &gt; Opciones avanzadas.
+                          </span>
+                        ) : (
+                          <>
+                            {(saldo || 0) > 0 && estimacionValida?.por_dia != null && (
+                              <span className={`${styles.settingSub} ${styles.settingSubHighlight}`}>
+                                +{formatMonto(estimacionValida.por_dia, moneda)} por día
+                              </span>
+                            )}
+                            {estimacionValida?.fecha_dato && (
+                              <span className={styles.tasaDatoSmall}>
+                                Tasa de hoy de {entidadInfo?.nombre || bankSeleccionado.nombre}, dato del {formatDiaMes(estimacionValida.fecha_dato)}.{estimacionValida.tope ? ` Rinde hasta ${formatMonto(estimacionValida.tope, moneda)}.` : ''}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.tnaInputBadge}>
-                      <input
-                        id="bk-tna"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="1000"
-                        className={styles.tnaInput}
-                        value={tna}
-                        onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })}
-                        placeholder="0.0"
-                      />
-                      <span className={styles.tnaSuffix} aria-hidden="true">%</span>
-                    </div>
-                  </div>
+                  )}
+
 
                   {/* Card 2: Marcar como principal */}
                   <button
@@ -722,7 +765,9 @@ export default function BankPickerModal({
                 {/* Advertencia si ya hay una principal */}
                 {esPrincipal && billeteraPrincipalActual && (
                   <div className={styles.warningBox}>
-                    <span className={styles.warningIcon}>⚠️</span>
+                    <span className={styles.warningIcon} aria-hidden="true">
+                      <AlertTriangle size={15} strokeWidth={2} />
+                    </span>
                     <p className={styles.warningText}>
                       Esto va a quitar el estado principal de{' '}
                       <strong>{billeteraPrincipalActual.nombre}</strong>.

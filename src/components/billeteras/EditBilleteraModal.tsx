@@ -1,17 +1,21 @@
-import { useEffect, useReducer, useRef, useState } from 'react'
-import { X, Pencil, TrendingUp, Star, Landmark } from '@/components/ui/icons'
-import type { Billetera } from '@/types'
+import { useEffect, useReducer, useRef, useState, useMemo } from 'react'
+import { X, Pencil, Star, Landmark, ChevronRight, SlidersHorizontal, AlertTriangle } from '@/components/ui/icons'
+import type { Billetera, EntidadTasa } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import type { BankDefinition } from '@/lib/constants/banks'
-import styles from './BankPickerModal.module.css'
+import styles from './EditBilleteraModal.module.css'
 import Modal from '@/components/ui/Modal/Modal'
+import { Field, SelectInput, type SelectOption } from '@/components/ui'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
+import billeteraService from '@/services/billetera.service'
 
 export interface EditPayload {
   nombre: string
   es_principal: boolean
   es_inversion?: boolean
   tna?: number | null
+  bank_id?: string | null
+  nivel_tasa?: string | null
 }
 
 interface EditBilleteraModalProps {
@@ -38,15 +42,13 @@ function EditLogo({
   if (url && !hasError) {
     return (
       <div 
-        className={`${styles.pickerLogoCircle} ${styles.size36}`} 
+        className={styles.bankPreviewLogo} 
         data-bank={id}
       >
         <img 
           src={url} 
           alt={bank?.nombre || customNombre || 'Billetera'} 
-          width={22} 
-          height={22} 
-          className={styles.pickerLogoImg} 
+          className={styles.bankPreviewLogoImg} 
           onError={() => setHasError(true)}
         />
       </div>
@@ -56,10 +58,10 @@ function EditLogo({
   const init = getInitials(bank ? bank.nombre : (customNombre || 'Mi'))
   return (
     <div 
-      className={`${styles.pickerLogoCircle} ${styles.size36}`} 
+      className={styles.bankPreviewLogo} 
       data-bank={id}
     >
-      <span className={`${styles.pickerLogoInitials} ${styles.initials36}`}>{init}</span>
+      <span className={styles.bankPreviewLogoInitials}>{init}</span>
     </div>
   )
 }
@@ -70,6 +72,10 @@ interface EditState {
   esInversion: boolean
   tna: string
   tnaTouched: boolean
+  bankId: string | null
+  nivelTasa: string | null
+  nivelTasaTouched: boolean
+  opcionesAvanzadasOpen: boolean
   isSubmitting: boolean
   isEditingName: boolean
 }
@@ -80,16 +86,22 @@ type EditAction =
 
 function editReducer(state: EditState, action: EditAction): EditState {
   switch (action.type) {
-    case 'INITIALIZE':
+    case 'INITIALIZE': {
+      const initialBankId = action.billetera.bank_id || action.billetera.entidad_efectiva || null
       return {
         nombre: action.billetera.nombre,
         esPrincipal: action.billetera.es_principal,
         esInversion: Boolean(action.billetera.es_inversion),
         tna: action.billetera.tna != null ? String(action.billetera.tna) : '',
         tnaTouched: false,
+        bankId: initialBankId,
+        nivelTasa: action.billetera.nivel_tasa || null,
+        nivelTasaTouched: false,
+        opcionesAvanzadasOpen: false,
         isSubmitting: false,
         isEditingName: false,
       }
+    }
     case 'SET_FIELD':
       return { ...state, [action.field]: action.value }
     default:
@@ -110,11 +122,30 @@ export default function EditBilleteraModal({
     esInversion: false,
     tna: '',
     tnaTouched: false,
+    bankId: null,
+    nivelTasa: null,
+    nivelTasaTouched: false,
+    opcionesAvanzadasOpen: false,
     isSubmitting: false,
     isEditingName: false,
   })
 
-  const { nombre, esPrincipal, esInversion, tna, tnaTouched, isSubmitting, isEditingName } = state
+  const [entidades, setEntidades] = useState<EntidadTasa[]>([])
+
+  const {
+    nombre,
+    esPrincipal,
+    esInversion,
+    tna,
+    tnaTouched,
+    bankId,
+    nivelTasa,
+    nivelTasaTouched,
+    opcionesAvanzadasOpen,
+    isSubmitting,
+    isEditingName,
+  } = state
+
   const nameInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -124,6 +155,12 @@ export default function EditBilleteraModal({
   }, [isOpen, billetera])
 
   useEffect(() => {
+    if (isOpen) {
+      billeteraService.getEntidades().then(setEntidades).catch(console.error)
+    }
+  }, [isOpen])
+
+  useEffect(() => {
     if (isEditingName && nameInputRef.current) {
       nameInputRef.current.focus()
       const len = nameInputRef.current.value.length
@@ -131,41 +168,57 @@ export default function EditBilleteraModal({
     }
   }, [isEditingName])
 
-  const bank = billetera?.bank_id
-    ? getBankById(billetera.bank_id)
+  const bank = bankId
+    ? getBankById(bankId)
     : !billetera?.es_efectivo && billetera?.nombre
       ? findBankByNombre(billetera.nombre)
       : undefined
 
-  const tipoLabel = billetera?.es_efectivo
-    ? 'Efectivo'
-    : bank?.tipo === 'billetera_virtual'
-    ? 'Billetera virtual'
-    : bank?.tipo === 'banco_digital'
-    ? 'Banco digital'
-    : bank?.tipo === 'plataforma_inversion'
-    ? 'Plataforma de inversión'
-    : bank
-    ? 'Banco tradicional'
-    : 'Personalizada'
+  const entidadSeleccionada = useMemo(() => {
+    if (!bankId || bankId === 'custom') return null
+    return entidades.find((e) => e.id === bankId) || null
+  }, [entidades, bankId])
 
-  // Estimación de rendimiento diario inteligente según saldo actual
-  const tnaNum = parseFloat(tna) || 0
-  const saldoNum = billetera?.saldo_actual || 0
-  let yieldText = ''
-  if (tnaNum > 0) {
-    const dailyRate = tnaNum / 365
-    if (saldoNum > 0) {
-      const dailyIncome = (saldoNum * (tnaNum / 100)) / 365
-      const formattedIncome = dailyIncome.toLocaleString('es-AR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+  const tieneNiveles = Boolean(
+    entidadSeleccionada &&
+    entidadSeleccionada.tipo_fuente &&
+    entidadSeleccionada.opciones.length > 0 &&
+    (entidadSeleccionada.opciones.length > 1 || entidadSeleccionada.clave_base === null)
+  )
+
+  const nivelOpciones = entidadSeleccionada ? entidadSeleccionada.opciones : []
+  const opcionSeleccionada = nivelOpciones.find((o) => o.clave === nivelTasa)
+
+  const selectOptions = useMemo<SelectOption[]>(() => {
+    if (!entidadSeleccionada) return []
+    const opts: SelectOption[] = []
+    opts.push({
+      value: '',
+      label: entidadSeleccionada.clave_base ? 'Tasa base' : 'No cumplo la condición',
+    })
+    entidadSeleccionada.opciones
+      .filter((opt) => opt.clave !== entidadSeleccionada.clave_base)
+      .forEach((opt) => {
+        opts.push({
+          value: opt.clave,
+          label: `${opt.clave}${opt.tna != null ? ` · ${opt.tna}% TNA` : ''}`,
+        })
       })
-      yieldText = `+${billetera?.moneda === 'USD' ? 'US$' : '$'} ${formattedIncome}/día (~${dailyRate.toFixed(2)}%)`
-    } else {
-      yieldText = `~${dailyRate.toFixed(2)}% diario estimado`
+    return opts
+  }, [entidadSeleccionada])
+
+  const tasaAutoHoy = useMemo(() => {
+    if (!entidadSeleccionada) return null
+    if (nivelTasa) {
+      const opt = entidadSeleccionada.opciones.find((o) => o.clave === nivelTasa)
+      return opt?.tna ?? null
     }
-  }
+    if (entidadSeleccionada.clave_base) {
+      const opt = entidadSeleccionada.opciones.find((o) => o.clave === entidadSeleccionada.clave_base)
+      return opt?.tna ?? null
+    }
+    return null
+  }, [entidadSeleccionada, nivelTasa])
 
   const muestraAdvertencia = esPrincipal && !billetera?.es_principal && billeteraPrincipalActual
 
@@ -175,7 +228,7 @@ export default function EditBilleteraModal({
     containerStyle,
   } = useAdaptiveModalHeight({
     enabled: isOpen && !!billetera,
-    deps: [nombre, esPrincipal, esInversion, tna, muestraAdvertencia, isEditingName, yieldText],
+    deps: [nombre, esPrincipal, esInversion, tna, bankId, nivelTasa, opcionesAvanzadasOpen, muestraAdvertencia, isEditingName],
     extraPadding: 4,
   })
 
@@ -192,19 +245,30 @@ export default function EditBilleteraModal({
         es_principal: esPrincipal,
         es_inversion: esInversion,
       }
-      if (!billetera.es_efectivo && tnaTouched) {
-        const trimmed = tna.trim()
-        if (trimmed !== '') {
-          const parsed = parseFloat(trimmed)
-          if (!isNaN(parsed) && parsed >= 0) {
-            payload.tna = parsed
-          }
-        } else {
-          if (billetera.tna != null) {
-            payload.tna = null
+
+      if (!billetera.es_efectivo) {
+        const currentNivel = billetera.nivel_tasa || null
+        if (nivelTasaTouched && nivelTasa !== currentNivel) {
+          payload.nivel_tasa = nivelTasa
+        }
+
+        if (tnaTouched) {
+          const trimmed = tna.trim()
+          if (trimmed !== '') {
+            const parsed = parseFloat(trimmed)
+            if (!isNaN(parsed) && parsed >= 0) {
+              if (parsed !== billetera.tna) {
+                payload.tna = parsed
+              }
+            }
+          } else {
+            if (billetera.tna != null) {
+              payload.tna = null
+            }
           }
         }
       }
+
       await onEditar(billetera.id, payload)
       onClose()
     } finally {
@@ -226,7 +290,7 @@ export default function EditBilleteraModal({
         className={styles.formContainer}
         style={containerStyle}
       >
-        {/* Cuerpo scrolleable que incluye el header (arquitectura idéntica a BankPickerModal) */}
+        {/* Cuerpo scrolleable que incluye el header */}
         <div
           ref={formBodyRef}
           className={`${styles.formBody} ${styles.formBodyWithHeader}`}
@@ -288,9 +352,6 @@ export default function EditBilleteraModal({
                     </button>
                   )}
                 </div>
-                <p className={styles.bankPreviewTipo}>
-                  {tipoLabel}
-                </p>
               </div>
             </div>
 
@@ -304,46 +365,10 @@ export default function EditBilleteraModal({
             </button>
           </div>
 
-          {/* Campos del form agrupados en formFields con padding dedicado */}
+          {/* Campos del form agrupados en formFields */}
           <div className={styles.formFields}>
             <div className={styles.settingsCardsList}>
-              {/* Card 1: Rendimiento (TNA) — solo si no es efectivo */}
-              {!billetera.es_efectivo && (
-                <div className={styles.settingCard}>
-                  <div className={`${styles.settingIconBox} ${styles.iconBoxPrimary}`}>
-                    <TrendingUp size={18} strokeWidth={2} />
-                  </div>
-                  <div className={styles.settingInfo}>
-                    <div className={styles.settingLabelRow}>
-                      <label htmlFor="edit-tna" className={styles.settingLabel}>
-                        Rendimiento (TNA)
-                      </label>
-                    </div>
-                    <span className={`${styles.settingSub} ${yieldText ? styles.settingSubHighlight : ''}`}>
-                      {yieldText || 'Rendimiento anual estimado'}
-                    </span>
-                  </div>
-                  <div className={styles.tnaInputBadge}>
-                    <input
-                      id="edit-tna"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="1000"
-                      className={styles.tnaInput}
-                      value={tna}
-                      onChange={(e) => {
-                        dispatch({ type: 'SET_FIELD', field: 'tna', value: e.target.value })
-                        dispatch({ type: 'SET_FIELD', field: 'tnaTouched', value: true })
-                      }}
-                      placeholder="0.0"
-                    />
-                    <span className={styles.tnaSuffix} aria-hidden="true">%</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Card 2: Marcar como principal */}
+              {/* Card 1: Marcar como principal */}
               <button
                 type="button"
                 className={`${styles.settingCard} ${styles.settingCardClickable} ${
@@ -382,7 +407,7 @@ export default function EditBilleteraModal({
                 </div>
               </button>
 
-              {/* Card 3: Cuenta de inversión */}
+              {/* Card 2: Cuenta de inversión */}
               <button
                 type="button"
                 className={`${styles.settingCard} ${styles.settingCardClickable} ${
@@ -420,12 +445,109 @@ export default function EditBilleteraModal({
                   />
                 </div>
               </button>
+
+              {/* Card 3: Opciones avanzadas — plegable, solo si no es efectivo */}
+              {!billetera.es_efectivo && (
+                <button
+                  type="button"
+                  className={`${styles.settingCard} ${styles.settingCardClickable} ${
+                    opcionesAvanzadasOpen ? styles.settingCardActiveBlue : ''
+                  }`}
+                  onClick={() => dispatch({ type: 'SET_FIELD', field: 'opcionesAvanzadasOpen', value: !opcionesAvanzadasOpen })}
+                  aria-expanded={opcionesAvanzadasOpen}
+                  aria-label="Opciones avanzadas"
+                >
+                  <div
+                    className={`${styles.settingIconBox} ${
+                      opcionesAvanzadasOpen ? styles.iconBoxBlue : styles.iconBoxDefault
+                    }`}
+                  >
+                    <SlidersHorizontal size={18} strokeWidth={2} />
+                  </div>
+                  <div className={styles.settingInfo}>
+                    <div className={styles.settingLabelRow}>
+                      <span className={styles.settingLabel}>Opciones avanzadas</span>
+                    </div>
+                    <span className={styles.settingSub}>
+                      Tasa de interés y configuración personalizada
+                    </span>
+                  </div>
+                  <div className={`${styles.chevronWrapper} ${opcionesAvanzadasOpen ? styles.chevronOpen : ''}`}>
+                    <ChevronRight size={18} strokeWidth={2} />
+                  </div>
+                </button>
+              )}
             </div>
+
+            {/* Contenido desplegable de Opciones avanzadas */}
+            {!billetera.es_efectivo && opcionesAvanzadasOpen && (
+              <div className={styles.opcionesAvanzadasContent}>
+                {/* 1. Selector Nivel de tasa (solo si la entidad tiene niveles) */}
+                {tieneNiveles && (
+                  <div className={styles.advancedField}>
+                    <SelectInput
+                      id="edit-nivel"
+                      label="Nivel de tasa"
+                      value={nivelTasa || ''}
+                      onChange={(val) => {
+                        dispatch({ type: 'SET_FIELD', field: 'nivelTasa', value: val === '' ? null : val })
+                        dispatch({ type: 'SET_FIELD', field: 'nivelTasaTouched', value: true })
+                      }}
+                      options={selectOptions}
+                      placeholder="Seleccionar nivel..."
+                    />
+                    {opcionSeleccionada?.condiciones && (
+                      <div className={styles.condicionesCard}>
+                        {opcionSeleccionada.condiciones}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 2. Tasa propia (TNA %) usando Field global */}
+                <div className={styles.advancedField}>
+                  <Field
+                    id="edit-tna-propia"
+                    label="Tasa propia (TNA %)"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="1000"
+                    placeholder="0.0"
+                    value={tna}
+                    onChange={(val) => {
+                      dispatch({ type: 'SET_FIELD', field: 'tna', value: val })
+                      dispatch({ type: 'SET_FIELD', field: 'tnaTouched', value: true })
+                    }}
+                    rightSlot={<span className={styles.tnaSuffix}>%</span>}
+                    hint="Si la cargás, reemplaza la tasa automática."
+                    className={styles.tnaField}
+                  />
+                  {tna.trim() !== '' && tasaAutoHoy != null && entidadSeleccionada && (
+                    <p className={styles.usarAutomaticaText}>
+                      La tasa de hoy de {entidadSeleccionada.nombre} es {tasaAutoHoy}%.
+                      <button
+                        type="button"
+                        className={styles.usarAutomaticaBtn}
+                        onClick={() => {
+                          dispatch({ type: 'SET_FIELD', field: 'tna', value: '' })
+                          dispatch({ type: 'SET_FIELD', field: 'tnaTouched', value: true })
+                        }}
+                      >
+                        Usar la automática
+                      </button>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Advertencia si ya hay una principal */}
             {muestraAdvertencia && (
               <div className={styles.warningBox}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">
+                  <AlertTriangle size={15} strokeWidth={2} />
+                </span>
                 <p className={styles.warningText}>
                   Esto va a quitar el estado principal de{' '}
                   <strong>{billeteraPrincipalActual?.nombre}</strong>.

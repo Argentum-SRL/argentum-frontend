@@ -29,7 +29,9 @@ function getElementOuterHeight(el: HTMLElement): number {
   const style = window.getComputedStyle(el)
   const marginTop = parseFloat(style.marginTop) || 0
   const marginBottom = parseFloat(style.marginBottom) || 0
-  return el.offsetHeight + marginTop + marginBottom
+  const rect = el.getBoundingClientRect()
+  const contentHeight = Math.ceil(rect.height) || el.offsetHeight
+  return contentHeight + marginTop + marginBottom
 }
 
 /**
@@ -112,9 +114,9 @@ export function useAdaptiveModalHeight(
       // Footer fijo si existe
       const footerH = footerEl ? getElementOuterHeight(footerEl) : 0
 
-      totalContentH = headerH + bodyH + footerH + extraPadding
+      totalContentH = headerH + bodyH + footerH + Math.max(extraPadding, 8)
     } else if (containerEl) {
-      totalContentH = getContainerIntrinsicHeight(containerEl) + extraPadding
+      totalContentH = getContainerIntrinsicHeight(containerEl) + Math.max(extraPadding, 8)
     } else {
       return
     }
@@ -158,7 +160,7 @@ export function useAdaptiveModalHeight(
           observer.observe(child)
         }
       })
-      mutationObserver.observe(bodyEl, { childList: true, subtree: false })
+      mutationObserver.observe(bodyEl, { childList: true, subtree: true, characterData: true })
     }
 
     window.addEventListener('resize', measure)

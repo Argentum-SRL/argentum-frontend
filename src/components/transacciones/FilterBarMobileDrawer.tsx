@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Check, X, Wallet, Banknote } from '@/components/ui/icons'
+import { useState, useMemo } from 'react'
+import { Check, X, Wallet, Banknote, ArrowUpRight, ArrowDownLeft, ChevronDown, Star } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -8,36 +8,74 @@ import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import styles from './FilterBar.module.css'
 import { DateInput } from '@/components/ui'
+import { toISODateString, formatMonto } from '@/utils/format'
 
 interface FilterBarMobileDrawerProps {
   isOpen: boolean
   onClose: () => void
-  filters: TransaccionFilters
+  filters?: TransaccionFilters
   onFilterChange: (newFilters: TransaccionFilters) => void
   onClear: () => void
-  billeteras: Billetera[]
-  categorias: Categoria[]
-  hasActiveFilters: boolean
+  billeteras?: Billetera[]
+  categorias?: Categoria[]
+  hasActiveFilters?: boolean
   showMonedaFilter?: boolean
 }
 
 export default function FilterBarMobileDrawer({
   isOpen,
   onClose,
-  filters,
+  filters = {},
   onFilterChange,
   onClear,
-  billeteras,
-  categorias,
-  hasActiveFilters,
+  billeteras = [],
+  categorias = [],
+  hasActiveFilters = false,
   showMonedaFilter = false,
 }: FilterBarMobileDrawerProps) {
   const { periodo: periodoActual } = usePeriodoActual()
 
-  const [localFilters, setLocalFilters] = useState<TransaccionFilters>({ ...filters })
+  const safeBilleteras = useMemo(() => (Array.isArray(billeteras) ? billeteras : []), [billeteras])
+  const safeCategorias = useMemo(() => (Array.isArray(categorias) ? categorias : []), [categorias])
+
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  const [localFilters, setLocalFilters] = useState<TransaccionFilters>(() => ({ ...filters }))
+  const [isAccountsOpen, setIsAccountsOpen] = useState(false)
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
+
+  // Sincronizar estado local al abrir el modal (render-phase adjustment)
+  if (prevIsOpen !== isOpen) {
+    setPrevIsOpen(isOpen)
+    if (isOpen) {
+      setLocalFilters({ ...filters })
+      setIsAccountsOpen(false)
+      setIsCategoriesOpen(false)
+    }
+  }
 
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {
-    setLocalFilters((prev) => ({ ...prev, tipo }))
+    setLocalFilters((prev) => {
+      let nextCatId = prev.categoria_id
+      let nextCatIds = prev.categoria_ids
+
+      if (tipo && (nextCatId || (nextCatIds && nextCatIds.length > 0))) {
+        const allowedCats = safeCategorias.filter((c) => c && c.tipo === tipo).map((c) => c.id)
+        if (nextCatId && !allowedCats.includes(nextCatId)) {
+          nextCatId = undefined
+        }
+        if (nextCatIds) {
+          nextCatIds = nextCatIds.filter((id) => allowedCats.includes(id))
+          if (nextCatIds.length === 0) nextCatIds = undefined
+        }
+      }
+
+      return {
+        ...prev,
+        tipo,
+        categoria_id: nextCatId,
+        categoria_ids: nextCatIds,
+      }
+    })
   }
 
   const handleBilleteraSelect = (billeteraId?: string) => {
@@ -72,30 +110,30 @@ export default function FilterBarMobileDrawer({
     let hasta: string
 
     if (preset === 'ciclo') {
-      if (periodoActual) {
+      if (periodoActual?.fecha_inicio && periodoActual?.fecha_fin) {
         desde = periodoActual.fecha_inicio
         hasta = periodoActual.fecha_fin
       } else {
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
         const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-        desde = firstDay.toISOString().split('T')[0]
-        hasta = lastDay.toISOString().split('T')[0]
+        desde = toISODateString(firstDay)
+        hasta = toISODateString(lastDay)
       }
     } else if (preset === 'este_mes') {
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-      desde = firstDay.toISOString().split('T')[0]
-      hasta = lastDay.toISOString().split('T')[0]
+      desde = toISODateString(firstDay)
+      hasta = toISODateString(lastDay)
     } else if (preset === 'mes_pasado') {
       const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
       const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
-      desde = firstDay.toISOString().split('T')[0]
-      hasta = lastDay.toISOString().split('T')[0]
+      desde = toISODateString(firstDay)
+      hasta = toISODateString(lastDay)
     } else { // ultimos_30d
-      const past = new Date()
+      const past = new Date(today)
       past.setDate(today.getDate() - 30)
-      desde = past.toISOString().split('T')[0]
-      hasta = today.toISOString().split('T')[0]
+      desde = toISODateString(past)
+      hasta = toISODateString(today)
     }
 
     setLocalFilters((prev) => ({
@@ -118,11 +156,66 @@ export default function FilterBarMobileDrawer({
   }
 
   const handleClearAll = () => {
+    setLocalFilters({
+      tipo: undefined,
+      moneda: undefined,
+      fecha_desde: periodoActual?.fecha_inicio,
+      fecha_hasta: periodoActual?.fecha_fin,
+      billetera_id: undefined,
+      categoria_id: undefined,
+      categoria_ids: undefined,
+      estado_verificacion: undefined,
+      busqueda: undefined,
+    })
     onClear()
     onClose()
   }
 
-  const isAllCategoriesSelected = !localFilters.categoria_ids || localFilters.categoria_ids.length === 0
+  const hasLocalActive = useMemo(() => {
+    return Object.entries(localFilters).some(([k, v]) => {
+      if (k === 'fecha_desde') return periodoActual?.fecha_inicio ? v !== periodoActual.fecha_inicio : Boolean(v)
+      if (k === 'fecha_hasta') return periodoActual?.fecha_fin ? v !== periodoActual.fecha_fin : Boolean(v)
+      if (Array.isArray(v)) return v.length > 0
+      return v !== undefined && v !== ''
+    })
+  }, [localFilters, periodoActual])
+
+  const selectedCategoriesCount = (localFilters.categoria_ids && Array.isArray(localFilters.categoria_ids) && localFilters.categoria_ids.length > 0)
+    ? localFilters.categoria_ids.length
+    : (localFilters.categoria_id ? 1 : 0)
+
+  const isAllCategoriesSelected = selectedCategoriesCount === 0
+
+  const visibleCategorias = useMemo(() => {
+    return localFilters.tipo 
+      ? safeCategorias.filter((c) => c && c.tipo === localFilters.tipo) 
+      : safeCategorias
+  }, [localFilters.tipo, safeCategorias])
+
+  const egresoCatsMobile = useMemo(() => visibleCategorias.filter((c) => c && c.tipo === 'egreso'), [visibleCategorias])
+  const ingresoCatsMobile = useMemo(() => visibleCategorias.filter((c) => c && c.tipo === 'ingreso'), [visibleCategorias])
+
+  const selectedWallet = useMemo(() => {
+    return localFilters.billetera_id
+      ? safeBilleteras.find((b) => b && b.id === localFilters.billetera_id)
+      : undefined
+  }, [localFilters.billetera_id, safeBilleteras])
+
+  const walletTriggerLabel = !selectedWallet
+    ? `Todas las billeteras (${safeBilleteras.length})`
+    : selectedWallet.es_efectivo
+      ? `Efectivo ${selectedWallet.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
+      : selectedWallet.nombre
+
+  const categoryTriggerLabel = isAllCategoriesSelected
+    ? `Todas las categorías (${visibleCategorias.length})`
+    : selectedCategoriesCount === 1
+      ? (() => {
+          const catId = localFilters.categoria_ids?.[0] || localFilters.categoria_id
+          const c = safeCategorias.find((x) => x && x.id === catId)
+          return c ? c.nombre : '1 categoría'
+        })()
+      : `${selectedCategoriesCount} categorías seleccionadas`
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Filtros">
@@ -159,14 +252,16 @@ export default function FilterBarMobileDrawer({
               className={`${styles.typePillMobile} ${localFilters.tipo === 'egreso' ? styles.typePillActiveEgresoMobile : ''}`}
               onClick={() => handleTipoChange('egreso')}
             >
-              Egresos
+              <ArrowUpRight size={14} strokeWidth={2.2} />
+              <span>Egresos</span>
             </button>
             <button
               type="button"
               className={`${styles.typePillMobile} ${localFilters.tipo === 'ingreso' ? styles.typePillActiveIngresoMobile : ''}`}
               onClick={() => handleTipoChange('ingreso')}
             >
-              Ingresos
+              <ArrowDownLeft size={14} strokeWidth={2.2} />
+              <span>Ingresos</span>
             </button>
           </div>
         </div>
@@ -201,92 +296,221 @@ export default function FilterBarMobileDrawer({
           </div>
         )}
 
-        {/* Billetera Selector */}
+        {/* Billetera Selector (Collapsible Dashboard Style) */}
         <div>
           <div className={styles.popoverTitle}>Billetera / Cuenta</div>
-          <div className={styles.categoriaListMobile}>
+          <div className={styles.accountsSection}>
             <button
               type="button"
-              className={`${styles.categoriaRowMobile} ${!localFilters.billetera_id ? styles.categoriaRowActiveMobile : ''}`}
-              onClick={() => handleBilleteraSelect(undefined)}
+              className={`${styles.accountsTrigger} ${isAccountsOpen ? styles.triggerActive : ''}`}
+              onClick={() => setIsAccountsOpen(!isAccountsOpen)}
+              aria-expanded={isAccountsOpen}
+              title={isAccountsOpen ? 'Contraer cuentas' : 'Filtrar cuentas'}
             >
-              <div className={styles.categoriaRowLeftMobile}>
-                <Wallet size={16} />
-                <span>Todas las billeteras</span>
-              </div>
-              <div className={`${styles.checkboxMobile} ${!localFilters.billetera_id ? styles.checkboxCheckedMobile : ''}`}>
-                {!localFilters.billetera_id && <Check size={14} strokeWidth={3} />}
+              <div className={styles.triggerContent}>
+                <div className={styles.triggerLeft}>
+                  <span className={styles.triggerDot} />
+                  <span className={styles.triggerText}>{walletTriggerLabel}</span>
+                </div>
+                <ChevronDown
+                  size={14}
+                  className={`${styles.chevron} ${isAccountsOpen ? styles.chevronOpen : ''}`}
+                />
               </div>
             </button>
 
-            {billeteras.map((bill) => {
-              const isSelected = localFilters.billetera_id === bill.id
-              const bank = bill.bank_id ? getBankById(bill.bank_id) : findBankByNombre(bill.nombre)
-              const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
+            {isAccountsOpen && (
+              <div className={styles.accountsDropdown}>
+                <div className={styles.dropdownHeader}>
+                  <span className={styles.dropdownTitle}>Filtrar cuentas</span>
+                  <button
+                    type="button"
+                    className={`${styles.resetBtn} ${!localFilters.billetera_id ? styles.resetBtnActive : ''}`}
+                    onClick={() => handleBilleteraSelect(undefined)}
+                  >
+                    Todas ({safeBilleteras.length})
+                  </button>
+                </div>
 
-              return (
-                <button
-                  key={bill.id}
-                  type="button"
-                  className={`${styles.categoriaRowMobile} ${isSelected ? styles.categoriaRowActiveMobile : ''}`}
-                  onClick={() => handleBilleteraSelect(bill.id)}
-                >
-                  <div className={styles.categoriaRowLeftMobile}>
-                    {bill.es_efectivo ? (
-                      <Banknote size={16} />
-                    ) : logoUrl ? (
-                      <img src={logoUrl} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />
-                    ) : (
-                      <Wallet size={16} />
-                    )}
-                    <span>{bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}</span>
-                  </div>
-                  <div className={`${styles.checkboxMobile} ${isSelected ? styles.checkboxCheckedMobile : ''}`}>
-                    {isSelected && <Check size={14} strokeWidth={3} />}
-                  </div>
-                </button>
-              )
-            })}
+                <div className={styles.accountsList} role="listbox">
+                  {safeBilleteras.map((bill) => {
+                    if (!bill) return null
+                    const isSelected = localFilters.billetera_id === bill.id
+                    const bank = bill.bank_id ? getBankById(bill.bank_id) : findBankByNombre(bill.nombre)
+                    const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
+
+                    return (
+                      <button
+                        key={bill.id}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        className={`${styles.accountRow} ${isSelected ? styles.rowSelected : ''}`}
+                        onClick={() => handleBilleteraSelect(isSelected ? undefined : bill.id)}
+                        title={`Alternar ${bill.nombre}`}
+                      >
+                        <div className={styles.rowLeft}>
+                          <div className={`${styles.checkbox} ${isSelected ? styles.checkboxChecked : ''}`}>
+                            {isSelected && <Check size={10} strokeWidth={3} />}
+                          </div>
+                          {bill.es_efectivo ? (
+                            <Banknote size={15} className={styles.bankIconMini} />
+                          ) : logoUrl ? (
+                            <img src={logoUrl} alt="" className={styles.bankIconMini} />
+                          ) : (
+                            <Wallet size={15} className={styles.bankIconMini} />
+                          )}
+                          <span className={styles.accountName}>
+                            {bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}
+                          </span>
+                          {bill.es_principal && (
+                            <Star size={10} fill="currentColor" className={styles.starIcon} />
+                          )}
+                        </div>
+                        {bill.saldo_actual !== undefined && (
+                          <span className={styles.accountAmount}>
+                            {formatMonto(bill.saldo_actual, bill.moneda)}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Categoría Selector (Multi-selection checklist) */}
+        {/* Categoría Selector (Collapsible Dashboard Style with Multi-Selection) */}
         <div>
-          <div className={styles.popoverTitle}>Categorías</div>
-          <div className={styles.categoriaListMobile}>
+          <div className={styles.popoverTitle}>
+            {localFilters.tipo === 'egreso' ? 'Categorías de gasto' : localFilters.tipo === 'ingreso' ? 'Categorías de ingreso' : 'Categorías'}
+          </div>
+          <div className={styles.accountsSection}>
             <button
               type="button"
-              className={`${styles.categoriaRowMobile} ${isAllCategoriesSelected ? styles.categoriaRowActiveMobile : ''}`}
-              onClick={handleClearCategories}
+              className={`${styles.accountsTrigger} ${isCategoriesOpen ? styles.triggerActive : ''}`}
+              onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+              aria-expanded={isCategoriesOpen}
+              title={isCategoriesOpen ? 'Contraer categorías' : 'Filtrar categorías'}
             >
-              <div className={styles.categoriaRowLeftMobile}>
-                <div className={styles.allCatsIconMobile}>🌟</div>
-                <span>Todas las categorías</span>
-              </div>
-              <div className={`${styles.checkboxMobile} ${isAllCategoriesSelected ? styles.checkboxCheckedMobile : ''}`}>
-                {isAllCategoriesSelected && <Check size={14} strokeWidth={3} />}
+              <div className={styles.triggerContent}>
+                <div className={styles.triggerLeft}>
+                  <span className={`${styles.triggerDot} ${styles.triggerDotCategory}`} />
+                  <span className={styles.triggerText}>{categoryTriggerLabel}</span>
+                </div>
+                <ChevronDown
+                  size={14}
+                  className={`${styles.chevron} ${isCategoriesOpen ? styles.chevronOpen : ''}`}
+                />
               </div>
             </button>
 
-            {categorias.map((cat) => {
-              const isSelected = localFilters.categoria_ids?.includes(cat.id) || localFilters.categoria_id === cat.id
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  className={`${styles.categoriaRowMobile} ${isSelected ? styles.categoriaRowActiveMobile : ''}`}
-                  onClick={() => handleToggleCategory(cat.id)}
-                >
-                  <div className={styles.categoriaRowLeftMobile}>
-                    <CategoriaIcon nombre={cat.nombre} size={16} />
-                    <span>{cat.nombre}</span>
-                  </div>
-                  <div className={`${styles.checkboxMobile} ${isSelected ? styles.checkboxCheckedMobile : ''}`}>
-                    {isSelected && <Check size={14} strokeWidth={3} />}
-                  </div>
-                </button>
-              )
-            })}
+            {isCategoriesOpen && (
+              <div className={styles.accountsDropdown}>
+                <div className={styles.dropdownHeader}>
+                  <span className={styles.dropdownTitle}>
+                    {localFilters.tipo === 'egreso'
+                      ? 'Categorías de gasto'
+                      : localFilters.tipo === 'ingreso'
+                        ? 'Categorías de ingreso'
+                        : 'Filtrar categorías'}
+                  </span>
+                  <button
+                    type="button"
+                    className={`${styles.resetBtn} ${isAllCategoriesSelected ? styles.resetBtnActive : ''}`}
+                    onClick={handleClearCategories}
+                  >
+                    Todas ({visibleCategorias.length})
+                  </button>
+                </div>
+
+                <div className={styles.accountsList} role="listbox">
+                  {localFilters.tipo ? (
+                    visibleCategorias.map((cat) => {
+                      const isSelected = localFilters.categoria_ids?.includes(cat.id) || localFilters.categoria_id === cat.id
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          className={`${styles.accountRow} ${isSelected ? styles.rowSelected : ''}`}
+                          onClick={() => handleToggleCategory(cat.id)}
+                          title={`Alternar ${cat.nombre}`}
+                        >
+                          <div className={styles.rowLeft}>
+                            <div className={`${styles.checkbox} ${isSelected ? styles.checkboxChecked : ''}`}>
+                              {isSelected && <Check size={10} strokeWidth={3} />}
+                            </div>
+                            <CategoriaIcon nombre={cat.nombre} size={16} />
+                            <span className={styles.accountName}>{cat.nombre}</span>
+                          </div>
+                        </button>
+                      )
+                    })
+                  ) : (
+                    <>
+                      {egresoCatsMobile.length > 0 && (
+                        <div className={styles.catGroupMobile}>
+                          <div className={styles.catGroupHeaderMobile}>Gastos ({egresoCatsMobile.length})</div>
+                          {egresoCatsMobile.map((cat) => {
+                            const isSelected = localFilters.categoria_ids?.includes(cat.id) || localFilters.categoria_id === cat.id
+                            return (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                role="option"
+                                aria-selected={isSelected}
+                                className={`${styles.accountRow} ${isSelected ? styles.rowSelected : ''}`}
+                                onClick={() => handleToggleCategory(cat.id)}
+                                title={`Alternar ${cat.nombre}`}
+                              >
+                                <div className={styles.rowLeft}>
+                                  <div className={`${styles.checkbox} ${isSelected ? styles.checkboxChecked : ''}`}>
+                                    {isSelected && <Check size={10} strokeWidth={3} />}
+                                  </div>
+                                  <CategoriaIcon nombre={cat.nombre} size={16} />
+                                  <span className={styles.accountName}>{cat.nombre}</span>
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+
+                      {ingresoCatsMobile.length > 0 && (
+                        <div className={styles.catGroupMobile}>
+                          <div className={styles.catGroupHeaderMobile}>Ingresos ({ingresoCatsMobile.length})</div>
+                          {ingresoCatsMobile.map((cat) => {
+                            const isSelected = localFilters.categoria_ids?.includes(cat.id) || localFilters.categoria_id === cat.id
+                            return (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                role="option"
+                                aria-selected={isSelected}
+                                className={`${styles.accountRow} ${isSelected ? styles.rowSelected : ''}`}
+                                onClick={() => handleToggleCategory(cat.id)}
+                                title={`Alternar ${cat.nombre}`}
+                              >
+                                <div className={styles.rowLeft}>
+                                  <div className={`${styles.checkbox} ${isSelected ? styles.checkboxChecked : ''}`}>
+                                    {isSelected && <Check size={10} strokeWidth={3} />}
+                                  </div>
+                                  <CategoriaIcon nombre={cat.nombre} size={16} />
+                                  <span className={styles.accountName}>{cat.nombre}</span>
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -348,9 +572,9 @@ export default function FilterBarMobileDrawer({
         <div className={styles.drawerActionsRowMobile}>
           <button
             type="button"
-            className={`${styles.clearBtnMobileNew} ${!hasActiveFilters ? styles.clearBtnDisabled : ''}`}
+            className={`${styles.clearBtnMobileNew} ${!(hasActiveFilters || hasLocalActive) ? styles.clearBtnDisabled : ''}`}
             onClick={handleClearAll}
-            disabled={!hasActiveFilters}
+            disabled={!(hasActiveFilters || hasLocalActive)}
           >
             Limpiar
           </button>

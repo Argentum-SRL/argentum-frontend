@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign } from '@/components/ui/icons'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign, Check } from '@/components/ui/icons'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
@@ -8,6 +8,7 @@ import { useModal } from '@/hooks/useModal'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import { DateInput } from '@/components/ui'
+import { toISODateString } from '@/utils/format'
 
 interface FilterBarProps {
   filters: TransaccionFilters
@@ -52,6 +53,7 @@ export default function FilterBar({
 
   const [walletPopoverOpen, setWalletPopoverOpen] = useState(false)
   const [catPopoverOpen, setCatPopoverOpen] = useState(false)
+  const [catSearch, setCatSearch] = useState('')
   const [datePopoverOpen, setDatePopoverOpen] = useState(false)
   const [monedaPopoverOpen, setMonedaPopoverOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(filters.busqueda || '')
@@ -80,7 +82,10 @@ export default function FilterBar({
   const monedaRef = useRef<HTMLDivElement>(null)
 
   useClickOutside(walletRef, () => setWalletPopoverOpen(false))
-  useClickOutside(catRef, () => setCatPopoverOpen(false))
+  useClickOutside(catRef, () => {
+    setCatPopoverOpen(false)
+    setCatSearch('')
+  })
   useClickOutside(dateRef, () => setDatePopoverOpen(false), '[data-portal="date-picker"]')
   useClickOutside(monedaRef, () => setMonedaPopoverOpen(false))
 
@@ -103,8 +108,49 @@ export default function FilterBar({
     }
   }
 
+  // Filtrar categorías según tipo activo en filtros y búsqueda rápida
+  const filteredCategorias = useMemo(() => {
+    let list = categorias
+    if (filters.tipo) {
+      list = list.filter(c => c.tipo === filters.tipo)
+    }
+    if (catSearch.trim()) {
+      const q = catSearch.trim().toLowerCase()
+      list = list.filter(c => c.nombre.toLowerCase().includes(q))
+    }
+    return list
+  }, [categorias, filters.tipo, catSearch])
+
+  const egresoCategorias = useMemo(() => {
+    return filteredCategorias.filter(c => c.tipo === 'egreso')
+  }, [filteredCategorias])
+
+  const ingresoCategorias = useMemo(() => {
+    return filteredCategorias.filter(c => c.tipo === 'ingreso')
+  }, [filteredCategorias])
+
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {
-    onFilterChange({ ...filters, tipo })
+    let nextCatId = filters.categoria_id
+    let nextCatIds = filters.categoria_ids
+
+    // Limpiar categorías seleccionadas que no pertenezcan al nuevo tipo
+    if (tipo && (nextCatId || (nextCatIds && nextCatIds.length > 0))) {
+      const allowedCats = categorias.filter(c => c.tipo === tipo).map(c => c.id)
+      if (nextCatId && !allowedCats.includes(nextCatId)) {
+        nextCatId = undefined
+      }
+      if (nextCatIds) {
+        nextCatIds = nextCatIds.filter(id => allowedCats.includes(id))
+        if (nextCatIds.length === 0) nextCatIds = undefined
+      }
+    }
+
+    onFilterChange({ 
+      ...filters, 
+      tipo,
+      categoria_id: nextCatId,
+      categoria_ids: nextCatIds
+    })
   }
 
   const handleBilleteraSelect = (billeteraId?: string) => {
@@ -123,6 +169,20 @@ export default function FilterBar({
       categoria_ids: catId ? [catId] : undefined
     })
     setCatPopoverOpen(false)
+    setCatSearch('')
+  }
+
+  const isCustomDate = Boolean(
+    (filters.fecha_desde && (filters.fecha_desde !== periodoActual?.fecha_inicio)) ||
+    (filters.fecha_hasta && (filters.fecha_hasta !== periodoActual?.fecha_fin))
+  )
+
+  const handleResetDate = () => {
+    const desde = periodoActual?.fecha_inicio
+    const hasta = periodoActual?.fecha_fin
+    setLocalDesde(desde || '')
+    setLocalHasta(hasta || '')
+    onFilterChange({ ...filters, fecha_desde: desde, fecha_hasta: hasta })
   }
 
   const handleApplyPreset = (preset: 'ciclo' | 'este_mes' | 'mes_pasado' | 'ultimos_30d') => {
@@ -131,30 +191,30 @@ export default function FilterBar({
     let hasta: string
 
     if (preset === 'ciclo') {
-      if (periodoActual) {
+      if (periodoActual?.fecha_inicio && periodoActual?.fecha_fin) {
         desde = periodoActual.fecha_inicio
         hasta = periodoActual.fecha_fin
       } else {
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
         const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-        desde = firstDay.toISOString().split('T')[0]
-        hasta = lastDay.toISOString().split('T')[0]
+        desde = toISODateString(firstDay)
+        hasta = toISODateString(lastDay)
       }
     } else if (preset === 'este_mes') {
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-      desde = firstDay.toISOString().split('T')[0]
-      hasta = lastDay.toISOString().split('T')[0]
+      desde = toISODateString(firstDay)
+      hasta = toISODateString(lastDay)
     } else if (preset === 'mes_pasado') {
       const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
       const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
-      desde = firstDay.toISOString().split('T')[0]
-      hasta = lastDay.toISOString().split('T')[0]
+      desde = toISODateString(firstDay)
+      hasta = toISODateString(lastDay)
     } else {
-      const past = new Date()
+      const past = new Date(today)
       past.setDate(today.getDate() - 30)
-      desde = past.toISOString().split('T')[0]
-      hasta = today.toISOString().split('T')[0]
+      desde = toISODateString(past)
+      hasta = toISODateString(today)
     }
 
     setLocalDesde(desde)
@@ -222,28 +282,126 @@ export default function FilterBar({
     </div>
   )
 
-  const renderCategoriasList = () => (
-    <div className={styles.popoverList}>
-      <button
-        type="button"
-        className={`${styles.popoverItem} ${!filters.categoria_id && (!filters.categoria_ids || filters.categoria_ids.length === 0) ? styles.popoverItemActive : ''}`}
-        onClick={() => handleCategoriaSelect(undefined)}
-      >
-        Todas las categorías
-      </button>
-      {categorias.map(cat => (
-        <button
-          key={cat.id}
-          type="button"
-          className={`${styles.popoverItem} ${filters.categoria_id === cat.id ? styles.popoverItemActive : ''}`}
-          onClick={() => handleCategoriaSelect(cat.id)}
-        >
-          <CategoriaIcon nombre={cat.nombre} size={16} />
-          {cat.nombre}
-        </button>
-      ))}
-    </div>
-  )
+  const renderCategoriasList = () => {
+    const isAllSelected = !filters.categoria_id && (!filters.categoria_ids || filters.categoria_ids.length === 0)
+
+    return (
+      <div className={styles.catPopoverContent}>
+        {/* Barra de búsqueda rápida de categorías */}
+        <div className={styles.popoverSearchBox}>
+          <Search size={13} className={styles.popoverSearchIcon} />
+          <input
+            type="text"
+            className={styles.popoverSearchInput}
+            placeholder="Buscar categoría..."
+            value={catSearch}
+            onChange={(e) => setCatSearch(e.target.value)}
+            autoFocus
+          />
+          {catSearch && (
+            <button 
+              type="button" 
+              className={styles.popoverSearchClear}
+              onClick={() => setCatSearch('')}
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+
+        <div className={styles.popoverList}>
+          {!catSearch && (
+            <button
+              type="button"
+              className={`${styles.popoverItem} ${isAllSelected ? styles.popoverItemActive : ''}`}
+              onClick={() => handleCategoriaSelect(undefined)}
+            >
+              <span className={styles.popoverItemText}>Todas las categorías</span>
+              {isAllSelected && <Check size={14} className={styles.itemCheck} />}
+            </button>
+          )}
+
+          {/* Si filters.tipo está definido, renderizar lista directa */}
+          {filters.tipo ? (
+            filteredCategorias.length === 0 ? (
+              <div className={styles.popoverEmpty}>No se encontraron categorías</div>
+            ) : (
+              filteredCategorias.map(cat => {
+                const isSelected = filters.categoria_id === cat.id || filters.categoria_ids?.includes(cat.id)
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    className={`${styles.popoverItem} ${isSelected ? styles.popoverItemActive : ''}`}
+                    onClick={() => handleCategoriaSelect(cat.id)}
+                  >
+                    <CategoriaIcon nombre={cat.nombre} size={16} />
+                    <span className={styles.popoverItemText}>{cat.nombre}</span>
+                    {isSelected && <Check size={14} className={styles.itemCheck} />}
+                  </button>
+                )
+              })
+            )
+          ) : (
+            /* Si no hay tipo seleccionado (Todos), agrupar por Gastos e Ingresos para eliminar ambigüedad */
+            <>
+              {egresoCategorias.length > 0 && (
+                <div className={styles.catGroup}>
+                  <div className={styles.catGroupHeader}>
+                    <span>Gastos</span>
+                    <span className={styles.catGroupCount}>{egresoCategorias.length}</span>
+                  </div>
+                  {egresoCategorias.map(cat => {
+                    const isSelected = filters.categoria_id === cat.id || filters.categoria_ids?.includes(cat.id)
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        className={`${styles.popoverItem} ${isSelected ? styles.popoverItemActive : ''}`}
+                        onClick={() => handleCategoriaSelect(cat.id)}
+                      >
+                        <CategoriaIcon nombre={cat.nombre} size={16} />
+                        <span className={styles.popoverItemText}>{cat.nombre}</span>
+                        {isSelected && <Check size={14} className={styles.itemCheck} />}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {ingresoCategorias.length > 0 && (
+                <div className={styles.catGroup}>
+                  <div className={styles.catGroupHeader}>
+                    <span>Ingresos</span>
+                    <span className={styles.catGroupCount}>{ingresoCategorias.length}</span>
+                  </div>
+                  {ingresoCategorias.map(cat => {
+                    const isSelected = filters.categoria_id === cat.id || filters.categoria_ids?.includes(cat.id)
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        className={`${styles.popoverItem} ${isSelected ? styles.popoverItemActive : ''}`}
+                        onClick={() => handleCategoriaSelect(cat.id)}
+                      >
+                        <CategoriaIcon nombre={cat.nombre} size={16} />
+                        <span className={styles.popoverItemText}>{cat.nombre}</span>
+                        {isSelected && <Check size={14} className={styles.itemCheck} />}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {filteredCategorias.length === 0 && (
+                <div className={styles.popoverEmpty}>No se encontraron categorías</div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   const renderDateForm = () => (
     <div className={styles.datePopoverContainer}>
@@ -373,17 +531,22 @@ export default function FilterBar({
           </div>
 
           {/* Billetera Popover */}
-          <div className={`${styles.pill} ${styles.pillRelative}`} ref={walletRef}>
+          <div className={`${styles.pill} ${styles.pillRelative} ${activeBilletera ? styles.pillActive : ''}`} ref={walletRef}>
             <div 
               className={styles.pillIconFlex} 
               onClick={() => setWalletPopoverOpen(!walletPopoverOpen)}
             >
-              <Wallet size={14} />
-              {activeBilletera ? activeBilletera.nombre : 'Billetera'}
-              <ChevronDown size={14} />
+              <Wallet size={14} className={styles.pillIcon} />
+              <span className={styles.pillText}>
+                {activeBilletera 
+                  ? (activeBilletera.es_efectivo ? `Efectivo ${activeBilletera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : activeBilletera.nombre)
+                  : 'Billetera'}
+              </span>
+              <ChevronDown size={14} className={styles.pillChevron} />
             </div>
             {activeBilletera && (
               <button 
+                type="button"
                 className={styles.pillRemove} 
                 onClick={(e) => { e.stopPropagation(); handleBilleteraRemove(); }} 
                 aria-label="Remover filtro de billetera"
@@ -400,32 +563,80 @@ export default function FilterBar({
           </div>
 
           {/* Categoría Popover */}
-          <div className={`${styles.pill} ${styles.pillRelative}`} ref={catRef}>
+          <div 
+            className={`${styles.pill} ${styles.pillRelative} ${((filters.categoria_ids && filters.categoria_ids.length > 0) || activeCategoria) ? styles.pillActive : ''}`} 
+            ref={catRef}
+          >
             <div className={styles.pillIconFlex} onClick={() => setCatPopoverOpen(!catPopoverOpen)}>
-              {filters.categoria_ids && filters.categoria_ids.length > 1
-                ? `${filters.categoria_ids.length} cat.`
-                : activeCategoria
-                ? activeCategoria.nombre
-                : 'Categoría'}
-              <ChevronDown size={14} />
+              <CategoriaIcon 
+                nombre={activeCategoria?.nombre} 
+                size={14} 
+              />
+              <span className={styles.pillText}>
+                {filters.categoria_ids && filters.categoria_ids.length > 1
+                  ? `${filters.categoria_ids.length} cat.`
+                  : activeCategoria
+                  ? activeCategoria.nombre
+                  : 'Categoría'}
+              </span>
+              <ChevronDown size={14} className={styles.pillChevron} />
             </div>
+            {((filters.categoria_ids && filters.categoria_ids.length > 0) || activeCategoria) && (
+              <button 
+                type="button"
+                className={styles.pillRemove} 
+                onClick={(e) => { 
+                  e.stopPropagation()
+                  handleCategoriaSelect(undefined) 
+                }} 
+                aria-label="Remover filtro de categoría"
+              >
+                <X size={13} />
+              </button>
+            )}
             {catPopoverOpen && (
-              <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
-                <div className={styles.popoverTitle}>Categoría</div>
+              <div className={`${styles.popover} ${styles.popoverDesktopOnly} ${styles.catPopover}`}>
+                <div className={styles.popoverTitleRow}>
+                  <div className={styles.popoverTitle}>
+                    {filters.tipo === 'egreso' ? 'Categorías de gasto' : filters.tipo === 'ingreso' ? 'Categorías de ingreso' : 'Categorías'}
+                  </div>
+                  {((filters.categoria_ids && filters.categoria_ids.length > 0) || activeCategoria) && (
+                    <button
+                      type="button"
+                      className={styles.popoverClearBtn}
+                      onClick={() => handleCategoriaSelect(undefined)}
+                    >
+                      Limpiar
+                    </button>
+                  )}
+                </div>
                 {renderCategoriasList()}
               </div>
             )}
           </div>
 
           {/* Período Popover */}
-          <div className={`${styles.pill} ${styles.pillRelative}`} ref={dateRef}>
+          <div className={`${styles.pill} ${styles.pillRelative} ${isCustomDate ? styles.pillActive : ''}`} ref={dateRef}>
             <div className={styles.pillIconFlex} onClick={() => setDatePopoverOpen(!datePopoverOpen)}>
-              <Calendar size={14} />
-              Período
-              <ChevronDown size={14} />
+              <Calendar size={14} className={styles.pillIcon} />
+              <span className={styles.pillText}>Período</span>
+              <ChevronDown size={14} className={styles.pillChevron} />
             </div>
+            {isCustomDate && (
+              <button 
+                type="button"
+                className={styles.pillRemove} 
+                onClick={(e) => { 
+                  e.stopPropagation()
+                  handleResetDate() 
+                }} 
+                aria-label="Restablecer período al ciclo actual"
+              >
+                <X size={13} />
+              </button>
+            )}
             {datePopoverOpen && (
-              <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
+              <div className={`${styles.popover} ${styles.popoverDesktopOnly} ${styles.popoverRight}`}>
                 <div className={styles.popoverTitle}>Rango de fechas</div>
                 {renderDateForm()}
               </div>
@@ -434,14 +645,17 @@ export default function FilterBar({
 
           {/* Moneda Popover */}
           {showMonedaFilter && (
-            <div className={`${styles.pill} ${styles.pillRelative}`} ref={monedaRef}>
+            <div className={`${styles.pill} ${styles.pillRelative} ${filters.moneda ? styles.pillActive : ''}`} ref={monedaRef}>
               <div className={styles.pillIconFlex} onClick={() => setMonedaPopoverOpen(!monedaPopoverOpen)}>
-                <DollarSign size={14} />
-                {filters.moneda ? (filters.moneda === 'ARS' ? 'Pesos' : 'Dólares') : 'Moneda'}
-                <ChevronDown size={14} />
+                <DollarSign size={14} className={styles.pillIcon} />
+                <span className={styles.pillText}>
+                  {filters.moneda ? (filters.moneda === 'ARS' ? 'Pesos' : 'Dólares') : 'Moneda'}
+                </span>
+                <ChevronDown size={14} className={styles.pillChevron} />
               </div>
               {filters.moneda && (
                 <button 
+                  type="button"
                   className={styles.pillRemove} 
                   onClick={(e) => { e.stopPropagation(); onFilterChange({ ...filters, moneda: undefined }); }} 
                   aria-label="Remover filtro de moneda"
@@ -450,7 +664,7 @@ export default function FilterBar({
                 </button>
               )}
               {monedaPopoverOpen && (
-                <div className={`${styles.popover} ${styles.popoverDesktopOnly}`}>
+                <div className={`${styles.popover} ${styles.popoverDesktopOnly} ${styles.popoverRight}`}>
                   <div className={styles.popoverTitle}>Moneda</div>
                   <div className={styles.popoverList}>
                     <button
@@ -482,7 +696,7 @@ export default function FilterBar({
 
           {filters.estado_verificacion === 'pendiente' && (
             <div className={`${styles.pill} ${styles.pillActive}`}>
-              Pendientes IA
+              <span className={styles.pillText}>Pendientes IA</span>
               <button className={styles.pillRemove} onClick={() => onFilterChange({ ...filters, estado_verificacion: undefined })} aria-label="Remover filtro">
                 <X size={14} />
               </button>
@@ -497,16 +711,29 @@ export default function FilterBar({
         </div>
 
         {/* Search input (Desktop only) */}
-        <div className={styles.searchContainerDesktop}>
-          <Search size={16} className={styles.searchIcon} />
+        <div className={styles.searchContainerDesktop} data-has-value={Boolean(localSearch)}>
+          <Search size={14} className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Buscar transacciones..."
+            placeholder="Buscar..."
             title="Buscar transacción"
             value={localSearch}
             onChange={handleSearchChange}
           />
+          {localSearch && (
+            <button
+              type="button"
+              className={styles.clearSearchBtn}
+              onClick={() => {
+                setLocalSearch('')
+                onFilterChange({ ...filters, busqueda: undefined })
+              }}
+              aria-label="Limpiar búsqueda"
+            >
+              <X size={12} />
+            </button>
+          )}
         </div>
       </div>
     </>

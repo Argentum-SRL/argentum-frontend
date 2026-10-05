@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { X, CreditCard, CheckCircle2, Edit3, AlertTriangle, Info, Check, DollarSign, ArrowRightLeft } from '@/components/ui/icons'
 import type { TarjetaCredito, Billetera, PagarTarjetaPayload } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
@@ -54,8 +54,25 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   const [montoPesosCustom, setMontoPesosCustom] = useState<string>('')
   const [montoPercepcionCustom, setMontoPercepcionCustom] = useState<string>('')
 
-  const billeterasUSD = billeteras.filter(b => b.moneda === 'USD' && b.estado === 'activa')
-  const billeterasARS = billeteras.filter(b => b.moneda === 'ARS' && b.estado === 'activa')
+  const billeterasUSD: Billetera[] = useMemo(() => {
+    return billeteras
+      .filter((b: Billetera) => b.moneda === 'USD' && b.estado === 'activa')
+      .sort((a: Billetera, b: Billetera) => {
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+      })
+  }, [billeteras])
+
+  const billeterasARS: Billetera[] = useMemo(() => {
+    return billeteras
+      .filter((b: Billetera) => b.moneda === 'ARS' && b.estado === 'activa')
+      .sort((a: Billetera, b: Billetera) => {
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+      })
+  }, [billeteras])
 
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
   if (isOpen !== prevIsOpen) {

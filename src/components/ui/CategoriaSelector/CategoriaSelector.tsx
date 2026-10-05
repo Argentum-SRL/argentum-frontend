@@ -143,20 +143,28 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
       <div className={styles.container}>
         <label className={styles.fieldLabel}>Categoría</label>
         <div className={styles.catGrid}>
-          {displayCategorias.map(cat => (
-            <button
-              type="button"
-              key={cat.id}
-              className={`${styles.catBtn} ${categoriaId === cat.id ? styles.catBtnActive : ''}`}
-              onClick={() => {
-                onSelectCategoria(cat.id)
-                onSelectSubcategoria('')
-              }}
-            >
-              <CategoriaIcon nombre={cat.nombre} size={36} />
-              <span className={styles.catName}>{cat.nombre}</span>
-            </button>
-          ))}
+          {displayCategorias.map(cat => {
+            const isActive = categoriaId === cat.id
+            return (
+              <button
+                type="button"
+                key={cat.id}
+                data-active={isActive}
+                className={`${styles.catBtn} ${isActive ? styles.catBtnActive : ''}`}
+                title={`Categoría ${cat.nombre}`}
+                aria-label={`Seleccionar categoría ${cat.nombre}`}
+                onClick={() => {
+                  onSelectCategoria(cat.id)
+                  onSelectSubcategoria('')
+                }}
+              >
+                <div className={styles.catIconWrapper}>
+                  <CategoriaIcon nombre={cat.nombre} size={36} />
+                </div>
+                <span className={styles.catName}>{cat.nombre}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
     )
@@ -166,7 +174,9 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
     <div className={styles.container}>
       <div className={styles.selectedCatBanner}>
         <div className={styles.selectedCatInfo}>
-          <CategoriaIcon nombre={currentCat?.nombre} size={32} />
+          <div className={styles.selectedCatIconWrap}>
+            <CategoriaIcon nombre={currentCat?.nombre} size={32} />
+          </div>
           <div className={styles.selectedCatText}>
             <span className={styles.selectedCatLabel}>Categoría</span>
             <span className={styles.selectedCatName}>{currentCat?.nombre}</span>
@@ -190,17 +200,21 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
           {loadingSubcats ? (
             <div className={styles.subcatLoading}>Cargando subcategorías...</div>
           ) : (
-            sortedSubcategorias.map(sub => (
-              <button
-                type="button"
-                key={sub.id}
-                className={`${styles.subcatChip} ${subcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
-                onClick={() => onSelectSubcategoria(sub.id)}
-              >
-                <SubcategoriaIcon nombre={sub.nombre} parentCategory={currentCat?.nombre} size={32} />
-                {sub.nombre}
-              </button>
-            ))
+            sortedSubcategorias.map(sub => {
+              const isSubActive = subcategoriaId === sub.id
+              return (
+                <button
+                  type="button"
+                  key={sub.id}
+                  data-active={isSubActive}
+                  className={`${styles.subcatChip} ${isSubActive ? styles.subcatChipActive : ''}`}
+                  onClick={() => onSelectSubcategoria(sub.id)}
+                >
+                  <SubcategoriaIcon nombre={sub.nombre} parentCategory={currentCat?.nombre} size={28} />
+                  <span>{sub.nombre}</span>
+                </button>
+              )
+            })
           )}
         </div>
       </div>

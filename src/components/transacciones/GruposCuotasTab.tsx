@@ -4,29 +4,31 @@ import {
   Trash2, 
   Edit2, 
   XCircle, 
-  Calendar, 
   Sparkles, 
   Search, 
   ChevronRight,
+  ChevronLeft,
   X,
-  GripHorizontal
+  Wallet
 } from '@/components/ui/icons'
 import styles from './GruposCuotasTab.module.css'
 import grupoCuotasService from '@/services/grupoCuotas.service'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
-import type { GrupoCuotasResumen, GrupoCuotasUpdate, Billetera, Categoria, Subcategoria, TarjetaCredito } from '@/types'
+import type { GrupoCuotasResumen, GrupoCuotasUpdate, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
+import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { EmptyState, SelectInput, DateInput } from '@/components/ui'
+import { EmptyState, DateInput } from '@/components/ui'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
-import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
+import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import Modal from '@/components/ui/Modal/Modal'
 
@@ -46,16 +48,21 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const [statusFilter, setStatusFilter] = useState<'todas' | 'activas' | 'completadas'>('activas')
   const searchInputRef = useRef<HTMLInputElement>(null)
   
-  // States for the edit form
+  // States for the 2-step edit modal (matching TransaccionModal)
+  const [editStep, setEditStep] = useState<1 | 2>(1)
+  const [editSlideDirection, setEditSlideDirection] = useState<'forward' | 'back'>('forward')
   const [editDesc, setEditDesc] = useState('')
   const [editMonto, setEditMonto] = useState<number | null>(null)
   const [editCategoriaId, setEditCategoriaId] = useState('')
-  const [prevEditCategoriaId, setPrevEditCategoriaId] = useState('')
   const [editSubcategoriaId, setEditSubcategoriaId] = useState('')
-  const [showAllCats, setShowAllCats] = useState(false)
-  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
-  const [loadingSubcats, setLoadingSubcats] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  // States for the 2-slide Detail & Prepay modal
+  const [detailSlide, setDetailSlide] = useState<'detail' | 'prepay'>('detail')
+  const [detailSlideDirection, setDetailSlideDirection] = useState<'forward' | 'back'>('forward')
+  const [billeteraSeleccionada, setBilleteraSeleccionada] = useState<string>('')
+  const [billeteras, setBilleteras] = useState<Billetera[]>([])
+  const detailWalletsCarouselRef = useRef<HTMLDivElement>(null)
 
   // Categories list
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -68,21 +75,72 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const [editTarjetaTouched, setEditTarjetaTouched] = useState(false)
   const [editFechaReferencia, setEditFechaReferencia] = useState('')
   const [editFechaTouched, setEditFechaTouched] = useState(false)
-  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const tarjetasCarouselRef = useRef<HTMLDivElement>(null)
 
-  // Prepayment & Wallet states
-  const [grupoPrepago, setGrupoPrepago] = useState<GrupoCuotasResumen | null>(null)
-  const [billeteraSeleccionada, setBilleteraSeleccionada] = useState<string>('')
-  const [billeteras, setBilleteras] = useState<Billetera[]>([])
+  // Tarjetas ordenadas: tarjeta asociada a billetera principal primero, luego por mayor saldo
+  const tarjetasCarousel = useMemo(() => {
+    const activas = tarjetas.filter(t => t.estado === 'activa' || t.id === editTarjetaId)
+    return [...activas].sort((a, b) => {
+      const billA = billeteras.find(x => x.id === a.billetera_id)
+      const billB = billeteras.find(x => x.id === b.billetera_id)
+
+      const isPrincA = billA?.es_principal ?? false
+      const isPrincB = billB?.es_principal ?? false
+      if (isPrincA && !isPrincB) return -1
+      if (!isPrincA && isPrincB) return 1
+
+      const saldoA = Number(billA?.saldo_actual) || 0
+      const saldoB = Number(billB?.saldo_actual) || 0
+      return saldoB - saldoA
+    })
+  }, [tarjetas, editTarjetaId, billeteras])
+
+  // Datos computados para el modal de detalle
+  const detailSelectedCat = useMemo(() => {
+    if (!selectedGrupo) return undefined
+    return categorias.find(c => c.id === selectedGrupo.categoria_id)
+  }, [selectedGrupo, categorias])
+
+  const detailMatchingWallets = useMemo(() => {
+    if (!selectedGrupo) return []
+    return billeteras
+      .filter(b => b.moneda === selectedGrupo.moneda)
+      .sort((a, b) => {
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+      })
+  }, [selectedGrupo, billeteras])
+
+  const detailProgressPercent = useMemo(() => {
+    if (!selectedGrupo) return 0
+    return Math.min(100, Math.max(0, Math.round((selectedGrupo.cantidad_pagadas / Math.max(selectedGrupo.cantidad_cuotas, 1)) * 100)))
+  }, [selectedGrupo])
 
   const { confirm } = useModal()
   const { lastDataUpdate } = useNotificaciones()
 
-  if (editCategoriaId !== prevEditCategoriaId) {
-    setPrevEditCategoriaId(editCategoriaId)
-    setSubcategorias([])
-  }
+  const {
+    fieldsRef: editBodyRef,
+    footerRef: editFooterRef,
+    dynamicHeight: editDynamicHeight,
+  } = useAdaptiveModalHeight({
+    enabled: !!editingGrupo,
+    deps: [editStep, editMonto, editTarjetaId, editDesc, editFechaReferencia, editCategoriaId, editSubcategoriaId, tarjetas.length],
+    extraPadding: 22,
+    maxHeightRatio: 0.90,
+  })
+
+  const {
+    fieldsRef: detailBodyRef,
+    footerRef: detailFooterRef,
+    dynamicHeight: detailDynamicHeight,
+  } = useAdaptiveModalHeight({
+    enabled: !!selectedGrupo,
+    deps: [selectedGrupo?.id, detailSlide, billeteraSeleccionada, billeteras.length],
+    extraPadding: 22,
+    maxHeightRatio: 0.90,
+  })
 
   const fetchGrupos = useCallback(async () => {
     try {
@@ -164,123 +222,36 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     if (!editingGrupo || !editTarjetaId) return
 
     const timer = setTimeout(() => {
-      const card = cardRefs.current.get(editTarjetaId)
-      if (card) {
-        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
-        if (scroller) {
-          const cardRect = card.getBoundingClientRect()
-          const scrollerRect = scroller.getBoundingClientRect()
-          const currentScroll = scroller.scrollLeft
-          const offset = cardRect.left - scrollerRect.left + currentScroll
-          const targetScrollLeft = offset - (scroller.clientWidth - cardRect.width) / 2
+      const container = tarjetasCarouselRef.current
+      if (!container) return
+      const card = container.querySelector(`[data-id="${editTarjetaId}"]`) as HTMLElement | null
+      const scroller = container.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+      if (card && scroller) {
+        const cardRect = card.getBoundingClientRect()
+        const scrollerRect = scroller.getBoundingClientRect()
+        const currentScroll = scroller.scrollLeft
+        const offset = cardRect.left - scrollerRect.left + currentScroll
+        const targetScrollLeft = offset - (scroller.clientWidth - cardRect.width) / 2
 
-          scroller.scrollTo({
-            left: Math.max(0, targetScrollLeft),
-            behavior: 'smooth',
-          })
-        }
+        scroller.scrollTo({
+          left: Math.max(0, targetScrollLeft),
+          behavior: 'smooth',
+        })
       }
     }, 100)
 
     return () => clearTimeout(timer)
   }, [editingGrupo, editTarjetaId])
 
-  useEffect(() => {
-    if (!editCategoriaId) return
-
-    let isMounted = true
-    const fetchSubcats = async () => {
-      setLoadingSubcats(true)
-      try {
-        const data = await categoriaService.getSubcategorias(editCategoriaId)
-        if (isMounted) {
-          setSubcategorias(data)
-        }
-      } catch (e) {
-        console.error('Error fetching subcategorias:', e)
-      } finally {
-        if (isMounted) {
-          setLoadingSubcats(false)
-        }
-      }
-    }
-
-    fetchSubcats()
-    return () => {
-      isMounted = false
-    }
-  }, [editCategoriaId])
-
-  const filteredCategorias = useMemo(() => {
-    return categorias.filter(c => c.tipo === 'egreso')
-  }, [categorias])
-
-  const displayCategorias = useMemo(() => {
-    if (showAllCats) return filteredCategorias
-    return filteredCategorias.slice(0, 7)
-  }, [filteredCategorias, showAllCats])
-
-  const hasMoreCats = filteredCategorias.length > 7
-
-  const currentCat = useMemo(() => categorias.find(c => c.id === editCategoriaId), [categorias, editCategoriaId])
-  const currentCatNorm = useMemo(() => currentCat ? currentCat.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() : '', [currentCat])
-  const hideGeneralSubcat = currentCatNorm === 'empleo' || currentCatNorm === 'trabajo independiente' || currentCatNorm === 'inversiones y rentas'
-
-  const sortedSubcategorias = useMemo(() => {
-    const PROBABILIDAD_SUBCATS: Record<string, string[]> = {
-      transporte: ['taxi / apps', 'transporte publico', 'combustible', 'peajes', 'estacionamiento', 'mantenimiento y seguro del auto'],
-      salud: ['farmacia', 'medico / consulta', 'obra social / prepaga', 'estudios y analisis', 'odontologia', 'terapias', 'deportes y gimnasio'],
-      'equipamiento del hogar': ['limpieza', 'reparaciones', 'muebles y electrodomesticos'],
-      hogar: ['limpieza', 'reparaciones', 'muebles y electrodomesticos'],
-      vivienda: ['luz', 'gas', 'agua', 'alquiler', 'expensas', 'impuestos', 'seguros'],
-      servicios: ['luz', 'gas', 'agua', 'alquiler', 'expensas', 'impuestos', 'seguros'],
-      recreativo: ['salidas', 'hobbies y juegos', 'viajes'],
-      alimentacion: ['supermercado', 'kiosco', 'verduleria', 'carniceria'],
-      indumentaria: ['ropa', 'calzado', 'accesorios'],
-      comunicacion: ['celular', 'internet y cable'],
-      educacion: ['cuotas', 'materiales y libros', 'idiomas'],
-      gastronomia: ['restaurantes', 'delivery', 'cafeteria'],
-      'restaurantes y delivery': ['restaurantes', 'delivery', 'cafeteria'],
-      otros: ['reintegros', 'cuidado personal', 'mascotas', 'regalos'],
-      banco: ['comisiones y gastos bancarios', 'impuesto al cheque / movimientos', 'prestamos', 'intereses pagados'],
-      empleo: ['sueldo', 'bonos y horas extras', 'aguinaldo'],
-      'trabajo independiente': ['honorarios', 'venta de productos/servicios'],
-      'inversiones y rentas': ['dividendos e intereses', 'alquileres cobrados'],
-    }
-
-    const priorityList = PROBABILIDAD_SUBCATS[currentCatNorm] || []
-
-    return [...subcategorias]
-      .filter(s => s.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim() !== 'otros')
-      .sort((a, b) => {
-        const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
-        const aNorm = norm(a.nombre)
-        const bNorm = norm(b.nombre)
-
-        const isAOtros = aNorm === 'otros' || aNorm === 'otro' || aNorm === 'otras' || aNorm === 'otros gastos' || aNorm === 'otros ingresos' || aNorm === 'varios'
-        const isBOtros = bNorm === 'otros' || bNorm === 'otro' || bNorm === 'otras' || bNorm === 'otros gastos' || bNorm === 'otros ingresos' || bNorm === 'varios'
-
-        if (isAOtros && !isBOtros) return 1
-        if (!isAOtros && isBOtros) return -1
-        if (isAOtros && isBOtros) return 0
-
-        const ai = priorityList.indexOf(aNorm)
-        const bi = priorityList.indexOf(bNorm)
-        if (ai !== -1 && bi !== -1) return ai - bi
-        if (ai !== -1) return -1
-        if (bi !== -1) return 1
-
-        return aNorm.localeCompare(bNorm)
-      })
-  }, [subcategorias, currentCatNorm])
-
   const handleEditClick = (grupo: GrupoCuotasResumen) => {
+    setSelectedGrupo(null)
     setEditingGrupo(grupo)
-    setEditDesc(grupo.descripcion)
+    setEditStep(1)
+    setEditSlideDirection('forward')
+    setEditDesc(grupo.descripcion || '')
     setEditMonto(grupo.monto_total)
     setEditCategoriaId(grupo.categoria_id || '')
     setEditSubcategoriaId(grupo.subcategoria_id || '')
-    setShowAllCats(false)
 
     const matchingTarjeta = tarjetas.find(t => t.nombre === grupo.tarjeta_nombre)
     setEditTarjetaId(matchingTarjeta ? matchingTarjeta.id : (tarjetas[0]?.id || ''))
@@ -289,6 +260,82 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     const fechaComp = grupo.fecha_compra ? grupo.fecha_compra.split('T')[0] : ''
     setEditFechaReferencia(fechaComp)
     setEditFechaTouched(false)
+  }
+
+  const goEditStep2 = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (editMonto === null || editMonto <= 0) {
+      sileo.error({ title: 'Ingresá un monto total válido' })
+      return
+    }
+    if (!editTarjetaId && tarjetas.length > 0) {
+      sileo.error({ title: 'Seleccioná una tarjeta de crédito' })
+      return
+    }
+    setEditSlideDirection('forward')
+    setEditStep(2)
+  }
+
+  const goEditStep1 = () => {
+    setEditSlideDirection('back')
+    setEditStep(1)
+  }
+
+  // Auto-scroll billetera seleccionada en el carrusel de prepago
+  useEffect(() => {
+    if (!selectedGrupo || !billeteraSeleccionada || detailSlide !== 'prepay') return
+
+    const timer = setTimeout(() => {
+      const container = detailWalletsCarouselRef.current
+      if (!container) return
+      const card = container.querySelector(`[data-id="${billeteraSeleccionada}"]`) as HTMLElement | null
+      const scroller = container.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+      if (card && scroller) {
+        const cardRect = card.getBoundingClientRect()
+        const scrollerRect = scroller.getBoundingClientRect()
+        const currentScroll = scroller.scrollLeft
+        const offset = cardRect.left - scrollerRect.left + currentScroll
+        const targetScrollLeft = offset - (scroller.clientWidth - cardRect.width) / 2
+
+        scroller.scrollTo({
+          left: Math.max(0, targetScrollLeft),
+          behavior: 'smooth',
+        })
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [selectedGrupo, billeteraSeleccionada, detailSlide])
+
+  const handleOpenDetail = (grupo: GrupoCuotasResumen) => {
+    setSelectedGrupo(grupo)
+    setDetailSlide('detail')
+    setDetailSlideDirection('forward')
+    const matchingWallets = billeteras
+      .filter(b => b.moneda === grupo.moneda)
+      .sort((a, b) => {
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+      })
+    const principal = matchingWallets.find(b => b.es_principal)
+    setBilleteraSeleccionada(principal ? principal.id : (matchingWallets[0]?.id || ''))
+  }
+
+  const handleCloseDetail = () => {
+    setSelectedGrupo(null)
+    setDetailSlide('detail')
+    setBilleteraSeleccionada('')
+  }
+
+  const handleGoPrepay = () => {
+    setDetailSlideDirection('forward')
+    setDetailSlide('prepay')
+  }
+
+  const handleBackToDetail = () => {
+    setDetailSlideDirection('back')
+    setDetailSlide('detail')
   }
 
   const handleCancelar = (grupo: GrupoCuotasResumen) => {
@@ -301,7 +348,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         try {
           await grupoCuotasService.cancelarGrupo(grupo.id)
           sileo.success({ title: 'Compra en cuotas cancelada' })
-          setSelectedGrupo(null)
+          handleCloseDetail()
           fetchGrupos()
           onRefreshNeeded?.()
         } catch (e) {
@@ -312,35 +359,21 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     })
   }
 
-  const handlePrepagar = (grupo: GrupoCuotasResumen) => {
-    setSelectedGrupo(null)
-    setGrupoPrepago(grupo)
-    setBilleteraSeleccionada('')
-  }
-
-  const confirmarPrepago = async () => {
-    if (!grupoPrepago || !billeteraSeleccionada) return
-    confirm({
-      title: '¿Prepagás las cuotas restantes?',
-      description: 'Se van a saldar todas las cuotas pendientes de este grupo.',
-      variant: 'default',
-      confirmLabel: 'Confirmar',
-      onConfirm: async () => {
-        setSaving(true)
-        try {
-          await grupoCuotasService.prepagarGrupo(grupoPrepago.id, billeteraSeleccionada)
-          sileo.success({ title: '¡Listo! Las cuotas restantes se saldaron.' })
-          setGrupoPrepago(null)
-          fetchGrupos()
-          onRefreshNeeded?.()
-        } catch (e) {
-          console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No pudimos saldar las cuotas. Intentá de nuevo.') })
-        } finally {
-          setSaving(false)
-        }
-      }
-    })
+  const ejecutarPrepago = async (grupoId: string) => {
+    if (!billeteraSeleccionada) return
+    setSaving(true)
+    try {
+      await grupoCuotasService.prepagarGrupo(grupoId, billeteraSeleccionada)
+      sileo.success({ title: '¡Listo! Las cuotas restantes se saldaron con éxito.' })
+      handleCloseDetail()
+      fetchGrupos()
+      onRefreshNeeded?.()
+    } catch (e) {
+      console.error(e)
+      sileo.error({ title: getErrorMessage(e, 'No pudimos saldar las cuotas. Intentá de nuevo.') })
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -649,38 +682,39 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       ) : (
         <div className={styles.listContainer}>
           {filteredGrupos.map((grupo) => {
+            const isSinglePayment = (grupo.cantidad_cuotas || 1) <= 1
+            const isCompleted = grupo.cantidad_pendientes === 0 && grupo.cantidad_pagadas >= grupo.cantidad_cuotas
+            const isCancelled = grupo.estado === 'cancelado' || (grupo.cantidad_pendientes === 0 && grupo.cantidad_pagadas < grupo.cantidad_cuotas)
+
             const progressPercent = grupo.cantidad_cuotas > 0 
               ? Math.min(100, Math.max(0, (grupo.cantidad_pagadas / grupo.cantidad_cuotas) * 100))
               : 0
 
-            const isCompleted = grupo.cantidad_pendientes === 0 && grupo.cantidad_pagadas >= grupo.cantidad_cuotas
-            const isCancelled = grupo.estado === 'cancelado' || (grupo.cantidad_pendientes === 0 && grupo.cantidad_pagadas < grupo.cantidad_cuotas)
+            const cat = categorias.find(c => c.id === grupo.categoria_id)
 
             return (
               <div 
                 key={grupo.id} 
                 className={`${styles.row} ${isCancelled ? styles.rowCancelled : ''}`}
-                onClick={() => setSelectedGrupo(grupo)}
+                onClick={() => handleOpenDetail(grupo)}
                 role="button"
                 tabIndex={0}
               >
-                {/* Left: Squircle Avatar */}
+                {/* Left: Avatar (Category icon or styled Credit Card) */}
                 <div className={styles.rowAvatar}>
-                  <CreditCard size={18} className={styles.rowAvatarIcon} />
+                  {cat?.nombre ? (
+                    <CategoriaIcon nombre={cat.nombre} size={24} />
+                  ) : (
+                    <CreditCard size={18} className={styles.rowAvatarIcon} />
+                  )}
                 </div>
 
-                {/* Center Column: Title + Subtitle */}
+                {/* Center Column: Title + Clean, Non-Redundant Subtitle */}
                 <div className={styles.rowInfo}>
                   <div className={styles.rowTitleRow}>
-                    <span className={styles.rowTitle} title={grupo.descripcion?.trim() || 'Compra en cuotas'}>
-                      {grupo.descripcion?.trim() || 'Compra en cuotas'}
+                    <span className={styles.rowTitle} title={grupo.descripcion?.trim() || 'Compra con tarjeta'}>
+                      {grupo.descripcion?.trim() || 'Compra con tarjeta'}
                     </span>
-
-                    {grupo.tarjeta_nombre && (
-                      <span className={styles.cardTag}>
-                        {grupo.tarjeta_nombre}
-                      </span>
-                    )}
 
                     {isCompleted && (
                       <span className={styles.badgeCompleted}>Listo</span>
@@ -691,9 +725,24 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
                   </div>
 
                   <div className={styles.rowMeta}>
-                    <span className={styles.metaCuotas}>
-                      <strong>{grupo.cantidad_pagadas}/{grupo.cantidad_cuotas}</strong> cuotas
-                    </span>
+                    {grupo.tarjeta_nombre && (
+                      <>
+                        <span className={styles.metaCard}>
+                          {grupo.tarjeta_nombre}
+                        </span>
+                        <span className={styles.metaDot}>•</span>
+                      </>
+                    )}
+
+                    {isSinglePayment ? (
+                      <span className={styles.metaCuotas}>
+                        Pago único
+                      </span>
+                    ) : (
+                      <span className={styles.metaCuotas}>
+                        Cuota <strong>{grupo.cantidad_pagadas}</strong> de <strong>{grupo.cantidad_cuotas}</strong>
+                      </span>
+                    )}
 
                     {grupo.cantidad_pendientes > 0 && grupo.proximo_vencimiento && (
                       <>
@@ -705,25 +754,36 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
                     )}
                   </div>
 
-                  {/* Progress Line */}
-                  <div className={styles.miniProgressBar}>
-                    <div 
-                      className={styles.miniProgressFill}
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
+                  {/* Progress Line only for multi-installment plans */}
+                  {!isSinglePayment && (
+                    <div className={styles.miniProgressBar}>
+                      <div 
+                        className={styles.miniProgressFill}
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
+                  )}
                 </div>
 
-                {/* Right Column: Amounts */}
+                {/* Right Column: Clean Amount Hierarchy */}
                 <div className={styles.rowAmountArea}>
-                  <span className={styles.rowMonthlyAmount}>
-                    {formatMonto(grupo.monto_cuota, grupo.moneda)} <span className={styles.rowPerMonth}>/ mes</span>
-                  </span>
-                  <span className={styles.rowPendingAmount}>
-                    {grupo.cantidad_pendientes > 0 
-                      ? `${formatMonto(grupo.total_pendiente, grupo.moneda)} rest.`
-                      : 'Completado'}
-                  </span>
+                  {isSinglePayment ? (
+                    <span className={styles.rowMonthlyAmount}>
+                      {formatMonto(grupo.monto_total, grupo.moneda)}
+                    </span>
+                  ) : (
+                    <>
+                      <span className={styles.rowMonthlyAmount}>
+                        {formatMonto(grupo.monto_cuota, grupo.moneda)}
+                        <span className={styles.rowPerMonth}>/cuota</span>
+                      </span>
+                      <span className={styles.rowPendingAmount}>
+                        {grupo.cantidad_pendientes > 0 
+                          ? `${grupo.cantidad_pendientes} rest.`
+                          : 'Al día'}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 {/* Desktop Chevron */}
@@ -737,413 +797,629 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       {/* ── MODAL DE DETALLE & ACCIONES DE CUOTA ────────────────────────── */}
       <Modal
         isOpen={!!selectedGrupo}
-        onClose={() => setSelectedGrupo(null)}
-        title="Detalle de compra en cuotas"
-        size="md"
+        onClose={handleCloseDetail}
+        showHeader={false}
+        noPadding
+        autoHeight
+        ariaLabel="Detalle de compra en cuotas"
       >
         {selectedGrupo && (
-          <div className={styles.detailModalContent}>
-            {/* Header / Main Info */}
-            <div className={styles.detailHeader}>
-              <div className={styles.detailTitleArea}>
-                <h3 className={styles.detailTitle}>{selectedGrupo.descripcion?.trim() || 'Compra en cuotas'}</h3>
-                <div className={styles.detailTags}>
-                  {selectedGrupo.tarjeta_nombre && (
-                    <span className={styles.cardTag}>
-                      <CreditCard size={12} /> {selectedGrupo.tarjeta_nombre}
-                    </span>
-                  )}
-                  {selectedGrupo.tiene_interes && (
-                    <span className={styles.interesBadge}>Con Interés</span>
-                  )}
-                </div>
-              </div>
-              <div className={styles.detailTotal}>
-                <span className={styles.detailTotalLabel}>Monto total</span>
-                <span className={styles.detailTotalValue}>
-                  {formatMonto(selectedGrupo.monto_total, selectedGrupo.moneda)}
-                </span>
-              </div>
-            </div>
-
-            {/* Progress Card */}
-            <div className={styles.detailProgressCard}>
-              <div className={styles.progressBarTrack}>
-                <div 
-                  className={styles.progressBarFill}
-                  style={{ width: `${(selectedGrupo.cantidad_pagadas / selectedGrupo.cantidad_cuotas) * 100}%` }}
-                />
-              </div>
-              <div className={styles.detailProgressTextRow}>
-                <span><strong>{selectedGrupo.cantidad_pagadas}</strong> de <strong>{selectedGrupo.cantidad_cuotas}</strong> cuotas pagadas</span>
-                <span><strong>{formatMonto(selectedGrupo.monto_cuota, selectedGrupo.moneda)}</strong> / cuota</span>
-              </div>
-              {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.proximo_vencimiento && (
-                <div className={styles.detailVencimiento}>
-                  <Calendar size={13} />
-                  <span>Próximo vencimiento: {formatFecha(selectedGrupo.proximo_vencimiento)}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Amounts Split */}
-            <div className={styles.detailAmountsRow}>
-              <div className={styles.detailAmountBox}>
-                <span className={styles.detailAmountLabel}>Total Pagado</span>
-                <span className={styles.detailAmountValue}>
-                  {formatMonto(selectedGrupo.total_pagado, selectedGrupo.moneda)}
-                </span>
-              </div>
-              <div className={styles.detailAmountBox}>
-                <span className={styles.detailAmountLabel}>Total Pendiente</span>
-                <span className={`${styles.detailAmountValue} ${styles.metricRed}`}>
-                  {formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)}
-                </span>
-              </div>
-            </div>
-
-            {/* Costo Financiero / Tasas (Visible only with interest) */}
-            {selectedGrupo.tiene_interes && (
-              <div className={styles.detailTasasCard}>
-                <div className={styles.detailTasasHeader}>
-                  <span className={styles.detailTasasTitle}>Costo financiero</span>
-                  {selectedGrupo.tasa_interes != null && (
-                    <span className={styles.detailTasaMensualBadge}>
-                      {Number(selectedGrupo.tasa_interes).toFixed(2)}% mensual
-                    </span>
-                  )}
-                </div>
-                <div className={styles.detailTasasGrid}>
-                  <div className={styles.detailTasaItem}>
-                    <span className={styles.detailTasaLabel}>TNA</span>
-                    <span className={styles.detailTasaValue}>
-                      {selectedGrupo.tna != null ? `${Number(selectedGrupo.tna).toFixed(2)}%` : '-'}
-                    </span>
-                  </div>
-                  <div className={styles.detailTasaItem}>
-                    <span className={styles.detailTasaLabel}>TEA</span>
-                    <span className={styles.detailTasaValue}>
-                      {selectedGrupo.tea != null ? `${Number(selectedGrupo.tea).toFixed(2)}%` : '-'}
-                    </span>
-                  </div>
-                  <div className={`${styles.detailTasaItem} ${styles.detailTasaItemHighlight}`}>
-                    <span className={styles.detailTasaLabel}>CFT estimado</span>
-                    <span className={`${styles.detailTasaValue} ${styles.detailCftValue}`}>
-                      {selectedGrupo.cft_estimado != null ? `${Number(selectedGrupo.cft_estimado).toFixed(2)}%` : '-'}
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.detailCftFootnote}>
-                  * CFT estimado con IVA (21%) sobre intereses
-                </div>
-              </div>
-            )}
-
-            {/* Actions Grid */}
-            <div className={styles.detailActionsGrid}>
-              {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
-                <button
-                  type="button"
-                  className={styles.detailPrepayBtn}
-                  onClick={() => handlePrepagar(selectedGrupo)}
-                >
-                  <Sparkles size={14} />
-                  Prepagar restantes
-                </button>
-              )}
-
-              <button
-                type="button"
-                className={styles.detailEditBtn}
-                onClick={() => handleEditClick(selectedGrupo)}
+          <div className={styles.modalRoot}>
+            <div
+              className={`${styles.slidesContainer} ${detailSlide === 'detail' ? styles.detailStep1 : styles.detailStep2}`}
+              style={detailDynamicHeight ? { height: `${detailDynamicHeight}px` } : undefined}
+            >
+              
+              {/* ──── SLIDE 1: Vista Detalle ──── */}
+              <div
+                className={`${styles.slide} ${
+                  detailSlide === 'detail'
+                    ? styles.slideVisible
+                    : detailSlideDirection === 'forward'
+                    ? styles.slideExitLeft
+                    : styles.slideExitRight
+                }`}
               >
-                <Edit2 size={14} />
-                Editar
-              </button>
+                  <div className={styles.formContainer}>
+                    <div
+                      ref={detailSlide === 'detail' ? detailBodyRef : undefined}
+                      className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+                    >
+                      {/* Header */}
+                      <div className={styles.formHeader}>
+                        <div className={styles.headerLeft}>
+                          <h2 className={styles.headerTitle}>Detalle de cuotas</h2>
+                        </div>
+                        <div className={styles.headerRightActions}>
+                          <button
+                            type="button"
+                            className={styles.deleteHeaderBtn}
+                            onClick={() => handleDeleteClick(selectedGrupo.id)}
+                            title="Eliminar compra"
+                            aria-label="Eliminar compra"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.closeBtn}
+                            onClick={handleCloseDetail}
+                            title="Cerrar"
+                            aria-label="Cerrar"
+                          >
+                            <X size={18} strokeWidth={1.75} />
+                          </button>
+                        </div>
+                      </div>
 
-              {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
-                <button
-                  type="button"
-                  className={styles.detailCancelBtn}
-                  onClick={() => handleCancelar(selectedGrupo)}
+                      {/* Main Content */}
+                      <div className={styles.detailBodyContent}>
+                        
+                        {/* 1. Hero Identity & Amount Card */}
+                        <div className={styles.detailHeroSurface}>
+                          <div className={styles.detailHeroTopRow}>
+                            <div className={styles.detailHeroAvatar}>
+                              {detailSelectedCat ? (
+                                <CategoriaIcon nombre={detailSelectedCat.nombre} size={24} />
+                              ) : (
+                                <CreditCard size={20} style={{ color: 'var(--primary)' }} />
+                              )}
+                            </div>
+                            <div className={styles.detailHeroMeta}>
+                              <h3 className={styles.detailHeroTitle} title={selectedGrupo.descripcion?.trim() || 'Compra en cuotas'}>
+                                {selectedGrupo.descripcion?.trim() || 'Compra en cuotas'}
+                              </h3>
+                              <div className={styles.detailHeroBadgeList}>
+                                <span className={styles.cuotasCountBadge}>
+                                  {selectedGrupo.cantidad_cuotas} {selectedGrupo.cantidad_cuotas === 1 ? 'pago' : 'cuotas'}
+                                </span>
+                                {selectedGrupo.tarjeta_nombre && (
+                                  <span className={styles.cardInfoBadge}>
+                                    <CreditCard size={11} strokeWidth={2} />
+                                    <span>{selectedGrupo.tarjeta_nombre}</span>
+                                  </span>
+                                )}
+                                {selectedGrupo.tiene_interes ? (
+                                  <span className={styles.interesBadge}>Con Interés</span>
+                                ) : (
+                                  <span className={styles.sinInteresBadge}>Sin Interés</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className={styles.detailHeroNumbersRow}>
+                            <div className={styles.detailHeroAmountGroup}>
+                              <span className={styles.detailHeroMainAmount}>
+                                {formatMonto(selectedGrupo.monto_cuota, selectedGrupo.moneda)}
+                              </span>
+                              <span className={styles.detailHeroAmountSuffix}>/ cuota</span>
+                            </div>
+                            <div className={styles.detailHeroTotalPill}>
+                              <span className={styles.detailHeroTotalLabel}>Total:</span>
+                              <span className={styles.detailHeroTotalVal}>
+                                {formatMonto(selectedGrupo.monto_total, selectedGrupo.moneda)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. Progress & Financial Breakdown */}
+                        <div className={styles.detailProgressSurface}>
+                          <div className={styles.detailProgressHeader}>
+                            <span className={styles.detailProgressTitle}>
+                              <strong>{selectedGrupo.cantidad_pagadas}</strong> de <strong>{selectedGrupo.cantidad_cuotas}</strong> cuotas pagadas
+                            </span>
+                            <span className={styles.detailProgressBadge}>
+                              {detailProgressPercent}%
+                            </span>
+                          </div>
+
+                          <div className={styles.progressBarTrack} role="progressbar" aria-valuenow={detailProgressPercent} aria-valuemin={0} aria-valuemax={100}>
+                            <div 
+                              className={styles.progressBarFill}
+                              style={{ width: `${detailProgressPercent}%` }}
+                            />
+                          </div>
+
+                          <div className={styles.detailStatsGrid}>
+                            <div className={styles.detailStatCell}>
+                              <span className={styles.detailStatLabel}>Total Pagado</span>
+                              <span className={styles.detailStatValue}>
+                                {formatMonto(selectedGrupo.total_pagado, selectedGrupo.moneda)}
+                              </span>
+                            </div>
+
+                            <div className={styles.detailStatCell}>
+                              <span className={styles.detailStatLabel}>Total Pendiente</span>
+                              <span className={`${styles.detailStatValue} ${selectedGrupo.cantidad_pendientes > 0 ? styles.statPendingRed : ''}`}>
+                                {formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)}
+                              </span>
+                            </div>
+
+                            <div className={styles.detailStatCell}>
+                              <span className={styles.detailStatLabel}>Próximo vencimiento</span>
+                              <span className={styles.detailStatValue}>
+                                {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.proximo_vencimiento
+                                  ? formatFecha(selectedGrupo.proximo_vencimiento)
+                                  : 'Al día'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 3. Costo Financiero (solo si tiene interés) */}
+                        {selectedGrupo.tiene_interes && (
+                          <div className={styles.detailTasasSurface}>
+                            <div className={styles.detailTasasTop}>
+                              <span className={styles.detailTasasHeading}>Costo financiero</span>
+                              {selectedGrupo.tasa_interes != null && (
+                                <span className={styles.detailTasaMensualPill}>
+                                  {Number(selectedGrupo.tasa_interes).toFixed(2)}% mensual
+                                </span>
+                              )}
+                            </div>
+                            <div className={styles.detailTasasPillsRow}>
+                              {selectedGrupo.cft_estimado != null && (
+                                <div className={`${styles.tasaChip} ${styles.tasaChipCft}`}>
+                                  <span className={styles.tasaChipLbl}>CFT</span>
+                                  <span className={styles.tasaChipVal}>{Number(selectedGrupo.cft_estimado).toFixed(2)}%</span>
+                                </div>
+                              )}
+                              {selectedGrupo.tna != null && (
+                                <div className={styles.tasaChip}>
+                                  <span className={styles.tasaChipLbl}>TNA</span>
+                                  <span className={styles.tasaChipVal}>{Number(selectedGrupo.tna).toFixed(2)}%</span>
+                                </div>
+                              )}
+                              {selectedGrupo.tea != null && (
+                                <div className={styles.tasaChip}>
+                                  <span className={styles.tasaChipLbl}>TEA</span>
+                                  <span className={styles.tasaChipVal}>{Number(selectedGrupo.tea).toFixed(2)}%</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                      </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div ref={detailSlide === 'detail' ? detailFooterRef : undefined} className={styles.detailFormFooter}>
+                      <div className={styles.detailFooterLeftGroup}>
+                        {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
+                          <button
+                            type="button"
+                            className={styles.detailCancelCuotasBtn}
+                            onClick={() => handleCancelar(selectedGrupo)}
+                            title="Cancelar cuotas restantes"
+                          >
+                            <XCircle size={15} />
+                            <span>Cancelar cuotas</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className={styles.detailFooterRightGroup}>
+                        <button
+                          type="button"
+                          className={styles.detailEditActionBtn}
+                          onClick={() => handleEditClick(selectedGrupo)}
+                        >
+                          <Edit2 size={14} />
+                          <span>Editar</span>
+                        </button>
+
+                        {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
+                          <button
+                            type="button"
+                            className={styles.detailPrepayActionBtn}
+                            onClick={handleGoPrepay}
+                          >
+                            <Sparkles size={14} />
+                            <span>Prepagar</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ──── SLIDE 2: Prepagar Cuotas (Solapa Separada) ──── */}
+                <div
+                  className={`${styles.slide} ${
+                    detailSlide === 'prepay'
+                      ? styles.slideVisible
+                      : detailSlideDirection === 'forward'
+                      ? styles.slideEnterRight
+                      : styles.slideEnterLeft
+                  }`}
                 >
-                  <XCircle size={14} />
-                  Cancelar
-                </button>
-              )}
+                  <form
+                    className={styles.formContainer}
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      ejecutarPrepago(selectedGrupo.id)
+                    }}
+                  >
+                    <div
+                      ref={detailSlide === 'prepay' ? detailBodyRef : undefined}
+                      className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+                    >
+                      <div className={styles.formHeader}>
+                        <div className={styles.headerLeft}>
+                          <button
+                            type="button"
+                            className={styles.backBtn}
+                            onClick={handleBackToDetail}
+                            title="Volver al detalle"
+                            aria-label="Volver al detalle"
+                          >
+                            <ChevronLeft size={18} strokeWidth={2} />
+                          </button>
+                          <div>
+                            <h2 className={styles.headerTitle}>Prepagar cuotas</h2>
+                          </div>
+                        </div>
+                        <div className={styles.headerRightActions}>
+                          <button
+                            type="button"
+                            className={styles.closeBtn}
+                            onClick={handleCloseDetail}
+                            title="Cerrar"
+                            aria-label="Cerrar"
+                          >
+                            <X size={18} strokeWidth={1.75} />
+                          </button>
+                        </div>
+                      </div>
 
-              <button
-                type="button"
-                className={styles.detailDeleteBtn}
-                onClick={() => handleDeleteClick(selectedGrupo.id)}
-              >
-                <Trash2 size={14} />
-                Eliminar
-              </button>
+                      <div className={styles.formFields}>
+                        {/* 1. Hero Prepay Banner */}
+                        <div className={styles.prepayHeroBanner}>
+                          <div className={styles.prepayHeroIconWrap}>
+                            <Sparkles size={20} strokeWidth={2} />
+                          </div>
+                          <div className={styles.prepayHeroContent}>
+                            <span className={styles.prepayHeroLabel}>Total a adelantar</span>
+                            <div className={styles.prepayHeroAmount}>
+                              {formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)}
+                            </div>
+                            <p className={styles.prepayHeroNarrative}>
+                              Saldarás <strong>{selectedGrupo.cantidad_pendientes} {selectedGrupo.cantidad_pendientes === 1 ? 'cuota pendiente restante' : 'cuotas pendientes restantes'}</strong> de <strong>"{selectedGrupo.descripcion?.trim()}"</strong>.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 2. Wallet Carousel */}
+                        <div className={styles.formField}>
+                          <label className={styles.fieldLabel}>¿Con qué billetera o cuenta pagás?</label>
+                          {detailMatchingWallets.length === 0 ? (
+                            <div className={styles.emptyWalletBox}>
+                              <div className={styles.emptyWalletIcon}>
+                                <Wallet size={22} strokeWidth={1.75} />
+                              </div>
+                              <p className={styles.emptyWalletTitle}>
+                                No tenés cuentas en {selectedGrupo.moneda}
+                              </p>
+                              <p className={styles.emptyWalletSub}>
+                                Creá o activá una billetera en {selectedGrupo.moneda} para poder saldar estas cuotas.
+                              </p>
+                            </div>
+                          ) : (
+                            <div className={styles.billeterasCarouselScroller}>
+                              <div className={styles.billeterasCarousel} ref={detailWalletsCarouselRef}>
+                                {detailMatchingWallets.map((b) => (
+                                  <div
+                                    key={b.id}
+                                    data-id={b.id}
+                                    className={styles.billeteraSelectWrap}
+                                    data-active={billeteraSeleccionada === b.id}
+                                  >
+                                    <BilleteraCard
+                                      billetera={b}
+                                      className={styles.fullHeightCard}
+                                      disableNavigation={true}
+                                      hideCurrencyChip={true}
+                                    />
+                                    <button
+                                      type="button"
+                                      className={styles.billeteraOverlay}
+                                      onClick={() => setBilleteraSeleccionada(b.id)}
+                                      title={`Seleccionar cuenta ${b.nombre}`}
+                                      aria-label={`Seleccionar cuenta ${b.nombre}`}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 3. Notice */}
+                        <div className={styles.prepayNoticeTip}>
+                          <span>💡</span>
+                          <span>
+                            Al confirmar el pago, las <strong>{selectedGrupo.cantidad_pendientes} cuotas pendientes</strong> se registrarán como pagadas inmediatamente y se debitarán de tu cuenta.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div ref={detailSlide === 'prepay' ? detailFooterRef : undefined} className={styles.formFooter}>
+                      <button
+                        type="button"
+                        className={styles.cancelBtn}
+                        onClick={handleBackToDetail}
+                        disabled={saving}
+                      >
+                        Atrás
+                      </button>
+                      <button
+                        type="submit"
+                        className={styles.submitBtn}
+                        disabled={!billeteraSeleccionada || detailMatchingWallets.length === 0 || saving}
+                      >
+                        {saving
+                          ? 'Procesando pago...'
+                          : `Confirmar pago (${formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)})`}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </Modal>
 
-      {/* ── MODAL DE EDICIÓN ─────────────────────────────────────────────── */}
+      {/* ── MODAL DE EDICIÓN (2 PASOS - ESTILO TRANSACCIONMODAL) ────────── */}
       <Modal 
         isOpen={!!editingGrupo} 
         onClose={() => setEditingGrupo(null)}
-        title="Editar compra en cuotas"
-        size="md"
+        showHeader={false}
+        noPadding
         autoHeight
+        ariaLabel="Editar compra en cuotas"
       >
         {editingGrupo && (
-          <form onSubmit={handleSave} className={styles.editForm}>
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel}>Descripción</label>
-              <input 
-                type="text" 
-                className={styles.fieldInput} 
-                value={editDesc} 
-                onChange={(e) => setEditDesc(e.target.value)}
-                placeholder="Ej. Smart TV 55"
-              />
+          <div className={styles.modalRoot}>
+            {/* Indicador de pasos superior centrado */}
+            <div className={styles.stepIndicator} aria-hidden="true">
+              <div className={`${styles.dot} ${editStep === 1 ? styles.dotActive : styles.dotInactive}`} />
+              <div className={`${styles.dot} ${editStep === 2 ? styles.dotActive : styles.dotInactive}`} />
             </div>
 
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel}>Monto total recalculado</label>
-              <MontoInput
-                value={editMonto}
-                onChange={(v) => setEditMonto(v)}
-                moneda={(editingGrupo.moneda as 'ARS' | 'USD') || 'ARS'}
-                allowDecimals
-              />
-            </div>
-
-            {/* Selector de Tarjeta */}
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel}>Tarjeta</label>
-              <div className={styles.billeterasCarouselScroller}>
-                <div className={styles.billeterasCarousel} ref={tarjetasCarouselRef}>
-                  {tarjetas.length === 0 ? (
-                    <p className={styles.noTarjetas}>No tenés tarjetas activas.</p>
-                  ) : (
-                    tarjetas.map((t) => (
-                      <div
-                        key={t.id}
-                        className={styles.billeteraSelectWrap}
-                        data-active={editTarjetaId === t.id}
-                        ref={(el) => {
-                          if (el) cardRefs.current.set(t.id, el)
-                          else cardRefs.current.delete(t.id)
-                        }}
-                      >
-                        <RealCardPreview
-                          ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
-                          red={t.red}
-                          titular={t.nombre}
-                          diaCierre={t.dia_cierre}
-                          diaVencimiento={t.dia_vencimiento}
-                          color={t.color || '#0D2045'}
-                          billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
-                        />
+            <div
+              className={`${styles.slidesContainer} ${editStep === 1 ? styles.editStep1 : styles.editStep2}`}
+              style={editDynamicHeight ? { height: `${editDynamicHeight}px` } : undefined}
+            >
+              
+              {/* ──── PASO 1: Monto y Tarjeta ──── */}
+              <div
+                className={`${styles.slide} ${
+                  editStep === 1
+                    ? styles.slideVisible
+                    : editSlideDirection === 'forward'
+                    ? styles.slideExitLeft
+                    : styles.slideExitRight
+                }`}
+              >
+                <form className={styles.formContainer} onSubmit={goEditStep2}>
+                  <div
+                    ref={editStep === 1 ? editBodyRef : undefined}
+                    className={`${styles.formBody} ${styles.formBodyWithHeader} ${styles.formBodyStep1}`}
+                  >
+                    <div className={styles.formHeader}>
+                      <div className={styles.headerLeft}>
+                        <h2 className={styles.headerTitle}>Editar compra en cuotas</h2>
+                      </div>
+                      <div className={styles.headerRightActions}>
                         <button
                           type="button"
-                          className={styles.billeteraOverlay}
-                          onClick={() => {
-                            setEditTarjetaId(t.id)
-                            setEditTarjetaTouched(true)
-                          }}
-                          title={`Seleccionar tarjeta ${t.nombre}`}
-                          aria-label={`Seleccionar tarjeta ${t.nombre}`}
+                          className={styles.closeBtn}
+                          onClick={() => setEditingGrupo(null)}
+                          title="Cerrar"
+                          aria-label="Cerrar"
+                        >
+                          <X size={18} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className={styles.formFields}>
+                      {/* 1. Hero Monto */}
+                      <div className={styles.formField}>
+                        <label className={styles.fieldLabel}>Monto total recalculado</label>
+                        <MontoInput
+                          value={editMonto}
+                          onChange={(v) => setEditMonto(v)}
+                          moneda={(editingGrupo.moneda as 'ARS' | 'USD') || 'ARS'}
+                          allowDecimals
+                          autoFocus
                         />
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
 
-            {/* Fecha de Referencia */}
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel} htmlFor="edit-fecha-referencia">
-                Fecha de referencia
-              </label>
-              <DateInput
-                id="edit-fecha-referencia"
-                value={editFechaReferencia}
-                onChange={(val) => {
-                  setEditFechaReferencia(val)
-                  setEditFechaTouched(true)
-                }}
-                className={styles.fieldInput}
-              />
-            </div>
-
-            {/* Categoría y Subcategoría */}
-            {!editCategoriaId ? (
-              <div className={styles.formField}>
-                <label className={styles.fieldLabel}>Categoría</label>
-                <div className={styles.catGrid}>
-                  {displayCategorias.map((cat) => (
-                    <button
-                      type="button"
-                      key={cat.id}
-                      className={`${styles.catBtn} ${editCategoriaId === cat.id ? styles.catBtnActive : ''}`}
-                      onClick={() => {
-                        setEditCategoriaId(cat.id)
-                        setEditSubcategoriaId('')
-                      }}
-                    >
-                      <CategoriaIcon nombre={cat.nombre} size={36} />
-                      <span className={styles.catName}>{cat.nombre}</span>
-                    </button>
-                  ))}
-                  {!showAllCats && hasMoreCats && (
-                    <button
-                      type="button"
-                      className={styles.catBtn}
-                      onClick={() => setShowAllCats(true)}
-                    >
-                      <div className={styles.moreCatsIconWrap}>
-                        <GripHorizontal size={22} strokeWidth={1.5} />
+                      {/* 2. Tarjeta Carousel */}
+                      <div className={styles.formField}>
+                        <label className={styles.fieldLabel}>Tarjeta de crédito</label>
+                        {tarjetasCarousel.length === 0 ? (
+                          <div className={styles.emptyWalletBox}>
+                            <div className={styles.emptyWalletIcon}>
+                              <CreditCard size={22} strokeWidth={1.75} />
+                            </div>
+                            <p className={styles.emptyWalletTitle}>No tenés tarjetas activas</p>
+                          </div>
+                        ) : (
+                          <div className={styles.billeterasCarouselScroller}>
+                            <div className={styles.billeterasCarousel} ref={tarjetasCarouselRef}>
+                              {tarjetasCarousel.map(t => (
+                                <div
+                                  key={t.id}
+                                  data-id={t.id}
+                                  className={`${styles.billeteraSelectWrap} ${styles.tarjetaSelectWrap}`}
+                                  data-active={editTarjetaId === t.id}
+                                >
+                                  <RealCardPreview
+                                    ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
+                                    red={t.red}
+                                    titular={t.nombre}
+                                    diaCierre={t.dia_cierre}
+                                    diaVencimiento={t.dia_vencimiento}
+                                    color={t.color || '#0D2045'}
+                                    billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
+                                    className={styles.fullHeightCard}
+                                  />
+                                  <button
+                                    type="button"
+                                    className={styles.billeteraOverlay}
+                                    onClick={() => {
+                                      setEditTarjetaId(t.id)
+                                      setEditTarjetaTouched(true)
+                                    }}
+                                    title={`Seleccionar tarjeta ${t.nombre}`}
+                                    aria-label={`Seleccionar tarjeta ${t.nombre}`}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <span className={styles.catName}>Más</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className={styles.selectedCatBanner}>
-                  <div className={styles.selectedCatInfo}>
-                    <CategoriaIcon nombre={categorias.find(c => c.id === editCategoriaId)?.nombre} size={32} />
-                    <div className={styles.selectedCatText}>
-                      <span className={styles.selectedCatLabel}>Categoría</span>
-                      <span className={styles.selectedCatName}>{categorias.find(c => c.id === editCategoriaId)?.nombre}</span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className={styles.changeCatBtn}
-                    onClick={() => {
-                      setEditCategoriaId('')
-                      setEditSubcategoriaId('')
-                    }}
-                  >
-                    Cambiar
-                  </button>
-                </div>
 
-                <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Subcategoría</label>
-                  <div className={styles.subcatGrid}>
-                    {loadingSubcats ? <div className={styles.subcatLoading}>Cargando...</div> : (
-                      <>
-                        {!hideGeneralSubcat && (
-                          <button
-                            type="button"
-                            className={`${styles.subcatChip} ${!editSubcategoriaId ? styles.subcatChipActive : ''}`}
-                            onClick={() => setEditSubcategoriaId('')}
-                          >
-                            <SubcategoriaIcon nombre="general" parentCategory={categorias.find(c => c.id === editCategoriaId)?.nombre} size={32} />
-                            General
-                          </button>
-                        )}
-                        {sortedSubcategorias.map((sub) => (
-                          <button
-                            type="button"
-                            key={sub.id}
-                            className={`${styles.subcatChip} ${editSubcategoriaId === sub.id ? styles.subcatChipActive : ''}`}
-                            onClick={() => setEditSubcategoriaId(sub.id)}
-                          >
-                            <SubcategoriaIcon nombre={sub.nombre} parentCategory={categorias.find(c => c.id === editCategoriaId)?.nombre} size={32} />
-                            {sub.nombre}
-                          </button>
-                        ))}
-                      </>
-                    )}
+                  <div ref={editStep === 1 ? editFooterRef : undefined} className={styles.formFooter}>
+                    <button
+                      type="button"
+                      className={styles.cancelBtn}
+                      onClick={() => setEditingGrupo(null)}
+                    >
+                      Cancelar
+                    </button>
+                    <button type="submit" className={styles.submitBtn}>
+                      Continuar
+                    </button>
                   </div>
-                </div>
-              </>
-            )}
-
-            <div className={styles.modalInfoPanel}>
-              <CreditCard size={18} className={styles.infoIcon} />
-              <p className={styles.infoText}>
-                Al modificar el monto total, el saldo restante se redistribuirá entre las cuotas pendientes ({editingGrupo.cantidad_pendientes} cuotas restantes).
-              </p>
-            </div>
-
-            <div className={styles.formActions}>
-              <button 
-                type="button" 
-                className={styles.cancelBtn}
-                onClick={() => setEditingGrupo(null)}
-                disabled={saving}
-              >
-                Cancelar
-              </button>
-              <button 
-                type="submit" 
-                className={styles.submitBtn}
-                disabled={saving}
-              >
-                {saving ? 'Guardando...' : 'Guardar Cambios'}
-              </button>
-            </div>
-          </form>
-        )}
-      </Modal>
-
-      {/* ── MODAL DE PREPAGO ─────────────────────────────────────────────── */}
-      <Modal
-        isOpen={!!grupoPrepago}
-        onClose={() => setGrupoPrepago(null)}
-        title="Prepagar cuotas pendientes"
-        size="md"
-      >
-        {grupoPrepago && (
-          <div className={styles.editForm}>
-            <div className={styles.modalInfoPanel}>
-              <CreditCard size={18} className={styles.infoIcon} />
-              <div className={styles.infoText}>
-                Vas a adelantar el pago total de las <strong>{grupoPrepago.cantidad_pendientes} cuotas pendientes</strong> por un total de <strong>{formatMonto(grupoPrepago.total_pendiente, grupoPrepago.moneda)}</strong>.
+                </form>
               </div>
-            </div>
 
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel}>¿Desde qué billetera/cuenta pagás?</label>
-              <SelectInput
-                id="prepago-billetera"
-                label=""
-                value={billeteraSeleccionada}
-                onChange={(val) => setBilleteraSeleccionada(val)}
-                options={[
-                  { value: '', label: 'Seleccioná una billetera...' },
-                  ...billeteras
-                    .filter(b => b.moneda === grupoPrepago.moneda)
-                    .map(b => ({
-                      value: b.id,
-                      label: `${b.nombre} (${formatMonto(b.saldo_actual, b.moneda)})`
-                    }))
-                ]}
-              />
-            </div>
+              {/* ──── PASO 2: Detalles, Fecha y Categoría ──── */}
+              <div
+                className={`${styles.slide} ${
+                  editStep === 2
+                    ? styles.slideVisible
+                    : editSlideDirection === 'forward'
+                    ? styles.slideEnterRight
+                    : styles.slideEnterLeft
+                }`}
+              >
+                <form className={styles.formContainer} onSubmit={handleSave}>
+                  <div
+                    ref={editStep === 2 ? editBodyRef : undefined}
+                    className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+                  >
+                    <div className={styles.formHeader}>
+                      <div className={styles.headerLeft}>
+                        <button
+                          type="button"
+                          className={styles.backBtn}
+                          onClick={goEditStep1}
+                          title="Atrás"
+                          aria-label="Atrás"
+                        >
+                          <ChevronLeft size={18} strokeWidth={2} />
+                        </button>
+                        <div>
+                          <h2 className={styles.headerTitle}>Detalles</h2>
+                        </div>
+                      </div>
+                      <div className={styles.headerRightActions}>
+                        <button
+                          type="button"
+                          className={styles.closeBtn}
+                          onClick={() => setEditingGrupo(null)}
+                          title="Cerrar"
+                          aria-label="Cerrar"
+                        >
+                          <X size={18} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    </div>
 
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                className={styles.cancelBtn}
-                onClick={() => setGrupoPrepago(null)}
-                disabled={saving}
-              >
-                Volver
-              </button>
-              <button
-                type="button"
-                className={styles.submitBtn}
-                onClick={confirmarPrepago}
-                disabled={!billeteraSeleccionada || saving}
-              >
-                {saving ? 'Procesando...' : 'Confirmar Prepago'}
-              </button>
+                    <div className={styles.formFields}>
+                      {/* Descripción + Fecha */}
+                      <div className={styles.descFechaRow}>
+                        <div className={`${styles.formField} ${styles.descCol}`}>
+                          <label className={styles.fieldLabel} htmlFor="edit-cuota-desc">Descripción</label>
+                          <input
+                            id="edit-cuota-desc"
+                            type="text"
+                            className={styles.fieldInput}
+                            value={editDesc}
+                            onChange={(e) => setEditDesc(e.target.value)}
+                            placeholder="Ej: Smart TV 55"
+                          />
+                        </div>
+                        <div className={`${styles.formField} ${styles.fechaCol}`}>
+                          <label className={styles.fieldLabel} htmlFor="edit-cuota-fecha">Fecha compra</label>
+                          <DateInput
+                            id="edit-cuota-fecha"
+                            value={editFechaReferencia}
+                            onChange={(val) => {
+                              setEditFechaReferencia(val)
+                              setEditFechaTouched(true)
+                            }}
+                            className={styles.fieldInput}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Categoría y Subcategoría (reusado CategoriaSelector) */}
+                      <CategoriaSelector
+                        categorias={categorias}
+                        categoriaId={editCategoriaId}
+                        subcategoriaId={editSubcategoriaId}
+                        tipo="egreso"
+                        autoseleccionarPrimeraSubcategoria={true}
+                        onSelectCategoria={(id) => {
+                          setEditCategoriaId(id)
+                          setEditSubcategoriaId('')
+                        }}
+                        onSelectSubcategoria={(id) => setEditSubcategoriaId(id)}
+                      />
+
+                      {/* Recalculation Notice */}
+                      <div className={styles.editRecalcNotice}>
+                        <span>💡</span>
+                        <span>
+                          Al modificar el monto total o tarjeta, se recalcularán automáticamente las <strong>{editingGrupo.cantidad_pendientes} cuotas pendientes</strong>.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div ref={editStep === 2 ? editFooterRef : undefined} className={styles.formFooter}>
+                    <button
+                      type="button"
+                      className={styles.cancelBtn}
+                      onClick={goEditStep1}
+                      disabled={saving}
+                    >
+                      Atrás
+                    </button>
+                    <button
+                      type="submit"
+                      className={styles.submitBtn}
+                      disabled={saving}
+                    >
+                      {saving ? 'Guardando...' : 'Guardar cambios'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
             </div>
           </div>
         )}

@@ -90,6 +90,9 @@ export default function TransaccionesPage() {
     if (k === 'fecha_desde' || k === 'fecha_hasta') {
       return v !== defaultFilters[k as keyof TransaccionFilters]
     }
+    if (Array.isArray(v)) {
+      return v.length > 0
+    }
     return v !== undefined && v !== ''
   }), [filters, defaultFilters])
 

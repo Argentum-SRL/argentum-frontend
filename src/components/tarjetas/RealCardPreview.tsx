@@ -25,6 +25,7 @@ interface RealCardPreviewProps {
   diaVencimiento: number
   color: string
   billeteraNombre: string
+  className?: string
 }
 
 export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
@@ -34,7 +35,8 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
   diaCierre,
   diaVencimiento,
   color,
-  billeteraNombre
+  billeteraNombre,
+  className = '',
 }) => {
   let logo = RED_LOGOS[red]
   if (red === 'visa') {
@@ -111,7 +113,7 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
   
   return (
     <div 
-      className={styles.realCard} 
+      className={`${styles.realCard} ${className}`.trim()} 
       style={{ background: compositeBackground }}
     >
       {/* ── Contenido de la Tarjeta ── */}

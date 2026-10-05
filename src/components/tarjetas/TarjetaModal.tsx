@@ -218,7 +218,13 @@ export const TarjetaModal: React.FC = () => {
   }
 
   const bancarias = useMemo(() => {
-    return (data?.billeteras || []).filter((b: Billetera) => !b.es_efectivo)
+    return [...(data?.billeteras || [])]
+      .filter((b: Billetera) => !b.es_efectivo)
+      .sort((a, b) => {
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+      })
   }, [data?.billeteras])
 
   const selectedBilletera = useMemo(() => {

@@ -191,7 +191,13 @@ export default function GoalContributionModal({
   }
 
   const filteredBilleteras = useMemo(() => {
-    return billeteras.filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === billetera_id))
+    return [...billeteras]
+      .filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === billetera_id))
+      .sort((a, b) => {
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+      })
   }, [billeteras, moneda, billetera_id])
 
   return (

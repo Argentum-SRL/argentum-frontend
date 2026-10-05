@@ -3,6 +3,8 @@ import type { TransferenciaInterna, Billetera } from '@/types'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import type { TipoOperacionFilter, PeriodoPresetFilter } from './TransferenciasFilterBar'
 
+import { toISODateString } from '@/utils/format'
+
 const MESES = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
@@ -11,11 +13,11 @@ const MESES = [
 export function getDayLabel(fechaStr: string): string {
   if (!fechaStr) return ''
   const today = new Date()
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const todayStr = toISODateString(today)
 
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
+  const yesterdayStr = toISODateString(yesterday)
 
   if (fechaStr === todayStr) return 'Hoy'
   if (fechaStr === yesterdayStr) return 'Ayer'
@@ -47,30 +49,30 @@ export function useTransferenciasFilters({
     if (periodoPreset === 'todos') return null
     const today = new Date()
     if (periodoPreset === 'ciclo') {
-      if (periodoActual) {
+      if (periodoActual?.fecha_inicio && periodoActual?.fecha_fin) {
         return { desde: periodoActual.fecha_inicio, hasta: periodoActual.fecha_fin }
       }
       const d1 = new Date(today.getFullYear(), today.getMonth(), 1)
       const d2 = new Date(today.getFullYear(), today.getMonth() + 1, 0)
       return {
-        desde: d1.toISOString().split('T')[0],
-        hasta: d2.toISOString().split('T')[0],
+        desde: toISODateString(d1),
+        hasta: toISODateString(d2),
       }
     }
     if (periodoPreset === 'este_mes') {
       const d1 = new Date(today.getFullYear(), today.getMonth(), 1)
       const d2 = new Date(today.getFullYear(), today.getMonth() + 1, 0)
       return {
-        desde: d1.toISOString().split('T')[0],
-        hasta: d2.toISOString().split('T')[0],
+        desde: toISODateString(d1),
+        hasta: toISODateString(d2),
       }
     }
     if (periodoPreset === 'mes_pasado') {
       const d1 = new Date(today.getFullYear(), today.getMonth() - 1, 1)
       const d2 = new Date(today.getFullYear(), today.getMonth(), 0)
       return {
-        desde: d1.toISOString().split('T')[0],
-        hasta: d2.toISOString().split('T')[0],
+        desde: toISODateString(d1),
+        hasta: toISODateString(d2),
       }
     }
     return null

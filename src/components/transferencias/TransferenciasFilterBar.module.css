@@ -388,37 +388,82 @@
 
 .pillGroupMobile {
   display: flex;
-  background: var(--surface-alt);
-  border-radius: 12px;
-  padding: 4px;
   width: 100%;
-  gap: 4px;
+  background: transparent;
+  padding: 0;
+  border: none;
+  gap: 8px;
+  box-sizing: border-box;
 }
 
 .typePillMobile {
   flex: 1;
-  padding: 10px 8px;
+  min-width: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  text-align: center;
-  color: var(--text-2);
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: -0.01em;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0 8px;
   white-space: nowrap;
-  font-family: inherit;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .typePillMobile:hover {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+  }
 }
 
 .typePillMobile:active {
-  transform: scale(0.97);
+  transform: scale(0.975);
 }
 
 .typePillActiveMobile {
-  background: var(--primary);
-  color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.06);
+  border-color: var(--border) !important;
+  z-index: 2;
+}
+
+:global([data-theme="dark"]) .typePillMobile,
+:global(.dark) .typePillMobile {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-2);
+}
+
+:global([data-theme="dark"]) .typePillMobile:hover,
+:global(.dark) .typePillMobile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+}
+
+:global([data-theme="dark"]) .typePillActiveMobile,
+:global(.dark) .typePillActiveMobile {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Accounts Section (Dashboard Style) ── */

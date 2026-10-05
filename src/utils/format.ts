@@ -66,3 +66,14 @@ export function formatHora(fecha: string | Date): string {
   }).format(d)
 }
 
+/**
+ * Formatea un objeto Date a string ISO 'YYYY-MM-DD' preservando la zona horaria local
+ * (evita el desfase de un día producido por toISOString() en zonas horarias UTC negativas).
+ */
+export function toISODateString(fecha: Date): string {
+  const year = fecha.getFullYear()
+  const month = String(fecha.getMonth() + 1).padStart(2, '0')
+  const day = String(fecha.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+

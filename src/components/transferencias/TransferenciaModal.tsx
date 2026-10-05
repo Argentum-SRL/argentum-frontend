@@ -40,9 +40,15 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   billeteras,
   cotizacionOficial,
 }) => {
-  // Cuentas activas
+  // Cuentas activas ordenadas (principal primero, luego mayor saldo a menor)
   const activeWallets = useMemo(() => {
-    return billeteras.filter(b => b.estado === 'activa')
+    return [...billeteras]
+      .filter(b => b.estado === 'activa')
+      .sort((a, b) => {
+        if (a.es_principal && !b.es_principal) return -1
+        if (!a.es_principal && b.es_principal) return 1
+        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
+      })
   }, [billeteras])
 
   // Tipos de Operación: Solo 2 solapas principales (Detección automática)

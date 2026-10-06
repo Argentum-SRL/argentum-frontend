@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RefreshCcw, ArrowRight, Pencil, RotateCcw, CheckCircle, Lightbulb, HelpCircle } from '@/components/ui/icons';
 import { MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
@@ -62,13 +62,6 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   const [animKey, setAnimKey] = useState(0);
   const [animDir, setAnimDir] = useState<'fwd' | 'bwd'>('fwd');
 
-  useEffect(() => {
-    if (resultado && activeStage !== 3) {
-      setAnimDir('fwd');
-      setAnimKey(k => k + 1);
-      setActiveStage(3);
-    }
-  }, [resultado]);
 
   const goTo = (s: 1 | 2 | 3) => {
     if (s === activeStage) return;

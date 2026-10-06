@@ -985,4 +985,50 @@ export interface SubcategoriaGasto {
   }
 }
 
+// ===== MEMORIA POR COMERCIO =====
+
+export interface MemoriaSugerenciaResponse {
+  clave: string | null
+  memoria_id: string | null
+  categoria_id: string | null
+  subcategoria_id: string | null
+}
+
+export interface TransaccionAnteriorItem {
+  id: string
+  fecha: string
+  monto: number
+  moneda: string
+  descripcion: string
+  categoria_nombre: string
+  subcategoria_nombre: string | null
+}
+
+export interface MemoriaComercioGuardarPayload {
+  descripcion: string
+  tipo: 'egreso' | 'ingreso'
+  categoria_id: string
+  subcategoria_id?: string | null
+}
+
+export interface MemoriaComercioGuardarResponse {
+  memoria_id: string
+  clave: string
+  categoria_id: string
+  subcategoria_id: string | null
+  cantidad_anteriores: number
+  anteriores: TransaccionAnteriorItem[]
+}
+
+export interface MemoriaComercioAplicarPayload {
+  memoria_id: string
+  transaccion_ids: string[]
+}
+
+export interface MemoriaComercioAplicarResponse {
+  actualizadas: number
+  omitidas: number
+}
+
 export * from './importacion'
+

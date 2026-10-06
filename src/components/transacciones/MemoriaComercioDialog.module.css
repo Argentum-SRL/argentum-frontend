@@ -1,0 +1,337 @@
+/* ─── MemoriaComercioDialog.module.css — Matched to GoalModal aesthetics ─── */
+
+.modalRoot {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  font-family: 'Figtree', sans-serif;
+  overflow: hidden;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Form Header (Unificado sin líneas divisorias, estilo GoalModal) ──────── */
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 4px;
+  flex-shrink: 0;
+  border-bottom: none;
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* ── Form Body (Cuerpo directo, limpio y orgánico) ────────────────────────── */
+.formBody {
+  flex: 1;
+  padding: 12px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.questionText {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.questionText strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ── Category / Subcategory Visual Badge ─────────────────────────────────── */
+.catBadge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+:global([data-theme="dark"]) .catBadge,
+:global(.dark) .catBadge {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.catIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+:global([data-theme="dark"]) .catIconWrap,
+:global(.dark) .catIconWrap {
+  background: var(--page);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.catDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.catLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.catName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Step 2: Lista de anteriores limpia ─────────────────────────────────── */
+.description {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.description strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.anterioresBox {
+  width: 100%;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+}
+
+.anterioresList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.anteriorItem {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 2px 0;
+}
+
+.anteriorDate {
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.anteriorDot {
+  color: var(--text-3);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.anteriorAmount {
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.anteriorCategory {
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.masAnteriores {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+  text-align: right;
+}
+
+.pregunta {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.pregunta strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ── Footer (Unificado sin líneas divisorias, estilo GoalModal) ───────────── */
+.formFooter {
+  padding: 10px 20px 16px;
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  border-top: none;
+}
+
+@media (max-width: 480px) {
+  .formHeader {
+    padding: 14px 16px 4px;
+  }
+  .formBody {
+    padding: 10px 16px 14px;
+  }
+  .formFooter {
+    padding: 8px 16px 14px;
+  }
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 42px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  font-family: 'Figtree', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitBtn {
+  flex: 2;
+  height: 42px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 120ms ease, transform 120ms ease;
+  font-family: 'Figtree', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sugerenciaText {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  margin-top: 8px;
+  margin-bottom: 0;
+  line-height: 1.4;
+  font-weight: 500;
+}

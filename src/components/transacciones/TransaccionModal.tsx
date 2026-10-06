@@ -1,16 +1,24 @@
 import { useMemo, useEffect, useReducer, useRef, useState, useCallback } from 'react'
 import {
-  ArrowUpRight, ArrowDownLeft, CreditCard, ArrowRightLeft, Layers, Banknote,
-  ChevronLeft, X, Trash2, Wallet, SlidersHorizontal, Plus, Minus, Lightbulb,
+  ArrowUpRight,
+  ArrowDownLeft,
+  CreditCard,
+  ArrowRightLeft,
+  Layers,
+  Banknote,
+  ChevronLeft,
+  X,
+  Trash2,
+  Wallet,
+  SlidersHorizontal,
+  Plus,
+  Minus,
+  Lightbulb,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import transaccionService from '@/services/transaccion.service'
-import memoriaComercioService from '@/services/memoriaComercio.service'
-import categoriaService from '@/services/categoria.service'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
-import MemoriaComercioDialog from './MemoriaComercioDialog'
-import memoriaStyles from './MemoriaComercioDialog.module.css'
 import { formatMonto } from '@/utils/format'
 import styles from './TransaccionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
@@ -22,25 +30,50 @@ import { DateInput } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
+import { useMemoriaComercio } from './useMemoriaComercio'
+import MemoriaComercioDialog from './MemoriaComercioDialog'
+import memoriaStyles from './MemoriaComercioDialog.module.css'
 
 interface TransaccionModalProps {
-  open: boolean; onClose: () => void; transaccion?: Transaccion | null;
-  billeteraInicialId?: string; tipoInicial?: 'egreso' | 'ingreso';
-  billeteras: Billetera[]; categorias: Categoria[]; tarjetas: TarjetaCredito[];
-  onSuccess: (tx?: Transaccion | null) => void;
+  open: boolean
+  onClose: () => void
+  transaccion?: Transaccion | null
+  billeteraInicialId?: string
+  tipoInicial?: 'egreso' | 'ingreso'
+  billeteras: Billetera[]
+  categorias: Categoria[]
+  tarjetas: TarjetaCredito[]
+  onSuccess: (tx?: Transaccion | null) => void
 }
 
 interface FormState {
-  step: 1 | 2 | 3; slideDirection: 'forward' | 'back'; tipo: 'ingreso' | 'egreso';
-  monto: number | null; moneda: 'ARS' | 'USD'; descripcion: string;
-  categoriaId: string; subcategoriaId: string; billeteraId: string; tarjetaId: string;
-  fecha: string; metodoPago: 'debito' | 'efectivo' | 'credito' | 'transferencia';
-  cantidadCuotas: number; cuotaInicial: number; proximoResumen: boolean;
-  tasaInteres: number; isSubmitting: boolean; sugerenciaClave: string | null;
+  step: 1 | 2 | 3
+  slideDirection: 'forward' | 'back'
+  tipo: 'ingreso' | 'egreso'
+  monto: number | null
+  moneda: 'ARS' | 'USD'
+  descripcion: string
+  categoriaId: string
+  subcategoriaId: string
+  billeteraId: string
+  tarjetaId: string
+  fecha: string
+  metodoPago: 'debito' | 'efectivo' | 'credito' | 'transferencia'
+  cantidadCuotas: number
+  cuotaInicial: number
+  proximoResumen: boolean
+  tasaInteres: number
+  isSubmitting: boolean
 }
 
 type FormAction =
-  | { type: 'RESET'; transaccion: Transaccion | null; billeteras: Billetera[]; billeteraInicialId?: string; tipoInicial?: 'egreso' | 'ingreso' }
+  | {
+      type: 'RESET'
+      transaccion: Transaccion | null
+      billeteras: Billetera[]
+      billeteraInicialId?: string
+      tipoInicial?: 'egreso' | 'ingreso'
+    }
   | { type: 'SET_STEP'; step: 1 | 2 | 3; direction: 'forward' | 'back' }
   | { [K in keyof FormState]: { type: 'SET_FIELD'; field: K; value: FormState[K] } }[keyof FormState]
 
@@ -50,10 +83,23 @@ function todayLocal(): string {
 }
 
 const initialState: FormState = {
-  step: 1, slideDirection: 'forward', tipo: 'egreso', monto: null, moneda: 'ARS', descripcion: '',
-  categoriaId: '', subcategoriaId: '', billeteraId: '', tarjetaId: '', fecha: todayLocal(),
-  metodoPago: 'debito', cantidadCuotas: 2, cuotaInicial: 1, proximoResumen: false, tasaInteres: 0, isSubmitting: false,
-  sugerenciaClave: null,
+  step: 1,
+  slideDirection: 'forward',
+  tipo: 'egreso',
+  monto: null,
+  moneda: 'ARS',
+  descripcion: '',
+  categoriaId: '',
+  subcategoriaId: '',
+  billeteraId: '',
+  tarjetaId: '',
+  fecha: todayLocal(),
+  metodoPago: 'debito',
+  cantidadCuotas: 2,
+  cuotaInicial: 1,
+  proximoResumen: false,
+  tasaInteres: 0,
+  isSubmitting: false,
 }
 
 function formReducer(state: FormState, action: FormAction): FormState {
@@ -62,28 +108,55 @@ function formReducer(state: FormState, action: FormAction): FormState {
       if (action.transaccion) {
         const wallet = action.billeteras.find(b => b.id === action.transaccion?.billetera_id)
         const metodoDeducido: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
-          action.transaccion.metodo_pago || (action.transaccion.tarjeta_id ? 'credito' : wallet?.es_efectivo ? 'efectivo' : 'debito')
+          action.transaccion.metodo_pago || (
+            action.transaccion.tarjeta_id
+              ? 'credito'
+              : wallet?.es_efectivo
+                ? 'efectivo'
+                : 'debito'
+          )
         return {
           ...initialState,
-          tipo: action.transaccion.tipo, monto: action.transaccion.monto, moneda: action.transaccion.moneda,
-          descripcion: action.transaccion.descripcion || '', categoriaId: action.transaccion.categoria_id || '',
-          subcategoriaId: action.transaccion.subcategoria_id || '', billeteraId: action.transaccion.billetera_id,
-          tarjetaId: action.transaccion.tarjeta_id || '', fecha: action.transaccion.fecha.split('T')[0], metodoPago: metodoDeducido,
+          tipo: action.transaccion.tipo,
+          monto: action.transaccion.monto,
+          moneda: action.transaccion.moneda,
+          descripcion: action.transaccion.descripcion || '',
+          categoriaId: action.transaccion.categoria_id || '',
+          subcategoriaId: action.transaccion.subcategoria_id || '',
+          billeteraId: action.transaccion.billetera_id,
+          tarjetaId: action.transaccion.tarjeta_id || '',
+          fecha: action.transaccion.fecha.split('T')[0],
+          metodoPago: metodoDeducido,
         }
       } else {
         const activas = action.billeteras.filter(b => b.estado === 'activa')
+
+        // Orden estricto: Billetera principal primero, luego de mayor a menor saldo
         const sorted = [...activas].sort((a, b) => {
           if (a.es_principal && !b.es_principal) return -1
           if (!a.es_principal && b.es_principal) return 1
           return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
         })
-        const chosenWallet = action.billeteraInicialId ? action.billeteras.find(b => b.id === action.billeteraInicialId) : undefined
+
+        const chosenWallet = action.billeteraInicialId
+          ? action.billeteras.find(b => b.id === action.billeteraInicialId)
+          : undefined
+
         const best = chosenWallet || sorted[0]
         const monedaInicial = best?.moneda || 'ARS'
         const bestForCurrency = chosenWallet || sorted.find(b => b.moneda === monedaInicial) || best
         const hasBancosInMoneda = sorted.some(b => !b.es_efectivo && b.moneda === monedaInicial)
-        const metodoInicial: 'debito' | 'efectivo' | 'credito' | 'transferencia' = (!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'debito'
-        return { ...initialState, tipo: action.tipoInicial || 'egreso', fecha: todayLocal(), billeteraId: bestForCurrency?.id || '', moneda: monedaInicial, metodoPago: metodoInicial }
+        const metodoInicial: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
+          (!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'debito'
+
+        return {
+          ...initialState,
+          tipo: action.tipoInicial || 'egreso',
+          fecha: todayLocal(),
+          billeteraId: bestForCurrency?.id || '',
+          moneda: monedaInicial,
+          metodoPago: metodoInicial,
+        }
       }
     case 'SET_STEP':
       return { ...state, step: action.step, slideDirection: action.direction }
@@ -104,6 +177,28 @@ export default function TransaccionModal({
   const carouselRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const submittingRef = useRef(false)
+
+  const {
+    sugerenciaClave,
+    marcarCategoriaManual,
+    evaluarMemoriaPostGuardado,
+    showMemoriaDialog,
+    memoriaDialogData,
+    cerrarMemoriaDialog,
+  } = useMemoriaComercio({
+    open,
+    isEdit,
+    descripcion: state.descripcion,
+    tipo: state.tipo,
+    categoriaId: state.categoriaId,
+    subcategoriaId: state.subcategoriaId,
+    categorias,
+    onAutoSelectCategoria: (catId: string, subcatId: string) => {
+      dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: catId })
+      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: subcatId })
+    },
+    onClose,
+  })
 
   const setCardNode = useCallback((id: string, el: HTMLDivElement | null) => {
     if (el) {
@@ -159,19 +254,11 @@ export default function TransaccionModal({
   const {
     step, slideDirection, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
     billeteraId, tarjetaId, fecha, metodoPago, cantidadCuotas, cuotaInicial, proximoResumen, tasaInteres, isSubmitting,
-    sugerenciaClave,
   } = state
 
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [isCustomOverride, setIsCustomOverride] = useState(false)
   const isCustomCuotas = isCustomOverride || ![1, 3, 6, 12].includes(cantidadCuotas)
-  const categoriaManualRef = useRef(false)
-
-  const [showMemoriaDialog, setShowMemoriaDialog] = useState(false)
-  const [memoriaDialogData, setMemoriaDialogData] = useState<{
-    clave: string; descripcion: string; tipo: 'egreso' | 'ingreso'; categoriaId: string;
-    subcategoriaId: string | null; categoriaNombre: string; subcategoriaNombre: string | null;
-  } | null>(null)
 
   const getCuotaPreview = (n: number) => {
     const m = Number(monto) || 0
@@ -181,7 +268,6 @@ export default function TransaccionModal({
 
   useEffect(() => {
     submittingRef.current = false
-    categoriaManualRef.current = false
     if (open) {
       dispatch({
         type: 'RESET',
@@ -191,34 +277,7 @@ export default function TransaccionModal({
         tipoInicial,
       })
     }
-  }, [open, transaccion, billeteras, billeteraInicialId, tipoInicial])
-
-  // Sugerencia de categoría por memoria de comercio (al crear)
-  useEffect(() => {
-    if (!open || isEdit) return
-    if (tipo !== 'egreso' && tipo !== 'ingreso') return
-    if (!descripcion.trim()) return
-    if (categoriaManualRef.current) return
-
-    const timer = setTimeout(async () => {
-      try {
-        const res = await memoriaComercioService.getSugerencia(descripcion.trim(), tipo)
-        if (res.memoria_id && !categoriaManualRef.current) {
-          if (res.categoria_id) {
-            dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: res.categoria_id })
-            dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: res.subcategoria_id || '' })
-            dispatch({ type: 'SET_FIELD', field: 'sugerenciaClave', value: res.clave })
-          }
-        } else {
-          dispatch({ type: 'SET_FIELD', field: 'sugerenciaClave', value: null })
-        }
-      } catch (e) {
-        console.error('Error al obtener sugerencia de comercio:', e)
-      }
-    }, 400)
-
-    return () => clearTimeout(timer)
-  }, [descripcion, tipo, open, isEdit])
+  }, [open, transaccion, billeteras, billeteraInicialId, tipoInicial, isEdit])
 
 
   // Si cambia la tarjeta seleccionada, actualizar la billeteraId automáticamente
@@ -538,16 +597,33 @@ export default function TransaccionModal({
       const inicial = Math.max(1, Math.min(cant, cuotaInicial || 1))
 
       const payload = isCuotaHija
-        ? { descripcion: descripcion.trim(), categoria_id: categoriaId, subcategoria_id: subcategoriaId || null }
+        ? {
+            descripcion: descripcion.trim(),
+            categoria_id: categoriaId,
+            subcategoria_id: subcategoriaId || null,
+          }
         : {
-            tipo, monto: Number(monto), moneda, descripcion: descripcion.trim(),
-            categoria_id: categoriaId, subcategoria_id: subcategoriaId || null,
-            billetera_id: resolvedBilleteraId, fecha, metodo_pago: metodoPago,
+            tipo,
+            monto: Number(monto),
+            moneda,
+            descripcion: descripcion.trim(),
+            categoria_id: categoriaId,
+            subcategoria_id: subcategoriaId || null,
+            billetera_id: resolvedBilleteraId,
+            fecha,
+            metodo_pago: metodoPago,
             tarjeta_id: (metodoPago === 'credito' && tarjetaId) ? tarjetaId : null,
             origen: isEdit ? undefined : ('manual' as const),
             es_padre_cuotas: !isEdit && metodoPago === 'credito' ? true : undefined,
             info_cuotas: !isEdit && metodoPago === 'credito'
-              ? { cantidad_cuotas: cant, cuota_inicial: inicial, tiene_interes: tasaInteres > 0, tasa_interes: tasaInteres, monto_total: Number(monto), proximo_resumen: proximoResumen }
+              ? {
+                cantidad_cuotas: cant,
+                cuota_inicial: inicial,
+                tiene_interes: tasaInteres > 0,
+                tasa_interes: tasaInteres,
+                monto_total: Number(monto),
+                proximo_resumen: proximoResumen
+              }
               : undefined,
           }
       let savedTx: Transaccion | null = null
@@ -567,52 +643,7 @@ export default function TransaccionModal({
           sileo.success({ title: 'Transacción actualizada' })
         }
         onSuccess(savedTx)
-
-        // Evaluar memoria por comercio si cambió la categoría o subcategoría
-        const origCatId = transaccion.categoria_id || ''
-        const origSubcatId = transaccion.subcategoria_id || ''
-        const newCatId = categoriaId || ''
-        const newSubcatId = subcategoriaId || ''
-        const cambioCategoria = (newCatId !== origCatId || newSubcatId !== origSubcatId)
-        const descValida = descripcion.trim().length > 0
-        const tipoValido = tipo === 'egreso' || tipo === 'ingreso'
-
-        if (cambioCategoria && descValida && tipoValido) {
-          try {
-            const sug = await memoriaComercioService.getSugerencia(descripcion.trim(), tipo)
-            const memoriaDiferente = !sug.memoria_id || sug.categoria_id !== newCatId || (sug.subcategoria_id || null) !== (newSubcatId || null)
-            if (sug.clave && memoriaDiferente) {
-              const catObj = categorias.find(c => c.id === newCatId)
-              const catNom = catObj?.nombre || ''
-              let subcatNom: string | null = null
-              if (newSubcatId) {
-                try {
-                  const subcats = await categoriaService.getSubcategorias(newCatId)
-                  const subObj = subcats.find(s => s.id === newSubcatId)
-                  subcatNom = subObj?.nombre || null
-                } catch {
-                  // Fallback silencioso si falla la consulta de subcategorías
-                }
-              }
-
-              setMemoriaDialogData({
-                clave: sug.clave,
-                descripcion: descripcion.trim(),
-                tipo,
-                categoriaId: newCatId,
-                subcategoriaId: newSubcatId || null,
-                categoriaNombre: catNom,
-                subcategoriaNombre: subcatNom,
-              })
-              setShowMemoriaDialog(true)
-              return
-            }
-          } catch (e) {
-            console.error('Error al evaluar memoria por comercio:', e)
-          }
-        }
-
-        onClose()
+        await evaluarMemoriaPostGuardado(transaccion)
       }
     } catch (e) {
       console.error(e)
@@ -625,7 +656,7 @@ export default function TransaccionModal({
 
   return (
     <>
-      <Modal isOpen={open && !showMemoriaDialog} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Nueva transacción">
+    <Modal isOpen={open && !showMemoriaDialog} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Nueva transacción">
       <div className={styles.modalRoot}>
         {/* Indicador de pasos superior centrado (estilo Nueva Billetera / BankPickerModal) */}
         <div className={styles.stepIndicator} aria-hidden="true">
@@ -1205,13 +1236,12 @@ export default function TransaccionModal({
                     tipo={tipo}
                     autoseleccionarPrimeraSubcategoria={true}
                     onSelectCategoria={(id) => {
-                      categoriaManualRef.current = true
-                      dispatch({ type: 'SET_FIELD', field: 'sugerenciaClave', value: null })
+                      marcarCategoriaManual()
                       dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: id })
                       dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
                     }}
                     onSelectSubcategoria={(id) => {
-                      categoriaManualRef.current = true
+                      marcarCategoriaManual()
                       dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: id })
                     }}
                   />
@@ -1239,10 +1269,7 @@ export default function TransaccionModal({
     {showMemoriaDialog && memoriaDialogData && (
       <MemoriaComercioDialog
         isOpen={showMemoriaDialog}
-        onClose={() => {
-          setShowMemoriaDialog(false)
-          onClose()
-        }}
+        onClose={cerrarMemoriaDialog}
         clave={memoriaDialogData.clave}
         descripcion={memoriaDialogData.descripcion}
         tipo={memoriaDialogData.tipo}

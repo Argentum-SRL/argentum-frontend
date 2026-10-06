@@ -13,6 +13,7 @@ interface ParametersSummaryBarProps {
   items: SummaryItem[];
   onEdit: () => void;
   editLabel?: string;
+  showStepper?: boolean;
 }
 
 export const ParametersSummaryBar: React.FC<ParametersSummaryBarProps> = ({
@@ -21,25 +22,28 @@ export const ParametersSummaryBar: React.FC<ParametersSummaryBarProps> = ({
   items,
   onEdit,
   editLabel = 'Modificar datos',
+  showStepper = false,
 }) => {
   return (
     <div className={styles.summaryBarCard} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
-      {/* ── Stepper Line in Step 3 ── */}
-      <div className={styles.stepperTrack} style={{ width: '100%', paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
-        <div className={`${styles.stepBadge} ${styles.stepBadgeDone}`} onClick={onEdit} role="button" title="Volver a modificar precio">
-          <Check size={12} strokeWidth={3} />
-          <span>01 Compra</span>
+      {/* ── Stepper Line (if enabled) ── */}
+      {showStepper && (
+        <div className={styles.stepperTrack} style={{ width: '100%', paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
+          <div className={`${styles.stepBadge} ${styles.stepBadgeDone}`} onClick={onEdit} role="button" title="Volver a modificar precio">
+            <Check size={12} strokeWidth={3} />
+            <span>01 Compra</span>
+          </div>
+          <span className={styles.stepSeparator}>→</span>
+          <div className={`${styles.stepBadge} ${styles.stepBadgeDone}`} onClick={onEdit} role="button" title="Volver a modificar financiación">
+            <Check size={12} strokeWidth={3} />
+            <span>02 Financiación</span>
+          </div>
+          <span className={styles.stepSeparator}>→</span>
+          <div className={`${styles.stepBadge} ${styles.stepBadgeActive}`}>
+            <span>03 Análisis</span>
+          </div>
         </div>
-        <span className={styles.stepSeparator}>→</span>
-        <div className={`${styles.stepBadge} ${styles.stepBadgeDone}`} onClick={onEdit} role="button" title="Volver a modificar financiación">
-          <Check size={12} strokeWidth={3} />
-          <span>02 Financiación</span>
-        </div>
-        <span className={styles.stepSeparator}>→</span>
-        <div className={`${styles.stepBadge} ${styles.stepBadgeActive}`}>
-          <span>03 Análisis</span>
-        </div>
-      </div>
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 14, flexWrap: 'wrap' }}>
         <div className={styles.summaryBarLeft}>

@@ -1,8 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { Scale, HelpCircle, FileSpreadsheet } from '@/components/ui/icons';
 import useTools from '@/hooks/useTools';
-import ConvenienciaForm from '@/components/tools/ConvenienciaForm';
-import ConvenienciaResult from '@/components/tools/ConvenienciaResult';
+import ConvenienciaWizard from '@/components/tools/ConvenienciaWizard';
 import FinancialContextBanner from '@/components/tools/FinancialContextBanner';
 import CanAffordForm from '@/components/tools/CanAffordForm';
 import CanAffordResult from '@/components/tools/CanAffordResult';
@@ -140,45 +139,24 @@ export default function ToolsPage() {
         </div>
       </div>
 
-      {/* ── Tab: Cuotas vs Contado ───────────────────────────────────────── */}
+      {/* ── Tab: Cuotas vs Contado (Financial Wizard Shell) ─────────────── */}
       {currentTab === 'conveniencia' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
           {ipcLoading ? (
             <div className={`${pageStyles.skeleton} ${pageStyles.skeletonCard}`} />
-          ) : !resultado ? (
-            /* Estado 1: Formulario de Carga (100% visible sin scroll) */
-            <ConvenienciaForm
+          ) : (
+            <ConvenienciaWizard
               formData={formData}
               setFormData={setFormData}
+              resultado={resultado}
               calculando={calculando}
               calcular={calcular}
+              resetCalculadora={resetCalculadora}
               cuotaCalculada={cuotaCalculada}
               ipcData={ipcData}
               ipcLoading={ipcLoading}
               ipcError={ipcError}
             />
-          ) : (
-            /* Estado 2: Modo Análisis (Barra Resumen Superior + Resultados Completos) */
-            <>
-              <ParametersSummaryBar
-                title="Cuotas vs Contado"
-                icon={Scale}
-                items={[
-                  { label: 'Contado', value: formatMonto(formData.precio_contado || 0, 'ARS') },
-                  {
-                    label: 'Financiación',
-                    value: formData.tiene_interes
-                      ? `${formData.cantidad_cuotas} cuotas (TNA ${formData.tna}%)`
-                      : `${formData.cantidad_cuotas} cuotas fijas de ${formData.precio_total_cuotas && formData.cantidad_cuotas ? formatMonto(formData.precio_total_cuotas / formData.cantidad_cuotas, 'ARS') : '$0'}`
-                  },
-                  { label: 'Inflación esperada', value: `${formData.inflacion_mensual}% /mes` }
-                ]}
-                onEdit={resetCalculadora}
-                editLabel="Modificar datos"
-              />
-
-              <ConvenienciaResult resultado={resultado} />
-            </>
           )}
         </div>
       )}

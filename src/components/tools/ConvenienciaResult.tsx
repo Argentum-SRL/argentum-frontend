@@ -1,6 +1,7 @@
 import React from 'react';
-import { CheckCircle, Lightbulb, HelpCircle } from '@/components/ui/icons';
+import { CheckCircle, Lightbulb, HelpCircle, Pencil, RotateCcw } from '@/components/ui/icons';
 import { formatMonto } from '@/utils/format';
+import { Button } from '@/components/ui';
 import type { ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import DetalleCuotasChart from './DetalleCuotasChart';
 import ExplicacionCalculo from './ExplicacionCalculo';
@@ -8,9 +9,17 @@ import styles from './ToolsComponents.module.css';
 
 interface ConvenienciaResultProps {
   resultado: IConvenienciaResult;
+  onEditFinanciacion?: () => void;
+  onNuevaConsulta?: () => void;
+  inWizard?: boolean;
 }
 
-export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultado }) => {
+export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({
+  resultado,
+  onEditFinanciacion,
+  onNuevaConsulta,
+  inWizard = false,
+}) => {
   const {
     resultado: veredicto,
     precio_contado,
@@ -21,21 +30,24 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
     detalle_por_mes,
   } = resultado;
 
-  const renderBanner = () => {
+  const isCuotas = veredicto === 'conviene_cuotas';
+  const isContado = veredicto === 'conviene_contado';
+
+  const renderVerdictBanner = () => {
     switch (veredicto) {
       case 'conviene_cuotas':
         return (
           <div className={`${styles.resultBanner} ${styles.bannerCuotas}`}>
             <div className={styles.bannerIconContainer}>
-              <CheckCircle size={26} />
+              <CheckCircle size={24} />
             </div>
             <div className={styles.bannerText}>
               <h3 className={styles.bannerTitle}>Pagar en cuotas</h3>
               <div className={styles.bannerHighlight}>
-                Ahorrás {formatMonto(ahorro_real, 'ARS')}
+                Ahorrás {formatMonto(ahorro_real, 'ARS')} en términos reales
               </div>
               <p className={styles.bannerDesc}>
-                La inflación trabaja a tu favor. En términos reales, el total en cuotas te sale menos.
+                La inflación trabaja a tu favor licuando las cuotas futuras frente al pago al contado.
               </p>
             </div>
           </div>
@@ -44,7 +56,7 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
         return (
           <div className={`${styles.resultBanner} ${styles.bannerContado}`}>
             <div className={styles.bannerIconContainer}>
-              <Lightbulb size={26} />
+              <Lightbulb size={24} />
             </div>
             <div className={styles.bannerText}>
               <h3 className={styles.bannerTitle}>Pagar de contado</h3>
@@ -52,7 +64,7 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
                 Ahorrás {formatMonto(ahorro_real, 'ARS')} frente a financiar
               </div>
               <p className={styles.bannerDesc}>
-                La inflación no alcanza a compensar el costo adicional o recargo de las cuotas.
+                El recargo o tasa de interés es mayor al efecto erosivo de la inflación estimada.
               </p>
             </div>
           </div>
@@ -61,7 +73,7 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
         return (
           <div className={`${styles.resultBanner} ${styles.bannerIndiferente}`}>
             <div className={styles.bannerIconContainer}>
-              <HelpCircle size={26} />
+              <HelpCircle size={24} />
             </div>
             <div className={styles.bannerText}>
               <h3 className={styles.bannerTitle}>Da prácticamente lo mismo</h3>
@@ -69,7 +81,7 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
                 Diferencia: {formatMonto(ahorro_real, 'ARS')} ({porcentaje_ahorro.toFixed(1)}%)
               </div>
               <p className={styles.bannerDesc}>
-                La diferencia es mínima (menor al 1%). Elegí según tu disponibilidad de dinero en mano.
+                La brecha es menor al 1%. Elegí la alternativa según tu disponibilidad de efectivo hoy.
               </p>
             </div>
           </div>
@@ -77,74 +89,83 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
     }
   };
 
-  const renderComparison = () => {
-    const isCuotas = veredicto === 'conviene_cuotas';
-    const isContado = veredicto === 'conviene_contado';
-
+  const renderComparisonBand = () => {
     return (
       <div className={styles.comparisonBand}>
         <div className={styles.comparisonItem}>
-          <span className={styles.comparisonLabel}>Costo real de las cuotas</span>
-          <span className={styles.comparisonValue}>{formatMonto(costo_real_cuotas, 'ARS')}</span>
-          <span className={styles.comparisonDesc}>A pesos de hoy (ajustado por inflación)</span>
+          <span className={styles.comparisonLabel}>Contado</span>
+          <span className={styles.comparisonValue}>{formatMonto(precio_contado, 'ARS')}</span>
+          <span className={styles.comparisonDesc}>Pago único hoy</span>
         </div>
 
         <div className={styles.comparisonSeparator}>vs.</div>
 
         <div className={styles.comparisonItem}>
-          <span className={styles.comparisonLabel}>Precio de contado</span>
-          <span className={styles.comparisonValue}>{formatMonto(precio_contado, 'ARS')}</span>
-          <span className={styles.comparisonDesc}>Si pagás todo hoy</span>
+          <span className={styles.comparisonLabel}>Cuotas (Costo Real)</span>
+          <span className={styles.comparisonValue}>{formatMonto(costo_real_cuotas, 'ARS')}</span>
+          <span className={styles.comparisonDesc}>Ajustado por inflación</span>
         </div>
 
         <div className={styles.comparisonSeparator}>=</div>
 
         <div className={`${styles.comparisonItem} ${styles.comparisonHighlight}`}>
           <span className={styles.comparisonLabel}>
-            {isCuotas ? 'Te ahorrás' : isContado ? 'Pagás de más' : 'Diferencia'}
+            {isCuotas ? 'Ahorro real' : isContado ? 'Sobrecosto real' : 'Diferencia'}
           </span>
           <span
             className={styles.comparisonValue}
             style={{
               color: isCuotas ? 'var(--success)' : isContado ? 'var(--error)' : 'var(--text)',
-              fontSize: 21,
+              fontSize: '20px',
             }}
           >
             {formatMonto(ahorro_real, 'ARS')}
           </span>
           <span className={styles.comparisonDesc}>
             {isCuotas
-              ? `(${porcentaje_ahorro.toFixed(1)}% de ahorro real)`
+              ? `${porcentaje_ahorro.toFixed(1)}% de ahorro real`
               : isContado
-              ? `(${porcentaje_ahorro.toFixed(1)}% más que contado)`
-              : `(${porcentaje_ahorro.toFixed(1)}% de diferencia)`}
+              ? `${porcentaje_ahorro.toFixed(1)}% más que contado`
+              : `${porcentaje_ahorro.toFixed(1)}% de diferencia`}
           </span>
         </div>
       </div>
     );
   };
 
-  return (
-    <div className={`${styles.card} ${styles.animateFadeIn}`}>
-      <h2 className={styles.cardTitle}>¿Qué conviene más?</h2>
+  const content = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, width: '100%' }}>
+      {/* 1. Título */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <h2 className={styles.cardTitle} style={{ margin: 0, fontSize: 18 }}>
+          ¿Qué conviene más?
+        </h2>
+        <span style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>
+          {cantidad_cuotas} cuotas evaluadas
+        </span>
+      </div>
 
-      {renderBanner()}
+      {/* 2. Verdict Banner */}
+      {renderVerdictBanner()}
 
-      {renderComparison()}
+      {/* 3 & 4. Comparación Contado vs Cuotas y Ahorro */}
+      {renderComparisonBand()}
 
-      {/* Interés total financiado */}
+      {/* 5. Información secundaria (si tiene interés) */}
       {resultado.tiene_interes && (
-        <div className={styles.metricsGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
-          <div className={styles.metricBox}>
+        <div className={styles.metricsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+          <div className={styles.metricBox} style={{ padding: '10px 14px' }}>
             <span className={styles.metricLabel}>Interés total financiado</span>
-            <span className={styles.metricValue}>{formatMonto(resultado.interes_total ?? 0, 'ARS')}</span>
+            <span className={styles.metricValue} style={{ fontSize: 16 }}>
+              {formatMonto(resultado.interes_total ?? 0, 'ARS')}
+            </span>
             {resultado.tna_usada && (
-              <span className={styles.metricDesc}>Calculado a TNA {resultado.tna_usada}%</span>
+              <span className={styles.metricDesc}>Tasa TNA {resultado.tna_usada}%</span>
             )}
           </div>
-          <div className={styles.metricBox}>
-            <span className={styles.metricLabel}>Total financiado con interés</span>
-            <span className={styles.metricValue}>
+          <div className={styles.metricBox} style={{ padding: '10px 14px' }}>
+            <span className={styles.metricLabel}>Total nominal financiado</span>
+            <span className={styles.metricValue} style={{ fontSize: 16 }}>
               {formatMonto(resultado.precio_total_cuotas_con_interes ?? 0, 'ARS')}
             </span>
             <span className={styles.metricDesc}>
@@ -154,11 +175,49 @@ export const ConvenienciaResult: React.FC<ConvenienciaResultProps> = ({ resultad
         </div>
       )}
 
+      {/* 6. Gráfico compacto de cuotas */}
       {cantidad_cuotas <= 24 && (
         <DetalleCuotasChart detallePorMes={detalle_por_mes} resultado={veredicto} />
       )}
 
+      {/* 7. Explicación educativa colapsable */}
       <ExplicacionCalculo />
+
+      {/* Acciones de navegación */}
+      {(onEditFinanciacion || onNuevaConsulta) && (
+        <div className={styles.wizardResultActions}>
+          {onEditFinanciacion && (
+            <Button
+              variant="secondary"
+              onClick={onEditFinanciacion}
+              type="button"
+            >
+              <Pencil size={14} style={{ marginRight: 6 }} />
+              <span>Modificar financiación</span>
+            </Button>
+          )}
+          {onNuevaConsulta && (
+            <Button
+              variant="ghost"
+              onClick={onNuevaConsulta}
+              type="button"
+            >
+              <RotateCcw size={14} style={{ marginRight: 6 }} />
+              <span>Nueva simulación</span>
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  if (inWizard) {
+    return content;
+  }
+
+  return (
+    <div className={`${styles.card} ${styles.animateFadeIn}`}>
+      {content}
     </div>
   );
 };

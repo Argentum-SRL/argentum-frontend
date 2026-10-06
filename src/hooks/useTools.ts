@@ -72,33 +72,33 @@ export const useTools = () => {
     
     if (contado === null || isNaN(contado) || contado <= 0) {
       sileo.error({ title: 'El precio de contado debe ser mayor a 0' });
-      return;
+      return false;
     }
     if (contado > MAX_MONTO_INTEGRIDAD) {
       sileo.error({ title: 'El precio de contado excede el límite permitido' });
-      return;
+      return false;
     }
     if (!tiene_interes && (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0)) {
       sileo.error({ title: 'El precio total en cuotas debe ser mayor a 0' });
-      return;
+      return false;
     }
     if (!tiene_interes && cuotasTotal !== null && cuotasTotal > MAX_MONTO_INTEGRIDAD) {
       sileo.error({ title: 'El precio en cuotas excede el límite permitido' });
-      return;
+      return false;
     }
     if (cuotas === null || isNaN(cuotas) || cuotas < 1 || cuotas > 120) {
       sileo.error({ title: 'La cantidad de cuotas debe estar entre 1 y 120' });
-      return;
+      return false;
     }
     if (isNaN(inflacion) || inflacion < 0 || inflacion > 100) {
       sileo.error({ title: 'La inflación mensual debe estar entre 0% y 100%' });
-      return;
+      return false;
     }
     if (tiene_interes) {
       const parsedTna = parseFloat(tnaVal);
       if (isNaN(parsedTna) || parsedTna < 0.1 || parsedTna > 3000) {
         sileo.error({ title: 'Debe ingresar una TNA válida entre 0.1% y 3000%' });
-        return;
+        return false;
       }
     }
     
@@ -114,11 +114,13 @@ export const useTools = () => {
       });
       setResultado(res);
       sileo.success({ title: 'Cálculo realizado con éxito' });
+      return true;
     } catch (err: unknown) {
       console.error(err);
       const error = err as import('axios').AxiosError<{ error?: { message?: string } }>;
       const detail = error.response?.data?.error?.message || 'No pudimos calcular. Verificá los datos ingresados.';
       sileo.error({ title: detail });
+      return false;
     } finally {
       setCalculando(false);
     }

@@ -153,8 +153,8 @@ export const BalanceCard = memo(function BalanceCard({
   return (
     <div ref={cardRef} className={`${styles.card} ${className || ''}`}>
       {/* ── 1. Header: Monedas a la izquierda & Privacidad a la derecha ───── */}
-      <div className={styles.header}>
-        {tieneBilleterasUsd && (
+      {tieneBilleterasUsd && (
+        <div className={styles.header}>
           <div className={styles.currencyToggle} role="tablist" aria-label="Seleccionar moneda">
             <button
               type="button"
@@ -175,24 +175,37 @@ export const BalanceCard = memo(function BalanceCard({
               Dólares
             </button>
           </div>
-        )}
 
-        <button
-          type="button"
-          className={styles.privacyBtn}
-          onClick={onTogglePrivacy}
-          title={showBalance ? 'Ocultar montos' : 'Mostrar montos'}
-          aria-label={showBalance ? 'Ocultar montos' : 'Mostrar montos'}
-        >
-          {showBalance ? <Eye size={16} strokeWidth={1.8} /> : <EyeOff size={16} strokeWidth={1.8} />}
-        </button>
-      </div>
+          <button
+            type="button"
+            className={styles.privacyBtn}
+            onClick={onTogglePrivacy}
+            title={showBalance ? 'Ocultar montos' : 'Mostrar montos'}
+            aria-label={showBalance ? 'Ocultar montos' : 'Mostrar montos'}
+          >
+            {showBalance ? <Eye size={16} strokeWidth={1.8} /> : <EyeOff size={16} strokeWidth={1.8} />}
+          </button>
+        </div>
+      )}
 
       {/* ── 2. Los Dos Saldos (Protagonistas absolutos con presencia) ─── */}
       <div className={styles.saldosHero}>
         {/* Saldo Total */}
         <div className={styles.saldoMain}>
-          <span className={styles.saldoLabel}>Saldo total</span>
+          <div className={styles.saldoHeader}>
+            <span className={styles.saldoLabel}>Saldo total</span>
+            {!tieneBilleterasUsd && (
+              <button
+                type="button"
+                className={styles.privacyBtn}
+                onClick={onTogglePrivacy}
+                title={showBalance ? 'Ocultar montos' : 'Mostrar montos'}
+                aria-label={showBalance ? 'Ocultar montos' : 'Mostrar montos'}
+              >
+                {showBalance ? <Eye size={16} strokeWidth={1.8} /> : <EyeOff size={16} strokeWidth={1.8} />}
+              </button>
+            )}
+          </div>
           <h2 className={`${styles.totalAmount} ${saldoTotal < 0 ? styles.amountNegative : ''}`}>
             {showBalance ? fmt(saldoTotal, moneda) : '••••••••'}
           </h2>

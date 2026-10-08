@@ -4,9 +4,9 @@ import { BANKS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
 import type { Billetera } from '@/types'
 
-// Carga todos los SVGs de banks/ como URLs estáticas via Vite glob import.
+// Carga todos los logos de banks/ (SVG, PNG, etc.) como URLs estáticas via Vite glob import.
 // La key resultante es la ruta relativa al módulo; se indexa por filename.
-const _logoModules = import.meta.glob('@/assets/banks/*.svg', {
+const _logoModules = import.meta.glob('@/assets/banks/*.{svg,png,webp}', {
   eager: true,
   query: '?url',
   import: 'default',

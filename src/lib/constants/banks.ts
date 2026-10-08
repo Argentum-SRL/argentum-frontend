@@ -68,7 +68,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'billetera_virtual',
     colorPrimario: '#14D883',
     colorTexto: '#111',
-    logoPath: '',
+    logoPath: 'cocos.png',
     gradiente: 'linear-gradient(135deg, #14D883 0%, #0CB068 100%)',
   },
   {
@@ -77,7 +77,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'billetera_virtual',
     colorPrimario: '#18181B',
     colorTexto: 'white',
-    logoPath: '',
+    logoPath: 'arq.png',
     gradiente: 'linear-gradient(135deg, #27272A 0%, #09090B 100%)',
   },
   {
@@ -86,7 +86,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'billetera_virtual',
     colorPrimario: '#FF2D55',
     colorTexto: 'white',
-    logoPath: '',
+    logoPath: 'astropay.png',
     gradiente: 'linear-gradient(135deg, #FF2D55 0%, #C41638 100%)',
   },
 
@@ -217,7 +217,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'banco_tradicional',
     colorPrimario: '#005696',
     colorTexto: 'white',
-    logoPath: '',
+    logoPath: 'credicoop.png',
     gradiente: 'linear-gradient(135deg, #005696 0%, #003660 100%)',
   },
 
@@ -228,7 +228,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'plataforma_inversion',
     colorPrimario: '#004A8F',
     colorTexto: 'white',
-    logoPath: '',
+    logoPath: 'balanz.png',
     gradiente: 'linear-gradient(135deg, #004A8F 0%, #002D5C 100%)',
   },
   {
@@ -237,7 +237,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'plataforma_inversion',
     colorPrimario: '#00A3E0',
     colorTexto: 'white',
-    logoPath: '',
+    logoPath: 'iol.png',
     gradiente: 'linear-gradient(135deg, #00A3E0 0%, #0077A8 100%)',
   },
 ]

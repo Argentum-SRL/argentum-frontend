@@ -37,6 +37,8 @@ import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
 
 import { getFotoUrl } from '@/utils/fotoUrl'
+import FacturaPanel from '@/components/facturas/FacturaPanel'
+import facturaStyles from '@/components/facturas/FacturaPanel.module.css'
 import styles from './DashboardPage.module.css'
 
 // ── Formatter ────────────────────────────────────────────────────────────
@@ -530,6 +532,8 @@ export default function DashboardPage() {
   const [loadingSubcategorias, setLoadingSubcategorias] = useState(false)
   const [isAccountsOpen, setIsAccountsOpen] = useState(false)
   const [isCompromisosOpen, setIsCompromisosOpen] = useState(false)
+  const [selectedFacturaId, setSelectedFacturaId] = useState<string | null>(null)
+  const [isFacturaPanelOpen, setIsFacturaPanelOpen] = useState(false)
 
   const handleToggleAccounts = useCallback(() => {
     setIsAccountsOpen(prev => {
@@ -1014,8 +1018,12 @@ export default function DashboardPage() {
                 return (
                   <div className={styles.list}>
                     {topPagos.map((p) => {
-                      const isVencido = Boolean(p.es_vencido || p.dias_restantes < 0)
-                      const isUrgente = !isVencido && p.dias_restantes <= 1
+                      const isFactura = p.tipo === 'factura'
+                      const isFacturaPagada = isFactura && p.estado_factura === 'pagada'
+                      const isFacturaVencida = isFactura && p.estado_factura === 'vencida'
+
+                      const isVencido = !isFacturaPagada && (isFacturaVencida || Boolean(p.es_vencido || p.dias_restantes < 0))
+                      const isUrgente = !isFacturaPagada && !isVencido && p.dias_restantes <= 1
                       let fechaTxt = formatFecha(p.fecha_cobro)
                       if (isVencido) {
                         const diasPasados = Math.abs(p.dias_restantes)
@@ -1029,7 +1037,10 @@ export default function DashboardPage() {
                       }
 
                       const handlePagoClick = () => {
-                        if (p.tipo === 'suscripcion') {
+                        if (p.tipo === 'factura') {
+                          setSelectedFacturaId(p.factura_id || p.id)
+                          setIsFacturaPanelOpen(true)
+                        } else if (p.tipo === 'suscripcion') {
                           navigate('/app/suscripciones')
                         } else if (p.tipo === 'resumen_tarjeta') {
                           navigate(p.billetera_id ? `/app/billeteras/${p.billetera_id}` : '/app/billeteras')
@@ -1051,7 +1062,11 @@ export default function DashboardPage() {
                           </div>
                           <div className={styles.pagoRight}>
                             <div className={styles.itemAmount}>{formatMonto(p.monto, p.moneda)}</div>
-                            {isVencido ? (
+                            {isFacturaPagada ? (
+                              <span className={facturaStyles.pagadaBadge}>Pagada</span>
+                            ) : isFacturaVencida ? (
+                              <span className={styles.vencidoBadge}>Vencida</span>
+                            ) : isVencido ? (
                               <span className={styles.vencidoBadge}>Vencido</span>
                             ) : isUrgente ? (
                               <span className={styles.urgentBadge}>Urgente</span>
@@ -1152,6 +1167,19 @@ export default function DashboardPage() {
           </div>
         </WidgetErrorBoundary>
       </div>
+
+      <FacturaPanel
+        isOpen={isFacturaPanelOpen}
+        onClose={() => {
+          setIsFacturaPanelOpen(false)
+          setSelectedFacturaId(null)
+        }}
+        facturaId={selectedFacturaId}
+        billeteras={billeteras}
+        onSuccess={() => {
+          void fetchData()
+        }}
+      />
     </div>
   )
 }

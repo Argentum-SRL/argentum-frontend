@@ -351,6 +351,7 @@ export interface Transaccion {
   movimiento_meta_id?: string | null
   monto_original?: number | null
   cotizacion_aplicada?: number | null
+  factura_id?: string | null
 }
 
 export interface TransferenciaInterna {
@@ -451,13 +452,31 @@ export interface PagoDashboard {
   moneda: 'ARS' | 'USD'
   fecha_cobro: string
   dias_restantes: number
-  tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta'
+  tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura'
   tarjeta_id?: string
   color?: string
   red?: string
   billetera_nombre?: string
   billetera_id?: string
   es_vencido?: boolean
+  factura_id?: string
+  estado_factura?: 'pendiente' | 'vencida' | 'pagada'
+}
+
+export interface Factura {
+  id: string
+  descripcion: string
+  monto: number
+  moneda: 'ARS' | 'USD'
+  fecha_vencimiento: string
+  estado: string
+  pagada_automaticamente: boolean
+  transaccion_id?: string | null
+  categoria_id?: string | null
+  subcategoria_id?: string | null
+  categoria_nombre?: string | null
+  subcategoria_nombre?: string | null
+  vencida: boolean
 }
 
 export interface Proyeccion {
@@ -776,6 +795,7 @@ export type TipoNotificacion =
   | 'META_ALCANZADA'
   | 'GASTO_INUSUAL'
   | 'INACTIVIDAD'
+  | 'FACTURA_VENCE'
 
 export interface Notificacion {
   id: string

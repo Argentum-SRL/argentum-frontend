@@ -16,6 +16,7 @@ import {
   Info,
   X,
   MoreVertical,
+  Receipt,
 } from '@/components/ui/icons'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { Notificacion, TipoNotificacion } from '@/types'
@@ -110,6 +111,8 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
         return <Target size={18} />
       case 'INACTIVIDAD':
         return <Smile size={18} />
+      case 'FACTURA_VENCE':
+        return <Receipt size={18} />
       default:
         return <Info size={18} />
     }

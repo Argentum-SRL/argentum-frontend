@@ -77,12 +77,12 @@ export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = (rawList as RawServici
 }))
 
 export const CATEGORIAS_CATALOGO = [
-  { label: 'Streaming',      ids: ['netflix','hbomax','primevideo','paramount','appletv','crunchyroll','plutotv','peacock'] },
-  { label: 'Música',         ids: ['spotify','applemusic','youtubemusic','tidal','deezer'] },
-  { label: 'Productividad',  ids: ['icloud','googleone','microsoft365','adobe','chatgpt','canva','notion','evernote','dropbox','grammarly'] },
-  { label: 'Gaming',         ids: ['xbox','playstation'] },
+  { label: 'Streaming',      ids: ['netflix','hbomax','primevideo','paramount','appletv','crunchyroll','plutotv','peacock','youtubepremium','rakutenviki','twitch','kick'] },
+  { label: 'Música',         ids: ['spotify','applemusic','youtubemusic','tidal','deezer','amazonmusic'] },
+  { label: 'Productividad',  ids: ['icloud','googleone','microsoft365','adobe','chatgpt','claude','copilot','gemini','googleworkspace','github','linkedin','onedrive','canva','notion','evernote','dropbox','grammarly','capcut'] },
+  { label: 'Gaming',         ids: ['xbox','playstation','ubisoft','twitch','kick','discord'] },
   { label: 'Delivery',       ids: ['rappi','pedidosya'] },
-  { label: 'Otros',          ids: ['duolingo'] },
+  { label: 'Otros',          ids: ['duolingo','discord','meli'] },
 ]
 
 function normalizeText(str: string): string {

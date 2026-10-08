@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCcw, ArrowRight, Pencil, RotateCcw, CheckCircle, Lightbulb, HelpCircle } from '@/components/ui/icons';
+import {
+  RefreshCcw, ArrowRight, Pencil, RotateCcw,
+  CheckCircle, Lightbulb, HelpCircle,
+} from '@/components/ui/icons';
 import { MontoInput } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import type { IPCData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
@@ -62,6 +65,13 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   const [animKey, setAnimKey] = useState(0);
   const [animDir, setAnimDir] = useState<'fwd' | 'bwd'>('fwd');
 
+  useEffect(() => {
+    if (resultado && activeStage !== 3) {
+      setAnimDir('fwd');
+      setAnimKey(k => k + 1);
+      setActiveStage(3);
+    }
+  }, [resultado]);
 
   const goTo = (s: 1 | 2 | 3) => {
     if (s === activeStage) return;
@@ -161,47 +171,56 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
 
   const verdictConfig = resultado ? (
     isCuotas
-      ? { label: 'Conviene pagar en cuotas', sub: `Ahorrás ${formatMonto(resultado.ahorro_real, 'ARS')} en términos reales`, hint: 'La inflación licúa las cuotas futuras a tu favor.', icon: CheckCircle, color: 'success' }
+      ? { label: 'Conviene pagar en cuotas', sub: `Ahorrás ${formatMonto(resultado.ahorro_real, 'ARS')} en términos reales`, hint: 'La inflación licúa las cuotas futuras a tu favor.', icon: CheckCircle }
       : isContado
-      ? { label: 'Conviene pagar de contado', sub: `Ahorrás ${formatMonto(resultado.ahorro_real, 'ARS')} frente a financiar`, hint: 'El recargo supera el efecto inflacionario.', icon: Lightbulb, color: 'error' }
-      : { label: 'Da prácticamente lo mismo', sub: `Diferencia de apenas ${resultado.porcentaje_ahorro.toFixed(1)}%`, hint: 'Elegí según tu disponibilidad de efectivo hoy.', icon: HelpCircle, color: 'gold' }
+      ? { label: 'Conviene pagar de contado', sub: `Ahorrás ${formatMonto(resultado.ahorro_real, 'ARS')} frente a financiar`, hint: 'El recargo supera el efecto inflacionario.', icon: Lightbulb }
+      : { label: 'Da prácticamente lo mismo', sub: `Diferencia de apenas ${resultado.porcentaje_ahorro.toFixed(1)}%`, hint: 'Elegí según tu disponibilidad de efectivo hoy.', icon: HelpCircle }
   ) : null;
-
-  // ── Step indicator ───────────────────────────────────────────────────────
-  const steps: { key: 1 | 2 | 3; label: string }[] = [
-    { key: 1, label: 'Compra' },
-    { key: 2, label: 'Financiación' },
-    { key: 3, label: 'Análisis' },
-  ];
 
   return (
     <div className={styles.fwShell}>
 
-      {/* ══ Step dots (minimal, top center) ══ */}
-      <div className={styles.fwDots}>
-        {steps.map((s, i) => (
-          <React.Fragment key={s.key}>
-            {i > 0 && (
-              <div className={`${styles.fwDotLine} ${activeStage > i ? styles.fwDotLineFilled : ''}`} />
-            )}
-            <button
-              type="button"
-              className={`${styles.fwDot} ${activeStage === s.key ? styles.fwDotActive : ''} ${activeStage > s.key ? styles.fwDotDone : ''}`}
-              onClick={() => {
-                if (s.key === 1) goTo(1);
-                if (s.key === 2 && !isStep1Invalid) goTo(2);
-                if (s.key === 3 && resultado) goTo(3);
-              }}
-              disabled={(s.key === 2 && isStep1Invalid && activeStage < 2) || (s.key === 3 && !resultado && activeStage < 3)}
-              aria-label={`Paso ${s.key}: ${s.label}`}
-            >
-              {activeStage > s.key ? '✓' : s.key}
-            </button>
-            {activeStage === s.key && (
-              <span className={styles.fwDotLabel}>{s.label}</span>
-            )}
-          </React.Fragment>
-        ))}
+      {/* ══ Progress track ══ */}
+      <div className={styles.fwProgress}>
+        <button
+          type="button"
+          className={`${styles.fwProgressStep} ${activeStage === 1 ? styles.fwProgressStepActive : ''} ${activeStage > 1 ? styles.fwProgressStepDone : ''}`}
+          onClick={() => goTo(1)}
+          aria-label="Paso 1: Compra"
+        >
+          <span className={styles.fwProgressDot}>{activeStage > 1 ? '✓' : '1'}</span>
+          <span className={styles.fwProgressLabel}>
+            {activeStage > 1 && formData.precio_contado
+              ? `Compra · ${formatMonto(formData.precio_contado, 'ARS')}`
+              : 'Compra'}
+          </span>
+        </button>
+
+        <div className={`${styles.fwProgressLine} ${activeStage > 1 ? styles.fwProgressLineFilled : ''}`} />
+
+        <button
+          type="button"
+          className={`${styles.fwProgressStep} ${activeStage === 2 ? styles.fwProgressStepActive : ''} ${activeStage > 2 ? styles.fwProgressStepDone : ''} ${isStep1Invalid && activeStage < 2 ? styles.fwProgressStepLocked : ''}`}
+          onClick={() => !isStep1Invalid && goTo(2)}
+          disabled={isStep1Invalid && activeStage < 2}
+          aria-label="Paso 2: Financiación"
+        >
+          <span className={styles.fwProgressDot}>{activeStage > 2 ? '✓' : '2'}</span>
+          <span className={styles.fwProgressLabel}>Financiación</span>
+        </button>
+
+        <div className={`${styles.fwProgressLine} ${activeStage > 2 ? styles.fwProgressLineFilled : ''}`} />
+
+        <button
+          type="button"
+          className={`${styles.fwProgressStep} ${activeStage === 3 ? styles.fwProgressStepActive : ''} ${!resultado && activeStage < 3 ? styles.fwProgressStepLocked : ''}`}
+          onClick={() => resultado && goTo(3)}
+          disabled={!resultado && activeStage < 3}
+          aria-label="Paso 3: Análisis"
+        >
+          <span className={styles.fwProgressDot}>3</span>
+          <span className={styles.fwProgressLabel}>Análisis</span>
+        </button>
       </div>
 
       {/* ══ Stage body ══ */}
@@ -210,9 +229,9 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
         className={`${styles.fwStage} ${animDir === 'fwd' ? styles.fwStageFwd : styles.fwStageBwd}`}
       >
 
-        {/* ─────────────────────────────────────
-            STAGE 1 — COMPRA
-           ───────────────────────────────────── */}
+        {/* ═══════════════════════════════════════════
+            STAGE 1 — COMPRA (sin cambios)
+           ═══════════════════════════════════════════ */}
         {activeStage === 1 && (
           <div className={styles.fwSingleCol}>
             <div className={styles.fwHeroBlock}>
@@ -246,209 +265,287 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
           </div>
         )}
 
-        {/* ─────────────────────────────────────
-            STAGE 2 — FINANCIACIÓN (columna única)
-           ───────────────────────────────────── */}
+        {/* ═══════════════════════════════════════════
+            STAGE 2 — FINANCIACIÓN
+            Composición: 65% config | 35% live summary
+           ═══════════════════════════════════════════ */}
         {activeStage === 2 && (
-          <div className={styles.fwSingleCol}>
+          <div className={styles.s2Shell}>
 
-            {/* Header with contado recap */}
-            <div className={styles.fwStage2Top}>
-              <div className={styles.fwHeroBlock}>
-                <p className={styles.fwEyebrow}>Paso 2 de 3</p>
-                <h2 className={styles.fwHeroTitle}>¿Cómo te ofrecen pagar?</h2>
+            {/* ── LEFT: Config zone (65%) ── */}
+            <div className={styles.s2Config}>
+
+              <div className={styles.s2Header}>
+                <h2 className={styles.s2Title}>¿Cómo te ofrecen pagar?</h2>
+                <p className={styles.s2Subtitle}>
+                  Elegí las cuotas y condiciones para compararlas contra el pago al contado.
+                </p>
               </div>
-              <button type="button" className={styles.fwRecapChip} onClick={() => goTo(1)}>
-                <span className={styles.fwRecapPrice}>{formData.precio_contado ? formatMonto(formData.precio_contado, 'ARS') : '—'}</span>
-                <span className={styles.fwRecapLabel}>al contado</span>
-                <Pencil size={11} className={styles.fwRecapIcon} />
-              </button>
-            </div>
 
-            {/* ── Section 1: Cuotas ── */}
-            <div className={styles.fwSection}>
-              <label className={styles.fwSectionLabel}>Cantidad de cuotas</label>
-              <div className={styles.fwChipsRow}>
-                {QUICK_CUOTAS.map((n) => (
+              {/* 1. Cantidad de cuotas */}
+              <div className={styles.s2Field}>
+                <label className={styles.s2Label}>Cantidad de cuotas</label>
+                <div className={styles.s2Chips}>
+                  {QUICK_CUOTAS.map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={`${styles.s2Chip} ${formData.cantidad_cuotas === n && !isCustomCuotas ? styles.s2ChipActive : ''}`}
+                      onClick={() => {
+                        setIsCustomCuotas(false);
+                        handleChange('cantidad_cuotas', n);
+                      }}
+                    >
+                      {n}x
+                    </button>
+                  ))}
                   <button
-                    key={n}
                     type="button"
-                    className={`${styles.fwChip} ${formData.cantidad_cuotas === n && !isCustomCuotas ? styles.fwChipActive : ''}`}
-                    onClick={() => {
-                      setIsCustomCuotas(false);
-                      handleChange('cantidad_cuotas', n);
-                    }}
+                    className={`${styles.s2Chip} ${isCustomCuotas ? styles.s2ChipActive : ''}`}
+                    onClick={() => setIsCustomCuotas(true)}
                   >
-                    {n}x
+                    Otra
                   </button>
-                ))}
-                <button
-                  type="button"
-                  className={`${styles.fwChip} ${isCustomCuotas ? styles.fwChipActive : ''}`}
-                  onClick={() => setIsCustomCuotas(true)}
-                >
-                  Otra
-                </button>
-              </div>
-
-              {isCustomCuotas && (
-                <div className={`${styles.fwInlineInput} ${styles.fwFadeIn}`}>
-                  <input
-                    id="conv_cuotas_custom"
-                    type="number"
-                    placeholder="Ej: 9"
-                    value={formData.cantidad_cuotas ?? ''}
-                    onChange={(e) => {
-                      const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
-                      handleChange('cantidad_cuotas', val);
-                    }}
-                    min="1" max="120" step="1"
-                    className={styles.fwNumInput}
-                    inputMode="numeric"
-                    autoFocus
-                  />
-                  <span className={styles.fwNumUnit}>cuotas</span>
                 </div>
-              )}
 
-              {/* Cuota estimada live */}
-              {cuotaEstimada !== null && formData.cantidad_cuotas && (
-                <div className={styles.fwLiveCuota}>
-                  <span className={styles.fwLiveCuotaVal}>{formatMonto(cuotaEstimada, 'ARS')}</span>
-                  <span className={styles.fwLiveCuotaSub}> por cuota</span>
-                </div>
-              )}
-            </div>
-
-            {/* ── Section 2: Modalidad ── */}
-            <div className={styles.fwSection}>
-              <label className={styles.fwSectionLabel}>Modalidad de financiación</label>
-              <div className={styles.fwToggleRow}>
-                <button
-                  type="button"
-                  className={`${styles.fwToggleBtn} ${!formData.tiene_interes ? styles.fwToggleBtnActive : ''}`}
-                  onClick={() => handleChange('tiene_interes', false)}
-                >
-                  Precio total fijado
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.fwToggleBtn} ${formData.tiene_interes ? styles.fwToggleBtnActive : ''}`}
-                  onClick={() => handleChange('tiene_interes', true)}
-                >
-                  Con tasa (TNA)
-                </button>
-              </div>
-
-              {!formData.tiene_interes && (
-                <div className={styles.fwFadeIn}>
-                  <MontoInput
-                    label="Precio total en cuotas"
-                    placeholder="0"
-                    value={formData.precio_total_cuotas}
-                    onChange={(val) => handleChange('precio_total_cuotas', val)}
-                    allowDecimals
-                    hideCurrency
-                    compact
-                  />
-                  <p className={styles.fwFieldHint}>Suma de todas las cuotas a pagar</p>
-                </div>
-              )}
-
-              {formData.tiene_interes && (
-                <div className={styles.fwFadeIn}>
-                  <label className={styles.fwFieldLabel} htmlFor="conv_tna">TNA (Tasa Nominal Anual)</label>
-                  <div className={styles.fwInlineInput}>
+                {/* "Otra cantidad" — input compacto integrado */}
+                {isCustomCuotas && (
+                  <div className={`${styles.s2CustomWrap} ${styles.s2FadeSlide}`}>
                     <input
-                      id="conv_tna"
+                      id="conv_cuotas_custom"
                       type="number"
-                      step="any"
-                      min="0.1"
-                      max="3000"
-                      placeholder="Ej: 120"
-                      value={formData.tna}
-                      onChange={(e) => handleChange('tna', e.target.value)}
-                      className={styles.fwNumInput}
-                      inputMode="decimal"
+                      placeholder="0"
+                      value={formData.cantidad_cuotas ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
+                        handleChange('cantidad_cuotas', val);
+                      }}
+                      min="1"
+                      max="120"
+                      step="1"
+                      className={styles.s2CustomField}
+                      inputMode="numeric"
+                      autoFocus
                     />
-                    <span className={styles.fwNumUnit}>%</span>
+                    <span className={styles.s2CustomSuffix}>cuotas</span>
                   </div>
-                  {formData.tna !== '' && (isNaN(parseFloat(formData.tna)) || parseFloat(formData.tna) < 0.1 || parseFloat(formData.tna) > 3000) && (
-                    <span className={styles.errorText}>TNA debe estar entre 0.1% y 3000%</span>
+                )}
+                {isCustomCuotas && formData.cantidad_cuotas !== null && !isNaN(formData.cantidad_cuotas) &&
+                  (formData.cantidad_cuotas < 1 || formData.cantidad_cuotas > 120) && (
+                    <span className={styles.errorText}>Entre 1 y 120 cuotas</span>
                   )}
-                  <p className={styles.fwFieldHint}>Figura en el resumen bancario o web del comercio</p>
-                </div>
-              )}
-            </div>
-
-            {/* ── Section 3: Inflación ── */}
-            <div className={styles.fwSection}>
-              <div className={styles.fwSectionLabelRow}>
-                <label className={styles.fwSectionLabel} htmlFor="conv_inflacion">Inflación mensual esperada</label>
-                <span className={styles.fwSectionMeta}>{ipcLabel}</span>
               </div>
 
-              <div className={styles.fwInlineInput}>
-                <input
-                  id="conv_inflacion"
-                  type="number"
-                  step="any"
-                  min="0"
-                  max="100"
-                  placeholder="Ej: 1.66"
-                  value={formData.inflacion_mensual}
-                  onChange={(e) => handleChange('inflacion_mensual', e.target.value)}
-                  className={styles.fwNumInput}
-                  inputMode="decimal"
-                />
-                <span className={styles.fwNumUnit}>% / mes</span>
-                {ipcData?.valor_mensual != null && (
+              {/* 2. Modalidad — segmented control */}
+              <div className={styles.s2Field}>
+                <label className={styles.s2Label}>Modalidad</label>
+                <div className={styles.s2Segment} role="group">
                   <button
                     type="button"
-                    className={styles.fwSyncBtn}
-                    onClick={syncIpc}
-                    title="Usar dato oficial"
+                    className={`${styles.s2SegBtn} ${!formData.tiene_interes ? styles.s2SegBtnActive : ''}`}
+                    onClick={() => handleChange('tiene_interes', false)}
                   >
-                    <RefreshCcw size={11} className={isRotating ? styles.iconRotating : ''} />
-                    <span>Usar {ipcData.valor_mensual}%</span>
+                    Precio total fijado
                   </button>
+                  <button
+                    type="button"
+                    className={`${styles.s2SegBtn} ${formData.tiene_interes ? styles.s2SegBtnActive : ''}`}
+                    onClick={() => handleChange('tiene_interes', true)}
+                  >
+                    Con tasa (TNA)
+                  </button>
+                </div>
+
+                {/* Precio total fijado */}
+                {!formData.tiene_interes && (
+                  <div className={`${styles.s2CondArea} ${styles.s2FadeSlide}`}>
+                    <label className={styles.s2CondLabel}>Precio total de las cuotas</label>
+                    <MontoInput
+                      label=""
+                      placeholder="0"
+                      value={formData.precio_total_cuotas}
+                      onChange={(val) => handleChange('precio_total_cuotas', val)}
+                      allowDecimals
+                      hideCurrency
+                      compact
+                    />
+                    <p className={styles.s2Hint}>Suma de todas las cuotas a pagar</p>
+                  </div>
+                )}
+
+                {/* Con tasa TNA */}
+                {formData.tiene_interes && (
+                  <div className={`${styles.s2CondArea} ${styles.s2FadeSlide}`}>
+                    <label className={styles.s2CondLabel} htmlFor="conv_tna">TNA (Tasa Nominal Anual)</label>
+                    <div className={styles.s2NumWrap}>
+                      <input
+                        id="conv_tna"
+                        type="number"
+                        step="any"
+                        min="0.1"
+                        max="3000"
+                        placeholder="Ej: 120"
+                        value={formData.tna}
+                        onChange={(e) => handleChange('tna', e.target.value)}
+                        className={styles.s2NumField}
+                        inputMode="decimal"
+                      />
+                      <span className={styles.s2NumSuffix}>%</span>
+                    </div>
+                    {formData.tna !== '' && (isNaN(parseFloat(formData.tna)) || parseFloat(formData.tna) < 0.1 || parseFloat(formData.tna) > 3000) && (
+                      <span className={styles.errorText}>TNA entre 0.1% y 3000%</span>
+                    )}
+                    <p className={styles.s2Hint}>Figura en el resumen bancario o web del comercio</p>
+                  </div>
                 )}
               </div>
 
-              {formData.inflacion_mensual && (isNaN(parseFloat(formData.inflacion_mensual)) || parseFloat(formData.inflacion_mensual) < 0 || parseFloat(formData.inflacion_mensual) > 100) && (
-                <span className={styles.errorText}>Inflación debe estar entre 0% y 100%</span>
-              )}
+              {/* 3. Inflación — bloque compacto horizontal */}
+              <div className={styles.s2InflationRow}>
+                <div className={styles.s2InflationMeta}>
+                  <label className={styles.s2InflationLabel} htmlFor="conv_inflacion">
+                    Inflación mensual esperada
+                  </label>
+                  <span className={styles.s2InflationSource}>{ipcLabel}</span>
+                </div>
+                <div className={styles.s2InflationInputs}>
+                  <div className={styles.s2NumWrap}>
+                    <input
+                      id="conv_inflacion"
+                      type="number"
+                      step="any"
+                      min="0"
+                      max="100"
+                      placeholder="1.66"
+                      value={formData.inflacion_mensual}
+                      onChange={(e) => handleChange('inflacion_mensual', e.target.value)}
+                      className={styles.s2NumField}
+                      inputMode="decimal"
+                    />
+                    <span className={styles.s2NumSuffix}>% / mes</span>
+                    {ipcData?.valor_mensual != null && (
+                      <button
+                        type="button"
+                        className={styles.s2IpcBtn}
+                        onClick={syncIpc}
+                        title="Usar dato oficial del INDEC"
+                      >
+                        <RefreshCcw size={11} className={isRotating ? styles.iconRotating : ''} />
+                        <span>Usar {ipcData.valor_mensual}%</span>
+                      </button>
+                    )}
+                  </div>
+                  {formData.inflacion_mensual && (isNaN(parseFloat(formData.inflacion_mensual)) || parseFloat(formData.inflacion_mensual) < 0 || parseFloat(formData.inflacion_mensual) > 100) && (
+                    <span className={styles.errorText}>Entre 0% y 100%</span>
+                  )}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <button
+                type="button"
+                className={`${styles.s2Cta} ${isStep2Invalid ? styles.s2CtaDisabled : ''}`}
+                disabled={isStep2Invalid || calculando}
+                onClick={handleCalcular}
+              >
+                {calculando ? (
+                  <>
+                    <span className={styles.s2CtaSpinner} />
+                    <span>Calculando…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Ver análisis</span>
+                    <ArrowRight size={17} />
+                  </>
+                )}
+              </button>
             </div>
 
-            {/* CTA */}
-            <button
-              type="button"
-              className={`${styles.fwCta} ${isStep2Invalid ? styles.fwCtaDisabled : ''}`}
-              disabled={isStep2Invalid || calculando}
-              onClick={handleCalcular}
-            >
-              {calculando ? (
-                <>
-                  <span className={styles.fwCtaSpinner} />
-                  <span>Calculando…</span>
-                </>
-              ) : (
-                <>
-                  <span>Ver análisis</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
+            {/* ── RIGHT: Live summary (35%) ── */}
+            <aside className={styles.s2Live} aria-label="Resumen en vivo">
+              <div className={styles.s2LiveHeader}>
+                <span className={styles.s2LiveTitle}>TU OFERTA</span>
+                <span className={styles.s2LiveBadge}>
+                  <span className={styles.s2LivePulse} aria-hidden="true" />
+                  EN VIVO
+                </span>
+              </div>
+
+              {/* Precio de contado */}
+              <div className={styles.s2LiveBlock}>
+                <div className={styles.s2LiveBigNum}>
+                  {formData.precio_contado ? formatMonto(formData.precio_contado, 'ARS') : '—'}
+                </div>
+                <div className={styles.s2LiveRowBetween}>
+                  <span className={styles.s2LiveSmallLabel}>Contado</span>
+                  <button type="button" className={styles.s2LiveEditBtn} onClick={() => goTo(1)}>
+                    <Pencil size={10} />
+                    <span>Editar</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.s2LiveSep} />
+
+              {/* Cuotas */}
+              <div className={styles.s2LiveBlock}>
+                <div className={styles.s2LiveRow}>
+                  <span className={styles.s2LiveSmallLabel}>Cuotas</span>
+                  <span className={styles.s2LiveVal}>
+                    {formData.cantidad_cuotas ? `${formData.cantidad_cuotas}×` : '—'}
+                  </span>
+                </div>
+                {cuotaEstimada !== null && (
+                  <div className={styles.s2LiveRow}>
+                    <span className={styles.s2LiveSmallLabel}>Por cuota</span>
+                    <span className={styles.s2LiveVal}>{formatMonto(cuotaEstimada, 'ARS')}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.s2LiveSep} />
+
+              {/* Inflación */}
+              <div className={styles.s2LiveBlock}>
+                <div className={styles.s2LiveRow}>
+                  <span className={styles.s2LiveSmallLabel}>Inflación est.</span>
+                  <span className={styles.s2LiveVal}>
+                    {formData.inflacion_mensual ? `${formData.inflacion_mensual}% / mes` : '—'}
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.s2LiveSep} />
+
+              {/* Precio total o TNA */}
+              <div className={styles.s2LiveBlock}>
+                {!formData.tiene_interes && formData.precio_total_cuotas != null ? (
+                  <div className={styles.s2LiveRow}>
+                    <span className={styles.s2LiveSmallLabel}>Precio total</span>
+                    <span className={styles.s2LiveVal}>{formatMonto(formData.precio_total_cuotas, 'ARS')}</span>
+                  </div>
+                ) : formData.tiene_interes && formData.tna ? (
+                  <div className={styles.s2LiveRow}>
+                    <span className={styles.s2LiveSmallLabel}>TNA</span>
+                    <span className={styles.s2LiveVal}>{formData.tna}%</span>
+                  </div>
+                ) : (
+                  <span className={styles.s2LivePlaceholder}>
+                    {!formData.tiene_interes ? 'Ingresá el precio total' : 'Ingresá la TNA'}
+                  </span>
+                )}
+              </div>
+            </aside>
           </div>
         )}
 
-        {/* ─────────────────────────────────────
-            STAGE 3 — ANÁLISIS
-           ───────────────────────────────────── */}
+        {/* ═══════════════════════════════════════════
+            STAGE 3 — ANÁLISIS (sin cambios)
+           ═══════════════════════════════════════════ */}
         {activeStage === 3 && resultado && verdictConfig && (
           <div className={styles.fwSingleCol}>
 
-            {/* Veredicto hero */}
             <div className={`${styles.fwVerdict} ${isCuotas ? styles.fwVerdictCuotas : isContado ? styles.fwVerdictContado : styles.fwVerdictEmpate}`}>
               <div className={styles.fwVerdictIconWrap}>
                 {React.createElement(verdictConfig.icon, { size: 26 })}
@@ -460,7 +557,6 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
               </div>
             </div>
 
-            {/* Compare row */}
             <div className={styles.fwCompareRow}>
               <div className={styles.fwCompareCol}>
                 <span className={styles.fwCompareColLabel}>Contado</span>
@@ -489,7 +585,6 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
               </div>
             </div>
 
-            {/* Extra metrics si hay interés */}
             {resultado.tiene_interes && (
               <div className={styles.fwMetricsRow}>
                 <div className={styles.fwMetric}>
@@ -505,15 +600,12 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
               </div>
             )}
 
-            {/* Gráfico */}
             {resultado.cantidad_cuotas <= 24 && (
               <DetalleCuotasChart detallePorMes={resultado.detalle_por_mes} resultado={resultado.resultado} />
             )}
 
-            {/* Explicación */}
             <ExplicacionCalculo />
 
-            {/* Actions */}
             <div className={styles.fwActions}>
               <button type="button" className={styles.fwActionSecondary} onClick={() => goTo(2)}>
                 <Pencil size={13} />

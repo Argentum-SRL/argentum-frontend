@@ -23,6 +23,7 @@ import type { Notificacion, TipoNotificacion } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import { EmptyState } from '@/components/ui'
 import { formatHora } from '@/utils/format'
+import { limpiarMensajeNotificacion } from '@/utils/notificacion.utils'
 import NotificacionesConfigModal from './NotificacionesConfigModal'
 import styles from './NotificacionesDrawer.module.css'
 
@@ -233,7 +234,7 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                         >
                           <div className={styles.iconWrapper}>{getIcon(n.tipo)}</div>
                           <div className={styles.cardBody}>
-                            <p className={styles.message}>{n.mensaje}</p>
+                            <p className={styles.message}>{limpiarMensajeNotificacion(n.mensaje)}</p>
                             <div className={styles.metaRow}>
                               <span className={styles.time}>{formatTime(n.created_at)}</span>
                             </div>

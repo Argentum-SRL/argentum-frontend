@@ -4,6 +4,7 @@ import notificacionService from '@/services/notificacion.service'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import { NotificacionContext, type DataUpdateEvent } from './NotificacionContextBase'
+import { limpiarMensajeNotificacion } from '@/utils/notificacion.utils'
 
 
 export function NotificacionProvider({ children }: { children: ReactNode }) {
@@ -27,7 +28,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     try {
       const data = await notificacionService.list({ solo_no_leidas: false }, signal)
-      setNotificaciones(data)
+      setNotificaciones(data.map((n) => ({ ...n, mensaje: limpiarMensajeNotificacion(n.mensaje) })))
     } catch (error) {
       if (error && typeof error === 'object' && 'name' in error && (error.name === 'AbortError' || error.name === 'CanceledError')) return
       console.error('Error fetching notifications:', error)
@@ -181,7 +182,11 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
             return
           }
 
-          const newNotif = data as Notificacion
+          const rawNotif = data as Notificacion
+          const newNotif: Notificacion = {
+            ...rawNotif,
+            mensaje: limpiarMensajeNotificacion(rawNotif.mensaje),
+          }
 
           setNotificaciones((prev) => {
             // Evitar duplicados

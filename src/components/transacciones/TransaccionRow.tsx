@@ -58,8 +58,11 @@ const TransaccionRow = memo(({
   }, [transaccion.fecha_creacion, transaccion.fecha])
 
   const metodoLabel = useMemo(() => {
+    if (transaccion.tipo === 'ingreso' && (transaccion.metodo_pago === 'debito' || transaccion.metodo_pago === 'credito')) {
+      return billetera?.es_efectivo ? 'Efectivo' : 'Transferencia'
+    }
     return METODO_PAGO_LABELS[transaccion.metodo_pago] || transaccion.metodo_pago || 'Movimiento'
-  }, [transaccion.metodo_pago])
+  }, [transaccion.metodo_pago, transaccion.tipo, billetera?.es_efectivo])
 
   // Obtener info del banco / logo si aplica
   const bankInfo = useMemo(() => {

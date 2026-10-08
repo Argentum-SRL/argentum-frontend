@@ -108,14 +108,17 @@ function formReducer(state: FormState, action: FormAction): FormState {
     case 'RESET':
       if (action.transaccion) {
         const wallet = action.billeteras.find(b => b.id === action.transaccion?.billetera_id)
-        const metodoDeducido: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
+        let metodoDeducido: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
           action.transaccion.metodo_pago || (
             action.transaccion.tarjeta_id
               ? 'credito'
               : wallet?.es_efectivo
                 ? 'efectivo'
-                : 'debito'
+                : (action.transaccion.tipo === 'ingreso' ? 'transferencia' : 'debito')
           )
+        if (action.transaccion.tipo === 'ingreso' && (metodoDeducido === 'debito' || metodoDeducido === 'credito')) {
+          metodoDeducido = wallet?.es_efectivo ? 'efectivo' : 'transferencia'
+        }
         return {
           ...initialState,
           tipo: action.transaccion.tipo,
@@ -141,12 +144,15 @@ function formReducer(state: FormState, action: FormAction): FormState {
         const monedaInicial = best?.moneda || 'ARS'
         const bestForCurrency = chosenWallet || sorted.find(b => b.moneda === monedaInicial) || best
         const hasBancosInMoneda = sorted.some(b => !b.es_efectivo && b.moneda === monedaInicial)
+        const tipoInicialVal = action.tipoInicial || 'egreso'
         const metodoInicial: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
-          (!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'debito'
+          tipoInicialVal === 'ingreso'
+            ? ((!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'transferencia')
+            : ((!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'debito')
 
         return {
           ...initialState,
-          tipo: action.tipoInicial || 'egreso',
+          tipo: tipoInicialVal,
           fecha: todayLocal(),
           billeteraId: bestForCurrency?.id || '',
           moneda: monedaInicial,
@@ -322,7 +328,7 @@ export default function TransaccionModal({
     return tipo === 'egreso' && tarjetas.some(t => t.estado === 'activa' || t.id === tarjetaId)
   }, [tipo, tarjetas, tarjetaId])
 
-  // Métodos de pago disponibles según billeteras existentes en la moneda
+  // Métodos de pago disponibles según tipo y billeteras existentes en la moneda
   const availableMethods = useMemo(() => {
     const methods: Array<{
       key: 'debito' | 'transferencia' | 'credito' | 'efectivo'
@@ -330,9 +336,27 @@ export default function TransaccionModal({
       label: string
     }> = []
 
+    if (tipo === 'ingreso') {
+      if (hasBancos) {
+        methods.push({ key: 'transferencia', icon: <ArrowRightLeft size={18} strokeWidth={2.2} />, label: 'Transferencia' })
+      }
+
+      if (hasEfectivo) {
+        methods.push({ key: 'efectivo', icon: <Banknote size={18} strokeWidth={2.2} />, label: 'Efectivo' })
+      }
+
+      // Si el usuario no tiene ninguna billetera registrada
+      if (methods.length === 0) {
+        methods.push({ key: 'transferencia', icon: <ArrowRightLeft size={18} strokeWidth={2.2} />, label: 'Transferencia' })
+      }
+
+      return methods
+    }
+
+    // Para egresos:
     if (hasBancos) {
       methods.push({ key: 'debito', icon: <CreditCard size={18} strokeWidth={2.2} />, label: 'Débito' })
-      methods.push({ key: 'transferencia', icon: <ArrowRightLeft size={18} strokeWidth={2.2} />, label: 'Transfer' })
+      methods.push({ key: 'transferencia', icon: <ArrowRightLeft size={18} strokeWidth={2.2} />, label: 'Transferencia' })
     }
 
     if (hasCredito) {
@@ -349,7 +373,7 @@ export default function TransaccionModal({
     }
 
     return methods
-  }, [hasBancos, hasCredito, hasEfectivo])
+  }, [tipo, hasBancos, hasCredito, hasEfectivo])
 
   // Auto-ajuste de método de pago cuando cambia moneda, tipo o billeteras disponibles
   useEffect(() => {
@@ -361,9 +385,9 @@ export default function TransaccionModal({
         ? (availableMethods.find(m => m.key === 'efectivo')?.key || availableMethods[0]?.key)
         : (availableMethods.find(m => m.key !== 'efectivo')?.key || availableMethods[0]?.key)
 
-      dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: preferred || 'efectivo' })
+      dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: preferred || (tipo === 'ingreso' ? 'transferencia' : 'debito') })
     }
-  }, [open, availableMethods, metodoPago, billeterasMoneda, hasBancos])
+  }, [open, availableMethods, metodoPago, billeterasMoneda, hasBancos, tipo])
 
   // Billeteras ordenadas: La cuenta principal primero, luego de mayor a menor saldo
   const billeterasCarousel = useMemo(() => {
@@ -742,9 +766,9 @@ export default function TransaccionModal({
                         if (isCuotaHija) return
                         dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })
                         dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                        // Crédito no aplica a ingresos: resetear a débito o efectivo
-                        if (metodoPago === 'credito') {
-                          const nextMethod = hasBancos ? 'debito' : 'efectivo'
+                        // En ingresos no aplican crédito ni débito: migrar a transferencia o efectivo
+                        if (metodoPago === 'credito' || metodoPago === 'debito') {
+                          const nextMethod = hasBancos ? 'transferencia' : 'efectivo'
                           dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: nextMethod })
                           const firstWallet = billeteras.find(b => (nextMethod === 'efectivo' ? b.es_efectivo : !b.es_efectivo) && b.moneda === moneda && b.estado === 'activa')
                           if (firstWallet) dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: firstWallet.id })
@@ -800,7 +824,9 @@ export default function TransaccionModal({
                   {/* 2. Origen Dinámico */}
                   <div className={styles.formField}>
                     <label className={styles.fieldLabel}>
-                      {metodoPago === 'credito' ? 'Seleccioná tu tarjeta' : '¿De qué billetera?'}
+                      {metodoPago === 'credito'
+                        ? 'Seleccioná tu tarjeta'
+                        : (tipo === 'ingreso' ? '¿A qué billetera?' : '¿De qué billetera?')}
                     </label>
 
                     {metodoPago === 'credito' ? (

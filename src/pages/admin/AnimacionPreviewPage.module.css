@@ -9,6 +9,10 @@
   z-index: 100;
 }
 
+.scrollableRoot {
+  overflow-y: auto !important;
+}
+
 /* ── Botón Flotante para Reabrir Controles ────────────────────────────────── */
 .reopenControlsBtn {
   position: fixed;

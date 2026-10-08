@@ -14,7 +14,9 @@ import {
   ArrowLeft,
   Shield,
   Check,
+  Sparkles,
 } from '@/components/ui/icons'
+import { IconPlayground } from './components/IconPlayground'
 import styles from './AnimacionPreviewPage.module.css'
 
 const PREVIEW_PHRASES = [
@@ -35,7 +37,7 @@ export default function AnimacionPreviewPage() {
   const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
 
-  const [viewMode, setViewMode] = useState<'hero' | 'ambient'>('hero')
+  const [viewMode, setViewMode] = useState<'icons' | 'hero' | 'ambient'>('icons')
   const [selectedPhrase, setSelectedPhrase] = useState(PREVIEW_PHRASES[0])
   const [showControls, setShowControls] = useState(true)
   const [simulatedReducedMotion, setSimulatedReducedMotion] = useState(false)
@@ -55,9 +57,12 @@ export default function AnimacionPreviewPage() {
 
   return (
     <div
-      className={styles.pageRoot}
+      className={`${styles.pageRoot} ${viewMode === 'icons' ? styles.scrollableRoot : ''}`}
       data-reduced-motion={simulatedReducedMotion ? 'true' : undefined}
     >
+      {/* ── Vista 0: Sistema de Iconografía Animada (Playground & Auditoría Visual) ── */}
+      {viewMode === 'icons' && <IconPlayground />}
+
       {/* ── Vista 1: Hero Fullscreen Loading Experience ────────────────────── */}
       {viewMode === 'hero' && (
         <LunarLoading
@@ -114,7 +119,11 @@ export default function AnimacionPreviewPage() {
           <div className={styles.dockHeader}>
             <div className={styles.dockTitleWrap}>
               <span className={styles.adminBadge}>Admin Preview</span>
-              <span className={styles.dockTitle}>Mareas de Luz & Filigrana 925</span>
+              <span className={styles.dockTitle}>
+                {viewMode === 'icons'
+                  ? 'Iconografía Animada · Calidad Animate UI'
+                  : 'Mareas de Luz & Filigrana 925'}
+              </span>
             </div>
 
             <div className={styles.dockActions}>
@@ -143,6 +152,14 @@ export default function AnimacionPreviewPage() {
           <div className={styles.dockRow}>
             {/* Selector de modo */}
             <div className={styles.buttonGroup}>
+              <button
+                type="button"
+                className={`${styles.tabBtn} ${viewMode === 'icons' ? styles.tabBtnActive : ''}`}
+                onClick={() => setViewMode('icons')}
+              >
+                <Sparkles size={13} />
+                <span>Iconos Animados</span>
+              </button>
               <button
                 type="button"
                 className={`${styles.tabBtn} ${viewMode === 'hero' ? styles.tabBtnActive : ''}`}

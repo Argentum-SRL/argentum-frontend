@@ -11,7 +11,7 @@ export default function RootLayout() {
     <ThemeProvider>
       <AuthProvider>
         <NotificacionProvider>
-          <Suspense fallback={<AtmosphericLoading text="Cargando Argentum..." />}>
+          <Suspense fallback={<AtmosphericLoading />}>
             <Outlet />
           </Suspense>
           <ModalPortal />

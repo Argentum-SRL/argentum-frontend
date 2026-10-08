@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from '@/components/ui/icons'
 import { getEstadoOnboarding } from '@/services/onboarding.service'
@@ -9,7 +9,7 @@ import StepCicloFinanciero from '@/components/onboarding/StepCicloFinanciero'
 import StepMoneda from '@/components/onboarding/StepMoneda'
 import StepWhatsApp from '@/components/onboarding/StepWhatsApp'
 import { useAuth } from '@/hooks/useAuth'
-import { AtmosphericBackground, ThemeToggle } from '@/components/ui'
+import { AtmosphericBackground, AtmosphericLoading, AtmosphericMoonIcon, ThemeToggle } from '@/components/ui'
 import styles from './OnboardingPage.module.css'
 
 const PASO_NUMERO: Record<string, number> = {
@@ -24,20 +24,6 @@ function mapEstadoAPaso(estado: EstadoOnboarding): number {
   return PASO_NUMERO[estado.pasos_pendientes[0]] ?? 1
 }
 
-function MoonIcon({ size }: { size: number }) {
-  const maskId = `moon-${useId().replace(/[^a-z0-9]/gi, '')}`
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" className={styles.headerMoon}>
-      <defs>
-        <mask id={maskId}>
-          <circle cx="50" cy="50" r="24" fill="white" />
-          <circle cx="58" cy="50" r="19" fill="black" />
-        </mask>
-      </defs>
-      <circle cx="50" cy="50" r="24" fill="currentColor" mask={`url(#${maskId})`} />
-    </svg>
-  )
-}
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
@@ -150,11 +136,7 @@ export default function OnboardingPage() {
   }
 
   if (cargando) {
-    return (
-      <AtmosphericBackground fullScreen centered className={styles.loading}>
-        <Loader2 size={32} className="animate-spin text-white" />
-      </AtmosphericBackground>
-    )
+    return <AtmosphericLoading />
   }
 
   const datos = estado?.datos_actuales
@@ -165,7 +147,7 @@ export default function OnboardingPage() {
       <ThemeToggle />
       <div className={[styles.inner, isStepWide ? styles.innerWide : ''].filter(Boolean).join(' ')}>
         <div className={styles.header}>
-          <MoonIcon size={32} />
+          <AtmosphericMoonIcon size={32} />
           <span className={styles.logoText}>Argentum</span>
         </div>
 

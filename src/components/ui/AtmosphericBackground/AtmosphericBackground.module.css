@@ -1,22 +1,26 @@
-/* ── Page Atmospheric Background (Identidad visual de Argentum) ───────── */
+/* ── Argentum Creative Direction — Mareas de Luz & Filigrana Lunar ───────── */
+/* Concepto: Claroscuro Volumétrico, Mareas de Liquidez y Filigrana de Plata. */
+/* Cero órbitas, cero planetarios, cero esferas detrás de tarjetas.            */
+
 .container {
-  background: radial-gradient(ellipse at 60% 30%, #DFEAF8 0%, #EBF0F8 50%, #F5F4F0 100%);
   box-sizing: border-box;
   color: var(--text);
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+  position: relative;
+  width: 100%;
+
+  /* Modo Claro: Eclipse Lunar — Volumetría cálida de ámbar, cobre y pergamino mineral */
+  background: radial-gradient(circle at 82% 14%, #FFFDF8 0%, #FAF4EC 28%, #F3EBE0 62%, #ECE2D2 100%);
 }
 
 :global([data-theme="dark"]) .container {
-  background: radial-gradient(ellipse at 60% 40%, #1a3a6e 0%, #0D2045 55%, #070f24 100%);
+  /* Modo Oscuro: Noche Lunar — Luz de plata fría sobre obsidiana e índigo de medianoche */
+  background: radial-gradient(circle at 82% 14%, #0E1B33 0%, #071021 32%, #040813 65%, #020408 100%);
 }
 
 .fixed {
   position: fixed;
   inset: 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   width: 100%;
   height: 100%;
   min-height: -webkit-fill-available;
@@ -40,12 +44,15 @@
 }
 
 @media (max-width: 767px) {
+  .centered {
+    padding: 20px 16px;
+  }
   .compensateBottomNav {
-    padding: 24px 20px calc(24px + 56px + env(safe-area-inset-bottom, 0px));
+    padding: 20px 16px calc(24px + 56px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* ── Capa de decoraciones aislada (evita scroll vertical indebido) ───────── */
+/* ── Capa de Atmósfera y Mareas (25–35% presencia, fondo ambiental puro) ── */
 .decorationsLayer {
   position: absolute;
   inset: 0;
@@ -54,28 +61,111 @@
   z-index: 0;
 }
 
-/* ── Seamless Safe Area Vignettes (Camuflaje para Status Bar y Safari Bar) ── */
+/* ── Fuente de Luz Volumétrica en el Cuadrante Superior Derecho ─────────── */
+.lightSourceGlow {
+  position: absolute;
+  top: -12vw;
+  right: -10vw;
+  width: 70vw;
+  height: 70vw;
+  min-width: 480px;
+  min-height: 480px;
+  max-width: 1000px;
+  max-height: 1000px;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: background 0.6s ease;
+  filter: blur(40px);
+
+  /* Modo Claro: Resplandor cálido de refracción solar en eclipse */
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(217, 130, 43, 0.26) 0%,
+    rgba(194, 94, 46, 0.14) 34%,
+    rgba(194, 94, 46, 0.04) 65%,
+    transparent 80%
+  );
+}
+
+:global([data-theme="dark"]) .lightSourceGlow {
+  /* Modo Oscuro: Halo de plata lunar y dispersión azul starlight */
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(203, 213, 225, 0.22) 0%,
+    rgba(96, 165, 250, 0.12) 34%,
+    rgba(56, 189, 248, 0.03) 65%,
+    transparent 80%
+  );
+}
+
+/* Resplandor secundario de equilibrio en el cuadrante inferior izquierdo */
+.ambientCounterGlow {
+  position: absolute;
+  bottom: -15vw;
+  left: -15vw;
+  width: 55vw;
+  height: 55vw;
+  min-width: 380px;
+  min-height: 380px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(50px);
+  transition: background 0.6s ease;
+
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(194, 94, 46, 0.06) 0%,
+    transparent 70%
+  );
+}
+
+:global([data-theme="dark"]) .ambientCounterGlow {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(148, 163, 184, 0.05) 0%,
+    transparent 70%
+  );
+}
+
+/* ── Escena SVG de Mareas y Caustics de Luz ────────────────────────────── */
+.causticsSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* ── Filigrana / Hallmark de Argentum ───────────────────────────────────── */
+.hallmarkGroup {
+  transition: opacity 0.4s ease;
+  user-select: none;
+}
+
+/* ── Viñetas de Camuflaje para Safe Areas (iOS Status Bar & Home Bar) ───── */
 .topVignette {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: calc(env(safe-area-inset-top, 44px) + 60px);
+  height: calc(env(safe-area-inset-top, 44px) + 36px);
   background: linear-gradient(
     to bottom,
-    #F5F4F0 0%,
-    rgba(245, 244, 240, 0.96) calc(env(safe-area-inset-top, 44px) + 8px),
+    rgba(255, 253, 248, 0.94) 0%,
+    rgba(255, 253, 248, 0.75) calc(env(safe-area-inset-top, 44px) + 6px),
     transparent 100%
   );
   pointer-events: none;
   z-index: 5;
+  transition: background 0.6s ease;
 }
 
 :global([data-theme="dark"]) .topVignette {
   background: linear-gradient(
     to bottom,
-    #070f24 0%,
-    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-top, 44px) + 8px),
+    rgba(2, 4, 8, 0.96) 0%,
+    rgba(2, 4, 8, 0.80) calc(env(safe-area-inset-top, 44px) + 6px),
     transparent 100%
   );
 }
@@ -85,100 +175,28 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: calc(env(safe-area-inset-bottom, 24px) + 75px);
+  height: calc(env(safe-area-inset-bottom, 24px) + 36px);
   background: linear-gradient(
     to top,
-    #F5F4F0 0%,
-    rgba(245, 244, 240, 0.96) calc(env(safe-area-inset-bottom, 24px) + 30px),
+    rgba(236, 226, 210, 0.94) 0%,
+    rgba(236, 226, 210, 0.75) calc(env(safe-area-inset-bottom, 24px) + 12px),
     transparent 100%
   );
   pointer-events: none;
   z-index: 5;
+  transition: background 0.6s ease;
 }
 
 :global([data-theme="dark"]) .bottomVignette {
   background: linear-gradient(
     to top,
-    #070f24 0%,
-    rgba(7, 15, 36, 0.96) calc(env(safe-area-inset-bottom, 24px) + 30px),
+    rgba(2, 4, 8, 0.96) 0%,
+    rgba(2, 4, 8, 0.80) calc(env(safe-area-inset-bottom, 24px) + 12px),
     transparent 100%
   );
 }
 
-/* ── Ambient Halos ───────────────────────────────────────────────────────── */
-.ambientGlowTop {
-  position: absolute;
-  top: -40px;
-  left: 15%;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(72, 120, 184, 0.14) 0%, transparent 70%);
-  filter: blur(45px);
-  pointer-events: none;
-}
-
-:global([data-theme="dark"]) .ambientGlowTop {
-  background: radial-gradient(circle, rgba(72, 120, 184, 0.28) 0%, transparent 70%);
-}
-
-.ambientGlowBottom {
-  position: absolute;
-  bottom: -140px;
-  right: 12%;
-  width: 520px;
-  height: 520px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(168, 144, 90, 0.12) 0%, transparent 70%);
-  filter: blur(55px);
-  pointer-events: none;
-}
-
-:global([data-theme="dark"]) .ambientGlowBottom {
-  background: radial-gradient(circle, rgba(168, 144, 90, 0.16) 0%, transparent 70%);
-}
-
-/* ── Decorative Floating Moons ───────────────────────────────────────────── */
-.decoMoon {
-  position: absolute;
-  pointer-events: none;
-  top: var(--top);
-  left: var(--left);
-  right: var(--right);
-  opacity: var(--opacity);
-  animation: var(--anim);
-  color: var(--primary);
-}
-
-:global([data-theme="dark"]) .decoMoon {
-  color: var(--silver, #cbd5e1);
-}
-
-@keyframes floatSlow {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-14px) rotate(4deg);
-  }
-}
-
-@keyframes floatMedium {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(-3deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .decoMoon {
-    animation: none !important;
-  }
-}
-
-/* ── Shared Glassmorphism Card (Adaptable Light / Dark) ─────────────────── */
+/* ── Tarjeta Elevada de Primer Plano (Monolito de Cristal y Plata) ──────── */
 .card {
   display: flex;
   flex-direction: column;
@@ -186,31 +204,47 @@
   text-align: center;
   max-width: 440px;
   width: 100%;
-  padding: 36px 28px;
+  padding: 36px 30px;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(13, 32, 69, 0.08);
-  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
   position: relative;
   z-index: 10;
   box-sizing: border-box;
-  animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-  color: var(--text);
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  animation: cardElevate 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+
+  /* Modo Claro: Cristal de alabastro pulido con bisel superior de luz */
+  background: rgba(255, 255, 255, 0.90);
+  border: 1px solid rgba(217, 130, 43, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 24px 60px -12px rgba(20, 22, 29, 0.08),
+    0 6px 18px -4px rgba(194, 94, 46, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  color: #14161D;
 }
 
 :global([data-theme="dark"]) .card {
-  background: rgba(13, 26, 54, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  /* Modo Oscuro: Cristal de obsidiana con bisel superior de plata */
+  background: rgba(10, 18, 34, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 28px 72px -12px rgba(0, 0, 0, 0.70),
+    0 6px 20px -4px rgba(56, 189, 248, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #F8FAFC;
 }
 
-@keyframes cardFadeIn {
+@keyframes cardElevate {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(8px);
+    transform: scale(0.97) translateY(8px);
   }
   to {
     opacity: 1;
@@ -218,34 +252,24 @@
   }
 }
 
-/* ── Atmospheric Loading State ───────────────────────────────────────────── */
-.loadingWrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  z-index: 10;
-}
-
-.spinner {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 3px solid rgba(203, 213, 225, 0.12);
-  border-top-color: #60a5fa;
-  animation: atmSpin 0.85s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
-}
-
-@keyframes atmSpin {
-  to {
-    transform: rotate(360deg);
+/* ── Fallbacks de Accesibilidad ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none !important;
   }
 }
 
-.loadingText {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+@media (prefers-reduced-transparency: reduce) {
+  .card {
+    background: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  :global([data-theme="dark"]) .card {
+    background: #0E1626 !important;
+  }
+  .lightSourceGlow,
+  .ambientCounterGlow {
+    display: none !important;
+  }
 }

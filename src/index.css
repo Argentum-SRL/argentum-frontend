@@ -96,6 +96,25 @@ p, h1, h2, h3, h4, h5, h6 {
   --container-px-mobile: 20px;
   --container-px-tablet: 32px;
   --container-px-desktop: 48px;
+
+  /* Argentum Lunar System Tokens — Modo Claro: Eclipse Lunar */
+  --lunar-bg: #FAF7F2;
+  --lunar-bg-deep: #EDE4D4;
+  --lunar-ink: #14161D;
+  --lunar-ink-muted: #5C5854;
+  --lunar-silver: #8A95A8;
+  --lunar-silver-bright: #CBD5E1;
+  --lunar-silver-glow: rgba(138, 149, 168, 0.18);
+  --lunar-steel: #1A3568;
+  --lunar-amber: #D9822B;
+  --lunar-copper: #C25E2E;
+  --lunar-burnt-orange: #B84D1E;
+  --lunar-eclipse-glow: rgba(194, 94, 46, 0.22);
+  --lunar-eclipse-halo: radial-gradient(circle, rgba(217, 130, 43, 0.22) 0%, rgba(194, 94, 46, 0.10) 45%, transparent 72%);
+  --lunar-atmosphere: radial-gradient(ellipse at 70% 25%, #FAF5EE 0%, #F4ECE0 45%, #EBE1D0 100%);
+  --lunar-ambient-contour: rgba(194, 94, 46, 0.16);
+  --lunar-orbit-line: rgba(20, 22, 29, 0.14);
+  --lunar-orbit-node: #C25E2E;
 }
 
 :root.dark,
@@ -131,6 +150,25 @@ p, h1, h2, h3, h4, h5, h6 {
   --border: var(--surface-alt);
   --border-color: var(--surface-alt);
   --border-subtle: rgba(255, 255, 255, 0.08);
+
+  /* Argentum Lunar System Tokens — Modo Oscuro: Noche Lunar */
+  --lunar-bg: #060B14;
+  --lunar-bg-deep: #020408;
+  --lunar-ink: #F8FAFC;
+  --lunar-ink-muted: #94A3B8;
+  --lunar-silver: #A8B4C5;
+  --lunar-silver-bright: #E2E8F0;
+  --lunar-silver-glow: rgba(168, 180, 197, 0.22);
+  --lunar-steel: #4878B8;
+  --lunar-amber: #60A5FA;
+  --lunar-copper: #38BDF8;
+  --lunar-burnt-orange: #818CF8;
+  --lunar-eclipse-glow: rgba(148, 163, 184, 0.20);
+  --lunar-eclipse-halo: radial-gradient(circle, rgba(148, 163, 184, 0.20) 0%, rgba(56, 189, 248, 0.08) 45%, transparent 72%);
+  --lunar-atmosphere: radial-gradient(ellipse at 70% 25%, #0C172B 0%, #060B14 50%, #020408 100%);
+  --lunar-ambient-contour: rgba(203, 213, 225, 0.14);
+  --lunar-orbit-line: rgba(168, 180, 197, 0.16);
+  --lunar-orbit-node: #60A5FA;
 }
 
 html {
@@ -174,6 +212,17 @@ body {
 @keyframes typing-dot {
   0%, 60%, 100% { transform: translateY(0);    opacity: 0.4; }
   30%           { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes argentumBreathe {
+  0%, 100% {
+    opacity: 0.88;
+    transform: scale(0.985);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.015);
+  }
 }
 
 .scrollbar-none {

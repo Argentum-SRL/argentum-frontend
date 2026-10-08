@@ -1,0 +1,356 @@
+/* ── Preview del Sistema Lunar — Solo Administradores ───────────────────── */
+
+.pageRoot {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* ── Botón Flotante para Reabrir Controles ────────────────────────────────── */
+.reopenControlsBtn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: rgba(13, 32, 69, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reopenControlsBtn:hover {
+  background: rgba(13, 32, 69, 0.98);
+  transform: translateY(-1px);
+}
+
+/* ── Floating Control Dock (Glassmorphism sobrio) ───────────────────────── */
+.controlDock {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 92vw;
+  width: auto;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(13, 32, 69, 0.12);
+  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  color: var(--text);
+  box-sizing: border-box;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:global([data-theme="dark"]) .controlDock {
+  background: rgba(13, 26, 54, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  color: #FFFFFF;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.dockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid rgba(13, 32, 69, 0.08);
+  padding-bottom: 8px;
+}
+
+:global([data-theme="dark"]) .dockHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.dockTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adminBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(72, 120, 184, 0.16);
+  color: var(--primary, #4878b8);
+}
+
+:global([data-theme="dark"]) .adminBadge {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+}
+
+.dockTitle {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dockActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.minimizeBtn,
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(13, 32, 69, 0.1);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+:global([data-theme="dark"]) .minimizeBtn,
+:global([data-theme="dark"]) .closeBtn {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--silver, #cbd5e1);
+}
+
+.minimizeBtn:hover,
+.closeBtn:hover {
+  background: rgba(13, 32, 69, 0.06);
+  color: var(--text);
+}
+
+:global([data-theme="dark"]) .minimizeBtn:hover,
+:global([data-theme="dark"]) .closeBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.dockRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.buttonGroup {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(13, 32, 69, 0.06);
+}
+
+:global([data-theme="dark"]) .buttonGroup {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+:global([data-theme="dark"]) .tabBtn {
+  color: var(--silver, #cbd5e1);
+}
+
+.tabBtnActive {
+  background: #FFFFFF;
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="dark"]) .tabBtnActive {
+  background: rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.selectInput {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(13, 32, 69, 0.15);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+}
+
+:global([data-theme="dark"]) .selectInput {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(18, 30, 56, 0.9);
+  color: #FFFFFF;
+}
+
+.toggleThemeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(13, 32, 69, 0.12);
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+:global([data-theme="dark"]) .toggleThemeBtn {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.toggleThemeBtn:hover {
+  background: rgba(13, 32, 69, 0.06);
+}
+
+:global([data-theme="dark"]) .toggleThemeBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.activeMotionBtn {
+  background: rgba(13, 32, 69, 0.12);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+:global([data-theme="dark"]) .activeMotionBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+}
+
+:global([data-reduced-motion="true"]) * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* ── Tarjeta de Demostración para Modo Ambiental ─────────────────────────── */
+.ambientDemoCard {
+  max-width: 440px;
+  width: 100%;
+  padding: 32px 28px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(13, 32, 69, 0.08);
+  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.06), 0 2px 8px rgba(13, 32, 69, 0.03);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+:global([data-theme="dark"]) .ambientDemoCard {
+  background: rgba(13, 26, 54, 0.82);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.ambientDemoTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+:global([data-theme="dark"]) .ambientDemoTitle {
+  color: #FFFFFF;
+}
+
+.ambientDemoText {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+:global([data-theme="dark"]) .ambientDemoText {
+  color: var(--silver, #cbd5e1);
+}
+
+.demoBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 20px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 13.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.demoBtn:hover {
+  opacity: 0.92;
+}
+
+@media (max-width: 640px) {
+  .controlDock {
+    bottom: 12px;
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .dockTitle {
+    font-size: 11.5px;
+  }
+  .dockRow {
+    gap: 6px;
+  }
+}

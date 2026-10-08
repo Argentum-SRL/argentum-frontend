@@ -26,6 +26,7 @@ const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/Suscripci
 const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
+const AnimacionPreviewPage = lazy(() => import('@/pages/admin/AnimacionPreviewPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 const TermsPage = lazy(() => import('@/pages/TermsPage'))
 
@@ -57,6 +58,9 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute mode="admin" />,
         children: [
+          // Preview fullscreen de la animación lunar para administradores
+          { path: '/animacion', element: <AnimacionPreviewPage />, errorElement: <PageErrorBoundary /> },
+          { path: '/app/animacion', element: <AnimacionPreviewPage />, errorElement: <PageErrorBoundary /> },
           {
             element: <AppWrapper />,
             errorElement: <PageErrorBoundary />,

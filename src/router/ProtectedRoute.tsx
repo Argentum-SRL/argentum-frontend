@@ -13,7 +13,7 @@ export default function ProtectedRoute({ mode = 'app' }: Props) {
   const location = useLocation()
 
   if (isLoading) {
-    return <AtmosphericLoading text="Verificando sesión..." />
+    return <AtmosphericLoading />
   }
 
   if (!isAuthenticated) {

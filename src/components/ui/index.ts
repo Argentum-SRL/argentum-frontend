@@ -45,9 +45,15 @@ export {
   AtmosphericCard,
   AtmosphericLoading,
   AtmosphericMoonIcon,
+  LunarBackground,
+  LunarMoonIcon,
   type AtmosphericBackgroundProps,
   type AtmosphericCardProps,
   type AtmosphericLoadingProps,
 } from './AtmosphericBackground/AtmosphericBackground'
+export { ArgentumCrescent, type ArgentumCrescentProps } from './AtmosphericBackground/ArgentumCrescent'
+export { LunarPhase, type LunarPhaseProps } from './AtmosphericBackground/LunarPhase'
+export { LunarLoading, type LunarLoadingProps } from './AtmosphericBackground/LunarLoading'
+export { DEFAULT_LUNAR_PHRASES } from './AtmosphericBackground/lunarConstants'
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle/ThemeToggle'
 export { SileoToaster } from './SileoToaster/SileoToaster'

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTheme } from '@/hooks/useTheme'
+import { updateSystemBars } from '@/utils/systemTheme'
 import { LunarPhase } from './LunarPhase'
 import { DEFAULT_LUNAR_PHRASES } from './lunarConstants'
 import styles from './LunarLoading.module.css'
@@ -89,6 +90,19 @@ export function LunarLoading({
       window.removeEventListener('resize', handleResize)
     }
   }, [])
+
+  // Sincronizar barras del sistema (iOS Safari y Android Chrome) con el tono del loader
+  useEffect(() => {
+    if (!fullScreen) return
+
+    const lunarBg = isDark ? '#0C172B' : '#FAF7F2'
+    updateSystemBars(lunarBg, isDark)
+
+    return () => {
+      const defaultBg = isDark ? '#0E1117' : '#FAF7F2'
+      updateSystemBars(defaultBg, isDark)
+    }
+  }, [fullScreen, isDark])
 
   // Movimiento continuo de las fases a 6 segundos (sin interacción con mouse)
   useEffect(() => {
@@ -182,6 +196,10 @@ export function LunarLoading({
       aria-live="polite"
       aria-label={`${currentDisplayPhrase} — Argentum`}
     >
+      {/* Viñetas sutiles para muestreo y transición perfecta en Status Bar y Home Bar */}
+      <div className={styles.topSafeBlend} aria-hidden="true" />
+      <div className={styles.bottomSafeBlend} aria-hidden="true" />
+
       <div className={styles.compositionStage}>
         {/* Marco de la Luna sin diagramas ni líneas planetarias */}
         <div className={styles.moonFrame}>

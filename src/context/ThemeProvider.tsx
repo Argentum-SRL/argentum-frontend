@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { type Theme, ThemeContext } from './ThemeContext'
+import { updateSystemBars } from '@/utils/systemTheme'
 
 interface ThemeProviderProps {
   children: React.ReactNode
@@ -18,8 +19,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const applyTheme = useCallback((newTheme: Theme) => {
     const isDark = newTheme === 'dark'
-    const themeColor = isDark ? '#0E1117' : '#F5F4F0'
-    const colorScheme = isDark ? 'dark' : 'light'
+    const themeColor = isDark ? '#0E1117' : '#FAF7F2'
 
     if (isDark) {
       document.documentElement.setAttribute('data-theme', 'dark')
@@ -29,18 +29,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       document.documentElement.classList.remove('dark')
     }
 
-    document.documentElement.style.colorScheme = colorScheme
-    document.documentElement.style.backgroundColor = themeColor
-    document.body.style.backgroundColor = themeColor
-
-    // Actualizar la etiqueta meta theme-color dinámicamente para Safari/iOS y Android
-    const existingMetas = document.querySelectorAll('meta[name="theme-color"]')
-    existingMetas.forEach(meta => meta.remove())
-
-    const newMeta = document.createElement('meta')
-    newMeta.setAttribute('name', 'theme-color')
-    newMeta.setAttribute('content', themeColor)
-    document.head.appendChild(newMeta)
+    updateSystemBars(themeColor, isDark)
   }, [])
 
   useEffect(() => {

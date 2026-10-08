@@ -1,5 +1,6 @@
 import React, { type ReactNode } from 'react'
 import { useTheme } from '@/hooks/useTheme'
+import { updateSystemBars } from '@/utils/systemTheme'
 import { ArgentumCrescent } from './ArgentumCrescent'
 import { LunarLoading, type LunarLoadingProps } from './LunarLoading'
 import styles from './AtmosphericBackground.module.css'
@@ -248,31 +249,11 @@ export function AtmosphericBackground({
   React.useEffect(() => {
     const isDark = theme === 'dark'
     const targetBg = isDark ? '#020408' : '#FAF4EC'
-    const targetColorScheme = isDark ? 'dark' : 'light'
-
-    const prevHtmlBg = document.documentElement.style.backgroundColor
-    const prevBodyBg = document.body.style.backgroundColor
-    const prevColorScheme = document.documentElement.style.colorScheme
-
-    document.documentElement.style.backgroundColor = targetBg
-    document.body.style.backgroundColor = targetBg
-    document.documentElement.style.colorScheme = targetColorScheme
-
-    const metas = document.querySelectorAll('meta[name="theme-color"]')
-    const prevMetas: { el: Element; content: string }[] = []
-    metas.forEach((m) => {
-      const content = m.getAttribute('content') || ''
-      prevMetas.push({ el: m, content })
-      m.setAttribute('content', targetBg)
-    })
+    updateSystemBars(targetBg, isDark)
 
     return () => {
-      document.documentElement.style.backgroundColor = prevHtmlBg
-      document.body.style.backgroundColor = prevBodyBg
-      document.documentElement.style.colorScheme = prevColorScheme
-      prevMetas.forEach(({ el, content }) => {
-        el.setAttribute('content', content)
-      })
+      const defaultBg = isDark ? '#0E1117' : '#FAF7F2'
+      updateSystemBars(defaultBg, isDark)
     }
   }, [theme])
 

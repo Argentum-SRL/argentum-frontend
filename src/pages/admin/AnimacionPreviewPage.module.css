@@ -3,10 +3,11 @@
 .pageRoot {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100dvh;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   z-index: 100;
+  background-color: var(--html-bg);
 }
 
 .scrollableRoot {
@@ -16,8 +17,8 @@
 /* ── Botón Flotante para Reabrir Controles ────────────────────────────────── */
 .reopenControlsBtn {
   position: fixed;
-  top: 18px;
-  right: 18px;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  right: calc(env(safe-area-inset-right, 0px) + 16px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -44,7 +45,7 @@
 /* ── Floating Control Dock (Glassmorphism sobrio) ───────────────────────── */
 .controlDock {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;

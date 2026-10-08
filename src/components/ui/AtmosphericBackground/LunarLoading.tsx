@@ -91,11 +91,11 @@ export function LunarLoading({
     }
   }, [])
 
-  // Sincronizar barras del sistema (iOS Safari y Android Chrome) con el tono del loader
+  // Sincronizar barras del sistema (iOS Safari y Android Chrome) con el tono perimetral exacto del loader
   useEffect(() => {
     if (!fullScreen) return
 
-    const lunarBg = isDark ? '#0C172B' : '#FAF7F2'
+    const lunarBg = isDark ? '#060B14' : '#FAF7F2'
     updateSystemBars(lunarBg, isDark)
 
     return () => {
@@ -196,10 +196,6 @@ export function LunarLoading({
       aria-live="polite"
       aria-label={`${currentDisplayPhrase} — Argentum`}
     >
-      {/* Viñetas sutiles para muestreo y transición perfecta en Status Bar y Home Bar */}
-      <div className={styles.topSafeBlend} aria-hidden="true" />
-      <div className={styles.bottomSafeBlend} aria-hidden="true" />
-
       <div className={styles.compositionStage}>
         {/* Marco de la Luna sin diagramas ni líneas planetarias */}
         <div className={styles.moonFrame}>

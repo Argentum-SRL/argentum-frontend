@@ -15,49 +15,18 @@
   user-select: none;
   animation: containerFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 
-  /* Modo Claro: Eclipse Lunar (Marfil cálido y atmósfera editorial de luz cobriza) */
-  background: radial-gradient(ellipse at 50% 46%, #FAF7F2 0%, #F4ECE0 48%, #EBE1D0 100%);
+  /* Modo Claro: Base marfil cálido (#FAF7F2) exactamente idéntica en bordes y barras */
+  background-color: #FAF7F2;
+  background-image: radial-gradient(ellipse at 50% 46%, #FFFDF9 0%, #F8F3EA 38%, #FAF7F2 70%, #FAF7F2 100%);
   color: #14161D;
-  transition: background 0.6s ease, color 0.6s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 :global([data-theme="dark"]) .container {
-  /* Modo Oscuro: Noche Lunar (Tinta de medianoche, plata y silencio) */
-  background: radial-gradient(ellipse at 50% 46%, #0C172B 0%, #060B14 52%, #020408 100%);
+  /* Modo Oscuro: Base obsidiana lunar (#060B14) exactamente idéntica en bordes y barras */
+  background-color: #060B14;
+  background-image: radial-gradient(ellipse at 50% 46%, #0C172B 0%, #080F1E 42%, #060B14 70%, #060B14 100%);
   color: #F8FAFC;
-}
-
-/* ── Viñetas de protección y muestreo perfecto para Safe Areas (iOS & Android) ── */
-.topSafeBlend {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(env(safe-area-inset-top, 24px) + 20px);
-  background: linear-gradient(to bottom, #FAF7F2 0%, rgba(250, 247, 242, 0) 100%);
-  pointer-events: none;
-  z-index: 2;
-  transition: background 0.6s ease;
-}
-
-:global([data-theme="dark"]) .topSafeBlend {
-  background: linear-gradient(to bottom, #0C172B 0%, rgba(12, 23, 43, 0) 100%);
-}
-
-.bottomSafeBlend {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(env(safe-area-inset-bottom, 24px) + 24px);
-  background: linear-gradient(to top, #FAF7F2 0%, rgba(250, 247, 242, 0) 100%);
-  pointer-events: none;
-  z-index: 2;
-  transition: background 0.6s ease;
-}
-
-:global([data-theme="dark"]) .bottomSafeBlend {
-  background: linear-gradient(to top, #0C172B 0%, rgba(12, 23, 43, 0) 100%);
 }
 
 @keyframes containerFadeIn {

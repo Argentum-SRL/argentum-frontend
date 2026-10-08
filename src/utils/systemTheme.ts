@@ -37,15 +37,15 @@ export function updateSystemBars(color: string, isDark: boolean) {
   }
 
   // 5. Meta etiquetas theme-color:
-  // En iOS Safari, si el dispositivo del usuario tiene "Modo Oscuro" en los ajustes del sistema,
-  // Safari consulta la etiqueta con media="(prefers-color-scheme: dark)".
-  // Si la aplicación está en modo claro, DEBEMOS forzar el nuevo color en todas las etiquetas meta
-  // (incluidas las que tienen query 'media'). De lo contrario, Safari mantendrá la barra inferior
-  // en azul/negro oscuro.
+  // Actualizar todas las etiquetas meta theme-color y eliminar cualquier atributo 'media'
+  // para que Safari y Chrome no usen queries obsoletas que fuercen modos oscuros en páginas claras.
   const themeMetas = document.querySelectorAll('meta[name="theme-color"]')
   if (themeMetas.length > 0) {
     themeMetas.forEach((meta) => {
       meta.setAttribute('content', color)
+      if (meta.hasAttribute('media')) {
+        meta.removeAttribute('media')
+      }
     })
   } else {
     const meta = document.createElement('meta')

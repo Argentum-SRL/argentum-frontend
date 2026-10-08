@@ -10,11 +10,13 @@
   width: 100%;
 
   /* Modo Claro: Eclipse Lunar — Volumetría cálida de ámbar, cobre y pergamino mineral */
+  background-color: #FAF4EC;
   background: radial-gradient(circle at 82% 14%, #FFFDF8 0%, #FAF4EC 28%, #F3EBE0 62%, #ECE2D2 100%);
 }
 
 :global([data-theme="dark"]) .container {
   /* Modo Oscuro: Noche Lunar — Luz de plata fría sobre obsidiana e índigo de medianoche */
+  background-color: #020408;
   background: radial-gradient(circle at 82% 14%, #0E1B33 0%, #071021 32%, #040813 65%, #020408 100%);
 }
 

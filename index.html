@@ -5,15 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/argentum-app-icon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/argentum-app-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="color-scheme" content="light dark" id="meta-color-scheme" />
+    <meta name="color-scheme" content="light" id="meta-color-scheme" />
     <!-- Apple Web App & Status Bar Seamless Integration -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" id="meta-apple-status-bar" />
     <meta name="apple-mobile-web-app-title" content="Argentum" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#FAF7F2" id="meta-theme-color-default" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F2" id="meta-theme-color-light" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0C172B" id="meta-theme-color-dark" />
     <link rel="manifest" href="/manifest.json" />
     <title>Argentum</title>
     <script>
@@ -21,7 +19,7 @@
         try {
           var saved = localStorage.getItem('argentum_theme');
           var isDark = saved === 'dark';
-          var color = isDark ? '#0E1117' : '#FAF7F2';
+          var color = isDark ? '#060B14' : '#FAF7F2';
           var scheme = isDark ? 'dark' : 'light';
 
           if (isDark) {
@@ -46,6 +44,7 @@
           var metas = document.querySelectorAll('meta[name="theme-color"]');
           metas.forEach(function(m) {
             m.setAttribute('content', color);
+            m.removeAttribute('media');
           });
         } catch (e) {}
       })();
@@ -59,7 +58,7 @@
         min-height: 100%;
       }
       html.dark, html[data-theme="dark"], html.dark body, html[data-theme="dark"] body {
-        background-color: #0E1117 !important;
+        background-color: #060B14 !important;
         color-scheme: dark !important;
       }
     </style>

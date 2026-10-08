@@ -843,15 +843,19 @@
 }
 
 .currencySelected {
-  border-color: var(--primary) !important;
+  border-color: rgba(72, 120, 184, 0.4) !important;
   background: rgba(13, 32, 69, 0.05) !important;
   box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
 }
 
 [data-theme="dark"] .currencySelected {
   background: rgba(59, 130, 246, 0.1) !important;
-  border-color: #3b82f6 !important;
+  border-color: rgba(72, 120, 184, 0.5) !important;
   box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
 }
 
 .currencyTop {
@@ -1013,15 +1017,19 @@
 }
 
 .dolarOptionSelected {
-  border-color: var(--primary) !important;
+  border-color: rgba(72, 120, 184, 0.4) !important;
   background: rgba(13, 32, 69, 0.05) !important;
   box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
 }
 
 [data-theme="dark"] .dolarOptionSelected {
   background: rgba(59, 130, 246, 0.1) !important;
-  border-color: #3b82f6 !important;
+  border-color: rgba(72, 120, 184, 0.5) !important;
   box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
 }
 
 .dolarTop {

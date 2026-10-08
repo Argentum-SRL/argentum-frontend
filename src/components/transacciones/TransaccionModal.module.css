@@ -459,8 +459,8 @@
   scrollbar-width: none;
   overscroll-behavior-x: contain;
   /* Espaciado vertical holgado para eliminar cualquier clipping de elevación */
-  padding: 10px 0 16px;
-  margin: -4px 0 -6px;
+  padding: 12px 0 28px;
+  margin: -6px 0 -20px;
   touch-action: pan-x;
 }
 
@@ -473,7 +473,7 @@
   gap: 12px;
   overflow: visible;
   scroll-snap-type: x mandatory;
-  padding: 4px 16px 6px;
+  padding: 10px 16px 26px;
   -ms-overflow-style: none;
   scrollbar-width: none;
   min-width: 100%;
@@ -660,10 +660,10 @@
    No scale distortion (strictly 1.0), no colored glow, no artificial border, opacity strictly 1.0. */
 .billeteraSelectWrap[data-active="true"],
 .billeteraSelectWrap[data-selected="true"] {
-  transform: translateY(-2px);
+  transform: translateY(-4px) scale(1.03);
   filter: none;
   opacity: 1;
-  z-index: 4;
+  z-index: 10;
   box-shadow: var(--elevation-selection-modal);
 }
 
@@ -674,7 +674,7 @@
 
 /* Selección táctil instantánea */
 .billeteraSelectWrap:active {
-  transform: translateY(0);
+  transform: translateY(-1px) scale(1.01);
   transition-duration: 80ms;
 }
 
@@ -833,16 +833,26 @@
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 6px;
   width: 100%;
-  padding: 0;
+  padding: 4px;
+  background: var(--surface-alt);
+  border-radius: 14px;
+  border: 1px solid var(--border);
   overflow: visible;
+  box-sizing: border-box;
+}
+
+:global([data-theme="dark"]) .methodGrid,
+:global(.dark) .methodGrid {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .methodBtn {
   position: relative;
   height: 48px;
-  border-radius: 12px;
-  border: none;
-  background: var(--page);
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -860,25 +870,26 @@
               box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
               opacity 200ms ease,
               background 200ms ease;
+  color: var(--text-2);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .methodBtn[data-active="false"]:hover,
   .methodBtn:not(.methodBtnActive):hover {
-    transform: translateY(-1px);
-    box-shadow: var(--elevation-xs);
-    background: var(--surface);
+    color: var(--text);
   }
 }
 
 /* Active Tile: Subtle contextual elevation inside modal */
 .methodBtn[data-active="true"],
 .methodBtnActive {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02);
   opacity: 1;
   background: var(--surface) !important;
-  z-index: 5;
-  box-shadow: var(--elevation-selection-modal);
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  z-index: 8;
+  box-shadow: var(--elevation-sm);
 }
 
 :global([data-theme="dark"]) .methodBtn[data-active="true"],
@@ -886,6 +897,8 @@
 :global(.dark) .methodBtn[data-active="true"],
 :global(.dark) .methodBtnActive {
   background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: var(--elevation-sm);
 }
 
 /* Subtle reflection overlay */
@@ -1249,14 +1262,15 @@
   background: var(--surface) !important;
   border-color: rgba(72, 120, 184, 0.4) !important;
   box-shadow: var(--elevation-selection-modal);
-  transform: translateY(-1px) scale(1.02);
-  z-index: 2;
+  transform: translateY(-2px) scale(1.03);
+  z-index: 6;
 }
 
 :global([data-theme="dark"]) .planOptionCardActive,
 :global(.dark) .planOptionCardActive {
   background: #1e293b !important;
   border-color: rgba(72, 120, 184, 0.5) !important;
+  box-shadow: var(--elevation-selection-modal);
 }
 
 .planCuotasNum {
@@ -1696,11 +1710,18 @@
 .segmentedBar {
   display: flex;
   width: 100%;
-  background: transparent;
-  padding: 0;
-  border: none;
-  gap: 8px;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  gap: 4px;
   box-sizing: border-box;
+}
+
+:global([data-theme="dark"]) .segmentedBar,
+:global(.dark) .segmentedBar {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .segmentedPill {
@@ -1711,13 +1732,13 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: var(--page);
-  border: 1.5px solid var(--surface-alt);
-  border-radius: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.01em;
   transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -1726,9 +1747,7 @@
   white-space: nowrap;
 }
 
-.segmentedPill:hover {
-  background: var(--surface);
-  border-color: var(--border);
+.segmentedPill:hover:not(.segmentedPillActive) {
   color: var(--text);
 }
 
@@ -1740,23 +1759,21 @@
   background: var(--surface) !important;
   color: var(--text) !important;
   font-weight: 700 !important;
-  transform: translateY(-1px) scale(1.015);
-  box-shadow: var(--elevation-xs);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--elevation-sm);
   border-color: var(--border) !important;
-  z-index: 2;
+  z-index: 5;
 }
 
 :global([data-theme="dark"]) .segmentedPill,
 :global(.dark) .segmentedPill {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: transparent;
+  border-color: transparent;
   color: var(--text-2);
 }
 
-:global([data-theme="dark"]) .segmentedPill:hover,
-:global(.dark) .segmentedPill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+:global([data-theme="dark"]) .segmentedPill:hover:not(.segmentedPillActive),
+:global(.dark) .segmentedPill:hover:not(.segmentedPillActive) {
   color: var(--text);
 }
 
@@ -1765,6 +1782,7 @@
   background: #1e293b !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: var(--elevation-sm);
 }
 
 @media (max-width: 420px) {

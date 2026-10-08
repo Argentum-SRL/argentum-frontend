@@ -212,8 +212,8 @@
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   box-shadow: var(--elevation-sm);
-  transform: translateY(-1px) scale(1.04);
-  z-index: 2;
+  transform: translateY(-1.5px) scale(1.07);
+  z-index: 6;
 }
 
 .checkIcon {

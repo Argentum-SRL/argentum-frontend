@@ -21,39 +21,38 @@
   /* ── Elevation Tokens (Light Mode) ── */
   --elevation-none: none;
 
-  /* Level 1: Micro-elevation (resting tabs, active segment pill, subtle hover) */
-  --elevation-xs: 0 1px 2px rgba(var(--shadow-color-rgb), 0.04),
-                  0 1px 1px rgba(var(--shadow-color-rgb), 0.02);
+  /* Level 1: Micro-elevation (resting tabs, subtle hover) */
+  --elevation-xs: 0 1px 3px rgba(var(--shadow-color-rgb), 0.06),
+                  0 1px 2px rgba(var(--shadow-color-rgb), 0.03);
 
-  /* Level 2: Low elevation (resting cards on page, interactive hover) */
-  --elevation-sm: 0 2px 5px -1px rgba(var(--shadow-color-rgb), 0.05),
-                  0 1px 2px rgba(var(--shadow-color-rgb), 0.02);
+  /* Level 2: Low elevation (resting cards on page, active segment pill, chips) */
+  --elevation-sm: 0 4px 12px -1px rgba(var(--shadow-color-rgb), 0.16),
+                  0 2px 4px -1px rgba(var(--shadow-color-rgb), 0.08);
 
   /* Level 3: Medium elevation (floating dropdowns, popovers, select panels) */
-  --elevation-md: 0 6px 14px -2px rgba(var(--shadow-color-rgb), 0.07),
+  --elevation-md: 0 6px 14px -2px rgba(var(--shadow-color-rgb), 0.08),
                   0 2px 5px -1px rgba(var(--shadow-color-rgb), 0.03);
 
   /* Level 4: High elevation (modals, dialogs, drawers, bottom sheets) */
-  --elevation-lg: 0 14px 30px -5px rgba(var(--shadow-color-rgb), 0.09),
+  --elevation-lg: 0 14px 30px -5px rgba(var(--shadow-color-rgb), 0.10),
                   0 4px 10px -2px rgba(var(--shadow-color-rgb), 0.04);
 
   /* Level 5: Highest elevation (toasts, critical notifications, top-layer overlays) */
-  --elevation-xl: 0 20px 40px -6px rgba(var(--shadow-color-rgb), 0.12),
+  --elevation-xl: 0 20px 40px -6px rgba(var(--shadow-color-rgb), 0.13),
                   0 6px 14px -2px rgba(var(--shadow-color-rgb), 0.05);
 
   /* ── Selection Tokens ──
      Calibrated specifically for selected cards/surfaces:
-     - Much smaller than modal shadows (<= 10px blur)
+     - Clear physical elevation above resting siblings
      - Negative spread prevents sideways bleed into sibling cards
-     - Dual-layer: crisp contact key + soft ambient cushion */
-  --elevation-selection: 0 3px 8px -1px rgba(var(--shadow-color-rgb), 0.08),
-                         0 1px 3px rgba(var(--shadow-color-rgb), 0.04);
+     - Dual-layer: directional cast shadow + soft ambient cushion */
+  --elevation-selection: 0 10px 24px -3px rgba(var(--shadow-color-rgb), 0.22),
+                         0 4px 8px -1px rgba(var(--shadow-color-rgb), 0.10);
 
   /* Contextual Selection inside Modals:
-     Must remain strictly below Level 4 (Modal) so it separates from the dialog floor
-     without ever competing with the modal's outer elevation. */
-  --elevation-selection-modal: 0 4px 10px -2px rgba(var(--shadow-color-rgb), 0.10),
-                               0 1px 3px rgba(var(--shadow-color-rgb), 0.04);
+     Must separate definitively from the modal floor without clipping. */
+  --elevation-selection-modal: 0 12px 26px -3px rgba(var(--shadow-color-rgb), 0.24),
+                               0 4px 8px -1px rgba(var(--shadow-color-rgb), 0.12);
 
   /* ── Backward Compatibility Aliases ── */
   --shadow-none: var(--elevation-none);
@@ -71,40 +70,40 @@
   /* ── Base Shadow Tint (Dark Mode) ──
      Pure black ambient occlusion.
      On dark backgrounds (#161B24), depth is achieved through delicate ambient cushions
-     and luminance steps, NOT heavy black smudges.
-     All opacities are carefully graduated below 0.38. */
+     and luminance steps, NOT heavy black smudges. */
   --shadow-color-rgb: 0, 0, 0;
 
   --elevation-none: none;
 
-  /* Level 1: Micro-elevation (resting tabs, active segment pill, subtle hover) */
-  --elevation-xs: 0 1px 2px rgba(0, 0, 0, 0.16);
+  /* Level 1: Micro-elevation (resting tabs, subtle hover) */
+  --elevation-xs: 0 1px 3px rgba(0, 0, 0, 0.28),
+                  0 1px 2px rgba(0, 0, 0, 0.16);
 
-  /* Level 2: Low elevation (resting cards on dark page, interactive hover) */
-  --elevation-sm: 0 2px 5px -1px rgba(0, 0, 0, 0.22),
-                  0 1px 2px rgba(0, 0, 0, 0.12);
+  /* Level 2: Low elevation (resting cards on dark page, active segment pill, chips) */
+  --elevation-sm: 0 4px 14px -1px rgba(0, 0, 0, 0.65),
+                  0 2px 5px -1px rgba(0, 0, 0, 0.35);
 
   /* Level 3: Medium elevation (floating dropdowns, popovers, select panels) */
-  --elevation-md: 0 6px 14px -2px rgba(0, 0, 0, 0.26),
-                  0 2px 5px -1px rgba(0, 0, 0, 0.16);
+  --elevation-md: 0 6px 14px -2px rgba(0, 0, 0, 0.30),
+                  0 2px 5px -1px rgba(0, 0, 0, 0.18);
 
   /* Level 4: High elevation (modals, dialogs, drawers, bottom sheets) */
-  --elevation-lg: 0 14px 32px -5px rgba(0, 0, 0, 0.32),
-                  0 4px 10px -2px rgba(0, 0, 0, 0.18);
+  --elevation-lg: 0 14px 32px -5px rgba(0, 0, 0, 0.36),
+                  0 4px 10px -2px rgba(0, 0, 0, 0.20);
 
   /* Level 5: Highest elevation (toasts, critical notifications, top-layer overlays) */
-  --elevation-xl: 0 20px 40px -6px rgba(0, 0, 0, 0.36),
-                  0 6px 14px -2px rgba(0, 0, 0, 0.20);
+  --elevation-xl: 0 20px 40px -6px rgba(0, 0, 0, 0.40),
+                  0 6px 14px -2px rgba(0, 0, 0, 0.22);
 
   /* ── Selection Tokens (Dark Mode) ──
-     Calibrated to suggest the selected card is floating 1-2px higher than resting siblings.
+     Calibrated to provide tangible depth separation on dark surfaces (#161B24).
      Tight negative spread prevents blur bleed onto neighboring cards.
-     Opacities kept gentle (0.22 - 0.25) so it feels like physical elevation, not a dark halo. */
-  --elevation-selection: 0 3px 8px -1px rgba(0, 0, 0, 0.22),
-                         0 1px 3px rgba(0, 0, 0, 0.12);
+     Opacities balanced so the selected card clearly steps forward. */
+  --elevation-selection: 0 12px 26px -3px rgba(0, 0, 0, 0.70),
+                         0 4px 9px -1px rgba(0, 0, 0, 0.40);
 
-  --elevation-selection-modal: 0 4px 10px -2px rgba(0, 0, 0, 0.25),
-                               0 1px 3px rgba(0, 0, 0, 0.14);
+  --elevation-selection-modal: 0 14px 30px -3px rgba(0, 0, 0, 0.75),
+                               0 4px 10px -1px rgba(0, 0, 0, 0.45);
 }
 
 /* ==========================================================================

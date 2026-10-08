@@ -45,14 +45,14 @@
 .optionActive {
   background: var(--surface);
   color: var(--primary);
-  box-shadow: var(--elevation-xs);
-  transform: translateY(-0.5px) scale(1.01);
+  box-shadow: var(--elevation-sm);
+  transform: translateY(-1.5px) scale(1.02);
   font-weight: 700;
-  z-index: 2;
+  z-index: 4;
 }
 
 [data-theme="dark"] .optionActive {
   color: var(--text);
-  box-shadow: var(--elevation-xs);
-  transform: translateY(-0.5px) scale(1.01);
+  box-shadow: var(--elevation-sm);
+  transform: translateY(-1.5px) scale(1.02);
 }

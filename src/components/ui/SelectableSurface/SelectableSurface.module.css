@@ -50,39 +50,38 @@
    Strictly scale 1, strictly opacity 1. */
 @media (hover: hover) and (pointer: fine) {
   .surface[data-clickable="true"]:not([data-selected="true"]):not([data-disabled="true"]):hover {
-    transform: translateY(-1px);
+    transform: translateY(-1px) scale(1.008);
     box-shadow: var(--elevation-xs);
     opacity: 1;
     z-index: 2;
   }
 }
 
-/* ── Selected State: Depth, Elevation and Subtle Scale ──
-   Selected surface floats 2px above resting plane with contextual ambient cushion
-   and a gentle physical scale (~1.015) to feel physically closer.
-   Opacity is 1 (never dimmed, nor does it dim its siblings).
-   No harsh border, no neon glow. */
+/* ── Selected State: Depth, Elevation and Leve Escala ──
+   Selected surface floats 3.5px above resting plane with contextual ambient cushion
+   and physical scale (1.025) to feel unmistakably closer in 3D space.
+   Opacity is strictly 1 (never dimmed, nor does it dim its siblings). */
 .surface[data-selected="true"] {
-  transform: translateY(-2px) scale(1.015);
+  transform: translateY(-3.5px) scale(1.025);
   box-shadow: var(--surface-elevation-selected, var(--elevation-selection));
   opacity: 1;
-  z-index: 4;
+  z-index: 10;
 }
 
 /* Selected + Hover: stable resting on elevated plane without flutter */
 @media (hover: hover) and (pointer: fine) {
   .surface[data-selected="true"]:not([data-disabled="true"]):hover {
-    transform: translateY(-2px) scale(1.015);
+    transform: translateY(-3.5px) scale(1.025);
     box-shadow: var(--surface-elevation-selected, var(--elevation-selection));
     opacity: 1;
-    z-index: 4;
+    z-index: 10;
   }
 }
 
 /* ── Active / Press State ──
    Tactile feedback returning momentarily towards resting ground without layout shifts */
 .surface[data-clickable="true"]:not([data-disabled="true"]):active {
-  transform: translateY(-0.5px) scale(1.005);
+  transform: translateY(-1px) scale(1.01);
   box-shadow: var(--elevation-xs);
   transition-duration: 80ms;
 }

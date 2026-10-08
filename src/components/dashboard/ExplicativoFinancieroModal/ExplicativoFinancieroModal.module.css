@@ -9,7 +9,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--elevation-lg);
   max-height: 88dvh;
 }
 
@@ -127,7 +127,7 @@
 .tabActive {
   background: var(--surface);
   color: var(--primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--elevation-xs);
   font-weight: 700;
 }
 

@@ -35,8 +35,8 @@ export const MiniCard: React.FC<MiniCardProps> = ({ color = '#333', red = 'visa'
       justifyContent: 'center',
       position: 'relative',
       overflow: 'hidden',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.1)',
-      border: '0.5px solid rgba(0,0,0,0.1)'
+      boxShadow: 'var(--elevation-xs)',
+      border: '0.5px solid rgba(0,0,0,0.15)'
     }}>
       {/* Glossy Effect */}
       <div style={{
@@ -70,7 +70,7 @@ export const MiniCard: React.FC<MiniCardProps> = ({ color = '#333', red = 'visa'
         height: 6,
         borderRadius: 1.5,
         background: 'linear-gradient(135deg, #FFD700 0%, #B8860B 100%)',
-        boxShadow: 'inset 0 0 1px rgba(0,0,0,0.3)',
+        boxShadow: 'var(--elevation-none)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-around',

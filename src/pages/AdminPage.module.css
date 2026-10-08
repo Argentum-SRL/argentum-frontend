@@ -116,7 +116,7 @@
   border-radius: 16px;
   padding: 24px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--elevation-sm);
   transition: border-color 0.2s;
   min-height: 300px;
 }
@@ -168,7 +168,9 @@
 
 .searchInput:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+  box-shadow: var(--elevation-none);
   background-color: var(--surface);
 }
 
@@ -209,7 +211,7 @@
   border-radius: 16px;
   border: 1px solid var(--border);
   overflow: hidden; /* Prevent horizontal scrolling completely */
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--elevation-sm);
 }
 
 .table {
@@ -608,7 +610,7 @@
   background-color: var(--surface);
   color: var(--text-2);
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+  box-shadow: var(--elevation-xs);
 }
 
 .actionBtn:hover:not(:disabled) {
@@ -731,7 +733,9 @@
 
 .confirmEmailInput:focus {
   border-color: var(--error);
-  box-shadow: 0 0 0 3px rgba(235, 87, 87, 0.15);
+  outline: 2px solid var(--error);
+  outline-offset: -1px;
+  box-shadow: var(--elevation-none);
   background-color: var(--surface);
 }
 

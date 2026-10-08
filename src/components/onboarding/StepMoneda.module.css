@@ -41,15 +41,20 @@
   border: 1.5px solid var(--border);
   background: var(--surface);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s, background 0.15s;
 }
 
 .currencyCard:hover {
   background: var(--surface-alt);
+  transform: translateY(-1px);
 }
 
 .currencyCardActive {
   background: var(--surface-alt);
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-2px) scale(1.015);
+  border-color: rgba(72, 120, 184, 0.4);
+  z-index: 2;
 }
 
 :global([data-theme="dark"]) .currencyCard {
@@ -64,7 +69,10 @@
 
 :global([data-theme="dark"]) .currencyCardActive {
   background: rgba(72, 120, 184, 0.18);
-  border-color: var(--primary);
+  border-color: rgba(72, 120, 184, 0.5);
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-2px) scale(1.015);
+  z-index: 2;
 }
 
 .currencyCode {
@@ -111,7 +119,7 @@
   top: 2px;
   left: 2px;
   transition: transform 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  box-shadow: var(--elevation-xs);
 }
 
 .toggleOn .toggleThumb {
@@ -159,13 +167,17 @@
   background: var(--surface);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s, background 0.15s;
   width: 100%;
 }
 
 :global([data-theme="dark"]) .cotizacionCard {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.12);
+}
+
+.cotizacionCard:hover {
+  transform: translateY(-1px);
 }
 
 :global([data-theme="dark"]) .cotizacionCard:hover {
@@ -175,12 +187,18 @@
 
 :global([data-theme="dark"]) .cotizacionCardActive {
   background: rgba(72, 120, 184, 0.18);
-  border-color: var(--primary);
+  border-color: rgba(72, 120, 184, 0.5);
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-1.5px) scale(1.015);
+  z-index: 2;
 }
 
 .cotizacionCardActive {
-  border-color: var(--primary);
+  border-color: rgba(72, 120, 184, 0.4);
   background: var(--surface-alt);
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-1.5px) scale(1.015);
+  z-index: 2;
 }
 
 .cotizacionNombre {

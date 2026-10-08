@@ -231,7 +231,9 @@
 }
 
 .switch input:focus + .slider {
-  box-shadow: 0 0 1px var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: var(--elevation-none);
 }
 
 .switch input:checked + .slider:before {

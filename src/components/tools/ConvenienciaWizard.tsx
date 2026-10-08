@@ -73,11 +73,12 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   // Si llega resultado, avanzar a etapa 2
   useEffect(() => {
     if (resultado && activeStage !== 2) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnimDir('fwd');
       setAnimKey(k => k + 1);
       setActiveStage(2);
     }
-  }, [resultado]);
+  }, [resultado, activeStage]);
 
   const goTo = (s: 1 | 2) => {
     if (s === activeStage) return;
@@ -196,6 +197,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
 
   useEffect(() => {
     if (fixedMode === 'total' && formData.precio_total_cuotas && formData.cantidad_cuotas) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCuotaInputValue(Math.round((formData.precio_total_cuotas / formData.cantidad_cuotas) * 100) / 100);
     }
   }, [formData.precio_total_cuotas, formData.cantidad_cuotas, fixedMode]);

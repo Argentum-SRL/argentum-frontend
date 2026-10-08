@@ -305,7 +305,7 @@
   background: var(--surface) !important;
   color: var(--text) !important;
   border-color: var(--border) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--elevation-xs);
 }
 
 /* ── Alertas e Información ────────────────────────────────────────────────── */

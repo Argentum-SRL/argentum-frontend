@@ -51,3 +51,9 @@ export {
 } from './AtmosphericBackground/AtmosphericBackground'
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle/ThemeToggle'
 export { SileoToaster } from './SileoToaster/SileoToaster'
+export {
+  SelectableSurface,
+  type SelectableSurfaceProps,
+  type ElevationContextType,
+} from './SelectableSurface'
+

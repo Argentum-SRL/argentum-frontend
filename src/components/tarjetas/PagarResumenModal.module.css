@@ -15,7 +15,7 @@
     border-left: none !important;
     border-right: none !important;
     border-bottom: none !important;
-    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: var(--elevation-lg) !important;
   }
 }
 
@@ -188,8 +188,8 @@
   background: var(--surface) !important;
   color: var(--text) !important;
   font-weight: 700 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: var(--elevation-xs);
   border-color: var(--border) !important;
   z-index: 2;
 }
@@ -213,7 +213,6 @@
   background: #1e293b !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.16) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 @media (max-width: 420px) {
@@ -259,7 +258,7 @@
 
 .fieldSelect:focus {
   border-color: var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--elevation-none);
 }
 
 /* ── Hero Monto Card (Modo Pagar Total) ───────────────────────────────────── */
@@ -271,7 +270,7 @@
   flex-direction: column;
   gap: 4px;
   border: 1.5px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--elevation-none);
   transition: border-color 160ms ease, box-shadow 160ms ease;
   flex-shrink: 0;
 }
@@ -320,14 +319,15 @@
   color: var(--text-2);
   cursor: pointer;
   transition: all 140ms ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--elevation-none);
 }
 
 .quickChip:hover {
   background: var(--surface-alt);
   color: var(--text);
   border-color: var(--border);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--elevation-xs);
+  transform: translateY(-1px);
 }
 
 .quickChipActive {
@@ -335,7 +335,8 @@
   border-color: var(--text);
   color: var(--text);
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-xs);
+  transform: translateY(-1px);
 }
 
 /* ── Desglose Card (Clean) ───────────────────────────────────────────────── */
@@ -476,7 +477,7 @@
 
 .inlineInput:focus {
   border-color: var(--border);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--elevation-none);
 }
 
 .pesificacionTotalRow {
@@ -675,23 +676,25 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: opacity 120ms ease, transform 120ms ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: opacity 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: var(--elevation-xs);
 }
 
 .submitBtn:hover:not(:disabled) {
   opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
 }
 
 .submitBtn:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: var(--elevation-none);
 }
 
 .submitBtn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-  box-shadow: none;
+  box-shadow: var(--elevation-none);
 }
 
 /* ── Responsive Mobile ───────────────────────────────────────────────────── */

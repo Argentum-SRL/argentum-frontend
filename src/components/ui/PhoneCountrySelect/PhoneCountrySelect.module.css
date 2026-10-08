@@ -25,12 +25,7 @@
 .trigger:focus,
 .triggerOpen {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
-}
-
-[data-theme="dark"] .trigger:focus,
-[data-theme="dark"] .triggerOpen {
-  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
+  box-shadow: var(--elevation-none);
 }
 
 .flag { font-size: 16px; line-height: 1; }
@@ -52,7 +47,7 @@
   background: var(--surface);
   border: 1px solid var(--surface-alt);
   border-radius: 12px;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: var(--elevation-md);
   overflow: hidden;
   padding: 4px;
 }
@@ -74,7 +69,7 @@
   background: var(--surface);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--elevation-lg);
   width: 100%;
   max-width: 280px;
   max-height: 60vh;

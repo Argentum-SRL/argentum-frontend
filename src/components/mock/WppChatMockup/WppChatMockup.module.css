@@ -54,7 +54,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 0 80px rgba(72,120,184,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--elevation-xl);
   background: #ECE5DD;
 }
 
@@ -188,7 +189,7 @@
   border-radius: 16px 16px 16px 4px;
   background: #FFFFFF;
   padding: 8px 12px;
-  box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+  box-shadow: var(--elevation-xs);
 }
 
 .bubbleTextUser {

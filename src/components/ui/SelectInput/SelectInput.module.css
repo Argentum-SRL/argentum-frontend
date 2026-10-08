@@ -46,12 +46,7 @@
 
 .trigger:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
-}
-
-:global([data-theme="dark"]) .trigger:focus,
-:global(.dark) .trigger:focus {
-  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
+  box-shadow: var(--elevation-none);
 }
 
 .triggerPlaceholder {
@@ -103,9 +98,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.16),
-    0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-md);
   overflow: hidden;
   padding: 4px;
 }
@@ -114,7 +107,6 @@
 :global(.dark) .panel {
   background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
 }
 
 /* ─── MOBILE BOTTOM SHEET ─────────────────────────── */
@@ -142,9 +134,7 @@
   background: var(--surface);
   border-radius: 24px 24px 0 0;
   overflow-y: auto;
-  box-shadow:
-    0 -8px 32px rgba(0, 0, 0, 0.18),
-    0 -2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-lg);
   border-top: 1px solid var(--border);
   width: 100%;
   max-width: 500px;
@@ -159,7 +149,6 @@
 :global(.dark) .mobileBottomSheet {
   background: var(--surface);
   border-top-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes sheetSlideUp {

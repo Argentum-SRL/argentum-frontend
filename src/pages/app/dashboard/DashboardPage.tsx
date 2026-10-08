@@ -31,6 +31,7 @@ import { hasProyeccionVisible } from '@/components/dashboard/ProyeccionCard/proy
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { BalanceCard } from '@/components/dashboard/BalanceCard'
 import { formatMonto, formatFecha } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
@@ -601,18 +602,10 @@ export default function DashboardPage() {
   }
 
   const billeterasActivas = useMemo(() => {
-    return billeteras
-      .filter(b => b.estado === 'activa' && b.moneda === moneda)
-      .sort((a, b) => {
-        // 1. Favorita / Principal primero
-        if (a.es_principal && !b.es_principal) return -1
-        if (!a.es_principal && b.es_principal) return 1
-        // 2. Mayor saldo a menor saldo
-        const diff = (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-        if (diff !== 0) return diff
-        // 3. Fallback alfabético
-        return a.nombre.localeCompare(b.nombre)
-      })
+    return sortBilleteras(
+      billeteras.filter(b => b.estado === 'activa' && b.moneda === moneda),
+      moneda
+    )
   }, [billeteras, moneda])
 
   const fetchData = useCallback(async (signal?: AbortSignal) => {

@@ -4,6 +4,7 @@ import type { TarjetaCredito, Billetera, PagarTarjetaPayload } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { formatMonto } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import styles from './PagarResumenModal.module.css'
 
@@ -56,23 +57,17 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   const [montoPercepcionCustom, setMontoPercepcionCustom] = useState<string>('')
 
   const billeterasUSD: Billetera[] = useMemo(() => {
-    return billeteras
-      .filter((b: Billetera) => b.moneda === 'USD' && b.estado === 'activa')
-      .sort((a: Billetera, b: Billetera) => {
-        if (a.es_principal && !b.es_principal) return -1
-        if (!a.es_principal && b.es_principal) return 1
-        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-      })
+    return sortBilleteras(
+      (billeteras || []).filter((b: Billetera) => b.moneda === 'USD' && b.estado === 'activa'),
+      'USD'
+    )
   }, [billeteras])
 
   const billeterasARS: Billetera[] = useMemo(() => {
-    return billeteras
-      .filter((b: Billetera) => b.moneda === 'ARS' && b.estado === 'activa')
-      .sort((a: Billetera, b: Billetera) => {
-        if (a.es_principal && !b.es_principal) return -1
-        if (!a.es_principal && b.es_principal) return 1
-        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-      })
+    return sortBilleteras(
+      (billeteras || []).filter((b: Billetera) => b.moneda === 'ARS' && b.estado === 'activa'),
+      'ARS'
+    )
   }, [billeteras])
 
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)

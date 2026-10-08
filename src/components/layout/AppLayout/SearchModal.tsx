@@ -19,6 +19,7 @@ import tarjetaService from '@/services/tarjeta.service'
 import type { Billetera, Categoria, TarjetaCredito, Transaccion, Presupuesto } from '@/types'
 import type { Goal } from '@/types/goals'
 import { formatMonto } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import styles from './SearchModal.module.css'
 
 interface SearchModalProps {
@@ -216,9 +217,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     normalizeStr(item.subtitle).includes(normalizeStr(query))
   )
 
-  const filteredBilleteras = billeteras.filter(b =>
-    normalizeStr(b.nombre).includes(normalizeStr(query)) ||
-    normalizeStr(b.moneda).includes(normalizeStr(query))
+  const filteredBilleteras = sortBilleteras(
+    billeteras.filter(b =>
+      normalizeStr(b.nombre).includes(normalizeStr(query)) ||
+      normalizeStr(b.moneda).includes(normalizeStr(query))
+    )
   )
 
   const filteredMetas = metas.filter(g =>

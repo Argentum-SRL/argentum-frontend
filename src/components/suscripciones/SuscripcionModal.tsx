@@ -18,6 +18,7 @@ import type { Billetera, TarjetaCredito, Categoria, Suscripcion, CotizacionDolar
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import styles from './SuscripcionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
@@ -126,7 +127,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
           categoriaService.getCategorias(),
           dashboardService.getCotizacion().catch(() => null)
         ])) as [Billetera[], TarjetaCredito[], Categoria[], CotizacionDolar | null]
-        const validBilleteras = b.filter(x => !x.es_efectivo && x.estado === 'activa')
+        const validBilleteras = sortBilleteras(b.filter(x => !x.es_efectivo && x.estado === 'activa'))
         const validTarjetas = t.filter(x => x.estado === 'activa')
         setBilleteras(validBilleteras)
         setTarjetas(validTarjetas)

@@ -19,6 +19,7 @@ import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
 import type { GrupoCuotasResumen, GrupoCuotasUpdate, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
@@ -104,13 +105,10 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
 
   const detailMatchingWallets = useMemo(() => {
     if (!selectedGrupo) return []
-    return billeteras
-      .filter(b => b.moneda === selectedGrupo.moneda)
-      .sort((a, b) => {
-        if (a.es_principal && !b.es_principal) return -1
-        if (!a.es_principal && b.es_principal) return 1
-        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-      })
+    return sortBilleteras(
+      billeteras.filter(b => b.moneda === selectedGrupo.moneda),
+      selectedGrupo.moneda
+    )
   }, [selectedGrupo, billeteras])
 
   const detailProgressPercent = useMemo(() => {
@@ -312,13 +310,10 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     setSelectedGrupo(grupo)
     setDetailSlide('detail')
     setDetailSlideDirection('forward')
-    const matchingWallets = billeteras
-      .filter(b => b.moneda === grupo.moneda)
-      .sort((a, b) => {
-        if (a.es_principal && !b.es_principal) return -1
-        if (!a.es_principal && b.es_principal) return 1
-        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-      })
+    const matchingWallets = sortBilleteras(
+      billeteras.filter(b => b.moneda === grupo.moneda),
+      grupo.moneda
+    )
     const principal = matchingWallets.find(b => b.es_principal)
     setBilleteraSeleccionada(principal ? principal.id : (matchingWallets[0]?.id || ''))
   }

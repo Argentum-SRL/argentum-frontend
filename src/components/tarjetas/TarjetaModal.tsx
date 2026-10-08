@@ -10,7 +10,7 @@ import { useModal } from '@/hooks/useModal'
 import { useAuth } from '@/hooks/useAuth'
 import tarjetaService from '@/services/tarjeta.service'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
-import { getBankById, findBankByNombre } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import type { Billetera, TarjetaCredito, TarjetaCreditoCreate } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from './RealCardPreview'
@@ -148,7 +148,7 @@ function getInitialTarjetaState(data?: { tarjeta: TarjetaCredito | null; billete
     }
   }
 
-  const bancarias = (data.billeteras || []).filter(b => !b.es_efectivo)
+  const bancarias = sortBilleteras((data.billeteras || []).filter(b => !b.es_efectivo))
   const defaultId = data.billeteraId || data.defaultBilleteraId || bancarias[0]?.id || ''
   const defaultColor = getBilleteraColor((data.billeteras || []).find(b => b.id === defaultId))
 
@@ -218,13 +218,7 @@ export const TarjetaModal: React.FC = () => {
   }
 
   const bancarias = useMemo(() => {
-    return [...(data?.billeteras || [])]
-      .filter((b: Billetera) => !b.es_efectivo)
-      .sort((a, b) => {
-        if (a.es_principal && !b.es_principal) return -1
-        if (!a.es_principal && b.es_principal) return 1
-        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-      })
+    return sortBilleteras((data?.billeteras || []).filter((b: Billetera) => !b.es_efectivo))
   }, [data?.billeteras])
 
   const selectedBilletera = useMemo(() => {

@@ -30,6 +30,7 @@ import { DateInput } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { useMemoriaComercio } from './useMemoriaComercio'
 import MemoriaComercioDialog from './MemoriaComercioDialog'
 import memoriaStyles from './MemoriaComercioDialog.module.css'
@@ -130,13 +131,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
         }
       } else {
         const activas = action.billeteras.filter(b => b.estado === 'activa')
-
-        // Orden estricto: Billetera principal primero, luego de mayor a menor saldo
-        const sorted = [...activas].sort((a, b) => {
-          if (a.es_principal && !b.es_principal) return -1
-          if (!a.es_principal && b.es_principal) return 1
-          return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-        })
+        const sorted = sortBilleteras(activas)
 
         const chosenWallet = action.billeteraInicialId
           ? action.billeteras.find(b => b.id === action.billeteraInicialId)
@@ -381,13 +376,8 @@ export default function TransaccionModal({
       filtered = filtered.filter(b => !b.es_efectivo)
     }
 
-    // Orden estricto: Billetera principal primero, luego de mayor a menor saldo
-    return [...filtered].sort((a, b) => {
-      if (a.es_principal && !b.es_principal) return -1
-      if (!a.es_principal && b.es_principal) return 1
-      return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-    })
-  }, [billeterasMoneda, metodoPago])
+    return sortBilleteras(filtered, moneda)
+  }, [billeterasMoneda, metodoPago, moneda])
 
   const {
     fieldsRef: formBodyRef,
@@ -405,24 +395,18 @@ export default function TransaccionModal({
     dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: key })
 
     if (key === 'efectivo') {
-      const cashWallets = billeteras
-        .filter(b => b.es_efectivo && b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId))
-        .sort((a, b) => {
-          if (a.es_principal && !b.es_principal) return -1
-          if (!a.es_principal && b.es_principal) return 1
-          return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-        })
+      const cashWallets = sortBilleteras(
+        billeteras.filter(b => b.es_efectivo && b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId)),
+        moneda
+      )
       if (cashWallets.length > 0) {
         dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: cashWallets[0].id })
       }
     } else if (key === 'debito' || key === 'transferencia') {
-      const debitWallets = billeteras
-        .filter(b => !b.es_efectivo && b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId))
-        .sort((a, b) => {
-          if (a.es_principal && !b.es_principal) return -1
-          if (!a.es_principal && b.es_principal) return 1
-          return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-        })
+      const debitWallets = sortBilleteras(
+        billeteras.filter(b => !b.es_efectivo && b.moneda === moneda && (b.estado === 'activa' || b.id === billeteraId)),
+        moneda
+      )
       if (debitWallets.length > 0) {
         dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: debitWallets[0].id })
       }

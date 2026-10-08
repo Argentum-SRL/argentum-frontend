@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { SelectInput } from '@/components/ui'
 import type { TarjetaCredito, Billetera } from '@/types'
 import { formatMonto } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import styles from './ImportacionResumenSection.module.css'
 
 interface SeleccionTarjetaYBilleteraProps {
@@ -22,7 +23,10 @@ export const SeleccionTarjetaYBilletera: React.FC<SeleccionTarjetaYBilleteraProp
   onChangeBilleteraId,
 }) => {
   const activeTarjetas = tarjetas.filter(t => t.estado === 'activa')
-  const activeArsBilleteras = billeteras.filter(b => b.estado === 'activa' && b.moneda === 'ARS')
+  const activeArsBilleteras = sortBilleteras(
+    billeteras.filter(b => b.estado === 'activa' && b.moneda === 'ARS'),
+    'ARS'
+  )
 
   // Aplicar preselección automática si no hay valores seleccionados
   useEffect(() => {

@@ -10,6 +10,7 @@ import tarjetaService from '@/services/tarjeta.service'
 import { exportarTransaccionesPDF } from '@/services/exportPdf.service'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { useAuth } from '@/hooks/useAuth'
@@ -184,11 +185,11 @@ export default function TransaccionesPage() {
         fetchPendientes(),
         billeteraService.list(),
       ])
-      setBilleteras(freshBilleteras.filter((w) => w.estado === 'activa'))
+      setBilleteras(sortBilleteras(freshBilleteras.filter((w) => w.estado === 'activa'), usuario?.moneda_principal ?? 'ARS'))
     } finally {
       setLoading(false)
     }
-  }, [fetchInitialTransacciones, fetchPendientes, setActiveTab, activeTab])
+  }, [fetchInitialTransacciones, fetchPendientes, setActiveTab, activeTab, usuario?.moneda_principal])
 
   // 1. Carga de datos estáticos (Solo al montar)
   useEffect(() => {
@@ -201,7 +202,7 @@ export default function TransaccionesPage() {
           tarjetaService.getTarjetas()
         ])
         if (isMounted) {
-          setBilleteras(b.filter((w: Billetera) => w.estado === 'activa'))
+          setBilleteras(sortBilleteras(b.filter((w: Billetera) => w.estado === 'activa'), usuario?.moneda_principal ?? 'ARS'))
           setCategorias(c)
           setTarjetas(t)
         }
@@ -211,7 +212,7 @@ export default function TransaccionesPage() {
     }
     loadStatic()
     return () => { isMounted = false }
-  }, [])
+  }, [usuario?.moneda_principal])
 
   // 2. Carga de datos dinámicos (Cuando cambian los filtros y el período está listo)
   useEffect(() => {

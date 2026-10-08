@@ -7,7 +7,7 @@ import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { calcularTotales } from '@/lib/utils/billeteras.utils'
+import { calcularTotales, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
@@ -181,28 +181,14 @@ export default function BilleterasPage() {
     billeterasActivas, 
     billeterasArchivadas
   } = useMemo(() => {
-    const sortFn = (a: Billetera, b: Billetera) => {
-      // 1. La principal siempre es la primera
-      if (a.es_principal && !b.es_principal) return -1
-      if (!a.es_principal && b.es_principal) return 1
-
-      // 2. Agrupar por moneda: primero la moneda principal del usuario
-      const aPrioridad = a.moneda === monedaUsuario ? 0 : 1
-      const bPrioridad = b.moneda === monedaUsuario ? 0 : 1
-      if (aPrioridad !== bPrioridad) {
-        return aPrioridad - bPrioridad
-      }
-
-      return 0
-    }
-
-    const activas = billeteras
-      .filter((b) => b.estado === 'activa')
-      .sort(sortFn)
-
-    const archivadas = billeteras
-      .filter((b) => b.estado === 'archivada')
-      .sort(sortFn)
+    const activas = sortBilleteras(
+      billeteras.filter((b) => b.estado === 'activa'),
+      monedaUsuario
+    )
+    const archivadas = sortBilleteras(
+      billeteras.filter((b) => b.estado === 'archivada'),
+      monedaUsuario
+    )
     
     return {
       billeterasActivas: activas,

@@ -6,7 +6,7 @@ import type { Billetera, Categoria } from '@/types'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { useModal } from '@/hooks/useModal'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
-import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { DateInput } from '@/components/ui'
 import { toISODateString } from '@/utils/format'
 
@@ -128,6 +128,10 @@ export default function FilterBar({
   const ingresoCategorias = useMemo(() => {
     return filteredCategorias.filter(c => c.tipo === 'ingreso')
   }, [filteredCategorias])
+
+  const sortedBilleteras = useMemo(() => {
+    return sortBilleteras(billeteras)
+  }, [billeteras])
 
   const handleTipoChange = (tipo: 'ingreso' | 'egreso' | undefined) => {
     let nextCatId = filters.categoria_id
@@ -258,7 +262,7 @@ export default function FilterBar({
       >
         Todas las billeteras
       </button>
-      {billeteras.map(bill => {
+      {sortedBilleteras.map(bill => {
         const bank = bill.bank_id ? getBankById(bill.bank_id) : findBankByNombre(bill.nombre)
         const logoUrl = bank ? getBankLogoUrl(bank.logoPath) : ''
         return (

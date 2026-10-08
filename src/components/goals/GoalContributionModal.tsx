@@ -16,6 +16,7 @@ import type { Billetera } from '@/types'
 import goalsService from '@/services/goals.service'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import { formatMonto } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import styles from './GoalContributionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
@@ -65,18 +66,10 @@ const initialState: FormState = {
 }
 
 function getSortedWalletsForCurrency(billeteras: Billetera[], moneda: string, currentId?: string): Billetera[] {
-  return [...billeteras]
-    .filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === currentId))
-    .sort((a, b) => {
-      // 1. Billetera Principal siempre primera a la izquierda
-      if (a.es_principal && !b.es_principal) return -1
-      if (!a.es_principal && b.es_principal) return 1
-
-      // 2. De mayor a menor saldo
-      const saldoA = Number(a.saldo_actual) || 0
-      const saldoB = Number(b.saldo_actual) || 0
-      return saldoB - saldoA
-    })
+  return sortBilleteras(
+    billeteras.filter(b => b.moneda === moneda && (b.estado === 'activa' || b.id === currentId)),
+    moneda
+  )
 }
 
 function formReducer(state: FormState, action: FormAction): FormState {

@@ -106,3 +106,47 @@ export function getInitials(nombre: string): string {
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('')
 }
+
+/**
+ * Ordena una lista de billeteras según las reglas del sistema:
+ * 1. La billetera principal siempre a la izquierda / primera de todo.
+ * 2. Agrupadas por moneda (la moneda de la principal primero, luego otras).
+ * 3. Dentro de cada grupo de moneda, de mayor a menor saldo.
+ * 4. Desempate alfabético consistente por nombre.
+ */
+export function sortBilleteras(
+  billeteras: Billetera[],
+  monedaUsuarioFallback: string = 'ARS'
+): Billetera[] {
+  if (!billeteras || billeteras.length <= 1) return billeteras ? [...billeteras] : []
+
+  const principal = billeteras.find((b) => b.es_principal)
+  const monedaBase = principal?.moneda ?? monedaUsuarioFallback
+
+  return [...billeteras].sort((a, b) => {
+    // 1. La billetera principal siempre a la izquierda de todo
+    if (a.es_principal && !b.es_principal) return -1
+    if (!a.es_principal && b.es_principal) return 1
+
+    // 2. Agrupar por moneda: primero la moneda de la principal (o fallback)
+    const aPrioridad = a.moneda === monedaBase ? 0 : 1
+    const bPrioridad = b.moneda === monedaBase ? 0 : 1
+    if (aPrioridad !== bPrioridad) {
+      return aPrioridad - bPrioridad
+    }
+    if (a.moneda !== b.moneda) {
+      return a.moneda.localeCompare(b.moneda)
+    }
+
+    // 3. Dentro de cada grupo de moneda, ordenar de mayor a menor saldo
+    const saldoA = Number(a.saldo_actual) || 0
+    const saldoB = Number(b.saldo_actual) || 0
+    const diffSaldo = saldoB - saldoA
+    if (diffSaldo !== 0) {
+      return diffSaldo
+    }
+
+    // 4. Fallback alfabético por nombre
+    return a.nombre.localeCompare(b.nombre)
+  })
+}

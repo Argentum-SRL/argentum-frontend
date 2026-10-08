@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Check, Wallet, Banknote, ChevronDown, Star } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera } from '@/types'
-import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
 import type { TipoOperacionFilter } from './TransferenciasFilterBar'
 import styles from './TransferenciasFilterBar.module.css'
@@ -58,7 +58,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
     onClose()
   }
 
-  const activeWallets = billeteras.filter((b) => b.estado === 'activa')
+  const activeWallets = sortBilleteras(billeteras.filter((b) => b.estado === 'activa'))
 
   const canClear =
     hasActiveFilters ||

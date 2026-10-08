@@ -5,7 +5,7 @@ import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
-import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
+import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import styles from './FilterBar.module.css'
 import { DateInput } from '@/components/ui'
 import { toISODateString, formatMonto } from '@/utils/format'
@@ -35,7 +35,7 @@ export default function FilterBarMobileDrawer({
 }: FilterBarMobileDrawerProps) {
   const { periodo: periodoActual } = usePeriodoActual()
 
-  const safeBilleteras = useMemo(() => (Array.isArray(billeteras) ? billeteras : []), [billeteras])
+  const safeBilleteras = useMemo(() => sortBilleteras(Array.isArray(billeteras) ? billeteras : []), [billeteras])
   const safeCategorias = useMemo(() => (Array.isArray(categorias) ? categorias : []), [categorias])
 
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { AlertCircle } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera } from '@/types'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import styles from './ModalesImportacion.module.css'
 
 interface ModalBilleteraUSDProps {
@@ -29,9 +30,10 @@ export const ModalBilleteraUSD: React.FC<ModalBilleteraUSDProps> = ({
   currentStep,
   totalSteps,
 }) => {
-  // Filtrar billeteras USD activas
-  const usdWallets = billeteras.filter(
-    b => b.moneda === 'USD' && b.estado === 'activa'
+  // Filtrar billeteras USD activas (ordenadas con principal primero y luego mayor a menor saldo)
+  const usdWallets = sortBilleteras(
+    billeteras.filter(b => b.moneda === 'USD' && b.estado === 'activa'),
+    'USD'
   )
 
   const hasUsdWallets = usdWallets.length > 0

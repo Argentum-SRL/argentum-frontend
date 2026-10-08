@@ -16,6 +16,7 @@ import type { Billetera, CotizacionDolar, CotizacionesDolarResponse } from '@/ty
 import transferenciaService from '@/services/transferencia.service'
 import { getCotizaciones } from '@/services/onboarding.service'
 import { formatMonto } from '@/utils/format'
+import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
 import styles from './TransferenciaModal.module.css'
@@ -40,15 +41,9 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   billeteras,
   cotizacionOficial,
 }) => {
-  // Cuentas activas ordenadas (principal primero, luego mayor saldo a menor)
+  // Cuentas activas ordenadas (principal primero, agrupadas por moneda, mayor a menor saldo)
   const activeWallets = useMemo(() => {
-    return [...billeteras]
-      .filter(b => b.estado === 'activa')
-      .sort((a, b) => {
-        if (a.es_principal && !b.es_principal) return -1
-        if (!a.es_principal && b.es_principal) return 1
-        return (Number(b.saldo_actual) || 0) - (Number(a.saldo_actual) || 0)
-      })
+    return sortBilleteras(billeteras.filter(b => b.estado === 'activa'))
   }, [billeteras])
 
   // Tipos de Operación: Solo 2 solapas principales (Detección automática)
@@ -109,11 +104,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       ? activeWallets.filter(b => b.moneda === (fxDirection === 'compra' ? 'ARS' : 'USD'))
       : activeWallets.filter(b => b.moneda === effectiveMoneda)
 
-    return list.slice().sort((a, b) => {
-      if (a.es_principal && !b.es_principal) return -1
-      if (!a.es_principal && b.es_principal) return 1
-      return Number(b.saldo_actual) - Number(a.saldo_actual)
-    })
+    return sortBilleteras(list)
   }, [activeWallets, tipoOperacion, fxDirection, effectiveMoneda])
 
   // Resolver ID de origen efectivo
@@ -133,11 +124,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       ? activeWallets.filter(b => b.moneda === (fxDirection === 'compra' ? 'USD' : 'ARS') && b.id !== billeteraOrigenId)
       : activeWallets.filter(b => b.moneda === effectiveMoneda && b.id !== billeteraOrigenId)
 
-    return list.slice().sort((a, b) => {
-      if (a.es_principal && !b.es_principal) return -1
-      if (!a.es_principal && b.es_principal) return 1
-      return Number(b.saldo_actual) - Number(a.saldo_actual)
-    })
+    return sortBilleteras(list)
   }, [activeWallets, tipoOperacion, fxDirection, effectiveMoneda, billeteraOrigenId])
 
   // Resolver ID de destino efectivo

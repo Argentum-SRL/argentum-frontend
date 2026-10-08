@@ -23,7 +23,7 @@
   border-radius: 20px;
   border: 1px solid var(--border);
   padding: 20px;
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -104,7 +104,7 @@
 .stepBadgeActive {
   background: var(--primary);
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(13, 32, 69, 0.18);
+  box-shadow: var(--elevation-xs);
 }
 
 [data-theme="dark"] .stepBadgeActive {
@@ -385,7 +385,7 @@
   border: 1px solid var(--border);
   padding: 12px 16px;
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--elevation-xs);
 }
 
 .step1Header {
@@ -457,7 +457,7 @@
   gap: 16px;
   width: 100%;
   box-sizing: border-box;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--elevation-xs);
   animation: fadeSlideUp 0.3s ease both;
   flex-wrap: wrap;
 }
@@ -649,25 +649,29 @@
   background: transparent;
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s ease, background 0.18s ease;
   white-space: nowrap;
 }
 
 .pillOption:hover {
   color: var(--text);
+  transform: translateY(-0.5px);
 }
 
 .pillOptionActive {
   background: var(--surface);
   color: var(--primary);
   border-color: var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--elevation-xs);
+  transform: translateY(-0.5px) scale(1.015);
   font-weight: 700;
+  z-index: 2;
 }
 
 [data-theme="dark"] .pillOptionActive {
   color: #60a5fa;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--elevation-xs);
+  transform: translateY(-0.5px) scale(1.015);
 }
 
 /* ── Quick Chips (cuotas rápidas) ─────────────────────────────────────────── */
@@ -686,18 +690,22 @@
   background: var(--surface-alt);
   color: var(--text-2);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .chip:hover {
   border-color: var(--primary);
   color: var(--primary);
+  transform: translateY(-0.5px);
 }
 
 .chipActive {
   background: var(--primary);
   border-color: var(--primary);
   color: #fff;
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: var(--elevation-xs);
+  z-index: 2;
 }
 
 /* ── IPC Banner (live data) ──────────────────────────────────────────────── */
@@ -773,12 +781,14 @@
 
 .tnaInput:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+  box-shadow: var(--elevation-none);
 }
 
 [data-theme="dark"] .tnaInput:focus {
   border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+  box-shadow: var(--elevation-none);
 }
 
 .tnaInput::-webkit-inner-spin-button,
@@ -1166,7 +1176,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--elevation-sm);
   animation: fadeSlideUp 0.3s ease both;
 }
 
@@ -1436,7 +1446,7 @@
   border: 1px solid var(--border);
   padding: 10px 14px;
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--elevation-md);
 }
 
 .tooltipLabel {
@@ -1710,7 +1720,9 @@
 }
 
 .fwDot:focus-visible {
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  box-shadow: var(--elevation-none);
 }
 
 .fwDot:disabled { cursor: not-allowed; }
@@ -1719,7 +1731,7 @@
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: var(--elevation-xs);
   transform: scale(1.1);
 }
 
@@ -1976,7 +1988,7 @@
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.22);
+  box-shadow: var(--elevation-xs);
   transform: translateY(-1px);
 }
 
@@ -2096,12 +2108,12 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   font-family: inherit;
   letter-spacing: -0.01em;
-  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.22);
+  box-shadow: var(--elevation-sm);
 }
 
 .fwCta:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 7px 22px rgba(37, 99, 235, 0.3);
+  box-shadow: var(--elevation-md);
 }
 
 .fwCta:active:not(:disabled) { transform: translateY(0); }
@@ -2109,7 +2121,7 @@
 .fwCtaDisabled, .fwCta:disabled {
   opacity: 0.38;
   cursor: not-allowed;
-  box-shadow: none;
+  box-shadow: var(--elevation-none);
 }
 
 [data-theme="dark"] .fwCta:not(:disabled) { background: #2563eb; }
@@ -2355,7 +2367,7 @@
   border: 1px solid var(--border);
   padding: 6px 14px;
   border-radius: 999px;
-  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--elevation-xs);
 }
 
 .wbStepItem {
@@ -2376,7 +2388,9 @@
 }
 
 .wbStepItem:focus-visible {
-  box-shadow: 0 0 0 2px var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  box-shadow: var(--elevation-none);
 }
 
 .wbStepItem:disabled {
@@ -2409,7 +2423,7 @@
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  box-shadow: var(--elevation-xs);
 }
 
 .wbStepItemDone {
@@ -2443,7 +2457,7 @@
   border: 1.5px solid var(--border);
   border-radius: 24px;
   padding: 40px 36px;
-  box-shadow: 0 10px 32px -8px rgba(0, 0, 0, 0.06), 0 2px 8px -2px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -2502,19 +2516,19 @@
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+  box-shadow: var(--elevation-sm);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wbInitialCta:hover:not(:disabled) {
   transform: translateY(-1.5px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+  box-shadow: var(--elevation-md);
 }
 
 .wbInitialCta:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-  box-shadow: none;
+  box-shadow: var(--elevation-none);
 }
 
 /* ── Contenedor Maestro "Financial Workbench" ─────────────────────────── */
@@ -2525,7 +2539,7 @@
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 24px;
-  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.07), 0 2px 10px -2px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--elevation-sm);
   overflow: hidden;
   box-sizing: border-box;
   animation: wbFadeScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3025,14 +3039,16 @@
 }
 
 .wbChip:focus-visible {
-  box-shadow: 0 0 0 2px var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  box-shadow: var(--elevation-none);
 }
 
 .wbChipActive {
   background: var(--primary) !important;
   color: #fff !important;
   border-color: var(--primary) !important;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
+  box-shadow: var(--elevation-xs);
 }
 
 [data-theme="dark"] .wbChipActive {
@@ -3055,7 +3071,9 @@
 
 .wbCustomCuotasWrap:focus-within {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+  box-shadow: var(--elevation-none);
 }
 
 .wbCustomInput {
@@ -3110,18 +3128,20 @@
 }
 
 .wbSegmentedBtn:focus-visible {
-  box-shadow: 0 0 0 2px var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  box-shadow: var(--elevation-none);
 }
 
 .wbSegmentedBtnActive {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-xs);
 }
 
 [data-theme="dark"] .wbSegmentedBtnActive {
   background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--elevation-xs);
 }
 
 /* Modo de Ingreso (Por cuota vs Total) */
@@ -3174,7 +3194,7 @@
 .wbSubPillActive {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--elevation-xs);
 }
 
 .wbInputBlock {
@@ -3203,7 +3223,9 @@
 
 .wbStandardInputWrap:focus-within {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+  box-shadow: var(--elevation-none);
 }
 
 .wbStandardInput {
@@ -3313,24 +3335,26 @@
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+  box-shadow: var(--elevation-sm);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 }
 
 .wbCtaButton:hover:not(:disabled) {
   transform: translateY(-1.5px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+  box-shadow: var(--elevation-md);
 }
 
 .wbCtaButton:focus-visible {
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: var(--elevation-none);
 }
 
 .wbCtaButton:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-  box-shadow: none;
+  box-shadow: var(--elevation-none);
   transform: none;
 }
 

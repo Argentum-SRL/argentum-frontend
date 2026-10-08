@@ -18,7 +18,7 @@
   }
   .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    box-shadow: var(--elevation-md);
   }
 }
 
@@ -159,7 +159,7 @@
 }
 
 .progressOverflow {
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+  box-shadow: var(--elevation-none);
 }
 
 .progressLabels {

@@ -17,7 +17,7 @@
     border-left: none !important;
     border-right: none !important;
     border-bottom: none !important;
-    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: var(--elevation-lg) !important;
   }
 }
 
@@ -240,8 +240,8 @@
   background: var(--surface) !important;
   color: var(--text) !important;
   font-weight: 700 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: var(--elevation-xs);
   border-color: var(--border) !important;
   z-index: 2;
 }
@@ -265,7 +265,6 @@
   background: #1e293b !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 420px) {
@@ -358,44 +357,32 @@
   cursor: pointer;
 }
 
-/* Inactive Card: Receding in 3D depth, sitting lower, dimmed and soft */
+/* Inactive Card: Resting flat on surface */
 .billeteraSelectWrap[data-active="false"] {
-  transform: translateY(2px) scale(0.94);
-  filter: saturate(0.7) brightness(0.7);
-  opacity: 0.52;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+  opacity: 1;
+  box-shadow: var(--elevation-none);
   z-index: 1;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .billeteraSelectWrap[data-active="false"]:hover {
-    opacity: 0.78;
-    filter: saturate(0.88) brightness(0.85);
-    transform: translateY(0px) scale(0.97);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-xs);
     z-index: 2;
   }
 }
 
-/* Active Card: Popping forward toward user (Apple Wallet depth), elevated and radiant */
+/* Active Card: Subtle contextual elevation inside modal */
 .billeteraSelectWrap[data-active="true"] {
-  transform: translateY(-4px) scale(1.02);
-  filter: saturate(1.06) brightness(1.02);
+  transform: translateY(-2px);
   opacity: 1;
   z-index: 10;
-  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.26),
-              0 6px 14px -2px rgba(15, 23, 42, 0.16),
-              inset 0 1px 1px rgba(255, 255, 255, 0.45);
-}
-
-:global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
-  box-shadow: 0 20px 42px -4px rgba(0, 0, 0, 0.6),
-              0 8px 18px -2px rgba(0, 0, 0, 0.45),
-              inset 0 1px 1px rgba(255, 255, 255, 0.45);
+  box-shadow: var(--elevation-selection-modal);
 }
 
 .billeteraSelectWrap:active {
-  transform: translateY(-2px) scale(1.01);
+  transform: translateY(0);
   transition-duration: 80ms;
 }
 

@@ -17,7 +17,7 @@
     border-left: none !important;
     border-right: none !important;
     border-bottom: none !important;
-    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: var(--elevation-lg) !important;
   }
 }
 
@@ -212,7 +212,7 @@
   flex-direction: column;
   gap: 10px;
   border: 1.5px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--elevation-none);
 }
 
 .diffRow {
@@ -450,18 +450,20 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: opacity 120ms ease, transform 120ms ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: opacity 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: var(--elevation-xs);
   font-family: inherit;
 }
 
 .submitBtn:hover:not(:disabled) {
   opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
 }
 
 .submitBtn:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: var(--elevation-none);
 }
 
 .submitBtn:disabled {

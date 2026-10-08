@@ -2,7 +2,7 @@
   display: flex;
   min-height: 100dvh;
   --sb-bg: var(--surface);
-  --sb-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 10px rgba(0, 0, 0, 0.08);
+  --sb-shadow: var(--elevation-md);
   --sb-border: rgba(0, 0, 0, 0.10);
   --sb-text: var(--primary);
   --sb-text-hover: var(--primary);
@@ -14,13 +14,7 @@
 
 :global([data-theme="dark"]) .root,
 :global(.dark) .root {
-  /* Anterior: #0D2045 */
-  /* Anterior: #091120 */
   --sb-bg: #0b1729;
-  /* Anterior: --sb-shadow: 0 8px 32px rgba(10, 20, 50, 0.35), 0 2px 8px rgba(10, 20, 50, 0.20), inset 0 1px 0 rgba(255,255,255,0.08); */
-  /* Anterior franja inset: 0 20px 48px -8px rgba(0, 0, 0, 0.75), 0 8px 20px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.40); */
-  --sb-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.75), 0 6px 16px -2px rgba(0, 0, 0, 0.50);
-  /* Anterior: --sb-border: rgba(255, 255, 255, 0.10); */
   --sb-border: rgba(255, 255, 255, 0.08);
   --sb-text: rgba(255,255,255,0.35);
   --sb-text-hover: rgba(255,255,255,0.7);
@@ -102,7 +96,7 @@
   background-clip: padding-box;
   border-radius: 26px;
   padding: 4px;
-  box-shadow: var(--sb-shadow);
+  box-shadow: var(--elevation-md);
   border: 1px solid var(--sb-border);
   gap: 4px;
   -webkit-backdrop-filter: blur(16px);
@@ -111,7 +105,6 @@
 
 :global([data-theme="dark"]) .topNavPill,
 :global(.dark) .topNavPill {
-  /* Anterior: var(--sb-bg) / #091120 */
   background: #0b1729;
 }
 
@@ -131,7 +124,7 @@
   background-clip: padding-box;
   border-radius: 26px;
   padding: 4px;
-  box-shadow: var(--sb-shadow);
+  box-shadow: var(--elevation-md);
   border: 1px solid var(--sb-border);
   gap: 4px;
   flex-shrink: 0;
@@ -141,7 +134,6 @@
 
 :global([data-theme="dark"]) .actionPill,
 :global(.dark) .actionPill {
-  /* Anterior: var(--sb-bg) / #091120 */
   background: #0b1729;
 }
 
@@ -157,7 +149,7 @@
   background-clip: padding-box;
   border-radius: 26px;
   padding: 4px 14px 4px 4px;
-  box-shadow: var(--sb-shadow);
+  box-shadow: var(--elevation-md);
   border: 1px solid var(--sb-border);
   gap: 8px;
   cursor: pointer;
@@ -397,7 +389,7 @@
   right: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--elevation-md);
   border-radius: 16px;
   padding: 8px;
   display: flex;
@@ -409,7 +401,6 @@
 :global([data-theme="dark"]) .profileDropdown {
   background: var(--surface-alt);
   border-color: transparent;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .dropdownItem {

@@ -27,7 +27,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--elevation-xs);
 }
 
 .navBtn:hover:not(:disabled) {
@@ -77,7 +77,7 @@
 .summaryCard {
   background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--elevation-sm);
   border: 1px solid var(--border);
   padding: 16px 18px;
   display: flex;
@@ -456,13 +456,13 @@
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-sm);
 }
 
 .payBtn:hover:not(:disabled) {
   opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+  box-shadow: var(--elevation-md);
 }
 
 .payBtn:active:not(:disabled) {
@@ -474,7 +474,7 @@
   color: var(--text-3);
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
+  box-shadow: var(--elevation-none);
 }
 
 .payBtnSecondary {
@@ -494,13 +494,13 @@
   justify-content: center;
   gap: 6px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-sm);
 }
 
 .payBtnSecondary:hover:not(:disabled) {
   opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--elevation-md);
 }
 
 .paidBadge {

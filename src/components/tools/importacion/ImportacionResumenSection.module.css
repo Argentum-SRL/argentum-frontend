@@ -15,7 +15,7 @@
   background: var(--surface);
   border-radius: 20px;
   border: 1px solid var(--border);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -272,7 +272,7 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--elevation-sm);
 }
 
 .warningIconContainer {

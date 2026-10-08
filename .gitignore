@@ -27,12 +27,10 @@ dist-ssr
 gitleaks-*.json
 
 # Graphify and Antigravity local files
-/graphify-out/
-/.agents/
-/.agents/skills/
-/.agent/skills/
-.agents/skills/
-.agent/skills/
+graphify-out/
+.agents/
+.graphifyignore
+.gitattributes
 
 # Skills y artefactos de agentes locales
 .claude/

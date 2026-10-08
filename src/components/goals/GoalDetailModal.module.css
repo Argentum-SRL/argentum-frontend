@@ -17,7 +17,7 @@
     border-left: none !important;
     border-right: none !important;
     border-bottom: none !important;
-    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: var(--elevation-lg) !important;
   }
 }
 

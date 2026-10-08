@@ -34,7 +34,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--elevation-xs);
   border: 1.5px solid var(--surface);
 }
 

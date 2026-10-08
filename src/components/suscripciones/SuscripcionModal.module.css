@@ -506,17 +506,23 @@
   border: none;
   cursor: pointer;
   transition: all 150ms;
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
+  box-shadow: var(--elevation-xs);
 }
 
 .submitBtn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--elevation-none);
 }
 
 .submitBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: var(--elevation-none);
 }
 
 .cancelBtn {

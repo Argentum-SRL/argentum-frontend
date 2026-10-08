@@ -303,9 +303,7 @@
   backdrop-filter: blur(24px) saturate(180%);
   border-radius: 40px;
   border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 
-    0 4px 24px -1px rgba(0, 0, 0, 0.04),
-    0 32px 70px -18px rgba(13, 32, 69, 0.09);
+  box-shadow: var(--elevation-lg);
   margin: 0 auto;
   animation: contentIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
   overflow: hidden;
@@ -381,7 +379,7 @@
   justify-content: center;
   gap: 10px;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 10px 20px rgba(13, 32, 69, 0.2);
+  box-shadow: var(--elevation-sm);
   margin: 0 auto;
   width: auto;
   max-width: 100%;
@@ -394,7 +392,7 @@
 
 .emptyButton:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(13, 32, 69, 0.25);
+  box-shadow: var(--elevation-md);
   background: #142a57 !important;
 }
 
@@ -430,9 +428,7 @@
 :global([data-theme="dark"]) .emptyContent {
   background: rgba(22, 27, 36, 0.82);
   border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 4px 24px -1px rgba(0, 0, 0, 0.2),
-    0 32px 70px -18px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--elevation-lg);
 }
 
 :global([data-theme="dark"]) .emptyTitle {
@@ -449,7 +445,7 @@
 :global([data-theme="dark"]) .emptyButton {
   background: white !important;
   color: #0D2045 !important;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--elevation-sm);
 }
 
 :global([data-theme="dark"]) .emptyButton:hover {
@@ -653,7 +649,7 @@
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--elevation-sm);
   margin-top: 16px;
   margin-bottom: 4px;
 }

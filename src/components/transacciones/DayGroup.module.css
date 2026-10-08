@@ -64,12 +64,12 @@
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.015);
+  box-shadow: var(--elevation-sm);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 [data-theme="dark"] .cardContainer {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--elevation-sm);
   background: var(--surface);
   border-color: rgba(255, 255, 255, 0.06);
 }

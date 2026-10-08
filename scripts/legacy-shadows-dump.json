@@ -1,0 +1,2466 @@
+[
+  {
+    "file": "components/auth/AuthLayout/AuthLayout.module.css",
+    "line": 91,
+    "val": "0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04)",
+    "selector": ".standaloneCard",
+    "snippet": "  padding: var(--card-padding, 36px 32px);\n  border-radius: 24px;\n  background: rgba(255, 255, 255, 0.88);\n  border: 1px solid rgba(13, 32, 69, 0.08);\n  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04);\n  -webkit-backdrop-filter: blur(24px);\n  backdrop-filter: blur(24px);\n  box-sizing: border-box;"
+  },
+  {
+    "file": "components/auth/AuthLayout/AuthLayout.module.css",
+    "line": 104,
+    "val": "0 20px 50px rgba(0, 0, 0, 0.45)",
+    "selector": ":global([data-theme=\"dark\"]) .standaloneCard",
+    "snippet": "\n:global([data-theme=\"dark\"]) .standaloneCard {\n  background: rgba(13, 26, 54, 0.82);\n  border: 1px solid rgba(255, 255, 255, 0.08);\n  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);\n}\n\n.standalone .logoText {"
+  },
+  {
+    "file": "components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css",
+    "line": 54,
+    "val": "0 0 8px #10b981",
+    "selector": ".bgBadgeDot",
+    "snippet": "  width: 7px;\n  height: 7px;\n  border-radius: 50%;\n  background: #10b981;\n  box-shadow: 0 0 8px #10b981;\n}\n\n/* ── Modal Bloqueo Contraseña (Estética unificada con Modal y Perfil) ── */"
+  },
+  {
+    "file": "components/billeteras/ActualizarSaldoModal.module.css",
+    "line": 20,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalActualizarSaldo",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/billeteras/ActualizarSaldoModal.module.css",
+    "line": 215,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.04)",
+    "selector": ".diffBreakdownCard",
+    "snippet": "  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  border: 1.5px solid var(--border);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);\n}\n\n.diffRow {"
+  },
+  {
+    "file": "components/billeteras/ActualizarSaldoModal.module.css",
+    "line": 454,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.12)",
+    "selector": ".submitBtn",
+    "snippet": "  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  transition: opacity 120ms ease, transform 120ms ease;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);\n  font-family: inherit;\n}\n"
+  },
+  {
+    "file": "components/billeteras/BankPickerModal.module.css",
+    "line": 308,
+    "val": "0 6px 20px rgba(0, 0, 0, 0.10)",
+    "selector": ".pickerItem:hover",
+    "snippet": "}\n\n.pickerItem:hover {\n  transform: scale(1.04);\n  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);\n}\n\n.pickerItemNombre {"
+  },
+  {
+    "file": "components/billeteras/BankPickerModal.module.css",
+    "line": 1008,
+    "val": "0 0 0 2px rgba(var(--primary-rgb), 0.2)",
+    "selector": ".tnaInputBadge:focus-within",
+    "snippet": "}\n\n.tnaInputBadge:focus-within {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);\n}\n\n.tnaInput {"
+  },
+  {
+    "file": "components/billeteras/BankPickerModal.module.css",
+    "line": 1073,
+    "val": "0 1px 2px rgba(0, 0, 0, 0.2)",
+    "selector": ".customSwitchThumb",
+    "snippet": "  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: #ffffff;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  transform: translateX(0);\n  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);\n}"
+  },
+  {
+    "file": "components/billeteras/BilleteraCard.module.css",
+    "line": 22,
+    "val": "0 -4px 16px rgba(0, 0, 0, 0.1)",
+    "selector": ".wc",
+    "snippet": "\n@media (max-width: 767px) {\n  .wc {\n    height: 210px; /* Tamaño fijo tipo tarjeta solo en mobile */\n    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);\n  }\n  .frontCard {\n    order: 99;"
+  },
+  {
+    "file": "components/billeteras/BilleteraCard.module.css",
+    "line": 43,
+    "val": "0 16px 40px rgba(10, 13, 18, 0.12)",
+    "selector": ".wc:hover",
+    "snippet": "  }\n\n  .wc:hover {\n    transform: translateY(-3px);\n    box-shadow: 0 16px 40px rgba(10, 13, 18, 0.12);\n  }\n}\n"
+  },
+  {
+    "file": "components/billeteras/BilleteraCard.module.css",
+    "line": 257,
+    "val": "0 8px 24px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.06)",
+    "selector": ".dropdown",
+    "snippet": "  top: calc(100% + 6px);\n  right: 0;\n  background: white;\n  border-radius: 12px;\n  box-shadow: 0 8px 24px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.06);\n  border: 1px solid #EDECEA;\n  overflow: hidden;\n  min-width: 148px;"
+  },
+  {
+    "file": "components/billeteras/BilleteraCard.module.css",
+    "line": 407,
+    "val": "0 16px 40px rgba(10, 13, 18, 0.07)",
+    "selector": ".wcAdd:hover",
+    "snippet": "  .wcAdd:hover {\n    transform: translateY(-3px);\n    border-color: var(--primary);\n    background: var(--surface-alt);\n    box-shadow: 0 16px 40px rgba(10, 13, 18, 0.07);\n  }\n}\n"
+  },
+  {
+    "file": "components/billeteras/EditBilleteraModal.module.css",
+    "line": 147,
+    "val": "0 0 0 2px rgba(var(--primary-rgb), 0.12)",
+    "selector": ".bankPreviewNombreInput",
+    "snippet": "  border-radius: 8px;\n  padding: 2px 8px;\n  font-family: inherit;\n  outline: none;\n  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.12);\n}\n\n.bankPreviewTipo {"
+  },
+  {
+    "file": "components/billeteras/EditBilleteraModal.module.css",
+    "line": 380,
+    "val": "0 1px 2px rgba(0, 0, 0, 0.2)",
+    "selector": ".customSwitchThumb",
+    "snippet": "  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: #ffffff;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  transform: translateX(0);\n  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);\n}"
+  },
+  {
+    "file": "components/ciclo/CicloFinancieroSelector.module.css",
+    "line": 49,
+    "val": "0 4px 14px rgba(72, 120, 184, 0.15)",
+    "selector": ".modeCardActive",
+    "snippet": "\n.modeCardActive {\n  border-color: var(--primary) !important;\n  background: rgba(72, 120, 184, 0.08) !important;\n  box-shadow: 0 4px 14px rgba(72, 120, 184, 0.15);\n}\n\n:global([data-theme=\"dark\"]) .modeCard {"
+  },
+  {
+    "file": "components/ciclo/CicloFinancieroSelector.module.css",
+    "line": 65,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.25)",
+    "selector": ":global([data-theme=\"dark\"]) .modeCardActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .modeCardActive {\n  background: rgba(72, 120, 184, 0.18) !important;\n  border-color: var(--primary) !important;\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);\n}\n\n.modeIconWrap {"
+  },
+  {
+    "file": "components/ciclo/CicloFinancieroSelector.module.css",
+    "line": 242,
+    "val": "0 2px 8px rgba(72, 120, 184, 0.4)",
+    "selector": ".dayBtnActive",
+    "snippet": "  background: var(--primary) !important;\n  color: #ffffff !important;\n  font-weight: 700 !important;\n  border-color: var(--primary) !important;\n  box-shadow: 0 2px 8px rgba(72, 120, 184, 0.4);\n}\n\n:global([data-theme=\"dark\"]) .dayBtn {"
+  },
+  {
+    "file": "components/ciclo/CicloFinancieroSelector.module.css",
+    "line": 371,
+    "val": "0 3px 12px rgba(72, 120, 184, 0.12)",
+    "selector": ".businessCardActive",
+    "snippet": "\n.businessCardActive {\n  border-color: var(--primary) !important;\n  background: rgba(72, 120, 184, 0.09) !important;\n  box-shadow: 0 3px 12px rgba(72, 120, 184, 0.12);\n}\n\n:global([data-theme=\"dark\"]) .businessCard {"
+  },
+  {
+    "file": "components/ciclo/CicloFinancieroSelector.module.css",
+    "line": 507,
+    "val": "0 2px 8px rgba(72, 120, 184, 0.3)",
+    "selector": ".previewIconBox",
+    "snippet": "  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n  box-shadow: 0 2px 8px rgba(72, 120, 184, 0.3);\n}\n\n.previewContent {"
+  },
+  {
+    "file": "components/dashboard/BalanceCard/BalanceCard.module.css",
+    "line": 10,
+    "val": "0 16px 36px -12px rgba(8, 17, 34, 0.4)",
+    "selector": ".card",
+    "snippet": "  border-radius: 20px;\n  padding: 18px 20px;\n  color: #ffffff;\n  position: relative;\n  box-shadow: 0 16px 36px -12px rgba(8, 17, 34, 0.4);\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;"
+  },
+  {
+    "file": "components/dashboard/BalanceCard/BalanceCard.module.css",
+    "line": 28,
+    "val": "0 16px 40px -12px rgba(0, 0, 0, 0.65)",
+    "selector": "[data-theme=\"dark\"] .card",
+    "snippet": ":global(.dark) .card,\n[data-theme=\"dark\"] .card {\n  background: linear-gradient(165deg, #08101E 0%, #0C1A2E 60%, #091322 100%);\n  border: 1px solid rgba(255, 255, 255, 0.06);\n  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65);\n}\n\n/* ── 1. Header (Monedas a la izquierda, Privacidad a la derecha) ──── */"
+  },
+  {
+    "file": "components/dashboard/BalanceCard/BalanceCard.module.css",
+    "line": 99,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.18)",
+    "selector": ".currencyBtnActive",
+    "snippet": ".currencyBtnActive {\n  background: #ffffff;\n  color: #0C1728;\n  font-weight: 650;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);\n}\n\n:global([data-theme=\"dark\"]) .currencyBtnActive {"
+  },
+  {
+    "file": "components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal.module.css",
+    "line": 12,
+    "val": "0 20px 48px rgba(0, 0, 0, 0.2)",
+    "selector": ".modalRoot",
+    "snippet": "  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  position: relative;\n  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);\n  max-height: 88dvh;\n}\n"
+  },
+  {
+    "file": "components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal.module.css",
+    "line": 130,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.06)",
+    "selector": ".tabActive",
+    "snippet": "\n.tabActive {\n  background: var(--surface);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);\n  font-weight: 700;\n}\n"
+  },
+  {
+    "file": "components/dashboard/ProyeccionCard/ProyeccionCard.module.css",
+    "line": 10,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.02)",
+    "selector": ".card",
+    "snippet": "  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);\n  height: 100%;\n  width: 100%;\n  min-width: 0;"
+  },
+  {
+    "file": "components/goals/GoalCard.module.css",
+    "line": 24,
+    "val": "0 12px 24px -10px rgba(0, 0, 0, 0.06), 0 2px 6px -2px rgba(0, 0, 0, 0.03)",
+    "selector": ".card:hover",
+    "snippet": "\n.card:hover {\n  transform: translateY(-2px);\n  border-color: rgba(var(--primary-rgb), 0.28);\n  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.06), 0 2px 6px -2px rgba(0, 0, 0, 0.03);\n}\n\n:global([data-theme=\"dark\"]) .card:hover {"
+  },
+  {
+    "file": "components/goals/GoalCard.module.css",
+    "line": 29,
+    "val": "0 12px 28px -10px rgba(0, 0, 0, 0.4)",
+    "selector": ":global([data-theme=\"dark\"]) .card:hover",
+    "snippet": "}\n\n:global([data-theme=\"dark\"]) .card:hover {\n  border-color: rgba(72, 120, 184, 0.38);\n  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.4);\n}\n\n.card:focus-visible {"
+  },
+  {
+    "file": "components/goals/GoalCard.module.css",
+    "line": 33,
+    "val": "0 0 0 2px var(--primary)",
+    "selector": ".card:focus-visible",
+    "snippet": "  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.4);\n}\n\n.card:focus-visible {\n  box-shadow: 0 0 0 2px var(--primary);\n}\n\n/* ── Paused & Completed State Modifiers ────────────────────────────────────── */"
+  },
+  {
+    "file": "components/goals/GoalContributionModal.module.css",
+    "line": 20,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalContribution",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/goals/GoalContributionModal.module.css",
+    "line": 244,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1)",
+    "selector": ".segmentedPillActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/goals/GoalContributionModal.module.css",
+    "line": 268,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .segmentedPillActive",
+    "snippet": ":global(.dark) .segmentedPillActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "components/goals/GoalContributionModal.module.css",
+    "line": 366,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.2)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]",
+    "snippet": ".billeteraSelectWrap[data-active=\"false\"] {\n  transform: translateY(2px) scale(0.94);\n  filter: saturate(0.7) brightness(0.7);\n  opacity: 0.52;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);\n  z-index: 1;\n}\n"
+  },
+  {
+    "file": "components/goals/GoalContributionModal.module.css",
+    "line": 375,
+    "val": "0 6px 18px rgba(0, 0, 0, 0.28)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]:hover",
+    "snippet": "  .billeteraSelectWrap[data-active=\"false\"]:hover {\n    opacity: 0.78;\n    filter: saturate(0.88) brightness(0.85);\n    transform: translateY(0px) scale(0.97);\n    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);\n    z-index: 2;\n  }\n}"
+  },
+  {
+    "file": "components/goals/GoalContributionModal.module.css",
+    "line": 386,
+    "val": "0 16px 36px -4px rgba(15, 23, 42, 0.26),",
+    "selector": ".billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "  transform: translateY(-4px) scale(1.02);\n  filter: saturate(1.06) brightness(1.02);\n  opacity: 1;\n  z-index: 10;\n  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.26),\n              0 6px 14px -2px rgba(15, 23, 42, 0.16),\n              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}"
+  },
+  {
+    "file": "components/goals/GoalContributionModal.module.css",
+    "line": 392,
+    "val": "0 20px 42px -4px rgba(0, 0, 0, 0.6),",
+    "selector": ":global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}\n\n:global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"] {\n  box-shadow: 0 20px 42px -4px rgba(0, 0, 0, 0.6),\n              0 8px 18px -2px rgba(0, 0, 0, 0.45),\n              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}"
+  },
+  {
+    "file": "components/goals/GoalDetailModal.module.css",
+    "line": 20,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalDialog",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/goals/GoalModal.module.css",
+    "line": 20,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalGoal",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/goals/GoalModal.module.css",
+    "line": 333,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1)",
+    "selector": ".segmentedPillActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/goals/GoalModal.module.css",
+    "line": 362,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .segmentedPillActive",
+    "snippet": ":global(.dark) .segmentedPillActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "components/layout/AppLayout/AppLayout.module.css",
+    "line": 105,
+    "val": "var(--sb-shadow)",
+    "selector": ".topNavPill",
+    "snippet": "  background: var(--sb-bg);\n  background-clip: padding-box;\n  border-radius: 26px;\n  padding: 4px;\n  box-shadow: var(--sb-shadow);\n  border: 1px solid var(--sb-border);\n  gap: 4px;\n  -webkit-backdrop-filter: blur(16px);"
+  },
+  {
+    "file": "components/layout/AppLayout/AppLayout.module.css",
+    "line": 134,
+    "val": "var(--sb-shadow)",
+    "selector": ".actionPill",
+    "snippet": "  background: var(--sb-bg);\n  background-clip: padding-box;\n  border-radius: 26px;\n  padding: 4px;\n  box-shadow: var(--sb-shadow);\n  border: 1px solid var(--sb-border);\n  gap: 4px;\n  flex-shrink: 0;"
+  },
+  {
+    "file": "components/layout/AppLayout/AppLayout.module.css",
+    "line": 160,
+    "val": "var(--sb-shadow)",
+    "selector": ".profilePill",
+    "snippet": "  background: var(--sb-bg);\n  background-clip: padding-box;\n  border-radius: 26px;\n  padding: 4px 14px 4px 4px;\n  box-shadow: var(--sb-shadow);\n  border: 1px solid var(--sb-border);\n  gap: 8px;\n  cursor: pointer;"
+  },
+  {
+    "file": "components/layout/AppLayout/AppLayout.module.css",
+    "line": 400,
+    "val": "0 4px 20px rgba(0, 0, 0, 0.1)",
+    "selector": ".profileDropdown",
+    "snippet": "  top: calc(100% + 8px);\n  right: 0;\n  background: var(--surface);\n  border: 1px solid var(--border);\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\n  border-radius: 16px;\n  padding: 8px;\n  display: flex;"
+  },
+  {
+    "file": "components/layout/AppLayout/AppLayout.module.css",
+    "line": 412,
+    "val": "0 8px 32px rgba(0, 0, 0, 0.3)",
+    "selector": ":global([data-theme=\"dark\"]) .profileDropdown",
+    "snippet": "}\n:global([data-theme=\"dark\"]) .profileDropdown {\n  background: var(--surface-alt);\n  border-color: transparent;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);\n}\n\n.dropdownItem {"
+  },
+  {
+    "file": "components/layout/AppLayout/SearchModal.module.css",
+    "line": 204,
+    "val": "0 4px 8px rgba(0, 0, 0, 0.04)",
+    "selector": ".gridCard:hover, .gridCardActive",
+    "snippet": ".gridCard:hover, .gridCardActive {\n  border-color: var(--primary);\n  background: var(--surface-alt);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);\n}\n\n:global([data-theme=\"dark\"]) .gridCard {"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileBottomNav.module.css",
+    "line": 11,
+    "val": "var(--sb-shadow)",
+    "selector": ".mobileNav",
+    "snippet": "  background: var(--sb-bg);\n  background-clip: padding-box;\n  border-radius: 28px;\n  padding: 5px;\n  box-shadow: var(--sb-shadow);\n  border: 1px solid var(--sb-border);\n  z-index: 40;\n  align-items: center;"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileBottomNav.module.css",
+    "line": 28,
+    "val": "var(--sb-shadow)",
+    "selector": ":global(.dark) .mobileNav",
+    "snippet": ":global(.dark) .mobileNav {\n  /* Anterior: var(--sb-bg) / #091120 */\n  background: #0b1729;\n  border-color: var(--sb-border);\n  box-shadow: var(--sb-shadow);\n}\n\n@media (min-width: 768px) {"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileBottomNav.module.css",
+    "line": 53,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12)",
+    "selector": ".indicator",
+    "snippet": "  width: 52px;\n  height: 46px;\n  border-radius: 23px;\n  background: var(--sb-active-bg);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);\n  z-index: 1;\n  pointer-events: none;\n  will-change: transform, opacity;"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileBottomNav.module.css",
+    "line": 63,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+    "selector": ":global(.dark) .indicator",
+    "snippet": "}\n\n:global([data-theme=\"dark\"]) .indicator,\n:global(.dark) .indicator {\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);\n}\n\n"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileMoreSheet.module.css",
+    "line": 30,
+    "val": "0 -8px 32px rgba(0, 0, 0, 0.18), 0 -2px 8px rgba(0, 0, 0, 0.08)",
+    "selector": ".sheet",
+    "snippet": "  background: var(--surface);\n  border-radius: 24px 24px 0 0;\n  padding: 8px 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px;\n  z-index: 9001;\n  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18), 0 -2px 8px rgba(0, 0, 0, 0.08);\n  border-top: 1px solid var(--border);\n  opacity: 0;\n  transform: translate3d(0, 100%, 0);"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileMoreSheet.module.css",
+    "line": 46,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.45)",
+    "selector": ":global(.dark) .sheet",
+    "snippet": "\n:global([data-theme=\"dark\"]) .sheet,\n:global(.dark) .sheet {\n  border-top-color: rgba(255, 255, 255, 0.1);\n  box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.45);\n}\n\n@media (min-width: 768px) {"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileMoreSheet.module.css",
+    "line": 151,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12)",
+    "selector": ".itemPressed",
+    "snippet": ".itemPressed {\n  background: var(--sb-active-bg) !important;\n  color: var(--sb-active-text) !important;\n  transform: scale(0.978) translateZ(0) !important;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);\n}\n\n:global([data-theme=\"dark\"]) .itemPressed {"
+  },
+  {
+    "file": "components/layout/MobileBottomNav/MobileMoreSheet.module.css",
+    "line": 155,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16)",
+    "selector": ":global([data-theme=\"dark\"]) .itemPressed",
+    "snippet": "  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);\n}\n\n:global([data-theme=\"dark\"]) .itemPressed {\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);\n}\n\n.itemPressed .iconWrapper {"
+  },
+  {
+    "file": "components/mock/DashboardMockup/DashboardMockup.module.css",
+    "line": 55,
+    "val": "0 2px 24px rgba(0,0,0,0.12)",
+    "selector": ".card",
+    "snippet": "  max-width: 340px;\n  border-radius: 16px;\n  padding: 20px;\n  background: var(--surface);\n  box-shadow: 0 2px 24px rgba(0,0,0,0.12);\n}\n\n.balanceLabel {"
+  },
+  {
+    "file": "components/mock/WppChatMockup/WppChatMockup.module.css",
+    "line": 57,
+    "val": "0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 0 80px rgba(72,120,184,0.25)",
+    "selector": ".chatCard",
+    "snippet": "  border-radius: 16px;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 0 80px rgba(72,120,184,0.25);\n  background: #ECE5DD;\n}\n"
+  },
+  {
+    "file": "components/mock/WppChatMockup/WppChatMockup.module.css",
+    "line": 191,
+    "val": "0 1px 0.5px rgba(0,0,0,0.13)",
+    "selector": ".bubbleText",
+    "snippet": "  max-width: 75%;\n  border-radius: 16px 16px 16px 4px;\n  background: #FFFFFF;\n  padding: 8px 12px;\n  box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);\n}\n\n.bubbleTextUser {"
+  },
+  {
+    "file": "components/notificaciones/NotificacionesConfigModal.module.css",
+    "line": 234,
+    "val": "0 0 1px var(--primary)",
+    "selector": ".switch input:focus + .slider",
+    "snippet": "  background-color: var(--primary);\n}\n\n.switch input:focus + .slider {\n  box-shadow: 0 0 1px var(--primary);\n}\n\n.switch input:checked + .slider:before {"
+  },
+  {
+    "file": "components/notificaciones/NotificacionesDrawer.module.css",
+    "line": 202,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.05)",
+    "selector": ".card:hover",
+    "snippet": "\n.card:hover {\n  border-color: var(--text-3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);\n}\n\n.cardUnread {"
+  },
+  {
+    "file": "components/notificaciones/NotificacionesDrawer.module.css",
+    "line": 330,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.15)",
+    "selector": ".silenceMenu",
+    "snippet": "  right: 0;\n  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  z-index: 20;\n  min-width: 120px;\n  padding: 4px;"
+  },
+  {
+    "file": "components/notificaciones/NotificacionesDrawer.module.css",
+    "line": 392,
+    "val": "0 8px 24px rgba(0, 0, 0, 0.18)",
+    "selector": ".mobileMenu",
+    "snippet": "  right: 0;\n  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 12px;\n  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);\n  z-index: 30;\n  min-width: 175px;\n  padding: 6px;"
+  },
+  {
+    "file": "components/onboarding/StepDatosPersonales.module.css",
+    "line": 47,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".input:focus",
+    "snippet": "}\n\n.input:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .input:focus {"
+  },
+  {
+    "file": "components/onboarding/StepDatosPersonales.module.css",
+    "line": 51,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.15)",
+    "selector": ":global([data-theme=\"dark\"]) .input:focus",
+    "snippet": "  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .input:focus {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);\n}\n\n.inputError {"
+  },
+  {
+    "file": "components/onboarding/StepMoneda.module.css",
+    "line": 114,
+    "val": "0 1px 3px rgba(0,0,0,0.15)",
+    "selector": ".toggleThumb",
+    "snippet": "  position: absolute;\n  top: 2px;\n  left: 2px;\n  transition: transform 0.2s;\n  box-shadow: 0 1px 3px rgba(0,0,0,0.15);\n}\n\n.toggleOn .toggleThumb {"
+  },
+  {
+    "file": "components/perfil/PerfilFinancieroCard.module.css",
+    "line": 8,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.02)",
+    "selector": ".pfCard",
+    "snippet": "  border-radius: 20px;\n  padding: 16px 20px;\n  position: relative;\n  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);\n  display: flex;\n  flex-direction: column;\n  gap: 14px;"
+  },
+  {
+    "file": "components/perfil/PerfilFinancieroCard.module.css",
+    "line": 270,
+    "val": "0 10px 25px -4px rgba(0, 0, 0, 0.15)",
+    "selector": ".pfTooltip",
+    "snippet": "  padding: 8px 12px;\n  border-radius: 10px;\n  width: 200px;\n  max-width: 240px;\n  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.15);\n  z-index: 60;\n  pointer-events: none;\n  text-align: left;"
+  },
+  {
+    "file": "components/presupuestos/PresupuestoModal.module.css",
+    "line": 20,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalPresupuesto",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/presupuestos/PresupuestoModal.module.css",
+    "line": 432,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.03)",
+    "selector": ".catCardSelected",
+    "snippet": "\n.catCardSelected {\n  border-color: rgba(var(--primary-rgb), 0.4);\n  background: var(--surface);\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);\n}\n\n:global([data-theme=\"dark\"]) .catCardSelected,"
+  },
+  {
+    "file": "components/presupuestos/PresupuestoModal.module.css",
+    "line": 442,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.05)",
+    "selector": ".catCardExpanded",
+    "snippet": "}\n\n.catCardExpanded {\n  border-color: var(--silver);\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);\n}\n\n.catCardTop {"
+  },
+  {
+    "file": "components/presupuestos/PresupuestoModal.module.css",
+    "line": 569,
+    "val": "0 2px 6px rgba(var(--primary-rgb), 0.35)",
+    "selector": ".checkCircleActive",
+    "snippet": "\n.checkCircleActive {\n  background: var(--primary);\n  border-color: var(--primary);\n  box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.35);\n  transform: scale(1.05);\n}\n"
+  },
+  {
+    "file": "components/presupuestos/PresupuestoModal.module.css",
+    "line": 669,
+    "val": "0 2px 6px rgba(var(--primary-rgb), 0.25)",
+    "selector": ".subcatChipActive",
+    "snippet": "  background: var(--primary) !important;\n  color: #ffffff !important;\n  border-color: var(--primary) !important;\n  font-weight: 700;\n  box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.25);\n}\n\n.subcatChipName {"
+  },
+  {
+    "file": "components/presupuestos/PresupuestoModal.module.css",
+    "line": 729,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.06)",
+    "selector": ".periodBtnActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--primary) !important;\n  font-weight: 700;\n  border-color: rgba(var(--primary-rgb), 0.15) !important;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);\n}\n\n[data-theme=\"dark\"] .periodBtnActive,"
+  },
+  {
+    "file": "components/presupuestos/PresupuestoModal.module.css",
+    "line": 737,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.3)",
+    "selector": ".dark .periodBtnActive",
+    "snippet": ".dark .periodBtnActive {\n  background: var(--surface-3, #1e293b) !important;\n  color: var(--primary-light, #93c5fd) !important;\n  border-color: rgba(255, 255, 255, 0.1) !important;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n}\n\n.periodBtnIcon {"
+  },
+  {
+    "file": "components/suscripciones/SuscripcionCard.module.css",
+    "line": 17,
+    "val": "0 8px 24px rgba(0, 0, 0, 0.1)",
+    "selector": ".card:hover",
+    "snippet": "}\n\n.card:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);\n}\n\n.cardPausada {"
+  },
+  {
+    "file": "components/suscripciones/SuscripcionModal.module.css",
+    "line": 509,
+    "val": "0 4px 12px rgba(var(--primary-rgb), 0.2)",
+    "selector": ".submitBtn",
+    "snippet": "  font-size: 15px;\n  border: none;\n  cursor: pointer;\n  transition: all 150ms;\n  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);\n}\n\n.submitBtn:hover:not(:disabled) {"
+  },
+  {
+    "file": "components/suscripciones/SuscripcionModal.module.css",
+    "line": 514,
+    "val": "0 6px 16px rgba(var(--primary-rgb), 0.3)",
+    "selector": ".submitBtn:hover:not(:disabled)",
+    "snippet": "}\n\n.submitBtn:hover:not(:disabled) {\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3);\n}\n\n.submitBtn:disabled {"
+  },
+  {
+    "file": "components/tarjetas/MiniCard.tsx",
+    "line": 38,
+    "val": "'0 4px 8px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.1)',",
+    "selector": "<div style=",
+    "snippet": "      alignItems: 'center',\n      justifyContent: 'center',\n      position: 'relative',\n      overflow: 'hidden',\n      boxShadow: '0 4px 8px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.1)',\n      border: '0.5px solid rgba(0,0,0,0.1)'\n    }}>\n      {/* Glossy Effect */}"
+  },
+  {
+    "file": "components/tarjetas/MiniCard.tsx",
+    "line": 73,
+    "val": "'inset 0 0 1px rgba(0,0,0,0.3)',",
+    "selector": "<div style=",
+    "snippet": "        width: 8,\n        height: 6,\n        borderRadius: 1.5,\n        background: 'linear-gradient(135deg, #FFD700 0%, #B8860B 100%)',\n        boxShadow: 'inset 0 0 1px rgba(0,0,0,0.3)',\n        display: 'flex',\n        flexDirection: 'column',\n        justifyContent: 'space-around',"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 18,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalPagarResumen",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 192,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)",
+    "selector": ".segmentedPillActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-1px);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 216,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.35)",
+    "selector": ":global(.dark) .segmentedPillActive",
+    "snippet": ":global(.dark) .segmentedPillActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.16) !important;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 262,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".fieldSelect:focus",
+    "snippet": "}\n\n.fieldSelect:focus {\n  border-color: var(--border);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n/* ── Hero Monto Card (Modo Pagar Total) ───────────────────────────────────── */"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 274,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.04)",
+    "selector": ".montoHeroCard",
+    "snippet": "  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  border: 1.5px solid var(--border);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);\n  transition: border-color 160ms ease, box-shadow 160ms ease;\n  flex-shrink: 0;\n}"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 323,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.04)",
+    "selector": ".quickChip",
+    "snippet": "  font-weight: 600;\n  color: var(--text-2);\n  cursor: pointer;\n  transition: all 140ms ease;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);\n}\n\n.quickChip:hover {"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 330,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.06)",
+    "selector": ".quickChip:hover",
+    "snippet": ".quickChip:hover {\n  background: var(--surface-alt);\n  color: var(--text);\n  border-color: var(--border);\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);\n}\n\n.quickChipActive {"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 338,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08)",
+    "selector": ".quickChipActive",
+    "snippet": "  background: var(--surface-alt);\n  border-color: var(--text);\n  color: var(--text);\n  font-weight: 700;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n}\n\n/* ── Desglose Card (Clean) ───────────────────────────────────────────────── */"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 479,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.05)",
+    "selector": ".inlineInput:focus",
+    "snippet": "}\n\n.inlineInput:focus {\n  border-color: var(--border);\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);\n}\n\n.pesificacionTotalRow {"
+  },
+  {
+    "file": "components/tarjetas/PagarResumenModal.module.css",
+    "line": 679,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.12)",
+    "selector": ".submitBtn",
+    "snippet": "  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  transition: opacity 120ms ease, transform 120ms ease;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);\n}\n\n.submitBtn:hover:not(:disabled) {"
+  },
+  {
+    "file": "components/tarjetas/PresionFuturaCard.module.css",
+    "line": 31,
+    "val": "0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)",
+    "selector": ".card",
+    "snippet": ".card {\n  background: var(--surface);\n  border-radius: 16px;\n  border: 1px solid var(--border);\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);\n  padding: 16px 18px;\n  display: flex;\n  flex-direction: column;"
+  },
+  {
+    "file": "components/tarjetas/PresionFuturaCard.module.css",
+    "line": 200,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.03)",
+    "selector": ".emptyCard",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 14px;\n  padding: 14px 16px;\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);\n}\n\n.emptyIconCircle {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaCard.module.css",
+    "line": 137,
+    "val": "0 12px 28px rgba(0, 0, 0, 0.15)",
+    "selector": ".cardScene",
+    "snippet": "  position: relative;\n  cursor: pointer;\n  margin: 0 auto;\n  border-radius: 14px;\n  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);\n}\n\n/* Contenedor que rota */"
+  },
+  {
+    "file": "components/tarjetas/TarjetaCard.module.css",
+    "line": 287,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.25)",
+    "selector": ".magneticStripe",
+    "snippet": "  height: clamp(22px, 9cqi, 32px);\n  margin-left: clamp(-20px, -5.5cqi, -12px);\n  margin-right: clamp(-20px, -5.5cqi, -12px);\n  margin-top: clamp(-6px, -2cqi, -2px);\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);\n}\n\n.signatureStripRow {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaCard.module.css",
+    "line": 307,
+    "val": "inset 0 1px 2px rgba(0, 0, 0, 0.08)",
+    "selector": ".signatureStrip",
+    "snippet": "  align-items: center;\n  padding-left: clamp(8px, 3cqi, 12px);\n  padding-right: 6px;\n  border-radius: 4px;\n  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);\n}\n\n.signatureText {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaCard.module.css",
+    "line": 330,
+    "val": "inset 0 0 0 1px rgba(0, 0, 0, 0.08)",
+    "selector": ".cvvBox",
+    "snippet": "  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  border-radius: 4px;\n  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);\n  flex-shrink: 0;\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 20,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalTarjeta",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 195,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".fieldInput:focus",
+    "snippet": "\n.fieldInput:focus {\n  border-color: var(--border);\n  background: var(--surface);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n.fieldHint {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 233,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08)",
+    "selector": ".redTile",
+    "snippet": "  -webkit-tap-highlight-color: transparent;\n  transform: translateY(3px) scale(0.93);\n  opacity: 0.52;\n  filter: saturate(0.65) brightness(0.85);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),\n              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),\n              opacity 240ms ease,"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 246,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.14)",
+    "selector": ".redTile[data-active=\"false\"]:hover",
+    "snippet": "  .redTile[data-active=\"false\"]:hover {\n    transform: translateY(0px) scale(0.98);\n    opacity: 0.82;\n    filter: saturate(0.9) brightness(0.96);\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);\n    background: var(--surface);\n  }\n}"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 258,
+    "val": "0 8px 20px -2px rgba(0, 0, 0, 0.12),",
+    "selector": ".redTile[data-active=\"true\"]",
+    "snippet": "  opacity: 1;\n  filter: saturate(1.05) brightness(1.01);\n  background: var(--surface);\n  z-index: 5;\n  box-shadow: 0 8px 20px -2px rgba(0, 0, 0, 0.12),\n              0 3px 6px -1px rgba(0, 0, 0, 0.06);\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 264,
+    "val": "0 10px 24px -2px rgba(0, 0, 0, 0.45),",
+    "selector": ":global([data-theme=\"dark\"]) .redTile[data-active=\"true\"]",
+    "snippet": "}\n\n:global([data-theme=\"dark\"]) .redTile[data-active=\"true\"] {\n  background: #1e293b;\n  box-shadow: 0 10px 24px -2px rgba(0, 0, 0, 0.45),\n              0 4px 10px -1px rgba(0, 0, 0, 0.3);\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 276,
+    "val": "inset 0 1px 1px rgba(255, 255, 255, 0.45)",
+    "selector": ".redTile[data-active=\"true\"]::after",
+    "snippet": "  inset: 0;\n  border-radius: inherit;\n  pointer-events: none;\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.08) 100%);\n  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}\n\n/* Tactile Spring Press */"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 342,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".cardDigitsHero:focus-within",
+    "snippet": "\n.cardDigitsHero:focus-within {\n  border-color: var(--border);\n  background: var(--surface);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n.cardDigitsPrefix {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 431,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.15)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]",
+    "snippet": ".billeteraSelectWrap[data-active=\"false\"] {\n  transform: translateY(3px) scale(0.93);\n  filter: saturate(0.65) brightness(0.65);\n  opacity: 0.48;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n  z-index: 1;\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 440,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.2)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]:hover",
+    "snippet": "  .billeteraSelectWrap[data-active=\"false\"]:hover {\n    opacity: 0.72;\n    filter: saturate(0.85) brightness(0.8);\n    transform: translateY(1px) scale(0.96);\n    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);\n    z-index: 2;\n  }\n}"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 450,
+    "val": "0 12px 28px -4px rgba(0, 0, 0, 0.18),",
+    "selector": ".billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "  transform: translateY(-6px) scale(1.03);\n  filter: saturate(1.05) brightness(1.01);\n  opacity: 1;\n  z-index: 10;\n  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.18),\n              0 4px 10px -2px rgba(0, 0, 0, 0.08);\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 455,
+    "val": "0 14px 32px -4px rgba(0, 0, 0, 0.5),",
+    "selector": ":global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "              0 4px 10px -2px rgba(0, 0, 0, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"] {\n  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.5),\n              0 6px 14px -2px rgba(0, 0, 0, 0.35);\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 504,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".cycleDualCard:focus-within",
+    "snippet": "\n.cycleDualCard:focus-within {\n  border-color: var(--border);\n  background: var(--surface);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n.cycleCol {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 586,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".percepcionCard:focus-within",
+    "snippet": "\n.percepcionCard:focus-within {\n  border-color: var(--border);\n  background: var(--surface);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n.percepcionInfo {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 621,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.05)",
+    "selector": ".percepcionBadgeInput",
+    "snippet": "  border-radius: 12px;\n  padding: 0 10px;\n  height: 38px;\n  flex-shrink: 0;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);\n}\n\n:global([data-theme=\"dark\"]) .percepcionBadgeInput {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 701,
+    "val": "0 16px 36px -8px rgba(0, 0, 0, 0.22), 0 4px 12px -2px rgba(0, 0, 0, 0.08)",
+    "selector": ".realCard",
+    "snippet": "  padding: clamp(12px, 4.8cqi, 18px) clamp(14px, 5.8cqi, 22px);\n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.22), 0 4px 12px -2px rgba(0, 0, 0, 0.08);\n  font-size: 0.9em;\n  transition: background 300ms ease, box-shadow 300ms ease;\n  user-select: none;"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 872,
+    "val": "0 3px 8px rgba(0, 0, 0, 0.2)",
+    "selector": ".colorSwatchCircle",
+    "snippet": "  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  border: 1px solid rgba(255, 255, 255, 0.25);\n  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);\n  transition: box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);\n}\n"
+  },
+  {
+    "file": "components/tarjetas/TarjetaModal.module.css",
+    "line": 877,
+    "val": "0 12px 24px -4px rgba(0, 0, 0, 0.38),",
+    "selector": ".colorSwatchBtn[data-active=\"true\"] .colorSwatchCircle",
+    "snippet": "  transition: box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);\n}\n\n.colorSwatchBtn[data-active=\"true\"] .colorSwatchCircle {\n  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.38),\n              0 4px 10px rgba(0, 0, 0, 0.15),\n              inset 0 1px 1.5px rgba(255, 255, 255, 0.45);\n}"
+  },
+  {
+    "file": "components/tarjetas/TarjetaSummary.module.css",
+    "line": 30,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.04)",
+    "selector": ".navBtn",
+    "snippet": "  color: var(--text-2);\n  cursor: pointer;\n  transition: all 0.2s ease;\n  flex-shrink: 0;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);\n}\n\n.navBtn:hover:not(:disabled) {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaSummary.module.css",
+    "line": 80,
+    "val": "0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)",
+    "selector": ".summaryCard",
+    "snippet": "/* ── Tarjeta de Resumen (Clean FinTech Card) ── */\n.summaryCard {\n  background: var(--surface);\n  border-radius: 16px;\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);\n  border: 1px solid var(--border);\n  padding: 16px 18px;\n  display: flex;"
+  },
+  {
+    "file": "components/tarjetas/TarjetaSummary.module.css",
+    "line": 459,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08)",
+    "selector": ".payBtn",
+    "snippet": "  width: 100%;\n  transition: all 0.2s ease;\n  text-transform: uppercase;\n  letter-spacing: 0.05em;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n}\n\n.payBtn:hover:not(:disabled) {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaSummary.module.css",
+    "line": 465,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.14)",
+    "selector": ".payBtn:hover:not(:disabled)",
+    "snippet": "\n.payBtn:hover:not(:disabled) {\n  opacity: 0.92;\n  transform: translateY(-1px);\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);\n}\n\n.payBtn:active:not(:disabled) {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaSummary.module.css",
+    "line": 497,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08)",
+    "selector": ".payBtnSecondary",
+    "snippet": "  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  transition: all 0.2s ease;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n}\n\n.payBtnSecondary:hover:not(:disabled) {"
+  },
+  {
+    "file": "components/tarjetas/TarjetaSummary.module.css",
+    "line": 503,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.12)",
+    "selector": ".payBtnSecondary:hover:not(:disabled)",
+    "snippet": "\n.payBtnSecondary:hover:not(:disabled) {\n  opacity: 0.92;\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);\n}\n\n.paidBadge {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 26,
+    "val": "0 2px 14px rgba(0, 0, 0, 0.03)",
+    "selector": ".card",
+    "snippet": "  background: var(--surface);\n  border-radius: 20px;\n  border: 1px solid var(--border);\n  padding: 20px;\n  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03);\n  display: flex;\n  flex-direction: column;\n  gap: 16px;"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 107,
+    "val": "0 2px 8px rgba(13, 32, 69, 0.18)",
+    "selector": ".stepBadgeActive",
+    "snippet": "\n.stepBadgeActive {\n  background: var(--primary);\n  color: #ffffff;\n  box-shadow: 0 2px 8px rgba(13, 32, 69, 0.18);\n}\n\n[data-theme=\"dark\"] .stepBadgeActive {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 388,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.03)",
+    "selector": ".comparisonHighlight",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  padding: 12px 16px;\n  border-radius: 14px;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);\n}\n\n.step1Header {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 460,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.03)",
+    "selector": ".summaryBarCard",
+    "snippet": "  justify-content: space-between;\n  gap: 16px;\n  width: 100%;\n  box-sizing: border-box;\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);\n  animation: fadeSlideUp 0.3s ease both;\n  flex-wrap: wrap;\n}"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 664,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.06)",
+    "selector": ".pillOptionActive",
+    "snippet": ".pillOptionActive {\n  background: var(--surface);\n  color: var(--primary);\n  border-color: var(--border);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);\n  font-weight: 700;\n}\n"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 670,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.3)",
+    "selector": "[data-theme=\"dark\"] .pillOptionActive",
+    "snippet": "}\n\n[data-theme=\"dark\"] .pillOptionActive {\n  color: #60a5fa;\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);\n}\n\n/* ── Quick Chips (cuotas rápidas) ─────────────────────────────────────────── */"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 776,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".tnaInput:focus",
+    "snippet": "}\n\n.tnaInput:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n[data-theme=\"dark\"] .tnaInput:focus {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 781,
+    "val": "0 0 0 3px rgba(96, 165, 250, 0.15)",
+    "selector": "[data-theme=\"dark\"] .tnaInput:focus",
+    "snippet": "}\n\n[data-theme=\"dark\"] .tnaInput:focus {\n  border-color: #60a5fa;\n  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);\n}\n\n.tnaInput::-webkit-inner-spin-button,"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 1169,
+    "val": "0 2px 12px rgba(0, 0, 0, 0.03)",
+    "selector": ".contextCard",
+    "snippet": "  padding: 16px 20px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);\n  animation: fadeSlideUp 0.3s ease both;\n}\n"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 1439,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.1)",
+    "selector": ".chartTooltip",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  padding: 10px 14px;\n  border-radius: 10px;\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);\n}\n\n.tooltipLabel {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 1713,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.2)",
+    "selector": ".fwDot:focus-visible",
+    "snippet": "  line-height: 1;\n}\n\n.fwDot:focus-visible {\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);\n}\n\n.fwDot:disabled { cursor: not-allowed; }"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 1722,
+    "val": "0 2px 12px rgba(37, 99, 235, 0.3)",
+    "selector": ".fwDotActive",
+    "snippet": ".fwDotActive {\n  background: var(--primary);\n  color: #fff;\n  border-color: var(--primary);\n  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.3);\n  transform: scale(1.1);\n}\n"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 1979,
+    "val": "0 3px 10px rgba(37, 99, 235, 0.22)",
+    "selector": ".fwChipActive",
+    "snippet": ".fwChipActive {\n  background: var(--primary);\n  color: #fff;\n  border-color: var(--primary);\n  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.22);\n  transform: translateY(-1px);\n}\n"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2099,
+    "val": "0 4px 18px rgba(37, 99, 235, 0.22)",
+    "selector": ".fwCta",
+    "snippet": "  cursor: pointer;\n  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;\n  font-family: inherit;\n  letter-spacing: -0.01em;\n  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.22);\n}\n\n.fwCta:hover:not(:disabled) {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2104,
+    "val": "0 7px 22px rgba(37, 99, 235, 0.3)",
+    "selector": ".fwCta:hover:not(:disabled)",
+    "snippet": "}\n\n.fwCta:hover:not(:disabled) {\n  transform: translateY(-2px);\n  box-shadow: 0 7px 22px rgba(37, 99, 235, 0.3);\n}\n\n.fwCta:active:not(:disabled) { transform: translateY(0); }"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2358,
+    "val": "0 2px 8px -2px rgba(0, 0, 0, 0.04)",
+    "selector": ".wbStepper",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  padding: 6px 14px;\n  border-radius: 999px;\n  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.04);\n}\n\n.wbStepItem {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2379,
+    "val": "0 0 0 2px var(--primary)",
+    "selector": ".wbStepItem:focus-visible",
+    "snippet": "  outline: none;\n}\n\n.wbStepItem:focus-visible {\n  box-shadow: 0 0 0 2px var(--primary);\n}\n\n.wbStepItem:disabled {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2412,
+    "val": "0 2px 8px rgba(37, 99, 235, 0.35)",
+    "selector": ".wbStepItemActive .wbStepDot",
+    "snippet": ".wbStepItemActive .wbStepDot {\n  background: var(--primary);\n  color: #fff;\n  border-color: var(--primary);\n  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);\n}\n\n.wbStepItemDone {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2446,
+    "val": "0 10px 32px -8px rgba(0, 0, 0, 0.06), 0 2px 8px -2px rgba(0, 0, 0, 0.03)",
+    "selector": ".wbInitialShell",
+    "snippet": "  background: var(--surface);\n  border: 1.5px solid var(--border);\n  border-radius: 24px;\n  padding: 40px 36px;\n  box-shadow: 0 10px 32px -8px rgba(0, 0, 0, 0.06), 0 2px 8px -2px rgba(0, 0, 0, 0.03);\n  display: flex;\n  flex-direction: column;\n  gap: 16px;"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2505,
+    "val": "0 4px 14px rgba(37, 99, 235, 0.28)",
+    "selector": ".wbInitialCta",
+    "snippet": "  font-size: 15px;\n  font-weight: 700;\n  font-family: inherit;\n  cursor: pointer;\n  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);\n  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);\n}\n"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2511,
+    "val": "0 6px 20px rgba(37, 99, 235, 0.38)",
+    "selector": ".wbInitialCta:hover:not(:disabled)",
+    "snippet": "}\n\n.wbInitialCta:hover:not(:disabled) {\n  transform: translateY(-1.5px);\n  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);\n}\n\n.wbInitialCta:disabled {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 2528,
+    "val": "0 12px 40px -10px rgba(0, 0, 0, 0.07), 0 2px 10px -2px rgba(0, 0, 0, 0.03)",
+    "selector": ".wbShell",
+    "snippet": "  margin: 0 auto;\n  background: var(--surface);\n  border: 1.5px solid var(--border);\n  border-radius: 24px;\n  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.07), 0 2px 10px -2px rgba(0, 0, 0, 0.03);\n  overflow: hidden;\n  box-sizing: border-box;\n  animation: wbFadeScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3028,
+    "val": "0 0 0 2px var(--primary)",
+    "selector": ".wbChip:focus-visible",
+    "snippet": "  color: var(--text);\n}\n\n.wbChip:focus-visible {\n  box-shadow: 0 0 0 2px var(--primary);\n}\n\n.wbChipActive {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3035,
+    "val": "0 2px 8px rgba(37, 99, 235, 0.28)",
+    "selector": ".wbChipActive",
+    "snippet": ".wbChipActive {\n  background: var(--primary) !important;\n  color: #fff !important;\n  border-color: var(--primary) !important;\n  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);\n}\n\n[data-theme=\"dark\"] .wbChipActive {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3058,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.12)",
+    "selector": ".wbCustomCuotasWrap:focus-within",
+    "snippet": "}\n\n.wbCustomCuotasWrap:focus-within {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n}\n\n.wbCustomInput {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3113,
+    "val": "0 0 0 2px var(--primary)",
+    "selector": ".wbSegmentedBtn:focus-visible",
+    "snippet": "  outline: none;\n}\n\n.wbSegmentedBtn:focus-visible {\n  box-shadow: 0 0 0 2px var(--primary);\n}\n\n.wbSegmentedBtnActive {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3119,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.08)",
+    "selector": ".wbSegmentedBtnActive",
+    "snippet": "\n.wbSegmentedBtnActive {\n  background: var(--surface);\n  color: var(--text);\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);\n}\n\n[data-theme=\"dark\"] .wbSegmentedBtnActive {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3124,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.25)",
+    "selector": "[data-theme=\"dark\"] .wbSegmentedBtnActive",
+    "snippet": "}\n\n[data-theme=\"dark\"] .wbSegmentedBtnActive {\n  background: rgba(255, 255, 255, 0.1);\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);\n}\n\n/* Modo de Ingreso (Por cuota vs Total) */"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3177,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.06)",
+    "selector": ".wbSubPillActive",
+    "snippet": "\n.wbSubPillActive {\n  background: var(--surface);\n  color: var(--text);\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);\n}\n\n.wbInputBlock {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3206,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.12)",
+    "selector": ".wbStandardInputWrap:focus-within",
+    "snippet": "}\n\n.wbStandardInputWrap:focus-within {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n}\n\n.wbStandardInput {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3316,
+    "val": "0 4px 14px rgba(37, 99, 235, 0.28)",
+    "selector": ".wbCtaButton",
+    "snippet": "  font-size: 15px;\n  font-weight: 700;\n  cursor: pointer;\n  font-family: inherit;\n  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);\n  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);\n  outline: none;\n}"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3323,
+    "val": "0 6px 20px rgba(37, 99, 235, 0.38)",
+    "selector": ".wbCtaButton:hover:not(:disabled)",
+    "snippet": "}\n\n.wbCtaButton:hover:not(:disabled) {\n  transform: translateY(-1.5px);\n  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);\n}\n\n.wbCtaButton:focus-visible {"
+  },
+  {
+    "file": "components/tools/ToolsComponents.module.css",
+    "line": 3327,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.4)",
+    "selector": ".wbCtaButton:focus-visible",
+    "snippet": "  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);\n}\n\n.wbCtaButton:focus-visible {\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);\n}\n\n.wbCtaButton:disabled {"
+  },
+  {
+    "file": "components/tools/importacion/ImportacionResumenSection.module.css",
+    "line": 18,
+    "val": "0 8px 30px rgba(0, 0, 0, 0.04)",
+    "selector": ".formContainer",
+    "snippet": ".formContainer {\n  background: var(--surface);\n  border-radius: 20px;\n  border: 1px solid var(--border);\n  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;"
+  },
+  {
+    "file": "components/tools/importacion/ImportacionResumenSection.module.css",
+    "line": 275,
+    "val": "0 4px 20px rgba(0, 0, 0, 0.02)",
+    "selector": ".blockingCard",
+    "snippet": "  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 16px;\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);\n}\n\n.warningIconContainer {"
+  },
+  {
+    "file": "components/tools/importacion/ModalesImportacion.module.css",
+    "line": 308,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.05)",
+    "selector": ".pillActiveNeutral",
+    "snippet": ".pillActiveNeutral {\n  background: var(--surface) !important;\n  color: var(--text) !important;\n  border-color: var(--border) !important;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);\n}\n\n/* ── Alertas e Información ────────────────────────────────────────────────── */"
+  },
+  {
+    "file": "components/tools/importacion/TablaPreviewImportacion.module.css",
+    "line": 233,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.02)",
+    "selector": ".card",
+    "snippet": "  padding: 16px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);\n  transition: opacity 150ms ease, border-color 150ms ease;\n}\n"
+  },
+  {
+    "file": "components/transacciones/DayGroup.module.css",
+    "line": 67,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.015)",
+    "selector": ".cardContainer",
+    "snippet": "  background: var(--surface);\n  border-radius: 18px;\n  overflow: hidden;\n  border: 1px solid var(--border);\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.015);\n  transition: box-shadow 0.2s ease, border-color 0.2s ease;\n}\n"
+  },
+  {
+    "file": "components/transacciones/DayGroup.module.css",
+    "line": 72,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.2)",
+    "selector": "[data-theme=\"dark\"] .cardContainer",
+    "snippet": "  transition: box-shadow 0.2s ease, border-color 0.2s ease;\n}\n\n[data-theme=\"dark\"] .cardContainer {\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);\n  background: var(--surface);\n  border-color: rgba(255, 255, 255, 0.06);\n}"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 68,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.02)",
+    "selector": ".mobileFilterBtn",
+    "snippet": "  border: 1px solid var(--border);\n  font-size: 13px;\n  font-weight: 700;\n  cursor: pointer;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);\n  transition: all 0.15s ease;\n  user-select: none;\n}"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 170,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.12)",
+    "selector": ".mobileExpandedSearchInput",
+    "snippet": "  background: var(--surface);\n  color: var(--text);\n  font-size: 13.5px;\n  font-weight: 500;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n  outline: none;\n  font-family: inherit;\n  box-sizing: border-box;"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 177,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.2)",
+    "selector": ":global([data-theme=\"dark\"]) .mobileExpandedSearchInput",
+    "snippet": "  box-sizing: border-box;\n}\n\n:global([data-theme=\"dark\"]) .mobileExpandedSearchInput {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.2);\n}\n\n.mobileExpandedSearchInput::placeholder {"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 282,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".tabActive",
+    "snippet": "\n.tabActive {\n  background: var(--surface);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n:global([data-theme=\"dark\"]) .tabActive {"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 288,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.25)",
+    "selector": ":global([data-theme=\"dark\"]) .tabActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .tabActive {\n  background: var(--surface-alt);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);\n}\n\n/* ── Desktop Filter Pills ─────────────────────────────── */"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 337,
+    "val": "0 2px 8px rgba(var(--primary-rgb, 13, 32, 69), 0.15)",
+    "selector": ".pillActive",
+    "snippet": ".pillActive {\n  background: var(--primary);\n  border-color: var(--primary);\n  color: #ffffff;\n  box-shadow: 0 2px 8px rgba(var(--primary-rgb, 13, 32, 69), 0.15);\n}\n\n.pillRelative {"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 531,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".searchInput:focus",
+    "snippet": "\n.searchInput:focus {\n  outline: none;\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .searchInput:focus {"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 535,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.18)",
+    "selector": ":global([data-theme=\"dark\"]) .searchInput:focus",
+    "snippet": "  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .searchInput:focus {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.18);\n}\n\n.searchInput::placeholder {"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 578,
+    "val": "0 10px 38px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.06)",
+    "selector": ".popover",
+    "snippet": "  top: calc(100% + 8px);\n  left: 0;\n  background: var(--surface);\n  border-radius: 14px;\n  box-shadow: 0 10px 38px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.06);\n  border: 1px solid var(--border);\n  padding: 12px;\n  z-index: 100;"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 930,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.06)",
+    "selector": ".typePillActiveIngresoMobile",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.06);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 958,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .typePillActiveIngresoMobile",
+    "snippet": ":global(.dark) .typePillActiveIngresoMobile {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);\n}\n\n/* ── Collapsible Dropdown Sections (Mobile Drawer) ── */"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 996,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.05)",
+    "selector": ".triggerActive",
+    "snippet": "\n.triggerActive {\n  background: var(--surface) !important;\n  border-color: var(--border) !important;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);\n}\n\n:global([data-theme=\"dark\"]) .accountsTrigger,"
+  },
+  {
+    "file": "components/transacciones/FilterBar.module.css",
+    "line": 1414,
+    "val": "0 4px 12px rgba(var(--primary-rgb, 13, 32, 69), 0.2)",
+    "selector": ".applyBtnMobileNew",
+    "snippet": "  font-weight: 700;\n  cursor: pointer;\n  text-align: center;\n  transition: all 0.2s ease;\n  box-shadow: 0 4px 12px rgba(var(--primary-rgb, 13, 32, 69), 0.2);\n  font-family: inherit;\n}\n"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 21,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.02)",
+    "selector": ".metricsBar",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 16px;\n  padding: 12px 18px;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);\n}\n\n@media (min-width: 768px) {"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 150,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".filterTabActive",
+    "snippet": "\n.filterTabActive {\n  background: var(--surface);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n:global([data-theme=\"dark\"]) .filterTabActive {"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 156,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.25)",
+    "selector": ":global([data-theme=\"dark\"]) .filterTabActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .filterTabActive {\n  background: var(--surface-alt);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);\n}\n\n.mobileSearchTriggerBtn {"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 226,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.12)",
+    "selector": ".mobileExpandedSearchInput",
+    "snippet": "  background: var(--surface);\n  color: var(--text);\n  font-size: 13.5px;\n  font-weight: 500;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n  outline: none;\n}\n"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 316,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.02)",
+    "selector": ".row",
+    "snippet": "  cursor: pointer;\n  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 14px;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);\n  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;\n  -webkit-user-select: none;\n  user-select: none;"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 334,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.04)",
+    "selector": ".row:hover",
+    "snippet": "\n.row:hover {\n  background: var(--surface-alt);\n  transform: translateY(-1.5px);\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);\n}\n\n:global([data-theme=\"dark\"]) .row,"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 341,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.2)",
+    "selector": ":global(.dark) .row",
+    "snippet": ":global([data-theme=\"dark\"]) .row,\n:global(.dark) .row {\n  background: var(--surface);\n  border-color: rgba(255, 255, 255, 0.07);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);\n}\n\n:global([data-theme=\"dark\"]) .row:hover,"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 348,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.35)",
+    "selector": ":global(.dark) .row:hover",
+    "snippet": ":global([data-theme=\"dark\"]) .row:hover,\n:global(.dark) .row:hover {\n  background: var(--surface-alt);\n  border-color: rgba(255, 255, 255, 0.14);\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);\n}\n\n.row:active {"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 649,
+    "val": "0 4px 16px -2px rgba(13, 32, 69, 0.04)",
+    "selector": ".detailHeroSurface",
+    "snippet": "  padding: 16px 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n  box-shadow: 0 4px 16px -2px rgba(13, 32, 69, 0.04);\n}\n\n:global([data-theme=\"dark\"]) .detailHeroSurface,"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 674,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.04)",
+    "selector": ".detailHeroAvatar",
+    "snippet": "  border: 1px solid var(--border);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);\n  flex-shrink: 0;\n}\n"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 1045,
+    "val": "0 4px 12px rgba(13, 32, 69, 0.15)",
+    "selector": ".detailPrepayActionBtn",
+    "snippet": "  background: #0D2045;\n  color: white;\n  border: none;\n  font-family: 'Figtree', sans-serif;\n  box-shadow: 0 4px 12px rgba(13, 32, 69, 0.15);\n}\n\n:global([data-theme=\"dark\"]) .detailPrepayActionBtn,"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 1051,
+    "val": "0 4px 12px rgba(59, 130, 246, 0.25)",
+    "selector": ":global(.dark) .detailPrepayActionBtn",
+    "snippet": "\n:global([data-theme=\"dark\"]) .detailPrepayActionBtn,\n:global(.dark) .detailPrepayActionBtn {\n  background: var(--primary);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);\n}\n\n.detailPrepayActionBtn:hover {"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 1086,
+    "val": "0 4px 12px rgba(59, 130, 246, 0.05)",
+    "selector": ".prepayHeroBanner",
+    "snippet": "  padding: 16px 18px;\n  border-radius: 16px;\n  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%);\n  border: 1.5px solid rgba(59, 130, 246, 0.22);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.05);\n}\n\n.prepayHeroIconWrap {"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 1715,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.2)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]",
+    "snippet": ".billeteraSelectWrap[data-active=\"false\"] {\n  transform: translateY(2px) scale(0.94);\n  filter: saturate(0.7) brightness(0.7);\n  opacity: 0.52;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);\n  z-index: 1;\n}\n"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 1724,
+    "val": "0 6px 18px rgba(0, 0, 0, 0.28)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]:hover",
+    "snippet": "  .billeteraSelectWrap[data-active=\"false\"]:hover {\n    opacity: 0.78;\n    filter: saturate(0.88) brightness(0.85);\n    transform: translateY(0px) scale(0.97);\n    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);\n    z-index: 2;\n  }\n}"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 1734,
+    "val": "0 16px 36px -4px rgba(15, 23, 42, 0.26),",
+    "selector": ".billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "  transform: translateY(-4px) scale(1.02);\n  filter: saturate(1.06) brightness(1.02);\n  opacity: 1;\n  z-index: 10;\n  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.26),\n              0 6px 14px -2px rgba(15, 23, 42, 0.16),\n              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}"
+  },
+  {
+    "file": "components/transacciones/GruposCuotasTab.module.css",
+    "line": 1740,
+    "val": "0 20px 42px -4px rgba(0, 0, 0, 0.6),",
+    "selector": ":global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}\n\n:global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"] {\n  box-shadow: 0 20px 42px -4px rgba(0, 0, 0, 0.6),\n              0 8px 18px -2px rgba(0, 0, 0, 0.45),\n              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}"
+  },
+  {
+    "file": "components/transacciones/MemoriaComercioDialog.module.css",
+    "line": 108,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.06)",
+    "selector": ".catIconWrap",
+    "snippet": "  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);\n}\n\n:global([data-theme=\"dark\"]) .catIconWrap,"
+  },
+  {
+    "file": "components/transacciones/MemoriaComercioDialog.module.css",
+    "line": 114,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .catIconWrap",
+    "snippet": "\n:global([data-theme=\"dark\"]) .catIconWrap,\n:global(.dark) .catIconWrap {\n  background: var(--page);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\n.catDetails {"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 445,
+    "val": "0 2px 8px rgba(220, 38, 38, 0.1)",
+    "selector": ".pillActiveEgreso",
+    "snippet": "\n.pillActiveEgreso {\n  background: #fee2e2 !important;\n  color: #dc2626 !important;\n  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);\n}\n\n.pillActiveIngreso {"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 717,
+    "val": "inset 0 1px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(0, 0, 0, 0.2)",
+    "selector": ".billeteraSelectWrap :global(.wcBg)::after",
+    "snippet": "  inset: 0;\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(0, 0, 0, 0.16) 100%);\n  pointer-events: none;\n  border-radius: inherit;\n  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(0, 0, 0, 0.2);\n}\n\n/* Card inner layout: top header + centered balance */"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 744,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.15) !important",
+    "selector": ".billeteraSelectWrap :global(.wcLogo)",
+    "snippet": "  min-width: 28px !important;\n  border-radius: 50% !important;\n  background: rgba(255, 255, 255, 0.2) !important;\n  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;\n}\n\n.billeteraSelectWrap :global(.wcCardLogo) {"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 857,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.05)",
+    "selector": ".methodBtn",
+    "snippet": "  -webkit-tap-highlight-color: transparent;\n  transform: translateY(1px) scale(0.96);\n  opacity: 0.6;\n  filter: saturate(0.75) brightness(0.92);\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);\n  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1),\n              box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1),\n              opacity 200ms ease,"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 871,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.1)",
+    "selector": ".methodBtn:not(.methodBtnActive):hover",
+    "snippet": "  .methodBtn:not(.methodBtnActive):hover {\n    transform: translateY(0px) scale(0.98);\n    opacity: 0.85;\n    filter: saturate(0.9) brightness(0.98);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n    background: var(--surface);\n  }\n}"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 884,
+    "val": "0 6px 16px -2px rgba(0, 0, 0, 0.12),",
+    "selector": ".methodBtnActive",
+    "snippet": "  opacity: 1;\n  filter: saturate(1.05) brightness(1.01);\n  background: var(--surface) !important;\n  z-index: 5;\n  box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.12),\n              0 2px 5px -1px rgba(0, 0, 0, 0.06);\n}\n"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 893,
+    "val": "0 8px 20px -2px rgba(0, 0, 0, 0.45),",
+    "selector": ":global(.dark) .methodBtnActive",
+    "snippet": ":global([data-theme=\"dark\"]) .methodBtnActive,\n:global(.dark) .methodBtn[data-active=\"true\"],\n:global(.dark) .methodBtnActive {\n  background: #1e293b !important;\n  box-shadow: 0 8px 20px -2px rgba(0, 0, 0, 0.45),\n              0 3px 8px -1px rgba(0, 0, 0, 0.3);\n}\n"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 906,
+    "val": "inset 0 1px 1px rgba(255, 255, 255, 0.45)",
+    "selector": ".methodBtnActive::after",
+    "snippet": "  inset: 0;\n  border-radius: inherit;\n  pointer-events: none;\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.08) 100%);\n  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}\n\n/* Tactile Spring Press */"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1197,
+    "val": "0 0 0 2px var(--surface)",
+    "selector": ".tarjetaDot",
+    "snippet": "  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n  background-color: var(--tarjeta-color, var(--text-3));\n  box-shadow: 0 0 0 2px var(--surface);\n}\n\n.tarjetaOptionActive .tarjetaDot {"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1201,
+    "val": "0 0 0 2px var(--surface-alt)",
+    "selector": ".tarjetaOptionActive .tarjetaDot",
+    "snippet": "  box-shadow: 0 0 0 2px var(--surface);\n}\n\n.tarjetaOptionActive .tarjetaDot {\n  box-shadow: 0 0 0 2px var(--surface-alt);\n}\n\n/* ── Minimalist & High-Craft Step 2: Financiación (Apple/Fintech Standard) ── */"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1255,
+    "val": "0 4px 14px rgba(15, 23, 42, 0.1), inset 0 0 0 1px var(--primary)",
+    "selector": ".planOptionCardActive",
+    "snippet": "\n.planOptionCardActive {\n  background: var(--surface) !important;\n  border-color: var(--primary) !important;\n  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1), inset 0 0 0 1px var(--primary);\n  transform: translateY(-2px);\n}\n"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1262,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.45), inset 0 0 0 1px var(--primary)",
+    "selector": ":global(.dark) .planOptionCardActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .planOptionCardActive,\n:global(.dark) .planOptionCardActive {\n  background: #1e293b !important;\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), inset 0 0 0 1px var(--primary);\n}\n\n.planCuotasNum {"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1419,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08)",
+    "selector": ".timingBtnActive",
+    "snippet": "\n.timingBtnActive {\n  background: var(--surface) !important;\n  color: var(--text) !important;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .timingBtnActive,"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1425,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.4)",
+    "selector": ":global(.dark) .timingBtnActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .timingBtnActive,\n:global(.dark) .timingBtnActive {\n  background: #1e293b !important;\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);\n}\n\n.timingBtnTitle {"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1531,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.04)",
+    "selector": ".heroFinancingCard",
+    "snippet": "  padding: 10px 14px;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);\n}\n\n:global([data-theme=\"dark\"]) .heroFinancingCard,"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1748,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1)",
+    "selector": ".segmentedPillActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/transacciones/TransaccionModal.module.css",
+    "line": 1772,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .segmentedPillActive",
+    "snippet": ":global(.dark) .segmentedPillActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "components/transacciones/TransaccionRow.module.css",
+    "line": 36,
+    "val": "inset 0 0 0 2px var(--primary)",
+    "selector": ".rowClickable:focus-visible",
+    "snippet": "  transform: scale(0.998);\n}\n\n.rowClickable:focus-visible {\n  box-shadow: inset 0 0 0 2px var(--primary);\n}\n\n.rowStatic {"
+  },
+  {
+    "file": "components/transacciones/TransaccionRow.module.css",
+    "line": 121,
+    "val": "0 2px 4px rgba(217, 119, 6, 0.3)",
+    "selector": ".avatarBadge",
+    "snippet": "  color: #FFFFFF;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);\n  border: 1.5px solid var(--surface);\n}\n"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 20,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5) !important",
+    "selector": ".modalTransferencia",
+    "snippet": "    margin: 0 !important;\n    border-left: none !important;\n    border-right: none !important;\n    border-bottom: none !important;\n    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5) !important;\n  }\n}\n"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 236,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.12)",
+    "selector": ".pillActivePrimary",
+    "snippet": ".pillActivePrimary {\n  background: var(--primary) !important;\n  color: #ffffff !important;\n  border-color: var(--primary) !important;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);\n}\n\n.pillActiveEgreso {"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 301,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1)",
+    "selector": ".segmentedPillActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 325,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .segmentedPillActive",
+    "snippet": ":global(.dark) .segmentedPillActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 411,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.25)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]",
+    "snippet": ".billeteraSelectWrap[data-active=\"false\"] {\n  transform: translateY(4px) scale(0.92);\n  filter: saturate(0.65) brightness(0.65);\n  opacity: 0.48;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);\n  z-index: 1;\n}\n"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 420,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.32)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]:hover",
+    "snippet": "  .billeteraSelectWrap[data-active=\"false\"]:hover {\n    opacity: 0.72;\n    filter: saturate(0.85) brightness(0.8);\n    transform: translateY(1px) scale(0.95);\n    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);\n    z-index: 2;\n  }\n}"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 431,
+    "val": "0 20px 42px -6px rgba(15, 23, 42, 0.28),",
+    "selector": ".billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "  transform: translateY(-8px) scale(1.04);\n  filter: saturate(1.08) brightness(1.02);\n  opacity: 1;\n  z-index: 10;\n  box-shadow: 0 20px 42px -6px rgba(15, 23, 42, 0.28),\n              0 8px 18px -3px rgba(15, 23, 42, 0.18),\n              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 437,
+    "val": "0 24px 48px -6px rgba(0, 0, 0, 0.62),",
+    "selector": ":global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}\n\n:global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"] {\n  box-shadow: 0 24px 48px -6px rgba(0, 0, 0, 0.62),\n              0 10px 22px -3px rgba(0, 0, 0, 0.45),\n              inset 0 1px 1px rgba(255, 255, 255, 0.45);\n}"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 484,
+    "val": "inset 0 1px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(0, 0, 0, 0.2)",
+    "selector": ".billeteraSelectWrap :global(.wcBg)::after",
+    "snippet": "  inset: 0;\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(0, 0, 0, 0.16) 100%);\n  pointer-events: none;\n  border-radius: inherit;\n  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(0, 0, 0, 0.2);\n}\n\n/* Card inner layout: top header + centered balance */"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 511,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.15) !important",
+    "selector": ".billeteraSelectWrap :global(.wcLogo)",
+    "snippet": "  min-width: 36px !important;\n  border-radius: 50% !important;\n  background: rgba(255, 255, 255, 0.2) !important;\n  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;\n}\n\n.billeteraSelectWrap :global(.wcCardLogo) {"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 661,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1)",
+    "selector": ".methodBtnActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  border-color: var(--border) !important;\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);\n  z-index: 2;\n}\n"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 689,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .methodBtnActive",
+    "snippet": ":global([data-theme=\"dark\"]) .methodBtnActive,\n:global(.dark) .methodBtnActive {\n  background: #1e293b !important;\n  border-color: rgba(255, 255, 255, 0.22) !important;\n  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);\n}\n\n:global([data-theme=\"dark\"]) .methodBtnActive .methodBtnTitle,"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 912,
+    "val": "0 3px 10px rgba(0, 0, 0, 0.2)",
+    "selector": ".billeteraSelectWrap[data-active=\"false\"]",
+    "snippet": "  .billeteraSelectWrap[data-active=\"false\"] {\n    transform: translateY(3px) scale(0.92);\n    opacity: 0.46;\n    filter: saturate(0.65) brightness(0.65);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);\n  }\n\n  .billeteraSelectWrap[data-active=\"true\"] {"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 919,
+    "val": "0 16px 34px -4px rgba(15, 23, 42, 0.28),",
+    "selector": ".billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "  .billeteraSelectWrap[data-active=\"true\"] {\n    transform: translateY(-6px) scale(1.04);\n    opacity: 1;\n    filter: saturate(1.08) brightness(1.02);\n    box-shadow: 0 16px 34px -4px rgba(15, 23, 42, 0.28),\n                0 6px 14px -2px rgba(15, 23, 42, 0.16);\n  }\n"
+  },
+  {
+    "file": "components/transferencias/TransferenciaModal.module.css",
+    "line": 924,
+    "val": "0 18px 38px -4px rgba(0, 0, 0, 0.58),",
+    "selector": ":global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"]",
+    "snippet": "                0 6px 14px -2px rgba(15, 23, 42, 0.16);\n  }\n\n  :global([data-theme=\"dark\"]) .billeteraSelectWrap[data-active=\"true\"] {\n    box-shadow: 0 18px 38px -4px rgba(0, 0, 0, 0.58),\n                0 6px 16px -2px rgba(0, 0, 0, 0.42);\n  }\n"
+  },
+  {
+    "file": "components/transferencias/TransferenciaRow.module.css",
+    "line": 37,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.12)",
+    "selector": ".avatarDestino",
+    "snippet": "  display: flex;\n  align-items: center;\n  justify-content: center;\n  overflow: hidden;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);\n  border: 1.5px solid var(--surface);\n}\n"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 60,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.02)",
+    "selector": ".mobileFilterBtn",
+    "snippet": "  border: 1px solid var(--border);\n  font-size: 13px;\n  font-weight: 700;\n  cursor: pointer;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);\n  transition: all 0.15s ease;\n  user-select: none;\n}"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 179,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.12)",
+    "selector": ".mobileExpandedSearchInput",
+    "snippet": "  background: var(--surface);\n  color: var(--text);\n  font-size: 13.5px;\n  font-weight: 500;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n  outline: none;\n  font-family: inherit;\n}"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 185,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.2)",
+    "selector": ":global([data-theme=\"dark\"]) .mobileExpandedSearchInput",
+    "snippet": "  font-family: inherit;\n}\n\n:global([data-theme=\"dark\"]) .mobileExpandedSearchInput {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.2);\n}\n\n.mobileExpandedSearchInput::placeholder {"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 275,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".tabActive",
+    "snippet": "\n.tabActive {\n  background: var(--surface);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n:global([data-theme=\"dark\"]) .tabActive {"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 281,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.25)",
+    "selector": ":global([data-theme=\"dark\"]) .tabActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .tabActive {\n  background: var(--surface-alt);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);\n}\n\n/* ── Search Container (Desktop) ──────── */"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 335,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.1)",
+    "selector": ".searchInput:focus",
+    "snippet": "\n.searchInput:focus {\n  outline: none;\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.1);\n}\n\n:global([data-theme=\"dark\"]) .searchInput:focus {"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 339,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.2)",
+    "selector": ":global([data-theme=\"dark\"]) .searchInput:focus",
+    "snippet": "  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.1);\n}\n\n:global([data-theme=\"dark\"]) .searchInput:focus {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.2);\n}\n\n.searchInput::placeholder {"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 442,
+    "val": "0 6px 16px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.06)",
+    "selector": ".typePillActiveMobile",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-2px);\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.06);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 466,
+    "val": "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)",
+    "selector": ":global(.dark) .typePillActiveMobile",
+    "snippet": ":global(.dark) .typePillActiveMobile {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);\n}\n\n/* ── Accounts Section (Dashboard Style) ── */"
+  },
+  {
+    "file": "components/transferencias/TransferenciasFilterBar.module.css",
+    "line": 744,
+    "val": "0 4px 12px rgba(var(--primary-rgb, 13, 32, 69), 0.2)",
+    "selector": ".applyBtnMobileNew",
+    "snippet": "  font-weight: 700;\n  cursor: pointer;\n  text-align: center;\n  transition: all 0.2s ease;\n  box-shadow: 0 4px 12px rgba(var(--primary-rgb, 13, 32, 69), 0.2);\n  font-family: inherit;\n}\n"
+  },
+  {
+    "file": "components/ui/AtmosphericBackground/AtmosphericBackground.module.css",
+    "line": 193,
+    "val": "0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04)",
+    "selector": ".card",
+    "snippet": "  padding: 36px 28px;\n  border-radius: 24px;\n  background: rgba(255, 255, 255, 0.88);\n  border: 1px solid rgba(13, 32, 69, 0.08);\n  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04);\n  -webkit-backdrop-filter: blur(24px);\n  backdrop-filter: blur(24px);\n  position: relative;"
+  },
+  {
+    "file": "components/ui/AtmosphericBackground/AtmosphericBackground.module.css",
+    "line": 207,
+    "val": "0 20px 50px rgba(0, 0, 0, 0.45)",
+    "selector": ":global([data-theme=\"dark\"]) .card",
+    "snippet": "\n:global([data-theme=\"dark\"]) .card {\n  background: rgba(13, 26, 54, 0.78);\n  border: 1px solid rgba(255, 255, 255, 0.08);\n  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);\n}\n\n@keyframes cardFadeIn {"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 52,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.04)",
+    "selector": ".catBtn",
+    "snippet": "  outline: none;\n  -webkit-tap-highlight-color: transparent;\n  opacity: 1;\n  filter: none;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);\n  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),\n              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),\n              border-color 200ms ease,"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 76,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.08)",
+    "selector": ".catBtn:hover",
+    "snippet": "@media (hover: hover) and (pointer: fine) {\n  .catBtn:hover {\n    transform: translateY(-2px);\n    border-color: var(--silver);\n    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);\n    background: var(--surface);\n  }\n}"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 88,
+    "val": "0 0 0 1.5px var(--primary),",
+    "selector": ".catBtnActive",
+    "snippet": "  transform: translateY(-2px) scale(1.02);\n  background: var(--surface) !important;\n  border-color: var(--primary) !important;\n  z-index: 5;\n  box-shadow: 0 0 0 1.5px var(--primary),\n              0 6px 18px -2px rgba(var(--primary-rgb), 0.18),\n              0 2px 5px -1px rgba(0, 0, 0, 0.06);\n}"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 99,
+    "val": "0 0 0 1.5px var(--primary),",
+    "selector": ":global(.dark) .catBtnActive",
+    "snippet": ":global(.dark) .catBtn[data-active=\"true\"],\n:global(.dark) .catBtnActive {\n  background: #1e293b !important;\n  border-color: var(--primary) !important;\n  box-shadow: 0 0 0 1.5px var(--primary),\n              0 8px 20px -2px rgba(0, 0, 0, 0.45);\n}\n"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 179,
+    "val": "0 3px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03)",
+    "selector": ".selectedCatBanner",
+    "snippet": "  justify-content: space-between;\n  padding: 10px 14px;\n  background: var(--surface);\n  border-radius: 14px;\n  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);\n  border: 1px solid var(--border-subtle);\n  transition: all 200ms ease;\n}"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 188,
+    "val": "0 6px 18px rgba(0, 0, 0, 0.35)",
+    "selector": ":global(.dark) .selectedCatBanner",
+    "snippet": ":global([data-theme=\"dark\"]) .selectedCatBanner,\n:global(.dark) .selectedCatBanner {\n  background: #1e293b;\n  border-color: rgba(255, 255, 255, 0.08);\n  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);\n}\n\n@media (max-width: 480px) {"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 314,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.04)",
+    "selector": ".subcatChip",
+    "snippet": "  color: var(--text);\n  cursor: pointer;\n  outline: none;\n  font-family: 'Figtree', sans-serif;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);\n  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease;\n  -webkit-tap-highlight-color: transparent;\n  user-select: none;"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 336,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.08)",
+    "selector": ".subcatChip:hover",
+    "snippet": "  .subcatChip:hover {\n    background: var(--surface);\n    color: var(--text);\n    border-color: var(--silver);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);\n    transform: translateY(-1px);\n  }\n}"
+  },
+  {
+    "file": "components/ui/CategoriaSelector/CategoriaSelector.module.css",
+    "line": 347,
+    "val": "0 4px 14px rgba(var(--primary-rgb), 0.35)",
+    "selector": ".subcatChip[data-active=\"true\"]",
+    "snippet": "  background: var(--primary) !important;\n  border-color: var(--primary) !important;\n  color: #ffffff !important;\n  font-weight: 700;\n  box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.35);\n  transform: translateY(-1px) scale(1.02);\n}\n"
+  },
+  {
+    "file": "components/ui/ColorPicker/ColorPicker.module.css",
+    "line": 47,
+    "val": "0 1px 4px rgba(0, 0, 0, 0.15)",
+    "selector": ".swatch",
+    "snippet": "  width: 22px;\n  height: 22px;\n  border-radius: 6px;\n  border: 2px solid #fff;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);\n  flex-shrink: 0;\n}\n"
+  },
+  {
+    "file": "components/ui/ColorPicker/ColorPicker.module.css",
+    "line": 78,
+    "val": "0 16px 40px rgba(0, 0, 0, 0.6)",
+    "selector": ":global(.dark) .panel",
+    "snippet": ":global([data-theme=\"dark\"]) .panel,\n:global(.dark) .panel {\n  background: var(--surface);\n  border: 1px solid rgba(255, 255, 255, 0.12);\n  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);\n}\n\n.panelInner {"
+  },
+  {
+    "file": "components/ui/ColorPicker/ColorPicker.module.css",
+    "line": 124,
+    "val": "0 -8px 40px rgba(0, 0, 0, 0.6)",
+    "selector": ":global(.dark) .bottomSheet",
+    "snippet": ":global([data-theme=\"dark\"]) .bottomSheet,\n:global(.dark) .bottomSheet {\n  background: var(--surface);\n  border-top: 1px solid rgba(255, 255, 255, 0.12);\n  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);\n}\n\n.dragHandle {"
+  },
+  {
+    "file": "components/ui/ColorPicker/ColorPicker.module.css",
+    "line": 203,
+    "val": "inset 0 0 0 1px rgba(0, 0, 0, 0.08)",
+    "selector": ".presetBtn",
+    "snippet": "  align-items: center;\n  justify-content: center;\n  transition: transform 0.12s ease, box-shadow 0.12s ease;\n  position: relative;\n  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);\n}\n\n.presetBtn:active {"
+  },
+  {
+    "file": "components/ui/ColorPicker/ColorPicker.module.css",
+    "line": 216,
+    "val": "0 0 0 2px var(--surface), 0 0 0 4px var(--primary) !important",
+    "selector": ".presetBtnActive",
+    "snippet": "  z-index: 1;\n}\n\n.presetBtnActive {\n  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary) !important;\n  transform: scale(1.05);\n  z-index: 2;\n}"
+  },
+  {
+    "file": "components/ui/ColorPicker/ColorPicker.module.css",
+    "line": 258,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.15)",
+    "selector": ".hexPreview",
+    "snippet": "  width: 36px;\n  height: 36px;\n  border-radius: 10px;\n  border: 2px solid #fff;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);\n  flex-shrink: 0;\n}\n"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 67,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".inputFocused",
+    "snippet": "\n.input:focus,\n.inputFocused {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .input:focus,"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 76,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.15)",
+    "selector": "[data-theme=\"dark\"] .inputFocused",
+    "snippet": ":global([data-theme=\"dark\"]) .inputFocused,\n:global(.dark) .inputFocused,\n[data-theme=\"dark\"] .input:focus,\n[data-theme=\"dark\"] .inputFocused {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);\n}\n\n.inputError {"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 133,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.08)",
+    "selector": ".formatHintBadge",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 6px;\n  padding: 2px 7px;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);\n  pointer-events: none;\n  z-index: 100;\n  animation: fadeInHint 150ms cubic-bezier(0.16, 1, 0.3, 1);"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 144,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.35)",
+    "selector": "[data-theme=\"dark\"] .formatHintBadge",
+    "snippet": "\n[data-theme=\"dark\"] .formatHintBadge {\n  background: var(--surface-alt);\n  border-color: rgba(255, 255, 255, 0.08);\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);\n}\n\n.formatHintIcon {"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 203,
+    "val": "0 0 0 2px var(--primary)",
+    "selector": ".compactRow:focus-visible",
+    "snippet": "  background: var(--surface-alt);\n}\n\n.compactRow:focus-visible {\n  box-shadow: 0 0 0 2px var(--primary);\n}\n\n.compactDisabled {"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 270,
+    "val": "0 20px 48px rgba(0, 0, 0, 0.6)",
+    "selector": ":global(.dark) .popover",
+    "snippet": ":global([data-theme=\"dark\"]) .popover,\n:global(.dark) .popover {\n  background: var(--surface);\n  border-color: rgba(255, 255, 255, 0.12);\n  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);\n}\n\n/* ─── MOBILE OVERLAY ──────────────────────────────── */"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 291,
+    "val": "0 -4px 24px rgba(0, 0, 0, 0.12)",
+    "selector": ".bottomSheet",
+    "snippet": ".bottomSheet {\n  background: var(--surface);\n  border: none;\n  border-radius: 28px 28px 0 0;\n  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);\n  width: 100%;\n  max-width: 480px;\n  box-sizing: border-box;"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 307,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5)",
+    "selector": ":global(.dark) .bottomSheet",
+    "snippet": ":global([data-theme=\"dark\"]) .bottomSheet,\n:global(.dark) .bottomSheet {\n  background: var(--surface);\n  border-top: 1px solid rgba(255, 255, 255, 0.1);\n  box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5);\n}\n\n.bottomSheetHandle {"
+  },
+  {
+    "file": "components/ui/DateInput/DateInput.module.css",
+    "line": 382,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.05)",
+    "selector": ".wheelHighlightWrapper",
+    "snippet": ".wheelHighlightWrapper {\n  background: var(--surface-alt);\n  border-radius: 10px;\n  border: 1px solid var(--border);\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);\n}\n\n.wheelHighlightItem {"
+  },
+  {
+    "file": "components/ui/Drawer/Drawer.module.css",
+    "line": 20,
+    "val": "-4px 0 20px rgba(0, 0, 0, 0.1)",
+    "selector": ".drawer",
+    "snippet": "  width: 100%;\n  max-width: var(--drawer-width, 480px);\n  height: 100%;\n  background: var(--surface);\n  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);\n  display: flex;\n  flex-direction: column;\n  animation: slideIn 0.3s ease-out;"
+  },
+  {
+    "file": "components/ui/Drawer/Drawer.module.css",
+    "line": 29,
+    "val": "-4px 0 32px rgba(0, 0, 0, 0.5)",
+    "selector": ":global(.dark) .drawer",
+    "snippet": "\n:global([data-theme=\"dark\"]) .drawer,\n:global(.dark) .drawer {\n  border-left: 1px solid rgba(255, 255, 255, 0.08);\n  box-shadow: -4px 0 32px rgba(0, 0, 0, 0.5);\n}\n\n@keyframes slideIn {"
+  },
+  {
+    "file": "components/ui/ErrorBoundary/ModalErrorBoundary.module.css",
+    "line": 37,
+    "val": "0 24px 64px rgba(0, 0, 0, 0.6)",
+    "selector": ":global(.dark) .modal",
+    "snippet": ":global([data-theme=\"dark\"]) .modal,\n:global(.dark) .modal {\n  background: var(--surface);\n  border: 1px solid rgba(255, 255, 255, 0.12);\n  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);\n}\n\n@media (max-width: 767px) {"
+  },
+  {
+    "file": "components/ui/ErrorBoundary/PageErrorBoundary.module.css",
+    "line": 59,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.15)",
+    "selector": ".retryBtn",
+    "snippet": ".retryBtn {\n  background: var(--primary);\n  border: none;\n  color: #ffffff;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n}\n\n.retryBtn:hover {"
+  },
+  {
+    "file": "components/ui/ErrorBoundary/PageErrorBoundary.module.css",
+    "line": 65,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.2)",
+    "selector": ".retryBtn:hover",
+    "snippet": "\n.retryBtn:hover {\n  opacity: 0.92;\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);\n}\n\n.retryBtn:active {"
+  },
+  {
+    "file": "components/ui/ErrorBoundary/RootErrorBoundary.module.css",
+    "line": 47,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.15)",
+    "selector": ".reloadBtn",
+    "snippet": "  box-sizing: border-box;\n  background: var(--primary);\n  border: none;\n  color: #ffffff;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n}\n\n.reloadBtn:hover {"
+  },
+  {
+    "file": "components/ui/ErrorBoundary/RootErrorBoundary.module.css",
+    "line": 53,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.2)",
+    "selector": ".reloadBtn:hover",
+    "snippet": "\n.reloadBtn:hover {\n  opacity: 0.92;\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);\n}\n\n.reloadBtn:active {"
+  },
+  {
+    "file": "components/ui/Field/Field.module.css",
+    "line": 38,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".input:focus",
+    "snippet": "}\n\n.input:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .input:focus,"
+  },
+  {
+    "file": "components/ui/Field/Field.module.css",
+    "line": 44,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.15)",
+    "selector": ":global(.dark) .input:focus",
+    "snippet": "\n:global([data-theme=\"dark\"]) .input:focus,\n:global(.dark) .input:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);\n}\n\n.input:disabled {"
+  },
+  {
+    "file": "components/ui/Input/Input.module.css",
+    "line": 47,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".input:focus",
+    "snippet": "\n.input:focus {\n  background: var(--surface);\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .input:focus,"
+  },
+  {
+    "file": "components/ui/Input/Input.module.css",
+    "line": 53,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.15)",
+    "selector": ":global(.dark) .input:focus",
+    "snippet": "\n:global([data-theme=\"dark\"]) .input:focus,\n:global(.dark) .input:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);\n}\n\n.withIcon {"
+  },
+  {
+    "file": "components/ui/Modal/Modal.module.css",
+    "line": 75,
+    "val": "0 24px 64px rgba(0, 0, 0, 0.6)",
+    "selector": ":global(.dark) .container",
+    "snippet": ":global([data-theme=\"dark\"]) .container,\n:global(.dark) .container {\n  background: var(--surface);\n  border: 1px solid rgba(255, 255, 255, 0.12);\n  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);\n}\n\n@media (max-width: 767px) {"
+  },
+  {
+    "file": "components/ui/MontoInput/MontoInput.module.css",
+    "line": 179,
+    "val": "0 0 0 3px rgba(37, 99, 235, 0.12) !important",
+    "selector": ".montoOutlined:focus-within",
+    "snippet": "}\n\n.montoOutlined:focus-within {\n  border-color: var(--primary) !important;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;\n}\n\n[data-theme=\"dark\"] .montoOutlined:focus-within {"
+  },
+  {
+    "file": "components/ui/MontoInput/MontoInput.module.css",
+    "line": 183,
+    "val": "0 0 0 3px rgba(96, 165, 250, 0.2) !important",
+    "selector": "[data-theme=\"dark\"] .montoOutlined:focus-within",
+    "snippet": "  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;\n}\n\n[data-theme=\"dark\"] .montoOutlined:focus-within {\n  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;\n}\n\n.montoOutlined .montoHeroPrefix {"
+  },
+  {
+    "file": "components/ui/PhoneCountrySelect/PhoneCountrySelect.module.css",
+    "line": 28,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".triggerOpen",
+    "snippet": "\n.trigger:focus,\n.triggerOpen {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n[data-theme=\"dark\"] .trigger:focus,"
+  },
+  {
+    "file": "components/ui/PhoneCountrySelect/PhoneCountrySelect.module.css",
+    "line": 33,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.15)",
+    "selector": "[data-theme=\"dark\"] .triggerOpen",
+    "snippet": "}\n\n[data-theme=\"dark\"] .trigger:focus,\n[data-theme=\"dark\"] .triggerOpen {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);\n}\n\n.flag { font-size: 16px; line-height: 1; }"
+  },
+  {
+    "file": "components/ui/PhoneCountrySelect/PhoneCountrySelect.module.css",
+    "line": 55,
+    "val": "0 12px 36px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)",
+    "selector": ".panel",
+    "snippet": "  z-index: 9100;\n  background: var(--surface);\n  border: 1px solid var(--surface-alt);\n  border-radius: 12px;\n  box-shadow: 0 12px 36px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);\n  overflow: hidden;\n  padding: 4px;\n}"
+  },
+  {
+    "file": "components/ui/PhoneCountrySelect/PhoneCountrySelect.module.css",
+    "line": 77,
+    "val": "0 24px 64px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.08)",
+    "selector": ".mobilePanelWrap",
+    "snippet": ".mobilePanelWrap {\n  background: var(--surface);\n  border-radius: 20px;\n  overflow: hidden;\n  box-shadow: 0 24px 64px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.08);\n  width: 100%;\n  max-width: 280px;\n  max-height: 60vh;"
+  },
+  {
+    "file": "components/ui/SegmentedControl.module.css",
+    "line": 47,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.06)",
+    "selector": ".optionActive",
+    "snippet": "\n.optionActive {\n  background: var(--surface);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);\n}\n\n[data-theme=\"dark\"] .optionActive {"
+  },
+  {
+    "file": "components/ui/SegmentedControl.module.css",
+    "line": 52,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.25)",
+    "selector": "[data-theme=\"dark\"] .optionActive",
+    "snippet": "}\n\n[data-theme=\"dark\"] .optionActive {\n  color: var(--text);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);\n}\n"
+  },
+  {
+    "file": "components/ui/SelectInput/SelectInput.module.css",
+    "line": 49,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".trigger:focus",
+    "snippet": "}\n\n.trigger:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .trigger:focus,"
+  },
+  {
+    "file": "components/ui/SelectInput/SelectInput.module.css",
+    "line": 54,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.15)",
+    "selector": ":global(.dark) .trigger:focus",
+    "snippet": "}\n\n:global([data-theme=\"dark\"]) .trigger:focus,\n:global(.dark) .trigger:focus {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);\n}\n\n.triggerPlaceholder {"
+  },
+  {
+    "file": "components/ui/SelectInput/SelectInput.module.css",
+    "line": 117,
+    "val": "0 20px 48px rgba(0, 0, 0, 0.6)",
+    "selector": ":global(.dark) .panel",
+    "snippet": ":global([data-theme=\"dark\"]) .panel,\n:global(.dark) .panel {\n  background: var(--surface);\n  border: 1px solid rgba(255, 255, 255, 0.12);\n  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);\n}\n\n/* ─── MOBILE BOTTOM SHEET ─────────────────────────── */"
+  },
+  {
+    "file": "components/ui/SelectInput/SelectInput.module.css",
+    "line": 162,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5)",
+    "selector": ":global(.dark) .mobileBottomSheet",
+    "snippet": ":global([data-theme=\"dark\"]) .mobileBottomSheet,\n:global(.dark) .mobileBottomSheet {\n  background: var(--surface);\n  border-top-color: rgba(255, 255, 255, 0.12);\n  box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5);\n}\n\n@keyframes sheetSlideUp {"
+  },
+  {
+    "file": "components/ui/ThemeToggle/ThemeToggle.module.css",
+    "line": 13,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.06)",
+    "selector": ".toggleBtn",
+    "snippet": "  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);\n  -webkit-backdrop-filter: blur(12px);\n  backdrop-filter: blur(12px);\n}"
+  },
+  {
+    "file": "components/ui/ThemeToggle/ThemeToggle.module.css",
+    "line": 22,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.1)",
+    "selector": ".toggleBtn:hover",
+    "snippet": ".toggleBtn:hover {\n  background: var(--surface-alt);\n  color: var(--text);\n  transform: scale(1.05);\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);\n}\n\n.toggleBtn:active {"
+  },
+  {
+    "file": "components/ui/ThemeToggle/ThemeToggle.module.css",
+    "line": 68,
+    "val": "0 4px 16px rgba(0, 0, 0, 0.35)",
+    "selector": ":global(.dark) .toggleBtn",
+    "snippet": ":global([data-theme=\"dark\"]) .toggleBtn,\n:global(.dark) .toggleBtn {\n  background: rgba(22, 27, 36, 0.85);\n  border-color: rgba(255, 255, 255, 0.12);\n  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);\n}\n\n:global([data-theme=\"dark\"]) .toggleBtn:hover,"
+  },
+  {
+    "file": "components/ui/TimeInput/TimeInput.module.css",
+    "line": 46,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".input:focus",
+    "snippet": "}\n\n.input:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n}\n\n:global([data-theme=\"dark\"]) .input:focus,"
+  },
+  {
+    "file": "components/ui/TimeInput/TimeInput.module.css",
+    "line": 52,
+    "val": "0 0 0 3px rgba(72, 120, 184, 0.15)",
+    "selector": "[data-theme=\"dark\"] .input:focus",
+    "snippet": "\n:global([data-theme=\"dark\"]) .input:focus,\n:global(.dark) .input:focus,\n[data-theme=\"dark\"] .input:focus {\n  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);\n}\n\n.inputError {"
+  },
+  {
+    "file": "components/ui/TimeInput/TimeInput.module.css",
+    "line": 99,
+    "val": "0 20px 48px rgba(0, 0, 0, 0.6)",
+    "selector": ":global(.dark) .popover",
+    "snippet": ":global([data-theme=\"dark\"]) .popover,\n:global(.dark) .popover {\n  background: var(--surface);\n  border-color: rgba(255, 255, 255, 0.12);\n  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);\n}\n\n/* ─── MOBILE OVERLAY ──────────────────────────────── */"
+  },
+  {
+    "file": "components/ui/TimeInput/TimeInput.module.css",
+    "line": 120,
+    "val": "0 -4px 24px rgba(0, 0, 0, 0.12)",
+    "selector": ".bottomSheet",
+    "snippet": ".bottomSheet {\n  background: var(--surface);\n  border: none;\n  border-radius: 28px 28px 0 0;\n  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);\n  width: 100%;\n  max-width: 420px;\n  box-sizing: border-box;"
+  },
+  {
+    "file": "components/ui/TimeInput/TimeInput.module.css",
+    "line": 136,
+    "val": "0 -8px 36px rgba(0, 0, 0, 0.5)",
+    "selector": ":global(.dark) .bottomSheet",
+    "snippet": ":global([data-theme=\"dark\"]) .bottomSheet,\n:global(.dark) .bottomSheet {\n  background: var(--surface);\n  border-top: 1px solid rgba(255, 255, 255, 0.1);\n  box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5);\n}\n\n@keyframes slideUpSheet {"
+  },
+  {
+    "file": "components/ui/TimeInput/TimeInput.module.css",
+    "line": 216,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.05)",
+    "selector": ".wheelHighlightWrapper",
+    "snippet": ".wheelHighlightWrapper {\n  background: var(--surface-alt);\n  border-radius: 12px;\n  border: 1px solid var(--border);\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);\n}\n\n.wheelHighlightItem {"
+  },
+  {
+    "file": "components/whatsapp/VinculacionWhatsAppCard.module.css",
+    "line": 67,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.03)",
+    "selector": ".qrContainer",
+    "snippet": "  width: 100%;\n  max-width: 230px;\n  height: 100%;\n  box-sizing: border-box;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);\n}\n\n.qrImage {"
+  },
+  {
+    "file": "pages/AdminPage.module.css",
+    "line": 171,
+    "val": "0 0 0 3px rgba(var(--primary-rgb), 0.1)",
+    "selector": ".searchInput:focus",
+    "snippet": "}\n\n.searchInput:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);\n  background-color: var(--surface);\n}\n"
+  },
+  {
+    "file": "pages/AdminPage.module.css",
+    "line": 611,
+    "val": "0 2px 4px rgba(0, 0, 0, 0.01)",
+    "selector": ".actionBtn",
+    "snippet": "  border: 1px solid var(--border);\n  background-color: var(--surface);\n  color: var(--text-2);\n  text-align: center;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);\n}\n\n.actionBtn:hover:not(:disabled) {"
+  },
+  {
+    "file": "pages/AdminPage.module.css",
+    "line": 734,
+    "val": "0 0 0 3px rgba(235, 87, 87, 0.15)",
+    "selector": ".confirmEmailInput:focus",
+    "snippet": "}\n\n.confirmEmailInput:focus {\n  border-color: var(--error);\n  box-shadow: 0 0 0 3px rgba(235, 87, 87, 0.15);\n  background-color: var(--surface);\n}\n"
+  },
+  {
+    "file": "pages/NotFoundPage.module.css",
+    "line": 70,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.15)",
+    "selector": ".primaryButton",
+    "snippet": ".primaryButton {\n  background: var(--primary);\n  border: none;\n  color: #ffffff;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n}\n\n.primaryButton:hover {"
+  },
+  {
+    "file": "pages/NotFoundPage.module.css",
+    "line": 76,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.2)",
+    "selector": ".primaryButton:hover",
+    "snippet": "\n.primaryButton:hover {\n  opacity: 0.92;\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);\n}\n\n.primaryButton:active {"
+  },
+  {
+    "file": "pages/TermsPage.module.css",
+    "line": 70,
+    "val": "0 4px 20px rgba(0, 0, 0, 0.03)",
+    "selector": ".card",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 16px;\n  padding: 40px;\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);\n}\n\n.navigation {"
+  },
+  {
+    "file": "pages/app/billeteras/BilleteraDetallePage.module.css",
+    "line": 42,
+    "val": "0 4px 20px rgba(0, 0, 0, 0.12)",
+    "selector": ".headerCard",
+    "snippet": "  overflow: hidden;\n  height: auto;\n  min-height: 84px;\n  flex-shrink: 0;\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);\n}\n\n@media (min-width: 640px) {"
+  },
+  {
+    "file": "pages/app/billeteras/BilleteraDetallePage.module.css",
+    "line": 354,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)",
+    "selector": ".tabBtnActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-1px);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "pages/app/billeteras/BilleteraDetallePage.module.css",
+    "line": 378,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.35)",
+    "selector": ":global(.dark) .tabBtnActive",
+    "snippet": ":global(.dark) .tabBtnActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.16) !important;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "pages/app/billeteras/BilleteraDetallePage.module.css",
+    "line": 468,
+    "val": "0 2px 8px rgba(0,0,0,0.05)",
+    "selector": ".carouselBtn",
+    "snippet": "  color: var(--text-3);\n  cursor: pointer;\n  transition: all 0.2s ease;\n  flex-shrink: 0;\n  box-shadow: 0 2px 8px rgba(0,0,0,0.05);\n}\n\n@media (max-width: 360px) {"
+  },
+  {
+    "file": "pages/app/billeteras/BilleteraDetallePage.module.css",
+    "line": 763,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.04)",
+    "selector": ".rendimientoCard",
+    "snippet": "  padding: 16px 20px;\n  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 16px;\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);\n  transition: border-color 0.2s ease, box-shadow 0.2s ease;\n}\n"
+  },
+  {
+    "file": "pages/app/billeteras/BilleteraDetallePage.module.css",
+    "line": 921,
+    "val": "0 3px 10px rgba(0, 0, 0, 0.1)",
+    "selector": ".registrarRendimientoBtn:hover",
+    "snippet": ".registrarRendimientoBtn:hover {\n  background: var(--primary);\n  color: white;\n  border-color: var(--primary);\n  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);\n  transform: translateY(-1px);\n}\n"
+  },
+  {
+    "file": "pages/app/billeteras/BilleterasPage.module.css",
+    "line": 291,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.03)",
+    "selector": ".mobileSummaryCard",
+    "snippet": "  border-radius: 20px;\n  padding: 16px 18px;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);\n  margin-bottom: 4px;\n}\n"
+  },
+  {
+    "file": "pages/app/billeteras/BilleterasPage.module.css",
+    "line": 404,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)",
+    "selector": ".tabBtnActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-1px);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "pages/app/billeteras/BilleterasPage.module.css",
+    "line": 428,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.35)",
+    "selector": ":global(.dark) .tabBtnActive",
+    "snippet": ":global(.dark) .tabBtnActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.16) !important;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "pages/app/dashboard/DashboardPage.module.css",
+    "line": 324,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.15)",
+    "selector": ".mobileAvatar",
+    "snippet": "  font-weight: 700;\r\n  font-size: 16px;\r\n  overflow: hidden;\r\n  border: 2px solid var(--border);\r\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\r\n  transition: transform 0.15s ease;\r\n}\r\n\r"
+  },
+  {
+    "file": "pages/app/dashboard/DashboardPage.module.css",
+    "line": 714,
+    "val": "0 2px 4px rgba(0, 0, 0, 0.05)",
+    "selector": ".appleCalendar",
+    "snippet": "  width: 38px;\r\n  height: 38px;\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);\r\n  background: var(--surface);\r\n  border: 1px solid var(--border);\r\n  flex-shrink: 0;\r"
+  },
+  {
+    "file": "pages/app/dashboard/DashboardPage.module.css",
+    "line": 1119,
+    "val": "0 -8px 32px rgba(0, 0, 0, 0.15)",
+    "selector": ".profileSheet",
+    "snippet": "  background: var(--surface);\r\n  border-radius: 24px 24px 0 0;\r\n  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));\r\n  z-index: 1001;\r\n  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);\r\n  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);\r\n  display: flex;\r\n  flex-direction: column;\r"
+  },
+  {
+    "file": "pages/app/metas/GoalsBarChart.module.css",
+    "line": 145,
+    "val": "0 0 16px rgba(202, 138, 4, 0.35)",
+    "selector": ".solidFillCompleted",
+    "snippet": "  box-sizing: border-box;\n}\n\n.solidFillCompleted {\n  box-shadow: 0 0 16px rgba(202, 138, 4, 0.35);\n}\n\n:global([data-theme=\"dark\"]) .solidFill,"
+  },
+  {
+    "file": "pages/app/metas/GoalsBarChart.module.css",
+    "line": 270,
+    "val": "inset 0 0 0 1px var(--border)",
+    "selector": ".sheetIcon",
+    "snippet": "  background: var(--surface-alt);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: inset 0 0 0 1px var(--border);\n}\n\n.sheetTitle {"
+  },
+  {
+    "file": "pages/app/metas/MetasPage.module.css",
+    "line": 151,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".tabActive",
+    "snippet": "\n.tabActive {\n  background: var(--surface);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n:global([data-theme=\"dark\"]) .tabActive {"
+  },
+  {
+    "file": "pages/app/metas/MetasPage.module.css",
+    "line": 157,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.25)",
+    "selector": ":global([data-theme=\"dark\"]) .tabActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .tabActive {\n  background: var(--surface-alt);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);\n}\n\n/* ── Grid & Content ──────────────────────────────────────────────────────── */"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 90,
+    "val": "0 2px 12px rgba(0, 0, 0, 0.02)",
+    "selector": ".heroCard",
+    "snippet": "  border-radius: 20px;\n  padding: 22px 24px;\n  box-sizing: border-box;\n  flex-shrink: 0;\n  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);\n  display: block;\n  overflow: hidden;\n  width: 100%;"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 98,
+    "val": "0 4px 24px rgba(0, 0, 0, 0.25)",
+    "selector": "[data-theme=\"dark\"] .heroCard",
+    "snippet": "  transition: border-color 0.2s ease, box-shadow 0.2s ease;\n}\n\n[data-theme=\"dark\"] .heroCard {\n  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);\n  background: linear-gradient(180deg, rgba(22, 27, 36, 0.98) 0%, rgba(18, 22, 30, 0.98) 100%);\n}\n"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 166,
+    "val": "0 0 0 1.5px var(--border), 0 4px 14px rgba(0, 0, 0, 0.08)",
+    "selector": ".avatarWrapper",
+    "snippet": "  height: 80px;\n  border-radius: 50%;\n  overflow: hidden;\n  border: 3px solid var(--surface);\n  box-shadow: 0 0 0 1.5px var(--border), 0 4px 14px rgba(0, 0, 0, 0.08);\n  background: var(--surface-alt);\n  display: flex;\n  align-items: center;"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 231,
+    "val": "0 2px 6px rgba(0, 0, 0, 0.12)",
+    "selector": ".deletePhotoBtn",
+    "snippet": "  display: flex;\n  align-items: center;\n  justify-content: center;\n  cursor: pointer;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);\n  transition: transform 0.15s ease, background-color 0.15s ease;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 429,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08) !important",
+    "selector": ".tabActive",
+    "snippet": ".tabActive {\n  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;\n}\n\n[data-theme=\"dark\"] .tabActive {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 435,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.3) !important",
+    "selector": "[data-theme=\"dark\"] .tabActive",
+    "snippet": "\n[data-theme=\"dark\"] .tabActive {\n  background: var(--surface) !important;\n  color: #60a5fa !important;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;\n}\n\n.tabDanger {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 450,
+    "val": "0 2px 8px rgba(239, 68, 68, 0.15) !important",
+    "selector": ".tabDangerActive",
+    "snippet": "\n.tabDangerActive {\n  background: rgba(239, 68, 68, 0.12) !important;\n  color: var(--error, #ef4444) !important;\n  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15) !important;\n}\n\n/* ── 4. General Tab & Generic Section Cards ──────────────────────── */"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 477,
+    "val": "0 1px 6px rgba(0, 0, 0, 0.02)",
+    "selector": ".sectionCard",
+    "snippet": "  display: flex;\n  flex-direction: column;\n  gap: 18px;\n  width: 100%;\n  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);\n}\n\n@media (max-width: 640px) {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 848,
+    "val": "0 0 0 1px var(--primary)",
+    "selector": ".currencySelected",
+    "snippet": "\n.currencySelected {\n  border-color: var(--primary) !important;\n  background: rgba(13, 32, 69, 0.05) !important;\n  box-shadow: 0 0 0 1px var(--primary);\n}\n\n[data-theme=\"dark\"] .currencySelected {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 854,
+    "val": "0 0 0 1px #3b82f6",
+    "selector": "[data-theme=\"dark\"] .currencySelected",
+    "snippet": "\n[data-theme=\"dark\"] .currencySelected {\n  background: rgba(59, 130, 246, 0.1) !important;\n  border-color: #3b82f6 !important;\n  box-shadow: 0 0 0 1px #3b82f6;\n}\n\n.currencyTop {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 956,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.2)",
+    "selector": ".slider:before",
+    "snippet": "  bottom: 3px;\n  background-color: #ffffff;\n  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n  border-radius: 50%;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);\n}\n\n.switch input:checked + .slider {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 1018,
+    "val": "0 0 0 1px var(--primary)",
+    "selector": ".dolarOptionSelected",
+    "snippet": "\n.dolarOptionSelected {\n  border-color: var(--primary) !important;\n  background: rgba(13, 32, 69, 0.05) !important;\n  box-shadow: 0 0 0 1px var(--primary);\n}\n\n[data-theme=\"dark\"] .dolarOptionSelected {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 1024,
+    "val": "0 0 0 1px #3b82f6",
+    "selector": "[data-theme=\"dark\"] .dolarOptionSelected",
+    "snippet": "\n[data-theme=\"dark\"] .dolarOptionSelected {\n  background: rgba(59, 130, 246, 0.1) !important;\n  border-color: #3b82f6 !important;\n  box-shadow: 0 0 0 1px #3b82f6;\n}\n\n.dolarTop {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 1168,
+    "val": "0 1px 3px rgba(0, 0, 0, 0.08)",
+    "selector": ".googleAuthInfoIcon",
+    "snippet": "  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);\n}\n\n.googleAuthInfoText h4 {"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 1229,
+    "val": "0 0 0 3px rgba(13, 32, 69, 0.08)",
+    "selector": ".cleanInput:focus",
+    "snippet": "}\n\n.cleanInput:focus {\n  border-color: var(--primary);\n  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);\n  background: var(--surface);\n}\n"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 1234,
+    "val": "0 0 0 3px rgba(59, 130, 246, 0.15)",
+    "selector": "[data-theme=\"dark\"] .cleanInput:focus",
+    "snippet": "  background: var(--surface);\n}\n\n[data-theme=\"dark\"] .cleanInput:focus {\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\n  border-color: #3b82f6;\n}\n"
+  },
+  {
+    "file": "pages/app/perfil/PerfilPage.module.css",
+    "line": 1780,
+    "val": "0 20px 48px rgba(0, 0, 0, 0.3)",
+    "selector": ".modalCard",
+    "snippet": "  max-height: 90dvh;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);\n  animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);\n}\n"
+  },
+  {
+    "file": "pages/app/presupuestos/BudgetBarChart.module.css",
+    "line": 138,
+    "val": "0 0 16px rgba(239, 68, 68, 0.35)",
+    "selector": ".solidFillOverflow",
+    "snippet": "  box-sizing: border-box;\n}\n\n.solidFillOverflow {\n  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);\n}\n\n:global([data-theme=\"dark\"]) .solidFill,"
+  },
+  {
+    "file": "pages/app/presupuestos/BudgetBarChart.module.css",
+    "line": 242,
+    "val": "inset 0 0 0 1px var(--border)",
+    "selector": ".sheetIcon",
+    "snippet": "  background: var(--surface-alt);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: inset 0 0 0 1px var(--border);\n}\n\n.sheetTitle {"
+  },
+  {
+    "file": "pages/app/presupuestos/BudgetCard.module.css",
+    "line": 21,
+    "val": "0 12px 30px rgba(0,0,0,0.08)",
+    "selector": ".card:hover",
+    "snippet": "    gap: 20px;\n  }\n  .card:hover {\n    transform: translateY(-4px);\n    box-shadow: 0 12px 30px rgba(0,0,0,0.08);\n  }\n}\n"
+  },
+  {
+    "file": "pages/app/presupuestos/BudgetCard.module.css",
+    "line": 162,
+    "val": "0 0 12px rgba(239, 68, 68, 0.3)",
+    "selector": ".progressOverflow",
+    "snippet": "  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);\n}\n\n.progressOverflow {\n  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);\n}\n\n.progressLabels {"
+  },
+  {
+    "file": "pages/app/presupuestos/BudgetHistoryModal.module.css",
+    "line": 90,
+    "val": "0 8px 24px rgba(0,0,0,0.06)",
+    "selector": ".historyItem:hover",
+    "snippet": "\n.historyItem:hover {\n  border-color: var(--primary);\n  transform: translateY(-2px);\n  box-shadow: 0 8px 24px rgba(0,0,0,0.06);\n}\n\n.itemHeader {"
+  },
+  {
+    "file": "pages/app/presupuestos/PresupuestosPage.module.css",
+    "line": 153,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.05)",
+    "selector": ".tabActive",
+    "snippet": "\n.tabActive {\n  background: var(--surface);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n:global([data-theme=\"dark\"]) .tabActive {"
+  },
+  {
+    "file": "pages/app/presupuestos/PresupuestosPage.module.css",
+    "line": 159,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.25)",
+    "selector": ":global([data-theme=\"dark\"]) .tabActive",
+    "snippet": "\n:global([data-theme=\"dark\"]) .tabActive {\n  background: var(--surface-alt);\n  color: var(--primary);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);\n}\n\n/* ── Grid & Responsive Containers ────────────────────────────────────────── */"
+  },
+  {
+    "file": "pages/app/suscripciones/SuscripcionesPage.module.css",
+    "line": 384,
+    "val": "0 10px 20px rgba(13, 32, 69, 0.2)",
+    "selector": ".emptyButton",
+    "snippet": "  align-items: center;\n  justify-content: center;\n  gap: 10px;\n  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);\n  box-shadow: 0 10px 20px rgba(13, 32, 69, 0.2);\n  margin: 0 auto;\n  width: auto;\n  max-width: 100%;"
+  },
+  {
+    "file": "pages/app/suscripciones/SuscripcionesPage.module.css",
+    "line": 397,
+    "val": "0 15px 30px rgba(13, 32, 69, 0.25)",
+    "selector": ".emptyButton:hover",
+    "snippet": "}\n\n.emptyButton:hover {\n  transform: translateY(-2px) scale(1.02);\n  box-shadow: 0 15px 30px rgba(13, 32, 69, 0.25);\n  background: #142a57 !important;\n}\n"
+  },
+  {
+    "file": "pages/app/suscripciones/SuscripcionesPage.module.css",
+    "line": 452,
+    "val": "0 10px 20px rgba(0, 0, 0, 0.2)",
+    "selector": ":global([data-theme=\"dark\"]) .emptyButton",
+    "snippet": "\n:global([data-theme=\"dark\"]) .emptyButton {\n  background: white !important;\n  color: #0D2045 !important;\n  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);\n}\n\n:global([data-theme=\"dark\"]) .emptyButton:hover {"
+  },
+  {
+    "file": "pages/app/suscripciones/SuscripcionesPage.module.css",
+    "line": 656,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.03)",
+    "selector": ".mobileSummaryCard",
+    "snippet": "  border-radius: 20px;\n  padding: 16px 18px;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);\n  margin-top: 16px;\n  margin-bottom: 4px;\n}"
+  },
+  {
+    "file": "pages/app/tools/ToolsPage.module.css",
+    "line": 120,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.06)",
+    "selector": ".toolTabBtnActive",
+    "snippet": "\n.toolTabBtnActive {\n  background: var(--surface);\n  border-color: var(--border);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);\n}\n\n[data-theme=\"dark\"] .toolTabBtnActive {"
+  },
+  {
+    "file": "pages/app/tools/ToolsPage.module.css",
+    "line": 126,
+    "val": "0 2px 10px rgba(0, 0, 0, 0.3)",
+    "selector": "[data-theme=\"dark\"] .toolTabBtnActive",
+    "snippet": "\n[data-theme=\"dark\"] .toolTabBtnActive {\n  background: var(--surface);\n  border-color: rgba(255, 255, 255, 0.1);\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);\n}\n\n.toolTabIconBox {"
+  },
+  {
+    "file": "pages/app/transacciones/TransaccionesPage.module.css",
+    "line": 179,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)",
+    "selector": ".tabBtnActive",
+    "snippet": "  background: var(--surface) !important;\n  color: var(--text) !important;\n  font-weight: 700 !important;\n  transform: translateY(-1px);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);\n  border-color: var(--border) !important;\n  z-index: 2;\n}"
+  },
+  {
+    "file": "pages/app/transacciones/TransaccionesPage.module.css",
+    "line": 203,
+    "val": "0 4px 14px rgba(0, 0, 0, 0.35)",
+    "selector": ":global(.dark) .tabBtnActive",
+    "snippet": ":global(.dark) .tabBtnActive {\n  background: #1e293b !important;\n  color: #ffffff !important;\n  border-color: rgba(255, 255, 255, 0.16) !important;\n  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);\n}\n\n@media (max-width: 420px) {"
+  },
+  {
+    "file": "pages/app/transacciones/TransaccionesPage.module.css",
+    "line": 378,
+    "val": "0 2px 8px rgba(0, 0, 0, 0.03)",
+    "selector": ".mobileSplitStrip",
+    "snippet": "  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: 16px;\n  padding: 12px 14px;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);\n  margin-bottom: 4px;\n}\n"
+  },
+  {
+    "file": "pages/auth/verificar-telefono/VerificarTelefono.module.css",
+    "line": 67,
+    "val": "0 4px 12px rgba(0, 0, 0, 0.03)",
+    "selector": ".qrContainer",
+    "snippet": "  width: 100%;\n  max-width: 230px;\n  height: 100%;\n  box-sizing: border-box;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);\n}\n\n.qrImage {"
+  },
+  {
+    "file": "pages/onboarding/OnboardingPage.module.css",
+    "line": 60,
+    "val": "0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04)",
+    "selector": ".card",
+    "snippet": ".card {\n  background: rgba(255, 255, 255, 0.88);\n  border-radius: 24px;\n  border: 1px solid rgba(13, 32, 69, 0.08);\n  box-shadow: 0 16px 40px rgba(13, 32, 69, 0.07), 0 2px 8px rgba(13, 32, 69, 0.04);\n  -webkit-backdrop-filter: blur(24px);\n  backdrop-filter: blur(24px);\n  padding: 24px 24px 28px;"
+  },
+  {
+    "file": "pages/onboarding/OnboardingPage.module.css",
+    "line": 71,
+    "val": "0 20px 50px rgba(0, 0, 0, 0.45)",
+    "selector": ":global([data-theme=\"dark\"]) .card",
+    "snippet": "\n:global([data-theme=\"dark\"]) .card {\n  background: rgba(13, 26, 54, 0.82);\n  border: 1px solid rgba(255, 255, 255, 0.08);\n  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);\n}\n\n@media (min-width: 480px) {"
+  }
+]

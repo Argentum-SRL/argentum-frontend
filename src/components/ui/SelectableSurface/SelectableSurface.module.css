@@ -1,0 +1,143 @@
+/* ==========================================================================
+   SelectableSurface Component Styles
+   Encapsulates physical micro-elevation, micro-translation, and tactile states
+   strictly driven by Argentum Global Elevation tokens.
+   Zero hardcoded shadows. Zero artificial sibling dimming.
+   ========================================================================== */
+
+.surface {
+  position: relative;
+  box-sizing: border-box;
+
+  /* ── Resting State ──
+     Full visual integrity: 100% opacity, 100% color/contrast, resting on ground */
+  opacity: 1;
+  transform: translateY(0);
+  box-shadow: var(--elevation-none);
+  z-index: 1;
+
+  /* Physical micro-transition curve aligned with Argentum design system */
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 180ms ease,
+              border-color 180ms ease;
+
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+/* ── Contextual Elevation Resolution ── */
+.surface[data-context="page"] {
+  --surface-elevation-selected: var(--elevation-selection);
+}
+
+.surface[data-context="modal"] {
+  --surface-elevation-selected: var(--elevation-selection-modal);
+}
+
+/* Inherit context from modal ancestor if not explicitly specified */
+:global([data-elevation-context="modal"]) .surface:not([data-context="page"]) {
+  --surface-elevation-selected: var(--elevation-selection-modal);
+}
+
+/* ── Interactive Cursor ── */
+.surface[data-clickable="true"]:not([data-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* ── Hover State (Unselected) ──
+   Subtle micro-lift of -1px and micro-elevation-xs.
+   Strictly scale 1, strictly opacity 1. */
+@media (hover: hover) and (pointer: fine) {
+  .surface[data-clickable="true"]:not([data-selected="true"]):not([data-disabled="true"]):hover {
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-xs);
+    opacity: 1;
+    z-index: 2;
+  }
+}
+
+/* ── Selected State: Depth, Elevation and Subtle Scale ──
+   Selected surface floats 2px above resting plane with contextual ambient cushion
+   and a gentle physical scale (~1.015) to feel physically closer.
+   Opacity is 1 (never dimmed, nor does it dim its siblings).
+   No harsh border, no neon glow. */
+.surface[data-selected="true"] {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: var(--surface-elevation-selected, var(--elevation-selection));
+  opacity: 1;
+  z-index: 4;
+}
+
+/* Selected + Hover: stable resting on elevated plane without flutter */
+@media (hover: hover) and (pointer: fine) {
+  .surface[data-selected="true"]:not([data-disabled="true"]):hover {
+    transform: translateY(-2px) scale(1.015);
+    box-shadow: var(--surface-elevation-selected, var(--elevation-selection));
+    opacity: 1;
+    z-index: 4;
+  }
+}
+
+/* ── Active / Press State ──
+   Tactile feedback returning momentarily towards resting ground without layout shifts */
+.surface[data-clickable="true"]:not([data-disabled="true"]):active {
+  transform: translateY(-0.5px) scale(1.005);
+  box-shadow: var(--elevation-xs);
+  transition-duration: 80ms;
+}
+
+/* ── Disabled State ── */
+.surface[data-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: translateY(0);
+  box-shadow: var(--elevation-none);
+}
+
+/* ── Optional Selection Indicator ──
+   Disabled by default (showIndicator=false).
+   Rendered only when consumer explicitly requests visual badge confirmation. */
+.indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.96);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D2045' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: 12px;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: var(--elevation-xs);
+  pointer-events: none;
+  z-index: 12;
+  animation: indicatorPop 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-theme="dark"]) .indicator {
+  background-color: rgba(30, 37, 48, 0.96);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E6ECF2' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  box-shadow: var(--elevation-xs);
+}
+
+@keyframes indicatorPop {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface,
+  .surface[data-selected="true"] {
+    transition: none !important;
+    transform: none !important;
+  }
+}

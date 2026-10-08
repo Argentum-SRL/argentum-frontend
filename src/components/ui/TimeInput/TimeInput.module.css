@@ -43,13 +43,7 @@
 
 .input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
-}
-
-:global([data-theme="dark"]) .input:focus,
-:global(.dark) .input:focus,
-[data-theme="dark"] .input:focus {
-  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
+  box-shadow: var(--elevation-none);
 }
 
 .inputError {
@@ -80,9 +74,7 @@
   backdrop-filter: blur(16px);
   border: 1px solid var(--border);
   border-radius: 20px;
-  box-shadow:
-    0 20px 48px rgba(0, 0, 0, 0.22),
-    0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-md);
   padding: 14px 16px 12px;
   width: 240px;
   display: flex;
@@ -96,7 +88,6 @@
 :global(.dark) .popover {
   background: var(--surface);
   border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
 }
 
 /* ─── MOBILE OVERLAY ──────────────────────────────── */
@@ -117,7 +108,7 @@
   background: var(--surface);
   border: none;
   border-radius: 28px 28px 0 0;
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--elevation-lg);
   width: 100%;
   max-width: 420px;
   box-sizing: border-box;
@@ -133,7 +124,6 @@
 :global(.dark) .bottomSheet {
   background: var(--surface);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes slideUpSheet {
@@ -213,7 +203,7 @@
   background: var(--surface-alt);
   border-radius: 12px;
   border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--elevation-xs);
 }
 
 .wheelHighlightItem {

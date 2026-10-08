@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "graph:update": "graphify . --output graphify-out"
+    "graph:update": "graphify . --output graphify-out",
+    "audit:elevation": "node scripts/audit-hardcoded-shadows.mjs"
   },
   "dependencies": {
     "@ncdai/react-wheel-picker": "^1.2.2",

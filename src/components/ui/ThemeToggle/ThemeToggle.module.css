@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--elevation-sm);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
@@ -19,7 +19,7 @@
   background: var(--surface-alt);
   color: var(--text);
   transform: scale(1.05);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--elevation-md);
 }
 
 .toggleBtn:active {
@@ -65,7 +65,6 @@
 :global(.dark) .toggleBtn {
   background: rgba(22, 27, 36, 0.85);
   border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 :global([data-theme="dark"]) .toggleBtn:hover,

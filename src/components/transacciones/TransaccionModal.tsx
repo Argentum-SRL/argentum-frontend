@@ -26,7 +26,7 @@ import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { DateInput } from '@/components/ui'
+import { DateInput, SelectableSurface } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
@@ -818,11 +818,13 @@ export default function TransaccionModal({
                         <div className={styles.billeterasCarouselScroller}>
                           <div className={styles.billeterasCarousel} ref={carouselRef}>
                             {tarjetasCarousel.map(t => (
-                              <div
+                              <SelectableSurface
                                 key={t.id}
+                                selected={tarjetaId === t.id}
+                                context="modal"
                                 className={`${styles.billeteraSelectWrap} ${styles.tarjetaSelectWrap}`}
                                 data-active={tarjetaId === t.id}
-                                ref={(el) => setCardNode(t.id, el)}
+                                ref={(el) => setCardNode(t.id, el as HTMLDivElement | null)}
                               >
                                 <RealCardPreview
                                   ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
@@ -841,7 +843,7 @@ export default function TransaccionModal({
                                   title={`Seleccionar tarjeta ${t.nombre}`}
                                   aria-label={`Seleccionar tarjeta ${t.nombre}`}
                                 />
-                              </div>
+                              </SelectableSurface>
                             ))}
                           </div>
                         </div>
@@ -867,11 +869,13 @@ export default function TransaccionModal({
                         <div className={styles.billeterasCarouselScroller}>
                           <div className={styles.billeterasCarousel} ref={carouselRef}>
                             {billeterasCarousel.map(b => (
-                              <div
+                              <SelectableSurface
                                 key={b.id}
+                                selected={billeteraId === b.id}
+                                context="modal"
                                 className={styles.billeteraSelectWrap}
                                 data-active={billeteraId === b.id}
-                                ref={(el) => setCardNode(b.id, el)}
+                                ref={(el) => setCardNode(b.id, el as HTMLDivElement | null)}
                               >
                                 <BilleteraCard billetera={b} className={styles.fullHeightCard} disableNavigation={true} hideCurrencyChip={true} />
                                 <button
@@ -882,7 +886,7 @@ export default function TransaccionModal({
                                   title={`Seleccionar billetera ${b.nombre}`}
                                   aria-label={`Seleccionar billetera ${b.nombre}`}
                                 />
-                              </div>
+                              </SelectableSurface>
                             ))}
                           </div>
                         </div>

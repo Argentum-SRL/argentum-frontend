@@ -135,7 +135,7 @@
 }
 
 .solidFillOverflow {
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+  box-shadow: var(--elevation-none);
 }
 
 :global([data-theme="dark"]) .solidFill,
@@ -239,7 +239,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 0 1px var(--border);
+  border: 1px solid var(--border);
+  box-shadow: var(--elevation-none);
 }
 
 .sheetTitle {

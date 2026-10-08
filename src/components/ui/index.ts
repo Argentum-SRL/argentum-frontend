@@ -57,3 +57,9 @@ export { LunarLoading, type LunarLoadingProps } from './AtmosphericBackground/Lu
 export { DEFAULT_LUNAR_PHRASES } from './AtmosphericBackground/lunarConstants'
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle/ThemeToggle'
 export { SileoToaster } from './SileoToaster/SileoToaster'
+export {
+  SelectableSurface,
+  type SelectableSurfaceProps,
+  type ElevationContextType,
+} from './SelectableSurface'
+

@@ -5,7 +5,7 @@
   padding: 16px 20px;
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -267,7 +267,7 @@
   border-radius: 10px;
   width: 200px;
   max-width: 240px;
-  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--elevation-md);
   z-index: 60;
   pointer-events: none;
   text-align: left;

@@ -44,11 +44,13 @@
 
 .input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(13, 32, 69, 0.08);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+  box-shadow: var(--elevation-none);
 }
 
 :global([data-theme="dark"]) .input:focus {
-  box-shadow: 0 0 0 3px rgba(72, 120, 184, 0.15);
+  box-shadow: var(--elevation-none);
 }
 
 .inputError {

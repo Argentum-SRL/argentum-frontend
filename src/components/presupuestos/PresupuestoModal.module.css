@@ -370,6 +370,9 @@
   background: rgba(var(--primary-rgb), 0.12) !important;
   color: var(--primary) !important;
   border-color: rgba(var(--primary-rgb), 0.35) !important;
+  transform: translateY(-1.5px) scale(1.025);
+  box-shadow: var(--elevation-sm);
+  z-index: 5;
 }
 
 .presetPillClear {
@@ -430,11 +433,14 @@
   border-color: rgba(var(--primary-rgb), 0.4);
   background: var(--surface);
   box-shadow: var(--elevation-selection-modal);
+  transform: translateY(-2.5px) scale(1.02);
+  z-index: 6;
 }
 
 :global([data-theme="dark"]) .catCardSelected,
 :global(.dark) .catCardSelected {
   border-color: rgba(var(--primary-rgb), 0.5);
+  box-shadow: var(--elevation-selection-modal);
 }
 
 .catCardExpanded {
@@ -665,7 +671,9 @@
   color: #ffffff !important;
   border-color: var(--primary) !important;
   font-weight: 700;
-  box-shadow: var(--elevation-xs);
+  box-shadow: var(--elevation-sm);
+  transform: translateY(-1.5px) scale(1.03);
+  z-index: 5;
 }
 
 .subcatChipName {
@@ -725,7 +733,9 @@
   color: var(--primary) !important;
   font-weight: 700;
   border-color: rgba(var(--primary-rgb), 0.15) !important;
-  box-shadow: var(--elevation-xs);
+  box-shadow: var(--elevation-sm);
+  transform: translateY(-1.5px) scale(1.025);
+  z-index: 5;
 }
 
 [data-theme="dark"] .periodBtnActive,
@@ -733,6 +743,7 @@
   background: var(--surface-3, #1e293b) !important;
   color: var(--primary-light, #93c5fd) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--elevation-sm);
 }
 
 .periodBtnIcon {
@@ -790,12 +801,16 @@
 .renewalCardActive {
   background: rgba(var(--primary-rgb), 0.04) !important;
   border-color: rgba(var(--primary-rgb), 0.35) !important;
+  box-shadow: var(--elevation-selection-modal);
+  transform: translateY(-2.5px) scale(1.02);
+  z-index: 6;
 }
 
 [data-theme="dark"] .renewalCardActive,
 .dark .renewalCardActive {
   background: rgba(72, 120, 184, 0.1) !important;
   border-color: rgba(72, 120, 184, 0.35) !important;
+  box-shadow: var(--elevation-selection-modal);
 }
 
 .renewalLeft {

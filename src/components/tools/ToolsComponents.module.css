@@ -662,16 +662,16 @@
   background: var(--surface);
   color: var(--primary);
   border-color: var(--border);
-  box-shadow: var(--elevation-xs);
-  transform: translateY(-0.5px) scale(1.015);
+  box-shadow: var(--elevation-sm);
+  transform: translateY(-1.5px) scale(1.025);
   font-weight: 700;
-  z-index: 2;
+  z-index: 5;
 }
 
 [data-theme="dark"] .pillOptionActive {
   color: #60a5fa;
-  box-shadow: var(--elevation-xs);
-  transform: translateY(-0.5px) scale(1.015);
+  box-shadow: var(--elevation-sm);
+  transform: translateY(-1.5px) scale(1.025);
 }
 
 /* ── Quick Chips (cuotas rápidas) ─────────────────────────────────────────── */
@@ -703,9 +703,9 @@
   background: var(--primary);
   border-color: var(--primary);
   color: #fff;
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: var(--elevation-xs);
-  z-index: 2;
+  transform: translateY(-1.5px) scale(1.03);
+  box-shadow: var(--elevation-sm);
+  z-index: 5;
 }
 
 /* ── IPC Banner (live data) ──────────────────────────────────────────────── */

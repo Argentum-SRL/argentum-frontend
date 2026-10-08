@@ -230,21 +230,33 @@
 .settingCardActiveGold {
   border-color: rgba(201, 162, 39, 0.45) !important;
   background: rgba(201, 162, 39, 0.06) !important;
+  box-shadow: var(--elevation-selection-modal);
+  transform: translateY(-2.5px) scale(1.02);
+  z-index: 6;
 }
 
 [data-theme="dark"] .settingCardActiveGold {
   border-color: rgba(229, 184, 42, 0.45) !important;
   background: rgba(229, 184, 42, 0.08) !important;
+  box-shadow: var(--elevation-selection-modal);
+  transform: translateY(-2.5px) scale(1.02);
+  z-index: 6;
 }
 
 .settingCardActiveGreen {
   border-color: rgba(46, 204, 113, 0.45) !important;
   background: rgba(46, 204, 113, 0.06) !important;
+  box-shadow: var(--elevation-selection-modal);
+  transform: translateY(-2.5px) scale(1.02);
+  z-index: 6;
 }
 
 [data-theme="dark"] .settingCardActiveGreen {
   border-color: rgba(46, 204, 113, 0.4) !important;
   background: rgba(46, 204, 113, 0.08) !important;
+  box-shadow: var(--elevation-selection-modal);
+  transform: translateY(-2.5px) scale(1.02);
+  z-index: 6;
 }
 
 .settingIconBox {

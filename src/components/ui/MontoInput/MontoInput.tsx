@@ -17,6 +17,7 @@ interface MontoInputProps {
   optional?: boolean
   hideCurrency?: boolean
   compact?: boolean
+  variant?: 'hero' | 'outlined'
 }
 
 function formatearParaMostrar(str: string): string {
@@ -45,6 +46,7 @@ const MontoInput = memo(({
   allowDecimals = false,
   hideCurrency = false,
   compact = false,
+  variant = 'hero',
 }: MontoInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [prevValue, setPrevValue] = useState(value)
@@ -135,6 +137,7 @@ const MontoInput = memo(({
       )}
       <div className={[
         styles.montoHero,
+        variant === 'outlined' ? styles.montoOutlined : '',
         compact ? styles.montoHeroCompact : '',
         error ? styles.montoHeroError : '',
         disabled ? styles.montoHeroDisabled : ''

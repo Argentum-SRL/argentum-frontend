@@ -162,3 +162,38 @@
   font-size: 18px;
   letter-spacing: -0.5px;
 }
+
+/* ── Modo Outlined — control estándar de formulario (48px) ── */
+.montoOutlined {
+  background: var(--surface) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 0 14px !important;
+  height: 48px !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.montoOutlined:focus-within {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+[data-theme="dark"] .montoOutlined:focus-within {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+}
+
+.montoOutlined .montoHeroPrefix {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.3px !important;
+  color: var(--text-2) !important;
+}
+
+.montoOutlined .montoHeroField {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.2px !important;
+  height: 100% !important;
+  line-height: 48px !important;
+}

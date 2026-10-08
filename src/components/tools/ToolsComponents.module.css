@@ -2332,3 +2332,1005 @@
 }
 
 .iconRotating { animation: fwSpin 0.6s linear; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FINANCIAL WORKBENCH — Simulador Unificado Cuotas vs Contado
+   Diseño & Experiencia Senior: Arquitectura Workbench 2 Paneles Integrados
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Stepper Maestro ──────────────────────────────────────────────────── */
+.wbStepperWrap {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  justify-content: center;
+}
+
+.wbStepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+}
+
+.wbStepItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.wbStepItem:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.wbStepItem:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.wbStepDot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1;
+}
+
+.wbStepItemActive {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.wbStepItemActive .wbStepDot {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+
+.wbStepItemDone {
+  color: var(--success);
+}
+
+.wbStepItemDone .wbStepDot {
+  background: rgba(26, 122, 74, 0.12);
+  color: var(--success);
+  border-color: rgba(26, 122, 74, 0.3);
+}
+
+.wbStepDivider {
+  width: 32px;
+  height: 1.5px;
+  background: var(--border);
+  margin: 0 6px;
+  transition: background 0.3s ease;
+}
+
+.wbStepDividerActive {
+  background: rgba(26, 122, 74, 0.5);
+}
+
+/* ── Hero Inicial Centrado (Paso 1 antes de confirmar contado) ────────── */
+.wbInitialShell {
+  width: 100%;
+  max-width: 500px;
+  margin: 16px auto 36px auto;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 40px 36px;
+  box-shadow: 0 10px 32px -8px rgba(0, 0, 0, 0.06), 0 2px 8px -2px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: wbFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes wbFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wbInitialEyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.wbInitialTitle {
+  font-size: clamp(24px, 4vw, 30px);
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.wbInitialSub {
+  font-size: 14.5px;
+  color: var(--text-2);
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.wbInitialInputWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 4px 0 12px 0;
+}
+
+.wbInitialCta {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wbInitialCta:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+}
+
+.wbInitialCta:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── Contenedor Maestro "Financial Workbench" ─────────────────────────── */
+.wbShell {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.07), 0 2px 10px -2px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  box-sizing: border-box;
+  animation: wbFadeScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes wbFadeScale {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.wbGrid {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  align-items: stretch;
+  min-height: 560px;
+}
+
+@media (max-width: 920px) {
+  .wbGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Panel Izquierdo: El Ancla (Contado & Tablero en Vivo) ───────────── */
+.wbLeftPanel {
+  background: var(--surface-alt);
+  border-right: 1.5px solid var(--border);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 920px) {
+  .wbLeftPanel {
+    border-right: none;
+    border-bottom: 1.5px solid var(--border);
+    padding: 24px 20px;
+  }
+}
+
+/* Bloque Contado */
+.wbContadoBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wbContadoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wbSectionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.wbBadgeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.wbEditBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.wbEditBtn:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.wbBigAmount {
+  font-size: clamp(28px, 3.2vw, 34px);
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.wbSubHint {
+  font-size: 12px;
+  color: var(--text-3);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.wbInlineEditWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  animation: wbFadeUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wbInlineSaveBtn {
+  align-self: flex-end;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.wbInlineSaveBtn:hover {
+  opacity: 0.88;
+}
+
+.wbDivider {
+  height: 1px;
+  background: var(--border);
+  width: 100%;
+}
+
+/* Tablero en Vivo */
+.wbLiveSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.wbLiveHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wbLiveTitle {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.wbLiveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(26, 122, 74, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(26, 122, 74, 0.25);
+}
+
+.wbPulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulseDot 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+/* Métricas 2x2 */
+.wbMetricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.wbMetricCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.wbMetricLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.wbMetricVal {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.wbMetricHighlight {
+  color: var(--primary);
+}
+
+[data-theme="dark"] .wbMetricHighlight {
+  color: #60a5fa;
+}
+
+.wbMetricSub {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+/* Card de Recargo Nominal */
+.wbRecargoCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wbRecargoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wbRecargoLabel {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.wbRecargoBadge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: -0.01em;
+}
+
+.wbRecargoDiff {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+/* Mini Barra Comparativa Visual */
+.wbCompareBars {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wbCompareTitle {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.wbBarRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wbBarMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+
+.wbBarName {
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.wbBarVal {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.wbBarTrack {
+  height: 8px;
+  background: var(--surface-alt);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .wbBarTrack {
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+.wbBarFillContado {
+  height: 100%;
+  background: #0ea5e9;
+  border-radius: 4px;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wbBarFillCuotasSame {
+  height: 100%;
+  background: var(--success);
+  border-radius: 4px;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wbBarFillCuotasSurcharge {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 4px;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Live Insight Pill (Diagnóstico contextual al pie del panel izquierdo) */
+.wbInsightCard {
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid transparent;
+}
+
+.wbInsightSuccess {
+  background: rgba(26, 122, 74, 0.08);
+  border-color: rgba(26, 122, 74, 0.2);
+}
+
+.wbInsightWarning {
+  background: rgba(234, 88, 12, 0.08);
+  border-color: rgba(234, 88, 12, 0.2);
+}
+
+.wbInsightNeutral {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.wbInsightIcon {
+  font-size: 16px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.wbInsightBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wbInsightTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.wbInsightDesc {
+  font-size: 11px;
+  color: var(--text-2);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── Panel Derecho: El Simulador (Condiciones de Financiación) ───────── */
+.wbRightPanel {
+  background: var(--surface);
+  padding: 36px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 920px) {
+  .wbRightPanel {
+    padding: 28px 20px;
+    gap: 24px;
+  }
+}
+
+.wbRightHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wbRightEyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.wbRightTitle {
+  font-size: clamp(22px, 2.8vw, 26px);
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.025em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.wbRightSub {
+  font-size: 13.5px;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.wbFormFields {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.wbField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wbFieldLabel {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+/* Chips de Cuotas */
+.wbChipsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wbChip {
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.wbChip:hover {
+  background: var(--surface-alt);
+  border-color: var(--text-3);
+  color: var(--text);
+}
+
+.wbChip:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.wbChipActive {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
+}
+
+[data-theme="dark"] .wbChipActive {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+.wbCustomCuotasWrap {
+  display: flex;
+  align-items: center;
+  max-width: 220px;
+  height: 48px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+  margin-top: 4px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wbCustomCuotasWrap:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.wbCustomInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.wbCustomSuffix {
+  padding: 0 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  background: var(--surface-alt);
+  border-left: 1px solid var(--border);
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Segmented Control: Modalidad */
+.wbSegmented {
+  display: flex;
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.wbSegmentedBtn {
+  flex: 1;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  outline: none;
+}
+
+.wbSegmentedBtn:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.wbSegmentedBtnActive {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .wbSegmentedBtnActive {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Modo de Ingreso (Por cuota vs Total) */
+.wbFixedModeArea {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: wbFadeSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes wbFadeSlide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wbSubModeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.wbSubModePrompt {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.wbSubModePills {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-alt);
+  padding: 2px;
+  border-radius: 8px;
+}
+
+.wbSubPill {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.wbSubPillActive {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.wbInputBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.wbFieldHint {
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+/* Inputs Numéricos Estandarizados (TNA e Inflación) */
+.wbStandardInputWrap {
+  display: flex;
+  align-items: stretch;
+  height: 48px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wbStandardInputWrap:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.wbStandardInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.wbStandardInput::placeholder {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.wbInputSuffix {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  border-left: 1.5px solid var(--border);
+  white-space: nowrap;
+}
+
+/* Inflación Header Row */
+.wbInflationHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wbIpcSourceTag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.wbInflationInputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wbInflationInputRow .wbStandardInputWrap {
+  flex: 1;
+}
+
+.wbIpcSyncBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.wbIpcSyncBtn:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.wbIpcSyncBtnActive {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* CTA Dominante */
+.wbCtaWrapper {
+  margin-top: 4px;
+}
+
+.wbCtaButton {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.wbCtaButton:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+}
+
+.wbCtaButton:focus-visible {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+}
+
+.wbCtaButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+

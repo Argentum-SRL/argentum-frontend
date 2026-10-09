@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Target,
   RefreshCw,
+  Repeat,
   Calculator,
   Shield,
   User,
@@ -226,6 +227,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   const mainItems: MenuItemConfig[] = [
     { id: 'metas', label: 'Metas', Icon: Target, path: '/app/metas' },
     { id: 'suscripciones', label: 'Suscripciones', Icon: RefreshCw, path: '/app/suscripciones' },
+    { id: 'lo-que-se-repite', label: 'Lo que se repite', Icon: Repeat, path: '/app/lo-que-se-repite' },
   ]
 
   if (isAdmin) {

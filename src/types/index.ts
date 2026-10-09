@@ -1066,3 +1066,57 @@ export interface MemoriaComercioAplicarResponse {
 
 export * from './importacion'
 
+// ============================================================================
+// PATRONES ("Lo que se repite")
+// ============================================================================
+
+export interface ItemIngreso {
+  clave_item: string
+  nombre: string
+  tipo: 'regular' | 'intermitente' | 'variable' | 'erratico' | string
+  moneda: string
+  monto_mensual: number | string
+  estado: 'sugerido' | 'confirmado' | string
+  cuenta_en_numeros: boolean
+  editable: boolean
+}
+
+export interface ItemRepetido {
+  clave_item: string
+  nombre: string
+  rubro: string | null
+  moneda: string
+  caja_detectada: 'fijo' | 'costumbre' | 'dia_a_dia' | string
+  caja: 'fijo' | 'costumbre' | 'dia_a_dia' | string
+  estado: 'sugerido' | 'confirmado' | 'movido' | string
+  frecuencia: 'mensual' | 'bimestral' | 'anual' | null
+  dia_tipico: number | null
+  proxima_fecha: string | null
+  fuerza: 'fuerte' | 'debil' | null
+  ocurrencias: number
+  monto_tipico: number | string
+  ultimo_monto: number | string | null
+  monto_mensual: number | string
+  cuenta_en_numeros: boolean
+  transacciones_ids: string[]
+}
+
+export interface PatronesResumen {
+  fecha_calculo: string
+  meses_ventana: number
+  ingresos: ItemIngreso[]
+  fijos: ItemRepetido[]
+  costumbre: ItemRepetido[]
+  dia_a_dia: ItemRepetido[]
+}
+
+export interface DecisionPatronPayload {
+  clave_item: string
+  decision: 'confirmar' | 'descartar' | 'mover'
+  caja_destino?: 'fijo' | 'costumbre' | 'dia_a_dia' | null
+}
+
+export interface DeshacerDecisionPayload {
+  clave_item: string
+}
+

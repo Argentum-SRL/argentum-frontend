@@ -1,7 +1,7 @@
 import { useId, useState, useEffect, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw,
+  LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw, Repeat,
   Bell, Search, Sun, Moon, LogOut, ChevronDown, User,
   Calculator, Shield
 } from '@/components/ui/icons'
@@ -46,6 +46,7 @@ const NAV_FINANCIAL = [
   { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart  },
   { label: 'Metas',          path: '/app/metas',           Icon: Target    },
   { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: RefreshCw },
+  { label: 'Lo que se repite', path: '/app/lo-que-se-repite', Icon: Repeat },
 ]
 
 

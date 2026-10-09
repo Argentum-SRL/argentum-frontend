@@ -94,6 +94,8 @@ const NotificacionesForm: React.FC<{
 }> = ({ initialConfig, onSave }) => {
   const [form, setForm] = useState(() => buildInitialState(initialConfig))
   const [isSaving, setIsSaving] = useState(false)
+  const isWppActive = (prefix: string) =>
+    !initialConfig?.whatsapp_tipos_activos || initialConfig.whatsapp_tipos_activos.includes(prefix)
 
   const handleToggle = (field: keyof typeof defaultFormState) => {
     setForm((prev) => ({ ...prev, [field]: !prev[field] }))
@@ -207,14 +209,16 @@ const NotificacionesForm: React.FC<{
                 <Globe size={13} />
                 <span>Web</span>
               </button>
-              <button
-                type="button"
-                className={`${styles.channelPill} ${form.cuota_vence_whatsapp ? styles.channelActive : ''}`}
-                onClick={() => handleToggle('cuota_vence_whatsapp')}
-              >
-                <MessageSquare size={13} />
-                <span>WhatsApp</span>
-              </button>
+              {isWppActive('cuota_vence') && (
+                <button
+                  type="button"
+                  className={`${styles.channelPill} ${form.cuota_vence_whatsapp ? styles.channelActive : ''}`}
+                  onClick={() => handleToggle('cuota_vence_whatsapp')}
+                >
+                  <MessageSquare size={13} />
+                  <span>WhatsApp</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -264,16 +268,18 @@ const NotificacionesForm: React.FC<{
                   <Globe size={13} />
                   <span>Web</span>
                 </button>
-                <button
-                  type="button"
-                  className={`${styles.channelPill} ${
-                    form.presupuesto_umbral_1_whatsapp ? styles.channelActive : ''
-                  }`}
-                  onClick={() => handleToggle('presupuesto_umbral_1_whatsapp')}
-                >
-                  <MessageSquare size={13} />
-                  <span>WhatsApp</span>
-                </button>
+                {isWppActive('presupuesto_umbral_1') && (
+                  <button
+                    type="button"
+                    className={`${styles.channelPill} ${
+                      form.presupuesto_umbral_1_whatsapp ? styles.channelActive : ''
+                    }`}
+                    onClick={() => handleToggle('presupuesto_umbral_1_whatsapp')}
+                  >
+                    <MessageSquare size={13} />
+                    <span>WhatsApp</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -324,16 +330,18 @@ const NotificacionesForm: React.FC<{
                   <Globe size={13} />
                   <span>Web</span>
                 </button>
-                <button
-                  type="button"
-                  className={`${styles.channelPill} ${
-                    form.suscripcion_recordatorio_whatsapp ? styles.channelActive : ''
-                  }`}
-                  onClick={() => handleToggle('suscripcion_recordatorio_whatsapp')}
-                >
-                  <MessageSquare size={13} />
-                  <span>WhatsApp</span>
-                </button>
+                {isWppActive('suscripcion_recordatorio') && (
+                  <button
+                    type="button"
+                    className={`${styles.channelPill} ${
+                      form.suscripcion_recordatorio_whatsapp ? styles.channelActive : ''
+                    }`}
+                    onClick={() => handleToggle('suscripcion_recordatorio_whatsapp')}
+                  >
+                    <MessageSquare size={13} />
+                    <span>WhatsApp</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -368,14 +376,16 @@ const NotificacionesForm: React.FC<{
                   <Globe size={13} />
                   <span>Web</span>
                 </button>
-                <button
-                  type="button"
-                  className={`${styles.channelPill} ${form.meta_alcanzada_whatsapp ? styles.channelActive : ''}`}
-                  onClick={() => handleToggle('meta_alcanzada_whatsapp')}
-                >
-                  <MessageSquare size={13} />
-                  <span>WhatsApp</span>
-                </button>
+                {isWppActive('meta_alcanzada') && (
+                  <button
+                    type="button"
+                    className={`${styles.channelPill} ${form.meta_alcanzada_whatsapp ? styles.channelActive : ''}`}
+                    onClick={() => handleToggle('meta_alcanzada_whatsapp')}
+                  >
+                    <MessageSquare size={13} />
+                    <span>WhatsApp</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -427,14 +437,16 @@ const NotificacionesForm: React.FC<{
                   <Globe size={13} />
                   <span>Web</span>
                 </button>
-                <button
-                  type="button"
-                  className={`${styles.channelPill} ${form.inactividad_whatsapp ? styles.channelActive : ''}`}
-                  onClick={() => handleToggle('inactividad_whatsapp')}
-                >
-                  <MessageSquare size={13} />
-                  <span>WhatsApp</span>
-                </button>
+                {isWppActive('inactividad') && (
+                  <button
+                    type="button"
+                    className={`${styles.channelPill} ${form.inactividad_whatsapp ? styles.channelActive : ''}`}
+                    onClick={() => handleToggle('inactividad_whatsapp')}
+                  >
+                    <MessageSquare size={13} />
+                    <span>WhatsApp</span>
+                  </button>
+                )}
               </div>
             </div>
           )}

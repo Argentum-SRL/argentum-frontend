@@ -867,6 +867,7 @@ export interface ConfiguracionNotificacion {
   whatsapp_hora_envio: number
   whatsapp_minuto_envio: number
   updated_at?: string | null
+  whatsapp_tipos_activos?: string[]
 }
 
 

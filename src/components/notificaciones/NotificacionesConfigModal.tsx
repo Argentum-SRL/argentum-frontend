@@ -49,6 +49,8 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
   const [prevOpenAndConfig, setPrevOpenAndConfig] = useState<{ open: boolean; config: typeof config }>({ open: false, config: null })
   const [form, setForm] = useState(defaultFormState)
   const [isSaving, setIsSaving] = useState(false)
+  const isWppActive = (prefix: string) =>
+    !config?.whatsapp_tipos_activos || config.whatsapp_tipos_activos.includes(prefix)
 
   if (open !== prevOpenAndConfig.open || config !== prevOpenAndConfig.config) {
     setPrevOpenAndConfig({ open, config })
@@ -201,15 +203,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                     />
                     En la web
                   </label>
-                  <label className={styles.channelLabel}>
-                    <input
-                      type="checkbox"
-                      checked={form.cuota_vence_whatsapp}
-                      onChange={() => handleCheckboxChange('cuota_vence_whatsapp')}
-                      className={styles.channelCheckbox}
-                    />
-                    Por WhatsApp
-                  </label>
+                  {isWppActive('cuota_vence') && (
+                    <label className={styles.channelLabel}>
+                      <input
+                        type="checkbox"
+                        checked={form.cuota_vence_whatsapp}
+                        onChange={() => handleCheckboxChange('cuota_vence_whatsapp')}
+                        className={styles.channelCheckbox}
+                      />
+                      Por WhatsApp
+                    </label>
+                  )}
                 </div>
               </div>
             </div>
@@ -266,15 +270,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                       />
                       En la web
                     </label>
-                    <label className={styles.channelLabel}>
-                      <input
-                        type="checkbox"
-                        checked={form.presupuesto_umbral_1_whatsapp}
-                        onChange={() => handleCheckboxChange('presupuesto_umbral_1_whatsapp')}
-                        className={styles.channelCheckbox}
-                      />
-                      Por WhatsApp
-                    </label>
+                    {isWppActive('presupuesto_umbral_1') && (
+                      <label className={styles.channelLabel}>
+                        <input
+                          type="checkbox"
+                          checked={form.presupuesto_umbral_1_whatsapp}
+                          onChange={() => handleCheckboxChange('presupuesto_umbral_1_whatsapp')}
+                          className={styles.channelCheckbox}
+                        />
+                        Por WhatsApp
+                      </label>
+                    )}
                   </div>
                 </div>
               )}
@@ -299,15 +305,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                     />
                     En la web
                   </label>
-                  <label className={styles.channelLabel}>
-                    <input
-                      type="checkbox"
-                      checked={form.presupuesto_umbral_2_whatsapp}
-                      onChange={() => handleCheckboxChange('presupuesto_umbral_2_whatsapp')}
-                      className={styles.channelCheckbox}
-                    />
-                    Por WhatsApp
-                  </label>
+                  {isWppActive('presupuesto_umbral_2') && (
+                    <label className={styles.channelLabel}>
+                      <input
+                        type="checkbox"
+                        checked={form.presupuesto_umbral_2_whatsapp}
+                        onChange={() => handleCheckboxChange('presupuesto_umbral_2_whatsapp')}
+                        className={styles.channelCheckbox}
+                      />
+                      Por WhatsApp
+                    </label>
+                  )}
                 </div>
               </div>
             </div>
@@ -339,15 +347,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                     />
                     En la web
                   </label>
-                  <label className={styles.channelLabel}>
-                    <input
-                      type="checkbox"
-                      checked={form.suscripcion_hoy_whatsapp}
-                      onChange={() => handleCheckboxChange('suscripcion_hoy_whatsapp')}
-                      className={styles.channelCheckbox}
-                    />
-                    Por WhatsApp
-                  </label>
+                  {isWppActive('suscripcion_hoy') && (
+                    <label className={styles.channelLabel}>
+                      <input
+                        type="checkbox"
+                        checked={form.suscripcion_hoy_whatsapp}
+                        onChange={() => handleCheckboxChange('suscripcion_hoy_whatsapp')}
+                        className={styles.channelCheckbox}
+                      />
+                      Por WhatsApp
+                    </label>
+                  )}
                 </div>
               </div>
             </div>
@@ -396,15 +406,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                       />
                       En la web
                     </label>
-                    <label className={styles.channelLabel}>
-                      <input
-                        type="checkbox"
-                        checked={form.suscripcion_recordatorio_whatsapp}
-                        onChange={() => handleCheckboxChange('suscripcion_recordatorio_whatsapp')}
-                        className={styles.channelCheckbox}
-                      />
-                      Por WhatsApp
-                    </label>
+                    {isWppActive('suscripcion_recordatorio') && (
+                      <label className={styles.channelLabel}>
+                        <input
+                          type="checkbox"
+                          checked={form.suscripcion_recordatorio_whatsapp}
+                          onChange={() => handleCheckboxChange('suscripcion_recordatorio_whatsapp')}
+                          className={styles.channelCheckbox}
+                        />
+                        Por WhatsApp
+                      </label>
+                    )}
                   </div>
                 </div>
               )}
@@ -447,15 +459,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                       />
                       En la web
                     </label>
-                    <label className={styles.channelLabel}>
-                      <input
-                        type="checkbox"
-                        checked={form.meta_alcanzada_whatsapp}
-                        onChange={() => handleCheckboxChange('meta_alcanzada_whatsapp')}
-                        className={styles.channelCheckbox}
-                      />
-                      Por WhatsApp
-                    </label>
+                    {isWppActive('meta_alcanzada') && (
+                      <label className={styles.channelLabel}>
+                        <input
+                          type="checkbox"
+                          checked={form.meta_alcanzada_whatsapp}
+                          onChange={() => handleCheckboxChange('meta_alcanzada_whatsapp')}
+                          className={styles.channelCheckbox}
+                        />
+                        Por WhatsApp
+                      </label>
+                    )}
                   </div>
                 </div>
               )}
@@ -480,15 +494,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                     />
                     En la web
                   </label>
-                  <label className={styles.channelLabel}>
-                    <input
-                      type="checkbox"
-                      checked={form.saldo_cero_whatsapp}
-                      onChange={() => handleCheckboxChange('saldo_cero_whatsapp')}
-                      className={styles.channelCheckbox}
-                    />
-                    Por WhatsApp
-                  </label>
+                  {isWppActive('saldo_cero') && (
+                    <label className={styles.channelLabel}>
+                      <input
+                        type="checkbox"
+                        checked={form.saldo_cero_whatsapp}
+                        onChange={() => handleCheckboxChange('saldo_cero_whatsapp')}
+                        className={styles.channelCheckbox}
+                      />
+                      Por WhatsApp
+                    </label>
+                  )}
                 </div>
               </div>
             </div>
@@ -538,15 +554,17 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
                       />
                       En la web
                     </label>
-                    <label className={styles.channelLabel}>
-                      <input
-                        type="checkbox"
-                        checked={form.inactividad_whatsapp}
-                        onChange={() => handleCheckboxChange('inactividad_whatsapp')}
-                        className={styles.channelCheckbox}
-                      />
-                      Por WhatsApp
-                    </label>
+                    {isWppActive('inactividad') && (
+                      <label className={styles.channelLabel}>
+                        <input
+                          type="checkbox"
+                          checked={form.inactividad_whatsapp}
+                          onChange={() => handleCheckboxChange('inactividad_whatsapp')}
+                          className={styles.channelCheckbox}
+                        />
+                        Por WhatsApp
+                      </label>
+                    )}
                   </div>
                 </div>
               )}

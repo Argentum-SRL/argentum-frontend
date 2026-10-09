@@ -1,4 +1,5 @@
 import { useRef, useCallback, useState, memo } from 'react'
+import { formatMonto } from '@/utils/format'
 import styles from './MontoInput.module.css'
 
 interface MontoInputProps {
@@ -49,6 +50,8 @@ const MontoInput = memo(({
   variant = 'hero',
 }: MontoInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
+  const isExceedingMaxRef = useRef(false)
+  const [internalError, setInternalError] = useState<string | null>(null)
   const [prevValue, setPrevValue] = useState(value)
   const [inputValue, setInputValue] = useState(() => {
     if (value === null || value === undefined) return ''
@@ -58,8 +61,13 @@ const MontoInput = memo(({
   if (value !== prevValue) {
     setPrevValue(value)
     if (value === null || value === undefined) {
-      setInputValue('')
+      if (!isExceedingMaxRef.current) {
+        setInputValue('')
+        setInternalError(null)
+      }
     } else {
+      isExceedingMaxRef.current = false
+      setInternalError(null)
       const valorActualLimpio = limpiarParaNumero(inputValue)
       const valorActualNum = parseFloat(valorActualLimpio)
       if (valorActualNum !== value) {
@@ -71,7 +79,13 @@ const MontoInput = memo(({
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value
-    if (!raw) { setInputValue(''); onChange(null); return }
+    if (!raw) {
+      setInputValue('')
+      isExceedingMaxRef.current = false
+      setInternalError(null)
+      onChange(null)
+      return
+    }
     // Normalizar punto como decimal → coma (estilo argentino)
     if (raw.endsWith('.') && !raw.includes(',')) raw = raw.slice(0, -1) + ','
     // Siempre permitir coma (separador decimal argentino) y punto (separador de miles)
@@ -84,14 +98,26 @@ const MontoInput = memo(({
     const oldLen = e.target.value.length
     setInputValue(formatted)
     const paraPadre = limpiarParaNumero(formatted)
+
+    let num: number | null
     if (paraPadre.endsWith('.')) {
-      const num = parseFloat(paraPadre.slice(0, -1))
-      onChange(isNaN(num) ? null : num)
+      const parsed = parseFloat(paraPadre.slice(0, -1))
+      num = isNaN(parsed) ? null : parsed
     } else {
-      const num = allowDecimals ? parseFloat(paraPadre) : parseInt(paraPadre, 10)
-      if (!isNaN(num)) { if (max === undefined || num <= max) onChange(num) }
-      else onChange(null)
+      const parsed = allowDecimals ? parseFloat(paraPadre) : parseInt(paraPadre, 10)
+      num = isNaN(parsed) ? null : parsed
     }
+
+    if (num !== null && max !== undefined && num > max) {
+      isExceedingMaxRef.current = true
+      setInternalError(`No puede superar ${formatMonto(max, moneda)}.`)
+      onChange(null)
+    } else {
+      isExceedingMaxRef.current = false
+      setInternalError(null)
+      onChange(num)
+    }
+
     requestAnimationFrame(() => {
       if (inputRef.current) {
         const newLen = inputRef.current.value.length
@@ -99,7 +125,7 @@ const MontoInput = memo(({
         inputRef.current.setSelectionRange(newPos, newPos)
       }
     })
-  }, [onChange, allowDecimals, max])
+  }, [onChange, allowDecimals, max, moneda])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     const navKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Home', 'End']
@@ -124,9 +150,21 @@ const MontoInput = memo(({
     const formatted = formatearParaMostrar(cleaned)
     setInputValue(formatted)
     const numStr = limpiarParaNumero(formatted)
-    const num = parseFloat(numStr)
-    if (!isNaN(num) && (max === undefined || num <= max)) onChange(num)
-  }, [onChange, allowDecimals, max])
+    const parsed = allowDecimals ? parseFloat(numStr) : parseInt(numStr, 10)
+    const num = isNaN(parsed) ? null : parsed
+
+    if (num !== null && max !== undefined && num > max) {
+      isExceedingMaxRef.current = true
+      setInternalError(`No puede superar ${formatMonto(max, moneda)}.`)
+      onChange(null)
+    } else {
+      isExceedingMaxRef.current = false
+      setInternalError(null)
+      onChange(num)
+    }
+  }, [onChange, allowDecimals, max, moneda])
+
+  const effectiveError = error || internalError
 
   return (
     <div className={[styles.wrap, className].filter(Boolean).join(' ')}>
@@ -139,7 +177,7 @@ const MontoInput = memo(({
         styles.montoHero,
         variant === 'outlined' ? styles.montoOutlined : '',
         compact ? styles.montoHeroCompact : '',
-        error ? styles.montoHeroError : '',
+        effectiveError ? styles.montoHeroError : '',
         disabled ? styles.montoHeroDisabled : ''
       ].filter(Boolean).join(' ')}>
         {/* Chip de moneda — clickeable solo si onMonedaChange está definido */}
@@ -179,7 +217,7 @@ const MontoInput = memo(({
           />
         </div>
       </div>
-      {error && <p className={styles.error}>{error}</p>}
+      {effectiveError && <p className={styles.error}>{effectiveError}</p>}
     </div>
   )
 })

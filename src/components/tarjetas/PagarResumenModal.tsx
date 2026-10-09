@@ -1,11 +1,14 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { X, CreditCard, CheckCircle2, Edit3, AlertTriangle, Info, Check, DollarSign, ArrowRightLeft } from '@/components/ui/icons'
-import type { TarjetaCredito, Billetera, PagarTarjetaPayload } from '@/types'
+import type { TarjetaCredito, Billetera, PagarTarjetaPayload, Categoria, ResultadoPagoTarjeta } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
+import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
+import categoriaService from '@/services/categoria.service'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
+import { sileo } from 'sileo'
 import styles from './PagarResumenModal.module.css'
 
 export interface PagarResumenModalProps {
@@ -22,7 +25,7 @@ export interface PagarResumenModalProps {
   pagoMinimoAclaracion?: string
   cotizacionOficialPropuesta?: number | null
   porcentajePercepcion?: number | null
-  onConfirm: (payload: PagarTarjetaPayload) => Promise<void>
+  onConfirm: (payload: PagarTarjetaPayload) => Promise<ResultadoPagoTarjeta | void>
   isPaying: boolean
 }
 
@@ -46,6 +49,12 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   const [tipoPago, setTipoPago] = useState<'total' | 'otro'>('total')
   const [montoCustom, setMontoCustom] = useState<number | null>(null)
 
+  // Diferencia / Excedente opciones
+  const [diferenciaTipo, setDiferenciaTipo] = useState<'cargos_banco' | 'compras_no_cargadas'>('cargos_banco')
+  const [diferenciaCategoriaId, setDiferenciaCategoriaId] = useState<string | null>(null)
+  const [diferenciaSubcategoriaId, setDiferenciaSubcategoriaId] = useState<string | null>(null)
+  const [categorias, setCategorias] = useState<Categoria[]>([])
+
   // Multimoneda USD options
   const [modoUSD, setModoUSD] = useState<'dolares' | 'pesificar'>('dolares')
   const [billeteraUSDId, setBilleteraUSDId] = useState<string>('')
@@ -55,6 +64,12 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   const [cotizacionCustom, setCotizacionCustom] = useState<string | null>(null)
   const [montoPesosCustom, setMontoPesosCustom] = useState<string>('')
   const [montoPercepcionCustom, setMontoPercepcionCustom] = useState<string>('')
+
+  useEffect(() => {
+    if (isOpen) {
+      categoriaService.getCategorias().then(setCategorias).catch(() => {})
+    }
+  }, [isOpen])
 
   const billeterasUSD: Billetera[] = useMemo(() => {
     return sortBilleteras(
@@ -76,6 +91,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
     if (isOpen) {
       setTipoPago('total')
       setMontoCustom(null)
+      setDiferenciaTipo('cargos_banco')
+      setDiferenciaCategoriaId(null)
+      setDiferenciaSubcategoriaId(null)
       const defaultUSD = billeterasUSD[0]?.id || ''
       setBilleteraUSDId(defaultUSD)
       const defaultARS = billeterasARS.find(b => b.id === tarjeta.billetera_id)?.id || billeterasARS[0]?.id || ''
@@ -97,9 +115,18 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
     ? totalAPagar 
     : (montoCustom ?? 0)
 
-  const isMenorQueTotal = numMonto < totalAPagar && numMonto > 0
-  const isMenorQueMinimo = pagoMinimoEstimado > 0 && numMonto < pagoMinimoEstimado && numMonto > 0
-  const isValidMonto = numMonto > 0 && numMonto <= totalAPagar
+  const isPesificacion = monedaAPagar === 'USD' && modoUSD === 'pesificar'
+  const isExcedente = tipoPago === 'otro' && (montoCustom ?? 0) > totalAPagar
+  const diferencia = isExcedente ? ((montoCustom ?? 0) - totalAPagar) : 0
+
+  const isMenorQueTotal = !isExcedente && tipoPago === 'otro' && numMonto < totalAPagar && numMonto > 0
+  const isMenorQueMinimo = !isExcedente && tipoPago === 'otro' && pagoMinimoEstimado > 0 && numMonto < pagoMinimoEstimado && numMonto > 0
+
+  const isValidMonto = isPesificacion
+    ? (numMonto > 0 && numMonto <= totalAPagar)
+    : (numMonto > 0)
+
+  const isExcedenteValid = !isExcedente || diferenciaTipo === 'cargos_banco' || (diferenciaTipo === 'compras_no_cargadas' && Boolean(diferenciaCategoriaId))
 
   // Calculations for Pesification
   const cotizacionNum = parseFloat(cotizacionEfectiva) || 0
@@ -121,7 +148,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
     ? (billeteraUSDId !== '')
     : true
 
-  const isFormValid = isValidMonto && isPesificacionValid && isDolaresDirectoValid
+  const isFormValid = isValidMonto && isPesificacionValid && isDolaresDirectoValid && isExcedenteValid
 
   const handleSelectTipo = (tipo: 'total' | 'otro') => {
     setTipoPago(tipo)
@@ -138,21 +165,32 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
     if (!isFormValid || isPaying) return
     const montoFinal = tipoPago === 'total' ? undefined : numMonto
 
+    const diferenciaPayload = isExcedente ? {
+      diferencia_tipo: diferenciaTipo,
+      ...(diferenciaTipo === 'compras_no_cargadas' ? {
+        diferencia_categoria_id: diferenciaCategoriaId || undefined,
+        diferencia_subcategoria_id: diferenciaSubcategoriaId || undefined,
+      } : {})
+    } : {}
+
+    let res: ResultadoPagoTarjeta | void
     if (monedaAPagar === 'ARS') {
-      await onConfirm({
+      res = await onConfirm({
         moneda: 'ARS',
-        monto: montoFinal
+        monto: montoFinal,
+        ...diferenciaPayload,
       })
     } else {
       if (modoUSD === 'dolares') {
-        await onConfirm({
+        res = await onConfirm({
           moneda: 'USD',
           pesificar: false,
           billetera_id: billeteraUSDId,
-          monto: montoFinal
+          monto: montoFinal,
+          ...diferenciaPayload,
         })
       } else {
-        await onConfirm({
+        res = await onConfirm({
           moneda: 'USD',
           pesificar: true,
           billetera_id: billeteraARSId,
@@ -162,6 +200,14 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           monto_percepcion_personalizado: montoPercepcionCustom !== '' ? parseFloat(montoPercepcionCustom) : undefined
         })
       }
+    }
+
+    const montoDiff = res?.monto_diferencia ?? (isExcedente ? diferencia : null)
+    if (montoDiff !== null && montoDiff !== undefined && Number(montoDiff) > 0) {
+      const tipoLabel = diferenciaTipo === 'cargos_banco' ? 'Cargos del banco' : 'Compras no cargadas'
+      sileo.success({
+        title: `Pago registrado. ${formatMonto(montoDiff, monedaAPagar)} quedaron como ${tipoLabel}.`
+      })
     }
   }
 
@@ -189,6 +235,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
       hasBreakdown,
       hasPriorDebt,
       hasRefinanced,
+      isExcedente,
+      diferenciaTipo,
+      diferenciaCategoriaId,
     ],
     extraPadding: 8,
     maxHeightRatio: 0.90,
@@ -361,14 +410,14 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                 moneda={monedaAPagar}
                 hideCurrency
                 allowDecimals
-                placeholder={`Hasta ${formatMonto(totalAPagar, monedaAPagar)}`}
-                max={totalAPagar}
+                placeholder={isPesificacion ? `Hasta ${formatMonto(totalAPagar, monedaAPagar)}` : undefined}
+                max={isPesificacion ? totalAPagar : undefined}
                 autoFocus
                 disabled={isPaying}
               />
 
-              {/* Quick chips si elige otro monto */}
-              {totalAPagar > 0 && (
+              {/* Quick chips si elige otro monto y no supera el total */}
+              {totalAPagar > 0 && !isExcedente && (
                 <div className={styles.quickChipsRow}>
                   {pagoMinimoEstimado > 0 && pagoMinimoEstimado < totalAPagar && (
                     <button
@@ -386,6 +435,80 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   >
                     50% ({formatMonto(Math.round(totalAPagar * 0.5), monedaAPagar)})
                   </button>
+                </div>
+              )}
+
+              {/* Bloque de excedente cuando montoCustom > totalAPagar */}
+              {isExcedente && (
+                <div className={styles.excedenteCard}>
+                  <div className={styles.excedenteHeader}>
+                    <span className={styles.excedenteTitulo}>
+                      Pagás {formatMonto(diferencia, monedaAPagar)} más que el total que calcula Argentum.
+                    </span>
+                  </div>
+
+                  <div className={styles.excedenteOpciones}>
+                    <label
+                      className={`${styles.excedenteOpcion} ${diferenciaTipo === 'cargos_banco' ? styles.excedenteOpcionActiva : ''}`}
+                      onClick={() => setDiferenciaTipo('cargos_banco')}
+                    >
+                      <div className={styles.excedenteRadioRow}>
+                        <input
+                          type="radio"
+                          name="diferencia_tipo"
+                          checked={diferenciaTipo === 'cargos_banco'}
+                          onChange={() => setDiferenciaTipo('cargos_banco')}
+                          className={styles.excedenteRadio}
+                        />
+                        <div className={styles.excedenteTextos}>
+                          <span className={styles.excedenteOpcionLabel}>
+                            Cargos del banco (comisiones, impuestos, intereses)
+                          </span>
+                          <span className={styles.excedenteOpcionSublabel}>
+                            Se anota como gasto en Banco &gt; Impuestos.
+                          </span>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label
+                      className={`${styles.excedenteOpcion} ${diferenciaTipo === 'compras_no_cargadas' ? styles.excedenteOpcionActiva : ''}`}
+                      onClick={() => setDiferenciaTipo('compras_no_cargadas')}
+                    >
+                      <div className={styles.excedenteRadioRow}>
+                        <input
+                          type="radio"
+                          name="diferencia_tipo"
+                          checked={diferenciaTipo === 'compras_no_cargadas'}
+                          onChange={() => setDiferenciaTipo('compras_no_cargadas')}
+                          className={styles.excedenteRadio}
+                        />
+                        <div className={styles.excedenteTextos}>
+                          <span className={styles.excedenteOpcionLabel}>
+                            Compras que no cargué
+                          </span>
+                        </div>
+                      </div>
+
+                      {diferenciaTipo === 'compras_no_cargadas' && (
+                        <div className={styles.excedenteCategoriaSelectorWrap} onClick={(e) => e.stopPropagation()}>
+                          <CategoriaSelector
+                            categorias={categorias}
+                            categoriaId={diferenciaCategoriaId || ''}
+                            subcategoriaId={diferenciaSubcategoriaId || ''}
+                            tipo="egreso"
+                            onSelectCategoria={(id) => {
+                              setDiferenciaCategoriaId(id)
+                              setDiferenciaSubcategoriaId(null)
+                            }}
+                            onSelectSubcategoria={(id) => {
+                              setDiferenciaSubcategoriaId(id)
+                            }}
+                          />
+                        </div>
+                      )}
+                    </label>
+                  </div>
                 </div>
               )}
             </div>
@@ -509,7 +632,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           )}
 
           {/* Box de Pago Mínimo Estimado */}
-          {pagoMinimoEstimado > 0 && (
+          {pagoMinimoEstimado > 0 && !isExcedente && (
             <div className={styles.minimoBox} title={pagoMinimoAclaracion || 'Monto de referencia orientativo bancario'}>
               <div className={styles.minimoTop}>
                 <div className={styles.minimoLabelGroup}>

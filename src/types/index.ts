@@ -645,6 +645,9 @@ export interface PagarTarjetaPayload {
   cotizacion_personalizada?: number
   monto_pesos_personalizado?: number
   monto_percepcion_personalizado?: number
+  diferencia_tipo?: 'cargos_banco' | 'compras_no_cargadas'
+  diferencia_categoria_id?: string | null
+  diferencia_subcategoria_id?: string | null
 }
 
 export interface ResultadoPagoTarjeta {
@@ -667,6 +670,7 @@ export interface ResultadoPagoTarjeta {
   moneda_pagada: string
   monto_pagado: number
   saldo_arrastrado_generado?: number | null
+  monto_diferencia?: number | null
 }
 
 export interface ResumenTarjeta {

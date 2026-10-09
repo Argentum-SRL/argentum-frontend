@@ -91,14 +91,23 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
     if (!payingTicket) return
     setIsPaying(true)
     try {
-      await tarjetaService.pagarResumenTarjeta(tarjeta.id, {
+      const res = await tarjetaService.pagarResumenTarjeta(tarjeta.id, {
         ...payload,
         fecha_resumen: payingTicket.vencimiento
       })
-      sileo.success({ title: 'Pago de resumen registrado con éxito' })
+      // Aviso de éxito según respuesta del servidor
+      if (res?.monto_diferencia && Number(res.monto_diferencia) > 0) {
+        const tipoLabel = payload.diferencia_tipo === 'cargos_banco' ? 'Cargos del banco' : 'Compras no cargadas'
+        sileo.success({
+          title: `Pago registrado. ${formatMonto(res.monto_diferencia, payload.moneda || 'ARS')} quedaron como ${tipoLabel}.`
+        })
+      } else {
+        sileo.success({ title: 'Pago de resumen registrado con éxito' })
+      }
       setIsPagarModalOpen(false)
       fetchResumen()
       if (onRefresh) onRefresh()
+      return res
     } catch (err: unknown) {
       console.error(err)
       sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
@@ -522,87 +531,106 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
             )
           })()}
           
-          {/* Fila de Vencimiento */}
-          {currentTicket.vencimiento && (
-            <div className={`${styles.vencimientoRow} ${isVencePronto(currentTicket.vencimiento) ? styles.vencimientoUrgent : ''}`}>
-              <div className={styles.vencimientoLeft}>
-                {isVencePronto(currentTicket.vencimiento) ? (
-                  <Clock size={14} className={styles.vencimientoIcon} />
-                ) : (
-                  <Calendar size={14} className={styles.vencimientoIcon} />
-                )}
-                <span className={styles.vencimientoLabel}>Vencimiento</span>
-              </div>
-              <span className={styles.vencimientoValue}>
-                {formatDate(currentTicket.vencimiento)}
-                {isVencePronto(currentTicket.vencimiento) && (
-                  <span className={styles.urgentBadge}>¡Próximo!</span>
-                )}
-              </span>
-            </div>
-          )}
-
-          {/* Botones de Pago */}
-          {(currentTicket.isPast || currentTicket.title === 'Resumen Actual') && (
-            (() => {
-              const hasARS = (currentTicket.totalARS && currentTicket.totalARS > 0) || (currentTicket.totalAPagarARS && currentTicket.totalAPagarARS > 0)
-              const hasUSD = (currentTicket.totalUSD && currentTicket.totalUSD > 0) || (currentTicket.totalAPagarUSD && currentTicket.totalAPagarUSD > 0)
-              const isBimonetario = hasARS && hasUSD
-
-              const isPaid = currentTicket.pagado || (
+          {(() => {
+            const hasARS = Boolean((currentTicket.totalARS && currentTicket.totalARS > 0) || (currentTicket.totalAPagarARS && currentTicket.totalAPagarARS > 0))
+            const hasUSD = Boolean((currentTicket.totalUSD && currentTicket.totalUSD > 0) || (currentTicket.totalAPagarUSD && currentTicket.totalAPagarUSD > 0))
+            const isPaid = Boolean(
+              currentTicket.pagado || (
                 currentTicket.cuotas.length > 0 && 
                 currentTicket.cuotas.every(c => c.pagada) && 
                 (!currentTicket.saldoArrastrado || currentTicket.saldoArrastrado === 0)
               )
-              if (isPaid) {
-                return (
-                  <div className={styles.paidBadge}>
-                    <CheckCircle2 size={16} strokeWidth={2.5} />
-                    <span>Resumen Pagado</span>
-                  </div>
-                )
-              }
+            )
+            const sinNadaParaPagar = !hasARS && !hasUSD && !isPaid
+            const esUrgente = isVencePronto(currentTicket.vencimiento) && !sinNadaParaPagar
 
-              if (isBimonetario) {
-                return (
-                  <div className={styles.buttonsRow}>
-                    {(currentTicket.totalAPagarARS || 0) > 0 && (
-                      <button
-                        type="button"
-                        className={styles.payBtn}
-                        onClick={() => handleOpenPagarModal(currentTicket, 'ARS')}
+            return (
+              <>
+                {/* Fila de Vencimiento */}
+                {currentTicket.vencimiento && (
+                  <div className={`${styles.vencimientoRow} ${esUrgente ? styles.vencimientoUrgent : ''}`}>
+                    <div className={styles.vencimientoLeft}>
+                      {esUrgente ? (
+                        <Clock size={14} className={styles.vencimientoIcon} />
+                      ) : (
+                        <Calendar size={14} className={styles.vencimientoIcon} />
+                      )}
+                      <span className={styles.vencimientoLabel}>Vencimiento</span>
+                    </div>
+                    <span className={styles.vencimientoValue}>
+                      {formatDate(currentTicket.vencimiento)}
+                      {esUrgente && (
+                        <span className={styles.urgentBadge}>¡Próximo!</span>
+                      )}
+                    </span>
+                  </div>
+                )}
+
+                {/* Botones de Pago */}
+                {(currentTicket.isPast || currentTicket.title === 'Resumen Actual') && (
+                  (() => {
+                    if (isPaid) {
+                      return (
+                        <div className={styles.paidBadge}>
+                          <CheckCircle2 size={16} strokeWidth={2.5} />
+                          <span>Resumen Pagado</span>
+                        </div>
+                      )
+                    }
+
+                    if (sinNadaParaPagar) {
+                      return (
+                        <div className={styles.sinDeudaText}>
+                          No hay nada para pagar en este resumen.
+                        </div>
+                      )
+                    }
+
+                    const isBimonetario = hasARS && hasUSD
+
+                    if (isBimonetario) {
+                      return (
+                        <div className={styles.buttonsRow}>
+                          {(currentTicket.totalAPagarARS || 0) > 0 && (
+                            <button
+                              type="button"
+                              className={styles.payBtn}
+                              onClick={() => handleOpenPagarModal(currentTicket, 'ARS')}
+                              disabled={isPaying}
+                            >
+                              {isPaying ? 'Procesando...' : 'Pagar Pesos'}
+                            </button>
+                          )}
+                          {(currentTicket.totalAPagarUSD || 0) > 0 && (
+                            <button
+                              type="button"
+                              className={styles.payBtnSecondary}
+                              onClick={() => handleOpenPagarModal(currentTicket, 'USD')}
+                              disabled={isPaying}
+                            >
+                              {isPaying ? 'Procesando...' : 'Pagar Dólares'}
+                            </button>
+                          )}
+                        </div>
+                      )
+                    }
+
+                    const targetMoneda = (hasUSD && !hasARS) ? 'USD' : 'ARS'
+                    return (
+                      <button 
+                        type="button" 
+                        className={styles.payBtn} 
+                        onClick={() => handleOpenPagarModal(currentTicket, targetMoneda)}
                         disabled={isPaying}
                       >
-                        {isPaying ? 'Procesando...' : 'Pagar Pesos'}
+                        {isPaying ? 'Procesando...' : (targetMoneda === 'USD' ? 'Pagar Dólares' : 'Pagar Tarjeta')}
                       </button>
-                    )}
-                    {(currentTicket.totalAPagarUSD || 0) > 0 && (
-                      <button
-                        type="button"
-                        className={styles.payBtnSecondary}
-                        onClick={() => handleOpenPagarModal(currentTicket, 'USD')}
-                        disabled={isPaying}
-                      >
-                        {isPaying ? 'Procesando...' : 'Pagar Dólares'}
-                      </button>
-                    )}
-                  </div>
-                )
-              }
-
-              const targetMoneda = (hasUSD && !hasARS) ? 'USD' : 'ARS'
-              return (
-                <button 
-                  type="button" 
-                  className={styles.payBtn} 
-                  onClick={() => handleOpenPagarModal(currentTicket, targetMoneda)}
-                  disabled={isPaying}
-                >
-                  {isPaying ? 'Procesando...' : (targetMoneda === 'USD' ? 'Pagar Dólares' : 'Pagar Tarjeta')}
-                </button>
-              )
-            })()
-          )}
+                    )
+                  })()
+                )}
+              </>
+            )
+          })()}
 
           {/* Toggle Expandir / Contraer */}
           {onToggleExpand && (

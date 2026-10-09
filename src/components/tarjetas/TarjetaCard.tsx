@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import { Clock, Edit2, Archive, Trash2 } from '@/components/ui/icons'
+import { Edit2, Archive, Trash2 } from '@/components/ui/icons'
 import type { TarjetaCredito, Billetera } from '@/types'
-import { calcularProximoVencimiento, RED_LABEL } from '@/lib/utils/tarjeta.utils'
-import { formatMonto } from '@/utils/format'
+import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import RealCardPreview from './RealCardPreview'
 import styles from './TarjetaCard.module.css'
 
@@ -19,13 +18,6 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
   const [isFlipped, setIsFlipped] = useState(false)
   const [isFlipping, setIsFlipping] = useState(false)
   const [flipDirection, setFlipDirection] = useState<'toBack' | 'toFront' | null>(null)
-
-  const proximoVencimiento = calcularProximoVencimiento(tarjeta.dia_vencimiento)
-  
-  const hoy = new Date()
-  const diffTime = proximoVencimiento.getTime() - hoy.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  const mostrarAlerta = diffDays >= 0 && diffDays <= 5
 
   // Extraer últimos 4 dígitos del nombre de la tarjeta
   const ultimos4 = tarjeta.nombre.replace('•••• ', '').slice(-4)
@@ -164,27 +156,6 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
 
         </div>
       </div>
-
-      {((mostrarAlerta && !isFlipped) || (tarjeta.resumen_actual && tarjeta.resumen_actual.total_comprometido_resumen_actual > 0)) && (
-        <div className={styles.content}>
-          <div className={styles.divider} />
-
-          <div className="flex justify-between items-center">
-            {mostrarAlerta && !isFlipped && (
-              <div className={styles.chipAlerta}>
-                <Clock size={12} />
-                <span>Vence en {diffDays} {diffDays === 1 ? 'día' : 'días'}</span>
-              </div>
-            )}
-            
-            {tarjeta.resumen_actual && tarjeta.resumen_actual.total_comprometido_resumen_actual > 0 && (
-              <span className={styles.resumenMontoLabel}>
-                Resumen: {formatMonto(tarjeta.resumen_actual.total_comprometido_resumen_actual, tarjeta.moneda)}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

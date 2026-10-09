@@ -8,7 +8,6 @@ import categoriaService from '@/services/categoria.service'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
-import { sileo } from 'sileo'
 import styles from './PagarResumenModal.module.css'
 
 export interface PagarResumenModalProps {
@@ -173,16 +172,15 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
       } : {})
     } : {}
 
-    let res: ResultadoPagoTarjeta | void
     if (monedaAPagar === 'ARS') {
-      res = await onConfirm({
+      await onConfirm({
         moneda: 'ARS',
         monto: montoFinal,
         ...diferenciaPayload,
       })
     } else {
       if (modoUSD === 'dolares') {
-        res = await onConfirm({
+        await onConfirm({
           moneda: 'USD',
           pesificar: false,
           billetera_id: billeteraUSDId,
@@ -190,7 +188,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           ...diferenciaPayload,
         })
       } else {
-        res = await onConfirm({
+        await onConfirm({
           moneda: 'USD',
           pesificar: true,
           billetera_id: billeteraARSId,
@@ -200,14 +198,6 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           monto_percepcion_personalizado: montoPercepcionCustom !== '' ? parseFloat(montoPercepcionCustom) : undefined
         })
       }
-    }
-
-    const montoDiff = res?.monto_diferencia ?? (isExcedente ? diferencia : null)
-    if (montoDiff !== null && montoDiff !== undefined && Number(montoDiff) > 0) {
-      const tipoLabel = diferenciaTipo === 'cargos_banco' ? 'Cargos del banco' : 'Compras no cargadas'
-      sileo.success({
-        title: `Pago registrado. ${formatMonto(montoDiff, monedaAPagar)} quedaron como ${tipoLabel}.`
-      })
     }
   }
 

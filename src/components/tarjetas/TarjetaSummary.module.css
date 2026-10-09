@@ -526,6 +526,21 @@
   border-color: rgba(52, 211, 153, 0.3);
 }
 
+.sinDeudaText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Botón Expandir / Contraer */
 .expandBtn {
   background: transparent;

@@ -50,6 +50,8 @@ export interface Suscripcion {
   precio_actual: HistorialSuscripcion | null
   historial_precios: HistorialSuscripcion[]
   costo_mensual_equivalente: number | null
+  subcategoria?: Subcategoria | null
+  categoria?: Categoria | null
 }
 
 export interface TotalMensualSuscripciones {

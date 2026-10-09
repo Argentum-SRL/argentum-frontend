@@ -208,25 +208,25 @@
 
 /* Depth variations - calibrated for rich aesthetic without visual clutter */
 .far {
-  width: 36px;
-  height: 36px;
-  opacity: 0.22;
+  width: 38px;
+  height: 38px;
+  opacity: 0.35;
   z-index: 1;
   filter: drop-shadow(0 2px 6px rgba(10, 13, 18, 0.08));
 }
 
 .mid {
-  width: 48px;
-  height: 48px;
-  opacity: 0.45;
+  width: 50px;
+  height: 50px;
+  opacity: 0.58;
   z-index: 2;
   filter: drop-shadow(0 4px 12px rgba(10, 13, 18, 0.12));
 }
 
 .near {
-  width: 62px;
-  height: 62px;
-  opacity: 0.72;
+  width: 64px;
+  height: 64px;
+  opacity: 0.85;
   z-index: 4;
   filter: drop-shadow(0 8px 18px rgba(10, 13, 18, 0.16));
 }
@@ -272,15 +272,15 @@
   }
 }
 
-/* Atmospheric Radial Blur Overlay - dissolves seamlessly into background */
+/* Atmospheric Radial Blur Overlay - gentle background depth behind central card */
 .blurOverlay {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse 72% 62% at 50% 50%,
-    rgba(245, 244, 240, 0.88) 0%,
-    rgba(245, 244, 240, 0.45) 55%,
-    rgba(245, 244, 240, 0) 100%
+    ellipse 44% 38% at 50% 50%,
+    rgba(245, 244, 240, 0.65) 0%,
+    rgba(245, 244, 240, 0.20) 45%,
+    rgba(245, 244, 240, 0) 75%
   );
   z-index: 3;
   pointer-events: none;
@@ -414,15 +414,15 @@
 }
 
 :global([data-theme="dark"]) .far {
-  opacity: 0.18;
+  opacity: 0.30;
 }
 
 :global([data-theme="dark"]) .mid {
-  opacity: 0.38;
+  opacity: 0.52;
 }
 
 :global([data-theme="dark"]) .near {
-  opacity: 0.65;
+  opacity: 0.80;
 }
 
 :global([data-theme="dark"]) .emptyContent {
@@ -454,10 +454,10 @@
 
 :global([data-theme="dark"]) .blurOverlay {
   background: radial-gradient(
-    ellipse 72% 62% at 50% 50%,
-    rgba(14, 17, 23, 0.90) 0%,
-    rgba(14, 17, 23, 0.50) 55%,
-    rgba(14, 17, 23, 0) 100%
+    ellipse 44% 38% at 50% 50%,
+    rgba(14, 17, 23, 0.75) 0%,
+    rgba(14, 17, 23, 0.25) 45%,
+    rgba(14, 17, 23, 0) 75%
   );
 }
 
@@ -511,21 +511,21 @@
   }
 
   .far {
-    width: 26px;
-    height: 26px;
-    opacity: 0.25;
+    width: 24px;
+    height: 24px;
+    opacity: 0.35;
   }
 
   .mid {
-    width: 36px;
-    height: 36px;
-    opacity: 0.48;
+    width: 32px;
+    height: 32px;
+    opacity: 0.55;
   }
 
   .near {
-    width: 46px;
-    height: 46px;
-    opacity: 0.72;
+    width: 42px;
+    height: 42px;
+    opacity: 0.82;
   }
 
   .emptyState {
@@ -543,9 +543,9 @@
 
   .emptyContent {
     width: 100%;
-    max-width: 360px;
-    padding: 32px 20px;
-    border-radius: 28px;
+    max-width: 326px;
+    padding: 26px 18px;
+    border-radius: 26px;
     margin: 0 auto;
     box-sizing: border-box;
     display: flex;
@@ -556,17 +556,17 @@
   }
 
   .emptyTitle {
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1.25;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     width: 100%;
     text-align: center;
   }
 
   .emptySubtitle {
-    font-size: 14px;
-    line-height: 1.55;
-    margin-bottom: 24px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    margin-bottom: 20px;
     max-width: 100%;
     width: 100%;
     margin-left: 0;

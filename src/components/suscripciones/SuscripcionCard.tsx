@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import { Edit2, Play, Pause, Trash2, CreditCard, Wallet, Bell, Calendar, TrendingUp } from '@/components/ui/icons'
-import type { Suscripcion, Billetera, TarjetaCredito } from '@/types'
+import type { Suscripcion, Billetera, TarjetaCredito, Categoria, Subcategoria } from '@/types'
 import { findServicioCatalogo } from '@/lib/constants/suscripciones'
 import { formatMonto, formatFecha } from '@/utils/format'
+import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import { getSubcategoriaVisual, getCategoriaVisual } from '@/lib/utils/categoria.utils'
+import { sugerirCategoriaNombre } from '@/lib/utils/sugerirCategoriaSuscripcion'
 import styles from './SuscripcionCard.module.css'
 
 interface SuscripcionCardProps {
   suscripcion: Suscripcion
   billeteras: Billetera[]
   tarjetas: TarjetaCredito[]
+  categorias?: Categoria[]
+  subcategorias?: Subcategoria[]
   onEdit: (s: Suscripcion) => void
   onUpdatePrecio: (s: Suscripcion) => void
   onToggleEstado: (s: Suscripcion) => void
@@ -19,12 +24,15 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
   suscripcion, 
   billeteras, 
   tarjetas, 
+  categorias,
+  subcategorias,
   onEdit, 
   onUpdatePrecio, 
   onToggleEstado, 
   onDelete 
 }) => {
-  const [logoError, setLogoError] = React.useState(false)
+  const [logoError, setLogoError] = useState(false)
+  const [iconError, setIconError] = useState(false)
   const catalogoItem = findServicioCatalogo(suscripcion.nombre)
   
   const parseLocalDate = (dateStr: string): Date => {
@@ -61,6 +69,56 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
   const bgColor = catalogoItem?.color ?? 'var(--surface)'
   const textColor = catalogoItem?.colorTexto ?? 'var(--text)'
 
+  const hasBrandLogo = Boolean(catalogoItem?.logoPath && !catalogoItem?.generico && !logoError)
+
+  // 1. Resolver nombre de la subcategoría asociada
+  const subcategoriaNombre = useMemo(() => {
+    if (suscripcion.subcategoria?.nombre) {
+      return suscripcion.subcategoria.nombre
+    }
+    if (suscripcion.subcategoria_id && subcategorias) {
+      const match = subcategorias.find(s => s.id === suscripcion.subcategoria_id)
+      if (match?.nombre) return match.nombre
+    }
+    if (catalogoItem?.subcategoria) {
+      return catalogoItem.subcategoria
+    }
+    const sugerido = sugerirCategoriaNombre(suscripcion.nombre)
+    if (sugerido.subcategoria) {
+      return sugerido.subcategoria
+    }
+    return null
+  }, [suscripcion.subcategoria, suscripcion.subcategoria_id, suscripcion.nombre, subcategorias, catalogoItem])
+
+  // 2. Resolver nombre de la categoría (padre)
+  const categoriaNombre = useMemo(() => {
+    if (suscripcion.categoria?.nombre) {
+      return suscripcion.categoria.nombre
+    }
+    if (suscripcion.categoria_id && categorias) {
+      const match = categorias.find(c => c.id === suscripcion.categoria_id)
+      if (match?.nombre) return match.nombre
+    }
+    if (suscripcion.subcategoria_id && subcategorias && categorias) {
+      const sub = subcategorias.find(s => s.id === suscripcion.subcategoria_id)
+      if (sub?.categoria_id) {
+        const match = categorias.find(c => c.id === sub.categoria_id)
+        if (match?.nombre) return match.nombre
+      }
+    }
+    if (catalogoItem?.categoria) {
+      return catalogoItem.categoria
+    }
+    const sugerido = sugerirCategoriaNombre(suscripcion.nombre)
+    if (sugerido.categoria) {
+      return sugerido.categoria
+    }
+    return null
+  }, [suscripcion.categoria, suscripcion.categoria_id, suscripcion.subcategoria_id, suscripcion.nombre, categorias, subcategorias, catalogoItem])
+
+  const subcatVisual = subcategoriaNombre ? getSubcategoriaVisual(subcategoriaNombre) : null
+  const catVisual = (!subcatVisual && categoriaNombre) ? getCategoriaVisual(categoriaNombre) : null
+  const hasCategoryIcon = Boolean(subcatVisual || (catVisual && catVisual.label !== 'Sin categoría'))
 
   return (
     <div 
@@ -88,9 +146,9 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
       {/* ZONA TOP: Logo, Nombre y Frecuencia */}
       <div className={styles.header}>
         <div className={styles.logoWrapper}>
-          {catalogoItem?.logoPath && !logoError ? (
+          {hasBrandLogo ? (
             <img 
-              src={catalogoItem.logoPath} 
+              src={catalogoItem!.logoPath} 
               alt={suscripcion.nombre} 
               className={styles.logo}
               onError={() => setLogoError(true)}
@@ -103,7 +161,16 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
                 color: isBrand ? 'white' : 'var(--text-2)'
               }}
             >
-              {suscripcion.nombre ? suscripcion.nombre[0].toUpperCase() : '?'}
+              {hasCategoryIcon && !iconError ? (
+                <SubcategoriaIcon 
+                  nombre={subcategoriaNombre} 
+                  parentCategory={categoriaNombre} 
+                  size={26}
+                  onError={() => setIconError(true)}
+                />
+              ) : (
+                suscripcion.nombre ? suscripcion.nombre[0].toUpperCase() : '?'
+              )}
             </div>
           )}
         </div>

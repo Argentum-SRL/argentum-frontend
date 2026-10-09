@@ -7,9 +7,11 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import suscripcionService from '@/services/suscripcion.service'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
-import type { Suscripcion, TotalMensualSuscripciones, Billetera, TarjetaCredito } from '@/types'
+import categoriaService from '@/services/categoria.service'
+import type { Suscripcion, TotalMensualSuscripciones, Billetera, TarjetaCredito, Categoria, Subcategoria } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
+import { getSubcategoriaVisual } from '@/lib/utils/categoria.utils'
 import SuscripcionCard from '@/components/suscripciones/SuscripcionCard'
 import SuscripcionModal from '@/components/suscripciones/SuscripcionModal'
 import styles from './SuscripcionesPage.module.css'
@@ -20,47 +22,49 @@ interface FloatingItemConfig {
   mt?: string
   ml?: string
   size: 'far' | 'mid' | 'near'
+  brandId?: string
+  subcatName?: string
+  label: string
 }
 
 const FLOATING_ITEMS: FloatingItemConfig[] = [
-  // ── Sector Izquierdo Exterior (Left Wing Outer)
-  { dt: '12%', dl: '5%',  mt: '5%',  ml: '16%', size: 'mid'  }, // 1: Netflix
-  { dt: '32%', dl: '5%',  mt: '6%',  ml: '82%', size: 'near' }, // 2: HBO Max
-  { dt: '54%', dl: '5%',  mt: '13%', ml: '50%', size: 'far'  }, // 3: Prime Video
-  { dt: '76%', dl: '5%',  mt: '22%', ml: '18%', size: 'near' }, // 4: Paramount+
+  // ── Halo Inmediato alrededor del Card Central (Immediate Orbit)
+  // Flanco Izquierdo Cercano
+  { dt: '26%', dl: '26%', mt: '19%', ml: '68%', size: 'mid',  subcatName: 'obra social', label: 'Obra Social' },
+  { dt: '44%', dl: '23%', mt: '10%', ml: '18%', size: 'near', brandId: 'netflix', label: 'Netflix' },
+  { dt: '62%', dl: '25%',                       size: 'mid',  brandId: 'hbomax', label: 'HBO Max' },
+  { dt: '76%', dl: '28%', mt: '19%', ml: '32%', size: 'far',  brandId: 'spotify', label: 'Spotify' },
 
-  // ── Sector Izquierdo Interior (Left Wing Inner)
-  { dt: '18%', dl: '15%', mt: '21%', ml: '82%', size: 'mid'  }, // 5: Apple TV+
-  { dt: '42%', dl: '15%', mt: '38%', ml: '4%',  size: 'far'  }, // 6: Crunchyroll
-  { dt: '66%', dl: '15%', mt: '48%', ml: '96%', size: 'far'  }, // 7: Pluto TV
+  // Flanco Derecho Cercano
+  { dt: '26%', dl: '74%', mt: '10%', ml: '82%', size: 'mid',  brandId: 'applemusic', label: 'Apple Music' },
+  { dt: '44%', dl: '77%', mt: '50%', ml: '93%', size: 'far',  brandId: 'chatgpt', label: 'ChatGPT' },
+  { dt: '62%', dl: '75%',                       size: 'near', brandId: 'appletv', label: 'Apple TV+' },
+  { dt: '76%', dl: '72%',                       size: 'mid',  brandId: 'googleone', label: 'Google One' },
 
-  // ── Sector Flancos (Flanks)
-  { dt: '10%', dl: '25%', mt: '58%', ml: '4%',  size: 'mid'  }, // 8: Peacock
-  { dt: '84%', dl: '24%', mt: '57%', ml: '96%', size: 'mid'  }, // 9: Spotify
+  // Corona Superior Cercana (Arriba del Card)
+  { dt: '15%', dl: '38%', mt: '6%',  ml: '50%', size: 'near', brandId: 'duolingo', label: 'Duolingo' },
+  { dt: '11%', dl: '50%',                       size: 'mid',  brandId: 'youtubepremium', label: 'YouTube Premium' },
+  { dt: '15%', dl: '62%', mt: '32%', ml: '92%', size: 'near', brandId: 'playstation', label: 'PlayStation' },
 
-  // ── Sector Superior Desktop / Inferior Mobile
-  { dt: '5%',  dl: '38%', mt: '65%', ml: '20%', size: 'near' }, // 10: Apple Music
-  { dt: '5%',  dl: '62%', mt: '66%', ml: '80%', size: 'mid'  }, // 11: YT Music
+  // Base Inferior Cercana (Abajo del Card)
+  { dt: '85%', dl: '38%', mt: '75%', ml: '26%', size: 'far',  brandId: 'deezer', label: 'Deezer' },
+  { dt: '88%', dl: '50%', mt: '78%', ml: '50%', size: 'near', brandId: 'dropbox', label: 'Dropbox' },
+  { dt: '85%', dl: '62%', mt: '75%', ml: '74%', size: 'mid',  brandId: 'adobe', label: 'Adobe CC' },
 
-  // ── Sector Flancos y Base
-  { dt: '10%', dl: '75%', mt: '73%', ml: '50%', size: 'near' }, // 12: Tidal
-  { dt: '84%', dl: '76%', mt: '80%', ml: '18%', size: 'mid'  }, // 13: Deezer
+  // ── Órbita Media y Flancos Exteriores
+  // Sector Izquierdo Exterior
+  { dt: '12%', dl: '14%', mt: '50%', ml: '7%',  size: 'far',  brandId: 'primevideo', label: 'Prime Video' },
+  { dt: '34%', dl: '8%',  mt: '32%', ml: '8%',  size: 'near', subcatName: 'gimnasio', label: 'Gimnasio' },
+  { dt: '52%', dl: '6%',                        size: 'far',  brandId: 'paramount', label: 'Paramount+' },
+  { dt: '70%', dl: '10%',                       size: 'far',  brandId: 'microsoft365', label: 'Microsoft 365' },
+  { dt: '88%', dl: '16%', mt: '67%', ml: '9%',  size: 'near', subcatName: 'celular', label: 'Celular' },
 
-  // ── Sector Derecho Interior
-  { dt: '18%', dl: '85%', mt: '81%', ml: '82%', size: 'near' }, // 14: iCloud
-  { dt: '42%', dl: '85%', mt: '88%', ml: '30%', size: 'mid'  }, // 15: Google One
-  { dt: '66%', dl: '85%', mt: '88%', ml: '70%', size: 'near' }, // 16: Microsoft 365
-
-  // ── Sector Derecho Exterior
-  { dt: '12%', dl: '95%', mt: '95%', ml: '16%', size: 'far'  }, // 17: Adobe CC
-  { dt: '32%', dl: '95%', mt: '96%', ml: '50%', size: 'mid'  }, // 18: ChatGPT Plus
-  { dt: '54%', dl: '95%', mt: '95%', ml: '84%', size: 'far'  }, // 19: Canva
-  { dt: '76%', dl: '95%', size: 'far'  },                        // 20: Notion
-
-  // ── Sector Inferior Desktop (Base)
-  { dt: '90%', dl: '38%', size: 'mid'  }, // 21: Evernote
-  { dt: '92%', dl: '50%', size: 'near' }, // 22: Dropbox
-  { dt: '90%', dl: '62%', size: 'mid'  }, // 23: Grammarly
+  // Sector Derecho Exterior
+  { dt: '12%', dl: '86%',                       size: 'mid',  brandId: 'icloud', label: 'iCloud' },
+  { dt: '34%', dl: '92%',                       size: 'near', brandId: 'github', label: 'GitHub' },
+  { dt: '52%', dl: '94%',                       size: 'far',  brandId: 'canva', label: 'Canva' },
+  { dt: '70%', dl: '90%',                       size: 'far',  brandId: 'notion', label: 'Notion' },
+  { dt: '88%', dl: '84%', mt: '67%', ml: '91%', size: 'mid',  subcatName: 'cuotas', label: 'Cuotas' },
 ]
 
 
@@ -69,6 +73,8 @@ const SuscripcionesPage: React.FC = () => {
   const [totales, setTotales] = useState<TotalMensualSuscripciones | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
+  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedSuscripcion, setSelectedSuscripcion] = useState<Suscripcion | null>(null)
@@ -84,16 +90,20 @@ const SuscripcionesPage: React.FC = () => {
 
   const loadData = useCallback(async (isFirstLoad = false, signal?: AbortSignal) => {
     try {
-      const [data, t, bills, cards] = await Promise.all([
+      const [data, t, bills, cards, cats, subs] = await Promise.all([
         suscripcionService.getSuscripciones(undefined, signal),
         suscripcionService.getTotalMensual(signal),
         billeteraService.list(signal),
         tarjetaService.getTarjetas(signal),
+        categoriaService.getCategorias().catch(() => []),
+        categoriaService.getAllSubcategorias(signal).catch(() => []),
       ])
       if (signal?.aborted) return
 
       setBilleteras(bills)
       setTarjetas(cards)
+      setCategorias(cats)
+      setSubcategorias(subs)
       
       const prevLength = suscripcionesLengthRef.current
       if (!isFirstLoad && prevLength === 0 && data.length > 0) {
@@ -208,8 +218,13 @@ const SuscripcionesPage: React.FC = () => {
           {/* Capa 1: Logos Flotantes con profundidad */}
           <div className={styles.logosLayer}>
             {FLOATING_ITEMS.map((item, i) => {
-              const s = CATALOGO_SUSCRIPCIONES[i % CATALOGO_SUSCRIPCIONES.length]
-              if (!s || !s.logoPath) return null
+              const src = item.subcatName
+                ? getSubcategoriaVisual(item.subcatName)?.iconSrc
+                : item.brandId
+                  ? CATALOGO_SUSCRIPCIONES.find(s => s.id === item.brandId)?.logoPath
+                  : ''
+              
+              if (!src) return null
               
               const style = {
                 '--top-dt': item.dt,
@@ -220,9 +235,9 @@ const SuscripcionesPage: React.FC = () => {
 
               return (
                 <img
-                  key={`${s.id}-${i}`}
-                  src={s.logoPath}
-                  alt={s.nombre}
+                  key={`${item.label}-${i}`}
+                  src={src}
+                  alt={item.label}
                   style={style}
                   className={`${styles.logoFlotante} ${styles[item.size]} ${!item.mt ? styles.hideMobile : ''}`}
                   onError={(e) => {
@@ -238,9 +253,9 @@ const SuscripcionesPage: React.FC = () => {
 
           {/* Capa 2: Contenido central con glassmorphism */}
           <div className={styles.emptyContent}>
-            <h1 className={styles.emptyTitle}>Todavía no cargaste ninguna suscripción.</h1>
+            <h1 className={styles.emptyTitle}>No tenés suscripciones ni débitos registrados</h1>
             <p className={styles.emptySubtitle}>
-              Netflix, la prepaga, el gimnasio, el celular: todo lo que se te cobra solo cada mes. Cargalo una vez y lo anotamos cada vez que se cobra. Si lo pagás a mano, no hace falta cargarlo acá.
+              Registrá tus servicios digitales, membresías y cargos recurrentes (como streaming, telefonía, gimnasio o seguros). Configuralos una sola vez para proyectar tu gasto fijo mensual y registrar cada cobro automáticamente a su vencimiento.
             </p>
             <Button 
               onClick={handleCreate} 
@@ -273,7 +288,7 @@ const SuscripcionesPage: React.FC = () => {
         <div className={styles.titleGroup}>
           <h1>Suscripciones</h1>
           <p className={styles.subtitle}>
-            Suscripciones y débitos automáticos: lo que se te cobra solo cada mes.
+            Controlá tus servicios, membresías y débitos automáticos recurrentes.
           </p>
         </div>
         <button className={styles.nuevaBtn} onClick={handleCreate}>
@@ -335,6 +350,8 @@ const SuscripcionesPage: React.FC = () => {
                   suscripcion={s}
                   billeteras={billeteras}
                   tarjetas={tarjetas}
+                  categorias={categorias}
+                  subcategorias={subcategorias}
                   onEdit={handleEdit}
                   onUpdatePrecio={handleEdit}
                   onToggleEstado={handleToggleEstado}

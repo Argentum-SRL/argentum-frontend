@@ -6,9 +6,10 @@ interface SubcategoriaIconProps {
   parentCategory?: string | null
   size?: number
   className?: string
+  onError?: () => void
 }
 
-export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, className }: SubcategoriaIconProps) => {
+export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, className, onError }: SubcategoriaIconProps) => {
   // 1. Intentamos buscar el visual de la subcategoría
   const visual = getSubcategoriaVisual(nombre)
   let iconSrc = visual?.iconSrc
@@ -33,6 +34,7 @@ export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, class
       loading="lazy"
       style={{ objectFit: 'contain' }}
       className={className}
+      onError={onError}
     />
   )
 })

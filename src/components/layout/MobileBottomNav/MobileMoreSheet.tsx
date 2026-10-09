@@ -227,10 +227,10 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   const mainItems: MenuItemConfig[] = [
     { id: 'metas', label: 'Metas', Icon: Target, path: '/app/metas' },
     { id: 'suscripciones', label: 'Suscripciones', Icon: RefreshCw, path: '/app/suscripciones' },
-    { id: 'lo-que-se-repite', label: 'Lo que se repite', Icon: Repeat, path: '/app/lo-que-se-repite' },
   ]
 
   if (isAdmin) {
+    mainItems.push({ id: 'lo-que-se-repite', label: 'Lo que se repite', Icon: Repeat, path: '/app/lo-que-se-repite' })
     mainItems.push({ id: 'herramientas', label: 'Herramientas', Icon: Calculator, path: '/app/herramientas' })
     mainItems.push({ id: 'admin', label: 'Módulo Admin', Icon: Shield, path: '/admin' })
   }

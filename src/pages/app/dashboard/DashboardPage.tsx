@@ -788,11 +788,20 @@ export default function DashboardPage() {
   const suscripcionesPendientes = saldoInfo ? Number(saldoInfo.suscripciones_pendientes) : (moneda === 'ARS' ? (data?.disponible_real.ars.suscripciones_mensuales || 0) : (data?.disponible_real.usd.suscripciones_mensuales || 0))
 
   const compromisos = useMemo(() => {
-    const list: Array<{ id: string; nombre: string; monto: number; tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta' }> = []
+    if (saldoInfo?.compromisos && Array.isArray(saldoInfo.compromisos)) {
+      return saldoInfo.compromisos.map(c => ({
+        id: c.id,
+        nombre: c.nombre,
+        monto: Number(c.monto) || 0,
+        tipo: c.tipo,
+      }))
+    }
+
+    const list: Array<{ id: string; nombre: string; monto: number; tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura' }> = []
     const pagosFiltrados = (data?.proximos_pagos ?? []).filter(p => p.moneda === moneda)
 
     for (const p of pagosFiltrados) {
-      if (p.tipo === 'suscripcion' || p.tipo === 'cuota' || p.tipo === 'resumen_tarjeta') {
+      if (p.tipo === 'suscripcion' || p.tipo === 'cuota' || p.tipo === 'resumen_tarjeta' || p.tipo === 'factura') {
         list.push({
           id: p.id,
           nombre: p.nombre || (p.tipo === 'suscripcion' ? 'Suscripción' : 'Cuota'),
@@ -821,7 +830,7 @@ export default function DashboardPage() {
       }
     }
     return list
-  }, [data?.proximos_pagos, moneda, suscripcionesPendientes, cuotasPendientes])
+  }, [saldoInfo, data?.proximos_pagos, moneda, suscripcionesPendientes, cuotasPendientes])
 
   if (error) {
     return (
@@ -997,7 +1006,9 @@ export default function DashboardPage() {
         <WidgetErrorBoundary title="Próximos pagos">
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Próximos pagos</h3>
+              <div>
+                <h3 className={styles.cardTitle}>Próximos pagos</h3>
+              </div>
             </div>
             <div className={styles.cardContent}>
               {loading ? (

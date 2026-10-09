@@ -16,7 +16,7 @@ export interface CompromisoItem {
   id: string
   nombre: string
   monto: number
-  tipo?: 'suscripcion' | 'cuota' | 'resumen_tarjeta'
+  tipo?: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura'
 }
 
 export interface BalanceCardProps {

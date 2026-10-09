@@ -410,13 +410,17 @@ export interface DashboardResumen {
       saldo_total: number | string
       cuotas_pendientes: number | string
       suscripciones_pendientes: number | string
+      facturas_pendientes?: number | string
       saldo_disponible: number | string
+      compromisos?: CompromisoDisponibleItem[]
     }
     usd: {
       saldo_total: number | string
       cuotas_pendientes: number | string
       suscripciones_pendientes: number | string
+      facturas_pendientes?: number | string
       saldo_disponible: number | string
+      compromisos?: CompromisoDisponibleItem[]
     }
   }
   gastos_por_categoria?: {
@@ -425,6 +429,14 @@ export interface DashboardResumen {
   }
   ultimos_movimientos: MovimientoDashboard[]
   proximos_pagos: PagoDashboard[]
+}
+
+export interface CompromisoDisponibleItem {
+  id: string
+  tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura'
+  nombre: string
+  monto: number | string
+  fecha_cobro: string
 }
 
 export interface CategoriaGastoItem {

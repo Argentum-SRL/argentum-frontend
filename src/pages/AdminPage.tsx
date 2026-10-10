@@ -2,12 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import adminService from '@/services/adminService'
 import type { UsuarioAdminResumen, UsuarioAdmin, FiltrosAdmin, AdminStats } from '@/types/admin'
-import { Button, EmptyState, SelectInput } from '@/components/ui'
+import { Button, EmptyState, SelectInput, LunarLoader } from '@/components/ui'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import {
   Search,
-  Loader2,
   AlertTriangle,
   UserX,
   UserCheck,
@@ -568,7 +567,7 @@ export default function AdminPage() {
           <div className={styles.tableWrapper}>
             {loading ? (
               <div className="p-12 flex flex-col items-center justify-center gap-3">
-                <Loader2 className="w-8 h-8 text-[var(--primary)] animate-spin" />
+                <LunarLoader size={32} color="var(--primary)" />
                 <span className="text-sm text-gray-500">Cargando listado de usuarios...</span>
               </div>
             ) : error ? (
@@ -658,7 +657,7 @@ export default function AdminPage() {
         <div className={styles.detailCol}>
           {loadingDetail ? (
             <div className="py-24 flex flex-col items-center justify-center gap-3">
-              <Loader2 className="w-8 h-8 text-[var(--primary)] animate-spin" />
+              <LunarLoader size={32} color="var(--primary)" />
               <span className="text-sm text-gray-500">Cargando detalles del usuario...</span>
             </div>
           ) : detailError ? (
@@ -971,8 +970,8 @@ export default function AdminPage() {
                         onClick={handleExecuteAction}
                       >
                         {actionLoading ? (
-                          <span className="flex items-center gap-1">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Procesando...
+                          <span className="flex items-center gap-1.5">
+                            <LunarLoader size={14} /> Procesando...
                           </span>
                         ) : (
                           'Sí, confirmar'

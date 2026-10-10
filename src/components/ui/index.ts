@@ -54,6 +54,7 @@ export {
 export { ArgentumCrescent, type ArgentumCrescentProps } from './AtmosphericBackground/ArgentumCrescent'
 export { LunarPhase, type LunarPhaseProps } from './AtmosphericBackground/LunarPhase'
 export { LunarLoading, type LunarLoadingProps } from './AtmosphericBackground/LunarLoading'
+export { LunarLoader, type LunarLoaderProps } from './LunarLoader'
 export { DEFAULT_LUNAR_PHRASES } from './AtmosphericBackground/lunarConstants'
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle/ThemeToggle'
 export { SileoToaster } from './SileoToaster/SileoToaster'

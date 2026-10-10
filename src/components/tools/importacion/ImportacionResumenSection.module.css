@@ -319,7 +319,9 @@
 
 .spinner {
   color: var(--primary);
-  animation: spin 1s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loadingTitle {

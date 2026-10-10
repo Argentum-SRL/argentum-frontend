@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { AlertTriangle, Info } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
+import { LunarLoader } from '@/components/ui/LunarLoader'
 import styles from './ConfirmModal.module.css'
 
 /**
@@ -124,7 +125,7 @@ export function ConfirmModal({
             disabled={!canConfirm}
             autoFocus={!requireTyping}
           >
-            {isLoading && <div className={styles.spinner} />}
+            {isLoading && <LunarLoader size={16} />}
             {confirmLabel}
           </button>
           <button

@@ -227,7 +227,8 @@ export {
   Loader2,
   Loader2Icon,
   LoaderCircle,
-  LoaderCircleIcon
+  LoaderCircleIcon,
+  LunarLoader,
 } from './loader';
 
 export {

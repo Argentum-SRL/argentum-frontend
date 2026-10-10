@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useModal } from '@/hooks/useModal'
 import Modal from '@/components/ui/Modal/Modal'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, LunarLoader } from '@/components/ui'
 import transaccionService from '@/services/transaccion.service'
 import billeteraService from '@/services/billetera.service'
 import goalsService from '@/services/goals.service'
@@ -390,7 +390,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           <div className={styles.scrollArea}>
             {loadingTransactions && (
               <div className={styles.loadingWrapper}>
-                <RefreshCw size={24} className={styles.spinner} />
+                <LunarLoader size={24} color="var(--primary)" />
               </div>
             )}
 

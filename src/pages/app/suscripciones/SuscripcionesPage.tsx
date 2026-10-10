@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { Plus, Loader2 } from '@/components/ui/icons'
-import { Button, PageSummaryBar } from '@/components/ui'
+import { Plus } from '@/components/ui/icons'
+import { Button, PageSummaryBar, LunarLoader } from '@/components/ui'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -206,7 +206,7 @@ const SuscripcionesPage: React.FC = () => {
   if (loading) {
     return (
       <div className={styles.loading}>
-        <Loader2 className="animate-spin" size={40} color="#0D2045" />
+        <LunarLoader size={40} color="var(--primary)" />
       </div>
     )
   }

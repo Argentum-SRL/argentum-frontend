@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { X, Loader2, Wallet, Check, AlertTriangle, CheckCircle2, ArrowLeft } from '@/components/ui/icons'
+import { X, Wallet, Check, AlertTriangle, CheckCircle2, ArrowLeft } from '@/components/ui/icons'
+import { LunarLoader } from '@/components/ui'
 import type { Billetera, ControlSaldoPreview } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
@@ -332,7 +333,7 @@ export default function ActualizarSaldoModal({
               >
                 {isLoadingPreview ? (
                   <>
-                    <Loader2 className="animate-spin" size={16} />
+                    <LunarLoader size={16} />
                     <span>Revisando...</span>
                   </>
                 ) : (
@@ -366,7 +367,7 @@ export default function ActualizarSaldoModal({
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="animate-spin" size={16} />
+                        <LunarLoader size={16} />
                         <span>Guardando...</span>
                       </>
                     ) : (
@@ -388,7 +389,7 @@ export default function ActualizarSaldoModal({
                           onClick={handleAjustarSaldo}
                           disabled={isSubmitting}
                         >
-                          {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : 'Ajustar el saldo'}
+                          {isSubmitting ? <LunarLoader size={16} /> : 'Ajustar el saldo'}
                         </button>
                         <button
                           type="button"
@@ -415,7 +416,7 @@ export default function ActualizarSaldoModal({
                         >
                           {isSubmitting ? (
                             <>
-                              <Loader2 className="animate-spin" size={16} />
+                              <LunarLoader size={16} />
                               <span>Ajustando...</span>
                             </>
                           ) : (

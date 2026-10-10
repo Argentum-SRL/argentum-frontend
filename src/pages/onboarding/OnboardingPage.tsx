@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2 } from '@/components/ui/icons'
 import { getEstadoOnboarding } from '@/services/onboarding.service'
 import type { EstadoOnboarding } from '@/types/index'
 import StepIndicator from '@/components/onboarding/StepIndicator'
@@ -9,7 +8,7 @@ import StepCicloFinanciero from '@/components/onboarding/StepCicloFinanciero'
 import StepMoneda from '@/components/onboarding/StepMoneda'
 import StepWhatsApp from '@/components/onboarding/StepWhatsApp'
 import { useAuth } from '@/hooks/useAuth'
-import { AtmosphericBackground, AtmosphericLoading, AtmosphericMoonIcon, ThemeToggle } from '@/components/ui'
+import { AtmosphericBackground, AtmosphericLoading, AtmosphericMoonIcon, ThemeToggle, LunarLoader } from '@/components/ui'
 import styles from './OnboardingPage.module.css'
 
 const PASO_NUMERO: Record<string, number> = {
@@ -167,7 +166,7 @@ export default function OnboardingPage() {
                 >
                   {cargandoReintento || cargando ? (
                     <>
-                      <Loader2 className="animate-spin" size={18} />
+                      <LunarLoader size={18} />
                       Cargando...
                     </>
                   ) : (

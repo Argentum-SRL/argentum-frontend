@@ -1,0 +1,51 @@
+/* ── LunarLoader — Componente Modular de Ultra Alta Fidelidad ── */
+
+.lunarLoader {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  line-height: 1;
+  user-select: none;
+  /* Prohibir estrictamente cualquier rotación heredada (ej. animate-spin) */
+  animation: none !important;
+  transform: none !important;
+  box-sizing: border-box;
+}
+
+.halo {
+  position: absolute;
+  inset: -28%;
+  width: 156%;
+  height: 156%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: blur(1.5px);
+}
+
+.svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* ── Resplandor Estelar / Fulgor Atmosférico de Alta Fidelidad ── */
+.brandGlowLight {
+  filter: drop-shadow(0 0 2.5px rgba(224, 98, 36, 0.65)) drop-shadow(0 0 5px rgba(255, 160, 51, 0.3));
+}
+
+.brandGlowDark {
+  filter: drop-shadow(0 0 2.5px rgba(147, 197, 253, 0.7)) drop-shadow(0 0 4.5px rgba(226, 232, 240, 0.35));
+}
+
+.currentGlow {
+  filter: drop-shadow(0 0 2px currentColor);
+}

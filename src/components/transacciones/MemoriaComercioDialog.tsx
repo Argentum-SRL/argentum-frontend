@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Modal from '@/components/ui/Modal/Modal'
+import { LunarLoader } from '@/components/ui'
 import { X } from '@/components/ui/icons'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import memoriaComercioService from '@/services/memoriaComercio.service'
@@ -165,7 +166,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
                 disabled={isLoading}
                 autoFocus
               >
-                {isLoading && <div className={styles.spinner} />}
+                {isLoading && <LunarLoader size={16} />}
                 <span>Sí, siempre</span>
               </button>
             </div>
@@ -239,7 +240,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
                 disabled={isLoading}
                 autoFocus
               >
-                {isLoading && <div className={styles.spinner} />}
+                {isLoading && <LunarLoader size={16} />}
                 <span>Pasarlos</span>
               </button>
             </div>

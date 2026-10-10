@@ -1,9 +1,9 @@
 import { type FormEvent, useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
-import { Eye, EyeOff, CheckCircle2, ArrowLeft, Loader2, Lock, AlertTriangle } from '@/components/ui/icons'
+import { Eye, EyeOff, CheckCircle2, ArrowLeft, Lock, AlertTriangle } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
-import { Field, Button } from '@/components/ui'
+import { Field, Button, LunarLoader } from '@/components/ui'
 import { validarResetToken, confirmarResetPassword } from '@/services/auth.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
       <AuthLayout title="Restablecer contraseña" leftPanel={<WppChatMockup />}>
         <div className={styles.centerContainer}>
           <div className={`${styles.iconWrap} ${styles.loading}`}>
-            <Loader2 size={40} className="animate-spin" />
+            <LunarLoader size={40} color="var(--primary)" />
           </div>
           <p className={styles.message}>Validando el enlace de recuperación...</p>
         </div>

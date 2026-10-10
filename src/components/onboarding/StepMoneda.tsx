@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2 } from '@/components/ui/icons'
 import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { Button } from '@/components/ui'
+import { Button, LunarLoader } from '@/components/ui'
 import styles from './StepMoneda.module.css'
 
 interface Props {
@@ -141,7 +140,7 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
 
             {cargando ? (
               <div className={styles.cotizacionLoading}>
-                <Loader2 size={14} className="animate-spin" />
+                <LunarLoader size={14} />
                 <span>Cargando cotizaciones...</span>
               </div>
             ) : cotizaciones ? (

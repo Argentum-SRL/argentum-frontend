@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Calendar, Building2, Check, AlertCircle, RefreshCw } from '@/components/ui/icons'
+import { Calendar, Building2, Check, AlertCircle } from '@/components/ui/icons'
+import { LunarLoader } from '@/components/ui'
 import { getPreviewFechaCobro } from '@/services/onboarding.service'
 import { REGLAS_CICLO } from '@/lib/utils/ciclo'
 import styles from './CicloFinancieroSelector.module.css'
@@ -402,7 +403,7 @@ export const CicloFinancieroSelector: React.FC<Props> = ({
       <div className={styles.previewCard}>
         <div className={styles.previewIconBox}>
           {loadingPreview ? (
-            <RefreshCw size={18} className="animate-spin" />
+            <LunarLoader size={18} />
           ) : (
             <Calendar size={18} />
           )}

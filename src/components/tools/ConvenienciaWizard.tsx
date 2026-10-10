@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCcw, ArrowRight, Pencil, RotateCcw, CheckCircle, Lightbulb, HelpCircle } from '@/components/ui/icons';
-import { MontoInput } from '@/components/ui';
+import { MontoInput, LunarLoader } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import type { IPCData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
@@ -847,7 +847,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
                       >
                         {calculando ? (
                           <>
-                            <span className={styles.s2CtaSpinner} />
+                            <LunarLoader size={18} />
                             <span>Calculando conveniencia…</span>
                           </>
                         ) : (

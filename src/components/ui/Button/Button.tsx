@@ -1,5 +1,5 @@
 import { memo, type ReactNode } from 'react'
-import { Loader2 } from '@/components/ui/icons'
+import { LunarLoader } from '@/components/ui/LunarLoader'
 import styles from './Button.module.css'
 
 interface ButtonProps {
@@ -35,12 +35,13 @@ const Button = memo(({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
+      data-loading={loading ? 'true' : undefined}
       className={cls}
     >
       {loading ? (
         <>
-          <Loader2 size={18} className="animate-spin" />
-          {children}
+          <LunarLoader size={20} />
+          <span className={styles.btnText}>{children}</span>
         </>
       ) : (
         children

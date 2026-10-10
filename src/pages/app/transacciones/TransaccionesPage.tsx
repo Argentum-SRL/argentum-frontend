@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, Loader2 } from '@/components/ui/icons'
+import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard } from '@/components/ui/icons'
+import { LunarLoader } from '@/components/ui'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -613,7 +614,7 @@ export default function TransaccionesPage() {
 
                 {loadingMore && (
                   <div className={styles.loadingMore}>
-                    <Loader2 size={16} className="animate-spin" />
+                    <LunarLoader size={16} />
                     Cargando más transacciones...
                   </div>
                 )}

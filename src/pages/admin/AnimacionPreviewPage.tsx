@@ -4,6 +4,8 @@ import {
   LunarLoading,
   AtmosphericBackground,
   AtmosphericMoonIcon,
+  LunarLoader,
+  Button,
 } from '@/components/ui'
 import { useTheme } from '@/hooks/useTheme'
 import {
@@ -37,10 +39,11 @@ export default function AnimacionPreviewPage() {
   const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
 
-  const [viewMode, setViewMode] = useState<'icons' | 'hero' | 'ambient'>('icons')
+  const [viewMode, setViewMode] = useState<'icons' | 'hero' | 'ambient' | 'modular'>('icons')
   const [selectedPhrase, setSelectedPhrase] = useState(PREVIEW_PHRASES[0])
   const [showControls, setShowControls] = useState(true)
   const [simulatedReducedMotion, setSimulatedReducedMotion] = useState(false)
+  const [demoBtnLoading, setDemoBtnLoading] = useState(true)
 
   // Escuchar tecla Escape para alternar controles (modo inmersivo limpio)
   useEffect(() => {
@@ -57,7 +60,7 @@ export default function AnimacionPreviewPage() {
 
   return (
     <div
-      className={`${styles.pageRoot} ${viewMode === 'icons' ? styles.scrollableRoot : ''}`}
+      className={`${styles.pageRoot} ${viewMode === 'icons' || viewMode === 'modular' ? styles.scrollableRoot : ''}`}
       data-reduced-motion={simulatedReducedMotion ? 'true' : undefined}
     >
       {/* ── Vista 0: Sistema de Iconografía Animada (Playground & Auditoría Visual) ── */}
@@ -98,6 +101,86 @@ export default function AnimacionPreviewPage() {
             </button>
           </div>
         </AtmosphericBackground>
+      )}
+
+      {/* ── Vista 3: Showcase del LunarLoader Modularizado (Botones y Componentes) ── */}
+      {viewMode === 'modular' && (
+        <div className={styles.modularShowcase}>
+          <div className={styles.modularCard}>
+            <div className={styles.modularHeader}>
+              <LunarLoader size={32} variant="brand" />
+              <div>
+                <h2 className={styles.ambientDemoTitle} style={{ margin: 0 }}>LunarLoader Modular</h2>
+                <p className={styles.modularSub}>
+                  Animación continua de fases lunares y eclipse del Hero Loader, miniaturizada y calibrada con precisión óptica.
+                </p>
+              </div>
+            </div>
+
+            {/* Simulación del Botón exacto de login */}
+            <div className={styles.modularSection}>
+              <h3 className={styles.sectionHeader}>Botón &quot;Ingresar&quot; (Exacto de Login / Auth)</h3>
+              <div className={styles.buttonDemoWrap}>
+                <Button
+                  loading={demoBtnLoading}
+                  fullWidth
+                  onClick={() => setDemoBtnLoading((prev) => !prev)}
+                >
+                  Ingresar
+                </Button>
+                <button
+                  type="button"
+                  className={styles.toggleLoadingBtn}
+                  onClick={() => setDemoBtnLoading((prev) => !prev)}
+                >
+                  {demoBtnLoading ? 'Desactivar estado loading' : 'Activar estado loading'}
+                </button>
+              </div>
+            </div>
+
+            {/* Escala de tamaños modulares */}
+            <div className={styles.modularSection}>
+              <h3 className={styles.sectionHeader}>Escala de tamaños adaptativos (14px a 40px)</h3>
+              <div className={styles.sizesRow}>
+                {[14, 16, 18, 24, 32, 40].map((sz) => (
+                  <div key={sz} className={styles.sizeItem}>
+                    <div className={styles.sizeIconBox}>
+                      <LunarLoader size={sz} />
+                    </div>
+                    <span className={styles.sizeLabel}>{sz}px</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Variantes Brand con demostración explícita de modos */}
+            <div className={styles.modularSection}>
+              <h3 className={styles.sectionHeader}>
+                Variante Brand según Modo del Sistema (Claro = Naranja Eclipse · Oscuro = Plata &amp; Azul Glacial)
+              </h3>
+              <div className={styles.sizesRow}>
+                <div className={styles.sizeItem}>
+                  <div className={styles.sizeIconBox} style={{ background: '#FAF7F2', borderRadius: '10px', padding: '6px' }}>
+                    <LunarLoader size={28} variant="brand" themeMode="light" />
+                  </div>
+                  <span className={styles.sizeLabel}>Modo Claro (Naranja)</span>
+                </div>
+                <div className={styles.sizeItem}>
+                  <div className={styles.sizeIconBox} style={{ background: '#060B14', borderRadius: '10px', padding: '6px' }}>
+                    <LunarLoader size={28} variant="brand" themeMode="dark" />
+                  </div>
+                  <span className={styles.sizeLabel}>Modo Oscuro (Azul/Plata)</span>
+                </div>
+                <div className={styles.sizeItem}>
+                  <div className={styles.sizeIconBox}>
+                    <LunarLoader size={28} variant="brand" themeMode="auto" />
+                  </div>
+                  <span className={styles.sizeLabel}>Dinámico (Sistema: {theme})</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── Botón flotante para restaurar controles si fueron ocultados ───── */}
@@ -175,6 +258,14 @@ export default function AnimacionPreviewPage() {
               >
                 <AtmosphericMoonIcon size={14} />
                 <span>Fondo Ambiental</span>
+              </button>
+              <button
+                type="button"
+                className={`${styles.tabBtn} ${viewMode === 'modular' ? styles.tabBtnActive : ''}`}
+                onClick={() => setViewMode('modular')}
+              >
+                <LunarLoader size={14} />
+                <span>LunarLoader Modular</span>
               </button>
             </div>
 

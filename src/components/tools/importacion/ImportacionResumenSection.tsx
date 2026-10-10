@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Loader2, AlertTriangle, ShieldAlert } from '@/components/ui/icons'
+import { AlertTriangle, ShieldAlert } from '@/components/ui/icons'
+import { LunarLoader } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import tarjetaService from '@/services/tarjeta.service'
@@ -285,7 +286,7 @@ export const ImportacionResumenSection: React.FC = () => {
   if (loadingData) {
     return (
       <div className={styles.loadingContainer}>
-        <Loader2 size={36} className={styles.spinner} />
+        <LunarLoader size={36} color="var(--primary)" />
         <p className={styles.loadingTitle}>Verificando tus tarjetas activas...</p>
       </div>
     )
@@ -312,7 +313,7 @@ export const ImportacionResumenSection: React.FC = () => {
   if (isProcessing) {
     return (
       <div className={`${styles.formContainer} ${styles.loadingContainer}`}>
-        <Loader2 size={36} className={styles.spinner} />
+        <LunarLoader size={36} color="var(--primary)" />
         <p className={styles.loadingTitle}>Analizando tu resumen</p>
         <p className={styles.loadingDesc}>{loadingText}</p>
       </div>
@@ -323,7 +324,7 @@ export const ImportacionResumenSection: React.FC = () => {
   if (loadingPreview) {
     return (
       <div className={`${styles.formContainer} ${styles.loadingContainer}`}>
-        <Loader2 size={36} className={styles.spinner} />
+        <LunarLoader size={36} color="var(--primary)" />
         <p className={styles.loadingTitle}>Cargando vista previa...</p>
         <p className={styles.loadingDesc}>Estamos leyendo las transacciones del resumen.</p>
       </div>

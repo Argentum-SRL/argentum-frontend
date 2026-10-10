@@ -5,7 +5,7 @@ import {
   AlertCircle 
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, LunarLoader } from '@/components/ui'
 import type { Presupuesto, PeriodoPresupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
 import styles from './BudgetHistoryModal.module.css'
@@ -71,7 +71,7 @@ export default function BudgetHistoryModal({
         <div className={styles.historyBody}>
           {loading ? (
             <div className={styles.loadingState}>
-              <div className="spinner" />
+              <LunarLoader size={28} color="var(--primary)" />
               <p>Cargando historial...</p>
             </div>
           ) : historial.length === 0 ? (

@@ -26,7 +26,7 @@ import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, LunarLoader } from '@/components/ui'
 import styles from './PresupuestoDetailModal.module.css'
 
 interface PresupuestoDetailModalProps {
@@ -679,7 +679,7 @@ export default function PresupuestoDetailModal({
                 {activeTab === 'gastos' ? (
                   loadingTx ? (
                     <div className={styles.loadingBox}>
-                      <div className="spinner" />
+                      <LunarLoader size={24} color="var(--primary)" />
                       <span>Cargando transacciones del ciclo...</span>
                     </div>
                   ) : !p ? (
@@ -734,7 +734,7 @@ export default function PresupuestoDetailModal({
                 ) : (
                   loadingHistorial ? (
                     <div className={styles.loadingBox}>
-                      <div className="spinner" />
+                      <LunarLoader size={24} color="var(--primary)" />
                       <span>Cargando historial de periodos...</span>
                     </div>
                   ) : historial.length === 0 ? (

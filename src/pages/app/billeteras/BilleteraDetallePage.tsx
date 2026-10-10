@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, CreditCard, Plus, Loader2, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2 } from '@/components/ui/icons'
+import { ChevronLeft, ChevronRight, CreditCard, Plus, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2 } from '@/components/ui/icons'
 import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo, EntidadTasa } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import categoriaService from '@/services/categoria.service'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, LunarLoader } from '@/components/ui'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
@@ -436,7 +436,7 @@ const BilleteraDetallePage: React.FC = () => {
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <Loader2 className="animate-spin" size={32} />
+        <LunarLoader size={32} />
       </div>
     )
   }
@@ -630,7 +630,7 @@ const BilleteraDetallePage: React.FC = () => {
           <h2 className={styles.sectionTitle}>Movimientos</h2>
           {loadingData ? (
             <div className={styles.tabLoading}>
-              <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
+              <LunarLoader size={24} color="var(--text-3)" />
             </div>
           ) : movimientos.length === 0 ? (
             <EmptyState
@@ -699,7 +699,7 @@ const BilleteraDetallePage: React.FC = () => {
 
             {loadingData ? (
               <div className={styles.tabLoading}>
-                <Loader2 className="animate-spin" size={24} color="var(--text-3)" />
+                <LunarLoader size={24} color="var(--text-3)" />
               </div>
             ) : tarjetas.length === 0 ? (
               <EmptyState

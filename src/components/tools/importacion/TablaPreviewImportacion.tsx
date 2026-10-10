@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { LunarLoader } from '@/components/ui'
 import SelectInput from '@/components/ui/SelectInput/SelectInput'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { formatMonto } from '@/utils/format'
@@ -146,9 +147,14 @@ export const TablaPreviewImportacion: React.FC<TablaPreviewImportacionProps> = (
     return tags
   }
 
-  // Si no se cargó el estado local, mostrar spinner
+  // Si no se cargó el estado local, mostrar spinner lunar
   if (rowStates.length === 0) {
-    return <div className={styles.loading}>Procesando vista previa...</div>
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 32, color: 'var(--text-3)' }}>
+        <LunarLoader size={20} color="var(--primary)" />
+        <span>Procesando vista previa...</span>
+      </div>
+    )
   }
 
   return (

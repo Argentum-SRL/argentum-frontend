@@ -18,7 +18,8 @@
       (function() {
         try {
           var saved = localStorage.getItem('argentum_theme');
-          var isDark = saved === 'dark';
+          var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = saved === 'dark' || (!saved && systemDark);
           var color = isDark ? '#060B14' : '#FAF7F2';
           var scheme = isDark ? 'dark' : 'light';
 

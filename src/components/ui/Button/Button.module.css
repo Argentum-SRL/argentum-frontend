@@ -21,9 +21,24 @@
   width: 100%;
 }
 
-.btn:disabled {
+.btn:disabled:not([data-loading="true"]) {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.btn[data-loading="true"] {
+  opacity: 1 !important;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.btnText {
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn[data-loading="true"] .btnText {
+  opacity: 0.92;
 }
 
 .btn:not(:disabled):active {

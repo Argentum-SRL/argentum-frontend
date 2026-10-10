@@ -4,11 +4,11 @@ import {
   Copy,
   Check,
   Clock,
-  Loader2,
   CheckCircle2,
   AlertCircle,
   RefreshCw,
 } from '@/components/ui/icons'
+import { LunarLoader } from '@/components/ui'
 import {
   solicitarCodigoVinculacion,
   type CodigoVinculacionResponse,
@@ -191,7 +191,7 @@ export default function VinculacionWhatsAppCard({
           Argentum desde tu chat.
         </p>
         <div className={styles.waitingIndicator}>
-          <Loader2 size={16} className="animate-spin" />
+          <LunarLoader size={16} />
           <span>Redirigiendo a tu cuenta...</span>
         </div>
       </div>
@@ -224,7 +224,7 @@ export default function VinculacionWhatsAppCard({
 
       {loading ? (
         <div className={styles.loaderWrap}>
-          <Loader2 size={32} className="animate-spin text-primary" />
+          <LunarLoader size={32} color="var(--primary)" />
           <span>Generando código de vinculación...</span>
         </div>
       ) : apiError && !codigoData ? (
@@ -272,7 +272,7 @@ export default function VinculacionWhatsAppCard({
                     background: 'rgba(255, 255, 255, 0.05)',
                   }}
                 >
-                  <Loader2 size={24} className="animate-spin text-primary" />
+                  <LunarLoader size={24} color="var(--primary)" />
                 </div>
               )}
               <span className={styles.qrHint}>
@@ -332,7 +332,7 @@ export default function VinculacionWhatsAppCard({
                   disabled={loading}
                   className={styles.renewBtn}
                 >
-                  <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                  {loading ? <LunarLoader size={18} /> : <RefreshCw size={18} />}
                   <span>Generar nuevo código</span>
                 </button>
               )}
@@ -340,7 +340,7 @@ export default function VinculacionWhatsAppCard({
 
             {countdown > 0 && (
               <div className={styles.waitingIndicator}>
-                <Loader2 size={14} className="animate-spin" />
+                <LunarLoader size={14} />
                 <span>Esperando que envíes el mensaje en WhatsApp...</span>
               </div>
             )}

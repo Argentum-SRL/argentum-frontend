@@ -4,8 +4,7 @@ import { setToken } from '@/services/api'
 
 export function manejarRespuestaAuth(
   respuesta: AuthResponse,
-  navigate: NavigateFunction,
-  fromPath?: string
+  navigate: NavigateFunction
 ): void {
   if (respuesta.access_token) setToken(respuesta.access_token)
 
@@ -21,11 +20,6 @@ export function manejarRespuestaAuth(
   } else if (respuesta.requiere_onboarding) {
     navigate('/onboarding', { replace: true })
   } else {
-    const isValidFrom = fromPath && (
-      fromPath.startsWith('/app/') || 
-      fromPath.startsWith('/admin')
-    )
-    const target = isValidFrom ? fromPath : '/app/dashboard'
-    navigate(target, { replace: true })
+    navigate('/app/dashboard', { replace: true })
   }
 }

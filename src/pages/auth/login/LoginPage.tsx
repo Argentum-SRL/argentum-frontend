@@ -1,5 +1,5 @@
-import { type FormEvent, useState, useCallback } from 'react'
-import { useNavigate, Link, useLocation, type Location } from 'react-router-dom'
+import { type FormEvent, useState, useCallback, useEffect } from 'react'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, CheckCircle2 } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import WppChatMockup from '@/components/mock/WppChatMockup/WppChatMockup'
@@ -14,10 +14,9 @@ import styles from './LoginPage.module.css'
 const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { login, isAuthenticated, usuario } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: Location })?.from?.pathname
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -27,6 +26,13 @@ export default function LoginPage() {
   const [hasSubmitted, setHasSubmitted] = useState(false)
 
   const successMessage = location.state?.message
+
+  // Si ya está autenticado, redirigir al dashboard (o al onboarding si no lo completó)
+  useEffect(() => {
+    if (isAuthenticated && usuario) {
+      navigate(usuario.onboarding_completo ? '/app/dashboard' : '/onboarding', { replace: true })
+    }
+  }, [isAuthenticated, usuario, navigate])
 
   const logGoogleError = (stage: string, error: unknown) => {
     if (!import.meta.env.DEV) return
@@ -51,14 +57,14 @@ export default function LoginPage() {
       setApiError(null)
       const respuesta = await loginWithGoogle(credential)
       login(respuesta)
-      manejarRespuestaAuth(respuesta, navigate, from)
+      manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       logGoogleError('Error al llamar loginWithGoogle', err)
       setApiError(getErrorMessage(err, 'Falló el login con Google.'))
     } finally {
       setLoading(false)
     }
-  }, [login, navigate, from])
+  }, [login, navigate])
 
   const handleGoogleError = useCallback(() => {
     if (import.meta.env.DEV) {
@@ -77,7 +83,7 @@ export default function LoginPage() {
     try {
       const respuesta = await loginWithEmail({ email, password })
       login(respuesta)
-      manejarRespuestaAuth(respuesta, navigate, from)
+      manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       if (import.meta.env.DEV) {
         console.error('[Auth][Email][Login] Error visible en UI', err)

@@ -6,7 +6,7 @@ export function limpiarMensajeNotificacion(mensaje?: string | null): string {
   if (!mensaje) return ''
 
   // 1. Eliminar enlaces markdown: [texto](url) -> texto
-  let texto = mensaje.replace(/\[([^\]]+)\]\(https?:\/\/[^\)]+\)/gi, '$1')
+  let texto = mensaje.replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/gi, '$1')
 
   // 2. Eliminar URLs directas (con o sin frases introductorias como "desde", "en", etc.)
   texto = texto

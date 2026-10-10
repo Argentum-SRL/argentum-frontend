@@ -1,6 +1,5 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
 import os from 'node:os'
 import path from 'path'
 import { fileURLToPath } from 'node:url'
@@ -28,44 +27,6 @@ export default defineConfig(({ mode }) => {
     },
   plugins: [
     react(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      filename: 'pwa-sw.js',
-      // Desactivar el SW en desarrollo para evitar que cachée JS viejo
-      devOptions: {
-        enabled: false,
-      },
-      workbox: {
-        // Fuerza al browser a desregistrar el SW viejo en la próxima visita
-        // Eliminar esta opción una vez que todos los clientes hayan actualizado
-        skipWaiting: true,
-        clientsClaim: true,
-        navigateFallbackDenylist: [
-          /\/node_modules\/.vite\//,
-          /\/@vite\//,
-          /\/@id\//,
-          /\?v=[a-f0-9]+$/,
-        ],
-        runtimeCaching: [
-          {
-            urlPattern: /\/node_modules\/.vite\//,
-            handler: 'NetworkOnly',
-          },
-          {
-            urlPattern: /\/@vite\//,
-            handler: 'NetworkOnly',
-          },
-          {
-            urlPattern: /\/@id\//,
-            handler: 'NetworkOnly',
-          },
-          {
-            urlPattern: /\?v=[a-f0-9]+$/,
-            handler: 'NetworkOnly',
-          },
-        ],
-      },
-    }),
   ],
   optimizeDeps: {
     entries: ['src/main.tsx'],

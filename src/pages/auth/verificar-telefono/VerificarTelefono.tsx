@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
 import VinculacionWhatsAppCard from '@/components/whatsapp/VinculacionWhatsAppCard'
 import { useAuth } from '@/hooks/useAuth'
@@ -7,18 +7,14 @@ import { useAuth } from '@/hooks/useAuth'
 export default function VerificarTelefono() {
   const { usuario } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const handleContinuar = useCallback(() => {
-    const state = location.state as { from?: string } | null
-    if (state?.from) {
-      navigate(state.from, { replace: true })
-    } else if (usuario && !usuario.onboarding_completo) {
+    if (usuario && !usuario.onboarding_completo) {
       navigate('/onboarding', { replace: true })
     } else {
       navigate('/app/dashboard', { replace: true })
     }
-  }, [location.state, navigate, usuario])
+  }, [navigate, usuario])
 
   return (
     <AuthLayout

@@ -98,7 +98,7 @@ export default function VerificarEmail() {
         login(respuesta)
       }
       
-      manejarRespuestaAuth(respuesta, navigate, fromPath)
+      manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
       const msg = getErrorMessage(err, "No pudimos verificar tu email. El enlace puede haber expirado — pedí uno nuevo.")
       setApiError(msg)

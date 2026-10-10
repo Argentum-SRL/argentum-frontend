@@ -7,7 +7,6 @@ import type { TransaccionFilters } from '@/services/transaccion.service'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
-import { exportarTransaccionesPDF } from '@/services/exportPdf.service'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
@@ -424,7 +423,8 @@ export default function TransaccionesPage() {
     egresos: totalEgresos
   }), [balance, totalIngresos, totalEgresos])
 
-  const handleExportar = useCallback(() => {
+  const handleExportar = useCallback(async () => {
+    const { exportarTransaccionesPDF } = await import('@/services/exportPdf.service')
     exportarTransaccionesPDF({
       transacciones: filteredTransacciones,
       resumen: {

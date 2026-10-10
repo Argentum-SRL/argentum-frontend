@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import CrearPasswordBloqueo from '@/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo'
 
@@ -10,14 +10,13 @@ interface Props {
 
 export default function ProtectedRoute({ mode = 'app' }: Props) {
   const { usuario, isAuthenticated, isLoading, is_admin } = useAuth()
-  const location = useLocation()
 
   if (isLoading) {
     return <AtmosphericLoading />
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />
+    return <Navigate to="/login" replace />
   }
 
   if (usuario && !usuario.password_configurada) {

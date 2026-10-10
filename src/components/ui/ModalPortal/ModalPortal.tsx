@@ -9,6 +9,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
 import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
 import BalanceCicloModal from '@/components/dashboard/BalanceCicloModal/BalanceCicloModal'
 import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
+import PresupuestoDetailModal from '@/components/presupuestos/PresupuestoDetailModal'
 import GoalModal from '@/components/goals/GoalModal'
 import GoalContributionModal from '@/components/goals/GoalContributionModal'
 import GoalDetailModal from '@/components/goals/GoalDetailModal'
@@ -29,6 +30,7 @@ export function ModalPortal() {
   const filterDrawerData = typedModals.transaccionFilters?.data
   const proyeccionData = typedModals.proyeccion?.data
   const presupuestoData = typedModals.presupuesto?.data
+  const presupuestoDetailData = typedModals.presupuestoDetail?.data
   const goalData = typedModals.goal?.data
   const goalContributionData = typedModals.goalContribution?.data
   const goalDetailData = typedModals.goalDetail?.data
@@ -127,6 +129,19 @@ export function ModalPortal() {
             presupuesto={presupuestoData.presupuesto}
             categorias={presupuestoData.categorias}
             onSuccess={presupuestoData.onSuccess}
+          />
+        </ModalErrorBoundary>
+      )}
+
+      {typedModals.presupuestoDetail?.isOpen && presupuestoDetailData && (
+        <ModalErrorBoundary modalName="presupuestoDetail" onClose={() => closeModal('presupuestoDetail')}>
+          <PresupuestoDetailModal
+            open={true}
+            onClose={() => closeModal('presupuestoDetail')}
+            presupuesto={presupuestoDetailData.presupuesto}
+            categorias={presupuestoDetailData.categorias}
+            billeteras={presupuestoDetailData.billeteras}
+            onSuccess={presupuestoDetailData.onSuccess}
           />
         </ModalErrorBoundary>
       )}

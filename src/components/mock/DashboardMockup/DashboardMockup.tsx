@@ -161,7 +161,7 @@ export default function DashboardMockup() {
 
           {/* Tabs */}
           <div className={styles.tabs}>
-            {['Hoy', 'Semana', 'Mes', 'USD'].map((tab) => (
+            {['Hoy', 'Semana', 'Mes', 'Dólares'].map((tab) => (
               <button
                 key={tab}
                 className={`${styles.tab} ${tab === 'Hoy' ? styles.tabActive : ''}`}

@@ -6,10 +6,12 @@ import {
 import styles from './PresupuestosPage.module.css'
 import presupuestoService from '@/services/presupuesto.service'
 import categoriaService from '@/services/categoria.service'
+import billeteraService from '@/services/billetera.service'
 import type { 
   Presupuesto, 
   PeriodoPresupuesto, 
-  Categoria
+  Categoria,
+  Billetera
 } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { sileo } from 'sileo'
@@ -33,6 +35,7 @@ export default function PresupuestosPage() {
   
   // Data for forms
   const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [billeteras, setBilleteras] = useState<Billetera[]>([])
 
   // History Drawer States
   const [showHistory, setShowHistory] = useState(false)
@@ -88,9 +91,13 @@ export default function PresupuestosPage() {
     const controller = new AbortController()
     const loadData = async () => {
       try {
-        const cats = await categoriaService.getCategorias()
+        const [cats, bills] = await Promise.all([
+          categoriaService.getCategorias(),
+          billeteraService.list(controller.signal).catch(() => [])
+        ])
         if (!controller.signal.aborted) {
           setCategorias(cats.filter(c => c.tipo === 'egreso'))
+          setBilleteras(bills)
         }
       } catch (err) {
         if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
@@ -124,6 +131,17 @@ export default function PresupuestosPage() {
       }
     })
   }, [categorias, open, fetchPresupuestos])
+
+  const handleDetails = useCallback((p: Presupuesto) => {
+    open('presupuestoDetail', {
+      data: {
+        presupuesto: p,
+        categorias,
+        billeteras,
+        onSuccess: fetchPresupuestos
+      }
+    })
+  }, [open, categorias, billeteras, fetchPresupuestos])
 
   const handlePause = (p: Presupuesto) => {
     confirm({
@@ -346,6 +364,7 @@ export default function PresupuestosPage() {
                 <BudgetCard 
                   key={p.id} 
                   presupuesto={p} 
+                  onDetails={() => handleDetails(p)}
                   onEdit={() => handleEdit(p)}
                   onPause={() => handlePause(p)}
                   onResume={() => handleResume(p.id)}

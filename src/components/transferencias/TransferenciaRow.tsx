@@ -140,7 +140,7 @@ export const TransferenciaRow = memo(({
             <div className={styles.rateMetaRow}>
               {transferencia.cotizacion ? (
                 <span className={styles.rateBadge}>
-                  1 USD = {formatMonto(transferencia.cotizacion, 'ARS')}
+                  1 Dólar = {formatMonto(transferencia.cotizacion, 'ARS')}
                 </span>
               ) : (
                 <span className={styles.cambioMonedaBadge}>Cambio de moneda</span>

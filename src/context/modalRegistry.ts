@@ -49,6 +49,13 @@ export interface ModalPayloadMap {
     categorias: Categoria[]
     onSuccess: () => Promise<void> | void
   }
+  presupuestoDetail: {
+    presupuesto: Presupuesto
+    categorias?: Categoria[]
+    billeteras?: Billetera[]
+    tarjetas?: TarjetaCredito[]
+    onSuccess?: () => Promise<void> | void
+  }
   goal: {
     goal: Goal | null
     onSuccess: () => Promise<void> | void

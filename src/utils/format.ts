@@ -11,6 +11,12 @@ export function formatMonto(monto: number | string, moneda: 'ARS' | 'USD' | stri
   }).format(safeMonto)
 }
 
+export function formatMoneda(moneda?: string | null): string {
+  if (!moneda) return 'Pesos'
+  const m = String(moneda).toUpperCase()
+  return m === 'USD' || m === 'DOLARES' || m === 'DÓLARES' ? 'Dólares' : 'Pesos'
+}
+
 export function formatFecha(fecha: string | Date): string {
   let d: Date
   if (typeof fecha === 'string') {

@@ -64,7 +64,7 @@
 .closeBtn {
   width: 32px;
   height: 32px;
-  border-radius: 9px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -187,11 +187,20 @@
 .dateMeta {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 3.5px;
+  line-height: 1;
+}
+
+.dateMeta span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .dateIcon {
   color: var(--text-3);
+  display: block;
+  transform: translateY(-0.5px);
 }
 
 /* ── Hero Card ─────────────────────────────────────────────────────────────── */

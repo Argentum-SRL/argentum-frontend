@@ -627,7 +627,7 @@ export const TarjetaModal: React.FC = () => {
                 <div className={styles.formField}>
                   <div className={styles.percepcionCard}>
                     <div className={styles.percepcionInfo}>
-                      <span className={styles.percepcionTitle}>Recargo compras en USD</span>
+                      <span className={styles.percepcionTitle}>Recargo compras en Dólares</span>
                       <span className={styles.percepcionSubtitle}>
                         Percepción impositiva para gastos en el exterior
                       </span>

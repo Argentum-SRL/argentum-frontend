@@ -375,7 +375,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                   {/* Bloque Pesos */}
                   <div className={styles.monedaBlock}>
                     <div className={styles.monedaBlockHeader}>
-                      <span className={styles.monedaBadge}>Pesos (ARS)</span>
+                      <span className={styles.monedaBadge}>Pesos</span>
                     </div>
                     {/* Solo mostrar desglose si hay deuda anterior o saldo financiado */}
                     {((currentTicket.totalVencidoAnteriorARS || 0) > 0 || (currentTicket.saldoArrastradoARS || 0) > 0) && (
@@ -416,7 +416,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                   {/* Bloque Dólares */}
                   <div className={styles.monedaBlock}>
                     <div className={styles.monedaBlockHeader}>
-                      <span className={styles.monedaBadge}>Dólares (USD)</span>
+                      <span className={styles.monedaBadge}>Dólares</span>
                     </div>
                     {/* Solo mostrar desglose si hay deuda anterior o saldo financiado */}
                     {((currentTicket.totalVencidoAnteriorUSD || 0) > 0 || (currentTicket.saldoArrastradoUSD || 0) > 0) && (

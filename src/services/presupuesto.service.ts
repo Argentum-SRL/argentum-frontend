@@ -58,6 +58,12 @@ const presupuestoService = {
     return response.data
   },
 
+  renovarPresupuesto: async (id: string): Promise<Presupuesto> => {
+    const response = await api.post<Presupuesto>(`/presupuestos/${id}/renovar`)
+    invalidatePresupuestos()
+    return response.data
+  },
+
   eliminarPresupuesto: async (id: string): Promise<void> => {
     await api.delete(`/presupuestos/${id}`)
     invalidatePresupuestos()

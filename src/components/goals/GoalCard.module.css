@@ -121,15 +121,24 @@
 .metaRow {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 4.5px;
   font-size: 11.5px;
+  line-height: 1;
   color: var(--text-3);
   font-weight: 500;
+}
+
+.metaRow span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .metaIcon {
   color: var(--text-3);
   flex-shrink: 0;
+  display: block;
+  transform: translateY(-0.5px);
 }
 
 /* ── Header Right: Status & Quick Actions ─────────────────────────────────── */

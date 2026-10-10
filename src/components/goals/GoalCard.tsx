@@ -81,13 +81,15 @@ export default function GoalCard({ goal, onContribute, onDetails }: GoalCardProp
                 {goal.nombre}
               </h3>
               <span className={styles.currencyTag}>
-                {goal.moneda === 'USD' ? 'USD' : 'ARS'}
+                {goal.moneda === 'USD' ? 'Dólares' : 'Pesos'}
               </span>
             </div>
-            <div className={styles.metaRow}>
-              <Calendar size={12} className={styles.metaIcon} />
-              <span>{goal.fecha_limite ? formatFecha(goal.fecha_limite) : 'Sin vencimiento'}</span>
-            </div>
+            {goal.fecha_limite && (
+              <div className={styles.metaRow}>
+                <Calendar size={12} className={styles.metaIcon} />
+                <span>{formatFecha(goal.fecha_limite)}</span>
+              </div>
+            )}
           </div>
         </div>
 

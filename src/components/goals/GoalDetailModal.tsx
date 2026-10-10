@@ -281,7 +281,7 @@ export default function GoalDetailModal({
 
               <div className={styles.metaRow}>
                 <span className={styles.currencyPill}>
-                  {goal.moneda === 'USD' ? 'USD' : 'ARS'}
+                  {goal.moneda === 'USD' ? 'Dólares' : 'Pesos'}
                 </span>
 
                 {isPaused && (

@@ -152,7 +152,7 @@ export const PresionFuturaCard: React.FC<Props> = ({
             <div className={styles.titleRow}>
               <Calendar size={15} className={styles.headerIcon} />
               <h3 className={styles.cardTitle}>
-                Cuotas futuras {hasArs && hasUsd ? `(${moneda})` : ''}
+                Cuotas futuras {hasArs && hasUsd ? `(${moneda === 'ARS' ? 'Pesos' : 'Dólares'})` : ''}
               </h3>
               <span className={styles.mesesTag}>Próximos {meses} meses</span>
             </div>

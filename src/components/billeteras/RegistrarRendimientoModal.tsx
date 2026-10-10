@@ -75,7 +75,7 @@ export default function RegistrarRendimientoModal({
     }
   }
 
-  const simboloMoneda = billetera.moneda === 'USD' ? 'USD' : '$'
+  const simboloMoneda = billetera.moneda === 'USD' ? 'US$' : '$'
   const parsedMonto = parseFloat(monto)
   const isValid = !isNaN(parsedMonto) && parsedMonto > 0
 

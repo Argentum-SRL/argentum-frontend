@@ -1,9 +1,4 @@
-import { useState } from 'react'
-import {
-  Layers,
-  ShieldCheck,
-} from '@/components/ui/icons'
-import { GitBranch, GitFork, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import type { DesignAuditMetrics, CoverageMatrix } from '@/types/diseno'
 import styles from './DisenoMetricsBar.module.css'
 
@@ -18,15 +13,14 @@ interface Props {
   }
 }
 
-export default function DisenoMetricsBar({ metrics, coverageMatrix, decisionStats }: Props) {
-  const [showTechMetrics, setShowTechMetrics] = useState(false)
+export default function DisenoMetricsBar({ decisionStats }: Props) {
   const percentApproved = decisionStats.total > 0
     ? Math.round((decisionStats.aprobadas / decisionStats.total) * 100)
     : 0
 
   return (
     <div className={styles.wrapper}>
-      {/* Tarjeta Principal de Progreso Humano */}
+      {/* Tarjeta Principal de Progreso Visual */}
       <div className={styles.heroProgressCard}>
         <div className={styles.progressMainCol}>
           <div className={styles.progressHeader}>
@@ -54,72 +48,7 @@ export default function DisenoMetricsBar({ metrics, coverageMatrix, decisionStat
             <span><strong>{decisionStats.pendientes}</strong> pendientes de elegir</span>
           </div>
         </div>
-
-        <button
-          type="button"
-          className={styles.toggleTechBtn}
-          onClick={() => setShowTechMetrics(!showTechMetrics)}
-        >
-          {showTechMetrics ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          <span>{showTechMetrics ? 'Ocultar datos técnicos' : 'Ver datos de auditoría de código'}</span>
-        </button>
       </div>
-
-      {/* Panel Plegable con Métricas Técnicas de AST */}
-      {showTechMetrics && (
-        <div className={styles.techMetricsGrid}>
-          <div className={styles.metricCard}>
-            <div className={styles.metricIconWrap}>
-              <Layers size={16} />
-            </div>
-            <div className={styles.metricData}>
-              <span className={styles.metricValue}>
-                {metrics.inventorySummary.totalVariantsDetected.toLocaleString()}
-              </span>
-              <span className={styles.metricLabel}>Ocurrencias AST Identificadas</span>
-            </div>
-          </div>
-
-          <div className={styles.metricCard}>
-            <div className={`${styles.metricIconWrap} ${styles.iconShared}`}>
-              <GitFork size={16} />
-            </div>
-            <div className={styles.metricData}>
-              <span className={styles.metricValue}>
-                {coverageMatrix?.canonicalPatternsIdentified ?? 194}
-              </span>
-              <span className={styles.metricLabel}>Patrones Canónicos Agrupados</span>
-            </div>
-          </div>
-
-          <div className={styles.metricCard}>
-            <div className={`${styles.metricIconWrap} ${styles.iconWarning}`}>
-              <ShieldCheck size={16} />
-            </div>
-            <div className={styles.metricData}>
-              <span className={styles.metricValue}>
-                {coverageMatrix?.coveragePercentage ?? 100}%
-              </span>
-              <span className={styles.metricLabel}>
-                Auditoría AST ({coverageMatrix ? `${coverageMatrix.renderedInVivoCount} In Vivo • ${coverageMatrix.renderedWithOriginalCssCount} CSS` : '194 Patrones'})
-              </span>
-            </div>
-          </div>
-
-          <div className={styles.metricCard}>
-            <div className={`${styles.metricIconWrap} ${styles.iconFiles}`}>
-              <GitBranch size={16} />
-            </div>
-            <div className={styles.metricData}>
-              <span className={styles.metricValue}>
-                {metrics.scannedFiles.tsxAndTs} / {metrics.scannedFiles.css}
-              </span>
-              <span className={styles.metricLabel}>Archivos React / CSS Auditados</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
-

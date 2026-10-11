@@ -18,20 +18,18 @@ interface Props {
   decisiones?: Record<string, DesignDecision>
 }
 
-export default function DisenoCategoryNav({
-  selectedCategory,
-  onSelectCategory,
-  activeView,
-  onSelectView,
-  searchTerm,
-  onSearchChange,
-  filterReuse,
-  onFilterReuseChange,
-  filterStatus,
-  onFilterStatusChange,
-  categoryCounts,
-  decisiones = {},
-}: Props) {
+export default function DisenoCategoryNav(props: Props) {
+  const {
+    selectedCategory,
+    onSelectCategory,
+    activeView,
+    onSelectView,
+    searchTerm,
+    onSearchChange,
+    filterStatus,
+    onFilterStatusChange,
+    decisiones = {},
+  } = props
   return (
     <aside className={styles.navContainer}>
       {/* Selector de Vista Principal */}
@@ -44,7 +42,7 @@ export default function DisenoCategoryNav({
           onClick={() => onSelectView('catalogo')}
           title="Ver opciones y elegir el diseño oficial"
         >
-          1. Explorar y Elegir
+          🎨 Explorar y Elegir
         </button>
         <button
           type="button"
@@ -54,27 +52,7 @@ export default function DisenoCategoryNav({
           onClick={() => onSelectView('comparador')}
           title="Comparar dos variantes frente a frente"
         >
-          2. Comparar Lado a Lado
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeView === 'especificaciones'}
-          className={`${styles.viewModeBtn} ${activeView === 'especificaciones' ? styles.viewModeBtnActive : ''}`}
-          onClick={() => onSelectView('especificaciones')}
-          title="Ajustar medidas de curvatura, altura y padding"
-        >
-          3. Medidas & Tokens
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeView === 'auditoria'}
-          className={`${styles.viewModeBtn} ${activeView === 'auditoria' ? styles.viewModeBtnActive : ''}`}
-          onClick={() => onSelectView('auditoria')}
-          title="Reporte técnico de código y AST"
-        >
-          4. Datos AST
+          ⚖️ Comparar Lado a Lado
         </button>
       </div>
 
@@ -85,7 +63,7 @@ export default function DisenoCategoryNav({
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Buscar por componente, archivo, clase..."
+            placeholder="Buscar elemento o pantalla..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
           />
@@ -94,32 +72,22 @@ export default function DisenoCategoryNav({
         <div className={styles.filterSelectors}>
           <select
             className={styles.filterSelect}
-            value={filterReuse}
-            onChange={(e) => onFilterReuseChange(e.target.value as typeof filterReuse)}
-            aria-label="Filtrar por nivel de reutilización"
-          >
-            <option value="todos">Todos los niveles</option>
-            <option value="compartidos">Solo Compartidos (UI Oficial)</option>
-            <option value="locales">Solo Locales (Divergentes)</option>
-          </select>
-
-          <select
-            className={styles.filterSelect}
             value={filterStatus}
             onChange={(e) => onFilterStatusChange(e.target.value as typeof filterStatus)}
-            aria-label="Filtrar por estado de decisión"
+            aria-label="Filtrar por estado de avance"
+            style={{ width: '100%' }}
           >
-            <option value="todos">Todos los estados</option>
-            <option value="pendiente">Pendientes</option>
-            <option value="revisada">Revisadas</option>
-            <option value="aprobada">Aprobadas</option>
+            <option value="todos">Todas las familias (12)</option>
+            <option value="pendiente">Solo Pendientes de elegir</option>
+            <option value="aprobada">Solo Diseños elegidos</option>
+            <option value="revisada">En revisión</option>
           </select>
         </div>
       </div>
 
       {/* Lista de Categorías */}
       <div className={styles.categoriesList}>
-        <span className={styles.listSectionTitle}>Familias de Componentes ({CATEGORIES_CONFIG.length})</span>
+        <span className={styles.listSectionTitle}>Familias de la App ({CATEGORIES_CONFIG.length})</span>
         {CATEGORIES_CONFIG.map((cat) => {
           const Icon = cat.icon
           const isSelected = selectedCategory === cat.id
@@ -133,11 +101,10 @@ export default function DisenoCategoryNav({
               : styles.dotPendiente
           const statusTitle =
             status === 'aprobada'
-              ? 'Diseño oficial aprobado'
+              ? 'Diseño oficial elegido'
               : status === 'revisada'
               ? 'En revisión'
               : 'Pendiente de elegir'
-          const count = categoryCounts[cat.id] || 0
           return (
             <button
               key={cat.id}
@@ -155,7 +122,6 @@ export default function DisenoCategoryNav({
               </div>
               <div className={styles.categoryItemRight}>
                 <span className={`${styles.statusIndicatorDot} ${dotClass}`} title={statusTitle} />
-                <span className={styles.categoryBadge}>{count}</span>
               </div>
             </button>
           )

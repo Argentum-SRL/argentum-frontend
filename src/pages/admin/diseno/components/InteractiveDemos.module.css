@@ -1,91 +1,122 @@
+/* ── Contenedor General de Demostraciones ───────────────────────────────── */
 .demoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 22px;
   width: 100%;
 }
 
+@media (max-width: 640px) {
+  .demoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Tarjeta de Variante ─────────────────────────────────────────────────── */
 .variantCard {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   box-shadow: var(--elevation-xs);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .variantCard:hover {
+  border-color: rgba(201, 162, 39, 0.4);
   box-shadow: var(--elevation-sm);
 }
 
-.sharedReferenceCard {
-  border-color: rgba(201, 162, 39, 0.4);
-  background: linear-gradient(180deg, rgba(201, 162, 39, 0.03) 0%, var(--surface) 100%);
-}
-
-.variantHeader {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.variantTag {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
+.cardHeader {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.tagShared {
-  color: var(--gold);
+.cardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.variantFile {
+.cardTag {
   font-size: 11px;
-  font-family: monospace;
-  color: var(--text-3);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text-2);
 }
 
+.cardTagOfficial {
+  background: rgba(201, 162, 39, 0.15);
+  color: var(--gold);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+/* ── Canvas de Demostración ─────────────────────────────────────────────── */
 .demoCanvas {
   background: var(--page);
-  border-radius: 12px;
-  padding: 16px;
-  min-height: 100px;
+  border-radius: 14px;
+  padding: 20px;
+  min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed var(--border);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
 }
 
-.variantSpecs {
+/* ── Botón de Selección Directa al pie de cada tarjeta ──────────────────── */
+.cardActionBar {
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.selectInDemoBtn {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--text-2);
-  border-top: 1px solid var(--border);
-  padding-top: 10px;
-}
-
-.variantSpecs code {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
   background: var(--surface-alt);
-  padding: 1px 4px;
-  border-radius: 4px;
-  font-family: monospace;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── 1. SELECTORES SEGMENTADOS ─────────────────────────── */
+.selectInDemoBtn:hover {
+  background: var(--surface);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-1px);
+}
 
-/* TransaccionModal Segmented Bar */
-.transaccionSegmentedBar {
+.selectedInDemoBtnActive {
+  background: rgba(201, 162, 39, 0.18) !important;
+  color: var(--gold) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 14px rgba(201, 162, 39, 0.25);
+}
+
+/* ==========================================================================
+   1. SELECTORES SEGMENTADOS (Pills & Bars)
+   ========================================================================== */
+.segmentedCapsule {
   display: flex;
   width: 100%;
   background: var(--surface-alt);
@@ -96,92 +127,91 @@
   box-sizing: border-box;
 }
 
-.transaccionPill {
+.segmentedCapsulePill {
   flex: 1;
   min-width: 0;
-  height: 38px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
   border-radius: 10px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  outline: none;
+  transition: all 180ms ease;
 }
 
-.transaccionPill:hover:not(.transaccionPillActive) {
+.segmentedCapsulePill:hover:not(.segmentedCapsulePillActive) {
   color: var(--text);
 }
 
-.transaccionPillActive {
+.segmentedCapsulePillActive {
   background: var(--surface) !important;
   color: var(--text) !important;
   font-weight: 700 !important;
   box-shadow: var(--elevation-sm);
-  border-color: var(--border) !important;
 }
 
-/* PagarResumenModal Segmented Bar */
-.pagarResumenSegmentedBar {
+/* Selector con Borde Individual Separado */
+.segmentedBorderRow {
   display: flex;
   width: 100%;
-  gap: 8px;
-  box-sizing: border-box;
+  gap: 10px;
 }
 
-.pagarResumenPill {
+.segmentedBorderPill {
   flex: 1;
-  min-width: 0;
-  height: 42px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  background: var(--page);
-  border: 1.5px solid var(--surface-alt);
+  gap: 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  outline: none;
+  transition: all 180ms ease;
 }
 
-.pagarResumenPillActive {
-  background: var(--surface) !important;
+.segmentedBorderPill:hover {
+  border-color: var(--text-3);
+  color: var(--text);
+}
+
+.segmentedBorderPillActive {
+  border-color: var(--gold) !important;
   color: var(--text) !important;
   font-weight: 700 !important;
-  transform: translateY(-1.5px) scale(1.02);
+  background: var(--surface) !important;
   box-shadow: var(--elevation-sm);
-  border-color: var(--border) !important;
+  transform: translateY(-1px);
 }
 
-/* PresupuestoModal Period Wrap */
-.presupuestoPeriodWrap {
+/* Selector de Períodos en Fondo Sutil */
+.periodSelectorBar {
   display: flex;
   width: 100%;
   background: var(--surface-3);
-  padding: 3px;
+  padding: 4px;
   border-radius: 12px;
   gap: 4px;
 }
 
-.presupuestoPeriodBtn {
+.periodPill {
   flex: 1;
-  height: 44px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   background: transparent;
   border: none;
   border-radius: 9px;
@@ -193,107 +223,77 @@
   transition: all 180ms ease;
 }
 
-.presupuestoPeriodBtnActive {
-  background: var(--surface) !important;
-  color: var(--primary) !important;
-  font-weight: 700 !important;
-  box-shadow: var(--elevation-sm);
-}
-
-[data-theme="dark"] .presupuestoPeriodBtnActive {
-  color: var(--text) !important;
-}
-
-/* Goal Segmented Bar */
-.goalSegmentedBar {
-  display: flex;
-  width: 100%;
-  background: var(--surface-alt);
-  padding: 4px;
-  border-radius: 14px;
-  gap: 4px;
-}
-
-.goalPill {
-  flex: 1;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text-2);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 180ms ease;
-}
-
-.goalPillActive {
+.periodPillActive {
   background: var(--surface) !important;
   color: var(--text) !important;
   font-weight: 700 !important;
   box-shadow: var(--elevation-sm);
 }
 
-/* ── 2. OPCIONES SELECCIONABLES ─────────────────────────── */
-.renewalGroup {
+/* ==========================================================================
+   2. TARJETAS DE SELECCIÓN (Renewal & Payment Methods)
+   ========================================================================== */
+.renewalList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
 }
 
-.renewalCard {
+.renewalOption {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
+  gap: 14px;
+  padding: 14px 16px;
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 14px;
   cursor: pointer;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 160ms ease;
 }
 
-.renewalCard:hover {
+.renewalOption:hover {
   border-color: var(--primary-light);
 }
 
-.renewalCardActive {
-  border-color: var(--primary);
-  background: var(--surface);
-  box-shadow: var(--elevation-xs);
+.renewalOptionActive {
+  border-color: var(--gold) !important;
+  background: var(--surface) !important;
+  box-shadow: 0 0 10px rgba(201, 162, 39, 0.15);
 }
 
-.renewalLeft {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.renewalIconWrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--surface-alt);
+.renewalRadio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-2);
+  flex-shrink: 0;
+  transition: border-color 160ms ease;
 }
 
-.renewalInfo {
+.renewalRadioActive {
+  border-color: var(--gold);
+}
+
+.renewalRadioDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.renewalTexts {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .renewalTitle {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
 }
 
@@ -302,398 +302,604 @@
   color: var(--text-2);
 }
 
-.radioCircle {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 180ms ease;
-}
-
-.radioCircleActive {
-  border-color: var(--primary);
-}
-
-.radioDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--primary);
-}
-
-/* Payment Method Row */
-.paymentMethodRow {
-  display: flex;
-  gap: 8px;
+/* Métodos de Pago */
+.paymentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
   width: 100%;
 }
 
-.paymentCard {
-  flex: 1;
+.paymentBtn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 4px;
-  min-height: 60px;
-  background: var(--surface-alt);
-  border: 1.5px solid transparent;
+  padding: 14px 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
+  transition: all 160ms ease;
+}
+
+.paymentBtn:hover {
+  border-color: var(--text-3);
+  color: var(--text);
+}
+
+.paymentBtnActive {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+  background: rgba(201, 162, 39, 0.08) !important;
+  font-weight: 700 !important;
+}
+
+/* SelectableSurface Demo */
+.surfaceDemoBox {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
   transition: all 180ms ease;
 }
 
-.paymentCard:hover {
-  color: var(--text);
-  background: var(--surface);
+.surfaceDemoBox:hover {
+  border-color: var(--gold);
 }
 
-.paymentCardActive {
-  background: var(--surface) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
-  box-shadow: var(--elevation-sm);
-  font-weight: 700;
-}
-
-[data-theme="dark"] .paymentCardActive {
-  color: var(--text) !important;
+.surfaceDemoBoxActive {
   border-color: var(--gold) !important;
+  box-shadow: 0 0 12px rgba(201, 162, 39, 0.2);
 }
 
-/* Wallet Mini Cards */
-.walletCardsRow {
+.surfaceIconBox {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.14);
+  color: var(--gold);
   display: flex;
-  gap: 10px;
-  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.walletMiniCard {
-  flex: 1;
-  border-radius: 16px;
-  padding: 12px 14px;
-  color: #fff;
-  cursor: pointer;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-  box-shadow: var(--elevation-sm);
+.surfaceTextBox {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 3px;
 }
 
-.walletMiniCard:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--elevation-md);
-}
-
-.walletGalicia {
-  background: linear-gradient(135deg, #FF6600 0%, #E64A00 100%);
-}
-
-.walletAhorro {
-  background: linear-gradient(135deg, #0D2045 0%, #1A3568 100%);
-}
-
-.walletActive {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.walletCardTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.walletCardName {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.walletBadge {
-  font-size: 9px;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-weight: 700;
-}
-
-.walletCardSaldo {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.surfaceDemo {
-  width: 100%;
-}
-
-.surfaceInner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.surfaceInner strong {
-  display: block;
+.surfaceTextTitle {
   font-size: 14px;
+  font-weight: 700;
   color: var(--text);
 }
 
-.surfaceInner p {
+.surfaceTextDesc {
   font-size: 12px;
   color: var(--text-2);
 }
 
-/* ── 3. BOTONES DE ACCIÓN ───────────────────────────────── */
-.buttonFlexRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.modalFooterRow {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-}
-
-.localCancelBtn {
-  flex: 1;
-  height: 46px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 180ms ease;
-}
-
-.localCancelBtn:hover {
-  background: var(--surface-alt);
-}
-
-.localSubmitBtn {
-  flex: 2;
-  height: 46px;
-  border-radius: 12px;
-  border: none;
-  background: var(--primary);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 180ms ease;
-  box-shadow: var(--elevation-sm);
-}
-
-.localSubmitBtn:hover {
-  opacity: 0.95;
-  transform: translateY(-1px);
-}
-
-/* ── 4. CAMPOS DE ENTRADA ───────────────────────────────── */
-.montoHeroCardDemo {
-  background: var(--surface-3);
-  border-radius: 16px;
-  padding: 16px 20px;
-  width: 100%;
+/* ==========================================================================
+   3. BOTONES DE ACCIÓN
+   ========================================================================== */
+.buttonsStack {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
+  width: 100%;
 }
 
-.montoHeroLabel {
+.modalButtonsPair {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.modalCancelBtn {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 160ms ease;
+}
+
+.modalCancelBtn:hover {
+  background: var(--border);
+}
+
+.modalConfirmBtn {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 160ms ease;
+}
+
+.modalConfirmBtn:hover {
+  opacity: 0.92;
+}
+
+/* ==========================================================================
+   4. CAMPOS DE TEXTO & INPUTS
+   ========================================================================== */
+.inputFieldStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.inputFieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.inputFieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.inputFieldBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 160ms ease;
+  box-sizing: border-box;
+}
+
+.inputFieldBox:focus-within {
+  border-color: var(--gold);
+}
+
+.inputFieldBox input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+/* ==========================================================================
+   5. MONTOS Y SALDOS FINANCIEROS
+   ========================================================================== */
+.heroBalanceCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+}
+
+.heroBalanceLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+
+.heroBalanceAmount {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.txAmountsCompare {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.txAmountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.txAmountDesc {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.txAmountPositive {
+  font-size: 15px;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.txAmountNegative {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ef4444;
+}
+
+.pagoResumenCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--surface-3);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.pagoResumenLabel {
   font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   letter-spacing: 0.05em;
 }
 
-.montoHeroAmount {
-  font-size: 32px;
+.pagoResumenAmount {
+  font-size: 28px;
   font-weight: 800;
   color: var(--text);
-  letter-spacing: -0.02em;
 }
 
-/* ── 5. ESTADOS & FEEDBACK ─────────────────────────────── */
-.loaderRow {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.alertStack {
+/* ==========================================================================
+   6. VENTANAS Y MODALES (DISEÑO DE BORDES Y CABECERAS)
+   ========================================================================== */
+.modalFrameMockup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   width: 100%;
+  background: var(--surface);
+  box-shadow: var(--elevation-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: all 180ms ease;
 }
 
-.alertBox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
+.modalFrameRadius16 {
+  border-radius: 16px;
 }
 
-.alertSuccess {
-  background: var(--success-bg);
-  color: var(--success);
-  border: 1px solid rgba(26, 122, 74, 0.2);
+.modalFrameRadius20 {
+  border-radius: 20px;
 }
 
-.alertWarning {
-  background: rgba(201, 162, 39, 0.12);
-  color: var(--warning);
-  border: 1px solid rgba(201, 162, 39, 0.25);
+.modalFrameRadius24 {
+  border-radius: 24px;
 }
 
-/* ── Capability Badges ─────────────────────────────────────────────────────── */
-.headerTopRow {
+.modalFrameHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
 }
 
-.capabilityBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10px;
+.modalFrameTitle {
+  font-size: 14px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 3px 8px;
-  border-radius: 6px;
-  width: fit-content;
+  color: var(--text);
 }
 
-.badgeInVivo {
-  background: rgba(34, 197, 94, 0.12);
-  color: #16a34a;
-  border: 1px solid rgba(34, 197, 94, 0.28);
+.modalFrameClose {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  cursor: pointer;
 }
 
-.badgeCssModule {
-  background: rgba(99, 102, 241, 0.12);
-  color: #6366f1;
-  border: 1px solid rgba(99, 102, 241, 0.28);
-}
-
-.badgeBlocked {
-  background: rgba(245, 158, 11, 0.12);
-  color: #d97706;
-  border: 1px solid rgba(245, 158, 11, 0.28);
-}
-
-/* ── Unrenderable Isolation Blocked Cards ─────────────────────────────────── */
-.unrenderableCard {
-  border-color: rgba(245, 158, 11, 0.35);
-  background: linear-gradient(180deg, rgba(245, 158, 11, 0.03) 0%, var(--surface) 100%);
-}
-
-.unrenderableCanvas {
+.modalFrameBody {
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  background: var(--surface-2);
-  border-radius: 12px;
-  border: 1px dashed rgba(245, 158, 11, 0.35);
-}
-
-.unrenderableReasonHeader {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #d97706;
 }
 
-.unrenderableReasonText {
-  font-size: 12px;
+.modalFrameBodyText {
+  font-size: 13px;
   color: var(--text-2);
-  line-height: 1.5;
+  line-height: 1.4;
   margin: 0;
 }
 
-.unrenderableBlockerTag {
+.modalFrameFooter {
+  display: flex;
+  gap: 8px;
+  padding: 12px 18px;
+  background: var(--page);
+  border-top: 1px solid var(--border);
+}
+
+/* ==========================================================================
+   7. MENÚS Y NAVEGACIÓN
+   ========================================================================== */
+.navPillMockup {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
   background: var(--surface);
+  padding: 4px;
+  border-radius: 26px;
   border: 1px solid var(--border);
-  padding: 4px 10px;
-  border-radius: 6px;
-  color: var(--text-2);
-  font-family: monospace;
+  box-shadow: var(--elevation-md);
+  gap: 4px;
 }
 
-@media (max-width: 480px) {
-  .demoGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ── Botón de Selección Directa en Demostración ── */
-.cardActionBar {
+.navPillItem {
   display: flex;
   align-items: center;
-  justify-content: stretch;
-  margin-top: 8px;
-}
-
-.selectInDemoBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
+  gap: 6px;
   padding: 8px 14px;
-  border-radius: 10px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 700;
+  border-radius: 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   font-family: inherit;
   transition: all 160ms ease;
 }
 
-.selectInDemoBtn:hover {
-  background: var(--surface);
-  border-color: var(--gold);
+.navPillItemActive {
+  background: rgba(201, 162, 39, 0.16);
   color: var(--gold);
-  transform: translateY(-1px);
+  font-weight: 700;
 }
 
-.selectedInDemoBtnActive {
-  background: rgba(201, 162, 39, 0.16) !important;
-  color: var(--gold) !important;
-  border-color: rgba(201, 162, 39, 0.6) !important;
-  box-shadow: 0 0 10px rgba(201, 162, 39, 0.2);
+.mobileDockMockup {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  background: var(--surface);
+  padding: 10px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--elevation-sm);
 }
 
+.mobileDockItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
 
+.mobileDockItemActive {
+  color: var(--gold);
+  font-weight: 700;
+}
 
+/* ==========================================================================
+   8. AVISOS, BADGES Y ALERTAS
+   ========================================================================== */
+.badgesGroupWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.badgePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badgeSuccess {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badgeWarning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badgeDanger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badgeGold {
+  background: rgba(201, 162, 39, 0.15);
+  color: var(--gold);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+.alertBoxBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  width: 100%;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.alertBoxSuccess {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.alertBoxWarning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+
+/* ==========================================================================
+   9. PANTALLAS DE CARGA Y VACÍAS
+   ========================================================================== */
+.loaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  padding: 16px;
+}
+
+.skeletonPreviewCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.skeletonLine {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--border) 50%, var(--surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+.skeletonCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ==========================================================================
+   10. CONMUTADORES Y AJUSTES ESPECIALES
+   ========================================================================== */
+.switchesStack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.switchLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.switchTrack {
+  width: 46px;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: background 180ms ease, border-color 180ms ease;
+  box-sizing: border-box;
+}
+
+.switchTrackOn {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.switchThumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.switchThumbOn {
+  transform: translateX(20px);
+}

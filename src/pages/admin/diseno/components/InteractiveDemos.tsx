@@ -4,14 +4,18 @@ import {
   Edit3,
   ArrowUpRight,
   ArrowDownLeft,
-  Plus,
-  Minus,
   CreditCard,
   Building2,
   Banknote,
   AlertTriangle,
   Sparkles,
-  Star,
+  X,
+  Search,
+  Home,
+  PieChart,
+  Target,
+  Layers,
+  Check,
 } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import Button from '@/components/ui/Button/Button'
@@ -21,6 +25,7 @@ import SelectableSurface from '@/components/ui/SelectableSurface/SelectableSurfa
 import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import TransaccionRow from '@/components/transacciones/TransaccionRow'
+import EmptyState from '@/components/ui/EmptyState/EmptyState'
 import type { Billetera, Transaccion } from '@/types'
 import styles from './InteractiveDemos.module.css'
 
@@ -28,7 +33,6 @@ export interface DemoProps {
   selectedId?: string | null
   onSelect?: (id: string, name: string) => void
 }
-
 
 // ─── Fixtures Seguros para Renderizado In-Vivo ─────────────────────────────
 const MOCK_BILLETERA: Billetera = {
@@ -65,138 +69,105 @@ const MOCK_TRANSACCION: Transaccion = {
   fecha_creacion: '2026-10-10T14:30:00Z',
 }
 
-// ---------------------------------------------------------------------------
-// 1. SELECTORES SEGMENTADOS (Segmented Controls Demos)
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 1. SELECTORES SEGMENTADOS (Pills & Bars)
+// ===========================================================================
 export function DemoSegmentedControls({ selectedId, onSelect }: DemoProps = {}) {
   const [variantA, setVariantA] = useState<'egreso' | 'ingreso'>('egreso')
   const [variantB, setVariantB] = useState<'total' | 'otro'>('total')
   const [variantC, setVariantC] = useState<'semanal' | 'quincenal' | 'mensual'>('mensual')
-  const [variantD, setVariantD] = useState<'aporte' | 'retiro'>('aporte')
-  const [variantE, setVariantE] = useState<'mes' | 'año' | 'historico'>('mes')
+  const [variantD, setVariantD] = useState<'mes' | 'año' | 'historico'>('mes')
 
   return (
     <div className={styles.demoGrid}>
-      {/* Variante 1: TransaccionModal (Apple Style Pill en container gris) */}
+      {/* Opción 1: Cápsula Gris (Transacciones) */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>TransaccionModal (Selector Operación)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/transacciones/TransaccionModal.module.css</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Selector en Cápsula (Transacciones)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.transaccionSegmentedBar} role="radiogroup" aria-label="Tipo de transacción">
+          <div className={styles.segmentedCapsule} role="radiogroup">
             <button
               type="button"
-              role="radio"
-              aria-checked={variantA === 'egreso'}
-              className={`${styles.transaccionPill} ${variantA === 'egreso' ? styles.transaccionPillActive : ''}`}
+              className={`${styles.segmentedCapsulePill} ${variantA === 'egreso' ? styles.segmentedCapsulePillActive : ''}`}
               onClick={() => setVariantA('egreso')}
             >
-              <ArrowUpRight size={14} strokeWidth={2.2} />
+              <ArrowUpRight size={15} />
               <span>Egreso</span>
             </button>
             <button
               type="button"
-              role="radio"
-              aria-checked={variantA === 'ingreso'}
-              className={`${styles.transaccionPill} ${variantA === 'ingreso' ? styles.transaccionPillActive : ''}`}
+              className={`${styles.segmentedCapsulePill} ${variantA === 'ingreso' ? styles.segmentedCapsulePillActive : ''}`}
               onClick={() => setVariantA('ingreso')}
             >
-              <ArrowDownLeft size={14} strokeWidth={2.2} />
+              <ArrowDownLeft size={15} />
               <span>Ingreso</span>
             </button>
           </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Container: <code>padding: 4px; radius: 14px; bg: surface-alt</code></span>
-          <span>Pill: <code>height: 38px; radius: 10px; shadow: elevation-sm</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('TransaccionModal_pill') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-selectores_segmentados-TransaccionModal_pill', 'Selector Tipo Transacción (TransaccionModal)')}
+              onClick={() => onSelect('canonical-selectores_segmentados-TransaccionModal_pill', 'Selector en Cápsula (Transacciones)')}
             >
-              <Star size={13} fill={selectedId?.includes('TransaccionModal_pill') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('TransaccionModal_pill') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Variante 2: PagarResumenModal (Pills independientes con borde) */}
+      {/* Opción 2: Botones con Borde Separado (Liquidación) */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>PagarResumenModal (Liquidación Tarjeta)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/tarjetas/PagarResumenModal.module.css</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Botones con Borde Separado (Liquidación)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.pagarResumenSegmentedBar} role="radiogroup" aria-label="Tipo de pago">
+          <div className={styles.segmentedBorderRow} role="radiogroup">
             <button
               type="button"
-              role="radio"
-              aria-checked={variantB === 'total'}
-              className={`${styles.pagarResumenPill} ${variantB === 'total' ? styles.pagarResumenPillActive : ''}`}
+              className={`${styles.segmentedBorderPill} ${variantB === 'total' ? styles.segmentedBorderPillActive : ''}`}
               onClick={() => setVariantB('total')}
             >
-              <CheckCircle2 size={14} strokeWidth={2.2} />
+              <CheckCircle2 size={15} />
               <span>Pagar el total</span>
             </button>
             <button
               type="button"
-              role="radio"
-              aria-checked={variantB === 'otro'}
-              className={`${styles.pagarResumenPill} ${variantB === 'otro' ? styles.pagarResumenPillActive : ''}`}
+              className={`${styles.segmentedBorderPill} ${variantB === 'otro' ? styles.segmentedBorderPillActive : ''}`}
               onClick={() => setVariantB('otro')}
             >
-              <Edit3 size={14} strokeWidth={2} />
-              <span>Ingresar otro monto</span>
+              <Edit3 size={15} />
+              <span>Otro monto</span>
             </button>
           </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Bordes: <code>border: 1px solid var(--border); sin container exterior</code></span>
-          <span>Pill: <code>height: 42px; radius: 12px; active bg: surface</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('PagarResumenModal_pill') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-selectores_segmentados-PagarResumenModal_pill', 'Selector Pago Tarjeta (PagarResumenModal)')}
+              onClick={() => onSelect('canonical-selectores_segmentados-PagarResumenModal_pill', 'Botones con Borde Separado (Liquidación)')}
             >
-              <Star size={13} fill={selectedId?.includes('PagarResumenModal_pill') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('PagarResumenModal_pill') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Variante 3: PresupuestoModal (Periodo semanal/quincenal/mensual) */}
+      {/* Opción 3: Selector de Períodos en Fondo Sutil */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>PresupuestoModal (Selector Período)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/presupuestos/PresupuestoModal.module.css</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 3: Períodos con Fondo Sutil (Presupuestos)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.presupuestoPeriodBar} role="radiogroup" aria-label="Período de presupuesto">
+          <div className={styles.periodSelectorBar} role="radiogroup">
             {(['semanal', 'quincenal', 'mensual'] as const).map((p) => (
               <button
                 key={p}
                 type="button"
-                role="radio"
-                aria-checked={variantC === p}
-                className={`${styles.presupuestoPeriodPill} ${variantC === p ? styles.presupuestoPeriodPillActive : ''}`}
+                className={`${styles.periodPill} ${variantC === p ? styles.periodPillActive : ''}`}
                 onClick={() => setVariantC(p)}
               >
                 <span>{p.charAt(0).toUpperCase() + p.slice(1)}</span>
@@ -204,83 +175,24 @@ export function DemoSegmentedControls({ selectedId, onSelect }: DemoProps = {}) 
             ))}
           </div>
         </div>
-        <div className={styles.variantSpecs}>
-          <span>Container: <code>padding: 3px; radius: 12px; bg: surface-3</code></span>
-          <span>Pill: <code>height: 44px; radius: 9px; active shadow: elevation-sm</code></span>
-        </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('PresupuestoModal_period') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-selectores_segmentados-PresupuestoModal_period', 'Selector Período (PresupuestoModal)')}
+              onClick={() => onSelect('canonical-selectores_segmentados-PresupuestoModal_period', 'Períodos con Fondo Sutil (Presupuestos)')}
             >
-              <Star size={13} fill={selectedId?.includes('PresupuestoModal_period') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('PresupuestoModal_period') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Variante 4: GoalContributionModal (Operación Aporte vs Retiro) */}
+      {/* Opción 4: SegmentedControl Oficial Compartido */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>GoalContributionModal (Aporte/Retiro)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/goals/GoalContributionModal.module.css</span>
-        </div>
-        <div className={styles.demoCanvas}>
-          <div className={styles.goalSegmentedBar} role="radiogroup" aria-label="Tipo de operación">
-            <button
-              type="button"
-              role="radio"
-              aria-checked={variantD === 'aporte'}
-              className={`${styles.goalPill} ${variantD === 'aporte' ? styles.goalPillActive : ''}`}
-              onClick={() => setVariantD('aporte')}
-            >
-              <Plus size={14} strokeWidth={2.2} />
-              <span>Aportar</span>
-            </button>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={variantD === 'retiro'}
-              className={`${styles.goalPill} ${variantD === 'retiro' ? styles.goalPillActive : ''}`}
-              onClick={() => setVariantD('retiro')}
-            >
-              <Minus size={14} strokeWidth={2.2} />
-              <span>Retirar</span>
-            </button>
-          </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Container: <code>padding: 4px; radius: 14px; gap: 4px</code></span>
-          <span>Pill: <code>height: 38px; radius: 10px; font-weight: 700</code></span>
-        </div>
-        {onSelect && (
-          <div className={styles.cardActionBar}>
-            <button
-              type="button"
-              className={`${styles.selectInDemoBtn} ${selectedId?.includes('GoalContributionModal_operation') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-selectores_segmentados-GoalContributionModal_operation', 'Selector Operación Meta (GoalContributionModal)')}
-            >
-              <Star size={13} fill={selectedId?.includes('GoalContributionModal_operation') ? 'currentColor' : 'none'} />
-              <span>{selectedId?.includes('GoalContributionModal_operation') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Variante 5: SegmentedControl Oficial (Shared UI Component) */}
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>SegmentedControl (Shared UI Oficial)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/ui/SegmentedControl.tsx</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 4: SegmentedControl Oficial Compartido</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
         </div>
         <div className={styles.demoCanvas}>
           <SegmentedControl
@@ -289,21 +201,17 @@ export function DemoSegmentedControls({ selectedId, onSelect }: DemoProps = {}) 
               { value: 'año', label: 'Este año' },
               { value: 'historico', label: 'Histórico' },
             ]}
-            value={variantE}
-            onChange={(val) => setVariantE(val as 'mes' | 'año' | 'historico')}
+            value={variantD}
+            onChange={(val) => setVariantD(val as 'mes' | 'año' | 'historico')}
             fullWidth
           />
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Container: <code>padding: 4px; radius: 12px; border: 1px solid var(--border)</code></span>
-          <span>Pill: <code>padding: 6px 14px; radius: 8px; scale(1.02)</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('SegmentedControl') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-selectores_segmentados-SegmentedControl', 'SegmentedControl (Shared UI Oficial)')}
+              onClick={() => onSelect('canonical-selectores_segmentados-SegmentedControl', 'SegmentedControl Oficial Compartido')}
             >
               <span>{selectedId?.includes('SegmentedControl') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
@@ -314,9 +222,9 @@ export function DemoSegmentedControls({ selectedId, onSelect }: DemoProps = {}) 
   )
 }
 
-// ---------------------------------------------------------------------------
-// 2. OPCIONES SELECCIONABLES (Selectable Cards Demos)
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 2. TARJETAS DE SELECCIÓN (Renewal & Payments)
+// ===========================================================================
 export function DemoSelectableCards({ selectedId, onSelect }: DemoProps = {}) {
   const [renewal, setRenewal] = useState<'auto' | 'manual'>('auto')
   const [metodo, setMetodo] = useState<'debito' | 'transferencia' | 'credito' | 'efectivo'>('debito')
@@ -324,73 +232,60 @@ export function DemoSelectableCards({ selectedId, onSelect }: DemoProps = {}) {
 
   return (
     <div className={styles.demoGrid}>
-      {/* Variante 1: Tarjetas de Renovación (PresupuestoModal) */}
+      {/* Opción 1: Tarjetas con Radio Button (Presupuesto) */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>Tarjetas de Renovación (PresupuestoModal)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/presupuestos/PresupuestoModal.tsx</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Tarjetas con Radio Button (Presupuestos)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.renewalCardsGrid}>
+          <div className={styles.renewalList}>
             <div
-              className={`${styles.renewalCard} ${renewal === 'auto' ? styles.renewalCardActive : ''}`}
+              className={`${styles.renewalOption} ${renewal === 'auto' ? styles.renewalOptionActive : ''}`}
               onClick={() => setRenewal('auto')}
             >
-              <div className={styles.renewalRadioCircle}>
-                {renewal === 'auto' && <div className={styles.radioInnerDot} />}
+              <div className={`${styles.renewalRadio} ${renewal === 'auto' ? styles.renewalRadioActive : ''}`}>
+                {renewal === 'auto' && <div className={styles.renewalRadioDot} />}
               </div>
-              <div className={styles.renewalText}>
-                <strong>Automática</strong>
-                <span>Se reinicia al inicio del ciclo</span>
+              <div className={styles.renewalTexts}>
+                <span className={styles.renewalTitle}>Automática</span>
+                <span className={styles.renewalDesc}>Se reinicia al comenzar cada ciclo</span>
               </div>
             </div>
 
             <div
-              className={`${styles.renewalCard} ${renewal === 'manual' ? styles.renewalCardActive : ''}`}
+              className={`${styles.renewalOption} ${renewal === 'manual' ? styles.renewalOptionActive : ''}`}
               onClick={() => setRenewal('manual')}
             >
-              <div className={styles.renewalRadioCircle}>
-                {renewal === 'manual' && <div className={styles.radioInnerDot} />}
+              <div className={`${styles.renewalRadio} ${renewal === 'manual' ? styles.renewalRadioActive : ''}`}>
+                {renewal === 'manual' && <div className={styles.renewalRadioDot} />}
               </div>
-              <div className={styles.renewalText}>
-                <strong>Manual</strong>
-                <span>Se archiva al expirar</span>
+              <div className={styles.renewalTexts}>
+                <span className={styles.renewalTitle}>Manual</span>
+                <span className={styles.renewalDesc}>Se archiva al expirar el período</span>
               </div>
             </div>
           </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Radio: <code>border-radius: 14px; border: 1.5px solid</code></span>
-          <span>Física: <code>border-color activo var(--gold); shadow-sm</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('PresupuestoModal_renewal') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-opciones_seleccionables-PresupuestoModal_renewal', 'Tarjetas de Renovación (PresupuestoModal)')}
+              onClick={() => onSelect('canonical-opciones_seleccionables-PresupuestoModal_renewal', 'Tarjetas con Radio Button (Presupuestos)')}
             >
-              <Star size={13} fill={selectedId?.includes('PresupuestoModal_renewal') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('PresupuestoModal_renewal') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Variante 2: Métodos de Pago (TransaccionModal) */}
+      {/* Opción 2: Botones Cuadrados con Ícono (Métodos de Pago) */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>Método de Pago (TransaccionModal)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/transacciones/TransaccionModal.tsx</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Botones con Ícono en Grilla (Pagos)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.paymentMethodsRow}>
+          <div className={styles.paymentGrid}>
             {[
               { id: 'debito', label: 'Débito', icon: CreditCard },
               { id: 'transferencia', label: 'Transf.', icon: Building2 },
@@ -403,70 +298,58 @@ export function DemoSelectableCards({ selectedId, onSelect }: DemoProps = {}) {
                 <button
                   key={m.id}
                   type="button"
-                  className={`${styles.methodCard} ${active ? styles.methodCardActive : ''}`}
+                  className={`${styles.paymentBtn} ${active ? styles.paymentBtnActive : ''}`}
                   onClick={() => setMetodo(m.id as 'debito' | 'transferencia' | 'credito' | 'efectivo')}
                 >
-                  <Icon size={16} />
+                  <Icon size={18} />
                   <span>{m.label}</span>
                 </button>
               )
             })}
           </div>
         </div>
-        <div className={styles.variantSpecs}>
-          <span>Píldora botón: <code>height: 48px; radius: 10px; gap: 6px</code></span>
-        </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('TransaccionModal_payment') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-opciones_seleccionables-TransaccionModal_payment', 'Métodos de Pago (TransaccionModal)')}
+              onClick={() => onSelect('canonical-opciones_seleccionables-TransaccionModal_payment', 'Botones con Ícono en Grilla (Pagos)')}
             >
-              <Star size={13} fill={selectedId?.includes('TransaccionModal_payment') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('TransaccionModal_payment') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Variante 3: SelectableSurface Oficial (Shared UI) */}
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>SelectableSurface (Shared UI Oficial)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/ui/SelectableSurface/SelectableSurface.tsx</span>
+      {/* Opción 3: SelectableSurface Oficial Compartido */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 3: Superficie Seleccionable Oficial</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
         </div>
         <div className={styles.demoCanvas}>
           <SelectableSurface
             selected={surfaceActive}
             onClick={() => setSurfaceActive(!surfaceActive)}
-            className={styles.surfaceDemoWrap}
           >
-            <div className={styles.surfaceContent}>
-              <div className={styles.surfaceIconWrap}>
-                <Sparkles size={18} />
+            <div className={styles.surfaceDemoBox}>
+              <div className={styles.surfaceIconBox}>
+                <Sparkles size={20} />
               </div>
-              <div className={styles.surfaceInfo}>
-                <strong>Superficie Oficial Estandarizada</strong>
-                <span>Borde accesible, micro-resorte y foco visible</span>
+              <div className={styles.surfaceTextBox}>
+                <strong className={styles.surfaceTextTitle}>Superficie Estándar de Selección</strong>
+                <span className={styles.surfaceTextDesc}>Micro-resorte al clic y borde accesible</span>
               </div>
             </div>
           </SelectableSurface>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Tokens: <code>radius: 14px; transition: 0.15s; outline-offset: 2px</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('SelectableSurface') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-opciones_seleccionables-SelectableSurface', 'SelectableSurface (Shared UI Oficial)')}
+              onClick={() => onSelect('canonical-opciones_seleccionables-SelectableSurface', 'Superficie Seleccionable Oficial')}
             >
-              <Star size={13} fill={selectedId?.includes('SelectableSurface') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('SelectableSurface') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
@@ -476,20 +359,17 @@ export function DemoSelectableCards({ selectedId, onSelect }: DemoProps = {}) {
   )
 }
 
-// ---------------------------------------------------------------------------
-// 3. BOTONES DE ACCIÓN (Action Buttons Demos)
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 3. BOTONES DE ACCIÓN
+// ===========================================================================
 export function DemoActionButtons({ selectedId, onSelect }: DemoProps = {}) {
   return (
     <div className={styles.demoGrid}>
-      {/* Variante 1: Button Oficial (Shared UI) */}
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>Button (Shared UI Oficial)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/ui/Button/Button.tsx</span>
+      {/* Opción 1: Botones Oficiales en Pila */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Botones Compartidos Oficiales</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
         </div>
         <div className={styles.demoCanvas}>
           <div className={styles.buttonsStack}>
@@ -504,53 +384,41 @@ export function DemoActionButtons({ selectedId, onSelect }: DemoProps = {}) {
             </Button>
           </div>
         </div>
-        <div className={styles.variantSpecs}>
-          <span>Tokens: <code>radius: 12px; font-weight: 600; padding: 10px 18px</code></span>
-        </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('Button') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-botones_accion-Button', 'Button (Shared UI Oficial)')}
+              onClick={() => onSelect('canonical-botones_accion-Button', 'Botones Compartidos Oficiales')}
             >
-              <Star size={13} fill={selectedId?.includes('Button') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('Button') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Variante 2: Botones Locales en Modales */}
+      {/* Opción 2: Botones de Modal Lado a Lado */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>Botones HTML Locales en Modales</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/transacciones/TransaccionModal.module.css</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Botones de Diálogo Lado a Lado</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.buttonsStack}>
-            <button type="button" className={styles.modalSubmitBtnLocal}>
-              <span>Confirmar en Modal (10px Radius)</span>
+          <div className={styles.modalButtonsPair}>
+            <button type="button" className={styles.modalCancelBtn}>
+              <span>Cancelar</span>
             </button>
-            <button type="button" className={styles.modalCancelBtnLocal}>
-              <span>Cerrar Diálogo</span>
+            <button type="button" className={styles.modalConfirmBtn}>
+              <span>Confirmar</span>
             </button>
           </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Divergencia: <code>radius: 10px; font-size: 14px; sin tokens compartidos</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('modal_buttons') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-botones_accion-modal_buttons', 'Botones Locales en Modales')}
+              onClick={() => onSelect('canonical-botones_accion-modal_buttons', 'Botones de Diálogo Lado a Lado')}
             >
-              <Star size={13} fill={selectedId?.includes('modal_buttons') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('modal_buttons') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
@@ -560,21 +428,98 @@ export function DemoActionButtons({ selectedId, onSelect }: DemoProps = {}) {
   )
 }
 
-// ---------------------------------------------------------------------------
-// 4. CAMPOS DE ENTRADA & IMPORTES HERO (Inputs Demos)
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 4. CAMPOS DE ENTRADA & INPUTS
+// ===========================================================================
 export function DemoInputs({ selectedId, onSelect }: DemoProps = {}) {
+  const [textVal, setTextVal] = useState('Supermercado Coto')
+  const [searchVal, setSearchVal] = useState('')
+
+  return (
+    <div className={styles.demoGrid}>
+      {/* Opción 1: Input Estándar con Etiqueta Superior */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Campo de Texto Estándar</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.inputFieldStack}>
+            <div className={styles.inputFieldGroup}>
+              <label className={styles.inputFieldLabel}>Descripción del gasto</label>
+              <div className={styles.inputFieldBox}>
+                <input
+                  type="text"
+                  value={textVal}
+                  onChange={(e) => setTextVal(e.target.value)}
+                  placeholder="Ej: Compra de alimentos..."
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('input_standard') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-campos_entrada-input_standard', 'Campo de Texto Estándar')}
+            >
+              <span>{selectedId?.includes('input_standard') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 2: Campo con Ícono de Búsqueda */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Campo de Búsqueda con Ícono</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.inputFieldStack}>
+            <div className={styles.inputFieldGroup}>
+              <label className={styles.inputFieldLabel}>Buscar transacción o categoría</label>
+              <div className={styles.inputFieldBox}>
+                <Search size={16} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                <input
+                  type="text"
+                  value={searchVal}
+                  onChange={(e) => setSearchVal(e.target.value)}
+                  placeholder="Buscar por nombre, comercio..."
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('input_search') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-campos_entrada-input_search', 'Campo de Búsqueda con Ícono')}
+            >
+              <span>{selectedId?.includes('input_search') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ===========================================================================
+// 5. MONTOS Y SALDOS (Financial Displays)
+// ===========================================================================
+export function DemoElementosFinancieros({ selectedId, onSelect }: DemoProps = {}) {
   const [monto, setMonto] = useState<number | null>(45000)
 
   return (
     <div className={styles.demoGrid}>
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>MontoInput (Formateo Monetario Oficial)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/ui/MontoInput/MontoInput.tsx</span>
+      {/* Opción 1: MontoInput Interactivo de Ingreso */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Teclado de Ingreso Monetario (MontoInput)</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
         </div>
         <div className={styles.demoCanvas}>
           <MontoInput
@@ -584,51 +529,92 @@ export function DemoInputs({ selectedId, onSelect }: DemoProps = {}) {
             autoFocus={false}
           />
         </div>
-        <div className={styles.variantSpecs}>
-          <span>Monto: <code>font-size: 36px; font-weight: 700; letter-spacing: -0.02em</code></span>
-          <span>Selector moneda: <code>badge ARS / USD conmutador dinámico</code></span>
-        </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('MontoInput') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-campos_entrada-MontoInput', 'MontoInput (Formateo Monetario Oficial)')}
+              onClick={() => onSelect('canonical-elementos_financieros-MontoInput', 'Teclado de Ingreso Monetario (MontoInput)')}
             >
-              <Star size={13} fill={selectedId?.includes('MontoInput') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('MontoInput') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
+      {/* Opción 2: Saldo Destacado Hero (Dashboard) */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>Monto Hero Card (PagarResumenModal)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/tarjetas/PagarResumenModal.module.css</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Saldo Destacado Principal (Dashboard / Billeteras)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.montoHeroCardDemo}>
-            <span className={styles.montoHeroLabel}>TOTAL A LIQUIDAR</span>
-            <div className={styles.montoHeroAmount}>$ 161.700</div>
+          <div className={styles.heroBalanceCard}>
+            <span className={styles.heroBalanceLabel}>SALDO DISPONIBLE TOTAL</span>
+            <div className={styles.heroBalanceAmount}>$ 1.485.200,00</div>
           </div>
         </div>
-        <div className={styles.variantSpecs}>
-          <span>Card: <code>bg: var(--surface-3); radius: 16px; padding: 16px 20px</code></span>
-          <span>Display: <code>font-size: 32px; font-weight: 800; color: var(--text)</code></span>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('saldo_hero') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-elementos_financieros-saldo_hero', 'Saldo Destacado Principal (Dashboard / Billeteras)')}
+            >
+              <span>{selectedId?.includes('saldo_hero') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 3: Monto en Tarjeta Gris (PagarResumenModal) */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 3: Tarjeta de Monto a Liquidar (Liquidación)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.pagoResumenCard}>
+            <span className={styles.pagoResumenLabel}>TOTAL A LIQUIDAR</span>
+            <div className={styles.pagoResumenAmount}>$ 161.700</div>
+          </div>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('MontoHeroCard') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-campos_entrada-MontoHeroCard', 'Monto Hero Card (PagarResumenModal)')}
+              onClick={() => onSelect('canonical-elementos_financieros-MontoHeroCard', 'Tarjeta de Monto a Liquidar (Liquidación)')}
             >
-              <Star size={13} fill={selectedId?.includes('MontoHeroCard') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('MontoHeroCard') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 4: Movimientos Positivos y Negativos */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 4: Movimientos con Color Semántico (+ Verde / - Rojo)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.txAmountsCompare}>
+            <div className={styles.txAmountRow}>
+              <span className={styles.txAmountDesc}>Sueldo mensual</span>
+              <span className={styles.txAmountPositive}>+$ 1.250.000</span>
+            </div>
+            <div className={styles.txAmountRow}>
+              <span className={styles.txAmountDesc}>Supermercado</span>
+              <span className={styles.txAmountNegative}>-$ 48.300</span>
+            </div>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('tx_semantic') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-elementos_financieros-tx_semantic', 'Movimientos con Color Semántico (+ Verde / - Rojo)')}
+            >
+              <span>{selectedId?.includes('tx_semantic') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
@@ -637,19 +623,17 @@ export function DemoInputs({ selectedId, onSelect }: DemoProps = {}) {
   )
 }
 
-// ---------------------------------------------------------------------------
-// 5. TARJETAS Y PANELES (Cards & Rows In Vivo)
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 6. TARJETAS DE RESUMEN Y BILLETERAS
+// ===========================================================================
 export function DemoTarjetasPaneles({ selectedId, onSelect }: DemoProps = {}) {
   return (
     <div className={styles.demoGrid}>
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>BilleteraCard (Producción In Vivo)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/billeteras/BilleteraCard.tsx</span>
+      {/* Opción 1: BilleteraCard Oficial en Vivo */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Tarjeta de Cuenta Bancaria (BilleteraCard)</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
         </div>
         <div className={styles.demoCanvas}>
           <BilleteraCard
@@ -657,30 +641,24 @@ export function DemoTarjetasPaneles({ selectedId, onSelect }: DemoProps = {}) {
             disableNavigation
           />
         </div>
-        <div className={styles.variantSpecs}>
-          <span>Tokens: <code>radius: 18px; elevación con micro-interacción de opciones</code></span>
-        </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('BilleteraCard') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-tarjetas_paneles-BilleteraCard', 'BilleteraCard (Producción In Vivo)')}
+              onClick={() => onSelect('canonical-tarjetas_paneles-BilleteraCard', 'Tarjeta de Cuenta Bancaria (BilleteraCard)')}
             >
-              <Star size={13} fill={selectedId?.includes('BilleteraCard') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('BilleteraCard') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>TransaccionRow (Fila Transacción In Vivo)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/transacciones/TransaccionRow.tsx</span>
+      {/* Opción 2: Fila de Movimiento en Vivo */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Renglón de Movimiento (TransaccionRow)</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
         </div>
         <div className={styles.demoCanvas}>
           <TransaccionRow
@@ -688,17 +666,13 @@ export function DemoTarjetasPaneles({ selectedId, onSelect }: DemoProps = {}) {
             billetera={MOCK_BILLETERA}
           />
         </div>
-        <div className={styles.variantSpecs}>
-          <span>Tokens: <code>radius: 12px; icon container: 40px; amount color semántico</code></span>
-        </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('TransaccionRow') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-tarjetas_paneles-TransaccionRow', 'TransaccionRow (Fila Transacción In Vivo)')}
+              onClick={() => onSelect('canonical-tarjetas_paneles-TransaccionRow', 'Renglón de Movimiento (TransaccionRow)')}
             >
-              <Star size={13} fill={selectedId?.includes('TransaccionRow') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('TransaccionRow') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
@@ -708,98 +682,113 @@ export function DemoTarjetasPaneles({ selectedId, onSelect }: DemoProps = {}) {
   )
 }
 
-// ---------------------------------------------------------------------------
-// 6. MODALES Y DIÁLOGOS (Tokens & Unrenderable Showcases)
-// ---------------------------------------------------------------------------
-export function DemoModalesDialogos() {
+// ===========================================================================
+// 7. VENTANAS Y MODALES (DISEÑO DE BORDES Y CABECERAS)
+// ===========================================================================
+export function DemoModalesDialogos({ selectedId, onSelect }: DemoProps = {}) {
   return (
     <div className={styles.demoGrid}>
-      {/* Componente No Renderizable 1: WhatsAppQrModal */}
-      <div className={`${styles.variantCard} ${styles.unrenderableCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>WhatsAppQrModal (Vinculación Admin)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeBlocked}`}>No Renderizable Aislado</span>
-          </div>
-          <span className={styles.variantFile}>src/components/admin/WhatsAppQrModal.tsx</span>
-        </div>
-        <div className={styles.unrenderableCanvas}>
-          <div className={styles.unrenderableReasonHeader}>
-            <AlertTriangle size={16} />
-            <span>Bloqueo Técnico de Aislamiento</span>
-          </div>
-          <p className={styles.unrenderableReasonText}>
-            Este componente mantiene una conexión bidireccional por WebSocket con el servicio de sesión de WhatsApp Baileys en el backend. Instanciarlo en un catálogo estático provocaría reconexiones fantasma y mutaciones no deseadas.
-          </p>
-          <div className={styles.unrenderableBlockerTag}>
-            <code>Bloqueador: WebSocket / Sesión Activa de Dispositivo</code>
-          </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Directriz: <code>Auditado estáticamente vía AST; dialog width: 440px; radius: 16px</code></span>
-        </div>
-      </div>
-
-      {/* Componente No Renderizable 2: TransaccionModal Completo */}
-      <div className={`${styles.variantCard} ${styles.unrenderableCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>TransaccionModal (Diálogo Completo)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeBlocked}`}>No Renderizable Completo</span>
-          </div>
-          <span className={styles.variantFile}>src/components/transacciones/TransaccionModal.tsx</span>
-        </div>
-        <div className={styles.unrenderableCanvas}>
-          <div className={styles.unrenderableReasonHeader}>
-            <AlertTriangle size={16} />
-            <span>Bloqueo de Estado Global Vivo</span>
-          </div>
-          <p className={styles.unrenderableReasonText}>
-            El modal completo acopla 4 queries de React Query (billeteras, categorías, tarjetas, cuotas) y el hook de mutación `useCrearTransaccion`. Sus componentes hijos (SegmentedBar, MontoInput, SelectableSurface) sí son auditados y renderizados individualmente.
-          </p>
-          <div className={styles.unrenderableBlockerTag}>
-            <code>Bloqueador: React Query Cache + Mutation Tree</code>
-          </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Directriz: <code>Subcomponentes aislados renderizados en vivo en sus respectivas categorías</code></span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// 7. ELEMENTOS INFORMATIVOS & BADGES
-// ---------------------------------------------------------------------------
-export function DemoElementosInformativos({ selectedId, onSelect }: DemoProps = {}) {
-  return (
-    <div className={styles.demoGrid}>
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>DebitoAutomaticoBadge (Producción In Vivo)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge.tsx</span>
+      {/* Opción 1: Borde Suave 16px */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Ventana con Esquinas Suaves (16px de Redondez)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <DebitoAutomaticoBadge />
+          <div className={`${styles.modalFrameMockup} ${styles.modalFrameRadius16}`}>
+            <div className={styles.modalFrameHeader}>
+              <span className={styles.modalFrameTitle}>Nueva Transacción</span>
+              <button type="button" className={styles.modalFrameClose}><X size={14} /></button>
+            </div>
+            <div className={styles.modalFrameBody}>
+              <p className={styles.modalFrameBodyText}>
+                Diseño compacto con bordes de 16px. Ideal para pantallas con mucha densidad de información.
+              </p>
+            </div>
+            <div className={styles.modalFrameFooter}>
+              <button type="button" className={styles.modalCancelBtn}>Cerrar</button>
+              <button type="button" className={styles.modalConfirmBtn}>Guardar</button>
+            </div>
           </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Tokens: <code>radius: 6px; font-size: 11px; bg: surface-3; color: gold</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
-              className={`${styles.selectInDemoBtn} ${selectedId?.includes('DebitoAutomaticoBadge') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-elementos_informativos-DebitoAutomaticoBadge', 'DebitoAutomaticoBadge (Producción In Vivo)')}
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('modal_16px') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-modales_dialogos-modal_16px', 'Ventana con Esquinas Suaves (16px)')}
             >
-              <Star size={13} fill={selectedId?.includes('DebitoAutomaticoBadge') ? 'currentColor' : 'none'} />
-              <span>{selectedId?.includes('DebitoAutomaticoBadge') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+              <span>{selectedId?.includes('modal_16px') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 2: Borde Moderno 20px */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Ventana Equilibrada (20px de Redondez)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={`${styles.modalFrameMockup} ${styles.modalFrameRadius20}`}>
+            <div className={styles.modalFrameHeader}>
+              <span className={styles.modalFrameTitle}>Configurar Presupuesto</span>
+              <button type="button" className={styles.modalFrameClose}><X size={14} /></button>
+            </div>
+            <div className={styles.modalFrameBody}>
+              <p className={styles.modalFrameBodyText}>
+                Curvatura intermedia de 20px con sombras suaves. Se siente moderna sin perder estructura.
+              </p>
+            </div>
+            <div className={styles.modalFrameFooter}>
+              <button type="button" className={styles.modalCancelBtn}>Cerrar</button>
+              <button type="button" className={styles.modalConfirmBtn}>Aceptar</button>
+            </div>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('modal_20px') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-modales_dialogos-modal_20px', 'Ventana Equilibrada (20px)')}
+            >
+              <span>{selectedId?.includes('modal_20px') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 3: Borde Amplio Curvado 24px (Apple Style) */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 3: Ventana Amplia Curvada (24px - Estilo Apple)</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={`${styles.modalFrameMockup} ${styles.modalFrameRadius24}`}>
+            <div className={styles.modalFrameHeader}>
+              <span className={styles.modalFrameTitle}>Confirmar Transferencia</span>
+              <button type="button" className={styles.modalFrameClose}><X size={14} /></button>
+            </div>
+            <div className={styles.modalFrameBody}>
+              <p className={styles.modalFrameBodyText}>
+                Curvatura amplia de 24px igual a las tarjetas y modales oficiales de Argentum. Muy suave a la vista.
+              </p>
+            </div>
+            <div className={styles.modalFrameFooter}>
+              <button type="button" className={styles.modalCancelBtn}>Cerrar</button>
+              <button type="button" className={styles.modalConfirmBtn}>Transferir</button>
+            </div>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('modal_24px') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-modales_dialogos-modal_24px', 'Ventana Amplia Curvada (24px - Estilo Apple)')}
+            >
+              <span>{selectedId?.includes('modal_24px') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
@@ -808,77 +797,464 @@ export function DemoElementosInformativos({ selectedId, onSelect }: DemoProps = 
   )
 }
 
-// ---------------------------------------------------------------------------
-// 8. ESTADOS DE INTERFAZ & FEEDBACK
-// ---------------------------------------------------------------------------
-export function DemoInterfaceStates({ selectedId, onSelect }: DemoProps = {}) {
+// ===========================================================================
+// 8. SELECTORES ESPECIALES (Categorías, País, Colores)
+// ===========================================================================
+export function DemoSeleccionAvanzada({ selectedId, onSelect }: DemoProps = {}) {
+  const [selectedColor, setSelectedColor] = useState('#2563EB')
+  const [selectedCat, setSelectedCat] = useState('supermercado')
+
+  const PALETTE = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6']
+
   return (
     <div className={styles.demoGrid}>
-      <div className={`${styles.variantCard} ${styles.sharedReferenceCard}`}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={`${styles.variantTag} ${styles.tagShared}`}>LunarLoader (Animación Identitaria)</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeInVivo}`}>Componente Original</span>
+      {/* Opción 1: Selector de Color de Cuenta */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Paleta Circular de Colores (Billeteras)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {PALETTE.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setSelectedColor(c)}
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: '50%',
+                  backgroundColor: c,
+                  border: selectedColor === c ? '3px solid #fff' : '2px solid transparent',
+                  outline: selectedColor === c ? `2px solid ${c}` : 'none',
+                  cursor: 'pointer',
+                  transition: 'all 160ms ease',
+                }}
+              />
+            ))}
           </div>
-          <span className={styles.variantFile}>src/components/ui/LunarLoader/LunarLoader.tsx</span>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('color_palette') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-seleccion_avanzada-color_palette', 'Paleta Circular de Colores (Billeteras)')}
+            >
+              <span>{selectedId?.includes('color_palette') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 2: Selector de Categoría con Ícono */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Selector de Categorías en Tarjetas</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, width: '100%' }}>
+            {[
+              { id: 'supermercado', label: 'Alimentos', color: '#10B981' },
+              { id: 'transporte', label: 'Transporte', color: '#3B82F6' },
+              { id: 'servicios', label: 'Servicios', color: '#F59E0B' },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCat(cat.id)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '12px 6px',
+                  borderRadius: 12,
+                  background: selectedCat === cat.id ? 'rgba(201, 162, 39, 0.12)' : 'var(--surface)',
+                  border: selectedCat === cat.id ? '1.5px solid var(--gold)' : '1px solid var(--border)',
+                  color: selectedCat === cat.id ? 'var(--gold)' : 'var(--text)',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: 'inherit',
+                }}
+              >
+                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: cat.color }} />
+                <span>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('category_picker') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-seleccion_avanzada-category_picker', 'Selector de Categorías en Tarjetas')}
+            >
+              <span>{selectedId?.includes('category_picker') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ===========================================================================
+// 9. MENÚS Y NAVEGACIÓN
+// ===========================================================================
+export function DemoNavegacion({ selectedId, onSelect }: DemoProps = {}) {
+  const [navTab, setNavTab] = useState('dashboard')
+
+  return (
+    <div className={styles.demoGrid}>
+      {/* Opción 1: Barra Superior Flotante en Cápsula */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Barra Superior Flotante en Cápsula (Desktop)</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.navPillMockup}>
+            {[
+              { id: 'dashboard', label: 'Inicio', icon: Home },
+              { id: 'transacciones', label: 'Movimientos', icon: Layers },
+              { id: 'presupuestos', label: 'Presupuestos', icon: PieChart },
+            ].map((item) => {
+              const Icon = item.icon
+              const active = navTab === item.id
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`${styles.navPillItem} ${active ? styles.navPillItemActive : ''}`}
+                  onClick={() => setNavTab(item.id)}
+                >
+                  <Icon size={14} />
+                  <span>{item.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('nav_floating') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-navegacion-nav_floating', 'Barra Superior Flotante en Cápsula')}
+            >
+              <span>{selectedId?.includes('nav_floating') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 2: Barra de Navegación Inferior Móvil (Dock) */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Menú Inferior Móvil (Dock Táctil)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.mobileDockMockup}>
+            {[
+              { id: 'dashboard', label: 'Inicio', icon: Home },
+              { id: 'transacciones', label: 'Gastos', icon: Layers },
+              { id: 'metas', label: 'Metas', icon: Target },
+            ].map((item) => {
+              const Icon = item.icon
+              const active = navTab === item.id
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`${styles.mobileDockItem} ${active ? styles.mobileDockItemActive : ''}`}
+                  onClick={() => setNavTab(item.id)}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('nav_dock') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-navegacion-nav_dock', 'Menú Inferior Móvil (Dock Táctil)')}
+            >
+              <span>{selectedId?.includes('nav_dock') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ===========================================================================
+// 10. AVISOS, BADGES Y ALERTAS
+// ===========================================================================
+export function DemoElementosInformativos({ selectedId, onSelect }: DemoProps = {}) {
+  return (
+    <div className={styles.demoGrid}>
+      {/* Opción 1: Etiquetas de Estado y Badges */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Etiquetas de Estado (Badges)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.badgesGroupWrap}>
+            <span className={`${styles.badgePill} ${styles.badgeSuccess}`}>
+              <CheckCircle2 size={12} /> Confirmada
+            </span>
+            <span className={`${styles.badgePill} ${styles.badgeWarning}`}>
+              <AlertTriangle size={12} /> Pendiente
+            </span>
+            <span className={`${styles.badgePill} ${styles.badgeGold}`}>
+              <DebitoAutomaticoBadge />
+            </span>
+            <span className={`${styles.badgePill} ${styles.badgeDanger}`}>
+              Rechazada
+            </span>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('badges_pack') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-elementos_informativos-badges_pack', 'Etiquetas de Estado (Badges)')}
+            >
+              <span>{selectedId?.includes('badges_pack') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 2: Banners de Alerta en Pantalla */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Banners de Alerta en Pantalla</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+            <div className={`${styles.alertBoxBanner} ${styles.alertBoxSuccess}`}>
+              <CheckCircle2 size={16} />
+              <span>Pago liquidado exitosamente en cuenta Galicia</span>
+            </div>
+            <div className={`${styles.alertBoxBanner} ${styles.alertBoxWarning}`}>
+              <AlertTriangle size={16} />
+              <span>Tu presupuesto mensual superó el 85 %</span>
+            </div>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('alert_banners') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-elementos_informativos-alert_banners', 'Banners de Alerta en Pantalla')}
+            >
+              <span>{selectedId?.includes('alert_banners') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ===========================================================================
+// 11. PANTALLAS DE CARGA Y VACÍAS
+// ===========================================================================
+export function DemoEstadosInterfaz({ selectedId, onSelect }: DemoProps = {}) {
+  return (
+    <div className={styles.demoGrid}>
+      {/* Opción 1: LunarLoader Identitario */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Animación de Carga Lunar (LunarLoader)</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
         </div>
         <div className={styles.demoCanvas}>
           <div className={styles.loaderRow}>
-            <LunarLoader size={24} />
-            <LunarLoader size={36} />
-            <LunarLoader size={48} />
+            <LunarLoader size={26} />
+            <LunarLoader size={38} />
+            <LunarLoader size={50} />
           </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Física: <code>Órbita elíptica lunar con destello ámbar/cobre</code></span>
-          <span>Tallas: <code>24px, 36px, 48px, 64px</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
               className={`${styles.selectInDemoBtn} ${selectedId?.includes('LunarLoader') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-estados_interfaz-LunarLoader', 'LunarLoader (Animación Identitaria)')}
+              onClick={() => onSelect('canonical-estados_interfaz-LunarLoader', 'Animación de Carga Lunar (LunarLoader)')}
             >
-              <Star size={13} fill={selectedId?.includes('LunarLoader') ? 'currentColor' : 'none'} />
               <span>{selectedId?.includes('LunarLoader') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}
       </div>
 
+      {/* Opción 2: Tarjeta Skeleton con Efecto Shimmer */}
       <div className={styles.variantCard}>
-        <div className={styles.variantHeader}>
-          <div className={styles.headerTopRow}>
-            <span className={styles.variantTag}>Alertas y Badges de Estado</span>
-            <span className={`${styles.capabilityBadge} ${styles.badgeCssModule}`}>CSS Module Original</span>
-          </div>
-          <span className={styles.variantFile}>src/components/ui</span>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Esqueleto de Carga (Skeleton Shimmer)</h4>
         </div>
         <div className={styles.demoCanvas}>
-          <div className={styles.alertStack}>
-            <div className={`${styles.alertBox} ${styles.alertSuccess}`}>
-              <CheckCircle2 size={16} />
-              <span>Pago liquidado correctamente en cuenta Galicia</span>
+          <div className={styles.skeletonPreviewCard}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div className={styles.skeletonCircle} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div className={styles.skeletonLine} style={{ width: '60%' }} />
+                <div className={styles.skeletonLine} style={{ width: '40%' }} />
+              </div>
             </div>
-            <div className={`${styles.alertBox} ${styles.alertWarning}`}>
-              <AlertTriangle size={16} />
-              <span>Vencimiento estimado en 4 días hábiles</span>
-            </div>
+            <div className={styles.skeletonLine} style={{ width: '100%' }} />
           </div>
-        </div>
-        <div className={styles.variantSpecs}>
-          <span>Radio: <code>10px; padding: 10px 14px; gap: 8px</code></span>
         </div>
         {onSelect && (
           <div className={styles.cardActionBar}>
             <button
               type="button"
-              className={`${styles.selectInDemoBtn} ${selectedId?.includes('AlertasBadges') ? styles.selectedInDemoBtnActive : ''}`}
-              onClick={() => onSelect('canonical-estados_interfaz-AlertasBadges', 'Alertas y Badges de Estado')}
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('skeleton_shimmer') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-estados_interfaz-skeleton_shimmer', 'Esqueleto de Carga (Skeleton Shimmer)')}
             >
-              <Star size={13} fill={selectedId?.includes('AlertasBadges') ? 'currentColor' : 'none'} />
-              <span>{selectedId?.includes('AlertasBadges') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+              <span>{selectedId?.includes('skeleton_shimmer') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 3: Pantalla Vacía Oficial */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 3: Pantalla Vacía Oficial (EmptyState)</h4>
+          <span className={`${styles.cardTag} ${styles.cardTagOfficial}`}>Oficial</span>
+        </div>
+        <div className={styles.demoCanvas}>
+          <EmptyState
+            title="Sin transacciones aún"
+            description="Tus movimientos aparecerán aquí cuando crees el primero."
+            actionLabel="Crear gasto"
+            onActionClick={() => {}}
+            variant="compact"
+          />
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('EmptyState') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-estados_interfaz-EmptyState', 'Pantalla Vacía Oficial (EmptyState)')}
+            >
+              <span>{selectedId?.includes('EmptyState') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ===========================================================================
+// 12. CONMUTADORES Y AJUSTES ESPECIALES
+// ===========================================================================
+export function DemoControlesEspeciales({ selectedId, onSelect }: DemoProps = {}) {
+  const [switchA, setSwitchA] = useState(true)
+  const [switchB, setSwitchB] = useState(false)
+  const [checkA, setCheckA] = useState(true)
+
+  return (
+    <div className={styles.demoGrid}>
+      {/* Opción 1: Conmutadores Switch Estilo iOS */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 1: Conmutadores Deslizables (Switches ON/OFF)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div className={styles.switchesStack}>
+            <div className={styles.switchRow} onClick={() => setSwitchA(!switchA)}>
+              <span className={styles.switchLabel}>Notificaciones push de gastos</span>
+              <div className={`${styles.switchTrack} ${switchA ? styles.switchTrackOn : ''}`}>
+                <div className={`${styles.switchThumb} ${switchA ? styles.switchThumbOn : ''}`} />
+              </div>
+            </div>
+
+            <div className={styles.switchRow} onClick={() => setSwitchB(!switchB)}>
+              <span className={styles.switchLabel}>Ocultar saldos en pantalla</span>
+              <div className={`${styles.switchTrack} ${switchB ? styles.switchTrackOn : ''}`}>
+                <div className={`${styles.switchThumb} ${switchB ? styles.switchThumbOn : ''}`} />
+              </div>
+            </div>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('switches_ios') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-controles_especiales-switches_ios', 'Conmutadores Deslizables (Switches ON/OFF)')}
+            >
+              <span>{selectedId?.includes('switches_ios') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Opción 2: Casilla de Verificación (Checkbox) */}
+      <div className={styles.variantCard}>
+        <div className={styles.cardHeader}>
+          <h4 className={styles.cardTitle}>Opción 2: Casilla de Verificación (Checkbox)</h4>
+        </div>
+        <div className={styles.demoCanvas}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              cursor: 'pointer',
+              padding: '12px 16px',
+              background: 'var(--surface)',
+              borderRadius: 12,
+              border: '1px solid var(--border)',
+              width: '100%',
+            }}
+            onClick={() => setCheckA(!checkA)}
+          >
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 7,
+                backgroundColor: checkA ? 'var(--gold)' : 'var(--surface-alt)',
+                border: checkA ? '2px solid var(--gold)' : '2px solid var(--border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                transition: 'all 160ms ease',
+              }}
+            >
+              {checkA && <Check size={14} strokeWidth={3} />}
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+              Repetir automáticamente cada mes
+            </span>
+          </div>
+        </div>
+        {onSelect && (
+          <div className={styles.cardActionBar}>
+            <button
+              type="button"
+              className={`${styles.selectInDemoBtn} ${selectedId?.includes('checkbox_styled') ? styles.selectedInDemoBtnActive : ''}`}
+              onClick={() => onSelect('canonical-controles_especiales-checkbox_styled', 'Casilla de Verificación (Checkbox)')}
+            >
+              <span>{selectedId?.includes('checkbox_styled') ? '✅ Diseño oficial elegido' : '⭐ Elegir este diseño'}</span>
             </button>
           </div>
         )}

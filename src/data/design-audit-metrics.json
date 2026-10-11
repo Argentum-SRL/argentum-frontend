@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-10-10T20:22:47.252Z",
+  "executionTimeMs": 2447,
+  "scannedFiles": {
+    "total": 444,
+    "tsxAndTs": 321,
+    "css": 123,
+    "cssRules": 6810
+  },
+  "inventorySummary": {
+    "totalVariantsDetected": 3511,
+    "sharedComponents": 135,
+    "localImplementations": 3376,
+    "divergencesAndDuplications": 3376,
+    "uniqueSharedPrimitives": 135
+  },
+  "categoryDistribution": {
+    "selectores_segmentados": 47,
+    "opciones_seleccionables": 94,
+    "campos_entrada": 181,
+    "seleccion_avanzada": 8,
+    "botones_accion": 554,
+    "tarjetas_paneles": 403,
+    "modales_dialogos": 1713,
+    "navegacion": 25,
+    "elementos_informativos": 230,
+    "estados_interfaz": 149,
+    "elementos_financieros": 85,
+    "controles_especiales": 22
+  },
+  "criticalDivergenceFamilies": [
+    {
+      "family": "selectores_segmentados",
+      "description": "Múltiples selectores de píldoras reimplementados localmente con radios divergentes (12px vs 8px vs full pill), alturas dispares (36px, 40px, 48px) y variaciones de sombras.",
+      "examples": [
+        "TransaccionModal (pill egreso/ingreso)",
+        "PagarResumenModal (pill total/otro monto)",
+        "PresupuestoModal (periodo semanal/quincenal/mensual)",
+        "GoalContributionModal (aporte/retiro)",
+        "SegmentedControl (componente compartido en src/components/ui)"
+      ]
+    },
+    {
+      "family": "opciones_seleccionables",
+      "description": "Tarjetas de selección de métodos de pago vs renovación vs billeteras con diferencias en el radio del borde, estados de foco y animación de selección.",
+      "examples": [
+        "PresupuestoModal (renewalCard con radioCircle)",
+        "TransaccionModal (metodoPago cards)",
+        "GoalContributionModal (wallet cards)",
+        "SelectableSurface (superficie seleccionable compartida)"
+      ]
+    },
+    {
+      "family": "botones_accion",
+      "description": "Botones primarios y secundarios creados como <button> HTML con CSS local conviviendo con el componente compartido <Button>.",
+      "examples": [
+        "Button (src/components/ui/Button)",
+        "Botones de envío en modales locales con border-radius 10px vs 14px"
+      ]
+    },
+    {
+      "family": "modales_dialogos",
+      "description": "Encabezados de modal con títulos de 18px a 22px, botones de cierre con distintos tamaños de icono (16px a 20px) y botones de pie de página con gaps variables.",
+      "examples": [
+        "Modal (src/components/ui/Modal)",
+        "PagarResumenModal",
+        "TransaccionModal",
+        "GoalContributionModal",
+        "PresupuestoModal"
+      ]
+    }
+  ]
+}

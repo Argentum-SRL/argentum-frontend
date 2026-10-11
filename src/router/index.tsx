@@ -27,6 +27,7 @@ const LoQueSeRepitePage = lazy(() => import('@/pages/app/lo-que-se-repite/LoQueS
 const PerfilPage = lazy(() => import('@/pages/app/perfil/PerfilPage'))
 const ToolsPage = lazy(() => import('@/pages/app/tools/ToolsPage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
+const DisenoPage = lazy(() => import('@/pages/admin/diseno/DisenoPage'))
 const AnimacionPreviewPage = lazy(() => import('@/pages/admin/AnimacionPreviewPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 const TermsPage = lazy(() => import('@/pages/TermsPage'))
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
             errorElement: <PageErrorBoundary />,
             children: [
               { path: '/admin', element: <AdminPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/diseño', element: <DisenoPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/diseno', element: <DisenoPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/admin/diseno', element: <DisenoPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/diseno', element: <DisenoPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/herramientas', element: <ToolsPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/lo-que-se-repite', element: <LoQueSeRepitePage />, errorElement: <PageErrorBoundary /> },
             ],

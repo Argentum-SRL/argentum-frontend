@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
+import { Layout } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import adminService from '@/services/adminService'
 import type { UsuarioAdminResumen, UsuarioAdmin, FiltrosAdmin, AdminStats } from '@/types/admin'
@@ -385,6 +387,15 @@ export default function AdminPage() {
           </p>
         </div>
         <div className={styles.headerActions}>
+          <Link
+            to="/diseño"
+            className={styles.refreshBtn}
+            style={{ textDecoration: 'none' }}
+            title="Explorar el Catálogo de Diseño de Argentum"
+          >
+            <Layout size={16} className={styles.btnIcon} />
+            Catálogo de Diseño
+          </Link>
           <button
             className={styles.refreshBtn}
             onClick={handleRefreshAll}

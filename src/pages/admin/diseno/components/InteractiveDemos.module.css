@@ -1,0 +1,699 @@
+.demoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.variantCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--elevation-xs);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.variantCard:hover {
+  box-shadow: var(--elevation-sm);
+}
+
+.sharedReferenceCard {
+  border-color: rgba(201, 162, 39, 0.4);
+  background: linear-gradient(180deg, rgba(201, 162, 39, 0.03) 0%, var(--surface) 100%);
+}
+
+.variantHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.variantTag {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tagShared {
+  color: var(--gold);
+}
+
+.variantFile {
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demoCanvas {
+  background: var(--page);
+  border-radius: 12px;
+  padding: 16px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border);
+}
+
+.variantSpecs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-2);
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.variantSpecs code {
+  background: var(--surface-alt);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+/* ── 1. SELECTORES SEGMENTADOS ─────────────────────────── */
+
+/* TransaccionModal Segmented Bar */
+.transaccionSegmentedBar {
+  display: flex;
+  width: 100%;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.transaccionPill {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.transaccionPill:hover:not(.transaccionPillActive) {
+  color: var(--text);
+}
+
+.transaccionPillActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  box-shadow: var(--elevation-sm);
+  border-color: var(--border) !important;
+}
+
+/* PagarResumenModal Segmented Bar */
+.pagarResumenSegmentedBar {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.pagarResumenPill {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.pagarResumenPillActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  transform: translateY(-1.5px) scale(1.02);
+  box-shadow: var(--elevation-sm);
+  border-color: var(--border) !important;
+}
+
+/* PresupuestoModal Period Wrap */
+.presupuestoPeriodWrap {
+  display: flex;
+  width: 100%;
+  background: var(--surface-3);
+  padding: 3px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.presupuestoPeriodBtn {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 180ms ease;
+}
+
+.presupuestoPeriodBtnActive {
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  box-shadow: var(--elevation-sm);
+}
+
+[data-theme="dark"] .presupuestoPeriodBtnActive {
+  color: var(--text) !important;
+}
+
+/* Goal Segmented Bar */
+.goalSegmentedBar {
+  display: flex;
+  width: 100%;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 14px;
+  gap: 4px;
+}
+
+.goalPill {
+  flex: 1;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 180ms ease;
+}
+
+.goalPillActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  box-shadow: var(--elevation-sm);
+}
+
+/* ── 2. OPCIONES SELECCIONABLES ─────────────────────────── */
+.renewalGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.renewalCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.renewalCard:hover {
+  border-color: var(--primary-light);
+}
+
+.renewalCardActive {
+  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: var(--elevation-xs);
+}
+
+.renewalLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.renewalIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+}
+
+.renewalInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.renewalTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.renewalDesc {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.radioCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 180ms ease;
+}
+
+.radioCircleActive {
+  border-color: var(--primary);
+}
+
+.radioDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* Payment Method Row */
+.paymentMethodRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.paymentCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 4px;
+  min-height: 60px;
+  background: var(--surface-alt);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 180ms ease;
+}
+
+.paymentCard:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.paymentCardActive {
+  background: var(--surface) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  box-shadow: var(--elevation-sm);
+  font-weight: 700;
+}
+
+[data-theme="dark"] .paymentCardActive {
+  color: var(--text) !important;
+  border-color: var(--gold) !important;
+}
+
+/* Wallet Mini Cards */
+.walletCardsRow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.walletMiniCard {
+  flex: 1;
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  box-shadow: var(--elevation-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.walletMiniCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-md);
+}
+
+.walletGalicia {
+  background: linear-gradient(135deg, #FF6600 0%, #E64A00 100%);
+}
+
+.walletAhorro {
+  background: linear-gradient(135deg, #0D2045 0%, #1A3568 100%);
+}
+
+.walletActive {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.walletCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.walletCardName {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.walletBadge {
+  font-size: 9px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.walletCardSaldo {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.surfaceDemo {
+  width: 100%;
+}
+
+.surfaceInner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.surfaceInner strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.surfaceInner p {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+/* ── 3. BOTONES DE ACCIÓN ───────────────────────────────── */
+.buttonFlexRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.modalFooterRow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.localCancelBtn {
+  flex: 1;
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.localCancelBtn:hover {
+  background: var(--surface-alt);
+}
+
+.localSubmitBtn {
+  flex: 2;
+  height: 46px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 180ms ease;
+  box-shadow: var(--elevation-sm);
+}
+
+.localSubmitBtn:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+/* ── 4. CAMPOS DE ENTRADA ───────────────────────────────── */
+.montoHeroCardDemo {
+  background: var(--surface-3);
+  border-radius: 16px;
+  padding: 16px 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.montoHeroLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  letter-spacing: 0.05em;
+}
+
+.montoHeroAmount {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+/* ── 5. ESTADOS & FEEDBACK ─────────────────────────────── */
+.loaderRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.alertStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.alertBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.alertSuccess {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(26, 122, 74, 0.2);
+}
+
+.alertWarning {
+  background: rgba(201, 162, 39, 0.12);
+  color: var(--warning);
+  border: 1px solid rgba(201, 162, 39, 0.25);
+}
+
+/* ── Capability Badges ─────────────────────────────────────────────────────── */
+.headerTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.capabilityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.badgeInVivo {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.badgeCssModule {
+  background: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+}
+
+.badgeBlocked {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+/* ── Unrenderable Isolation Blocked Cards ─────────────────────────────────── */
+.unrenderableCard {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.03) 0%, var(--surface) 100%);
+}
+
+.unrenderableCanvas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface-2);
+  border-radius: 12px;
+  border: 1px dashed rgba(245, 158, 11, 0.35);
+}
+
+.unrenderableReasonHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #d97706;
+}
+
+.unrenderableReasonText {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.unrenderableBlockerTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: var(--text-2);
+  font-family: monospace;
+}
+
+@media (max-width: 480px) {
+  .demoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Botón de Selección Directa en Demostración ── */
+.cardActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  margin-top: 8px;
+}
+
+.selectInDemoBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 160ms ease;
+}
+
+.selectInDemoBtn:hover {
+  background: var(--surface);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.selectedInDemoBtnActive {
+  background: rgba(201, 162, 39, 0.16) !important;
+  color: var(--gold) !important;
+  border-color: rgba(201, 162, 39, 0.6) !important;
+  box-shadow: 0 0 10px rgba(201, 162, 39, 0.2);
+}
+
+
+

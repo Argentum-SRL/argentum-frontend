@@ -1,0 +1,305 @@
+.findingsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.findingsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.headerTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.headerSubtitle {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.criticalFamiliesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitleBlock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.warningIcon {
+  color: #D9822B;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.familyAlertCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid #D9822B;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.familyAlertHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.familyNameTag {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.03em;
+}
+
+.familyDivergenceBadge {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(217, 130, 43, 0.15);
+  color: #D9822B;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.familyDescription {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+
+.examplesList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--surface-alt);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.examplesLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+
+.examplesPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.examplePill code {
+  font-size: 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: monospace;
+}
+
+.distributionCard,
+.recommendationsCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.distributionTableWrap {
+  overflow-x: auto;
+}
+
+.distTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.distTable th {
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.distTable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.tableBadgeAuditado {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--success);
+  background: var(--success-bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.recommendationList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.recItem strong {
+  color: var(--text);
+}
+
+.recItem p {
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.recItem code {
+  background: var(--surface-alt);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+/* ── Matriz de Cobertura Explícita ────────────────────────────────────────── */
+.coverageMatrixCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--elevation-xs);
+}
+
+.coverageStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.coverageStatItem {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coverageStatValue {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.coverageStatLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.unrenderableTableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.unrenderableTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.unrenderableTable th {
+  background: var(--surface-alt);
+  padding: 10px 14px;
+  font-weight: 700;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.unrenderableTable td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.unrenderableTable tr:last-child td {
+  border-bottom: none;
+}
+
+.reasonBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  font-weight: 600;
+}
+
+.exclusionList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+

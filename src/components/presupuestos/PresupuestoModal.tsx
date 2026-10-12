@@ -25,6 +25,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
 
 interface PresupuestoModalProps {
   open: boolean
@@ -863,7 +864,7 @@ export default function PresupuestoModal({
                         onClick={() => setField('periodo', p)}
                       >
                         <Calendar size={15} strokeWidth={1.75} className={styles.periodBtnIcon} />
-                        <span className={styles.periodBtnLabel}>{p.charAt(0).toUpperCase() + p.slice(1)}</span>
+                        <span className={styles.periodBtnLabel}>{etiquetaPeriodoPresupuesto(p)}</span>
                       </button>
                     ))}
                   </div>

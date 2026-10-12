@@ -27,6 +27,7 @@ import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { EmptyState, Skeleton } from '@/components/ui'
+import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
 import styles from './PresupuestoDetailModal.module.css'
 
 interface PresupuestoDetailModalProps {
@@ -429,7 +430,7 @@ export default function PresupuestoDetailModal({
 
                   <div className={styles.metaRow}>
                     <span className={styles.currencyPill}>{presupuesto.moneda === 'USD' ? 'Dólares' : 'Pesos'}</span>
-                    <span className={styles.periodPill}>{presupuesto.periodo}</span>
+                    <span className={styles.periodPill}>{etiquetaPeriodoPresupuesto(presupuesto.periodo)}</span>
 
                     {isPaused && (
                       <span className={styles.statusPillPaused}>

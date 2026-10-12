@@ -7,6 +7,7 @@ import {
 import type { Presupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
 import styles from './BudgetCard.module.css'
 
 interface BudgetCardProps {
@@ -119,7 +120,7 @@ export default function BudgetCard({
                 {presupuesto.nombre}
               </h3>
               <span className={styles.currencyTag}>{presupuesto.moneda === 'USD' ? 'Dólares' : 'Pesos'}</span>
-              <span className={styles.periodTag}>{presupuesto.periodo}</span>
+              <span className={styles.periodTag}>{etiquetaPeriodoPresupuesto(presupuesto.periodo)}</span>
             </div>
             <div className={styles.metaRow}>
               <Calendar size={12} className={styles.metaIcon} />

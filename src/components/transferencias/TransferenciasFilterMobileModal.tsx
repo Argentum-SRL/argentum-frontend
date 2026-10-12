@@ -4,7 +4,7 @@ import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
-import type { TipoOperacionFilter } from './TransferenciasFilterBar'
+import type { TipoOperacionFilter, PeriodoPresetFilter } from './TransferenciasFilterBar'
 import styles from './TransferenciasFilterBar.module.css'
 
 interface TransferenciasFilterMobileModalProps {
@@ -14,6 +14,8 @@ interface TransferenciasFilterMobileModalProps {
   onTipoOperacionChange: (val: TipoOperacionFilter) => void
   billeteraId: string | undefined
   onBilleteraChange: (id: string | undefined) => void
+  periodoPreset?: PeriodoPresetFilter
+  onPeriodoPresetChange?: (preset: PeriodoPresetFilter) => void
   billeteras?: Billetera[]
   hasActiveFilters: boolean
   onClear: () => void
@@ -26,12 +28,15 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
   onTipoOperacionChange,
   billeteraId,
   onBilleteraChange,
+  periodoPreset = 'ciclo',
+  onPeriodoPresetChange,
   billeteras = [],
   hasActiveFilters,
   onClear,
 }) => {
   const [localTipo, setLocalTipo] = useState<TipoOperacionFilter>(tipoOperacion)
   const [localBilleteraId, setLocalBilleteraId] = useState<string | undefined>(billeteraId)
+  const [localPeriodoPreset, setLocalPeriodoPreset] = useState<PeriodoPresetFilter>(periodoPreset)
   const [isAccountsOpen, setIsAccountsOpen] = useState(true)
 
   // Sincronizar estado local al abrir el modal sin causar renders en cascada
@@ -41,6 +46,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
     if (isOpen) {
       setLocalTipo(tipoOperacion)
       setLocalBilleteraId(billeteraId)
+      setLocalPeriodoPreset(periodoPreset)
       setIsAccountsOpen(true)
     }
   }
@@ -48,6 +54,9 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
   const handleApply = () => {
     onTipoOperacionChange(localTipo)
     onBilleteraChange(localBilleteraId)
+    if (onPeriodoPresetChange) {
+      onPeriodoPresetChange(localPeriodoPreset)
+    }
     onClose()
   }
 
@@ -55,6 +64,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
     onClear()
     setLocalTipo('todas')
     setLocalBilleteraId(undefined)
+    setLocalPeriodoPreset('ciclo')
     onClose()
   }
 
@@ -63,11 +73,47 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
   const canClear =
     hasActiveFilters ||
     localTipo !== 'todas' ||
-    localBilleteraId !== undefined
+    localBilleteraId !== undefined ||
+    localPeriodoPreset !== 'ciclo'
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Filtros">
       <div className={styles.mobileDrawerContainer}>
+        {/* ── Período ── */}
+        <div>
+          <div className={styles.drawerSectionTitle}>Período</div>
+          <div className={styles.periodoPillGroupMobile}>
+            <button
+              type="button"
+              className={`${styles.typePillMobile} ${localPeriodoPreset === 'ciclo' ? styles.typePillActiveMobile : ''}`}
+              onClick={() => setLocalPeriodoPreset('ciclo')}
+            >
+              Este ciclo
+            </button>
+            <button
+              type="button"
+              className={`${styles.typePillMobile} ${localPeriodoPreset === 'ciclo_anterior' ? styles.typePillActiveMobile : ''}`}
+              onClick={() => setLocalPeriodoPreset('ciclo_anterior')}
+            >
+              Ciclo anterior
+            </button>
+            <button
+              type="button"
+              className={`${styles.typePillMobile} ${localPeriodoPreset === 'ultimos_30d' ? styles.typePillActiveMobile : ''}`}
+              onClick={() => setLocalPeriodoPreset('ultimos_30d')}
+            >
+              Últimos 30 días
+            </button>
+            <button
+              type="button"
+              className={`${styles.typePillMobile} ${localPeriodoPreset === 'todos' ? styles.typePillActiveMobile : ''}`}
+              onClick={() => setLocalPeriodoPreset('todos')}
+            >
+              Todos
+            </button>
+          </div>
+        </div>
+
         {/* ── Tipo de Operación ── */}
         <div>
           <div className={styles.drawerSectionTitle}>Tipo de operación</div>
@@ -88,7 +134,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
             </button>
             <button
               type="button"
-              className={`${styles.typePillMobile} ${localTipo === 'fx' ? styles.typePillActiveMobile : ''}`}
+              className={`${styles.typePillMobile} ${styles.typePillFullWidthMobile} ${localTipo === 'fx' ? styles.typePillActiveMobile : ''}`}
               onClick={() => setLocalTipo('fx')}
             >
               Compra/Venta Dólares

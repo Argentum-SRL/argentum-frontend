@@ -42,7 +42,7 @@ export function useTransferenciasFilters({
   const [busqueda, setBusqueda] = useState('')
   const [tipoOperacion, setTipoOperacion] = useState<TipoOperacionFilter>('todas')
   const [billeteraId, setBilleteraId] = useState<string | undefined>(undefined)
-  const [periodoPreset, setPeriodoPreset] = useState<PeriodoPresetFilter>('todos')
+  const [periodoPreset, setPeriodoPreset] = useState<PeriodoPresetFilter>('ciclo')
 
   // Rango de fechas para el preset temporal seleccionado
   const dateRange = useMemo(() => {
@@ -59,20 +59,23 @@ export function useTransferenciasFilters({
         hasta: toISODateString(d2),
       }
     }
-    if (periodoPreset === 'este_mes') {
-      const d1 = new Date(today.getFullYear(), today.getMonth(), 1)
-      const d2 = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-      return {
-        desde: toISODateString(d1),
-        hasta: toISODateString(d2),
+    if (periodoPreset === 'ciclo_anterior') {
+      if (periodoActual?.ciclo_anterior_inicio && periodoActual?.ciclo_anterior_fin) {
+        return { desde: periodoActual.ciclo_anterior_inicio, hasta: periodoActual.ciclo_anterior_fin }
       }
-    }
-    if (periodoPreset === 'mes_pasado') {
       const d1 = new Date(today.getFullYear(), today.getMonth() - 1, 1)
       const d2 = new Date(today.getFullYear(), today.getMonth(), 0)
       return {
         desde: toISODateString(d1),
         hasta: toISODateString(d2),
+      }
+    }
+    if (periodoPreset === 'ultimos_30d') {
+      const past = new Date(today)
+      past.setDate(today.getDate() - 30)
+      return {
+        desde: toISODateString(past),
+        hasta: toISODateString(today),
       }
     }
     return null
@@ -172,7 +175,7 @@ export function useTransferenciasFilters({
       Boolean(busqueda.trim()) ||
       tipoOperacion !== 'todas' ||
       billeteraId !== undefined ||
-      periodoPreset !== 'todos'
+      periodoPreset !== 'ciclo'
     )
   }, [busqueda, tipoOperacion, billeteraId, periodoPreset])
 
@@ -180,7 +183,7 @@ export function useTransferenciasFilters({
     setBusqueda('')
     setTipoOperacion('todas')
     setBilleteraId(undefined)
-    setPeriodoPreset('todos')
+    setPeriodoPreset('ciclo')
   }, [])
 
   // Agrupamiento cronológico por fecha de las transferencias filtradas

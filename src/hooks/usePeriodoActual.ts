@@ -6,6 +6,9 @@ export interface PeriodoFechas {
   fecha_inicio: string
   fecha_fin: string
   label: string
+  ciclo_anterior_inicio: string
+  ciclo_anterior_fin: string
+  ciclo_anterior_label: string
 }
 
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
@@ -31,6 +34,7 @@ export function usePeriodoActual() {
           setPeriodo({
             ...data,
             label: formatLabel(data.fecha_inicio, data.fecha_fin),
+            ciclo_anterior_label: formatLabel(data.ciclo_anterior_inicio, data.ciclo_anterior_fin),
           })
           setLoading(false)
         }
@@ -45,10 +49,19 @@ export function usePeriodoActual() {
           const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0)
           const inicioIso = inicio.toISOString().split('T')[0]
           const finIso = fin.toISOString().split('T')[0]
+
+          const antInicio = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1)
+          const antFin = new Date(hoy.getFullYear(), hoy.getMonth(), 0)
+          const antInicioIso = antInicio.toISOString().split('T')[0]
+          const antFinIso = antFin.toISOString().split('T')[0]
+
           setPeriodo({
             fecha_inicio: inicioIso,
             fecha_fin: finIso,
             label: formatLabel(inicioIso, finIso),
+            ciclo_anterior_inicio: antInicioIso,
+            ciclo_anterior_fin: antFinIso,
+            ciclo_anterior_label: formatLabel(antInicioIso, antFinIso),
           })
           setLoading(false)
         }
@@ -57,5 +70,13 @@ export function usePeriodoActual() {
     return () => controller.abort()
   }, [usuario?.id, usuario?.ciclo_tipo, usuario?.ciclo_valor, usuario?.ciclo_ajuste_direccion])
 
-  return { periodo, loading }
+  return {
+    periodo,
+    cicloAnterior: periodo ? {
+      fecha_inicio: periodo.ciclo_anterior_inicio,
+      fecha_fin: periodo.ciclo_anterior_fin,
+      label: periodo.ciclo_anterior_label,
+    } : null,
+    loading
+  }
 }

@@ -14,11 +14,18 @@ let resumenPromises: Record<string, Promise<DashboardResumen> | undefined> = {}
 const proyeccionCache = createUserCache<ProyeccionesResponse>(DEFAULT_TTL)
 let proyeccionPromise: Promise<ProyeccionesResponse> | null = null
 
-const periodoActualCache = createUserCache<{ fecha_inicio: string; fecha_fin: string }>(DEFAULT_TTL)
-let periodoActualPromise: Promise<{ fecha_inicio: string; fecha_fin: string }> | null = null
+export interface PeriodoActualData {
+  fecha_inicio: string
+  fecha_fin: string
+  ciclo_anterior_inicio: string
+  ciclo_anterior_fin: string
+}
+
+const periodoActualCache = createUserCache<PeriodoActualData>(DEFAULT_TTL)
+let periodoActualPromise: Promise<PeriodoActualData> | null = null
 
 export const dashboardService = {
-  getPeriodoActual: async (signal?: AbortSignal): Promise<{ fecha_inicio: string; fecha_fin: string }> => {
+  getPeriodoActual: async (signal?: AbortSignal): Promise<PeriodoActualData> => {
     if (!signal && periodoActualPromise) return periodoActualPromise
 
     const cached = periodoActualCache.get()
@@ -28,7 +35,7 @@ export const dashboardService = {
 
     const fetchPromise = (async () => {
       try {
-        const response = await api.get<{ fecha_inicio: string; fecha_fin: string }>('/dashboard/periodo-actual', { signal })
+        const response = await api.get<PeriodoActualData>('/dashboard/periodo-actual', { signal })
         periodoActualCache.set(response.data)
         return response.data
       } finally {

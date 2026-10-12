@@ -189,7 +189,7 @@ export default function FilterBar({
     onFilterChange({ ...filters, fecha_desde: desde, fecha_hasta: hasta })
   }
 
-  const handleApplyPreset = (preset: 'ciclo' | 'este_mes' | 'mes_pasado' | 'ultimos_30d') => {
+  const handleApplyPreset = (preset: 'ciclo' | 'ciclo_anterior' | 'ultimos_30d') => {
     const today = new Date()
     let desde: string
     let hasta: string
@@ -204,16 +204,16 @@ export default function FilterBar({
         desde = toISODateString(firstDay)
         hasta = toISODateString(lastDay)
       }
-    } else if (preset === 'este_mes') {
-      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-      desde = toISODateString(firstDay)
-      hasta = toISODateString(lastDay)
-    } else if (preset === 'mes_pasado') {
-      const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-      const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
-      desde = toISODateString(firstDay)
-      hasta = toISODateString(lastDay)
+    } else if (preset === 'ciclo_anterior') {
+      if (periodoActual?.ciclo_anterior_inicio && periodoActual?.ciclo_anterior_fin) {
+        desde = periodoActual.ciclo_anterior_inicio
+        hasta = periodoActual.ciclo_anterior_fin
+      } else {
+        const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+        const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
+        desde = toISODateString(firstDay)
+        hasta = toISODateString(lastDay)
+      }
     } else {
       const past = new Date(today)
       past.setDate(today.getDate() - 30)
@@ -413,14 +413,16 @@ export default function FilterBar({
         <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('ciclo')}>
           Este ciclo
         </button>
-        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('este_mes')}>
-          Este mes
+        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('ciclo_anterior')}>
+          Ciclo anterior
         </button>
-        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('mes_pasado')}>
-          Mes pasado
-        </button>
-        <button type="button" className={styles.desktopPresetBtn} onClick={() => handleApplyPreset('ultimos_30d')}>
-          30 días
+        <button
+          type="button"
+          className={styles.desktopPresetBtn}
+          style={{ gridColumn: '1 / -1' }}
+          onClick={() => handleApplyPreset('ultimos_30d')}
+        >
+          Últimos 30 días
         </button>
       </div>
 

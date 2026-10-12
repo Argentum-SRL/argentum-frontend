@@ -1,11 +1,26 @@
-import React, { useState, useRef } from 'react'
-import { Search, X, Filter } from '@/components/ui/icons'
+import React, { useState, useRef, useEffect } from 'react'
+import { Search, X, Filter, Calendar, ChevronDown } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import { TransferenciasFilterMobileModal } from './TransferenciasFilterMobileModal'
 import styles from './TransferenciasFilterBar.module.css'
 
+function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
+  useEffect(() => {
+    const listener = (e: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(e.target as Node)) return
+      handler()
+    }
+    document.addEventListener('mousedown', listener)
+    document.addEventListener('touchstart', listener)
+    return () => {
+      document.removeEventListener('mousedown', listener)
+      document.removeEventListener('touchstart', listener)
+    }
+  }, [ref, handler])
+}
+
 export type TipoOperacionFilter = 'todas' | 'cuentas' | 'fx'
-export type PeriodoPresetFilter = 'todos' | 'ciclo' | 'este_mes' | 'mes_pasado'
+export type PeriodoPresetFilter = 'ciclo' | 'ciclo_anterior' | 'ultimos_30d' | 'todos'
 
 export interface TransferenciasFilterBarProps {
   busqueda: string
@@ -32,13 +47,34 @@ export const TransferenciasFilterBar: React.FC<TransferenciasFilterBarProps> = (
   onTipoOperacionChange,
   billeteraId,
   onBilleteraChange,
+  periodoPreset = 'ciclo',
+  onPeriodoPresetChange,
   billeteras = [],
   hasActiveFilters = false,
   onClearFilters,
 }) => {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const dateRef = useRef<HTMLDivElement>(null)
+
+  useClickOutside(dateRef, () => setDatePopoverOpen(false))
+
+  const getPeriodoLabel = (preset: PeriodoPresetFilter) => {
+    switch (preset) {
+      case 'ciclo':
+        return 'Este ciclo'
+      case 'ciclo_anterior':
+        return 'Ciclo anterior'
+      case 'ultimos_30d':
+        return 'Últimos 30 días'
+      case 'todos':
+        return 'Todos'
+      default:
+        return 'Período'
+    }
+  }
 
   const handleOpenMobileSearch = () => {
     setMobileSearchOpen(true)
@@ -143,6 +179,95 @@ export const TransferenciasFilterBar: React.FC<TransferenciasFilterBarProps> = (
               Compra/Venta Dólares
             </button>
           </div>
+
+          {/* Período Dropdown Pill (matching Transacciones) */}
+          {onPeriodoPresetChange && (
+            <div
+              className={`${styles.pill} ${styles.pillRelative} ${periodoPreset !== 'ciclo' ? styles.pillActive : ''}`}
+              ref={dateRef}
+            >
+              <div
+                className={styles.pillIconFlex}
+                onClick={() => setDatePopoverOpen(!datePopoverOpen)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setDatePopoverOpen(!datePopoverOpen)
+                  }
+                }}
+                aria-haspopup="true"
+                aria-expanded={datePopoverOpen}
+              >
+                <Calendar size={14} className={styles.pillIcon} />
+                <span className={styles.pillText}>{getPeriodoLabel(periodoPreset)}</span>
+                <ChevronDown size={14} className={styles.pillChevron} />
+              </div>
+
+              {periodoPreset !== 'ciclo' && (
+                <button
+                  type="button"
+                  className={styles.pillRemove}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onPeriodoPresetChange('ciclo')
+                  }}
+                  aria-label="Restablecer período al ciclo actual"
+                >
+                  <X size={13} />
+                </button>
+              )}
+
+              {datePopoverOpen && (
+                <div className={`${styles.popover} ${styles.popoverDesktopOnly} ${styles.popoverDate}`}>
+                  <div className={styles.popoverTitle}>Período</div>
+                  <div className={styles.desktopPresetsRow}>
+                    <button
+                      type="button"
+                      className={`${styles.desktopPresetBtn} ${periodoPreset === 'ciclo' ? styles.desktopPresetBtnActive : ''}`}
+                      onClick={() => {
+                        onPeriodoPresetChange('ciclo')
+                        setDatePopoverOpen(false)
+                      }}
+                    >
+                      Este ciclo
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.desktopPresetBtn} ${periodoPreset === 'ciclo_anterior' ? styles.desktopPresetBtnActive : ''}`}
+                      onClick={() => {
+                        onPeriodoPresetChange('ciclo_anterior')
+                        setDatePopoverOpen(false)
+                      }}
+                    >
+                      Ciclo anterior
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.desktopPresetBtn} ${periodoPreset === 'ultimos_30d' ? styles.desktopPresetBtnActive : ''}`}
+                      onClick={() => {
+                        onPeriodoPresetChange('ultimos_30d')
+                        setDatePopoverOpen(false)
+                      }}
+                    >
+                      Últimos 30 días
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.desktopPresetBtn} ${periodoPreset === 'todos' ? styles.desktopPresetBtnActive : ''}`}
+                      onClick={() => {
+                        onPeriodoPresetChange('todos')
+                        setDatePopoverOpen(false)
+                      }}
+                    >
+                      Todos
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Search Input (Desktop) */}
@@ -177,6 +302,8 @@ export const TransferenciasFilterBar: React.FC<TransferenciasFilterBarProps> = (
         onTipoOperacionChange={onTipoOperacionChange}
         billeteraId={billeteraId}
         onBilleteraChange={onBilleteraChange || (() => {})}
+        periodoPreset={periodoPreset}
+        onPeriodoPresetChange={onPeriodoPresetChange}
         billeteras={billeteras}
         hasActiveFilters={hasActiveFilters}
         onClear={onClearFilters || (() => {})}

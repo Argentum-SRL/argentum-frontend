@@ -282,6 +282,209 @@
   box-shadow: var(--elevation-xs);
 }
 
+/* ── Desktop Filter Pills (matching Transacciones FilterBar) ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  height: 34px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1100px) {
+  .pill {
+    padding: 0 14px;
+    height: 38px;
+    font-size: 13px;
+    gap: 6px;
+    border-radius: 12px;
+  }
+}
+
+.pill:hover:not(.pillActive) {
+  background: var(--surface-alt);
+  color: var(--text);
+  border-color: var(--border-hover, var(--border));
+}
+
+.pill:active {
+  transform: scale(0.98);
+}
+
+.pillActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: var(--elevation-xs);
+}
+
+.pillRelative {
+  position: relative !important;
+}
+
+.pillIconFlex {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+@media (min-width: 1100px) {
+  .pillIconFlex {
+    gap: 6px;
+  }
+}
+
+.pillText {
+  display: inline-block;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+@media (min-width: 1100px) {
+  .pillText {
+    max-width: 140px;
+  }
+}
+
+.pillIcon {
+  flex-shrink: 0;
+}
+
+.pillChevron {
+  flex-shrink: 0;
+  opacity: 0.65;
+  transition: transform 0.2s ease;
+}
+
+.pill:hover .pillChevron {
+  opacity: 1;
+}
+
+.pillRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 3px;
+  margin-right: -4px;
+  padding: 2px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.pillRemove:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.1);
+}
+
+.pillRemove:active {
+  transform: scale(0.9);
+}
+
+/* ── Popovers (Dropdowns matching Transacciones) ─────────── */
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: var(--elevation-md);
+  border: 1px solid var(--border);
+  padding: 12px;
+  z-index: 100;
+  min-width: 220px;
+  max-width: min(340px, calc(100vw - 32px));
+  animation: popoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popoverDesktopOnly {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .popoverDesktopOnly {
+    display: block !important;
+  }
+}
+
+.popoverDate {
+  min-width: 250px;
+}
+
+.popoverTitle {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px 0;
+}
+
+.desktopPresetsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.desktopPresetBtn {
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  border: 1px solid transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  font-family: inherit;
+}
+
+.desktopPresetBtn:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.desktopPresetBtnActive {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+}
+
 /* ── Search Container (Desktop) ──────── */
 .searchContainerDesktop {
   display: none;
@@ -389,7 +592,8 @@
 }
 
 .pillGroupMobile {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   width: 100%;
   background: transparent;
   padding: 0;
@@ -398,10 +602,23 @@
   box-sizing: border-box;
 }
 
+.periodoPillGroupMobile {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.typePillFullWidthMobile {
+  grid-column: 1 / -1;
+}
+
 .typePillMobile {
   flex: 1;
   min-width: 0;
-  height: 40px;
+  min-height: 40px;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -417,11 +634,14 @@
   letter-spacing: -0.01em;
   transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
-  padding: 0 8px;
-  white-space: nowrap;
+  padding: 6px 10px;
+  text-align: center;
+  white-space: normal;
+  word-break: normal;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  box-sizing: border-box;
 }
 
 @media (hover: hover) and (pointer: fine) {

@@ -12,7 +12,6 @@ const RegisterPage = lazy(() => import('@/pages/auth/register/RegisterPage'))
 const PhoneLoginPage = lazy(() => import('@/pages/auth/phone-login/PhoneLoginPage'))
 const VerificarEmail = lazy(() => import('@/pages/auth/verificar-email/VerificarEmail'))
 const VerificarTelefono = lazy(() => import('@/pages/auth/verificar-telefono/VerificarTelefono'))
-const CompletarPerfil = lazy(() => import('@/pages/auth/completar-perfil/CompletarPerfil'))
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'))
 const RecuperarPassword = lazy(() => import('@/pages/auth/recuperar-password/RecuperarPassword'))
 const ResetPasswordPage = lazy(() => import('@/pages/auth/reset-password/ResetPasswordPage'))
@@ -44,7 +43,6 @@ const router = createBrowserRouter([
       { path: '/login/telefono', element: <PhoneLoginPage /> },
       { path: '/auth/verificar-email', element: <VerificarEmail /> },
       { path: '/auth/verificar-telefono', element: <VerificarTelefono /> },
-      { path: '/auth/completar-perfil', element: <CompletarPerfil /> },
       { path: '/auth/recuperar-password', element: <RecuperarPassword /> },
       { path: '/reset-password', element: <ResetPasswordPage /> },
 

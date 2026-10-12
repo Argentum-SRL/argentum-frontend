@@ -10,8 +10,6 @@ export function manejarRespuestaAuth(
 
   if (respuesta.requiere_telefono) {
     navigate('/auth/verificar-telefono', { replace: true })
-  } else if (respuesta.requiere_datos) {
-    navigate('/auth/completar-perfil', { replace: true })
   } else if (respuesta.requiere_verificacion_email) {
     navigate('/auth/verificar-email', {
       replace: true,

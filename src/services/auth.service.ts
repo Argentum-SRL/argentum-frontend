@@ -17,13 +17,6 @@ export interface RegisterPayload {
   turnstile_token?: string
 }
 
-export interface CompletarPerfilPayload {
-  nombre: string
-  apellido: string
-  email: string
-  password: string
-}
-
 export interface OkResponse {
   ok: boolean
 }
@@ -123,12 +116,6 @@ export async function enviarCodigoEmail(email: string): Promise<unknown> {
 
 export async function verificarCodigoEmail(email: string, codigo: string): Promise<AuthResponse> {
   const { data } = await api.post<AuthResponse>('/auth/email/verificar', { email, codigo })
-  guardarTokensSiPresentes(data)
-  return data
-}
-
-export async function completarPerfil(payload: CompletarPerfilPayload): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>('/auth/completar-perfil', payload)
   guardarTokensSiPresentes(data)
   return data
 }

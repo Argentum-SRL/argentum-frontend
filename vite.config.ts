@@ -53,6 +53,8 @@ export default defineConfig(({ mode }) => {
         // Necesario para que las cookies seteadas por el backend (127.0.0.1:8000)
         // sean aceptadas por el browser como cookies de localhost:5173
         cookieDomainRewrite: 'localhost',
+        // Reescribe el path de refresh_token (/auth) para que coincida con el prefijo /api en desarrollo
+        cookiePathRewrite: { '/auth': '/api/auth' },
         // Previene que el proxy reescriba Secure en cookies cuando corre en HTTP
         secure: false,
         timeout: 60000,

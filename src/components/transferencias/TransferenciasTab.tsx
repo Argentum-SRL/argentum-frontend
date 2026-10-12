@@ -1,6 +1,6 @@
 import React from 'react'
 import { ArrowRightLeft, Search } from '@/components/ui/icons'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, TransferenciasListSkeleton } from '@/components/ui'
 import type { TransferenciaInterna, Billetera } from '@/types'
 import TransferenciasFilterBar from './TransferenciasFilterBar'
 import TransferenciaRow from './TransferenciaRow'
@@ -62,7 +62,7 @@ export const TransferenciasTab: React.FC<TransferenciasTabProps> = ({
 
       {/* ── Estado de Carga / Vacío / Listado Agrupado ── */}
       {loading ? (
-        <div className={styles.loadingState}>Cargando transferencias...</div>
+        <TransferenciasListSkeleton count={4} />
       ) : transferencias.length === 0 ? (
         <EmptyState
           icon={ArrowRightLeft}

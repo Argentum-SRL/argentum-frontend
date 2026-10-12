@@ -4,7 +4,7 @@ import { Layout } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import adminService from '@/services/adminService'
 import type { UsuarioAdminResumen, UsuarioAdmin, FiltrosAdmin, AdminStats } from '@/types/admin'
-import { Button, EmptyState, SelectInput, LunarLoader } from '@/components/ui'
+import { Button, EmptyState, SelectInput, LunarLoader, TableSkeleton, Skeleton } from '@/components/ui'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import {
@@ -383,7 +383,13 @@ export default function AdminPage() {
         <div className={styles.titleGroup}>
           <h1>Panel de Administración</h1>
           <p className={styles.subtitle}>
-            {loadingStats ? 'Cargando datos...' : `${stats?.total || 0} usuarios registrados en total`}
+            {loadingStats ? (
+              <span style={{ display: 'inline-block', verticalAlign: 'middle' }} aria-hidden="true">
+                <Skeleton variant="text" width={180} height={12} />
+              </span>
+            ) : (
+              `${stats?.total || 0} usuarios registrados en total`
+            )}
           </p>
         </div>
         <div className={styles.headerActions}>
@@ -577,10 +583,7 @@ export default function AdminPage() {
           {/* Table Container */}
           <div className={styles.tableWrapper}>
             {loading ? (
-              <div className="p-12 flex flex-col items-center justify-center gap-3">
-                <LunarLoader size={32} color="var(--primary)" />
-                <span className="text-sm text-gray-500">Cargando listado de usuarios...</span>
-              </div>
+              <TableSkeleton rows={7} cols={5} />
             ) : error ? (
               <div className="p-8 text-center text-[var(--error)] font-medium">
                 {error}
@@ -667,9 +670,16 @@ export default function AdminPage() {
         {/* Right Column (Detail View / Support Actions) */}
         <div className={styles.detailCol}>
           {loadingDetail ? (
-            <div className="py-24 flex flex-col items-center justify-center gap-3">
-              <LunarLoader size={32} color="var(--primary)" />
-              <span className="text-sm text-gray-500">Cargando detalles del usuario...</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <Skeleton variant="circular" width={56} height={56} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                  <Skeleton variant="text" width="60%" height={20} />
+                  <Skeleton variant="text" width="40%" height={14} />
+                </div>
+              </div>
+              <Skeleton variant="rounded" height={120} borderRadius={16} />
+              <Skeleton variant="rounded" height={160} borderRadius={16} />
             </div>
           ) : detailError ? (
             <div className="py-12 text-center text-[var(--error)] font-medium">

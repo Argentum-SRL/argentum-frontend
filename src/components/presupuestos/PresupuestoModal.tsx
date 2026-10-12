@@ -742,7 +742,7 @@ export default function PresupuestoModal({
                                       ? 'Ocultar'
                                       : selectedSubCount > 0 && !isCatSelected
                                       ? `${selectedSubCount} de ${subs.length}`
-                                      : `${subs.length} subcats`}
+                                      : `${subs.length} ${subs.length === 1 ? 'subcategoría' : 'subcategorías'}`}
                                   </span>
                                   {isExpanded ? <ChevronUp size={12} strokeWidth={2.5} /> : <ChevronDown size={12} strokeWidth={2.5} />}
                                 </button>

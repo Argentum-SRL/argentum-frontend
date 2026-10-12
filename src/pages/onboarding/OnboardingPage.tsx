@@ -8,7 +8,7 @@ import StepCicloFinanciero from '@/components/onboarding/StepCicloFinanciero'
 import StepMoneda from '@/components/onboarding/StepMoneda'
 import StepWhatsApp from '@/components/onboarding/StepWhatsApp'
 import { useAuth } from '@/hooks/useAuth'
-import { AtmosphericBackground, AtmosphericLoading, AtmosphericMoonIcon, ThemeToggle, LunarLoader } from '@/components/ui'
+import { AtmosphericBackground, AtmosphericMoonIcon, ThemeToggle, LunarLoader, OnboardingSkeleton } from '@/components/ui'
 import styles from './OnboardingPage.module.css'
 
 const PASO_NUMERO: Record<string, number> = {
@@ -135,7 +135,14 @@ export default function OnboardingPage() {
   }
 
   if (cargando) {
-    return <AtmosphericLoading />
+    return (
+      <AtmosphericBackground fullScreen={false} centered={false} compensateBottomNav={false} className={styles.page}>
+        <ThemeToggle />
+        <div className={styles.inner}>
+          <OnboardingSkeleton />
+        </div>
+      </AtmosphericBackground>
+    )
   }
 
   const datos = estado?.datos_actuales

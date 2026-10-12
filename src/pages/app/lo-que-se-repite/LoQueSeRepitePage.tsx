@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { sileo } from 'sileo'
 import { AlertCircle, RefreshCw, ChevronDown } from '@/components/ui/icons'
+import { Skeleton } from '@/components/ui'
 import { Inbox } from 'lucide-react'
 import { getErrorMessage } from '@/utils/errorMessages'
 import patronesService from '@/services/patrones.service'
@@ -222,7 +223,9 @@ export const LoQueSeRepitePage: React.FC = () => {
       <div className={styles.root}>
         <header className={styles.header}>
           <h1 className={styles.title}>{TEXTOS.TITULO_PAGINA}</h1>
-          <p className={styles.subtitle}>Cargando lo que se repite...</p>
+          <div style={{ height: '18px', display: 'flex', alignItems: 'center' }} aria-hidden="true">
+            <Skeleton variant="text" width={240} height={13} />
+          </div>
         </header>
         <div className={styles.sections}>
           {[1, 2, 3, 4].map((i) => (

@@ -22,7 +22,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
 import BudgetBarChart from './BudgetBarChart'
 import BudgetHistoryModal from './BudgetHistoryModal'
-import { EmptyState, PageSummaryBar } from '@/components/ui'
+import { EmptyState, PageSummaryBar, PresupuestosSkeleton } from '@/components/ui'
 
 export default function PresupuestosPage() {
   const { usuario } = useAuth()
@@ -329,9 +329,7 @@ export default function PresupuestosPage() {
       {/* ── Content ────────────────────────────────────────────────────────── */}
       <div className={styles.content}>
         {loading ? (
-          <div className={styles.grid}>
-            {[1, 2, 3].map(i => <div key={i} className={`${styles.card} ${styles.skeletonCard} ${styles.skeleton}`} />)}
-          </div>
+          <PresupuestosSkeleton count={3} />
         ) : presupuestos.length === 0 ? (
           <EmptyState
             icon={PieChart}

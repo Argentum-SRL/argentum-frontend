@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Plus } from '@/components/ui/icons'
-import { Button, PageSummaryBar, LunarLoader } from '@/components/ui'
+import { Button, PageSummaryBar, SuscripcionesSkeleton } from '@/components/ui'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -205,8 +205,20 @@ const SuscripcionesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className={styles.loading}>
-        <LunarLoader size={40} color="var(--primary)" />
+      <div className={styles.root}>
+        <header className={styles.header}>
+          <div className={styles.titleGroup}>
+            <h1>Suscripciones</h1>
+            <p className={styles.subtitle}>
+              Controlá tus servicios, membresías y débitos automáticos recurrentes.
+            </p>
+          </div>
+          <button className={styles.nuevaBtn} disabled style={{ opacity: 0.6, cursor: 'default' }}>
+            <Plus size={16} strokeWidth={2.5} />
+            Agregar suscripción o débito
+          </button>
+        </header>
+        <SuscripcionesSkeleton />
       </div>
     )
   }

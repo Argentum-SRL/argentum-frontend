@@ -26,7 +26,7 @@ import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
-import { EmptyState, LunarLoader } from '@/components/ui'
+import { EmptyState, Skeleton } from '@/components/ui'
 import styles from './PresupuestoDetailModal.module.css'
 
 interface PresupuestoDetailModalProps {
@@ -678,9 +678,19 @@ export default function PresupuestoDetailModal({
               <div className={styles.contentSection}>
                 {activeTab === 'gastos' ? (
                   loadingTx ? (
-                    <div className={styles.loadingBox}>
-                      <LunarLoader size={24} color="var(--primary)" />
-                      <span>Cargando transacciones del ciclo...</span>
+                    <div className={styles.txList} aria-hidden="true">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className={styles.txItem}>
+                          <div className={styles.txLeft}>
+                            <Skeleton variant="rounded" width={28} height={28} borderRadius={8} />
+                            <div className={styles.txDetails}>
+                              <Skeleton variant="text" width={110} height={14} />
+                              <Skeleton variant="text" width={70} height={11} />
+                            </div>
+                          </div>
+                          <Skeleton variant="text" width={60} height={14} />
+                        </div>
+                      ))}
                     </div>
                   ) : !p ? (
                     <div className={styles.emptyStateWrap}>
@@ -733,9 +743,16 @@ export default function PresupuestoDetailModal({
                   )
                 ) : (
                   loadingHistorial ? (
-                    <div className={styles.loadingBox}>
-                      <LunarLoader size={24} color="var(--primary)" />
-                      <span>Cargando historial de periodos...</span>
+                    <div className={styles.historyList} aria-hidden="true">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} style={{ padding: '14px', background: 'var(--surface-alt)', borderRadius: '12px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <Skeleton variant="text" width={110} height={14} />
+                            <Skeleton variant="text" width={70} height={14} />
+                          </div>
+                          <Skeleton variant="rounded" height={6} borderRadius={4} />
+                        </div>
+                      ))}
                     </div>
                   ) : historial.length === 0 ? (
                     <div className={styles.emptyStateWrap}>

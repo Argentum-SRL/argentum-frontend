@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useModal } from '@/hooks/useModal'
 import Modal from '@/components/ui/Modal/Modal'
-import { EmptyState, LunarLoader } from '@/components/ui'
+import { EmptyState, Skeleton } from '@/components/ui'
 import transaccionService from '@/services/transaccion.service'
 import billeteraService from '@/services/billetera.service'
 import goalsService from '@/services/goals.service'
@@ -389,8 +389,17 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         <div className={styles.formBody}>
           <div className={styles.scrollArea}>
             {loadingTransactions && (
-              <div className={styles.loadingWrapper}>
-                <LunarLoader size={24} color="var(--primary)" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px' }} aria-hidden="true">
+                {[1, 2, 3].map(i => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 12px', background: 'var(--surface-alt)', borderRadius: '10px' }}>
+                    <Skeleton variant="rounded" width={28} height={28} borderRadius={8} />
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <Skeleton variant="text" width={i === 1 ? '50%' : '35%'} height={13} />
+                      <Skeleton variant="text" width="25%" height={10} />
+                    </div>
+                    <Skeleton variant="text" width={50} height={13} />
+                  </div>
+                ))}
               </div>
             )}
 

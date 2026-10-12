@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { Modal, Button, DateInput, SelectInput, LunarLoader } from '@/components/ui'
+import { Modal, Button, DateInput, SelectInput, FacturaPanelSkeleton } from '@/components/ui'
 import { AlertCircle } from '@/components/ui/icons'
 import type { Factura, Billetera } from '@/types'
 import facturaService from '@/services/factura.service'
@@ -237,11 +237,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
       size="sm"
     >
       <div className={styles.container}>
-        {loading && (
-          <div className={styles.loadingWrap}>
-            <LunarLoader size={24} />
-          </div>
-        )}
+        {loading && <FacturaPanelSkeleton />}
 
         {!loading && factura && (
           <>

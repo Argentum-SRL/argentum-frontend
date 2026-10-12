@@ -3,7 +3,7 @@ import { getCotizaciones, guardarMoneda } from '@/services/onboarding.service'
 import type { CotizacionesDolarResponse } from '@/types'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { Button, LunarLoader } from '@/components/ui'
+import { Button, Skeleton } from '@/components/ui'
 import styles from './StepMoneda.module.css'
 
 interface Props {
@@ -139,9 +139,14 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
             <label className={styles.label}>Tipo de cambio de referencia</label>
 
             {cargando ? (
-              <div className={styles.cotizacionLoading}>
-                <LunarLoader size={14} />
-                <span>Cargando cotizaciones...</span>
+              <div className={styles.cotizacionGrid} aria-hidden="true">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className={styles.cotizacionCard} style={{ pointerEvents: 'none', minHeight: '80px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <Skeleton variant="text" width={60} height={12} />
+                    <Skeleton variant="text" width={80} height={18} />
+                    <Skeleton variant="text" width={110} height={10} />
+                  </div>
+                ))}
               </div>
             ) : cotizaciones ? (
               <div className={styles.cotizacionGrid}>

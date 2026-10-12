@@ -8,7 +8,7 @@ import {
   AlertCircle,
   RefreshCw,
 } from '@/components/ui/icons'
-import { LunarLoader } from '@/components/ui'
+import { LunarLoader, Skeleton } from '@/components/ui'
 import {
   solicitarCodigoVinculacion,
   type CodigoVinculacionResponse,
@@ -223,9 +223,25 @@ export default function VinculacionWhatsAppCard({
       )}
 
       {loading ? (
-        <div className={styles.loaderWrap}>
-          <LunarLoader size={32} color="var(--primary)" />
-          <span>Generando código de vinculación...</span>
+        <div className={styles.twoColGrid} aria-hidden="true" style={{ opacity: 0.85 }}>
+          <div className={styles.qrCol}>
+            <div className={styles.qrContainer}>
+              <Skeleton variant="rounded" width={200} height={200} borderRadius={16} />
+              <div style={{ marginTop: 12 }}>
+                <Skeleton variant="text" width={220} height={12} />
+              </div>
+            </div>
+          </div>
+          <div className={styles.detailsCol}>
+            <div className={styles.codeCard}>
+              <Skeleton variant="text" width={160} height={13} />
+              <div style={{ margin: '10px 0' }}>
+                <Skeleton variant="text" width={140} height={32} />
+              </div>
+              <Skeleton variant="text" width="90%" height={12} />
+            </div>
+            <Skeleton variant="rounded" width="100%" height={44} borderRadius={12} />
+          </div>
         </div>
       ) : apiError && !codigoData ? (
         <div className={styles.errorBox}>

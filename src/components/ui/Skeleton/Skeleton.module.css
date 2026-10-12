@@ -1,0 +1,551 @@
+/* ─── Skeleton & Loading Templates (Argentum Design System) ───────────────── */
+
+@keyframes skeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-alt) 0%,
+    var(--surface) 50%,
+    var(--surface-alt) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.5s ease infinite;
+  display: block;
+  user-select: none;
+}
+
+.text {
+  height: 14px;
+  border-radius: 6px;
+}
+
+.circular {
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rounded {
+  border-radius: 12px;
+}
+
+.rectangular {
+  border-radius: 8px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── 1. Grid de Tarjetas (Billeteras / Suscripciones / Presupuestos / Metas) ── */
+.cardsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 24px;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .cardsGridOverlap > * {
+    margin-bottom: -100px;
+    position: relative;
+  }
+  .cardsGridNormal {
+    gap: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding-bottom: 0;
+  }
+  .cardsGridOverlap > * {
+    margin-bottom: 0;
+  }
+}
+
+.cardSkeleton {
+  height: 140px;
+  border-radius: 18px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-alt) 0%,
+    var(--surface) 50%,
+    var(--surface-alt) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.5s ease infinite;
+}
+
+@media (min-width: 768px) {
+  .cardSkeleton {
+    height: unset;
+    border-radius: 20px;
+    aspect-ratio: 1.75 / 1;
+  }
+}
+
+/* ── 2. Lista de Transacciones (DayGroup + Rows) ─────────────────────────── */
+.txListWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.dayGroupSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.dayHeaderSkeleton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 4px;
+}
+
+.txContainerCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.txRowSkeleton {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.txRowSkeleton:last-child {
+  border-bottom: none;
+}
+
+.txInfoSkeleton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.txAmountSkeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── 3. Grupos de Cuotas Skeleton ────────────────────────────────────────── */
+.cuotasWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.cuotasMetricsBar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.cuotasMetricItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cuotasList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cuotasCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cuotasCardTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ── 4. Transferencias Skeleton ──────────────────────────────────────────── */
+.transferenciasWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.transferRowSkeleton {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+/* ── 5. Importación de Resumen Skeleton ──────────────────────────────────── */
+.importWrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.importHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.importDropzone {
+  min-height: 180px;
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 20px;
+  background: var(--surface-alt);
+}
+
+.importFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* ── 6. Billetera Detalle Skeleton ───────────────────────────────────────── */
+.billeteraDetalleWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.billeteraHeroCard {
+  height: 180px;
+  border-radius: 24px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--surface-alt) 0%,
+    var(--surface) 50%,
+    var(--surface-alt) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.5s ease infinite;
+}
+
+@media (min-width: 768px) {
+  .billeteraHeroCard {
+    height: 220px;
+  }
+}
+
+/* ── 7. Suscripciones Page Skeleton ──────────────────────────────────────── */
+.suscripcionesWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.summaryBarSkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .summaryBarSkeleton {
+    grid-template-columns: 1fr;
+    height: 110px;
+  }
+}
+
+.suscripcionesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .suscripcionesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+}
+
+.suscripcionCardSkeleton {
+  height: 120px;
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-alt) 0%,
+    var(--surface) 50%,
+    var(--surface-alt) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.5s ease infinite;
+}
+
+/* ── 8. Table Skeleton (Admin / Data Views) ───────────────────────────────── */
+.tableContainerSkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tableHeaderSkeleton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.tableRowSkeleton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tableRowSkeleton:last-child {
+  border-bottom: none;
+}
+
+/* ── 9. Goals Skeleton ────────────────────────────────────────────────────── */
+.goalsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.goalsMobileChartSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 140px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .goalsMobileChartSkeleton {
+    display: none;
+  }
+}
+
+.goalsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .goalsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+}
+
+.goalCardSkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.goalCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.goalAmountsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.goalActionsRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ── 10. Presupuestos Skeleton ────────────────────────────────────────────── */
+.presupuestosWrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .presupuestosWrapper {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+}
+
+.presupuestoCardSkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.presupuestoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── 11. Tarjeta Summary Skeleton ─────────────────────────────────────────── */
+.tarjetaSummarySkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.tarjetaSummaryNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tarjetaSummaryDates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tarjetaSummaryActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* ── 12. Factura Panel Skeleton ───────────────────────────────────────────── */
+.facturaPanelSkeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.facturaDetailsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  background: var(--surface-alt);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+/* ── 13. Onboarding Skeleton ──────────────────────────────────────────────── */
+.onboardingWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  gap: 24px;
+}
+
+.onboardingCardSkeleton {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+

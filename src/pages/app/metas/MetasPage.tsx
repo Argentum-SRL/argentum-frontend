@@ -15,7 +15,7 @@ import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import GoalCard from '@/components/goals/GoalCard'
 import GoalsBarChart from './GoalsBarChart'
-import { EmptyState, PageSummaryBar } from '@/components/ui'
+import { EmptyState, PageSummaryBar, GoalsSkeleton } from '@/components/ui'
 
 export default function MetasPage() {
   const { open, confirm } = useModal()
@@ -259,9 +259,7 @@ export default function MetasPage() {
       {/* ── Content ──────────────────────────────────────────────────── */}
       <div className={styles.content}>
         {loading ? (
-          <div className={styles.grid}>
-            {[1, 2, 3].map(i => <div key={i} className={styles.skeletonCard} />)}
-          </div>
+          <GoalsSkeleton count={3} />
         ) : filteredGoals.length === 0 ? (
           <EmptyState
             icon={Target}

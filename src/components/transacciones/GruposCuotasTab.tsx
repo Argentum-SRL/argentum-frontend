@@ -25,7 +25,7 @@ import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { EmptyState, DateInput } from '@/components/ui'
+import { EmptyState, DateInput, GruposCuotasSkeleton } from '@/components/ui'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
@@ -529,7 +529,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   }, [grupos, search, statusFilter])
 
   if (loading) {
-    return <div className={styles.loadingState}>Cargando compras en cuotas...</div>
+    return <GruposCuotasSkeleton count={4} />
   }
 
   if (grupos.length === 0) {

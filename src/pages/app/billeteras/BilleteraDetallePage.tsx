@@ -6,7 +6,7 @@ import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import transaccionService from '@/services/transaccion.service'
 import categoriaService from '@/services/categoria.service'
-import { EmptyState, LunarLoader } from '@/components/ui'
+import { EmptyState, BilleteraDetalleSkeleton, TransactionsListSkeleton, CardsGridSkeleton } from '@/components/ui'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
@@ -435,8 +435,8 @@ const BilleteraDetallePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <LunarLoader size={32} />
+      <div className={styles.container}>
+        <BilleteraDetalleSkeleton />
       </div>
     )
   }
@@ -629,8 +629,8 @@ const BilleteraDetallePage: React.FC = () => {
         <section className={`${styles.movimientosSection} ${!billetera.es_efectivo && activeTab !== 'movimientos' ? styles.hiddenMobile : ''}`}>
           <h2 className={styles.sectionTitle}>Movimientos</h2>
           {loadingData ? (
-            <div className={styles.tabLoading}>
-              <LunarLoader size={24} color="var(--text-3)" />
+            <div style={{ padding: '8px 0' }}>
+              <TransactionsListSkeleton groupsCount={1} rowsPerGroup={3} />
             </div>
           ) : movimientos.length === 0 ? (
             <EmptyState
@@ -698,8 +698,8 @@ const BilleteraDetallePage: React.FC = () => {
             </div>
 
             {loadingData ? (
-              <div className={styles.tabLoading}>
-                <LunarLoader size={24} color="var(--text-3)" />
+              <div style={{ padding: '8px 0' }}>
+                <CardsGridSkeleton count={1} />
               </div>
             ) : tarjetas.length === 0 ? (
               <EmptyState

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard } from '@/components/ui/icons'
-import { LunarLoader } from '@/components/ui'
+import { LunarLoader, TransactionsListSkeleton, Skeleton } from '@/components/ui'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -445,7 +445,15 @@ export default function TransaccionesPage() {
       <div className={styles.pageHeader}>
         <div className={styles.titleGroup}>
           <h1>Transacciones</h1>
-          <p className={styles.subtitle}>{periodoActual?.label ?? 'Cargando período...'} · {transacciones.length} movimientos</p>
+          {loadingPeriodo || !periodoActual ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '18px' }} aria-hidden="true">
+              <Skeleton variant="text" width={110} height={12} />
+              <span style={{ color: 'var(--text-3)' }}>·</span>
+              <Skeleton variant="text" width={75} height={12} />
+            </div>
+          ) : (
+            <p className={styles.subtitle}>{periodoActual.label} · {loading ? '—' : `${transacciones.length} movimientos`}</p>
+          )}
         </div>
         <div className={styles.headerActions}>
           <button
@@ -582,7 +590,7 @@ export default function TransaccionesPage() {
           {/* ── Lista ────────────────────────────────────────────────────────── */}
           <div className={styles.listContainer}>
             {loading || loadingPeriodo ? (
-              <div className={styles.loadingState}>Cargando transacciones...</div>
+              <TransactionsListSkeleton groupsCount={2} rowsPerGroup={3} />
             ) : grupos.length === 0 ? (
               <EmptyState
                 icon={ArrowLeftRight}

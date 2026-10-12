@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, Info } from '@/components/ui/icons';
 import { formatMonto } from '@/utils/format';
 import type { FinancialContext } from '@/types/tools';
+import { Skeleton } from '@/components/ui';
 import styles from './ToolsComponents.module.css';
 
 interface FinancialContextBannerProps {
@@ -18,13 +19,13 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
   if (loading) {
     return (
       <div className={styles.contextSkeleton}>
-        <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px 20px' }}>
+        <Skeleton variant="text" width={180} height={16} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px 20px', marginTop: '12px' }}>
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonStat}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonDesc}`} />
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Skeleton variant="text" width="60%" height={12} />
+              <Skeleton variant="text" width="80%" height={20} />
+              <Skeleton variant="text" width="40%" height={11} />
             </div>
           ))}
         </div>

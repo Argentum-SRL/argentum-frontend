@@ -63,4 +63,21 @@ export {
   type SelectableSurfaceProps,
   type ElevationContextType,
 } from './SelectableSurface'
+export {
+  Skeleton,
+  CardsGridSkeleton,
+  TransactionsListSkeleton,
+  GruposCuotasSkeleton,
+  TransferenciasListSkeleton,
+  BilleteraDetalleSkeleton,
+  ImportacionResumenSkeleton,
+  SuscripcionesSkeleton,
+  TableSkeleton,
+  GoalsSkeleton,
+  PresupuestosSkeleton,
+  TarjetaSummarySkeleton,
+  FacturaPanelSkeleton,
+  OnboardingSkeleton,
+  type SkeletonProps,
+} from './Skeleton'
 

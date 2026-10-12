@@ -5,7 +5,7 @@ import tarjetaService from '@/services/tarjeta.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatMonto } from '@/utils/format'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, TarjetaSummarySkeleton } from '@/components/ui'
 import PagarResumenModal from './PagarResumenModal'
 import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
 import styles from './TarjetaSummary.module.css'
@@ -249,7 +249,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
     return days >= 0 && days <= 5
   }
 
-  if (loading) return <div className={styles.loadingSkeleton} />
+  if (loading) return <TarjetaSummarySkeleton />
 
   if (error) {
     return (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { AlertTriangle, ShieldAlert } from '@/components/ui/icons'
-import { LunarLoader } from '@/components/ui'
+import { LunarLoader, ImportacionResumenSkeleton, TableSkeleton } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import tarjetaService from '@/services/tarjeta.service'
@@ -284,12 +284,7 @@ export const ImportacionResumenSection: React.FC = () => {
 
   // Estado de carga inicial
   if (loadingData) {
-    return (
-      <div className={styles.loadingContainer}>
-        <LunarLoader size={36} color="var(--primary)" />
-        <p className={styles.loadingTitle}>Verificando tus tarjetas activas...</p>
-      </div>
-    )
+    return <ImportacionResumenSkeleton />
   }
 
   // Mensaje bloqueante si no tiene tarjetas de crédito activas
@@ -323,10 +318,8 @@ export const ImportacionResumenSection: React.FC = () => {
   // Pantalla de carga de la vista previa
   if (loadingPreview) {
     return (
-      <div className={`${styles.formContainer} ${styles.loadingContainer}`}>
-        <LunarLoader size={36} color="var(--primary)" />
-        <p className={styles.loadingTitle}>Cargando vista previa...</p>
-        <p className={styles.loadingDesc}>Estamos leyendo las transacciones del resumen.</p>
+      <div className={styles.formContainer}>
+        <TableSkeleton rows={6} cols={4} />
       </div>
     )
   }

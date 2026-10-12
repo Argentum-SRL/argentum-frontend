@@ -635,6 +635,11 @@ export interface SimularPesificacionResponse {
   total_estimado_ars?: number | null
 }
 
+export interface ResumenDeCompraResponse {
+  fecha_cierre: string
+  fecha_vencimiento: string
+}
+
 export interface PagarTarjetaPayload {
   monto?: number
   fecha_pago?: string

@@ -13,7 +13,6 @@ import {
   SlidersHorizontal,
   Plus,
   Minus,
-  Lightbulb,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
@@ -34,6 +33,8 @@ import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { useMemoriaComercio } from './useMemoriaComercio'
 import MemoriaComercioDialog from './MemoriaComercioDialog'
 import memoriaStyles from './MemoriaComercioDialog.module.css'
+import ResumenDeCompraInfo from './ResumenDeCompraInfo'
+import { useResumenDeCompra, formatDDMM } from '@/hooks/useResumenDeCompra'
 
 interface TransaccionModalProps {
   open: boolean
@@ -162,6 +163,9 @@ function formReducer(state: FormState, action: FormAction): FormState {
     case 'SET_STEP':
       return { ...state, step: action.step, slideDirection: action.direction }
     case 'SET_FIELD':
+      if (action.field === 'tarjetaId') {
+        return { ...state, tarjetaId: action.value, proximoResumen: false }
+      }
       return { ...state, [action.field]: action.value }
     default:
       return state
@@ -257,6 +261,13 @@ export default function TransaccionModal({
     billeteraId, tarjetaId, fecha, metodoPago, cantidadCuotas, cuotaInicial, proximoResumen, tasaInteres, isSubmitting,
   } = state
 
+  const { resumen: resumenCompra, loading: loadingResumenCompra, error: errorResumenCompra } = useResumenDeCompra(
+    metodoPago === 'credito' ? tarjetaId : null,
+    fecha,
+    proximoResumen
+  )
+  const vencimientoDDMM = resumenCompra?.fecha_vencimiento ? formatDDMM(resumenCompra.fecha_vencimiento) : ''
+
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [isCustomOverride, setIsCustomOverride] = useState(false)
   const isCustomCuotas = isCustomOverride || ![1, 3, 6, 12].includes(cantidadCuotas)
@@ -308,8 +319,6 @@ export default function TransaccionModal({
       return saldoB - saldoA
     })
   }, [tarjetas, tarjetaId, billeteras])
-
-  const selectedTarjeta = useMemo(() => tarjetas.find(t => t.id === tarjetaId), [tarjetas, tarjetaId])
 
   // Billeteras activas para la moneda seleccionada
   const billeterasMoneda = useMemo(() => {
@@ -1054,34 +1063,14 @@ export default function TransaccionModal({
                       )}
                     </div>
 
-                    {/* 2. ¿Cuándo entra la 1ª cuota? (Toggle claro) */}
-                    <div className={styles.timingSection}>
-                      <label className={styles.fieldLabel}>¿Cuándo entra la 1ª cuota?</label>
-                      <div className={styles.timingToggle}>
-                        <button
-                          type="button"
-                          className={`${styles.timingBtn} ${!proximoResumen ? styles.timingBtnActive : ''}`}
-                          onClick={() => dispatch({ type: 'SET_FIELD', field: 'proximoResumen', value: false })}
-                        >
-                          <span className={styles.timingBtnTitle}>Este mes</span>
-                          <span className={styles.timingBtnSub}>Resumen actual</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={`${styles.timingBtn} ${proximoResumen ? styles.timingBtnActive : ''}`}
-                          onClick={() => dispatch({ type: 'SET_FIELD', field: 'proximoResumen', value: true })}
-                        >
-                          <span className={styles.timingBtnTitle}>Próximo mes</span>
-                          <span className={styles.timingBtnSub}>Resumen siguiente</span>
-                        </button>
-                      </div>
-                      {selectedTarjeta && selectedTarjeta.dia_cierre > 0 && (
-                        <p className={styles.timingCardHint}>
-                          <Lightbulb size={13} strokeWidth={2} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 5, color: '#C9A227' }} />
-                          Tu <strong>{selectedTarjeta.nombre || 'tarjeta'}</strong> cierra el día <strong>{selectedTarjeta.dia_cierre}</strong> de cada mes.
-                        </p>
-                      )}
-                    </div>
+                    {/* 2. Resumen de compra */}
+                    <ResumenDeCompraInfo
+                      resumen={resumenCompra}
+                      loading={loadingResumenCompra}
+                      error={errorResumenCompra}
+                      proximoResumen={proximoResumen}
+                      onChangeProximoResumen={(value) => dispatch({ type: 'SET_FIELD', field: 'proximoResumen', value })}
+                    />
 
                     {/* 3. Opciones avanzadas (Progressive disclosure: Interés y cuotas ya pagadas) */}
                     {cantidadCuotas > 1 && (
@@ -1143,7 +1132,7 @@ export default function TransaccionModal({
                             {cantidadCuotas === 1 ? ' pago único' : '/mes'}
                           </span>
                         </div>
-                        {cantidadCuotas > 1 && (
+                        {cantidadCuotas > 1 && tasaInteres > 0 && (
                           <div className={styles.heroTotalBadge}>
                             Total: {formatMonto(calculoCuotas.total, moneda)}
                           </div>
@@ -1153,15 +1142,15 @@ export default function TransaccionModal({
                       <p className={styles.heroFinancingNarrative}>
                         {cantidadCuotas === 1 ? (
                           <>
-                            Se cargará en el resumen de <strong>{proximoResumen ? 'el próximo mes' : 'este mes'}</strong>.
+                            Se carga en {vencimientoDDMM ? <>el resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>el próximo resumen</strong>}.
                           </>
                         ) : cuotaInicial > 1 ? (
                           <>
-                            Pagarás <strong>{cantidadCuotas - cuotaInicial + 1} de {cantidadCuotas} cuotas</strong> a partir de <strong>{proximoResumen ? 'el próximo mes' : 'este mes'}</strong>.
+                            Pagarás <strong>{cantidadCuotas - cuotaInicial + 1} de {cantidadCuotas} cuotas</strong> a partir del {vencimientoDDMM ? <>resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>próximo resumen</strong>}.
                           </>
                         ) : (
                           <>
-                            Pagarás <strong>{cantidadCuotas} cuotas</strong> {tasaInteres > 0 ? `(con ${tasaInteres}% int.)` : '(sin interés)'}, comenzando en el resumen de <strong>{proximoResumen ? 'el próximo mes' : 'este mes'}</strong>.
+                            Pagarás <strong>{cantidadCuotas} cuotas</strong> {tasaInteres > 0 ? `(con ${tasaInteres}% int.)` : '(sin interés)'}, empezando en {vencimientoDDMM ? <>el resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>el próximo resumen</strong>}.
                           </>
                         )}
                       </p>

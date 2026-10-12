@@ -1,5 +1,5 @@
 import api from './api'
-import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData, PagarTarjetaPayload, SimularPesificacionResponse, ResultadoPagoTarjeta } from '@/types'
+import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData, PagarTarjetaPayload, SimularPesificacionResponse, ResultadoPagoTarjeta, ResumenDeCompraResponse } from '@/types'
 
 const tarjetaService = {
   getTarjetas: async (signal?: AbortSignal): Promise<TarjetaCredito[]> => {
@@ -38,6 +38,19 @@ const tarjetaService = {
 
   getResumenTarjeta: async (id: string, signal?: AbortSignal): Promise<ResumenTarjeta> => {
     const { data } = await api.get<ResumenTarjeta>(`/tarjetas/${id}/resumen`, { signal })
+    return data
+  },
+
+  getResumenDeCompra: async (
+    tarjetaId: string,
+    fecha: string,
+    proximoResumen: boolean = false,
+    signal?: AbortSignal
+  ): Promise<ResumenDeCompraResponse> => {
+    const { data } = await api.get<ResumenDeCompraResponse>(`/tarjetas/${tarjetaId}/resumen-de-compra`, {
+      params: { fecha, proximo_resumen: proximoResumen },
+      signal,
+    })
     return data
   },
   pagarResumenTarjeta: async (

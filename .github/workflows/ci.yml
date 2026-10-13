@@ -1,0 +1,35 @@
+# Workflow de integracion continua para el frontend de Argentum
+# Valida la instalacion limpia de dependencias y compila el bundle de produccion
+name: CI Frontend
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Compilacion y chequeo de tipos del frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      # Descarga del repositorio
+      - name: Descargar codigo fuente
+        uses: actions/checkout@v4
+
+      # Configuracion de Node.js con la misma version mayor que el entorno local (Node 26)
+      - name: Configurar Node.js 26
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+
+      # Instalacion reproducible de dependencias
+      - name: Instalar dependencias con npm ci
+        run: npm ci
+
+      # Verificacion de tipos TypeScript y construccion del proyecto con Vite
+      - name: Compilar aplicacion frontend (build)
+        run: npm run build

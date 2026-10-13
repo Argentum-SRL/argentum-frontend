@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/icons'
 import { formatMonto } from '@/utils/format'
 import type { Billetera } from '@/types'
+import { separarBilleterasEnCero } from './billeterasEnCero'
 import styles from './BalanceCard.module.css'
 
 export interface CompromisoItem {
@@ -72,9 +73,17 @@ export const BalanceCard = memo(function BalanceCard({
 }: BalanceCardProps) {
   const [internalAccountsOpen, setInternalAccountsOpen] = useState(false)
   const [internalCompromisosOpen, setInternalCompromisosOpen] = useState(false)
+  const [mostrarEnCero, setMostrarEnCero] = useState(false)
 
   const isAccountsOpen = externalAccountsOpen !== undefined ? externalAccountsOpen : internalAccountsOpen
   const isCompromisosOpen = externalCompromisosOpen !== undefined ? externalCompromisosOpen : internalCompromisosOpen
+
+  // Al cerrar el panel de cuentas, las billeteras en $0 vuelven a quedar ocultas
+  useEffect(() => {
+    if (!isAccountsOpen) {
+      setMostrarEnCero(false)
+    }
+  }, [isAccountsOpen])
 
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -149,6 +158,40 @@ export const BalanceCard = memo(function BalanceCard({
     }
     return fallback
   }, [compromisos, suscripcionesPendientes, cuotasPendientes])
+
+  const { visibles: billeterasVisibles, enCero: billeterasEnCero } = useMemo(
+    () => separarBilleterasEnCero(billeterasActivas, billeterasSeleccionadas),
+    [billeterasActivas, billeterasSeleccionadas]
+  )
+
+  const renderFilaBilletera = (b: Billetera) => {
+    const isExplicitlyFiltered = billeterasSeleccionadas.includes(b.id)
+
+    return (
+      <button
+        key={b.id}
+        type="button"
+        role="option"
+        aria-selected={isExplicitlyFiltered}
+        className={`${styles.accountRow} ${isExplicitlyFiltered ? styles.rowSelected : ''}`}
+        onClick={() => onToggleBilletera(b.id)}
+        title={`Alternar ${b.nombre}`}
+      >
+        <div className={styles.rowLeft}>
+          <div className={`${styles.checkbox} ${isExplicitlyFiltered ? styles.checkboxChecked : ''}`}>
+            {isExplicitlyFiltered && <Check size={10} strokeWidth={3} />}
+          </div>
+          <span className={styles.accountName}>{b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}</span>
+          {b.es_principal && (
+            <Star size={10} fill="currentColor" className={styles.starIcon} />
+          )}
+        </div>
+        <span className={styles.accountAmount}>
+          {showBalance ? fmt(b.saldo_actual, b.moneda) : '••••'}
+        </span>
+      </button>
+    )
+  }
 
   return (
     <div ref={cardRef} className={`${styles.card} ${className || ''}`}>
@@ -316,34 +359,23 @@ export const BalanceCard = memo(function BalanceCard({
               </div>
 
               <div className={styles.accountsList} role="listbox">
-                {billeterasActivas.map(b => {
-                  const isExplicitlyFiltered = billeterasSeleccionadas.includes(b.id)
+                {billeterasVisibles.map(renderFilaBilletera)}
 
-                  return (
-                    <button
-                      key={b.id}
-                      type="button"
-                      role="option"
-                      aria-selected={isExplicitlyFiltered}
-                      className={`${styles.accountRow} ${isExplicitlyFiltered ? styles.rowSelected : ''}`}
-                      onClick={() => onToggleBilletera(b.id)}
-                      title={`Alternar ${b.nombre}`}
-                    >
-                      <div className={styles.rowLeft}>
-                        <div className={`${styles.checkbox} ${isExplicitlyFiltered ? styles.checkboxChecked : ''}`}>
-                          {isExplicitlyFiltered && <Check size={10} strokeWidth={3} />}
-                        </div>
-                        <span className={styles.accountName}>{b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}</span>
-                        {b.es_principal && (
-                          <Star size={10} fill="currentColor" className={styles.starIcon} />
-                        )}
-                      </div>
-                      <span className={styles.accountAmount}>
-                        {showBalance ? fmt(b.saldo_actual, b.moneda) : '••••'}
-                      </span>
-                    </button>
-                  )
-                })}
+                {billeterasEnCero.length > 0 && (
+                  <button
+                    type="button"
+                    className={styles.zeroAccountsToggleBtn}
+                    onClick={() => setMostrarEnCero(prev => !prev)}
+                  >
+                    {mostrarEnCero
+                      ? 'Ocultar las de $0'
+                      : billeterasEnCero.length === 1
+                        ? 'Ver 1 en $0'
+                        : `Ver ${billeterasEnCero.length} en $0`}
+                  </button>
+                )}
+
+                {mostrarEnCero && billeterasEnCero.map(renderFilaBilletera)}
               </div>
             </div>
           )}

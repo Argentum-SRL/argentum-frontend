@@ -367,6 +367,23 @@
   font-weight: 600;
 }
 
+.zeroAccountsToggleBtn {
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  align-self: flex-start;
+}
+
+.zeroAccountsToggleBtn:hover {
+  color: #ffffff;
+}
+
 .accountsList {
   display: flex;
   flex-direction: column;

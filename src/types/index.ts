@@ -932,6 +932,7 @@ export interface GrupoCuotasResumen {
   estado: 'activo' | 'cancelado' | 'completado'
   categoria_id?: string | null
   subcategoria_id?: string | null
+  suscripcion_id?: string | null
 }
 
 export interface GrupoCuotasUpdate {

@@ -35,6 +35,7 @@
   text-align: center;
   color: var(--text);
   margin-bottom: 8px;
+  line-height: 1.25;
 }
 
 .description {
@@ -77,28 +78,95 @@
 
 .actions {
   display: flex;
-  flex-direction: column;
   gap: 10px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.actions > :only-child {
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: none;
+}
+
+.cancelBtn {
+  flex: 1;
+  max-width: 130px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
+  white-space: nowrap;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.cancelBtn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.cancelBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.cancelBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .confirmBtn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  font-weight: 700;
-  font-size: 0.9375rem;
+  flex: 2;
+  height: 42px;
+  border-radius: 12px;
   border: none;
+  font-size: 13.5px;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  transition: opacity 120ms ease, transform 120ms ease;
+  white-space: nowrap;
+}
+
+.confirmBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.confirmBtn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.confirmBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .confirmBtnDanger { 
   background: var(--error); 
   color: #fff; 
+}
+
+.confirmBtnDanger:focus-visible {
+  outline-color: var(--error);
 }
 
 .confirmBtnDefault { 
@@ -118,29 +186,7 @@
 }
 
 .confirmBtn:disabled { 
-  opacity: 0.5; 
-  cursor: not-allowed; 
-}
-
-.cancelBtn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  border: none;
-  background: none;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.cancelBtn:hover { 
-  background: var(--surface-alt); 
-}
-
-.cancelBtn:disabled { 
-  opacity: 0.5; 
+  opacity: 0.4; 
   cursor: not-allowed; 
 }
 
@@ -155,4 +201,58 @@
 
 @keyframes spin { 
   to { transform: rotate(360deg); } 
+}
+
+/* ── Responsive Behavior ─────────────────────────────────────────────────── */
+@media (max-width: 480px), (max-height: 720px) {
+  .iconWrap {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 12px;
+  }
+
+  .title {
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+
+  .description {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    margin-bottom: 16px;
+  }
+
+  .actions {
+    gap: 8px;
+  }
+
+  .cancelBtn {
+    height: 40px;
+    font-size: 13px;
+    max-width: 105px;
+    padding: 0 12px;
+  }
+
+  .confirmBtn {
+    height: 40px;
+    font-size: 12.5px;
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 340px) {
+  .actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .cancelBtn,
+  .confirmBtn {
+    width: 100%;
+    max-width: none;
+    flex: none;
+    height: 42px;
+    font-size: 13px;
+  }
 }

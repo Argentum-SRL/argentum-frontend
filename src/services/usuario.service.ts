@@ -78,8 +78,8 @@ const usuarioService = {
     return data
   },
 
-  eliminarCuenta: async () => {
-    const { data } = await api.delete<{ confirmacion: string }>('/usuarios/me')
+  eliminarCuenta: async (payload: { password?: string; google_token?: string } = {}) => {
+    const { data } = await api.post<{ confirmacion: string }>('/usuarios/me/eliminar', payload)
     return data
   },
 

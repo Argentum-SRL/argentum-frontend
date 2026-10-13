@@ -20,6 +20,7 @@ interface ConfirmModalProps {
   variant?: 'danger' | 'warning' | 'default'
   isLoading?: boolean
   requireTyping?: string
+  size?: 'sm' | 'md' | 'lg'
 }
 
 export function ConfirmModal({
@@ -32,7 +33,8 @@ export function ConfirmModal({
   cancelLabel = 'Cancelar',
   variant = 'default',
   isLoading = false,
-  requireTyping
+  requireTyping,
+  size = 'sm'
 }: ConfirmModalProps) {
   const [inputValue, setInputValue] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -86,7 +88,7 @@ export function ConfirmModal({
       isOpen={isOpen}
       onClose={handleClose}
       showHeader={false}
-      size="sm"
+      size={size}
       autoHeight
     >
       <form 
@@ -120,6 +122,14 @@ export function ConfirmModal({
 
         <div className={styles.actions}>
           <button
+            type="button"
+            className={styles.cancelBtn}
+            onClick={handleClose}
+            disabled={isLoading}
+          >
+            {cancelLabel}
+          </button>
+          <button
             type="submit"
             className={[styles.confirmBtn, confirmBtnClassMap[variant]].join(' ')}
             disabled={!canConfirm}
@@ -127,14 +137,6 @@ export function ConfirmModal({
           >
             {isLoading && <LunarLoader size={16} />}
             {confirmLabel}
-          </button>
-          <button
-            type="button"
-            className={styles.cancelBtn}
-            onClick={handleClose}
-            disabled={isLoading}
-          >
-            {cancelLabel}
           </button>
         </div>
       </form>

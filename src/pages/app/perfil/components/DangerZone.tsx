@@ -1,37 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Trash2 } from '@/components/ui/icons'
-import { useAuth } from '@/hooks/useAuth'
-import { useModal } from '@/hooks/useModal'
-import { sileo } from 'sileo'
-import usuarioService from '@/services/usuario.service'
-import { getErrorMessage } from '@/utils/errorMessages'
+import { EliminarCuentaModal } from './EliminarCuentaModal'
 import styles from '../PerfilPage.module.css'
 
 export const DangerZone: React.FC = () => {
-  const { logout } = useAuth()
-  const { confirm } = useModal()
-  const [isBtnHovered, setIsBtnHovered] = React.useState(false)
-
-  const handleDeleteAccount = () => {
-    confirm({
-      title: '¿Eliminar tu cuenta de Argentum permanentemente?',
-      description:
-        'Esta acción es IRREVERSIBLE. Se borrarán todas tus billeteras, transacciones, presupuestos, suscripciones y datos personales sin posibilidad de recuperación.',
-      variant: 'danger',
-      confirmLabel: 'Eliminar cuenta definitivamente',
-      requireTyping: 'ELIMINAR',
-      onConfirm: async () => {
-        try {
-          await usuarioService.eliminarCuenta()
-          sileo.success({ title: 'Tu cuenta ha sido eliminada exitosamente.' })
-          await logout()
-        } catch (error) {
-          console.error('Error al eliminar la cuenta:', error)
-          sileo.error({ title: getErrorMessage(error, 'Hubo un error al intentar eliminar la cuenta.') })
-        }
-      },
-    })
-  }
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isBtnHovered, setIsBtnHovered] = useState(false)
 
   return (
     <div className={styles.dangerSingleCard}>
@@ -44,13 +18,19 @@ export const DangerZone: React.FC = () => {
       <button
         type="button"
         className={styles.deleteBtnModern}
-        onClick={handleDeleteAccount}
+        onClick={() => setIsModalOpen(true)}
         onMouseEnter={() => setIsBtnHovered(true)}
         onMouseLeave={() => setIsBtnHovered(false)}
       >
         <Trash2 size={15} isHovered={isBtnHovered} />
         <span>Eliminar mi cuenta</span>
       </button>
+
+      <EliminarCuentaModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   )
 }
+

@@ -1,0 +1,599 @@
+
+.dotInactive {
+  width: 6px;
+  background: var(--surface-alt);
+}
+
+.slidesContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  max-height: 90dvh;
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.editStep1 {
+  height: 485px;
+}
+
+.editStep2 {
+  height: 525px;
+}
+
+.detailStep1 {
+  height: 465px;
+}
+
+.detailStep2 {
+  height: 485px;
+}
+
+@media (max-height: 800px) {
+  .editStep1 {
+    height: min(485px, 88dvh);
+  }
+  .editStep2 {
+    height: min(525px, 88dvh);
+  }
+  .detailStep1 {
+    height: min(465px, 88dvh);
+  }
+  .detailStep2 {
+    height: min(485px, 88dvh);
+  }
+}
+
+@media (max-width: 640px) {
+  .editStep1,
+  .editStep2,
+  .detailStep1,
+  .detailStep2 {
+    height: auto;
+    max-height: 88dvh;
+  }
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms ease;
+}
+
+.slideVisible {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.slideExitLeft {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slideExitRight {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slideEnterRight {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slideEnterLeft {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Formulario Base para Edit Modal ─────────────────────────────────────── */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 10px;
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerRightActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.backBtn, .closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.backBtn:hover, .closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.formBody {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.formBody::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
+
+.formBodyWithHeader {
+  padding: 0;
+  gap: 0;
+}
+
+.formBodyWithHeader .formHeader {
+  padding: 12px 20px 6px;
+}
+
+.formFields {
+  padding: 2px 20px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .formFields {
+    padding: 2px 14px 4px;
+    gap: 10px;
+  }
+  .formBodyWithHeader .formHeader {
+    padding: 10px 14px 4px;
+  }
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
+}
+
+.fieldInput {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 150ms ease;
+  font-family: 'Figtree', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+}
+
+.descFechaRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.descCol {
+  flex: 1;
+  min-width: 0;
+}
+
+.fechaCol {
+  flex: 0 0 152px;
+  width: 152px;
+  min-width: 152px;
+}
+
+@media (max-width: 420px) {
+  .descFechaRow {
+    gap: 6px;
+  }
+  .fechaCol {
+    flex: 0 0 140px;
+    width: 140px;
+    min-width: 140px;
+  }
+}
+
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.cancelBtn, .submitBtn {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: none;
+  font-family: 'Figtree', sans-serif;
+}
+
+.cancelBtn {
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1.5px solid var(--border);
+}
+
+.cancelBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.submitBtn {
+  background: var(--primary);
+  color: white;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.submitBtn:disabled, .cancelBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.editRecalcNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  font-size: 12px;
+  line-height: 1.4;
+  color: #B45309;
+}
+
+:global([data-theme="dark"]) .editRecalcNotice,
+:global(.dark) .editRecalcNotice {
+  color: #FBBF24;
+}
+
+.fullHeightCard {
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.tarjetaSelectWrap {
+  width: 216px;
+  height: 136px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.tarjetaSelectWrap :global(.realCard) {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  aspect-ratio: auto !important;
+  border-radius: 14px !important;
+  padding: 10px 14px 10px !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+  font-size: 0.85em !important;
+}
+
+.tarjetaSelectWrap :global(.cardTop) {
+  min-height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin-bottom: 2px !important;
+}
+
+.tarjetaSelectWrap :global(.bankLogoImg) {
+  height: 19px !important;
+  max-width: 85px !important;
+  object-fit: contain !important;
+}
+
+.tarjetaSelectWrap :global(.walletNamePreview) {
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.2 !important;
+}
+
+.tarjetaSelectWrap :global(.cardMid) {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 2px 0 !important;
+}
+
+.tarjetaSelectWrap :global(.chipContainer) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-left: 0 !important;
+}
+
+.tarjetaSelectWrap :global(.chipSvg) {
+  width: 28px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+.tarjetaSelectWrap :global(.contactlessSvg) {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.tarjetaSelectWrap :global(.cardNumber) {
+  font-family: 'SF Mono', 'Courier New', monospace !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  margin-bottom: 2px !important;
+  white-space: nowrap !important;
+  line-height: 1.1 !important;
+}
+
+.tarjetaSelectWrap :global(.cardBottom) {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  min-height: 22px !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoRow) {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoGroup) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0px !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoLabel) {
+  font-size: 7.5px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.4px !important;
+  line-height: 1 !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoValue) {
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  line-height: 1.1 !important;
+}
+
+.tarjetaSelectWrap :global(.networkLogoWrap) {
+  display: flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.tarjetaSelectWrap :global(.networkLogo) {
+  height: 20px !important;
+  max-height: 20px !important;
+  max-width: 46px !important;
+  object-fit: contain !important;
+}
+
+.tarjetaSelectWrap :global(img[alt="amex"]) {
+  height: 26px !important;
+  max-height: 26px !important;
+  max-width: 46px !important;
+}
+
+/* ── Carrusel de Tarjetas (Selector en Modal de Edición) ─────────────────────── */
+.billeterasCarouselScroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  padding: 6px 0 10px;
+  margin: 0;
+  touch-action: pan-x;
+}
+
+.billeterasCarouselScroller::-webkit-scrollbar {
+  display: none;
+}
+
+.billeterasCarousel {
+  display: flex;
+  gap: 12px;
+  overflow: visible;
+  scroll-snap-type: x mandatory;
+  padding: 4px 14px 6px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start;
+  justify-content: safe center;
+  align-items: center;
+}
+
+.billeterasCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+.billeteraSelectWrap {
+  position: relative;
+  width: 224px;
+  height: 122px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: 16px;
+  transform: translateY(0);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 240ms ease,
+              filter 240ms ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.billeteraSelectWrap[data-active="false"] {
+  transform: translateY(0) scale(0.96);
+  filter: saturate(0.85);
+  opacity: 1;
+  box-shadow: var(--elevation-none);
+  z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .billeteraSelectWrap[data-active="false"]:hover {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.008);
+    box-shadow: var(--elevation-xs);
+    z-index: 2;
+  }
+}
+
+.billeteraSelectWrap[data-active="true"] {
+  transform: translateY(-3.5px) scale(1.025);
+  filter: none;
+  opacity: 1;
+  z-index: 10;
+  box-shadow: var(--elevation-selection-modal);
+}
+
+:global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"] {
+  box-shadow: var(--elevation-selection-modal);
+}
+
+.billeteraOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+  border-radius: inherit;
+  border: none;
+  background: transparent;
+}
+
+.emptyWalletBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 380px;
+  margin: 4px auto 8px;
+  padding: 22px 20px;
+  border-radius: 20px;
+  border: 1.5px dashed var(--border);
+  background: var(--surface-alt);
+  gap: 8px;
+  box-sizing: border-box;
+  transition: all 200ms ease;
+}
+
+.emptyWalletIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}
+
+.emptyWalletTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.emptyWalletSub {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.45;
+  margin: 0;
+  max-width: 320px;
+}

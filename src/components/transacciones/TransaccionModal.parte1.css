@@ -1,0 +1,645 @@
+/* ── Modal Root Wrapper ─────────────────────────────────────────────────── */
+.modalRoot {
+  width: 520px;
+  max-width: 100%;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .modalRoot {
+    width: 100%;
+    max-height: 90dvh;
+  }
+}
+
+/* ── Indicador de pasos (Estilo BankPickerModal) ─────────────────────────── */
+.stepIndicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 24px 8px;
+  flex-shrink: 0;
+  background: var(--surface);
+  position: relative;
+  z-index: 10;
+}
+
+.dot {
+  height: 6px;
+  border-radius: 3px;
+  transition: width 300ms ease, background 300ms ease;
+}
+
+.dotActive {
+  width: 20px;
+  background: var(--primary);
+}
+
+.dotInactive {
+  width: 6px;
+  background: var(--surface-alt);
+}
+
+/* ── Slides container & transitions (Estilo BankPickerModal) ─────────────── */
+.slidesContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  max-height: 90dvh;
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step1 {
+  height: 525px;
+}
+
+.step1Compact {
+  height: 455px;
+}
+
+.step2 {
+  height: 465px;
+}
+
+.step3 {
+  height: 515px;
+}
+
+@media (max-height: 800px) {
+  .step1 {
+    height: min(525px, 88dvh);
+  }
+  .step1Compact {
+    height: min(455px, 88dvh);
+  }
+  .step2 {
+    height: min(465px, 88dvh);
+  }
+  .step3 {
+    height: min(515px, 88dvh);
+  }
+}
+
+@media (max-width: 640px) {
+  .step1,
+  .step1Compact,
+  .step2,
+  .step3 {
+    height: auto;
+    max-height: 88dvh;
+  }
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms ease;
+}
+
+.slideVisible {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.slideExitLeft {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slideExitRight {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slideEnterRight {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slideEnterLeft {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Formulario Base ─────────────────────────────────────────────────────── */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 10px;
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerRightActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deleteHeaderBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 120ms ease;
+}
+
+.deleteHeaderBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #DC2626;
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.backBtn, .closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.backBtn:hover, .closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.formBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formBodyStep1 {
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+}
+
+.formBodyWithHeader {
+  padding: 0;
+  gap: 0;
+}
+
+.formBodyWithHeader .formHeader {
+  padding: 12px 20px 6px;
+}
+
+.formFields {
+  padding: 2px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .formFields {
+    padding: 2px 14px 4px;
+    gap: 8px;
+  }
+  .formBodyWithHeader .formHeader {
+    padding: 10px 14px 4px;
+  }
+}
+
+.formBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.formBody::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
+}
+
+
+.fieldInput {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 150ms ease;
+  font-family: 'Figtree', sans-serif;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+}
+
+/* ── Hero Monto ──────────────────────────────────────────────────────────── */
+.montoHero {
+  background: var(--surface-alt);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Selector de moneda con bandera */
+.monedaSelector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.monedaFlag {
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 3px;
+  transition: background 120ms ease;
+}
+
+.monedaFlag:hover {
+  background: var(--border);
+}
+
+/* Chip toggle de moneda — un solo botón que alterna al hacer click */
+.monedaToggleChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: none;
+  background: var(--surface-alt);
+  cursor: pointer;
+  transition: background 140ms ease;
+  flex-shrink: 0;
+}
+
+.monedaToggleChip:hover {
+  background: var(--border);
+}
+
+.monedaChipFlag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.monedaChipLabel {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--text-2);
+  letter-spacing: 0.4px;
+}
+
+/* Divisor vertical entre el selector de moneda y el input */
+.montoDivider {
+  width: 1px;
+  height: 34px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* El input de número grande */
+.montoHeroInput {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.montoHeroPrefix {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text-3);
+  line-height: 1;
+  flex-shrink: 0;
+  letter-spacing: -1.2px;
+}
+
+.montoHeroField {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  font-family: 'Figtree', sans-serif;
+  line-height: 1;
+}
+
+.montoHeroField::placeholder {
+  color: var(--border);
+}
+
+/* ── Select Input Overlay ────────────────────────────────────────────────── */
+.selectInput {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E9198' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+/* ── Radio Pills (Tipo) ──────────────────────────────────────────────────── */
+.radioPills {
+  display: flex;
+  gap: 8px;
+}
+
+.radioPill {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 150ms ease;
+}
+
+.radioPill:hover {
+  background: var(--surface);
+}
+
+.pillActiveEgreso {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  box-shadow: var(--elevation-xs);
+}
+
+.pillActiveIngreso {
+  background: #16A34A;
+  color: white;
+  box-shadow: var(--elevation-xs);
+}
+
+/* ── Carrusel de Billeteras (Calibrated Depth & Surface Flow) ──────────────── */
+.billeterasCarouselScroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  /* Espaciado vertical holgado para eliminar cualquier clipping de elevación */
+  padding: 12px 0 28px;
+  margin: -6px 0 -20px;
+  touch-action: pan-x;
+}
+
+.billeterasCarouselScroller::-webkit-scrollbar {
+  display: none;
+}
+
+.billeterasCarousel {
+  display: flex;
+  gap: 12px;
+  overflow: visible;
+  scroll-snap-type: x mandatory;
+  padding: 10px 16px 26px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start;
+  justify-content: safe center;
+  align-items: center;
+}
+
+.billeterasCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+.billeteraSelectWrap {
+  position: relative;
+  width: 224px;
+  height: 122px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: 16px;
+  transform: translateY(0);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+/* ── Tarjetas de Crédito en Carrusel (Aspect Ratio 1.586 ID-1 Standard) ───── */
+.tarjetaSelectWrap {
+  width: 216px;
+  height: 136px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.tarjetaSelectWrap :global(.realCard) {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  aspect-ratio: auto !important;
+  border-radius: 14px !important;
+  padding: 10px 14px 10px !important;
+  box-shadow: var(--elevation-none) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+  font-size: 0.85em !important;
+}
+
+.tarjetaSelectWrap :global(.cardTop) {
+  min-height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin-bottom: 2px !important;
+}
+
+.tarjetaSelectWrap :global(.bankLogoImg) {
+  height: 19px !important;
+  max-width: 85px !important;
+  object-fit: contain !important;
+}
+
+.tarjetaSelectWrap :global(.walletNamePreview) {
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.2 !important;
+}
+
+.tarjetaSelectWrap :global(.cardMid) {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 2px 0 !important;
+}
+
+.tarjetaSelectWrap :global(.chipContainer) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-left: 0 !important;
+}
+
+.tarjetaSelectWrap :global(.chipSvg) {
+  width: 28px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+.tarjetaSelectWrap :global(.contactlessSvg) {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.tarjetaSelectWrap :global(.cardNumber) {
+  font-family: 'SF Mono', 'Courier New', monospace !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  margin-bottom: 2px !important;
+  white-space: nowrap !important;
+  line-height: 1.1 !important;
+}
+
+.tarjetaSelectWrap :global(.cardBottom) {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  min-height: 22px !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoRow) {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoGroup) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0px !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoLabel) {
+  font-size: 7.5px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.4px !important;
+  line-height: 1 !important;
+}
+
+.tarjetaSelectWrap :global(.cardInfoValue) {
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  line-height: 1.1 !important;
+}
+
+.tarjetaSelectWrap :global(.networkLogoWrap) {
+  display: flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.tarjetaSelectWrap :global(.networkLogo) {
+  height: 20px !important;
+  max-height: 20px !important;
+  max-width: 46px !important;
+  object-fit: contain !important;
+}
+
+.tarjetaSelectWrap :global(img[alt="amex"]) {
+  height: 26px !important;
+  max-height: 26px !important;
+  max-width: 46px !important;
+}
+
+/* ── Inactive Card: Resting flat on modal surface, crisp, natural and 100% legible ──
+   Zero artificial dimming (opacity 1). Sibling cards preserve full contrast, color, and logo vibrancy. */
+.billeteraSelectWrap[data-active="false"],
+.billeteraSelectWrap[data-selected="false"] {
+  transform: translateY(0);
+  filter: none;
+  opacity: 1;
+  box-shadow: var(--elevation-none);
+  z-index: 1;
+}

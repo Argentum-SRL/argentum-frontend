@@ -1,0 +1,717 @@
+.popoverItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+  transition: background-color 0.12s ease;
+  width: 100%;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.popoverItem:hover {
+  background: var(--surface-alt);
+}
+
+.popoverItemActive {
+  background: var(--surface-alt);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.popoverItemText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemCheck {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.catGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.catGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  padding: 6px 8px 3px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.catGroup:first-child .catGroupHeader {
+  border-top: none;
+  margin-top: 0;
+}
+
+.catGroupCount {
+  font-size: 9.5px;
+  font-weight: 700;
+  background: var(--surface-alt);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--text-3);
+}
+
+.popoverEmpty {
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+  padding: 16px 8px;
+}
+
+/* ── Date Popover ─────────────────────────────────────── */
+.datePopoverContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+  max-width: 100%;
+}
+
+.desktopPresetsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.desktopPresetBtn {
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  border: 1px solid transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  font-family: inherit;
+}
+
+.desktopPresetBtn:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.dateGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dateSubmitBtn {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 4px;
+  font-weight: 600;
+  background: var(--primary);
+  color: #ffffff;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.dateSubmitBtn:hover {
+  opacity: 0.9;
+}
+
+.typePillActive {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+/* ── Mobile Modal Drawer Content Styles ── */
+.mobileDrawerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 4px 10px;
+}
+
+.activePillsRowMobile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: -8px;
+}
+
+/* ── Segmented Control Apple Style (Mobile) ─────────────────────────────── */
+.pillGroupMobile {
+  display: flex;
+  width: 100%;
+  background: transparent;
+  padding: 0;
+  border: none;
+  gap: 8px;
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+
+.typePillMobile {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0 8px;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .typePillMobile:hover {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+  }
+}
+
+.typePillMobile:active {
+  transform: scale(0.975);
+}
+
+.typePillActiveTodosMobile,
+.typePillActiveEgresoMobile,
+.typePillActiveIngresoMobile {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-xs);
+  border-color: var(--border) !important;
+  z-index: 2;
+}
+
+:global([data-theme="dark"]) .typePillMobile,
+:global(.dark) .typePillMobile {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-2);
+}
+
+:global([data-theme="dark"]) .typePillMobile:hover,
+:global(.dark) .typePillMobile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+}
+
+:global([data-theme="dark"]) .typePillActiveTodosMobile,
+:global([data-theme="dark"]) .typePillActiveEgresoMobile,
+:global([data-theme="dark"]) .typePillActiveIngresoMobile,
+:global(.dark) .typePillActiveTodosMobile,
+:global(.dark) .typePillActiveEgresoMobile,
+:global(.dark) .typePillActiveIngresoMobile {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: var(--elevation-xs);
+}
+
+/* ── Collapsible Dropdown Sections (Mobile Drawer) ── */
+.accountsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 6px;
+}
+
+.accountsTrigger {
+  display: flex;
+  align-items: center;
+  background: var(--page);
+  border: 1.5px solid var(--surface-alt);
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .accountsTrigger:hover {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+}
+
+.triggerActive {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--elevation-xs);
+}
+
+:global([data-theme="dark"]) .accountsTrigger,
+:global(.dark) .accountsTrigger {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="dark"]) .accountsTrigger:hover,
+:global(.dark) .accountsTrigger:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+:global([data-theme="dark"]) .triggerActive,
+:global(.dark) .triggerActive {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.triggerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.triggerLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.triggerDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  flex-shrink: 0;
+}
+
+.triggerDotCategory {
+  background: var(--primary);
+}
+
+.triggerText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: var(--text-3);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.accountsDropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  animation: dropdownFadeIn 0.16s ease-out;
+  box-sizing: border-box;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdownTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.resetBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.resetBtn:hover {
+  color: var(--text);
+  background: var(--border);
+}
+
+.resetBtnActive {
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.accountsList {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+}
+
+.accountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.15s ease, color 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  font-family: inherit;
+}
+
+.accountRow:hover {
+  background: var(--surface);
+}
+
+.rowSelected {
+  background: rgba(37, 99, 235, 0.08);
+  font-weight: 600;
+}
+
+:global([data-theme="dark"]) .rowSelected,
+:global(.dark) .rowSelected {
+  background: rgba(72, 120, 184, 0.15);
+}
+
+.rowLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  flex: 1;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  border: 1.5px solid var(--text-3);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.checkboxChecked {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.bankIconMini {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+  color: var(--text-2);
+}
+
+.accountName {
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.starIcon {
+  color: #F59E0B;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+.accountAmount {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Category Checklist (Legacy support) */
+.categoriaListMobile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 6px;
+  padding-right: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .categoriaListMobile {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.categoriaRowMobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.categoriaRowMobile:active {
+  background: var(--surface-alt);
+}
+
+.categoriaRowActiveMobile {
+  background: var(--surface-alt);
+  font-weight: 600;
+}
+
+.categoriaRowLeftMobile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.allCatsIconMobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+}
+
+.checkboxMobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--text-3);
+  background: transparent;
+  color: transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkboxCheckedMobile {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+/* Quick Presets Grid */
+.presetsGridMobile {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.presetBtnMobile {
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.presetBtnMobile:active {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Mobile drawer category groups */
+.catGroupMobile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.catGroupHeaderMobile {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+  padding: 6px 8px 2px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.catGroupMobile:first-of-type .catGroupHeaderMobile {
+  border-top: none;
+  margin-top: 0;
+}
+
+/* Date Inputs Row */
+.dateInputsRowMobile {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.dateFieldMobile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Actions Row at Bottom */
+.drawerActionsRowMobile {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.clearBtnMobileNew {
+  flex: 1;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.clearBtnMobileNew:active {
+  background: var(--border);
+}
+
+.applyBtnMobileNew {
+  flex: 2;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 14px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: var(--elevation-sm);
+  font-family: inherit;
+}
+
+.applyBtnMobileNew:active {
+  opacity: 0.9;
+}
+
+.clearBtnDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

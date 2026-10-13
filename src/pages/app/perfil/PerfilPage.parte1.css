@@ -1,0 +1,687 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PerfilPage.module.css — Perfil & Ajustes (Optimizado y 100% Responsive)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Contenedor Principal y Header ────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-top: max(8px, env(safe-area-inset-top, 8px));
+    gap: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .page {
+    gap: 24px;
+  }
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 36px;
+}
+
+@media (max-width: 640px) {
+  .mainContent {
+    margin-bottom: 12px;
+  }
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .pageHeader {
+    display: none;
+  }
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.titleGroup h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .titleGroup h1 {
+    font-size: 26px;
+  }
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 0;
+}
+
+/* ── 2. Master Profile Hero Card ─────────────────────────────────── */
+.heroCard {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 24px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  box-shadow: var(--elevation-sm);
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="dark"] .heroCard {
+  box-shadow: var(--elevation-sm);
+  background: linear-gradient(180deg, rgba(22, 27, 36, 0.98) 0%, rgba(18, 22, 30, 0.98) 100%);
+}
+
+.heroGlow {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(168, 144, 90, 0.15) 0%, rgba(13, 32, 69, 0.08) 50%, transparent 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.heroInner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  z-index: 1;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .heroCard {
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+  .heroInner {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+  }
+  .avatarWrapper {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  .avatarFallback {
+    font-size: 22px !important;
+  }
+  .heroName {
+    font-size: 17px !important;
+  }
+  .heroContacts {
+    display: none !important;
+  }
+  .heroBadges {
+    display: none !important;
+  }
+  .heroDetails {
+    gap: 4px !important;
+  }
+}
+
+.avatarSection {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatarWrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--surface);
+  box-shadow: var(--elevation-xs);
+  background: var(--surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarFallback {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--surface-alt) 0%, var(--page) 100%);
+}
+
+.avatarOverlayBtn {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border: none;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.avatarWrapper:hover .avatarOverlayBtn,
+.avatarOverlayBtn:focus-visible {
+  opacity: 1;
+}
+
+.deletePhotoBtn {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--error, #e53e3e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--elevation-xs);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  z-index: 2;
+}
+
+.deletePhotoBtn:hover {
+  transform: scale(1.1);
+  background: rgba(229, 62, 62, 0.1);
+}
+
+.heroDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nameBadgeGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.heroName {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.heroContacts {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.contactItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.contactItem:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+.heroBadges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.statusChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.chipSuccess {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.chipWarning {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error, #ef4444);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.chipNeutral {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.chipInfo {
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+
+.chipInfo strong {
+  color: var(--text);
+}
+
+.chipSub {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-left: 2px;
+}
+
+/* ── 3. Segmented Navigation Tabs ────────────────────────────────── */
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  flex-shrink: 0;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  padding: 2px 0;
+}
+
+@supports (scrollbar-width: none) {
+  .controlsRow {
+    scrollbar-width: none;
+  }
+}
+
+.controlsRow::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  flex-shrink: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  width: max-content;
+}
+
+.dangerTabWrapper {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  flex-shrink: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  margin-left: auto;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  box-shadow: var(--elevation-xs) !important;
+}
+
+[data-theme="dark"] .tabActive {
+  background: var(--surface) !important;
+  color: #60a5fa !important;
+  box-shadow: var(--elevation-xs) !important;
+}
+
+.tabDanger {
+  color: var(--error, #ef4444);
+}
+
+.tabDanger:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--error, #ef4444);
+}
+
+.tabDangerActive {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: var(--error, #ef4444) !important;
+  box-shadow: var(--elevation-xs) !important;
+}
+
+/* ── 4. General Tab & Generic Section Cards ──────────────────────── */
+.tabGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .tabGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sectionCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  box-shadow: var(--elevation-sm);
+}
+
+@media (max-width: 640px) {
+  .sectionCard {
+    padding: 16px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.sectionIconWrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .sectionIconWrap {
+  color: #60a5fa;
+}
+
+.sectionHeaderText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sectionHeaderText h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.sectionHeaderText p {
+  font-size: 12px;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.actionBtnOutline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.actionBtnOutline:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+}
+
+.actionBtnOutlineSm {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.actionBtnOutlineSm:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+}
+
+/* Fields Grid (Datos Personales) */
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  width: 100%;
+}
+
+@media (min-width: 540px) {
+  .fieldsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.fieldItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fieldValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fieldValueWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mutedIcon {
+  color: var(--text-3);
+}
+
+.statusPillActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Contact List (Contacto & Vinculación) */
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.contactItemBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.contactItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.contactItemLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.contactItemLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}

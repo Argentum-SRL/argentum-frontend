@@ -1,0 +1,684 @@
+
+.sessionDeviceName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.currentSessionTag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.sessionMeta {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.revokeSingleBtn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--error, #ef4444);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.revokeSingleBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.revokeAllBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.revokeAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--error, #ef4444);
+  background: transparent;
+  color: var(--error, #ef4444);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.revokeAllBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ── 7. Notificaciones Tab ───────────────────────────────────────── */
+.notifContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.timeSectionBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface-alt);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .timeSectionBody {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+}
+
+.timeSectionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.timeSectionTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.timeSectionDesc {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.4;
+}
+
+.timeControlsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 680px) {
+  .timeControlsRow {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .timeControlsRow .timeInputBox {
+    flex: 1;
+  }
+  .timeControlsRow button {
+    flex: 1;
+  }
+}
+
+.timeInputBox {
+  display: flex;
+  align-items: center;
+}
+
+.notifCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 1080px) {
+  .notifCardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .notifCardsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.notifCard {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.notifCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.notifCardIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .notifCardIcon {
+  color: #60a5fa;
+}
+
+.notifCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.notifCardHeader .switch {
+  margin-left: auto;
+}
+
+.notifCardBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .notifCardBody {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+.inlineNumberControl {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.smallNumberInput {
+  width: 48px;
+  height: 28px;
+  padding: 0 4px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.smallNumberInput:focus {
+  border-color: var(--primary);
+}
+
+.channelsGroup {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.channelPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.channelPill:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.channelActive {
+  background: rgba(13, 32, 69, 0.06) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .channelActive {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+.notifFooterBar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+  width: 100%;
+}
+
+@media (max-width: 540px) {
+  .notifFooterBar {
+    justify-content: stretch;
+  }
+  .notifFooterBar button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ── 8. Danger Zone Tab ──────────────────────────────────────────── */
+.dangerSingleCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: var(--surface);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+[data-theme="dark"] .dangerSingleCard {
+  background: rgba(239, 68, 68, 0.04);
+}
+
+@media (max-width: 640px) {
+  .dangerSingleCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 18px;
+  }
+  .dangerSingleCard button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.dangerRowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.dangerActionTitleDestructive {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--error, #ef4444);
+}
+
+.dangerActionDesc {
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+
+.deleteBtnModern {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: var(--error, #ef4444);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.deleteBtnModern:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ── 9. Edit Modals (Datos, Email, Teléfono) ──────────────────────── */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.modalCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--elevation-lg);
+  animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modalTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.modalCloseBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modalCloseBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+/* ── Modal Forms (Matching TransaccionModal style) ─────────────────────── */
+.modalFormContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modalFormBody {
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.modalFormBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.modalFormBody::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.fieldInput {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 150ms ease;
+  font-family: inherit;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+}
+
+.formRowDual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 540px) {
+  .formRowDual {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.phoneInputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.countryBadgeWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.flagIcon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.countryCode {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.phoneInputField {
+  flex: 1;
+  min-width: 0;
+}
+
+.modalFieldHint {
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.modalFieldHint strong {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.passwordInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.modalPwEyeBtn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 120ms ease;
+}
+
+.modalPwEyeBtn:hover {
+  color: var(--text);
+}
+
+.modalFormFooter {
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--surface-alt);
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modalCancelBtn {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalCancelBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.modalSubmitBtn {
+  flex: 2;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.modalSubmitBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.modalSubmitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.modalAlertError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin: 10px 20px 0;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: var(--error, #ef4444);
+  font-size: 12px;
+  font-weight: 600;
+}

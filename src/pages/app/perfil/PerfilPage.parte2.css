@@ -1,0 +1,687 @@
+
+.unverifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.contactItemValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contactItemAction {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.editContactBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.editContactBtn:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.unlinkContactBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--error, #ef4444);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.unlinkContactBtn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--error, #ef4444);
+}
+
+.unlinkContactBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lockedTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.verifyDirectBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.verifyDirectBtn:hover {
+  opacity: 0.9;
+}
+
+/* ── 5. Finanzas & Moneda Tab ────────────────────────────────────── */
+.currencySelectGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.currencyOptionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-alt);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .currencyOptionCard {
+    padding: 10px 12px;
+    gap: 2px;
+  }
+  .currencyCode {
+    font-size: 13.5px !important;
+  }
+  .currencyName {
+    font-size: 11px !important;
+  }
+}
+
+.currencyOptionCard:hover {
+  background: var(--surface);
+  border-color: var(--text-3);
+}
+
+.currencySelected {
+  border-color: rgba(72, 120, 184, 0.4) !important;
+  background: rgba(13, 32, 69, 0.05) !important;
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
+}
+
+[data-theme="dark"] .currencySelected {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(72, 120, 184, 0.5) !important;
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
+}
+
+.currencyTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.currencyCode {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.currencyName {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.checkIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .checkIcon {
+  color: #60a5fa;
+}
+
+/* Feature Toggle Row (Moneda Secundaria) */
+.featureToggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--surface-alt);
+  border-radius: 13px;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.featureToggleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.featureToggleTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.featureToggleDesc {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-3);
+  line-height: 1.35;
+}
+
+/* iOS-style switch toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 26px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--border);
+  transition: 0.2s ease;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: var(--elevation-xs);
+}
+
+.switch input:checked + .slider {
+  background-color: var(--primary);
+}
+
+[data-theme="dark"] .switch input:checked + .slider {
+  background-color: #3b82f6;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* Tipo Dólar Options */
+.tipoDolarSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding-top: 4px;
+}
+
+.dolarOptionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .dolarOptionsGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.dolarOptionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-alt);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dolarOptionCard:hover {
+  background: var(--surface);
+  border-color: var(--text-3);
+}
+
+.dolarOptionSelected {
+  border-color: rgba(72, 120, 184, 0.4) !important;
+  background: rgba(13, 32, 69, 0.05) !important;
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
+}
+
+[data-theme="dark"] .dolarOptionSelected {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(72, 120, 184, 0.5) !important;
+  box-shadow: var(--elevation-selection);
+  transform: translateY(-2.5px) scale(1.025);
+  z-index: 8;
+}
+
+.dolarTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.dolarTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.dolarRatesRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  padding: 4px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+}
+
+.rateCol {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rateLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+}
+
+.rateValue {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.rateValuePrimary {
+  color: var(--primary);
+}
+
+[data-theme="dark"] .rateValuePrimary {
+  color: #60a5fa;
+}
+
+.dolarDesc {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-3);
+  line-height: 1.35;
+}
+
+
+
+.inputSuffix {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.fieldHelpText {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.4;
+  margin: 6px 0 0;
+}
+
+.cardFooterActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  width: 100%;
+}
+
+@media (max-width: 540px) {
+  .cardFooterActions {
+    justify-content: stretch;
+  }
+  .cardFooterActions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.saveBtnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.saveBtnPrimary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.saveBtnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── 6. Seguridad Tab ────────────────────────────────────────────── */
+.googleAuthInfoBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+}
+
+.googleAuthInfoIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--elevation-xs);
+}
+
+.googleAuthInfoText h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.googleAuthInfoText p {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.formInsideCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.formGroupLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.passwordInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.cleanInput {
+  width: 100%;
+  height: 42px;
+  padding: 0 38px 0 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.cleanInput:focus {
+  border-color: var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+  box-shadow: var(--elevation-none);
+  background: var(--surface);
+}
+
+[data-theme="dark"] .cleanInput:focus {
+  box-shadow: var(--elevation-none);
+  border-color: #3b82f6;
+}
+
+.pwEyeBtn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.pwEyeBtn:hover {
+  color: var(--text);
+}
+
+.formAlertError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error, #ef4444);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pwChecklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pwChecklistTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pwChecklistGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+@media (max-width: 540px) {
+  .pwChecklistGrid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+.reqItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-3);
+  transition: all 0.15s ease;
+}
+
+.reqDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-3);
+  flex-shrink: 0;
+}
+
+.reqSuccess {
+  color: #10b981 !important;
+  font-weight: 600;
+}
+
+.reqSuccess svg {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* Sesiones Activas */
+.sessionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.sessionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+}
+
+.sessionIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.sessionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}

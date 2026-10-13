@@ -1,0 +1,643 @@
+.planOptionCardActive .planCuotasNum {
+  color: var(--primary);
+}
+
+.planCuotasLbl {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+.planCuotasAmt {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-2);
+  margin-top: 2px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.planOptionCardActive .planCuotasAmt {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+/* Botón "Otra..." */
+.planCustomBtn {
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: var(--page);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 160ms ease;
+  min-height: 54px;
+}
+
+@media (max-width: 480px) {
+  .planCustomBtn {
+    grid-column: span 4;
+    min-height: 36px;
+    flex-direction: row;
+    gap: 6px;
+  }
+}
+
+.planCustomBtn:hover {
+  background: var(--surface-alt);
+  border-color: var(--border);
+}
+
+.planCustomBtnActive {
+  background: var(--surface) !important;
+  border-color: var(--primary) !important;
+}
+
+.planCustomBtnLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Stepper inline para cuotas custom */
+.customStepperRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--surface-alt);
+  padding: 6px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  animation: fadeIn 150ms ease;
+}
+
+.stepperBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.stepperBtn:hover {
+  background: var(--page);
+  border-color: var(--primary);
+}
+
+.stepperValue {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  min-width: 90px;
+  text-align: center;
+}
+
+/* ── Progressive Disclosure Link & Drawer ────────────────────────────────── */
+.advancedToggleBtn {
+  background: none;
+  border: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0;
+  transition: color 150ms ease;
+  align-self: flex-start;
+}
+
+.advancedToggleBtn:hover {
+  color: var(--primary);
+}
+
+.advancedDrawer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  animation: fadeIn 150ms ease-out;
+}
+
+@media (max-width: 480px) {
+  .advancedDrawer {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.advField {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.advLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.advInput {
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+  font-family: 'Figtree', sans-serif;
+  transition: border-color 150ms ease;
+}
+
+.advInput:focus {
+  border-color: var(--primary);
+}
+
+/* ── Hero Summary Banner (Apple Style Clean Result) ───────────────────────── */
+.heroFinancingCard {
+  border-radius: 14px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--elevation-none);
+}
+
+:global([data-theme="dark"]) .heroFinancingCard,
+:global(.dark) .heroFinancingCard {
+  background: var(--surface-alt);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.heroFinancingTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.heroInstallmentAmount {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.heroInstallmentSuffix {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-left: 2px;
+}
+
+.heroTotalBadge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.heroFinancingNarrative {
+  font-size: 11.5px;
+  color: var(--text-2);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.heroFinancingNarrative strong {
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────────── */
+.inputWrapperIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.fieldInputIconLarge {
+  width: 100%;
+  padding-left: 40px !important;
+}
+
+.fieldInputIconSmall {
+  width: 100%;
+  padding-left: 36px !important;
+}
+
+.summaryValLarge {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.summaryValSmall {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.summaryLbl {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.summaryVal {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+}
+
+.cuotaHijaWarning {
+  font-size: 12px;
+  color: #D97706;
+  background: rgba(217, 119, 6, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.formFooter {
+  padding: 10px 20px 14px;
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cancelBtn, .btnDelete {
+  flex: 1;
+  height: 42px;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface-alt);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.cancelBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.btnDelete {
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #DC2626;
+}
+
+.btnDelete:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.submitBtn {
+  flex: 2;
+  height: 42px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.submitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Operation Bar (Tipo Egreso / Ingreso Apple Style) ───────────────────── */
+.segmentedBar {
+  display: flex;
+  width: 100%;
+  background: var(--surface-alt);
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+:global([data-theme="dark"]) .segmentedBar,
+:global(.dark) .segmentedBar {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.segmentedPill {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.segmentedPill:hover:not(.segmentedPillActive) {
+  color: var(--text);
+}
+
+.segmentedPill:active {
+  transform: scale(0.975);
+}
+
+.segmentedPillActive {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--elevation-sm);
+  border-color: var(--border) !important;
+  z-index: 5;
+}
+
+:global([data-theme="dark"]) .segmentedPill,
+:global(.dark) .segmentedPill {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-2);
+}
+
+:global([data-theme="dark"]) .segmentedPill:hover:not(.segmentedPillActive),
+:global(.dark) .segmentedPill:hover:not(.segmentedPillActive) {
+  color: var(--text);
+}
+
+:global([data-theme="dark"]) .segmentedPillActive,
+:global(.dark) .segmentedPillActive {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: var(--elevation-sm);
+}
+
+@media (max-width: 420px) {
+  .segmentedBar {
+    gap: 6px;
+  }
+  .segmentedPill {
+    font-size: 12px;
+    gap: 4px;
+    padding: 0 4px;
+    height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segmentedPill,
+  .segmentedPillActive {
+    transition: none !important;
+  }
+}
+
+.descFechaRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.descCol {
+  flex: 1;
+  min-width: 0;
+}
+
+.fechaCol {
+  flex: 0 0 152px;
+  width: 152px;
+  min-width: 152px;
+}
+
+@media (max-width: 420px) {
+  .descFechaRow {
+    gap: 6px;
+  }
+  .fechaCol {
+    flex: 0 0 140px;
+    width: 140px;
+    min-width: 140px;
+  }
+}
+
+.flex2 {
+  flex: 2;
+}
+
+.flex1 {
+  flex: 1;
+}
+
+.moreCatsIconWrap {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+}
+
+/* ── Empty State Billetera / Tarjeta en Carrusel ─────────────────────────── */
+.emptyWalletBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 380px;
+  margin: 4px auto 8px;
+  padding: 22px 20px;
+  border-radius: 20px;
+  border: 1.5px dashed var(--border);
+  background: var(--surface-alt);
+  gap: 8px;
+  box-sizing: border-box;
+  transition: all 200ms ease;
+}
+
+.emptyWalletIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}
+
+.emptyWalletTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.emptyWalletSub {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.45;
+  margin: 0;
+  max-width: 320px;
+}
+
+/* ── Global Responsive overrides for compact viewports ─────────────────── */
+@media (max-width: 480px), (max-height: 720px) {
+  .billeteraSelectWrap {
+    width: 206px;
+    height: 114px;
+    border-radius: 14px;
+  }
+  .tarjetaSelectWrap {
+    width: 196px;
+    height: 124px;
+    border-radius: 12px;
+  }
+  .fullHeightCard {
+    border-radius: 14px !important;
+  }
+  .billeteraSelectWrap :global(.wc) {
+    border-radius: 14px !important;
+  }
+  .billeteraSelectWrap :global(.wcInner) {
+    padding: 8px 12px !important;
+  }
+  .billeteraSelectWrap :global(.wcLogo) {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+  }
+  .billeteraSelectWrap :global(.wcName) {
+    font-size: 13px !important;
+  }
+  .billeteraSelectWrap :global(.wcBalAmt) {
+    font-size: 19px !important;
+  }
+
+  .tarjetaSelectWrap :global(.realCard) {
+    border-radius: 12px !important;
+    padding: 8px 12px 7px !important;
+  }
+  .tarjetaSelectWrap :global(.bankLogoImg) {
+    height: 16px !important;
+    max-width: 70px !important;
+  }
+  .tarjetaSelectWrap :global(.chipSvg) {
+    width: 22px !important;
+    height: 16px !important;
+  }
+  .tarjetaSelectWrap :global(.contactlessSvg) {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  .tarjetaSelectWrap :global(.cardNumber) {
+    font-size: 11.5px !important;
+    letter-spacing: 0.08em !important;
+    margin-bottom: 2px !important;
+  }
+  .tarjetaSelectWrap :global(.cardInfoLabel) {
+    font-size: 7px !important;
+  }
+  .tarjetaSelectWrap :global(.cardInfoValue) {
+    font-size: 8.5px !important;
+  }
+  .tarjetaSelectWrap :global(.networkLogo) {
+    height: 17px !important;
+    max-width: 36px !important;
+  }
+  .tarjetaSelectWrap :global(img[alt="amex"]) {
+    height: 22px !important;
+    max-width: 36px !important;
+  }
+
+  .methodBtn {
+    height: 44px;
+    gap: 2px;
+  }
+  .methodIconWrapper {
+    height: 16px;
+  }
+  .methodBtnLabel {
+    font-size: 9.5px;
+  }
+  .montoHeroPrefix,
+  .montoHeroField {
+    font-size: 26px !important;
+  }
+  .formFooter {
+    padding: 8px 14px 10px;
+  }
+  .cancelBtn, .btnDelete, .submitBtn {
+    height: 40px;
+    font-size: 13px;
+  }
+}
+
+

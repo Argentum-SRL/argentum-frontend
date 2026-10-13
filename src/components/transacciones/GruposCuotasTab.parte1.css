@@ -1,0 +1,603 @@
+/* ═══════════════════════════════════════════════════════════════════
+   GruposCuotasTab.module.css — Diseño TransaccionRow-Style & Mobile UX
+   ═══════════════════════════════════════════════════════════════════ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* ── 1. Resumen Superior (Desktop Only) ─────────────────────────────── */
+.metricsBar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 18px;
+  box-shadow: var(--elevation-xs);
+}
+
+@media (min-width: 768px) {
+  .metricsBar {
+    display: flex;
+  }
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  text-align: center;
+}
+
+.metricLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.metricValue {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.metricRed {
+  color: var(--error, #E11D48);
+}
+
+.metricDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── 2. Controles de Filtro y Búsqueda ──────────────────────────────── */
+.controlsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Mobile Controls Bar (Tabs Centered + Search Button) */
+.mobileControlsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.mobileControlsHidden {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .mobileControlsBar {
+    display: none !important;
+  }
+}
+
+.filterTabsWrapperMobile {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.filterTabs {
+  display: flex;
+  background: var(--page);
+  padding: 3px;
+  border-radius: 12px;
+  gap: 3px;
+  width: fit-content;
+  flex-shrink: 0;
+}
+
+@media (min-width: 1100px) {
+  .filterTabs {
+    padding: 4px;
+    gap: 4px;
+  }
+}
+
+.filterTab {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+  font-family: inherit;
+}
+
+@media (min-width: 1100px) {
+  .filterTab {
+    padding: 7px 15px;
+    font-size: 13px;
+  }
+}
+
+.filterTab:hover:not(.filterTabActive) {
+  color: var(--text);
+}
+
+.filterTab:active {
+  transform: scale(0.97);
+}
+
+.filterTabActive {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: var(--elevation-xs);
+}
+
+:global([data-theme="dark"]) .filterTabActive {
+  background: var(--surface-alt);
+  color: var(--primary);
+  box-shadow: var(--elevation-xs);
+}
+
+.mobileSearchTriggerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.mobileSearchTriggerBtn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+/* Mobile Expanded Search Bar with Animation */
+.mobileExpandedSearch {
+  display: none;
+  width: 100%;
+  position: relative;
+  align-items: center;
+  animation: expandSearchCuotas 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes expandSearchCuotas {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mobileExpandedSearchActive {
+  display: flex !important;
+}
+
+@media (min-width: 768px) {
+  .mobileExpandedSearch {
+    display: none !important;
+  }
+}
+
+.mobileExpandedSearchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.mobileExpandedSearchInput {
+  width: 100%;
+  height: 38px;
+  padding: 0 38px 0 36px;
+  border-radius: 12px;
+  border: 1px solid var(--primary);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: var(--elevation-none);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+}
+
+.mobileExpandedSearchClose {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: none;
+  cursor: pointer;
+}
+
+/* Desktop Controls */
+.desktopControlsContainer {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktopControlsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .searchBoxDesktop {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 260px;
+  }
+
+  .searchIcon {
+    position: absolute;
+    left: 10px;
+    color: var(--text-3);
+    pointer-events: none;
+  }
+
+  .searchInput {
+    width: 100%;
+    height: 34px;
+    padding: 0 10px 0 32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  .searchInput:focus {
+    border-color: var(--primary);
+    outline: none;
+  }
+}
+
+/* ── 3. Listado de Cuotas (Mini-bloques individuales) ─────────────── */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .listContainer {
+    gap: 10px;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--elevation-xs);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+  -webkit-user-select: none;
+  user-select: none;
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .row {
+    padding: 11px 13px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+}
+
+.row:hover {
+  background: var(--surface-alt);
+  transform: translateY(-1.5px);
+  box-shadow: var(--elevation-sm);
+}
+
+:global([data-theme="dark"]) .row,
+:global(.dark) .row {
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow: var(--elevation-xs);
+}
+
+:global([data-theme="dark"]) .row:hover,
+:global(.dark) .row:hover {
+  background: var(--surface-alt);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: var(--elevation-sm);
+}
+
+.row:active {
+  transform: scale(0.995);
+}
+
+.rowCancelled {
+  opacity: 0.6;
+}
+
+/* Squircle Avatar */
+.rowAvatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 11px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  .rowAvatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 10px;
+  }
+}
+
+.row:hover .rowAvatar {
+  transform: scale(1.05);
+}
+
+:global([data-theme="dark"]) .rowAvatar,
+:global(.dark) .rowAvatar {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.rowAvatarIcon {
+  color: var(--primary);
+}
+
+/* Row Center Column */
+.rowInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rowTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .rowTitle {
+    font-size: 13.5px;
+  }
+}
+
+.cardTag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.badgeCompleted {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  background: rgba(22, 163, 74, 0.1);
+  color: #16A34A;
+  text-transform: uppercase;
+}
+
+.badgeCancelled {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  text-transform: uppercase;
+}
+
+.rowMeta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .rowMeta {
+    font-size: 11px;
+    gap: 4px;
+  }
+}
+
+.metaCard {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  font-family: 'SF Mono', 'Courier New', monospace;
+  letter-spacing: -0.02em;
+}
+
+.metaCuotas {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.metaCuotas strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.metaDot {
+  font-size: 7px;
+  opacity: 0.45;
+}
+
+.metaVencimiento {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mini Progress Bar */
+.miniProgressBar {
+  width: 100%;
+  max-width: 130px;
+  height: 3px;
+  background: var(--surface-alt);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .miniProgressBar {
+    max-width: 100px;
+  }
+}
+
+.miniProgressFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* Row Right Amount Column */
+.rowAmountArea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex-shrink: 0;
+  text-align: right;
+  margin-left: auto;
+}
+
+.rowMonthlyAmount {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .rowMonthlyAmount {
+    font-size: 13.5px;
+  }
+}
+
+.rowPerMonth {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-left: 2px;
+}
+
+.rowPendingAmount {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.rowChevron {
+  color: var(--text-3);
+  opacity: 0.3;
+  flex-shrink: 0;
+  display: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .rowChevron {
+    display: block;
+  }
+}
+
+.row:hover .rowChevron {
+  opacity: 0.9;
+  transform: translateX(2px);
+}
+
+.emptyFilterState {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px dashed var(--border);
+}

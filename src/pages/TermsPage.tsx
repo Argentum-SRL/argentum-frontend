@@ -45,10 +45,7 @@ export default function TermsPage() {
               Términos y Condiciones y Política de Privacidad — Argentum
             </h1>
             <p className={styles.meta} style={{ marginBottom: '8px' }}>
-              <strong>Última actualización:</strong> 1/9/2026
-            </p>
-            <p style={{ fontSize: '0.875rem', fontStyle: 'italic', color: 'var(--text-3)', margin: 0 }}>
-              Este texto es una referencia para publicar y no reemplaza asesoramiento legal profesional.
+              <strong>Última actualización:</strong> 13/10/2026
             </p>
           </div>
 
@@ -87,13 +84,13 @@ export default function TermsPage() {
             <h3>3.1 Los que nos das vos</h3>
             <ul>
               <li>Nombre y apellido</li>
-              <li>Email y contraseña (la contraseña se guarda cifrada con bcrypt, nunca en texto plano) — o, si te registrás con Google, tomamos el email, nombre, apellido y foto de esa cuenta</li>
+              <li>Email y contraseña (la contraseña se guarda como hash con bcrypt, nunca en texto plano) — o, si te registrás con Google, tomamos el email, nombre, apellido y foto de esa cuenta</li>
               <li>Teléfono, si vinculás WhatsApp</li>
               <li>Fecha de nacimiento</li>
               <li>Sexo (opcional — podés elegir &quot;prefiero no decirlo&quot;)</li>
               <li>Tus datos financieros: billeteras, saldos, transacciones, tarjetas de crédito (guardamos solo los últimos 4 dígitos, nunca el número completo), metas de ahorro, presupuestos, suscripciones</li>
               <li>Foto de perfil</li>
-              <li>Lo que nos mandes por WhatsApp: texto, notas de voz, fotos de comprobantes</li>
+              <li>Lo que nos mandes por WhatsApp: texto, notas de voz, fotos de comprobantes y facturas de servicios (foto o PDF)</li>
               <li>Resúmenes de tarjeta en PDF, si usás la función de importación — hoy solo está disponible para cuentas administradoras, en etapa de prueba</li>
             </ul>
 
@@ -107,7 +104,7 @@ export default function TermsPage() {
 
             <h3>3.3 Datos técnicos</h3>
             <p>
-              No guardamos tu dirección IP en ninguna tabla de nuestra base de datos. Se usa un instante en memoria para frenar abusos (como demasiados intentos de login seguidos) y no queda registrada en ningún lado — salvo un caso puntual: si te avisamos por email que detectamos un inicio de sesión desde un dispositivo nuevo, ese email sí incluye la IP de ese momento. También quedan logs técnicos del servidor (qué ruta se pidió, cuánto tardó) por unos días, para poder diagnosticar errores.
+              Para frenar abusos (por ejemplo, demasiados intentos de ingreso seguidos) guardamos tu dirección IP junto a un contador de intentos. Se borra sola cuando vence el límite, como mucho a las pocas horas. También quedan registros técnicos del servidor (qué ruta se pidió, cuánto tardó y si hubo errores) por unos días, para poder diagnosticar problemas. Esos registros pueden incluir la dirección IP desde la que se hizo el pedido, pero no incluyen tu email, nombre ni teléfono.
             </p>
           </section>
 
@@ -119,7 +116,7 @@ export default function TermsPage() {
             <ul>
               <li>Crear y manejar tu cuenta</li>
               <li>Que la app funcione: transacciones, presupuestos, metas, alertas de vencimientos de cuotas y suscripciones</li>
-              <li>Mandarte notificaciones — hoy te llegan por la campana dentro de la app en tiempo real, por WhatsApp, o por email cuando es algo de seguridad de tu cuenta (cambio de contraseña, verificación, dispositivo nuevo)</li>
+              <li>Mandarte notificaciones: por la campana dentro de la app en tiempo real, por WhatsApp, o por email cuando es algo de la seguridad de tu cuenta (verificación, recupero o cambio de contraseña, cambio de email e intentos fallidos de ingreso)</li>
               <li>Procesar tus mensajes de WhatsApp con IA para ayudarte a registrar transacciones</li>
               <li>Calcular tu perfil financiero y darte información orientativa sobre tus hábitos</li>
               <li>Mejorar y corregir la app</li>
@@ -151,15 +148,21 @@ export default function TermsPage() {
                 </thead>
                 <tbody>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '10px', fontWeight: '600' }}>Supabase</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Base de datos de la app</td>
+                    <td style={{ padding: '10px', fontWeight: '600' }}>Railway</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Alojar el backend y la base de datos de la app</td>
                     <td style={{ padding: '10px', color: 'var(--text-2)' }}>Todos tus datos de cuenta y financieros</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Estados Unidos</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '10px', fontWeight: '600' }}>Supabase</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Guardar tu foto de perfil</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Tu foto de perfil</td>
                     <td style={{ padding: '10px', color: 'var(--text-2)' }}>Brasil (San Pablo)</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '10px', fontWeight: '600' }}>OpenAI</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Interpretar tus mensajes de WhatsApp, transcribir audios, leer fotos de comprobantes, ayudar a leer resúmenes de tarjeta importados</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Mensajes de texto, notas de voz, fotos de comprobantes (con tu nombre reducido, ej. &quot;Juan P.&quot;), contexto financiero resumido, y texto de resúmenes ya sin CUIT/DNI/cuenta/domicilio</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Interpretar tus mensajes de WhatsApp, transcribir audios, leer fotos de comprobantes y facturas, y ayudar a leer resúmenes de tarjeta importados</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Mensajes de texto, notas de voz, fotos de comprobantes (con tu nombre reducido, ej. &quot;Juan P.&quot;), el texto de las facturas que nos mandes, un resumen de tu situación financiera, y el texto de resúmenes de tarjeta ya sin CUIT, DNI, cuenta ni domicilio</td>
                     <td style={{ padding: '10px', color: 'var(--text-2)' }}>Estados Unidos</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
@@ -170,38 +173,38 @@ export default function TermsPage() {
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '10px', fontWeight: '600' }}>Google</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Iniciar sesión con tu cuenta de Google</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Email, nombre, apellido y foto de tu cuenta de Google</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Iniciar sesión con tu cuenta de Google y cargar la tipografía de la app (Google Fonts)</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Email, nombre, apellido y foto de tu cuenta de Google; para la tipografía, solo la IP y datos técnicos de la conexión</td>
                     <td style={{ padding: '10px', color: 'var(--text-2)' }}>Estados Unidos</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '10px', fontWeight: '600' }}>Resend</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Mandar los emails (verificación, recuperación de contraseña, alertas de seguridad)</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Tu email, tu nombre, y en alertas de seguridad: fecha/hora y algún dato del dispositivo o IP</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Estados Unidos</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '10px', fontWeight: '600' }}>Railway</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Alojar y correr el backend de Argentum</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Todo lo que procesa el backend pasa por sus servidores mientras se ejecuta cada pedido; solo quedan logs técnicos efímeros por unos días</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Mandar los emails (verificación, recupero de contraseña y alertas de seguridad)</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Tu email, tu nombre y, en las alertas de seguridad, la fecha y la hora</td>
                     <td style={{ padding: '10px', color: 'var(--text-2)' }}>Estados Unidos</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '10px', fontWeight: '600' }}>Cloudflare</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Entregar la aplicación web (frontend)</td>
-                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>IP y metadatos técnicos de tu conexión, para poder mostrarte la app</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Entregar la aplicación web y el control antirobots del registro (Turnstile)</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>IP y datos técnicos de tu conexión</td>
                     <td style={{ padding: '10px', color: 'var(--text-2)' }}>Red global de Cloudflare, con mecanismos para transferir a Estados Unidos</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '10px', fontWeight: '600' }}>GitHub</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Guardar las copias de seguridad diarias de la base de datos</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Una copia cifrada de toda la base (no se puede leer sin la clave, que solo tiene Argentum)</td>
+                    <td style={{ padding: '10px', color: 'var(--text-2)' }}>Estados Unidos</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             <p>
-              <strong>Sobre la transferencia internacional:</strong> al aceptar este documento, autorizás que estos datos salgan de Argentina hacia Brasil y Estados Unidos, según el proveedor — es necesario para que funcionen las partes de IA, mensajería y hosting de la Plataforma.
+              <strong>Sobre la transferencia internacional:</strong> al aceptar este documento, autorizás que estos datos salgan de Argentina hacia Estados Unidos y Brasil, según el proveedor. Es necesario para que funcionen el alojamiento de la app, la IA, la mensajería y los emails.
             </p>
 
             <p>
-              <strong>Cuánto tiempo retienen tus datos estos proveedores</strong> (según sus políticas oficiales al momento de escribir esto — pueden cambiar, conviene revisarlas antes de publicar):
+              <strong>Cuánto tiempo retienen tus datos estos proveedores</strong> (según sus políticas oficiales a la fecha de este documento; pueden cambiar):
             </p>
             <ul>
               <li>
@@ -214,7 +217,13 @@ export default function TermsPage() {
                 <strong>Resend:</strong> mientras la cuenta de Argentum esté activa en Resend, guarda los datos de envío hasta 30 días; si en algún momento dejamos de usar el servicio, borra el resto dentro de los 90 días siguientes.
               </li>
               <li>
-                <strong>Supabase:</strong> mientras tu cuenta de Argentum esté activa, porque ahí vive toda la base de datos operativa.
+                <strong>Railway:</strong> mientras tu cuenta esté activa, porque ahí está la base de datos de la app.
+              </li>
+              <li>
+                <strong>Supabase:</strong> tu foto de perfil, hasta que la cambies o borres tu cuenta.
+              </li>
+              <li>
+                <strong>GitHub:</strong> las copias de seguridad cifradas se borran solas a los 3 días.
               </li>
             </ul>
 
@@ -233,6 +242,7 @@ export default function TermsPage() {
               <li>Interpretar tus mensajes de WhatsApp y ayudarte a registrar transacciones conversando</li>
               <li>Transcribir tus notas de voz</li>
               <li>Leer fotos de comprobantes y transferencias para sacar montos y otros datos</li>
+              <li>Leer facturas de servicios que nos mandes en foto o PDF, para sacar el monto y el vencimiento</li>
               <li>Ayudar a procesar resúmenes de tarjeta importados (función en prueba, solo para administradores)</li>
             </ul>
 
@@ -250,7 +260,7 @@ export default function TermsPage() {
           <section id="seccion-7" className={styles.section}>
             <h2>7. Función de WhatsApp</h2>
             <p>
-              Tus mensajes de texto y las transcripciones de tus notas de voz se guardan en nuestra base para que la conversación tenga contexto (por ejemplo, para acordarnos de qué veníamos hablando hace unos minutos). Hoy no hay un límite de tiempo definido para esto — se borran si eliminás tu cuenta.
+              Tus mensajes de texto y las transcripciones de tus notas de voz se guardan en nuestra base para que la conversación tenga contexto (por ejemplo, para acordarnos de qué veníamos hablando hace unos minutos). Se borran solos a los 90 días, o antes si eliminás tu cuenta.
             </p>
             <p>
               Podés desvincular tu WhatsApp cuando quieras desde tu perfil.
@@ -284,12 +294,12 @@ export default function TermsPage() {
             <ul>
               <li><strong>Acceso:</strong> pedirnos una copia de los datos que tenemos sobre vos.</li>
               <li><strong>Rectificación:</strong> corregir datos mal cargados o desactualizados. La mayoría los podés cambiar vos mismo desde tu perfil en la app.</li>
-              <li><strong>Cancelación (borrar todo):</strong> pedir que eliminemos tu cuenta y tus datos. Lo podés hacer vos mismo desde la configuración de tu cuenta, o escribiéndonos a <strong>srlargentum@gmail.com</strong>. Al borrar tu cuenta se borra todo de una, sin vuelta atrás: transacciones, billeteras, tarjetas, cuotas, metas, presupuestos, suscripciones, conversaciones de WhatsApp, resúmenes importados, notificaciones, categorías propias que hayas creado, foto de perfil y el resto de tu información.</li>
+              <li><strong>Cancelación (borrar todo):</strong> pedir que eliminemos tu cuenta y tus datos. Lo podés hacer vos mismo desde tu perfil (te pedimos tu contraseña, o que elijas tu cuenta de Google, para confirmar que sos vos), o escribiéndonos a <strong>srlargentum@gmail.com</strong>. Al borrar tu cuenta se borra todo de una, sin vuelta atrás: transacciones, billeteras, tarjetas, cuotas, metas, presupuestos, suscripciones, conversaciones de WhatsApp, resúmenes importados, notificaciones, foto de perfil y el resto de tu información.</li>
               <li><strong>Oposición:</strong> oponerte a que usemos tus datos para algo puntual, cuando corresponda.</li>
             </ul>
 
             <p>
-              Para ejercer cualquiera de estos derechos, escribinos a <strong>srlargentum@gmail.com</strong>. Respondemos dentro de los plazos que marca la ley (hoy: 10 días hábiles para acceso, 5 días hábiles para rectificación o borrado).
+              Para ejercer cualquiera de estos derechos, escribinos a <strong>srlargentum@gmail.com</strong>. Respondemos dentro de los plazos que marca la ley (10 días corridos para acceso y 5 días hábiles para rectificación o borrado).
             </p>
             <p>
               Si sentís que no te respondimos bien, podés hacer una denuncia ante la AAIP (Agencia de Acceso a la Información Pública), el organismo que controla esto en Argentina: <a href="https://www.argentina.gob.ar/aaip" target="_blank" rel="noopener noreferrer">www.argentina.gob.ar/aaip</a>
@@ -302,9 +312,12 @@ export default function TermsPage() {
           <section id="seccion-10" className={styles.section}>
             <h2>10. Seguridad</h2>
             <ul>
-              <li>Tu contraseña se guarda cifrada con bcrypt, nunca en texto plano.</li>
+              <li>Tu contraseña se guarda como hash con bcrypt, nunca en texto plano.</li>
               <li>Todo viaja cifrado entre tu dispositivo y nuestros servidores (HTTPS).</li>
               <li>Las sesiones se manejan con tokens que vencen solos y se pueden revocar en cualquier momento.</li>
+              <li>Los códigos que te mandamos por email no se guardan tal cual: guardamos solo una huella que no se puede revertir.</li>
+              <li>Después de 10 contraseñas incorrectas seguidas, la cuenta se bloquea una hora.</li>
+              <li>Hacemos una copia de seguridad cifrada de la base todos los días.</li>
             </ul>
             <p>
               Ningún sistema es 100% infalible. Si detectamos un incidente de seguridad que te afecte, te lo vamos a avisar.
@@ -318,8 +331,10 @@ export default function TermsPage() {
             <h2>11. Cuánto tiempo guardamos tus datos</h2>
             <ul>
               <li>Cuenta y datos financieros: mientras tu cuenta esté activa.</li>
-              <li>Conversaciones de WhatsApp: sin límite definido por ahora, hasta que borres tu cuenta.</li>
-              <li>Códigos de verificación: minutos — se descartan solos.</li>
+              <li>Conversaciones de WhatsApp: 90 días.</li>
+              <li>Registros de intentos de ingreso (con tu IP): como mucho unas horas.</li>
+              <li>Copias de seguridad: 3 días.</li>
+              <li>Códigos de verificación: minutos; se descartan solos.</li>
               <li>Sesiones vencidas: se limpian cada 6 horas.</li>
             </ul>
           </section>
@@ -330,7 +345,10 @@ export default function TermsPage() {
           <section id="seccion-12" className={styles.section}>
             <h2>12. Cookies y almacenamiento local</h2>
             <p>
-              No usamos cookies de terceros con fines de publicidad ni de rastreo. Lo único que guardamos en tu navegador son preferencias visuales — cosas como si preferís el tema claro u oscuro, o cómo te gusta ver tus tablas — nunca tus saldos, transacciones ni ningún dato financiero, que siempre se piden en el momento a nuestros servidores.
+              Usamos tres cookies propias, necesarias para que puedas iniciar sesión: access_token (tu sesión, dura 15 minutos), refresh_token (renueva tu sesión sin que tengas que volver a entrar, dura 30 días) y argentum_has_session (solo indica que hay una sesión abierta). Las dos primeras no se pueden leer desde el navegador. No usamos cookies de publicidad ni de rastreo.
+            </p>
+            <p>
+              En el almacenamiento de tu navegador guardamos solo preferencias: el tema claro u oscuro, qué billeteras y qué moneda ver en el dashboard y si elegiste ocultar los saldos. Nunca tus saldos, movimientos ni ningún dato financiero: esos se piden siempre en el momento a nuestros servidores.
             </p>
             <p>
               Argentum tiene funciones técnicas de app instalable (PWA), pero verificamos específicamente que ningún dato personal ni financiero se guarda en tu dispositivo para uso offline.

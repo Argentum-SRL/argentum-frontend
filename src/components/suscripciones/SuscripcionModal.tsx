@@ -53,6 +53,14 @@ type FormAction =
   | { type: 'SET_FIELD'; field: keyof FormState; value: string | number | boolean | null }
   | { type: 'RESET'; data?: Suscripcion | null; defaultBilleteraId?: string; defaultTarjetaId?: string }
 
+const getHoyLocal = (): string => {
+  const d = new Date()
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 const initialState: FormState = {
   step: 1,
   slideDirection: 'forward',
@@ -61,7 +69,7 @@ const initialState: FormState = {
   monto: null,
   moneda: 'ARS',
   frecuencia: 'mensual',
-  proximo_cobro: new Date().toISOString().split('T')[0],
+  proximo_cobro: getHoyLocal(),
   metodoCobro: 'debito',
   billeteraId: '',
   tarjetaId: '',
@@ -333,6 +341,12 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const handleSave = async () => {
     if (!state.monto || !state.nombrePersonalizado.trim()) {
       sileo.error({ title: 'Completá los campos obligatorios' })
+      return
+    }
+
+    const hoyLocal = getHoyLocal()
+    if (state.proximo_cobro < hoyLocal) {
+      sileo.error({ title: 'Tiene que ser hoy o una fecha futura.' })
       return
     }
 
@@ -672,9 +686,11 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                 <DateInput
                   id="proximo-cobro"
                   variant="compact"
-                  label="Primer cobro"
+                  label="Próximo cobro"
+                  min={getHoyLocal()}
                   value={state.proximo_cobro}
                   onChange={val => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: val })}
+                  error={state.proximo_cobro && state.proximo_cobro < getHoyLocal() ? 'Tiene que ser hoy o una fecha futura.' : undefined}
                 />
               </div>
 
@@ -683,7 +699,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                 <button 
                   type="submit"
                   className={styles.submitBtn} 
-                  disabled={state.isSubmitting}
+                  disabled={state.isSubmitting || (!!state.proximo_cobro && state.proximo_cobro < getHoyLocal())}
                 >
                   {state.isSubmitting ? 'Guardando...' : (state.isEdit ? 'Actualizar' : 'Guardar suscripción')}
                 </button>

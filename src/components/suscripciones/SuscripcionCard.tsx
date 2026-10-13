@@ -55,8 +55,8 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
   const diffTime = fechaCobro.getTime() - hoy.getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-  const urgenciaClass = diffDays === 0 ? styles.chipRojo : diffDays <= 7 ? styles.chipNaranja : ''
-  const urgenciaText = diffDays === 0 ? 'Hoy' : diffDays === 1 ? 'Mañana' : `En ${diffDays} días`
+  const urgenciaClass = diffDays <= 0 ? styles.chipRojo : diffDays <= 7 ? styles.chipNaranja : ''
+  const urgenciaText = diffDays < 0 ? 'Pendiente' : diffDays === 0 ? 'Hoy' : diffDays === 1 ? 'Mañana' : `En ${diffDays} días`
 
   const billetera = billeteras.find(b => b.id === suscripcion.billetera_id)
   const tarjeta = tarjetas.find(t => t.id === suscripcion.tarjeta_id)

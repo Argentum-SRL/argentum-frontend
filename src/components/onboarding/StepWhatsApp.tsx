@@ -13,7 +13,7 @@ interface Props {
 
 export default function StepWhatsApp({ onNext }: Props) {
   const navigate = useNavigate()
-  const { refreshUser } = useAuth()
+  const { usuario, updateUsuario, refreshUser } = useAuth()
   const [permiso, setPermiso] = useState(false)
   const [loadingPermiso, setLoadingPermiso] = useState(false)
 
@@ -22,8 +22,13 @@ export default function StepWhatsApp({ onNext }: Props) {
     setPermiso(nuevoValor)
     setLoadingPermiso(true)
     try {
-      await usuarioService.actualizarPermisoMensajes(nuevoValor)
-      await refreshUser()
+      const usuarioActualizado = await usuarioService.actualizarPermisoMensajes(nuevoValor)
+      if (usuario) {
+        updateUsuario({
+          ...usuarioActualizado,
+          onboarding_completo: usuario.onboarding_completo,
+        })
+      }
     } catch (err: unknown) {
       setPermiso(!nuevoValor)
       sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el permiso de lectura de mensajes.') })
@@ -45,7 +50,12 @@ export default function StepWhatsApp({ onNext }: Props) {
     }
   }
 
-  const handleHacerloDespues = () => {
+  const handleHacerloDespues = async () => {
+    try {
+      await refreshUser()
+    } catch {
+      // Ignorar error de refresh
+    }
     if (onNext) {
       onNext(null)
     } else {

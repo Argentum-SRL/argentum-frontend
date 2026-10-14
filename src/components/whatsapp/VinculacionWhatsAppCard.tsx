@@ -122,11 +122,15 @@ export default function VinculacionWhatsAppCard({
 
       if (me?.telefono_verificado && (esPrimeraVinculacion || telefonoCambio)) {
         setVinculado(true)
-        updateUsuario(me)
-        await refreshUser()
         sileo.success({ title: '¡Tu cuenta de WhatsApp fue vinculada exitosamente!' })
 
-        setTimeout(() => {
+        setTimeout(async () => {
+          updateUsuario(me)
+          try {
+            await refreshUser()
+          } catch {
+            // Ignorar errores de refresh
+          }
           if (onSuccess) {
             onSuccess()
           }

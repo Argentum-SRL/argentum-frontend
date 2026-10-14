@@ -16,15 +16,7 @@
 }
 
 .halo {
-  position: absolute;
-  inset: -28%;
-  width: 156%;
-  height: 156%;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: blur(1.5px);
+  display: none !important;
 }
 
 .svg {
@@ -37,15 +29,9 @@
   transform: none !important;
 }
 
-/* ── Resplandor Estelar / Fulgor Atmosférico de Alta Fidelidad ── */
-.brandGlowLight {
-  filter: drop-shadow(0 0 2.5px rgba(224, 98, 36, 0.65)) drop-shadow(0 0 5px rgba(255, 160, 51, 0.3));
-}
-
-.brandGlowDark {
-  filter: drop-shadow(0 0 2.5px rgba(147, 197, 253, 0.7)) drop-shadow(0 0 4.5px rgba(226, 232, 240, 0.35));
-}
-
+/* ── Resplandor Estelar / Fulgor Atmosférico (desactivado: cuerpo lunar puro) ── */
+.brandGlowLight,
+.brandGlowDark,
 .currentGlow {
-  filter: drop-shadow(0 0 2px currentColor);
+  filter: none;
 }

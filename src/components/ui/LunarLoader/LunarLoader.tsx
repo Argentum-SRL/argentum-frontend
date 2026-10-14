@@ -47,7 +47,7 @@ export const LunarLoader = memo(
       variant = 'brand',
       themeMode = 'auto',
       cycleDuration = 3.2,
-      showGlow = true,
+      showGlow = false,
       className = '',
       style,
       'aria-label': ariaLabel = 'Cargando...',
@@ -167,11 +167,13 @@ export const LunarLoader = memo(
         : `radial-gradient(circle, rgba(224, 98, 36, ${0.40 + eclipseFactor * 0.35}) 0%, rgba(255, 163, 51, ${0.22 + eclipseFactor * 0.22}) 42%, transparent 72%)`
       : `radial-gradient(circle, currentColor 0%, transparent 68%)`
 
-    const glowClass = isBrand
-      ? isDark
-        ? styles.brandGlowDark
-        : styles.brandGlowLight
-      : styles.currentGlow
+    const glowClass = showGlow
+      ? isBrand
+        ? isDark
+          ? styles.brandGlowDark
+          : styles.brandGlowLight
+        : styles.currentGlow
+      : ''
 
     // Limpieza defensiva de className
     const sanitizedClassName = className
@@ -291,7 +293,7 @@ export const LunarLoader = memo(
           </defs>
 
           {/* 1. Destello exterior de corona durante plenitud / eclipse */}
-          {eclipseFactor > 0 && (
+          {showGlow && eclipseFactor > 0 && (
             <circle
               cx={cx}
               cy={cy}

@@ -768,7 +768,7 @@ export interface Presupuesto {
   moneda: 'ARS' | 'USD'
   periodo: 'semanal' | 'quincenal' | 'mensual'
   renovacion: 'automatica' | 'manual'
-  estado: 'activo' | 'pausado' | 'finalizado'
+  estado: 'activo' | 'pausado'
   fecha_creacion: string
   categorias: PresupuestoCategoriaResponse[]
   periodo_actual: PeriodoPresupuesto | null

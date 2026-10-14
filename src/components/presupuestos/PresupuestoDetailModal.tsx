@@ -47,7 +47,7 @@ export default function PresupuestoDetailModal({
   billeteras = [],
   onSuccess
 }: PresupuestoDetailModalProps) {
-  const { open: openModal, confirm } = useModal()
+  const { open: openModal } = useModal()
   const [freshPresupuesto, setFreshPresupuesto] = useState<Presupuesto | null>(null)
   const [step, setStep] = useState<1 | 2>(1)
   const [animClass, setAnimClass] = useState('')
@@ -329,28 +329,33 @@ export default function PresupuestoDetailModal({
     }
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!presupuesto) return
-    const isFinalizado = presupuesto.estado === 'finalizado'
-    confirm({
-      title: isFinalizado ? '¿Eliminás definitivamente este presupuesto?' : '¿Finalizás este presupuesto?',
-      description: isFinalizado
-        ? 'Se borrará permanentemente de tu historial.'
-        : 'El presupuesto pasará a la pestaña de finalizados.',
-      variant: 'danger',
-      confirmLabel: isFinalizado ? 'Eliminar definitivamente' : 'Finalizar',
-      cancelLabel: 'Cancelar',
-      onConfirm: async () => {
-        try {
-          await presupuestoService.eliminarPresupuesto(presupuesto.id)
-          sileo.success({ title: isFinalizado ? 'Presupuesto eliminado definitivamente' : 'Presupuesto finalizado' })
-          onClose()
-          onSuccess?.()
-        } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No se pudo completar la acción.') })
-        }
-      }
-    })
+    const id = presupuesto.id
+    const estadoAnterior = presupuesto.estado
+    try {
+      await presupuestoService.eliminarPresupuesto(id)
+      onClose()
+      onSuccess?.()
+      sileo.action({
+        title: 'Presupuesto eliminado',
+        button: {
+          title: 'Deshacer',
+          onClick: async () => {
+            try {
+              await presupuestoService.restaurarPresupuesto(id, estadoAnterior)
+              sileo.success({ title: 'Presupuesto restaurado' })
+              onSuccess?.()
+            } catch (err: unknown) {
+              sileo.error({ title: getErrorMessage(err, 'No pudimos restaurar el presupuesto.') })
+            }
+          }
+        },
+        duration: 8000
+      })
+    } catch (err: unknown) {
+      sileo.error({ title: getErrorMessage(err, 'No se pudo eliminar el presupuesto.') })
+    }
   }
 
   if (!presupuesto) return null
@@ -599,8 +604,8 @@ export default function PresupuestoDetailModal({
                   type="button"
                   className={`${styles.footerIconBtn} ${styles.dangerIconBtn}`} 
                   onClick={handleDelete}
-                  title="Finalizar presupuesto"
-                  aria-label="Finalizar presupuesto"
+                  title="Eliminar presupuesto"
+                  aria-label="Eliminar presupuesto"
                 >
                   <Trash2 size={15} />
                 </button>

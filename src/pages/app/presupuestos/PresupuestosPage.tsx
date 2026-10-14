@@ -29,7 +29,7 @@ export default function PresupuestosPage() {
   const { open, confirm } = useModal()
   const { lastDataUpdate } = useNotificaciones()
 
-  const [activeTab, setActiveTab] = useState<'activo' | 'pausado' | 'finalizado'>('activo')
+  const [activeTab, setActiveTab] = useState<'activo' | 'pausado'>('activo')
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([])
   const [loading, setLoading] = useState(true)
   
@@ -179,25 +179,30 @@ export default function PresupuestosPage() {
     })
   }
 
-  const handleDelete = (p: Presupuesto) => {
-    const isFinalizado = p.estado === 'finalizado'
-    confirm({
-      title: isFinalizado ? '¿Eliminás definitivamente este presupuesto?' : '¿Finalizás este presupuesto?',
-      description: isFinalizado 
-        ? 'Se borrará permanentemente de tu historial.' 
-        : 'El presupuesto pasará a la pestaña de finalizados.',
-      variant: 'danger',
-      confirmLabel: isFinalizado ? 'Eliminar definitivamente' : 'Finalizar',
-      onConfirm: async () => {
-        try {
-          await presupuestoService.eliminarPresupuesto(p.id)
-          sileo.success({ title: isFinalizado ? 'Presupuesto eliminado definitivamente' : 'Presupuesto finalizado' })
-          fetchPresupuestos()
-        } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
-        }
-      }
-    })
+  const handleDelete = async (p: Presupuesto) => {
+    const estadoAnterior = p.estado
+    try {
+      await presupuestoService.eliminarPresupuesto(p.id)
+      fetchPresupuestos()
+      sileo.action({
+        title: 'Presupuesto eliminado',
+        button: {
+          title: 'Deshacer',
+          onClick: async () => {
+            try {
+              await presupuestoService.restaurarPresupuesto(p.id, estadoAnterior)
+              sileo.success({ title: 'Presupuesto restaurado' })
+              fetchPresupuestos()
+            } catch (err: unknown) {
+              sileo.error({ title: getErrorMessage(err, 'No pudimos restaurar el presupuesto.') })
+            }
+          }
+        },
+        duration: 8000
+      })
+    } catch (err: unknown) {
+      sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar el presupuesto. Intentá de nuevo.') })
+    }
   }
 
   const handleViewHistory = async (p: Presupuesto) => {
@@ -316,13 +321,6 @@ export default function PresupuestosPage() {
           >
             Pausados
           </button>
-          <button 
-            type="button"
-            className={`${styles.tab} ${activeTab === 'finalizado' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('finalizado')}
-          >
-            Finalizados
-          </button>
         </div>
       </div>
 
@@ -333,11 +331,11 @@ export default function PresupuestosPage() {
         ) : presupuestos.length === 0 ? (
           <EmptyState
             icon={PieChart}
-            title={activeTab === 'activo' ? 'Todavía no configuraste ningún presupuesto.' : `Sin presupuestos ${activeTab}s`}
+            title={activeTab === 'activo' ? 'Todavía no configuraste ningún presupuesto.' : 'Sin presupuestos pausados'}
             description={
               activeTab === 'activo' 
                 ? 'Definí un límite de gasto para tus categorías y Argentum te avisará si te pasás.' 
-                : `No tenés presupuestos en estado ${activeTab}.`
+                : 'No tenés presupuestos en estado pausado.'
             }
             actionLabel={activeTab === 'activo' ? 'Crear mi primer presupuesto' : undefined}
             onActionClick={handleOpenNew}

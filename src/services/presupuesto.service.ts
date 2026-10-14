@@ -69,6 +69,12 @@ const presupuestoService = {
     invalidatePresupuestos()
   },
 
+  restaurarPresupuesto: async (id: string, estado: 'activo' | 'pausado'): Promise<Presupuesto> => {
+    const response = await api.post<Presupuesto>(`/presupuestos/${id}/restaurar`, { estado })
+    invalidatePresupuestos()
+    return response.data
+  },
+
   getHistorial: async (id: string, signal?: AbortSignal): Promise<PeriodoPresupuesto[]> => {
     const response = await api.get<PeriodoPresupuesto[]>(`/presupuestos/${id}/historial`, { signal })
     return response.data

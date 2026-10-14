@@ -22,7 +22,6 @@ import styles from './PresupuestoModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
-import { useModal } from '@/hooks/useModal'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
@@ -101,7 +100,6 @@ export default function PresupuestoModal({
 }: PresupuestoModalProps) {
   const isEdit = !!presupuesto
   const { usuario } = useAuth()
-  const { confirm } = useModal()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const [fallbackCategorias, setFallbackCategorias] = useState<Categoria[]>([])
   const [allSubcategorias, setAllSubcategorias] = useState<Subcategoria[]>([])
@@ -383,25 +381,34 @@ export default function PresupuestoModal({
     setExpandedCats(next)
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!presupuesto) return
-    confirm({
-      title: '¿Eliminar presupuesto?',
-      description: `Se eliminará "${presupuesto.nombre}". Los gastos y transacciones no se verán afectados.`,
-      variant: 'danger',
-      confirmLabel: 'Eliminar',
-      onConfirm: async () => {
-        try {
-          await presupuestoService.eliminarPresupuesto(presupuesto.id)
-          sileo.success({ title: 'Presupuesto eliminado' })
-          onSuccess()
-          onClose()
-        } catch (e) {
-          console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar el presupuesto') })
-        }
-      }
-    })
+    const id = presupuesto.id
+    const estadoAnterior = presupuesto.estado
+    try {
+      await presupuestoService.eliminarPresupuesto(id)
+      onSuccess()
+      onClose()
+      sileo.action({
+        title: 'Presupuesto eliminado',
+        button: {
+          title: 'Deshacer',
+          onClick: async () => {
+            try {
+              await presupuestoService.restaurarPresupuesto(id, estadoAnterior)
+              sileo.success({ title: 'Presupuesto restaurado' })
+              onSuccess()
+            } catch (e) {
+              sileo.error({ title: getErrorMessage(e, 'No pudimos restaurar el presupuesto.') })
+            }
+          }
+        },
+        duration: 8000
+      })
+    } catch (e) {
+      console.error(e)
+      sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar el presupuesto') })
+    }
   }
 
   const handleSubmit = async () => {

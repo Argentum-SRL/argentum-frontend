@@ -23,6 +23,7 @@ export interface Usuario {
   password_hash?: string | null
   fecha_nacimiento: string | null
   sexo: 'masculino' | 'femenino' | 'no_binario' | 'prefiero_no_decir' | null
+  permiso_lectura_mensajes_en: string | null
 }
 
 // Historial de precios de una suscripción

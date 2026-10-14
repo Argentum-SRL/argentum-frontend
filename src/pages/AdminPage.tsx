@@ -33,6 +33,7 @@ import {
 import { getFotoUrl } from '@/utils/fotoUrl'
 import { formatFecha, formatFechaHora } from '@/utils/format'
 import { SchedulerPanel } from './admin/components/SchedulerPanel'
+import { MonitorWppPanel } from './admin/components/MonitorWppPanel'
 import styles from './AdminPage.module.css'
 
 // TableAvatar component to fetch and render user profile picture or fallback initials
@@ -1030,13 +1031,7 @@ export default function AdminPage() {
         )}
 
         {activeTab === 'wpp' && (
-          <div className={styles.emptyStateContainer}>
-            <EmptyState
-              icon={MessageSquare}
-              title="Monitor de conversaciones"
-              description="Esta sección estará disponible una vez que la plataforma esté desplegada con dominio propio. Mostrará todas las conversaciones de WhatsApp, intents detectados, errores de AI y latencia de respuesta."
-            />
-          </div>
+          <MonitorWppPanel />
         )}
 
         {activeTab === 'scheduler' && (

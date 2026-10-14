@@ -88,6 +88,11 @@ const usuarioService = {
       '/usuarios/me/marcar-modal-financiero-visto'
     )
     return data
+  },
+
+  actualizarPermisoMensajes: async (permitido: boolean) => {
+    const { data } = await api.put<Usuario>('/usuarios/me/permiso-mensajes', { permitido })
+    return data
   }
 }
 

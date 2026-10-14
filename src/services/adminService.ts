@@ -1,5 +1,12 @@
 import api from './api'
-import type { PaginatedUsuarios, UsuarioAdmin, FiltrosAdmin, AdminStats } from '../types/admin'
+import type {
+  PaginatedUsuarios,
+  UsuarioAdmin,
+  FiltrosAdmin,
+  AdminStats,
+  MonitorWppResumen,
+  PaginatedConversacionesMonitor,
+} from '../types/admin'
 
 export interface AdminResponseEnvelope<T> {
   success: boolean
@@ -85,6 +92,34 @@ const adminService = {
 
   correrJob: async (jobId: string) => {
     const { data } = await api.post<{ mensaje: string }>(`/v1/admin/scheduler/${jobId}/correr`)
+    return data
+  },
+
+  getMonitorWppResumen: async (dias: number, signal?: AbortSignal) => {
+    const { data } = await api.get<MonitorWppResumen>('/v1/admin/monitor-wpp/resumen', {
+      params: { dias },
+      signal,
+    })
+    return data
+  },
+
+  getMonitorWppConversaciones: async (
+    dias: number,
+    categoria?: string,
+    pagina?: number,
+    signal?: AbortSignal
+  ) => {
+    const { data } = await api.get<PaginatedConversacionesMonitor>(
+      '/v1/admin/monitor-wpp/conversaciones',
+      {
+        params: {
+          dias,
+          categoria: categoria || undefined,
+          pagina: pagina || 1,
+        },
+        signal,
+      }
+    )
     return data
   }
 }

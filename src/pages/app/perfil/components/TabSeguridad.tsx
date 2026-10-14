@@ -112,6 +112,21 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
     })
   }
 
+  const [isUpdatingPermiso, setIsUpdatingPermiso] = useState(false)
+
+  const handleTogglePermisoMensajes = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nuevoValor = e.target.checked
+    setIsUpdatingPermiso(true)
+    try {
+      const usuarioActualizado = await usuarioService.actualizarPermisoMensajes(nuevoValor)
+      updateUsuario(usuarioActualizado)
+    } catch (err: unknown) {
+      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el permiso de lectura de mensajes.') })
+    } finally {
+      setIsUpdatingPermiso(false)
+    }
+  }
+
   return (
     <div className={styles.tabGrid}>
       {/* 1. Métodos de Acceso Vinculados */}
@@ -255,6 +270,33 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
                   </button>
                 </>
               )}
+            </div>
+          </div>
+
+          {/* Permiso de lectura para mejorar el asistente */}
+          <div className={styles.contactItemBox}>
+            <div className={styles.contactItemInfo}>
+              <div className={styles.contactItemLabelRow}>
+                <span className={styles.contactItemLabel}>
+                  Permitir que el equipo de Argentum lea mis mensajes con el asistente para mejorarlo.
+                </span>
+              </div>
+              <span className={styles.contactItemValue}>
+                Si lo apagás, el equipo deja de ver también los mensajes anteriores.
+              </span>
+            </div>
+
+            <div className={styles.contactItemAction}>
+              <label className={styles.switch}>
+                <input
+                  type="checkbox"
+                  checked={Boolean(usuario?.permiso_lectura_mensajes_en)}
+                  onChange={handleTogglePermisoMensajes}
+                  disabled={isUpdatingPermiso}
+                  aria-label="Permitir que el equipo de Argentum lea mis mensajes con el asistente para mejorarlo"
+                />
+                <span className={styles.slider} />
+              </label>
             </div>
           </div>
         </div>

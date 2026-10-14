@@ -265,6 +265,9 @@ export default function TermsPage() {
             <p>
               Podés desvincular tu WhatsApp cuando quieras desde tu perfil.
             </p>
+            <p>
+              Lectura de mensajes para mejorar el asistente: solo si lo activás (en el onboarding o en Perfil &gt; Seguridad), el equipo de Argentum puede leer tus mensajes con el asistente de WhatsApp y sus respuestas, con el único fin de mejorar cómo los entiende. Está apagado salvo que lo actives y podés desactivarlo cuando quieras; al hacerlo, dejamos de ver también los mensajes anteriores.
+            </p>
           </section>
 
           <hr className={styles.divider} />
@@ -337,6 +340,9 @@ export default function TermsPage() {
               <li>Códigos de verificación: minutos; se descartan solos.</li>
               <li>Sesiones vencidas: se limpian cada 6 horas.</li>
             </ul>
+            <p>
+              Los registros de costo de la inteligencia artificial (sin el texto de tus mensajes) se guardan 400 días.
+            </p>
           </section>
 
           <hr className={styles.divider} />

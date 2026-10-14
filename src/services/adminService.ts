@@ -76,7 +76,44 @@ const adminService = {
       { params: anio ? { anio } : undefined }
     )
     return data
+  },
+
+  getScheduler: async (signal?: AbortSignal) => {
+    const { data } = await api.get<SchedulerResponse>('/v1/admin/scheduler', { signal })
+    return data
+  },
+
+  correrJob: async (jobId: string) => {
+    const { data } = await api.post<{ mensaje: string }>(`/v1/admin/scheduler/${jobId}/correr`)
+    return data
   }
 }
 
+export interface UltimaCorridaJob {
+  inicio: string
+  fin: string
+  resultado: 'ok' | 'error' | 'omitido'
+  duracion_ms: number
+  detalle?: string | null
+}
+
+export interface JobSchedulerItem {
+  job_id: string
+  nombre: string
+  que_hace: string
+  periodo_esperado_minutos: number
+  estado: 'Sin datos' | 'Al día' | 'Atrasado' | 'Falló'
+  puede_correr_ahora: boolean
+  proxima_corrida?: string | null
+  ultima_corrida?: UltimaCorridaJob | null
+  errores_24h: number
+  omitidas_24h: number
+}
+
+export interface SchedulerResponse {
+  scheduler_activo: boolean
+  jobs: JobSchedulerItem[]
+}
+
 export default adminService
+

@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/icons'
 import { getFotoUrl } from '@/utils/fotoUrl'
 import { formatFecha, formatFechaHora } from '@/utils/format'
+import { SchedulerPanel } from './admin/components/SchedulerPanel'
 import styles from './AdminPage.module.css'
 
 // TableAvatar component to fetch and render user profile picture or fallback initials
@@ -1039,13 +1040,7 @@ export default function AdminPage() {
         )}
 
         {activeTab === 'scheduler' && (
-          <div className={styles.emptyStateContainer}>
-            <EmptyState
-              icon={Clock}
-              title="Logs del scheduler"
-              description="Próximamente. Mostrará los jobs de APScheduler ejecutados, su estado y los errores ocurridos."
-            />
-          </div>
+          <SchedulerPanel />
         )}
       </div>
     </div>

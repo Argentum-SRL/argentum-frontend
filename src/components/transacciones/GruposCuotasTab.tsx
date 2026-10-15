@@ -24,6 +24,17 @@ import GrupoCuotasAvatar from './GrupoCuotasAvatar'
 import GrupoCuotasDetalleModal from './GrupoCuotasDetalleModal'
 import GrupoCuotasEditarModal from './GrupoCuotasEditarModal'
 
+function formatDiaMes(fechaStr?: string | null): string {
+  if (!fechaStr) return ''
+  const clean = fechaStr.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length === 3) {
+    const [, mm, dd] = parts
+    return `${dd}/${mm}`
+  }
+  return fechaStr
+}
+
 interface GruposCuotasTabProps {
   refreshTrigger?: number
   onRefreshNeeded?: () => void
@@ -119,19 +130,20 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   } = useAdaptiveModalHeight({
     enabled: !!editingGrupo,
     deps: [editStep, editMonto, editTarjetaId, editDesc, editFechaReferencia, editCategoriaId, editSubcategoriaId, tarjetas.length],
-    extraPadding: 22,
-    maxHeightRatio: 0.90,
+    extraPadding: 4,
+    maxHeightRatio: 0.85,
   })
 
   const {
     fieldsRef: detailBodyRef,
     footerRef: detailFooterRef,
+    containerStyle: detailContainerStyle,
     dynamicHeight: detailDynamicHeight,
   } = useAdaptiveModalHeight({
     enabled: !!selectedGrupo,
-    deps: [selectedGrupo?.id, detailSlide, billeteraSeleccionada, billeteras.length],
-    extraPadding: 22,
-    maxHeightRatio: 0.90,
+    deps: [selectedGrupo?.id, detailSlide, billeteraSeleccionada, billeteras.length, selectedGrupo?.tiene_interes],
+    extraPadding: 4,
+    maxHeightRatio: 0.85,
   })
 
   const fetchGrupos = useCallback(async () => {
@@ -363,7 +375,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const handleCancelar = (grupo: GrupoCuotasResumen) => {
     confirm({
       title: '¿Cancelás las cuotas restantes?',
-      description: 'Las cuotas que ya pagaste quedan registradas. Las pendientes se cancelan y no se van a cobrar.',
+      description: 'Las cuotas que faltan dejan de figurar en tus vencimientos futuros. Esta acción no mueve plata ni registra un pago.',
       variant: 'danger',
       confirmLabel: 'Cancelar cuotas',
       onConfirm: async () => {
@@ -376,6 +388,29 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         } catch (e) {
           console.error(e)
           sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
+        }
+      }
+    })
+  }
+
+  const handleAdelantar = (grupo: GrupoCuotasResumen) => {
+    const ddmm = formatDiaMes(grupo.vencimiento_adelanto)
+    const fechaTexto = ddmm ? ` que vence el ${ddmm}` : ''
+    const linea = `Todas las cuotas pendientes (${grupo.cantidad_pendientes}) pasan al próximo resumen de tu tarjeta${fechaTexto}. El banco te las cobrará juntas en ese resumen.`
+    confirm({
+      title: '¿Adelantar cuotas?',
+      description: linea,
+      confirmLabel: 'Adelantar cuotas',
+      onConfirm: async () => {
+        try {
+          await grupoCuotasService.adelantarGrupo(grupo.id)
+          sileo.success({ title: `Listo, las cuotas que faltaban pasan al resumen que vence el ${ddmm}.` })
+          handleCloseDetail()
+          fetchGrupos()
+          onRefreshNeeded?.()
+        } catch (e) {
+          console.error(e)
+          sileo.error({ title: getErrorMessage(e, 'No pudimos adelantar las cuotas. Intentá de nuevo.') })
         }
       }
     })
@@ -823,6 +858,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         selectedGrupo={selectedGrupo}
         detailSlide={detailSlide}
         detailSlideDirection={detailSlideDirection}
+        detailContainerStyle={detailContainerStyle}
         detailDynamicHeight={detailDynamicHeight}
         detailSelectedCat={detailSelectedCat}
         categorias={categorias}
@@ -836,6 +872,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         handleDeleteClick={handleDeleteClick}
         formatFecha={formatFecha}
         handleCancelar={handleCancelar}
+        handleAdelantar={handleAdelantar}
         handleEditClick={handleEditClick}
         handleGoPrepay={handleGoPrepay}
         handleBackToDetail={handleBackToDetail}

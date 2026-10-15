@@ -943,6 +943,7 @@ export interface GrupoCuotasResumen {
   cantidad_pendientes: number
   monto_cuota: number
   proximo_vencimiento: string | null
+  vencimiento_adelanto?: string | null
   total_pagado: number
   total_pendiente: number
   moneda: 'ARS' | 'USD'

@@ -8,7 +8,7 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  max-height: 90dvh;
+  max-height: 85dvh;
   transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -30,26 +30,22 @@
 
 @media (max-height: 800px) {
   .editStep1 {
-    height: min(485px, 88dvh);
+    height: min(485px, 85dvh);
   }
   .editStep2 {
-    height: min(525px, 88dvh);
+    height: min(525px, 85dvh);
   }
   .detailStep1 {
-    height: min(465px, 88dvh);
+    height: min(465px, 85dvh);
   }
   .detailStep2 {
-    height: min(485px, 88dvh);
+    height: min(485px, 85dvh);
   }
 }
 
 @media (max-width: 640px) {
-  .editStep1,
-  .editStep2,
-  .detailStep1,
-  .detailStep2 {
-    height: auto;
-    max-height: 88dvh;
+  .slidesContainer {
+    max-height: 85dvh;
   }
 }
 
@@ -149,12 +145,14 @@
 
 .formBody {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .formBody::-webkit-scrollbar {
@@ -260,8 +258,8 @@
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  padding: 12px 20px 16px;
-  border-top: 1px solid var(--border);
+  padding: 10px 20px 16px;
+  border-top: none;
   background: var(--surface);
   flex-shrink: 0;
 }

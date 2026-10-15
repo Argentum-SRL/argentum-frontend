@@ -259,8 +259,9 @@
 
 @media (max-width: 480px) {
   .detailStatsGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding-top: 8px;
   }
 }
 
@@ -368,8 +369,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 12px 20px 16px;
-  border-top: 1px solid var(--border);
+  padding: 10px 20px 16px;
+  border-top: none;
   background: var(--surface);
   flex-shrink: 0;
 }
@@ -382,93 +383,163 @@
 }
 
 .detailCancelCuotasBtn {
-  height: 42px;
+  height: 40px;
   padding: 0 14px;
-  border-radius: 12px;
+  border-radius: 10px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all 140ms ease;
   background: transparent;
   color: var(--text-3);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   font-family: 'Figtree', sans-serif;
+  user-select: none;
 }
 
 .detailCancelCuotasBtn:hover {
-  background: var(--surface-alt);
-  color: var(--text);
-  border-color: var(--text-3);
+  background: rgba(239, 68, 68, 0.08);
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.detailCancelCuotasBtn:active {
+  transform: scale(0.98);
 }
 
 .detailEditActionBtn {
-  height: 42px;
+  height: 40px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 10px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all 140ms ease;
   background: var(--surface-alt);
   color: var(--text);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   font-family: 'Figtree', sans-serif;
+  user-select: none;
 }
 
 .detailEditActionBtn:hover {
   background: var(--border);
+  color: var(--text);
 }
 
-.detailPrepayActionBtn {
-  height: 42px;
-  padding: 0 20px;
-  border-radius: 12px;
+.detailEditActionBtn:active {
+  transform: scale(0.98);
+}
+
+.detailPrepayActionBtn,
+.detailAdelantarActionBtn {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   cursor: pointer;
-  transition: all 150ms ease;
-  background: #0D2045;
-  color: white;
+  transition: all 140ms ease;
+  background: var(--primary);
+  color: #ffffff;
   border: none;
   font-family: 'Figtree', sans-serif;
-  box-shadow: var(--elevation-sm);
+  box-shadow: var(--elevation-xs);
+  user-select: none;
 }
 
-:global([data-theme="dark"]) .detailPrepayActionBtn,
-:global(.dark) .detailPrepayActionBtn {
-  background: var(--primary);
-  box-shadow: var(--elevation-sm);
-}
-
-.detailPrepayActionBtn:hover {
+.detailPrepayActionBtn:hover,
+.detailAdelantarActionBtn:hover {
   opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.detailPrepayActionBtn:active,
+.detailAdelantarActionBtn:active {
+  transform: scale(0.98);
 }
 
 @media (max-width: 480px) {
   .detailFormFooter {
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: 8px;
-    padding: 10px 14px 14px;
+    padding: 8px 14px 14px;
+    border-top: none;
   }
   .detailFooterLeftGroup,
   .detailFooterRightGroup {
     width: 100%;
   }
-  .detailCancelCuotasBtn,
-  .detailEditActionBtn,
-  .detailPrepayActionBtn {
-    flex: 1;
+  .detailFooterRightGroup {
+    order: 1;
+    display: flex;
+    gap: 8px;
+  }
+  .detailFooterLeftGroup {
+    order: 2;
+    display: flex;
+  }
+  .detailCancelCuotasBtn {
+    width: 100%;
+    height: 38px;
     justify-content: center;
+    font-size: 12.5px;
+  }
+  .detailEditActionBtn {
+    flex: 0 0 auto;
+    min-width: 88px;
+    height: 40px;
+    justify-content: center;
+  }
+  .detailPrepayActionBtn,
+  .detailAdelantarActionBtn {
+    flex: 1;
+    height: 40px;
+    justify-content: center;
+  }
+  .detailHeroSurface {
+    padding: 12px 14px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+  .detailHeroAvatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 10px;
+  }
+  .detailHeroTitle {
+    font-size: 14.5px;
+  }
+  .detailHeroMainAmount {
+    font-size: 20px;
+  }
+  .detailProgressSurface {
+    padding: 12px 14px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+  .detailStatLabel {
+    font-size: 8.5px;
+    letter-spacing: 0.2px;
+  }
+  .detailStatValue {
+    font-size: 12px;
+  }
+  .detailTasasSurface {
+    padding: 8px 12px;
+    gap: 6px;
+    border-radius: 12px;
   }
 }
 
@@ -566,7 +637,7 @@
 @media (max-width: 640px) {
   .modalRoot {
     width: 100%;
-    max-height: 90dvh;
+    max-height: 85dvh;
   }
 }
 

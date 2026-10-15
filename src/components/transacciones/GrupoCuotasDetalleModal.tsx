@@ -1,7 +1,7 @@
 /**
  * Modal de detalle y acciones (prepago y cancelación) para un grupo de compras en cuotas.
  */
-import type { RefObject } from 'react'
+import type { CSSProperties, RefObject } from 'react'
 import {
   Trash2,
   X,
@@ -24,6 +24,7 @@ export interface GrupoCuotasDetalleModalProps {
   selectedGrupo: GrupoCuotasResumen | null
   detailSlide: 'detail' | 'prepay'
   detailSlideDirection: 'forward' | 'back'
+  detailContainerStyle?: CSSProperties
   detailDynamicHeight?: number | null
   detailSelectedCat?: Categoria
   categorias?: Categoria[]
@@ -37,6 +38,7 @@ export interface GrupoCuotasDetalleModalProps {
   handleDeleteClick: (id: string) => void
   formatFecha: (fechaStr: string) => string
   handleCancelar: (grupo: GrupoCuotasResumen) => void
+  handleAdelantar?: (grupo: GrupoCuotasResumen) => void
   handleEditClick: (grupo: GrupoCuotasResumen) => void
   handleGoPrepay: () => void
   handleBackToDetail: () => void
@@ -51,6 +53,7 @@ export default function GrupoCuotasDetalleModal({
   selectedGrupo,
   detailSlide,
   detailSlideDirection,
+  detailContainerStyle,
   detailDynamicHeight,
   detailSelectedCat,
   categorias = [],
@@ -64,6 +67,7 @@ export default function GrupoCuotasDetalleModal({
   handleDeleteClick,
   formatFecha,
   handleCancelar,
+  handleAdelantar,
   handleEditClick,
   handleGoPrepay,
   handleBackToDetail,
@@ -73,6 +77,7 @@ export default function GrupoCuotasDetalleModal({
   detailFooterRef,
   detailWalletsCarouselRef,
 }: GrupoCuotasDetalleModalProps) {
+  const tieneTarjeta = Boolean(selectedGrupo?.tarjeta_nombre || selectedGrupo?.vencimiento_adelanto)
   return (
     <>
       {/* ── MODAL DE DETALLE & ACCIONES DE CUOTA ────────────────────────── */}
@@ -88,7 +93,10 @@ export default function GrupoCuotasDetalleModal({
           <div className={styles.modalRoot}>
             <div
               className={`${styles.slidesContainer} ${detailSlide === 'detail' ? styles.detailStep1 : styles.detailStep2}`}
-              style={detailDynamicHeight ? { height: `${detailDynamicHeight}px` } : undefined}
+              style={
+                detailContainerStyle ||
+                (detailDynamicHeight ? { height: `${detailDynamicHeight}px`, maxHeight: '85dvh' } : undefined)
+              }
             >
               
               {/* ──── SLIDE 1: Vista Detalle ──── */}
@@ -291,20 +299,34 @@ export default function GrupoCuotasDetalleModal({
                           type="button"
                           className={styles.detailEditActionBtn}
                           onClick={() => handleEditClick(selectedGrupo)}
+                          title="Editar compra"
                         >
                           <Edit2 size={14} />
                           <span>Editar</span>
                         </button>
 
                         {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
-                          <button
-                            type="button"
-                            className={styles.detailPrepayActionBtn}
-                            onClick={handleGoPrepay}
-                          >
-                            <Sparkles size={14} />
-                            <span>Prepagar</span>
-                          </button>
+                          tieneTarjeta ? (
+                            <button
+                              type="button"
+                              className={styles.detailAdelantarActionBtn}
+                              onClick={() => handleAdelantar?.(selectedGrupo)}
+                              title="Adelantar cuotas al próximo resumen"
+                            >
+                              <Sparkles size={14} />
+                              <span>Adelantar cuotas</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className={styles.detailPrepayActionBtn}
+                              onClick={handleGoPrepay}
+                              title="Prepagar cuotas pendientes"
+                            >
+                              <Sparkles size={14} />
+                              <span>Prepagar</span>
+                            </button>
+                          )
                         )}
                       </div>
                     </div>

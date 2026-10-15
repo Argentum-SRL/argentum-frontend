@@ -101,7 +101,7 @@ export default function GrupoCuotasEditarModal({
 
             <div
               className={`${styles.slidesContainer} ${editStep === 1 ? styles.editStep1 : styles.editStep2}`}
-              style={editDynamicHeight ? { height: `${editDynamicHeight}px` } : undefined}
+              style={editDynamicHeight ? { height: `${editDynamicHeight}px`, maxHeight: '85dvh' } : undefined}
             >
               
               {/* ──── PASO 1: Monto y Tarjeta ──── */}

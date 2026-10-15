@@ -40,6 +40,14 @@ const grupoCuotasService = {
     invalidateBilleteras()
     invalidatePresupuestos()
     return response.data
+  },
+
+  adelantarGrupo: async (grupoId: string): Promise<GrupoCuotasResumen> => {
+    const response = await api.post<GrupoCuotasResumen>(`/grupos-cuotas/${grupoId}/adelantar`)
+    invalidateResumen()
+    invalidateBilleteras()
+    invalidatePresupuestos()
+    return response.data
   }
 }
 

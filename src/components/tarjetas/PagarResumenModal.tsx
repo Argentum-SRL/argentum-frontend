@@ -26,6 +26,9 @@ export interface PagarResumenModalProps {
   porcentajePercepcion?: number | null
   onConfirm: (payload: PagarTarjetaPayload) => Promise<ResultadoPagoTarjeta | void>
   isPaying: boolean
+  fechaResumen?: string
+  initialTipoPago?: 'total' | 'otro'
+  initialMonto?: number | null
 }
 
 export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
@@ -44,12 +47,15 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   porcentajePercepcion = 30,
   onConfirm,
   isPaying,
+  fechaResumen,
+  initialTipoPago,
+  initialMonto,
 }) => {
   const [tipoPago, setTipoPago] = useState<'total' | 'otro'>('total')
   const [montoCustom, setMontoCustom] = useState<number | null>(null)
 
   // Diferencia / Excedente opciones
-  const [diferenciaTipo, setDiferenciaTipo] = useState<'cargos_banco' | 'compras_no_cargadas'>('cargos_banco')
+  const [diferenciaTipo, setDiferenciaTipo] = useState<'cargos_banco' | 'intereses' | 'compras_no_cargadas'>('cargos_banco')
   const [diferenciaCategoriaId, setDiferenciaCategoriaId] = useState<string | null>(null)
   const [diferenciaSubcategoriaId, setDiferenciaSubcategoriaId] = useState<string | null>(null)
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -88,8 +94,8 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   if (isOpen !== prevIsOpen) {
     setPrevIsOpen(isOpen)
     if (isOpen) {
-      setTipoPago('total')
-      setMontoCustom(null)
+      setTipoPago(initialTipoPago ?? 'total')
+      setMontoCustom(initialMonto !== undefined ? initialMonto : null)
       setDiferenciaTipo('cargos_banco')
       setDiferenciaCategoriaId(null)
       setDiferenciaSubcategoriaId(null)
@@ -125,7 +131,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
     ? (numMonto > 0 && numMonto <= totalAPagar)
     : (numMonto > 0)
 
-  const isExcedenteValid = !isExcedente || diferenciaTipo === 'cargos_banco' || (diferenciaTipo === 'compras_no_cargadas' && Boolean(diferenciaCategoriaId))
+  const isExcedenteValid = !isExcedente || diferenciaTipo === 'cargos_banco' || diferenciaTipo === 'intereses' || (diferenciaTipo === 'compras_no_cargadas' && Boolean(diferenciaCategoriaId))
 
   // Calculations for Pesification
   const cotizacionNum = parseFloat(cotizacionEfectiva) || 0
@@ -176,6 +182,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
       await onConfirm({
         moneda: 'ARS',
         monto: montoFinal,
+        fecha_resumen: fechaResumen,
         ...diferenciaPayload,
       })
     } else {
@@ -185,6 +192,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           pesificar: false,
           billetera_id: billeteraUSDId,
           monto: montoFinal,
+          fecha_resumen: fechaResumen,
           ...diferenciaPayload,
         })
       } else {
@@ -193,6 +201,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           pesificar: true,
           billetera_id: billeteraARSId,
           monto: montoFinal,
+          fecha_resumen: fechaResumen,
           cotizacion_personalizada: cotizacionNum > 0 ? cotizacionNum : undefined,
           monto_pesos_personalizado: montoPesosCustom !== '' ? parseFloat(montoPesosCustom) : undefined,
           monto_percepcion_personalizado: montoPercepcionCustom !== '' ? parseFloat(montoPercepcionCustom) : undefined
@@ -452,10 +461,33 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                         />
                         <div className={styles.excedenteTextos}>
                           <span className={styles.excedenteOpcionLabel}>
-                            Cargos del banco (comisiones, impuestos, intereses)
+                            Cargos del banco (comisiones e impuestos)
                           </span>
                           <span className={styles.excedenteOpcionSublabel}>
                             Se anota como gasto en Banco &gt; Impuestos.
+                          </span>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label
+                      className={`${styles.excedenteOpcion} ${diferenciaTipo === 'intereses' ? styles.excedenteOpcionActiva : ''}`}
+                      onClick={() => setDiferenciaTipo('intereses')}
+                    >
+                      <div className={styles.excedenteRadioRow}>
+                        <input
+                          type="radio"
+                          name="diferencia_tipo"
+                          checked={diferenciaTipo === 'intereses'}
+                          onChange={() => setDiferenciaTipo('intereses')}
+                          className={styles.excedenteRadio}
+                        />
+                        <div className={styles.excedenteTextos}>
+                          <span className={styles.excedenteOpcionLabel}>
+                            Intereses por no pagar el total
+                          </span>
+                          <span className={styles.excedenteOpcionSublabel}>
+                            Se anota como gasto en Banco &gt; Intereses pagados.
                           </span>
                         </div>
                       </div>

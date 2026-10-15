@@ -39,6 +39,11 @@ const notificacionService = {
     return data
   },
 
+  archivar: async (id: string): Promise<Notificacion> => {
+    const { data } = await api.put<Notificacion>(`/notificaciones/${id}/archivar`)
+    return data
+  },
+
   delete: async (id: string): Promise<boolean> => {
     await api.delete(`/notificaciones/${id}`)
     return true

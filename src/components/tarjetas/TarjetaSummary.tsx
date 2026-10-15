@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { AlertCircle, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, CreditCard, Calendar, Clock, CheckCircle2 } from '@/components/ui/icons'
 import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, ItemSaldoArrastrado, PagarTarjetaPayload } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
+import notificacionService from '@/services/notificacion.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatMonto } from '@/utils/format'
@@ -80,41 +81,12 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
   const [isPagarModalOpen, setIsPagarModalOpen] = useState(false)
   const [payingTicket, setPayingTicket] = useState<TicketData | null>(null)
   const [payingMoneda, setPayingMoneda] = useState<'ARS' | 'USD'>('ARS')
+  const [modalInitialTipoPago, setModalInitialTipoPago] = useState<'total' | 'otro'>('total')
+  const [modalInitialMonto, setModalInitialMonto] = useState<number | null>(null)
+  const [modalFechaResumen, setModalFechaResumen] = useState<string | undefined>(undefined)
+  const [dismissedNotifId, setDismissedNotifId] = useState<string | null>(null)
 
-  const handleOpenPagarModal = (ticket: TicketData, moneda: 'ARS' | 'USD' = 'ARS') => {
-    setPayingTicket(ticket)
-    setPayingMoneda(moneda)
-    setIsPagarModalOpen(true)
-  }
 
-  const handleConfirmarPago = async (payload: PagarTarjetaPayload) => {
-    if (!payingTicket) return
-    setIsPaying(true)
-    try {
-      const res = await tarjetaService.pagarResumenTarjeta(tarjeta.id, {
-        ...payload,
-        fecha_resumen: payingTicket.vencimiento
-      })
-      // Aviso de éxito según respuesta del servidor
-      if (res?.monto_diferencia && Number(res.monto_diferencia) > 0) {
-        const tipoLabel = payload.diferencia_tipo === 'cargos_banco' ? 'Cargos del banco' : 'Compras no cargadas'
-        sileo.success({
-          title: `Pago registrado. ${formatMonto(res.monto_diferencia, payload.moneda || 'ARS')} quedaron como ${tipoLabel}.`
-        })
-      } else {
-        sileo.success({ title: 'Pago de resumen registrado con éxito' })
-      }
-      setIsPagarModalOpen(false)
-      fetchResumen()
-      if (onRefresh) onRefresh()
-      return res
-    } catch (err: unknown) {
-      console.error(err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
-    } finally {
-      setIsPaying(false)
-    }
-  }
 
   const fetchResumen = useCallback(async () => {
     setLoading(true)
@@ -133,8 +105,30 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
   }, [tarjeta.id])
 
   useEffect(() => {
-    fetchResumen()
-  }, [fetchResumen])
+    let ignore = false
+    tarjetaService.getResumenTarjeta(tarjeta.id)
+      .then(data => {
+        if (!ignore) {
+          setResumen(data)
+          const actualIdx = data.resumenes_anteriores?.length || 0
+          setActiveIndex(actualIdx)
+        }
+      })
+      .catch((err: unknown) => {
+        if (!ignore) {
+          console.error('Error fetching resumen:', err)
+          setError('Error al cargar resúmenes.')
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoading(false)
+        }
+      })
+    return () => {
+      ignore = true
+    }
+  }, [tarjeta.id])
 
   const tickets: TicketData[] = useMemo(() => {
     if (!resumen) return []
@@ -249,6 +243,110 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
     return days >= 0 && days <= 5
   }
 
+  const handleOpenPagarModal = (ticket: TicketData, moneda: 'ARS' | 'USD' = 'ARS') => {
+    setPayingTicket(ticket)
+    setPayingMoneda(moneda)
+    setModalInitialTipoPago('total')
+    setModalInitialMonto(null)
+    setModalFechaResumen(ticket.vencimiento)
+    setIsPagarModalOpen(true)
+  }
+
+  const handlePagarResumenImpagoEntero = () => {
+    if (!tarjeta.resumen_impago) return
+    const impago = tarjeta.resumen_impago
+    const matchingTicket = tickets.find(t => t.vencimiento?.startsWith(impago.vencimiento)) || {
+      title: `Resumen ${formatDate(impago.vencimiento)}`,
+      cierre: '',
+      vencimiento: impago.vencimiento,
+      cuotas: [],
+      total: impago.monto,
+      totalAPagar: impago.monto,
+      totalARS: impago.moneda === 'ARS' ? impago.monto : 0,
+      totalUSD: impago.moneda === 'USD' ? impago.monto : 0,
+      isPast: true,
+    }
+    setPayingTicket(matchingTicket)
+    setPayingMoneda((impago.moneda as 'ARS' | 'USD') || 'ARS')
+    setModalInitialTipoPago('total')
+    setModalInitialMonto(impago.monto)
+    setModalFechaResumen(impago.vencimiento)
+    setIsPagarModalOpen(true)
+  }
+
+  const handlePagarResumenImpagoParcial = () => {
+    if (!tarjeta.resumen_impago) return
+    const impago = tarjeta.resumen_impago
+    const matchingTicket = tickets.find(t => t.vencimiento?.startsWith(impago.vencimiento)) || {
+      title: `Resumen ${formatDate(impago.vencimiento)}`,
+      cierre: '',
+      vencimiento: impago.vencimiento,
+      cuotas: [],
+      total: impago.monto,
+      totalAPagar: impago.monto,
+      totalARS: impago.moneda === 'ARS' ? impago.monto : 0,
+      totalUSD: impago.moneda === 'USD' ? impago.monto : 0,
+      isPast: true,
+    }
+    setPayingTicket(matchingTicket)
+    setPayingMoneda((impago.moneda as 'ARS' | 'USD') || 'ARS')
+    setModalInitialTipoPago('otro')
+    setModalInitialMonto(null)
+    setModalFechaResumen(impago.vencimiento)
+    setIsPagarModalOpen(true)
+  }
+
+  const handleArchivarResumenImpago = async () => {
+    if (!tarjeta.resumen_impago) return
+    const notifId = tarjeta.resumen_impago.notificacion_id
+    setDismissedNotifId(notifId)
+    try {
+      await notificacionService.archivar(notifId)
+    } catch {
+      try {
+        await notificacionService.delete(notifId)
+      } catch {
+        // Ignorar
+      }
+    }
+    if (onRefresh) onRefresh()
+  }
+
+  const handleConfirmarPago = async (payload: PagarTarjetaPayload) => {
+    if (!payingTicket && !modalFechaResumen && !payload.fecha_resumen) return
+    setIsPaying(true)
+    try {
+      const fechaResumenFinal = payload.fecha_resumen || modalFechaResumen || payingTicket?.vencimiento
+      const res = await tarjetaService.pagarResumenTarjeta(tarjeta.id, {
+        ...payload,
+        fecha_resumen: fechaResumenFinal
+      })
+      // Aviso de éxito según respuesta del servidor
+      if (res?.monto_diferencia && Number(res.monto_diferencia) > 0) {
+        const tipoLabel = payload.diferencia_tipo === 'cargos_banco' 
+          ? 'Cargos del banco' 
+          : payload.diferencia_tipo === 'intereses' 
+          ? 'Intereses' 
+          : 'Compras no cargadas'
+        sileo.success({
+          title: `Pago registrado. ${formatMonto(res.monto_diferencia, payload.moneda || 'ARS')} quedaron como ${tipoLabel}.`
+        })
+      } else {
+        sileo.success({ title: 'Pago de resumen registrado con éxito' })
+      }
+      setIsPagarModalOpen(false)
+      setDismissedNotifId(tarjeta.resumen_impago?.notificacion_id || null)
+      fetchResumen()
+      if (onRefresh) onRefresh()
+      return res
+    } catch (err: unknown) {
+      console.error(err)
+      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
+    } finally {
+      setIsPaying(false)
+    }
+  }
+
   if (loading) return <TarjetaSummarySkeleton />
 
   if (error) {
@@ -267,6 +365,41 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
 
   return (
     <div className={styles.summaryContainer}>
+      {/* Aviso Resumen Impago */}
+      {tarjeta.resumen_impago && tarjeta.resumen_impago.notificacion_id !== dismissedNotifId && (
+        <div className={styles.resumenImpagoBanner} role="alert">
+          <div className={styles.resumenImpagoContent}>
+            <AlertCircle size={18} className={styles.resumenImpagoIcon} />
+            <span className={styles.resumenImpagoTexto}>
+              {tarjeta.resumen_impago.mensaje || `¿Pagaste el resumen de ${tarjeta.nombre} de ${formatMonto(tarjeta.resumen_impago.monto, tarjeta.resumen_impago.moneda)} que venció el ${formatDate(tarjeta.resumen_impago.vencimiento)}?`}
+            </span>
+          </div>
+          <div className={styles.resumenImpagoActions}>
+            <button
+              type="button"
+              className={styles.impagoBtnPrimary}
+              onClick={handlePagarResumenImpagoEntero}
+            >
+              Sí, entero
+            </button>
+            <button
+              type="button"
+              className={styles.impagoBtnSecondary}
+              onClick={handlePagarResumenImpagoParcial}
+            >
+              Pagué una parte
+            </button>
+            <button
+              type="button"
+              className={styles.impagoBtnGhost}
+              onClick={handleArchivarResumenImpago}
+            >
+              Todavía no
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Selector de Mes / Ciclo */}
       <div className={styles.ticketNav}>
         <button 
@@ -660,10 +793,18 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       {payingTicket && (
         <PagarResumenModal
           isOpen={isPagarModalOpen}
-          onClose={() => setIsPagarModalOpen(false)}
+          onClose={() => {
+            setIsPagarModalOpen(false)
+            setModalInitialTipoPago('total')
+            setModalInitialMonto(null)
+            setModalFechaResumen(undefined)
+          }}
           tarjeta={tarjeta}
           monedaAPagar={payingMoneda}
           billeteras={billeteras}
+          fechaResumen={modalFechaResumen || payingTicket.vencimiento}
+          initialTipoPago={modalInitialTipoPago}
+          initialMonto={modalInitialMonto}
           totalAPagar={
             payingMoneda === 'USD'
               ? (payingTicket.totalAPagarUSD ?? payingTicket.totalUSD ?? 0)

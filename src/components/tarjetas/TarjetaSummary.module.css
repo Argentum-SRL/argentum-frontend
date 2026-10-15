@@ -5,6 +5,100 @@
   width: 100%;
 }
 
+/* ── Aviso Resumen Impago ── */
+.resumenImpagoBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid rgba(234, 179, 8, 0.45);
+  border-left: 4px solid #eab308;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: var(--elevation-xs);
+  transition: all 0.2s ease;
+}
+
+.resumenImpagoContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.resumenImpagoIcon {
+  color: #eab308;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.resumenImpagoTexto {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.resumenImpagoActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 28px;
+}
+
+.impagoBtnPrimary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.impagoBtnPrimary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.impagoBtnSecondary {
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.impagoBtnSecondary:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.impagoBtnGhost {
+  background: transparent;
+  color: var(--text-3);
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.impagoBtnGhost:hover {
+  color: var(--text);
+}
+
 /* ── Navegación Compacta ── */
 .ticketNav {
   display: flex;

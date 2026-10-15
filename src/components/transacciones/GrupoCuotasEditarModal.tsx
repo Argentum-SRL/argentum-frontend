@@ -175,6 +175,8 @@ export default function GrupoCuotasEditarModal({
                                     titular={t.nombre}
                                     diaCierre={t.dia_cierre}
                                     diaVencimiento={t.dia_vencimiento}
+                                    proximoCierre={t.proximo_cierre}
+                                    proximoVencimiento={t.proximo_vencimiento}
                                     color={t.color || '#0D2045'}
                                     billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
                                     className={styles.fullHeightCard}

@@ -94,14 +94,117 @@ function getBilleteraColor(billetera: Billetera | undefined): string {
   return 'linear-gradient(140deg, #1E3A8A 0%, #0F172A 60%, #020617 100%)'
 }
 
+// Helper para convertir ISO (YYYY-MM-DD) a DD/MM
+function isoToDDMM(isoStr?: string | null): string {
+  if (!isoStr) return ''
+  const clean = isoStr.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length === 3) {
+    const [, mm, dd] = parts
+    return `${dd.padStart(2, '0')}/${mm.padStart(2, '0')}`
+  }
+  return isoStr
+}
+
+// Formateador interactivo mientras el usuario tipea DD/MM
+function formatDDMMInput(val: string, prevVal: string = ''): string {
+  if (prevVal && val.length < prevVal.length && val.endsWith('/')) {
+    return val.slice(0, -1)
+  }
+  const digits = val.replace(/\D/g, '').slice(0, 4)
+  if (digits.length === 0) return ''
+  if (digits.length <= 2) {
+    if (val.includes('/') && digits.length >= 1) {
+      return `${digits.padStart(2, '0')}/`
+    }
+    return digits
+  }
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`
+}
+
+// Infiere la fecha completa ISO (YYYY-MM-DD) a partir de DD/MM
+function inferFechaIso(
+  ddmm: string,
+  tipo: 'cierre' | 'vencimiento' | 'ultimo_cierre',
+  cierreIsoRef?: string
+): string | null {
+  if (!ddmm) return null
+  if (ddmm.includes('-') && ddmm.split('-').length === 3) {
+    return ddmm.split('T')[0]
+  }
+  if (!ddmm.includes('/')) return null
+
+  const [dStr, mStr] = ddmm.split('/')
+  const day = parseInt(dStr, 10)
+  const month = parseInt(mStr, 10)
+
+  if (isNaN(day) || isNaN(month) || month < 1 || month > 12 || day < 1 || day > 31) {
+    return null
+  }
+
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth() + 1
+
+  let year = currentYear
+
+  if (tipo === 'cierre') {
+    if (currentMonth >= 11 && month <= 2) {
+      year = currentYear + 1
+    } else {
+      year = currentYear
+    }
+  } else if (tipo === 'vencimiento') {
+    let cierreYear = currentYear
+    let cierreMonth = currentMonth
+    if (cierreIsoRef) {
+      const parts = cierreIsoRef.split('-')
+      if (parts.length === 3) {
+        cierreYear = parseInt(parts[0], 10)
+        cierreMonth = parseInt(parts[1], 10)
+      }
+    }
+    if (month < cierreMonth) {
+      year = cierreYear + 1
+    } else {
+      year = cierreYear
+    }
+  } else if (tipo === 'ultimo_cierre') {
+    let cierreYear = currentYear
+    let cierreMonth = currentMonth
+    if (cierreIsoRef) {
+      const parts = cierreIsoRef.split('-')
+      if (parts.length === 3) {
+        cierreYear = parseInt(parts[0], 10)
+        cierreMonth = parseInt(parts[1], 10)
+      }
+    }
+    if (month > cierreMonth) {
+      year = cierreYear - 1
+    } else {
+      year = cierreYear
+    }
+  }
+
+  const maxDays = new Date(year, month, 0).getDate()
+  if (day > maxDays) {
+    return null
+  }
+
+  const mm = String(month).padStart(2, '0')
+  const dd = String(day).padStart(2, '0')
+  return `${year}-${mm}-${dd}`
+}
+
 interface TarjetaModalState {
   ultimos4: string
   apodo: string
   red: string
   billeteraId: string
   moneda: 'ARS' | 'USD'
-  diaCierre: number | ''
-  diaVencimiento: number | ''
+  proximoCierre: string
+  proximoVencimiento: string
+  ultimoCierre: string
   limiteCredito: number | null
   percepcionMonedaExtranjera: number
   color: string | null
@@ -119,8 +222,9 @@ const initialState: TarjetaModalState = {
   red: 'visa',
   billeteraId: '',
   moneda: 'ARS',
-  diaCierre: 10,
-  diaVencimiento: 3,
+  proximoCierre: '',
+  proximoVencimiento: '',
+  ultimoCierre: '',
   limiteCredito: null,
   percepcionMonedaExtranjera: 30,
   color: null,
@@ -140,8 +244,9 @@ function getInitialTarjetaState(data?: { tarjeta: TarjetaCredito | null; billete
       red: t.red,
       billeteraId: t.billetera_id,
       moneda: t.moneda,
-      diaCierre: t.dia_cierre,
-      diaVencimiento: t.dia_vencimiento,
+      proximoCierre: t.proximo_cierre ? isoToDDMM(t.proximo_cierre) : '',
+      proximoVencimiento: t.proximo_vencimiento ? isoToDDMM(t.proximo_vencimiento) : '',
+      ultimoCierre: '',
       limiteCredito: t.limite_credito,
       percepcionMonedaExtranjera: t.percepcion_moneda_extranjera !== undefined ? Number(t.percepcion_moneda_extranjera) : 30,
       color: t.color || getBilleteraColor((data.billeteras || []).find(b => b.id === t.billetera_id)),
@@ -251,6 +356,29 @@ export const TarjetaModal: React.FC = () => {
     return () => clearTimeout(timer)
   }, [step, state.billeteraId, data])
 
+  const handleDateInputChange = (
+    field: 'proximoCierre' | 'proximoVencimiento' | 'ultimoCierre',
+    val: string
+  ) => {
+    const formatted = formatDDMMInput(val, state[field])
+    dispatch({ type: 'SET_FIELD', field, value: formatted })
+  }
+
+  const handleDateBlur = (field: 'proximoCierre' | 'proximoVencimiento' | 'ultimoCierre') => {
+    const val = state[field]
+    if (!val || !val.includes('/')) return
+    const [d, m] = val.split('/')
+    const dNum = parseInt(d, 10)
+    const mNum = parseInt(m, 10)
+    if (!isNaN(dNum) && !isNaN(mNum) && dNum >= 1 && dNum <= 31 && mNum >= 1 && mNum <= 12) {
+      dispatch({
+        type: 'SET_FIELD',
+        field,
+        value: `${String(dNum).padStart(2, '0')}/${String(mNum).padStart(2, '0')}`,
+      })
+    }
+  }
+
   if (!data) return null
 
   // Paleta de opciones de colores
@@ -280,15 +408,40 @@ export const TarjetaModal: React.FC = () => {
       setAnimClass(styles.slideForward)
       setStep(2)
     } else if (step === 2) {
-      const diaCierreNum = Number(state.diaCierre)
-      const diaVencimientoNum = Number(state.diaVencimiento)
-
-      if (!Number.isInteger(diaCierreNum) || diaCierreNum < 1 || diaCierreNum > 28) {
-        sileo.error({ title: 'El día de cierre debe estar entre 1 y 28' })
+      if (!state.proximoCierre) {
+        sileo.error({ title: 'Ingresá la fecha de próximo cierre (DD/MM)' })
         return
       }
-      if (!Number.isInteger(diaVencimientoNum) || diaVencimientoNum < 1 || diaVencimientoNum > 28) {
-        sileo.error({ title: 'El día de vencimiento debe estar entre 1 y 28' })
+      if (!state.proximoVencimiento) {
+        sileo.error({ title: 'Ingresá la fecha de próximo vencimiento (DD/MM)' })
+        return
+      }
+      const isoCierre = inferFechaIso(state.proximoCierre, 'cierre')
+      if (!isoCierre) {
+        sileo.error({ title: 'Ingresá una fecha válida para el próximo cierre (ej: 22/10)' })
+        return
+      }
+      const isoVencimiento = inferFechaIso(state.proximoVencimiento, 'vencimiento', isoCierre)
+      if (!isoVencimiento) {
+        sileo.error({ title: 'Ingresá una fecha válida para el próximo vencimiento (ej: 04/11)' })
+        return
+      }
+      let isoUltimoCierre: string | null = null
+      if (state.ultimoCierre && state.ultimoCierre.trim()) {
+        isoUltimoCierre = inferFechaIso(state.ultimoCierre, 'ultimo_cierre', isoCierre)
+        if (!isoUltimoCierre) {
+          sileo.error({ title: 'Ingresá una fecha válida para el último cierre (ej: 24/09)' })
+          return
+        }
+      }
+      const diffMs = new Date(isoVencimiento).getTime() - new Date(isoCierre).getTime()
+      const diffDias = Math.round(diffMs / (1000 * 60 * 60 * 24))
+      if (isoVencimiento <= isoCierre || diffDias > 31) {
+        sileo.error({ title: 'El vencimiento tiene que ser posterior al cierre y dentro del mes siguiente.' })
+        return
+      }
+      if (isoUltimoCierre && isoUltimoCierre >= isoCierre) {
+        sileo.error({ title: 'El último cierre debe ser anterior al próximo cierre.' })
         return
       }
       if (state.limiteCredito !== null && state.limiteCredito !== undefined && state.limiteCredito <= 0) {
@@ -314,9 +467,6 @@ export const TarjetaModal: React.FC = () => {
     dispatch({ type: 'SET_FIELD', field: 'loading', value: true })
     dispatch({ type: 'SET_FIELD', field: 'error', value: null })
 
-    const diaCierreNum = Number(state.diaCierre)
-    const diaVencimientoNum = Number(state.diaVencimiento)
-
     try {
       let colorToSend: string | undefined = undefined
       if (state.color) {
@@ -330,14 +480,19 @@ export const TarjetaModal: React.FC = () => {
         }
       }
 
+      const isoCierre = inferFechaIso(state.proximoCierre, 'cierre')
+      const isoVencimiento = inferFechaIso(state.proximoVencimiento, 'vencimiento', isoCierre || undefined)
+      const isoUltimoCierre = state.ultimoCierre ? inferFechaIso(state.ultimoCierre, 'ultimo_cierre', isoCierre || undefined) : null
+
       const payload: TarjetaCreditoCreate = {
         nombre: `•••• ${state.ultimos4}`,
         apodo: state.apodo && state.apodo.trim() ? state.apodo.trim() : null,
         red: state.red,
         billetera_id: state.billeteraId,
         moneda: state.moneda,
-        dia_cierre: diaCierreNum,
-        dia_vencimiento: diaVencimientoNum,
+        proximo_cierre: isoCierre || state.proximoCierre,
+        proximo_vencimiento: isoVencimiento || state.proximoVencimiento,
+        ultimo_cierre: isoUltimoCierre || null,
         limite_credito: state.limiteCredito !== null && state.limiteCredito !== undefined ? state.limiteCredito : undefined,
         percepcion_moneda_extranjera: Number(state.percepcionMonedaExtranjera),
         color: colorToSend,
@@ -570,44 +725,64 @@ export const TarjetaModal: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Ciclo de Facturación (Dual Card) */}
+                {/* Fechas del resumen */}
                 <div className={styles.formField}>
-                  <label className={styles.fieldLabel}>Fechas del resumen</label>
-                  <div className={styles.cycleDualCard}>
-                    <div className={styles.cycleCol}>
-                      <span className={styles.cycleColLabel}>Cierre de resumen</span>
-                      <div className={styles.cycleValueRow}>
-                        <span className={styles.cycleValuePrefix}>Día</span>
-                        <input
-                          id="dia-cierre"
-                          type="number"
-                          min={1}
-                          max={28}
-                          className={styles.cycleValueInput}
-                          value={state.diaCierre}
-                          onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'diaCierre', value: e.target.value })}
-                        />
-                      </div>
+                  <div className={styles.fieldHeader}>
+                    <label className={styles.fieldLabel}>Fechas del resumen</label>
+                    <span className={styles.fieldHintTighter}>
+                      Las tres figuran en tu último resumen.
+                    </span>
+                  </div>
+                  <div className={styles.fechasResumenGrid}>
+                    <div className={styles.fechaCol}>
+                      <label className={styles.subFieldLabel} htmlFor="tarjeta-proximo-cierre">
+                        Próximo cierre
+                      </label>
+                      <input
+                        id="tarjeta-proximo-cierre"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="dd/mm"
+                        maxLength={5}
+                        className={styles.dateInput}
+                        value={state.proximoCierre}
+                        onChange={(e) => handleDateInputChange('proximoCierre', e.target.value)}
+                        onBlur={() => handleDateBlur('proximoCierre')}
+                        required
+                      />
                     </div>
-
-                    <div className={styles.cycleDivider}>
-                      <div className={styles.cycleDividerLine} />
+                    <div className={styles.fechaCol}>
+                      <label className={styles.subFieldLabel} htmlFor="tarjeta-proximo-vencimiento">
+                        Próximo vencimiento
+                      </label>
+                      <input
+                        id="tarjeta-proximo-vencimiento"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="dd/mm"
+                        maxLength={5}
+                        className={styles.dateInput}
+                        value={state.proximoVencimiento}
+                        onChange={(e) => handleDateInputChange('proximoVencimiento', e.target.value)}
+                        onBlur={() => handleDateBlur('proximoVencimiento')}
+                        required
+                      />
                     </div>
-
-                    <div className={styles.cycleCol}>
-                      <span className={styles.cycleColLabel}>Vencimiento de pago</span>
-                      <div className={styles.cycleValueRow}>
-                        <span className={styles.cycleValuePrefix}>Día</span>
-                        <input
-                          id="dia-vencimiento"
-                          type="number"
-                          min={1}
-                          max={28}
-                          className={styles.cycleValueInput}
-                          value={state.diaVencimiento}
-                          onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'diaVencimiento', value: e.target.value })}
-                        />
-                      </div>
+                    <div className={styles.fechaCol}>
+                      <label className={styles.subFieldLabel} htmlFor="tarjeta-ultimo-cierre">
+                        Último cierre (opcional)
+                      </label>
+                      <input
+                        id="tarjeta-ultimo-cierre"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="dd/mm"
+                        maxLength={5}
+                        className={styles.dateInput}
+                        value={state.ultimoCierre}
+                        onChange={(e) => handleDateInputChange('ultimoCierre', e.target.value)}
+                        onBlur={() => handleDateBlur('ultimoCierre')}
+                      />
                     </div>
                   </div>
                 </div>
@@ -703,8 +878,8 @@ export const TarjetaModal: React.FC = () => {
                       ultimos4={state.ultimos4}
                       red={state.red}
                       titular={titular}
-                      diaCierre={Number(state.diaCierre) || 10}
-                      diaVencimiento={Number(state.diaVencimiento) || 3}
+                      proximoCierre={state.proximoCierre}
+                      proximoVencimiento={state.proximoVencimiento}
                       color={state.color || colorOptions[0].value}
                       billeteraNombre={selectedBilletera?.nombre || ''}
                     />
@@ -763,9 +938,9 @@ export const TarjetaModal: React.FC = () => {
                   </div>
 
                   <div className={styles.summaryRow}>
-                    <span className={styles.summaryLbl}>Ciclo mensual</span>
+                    <span className={styles.summaryLbl}>Próximo resumen</span>
                     <span className={styles.summaryVal}>
-                      Cierre día {state.diaCierre} • Vence día {state.diaVencimiento}
+                      Cierre {isoToDDMM(state.proximoCierre) || '-'} • Vence {isoToDDMM(state.proximoVencimiento) || '-'}
                     </span>
                   </div>
 

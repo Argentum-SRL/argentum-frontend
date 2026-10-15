@@ -720,6 +720,13 @@ export interface TarjetaCredito {
   red: 'visa' | 'mastercard' | 'amex' | 'naranja' | 'cabal' | 'otro'
   dia_cierre: number
   dia_vencimiento: number
+  regla_cierre?: 'dia_fijo' | 'dia_semana'
+  semana_cierre?: number | null
+  dia_semana_cierre?: number | null
+  dias_hasta_vencimiento?: number | null
+  proximo_cierre?: string
+  proximo_vencimiento?: string
+  texto_fechas?: string
   limite_credito: number | null
   moneda: 'ARS' | 'USD'
   percepcion_moneda_extranjera: number
@@ -735,8 +742,11 @@ export interface TarjetaCreditoCreate {
   nombre: string
   apodo?: string | null
   red: string
-  dia_cierre: number
-  dia_vencimiento: number
+  proximo_cierre?: string
+  proximo_vencimiento?: string
+  ultimo_cierre?: string | null
+  dia_cierre?: number
+  dia_vencimiento?: number
   limite_credito?: number
   moneda: string
   percepcion_moneda_extranjera?: number

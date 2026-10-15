@@ -85,6 +85,8 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
               diaVencimiento={tarjeta.dia_vencimiento}
               color={color}
               billeteraNombre={billeteraNombre}
+              proximoCierre={tarjeta.proximo_cierre}
+              proximoVencimiento={tarjeta.proximo_vencimiento}
             />
           </div>
 

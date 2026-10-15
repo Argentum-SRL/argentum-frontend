@@ -280,9 +280,17 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
         </button>
         <div className={styles.navCenter}>
           <h4 className={styles.monthTitle}>{currentTicket.title}</h4>
-          <span className={styles.navSubtitle}>
-            {currentTicket.cierre ? `Cierre: ${formatDate(currentTicket.cierre)}` : 'Estimación Futura'}
-          </span>
+          <div className={styles.fechasBlock}>
+            <span className={styles.navSubtitle}>
+              {currentTicket.cierre ? `Cierre: ${formatDate(currentTicket.cierre)}` : 'Estimación Futura'}
+              {currentTicket.vencimiento ? ` • Vence: ${formatDate(currentTicket.vencimiento)}` : ''}
+            </span>
+            {tarjeta.texto_fechas && (
+              <span className={styles.textoFechas}>
+                {tarjeta.texto_fechas}
+              </span>
+            )}
+          </div>
         </div>
         <button 
           className={styles.navBtn} 

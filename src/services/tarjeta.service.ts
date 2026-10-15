@@ -82,6 +82,17 @@ const tarjetaService = {
   getPresionFutura: async (meses = 6, signal?: AbortSignal): Promise<PresionFuturaData> => {
     const { data } = await api.get<{ success: boolean; data: PresionFuturaData }>('/tarjetas/presion-futura', { params: { meses }, signal })
     return data.data
+  },
+  actualizarFechasResumen: async (
+    id: string,
+    fechaCierreOrPayload: string | { fecha_cierre: string; fecha_vencimiento: string },
+    fechaVencimiento?: string
+  ): Promise<{ ok: boolean; fecha_cierre: string; fecha_vencimiento: string; cuotas_movidas?: number }> => {
+    const payload = typeof fechaCierreOrPayload === 'string'
+      ? { fecha_cierre: fechaCierreOrPayload, fecha_vencimiento: fechaVencimiento! }
+      : fechaCierreOrPayload
+    const { data } = await api.post(`/tarjetas/${id}/fechas-resumen`, payload)
+    return data
   }
 }
 

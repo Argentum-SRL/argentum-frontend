@@ -21,10 +21,12 @@ interface RealCardPreviewProps {
   ultimos4: string
   red: string
   titular: string
-  diaCierre: number
-  diaVencimiento: number
+  diaCierre?: number
+  diaVencimiento?: number
   color: string
   billeteraNombre: string
+  proximoCierre?: string
+  proximoVencimiento?: string
   className?: string
 }
 
@@ -32,12 +34,28 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
   ultimos4,
   red,
   titular,
-  diaCierre,
-  diaVencimiento,
+  diaCierre = 10,
+  diaVencimiento = 3,
   color,
   billeteraNombre,
+  proximoCierre,
+  proximoVencimiento,
   className = '',
 }) => {
+  const formatDDMM = (isoDateStr?: string): string | null => {
+    if (!isoDateStr) return null
+    if (isoDateStr.includes('/') && isoDateStr.length >= 3) return isoDateStr
+    const clean = isoDateStr.split('T')[0]
+    const parts = clean.split('-')
+    if (parts.length === 3) {
+      const [, month, day] = parts
+      return `${day}/${month}`
+    }
+    return null
+  }
+
+  const cierreTexto = proximoCierre && formatDDMM(proximoCierre) ? formatDDMM(proximoCierre) : `día ${diaCierre}`
+  const vencimientoTexto = proximoVencimiento && formatDDMM(proximoVencimiento) ? formatDDMM(proximoVencimiento) : `día ${diaVencimiento}`
   let logo = RED_LOGOS[red]
   if (red === 'visa') {
     logo = getCardLogoUrl('visa_tarjeta_negro.svg') || visaLogo
@@ -210,7 +228,7 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
               className={styles.cardInfoValue} 
               style={{ color: textColor }}
             >
-              día {diaCierre}
+              {cierreTexto}
             </span>
           </div>
           <div className={styles.cardInfoGroup}>
@@ -224,7 +242,7 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
               className={styles.cardInfoValue} 
               style={{ color: textColor }}
             >
-              día {diaVencimiento}
+              {vencimientoTexto}
             </span>
           </div>
         </div>

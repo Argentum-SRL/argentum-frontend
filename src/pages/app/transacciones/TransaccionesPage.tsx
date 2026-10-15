@@ -4,11 +4,12 @@ import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard } f
 import { LunarLoader, TransactionsListSkeleton, Skeleton } from '@/components/ui'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
-import type { TransaccionFilters } from '@/services/transaccion.service'
+import movimientoService from '@/services/movimiento.service'
+import type { FiltrosMovimientos } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
-import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
+import type { Transaccion, Billetera, Categoria, TarjetaCredito, MovimientoItem, TotalesMoneda } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -48,8 +49,9 @@ export default function TransaccionesPage() {
   }, [setSearchParams])
 
   const [cuotasRefreshTrigger, setCuotasRefreshTrigger] = useState(0)
+  const [grupoInicialId, setGrupoInicialId] = useState<string | null>(null)
   
-  const defaultFilters: TransaccionFilters = useMemo(() => ({
+  const defaultFilters: FiltrosMovimientos = useMemo(() => ({
     tipo: undefined,
     moneda: undefined,
     fecha_desde: periodoActual?.fecha_inicio,
@@ -60,8 +62,8 @@ export default function TransaccionesPage() {
     busqueda: ''
   }), [periodoActual])
 
-  const [filters, setFilters] = useState<TransaccionFilters>(defaultFilters)
-  const mainCurrency = (filters?.moneda as 'ARS' | 'USD') || 'ARS' // Moneda base para el resumen adaptada al filtro activo
+  const [filters, setFilters] = useState<FiltrosMovimientos>(defaultFilters)
+  const mainCurrency = (filters?.moneda as 'ARS' | 'USD') || 'ARS'
 
   // Sincronizar filtros por defecto cuando el usuario cargue o cambie su ciclo
   const periodoKey = periodoActual ? `${periodoActual.fecha_inicio}_${periodoActual.fecha_fin}` : ''
@@ -71,7 +73,9 @@ export default function TransaccionesPage() {
     setFilters(defaultFilters)
   }
   
-  const [transacciones, setTransacciones] = useState<Transaccion[]>([])
+  const [movimientos, setMovimientos] = useState<MovimientoItem[]>([])
+  const [totalesServidor, setTotalesServidor] = useState<Record<string, TotalesMoneda>>({})
+  const [totalItems, setTotalItems] = useState(0)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
@@ -84,12 +88,12 @@ export default function TransaccionesPage() {
   const { open, confirm } = useModal()
 
   const showMonedaFilter = useMemo(() => {
-    return billeteras.some(b => b.moneda === 'USD') || transacciones.some(t => t.moneda === 'USD')
-  }, [billeteras, transacciones])
+    return billeteras.some(b => b.moneda === 'USD') || movimientos.some(m => m.moneda === 'USD')
+  }, [billeteras, movimientos])
 
   const hasActiveFilters = useMemo(() => Object.entries(filters).some(([k, v]) => {
     if (k === 'fecha_desde' || k === 'fecha_hasta') {
-      return v !== defaultFilters[k as keyof TransaccionFilters]
+      return v !== defaultFilters[k as keyof FiltrosMovimientos]
     }
     if (Array.isArray(v)) {
       return v.length > 0
@@ -98,23 +102,26 @@ export default function TransaccionesPage() {
   }), [filters, defaultFilters])
 
   // Carga inicial (página 0)
-  const fetchInitialTransacciones = useCallback(async (signal?: AbortSignal) => {
+  const fetchInitialMovimientos = useCallback(async (signal?: AbortSignal) => {
     try {
-      const data = await transaccionService.getTransacciones({
+      const resp = await movimientoService.getMovimientos({
         ...filters,
+        modo: 'general',
         skip: 0,
         limit: PAGE_SIZE
       }, signal)
       if (!signal?.aborted) {
-        setTransacciones(data)
-        setHasMore(data.length === PAGE_SIZE)
+        setMovimientos(resp.items)
+        setTotalesServidor(resp.totales)
+        setTotalItems(resp.total_items)
+        setHasMore(resp.hay_mas)
       }
     } catch (err) {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
       console.error(err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar las transacciones. Intentá de nuevo.') })
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar los movimientos. Intentá de nuevo.') })
     }
   }, [filters])
 
@@ -123,17 +130,18 @@ export default function TransaccionesPage() {
     if (loading || loadingPeriodo || loadingMore || !hasMore) return
     setLoadingMore(true)
     try {
-      const nextData = await transaccionService.getTransacciones({
+      const nextResp = await movimientoService.getMovimientos({
         ...filters,
-        skip: transacciones.length,
+        modo: 'general',
+        skip: movimientos.length,
         limit: PAGE_SIZE
       })
-      if (nextData.length < PAGE_SIZE) {
-        setHasMore(false)
-      }
-      setTransacciones(prev => {
-        const existingIds = new Set(prev.map(t => t.id))
-        const fresh = nextData.filter(t => !existingIds.has(t.id))
+      setHasMore(nextResp.hay_mas)
+      setTotalItems(nextResp.total_items)
+      setTotalesServidor(nextResp.totales)
+      setMovimientos(prev => {
+        const existingIds = new Set(prev.map(m => m.id))
+        const fresh = nextResp.items.filter(m => !existingIds.has(m.id))
         return [...prev, ...fresh]
       })
     } catch (err) {
@@ -141,11 +149,11 @@ export default function TransaccionesPage() {
         return
       }
       console.error(err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar más transacciones.') })
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar más movimientos.') })
     } finally {
       setLoadingMore(false)
     }
-  }, [loading, loadingPeriodo, loadingMore, hasMore, filters, transacciones.length])
+  }, [loading, loadingPeriodo, loadingMore, hasMore, filters, movimientos.length])
 
   const fetchPendientes = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -162,26 +170,13 @@ export default function TransaccionesPage() {
   }, [])
 
   // Función para refrescar todo (usada por modales)
-  const refresh = useCallback(async (createdOrUpdatedTx?: Transaccion | null) => {
+  const refresh = useCallback(async () => {
     setLoading(true)
     setCuotasRefreshTrigger(prev => prev + 1)
 
-    // Si se creó una transacción con tarjeta de crédito (cuota), cambiar automáticamente a la pestaña 'cuotas'
-    if (createdOrUpdatedTx && (createdOrUpdatedTx.es_padre_cuotas || createdOrUpdatedTx.metodo_pago === 'credito')) {
-      setActiveTab('cuotas')
-    } else if (
-      createdOrUpdatedTx &&
-      createdOrUpdatedTx.metodo_pago !== 'credito' &&
-      !createdOrUpdatedTx.es_padre_cuotas &&
-      activeTab === 'cuotas'
-    ) {
-      // Si estaba en cuotas y creó un movimiento normal (ej. efectivo/débito), volver al historial
-      setActiveTab('historial')
-    }
-
     try {
       const [, , freshBilleteras] = await Promise.all([
-        fetchInitialTransacciones(),
+        fetchInitialMovimientos(),
         fetchPendientes(),
         billeteraService.list(),
       ])
@@ -189,7 +184,7 @@ export default function TransaccionesPage() {
     } finally {
       setLoading(false)
     }
-  }, [fetchInitialTransacciones, fetchPendientes, setActiveTab, activeTab, usuario?.moneda_principal])
+  }, [fetchInitialMovimientos, fetchPendientes, usuario?.moneda_principal])
 
   // 1. Carga de datos estáticos (Solo al montar)
   useEffect(() => {
@@ -225,7 +220,7 @@ export default function TransaccionesPage() {
       setHasMore(true)
       try {
         await Promise.all([
-          fetchInitialTransacciones(controller.signal),
+          fetchInitialMovimientos(controller.signal),
           fetchPendientes(controller.signal)
         ])
       } finally {
@@ -237,7 +232,7 @@ export default function TransaccionesPage() {
     
     loadDynamic()
     return () => controller.abort()
-  }, [loadingPeriodo, fetchInitialTransacciones, fetchPendientes])
+  }, [loadingPeriodo, fetchInitialMovimientos, fetchPendientes])
 
   // 3. Observer para infinite scroll
   useEffect(() => {
@@ -268,7 +263,7 @@ export default function TransaccionesPage() {
     ) {
       const controller = new AbortController()
       const tid = setTimeout(() => {
-        void fetchInitialTransacciones(controller.signal)
+        void fetchInitialMovimientos(controller.signal)
         void fetchPendientes(controller.signal)
         setCuotasRefreshTrigger(prev => prev + 1)
       }, 0)
@@ -277,21 +272,22 @@ export default function TransaccionesPage() {
         controller.abort()
       }
     }
-  }, [loadingPeriodo, lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchInitialTransacciones, fetchPendientes])
+  }, [loadingPeriodo, lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchInitialMovimientos, fetchPendientes])
 
   // 5. Escuchar evento global de transacciones creadas/modificadas localmente
   useEffect(() => {
-    const handleTxCreated = (e: Event) => {
-      const customEvent = e as CustomEvent<Transaccion | null>
-      void refresh(customEvent.detail)
+    const handleTxCreated = () => {
+      void refresh()
     }
     window.addEventListener('argentum:transaccion-creada', handleTxCreated)
     return () => window.removeEventListener('argentum:transaccion-creada', handleTxCreated)
   }, [refresh])
 
-
   const handleEdit = useCallback((id: string) => {
-    const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
+    // Si id viene como "transaccion:<uuid>" o "<uuid>"
+    const rawId = id.includes(':') ? id.split(':')[1] : id
+    const mov = movimientos.find(m => m.id === id || (m.transaccion && m.transaccion.id === rawId))
+    const tx = mov?.transaccion || pendientesIA.find(t => t.id === rawId)
     if (tx) {
       open('transaccion', {
         data: {
@@ -303,10 +299,17 @@ export default function TransaccionesPage() {
         },
       })
     }
-  }, [transacciones, pendientesIA, billeteras, categorias, tarjetas, open, refresh])
+  }, [movimientos, pendientesIA, billeteras, categorias, tarjetas, open, refresh])
+
+  const handleOpenCuotasGroup = useCallback((grupoId: string) => {
+    setGrupoInicialId(grupoId)
+    setActiveTab('cuotas')
+  }, [setActiveTab])
 
   const handleDelete = useCallback((id: string) => {
-    const tx = transacciones.find(t => t.id === id) || pendientesIA.find(t => t.id === id)
+    const rawId = id.includes(':') ? id.split(':')[1] : id
+    const mov = movimientos.find(m => m.id === id || (m.transaccion && m.transaccion.id === rawId))
+    const tx = mov?.transaccion || pendientesIA.find(t => t.id === rawId)
     if (!tx) return
 
     if (tx.es_cuota_hija) {
@@ -317,7 +320,7 @@ export default function TransaccionesPage() {
         confirmLabel: 'Eliminar cuota',
         onConfirm: async () => {
           try {
-            await transaccionService.deleteCuotaIndividual(id)
+            await transaccionService.deleteCuotaIndividual(rawId)
             sileo.success({ title: 'La cuota se eliminó correctamente.' })
             refresh()
           } catch (e) {
@@ -336,7 +339,7 @@ export default function TransaccionesPage() {
       confirmLabel: 'Eliminar',
       onConfirm: async () => {
         try {
-          await transaccionService.deleteTransaccion(id)
+          await transaccionService.deleteTransaccion(rawId)
           sileo.success({ title: 'La transacción se eliminó.' })
           refresh()
         } catch (e) {
@@ -345,7 +348,7 @@ export default function TransaccionesPage() {
         }
       },
     })
-  }, [transacciones, pendientesIA, confirm, refresh])
+  }, [movimientos, pendientesIA, confirm, refresh])
 
   const openNewTransaccion = useCallback(() => {
     open('transaccion', {
@@ -372,71 +375,68 @@ export default function TransaccionesPage() {
     }))
   }, [])
 
-  const filteredTransacciones = useMemo(() => {
+  const filteredMovimientos = useMemo(() => {
     if (!filters.categoria_ids || filters.categoria_ids.length === 0) {
-      return transacciones
+      return movimientos
     }
-    return transacciones.filter(t => t.categoria_id && filters.categoria_ids?.includes(t.categoria_id))
-  }, [transacciones, filters.categoria_ids])
+    return movimientos.filter(m => {
+      const cid = m.transaccion?.categoria_id
+      return cid && filters.categoria_ids?.includes(cid)
+    })
+  }, [movimientos, filters.categoria_ids])
 
   const grupos = useMemo(() => {
-    const gruposObj: Record<string, Transaccion[]> = {}
-    filteredTransacciones.forEach(tx => {
-      const fecha = tx.fecha.split('T')[0]
+    const gruposObj: Record<string, MovimientoItem[]> = {}
+    filteredMovimientos.forEach(mov => {
+      const fecha = mov.fecha.split('T')[0]
       if (!gruposObj[fecha]) gruposObj[fecha] = []
-      gruposObj[fecha].push(tx)
+      gruposObj[fecha].push(mov)
     })
     return Object.entries(gruposObj).sort((a, b) => b[0].localeCompare(a[0]))
-  }, [filteredTransacciones])
+  }, [filteredMovimientos])
 
-  const { totalIngresos, totalEgresos, balance } = useMemo(() => {
-    let ingresos = 0
-    let egresos = 0
-    
-    // Solo sumamos lo que corresponde a la moneda principal para que el resumen sea coherente
-    const txsMoneda = filteredTransacciones.filter(t => t.moneda === mainCurrency)
-
-    txsMoneda.forEach(t => {
-      // Excluir transacciones pendientes de confirmación (alineado con dashboard)
-      if (t.estado_verificacion === 'pendiente') {
-        return
-      }
-      // Excluir aportes y retiros de metas de los totales de egresos/ingresos
-      if (t.movimiento_meta_id || t.descripcion?.startsWith('Aporte a la meta:') || t.descripcion?.startsWith('Retiro de la meta:')) {
-        return
-      }
-      const monto = Number(t.monto) || 0
-      if (t.tipo === 'ingreso') ingresos += monto
-      else egresos += monto
-    })
-
-    return {
-      totalIngresos: ingresos,
-      totalEgresos: egresos,
-      balance: ingresos - egresos
-    }
-  }, [filteredTransacciones, mainCurrency])
+  // Totales oficiales calculados por el servidor
+  const totalesMonedaActiva = totalesServidor[mainCurrency] || { gastos: 0, ingresos: 0, balance: 0 }
+  const totalIngresos = Number(totalesMonedaActiva.ingresos) || 0
+  const totalGastos = Number(totalesMonedaActiva.gastos) || 0
+  const balance = Number(totalesMonedaActiva.balance) || (totalIngresos - totalGastos)
 
   const formatCurrency = (monto: number) => formatMonto(Math.round(monto), mainCurrency)
   const resumen = useMemo(() => ({
     balance,
     ingresos: totalIngresos,
-    egresos: totalEgresos
-  }), [balance, totalIngresos, totalEgresos])
+    gastos: totalGastos
+  }), [balance, totalIngresos, totalGastos])
 
   const handleExportar = useCallback(async () => {
-    const { exportarTransaccionesPDF } = await import('@/services/exportPdf.service')
-    exportarTransaccionesPDF({
-      transacciones: filteredTransacciones,
-      resumen: {
-        totalIngresos: resumen.ingresos,
-        totalEgresos: resumen.egresos,
-        balance: resumen.balance
-      },
-      filters,
-      usuario
-    })
-  }, [filteredTransacciones, resumen, filters, usuario])
+    try {
+      // Pedir al servidor todos los ítems del filtro (limit 5000) y usar totales del servidor
+      const allData = await movimientoService.getMovimientos({
+        ...filters,
+        modo: 'general',
+        skip: 0,
+        limit: 5000
+      })
+      const { exportarTransaccionesPDF } = await import('@/services/exportPdf.service')
+      exportarTransaccionesPDF({
+        movimientos: allData.items,
+        totalesServidor: allData.totales,
+        resumen: {
+          totalIngresos: allData.totales[mainCurrency]?.ingresos ?? resumen.ingresos,
+          totalEgresos: allData.totales[mainCurrency]?.gastos ?? resumen.gastos,
+          balance: allData.totales[mainCurrency]?.balance ?? resumen.balance
+        },
+        filters: {
+          fecha_desde: filters.fecha_desde,
+          fecha_hasta: filters.fecha_hasta,
+        },
+        usuario
+      })
+    } catch (e) {
+      console.error(e)
+      sileo.error({ title: 'No pudimos armar el PDF. Intentá de nuevo.' })
+    }
+  }, [filters, mainCurrency, resumen, usuario])
 
   return (
     <div className={styles.page}>
@@ -452,16 +452,16 @@ export default function TransaccionesPage() {
               <Skeleton variant="text" width={75} height={12} />
             </div>
           ) : (
-            <p className={styles.subtitle}>{periodoActual.label} · {loading ? '—' : `${transacciones.length} movimientos`}</p>
+            <p className={styles.subtitle}>{periodoActual.label} · {loading ? '—' : `${totalItems} movimientos`}</p>
           )}
         </div>
         <div className={styles.headerActions}>
           <button
             className={`${styles.btnGhost} ${styles.desktopOnly}`}
             onClick={handleExportar}
-            disabled={filteredTransacciones.length === 0}
-            title={filteredTransacciones.length === 0
-              ? 'No hay transacciones para exportar'
+            disabled={filteredMovimientos.length === 0}
+            title={filteredMovimientos.length === 0
+              ? 'No hay movimientos para exportar'
               : 'Exportar PDF'}
           >
             <Download size={16} className={styles.btnIcon} />
@@ -525,9 +525,9 @@ export default function TransaccionesPage() {
             </div>
             <div className={styles.splitDivider} />
             <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Gastos</span>
+              <span className={styles.splitLabel}>Egresos</span>
               <span className={`${styles.splitValue} ${styles.colorRed}`}>
-                -{formatCurrency(Math.abs(resumen.egresos))}
+                -{formatCurrency(Math.abs(resumen.gastos))}
               </span>
             </div>
           </div>
@@ -554,7 +554,7 @@ export default function TransaccionesPage() {
               },
               {
                 label: "Egresos",
-                value: `-${formatCurrency(Math.abs(resumen.egresos))}`,
+                value: `-${formatCurrency(Math.abs(resumen.gastos))}`,
                 valueColor: '#FF8A65',
               },
             ]}
@@ -605,15 +605,17 @@ export default function TransaccionesPage() {
               />
             ) : (
               <>
-                {grupos.map(([fecha, txs]) => (
+                {grupos.map(([fecha, movs]) => (
                   <DayGroup
                     key={fecha}
                     fecha={fecha}
-                    transacciones={txs}
+                    movimientos={movs}
                     categorias={categorias}
                     billeteras={billeteras}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onOpenCuotasGroup={handleOpenCuotasGroup}
+                    modo="general"
                   />
                 ))}
 
@@ -623,11 +625,11 @@ export default function TransaccionesPage() {
                 {loadingMore && (
                   <div className={styles.loadingMore}>
                     <LunarLoader size={16} />
-                    Cargando más transacciones...
+                    Cargando más movimientos...
                   </div>
                 )}
 
-                {!hasMore && transacciones.length > 0 && (
+                {!hasMore && movimientos.length > 0 && (
                   <div className={styles.endOfList}>
                     Llegaste al final de las transacciones
                   </div>
@@ -642,6 +644,7 @@ export default function TransaccionesPage() {
           refreshTrigger={cuotasRefreshTrigger}
           onRefreshNeeded={refresh}
           onOpenNew={openNewTransaccion}
+          grupoInicialId={grupoInicialId}
         />
       )}
     </div>

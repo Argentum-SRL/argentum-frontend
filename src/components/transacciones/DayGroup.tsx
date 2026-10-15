@@ -1,17 +1,19 @@
 import { memo, useMemo } from 'react'
 import { Calendar } from '@/components/ui/icons'
-import type { Transaccion, Billetera, Categoria } from '@/types'
-import TransaccionRow from './TransaccionRow'
+import type { MovimientoItem, Billetera, Categoria } from '@/types'
+import MovimientoRow from './MovimientoRow'
 import styles from './DayGroup.module.css'
 
 interface DayGroupProps {
   fecha: string // YYYY-MM-DD
-  transacciones: Transaccion[]
+  movimientos: MovimientoItem[]
   categorias: Categoria[]
   billeteras: Billetera[]
   onEdit?: (id: string) => void
   onDelete?: (id: string) => void
+  onOpenCuotasGroup?: (grupoId: string) => void
   hideWallet?: boolean
+  modo?: 'general' | 'billetera'
 }
 
 const DIAS_SEMANA = [
@@ -73,16 +75,18 @@ function getFormattedDayInfo(fechaStr: string) {
 
 const DayGroup = memo(({
   fecha,
-  transacciones,
+  movimientos,
   categorias,
   billeteras,
   onEdit,
   onDelete,
+  onOpenCuotasGroup,
   hideWallet = false,
+  modo = 'general',
 }: DayGroupProps) => {
   const dayInfo = useMemo(() => getFormattedDayInfo(fecha), [fecha])
 
-  if (transacciones.length === 0) return null
+  if (movimientos.length === 0) return null
 
   return (
     <div className={styles.dayGroupWrapper}>
@@ -101,18 +105,22 @@ const DayGroup = memo(({
       
       {/* ── Group Card List ────────────────────────────────────────────── */}
       <div className={styles.cardContainer}>
-        {transacciones.map((tx) => {
-          const cat = categorias.find(c => c.id === tx.categoria_id)
-          const bill = billeteras.find(b => b.id === tx.billetera_id)
+        {movimientos.map((mov) => {
+          const catId = mov.transaccion?.categoria_id
+          const cat = catId ? categorias.find(c => c.id === catId) : undefined
+          const billId = mov.billetera_id || mov.transaccion?.billetera_id
+          const bill = billId ? billeteras.find(b => b.id === billId) : undefined
           return (
-            <TransaccionRow
-              key={tx.id}
-              transaccion={tx}
+            <MovimientoRow
+              key={mov.id}
+              movimiento={mov}
               categoria={cat}
               billetera={bill}
               onEdit={onEdit}
               onDelete={onDelete}
+              onOpenCuotasGroup={onOpenCuotasGroup}
               hideWallet={hideWallet}
+              modo={modo}
             />
           )
         })}

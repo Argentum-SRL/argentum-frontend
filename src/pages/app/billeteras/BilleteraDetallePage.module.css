@@ -1024,6 +1024,37 @@
   color: #EF4444;
 }
 
+.verMasContainer {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 8px;
+}
+
+.verMasBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.verMasBtn:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+}
+
+.verMasBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 
 
 

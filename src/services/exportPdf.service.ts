@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import type { Transaccion } from '@/types'
+import type { Transaccion, MovimientoItem, TotalesMoneda } from '@/types'
 
 interface TransaccionConRelaciones extends Transaccion {
   billetera?: { nombre?: string } | null
@@ -28,9 +28,19 @@ function formatMonto(n: number): string {
   })
 }
 
+function cleanPdfText(text: string | null | undefined): string {
+  if (!text) return ''
+  return text
+    .replace(/[→⇒➤➜]/g, '->')
+    .replace(/[←⇐]/g, '<-')
+    .replace(/↔/g, '<->')
+}
+
 export function exportarTransaccionesPDF(params: {
-  transacciones: Transaccion[]
-  resumen: { totalIngresos: number; totalEgresos: number; balance: number }
+  movimientos?: MovimientoItem[]
+  transacciones?: Transaccion[]
+  totalesServidor?: Record<string, TotalesMoneda>
+  resumen?: { totalIngresos: number; totalEgresos: number; balance: number }
   filters: { fecha_desde?: string; fecha_hasta?: string }
   usuario: { nombre: string | null; apellido: string | null } | null
 }): void {
@@ -92,14 +102,32 @@ export function exportarTransaccionesPDF(params: {
   // --- CÁLCULO COHERENTE DE TOTALES POR MONEDA ---
   let ingARS = 0, egrARS = 0
   let ingUSD = 0, egrUSD = 0
-  for (const t of params.transacciones) {
-    const m = Number(t.monto) || 0
-    if (t.moneda === 'USD') {
-      if (t.tipo === 'ingreso') ingUSD += m
-      else egrUSD += m
-    } else {
-      if (t.tipo === 'ingreso') ingARS += m
-      else egrARS += m
+  if (params.totalesServidor) {
+    ingARS = params.totalesServidor['ARS']?.ingresos || 0
+    egrARS = params.totalesServidor['ARS']?.gastos || 0
+    ingUSD = params.totalesServidor['USD']?.ingresos || 0
+    egrUSD = params.totalesServidor['USD']?.gastos || 0
+  } else if (params.movimientos) {
+    for (const m of params.movimientos) {
+      const monto = Number(m.monto) || 0
+      if (m.moneda === 'USD') {
+        if (m.cuenta_como === 'ingreso') ingUSD += monto
+        else if (m.cuenta_como === 'gasto') egrUSD += monto
+      } else {
+        if (m.cuenta_como === 'ingreso') ingARS += monto
+        else if (m.cuenta_como === 'gasto') egrARS += monto
+      }
+    }
+  } else if (params.transacciones) {
+    for (const t of params.transacciones) {
+      const m = Number(t.monto) || 0
+      if (t.moneda === 'USD') {
+        if (t.tipo === 'ingreso') ingUSD += m
+        else egrUSD += m
+      } else {
+        if (t.tipo === 'ingreso') ingARS += m
+        else egrARS += m
+      }
     }
   }
   const balARS = ingARS - egrARS
@@ -171,20 +199,36 @@ export function exportarTransaccionesPDF(params: {
   }
 
   // --- TABLA DE MOVIMIENTOS ---
-  const filas = params.transacciones.map(t => {
-    const tx = t as TransaccionConRelaciones
-    const catNombre = tx.categoria?.nombre ?? 'General'
-    const subNombre = tx.subcategoria?.nombre ?? 'General'
-    const simbolo = tx.moneda === 'USD' ? 'US$ ' : '$ '
-    return {
-      fecha: fmtFecha(tx.fecha),
-      desc: tx.descripcion || tx.subcategoria?.nombre || 'General',
-      cat: `${catNombre} / ${subNombre}`,
-      bill: tx.billetera?.nombre ?? '—',
-      monto: (tx.tipo === 'ingreso' ? '+' : '-') + simbolo +
-             formatMonto(Number(tx.monto))
-    }
-  })
+  const filas = params.movimientos
+    ? params.movimientos.map(m => {
+        const tx = m.transaccion as TransaccionConRelaciones | null
+        const catNombre = tx?.categoria?.nombre ?? m.etiqueta ?? 'General'
+        const subNombre = tx?.subcategoria?.nombre
+        const catDisplay = subNombre ? `${catNombre} / ${subNombre}` : catNombre
+        const simbolo = m.moneda === 'USD' ? 'US$ ' : '$ '
+        const signo = m.sentido === 'entra' ? '+' : m.sentido === 'sale' ? '-' : ''
+        return {
+          fecha: fmtFecha(m.fecha),
+          desc: cleanPdfText(m.descripcion),
+          cat: cleanPdfText(catDisplay),
+          bill: cleanPdfText(m.billetera_nombre ?? '—'),
+          monto: signo + simbolo + formatMonto(Number(m.monto)),
+        }
+      })
+    : (params.transacciones || []).map(t => {
+        const tx = t as TransaccionConRelaciones
+        const catNombre = tx.categoria?.nombre ?? 'General'
+        const subNombre = tx.subcategoria?.nombre ?? 'General'
+        const simbolo = tx.moneda === 'USD' ? 'US$ ' : '$ '
+        return {
+          fecha: fmtFecha(tx.fecha),
+          desc: cleanPdfText(tx.descripcion || tx.subcategoria?.nombre || 'General'),
+          cat: cleanPdfText(`${catNombre} / ${subNombre}`),
+          bill: cleanPdfText(tx.billetera?.nombre ?? '—'),
+          monto: (tx.tipo === 'ingreso' ? '+' : '-') + simbolo +
+                 formatMonto(Number(tx.monto))
+        }
+      })
 
   autoTable(doc, {
     startY: tieneUSD ? 73 : 68,

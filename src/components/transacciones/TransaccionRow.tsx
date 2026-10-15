@@ -17,11 +17,18 @@ import styles from './TransaccionRow.module.css'
 
 interface TransaccionRowProps {
   transaccion: Transaccion
+  titulo?: string
   categoria?: Categoria
   billetera?: Billetera
   onEdit?: (id: string) => void
   onDelete?: (id: string) => void
   hideWallet?: boolean
+  etiqueta?: string
+  aclaracion?: string | null
+  cuentaComo?: 'gasto' | 'ingreso' | 'nada'
+  saldoDespues?: number | null
+  cuotaTexto?: string | null
+  modo?: 'general' | 'billetera'
 }
 
 const METODO_PAGO_LABELS: Record<string, string> = {
@@ -33,11 +40,14 @@ const METODO_PAGO_LABELS: Record<string, string> = {
 
 const TransaccionRow = memo(({
   transaccion,
+  titulo,
   categoria,
   billetera,
   onEdit,
   onDelete,
-  hideWallet = false
+  hideWallet = false,
+  etiqueta,
+  cuentaComo,
 }: TransaccionRowProps) => {
   const isIngreso = transaccion.tipo === 'ingreso'
   const isPendiente = transaccion.estado_verificacion === 'pendiente'
@@ -81,7 +91,7 @@ const TransaccionRow = memo(({
     }
   }, [billetera])
 
-  const title = transaccion.descripcion || transaccion.subcategoria?.nombre || categoria?.nombre || 'Sin descripción'
+  const title = titulo || transaccion.descripcion || transaccion.subcategoria?.nombre || categoria?.nombre || 'Sin descripción'
   const categoriaNombre = isMeta ? 'Ahorro' : (categoria?.nombre || 'General')
   const subcategoriaNombre = isMeta ? 'Metas' : (transaccion.subcategoria?.nombre || 'General')
   const walletDisplayName = bankInfo?.name || billetera?.nombre || 'Billetera'
@@ -151,18 +161,6 @@ const TransaccionRow = memo(({
           </span>
 
           <div className={styles.badgesWrapper}>
-            {isAporteMeta && (
-              <span className={`${styles.badge} ${styles.badgeApartado}`}>
-                <Target size={10} strokeWidth={2.5} />
-                <span className={styles.badgeText}>Apartado</span>
-              </span>
-            )}
-            {isRetiroMeta && (
-              <span className={`${styles.badge} ${styles.badgeRetiroMeta}`}>
-                <Target size={10} strokeWidth={2.5} />
-                <span className={styles.badgeText}>Retiro</span>
-              </span>
-            )}
             {isPendienteIA && (
               <span className={`${styles.badge} ${styles.badgePendiente}`}>
                 <Sparkles size={10} strokeWidth={2.5} />
@@ -177,6 +175,11 @@ const TransaccionRow = memo(({
             )}
             {Boolean(transaccion.suscripcion_id) && (
               <DebitoAutomaticoBadge />
+            )}
+            {etiqueta && etiqueta !== 'Gasto' && etiqueta !== 'Ingreso' && (
+              <span className={styles.badgeEtiqueta}>
+                {etiqueta}
+              </span>
             )}
           </div>
         </div>
@@ -228,7 +231,15 @@ const TransaccionRow = memo(({
       {/* ── 3. Amount & Secondary Column ─────────────────────────────────── */}
       <div className={styles.amountArea}>
         <div className={`${styles.amount} ${
-          isAporteMeta ? styles.amountApartado : isRetiroMeta ? styles.amountRetiroMeta : isIngreso ? styles.amountIngreso : styles.amountEgreso
+          cuentaComo === 'nada'
+            ? styles.amountNada
+            : isAporteMeta
+            ? styles.amountApartado
+            : isRetiroMeta
+            ? styles.amountRetiroMeta
+            : isIngreso
+            ? styles.amountIngreso
+            : styles.amountEgreso
         }`}>
           <span className={styles.amountSign}>{isIngreso ? '+' : '-'}</span>
           <span className={styles.amountNumber}>{formatMonto(transaccion.monto, transaccion.moneda)}</span>

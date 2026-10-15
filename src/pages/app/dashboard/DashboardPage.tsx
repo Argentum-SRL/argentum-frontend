@@ -1156,6 +1156,11 @@ export default function DashboardPage() {
                           <div className={styles.itemMeta}>
                             <p className={styles.itemName}>
                               {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
+                              {m.etiqueta && m.etiqueta !== 'Gasto' && m.etiqueta !== 'Ingreso' && (
+                                <span className={styles.badgeEtiqueta}>
+                                  {m.etiqueta}
+                                </span>
+                              )}
                             </p>
                             <p className={styles.itemSub}>
                               {formatFecha(m.fecha)} • {m.billetera_nombre}
@@ -1163,11 +1168,25 @@ export default function DashboardPage() {
                               {isRetiro && ' • Retiro de meta'}
                             </p>
                           </div>
-                          <div className={`${styles.itemAmount} ${
-                            isAporte || isRetiro ? '' : (m.tipo === 'ingreso' ? styles.amountPos : styles.amountNeg)
-                          }`}>
-                            {m.tipo === 'ingreso' ? '+' : '-'}{formatMonto(m.monto, m.moneda)}
-                          </div>
+                          {(() => {
+                            const isNada = m.cuenta_como
+                              ? m.cuenta_como === 'nada'
+                              : (m.tipo === 'transferencia' || isAporte || isRetiro)
+                            const sign = m.sentido
+                              ? (m.sentido === 'entra' ? '+' : m.sentido === 'sale' ? '−' : '')
+                              : (m.tipo === 'transferencia' ? '' : (m.tipo === 'ingreso' ? '+' : '−'))
+                            const amountColorClass = isNada
+                              ? styles.amountNada
+                              : (m.sentido ? m.sentido === 'entra' : m.tipo === 'ingreso')
+                              ? styles.amountPos
+                              : styles.amountNeg
+
+                            return (
+                              <div className={`${styles.itemAmount} ${amountColorClass}`}>
+                                {sign}{formatMonto(m.monto, m.moneda)}
+                              </div>
+                            )
+                          })()}
                         </div>
                       )
                     })}

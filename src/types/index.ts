@@ -451,13 +451,18 @@ export interface MovimientoDashboard {
   descripcion: string
   fecha: string
   monto: number
-  tipo: 'ingreso' | 'egreso'
+  tipo: string
   moneda: 'ARS' | 'USD'
+  sentido?: 'entra' | 'sale' | 'neutro'
+  cuenta_como?: 'gasto' | 'ingreso' | 'nada'
   billetera_nombre: string
   categoria_nombre: string | null
   subcategoria_nombre: string | null
   estado_verificacion: 'confirmada' | 'pendiente' | null
   movimiento_meta_id?: string | null
+  etiqueta?: string
+  aclaracion?: string | null
+  cuota_texto?: string | null
 }
 
 export interface PagoDashboard {
@@ -1132,3 +1137,4 @@ export interface DeshacerDecisionPayload {
   clave_item: string
 }
 
+export * from './movimiento'

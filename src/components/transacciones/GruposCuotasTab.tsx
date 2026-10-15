@@ -28,9 +28,10 @@ interface GruposCuotasTabProps {
   refreshTrigger?: number
   onRefreshNeeded?: () => void
   onOpenNew?: () => void
+  grupoInicialId?: string | null
 }
 
-export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpenNew }: GruposCuotasTabProps = {}) {
+export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpenNew, grupoInicialId }: GruposCuotasTabProps = {}) {
   const [grupos, setGrupos] = useState<GrupoCuotasResumen[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedGrupo, setSelectedGrupo] = useState<GrupoCuotasResumen | null>(null)
@@ -201,6 +202,19 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     }, 0)
     return () => clearTimeout(timer)
   }, [fetchGrupos, fetchBilleteras, fetchCategorias, fetchSubcategorias, fetchSuscripciones, fetchTarjetas])
+
+  useEffect(() => {
+    if (grupoInicialId && grupos.length > 0) {
+      const match = grupos.find(g => g.id === grupoInicialId)
+      if (match) {
+        const timer = setTimeout(() => {
+          setSelectedGrupo(match)
+          setDetailSlide('detail')
+        }, 0)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [grupoInicialId, grupos])
 
   // Auto-refresco en vivo ante eventos SSE de actualización de datos
   useEffect(() => {

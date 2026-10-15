@@ -3,6 +3,7 @@ import type { Transaccion } from '@/types'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
 import { invalidatePresupuestos } from './presupuesto.service'
+import { sileo } from 'sileo'
 
 export interface TransaccionFilters {
   billetera_id?: string
@@ -48,13 +49,22 @@ const transaccionService = {
     return response.data
   },
 
-  createTransaccion: async (data: Partial<Transaccion>) => {
+  createTransaccion: async (data: Partial<Transaccion> & { info_cuotas?: { cantidad_cuotas?: number } }) => {
     const response = await api.post<Transaccion>('/transacciones', data)
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: response.data }))
+    }
+    const cuotas = data?.info_cuotas?.cantidad_cuotas
+    if (cuotas && Number(cuotas) > 1) {
+      setTimeout(() => {
+        sileo.info({
+          title: 'Vas a ver cada cuota en Transacciones el día de pago de la tarjeta. La compra completa queda en la pestaña Cuotas.',
+          duration: 6000,
+        })
+      }, 700)
     }
     return response.data
   },

@@ -2,3 +2,24 @@
 @import './DashboardPage.parte1.css';
 @import './DashboardPage.parte2.css';
 @import './DashboardPage.parte3.css';
+
+.badgeEtiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.amountNada {
+  color: var(--silver-dark);
+}

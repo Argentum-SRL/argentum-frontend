@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, CreditCard, Plus, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2 } from '@/components/ui/icons'
-import type { Billetera, TarjetaCredito, Transaccion, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo, EntidadTasa } from '@/types'
+import type { Billetera, TarjetaCredito, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo, EntidadTasa, MovimientoItem } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
-import transaccionService from '@/services/transaccion.service'
+import movimientoService from '@/services/movimiento.service'
 import categoriaService from '@/services/categoria.service'
 import { EmptyState, BilleteraDetalleSkeleton, TransactionsListSkeleton, CardsGridSkeleton } from '@/components/ui'
 import { sileo } from 'sileo'
@@ -58,7 +58,9 @@ const BilleteraDetallePage: React.FC = () => {
   const [ajustesData, setAjustesData] = useState<AjustesBilleteraResponse | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
-  const [movimientos, setMovimientos] = useState<Transaccion[]>([])
+  const [movimientos, setMovimientos] = useState<MovimientoItem[]>([])
+  const [hasMoreMovimientos, setHasMoreMovimientos] = useState(false)
+  const [loadingMoreMovimientos, setLoadingMoreMovimientos] = useState(false)
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [entidades, setEntidades] = useState<EntidadTasa[]>([])
   const [selectedTarjetaIndex, setSelectedTarjetaIndex] = useState<number>(0)
@@ -176,16 +178,15 @@ const BilleteraDetallePage: React.FC = () => {
     const loadTabData = async () => {
       setLoadingData(true)
       try {
-        // Cargar movimientos (filtramos crédito ya que impactan vía Pago de Resumen)
-        const [txs, cats, allBills] = await Promise.all([
-          transaccionService.getTransacciones({ billetera_id: id }, controller.signal),
+        const [movRes, cats, allBills] = await Promise.all([
+          movimientoService.getMovimientos({ modo: 'billetera', billetera_id: id, skip: 0, limit: 100 }, controller.signal),
           categoriaService.getCategorias(),
           billeteraService.list(controller.signal)
         ])
         if (controller.signal.aborted) return
 
-        const movimientosBilletera = txs.filter(tx => tx.metodo_pago !== 'credito')
-        setMovimientos(movimientosBilletera)
+        setMovimientos(movRes.items)
+        setHasMoreMovimientos(movRes.hay_mas)
         setCategorias(cats)
         setBilleteras(allBills)
 
@@ -217,14 +218,16 @@ const BilleteraDetallePage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, billetera?.id, checkUrlParams])
 
-  // Agrupar movimientos por día
+  // Agrupar movimientos por día (excluyendo el registro técnico de saldo inicial)
   const groupedMovimientos = useMemo(() => {
-    const groups: Record<string, Transaccion[]> = {}
-    movimientos.forEach(tx => {
-      const date = tx.fecha.split('T')[0]
-      if (!groups[date]) groups[date] = []
-      groups[date].push(tx)
-    })
+    const groups: Record<string, MovimientoItem[]> = {}
+    movimientos
+      .filter(mov => mov.clase !== 'saldo_inicial')
+      .forEach(mov => {
+        const date = mov.fecha.split('T')[0]
+        if (!groups[date]) groups[date] = []
+        groups[date].push(mov)
+      })
     return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]))
   }, [movimientos])
 
@@ -232,14 +235,14 @@ const BilleteraDetallePage: React.FC = () => {
     if (!id) return
     setLoadingData(true)
     try {
-      const [txs, bill, cards, ajustesRes] = await Promise.all([
-        transaccionService.getTransacciones({ billetera_id: id }),
+      const [movRes, bill, cards, ajustesRes] = await Promise.all([
+        movimientoService.getMovimientos({ modo: 'billetera', billetera_id: id, skip: 0, limit: 100 }),
         billeteraService.getById(id),
         tarjetaService.getTarjetasPorBilletera(id),
         billeteraService.getAjustes(id),
       ])
-      const movimientosBilletera = txs.filter(tx => tx.metodo_pago !== 'credito')
-      setMovimientos(movimientosBilletera)
+      setMovimientos(movRes.items)
+      setHasMoreMovimientos(movRes.hay_mas)
       setBilletera(bill)
       setTarjetas(cards)
       setAjustesData(ajustesRes)
@@ -293,6 +296,26 @@ const BilleteraDetallePage: React.FC = () => {
       sileo.error({ title: getErrorMessage(err, 'No pudimos actualizar la tasa.') })
     }
   }, [billetera, refreshData])
+
+  const handleLoadMoreMovimientos = useCallback(async () => {
+    if (!id || loadingMoreMovimientos || !hasMoreMovimientos) return
+    setLoadingMoreMovimientos(true)
+    try {
+      const res = await movimientoService.getMovimientos({
+        modo: 'billetera',
+        billetera_id: id,
+        skip: movimientos.length,
+        limit: 100
+      })
+      setMovimientos(prev => [...prev, ...res.items])
+      setHasMoreMovimientos(res.hay_mas)
+    } catch (err: unknown) {
+      console.error(err)
+      sileo.error({ title: 'No pudimos cargar más movimientos. Intentá de nuevo.' })
+    } finally {
+      setLoadingMoreMovimientos(false)
+    }
+  }, [id, loadingMoreMovimientos, hasMoreMovimientos, movimientos.length])
 
   const handleCargarMovimiento = useCallback((tipo?: 'egreso' | 'ingreso') => {
     if (!billetera) return
@@ -632,7 +655,7 @@ const BilleteraDetallePage: React.FC = () => {
             <div style={{ padding: '8px 0' }}>
               <TransactionsListSkeleton groupsCount={1} rowsPerGroup={3} />
             </div>
-          ) : movimientos.length === 0 ? (
+          ) : groupedMovimientos.length === 0 ? (
             <EmptyState
               icon={CreditCard}
               title="Sin movimientos"
@@ -640,16 +663,29 @@ const BilleteraDetallePage: React.FC = () => {
             />
           ) : (
             <div className={styles.movimientosList}>
-              {groupedMovimientos.map(([fecha, txs]) => (
+              {groupedMovimientos.map(([fecha, movs]) => (
                 <DayGroup
                   key={fecha}
                   fecha={fecha}
-                  transacciones={txs}
+                  movimientos={movs}
                   categorias={categorias}
                   billeteras={[billetera]}
                   hideWallet={true}
+                  modo="billetera"
                 />
               ))}
+              {hasMoreMovimientos && (
+                <div className={styles.verMasContainer}>
+                  <button
+                    type="button"
+                    className={styles.verMasBtn}
+                    onClick={handleLoadMoreMovimientos}
+                    disabled={loadingMoreMovimientos}
+                  >
+                    {loadingMoreMovimientos ? 'Cargando...' : 'Ver más'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
           {/* Sección Controles de Saldo — visible solo si hay ajustes */}

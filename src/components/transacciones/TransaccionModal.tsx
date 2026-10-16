@@ -456,6 +456,8 @@ export default function TransaccionModal({
   // Auto-selección de billetera (principal primero, luego mayor saldo)
   useEffect(() => {
     if (!open) return
+    // Con crédito la billetera la define siempre la tarjeta
+    if (metodoPago === 'credito') return
 
     if (isEdit) {
       const actualEsValida = billeterasCarousel.some(b => b.id === billeteraId)
@@ -468,7 +470,7 @@ export default function TransaccionModal({
         dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: billeterasCarousel[0].id })
       }
     }
-  }, [moneda, open, billeteraId, billeterasCarousel, isEdit])
+  }, [moneda, open, billeteraId, billeterasCarousel, isEdit, metodoPago])
 
   // Auto-selección de tarjeta de crédito (asociada a cuenta principal primero, luego mayor saldo)
   useEffect(() => {

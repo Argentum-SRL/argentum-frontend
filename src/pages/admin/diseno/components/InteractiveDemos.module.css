@@ -119,11 +119,10 @@
 .segmentedCapsule {
   display: flex;
   width: 100%;
-  background: var(--surface-alt);
-  padding: 4px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  gap: 4px;
+  background: transparent;
+  padding: 0;
+  border: none;
+  gap: 6px;
   box-sizing: border-box;
 }
 

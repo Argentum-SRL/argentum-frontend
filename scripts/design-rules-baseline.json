@@ -1,6 +1,6 @@
 {
   "totalViolations": {
-    "R01": 131,
+    "R01": 129,
     "R02": 35,
     "R03": 38,
     "R04": 22,
@@ -785,7 +785,7 @@
       "R14": 0
     },
     "components/transacciones/FilterBar.parte1.css": {
-      "R01": 1,
+      "R01": 0,
       "R02": 0,
       "R03": 1,
       "R04": 0,
@@ -993,7 +993,7 @@
       "R14": 0
     },
     "components/transferencias/TransferenciasFilterBar.module.css": {
-      "R01": 1,
+      "R01": 0,
       "R02": 0,
       "R03": 1,
       "R04": 0,

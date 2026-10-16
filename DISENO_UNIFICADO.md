@@ -80,6 +80,8 @@ El apilamiento z-index está estructurado por capas semánticas fijas. Todo cont
 | `--z-tooltip` | `700` | Capa superior absoluta para información contextual de ayuda. |
 
 > **Contextos de Apilamiento (Stacking Context):** Un elemento con `z-index: 500` crea un nuevo contexto para sus hijos. Cualquier menú desplegable abierto dentro de un modal que deba montar en portal requiere `--z-popover-top` (550) para quedar indefectiblemente por encima del cuerpo del modal sin competir con toasts globales (`--z-toast: 600`).
+> 
+> **Filtros desplegables:** la barra de filtros lleva z-index var(--z-dropdown) y el listado nunca lleva z-index mayor.
 
 ---
 
@@ -244,6 +246,7 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 
 | Pantalla / Módulo | Estado | Tanda Planificada |
 | :--- | :--- | :--- |
+| Filtros de Transacciones y Transferencias | Hecho (tanda 2) | Tanda 2 |
 | Transacciones | Pendiente | Fases Futuras |
 | Transferencias | Pendiente | Fases Futuras |
 | Tarjetas | Pendiente | Fases Futuras |

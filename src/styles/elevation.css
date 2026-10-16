@@ -161,9 +161,6 @@
   box-shadow: var(--elevation-selection-modal);
 }
 
-.elevation-pill {
-  box-shadow: var(--elevation-pill);
-}
 
 /* ── Contextual Helper ──
    Containers declaring data-elevation-context="modal" or class .elevation-context-modal

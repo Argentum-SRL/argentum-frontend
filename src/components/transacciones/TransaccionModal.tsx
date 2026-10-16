@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useReducer, useRef, useState, useCallback } from 'react'
+import { useMemo, useEffect, useReducer, useRef, useCallback } from 'react'
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -10,15 +10,11 @@ import {
   X,
   Trash2,
   Wallet,
-  SlidersHorizontal,
-  Plus,
-  Minus,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import transaccionService from '@/services/transaccion.service'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
-import { formatMonto } from '@/utils/format'
 import styles from './TransaccionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
@@ -29,12 +25,18 @@ import { DateInput, SelectableSurface } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
-import { sortBilleteras } from '@/lib/utils/billeteras.utils'
+import { sortBilleteras, getBankById, findBankByNombre } from '@/lib/utils/billeteras.utils'
 import { useMemoriaComercio } from './useMemoriaComercio'
 import MemoriaComercioDialog from './MemoriaComercioDialog'
 import memoriaStyles from './MemoriaComercioDialog.module.css'
-import ResumenDeCompraInfo from './ResumenDeCompraInfo'
 import { useResumenDeCompra, formatDDMM } from '@/hooks/useResumenDeCompra'
+import DebitoEnDolares from './DebitoEnDolares'
+import CalculoCuotasResumen from './CalculoCuotasResumen'
+
+function isBankLight(b: Billetera): boolean {
+  const bank = b.bank_id ? getBankById(b.bank_id) : findBankByNombre(b.nombre)
+  return !bank || bank.colorTexto === 'white'
+}
 
 interface TransaccionModalProps {
   open: boolean
@@ -49,7 +51,7 @@ interface TransaccionModalProps {
 }
 
 interface FormState {
-  step: 1 | 2 | 3
+  step: 1 | 2 | 3 | 4
   slideDirection: 'forward' | 'back'
   tipo: 'ingreso' | 'egreso'
   monto: number | null
@@ -66,6 +68,7 @@ interface FormState {
   proximoResumen: boolean
   tasaInteres: number
   isSubmitting: boolean
+  montoPesosDebito: number | null
 }
 
 type FormAction =
@@ -76,7 +79,7 @@ type FormAction =
       billeteraInicialId?: string
       tipoInicial?: 'egreso' | 'ingreso'
     }
-  | { type: 'SET_STEP'; step: 1 | 2 | 3; direction: 'forward' | 'back' }
+  | { type: 'SET_STEP'; step: 1 | 2 | 3 | 4; direction: 'forward' | 'back' }
   | { [K in keyof FormState]: { type: 'SET_FIELD'; field: K; value: FormState[K] } }[keyof FormState]
 
 function todayLocal(): string {
@@ -102,6 +105,7 @@ const initialState: FormState = {
   proximoResumen: false,
   tasaInteres: 0,
   isSubmitting: false,
+  montoPesosDebito: null,
 }
 
 function formReducer(state: FormState, action: FormAction): FormState {
@@ -120,11 +124,15 @@ function formReducer(state: FormState, action: FormAction): FormState {
         if (action.transaccion.tipo === 'ingreso' && (metodoDeducido === 'debito' || metodoDeducido === 'credito')) {
           metodoDeducido = wallet?.es_efectivo ? 'efectivo' : 'transferencia'
         }
+        const esDebitoOriginalUSD = action.transaccion.moneda === 'ARS' && action.transaccion.moneda_original === 'USD' && Number(action.transaccion.monto_original) > 0
+        const monedaInicial = esDebitoOriginalUSD ? 'USD' : action.transaccion.moneda
+        const montoInicial = esDebitoOriginalUSD ? Number(action.transaccion.monto_original) : action.transaccion.monto
+        const pesosInicial = esDebitoOriginalUSD ? Number(action.transaccion.monto) : null
         return {
           ...initialState,
           tipo: action.transaccion.tipo,
-          monto: action.transaccion.monto,
-          moneda: action.transaccion.moneda,
+          monto: montoInicial,
+          moneda: monedaInicial,
           descripcion: action.transaccion.descripcion || '',
           categoriaId: action.transaccion.categoria_id || '',
           subcategoriaId: action.transaccion.subcategoria_id || '',
@@ -132,6 +140,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           tarjetaId: action.transaccion.tarjeta_id || '',
           fecha: action.transaccion.fecha.split('T')[0],
           metodoPago: metodoDeducido,
+          montoPesosDebito: pesosInicial,
         }
       } else {
         const activas = action.billeteras.filter(b => b.estado === 'activa')
@@ -180,6 +189,7 @@ export default function TransaccionModal({
   const { confirm } = useModal()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const carouselRef = useRef<HTMLDivElement>(null)
+  const slidesContainerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const submittingRef = useRef(false)
 
@@ -259,7 +269,11 @@ export default function TransaccionModal({
   const {
     step, slideDirection, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
     billeteraId, tarjetaId, fecha, metodoPago, cantidadCuotas, cuotaInicial, proximoResumen, tasaInteres, isSubmitting,
+    montoPesosDebito,
   } = state
+
+  const billeteraSeleccionada = billeteras.find(b => b.id === billeteraId)
+  const esDebitoUsdEnPesos = moneda === 'USD' && tipo === 'egreso' && (metodoPago === 'debito' || metodoPago === 'transferencia') && billeteraSeleccionada?.moneda === 'ARS'
 
   const { resumen: resumenCompra, loading: loadingResumenCompra, error: errorResumenCompra } = useResumenDeCompra(
     metodoPago === 'credito' ? tarjetaId : null,
@@ -267,16 +281,6 @@ export default function TransaccionModal({
     proximoResumen
   )
   const vencimientoDDMM = resumenCompra?.fecha_vencimiento ? formatDDMM(resumenCompra.fecha_vencimiento) : ''
-
-  const [showAdvanced, setShowAdvanced] = useState(false)
-  const [isCustomOverride, setIsCustomOverride] = useState(false)
-  const isCustomCuotas = isCustomOverride || ![1, 3, 6, 12].includes(cantidadCuotas)
-
-  const getCuotaPreview = (n: number) => {
-    const m = Number(monto) || 0
-    if (!m) return ''
-    return `${formatMonto(m / n, moneda)}/mes`
-  }
 
   useEffect(() => {
     submittingRef.current = false
@@ -326,8 +330,12 @@ export default function TransaccionModal({
   }, [billeteras, moneda, billeteraId])
 
   const hasBancos = useMemo(() => {
-    return billeterasMoneda.some(b => !b.es_efectivo)
-  }, [billeterasMoneda])
+    if (billeterasMoneda.some(b => !b.es_efectivo)) return true
+    if (tipo === 'egreso' && moneda === 'USD') {
+      return billeteras.some(b => b.moneda === 'ARS' && !b.es_efectivo && (b.estado === 'activa' || b.id === billeteraId))
+    }
+    return false
+  }, [billeterasMoneda, tipo, moneda, billeteras, billeteraId])
 
   const hasEfectivo = useMemo(() => {
     return billeterasMoneda.some(b => b.es_efectivo)
@@ -407,10 +415,14 @@ export default function TransaccionModal({
       filtered = filtered.filter(b => b.es_efectivo)
     } else if (metodoPago === 'debito' || metodoPago === 'transferencia') {
       filtered = filtered.filter(b => !b.es_efectivo)
+      if (tipo === 'egreso' && moneda === 'USD') {
+        const enPesos = billeteras.filter(b => b.moneda === 'ARS' && !b.es_efectivo && (b.estado === 'activa' || b.id === billeteraId))
+        filtered = [...filtered, ...enPesos]
+      }
     }
 
     return sortBilleteras(filtered, moneda)
-  }, [billeterasMoneda, metodoPago, moneda])
+  }, [billeterasMoneda, metodoPago, moneda, tipo, billeteras, billeteraId])
 
   const {
     fieldsRef: formBodyRef,
@@ -418,8 +430,13 @@ export default function TransaccionModal({
     dynamicHeight,
   } = useAdaptiveModalHeight({
     enabled: open,
-    deps: [step, tipo, metodoPago, tarjetaId, billeteraId, isEdit, isCuotaHija, monto, moneda, descripcion, categoriaId, subcategoriaId, cantidadCuotas, proximoResumen, showAdvanced, isCustomCuotas, availableMethods.length, billeterasCarousel.length, tarjetasCarousel.length],
-    extraPadding: 22,
+    deps: [
+      step, tipo, metodoPago, tarjetaId, billeteraId, isEdit, isCuotaHija,
+      monto, moneda, descripcion, categoriaId, subcategoriaId, cantidadCuotas,
+      cuotaInicial, tasaInteres, proximoResumen, availableMethods.length,
+      billeterasCarousel.length, tarjetasCarousel.length, esDebitoUsdEnPesos, montoPesosDebito
+    ],
+    extraPadding: 24,
     maxHeightRatio: 0.90,
   })
 
@@ -516,16 +533,12 @@ export default function TransaccionModal({
     return () => clearTimeout(timer)
   }, [billeteraId, tarjetaId, open, metodoPago])
 
-
-  const calculoCuotas = useMemo(() => {
-    const cant = cantidadCuotas || 1
-    const tasa = tasaInteres ? tasaInteres / 100 : 0
-    const m = monto || 0
-    const valorCuota = tasa > 0
-      ? (m * tasa * Math.pow(1 + tasa, cant)) / (Math.pow(1 + tasa, cant) - 1)
-      : m / cant
-    return { total: valorCuota * cant, cuota: valorCuota }
-  }, [monto, cantidadCuotas, tasaInteres])
+  useEffect(() => {
+    if (slidesContainerRef.current) {
+      slidesContainerRef.current.scrollLeft = 0
+      slidesContainerRef.current.scrollTop = 0
+    }
+  }, [step, moneda])
 
   const goNext = () => {
     if (!monto || (metodoPago === 'credito' ? !tarjetaId : !billeteraId)) {
@@ -533,19 +546,25 @@ export default function TransaccionModal({
       return
     }
 
-    let nextStep: 1 | 2 | 3 = 2
+    let nextStep: 1 | 2 | 3 | 4 = 2
     if (step === 1) {
       nextStep = metodoPago === 'credito' ? 2 : 3
     } else if (step === 2) {
       nextStep = 3
+    } else if (step === 3) {
+      if (esDebitoUsdEnPesos) {
+        nextStep = 4
+      }
     }
 
     dispatch({ type: 'SET_STEP', step: nextStep, direction: 'forward' })
   }
 
   const goBack = () => {
-    let prevStep: 1 | 2 | 3 = 1
-    if (step === 3) {
+    let prevStep: 1 | 2 | 3 | 4 = 1
+    if (step === 4) {
+      prevStep = 3
+    } else if (step === 3) {
       prevStep = metodoPago === 'credito' ? 2 : 1
     } else if (step === 2) {
       prevStep = 1
@@ -564,6 +583,11 @@ export default function TransaccionModal({
     // Validaciones estrictas
     if (!monto || Number(monto) <= 0 || !Number.isFinite(Number(monto))) {
       sileo.error({ title: 'El monto debe ser mayor a cero' })
+      return
+    }
+
+    if (esDebitoUsdEnPesos && (!montoPesosDebito || montoPesosDebito <= 0)) {
+      sileo.error({ title: 'Ingresá el monto que te cobró el banco en pesos' })
       return
     }
 
@@ -623,8 +647,10 @@ export default function TransaccionModal({
           }
         : {
             tipo,
-            monto: Number(monto),
-            moneda,
+            monto: esDebitoUsdEnPesos ? Number(montoPesosDebito) : Number(monto),
+            moneda: esDebitoUsdEnPesos ? ('ARS' as const) : moneda,
+            moneda_original: esDebitoUsdEnPesos ? ('USD' as const) : undefined,
+            monto_original: esDebitoUsdEnPesos ? Number(monto) : undefined,
             descripcion: descripcion.trim(),
             categoria_id: categoriaId,
             subcategoria_id: subcategoriaId || null,
@@ -680,22 +706,31 @@ export default function TransaccionModal({
         {/* Indicador de pasos superior centrado (estilo Nueva Billetera / BankPickerModal) */}
         <div className={styles.stepIndicator} aria-hidden="true">
           <div className={`${styles.dot} ${step === 1 ? styles.dotActive : styles.dotInactive}`} />
-          {metodoPago === 'credito' && (
-            <div className={`${styles.dot} ${step === 2 ? styles.dotActive : styles.dotInactive}`} />
+          {(metodoPago === 'credito' || esDebitoUsdEnPesos) && (
+            <div
+              className={`${styles.dot} ${
+                (metodoPago === 'credito' ? step === 2 : step === 3)
+                  ? styles.dotActive
+                  : styles.dotInactive
+              }`}
+            />
           )}
-          <div className={`${styles.dot} ${step === 3 ? styles.dotActive : styles.dotInactive}`} />
+          <div
+            className={`${styles.dot} ${
+              (metodoPago === 'credito'
+                ? step === 3
+                : esDebitoUsdEnPesos
+                ? step === 4
+                : step === 3)
+                ? styles.dotActive
+                : styles.dotInactive
+            }`}
+          />
         </div>
 
         <div
-          className={`${styles.slidesContainer} ${
-            step === 1
-              ? availableMethods.length <= 1
-                ? styles.step1Compact
-                : styles.step1
-              : step === 2
-              ? styles.step2
-              : styles.step3
-          }`}
+          ref={slidesContainerRef}
+          className={styles.slidesContainer}
           style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
         >
 
@@ -799,7 +834,7 @@ export default function TransaccionModal({
                     moneda={moneda}
                     onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                     disabled={isCuotaHija}
-                    autoFocus
+                    autoFocus={step === 1}
                     allowDecimals
                   />
 
@@ -917,6 +952,11 @@ export default function TransaccionModal({
                                 ref={(el) => setCardNode(b.id, el as HTMLDivElement | null)}
                               >
                                 <BilleteraCard billetera={b} className={styles.fullHeightCard} disableNavigation={true} hideCurrencyChip={true} />
+                                {moneda === 'USD' && b.moneda === 'ARS' && (
+                                  <span className={`${styles.cuentaEnPesosChip} ${isBankLight(b) ? '' : styles.cuentaEnPesosChipDark}`}>
+                                    Cuenta en pesos
+                                  </span>
+                                )}
                                 <button
                                   type="button"
                                   className={styles.billeteraOverlay}
@@ -986,180 +1026,29 @@ export default function TransaccionModal({
                     </div>
                   </div>
 
-                  <div className={`${styles.formFields} ${styles.financiacionContainer}`}>
-                    {/* 1. Selector de Cantidad de Cuotas (Presets primarios + Otra) */}
-                    <div className={styles.planSelectorSection}>
-                      <label className={styles.fieldLabel}>¿En cuántas cuotas?</label>
-                      <div className={styles.planGrid}>
-                        {[1, 3, 6, 12].map((n) => {
-                          const isSelected = !isCustomCuotas && cantidadCuotas === n
-                          return (
-                            <button
-                              type="button"
-                              key={n}
-                              className={`${styles.planOptionCard} ${isSelected ? styles.planOptionCardActive : ''}`}
-                              onClick={() => {
-                                setIsCustomOverride(false)
-                                dispatch({ type: 'SET_FIELD', field: 'cantidadCuotas', value: n })
-                                if (cuotaInicial > n) {
-                                  dispatch({ type: 'SET_FIELD', field: 'cuotaInicial', value: 1 })
-                                }
-                              }}
-                            >
-                              <span className={styles.planCuotasNum}>{n}</span>
-                              <span className={styles.planCuotasLbl}>{n === 1 ? 'pago' : 'cuotas'}</span>
-                              {n > 1 && monto ? (
-                                <span className={styles.planCuotasAmt}>{getCuotaPreview(n)}</span>
-                              ) : null}
-                            </button>
-                          )
-                        })}
-
-                        <button
-                          type="button"
-                          className={`${styles.planCustomBtn} ${isCustomCuotas ? styles.planCustomBtnActive : ''}`}
-                          onClick={() => {
-                            if (!isCustomCuotas) {
-                              setIsCustomOverride(true)
-                              const nextVal = [1, 3, 6, 12].includes(cantidadCuotas) ? 18 : cantidadCuotas
-                              dispatch({ type: 'SET_FIELD', field: 'cantidadCuotas', value: nextVal })
-                            }
-                          }}
-                        >
-                          <span className={styles.planCustomBtnLabel}>
-                            {isCustomCuotas ? `${cantidadCuotas} cuotas` : 'Otra...'}
-                          </span>
-                        </button>
-                      </div>
-
-                      {/* Stepper inline al elegir cantidad personalizada */}
-                      {isCustomCuotas && (
-                        <div className={styles.customStepperRow}>
-                          <button
-                            type="button"
-                            className={styles.stepperBtn}
-                            onClick={() => {
-                              const val = Math.max(1, cantidadCuotas - 1)
-                              dispatch({ type: 'SET_FIELD', field: 'cantidadCuotas', value: val })
-                              if (cuotaInicial > val) dispatch({ type: 'SET_FIELD', field: 'cuotaInicial', value: 1 })
-                            }}
-                            disabled={cantidadCuotas <= 1}
-                            aria-label="Menos cuotas"
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className={styles.stepperValue}>
-                            {cantidadCuotas} {cantidadCuotas === 1 ? 'pago' : 'cuotas'}
-                          </span>
-                          <button
-                            type="button"
-                            className={styles.stepperBtn}
-                            onClick={() => {
-                              const val = Math.min(120, cantidadCuotas + 1)
-                              dispatch({ type: 'SET_FIELD', field: 'cantidadCuotas', value: val })
-                            }}
-                            disabled={cantidadCuotas >= 120}
-                            aria-label="Más cuotas"
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 2. Resumen de compra */}
-                    <ResumenDeCompraInfo
-                      resumen={resumenCompra}
-                      loading={loadingResumenCompra}
-                      error={errorResumenCompra}
-                      proximoResumen={proximoResumen}
-                      onChangeProximoResumen={(value) => dispatch({ type: 'SET_FIELD', field: 'proximoResumen', value })}
-                    />
-
-                    {/* 3. Opciones avanzadas (Progressive disclosure: Interés y cuotas ya pagadas) */}
-                    {cantidadCuotas > 1 && (
-                      <>
-                        <button
-                          type="button"
-                          className={styles.advancedToggleBtn}
-                          onClick={() => setShowAdvanced(!showAdvanced)}
-                        >
-                          <SlidersHorizontal size={13} />
-                          <span>{showAdvanced ? 'Ocultar opciones avanzadas' : 'Opciones avanzadas (interés o cuota actual)'}</span>
-                        </button>
-
-                        {showAdvanced && (
-                          <div className={styles.advancedDrawer}>
-                            <div className={styles.advField}>
-                              <label className={styles.advLabel}>Interés % mensual</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                min={0}
-                                max={100}
-                                placeholder="0% (Sin interés)"
-                                value={tasaInteres === 0 ? '' : tasaInteres}
-                                onChange={(e) => {
-                                  const val = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
-                                  dispatch({ type: 'SET_FIELD', field: 'tasaInteres', value: val })
-                                }}
-                                className={styles.advInput}
-                              />
-                            </div>
-                            <div className={styles.advField}>
-                              <label className={styles.advLabel}>Voy por la cuota</label>
-                              <input
-                                type="number"
-                                min={1}
-                                max={cantidadCuotas}
-                                value={cuotaInicial || 1}
-                                onChange={(e) => {
-                                  const val = e.target.value === '' ? 1 : Math.max(1, Math.min(cantidadCuotas, parseInt(e.target.value) || 1))
-                                  dispatch({ type: 'SET_FIELD', field: 'cuotaInicial', value: val })
-                                }}
-                                className={styles.advInput}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    {/* 4. Tarjeta Hero de Resumen */}
-                    <div className={styles.heroFinancingCard}>
-                      <div className={styles.heroFinancingTop}>
-                        <div>
-                          <span className={styles.heroInstallmentAmount}>
-                            {formatMonto(calculoCuotas.cuota, moneda)}
-                          </span>
-                          <span className={styles.heroInstallmentSuffix}>
-                            {cantidadCuotas === 1 ? ' pago único' : '/mes'}
-                          </span>
-                        </div>
-                        {cantidadCuotas > 1 && tasaInteres > 0 && (
-                          <div className={styles.heroTotalBadge}>
-                            Total: {formatMonto(calculoCuotas.total, moneda)}
-                          </div>
-                        )}
-                      </div>
-
-                      <p className={styles.heroFinancingNarrative}>
-                        {cantidadCuotas === 1 ? (
-                          <>
-                            Se carga en {vencimientoDDMM ? <>el resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>el próximo resumen</strong>}.
-                          </>
-                        ) : cuotaInicial > 1 ? (
-                          <>
-                            Pagarás <strong>{cantidadCuotas - cuotaInicial + 1} de {cantidadCuotas} cuotas</strong> a partir del {vencimientoDDMM ? <>resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>próximo resumen</strong>}.
-                          </>
-                        ) : (
-                          <>
-                            Pagarás <strong>{cantidadCuotas} cuotas</strong> {tasaInteres > 0 ? `(con ${tasaInteres}% int.)` : '(sin interés)'}, empezando en {vencimientoDDMM ? <>el resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>el próximo resumen</strong>}.
-                          </>
-                        )}
-                      </p>
-                    </div>
-                  </div>
+                  <CalculoCuotasResumen
+                    cantidadCuotas={cantidadCuotas}
+                    cuotaInicial={cuotaInicial}
+                    tasaInteres={tasaInteres}
+                    proximoResumen={proximoResumen}
+                    monto={monto}
+                    moneda={moneda}
+                    resumenCompra={resumenCompra}
+                    loadingResumenCompra={loadingResumenCompra}
+                    errorResumenCompra={errorResumenCompra}
+                    vencimientoDDMM={vencimientoDDMM}
+                    onFieldChange={(field, value) => {
+                      if (field === 'proximoResumen') {
+                        dispatch({ type: 'SET_FIELD', field: 'proximoResumen', value: Boolean(value) })
+                      } else if (field === 'cantidadCuotas') {
+                        dispatch({ type: 'SET_FIELD', field: 'cantidadCuotas', value: Number(value) })
+                      } else if (field === 'cuotaInicial') {
+                        dispatch({ type: 'SET_FIELD', field: 'cuotaInicial', value: Number(value) })
+                      } else if (field === 'tasaInteres') {
+                        dispatch({ type: 'SET_FIELD', field: 'tasaInteres', value: Number(value) })
+                      }
+                    }}
+                  />
                 </div>
 
                 <div ref={step === 2 ? formFooterRef : undefined} className={styles.formFooter}>
@@ -1175,16 +1064,20 @@ export default function TransaccionModal({
             className={`${styles.slide} ${
               step === 3
                 ? styles.slideVisible
-                : slideDirection === 'forward'
-                ? styles.slideEnterRight
-                : styles.slideEnterLeft
+                : step < 3
+                ? (slideDirection === 'forward' ? styles.slideEnterRight : styles.slideEnterLeft)
+                : (slideDirection === 'forward' ? styles.slideExitLeft : styles.slideExitRight)
             }`}
           >
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
                 e.preventDefault()
-                handleSubmit()
+                if (esDebitoUsdEnPesos) {
+                  goNext()
+                } else {
+                  handleSubmit()
+                }
               }}
             >
               <div
@@ -1263,11 +1156,88 @@ export default function TransaccionModal({
               <div ref={step === 3 ? formFooterRef : undefined} className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                  {isSubmitting ? 'Guardando...' : isPendienteIA ? 'Confirmar transacción' : isEdit ? 'Guardar cambios' : 'Guardar transacción'}
+                  {esDebitoUsdEnPesos
+                    ? 'Continuar'
+                    : isSubmitting
+                    ? 'Guardando...'
+                    : isPendienteIA
+                    ? 'Confirmar transacción'
+                    : isEdit
+                    ? 'Guardar cambios'
+                    : 'Guardar transacción'}
                 </button>
               </div>
             </form>
           </div>
+
+          {/* ════════════════════ PASO 4: Resumen de Cobro (Débito USD en pesos) ════════════════════ */}
+          {esDebitoUsdEnPesos && (
+            <div
+              className={`${styles.slide} ${
+                step === 4
+                  ? styles.slideVisible
+                  : slideDirection === 'forward'
+                  ? styles.slideEnterRight
+                  : styles.slideEnterLeft
+              }`}
+            >
+              {(step === 4 || step === 3) && (
+                <form 
+                  className={styles.formContainer}
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    handleSubmit()
+                  }}
+                >
+                  <div
+                    ref={step === 4 ? formBodyRef : undefined}
+                    className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+                  >
+                    <div className={styles.formHeader}>
+                      <div className={styles.headerLeft}>
+                        <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
+                          <ChevronLeft size={18} strokeWidth={2} />
+                        </button>
+                        <div>
+                          <h2 className={styles.headerTitle}>Resumen de cobro</h2>
+                        </div>
+                      </div>
+                      <div className={styles.headerRightActions}>
+                        <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
+                          <X size={18} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className={styles.formFields}>
+                      <DebitoEnDolares
+                        montoUsd={monto}
+                        montoPesos={montoPesosDebito}
+                        billeteraNombre={billeteraSeleccionada?.nombre}
+                        descripcion={descripcion}
+                        categoriaNombre={categorias.find(c => c.id === categoriaId)?.nombre}
+                        onChangeMontoPesos={(val) => dispatch({ type: 'SET_FIELD', field: 'montoPesosDebito', value: val })}
+                        autoFocus={step === 4}
+                      />
+                    </div>
+                  </div>
+
+                  <div ref={step === 4 ? formFooterRef : undefined} className={styles.formFooter}>
+                    <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                    <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                      {isSubmitting
+                        ? 'Guardando...'
+                        : isPendienteIA
+                        ? 'Confirmar transacción'
+                        : isEdit
+                        ? 'Guardar cambios'
+                        : 'Guardar transacción'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
 
         </div>
       </div>

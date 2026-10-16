@@ -67,14 +67,20 @@ const formatCompromisoNombre = (item: CompromisoItem): string => {
 
 const formatCompromisoDetalle = (item: CompromisoItem): string | null => {
   if (item.monto_usd == null) return null
-  const montoUsd = Number(item.monto_usd).toLocaleString('es-AR')
-  const cotiz = item.cotizacion != null ? `$${Number(item.cotizacion).toLocaleString('es-AR')}` : ''
-  const perc = item.percepcion != null ? ` (+${item.percepcion}%)` : ''
+  const montoUsd = formatMonto(item.monto_usd, 'USD')
+  const cotiz = item.cotizacion != null ? formatMonto(item.cotizacion, 'ARS') : ''
+  const percepcionEntero = item.percepcion != null ? Math.round(Number(item.percepcion)) : null
 
-  if (cotiz) {
-    return `US$ ${montoUsd} a ${cotiz}${perc}`
+  if (cotiz && percepcionEntero != null) {
+    return `${montoUsd} a ${cotiz} + ${percepcionEntero}% de percepción`
   }
-  return `US$ ${montoUsd}${perc}`
+  if (cotiz) {
+    return `${montoUsd} a ${cotiz}`
+  }
+  if (percepcionEntero != null) {
+    return `${montoUsd} + ${percepcionEntero}% de percepción`
+  }
+  return montoUsd
 }
 
 

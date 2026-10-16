@@ -29,6 +29,7 @@
 
 .modalAuto {
   height: auto !important;
+  max-height: 90dvh !important;
 }
 
 .modalAuto.noPadding .content {

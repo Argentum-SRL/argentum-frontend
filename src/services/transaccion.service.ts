@@ -1,5 +1,5 @@
 import api from './api'
-import type { Transaccion } from '@/types'
+import type { Transaccion, SugerenciaPesosResponse } from '@/types'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
 import { invalidatePresupuestos } from './presupuesto.service'
@@ -46,6 +46,11 @@ const transaccionService = {
 
   getPendientesIA: async (signal?: AbortSignal) => {
     const response = await api.get<Transaccion[]>('/transacciones/pendientes', { signal })
+    return response.data
+  },
+
+  getSugerenciaPesos: async (montoUsd: number, signal?: AbortSignal) => {
+    const response = await api.get<SugerenciaPesosResponse>(`/transacciones/sugerencia-pesos?monto_usd=${montoUsd}`, { signal })
     return response.data
   },
 

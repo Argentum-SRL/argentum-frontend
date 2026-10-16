@@ -353,8 +353,16 @@ export interface Transaccion {
   subcategoria?: Subcategoria
   movimiento_meta_id?: string | null
   monto_original?: number | null
+  moneda_original?: 'ARS' | 'USD' | null
   cotizacion_aplicada?: number | null
+  tipo_dolar_usado?: string | null
   factura_id?: string | null
+}
+
+export interface SugerenciaPesosResponse {
+  cotizacion: number | null
+  percepcion: number
+  monto_pesos: number | null
 }
 
 export interface TransferenciaInterna {

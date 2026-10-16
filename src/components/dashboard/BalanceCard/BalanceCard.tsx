@@ -17,7 +17,10 @@ export interface CompromisoItem {
   id: string
   nombre: string
   monto: number
-  tipo?: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura'
+  tipo?: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura' | 'dolares_con_pesos'
+  monto_usd?: number | string
+  cotizacion?: number | string
+  percepcion?: number | string
 }
 
 export interface BalanceCardProps {
@@ -47,6 +50,33 @@ export interface BalanceCardProps {
 const fmt = (n: number, moneda: 'ARS' | 'USD' = 'ARS') => {
   return formatMonto(n, moneda)
 }
+
+const formatCompromisoNombre = (item: CompromisoItem): string => {
+  if (item.tipo === 'dolares_con_pesos') {
+    let name = item.nombre
+      .replace(/^Parte en d[oó]lares de\s+/i, '')
+      .replace(/\s+que se paga con pesos$/i, '')
+      .trim()
+    if (!/\(usd\)$/i.test(name)) {
+      name = `${name} (USD)`
+    }
+    return name
+  }
+  return item.nombre
+}
+
+const formatCompromisoDetalle = (item: CompromisoItem): string | null => {
+  if (item.monto_usd == null) return null
+  const montoUsd = Number(item.monto_usd).toLocaleString('es-AR')
+  const cotiz = item.cotizacion != null ? `$${Number(item.cotizacion).toLocaleString('es-AR')}` : ''
+  const perc = item.percepcion != null ? ` (+${item.percepcion}%)` : ''
+
+  if (cotiz) {
+    return `US$ ${montoUsd} a ${cotiz}${perc}`
+  }
+  return `US$ ${montoUsd}${perc}`
+}
+
 
 export const BalanceCard = memo(function BalanceCard({
   moneda,
@@ -297,17 +327,30 @@ export const BalanceCard = memo(function BalanceCard({
               </div>
 
               <div className={styles.accountsList} role="list">
-                {itemsCompromisos.map((item: CompromisoItem) => (
-                  <div key={item.id} className={styles.accountRow}>
-                    <div className={styles.rowLeft}>
-                      <span className={styles.itemDot} />
-                      <span className={styles.accountName}>{item.nombre}</span>
+                {itemsCompromisos.map((item: CompromisoItem) => {
+                  const isDolaresConPesos = item.tipo === 'dolares_con_pesos'
+                  const displayName = isDolaresConPesos ? formatCompromisoNombre(item) : item.nombre
+                  const detalle = isDolaresConPesos ? formatCompromisoDetalle(item) : null
+
+                  return (
+                    <div key={item.id} className={styles.accountRow}>
+                      <div className={styles.rowLeft}>
+                        <span className={styles.itemDot} />
+                        <div className={styles.accountTextCol}>
+                          <span className={styles.accountName}>{displayName}</span>
+                          {detalle && (
+                            <span className={styles.compromisoDetalle}>
+                              {detalle}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className={styles.compromisoAmount}>
+                        -{showBalance ? fmt(item.monto, moneda) : '••••'}
+                      </span>
                     </div>
-                    <span className={styles.compromisoAmount}>
-                      -{showBalance ? fmt(item.monto, moneda) : '••••'}
-                    </span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}

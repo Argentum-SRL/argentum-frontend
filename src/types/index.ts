@@ -434,10 +434,13 @@ export interface DashboardResumen {
 
 export interface CompromisoDisponibleItem {
   id: string
-  tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura'
+  tipo: 'suscripcion' | 'cuota' | 'resumen_tarjeta' | 'factura' | 'dolares_con_pesos'
   nombre: string
   monto: number | string
   fecha_cobro: string
+  monto_usd?: number | string
+  cotizacion?: number | string
+  percepcion?: number | string
 }
 
 export interface CategoriaGastoItem {

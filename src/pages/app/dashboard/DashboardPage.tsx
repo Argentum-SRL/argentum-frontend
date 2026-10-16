@@ -794,6 +794,9 @@ export default function DashboardPage() {
         nombre: c.nombre,
         monto: Number(c.monto) || 0,
         tipo: c.tipo,
+        monto_usd: c.monto_usd != null ? Number(c.monto_usd) : undefined,
+        cotizacion: c.cotizacion != null ? Number(c.cotizacion) : undefined,
+        percepcion: c.percepcion != null ? Number(c.percepcion) : undefined,
       }))
     }
 

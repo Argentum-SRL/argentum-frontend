@@ -71,3 +71,7 @@ export default defineConfig([
   },
 ])
 ```
+
+## Diseño
+
+La arquitectura visual, escalas de tokens (espaciado, radios, capas z-index, sombras) y reglas de componentes de la interfaz de Argentum se encuentran unificadas y documentadas en [DISENO_UNIFICADO.md](./DISENO_UNIFICADO.md). Cualquier desarrollo o refactorización frontend debe respetar obligatoriamente dicha especificación.

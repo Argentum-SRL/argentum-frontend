@@ -1,5 +1,7 @@
 # SISTEMA GLOBAL DE ELEVACIÓN Y PROFUNDIDAD — ARGENTUM
 
+> **Aviso Importante:** Ante cualquier diferencia manda [DISENO_UNIFICADO.md](./DISENO_UNIFICADO.md).
+
 > **Principio Fundamental:**  
 > **"SHADOW IS HIERARCHY, NOT DECORATION."**  
 > Una sombra en Argentum no existe para embellecer un componente ni para dibujar un borde difuso. Existe con un único propósito semántico: **comunicar visual y físicamente qué superficie se encuentra por encima de otra en el eje Z**.
@@ -24,7 +26,7 @@ La elevación representa la distancia percibida en el eje Z entre una superficie
 
 ## 2. ESCALA SEMÁNTICA GLOBAL DE TOKENS
 
-Todos los tokens de elevación están centralizados y controlados en [elevation.css](file:///Users/manuelmartinez/Documents/GitHub/argentum/argentum-frontend/src/styles/elevation.css).
+Todos los tokens de elevación están centralizados y controlados en [elevation.css](./src/styles/elevation.css).
 
 ```css
 :root {
@@ -114,10 +116,10 @@ Página / Canvas (Nivel 0)
   * En dispositivos táctiles (mobile) el hover no es vinculante.
 * **ACTIVE / PRESSED:**
   * Compresión táctil instantánea: `transform: translateY(0); box-shadow: var(--elevation-xs);` o `--elevation-none`.
-* **SELECTED (ej. Selector Egreso / Ingreso / Transferencia):**
+* **SELECTED (ej. Selector Cápsula / SegmentedControl):**
   * La opción activa actúa como pastilla física despegada:
-  * `box-shadow: var(--elevation-xs); transform: translateY(-0.5px);`.
-  * No requiere bordes chillones ni brillos artificiales; la elevación comunica qué modo está presionado.
+  * `box-shadow: var(--elevation-pill); transform: none;`.
+  * La profundidad se transmite por elevación (`--elevation-pill`), luminancia y peso tipográfico (font-weight: 700), sin desplazamientos físicos (`translateY`) que alteren la alineación.
 * **FOCUS:**
   * Foco accesible por teclado: `outline: 2px solid var(--primary); outline-offset: 2px; box-shadow: var(--elevation-none);`.
   * Prohibido simular focus con spreads multicolores de `box-shadow`.
@@ -224,12 +226,13 @@ El sistema está validado en los 5 breakpoints canónicos:
   transform: scale(1.05); /* Descuadra layout */
 }
 
-/* ✅ CORRECTO: Micro-elevación física sutil sobre la base */
+/* ✅ CORRECTO: Selector cápsula oficial con elevación pill sin transform */
 .typeButtonActive {
-  background: var(--surface);
-  box-shadow: var(--elevation-xs);
-  transform: translateY(-0.5px);
-  color: var(--primary);
+  background: var(--selector-pill-bg-active);
+  box-shadow: var(--elevation-pill);
+  transform: none;
+  color: var(--text);
+  font-weight: 700;
 }
 ```
 
@@ -295,10 +298,14 @@ El sistema está validado en los 5 breakpoints canónicos:
 
 ## 12. GUARDRAIL DE CÓDIGO (AUDITORÍA AUTOMÁTICA)
 
-Para garantizar que ninguna nueva contribución agregue sombras hardcodeadas:
+Para garantizar que ninguna nueva contribución agregue sombras hardcodeadas o viole las reglas de diseño:
 
 ```bash
+# Auditoría de elevación y sombras hardcodeadas
 npm run audit:elevation
+
+# Auditoría integral de reglas de diseño unificado contra la línea base
+npm run audit:rules
 ```
 
-El script inspecciona todos los archivos `.css`, `.tsx` y `.ts` en `src/`, validando que el 100% de las declaraciones de elevación utilicen los tokens `var(--elevation-*)`.
+El script inspecciona todos los archivos `.css`, `.tsx` y `.ts` en `src/`, validando que el 100% de las declaraciones de elevación utilicen los tokens `var(--elevation-*)` y que no existan regresiones sobre la línea base de diseño unificado.

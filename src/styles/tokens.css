@@ -1,0 +1,83 @@
+/* ==========================================================================
+   Tokens Fundacionales del Diseño Unificado — Argentum
+   Definición estricta de escalas: espaciado, radios, capas (z-index),
+   medidas de modales, puntos de paso y selector cápsula oficial.
+   ========================================================================== */
+
+:root {
+  /* ── Escala de Espaciado ── */
+  --space-2xs: 2px; /* Espaciado mínimo para ajustes finos y bordes internos */
+  --space-xs: 4px; /* Espaciado extra pequeño para padding interno de controles compactos y selector track */
+  --space-icon: 6px; /* Separación exclusiva entre ícono y texto o separación interna de controles */
+  --space-sm: 8px; /* Espaciado pequeño para gap de elementos agrupados y label-a-campo */
+  --space-md: 12px; /* Espaciado medio para padding vertical de secciones y gap de botones */
+  --space-lg: 16px; /* Espaciado estándar entre campos de formulario y padding general */
+  --space-xl: 20px; /* Espaciado lateral de modales y contenedores principales */
+  --space-2xl: 24px; /* Separación vertical entre bloques principales de contenido */
+  --space-3xl: 32px; /* Espaciado amplio para separación entre módulos */
+  --space-4xl: 40px; /* Espaciado extra amplio para márgenes estructurales */
+  --space-5xl: 48px; /* Espaciado máximo para secciones de layout principal */
+
+  /* ── Radios de Curvatura ── */
+  --radius-modal: 20px; /* Radio de curvatura unificado para modales y bottom sheets */
+  --radius-control: 12px; /* Radio de curvatura estándar para controles interactivos y botones */
+  --radius-selector-track: 14px; /* Radio de la pista contenedora del selector cápsula */
+  --radius-selector-pill: 10px; /* Radio concéntrico de la píldora activa del selector cápsula */
+
+  /* ── Capas de Apilamiento (Z-Index) ── */
+  --z-base: 0; /* Capa base para flujo normal del documento */
+  --z-raised: 1; /* Elementos ligeramente elevados sobre la base */
+  --z-dropdown: 100; /* Menús desplegables y autocompletados estándar */
+  --z-sticky: 200; /* Elementos adheridos al scroll (sticky headers y navs) */
+  --z-fixed: 300; /* Barras fijas de navegación y controles permanentes */
+  --z-overlay: 400; /* Telón de fondo (backdrop) oscuro para modales y drawers */
+  --z-modal: 500; /* Diálogos modales y hojas deslizantes (drawers) */
+  --z-popover-top: 550; /* Desplegable o popover que se abre desde un modal vía portal */
+  --z-toast: 600; /* Notificaciones flotantes tipo toast */
+  --z-tooltip: 700; /* Tooltips de ayuda en la capa superior absoluta */
+
+  /* ── Medidas del Modal ── */
+  --modal-radius: var(--radius-modal); /* Radio de esquina del contenedor del modal */
+  --modal-pad-x: var(--space-xl); /* Padding horizontal constante en modales (20px) */
+  --modal-content-pad-top: var(--space-md); /* Padding superior del contenido del modal */
+  --modal-content-pad-bottom: var(--space-lg); /* Padding inferior del contenido del modal */
+  --modal-field-gap: var(--space-lg); /* Separación estándar entre campos consecutivos */
+  --modal-group-gap: var(--space-2xl); /* Separación entre grupos o bloques temáticos de campos */
+  --modal-label-gap: var(--space-sm); /* Separación entre etiqueta y su respectivo campo de entrada */
+  --modal-footer-pad-top: var(--space-md); /* Padding superior del pie del modal */
+  --modal-footer-pad-bottom: var(--space-lg); /* Padding inferior del pie del modal */
+  --modal-footer-gap: var(--space-md); /* Separación horizontal entre los dos botones del pie */
+  --modal-max-h: 90dvh; /* Altura máxima permitida para el diálogo modal */
+
+  /* ── Puntos de Paso (StepDots) ── */
+  --stepdots-pad: var(--space-lg) var(--space-xl) var(--space-xs); /* Padding superior, lateral e inferior del indicador de pasos */
+  --stepdot-height: 5px; /* Altura de cada barra indicadora de paso */
+  --stepdot-active-width: 20px; /* Ancho de la barra correspondiente al paso activo */
+  --stepdot-inactive-width: 6px; /* Ancho de las barras de pasos inactivos */
+  --stepdot-gap: var(--space-icon); /* Separación horizontal entre los puntos de paso */
+
+  /* ── Medidas del Selector Cápsula ── */
+  --selector-track-pad: var(--space-xs); /* Padding interno de la pista contenedora del selector */
+  --selector-gap: var(--space-xs); /* Separación entre píldoras dentro de la pista */
+  --selector-pill-h: 40px; /* Altura de la píldora para diseño horizontal o inline */
+  --selector-pill-h-stacked: 56px; /* Altura de la píldora para diseño vertical o apilado */
+
+  /* ── Colores del Selector Cápsula (Modo Claro) ── */
+  --selector-track-bg: var(--page); /* Color de fondo de la pista del selector en modo claro */
+  --selector-track-border: var(--border); /* Color de borde de la pista del selector en modo claro */
+  --selector-pill-bg-active: var(--surface); /* Fondo de la píldora activa en modo claro */
+  --selector-pill-border-active: transparent; /* Borde de la píldora activa en modo claro */
+  --selector-hover-bg: rgba(0, 0, 0, 0.04); /* Fondo hover en píldoras inactivas en modo claro */
+}
+
+:root.dark,
+:root[data-theme="dark"],
+.dark,
+[data-theme="dark"] {
+  /* ── Colores del Selector Cápsula (Modo Oscuro) ── */
+  --selector-track-bg: var(--page); /* Color de fondo de la pista del selector en modo oscuro */
+  --selector-track-border: var(--border); /* Color de borde de la pista del selector en modo oscuro */
+  --selector-pill-bg-active: var(--surface-alt); /* Fondo de la píldora activa en modo oscuro */
+  --selector-pill-border-active: rgba(255, 255, 255, 0.10); /* Borde sutil de la píldora activa en modo oscuro */
+  --selector-hover-bg: rgba(255, 255, 255, 0.05); /* Fondo hover en píldoras inactivas en modo oscuro */
+}

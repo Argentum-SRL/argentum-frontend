@@ -1,58 +1,104 @@
-.container {
-  display: inline-flex;
-  background: var(--surface-alt);
-  padding: 4px;
-  border-radius: 12px;
-  gap: 4px;
-  border: 1px solid var(--border);
-  align-items: center;
+/* ==========================================================================
+   SegmentedControl.module.css — Selector Cápsula Oficial de Argentum
+   Medidas y accesibilidad:
+   - Píldora 40px (stacked 56px) + padding 4px + borde 1px = ~50px alto total,
+     superando el objetivo táctil de 44px (WCAG 2.5.5 Target Size Enhanced).
+   - Radios concéntricos: pista 14px = píldora 10px + padding 4px.
+   - Prohibido en este archivo: transform, directivas important, márgenes negativos,
+     z-index y sombras que no sean var(--elevation-pill).
+   ========================================================================== */
+
+.track {
+  display: flex;
+  padding: var(--selector-track-pad);
+  gap: var(--selector-gap);
+  background: var(--selector-track-bg);
+  border: 1px solid var(--selector-track-border);
+  border-radius: var(--radius-selector-track);
+  box-sizing: border-box;
+  overflow: visible;
+  margin: 0;
 }
 
 .fullWidth {
-  display: flex;
   width: 100%;
 }
 
-.fullWidth .option {
+.pill {
   flex: 1;
-  text-align: center;
-}
-
-.option {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 14px;
-  border-radius: 8px;
+  min-width: 0;
+  min-height: var(--selector-pill-h);
+  border: 1px solid transparent;
+  border-radius: var(--radius-selector-pill);
+  background: transparent;
+  color: var(--text-2);
+  /* Se declaran propiedades individuales porque el atajo 'font' exige una familia tipográfica específica y descarta 'inherit' */
+  font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-2);
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
   cursor: pointer;
-  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease, background 0.15s ease;
-  border: none;
-  background: transparent;
-  white-space: nowrap;
-  -webkit-user-select: none;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
   user-select: none;
-  font-family: inherit;
+  -webkit-user-select: none;
+  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
 
-.option:hover:not(.optionActive) {
+.pillStacked {
+  min-height: var(--selector-pill-h-stacked);
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+.pillActive {
+  background: var(--selector-pill-bg-active);
+  border-color: var(--selector-pill-border-active);
   color: var(--text);
-  transform: translateY(-0.5px);
-}
-
-.optionActive {
-  background: var(--surface);
-  color: var(--primary);
-  box-shadow: var(--elevation-sm);
-  transform: translateY(-1.5px) scale(1.02);
   font-weight: 700;
-  z-index: 4;
+  box-shadow: var(--elevation-pill);
 }
 
-[data-theme="dark"] .optionActive {
-  color: var(--text);
-  box-shadow: var(--elevation-sm);
-  transform: translateY(-1.5px) scale(1.02);
+@media (hover: hover) and (pointer: fine) {
+  .pill:hover:not(.pillActive):not(.pillDisabled) {
+    color: var(--text);
+    background: var(--selector-hover-bg);
+  }
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.pillDisabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    transition: none;
+  }
 }

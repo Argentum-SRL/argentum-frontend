@@ -30,6 +30,10 @@ jobs:
       - name: Instalar dependencias con npm ci
         run: npm ci
 
+      # Verificacion de reglas de diseno unificado contra la linea base
+      - name: Reglas de diseño
+        run: npm run audit:rules
+
       # Verificacion de tipos TypeScript y construccion del proyecto con Vite
       - name: Compilar aplicacion frontend (build)
         run: npm run build

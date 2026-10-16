@@ -4,14 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "prepare": "node scripts/install-hooks.mjs",
+    "predev": "node scripts/install-hooks.mjs",
+    "predev:clean": "node scripts/install-hooks.mjs",
     "dev": "vite",
     "dev:clean": "vite --force",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run audit:rules",
     "preview": "vite preview",
     "graph:update": "graphify . --output graphify-out",
     "audit:elevation": "node scripts/audit-hardcoded-shadows.mjs",
-    "audit:design": "node scripts/audit-design-system.mjs"
+    "audit:design": "node scripts/audit-design-system.mjs",
+    "audit:rules": "node scripts/audit-design-rules.mjs"
   },
   "dependencies": {
     "@ncdai/react-wheel-picker": "^1.2.2",

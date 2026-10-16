@@ -54,6 +54,21 @@
   --elevation-selection-modal: 0 12px 26px -3px rgba(var(--shadow-color-rgb), 0.24),
                                0 4px 8px -1px rgba(var(--shadow-color-rgb), 0.12);
 
+  /* Píldora activa de la cápsula (alcance <= 4px) */
+  --elevation-pill: 0 1px 3px rgba(var(--shadow-color-rgb), 0.10), 0 1px 2px rgba(var(--shadow-color-rgb), 0.06);
+
+  /* ── Alcance de Elevación (Reach) ──
+     Regla: un contenedor con overflow hidden/auto/clip debe tener padding >= alcance de la sombra mayor de sus hijos en ese eje. Prohibido resolverlo con márgenes negativos.
+     Fórmula: alcance = |offset-x| + |offset-y| + blur + max(spread, 0); para varias capas, el mayor. */
+  --elevation-reach-pill: 4px;
+  --elevation-reach-xs: 4px;
+  --elevation-reach-sm: 18px;
+  --elevation-reach-md: 20px;
+  --elevation-reach-lg: 46px;
+  --elevation-reach-xl: 60px;
+  --elevation-reach-selection: 38px;
+  --elevation-reach-selection-modal: 44px;
+
   /* ── Backward Compatibility Aliases ── */
   --shadow-none: var(--elevation-none);
   --shadow-xs: var(--elevation-xs);
@@ -104,6 +119,10 @@
 
   --elevation-selection-modal: 0 14px 30px -3px rgba(0, 0, 0, 0.75),
                                0 4px 10px -1px rgba(0, 0, 0, 0.45);
+
+  /* Píldora activa de la cápsula (alcance <= 4px, dark mode) */
+  --elevation-pill: 0 1px 3px rgba(0, 0, 0, 0.45),
+                    0 1px 2px rgba(0, 0, 0, 0.30);
 }
 
 /* ==========================================================================
@@ -140,6 +159,10 @@
 
 .elevation-selection-modal {
   box-shadow: var(--elevation-selection-modal);
+}
+
+.elevation-pill {
+  box-shadow: var(--elevation-pill);
 }
 
 /* ── Contextual Helper ──

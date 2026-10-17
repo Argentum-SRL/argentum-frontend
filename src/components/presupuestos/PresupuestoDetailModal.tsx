@@ -28,6 +28,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { EmptyState, Skeleton } from '@/components/ui'
 import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './PresupuestoDetailModal.module.css'
 
 interface PresupuestoDetailModalProps {
@@ -654,31 +655,26 @@ export default function PresupuestoDetailModal({
                 </div>
               </div>
 
-              {/* Selector Segmentado Estilo Apple idéntico a _segmentedBar_51wt9_252 */}
-              <div className={styles.segmentedBar} role="radiogroup" aria-label="Vista de gastos e historial">
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={activeTab === 'gastos'}
-                  className={`${styles.segmentedPill} ${activeTab === 'gastos' ? styles.segmentedPillActive : ''}`}
-                  onClick={() => setActiveTab('gastos')}
-                >
-                  <Receipt size={14} strokeWidth={2} />
-                  <span>Gastos del ciclo</span>
-                  <span className={styles.segmentedBadge}>{transacciones.length}</span>
-                </button>
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={activeTab === 'historial'}
-                  className={`${styles.segmentedPill} ${activeTab === 'historial' ? styles.segmentedPillActive : ''}`}
-                  onClick={() => setActiveTab('historial')}
-                >
-                  <History size={14} strokeWidth={2} />
-                  <span>Historial de ciclos</span>
-                  <span className={styles.segmentedBadge}>{historial.length}</span>
-                </button>
-              </div>
+              <SegmentedControl<'gastos' | 'historial'>
+                options={[
+                  {
+                    value: 'gastos',
+                    label: 'Gastos del ciclo',
+                    icon: <Receipt size={15} strokeWidth={2} />,
+                    badge: transacciones.length,
+                  },
+                  {
+                    value: 'historial',
+                    label: 'Historial de ciclos',
+                    icon: <History size={15} strokeWidth={2} />,
+                    badge: historial.length,
+                  },
+                ]}
+                value={activeTab}
+                onChange={setActiveTab}
+                fullWidth
+                ariaLabel="Vista de gastos e historial"
+              />
 
               {/* Contenido de la pestaña activa */}
               <div className={styles.contentSection}>

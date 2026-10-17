@@ -2,9 +2,9 @@ import { useEffect, useReducer, useState, useCallback } from 'react'
 import {
   X,
   ChevronLeft,
-  Check,
   AlertCircle
 } from '@/components/ui/icons'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
@@ -374,22 +374,16 @@ export default function GoalModal({
                 {isEdit && (
                   <div className={styles.formField}>
                     <label className={styles.fieldLabel}>Estado de la meta</label>
-                    <div className={styles.segmentedBar} role="radiogroup" aria-label="Estado de la meta">
-                      {(['activa', 'pausada'] as const).map(s => (
-                        <button
-                          key={s}
-                          type="button"
-                          role="radio"
-                          aria-checked={estado === s}
-                          className={`${styles.segmentedPill} ${estado === s ? styles.segmentedPillActive : ''}`}
-                          onClick={() => setField('estado', s)}
-                          disabled={estado === EstadoMeta.COMPLETADA}
-                        >
-                          {estado === s && <Check size={14} strokeWidth={2.2} />}
-                          <span>{s.charAt(0).toUpperCase() + s.slice(1)}</span>
-                        </button>
-                      ))}
-                    </div>
+                    <SegmentedControl<EstadoMeta>
+                      options={[
+                        { value: EstadoMeta.ACTIVA, label: 'Activa', disabled: estado === EstadoMeta.COMPLETADA },
+                        { value: EstadoMeta.PAUSADA, label: 'Pausada', disabled: estado === EstadoMeta.COMPLETADA },
+                      ]}
+                      value={estado}
+                      onChange={s => setField('estado', s)}
+                      fullWidth
+                      ariaLabel="Estado de la meta"
+                    />
                     {estado === EstadoMeta.COMPLETADA && (
                       <p className={styles.fieldHint}>Esta meta ya fue completada y no puede pausarse.</p>
                     )}

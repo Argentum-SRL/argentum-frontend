@@ -379,11 +379,6 @@
 
 
 /* ── Minimalist & High-Craft Step 2: Financiación (Apple/Fintech Standard) ── */
-/* Contenedor del cuerpo en paso 2 */
-.formBodyStep2 {
-  min-height: 0;
-}
-
 .financiacionContainer {
   display: flex;
   flex-direction: column;

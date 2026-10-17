@@ -999,7 +999,7 @@ export default function TransaccionModal({
               >
                 <div
                   ref={step === 2 ? formBodyRef : undefined}
-                  className={`${styles.formBody} ${styles.formBodyWithHeader} ${styles.formBodyStep2}`}
+                  className={`${styles.formBody} ${styles.formBodyWithHeader}`}
                 >
                   <div className={styles.formHeader}>
                     <div className={styles.headerLeft}>

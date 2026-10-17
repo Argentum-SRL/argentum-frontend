@@ -19,6 +19,7 @@ import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './SuscripcionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 
@@ -558,22 +559,24 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                 )}
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>¿Cómo se cobra?</label>
-                  <div className={styles.radioPills}>
-                    <button
-                      type="button"
-                      className={`${styles.pill} ${state.metodoCobro === 'tarjeta' ? styles.pillActive : ''}`}
-                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'tarjeta' })}
-                    >
-                      <CreditCard size={14} /> Tarjeta de crédito
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.pill} ${state.metodoCobro === 'debito' ? styles.pillActive : ''}`}
-                      onClick={() => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value: 'debito' })}
-                    >
-                      <Wallet size={14} /> Cuenta / Billetera
-                    </button>
-                  </div>
+                  <SegmentedControl<'tarjeta' | 'debito'>
+                    options={[
+                      {
+                        value: 'tarjeta',
+                        label: 'Tarjeta de crédito',
+                        icon: <CreditCard size={15} />,
+                      },
+                      {
+                        value: 'debito',
+                        label: 'Cuenta / Billetera',
+                        icon: <Wallet size={15} />,
+                      },
+                    ]}
+                    value={state.metodoCobro}
+                    onChange={value => dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value })}
+                    fullWidth
+                    ariaLabel="Método de cobro"
+                  />
                 </div>
 
                 <div className={styles.formField}>
@@ -668,18 +671,20 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
               <div className={styles.formBody}>
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Frecuencia de cobro</label>
-                  <div className={styles.radioPills}>
-                    {['mensual', 'bimestral', 'trimestral', 'semestral', 'anual'].map(f => (
-                      <button
-                        key={f}
-                        type="button"
-                        className={`${styles.pill} ${state.frecuencia === f ? styles.pillActive : ''}`}
-                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value: f })}
-                      >
-                        {f.charAt(0).toUpperCase() + f.slice(1)}
-                      </button>
-                    ))}
-                  </div>
+                  <SegmentedControl<typeof state.frecuencia>
+                    options={[
+                      { value: 'mensual', label: 'Mensual' },
+                      { value: 'bimestral', label: 'Bimestral' },
+                      { value: 'trimestral', label: 'Trimestral' },
+                      { value: 'semestral', label: 'Semestral' },
+                      { value: 'anual', label: 'Anual' },
+                    ]}
+                    value={state.frecuencia}
+                    onChange={value => dispatch({ type: 'SET_FIELD', field: 'frecuencia', value })}
+                    fullWidth
+                    layout="wrap"
+                    ariaLabel="Frecuencia de cobro"
+                  />
                   {costoMensual && state.frecuencia !== 'mensual' && (
                     <p className={styles.previewCosto}>Equivale a {state.moneda === 'ARS' ? '$' : 'US$'} {costoMensual} por mes</p>
                   )}

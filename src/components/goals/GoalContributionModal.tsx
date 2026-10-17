@@ -17,6 +17,7 @@ import goalsService from '@/services/goals.service'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './GoalContributionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
@@ -320,29 +321,25 @@ export default function GoalContributionModal({
                   </div>
                 )}
 
-                {/* Operation Bar (Segmented Pills exacto a TransaccionModal) */}
-                <div className={styles.segmentedBar} role="radiogroup" aria-label="Tipo de operación">
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={tipo === 'aporte'}
-                    className={`${styles.segmentedPill} ${tipo === 'aporte' ? styles.segmentedPillActive : ''}`}
-                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'aporte' })}
-                  >
-                    <Plus size={14} strokeWidth={2.2} />
-                    <span>Aportar</span>
-                  </button>
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={tipo === 'retiro'}
-                    className={`${styles.segmentedPill} ${tipo === 'retiro' ? styles.segmentedPillActive : ''}`}
-                    onClick={() => dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'retiro' })}
-                  >
-                    <Minus size={14} strokeWidth={2.2} />
-                    <span>Retirar</span>
-                  </button>
-                </div>
+                {/* Operation Bar (SegmentedControl) */}
+                <SegmentedControl<TipoMovimientoMeta>
+                  options={[
+                    {
+                      value: TipoMovimientoMeta.APORTE,
+                      label: 'Aportar',
+                      icon: <Plus size={15} strokeWidth={2.2} />,
+                    },
+                    {
+                      value: TipoMovimientoMeta.RETIRO,
+                      label: 'Retirar',
+                      icon: <Minus size={15} strokeWidth={2.2} />,
+                    },
+                  ]}
+                  value={tipo}
+                  onChange={value => dispatch({ type: 'SET_FIELD', field: 'tipo', value })}
+                  fullWidth
+                  ariaLabel="Tipo de operación"
+                />
 
                 {/* Monto Hero */}
                 <div className={styles.formField}>

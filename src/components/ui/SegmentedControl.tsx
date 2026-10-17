@@ -6,6 +6,8 @@ export interface SegmentedControlOption<T extends string = string> {
   label: string
   /* Línea secundaria opcional para mostrar información complementaria */
   description?: string
+  /* Indicador numérico o texto breve opcional junto a la etiqueta */
+  badge?: number | string
   icon?: ReactNode
   disabled?: boolean
 }
@@ -17,7 +19,7 @@ export interface SegmentedControlProps<T extends string = string> {
   className?: string
   ariaLabel?: string
   fullWidth?: boolean
-  layout?: 'inline' | 'stacked'
+  layout?: 'inline' | 'stacked' | 'wrap'
 }
 
 /**
@@ -117,6 +119,7 @@ export default function SegmentedControl<T extends string = string>({
       aria-label={ariaLabel}
       className={[
         styles.track,
+        layout === 'wrap' ? styles.trackWrap : '',
         fullWidth ? styles.fullWidth : '',
         className,
       ].filter(Boolean).join(' ')}
@@ -143,6 +146,7 @@ export default function SegmentedControl<T extends string = string>({
             className={[
               styles.pill,
               layout === 'stacked' ? styles.pillStacked : '',
+              layout === 'wrap' ? styles.pillWrap : '',
               isActive ? styles.pillActive : '',
               isDisabled ? styles.pillDisabled : '',
             ].filter(Boolean).join(' ')}
@@ -162,6 +166,9 @@ export default function SegmentedControl<T extends string = string>({
               </span>
             ) : (
               <span className={styles.label}>{option.label}</span>
+            )}
+            {option.badge !== undefined && (
+              <span className={styles.badge}>{option.badge}</span>
             )}
           </button>
         )

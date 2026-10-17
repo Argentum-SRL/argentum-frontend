@@ -1,11 +1,12 @@
 /* ==========================================================================
    SegmentedControl.module.css — Selector Cápsula Oficial de Argentum (Opción 4)
    Diseño final sin pista contenedora (sin card ni fondo detrás de los botones):
-   - Botones sueltos en fila con gap var(--selector-gap).
+   - Botones sueltos en fila con gap var(--selector-gap) (o multilínea con .trackWrap y .pillWrap).
    - Píldora inactiva: transparente, sin borde, color var(--text-2), 13px, peso 600,
      min-height var(--selector-pill-h), radio var(--radius-selector-pill).
    - Píldora activa: background var(--selector-pill-bg-active), color var(--selector-pill-text-active),
      peso 700 y box-shadow var(--elevation-pill).
+   - Badge opcional para contadores (.badge) con contraste adaptativo al estado activo.
    - Hover solo cambia el color del texto a var(--text) (sin fondo de hover).
    - Prohibido en este archivo: transform, directivas important, márgenes negativos,
      z-index y sombras que no sean var(--elevation-pill).
@@ -17,6 +18,10 @@
   box-sizing: border-box;
   margin: 0;
   overflow: visible;
+}
+
+.trackWrap {
+  flex-wrap: wrap;
 }
 
 .fullWidth {
@@ -55,6 +60,11 @@
   gap: var(--space-xs);
 }
 
+.pillWrap {
+  flex: 1 1 auto;
+  padding: 0 var(--space-md);
+}
+
 .text {
   /* Contenedor vertical para opciones con etiqueta y descripción */
   display: flex;
@@ -90,11 +100,27 @@
   color: currentColor;
 }
 
+.badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  padding: 1px var(--space-icon);
+  border-radius: 999px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+}
+
 .pillActive {
   background: var(--selector-pill-bg-active);
   color: var(--selector-pill-text-active);
   font-weight: 700;
   box-shadow: var(--elevation-pill);
+}
+
+.pillActive .badge {
+  background: color-mix(in srgb, var(--selector-pill-text-active) 20%, transparent);
+  color: var(--selector-pill-text-active);
 }
 
 @media (hover: hover) and (pointer: fine) {

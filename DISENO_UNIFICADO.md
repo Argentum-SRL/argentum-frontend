@@ -108,6 +108,17 @@ El tipo `SegmentedControlOption` admite la prop opcional `description?: string`:
 - **Cuándo usarla:** Especialmente útil en modos apilados (`layout="stacked"`) donde se requiera exhibir un valor asociado o dato numérico complementario (por ejemplo, cotizaciones de divisas como `$ 1.234` debajo de la denominación `MEP` o `BLUE`) evitando truncamientos horizontales en modales angostos.
 - **Carácter opcional:** Si no se define `description`, el DOM conserva la estructura estándar de una sola línea (`span.label`) sin envoltorio adicional.
 
+### Propiedad opcional `badge`
+El tipo `SegmentedControlOption` admite la prop opcional `badge?: number | string`:
+- **Para qué sirve:** Renderiza un indicador compacto con fondo adaptativo (`.badge`) inmediatamente después de la etiqueta.
+- **Cuándo usarlo:** Contador junto a la etiqueta (por ejemplo, número de transacciones o registros de historial en pestañas).
+- **Carácter opcional:** Si no se define `badge`, no se genera ningún elemento adicional.
+
+### Layout multilínea `wrap`
+El componente `SegmentedControl` admite la opción `layout="wrap"` (además de `'inline'` y `'stacked'`):
+- **Para qué sirve:** Distribuye los botones del selector en varias filas (`flex-wrap: wrap`) con autoajuste flexible (`flex: 1 1 auto`) y espaciado horizontal padding `--space-md`.
+- **Cuándo usarlo:** Listas de 4 o más opciones que no entran en una fila (por ejemplo, frecuencias de cobro como mensual, bimestral, trimestral, semestral, anual).
+
 ### Ejemplo Canónico de Uso en React:
 ```tsx
 import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'
@@ -274,7 +285,7 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 | Filtros de Transacciones y Transferencias | Hecho (tanda 2) | Tanda 2 |
 | Modal base (ui/Modal) | Hecho (tanda 3a) | Tanda 3a |
 | Selectores de TransaccionModal y TransferenciaModal | Hecho (tanda 3b) | Tanda 3b |
-| Selectores de Metas, Presupuestos, Pagar resumen y Suscripción | Pendiente | Tanda 3c |
+| Selectores de Metas, Presupuestos, Pagar resumen y Suscripción | Hecho | Tanda 3c |
 | Transacciones | Pendiente | Fases Futuras |
 | Transferencias | Pendiente | Fases Futuras |
 | Tarjetas | Pendiente | Fases Futuras |

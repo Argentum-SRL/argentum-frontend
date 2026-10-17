@@ -8,6 +8,7 @@ import categoriaService from '@/services/categoria.service'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './PagarResumenModal.module.css'
 
 export interface PagarResumenModalProps {
@@ -284,28 +285,24 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         <div ref={formBodyRef} className={styles.modalBody}>
           {/* Si es USD, Selector de Modo: Dólares vs Pesificar */}
           {monedaAPagar === 'USD' && (
-            <div className={styles.segmentedBar} role="radiogroup" aria-label="Modo de pago en dólares">
-              <button
-                type="button"
-                role="radio"
-                aria-checked={modoUSD === 'dolares'}
-                className={`${styles.segmentedPill} ${modoUSD === 'dolares' ? styles.segmentedPillActive : ''}`}
-                onClick={() => setModoUSD('dolares')}
-              >
-                <DollarSign size={14} strokeWidth={2.2} />
-                <span>Pagar en dólares</span>
-              </button>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={modoUSD === 'pesificar'}
-                className={`${styles.segmentedPill} ${modoUSD === 'pesificar' ? styles.segmentedPillActive : ''}`}
-                onClick={() => setModoUSD('pesificar')}
-              >
-                <ArrowRightLeft size={14} strokeWidth={2} />
-                <span>Pesificar a pesos</span>
-              </button>
-            </div>
+            <SegmentedControl<'dolares' | 'pesificar'>
+              options={[
+                {
+                  value: 'dolares',
+                  label: 'Pagar en dólares',
+                  icon: <DollarSign size={15} strokeWidth={2.2} />,
+                },
+                {
+                  value: 'pesificar',
+                  label: 'Pesificar a pesos',
+                  icon: <ArrowRightLeft size={15} strokeWidth={2} />,
+                },
+              ]}
+              value={modoUSD}
+              onChange={setModoUSD}
+              fullWidth
+              ariaLabel="Modo de pago en dólares"
+            />
           )}
 
           {/* Alerta si elige pagar en USD pero no tiene billetera USD */}
@@ -369,28 +366,24 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
           )}
 
           {/* Segmented Control: Pagar Total vs Otro Monto */}
-          <div className={styles.segmentedBar} role="radiogroup" aria-label="Tipo de pago">
-            <button
-              type="button"
-              role="radio"
-              aria-checked={tipoPago === 'total'}
-              className={`${styles.segmentedPill} ${tipoPago === 'total' ? styles.segmentedPillActive : ''}`}
-              onClick={() => handleSelectTipo('total')}
-            >
-              <CheckCircle2 size={14} strokeWidth={2.2} />
-              <span>Pagar el total</span>
-            </button>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={tipoPago === 'otro'}
-              className={`${styles.segmentedPill} ${tipoPago === 'otro' ? styles.segmentedPillActive : ''}`}
-              onClick={() => handleSelectTipo('otro')}
-            >
-              <Edit3 size={14} strokeWidth={2} />
-              <span>Ingresar otro monto</span>
-            </button>
-          </div>
+          <SegmentedControl<'total' | 'otro'>
+            options={[
+              {
+                value: 'total',
+                label: 'Pagar el total',
+                icon: <CheckCircle2 size={15} strokeWidth={2.2} />,
+              },
+              {
+                value: 'otro',
+                label: 'Ingresar otro monto',
+                icon: <Edit3 size={15} strokeWidth={2} />,
+              },
+            ]}
+            value={tipoPago}
+            onChange={handleSelectTipo}
+            fullWidth
+            ariaLabel="Tipo de pago"
+          />
 
           {/* Hero Monto Card / MontoInput */}
           {tipoPago === 'total' ? (

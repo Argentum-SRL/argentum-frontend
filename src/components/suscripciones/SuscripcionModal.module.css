@@ -382,42 +382,6 @@
   background: var(--surface-alt);
 }
 
-/* ── Radio Pills & Method Buttons ────────────────────────────────────────── */
-.radioPills, .methodGrid {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
-.pill, .methodBtn {
-  flex: 1;
-  padding: 10px 6px;
-  border-radius: 12px;
-  border: 1.5px solid var(--surface-alt);
-  background: var(--page);
-  color: var(--text-2);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 150ms ease;
-  white-space: nowrap;
-}
-
-.pill:hover, .methodBtn:hover {
-  background: var(--surface-alt);
-  transform: translateY(-1px);
-}
-
-.pillActive, .methodBtnActive {
-  color: var(--primary);
-  font-weight: 700;
-  background: var(--surface-alt);
-}
-
 /* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
 .billeterasCarouselScroller {
   overflow-x: auto;

@@ -100,9 +100,6 @@
   box-shadow: var(--elevation-none) !important;
 }
 
-.billeteraSelectWrap :global(.wcCardLogo) {
-  max-width: 76px !important;
-}
 
 /* Horizontal alignment of Name + Principal Badge */
 .billeteraSelectWrap :global(.wcIdentity) {
@@ -344,57 +341,12 @@
   font-weight: 700;
 }
 
-.subcatIconFallback {
-  width: 24px;
-  height: 24px;
-  background: var(--surface-alt);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-3);
-}
-
-.subcatChipActive .subcatIconFallback {
-  background: var(--surface);
-  color: var(--text);
-}
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.subcatLoading {
-  font-size: 12px;
-  color: var(--text-3);
-  padding: 8px 0;
-  font-style: italic;
-}
-
-/* ── Cuotas Section ──────────────────────────────────────────────────────── */
-.cuotasSection {
-  background: var(--surface-alt);
-  border-radius: 14px;
-  padding: 13px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cuotasInputs {
-  display: flex;
-  gap: 10px;
-}
-
-.noTarjetas {
-  font-size: 13px;
-  color: var(--text-3);
-  margin: 0;
-  padding: 8px 0;
-}
 
 .emptyWalletBox {
   display: flex;
@@ -425,53 +377,13 @@
   line-height: 1.4;
 }
 
-.tarjetaGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.tarjetaOption {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--text-2);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.tarjetaOption:hover {
-  background: var(--surface-3);
-}
-
-.tarjetaOptionActive {
-  background: var(--surface-alt);
-  color: var(--text);
-  font-weight: 700;
-}
-
-.tarjetaDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--tarjeta-color, var(--text-3));
-  outline: 2px solid var(--surface);
-  box-shadow: var(--elevation-none);
-}
-
-.tarjetaOptionActive .tarjetaDot {
-  outline: 2px solid var(--surface-alt);
-  box-shadow: var(--elevation-none);
-}
 
 /* ── Minimalist & High-Craft Step 2: Financiación (Apple/Fintech Standard) ── */
+/* Contenedor del cuerpo en paso 2 */
+.formBodyStep2 {
+  min-height: 0;
+}
+
 .financiacionContainer {
   display: flex;
   flex-direction: column;

@@ -651,6 +651,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   <SegmentedControl<'oficial' | 'mep' | 'blue' | 'manual'>
                     ariaLabel="Tipo de cambio de referencia"
                     fullWidth
+                    layout="stacked"
                     value={tipoCotizacion}
                     onChange={(val) => {
                       setTipoCotizacion(val)
@@ -671,7 +672,8 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
 
                       return {
                         value: tipoRate,
-                        label: `${tipoRate.toUpperCase()} ${rateDisplay}`,
+                        label: tipoRate.toUpperCase(),
+                        description: rateDisplay,
                       }
                     })}
                   />

@@ -4,6 +4,8 @@ import styles from './SegmentedControl.module.css'
 export interface SegmentedControlOption<T extends string = string> {
   value: T
   label: string
+  /* Línea secundaria opcional para mostrar información complementaria */
+  description?: string
   icon?: ReactNode
   disabled?: boolean
 }
@@ -152,7 +154,15 @@ export default function SegmentedControl<T extends string = string>({
             onKeyDown={(e) => handleKeyDown(e, idx)}
           >
             {option.icon ? <span className={styles.icon}>{option.icon}</span> : null}
-            <span className={styles.label}>{option.label}</span>
+            {option.description ? (
+              /* Contenedor en columna para etiqueta y descripción secundaria */
+              <span className={styles.text}>
+                <span className={styles.label}>{option.label}</span>
+                <span className={styles.description}>{option.description}</span>
+              </span>
+            ) : (
+              <span className={styles.label}>{option.label}</span>
+            )}
           </button>
         )
       })}

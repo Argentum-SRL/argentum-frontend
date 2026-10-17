@@ -102,6 +102,12 @@ La Opción 1 de la página admin Diseño es una copia independiente y su botón 
 **Geometría Táctil y Accesibilidad:**  
 Píldora de 40px en entornos de escritorio y 44px en entornos táctiles (`@media (pointer: coarse)`), satisfaciendo plenamente el objetivo táctil de 44px exigido por WCAG 2.5.5 (Target Size Enhanced).
 
+### Propiedad opcional `description`
+El tipo `SegmentedControlOption` admite la prop opcional `description?: string`:
+- **Para qué sirve:** Renderiza una segunda línea de texto auxiliar bajo la etiqueta (`label`) dentro de un contenedor en columna (`.text`), con tipografía compacta (11px), peso 500, opacidad 0.8 y ellipsis en caso de desborde.
+- **Cuándo usarla:** Especialmente útil en modos apilados (`layout="stacked"`) donde se requiera exhibir un valor asociado o dato numérico complementario (por ejemplo, cotizaciones de divisas como `$ 1.234` debajo de la denominación `MEP` o `BLUE`) evitando truncamientos horizontales en modales angostos.
+- **Carácter opcional:** Si no se define `description`, el DOM conserva la estructura estándar de una sola línea (`span.label`) sin envoltorio adicional.
+
 ### Ejemplo Canónico de Uso en React:
 ```tsx
 import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'

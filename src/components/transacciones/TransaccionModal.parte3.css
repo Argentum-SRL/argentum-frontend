@@ -251,33 +251,6 @@
   align-items: center;
 }
 
-.inputIcon {
-  position: absolute;
-  left: 12px;
-  color: var(--text-3);
-  pointer-events: none;
-}
-
-.fieldInputIconLarge {
-  width: 100%;
-  padding-left: 40px !important;
-}
-
-.fieldInputIconSmall {
-  width: 100%;
-  padding-left: 36px !important;
-}
-
-.summaryValLarge {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.summaryValSmall {
-  font-size: 14px;
-  font-weight: 800;
-}
 
 .summaryLbl {
   font-size: 10px;
@@ -394,14 +367,6 @@
   flex: 1;
 }
 
-.moreCatsIconWrap {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-3);
-}
 
 /* ── Empty State Billetera / Tarjeta en Carrusel ─────────────────────────── */
 .emptyWalletBox {

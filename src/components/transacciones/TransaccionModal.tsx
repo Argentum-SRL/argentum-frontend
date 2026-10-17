@@ -16,6 +16,7 @@ import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import transaccionService from '@/services/transaccion.service'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
 import styles from './TransaccionModal.module.css'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
@@ -440,6 +441,24 @@ export default function TransaccionModal({
     maxHeightRatio: 0.90,
   })
 
+  const handleSelectTipo = (nuevoTipo: 'egreso' | 'ingreso') => {
+    if (isCuotaHija) return
+    if (nuevoTipo === 'egreso') {
+      dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'egreso' })
+      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+    } else if (nuevoTipo === 'ingreso') {
+      dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })
+      dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
+      // En ingresos no aplican crédito ni débito: migrar a transferencia o efectivo
+      if (metodoPago === 'credito' || metodoPago === 'debito') {
+        const nextMethod = hasBancos ? 'transferencia' : 'efectivo'
+        dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: nextMethod })
+        const firstWallet = billeteras.find(b => (nextMethod === 'efectivo' ? b.es_efectivo : !b.es_efectivo) && b.moneda === moneda && b.estado === 'activa')
+        if (firstWallet) dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: firstWallet.id })
+      }
+    }
+  }
+
   const handleSelectMetodo = (key: 'debito' | 'transferencia' | 'credito' | 'efectivo') => {
     if (isCuotaHija) return
     dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: key })
@@ -786,46 +805,27 @@ export default function TransaccionModal({
                     </div>
                   )}
 
-                  {/* 0. Tipo Ingreso/Egreso (Segmented Bar Apple Style arriba del monto) */}
-                  <div className={styles.segmentedBar} role="radiogroup" aria-label="Tipo de transacción">
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={tipo === 'egreso'}
-                      className={`${styles.segmentedPill} ${tipo === 'egreso' ? styles.segmentedPillActive : ''}`}
-                      onClick={() => {
-                        if (isCuotaHija) return
-                        dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'egreso' })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                      }}
-                      disabled={isCuotaHija}
-                    >
-                      <ArrowUpRight size={14} strokeWidth={2.2} />
-                      <span>Egreso</span>
-                    </button>
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={tipo === 'ingreso'}
-                      className={`${styles.segmentedPill} ${tipo === 'ingreso' ? styles.segmentedPillActive : ''}`}
-                      onClick={() => {
-                        if (isCuotaHija) return
-                        dispatch({ type: 'SET_FIELD', field: 'tipo', value: 'ingreso' })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                        // En ingresos no aplican crédito ni débito: migrar a transferencia o efectivo
-                        if (metodoPago === 'credito' || metodoPago === 'debito') {
-                          const nextMethod = hasBancos ? 'transferencia' : 'efectivo'
-                          dispatch({ type: 'SET_FIELD', field: 'metodoPago', value: nextMethod })
-                          const firstWallet = billeteras.find(b => (nextMethod === 'efectivo' ? b.es_efectivo : !b.es_efectivo) && b.moneda === moneda && b.estado === 'activa')
-                          if (firstWallet) dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: firstWallet.id })
-                        }
-                      }}
-                      disabled={isCuotaHija}
-                    >
-                      <ArrowDownLeft size={14} strokeWidth={2.2} />
-                      <span>Ingreso</span>
-                    </button>
-                  </div>
+                  {/* 0. Tipo Ingreso/Egreso (SegmentedControl cápsula oficial) */}
+                  <SegmentedControl<'egreso' | 'ingreso'>
+                    ariaLabel="Tipo de transacción"
+                    fullWidth
+                    value={tipo}
+                    onChange={handleSelectTipo}
+                    options={[
+                      {
+                        value: 'egreso',
+                        label: 'Egreso',
+                        icon: <ArrowUpRight size={15} strokeWidth={2.2} />,
+                        disabled: isCuotaHija,
+                      },
+                      {
+                        value: 'ingreso',
+                        label: 'Ingreso',
+                        icon: <ArrowDownLeft size={15} strokeWidth={2.2} />,
+                        disabled: isCuotaHija,
+                      },
+                    ]}
+                  />
 
                   {/* Hero monto */}
                   <MontoInput
@@ -842,28 +842,19 @@ export default function TransaccionModal({
                   {availableMethods.length > 1 && (
                     <div className={styles.formField}>
                       <label className={styles.fieldLabel}>{tipo === 'ingreso' ? '¿Cómo recibiste?' : '¿Cómo pagaste?'}</label>
-                      <div className={styles.methodGrid}>
-                        {availableMethods.map(({ key, icon, label }) => {
-                          const isActive = metodoPago === key
-                          return (
-                            <button
-                              type="button"
-                              key={key}
-                              data-active={isActive}
-                              className={`${styles.methodBtn} ${isActive ? styles.methodBtnActive : ''}`}
-                              title={`Método de pago ${label}`}
-                              aria-label={`Seleccionar método ${label}`}
-                              onClick={() => handleSelectMetodo(key)}
-                              disabled={isCuotaHija}
-                            >
-                              <div className={styles.methodIconWrapper}>
-                                {icon}
-                              </div>
-                              <span className={styles.methodBtnLabel}>{label}</span>
-                            </button>
-                          )
-                        })}
-                      </div>
+                      <SegmentedControl<'debito' | 'transferencia' | 'credito' | 'efectivo'>
+                        layout="stacked"
+                        fullWidth
+                        ariaLabel="Método de pago"
+                        options={availableMethods.map(({ key, icon, label }) => ({
+                          value: key,
+                          label,
+                          icon,
+                          disabled: isCuotaHija,
+                        }))}
+                        value={metodoPago}
+                        onChange={handleSelectMetodo}
+                      />
                     </div>
                   )}
 

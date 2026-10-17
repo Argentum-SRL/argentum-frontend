@@ -2,6 +2,11 @@ import React, { useEffect } from 'react'
 import { X } from '@/components/ui/icons'
 import styles from './Modal.module.css'
 
+export interface ModalStepDots {
+  total: number
+  current: number
+}
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -16,6 +21,7 @@ interface ModalProps {
   ariaLabel?: string
   closeOnOverlayClick?: boolean
   closeOnEscape?: boolean
+  stepDots?: ModalStepDots
 }
 
 const Modal: React.FC<ModalProps> = ({ 
@@ -32,6 +38,7 @@ const Modal: React.FC<ModalProps> = ({
   ariaLabel,
   closeOnOverlayClick = true,
   closeOnEscape = true,
+  stepDots,
 }) => {
   useEffect(() => {
     if (isOpen) {
@@ -73,6 +80,26 @@ const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         aria-label={ariaLabel}
       >
+        {/* Indicador de pasos superior opcional (solo se muestra si total > 1) */}
+        {stepDots && stepDots.total > 1 && (
+          <div
+            className={styles.stepDots}
+            role="progressbar"
+            aria-valuemin={1}
+            aria-valuemax={stepDots.total}
+            aria-valuenow={stepDots.current + 1}
+            aria-label={`Paso ${stepDots.current + 1} de ${stepDots.total}`}
+          >
+            {Array.from({ length: stepDots.total }, (_, idx) => (
+              <span
+                key={idx}
+                className={`${styles.stepDot} ${
+                  idx === stepDots.current ? styles.stepDotActive : styles.stepDotInactive
+                }`}
+              />
+            ))}
+          </div>
+        )}
         {showHeader && (
           <div className={styles.header}>
             <div className={styles.title}>{title}</div>

@@ -19,6 +19,7 @@ import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './TransferenciaModal.module.css'
 
 interface TransferenciaModalProps {
@@ -49,6 +50,20 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   // Tipos de Operación: Solo 2 solapas principales (Detección automática)
   const [tipoOperacion, setTipoOperacion] = useState<'entre_cuentas' | 'fx'>('entre_cuentas')
   const [fxDirection, setFxDirection] = useState<'compra' | 'venta'>('compra') // compra: ARS -> USD, venta: USD -> ARS
+
+  const handleSelectOperacion = (val: 'entre_cuentas' | 'compra' | 'venta') => {
+    if (val === 'entre_cuentas') {
+      setTipoOperacion('entre_cuentas')
+    } else if (val === 'compra') {
+      setTipoOperacion('fx')
+      setFxDirection('compra')
+      setMoneda('ARS')
+    } else if (val === 'venta') {
+      setTipoOperacion('fx')
+      setFxDirection('venta')
+      setMoneda('USD')
+    }
+  }
 
   // Moneda base del monto en Paso 1
   const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS')
@@ -429,49 +444,30 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
               </div>
 
               <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep1}`}>
-                {/* Selector de Operación (3 Solapas Directas Apple Style) */}
-                <div className={styles.segmentedBar} role="radiogroup" aria-label="Tipo de operación">
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={tipoOperacion === 'entre_cuentas'}
-                    className={`${styles.segmentedPill} ${tipoOperacion === 'entre_cuentas' ? styles.segmentedPillActive : ''}`}
-                    onClick={() => setTipoOperacion('entre_cuentas')}
-                  >
-                    <ArrowRightLeft size={14} strokeWidth={2} />
-                    <span>Entre cuentas</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={tipoOperacion === 'fx' && fxDirection === 'compra'}
-                    className={`${styles.segmentedPill} ${tipoOperacion === 'fx' && fxDirection === 'compra' ? styles.segmentedPillActive : ''}`}
-                    onClick={() => {
-                      setTipoOperacion('fx')
-                      setFxDirection('compra')
-                      setMoneda('ARS')
-                    }}
-                  >
-                    <ArrowDownLeft size={14} strokeWidth={2.2} />
-                    <span>Comprar</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={tipoOperacion === 'fx' && fxDirection === 'venta'}
-                    className={`${styles.segmentedPill} ${tipoOperacion === 'fx' && fxDirection === 'venta' ? styles.segmentedPillActive : ''}`}
-                    onClick={() => {
-                      setTipoOperacion('fx')
-                      setFxDirection('venta')
-                      setMoneda('USD')
-                    }}
-                  >
-                    <ArrowUpRight size={14} strokeWidth={2.2} />
-                    <span>Vender</span>
-                  </button>
-                </div>
+                {/* Selector de Operación (SegmentedControl cápsula oficial) */}
+                <SegmentedControl<'entre_cuentas' | 'compra' | 'venta'>
+                  ariaLabel="Tipo de operación"
+                  fullWidth
+                  value={tipoOperacion === 'entre_cuentas' ? 'entre_cuentas' : fxDirection}
+                  onChange={handleSelectOperacion}
+                  options={[
+                    {
+                      value: 'entre_cuentas',
+                      label: 'Entre cuentas',
+                      icon: <ArrowRightLeft size={15} strokeWidth={2} />,
+                    },
+                    {
+                      value: 'compra',
+                      label: 'Comprar',
+                      icon: <ArrowDownLeft size={15} strokeWidth={2.2} />,
+                    },
+                    {
+                      value: 'venta',
+                      label: 'Vender',
+                      icon: <ArrowUpRight size={15} strokeWidth={2.2} />,
+                    },
+                  ]}
+                />
 
                 {/* Hero Monto */}
                 <MontoInput
@@ -652,8 +648,18 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 {/* Selector de Tipos de Cambio para Dólares (FX) */}
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Tipo de cambio de referencia</label>
-                  <div className={styles.methodGrid}>
-                    {(['oficial', 'mep', 'blue', 'manual'] as const).map(tipoRate => {
+                  <SegmentedControl<'oficial' | 'mep' | 'blue' | 'manual'>
+                    ariaLabel="Tipo de cambio de referencia"
+                    fullWidth
+                    value={tipoCotizacion}
+                    onChange={(val) => {
+                      setTipoCotizacion(val)
+                      if (val !== 'manual') {
+                        const v = getRateValue(val)
+                        if (v) setCotizacionManual(v)
+                      }
+                    }}
+                    options={(['oficial', 'mep', 'blue', 'manual'] as const).map(tipoRate => {
                       const getRateDisplay = () => {
                         if (tipoRate === 'manual') {
                           return cotizacionManual ? `$ ${Number(cotizacionManual).toLocaleString('es-AR')}` : 'Manual'
@@ -663,25 +669,12 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       }
                       const rateDisplay = getRateDisplay()
 
-                      return (
-                        <button
-                          key={tipoRate}
-                          type="button"
-                          className={`${styles.methodBtn} ${tipoCotizacion === tipoRate ? styles.methodBtnActive : ''}`}
-                          onClick={() => {
-                            setTipoCotizacion(tipoRate)
-                            if (tipoRate !== 'manual') {
-                              const v = getRateValue(tipoRate)
-                              if (v) setCotizacionManual(v)
-                            }
-                          }}
-                        >
-                          <span className={styles.methodBtnTitle}>{tipoRate.toUpperCase()}</span>
-                          <span className={styles.methodBtnRate}>{rateDisplay}</span>
-                        </button>
-                      )
+                      return {
+                        value: tipoRate,
+                        label: `${tipoRate.toUpperCase()} ${rateDisplay}`,
+                      }
                     })}
-                  </div>
+                  />
                 </div>
 
                 {/* Input de Cotización con diseño Hero MontoInput */}

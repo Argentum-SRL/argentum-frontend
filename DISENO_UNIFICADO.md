@@ -21,7 +21,7 @@ La escala de espaciado de Argentum está calibrada para ofrecer ritmo vertical a
 | Token | Valor | Uso Normativo |
 | :--- | :--- | :--- |
 | `--space-2xs` | `2px` | Ajustes sub-pixel, bordes internos, microalineación. |
-| `--space-xs` | `4px` | Padding interno de controles compactos, pista de selectores. |
+| `--space-xs` | `4px` | Padding interno de controles compactos. |
 | `--space-icon` | `6px` | Separación exclusiva entre ícono y texto; separación interna de controles. |
 | `--space-sm` | `8px` | Gap entre etiqueta y campo (`--modal-label-gap`), grupos compactos. |
 | `--space-md` | `12px` | Padding vertical de secciones, gap entre botones de footer (`--modal-footer-gap`). |
@@ -47,7 +47,7 @@ Para sombras compuestas por múltiples capas, rige el valor máximo entre capas.
 
 | Nivel Semántico | Token de Sombra | Alcance Light | Alcance Dark | Token de Alcance Máximo |
 | :--- | :--- | :--- | :--- | :--- |
-| Píldora Activa | `--elevation-pill` | 4px | 4px | `--elevation-reach-pill`: `4px` |
+| Píldora Activa | `--elevation-pill` | 6px | 8px | `--elevation-reach-pill`: `8px` |
 | Nivel 1 (Micro) | `--elevation-xs` | 4px | 4px | `--elevation-reach-xs`: `4px` |
 | Nivel 2 (Baja) | `--elevation-sm` | 16px | 18px | `--elevation-reach-sm`: `18px` |
 | Nivel 3 (Media) | `--elevation-md` | 20px | 20px | `--elevation-reach-md`: `20px` |
@@ -87,23 +87,20 @@ El apilamiento z-index está estructurado por capas semánticas fijas. Todo cont
 
 ## 5. Selector Cápsula Oficial (`SegmentedControl`)
 
-El selector cápsula es el control oficial unificado para selección mutuamente excluyente (pestañas, tipos de movimiento, métodos de pago, filtros, frecuencias, etc.).
+El selector cápsula es el control oficial unificado para selección mutuamente excluyente (pestañas, tipos de movimiento, métodos de pago, filtros, frecuencias, etc.). Corresponde al componente oficial "Opción 4".
+Diseño final sin pista contenedora (sin card ni fondo detrás de los botones): botones sueltos en fila con gap 6px (`--selector-gap`). El botón inactivo no tiene fondo ni borde, con texto gris (`var(--text-2)`), 13px y peso 600. El botón elegido se destaca con fondo `var(--primary)`, texto `#FFFFFF`, peso 700 y sombra suave `var(--elevation-pill)` (alcance 8px), idéntico al punto activo del indicador de pasos. El hover sobre botones inactivos solo cambia el color del texto a `var(--text)` sin aplicar fondo.
+La Opción 1 de la página admin Diseño es una copia independiente y su botón elegido es blanco; el componente oficial (Opción 4) usa el color primario por decisión de Sebastián del 17/10.
 
 ### Tokens y Medidas del Selector
-- `--radius-selector-track`: `14px` (radio exterior de la pista contenedora).
-- `--radius-selector-pill`: `10px` (radio de la píldora activa interior, concéntrico con la pista).
-- `--selector-track-pad`: `var(--space-xs)` (`4px`).
-- `--selector-gap`: `var(--space-xs)` (`4px`).
-- `--selector-pill-h`: `40px` (modo horizontal o inline).
+- `--radius-selector-pill`: `10px` (radio del botón de selección).
+- `--selector-gap`: `var(--space-icon)` (`6px`).
+- `--selector-pill-h`: `40px` (y `44px` en pantallas táctiles con `@media (pointer: coarse)`).
 - `--selector-pill-h-stacked`: `56px` (modo vertical o apilado con ícono superior).
-- `--selector-track-bg`: `var(--page)` (fondo neutro de la pista).
-- `--selector-track-border`: `var(--border)` (borde sutil contenedor).
-- `--selector-pill-bg-active`: `var(--surface)` en light / `var(--surface-alt)` en dark.
-- `--selector-pill-border-active`: `transparent` en light / `rgba(255, 255, 255, 0.10)` en dark.
-- `--selector-hover-bg`: `rgba(0, 0, 0, 0.04)` en light / `rgba(255, 255, 255, 0.05)` en dark.
+- `--selector-pill-bg-active`: `var(--primary)`.
+- `--selector-pill-text-active`: `#FFFFFF`.
 
 **Geometría Táctil y Accesibilidad:**  
-Píldora (40px) + padding de pista (4px) + borde (1px) = **~50px de altura total**, superando con holgura el objetivo táctil de 44px exigido por WCAG 2.5.5 (Target Size Enhanced).
+Píldora de 40px en entornos de escritorio y 44px en entornos táctiles (`@media (pointer: coarse)`), satisfaciendo plenamente el objetivo táctil de 44px exigido por WCAG 2.5.5 (Target Size Enhanced).
 
 ### Ejemplo Canónico de Uso en React:
 ```tsx
@@ -157,8 +154,9 @@ El componente canónico `ui/Button` estandariza las interacciones principales en
 La estructura de modales en Argentum sigue un patrón invariable:
 
 1. **Indicador de Pasos Superior (`stepDots`):**
-   - Fijo en la parte superior del modal.
-   - Si el modal tiene **una sola etapa**, NO se muestran puntos de paso.
+   - Fijo en la parte superior del modal a través de la prop opcional `stepDots={{ total, current }}` (current empieza en 0).
+   - Si el modal tiene **una sola etapa** (`total <= 1`), NO se muestran puntos de paso.
+   - Con `total > 1`, se expone como un contenedor accesible `role="progressbar"` con `aria-valuenow`, `aria-valuemin="1"`, `aria-valuemax` y `aria-label="Paso X de Y"`.
    - Tokens: `--stepdots-pad`, `--stepdot-height` (5px), `--stepdot-active-width` (20px), `--stepdot-inactive-width` (6px), `--stepdot-gap` (`var(--space-icon)` = 6px).
 2. **Encabezado y Contenido:**
    - El título y los botones de volver/cerrar pertenecen al flujo del contenido scrolleable, no a una cabecera fija que robe espacio.
@@ -173,14 +171,35 @@ La estructura de modales en Argentum sigue un patrón invariable:
 3. **Acciones Destructivas:**
    - Botones de peligro como "Eliminar" se colocan al final del contenido del modal con confirmación, **nunca** compartiendo el footer de navegación.
 4. **Footer:**
+   - Implementado mediante el componente canónico `ModalFooter` (`secondary?: ReactNode`, `primary: ReactNode`).
    - `--modal-footer-pad-top`: `var(--space-md)` (`12px`).
    - `--modal-footer-pad-bottom`: `var(--space-lg)` (`16px`).
    - `--modal-footer-gap`: `var(--space-md)` (`12px`).
    - **Sin borde divisor superior** (`border-top: none`).
-   - Dos botones: Cancelar (`flex: 1`) + Confirmar (`flex: 2`).
+   - Con acción secundaria: Cancelar (`flex: 1`) + Confirmar / Principal (`flex: 2`).
+   - Sin acción secundaria: el botón principal ocupa todo el ancho disponible.
 
-### Sección Pendiente
-altura adaptativa automática y unificación del contenedor ui/Modal, incluidos MobileMoreSheet y Drawer, se resuelven en la tanda del Modal base.
+> **Aclaración sobre Capas:** El overlay del Modal base sigue en su capa actual (`z-index: 9000`) hasta la tanda que remapee todas las capas de portales a los tokens canónicos `--z-*`.
+
+### Ejemplo Canónico de Uso en React:
+```tsx
+<Modal
+  isOpen={isOpen}
+  onClose={onClose}
+  title="Título"
+  stepDots={{ total: 2, current: 0 }}
+  footer={
+    <ModalFooter
+      secondary={<Button variant="secondary" onClick={onClose}>Cancelar</Button>}
+      primary={<Button onClick={guardar}>Confirmar</Button>}
+    />
+  }
+>
+  <div>Contenido del modal</div>
+</Modal>
+```
+
+> **Pendiente:** Altura adaptativa (hook `useAdaptiveModalHeight` v2) en la tanda siguiente.
 
 ---
 
@@ -247,6 +266,9 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 | Pantalla / Módulo | Estado | Tanda Planificada |
 | :--- | :--- | :--- |
 | Filtros de Transacciones y Transferencias | Hecho (tanda 2) | Tanda 2 |
+| Modal base (ui/Modal) | Hecho (tanda 3a) | Tanda 3a |
+| Selectores de TransaccionModal y TransferenciaModal | Hecho (tanda 3b) | Tanda 3b |
+| Selectores de Metas, Presupuestos, Pagar resumen y Suscripción | Pendiente | Tanda 3c |
 | Transacciones | Pendiente | Fases Futuras |
 | Transferencias | Pendiente | Fases Futuras |
 | Tarjetas | Pendiente | Fases Futuras |

@@ -21,7 +21,6 @@
   /* ── Radios de Curvatura ── */
   --radius-modal: 20px; /* Radio de curvatura unificado para modales y bottom sheets */
   --radius-control: 12px; /* Radio de curvatura estándar para controles interactivos y botones */
-  --radius-selector-track: 14px; /* Radio de la pista contenedora del selector cápsula */
   --radius-selector-pill: 10px; /* Radio concéntrico de la píldora activa del selector cápsula */
 
   /* ── Capas de Apilamiento (Z-Index) ── */
@@ -57,27 +56,18 @@
   --stepdot-gap: var(--space-icon); /* Separación horizontal entre los puntos de paso */
 
   /* ── Medidas del Selector Cápsula ── */
-  --selector-track-pad: var(--space-xs); /* Padding interno de la pista contenedora del selector */
-  --selector-gap: var(--space-xs); /* Separación entre píldoras dentro de la pista */
-  --selector-pill-h: 40px; /* Altura de la píldora para diseño horizontal o inline */
-  --selector-pill-h-stacked: 56px; /* Altura de la píldora para diseño vertical o apilado */
+  --selector-gap: var(--space-icon); /* Separación horizontal entre botones de selección (6px) */
+  --selector-pill-h: 40px; /* Altura mínima de la píldora para diseño horizontal o inline (44px en táctil) */
+  --selector-pill-h-stacked: 56px; /* Altura mínima de la píldora para diseño vertical o apilado */
 
-  /* ── Colores del Selector Cápsula (Modo Claro) ── */
-  --selector-track-bg: var(--page); /* Color de fondo de la pista del selector en modo claro */
-  --selector-track-border: var(--border); /* Color de borde de la pista del selector en modo claro */
-  --selector-pill-bg-active: var(--surface); /* Fondo de la píldora activa en modo claro */
-  --selector-pill-border-active: transparent; /* Borde de la píldora activa en modo claro */
-  --selector-hover-bg: rgba(0, 0, 0, 0.04); /* Fondo hover en píldoras inactivas en modo claro */
+  /* ── Colores del Selector Cápsula ── */
+  --selector-pill-bg-active: var(--primary); /* Fondo del botón de selección activo */
+  --selector-pill-text-active: #FFFFFF; /* Color del texto del botón de selección activo */
 }
 
-:root.dark,
-:root[data-theme="dark"],
-.dark,
-[data-theme="dark"] {
-  /* ── Colores del Selector Cápsula (Modo Oscuro) ── */
-  --selector-track-bg: var(--page); /* Color de fondo de la pista del selector en modo oscuro */
-  --selector-track-border: var(--border); /* Color de borde de la pista del selector en modo oscuro */
-  --selector-pill-bg-active: var(--surface-alt); /* Fondo de la píldora activa en modo oscuro */
-  --selector-pill-border-active: rgba(255, 255, 255, 0.10); /* Borde sutil de la píldora activa en modo oscuro */
-  --selector-hover-bg: rgba(255, 255, 255, 0.05); /* Fondo hover en píldoras inactivas en modo oscuro */
+@media (pointer: coarse) {
+  :root {
+    --selector-pill-h: 44px; /* Altura táctil mejorada para WCAG 2.5.5 */
+  }
 }
+

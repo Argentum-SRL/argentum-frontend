@@ -2,7 +2,8 @@ import Button from './Button/Button.tsx'
 import Drawer from './Drawer/Drawer.tsx'
 import Field from './Field/Field.tsx'
 import MontoInput from './MontoInput/MontoInput.tsx'
-import Modal from './Modal/Modal.tsx'
+import Modal, { type ModalStepDots } from './Modal/Modal.tsx'
+import { ModalFooter, type ModalFooterProps } from './Modal/ModalFooter.tsx'
 import { Input } from './Input/Input.tsx'
 import EmptyState from './EmptyState/EmptyState.tsx'
 import PageSummaryBar from './PageSummaryBar'
@@ -21,6 +22,9 @@ export {
   Field, 
   MontoInput, 
   Modal, 
+  type ModalStepDots,
+  ModalFooter,
+  type ModalFooterProps,
   Input, 
   EmptyState, 
   PageSummaryBar, 

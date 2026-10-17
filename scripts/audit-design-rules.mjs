@@ -73,8 +73,9 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
-  // R13: define .stepDots
-  if (/\.stepDots\b/.test(cleanContent)) {
+  // R13: define .stepDots (excluye la definición canónica de src/components/ui/Modal/Modal.module.css)
+  const isModalCanonical = relPath.endsWith('components/ui/Modal/Modal.module.css') || relPath.endsWith('Modal/Modal.module.css');
+  if (!isModalCanonical && /\.stepDots\b/.test(cleanContent)) {
     violations.R13 = 1;
   }
 

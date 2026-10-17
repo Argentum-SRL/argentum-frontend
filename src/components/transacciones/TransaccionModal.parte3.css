@@ -357,103 +357,6 @@
   cursor: not-allowed;
 }
 
-/* ── Operation Bar (Tipo Egreso / Ingreso Apple Style) ───────────────────── */
-.segmentedBar {
-  display: flex;
-  width: 100%;
-  background: var(--surface-alt);
-  padding: 4px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  gap: 4px;
-  box-sizing: border-box;
-}
-
-:global([data-theme="dark"]) .segmentedBar,
-:global(.dark) .segmentedBar {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.segmentedPill {
-  flex: 1;
-  min-width: 0;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text-2);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  outline: none;
-  padding: 0 8px;
-  white-space: nowrap;
-}
-
-.segmentedPill:hover:not(.segmentedPillActive) {
-  color: var(--text);
-}
-
-.segmentedPill:active {
-  transform: scale(0.975);
-}
-
-.segmentedPillActive {
-  background: var(--surface) !important;
-  color: var(--text) !important;
-  font-weight: 700 !important;
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: var(--elevation-sm);
-  border-color: var(--border) !important;
-  z-index: 5;
-}
-
-:global([data-theme="dark"]) .segmentedPill,
-:global(.dark) .segmentedPill {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-2);
-}
-
-:global([data-theme="dark"]) .segmentedPill:hover:not(.segmentedPillActive),
-:global(.dark) .segmentedPill:hover:not(.segmentedPillActive) {
-  color: var(--text);
-}
-
-:global([data-theme="dark"]) .segmentedPillActive,
-:global(.dark) .segmentedPillActive {
-  background: #1e293b !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: var(--elevation-sm);
-}
-
-@media (max-width: 420px) {
-  .segmentedBar {
-    gap: 6px;
-  }
-  .segmentedPill {
-    font-size: 12px;
-    gap: 4px;
-    padding: 0 4px;
-    height: 36px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .segmentedPill,
-  .segmentedPillActive {
-    transition: none !important;
-  }
-}
 
 .descFechaRow {
   display: flex;
@@ -617,16 +520,6 @@
     max-width: 36px !important;
   }
 
-  .methodBtn {
-    height: 44px;
-    gap: 2px;
-  }
-  .methodIconWrapper {
-    height: 16px;
-  }
-  .methodBtnLabel {
-    font-size: 9.5px;
-  }
   .montoHeroPrefix,
   .montoHeroField {
     font-size: 26px !important;

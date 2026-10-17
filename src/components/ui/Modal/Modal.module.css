@@ -17,19 +17,18 @@
 .container {
   position: relative;
   background: var(--surface);
-  border-radius: 24px;
+  border-radius: var(--modal-radius);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   box-shadow: var(--elevation-lg);
-  animation: slideUp 220ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  animation: slideUp 220ms cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 100%;
-  max-height: 85dvh;
+  max-height: var(--modal-max-h);
 }
 
 .modalAuto {
-  height: auto !important;
-  max-height: 90dvh !important;
+  height: auto;
 }
 
 .modalAuto.noPadding .content {
@@ -43,8 +42,6 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  -webkit-mask-image: none;
-  mask-image: none;
 }
 
 @media (min-width: 768px) {
@@ -61,9 +58,8 @@
   }
   .container {
     width: 100%;
-    border-radius: 24px 24px 0 0;
-    max-height: 85dvh;
-    animation: slideUpMobile 240ms cubic-bezier(0.34, 1.1, 0.64, 1);
+    border-radius: var(--modal-radius) var(--modal-radius) 0 0;
+    animation: slideUpMobile 240ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
@@ -82,7 +78,7 @@
 }
 
 .header {
-  padding: 20px 24px 8px;
+  padding: var(--space-xl) var(--modal-pad-x) var(--space-sm);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -123,12 +119,10 @@
 }
 
 .content {
-  padding: 16px 24px 20px;
+  padding: var(--modal-content-pad-top) var(--modal-pad-x) var(--modal-content-pad-bottom);
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 16px, black calc(100% - 16px), transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0px, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
 .content::-webkit-scrollbar {
@@ -141,11 +135,57 @@
 }
 
 .footer {
-  padding: 12px 24px 20px;
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom);
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: var(--modal-footer-gap);
   flex-shrink: 0;
+}
+
+/* Indicadores de pasos canónicos (StepDots) */
+.stepDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--stepdot-gap);
+  padding: var(--stepdots-pad);
+  flex-shrink: 0;
+}
+
+.stepDot {
+  height: var(--stepdot-height);
+  border-radius: 99px;
+  background: var(--surface-alt);
+  transition: width 280ms ease, opacity 280ms ease;
+}
+
+.stepDotActive {
+  background: var(--primary);
+  width: var(--stepdot-active-width);
+}
+
+.stepDotInactive {
+  width: var(--stepdot-inactive-width);
+  opacity: 0.4;
+}
+
+/* Acciones canónicas del pie del modal */
+.footerActions {
+  display: flex;
+  gap: var(--modal-footer-gap);
+  width: 100%;
+}
+
+.footerSecondary {
+  flex: 1;
+}
+
+.footerPrimary {
+  flex: 2;
+}
+
+.footerPrimaryOnly {
+  flex: 1;
 }
 
 @keyframes fadeIn {
@@ -154,18 +194,18 @@
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUpMobile {
-  from { transform: translateY(60px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { opacity: 0; transform: translateY(60px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .container,
   .overlay {
-    animation: none !important;
+    animation: none;
   }
 }

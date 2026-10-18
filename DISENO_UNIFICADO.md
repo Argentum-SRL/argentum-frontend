@@ -216,7 +216,7 @@ La estructura de modales en Argentum sigue un patrón invariable:
 </Modal>
 ```
 
-> **Pendiente:** Altura adaptativa (hook `useAdaptiveModalHeight` v2) en la tanda siguiente.
+> **Modales de varios pasos:** el paso activo va en el flujo normal y los inactivos en absolute y ocultos; la cadena de contenedores es flex en columna con min-height:0 y el tope es var(--modal-max-h); sin min-height fijo ni medición en JS. TransaccionModal ya lo aplica; el resto de los modales sigue con el hook useAdaptiveModalHeight hasta su migración.
 
 ---
 
@@ -286,6 +286,8 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 | Modal base (ui/Modal) | Hecho (tanda 3a) | Tanda 3a |
 | Selectores de TransaccionModal y TransferenciaModal | Hecho (tanda 3b) | Tanda 3b |
 | Selectores de Metas, Presupuestos, Pagar resumen y Suscripción | Hecho | Tanda 3c |
+| Altura adaptativa: TransaccionModal | Hecho | Tanda 3d |
+| Altura adaptativa: resto de modales | Pendiente | Tandas siguientes |
 | Transacciones | Pendiente | Fases Futuras |
 | Transferencias | Pendiente | Fases Futuras |
 | Tarjetas | Pendiente | Fases Futuras |

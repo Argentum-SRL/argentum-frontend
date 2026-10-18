@@ -20,7 +20,6 @@ import SegmentedControl from '@/components/ui/SegmentedControl'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { DateInput, SelectableSurface } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
@@ -425,22 +424,6 @@ export default function TransaccionModal({
     return sortBilleteras(filtered, moneda)
   }, [billeterasMoneda, metodoPago, moneda, tipo, billeteras, billeteraId])
 
-  const {
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    dynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: open,
-    deps: [
-      step, tipo, metodoPago, tarjetaId, billeteraId, isEdit, isCuotaHija,
-      monto, moneda, descripcion, categoriaId, subcategoriaId, cantidadCuotas,
-      cuotaInicial, tasaInteres, proximoResumen, availableMethods.length,
-      billeterasCarousel.length, tarjetasCarousel.length, esDebitoUsdEnPesos, montoPesosDebito
-    ],
-    extraPadding: 24,
-    maxHeightRatio: 0.90,
-  })
-
   const handleSelectTipo = (nuevoTipo: 'egreso' | 'ingreso') => {
     if (isCuotaHija) return
     if (nuevoTipo === 'egreso') {
@@ -750,7 +733,6 @@ export default function TransaccionModal({
         <div
           ref={slidesContainerRef}
           className={styles.slidesContainer}
-          style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
         >
 
           {/* ════════════════════ PASO 1: Monto y Origen ════════════════════ */}
@@ -771,7 +753,6 @@ export default function TransaccionModal({
               }}
             >
               <div
-                ref={step === 1 ? formBodyRef : undefined}
                 className={`${styles.formBody} ${styles.formBodyWithHeader} ${styles.formBodyStep1}`}
               >
                 <div className={styles.formHeader}>
@@ -966,7 +947,7 @@ export default function TransaccionModal({
                 </div>
               </div>
 
-              <div ref={step === 1 ? formFooterRef : undefined} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 {isEdit ? (
                   <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
                     {isCuotaHija ? 'Eliminar cuota' : 'Eliminar'}
@@ -998,7 +979,6 @@ export default function TransaccionModal({
                 }}
               >
                 <div
-                  ref={step === 2 ? formBodyRef : undefined}
                   className={`${styles.formBody} ${styles.formBodyWithHeader}`}
                 >
                   <div className={styles.formHeader}>
@@ -1042,7 +1022,7 @@ export default function TransaccionModal({
                   />
                 </div>
 
-                <div ref={step === 2 ? formFooterRef : undefined} className={styles.formFooter}>
+                <div className={styles.formFooter}>
                   <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                   <button type="submit" className={styles.submitBtn}>Continuar</button>
                 </div>
@@ -1072,7 +1052,6 @@ export default function TransaccionModal({
               }}
             >
               <div
-                ref={step === 3 ? formBodyRef : undefined}
                 className={`${styles.formBody} ${styles.formBodyWithHeader}`}
               >
                 <div className={styles.formHeader}>
@@ -1144,7 +1123,7 @@ export default function TransaccionModal({
                 </div>
               </div>
 
-              <div ref={step === 3 ? formFooterRef : undefined} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                   {esDebitoUsdEnPesos
@@ -1181,7 +1160,6 @@ export default function TransaccionModal({
                   }}
                 >
                   <div
-                    ref={step === 4 ? formBodyRef : undefined}
                     className={`${styles.formBody} ${styles.formBodyWithHeader}`}
                   >
                     <div className={styles.formHeader}>
@@ -1213,7 +1191,7 @@ export default function TransaccionModal({
                     </div>
                   </div>
 
-                  <div ref={step === 4 ? formFooterRef : undefined} className={styles.formFooter}>
+                  <div className={styles.formFooter}>
                     <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                     <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                       {isSubmitting

@@ -99,7 +99,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 10px;
+  padding: 16px var(--modal-pad-x) 10px; /* Separación lateral oficial */
   flex-shrink: 0;
 }
 
@@ -148,10 +148,10 @@
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 20px;
+  padding: 16px var(--modal-pad-x); /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -170,30 +170,30 @@
 }
 
 .formBodyWithHeader .formHeader {
-  padding: 12px 20px 6px;
+  padding: 12px var(--modal-pad-x) 6px; /* Separación lateral oficial */
 }
 
 .formFields {
-  padding: 2px 20px 4px;
+  padding: 2px var(--modal-pad-x) 4px; /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
 }
 
 @media (max-width: 480px) {
   .formFields {
-    padding: 2px 14px 4px;
-    gap: 10px;
+    padding: 2px var(--modal-pad-x) 4px; /* Separación lateral oficial */
+    gap: var(--modal-field-gap); /* Separación estándar entre campos */
   }
   .formBodyWithHeader .formHeader {
-    padding: 10px 14px 4px;
+    padding: 10px var(--modal-pad-x) 4px; /* Separación lateral oficial */
   }
 }
 
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--modal-label-gap); /* Separación entre etiqueta y campo */
 }
 
 .fieldLabel {
@@ -202,7 +202,6 @@
   color: var(--text-3);
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  margin-bottom: 2px;
 }
 
 .fieldInput {
@@ -257,8 +256,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 10px 20px 16px;
+  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   border-top: none;
   background: var(--surface);
   flex-shrink: 0;

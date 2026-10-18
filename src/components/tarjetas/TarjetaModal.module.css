@@ -141,10 +141,10 @@
 }
 
 .formBody {
-  padding: 4px 20px 14px;
+  padding: 4px var(--modal-pad-x) 14px; /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -164,7 +164,7 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--modal-label-gap); /* Separación entre etiqueta y campo */
 }
 
 .fieldLabel {
@@ -985,10 +985,10 @@
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .formFooter {
-  padding: 10px 20px 14px;
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   background: var(--surface);
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
   flex-shrink: 0;
 }
 
@@ -1045,8 +1045,8 @@
   }
 
   .formBody {
-    padding: 4px 16px 10px;
-    gap: 12px;
+    padding: 4px var(--modal-pad-x) 10px; /* Separación lateral oficial */
+    gap: var(--modal-field-gap); /* Separación estándar entre campos */
   }
 
   .redGrid {
@@ -1080,8 +1080,8 @@
   }
 
   .formFooter {
-    padding: 10px 16px max(14px, env(safe-area-inset-bottom, 14px));
-    gap: 8px;
+    padding: 10px var(--modal-pad-x) max(14px, env(safe-area-inset-bottom, 14px)); /* Separación lateral oficial */
+    gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
   }
 
   .cancelBtn {

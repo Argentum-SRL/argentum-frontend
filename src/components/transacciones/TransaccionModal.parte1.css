@@ -115,7 +115,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 10px;
+  padding: 16px var(--modal-pad-x) 10px; /* Separación lateral oficial */
   flex-shrink: 0;
 }
 
@@ -184,10 +184,10 @@
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 20px;
+  padding: 16px var(--modal-pad-x); /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
 }
 
 .formBodyStep1 {
@@ -201,23 +201,23 @@
 }
 
 .formBodyWithHeader .formHeader {
-  padding: 12px 20px 6px;
+  padding: 12px var(--modal-pad-x) 6px; /* Separación lateral oficial */
 }
 
 .formFields {
-  padding: 2px 20px 12px;
+  padding: 2px var(--modal-pad-x) 12px; /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
 }
 
 @media (max-width: 480px) {
   .formFields {
-    padding: 2px 14px 4px;
-    gap: 8px;
+    padding: 2px var(--modal-pad-x) 4px; /* Separación lateral oficial */
+    gap: var(--modal-field-gap); /* Separación estándar entre campos */
   }
   .formBodyWithHeader .formHeader {
-    padding: 10px 14px 4px;
+    padding: 10px var(--modal-pad-x) 4px; /* Separación lateral oficial */
   }
 }
 
@@ -233,7 +233,7 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--modal-label-gap); /* Separación entre etiqueta y campo */
 }
 
 .fieldLabel {
@@ -242,7 +242,6 @@
   color: var(--text-3);
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  margin-bottom: 2px;
 }
 
 

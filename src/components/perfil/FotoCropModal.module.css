@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px 10px;
+  padding: 14px var(--modal-pad-x) 10px; /* Separación lateral oficial */
   flex-shrink: 0;
 }
 
@@ -55,10 +55,10 @@
 }
 
 .formBody {
-  padding: 14px 20px;
+  padding: 14px var(--modal-pad-x); /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -74,11 +74,11 @@
 }
 
 .formFooter {
-  padding: 12px 20px 16px;
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   border-top: 1px solid var(--surface-alt);
   background: var(--surface);
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
   flex-shrink: 0;
 }
 

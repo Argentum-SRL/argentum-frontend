@@ -30,7 +30,7 @@
 
 /* ── Header ────────────────────────────────────────────────────────────────── */
 .formHeader {
-  padding: 20px 20px 8px;
+  padding: 20px var(--modal-pad-x) 8px; /* Separación lateral oficial */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -179,10 +179,10 @@
 
 /* ── Form Fields ───────────────────────────────────────────────────────────── */
 .formFields {
-  padding: 8px 20px 12px;
+  padding: 8px var(--modal-pad-x) 12px; /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   box-sizing: border-box;
 }
 
@@ -571,10 +571,10 @@
 
 /* ── Footer ───────────────────────────────────────────────────────────────── */
 .formFooter {
-  padding: 6px 20px 20px;
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   background: var(--surface);
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
   align-items: center;
   border-top: none;
   box-sizing: border-box;

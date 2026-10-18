@@ -182,10 +182,11 @@ La estructura de modales en Argentum sigue un patrón invariable:
    - `--modal-content-pad-top`: `var(--space-md)` (`12px`).
    - `--modal-content-pad-bottom`: `var(--space-lg)` (`16px`).
    - `--modal-field-gap`: `var(--space-lg)` (`16px`) entre campos consecutivos.
-   - `--modal-group-gap`: `var(--space-2xl)` (`24px`) entre bloques temáticos.
+   - `--modal-group-gap`: `var(--space-2xl)` (`24px`) entre bloques temáticos (la separación de 24px entre bloques todavía no está aplicada, pendiente de definir bloques por familia).
    - `--modal-label-gap`: `var(--space-sm)` (`8px`) entre etiqueta e input.
    - `--modal-radius`: `var(--radius-modal)` (`20px`).
    - `--modal-max-h`: `90dvh`.
+   - **Aplicación en modales:** Las separaciones oficiales (20px lateral con `--modal-pad-x`, 16px entre campos con `--modal-field-gap`, 8px etiqueta-campo con `--modal-label-gap` y footer con sus variables) están aplicadas en todos los modales salvo las reglas con márgenes negativos o rem en `SuscripcionModal.module.css`, `NotificacionesConfigModal.module.css` y `ProyeccionModal.module.css` (saltadas para la tanda de estructura); la separación de 24px entre bloques temáticos continúa pendiente de definir por familia.
 3. **Acciones Destructivas:**
    - Botones de peligro como "Eliminar" se colocan al final del contenido del modal con confirmación, **nunca** compartiendo el footer de navegación.
 4. **Footer:**
@@ -299,6 +300,9 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 | Selectores de Metas, Presupuestos, Pagar resumen y Suscripción | Hecho | Tanda 3c |
 | Altura adaptativa: TransaccionModal | Hecho | Tanda 3d |
 | Carruseles de billeteras y tarjetas (6 copias) | Hecho | Tanda 3e |
+| Espaciado modales: Transacciones y Transferencias | Hecho | Tanda 3f |
+| Espaciado modales: resto | Hecho | Tanda 3g |
+| Espaciado modales: reglas saltadas (márgenes negativos y rem: SuscripcionModal.module.css, NotificacionesConfigModal.module.css, ProyeccionModal.module.css) | Pendiente | Tanda de estructura |
 | Altura adaptativa: resto de modales | Pendiente | Tandas siguientes |
 | Transacciones | Pendiente | Fases Futuras |
 | Transferencias | Pendiente | Fases Futuras |

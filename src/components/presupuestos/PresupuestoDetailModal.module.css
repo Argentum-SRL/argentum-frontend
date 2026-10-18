@@ -154,8 +154,8 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 16px 20px 8px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
+  padding: 16px var(--modal-pad-x) 8px; /* Separación lateral oficial */
   overflow-y: auto;
   min-height: 0;
   flex: 1;
@@ -756,8 +756,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 20px 16px;
+  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   background: var(--surface);
   border-top: none;
   flex-shrink: 0;

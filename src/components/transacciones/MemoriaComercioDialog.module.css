@@ -23,7 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 4px;
+  padding: 16px var(--modal-pad-x) 4px; /* Separación lateral oficial */
   flex-shrink: 0;
   border-bottom: none;
 }
@@ -59,10 +59,10 @@
 /* ── Form Body (Cuerpo directo, limpio y orgánico) ────────────────────────── */
 .formBody {
   flex: 1;
-  padding: 12px 20px 16px;
+  padding: 12px var(--modal-pad-x) 16px; /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   min-height: 0;
 }
 
@@ -232,10 +232,10 @@
 
 /* ── Footer (Unificado sin líneas divisorias, estilo GoalModal) ───────────── */
 .formFooter {
-  padding: 10px 20px 16px;
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   background: var(--surface);
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
   align-items: center;
   flex-shrink: 0;
   border-top: none;
@@ -243,13 +243,13 @@
 
 @media (max-width: 480px) {
   .formHeader {
-    padding: 14px 16px 4px;
+    padding: 14px var(--modal-pad-x) 4px; /* Separación lateral oficial */
   }
   .formBody {
-    padding: 10px 16px 14px;
+    padding: 10px var(--modal-pad-x) 14px; /* Separación lateral oficial */
   }
   .formFooter {
-    padding: 8px 16px 14px;
+    padding: 8px var(--modal-pad-x) 14px; /* Separación lateral oficial */
   }
 }
 

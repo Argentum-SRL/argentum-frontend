@@ -448,7 +448,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 20px 14px;
+  padding: 16px var(--modal-pad-x) 14px; /* Separación lateral oficial */
   flex-shrink: 0;
 }
 
@@ -607,10 +607,10 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px;
+  padding: 20px var(--modal-pad-x); /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
   mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
 }
@@ -621,14 +621,14 @@
 }
 
 .formBodyWithHeader .formHeader {
-  padding: 16px 20px 14px;
+  padding: 16px var(--modal-pad-x) 14px; /* Separación lateral oficial */
 }
 
 .formFields {
-  padding: 14px 20px 16px;
+  padding: 14px var(--modal-pad-x) 16px; /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--modal-field-gap); /* Separación estándar entre campos */
 }
 
 .formBody::-webkit-scrollbar {
@@ -649,7 +649,7 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--modal-label-gap); /* Separación entre etiqueta y campo */
 }
 
 .fieldLabel {
@@ -1133,10 +1133,10 @@
 
 /* Footer fijo del form */
 .formFooter {
-  padding: 14px 20px;
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   background: var(--surface);
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
   flex-shrink: 0;
 }
 

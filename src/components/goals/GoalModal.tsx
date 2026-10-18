@@ -14,7 +14,6 @@ import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { DateInput, ColorPicker } from '@/components/ui'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { useAuth } from '@/hooks/useAuth'
 
 interface GoalModalProps {
@@ -113,29 +112,6 @@ export default function GoalModal({
     }
   }, [open, goal, usuario?.moneda_principal])
 
-  // Hook universal de altura adaptativa (Auto-Hugging)
-  const {
-    headerRef: formHeaderRef,
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    dynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: open,
-    extraPadding: 28,
-    deps: [
-      step,
-      animClass,
-      nombre,
-      monto_objetivo,
-      moneda,
-      fecha_limite,
-      color,
-      nota,
-      estado,
-      localError,
-    ],
-  })
-
   const goNext = () => {
     const trimmedNombre = nombre.trim()
     if (!trimmedNombre) {
@@ -229,7 +205,6 @@ export default function GoalModal({
     >
       <div
         className={styles.slidesContainer}
-        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
       >
         {/* Indicador de pasos superior centrado (Pill Dots) */}
         <div className={styles.stepDots} aria-hidden="true">
@@ -247,7 +222,7 @@ export default function GoalModal({
                 goNext()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
                   <h2 className={styles.headerTitle}>{isEdit ? 'Editar meta' : 'Nueva meta'}</h2>
                 </div>
@@ -258,7 +233,7 @@ export default function GoalModal({
                 </div>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -298,7 +273,7 @@ export default function GoalModal({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={onClose}>
                   Cancelar
                 </button>
@@ -320,7 +295,7 @@ export default function GoalModal({
                 handleSubmit()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
                   <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
                     <ChevronLeft size={18} strokeWidth={2} />
@@ -334,7 +309,7 @@ export default function GoalModal({
                 </div>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep2}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep2}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -394,7 +369,7 @@ export default function GoalModal({
                 )}
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack} disabled={isSubmitting}>
                   Atrás
                 </button>

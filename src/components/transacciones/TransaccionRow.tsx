@@ -13,23 +13,8 @@ import type { Transaccion, Billetera, Categoria } from '@/types'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { formatMonto } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
+import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 import styles from './TransaccionRow.module.css'
-
-const REDUNDANT_ETIQUETAS = new Set([
-  'gasto',
-  'ingreso',
-  'inversión',
-  'inversion',
-  'transferencia',
-  'aporte a meta',
-  'retiro de meta',
-  'pago de tarjeta',
-  'ahorro',
-  'rendimiento',
-  'ajuste',
-  'saldo inicial',
-  'por confirmar',
-])
 
 interface TransaccionRowProps {
   transaccion: Transaccion
@@ -186,7 +171,7 @@ const TransaccionRow = memo(({
             {Boolean(transaccion.suscripcion_id) && (
               <DebitoAutomaticoBadge />
             )}
-            {etiqueta && !REDUNDANT_ETIQUETAS.has(etiqueta.trim().toLowerCase()) && (
+            {etiqueta && !esEtiquetaRedundante(etiqueta) && (
               <span className={`${styles.badgeEtiqueta} ${styles.desktopOnly}`}>
                 {etiqueta}
               </span>
@@ -226,7 +211,7 @@ const TransaccionRow = memo(({
         <div className={`${styles.mobileSubtitleRow} ${styles.mobileOnly}`}>
           {isPendiente && (
             <span className={styles.mobilePendingBadge}>
-              Por confirmar
+              {isPendienteIA ? 'Pendiente IA' : 'Por confirmar'}
             </span>
           )}
           <span className={styles.mobileCategoryText} title={categoryDisplayText}>

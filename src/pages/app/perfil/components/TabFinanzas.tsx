@@ -7,7 +7,13 @@ import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { CicloFinancieroSelector, type CicloValue } from '@/components/ciclo/CicloFinancieroSelector'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from '../PerfilPage.module.css'
+
+const MONEDA_PRINCIPAL_OPTIONS = [
+  { value: 'ARS', label: 'Pesos ($)', description: 'Peso Argentino' },
+  { value: 'USD', label: 'Dólares (US$)', description: 'Dólar Estadounidense' },
+]
 
 interface TabFinanzasProps {
   usuario: Usuario | null
@@ -136,35 +142,13 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           {/* Selector Moneda Principal */}
           <div className={styles.formGroup}>
             <label className={styles.formGroupLabel}>Moneda Principal</label>
-            <div className={styles.currencySelectGrid}>
-              <button
-                type="button"
-                className={`${styles.currencyOptionCard} ${
-                  monedaPrincipal === 'ARS' ? styles.currencySelected : ''
-                }`}
-                onClick={() => setMonedaPrincipal('ARS')}
-              >
-                <div className={styles.currencyTop}>
-                  <span className={styles.currencyCode}>Pesos ($)</span>
-                  {monedaPrincipal === 'ARS' && <Check size={16} className={styles.checkIcon} />}
-                </div>
-                <span className={styles.currencyName}>Peso Argentino</span>
-              </button>
-
-              <button
-                type="button"
-                className={`${styles.currencyOptionCard} ${
-                  monedaPrincipal === 'USD' ? styles.currencySelected : ''
-                }`}
-                onClick={() => setMonedaPrincipal('USD')}
-              >
-                <div className={styles.currencyTop}>
-                  <span className={styles.currencyCode}>Dólares (US$)</span>
-                  {monedaPrincipal === 'USD' && <Check size={16} className={styles.checkIcon} />}
-                </div>
-                <span className={styles.currencyName}>Dólar Estadounidense</span>
-              </button>
-            </div>
+            <SegmentedControl
+              options={MONEDA_PRINCIPAL_OPTIONS}
+              value={monedaPrincipal}
+              onChange={(val) => setMonedaPrincipal(val as 'ARS' | 'USD')}
+              ariaLabel="Moneda Principal"
+              fullWidth={false}
+            />
           </div>
 
           {/* Toggle Moneda Secundaria */}

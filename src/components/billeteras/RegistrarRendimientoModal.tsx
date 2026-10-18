@@ -7,7 +7,6 @@ import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
 import styles from './BankPickerModal.module.css'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 
 interface RegistrarRendimientoModalProps {
   isOpen: boolean
@@ -31,16 +30,6 @@ export default function RegistrarRendimientoModal({
     rendimientoEstimado != null && rendimientoEstimado > 0 ? String(rendimientoEstimado) : ''
   )
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-
-  const {
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    containerStyle,
-  } = useAdaptiveModalHeight({
-    enabled: isOpen && !!billetera,
-    deps: [monto, rendimientoEstimado],
-    extraPadding: 4,
-  })
 
   if (prevIsOpen !== isOpen || prevRendimiento !== rendimientoEstimado) {
     setPrevIsOpen(isOpen)
@@ -91,10 +80,8 @@ export default function RegistrarRendimientoModal({
       <form
         onSubmit={handleSubmit}
         className={styles.formContainer}
-        style={containerStyle}
       >
         <div
-          ref={formBodyRef}
           className={`${styles.formBody} ${styles.formBodyWithHeader}`}
         >
           <div className={styles.formHeader}>
@@ -156,7 +143,7 @@ export default function RegistrarRendimientoModal({
           </div>
         </div>
 
-        <div ref={formFooterRef} className={styles.formFooter}>
+        <div className={styles.formFooter}>
           <button type="button" className={styles.cancelBtn} onClick={onClose}>
             Cancelar
           </button>

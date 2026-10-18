@@ -120,6 +120,14 @@ El componente `SegmentedControl` admite la opción `layout="wrap"` (además de `
 - **Para qué sirve:** Distribuye los botones del selector en varias filas (`flex-wrap: wrap`) con autoajuste flexible (`flex: 1 1 auto`) y espaciado horizontal padding `--space-md`.
 - **Cuándo usarlo:** Listas de 4 o más opciones que no entran en una fila (por ejemplo, frecuencias de cobro como mensual, bimestral, trimestral, semestral, anual).
 
+### Estado de Migración a SegmentedControl
+| Ubicación | Componente / Selector | Estado | Observación |
+| `BalanceCard.tsx` | Toggle de Moneda (Pesos / Dólares) | Excepción explícita | Se preserva el diseño original redondeado con píldora blanca activa y track translúcido (.currencyToggle / .currencyBtn) por preferencia visual expresa de Sebastián. NO migrar a SegmentedControl. |
+| `TabFinanzas.tsx` | Selector de Moneda Principal (Pesos / Dólares) | Migrado | `fullWidth={false}` en página de usuario. Limpieza de `.currencySelectGrid`, `.currencyOptionCard` |
+| `DashboardPage.tsx` | Tabs de unidad ($ / %) | No migrado | Requiere modificar `DashboardPage.parte1.css` fuera de permitidas.txt |
+| `CicloFinancieroSelector.tsx` | Selector de Modo y Calendario | No migrado | No es selector de opciones excluyentes de texto corto (grilla compleja de tarjetas y días del mes) |
+| `TabFinanzas.tsx` | Tarjetas de Tipo de Dólar | No migrado | Grilla de tarjetas informativas complejas con cotizaciones dinámicas (compra/venta) |
+
 ### Ejemplo Canónico de Uso en React:
 ```tsx
 import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'
@@ -218,7 +226,7 @@ La estructura de modales en Argentum sigue un patrón invariable:
 </Modal>
 ```
 
-> **Modales de varios pasos:** el paso activo va en el flujo normal y los inactivos en absolute y ocultos; la cadena de contenedores es flex en columna con min-height:0 y el tope es var(--modal-max-h); sin min-height fijo ni medición en JS. TransaccionModal ya lo aplica; el resto de los modales sigue con el hook useAdaptiveModalHeight hasta su migración.
+> **Altura de modales y modales de varios pasos:** todos los modales resuelven su altura exclusivamente mediante CSS (`max-height: var(--modal-max-h); overflow: hidden; min-height: 0;`), con el cuerpo scrolleando por dentro (`overflow-y: auto; flex: 1;`) y el footer siempre visible fijo al fondo (`flex-shrink: 0;`). Sin mediciones en JS ni hooks de altura adaptativa (100% de los modales migrados del hook `useAdaptiveModalHeight` al patrón CSS estándar). En modales de varios pasos, el paso activo va en el flujo normal y los inactivos en absolute y ocultos.
 
 ### Carruseles de tarjetas
 Los carruseles de billeteras y tarjetas dentro de modales (`.billeterasCarouselScroller` y `.billeterasCarousel`) implementan dos reglas canónicas para contener físicamente la sombra de selección sin recortarla contra las paredes ni generar barras de scroll parásitas:

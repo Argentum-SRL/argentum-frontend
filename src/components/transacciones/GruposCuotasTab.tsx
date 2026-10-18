@@ -17,7 +17,6 @@ import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { EmptyState, GruposCuotasSkeleton } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
@@ -123,29 +122,10 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
 
   const { confirm } = useModal()
   const { lastDataUpdate } = useNotificaciones()
-
-  const {
-    fieldsRef: editBodyRef,
-    footerRef: editFooterRef,
-    dynamicHeight: editDynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: !!editingGrupo,
-    deps: [editStep, editMonto, editTarjetaId, editDesc, editFechaReferencia, editCategoriaId, editSubcategoriaId, tarjetas.length],
-    extraPadding: 4,
-    maxHeightRatio: 0.85,
-  })
-
-  const {
-    fieldsRef: detailBodyRef,
-    footerRef: detailFooterRef,
-    containerStyle: detailContainerStyle,
-    dynamicHeight: detailDynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: !!selectedGrupo,
-    deps: [selectedGrupo?.id, detailSlide, billeteraSeleccionada, billeteras.length, selectedGrupo?.tiene_interes],
-    extraPadding: 4,
-    maxHeightRatio: 0.85,
-  })
+  const detailBodyRef = useRef<HTMLDivElement | null>(null)
+  const detailFooterRef = useRef<HTMLDivElement | null>(null)
+  const editBodyRef = useRef<HTMLDivElement | null>(null)
+  const editFooterRef = useRef<HTMLDivElement | null>(null)
 
   const fetchGrupos = useCallback(async () => {
     try {
@@ -834,8 +814,8 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         selectedGrupo={selectedGrupo}
         detailSlide={detailSlide}
         detailSlideDirection={detailSlideDirection}
-        detailContainerStyle={detailContainerStyle}
-        detailDynamicHeight={detailDynamicHeight}
+        detailContainerStyle={undefined}
+        detailDynamicHeight={undefined}
         detailSelectedCat={detailSelectedCat}
         categorias={categorias}
         subcategorias={subcategorias}
@@ -865,7 +845,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         setEditingGrupo={setEditingGrupo}
         editStep={editStep}
         editSlideDirection={editSlideDirection}
-        editDynamicHeight={editDynamicHeight}
+        editDynamicHeight={undefined}
         editMonto={editMonto}
         setEditMonto={setEditMonto}
         tarjetasCarousel={tarjetasCarousel}

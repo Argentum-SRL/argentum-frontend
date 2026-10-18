@@ -11,6 +11,7 @@ export const DebitoAutomaticoBadge: React.FC<DebitoAutomaticoBadgeProps> = ({ cl
     <span
       className={`${styles.badge} ${styles.badgeRecurrente} ${className || ''}`}
       title="La app lo anotó sola porque es una suscripción"
+      aria-label="Débito automático"
     >
       <RefreshCw size={10} strokeWidth={2.5} />
       <span className={styles.badgeText}>Débito automático</span>

@@ -7,7 +7,6 @@ import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelect
 import categoriaService from '@/services/categoria.service'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './PagarResumenModal.module.css'
 
@@ -215,34 +214,6 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   const hasRefinanced = saldoArrastrado > 0
   const hasBreakdown = hasPriorDebt || hasRefinanced
 
-  const {
-    headerRef,
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    containerStyle,
-  } = useAdaptiveModalHeight({
-    enabled: isOpen && !!tarjeta,
-    deps: [
-      tipoPago,
-      montoCustom,
-      modoUSD,
-      billeteraUSDId,
-      billeteraARSId,
-      cotizacionCustom,
-      montoPesosCustom,
-      montoPercepcionCustom,
-      totalAPagar,
-      hasBreakdown,
-      hasPriorDebt,
-      hasRefinanced,
-      isExcedente,
-      diferenciaTipo,
-      diferenciaCategoriaId,
-    ],
-    extraPadding: 8,
-    maxHeightRatio: 0.90,
-  })
-
   return (
     <Modal
       isOpen={isOpen}
@@ -252,9 +223,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
       showHeader={false}
       autoHeight
     >
-      <div className={styles.modalContainer} style={containerStyle}>
+      <div className={styles.modalContainer}>
         {/* Header */}
-        <div ref={headerRef} className={styles.modalHeader}>
+        <div className={styles.modalHeader}>
           <div className={styles.headerLeft}>
             <h2 className={styles.headerTitle}>
               Pagar Resumen
@@ -282,7 +253,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         </div>
 
         {/* Body */}
-        <div ref={formBodyRef} className={styles.modalBody}>
+        <div className={styles.modalBody}>
           {/* Si es USD, Selector de Modo: Dólares vs Pesificar */}
           {monedaAPagar === 'USD' && (
             <SegmentedControl<'dolares' | 'pesificar'>
@@ -681,7 +652,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div ref={formFooterRef} className={styles.modalFooter}>
+        <div className={styles.modalFooter}>
           <button
             type="button"
             className={styles.cancelBtn}

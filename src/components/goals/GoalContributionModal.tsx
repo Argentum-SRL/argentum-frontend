@@ -23,7 +23,6 @@ import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { DateInput } from '@/components/ui'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 
 interface GoalContributionModalProps {
   open: boolean
@@ -150,30 +149,6 @@ export default function GoalContributionModal({
     return getSortedWalletsForCurrency(billeteras, moneda, billetera_id)
   }, [billeteras, moneda, billetera_id])
 
-  // Hook universal de altura adaptativa (Auto-Hugging)
-  const {
-    headerRef: formHeaderRef,
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    dynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: open,
-    extraPadding: 28,
-    deps: [
-      step,
-      animClass,
-      tipo,
-      monto,
-      moneda,
-      billetera_id,
-      fecha,
-      cotizacion_usada,
-      needsExchangeRate,
-      localError,
-      filteredBilleteras.length,
-    ],
-  })
-
   // Auto-selección inicial y scroll suave a la tarjeta seleccionada
   useEffect(() => {
     if (!open || !billetera_id || step !== 1) return
@@ -282,7 +257,6 @@ export default function GoalContributionModal({
     >
       <div
         className={styles.slidesContainer}
-        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
       >
         {/* Indicador de pasos superior centrado (Pill Dots) */}
         <div className={styles.stepDots} aria-hidden="true">
@@ -300,7 +274,7 @@ export default function GoalContributionModal({
                 goNext()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
                   <h2 className={styles.headerTitle}>
                     {tipo === 'aporte' ? 'Aportar a' : 'Retirar de'} {goal.nombre}
@@ -313,7 +287,7 @@ export default function GoalContributionModal({
                 </div>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -406,7 +380,7 @@ export default function GoalContributionModal({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={onClose}>
                   Cancelar
                 </button>
@@ -428,7 +402,7 @@ export default function GoalContributionModal({
                 handleSubmit()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
                   <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
                     <ChevronLeft size={18} strokeWidth={2} />
@@ -444,7 +418,7 @@ export default function GoalContributionModal({
                 </div>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep2}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep2}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -539,7 +513,7 @@ export default function GoalContributionModal({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack} disabled={isSubmitting}>
                   Atrás
                 </button>

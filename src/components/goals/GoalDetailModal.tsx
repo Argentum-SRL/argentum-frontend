@@ -17,7 +17,6 @@ import {
   ChevronUp
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import goalsService from '@/services/goals.service'
 import type { Goal, GoalMovement } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
@@ -103,17 +102,6 @@ export default function GoalDetailModal({
 
   const visibleMovements = showAllMovements ? sortedMovements : sortedMovements.slice(0, 5)
   const remainingMovementsCount = Math.max(0, sortedMovements.length - 5)
-
-  // Adaptive Height Hook
-  const {
-    fieldsRef,
-    footerRef,
-    dynamicHeight
-  } = useAdaptiveModalHeight({
-    enabled: open,
-    extraPadding: 24,
-    deps: [goal?.id, actual, objetivo, sortedMovements.length, showAllMovements]
-  })
 
   // ── Actions ───────────────────────────────────────────────────────────────
   const handleContribute = () => {
@@ -228,10 +216,9 @@ export default function GoalDetailModal({
     >
       <div 
         className={styles.modalContainer}
-        style={{ height: dynamicHeight ? `${dynamicHeight}px` : 'auto' }}
       >
         {/* ── Modal Body (Scrollable Content) ─────────────────────────── */}
-        <div ref={fieldsRef} className={styles.body}>
+        <div className={styles.body}>
           
           {/* Header integrado en el flujo de scroll */}
           <div className={styles.formHeader}>
@@ -458,7 +445,7 @@ export default function GoalDetailModal({
         </div>
 
         {/* ── Modal Footer (Actions) ──────────────────────────────────── */}
-        <div ref={footerRef} className={styles.footer}>
+        <div className={styles.footer}>
           <div className={styles.footerSecondaryGroup}>
             {!isCompleted && (
               <button 

@@ -338,7 +338,7 @@
   text-transform: uppercase;
   color: #B45309;
   background: #FEF3C7;
-  border: 1px solid rgba(217, 119, 6, 0.25);
+  border: 1px solid rgba(217, 119, 6, 0.2);
   padding: 1px 5px;
   border-radius: 4px;
   flex-shrink: 0;
@@ -347,7 +347,7 @@
 [data-theme="dark"] .mobilePendingBadge {
   color: #FBBF24;
   background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.35);
+  border-color: rgba(245, 158, 11, 0.3);
 }
 
 .mobileCategoryText {

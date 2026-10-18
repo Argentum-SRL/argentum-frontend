@@ -21,21 +21,7 @@ interface MovimientoRowProps {
   modo?: 'general' | 'billetera'
 }
 
-const REDUNDANT_ETIQUETAS = new Set([
-  'gasto',
-  'ingreso',
-  'inversión',
-  'inversion',
-  'transferencia',
-  'aporte a meta',
-  'retiro de meta',
-  'pago de tarjeta',
-  'ahorro',
-  'rendimiento',
-  'ajuste',
-  'saldo inicial',
-  'por confirmar',
-])
+import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 
 const MovimientoRow = memo(({
   movimiento,
@@ -110,12 +96,15 @@ const MovimientoRow = memo(({
   const isTransferencia = movimiento.clase === 'transferencia'
   const title = isTransferencia ? 'Transferencia' : movimiento.descripcion
 
+  const recorridoTransferencia =
+    movimiento.billetera_nombre && movimiento.billetera_destino_nombre
+      ? `${movimiento.billetera_nombre} → ${movimiento.billetera_destino_nombre}`
+      : movimiento.descripcion && movimiento.descripcion.includes('→')
+      ? movimiento.descripcion
+      : movimiento.descripcion || movimiento.billetera_nombre
+
   const subtitle = isTransferencia
-    ? (movimiento.descripcion && movimiento.descripcion !== 'Transferencia'
-        ? movimiento.descripcion
-        : (movimiento.billetera_nombre && movimiento.billetera_destino_nombre
-            ? `${movimiento.billetera_nombre} → ${movimiento.billetera_destino_nombre}`
-            : movimiento.billetera_nombre))
+    ? recorridoTransferencia
     : (movimiento.billetera_nombre && !hideWallet
         ? (movimiento.billetera_destino_nombre
             ? `${movimiento.billetera_nombre} → ${movimiento.billetera_destino_nombre}`
@@ -123,7 +112,7 @@ const MovimientoRow = memo(({
         : null)
 
   const showEtiqueta = Boolean(
-    movimiento.etiqueta && !REDUNDANT_ETIQUETAS.has(movimiento.etiqueta.trim().toLowerCase())
+    movimiento.etiqueta && !esEtiquetaRedundante(movimiento.etiqueta)
   )
 
   return (

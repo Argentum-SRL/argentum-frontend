@@ -8,8 +8,7 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  max-height: 85dvh;
-  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: var(--modal-max-h);
 }
 
 .editStep1 {
@@ -45,7 +44,7 @@
 
 @media (max-width: 640px) {
   .slidesContainer {
-    max-height: 85dvh;
+    max-height: var(--modal-max-h);
   }
 }
 

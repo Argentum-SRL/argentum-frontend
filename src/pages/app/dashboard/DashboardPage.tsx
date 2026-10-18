@@ -37,6 +37,7 @@ import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
 
 import { getFotoUrl } from '@/utils/fotoUrl'
+import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 import FacturaPanel from '@/components/facturas/FacturaPanel'
 import facturaStyles from '@/components/facturas/FacturaPanel.module.css'
 import styles from './DashboardPage.module.css'
@@ -46,22 +47,6 @@ import styles from './DashboardPage.module.css'
 const fmt = (n: number, moneda: 'ARS' | 'USD' = 'ARS') => {
   return formatMonto(n, moneda)
 }
-
-const REDUNDANT_ETIQUETAS = new Set([
-  'gasto',
-  'ingreso',
-  'inversión',
-  'inversion',
-  'transferencia',
-  'aporte a meta',
-  'retiro de meta',
-  'pago de tarjeta',
-  'ahorro',
-  'rendimiento',
-  'ajuste',
-  'saldo inicial',
-  'por confirmar',
-])
 
 // ── Components ───────────────────────────────────────────────────────────
 
@@ -1175,7 +1160,7 @@ export default function DashboardPage() {
                           <div className={styles.itemMeta}>
                             <p className={styles.itemName}>
                               {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
-                              {m.etiqueta && !REDUNDANT_ETIQUETAS.has(m.etiqueta.trim().toLowerCase()) && (
+                              {m.etiqueta && !esEtiquetaRedundante(m.etiqueta) && (
                                 <span className={styles.badgeEtiqueta}>
                                   {m.etiqueta}
                                 </span>

@@ -23,7 +23,6 @@ import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
 
@@ -162,32 +161,6 @@ export default function PresupuestoModal({
       return catMatch || subMatch
     })
   }, [egresoCategorias, allSubcategorias, searchQuery])
-
-  // Hook universal de altura adaptativa (Auto-Hugging)
-  const {
-    headerRef: formHeaderRef,
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    dynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: open,
-    deps: [
-      step,
-      animClass,
-      nombre,
-      monto,
-      moneda,
-      periodo,
-      renovacion,
-      selectedCategorias.length,
-      filteredCategorias.length,
-      searchQuery,
-      Array.from(expandedCats).join(','),
-      localError,
-    ],
-    extraPadding: 26,
-    maxHeightRatio: 0.88,
-  })
 
   const goNext = () => {
     if (step === 1) {
@@ -501,7 +474,6 @@ export default function PresupuestoModal({
     >
       <div
         className={styles.slidesContainer}
-        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
       >
         {/* Indicador de pasos superior centrado (Pill Dots) */}
         <div className={styles.stepDots} aria-hidden="true">
@@ -520,7 +492,7 @@ export default function PresupuestoModal({
                 goNext()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
                   <h2 className={styles.headerTitle}>{isEdit ? 'Editar presupuesto' : 'Nuevo presupuesto'}</h2>
                 </div>
@@ -542,7 +514,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -577,7 +549,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={onClose}>
                   Cancelar
                 </button>
@@ -599,7 +571,7 @@ export default function PresupuestoModal({
                 goNext()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
                   <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
                     <ChevronLeft size={18} strokeWidth={2} />
@@ -613,7 +585,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep2}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep2}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -810,7 +782,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={`${styles.formFooter} ${styles.formFooterStep2}`}>
+              <div className={`${styles.formFooter} ${styles.formFooterStep2}`}>
                 <div className={styles.selectedCount}>
                   <span>{selectedSummary}</span>
                 </div>
@@ -837,7 +809,7 @@ export default function PresupuestoModal({
                 handleSubmit()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
                   <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
                     <ChevronLeft size={18} strokeWidth={2} />
@@ -851,7 +823,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep3}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep3}`}>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -920,7 +892,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack} disabled={isSubmitting}>
                   Atrás
                 </button>

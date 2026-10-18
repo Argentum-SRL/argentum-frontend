@@ -14,7 +14,6 @@ import { getBankById, findBankByNombre, sortBilleteras } from '@/lib/utils/bille
 import type { Billetera, TarjetaCredito, TarjetaCreditoCreate } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from './RealCardPreview'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { formatMonto } from '@/utils/format'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import styles from './TarjetaModal.module.css'
@@ -293,18 +292,6 @@ export const TarjetaModal: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
-  // Altura dinámica adaptativa idéntica a TransferenciaModal
-  const {
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    dynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: Boolean(data),
-    deps: [step, state, data],
-    extraPadding: 22,
-    maxHeightRatio: 0.90,
-  })
-
   const [prevData, setPrevData] = useState(data)
   if (data !== prevData) {
     setPrevData(data)
@@ -545,7 +532,6 @@ export const TarjetaModal: React.FC = () => {
     >
       <div
         className={styles.slidesContainer}
-        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
       >
         {/* ── Step Indicator Dots (Funden fluidamente con el body) ── */}
         <div className={styles.stepDots}>
@@ -564,7 +550,7 @@ export const TarjetaModal: React.FC = () => {
                 goNext()
               }}
             >
-              <div ref={formBodyRef} className={styles.formBody}>
+              <div className={styles.formBody}>
                 {/* Header integrado directamente en el Body */}
                 <div className={styles.formHeader}>
                   <h2 className={styles.headerTitle}>
@@ -691,7 +677,7 @@ export const TarjetaModal: React.FC = () => {
                 )}
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={() => close('tarjeta')}>
                   Cancelar
                 </button>
@@ -713,7 +699,7 @@ export const TarjetaModal: React.FC = () => {
                 goNext()
               }}
             >
-              <div ref={formBodyRef} className={styles.formBody}>
+              <div className={styles.formBody}>
                 {/* Header integrado directamente en el Body */}
                 <div className={styles.formHeader}>
                   <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
@@ -824,7 +810,7 @@ export const TarjetaModal: React.FC = () => {
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>
                   Atrás
                 </button>
@@ -846,7 +832,7 @@ export const TarjetaModal: React.FC = () => {
                 handleSubmit()
               }}
             >
-              <div ref={formBodyRef} className={styles.formBody}>
+              <div className={styles.formBody}>
                 {/* Header integrado directamente en el Body */}
                 <div className={styles.formHeader}>
                   <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
@@ -953,7 +939,7 @@ export const TarjetaModal: React.FC = () => {
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>
                   Atrás
                 </button>

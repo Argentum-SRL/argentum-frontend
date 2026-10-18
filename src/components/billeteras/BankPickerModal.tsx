@@ -8,7 +8,6 @@ import styles from './BankPickerModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import Modal from '@/components/ui/Modal/Modal'
 import { DateInput } from '@/components/ui'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import billeteraService from '@/services/billetera.service'
 import { formatMonto } from '@/utils/format'
 
@@ -263,16 +262,6 @@ export default function BankPickerModal({
     }
   }
 
-  const {
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    dynamicHeight: dynamicFormHeight,
-  } = useAdaptiveModalHeight({
-    enabled: step === 'form',
-    deps: [step, esPrincipal, isCustom, bankSeleccionado, estimacion],
-    extraPadding: 4,
-  })
-
   // Cargar entidades una sola vez al abrir
   useEffect(() => {
     if (isOpen) {
@@ -409,11 +398,6 @@ export default function BankPickerModal({
               ? styles.formStepCustom
               : styles.formStep
           }`}
-          style={
-            step === 'form' && dynamicFormHeight
-              ? { height: `${dynamicFormHeight}px` }
-              : undefined
-          }
         >
         {/* ── PASO 1: PICKER ── */}
         <div
@@ -534,7 +518,7 @@ export default function BankPickerModal({
             <form onSubmit={handleSubmit} className={styles.formContainer}>
               {/* Cuerpo scrolleable que incluye el header */}
               <div
-                ref={formBodyRef}
+
                 className={`${styles.formBody} ${styles.formBodyWithHeader}`}
               >
                 {/* Header del form */}
@@ -838,7 +822,7 @@ export default function BankPickerModal({
             </div>
 
               {/* Footer fijo */}
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={onClose}>
                   Cancelar
                 </button>

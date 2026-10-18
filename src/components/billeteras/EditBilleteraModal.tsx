@@ -6,7 +6,6 @@ import type { BankDefinition } from '@/lib/constants/banks'
 import styles from './EditBilleteraModal.module.css'
 import Modal from '@/components/ui/Modal/Modal'
 import { Field, SelectInput, type SelectOption } from '@/components/ui'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import billeteraService from '@/services/billetera.service'
 
 export interface EditPayload {
@@ -222,16 +221,6 @@ export default function EditBilleteraModal({
 
   const muestraAdvertencia = esPrincipal && !billetera?.es_principal && billeteraPrincipalActual
 
-  const {
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    containerStyle,
-  } = useAdaptiveModalHeight({
-    enabled: isOpen && !!billetera,
-    deps: [nombre, esPrincipal, esInversion, tna, bankId, nivelTasa, opcionesAvanzadasOpen, muestraAdvertencia, isEditingName],
-    extraPadding: 4,
-  })
-
   if (!isOpen || !billetera) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -288,11 +277,9 @@ export default function EditBilleteraModal({
       <form
         onSubmit={handleSubmit}
         className={styles.formContainer}
-        style={containerStyle}
       >
         {/* Cuerpo scrolleable que incluye el header */}
         <div
-          ref={formBodyRef}
           className={`${styles.formBody} ${styles.formBodyWithHeader}`}
         >
           {/* Header del form */}
@@ -558,7 +545,7 @@ export default function EditBilleteraModal({
         </div>
 
         {/* Footer fijo */}
-        <div ref={formFooterRef} className={styles.formFooter}>
+        <div className={styles.formFooter}>
           <button type="button" className={styles.cancelBtn} onClick={onClose}>
             Cancelar
           </button>

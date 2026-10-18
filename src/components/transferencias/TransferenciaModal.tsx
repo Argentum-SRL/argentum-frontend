@@ -11,7 +11,6 @@ import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { DateInput } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import type { Billetera, CotizacionDolar, CotizacionesDolarResponse } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
 import { getCotizaciones } from '@/services/onboarding.service'
@@ -346,19 +345,6 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     }
   }
 
-  // Hook de altura adaptativa (idéntico a TransaccionModal)
-  const {
-    headerRef: formHeaderRef,
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    dynamicHeight,
-  } = useAdaptiveModalHeight({
-    enabled: isOpen,
-    deps: [step, tipoOperacion, fxDirection, effectiveMoneda, monto, billeteraOrigenId, billeteraDestinoId, tipoCotizacion, cotizacionActivaValor, billeterasOrigenDisponibles.length, billeterasDestinoDisponibles.length],
-    extraPadding: 22,
-    maxHeightRatio: 0.90,
-  })
-
   // Envío final
   const handleSubmit = async () => {
     if (isSubmitting || !billeteraOrigenId || !billeteraDestinoId || !monto) return
@@ -414,7 +400,6 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     >
       <div
         className={styles.slidesContainer}
-        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
       >
         {/* ── Step Indicator Dots (Idéntico a TransaccionModal) ── */}
         <div className={styles.stepDots}>
@@ -436,14 +421,14 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 goNext()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <h2 className={styles.headerTitle}>Transferir y Cambiar</h2>
                 <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar">
                   <X size={16} />
                 </button>
               </div>
 
-              <div ref={formBodyRef} className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
                 {/* Selector de Operación (SegmentedControl cápsula oficial) */}
                 <SegmentedControl<'entre_cuentas' | 'compra' | 'venta'>
                   ariaLabel="Tipo de operación"
@@ -533,7 +518,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 )}
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={onClose}>
                   Cancelar
                 </button>
@@ -555,7 +540,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 goNext()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
                   <ChevronLeft size={20} />
                 </button>
@@ -565,7 +550,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </button>
               </div>
 
-              <div ref={formBodyRef} className={styles.formBody}>
+              <div className={styles.formBody}>
                 {/* Selector de Billetera de Destino (Carrusel) */}
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>
@@ -612,7 +597,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>
                   Atrás
                 </button>
@@ -634,7 +619,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 goNext()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
                   <ChevronLeft size={20} />
                 </button>
@@ -644,7 +629,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </button>
               </div>
 
-              <div ref={formBodyRef} className={styles.formBody}>
+              <div className={styles.formBody}>
                 {/* Selector de Tipos de Cambio para Dólares (FX) */}
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Tipo de cambio de referencia</label>
@@ -705,7 +690,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>
                   Atrás
                 </button>
@@ -727,7 +712,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 handleSubmit()
               }}
             >
-              <div ref={formHeaderRef} className={styles.formHeader}>
+              <div className={styles.formHeader}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
                   <ChevronLeft size={20} />
                 </button>
@@ -737,7 +722,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </button>
               </div>
 
-              <div ref={formBodyRef} className={styles.formBody}>
+              <div className={styles.formBody}>
                 {/* Descripción/Nota + Fecha (Idéntico a Paso 3 de TransaccionModal) */}
                 <div className={styles.descFechaRow}>
                   <div className={`${styles.formField} ${styles.flex2}`}>
@@ -818,7 +803,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </div>
               </div>
 
-              <div ref={formFooterRef} className={styles.formFooter}>
+              <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>
                   Atrás
                 </button>

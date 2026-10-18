@@ -8,7 +8,6 @@ import billeteraService from '@/services/billetera.service'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import styles from './ActualizarSaldoModal.module.css'
 
 interface ActualizarSaldoModalProps {
@@ -56,18 +55,6 @@ export default function ActualizarSaldoModal({
       setIsSubmitting(false)
     }
   }
-
-  const {
-    headerRef,
-    fieldsRef: formBodyRef,
-    footerRef: formFooterRef,
-    containerStyle,
-  } = useAdaptiveModalHeight({
-    enabled: isOpen && !!billetera,
-    deps: [step, monto, preview, incluirRendimiento, isLoadingPreview, isSubmitting],
-    extraPadding: 8,
-    maxHeightRatio: 0.90,
-  })
 
   if (!isOpen || !billetera) return null
 
@@ -143,9 +130,9 @@ export default function ActualizarSaldoModal({
       autoHeight
       ariaLabel="Actualizar saldo"
     >
-      <div className={styles.modalContainer} style={containerStyle}>
+      <div className={styles.modalContainer}>
         {/* Header */}
-        <div ref={headerRef} className={styles.modalHeader}>
+        <div className={styles.modalHeader}>
           <div className={styles.headerLeft}>
             <h2 className={styles.headerTitle}>Actualizar saldo</h2>
             <div className={styles.headerSubtitleRow}>
@@ -170,7 +157,7 @@ export default function ActualizarSaldoModal({
         </div>
 
         {/* Body */}
-        <div ref={formBodyRef} className={styles.modalBody}>
+        <div className={styles.modalBody}>
           {/* Paso 1: Ingreso de monto */}
           {step === 1 && (
             <form id="actualizar-saldo-form" onSubmit={handleRevisar} className={styles.formFields}>
@@ -314,7 +301,7 @@ export default function ActualizarSaldoModal({
         </div>
 
         {/* Footer */}
-        <div ref={formFooterRef} className={styles.modalFooter}>
+        <div className={styles.modalFooter}>
           {step === 1 && (
             <>
               <button

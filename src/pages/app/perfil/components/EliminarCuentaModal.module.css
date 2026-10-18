@@ -1,11 +1,6 @@
 .modal {
-  max-width: 580px;
-}
-
-@media (min-width: 768px) {
-  .modal {
-    width: 580px !important;
-  }
+  --modal-w: 580px;
+  max-width: 100%;
 }
 
 .iconWrap {

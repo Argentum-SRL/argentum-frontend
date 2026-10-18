@@ -17,7 +17,6 @@ import {
   RefreshCw,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
-import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import presupuestoService from '@/services/presupuesto.service'
 import transaccionService from '@/services/transaccion.service'
 import type { Presupuesto, PeriodoPresupuesto, Categoria, Billetera, Transaccion } from '@/types'
@@ -234,13 +233,6 @@ export default function PresupuestoDetailModal({
     return sum / Math.min(historial.length, 3)
   }, [historial])
 
-  // Altura adaptativa
-  const { fieldsRef, footerRef, dynamicHeight } = useAdaptiveModalHeight({
-    enabled: open,
-    extraPadding: 24,
-    deps: [presupuesto?.id, step, activeTab, transacciones.length, historial.length, gastado, limite]
-  })
-
   // Estilo semántico para avatar y barra
   const progressFillColor = useMemo(() => {
     if (isSuperado) return 'var(--error)'
@@ -373,7 +365,6 @@ export default function PresupuestoDetailModal({
     >
       <div 
         className={styles.slidesContainer}
-        style={{ height: dynamicHeight ? `${dynamicHeight}px` : 'auto' }}
       >
         {/* Indicador de pasos superior centrado (Pill Dots) */}
         <div className={styles.stepDots} aria-hidden="true">
@@ -385,7 +376,7 @@ export default function PresupuestoDetailModal({
         {step === 1 && (
           <div className={`${styles.slide} ${animClass}`}>
             {/* Modal Body (Scrollable Content) */}
-            <div ref={fieldsRef} className={styles.body}>
+            <div className={styles.body}>
               {/* Header integrado */}
               <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
@@ -589,7 +580,7 @@ export default function PresupuestoDetailModal({
             </div>
 
             {/* Modal Footer Step 1 */}
-            <div ref={footerRef} className={styles.footer}>
+            <div className={styles.footer}>
               <div className={styles.footerSecondaryGroup}>
                 <button 
                   type="button"
@@ -627,7 +618,7 @@ export default function PresupuestoDetailModal({
         {/* ──── SOLAPA 2: Movimientos de Gastos e Historial de Ciclos ──── */}
         {step === 2 && (
           <div className={`${styles.slide} ${animClass}`}>
-            <div ref={fieldsRef} className={styles.body}>
+            <div className={styles.body}>
               {/* Header integrado con botón volver y cerrar */}
               <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
@@ -822,7 +813,7 @@ export default function PresupuestoDetailModal({
             </div>
 
             {/* Modal Footer Step 2 */}
-            <div ref={footerRef} className={styles.footer}>
+            <div className={styles.footer}>
               <button
                 type="button"
                 className={styles.volverBtn}

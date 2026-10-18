@@ -19,6 +19,7 @@ export interface SegmentedControlProps<T extends string = string> {
   className?: string
   ariaLabel?: string
   fullWidth?: boolean
+  /* wrap ya no hace falta: la cápsula siempre pasa a otra fila si no entra */
   layout?: 'inline' | 'stacked' | 'wrap'
 }
 
@@ -119,7 +120,6 @@ export default function SegmentedControl<T extends string = string>({
       aria-label={ariaLabel}
       className={[
         styles.track,
-        layout === 'wrap' ? styles.trackWrap : '',
         fullWidth ? styles.fullWidth : '',
         className,
       ].filter(Boolean).join(' ')}
@@ -146,7 +146,6 @@ export default function SegmentedControl<T extends string = string>({
             className={[
               styles.pill,
               layout === 'stacked' ? styles.pillStacked : '',
-              layout === 'wrap' ? styles.pillWrap : '',
               isActive ? styles.pillActive : '',
               isDisabled ? styles.pillDisabled : '',
             ].filter(Boolean).join(' ')}

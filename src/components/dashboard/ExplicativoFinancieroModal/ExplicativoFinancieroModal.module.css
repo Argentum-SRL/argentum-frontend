@@ -97,43 +97,7 @@
   flex-shrink: 0;
 }
 
-.tabs {
-  display: flex;
-  background: var(--page);
-  padding: 4px;
-  border-radius: 12px;
-  gap: 4px;
-  width: 100%;
-}
 
-.tab {
-  flex: 1;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  background: transparent;
-  text-align: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.tabActive {
-  background: var(--surface);
-  color: var(--primary);
-  box-shadow: var(--elevation-xs);
-  font-weight: 700;
-}
-
-:global([data-theme="dark"]) .tabActive {
-  color: var(--primary-light, #73a5e8);
-}
 
 /* ── Modal Body Content ── */
 .body {

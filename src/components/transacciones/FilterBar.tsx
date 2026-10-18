@@ -8,6 +8,7 @@ import { useModal } from '@/hooks/useModal'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { DateInput } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { toISODateString } from '@/utils/format'
 
 interface FilterBarProps {
@@ -512,29 +513,16 @@ export default function FilterBar({
 
         {/* Desktop-only filters group */}
         <div className={styles.desktopFilterGroup}>
-          <div className={styles.tabs}>
-            <button
-              type="button"
-              className={`${styles.tab} ${!filters.tipo ? styles.tabActive : ''}`}
-              onClick={() => handleTipoChange(undefined)}
-            >
-              Todos
-            </button>
-            <button
-              type="button"
-              className={`${styles.tab} ${filters.tipo === 'egreso' ? styles.tabActive : ''}`}
-              onClick={() => handleTipoChange('egreso')}
-            >
-              Egresos
-            </button>
-            <button
-              type="button"
-              className={`${styles.tab} ${filters.tipo === 'ingreso' ? styles.tabActive : ''}`}
-              onClick={() => handleTipoChange('ingreso')}
-            >
-              Ingresos
-            </button>
-          </div>
+          <SegmentedControl<'todos' | 'egreso' | 'ingreso'>
+            options={[
+              { value: 'todos', label: 'Todos' },
+              { value: 'egreso', label: 'Egresos' },
+              { value: 'ingreso', label: 'Ingresos' },
+            ]}
+            value={filters.tipo ?? 'todos'}
+            onChange={(v) => handleTipoChange(v === 'todos' ? undefined : v)}
+            ariaLabel="Filtrar por tipo"
+          />
 
           {/* Billetera Popover */}
           <div className={`${styles.pill} ${styles.pillRelative} ${activeBilletera ? styles.pillActive : ''}`} ref={walletRef}>

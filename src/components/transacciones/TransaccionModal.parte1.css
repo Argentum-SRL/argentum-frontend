@@ -1,6 +1,6 @@
 /* ── Modal Root Wrapper ─────────────────────────────────────────────────── */
 .modalRoot {
-  width: 520px;
+  width: 100%;
   max-width: 100%;
   max-height: var(--modal-max-h);
   background: var(--surface);
@@ -8,12 +8,6 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-}
-
-@media (max-width: 640px) {
-  .modalRoot {
-    width: 100%;
-  }
 }
 
 /* ── Indicador de pasos (Estilo BankPickerModal) ─────────────────────────── */

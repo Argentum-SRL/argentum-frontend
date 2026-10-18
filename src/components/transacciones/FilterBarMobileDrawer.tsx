@@ -8,7 +8,55 @@ import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import styles from './FilterBar.module.css'
 import { DateInput } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { toISODateString, formatMonto } from '@/utils/format'
+
+/**
+ * Función pura que calcula el rango de fechas {desde, hasta} para cada preset.
+ */
+function calcularRangoPreset(
+  preset: 'ciclo' | 'ciclo_anterior' | 'ultimos_30d',
+  periodoActual?: {
+    fecha_inicio?: string
+    fecha_fin?: string
+    ciclo_anterior_inicio?: string
+    ciclo_anterior_fin?: string
+  } | null
+): { desde: string; hasta: string } {
+  const today = new Date()
+  let desde: string
+  let hasta: string
+
+  if (preset === 'ciclo') {
+    if (periodoActual?.fecha_inicio && periodoActual?.fecha_fin) {
+      desde = periodoActual.fecha_inicio
+      hasta = periodoActual.fecha_fin
+    } else {
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+      desde = toISODateString(firstDay)
+      hasta = toISODateString(lastDay)
+    }
+  } else if (preset === 'ciclo_anterior') {
+    if (periodoActual?.ciclo_anterior_inicio && periodoActual?.ciclo_anterior_fin) {
+      desde = periodoActual.ciclo_anterior_inicio
+      hasta = periodoActual.ciclo_anterior_fin
+    } else {
+      const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+      const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
+      desde = toISODateString(firstDay)
+      hasta = toISODateString(lastDay)
+    }
+  } else {
+    // ultimos_30d
+    const past = new Date(today)
+    past.setDate(today.getDate() - 30)
+    desde = toISODateString(past)
+    hasta = toISODateString(today)
+  }
+
+  return { desde, hasta }
+}
 
 interface FilterBarMobileDrawerProps {
   isOpen: boolean
@@ -105,43 +153,24 @@ export default function FilterBarMobileDrawer({
   }
 
   const handleApplyPreset = (preset: 'ciclo' | 'ciclo_anterior' | 'ultimos_30d') => {
-    const today = new Date()
-    let desde: string
-    let hasta: string
-
-    if (preset === 'ciclo') {
-      if (periodoActual?.fecha_inicio && periodoActual?.fecha_fin) {
-        desde = periodoActual.fecha_inicio
-        hasta = periodoActual.fecha_fin
-      } else {
-        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-        desde = toISODateString(firstDay)
-        hasta = toISODateString(lastDay)
-      }
-    } else if (preset === 'ciclo_anterior') {
-      if (periodoActual?.ciclo_anterior_inicio && periodoActual?.ciclo_anterior_fin) {
-        desde = periodoActual.ciclo_anterior_inicio
-        hasta = periodoActual.ciclo_anterior_fin
-      } else {
-        const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-        const lastDay = new Date(today.getFullYear(), today.getMonth(), 0)
-        desde = toISODateString(firstDay)
-        hasta = toISODateString(lastDay)
-      }
-    } else { // ultimos_30d
-      const past = new Date(today)
-      past.setDate(today.getDate() - 30)
-      desde = toISODateString(past)
-      hasta = toISODateString(today)
-    }
-
+    const { desde, hasta } = calcularRangoPreset(preset, periodoActual)
     setLocalFilters((prev) => ({
       ...prev,
       fecha_desde: desde,
       fecha_hasta: hasta,
     }))
   }
+
+  const presetActual = useMemo<'ciclo' | 'ciclo_anterior' | 'ultimos_30d' | ''>(() => {
+    const presets: ('ciclo' | 'ciclo_anterior' | 'ultimos_30d')[] = ['ciclo', 'ciclo_anterior', 'ultimos_30d']
+    for (const p of presets) {
+      const r = calcularRangoPreset(p, periodoActual)
+      if (r.desde === localFilters.fecha_desde && r.hasta === localFilters.fecha_hasta) {
+        return p
+      }
+    }
+    return ''
+  }, [periodoActual, localFilters.fecha_desde, localFilters.fecha_hasta])
 
   const handleApply = () => {
     const catIds = localFilters.categoria_ids || (localFilters.categoria_id ? [localFilters.categoria_id] : [])
@@ -239,60 +268,34 @@ export default function FilterBarMobileDrawer({
         {/* Tipo Selector */}
         <div>
           <div className={styles.popoverTitle}>Tipo de movimiento</div>
-          <div className={styles.pillGroupMobile}>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${!localFilters.tipo ? styles.typePillActiveTodosMobile : ''}`}
-              onClick={() => handleTipoChange(undefined)}
-            >
-              Todos
-            </button>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localFilters.tipo === 'egreso' ? styles.typePillActiveEgresoMobile : ''}`}
-              onClick={() => handleTipoChange('egreso')}
-            >
-              <ArrowUpRight size={14} strokeWidth={2.2} />
-              <span>Egresos</span>
-            </button>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localFilters.tipo === 'ingreso' ? styles.typePillActiveIngresoMobile : ''}`}
-              onClick={() => handleTipoChange('ingreso')}
-            >
-              <ArrowDownLeft size={14} strokeWidth={2.2} />
-              <span>Ingresos</span>
-            </button>
-          </div>
+          <SegmentedControl<'todos' | 'egreso' | 'ingreso'>
+            options={[
+              { value: 'todos', label: 'Todos' },
+              { value: 'egreso', label: 'Egresos', icon: <ArrowUpRight size={15} strokeWidth={2.2} /> },
+              { value: 'ingreso', label: 'Ingresos', icon: <ArrowDownLeft size={15} strokeWidth={2.2} /> },
+            ]}
+            value={localFilters.tipo ?? 'todos'}
+            onChange={(v) => handleTipoChange(v === 'todos' ? undefined : v)}
+            fullWidth
+            ariaLabel="Tipo de movimiento"
+          />
         </div>
 
         {/* Moneda Selector */}
         {showMonedaFilter && (
           <div>
             <div className={styles.popoverTitle}>Moneda</div>
-            <div className={styles.pillGroupMobile}>
-              <button
-                type="button"
-                className={`${styles.typePillMobile} ${!localFilters.moneda ? styles.typePillActiveTodosMobile : ''}`}
-                onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: undefined }))}
-              >
-                Todas
-              </button>
-              <button
-                type="button"
-                className={`${styles.typePillMobile} ${localFilters.moneda === 'ARS' ? styles.typePillActiveTodosMobile : ''}`}
-                onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: 'ARS' }))}
-              >
-                Pesos
-              </button>
-              <button
-                type="button"
-                className={`${styles.typePillMobile} ${localFilters.moneda === 'USD' ? styles.typePillActiveTodosMobile : ''}`}
-                onClick={() => setLocalFilters((prev) => ({ ...prev, moneda: 'USD' }))}
-              >
-                Dólares
-              </button>
-            </div>
+            <SegmentedControl<'todas' | 'ARS' | 'USD'>
+              options={[
+                { value: 'todas', label: 'Todas' },
+                { value: 'ARS', label: 'Pesos' },
+                { value: 'USD', label: 'Dólares' },
+              ]}
+              value={(localFilters.moneda === 'ARS' || localFilters.moneda === 'USD') ? localFilters.moneda : 'todas'}
+              onChange={(v) => setLocalFilters((prev) => ({ ...prev, moneda: v === 'todas' ? undefined : v }))}
+              fullWidth
+              ariaLabel="Moneda"
+            />
           </div>
         )}
 
@@ -518,31 +521,19 @@ export default function FilterBarMobileDrawer({
         <div>
           <div className={styles.popoverTitle}>Período</div>
           
-          {/* Quick Presets */}
-          <div className={styles.presetsGridMobile}>
-            <button
-              type="button"
-              className={styles.presetBtnMobile}
-              onClick={() => handleApplyPreset('ciclo')}
-            >
-              Este ciclo
-            </button>
-            <button
-              type="button"
-              className={styles.presetBtnMobile}
-              onClick={() => handleApplyPreset('ciclo_anterior')}
-            >
-              Ciclo anterior
-            </button>
-            <button
-              type="button"
-              className={styles.presetBtnMobile}
-              style={{ gridColumn: '1 / -1' }}
-              onClick={() => handleApplyPreset('ultimos_30d')}
-            >
-              Últimos 30 días
-            </button>
-          </div>
+          <SegmentedControl<'ciclo' | 'ciclo_anterior' | 'ultimos_30d' | ''>
+            options={[
+              { value: 'ciclo', label: 'Este ciclo' },
+              { value: 'ciclo_anterior', label: 'Ciclo anterior' },
+              { value: 'ultimos_30d', label: 'Últimos 30 días' },
+            ]}
+            value={presetActual}
+            onChange={(v) => {
+              if (v) handleApplyPreset(v)
+            }}
+            fullWidth
+            ariaLabel="Atajos de período"
+          />
 
           <div className={styles.dateInputsRowMobile}>
             <DateInput

@@ -1,24 +1,8 @@
 /* ─── PresupuestoModal.module.css — 100% Matched to TransferenciaModal / TransaccionModal ─── */
 
-/* ── Modal Dialog Size (Desktop 520px vs Mobile 100% Bottom Sheet) ── */
-@media (min-width: 768px) {
-  .modalPresupuesto {
-    width: 520px !important;
-    max-width: min(520px, calc(100vw - 32px)) !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .modalPresupuesto {
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 24px 24px 0 0 !important;
-    margin: 0 !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
-    box-shadow: var(--elevation-lg) !important;
-  }
+/* Ancho del modal centralizado en el Modal base */
+.modalPresupuesto {
+  --modal-w: var(--modal-w-md);
 }
 
 /* ── Slides container & animations ───────────────────────────────────────── */
@@ -683,77 +667,6 @@
   flex-shrink: 0;
 }
 
-/* ── Step 3: Frecuencia & Periodos (Estilo BankPickerModal) ──────────────── */
-.periodSegmentedWrap {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  background: var(--surface-alt);
-  padding: 4px;
-  border-radius: 14px;
-  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.05));
-}
-
-[data-theme="dark"] .periodSegmentedWrap,
-.dark .periodSegmentedWrap {
-  background: var(--surface-2, rgba(255, 255, 255, 0.04));
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-.periodBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 10px 6px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: 'Figtree', sans-serif;
-  user-select: none;
-}
-
-.periodBtn:hover {
-  color: var(--text);
-  background: rgba(0, 0, 0, 0.03);
-}
-
-[data-theme="dark"] .periodBtn:hover,
-.dark .periodBtn:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.periodBtnActive {
-  background: var(--surface) !important;
-  color: var(--primary) !important;
-  font-weight: 700;
-  border-color: rgba(var(--primary-rgb), 0.15) !important;
-  box-shadow: var(--elevation-sm);
-  transform: translateY(-1.5px) scale(1.025);
-  z-index: 5;
-}
-
-[data-theme="dark"] .periodBtnActive,
-.dark .periodBtnActive {
-  background: var(--surface-3, #1e293b) !important;
-  color: var(--primary-light, #93c5fd) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  box-shadow: var(--elevation-sm);
-}
-
-.periodBtnIcon {
-  flex-shrink: 0;
-  color: inherit;
-}
-
-.periodBtnLabel {
-  font-size: 12.5px;
-  font-weight: 600;
-}
 
 /* ── Opciones de Renovación (Estilo SettingCard de BankPickerModal) ────────── */
 .renewalOptions {
@@ -841,15 +754,6 @@
 }
 
 @media (max-width: 480px) {
-  .periodBtn {
-    padding: 8px 4px;
-    gap: 3px;
-  }
-
-  .periodBtnLabel {
-    font-size: 11.5px;
-  }
-
   .renewalCard {
     padding: 9px 12px;
     gap: 10px;

@@ -1,24 +1,8 @@
 /* ─── ActualizarSaldoModal.module.css ────────────────────────────────────── */
 
-/* ── Modal Dialog Size (Desktop 520px vs Mobile 100% Bottom Sheet) ── */
-@media (min-width: 768px) {
-  .modalActualizarSaldo {
-    width: 520px !important;
-    max-width: min(520px, calc(100vw - 32px)) !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .modalActualizarSaldo {
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 24px 24px 0 0 !important;
-    margin: 0 !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
-    box-shadow: var(--elevation-lg) !important;
-  }
+/* Ancho del modal centralizado en el Modal base */
+.modalActualizarSaldo {
+  --modal-w: var(--modal-w-md);
 }
 
 .modalActualizarSaldo :global(.content) {

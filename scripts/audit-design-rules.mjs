@@ -16,6 +16,11 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 // Escala permitida para R08 (gap en px)
 const GAPS_PERMITIDOS = new Set([0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48]);
 
+// Escala permitida para R15 (@media min/max-width/height en px)
+const BREAKPOINTS_PERMITIDOS = new Set([
+  360, 479, 480, 639, 640, 719, 720, 767, 768, 1023, 1024, 1279, 1280, 1439, 1440, 1919, 1920, 2559, 2560,
+]);
+
 // Nombres y descripciones de reglas fijas
 export const RULE_DEFS = {
   R01: 'z-index con valor literal fuera de escala (-1, 0, 1, 2, 3 o var(--z-*))',
@@ -32,11 +37,40 @@ export const RULE_DEFS = {
   R12: 'Definiciones de selectores heredados (.segmented*, .methodGrid, etc.) fuera de SegmentedControl',
   R13: 'Definición de .stepDots en CSS (meta de unificación: 1)',
   R14: 'Infracciones en SegmentedControl.module.css (transform, !important, margen negativo, z-index, etc.)',
+  R15: '@media con (min|max)-(width|height) en px fuera de la escala permitida',
+  R16: 'text-overflow: ellipsis o overflow: hidden en .label, .description o .pill de SegmentedControl',
+  R17: 'width o max-width >= 300px con !important en CSS',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
 function stripCssComments(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+// Parser de bloques CSS con contador de llaves (sin retroceso de regex)
+function parseCssBlocks(css) {
+  const blocks = [];
+  let i = 0;
+  const n = css.length;
+  while (i < n) {
+    const braceOpen = css.indexOf('{', i);
+    if (braceOpen === -1) break;
+    const selector = css.substring(i, braceOpen).trim();
+    let depth = 1;
+    let j = braceOpen + 1;
+    while (j < n && depth > 0) {
+      if (css[j] === '{') depth++;
+      else if (css[j] === '}') depth--;
+      j++;
+    }
+    const body = css.substring(braceOpen + 1, j - 1);
+    blocks.push({ selector, body });
+    if (body.includes('{')) {
+      blocks.push(...parseCssBlocks(body));
+    }
+    i = j;
+  }
+  return blocks;
 }
 
 // Analizar archivo CSS
@@ -45,6 +79,7 @@ function auditCssFile(filePath, relPath, content) {
     R01: 0, R02: 0, R03: 0, R04: 0, R05: 0,
     R06: 0, R07: 0, R08: 0, R09: 0, R10: 0,
     R11: 0, R12: 0, R13: 0, R14: 0,
+    R15: 0, R16: 0, R17: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -205,6 +240,44 @@ function auditCssFile(filePath, relPath, content) {
     violations.R14 = r14Count;
   }
 
+  // R15: @media con (min|max)-(width|height) cuyo valor en px no está en la escala permitida
+  const mediaCondRegex = /@media\s+([^{]+)\{/g;
+  let mMatch;
+  while ((mMatch = mediaCondRegex.exec(cleanContent)) !== null) {
+    const cond = mMatch[1];
+    const pxRegex = /(?:min|max)-(?:width|height)\s*:\s*(\d+)px/gi;
+    let pMatch;
+    while ((pMatch = pxRegex.exec(cond)) !== null) {
+      const val = parseInt(pMatch[1], 10);
+      if (!BREAKPOINTS_PERMITIDOS.has(val)) {
+        violations.R15++;
+      }
+    }
+  }
+
+  // R16: text-overflow: ellipsis o overflow: hidden dentro de .label, .description o .pill en SegmentedControl.module.css
+  if (isSegmentedControl) {
+    const blocks = parseCssBlocks(cleanContent);
+    for (const b of blocks) {
+      if (/(?:^|[,\s])\.(?:label|description|pill)\b/.test(b.selector)) {
+        const toMatches = b.body.match(/text-overflow\s*:\s*ellipsis/gi);
+        if (toMatches) violations.R16 += toMatches.length;
+        const ovMatches = b.body.match(/overflow(?:-[xy])?\s*:\s*hidden/gi);
+        if (ovMatches) violations.R16 += ovMatches.length;
+      }
+    }
+  }
+
+  // R17: width: <N>px !important o max-width: <N>px !important con N >= 300 en cualquier CSS
+  const r17Regex = /(?:^|[;\s])(?:width|max-width)\s*:\s*(\d+)px\s*!important/gi;
+  let r17Match;
+  while ((r17Match = r17Regex.exec(cleanContent)) !== null) {
+    const pxVal = parseInt(r17Match[1], 10);
+    if (pxVal >= 300) {
+      violations.R17++;
+    }
+  }
+
   return violations;
 }
 
@@ -214,6 +287,7 @@ function auditTsxFile(filePath, relPath, content) {
     R01: 0, R02: 0, R03: 0, R04: 0, R05: 0,
     R06: 0, R07: 0, R08: 0, R09: 0, R10: 0,
     R11: 0, R12: 0, R13: 0, R14: 0,
+    R15: 0, R16: 0, R17: 0,
   };
 
   const fileName = path.basename(filePath);
@@ -392,6 +466,11 @@ function cli() {
       for (const [file, violations] of Object.entries(auditResults)) {
         const oldFileViolations = oldBaseline.files?.[file] || {};
         for (const [rule, count] of Object.entries(violations)) {
+          // Solo controlar aumentos para reglas existentes en la línea base previa (R01 a R14)
+          // Las reglas nuevas que se agregan en este paso se inicializan en la línea base
+          const isNewRule = oldBaseline.totalViolations?.[rule] === undefined;
+          if (isNewRule) continue;
+
           const oldCount = oldFileViolations[rule] || 0;
           if (count > oldCount) {
             regressions.push({

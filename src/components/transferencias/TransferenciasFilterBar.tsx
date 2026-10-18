@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Search, X, Filter, Calendar, ChevronDown } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import { TransferenciasFilterMobileModal } from './TransferenciasFilterMobileModal'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './TransferenciasFilterBar.module.css'
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
@@ -150,35 +151,16 @@ export const TransferenciasFilterBar: React.FC<TransferenciasFilterBarProps> = (
 
         {/* Desktop Filter Group (matching transacciones style) */}
         <div className={styles.desktopFilterGroup}>
-          <div className={styles.tabs} role="tablist" aria-label="Filtrar por tipo de operación">
-            <button
-              type="button"
-              className={`${styles.tab} ${tipoOperacion === 'todas' ? styles.tabActive : ''}`}
-              onClick={() => onTipoOperacionChange('todas')}
-              role="tab"
-              aria-selected={tipoOperacion === 'todas'}
-            >
-              Todas
-            </button>
-            <button
-              type="button"
-              className={`${styles.tab} ${tipoOperacion === 'cuentas' ? styles.tabActive : ''}`}
-              onClick={() => onTipoOperacionChange('cuentas')}
-              role="tab"
-              aria-selected={tipoOperacion === 'cuentas'}
-            >
-              Entre mis cuentas
-            </button>
-            <button
-              type="button"
-              className={`${styles.tab} ${tipoOperacion === 'fx' ? styles.tabActive : ''}`}
-              onClick={() => onTipoOperacionChange('fx')}
-              role="tab"
-              aria-selected={tipoOperacion === 'fx'}
-            >
-              Compra/Venta Dólares
-            </button>
-          </div>
+          <SegmentedControl<TipoOperacionFilter>
+            options={[
+              { value: 'todas', label: 'Todas' },
+              { value: 'cuentas', label: 'Entre mis cuentas' },
+              { value: 'fx', label: 'Compra/Venta Dólares' },
+            ]}
+            value={tipoOperacion}
+            onChange={onTipoOperacionChange}
+            ariaLabel="Filtrar por tipo de operación"
+          />
 
           {/* Período Dropdown Pill (matching Transacciones) */}
           {onPeriodoPresetChange && (

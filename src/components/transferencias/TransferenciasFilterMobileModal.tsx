@@ -4,6 +4,7 @@ import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import type { TipoOperacionFilter, PeriodoPresetFilter } from './TransferenciasFilterBar'
 import styles from './TransferenciasFilterBar.module.css'
 
@@ -82,64 +83,34 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
         {/* ── Período ── */}
         <div>
           <div className={styles.drawerSectionTitle}>Período</div>
-          <div className={styles.periodoPillGroupMobile}>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localPeriodoPreset === 'ciclo' ? styles.typePillActiveMobile : ''}`}
-              onClick={() => setLocalPeriodoPreset('ciclo')}
-            >
-              Este ciclo
-            </button>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localPeriodoPreset === 'ciclo_anterior' ? styles.typePillActiveMobile : ''}`}
-              onClick={() => setLocalPeriodoPreset('ciclo_anterior')}
-            >
-              Ciclo anterior
-            </button>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localPeriodoPreset === 'ultimos_30d' ? styles.typePillActiveMobile : ''}`}
-              onClick={() => setLocalPeriodoPreset('ultimos_30d')}
-            >
-              Últimos 30 días
-            </button>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localPeriodoPreset === 'todos' ? styles.typePillActiveMobile : ''}`}
-              onClick={() => setLocalPeriodoPreset('todos')}
-            >
-              Todos
-            </button>
-          </div>
+          <SegmentedControl<'ciclo' | 'ciclo_anterior' | 'ultimos_30d' | 'todos'>
+            options={[
+              { value: 'ciclo', label: 'Este ciclo' },
+              { value: 'ciclo_anterior', label: 'Ciclo anterior' },
+              { value: 'ultimos_30d', label: 'Últimos 30 días' },
+              { value: 'todos', label: 'Todos' },
+            ]}
+            value={localPeriodoPreset}
+            onChange={setLocalPeriodoPreset}
+            fullWidth
+            ariaLabel="Período"
+          />
         </div>
 
         {/* ── Tipo de Operación ── */}
         <div>
           <div className={styles.drawerSectionTitle}>Tipo de operación</div>
-          <div className={styles.pillGroupMobile}>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localTipo === 'todas' ? styles.typePillActiveMobile : ''}`}
-              onClick={() => setLocalTipo('todas')}
-            >
-              Todas
-            </button>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${localTipo === 'cuentas' ? styles.typePillActiveMobile : ''}`}
-              onClick={() => setLocalTipo('cuentas')}
-            >
-              Entre cuentas
-            </button>
-            <button
-              type="button"
-              className={`${styles.typePillMobile} ${styles.typePillFullWidthMobile} ${localTipo === 'fx' ? styles.typePillActiveMobile : ''}`}
-              onClick={() => setLocalTipo('fx')}
-            >
-              Compra/Venta Dólares
-            </button>
-          </div>
+          <SegmentedControl<'todas' | 'cuentas' | 'fx'>
+            options={[
+              { value: 'todas', label: 'Todas' },
+              { value: 'cuentas', label: 'Entre cuentas' },
+              { value: 'fx', label: 'Compra/Venta Dólares' },
+            ]}
+            value={localTipo}
+            onChange={setLocalTipo}
+            fullWidth
+            ariaLabel="Tipo de operación"
+          />
         </div>
 
         {/* ── Cuenta / Billetera (Diseño Dashboard) ── */}

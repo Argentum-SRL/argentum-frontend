@@ -45,10 +45,10 @@
 }
 
 @media (min-width: 768px) {
-  .sm { width: 400px; }
-  .md { width: 520px; }
-  .lg { width: 800px; }
-  .xl { width: 1000px; }
+  .sm { width: var(--modal-w, var(--modal-w-sm)); }
+  .md { width: var(--modal-w, var(--modal-w-md)); }
+  .lg { width: var(--modal-w, var(--modal-w-lg)); }
+  .xl { width: var(--modal-w, var(--modal-w-xl)); }
 }
 
 @media (max-width: 767px) {
@@ -60,6 +60,12 @@
     width: 100%;
     border-radius: var(--modal-radius) var(--modal-radius) 0 0;
     animation: slideUpMobile 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .content {
+    padding-bottom: max(var(--modal-content-pad-bottom), env(safe-area-inset-bottom, 0px));
+  }
+  .footer {
+    padding-bottom: max(var(--modal-footer-pad-bottom), env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -73,6 +79,8 @@
 @media (max-width: 767px) {
   :global([data-theme="dark"]) .container,
   :global(.dark) .container {
+    border-left: none;
+    border-right: none;
     border-bottom: none;
   }
 }

@@ -1,24 +1,8 @@
 /* ─── TarjetaModal.module.css — 100% Matched to TransferenciaModal / TransaccionModal ─── */
 
-/* ── Modal Dialog Size (Desktop 540px vs Mobile 100% Bottom Sheet) ── */
-@media (min-width: 768px) {
-  .modalTarjeta {
-    width: 540px !important;
-    max-width: min(540px, calc(100vw - 32px)) !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .modalTarjeta {
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 24px 24px 0 0 !important;
-    margin: 0 !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
-    box-shadow: var(--elevation-lg) !important;
-  }
+/* Ancho del modal centralizado en el Modal base */
+.modalTarjeta {
+  --modal-w: var(--modal-w-md-wide);
 }
 
 .modalTarjeta :global(.content) {

@@ -47,6 +47,22 @@ const fmt = (n: number, moneda: 'ARS' | 'USD' = 'ARS') => {
   return formatMonto(n, moneda)
 }
 
+const REDUNDANT_ETIQUETAS = new Set([
+  'gasto',
+  'ingreso',
+  'inversión',
+  'inversion',
+  'transferencia',
+  'aporte a meta',
+  'retiro de meta',
+  'pago de tarjeta',
+  'ahorro',
+  'rendimiento',
+  'ajuste',
+  'saldo inicial',
+  'por confirmar',
+])
+
 // ── Components ───────────────────────────────────────────────────────────
 
 const PHRASES = [
@@ -1159,7 +1175,7 @@ export default function DashboardPage() {
                           <div className={styles.itemMeta}>
                             <p className={styles.itemName}>
                               {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
-                              {m.etiqueta && m.etiqueta !== 'Gasto' && m.etiqueta !== 'Ingreso' && (
+                              {m.etiqueta && !REDUNDANT_ETIQUETAS.has(m.etiqueta.trim().toLowerCase()) && (
                                 <span className={styles.badgeEtiqueta}>
                                   {m.etiqueta}
                                 </span>

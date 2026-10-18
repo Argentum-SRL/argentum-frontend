@@ -21,6 +21,22 @@ interface MovimientoRowProps {
   modo?: 'general' | 'billetera'
 }
 
+const REDUNDANT_ETIQUETAS = new Set([
+  'gasto',
+  'ingreso',
+  'inversión',
+  'inversion',
+  'transferencia',
+  'aporte a meta',
+  'retiro de meta',
+  'pago de tarjeta',
+  'ahorro',
+  'rendimiento',
+  'ajuste',
+  'saldo inicial',
+  'por confirmar',
+])
+
 const MovimientoRow = memo(({
   movimiento,
   categoria,
@@ -91,33 +107,45 @@ const MovimientoRow = memo(({
       ? styles.amountIngreso
       : styles.amountEgreso
 
-  const subtitle =
-    movimiento.billetera_nombre && !hideWallet
-      ? movimiento.billetera_destino_nombre
-        ? `${movimiento.billetera_nombre} → ${movimiento.billetera_destino_nombre}`
-        : movimiento.billetera_nombre
-      : null
+  const isTransferencia = movimiento.clase === 'transferencia'
+  const title = isTransferencia ? 'Transferencia' : movimiento.descripcion
+
+  const subtitle = isTransferencia
+    ? (movimiento.descripcion && movimiento.descripcion !== 'Transferencia'
+        ? movimiento.descripcion
+        : (movimiento.billetera_nombre && movimiento.billetera_destino_nombre
+            ? `${movimiento.billetera_nombre} → ${movimiento.billetera_destino_nombre}`
+            : movimiento.billetera_nombre))
+    : (movimiento.billetera_nombre && !hideWallet
+        ? (movimiento.billetera_destino_nombre
+            ? `${movimiento.billetera_nombre} → ${movimiento.billetera_destino_nombre}`
+            : movimiento.billetera_nombre)
+        : null)
+
+  const showEtiqueta = Boolean(
+    movimiento.etiqueta && !REDUNDANT_ETIQUETAS.has(movimiento.etiqueta.trim().toLowerCase())
+  )
 
   return (
     <div
       className={`${styles.row} ${styles.rowStatic}`}
-      aria-label={`${movimiento.descripcion}, monto ${formatMonto(movimiento.monto, movimiento.moneda)}`}
+      aria-label={`${title}, monto ${formatMonto(movimiento.monto, movimiento.moneda)}`}
     >
       {renderAvatar()}
 
       <div className={styles.infoArea}>
         <div className={styles.titleRow}>
-          <span className={styles.title} title={movimiento.descripcion}>
-            {movimiento.descripcion}
+          <span className={styles.title} title={title}>
+            {title}
           </span>
 
-          <div className={styles.badgesWrapper}>
-            {movimiento.etiqueta && movimiento.etiqueta !== 'Gasto' && movimiento.etiqueta !== 'Ingreso' && (
+          {showEtiqueta && (
+            <div className={`${styles.badgesWrapper} ${styles.desktopOnly}`}>
               <span className={styles.badgeEtiqueta}>
                 {movimiento.etiqueta}
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Desktop metadata */}

@@ -23,6 +23,7 @@ import BudgetCard from './BudgetCard'
 import BudgetBarChart from './BudgetBarChart'
 import BudgetHistoryModal from './BudgetHistoryModal'
 import { EmptyState, PageSummaryBar, PresupuestosSkeleton } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 
 export default function PresupuestosPage() {
   const { usuario } = useAuth()
@@ -306,22 +307,15 @@ export default function PresupuestosPage() {
 
       {/* ── Controls Row (Tabs) ──────────────────────────────── */}
       <div className={styles.controlsRow}>
-        <div className={styles.tabs}>
-          <button 
-            type="button"
-            className={`${styles.tab} ${activeTab === 'activo' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('activo')}
-          >
-            Activos
-          </button>
-          <button 
-            type="button"
-            className={`${styles.tab} ${activeTab === 'pausado' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('pausado')}
-          >
-            Pausados
-          </button>
-        </div>
+        <SegmentedControl<'activo' | 'pausado'>
+          options={[
+            { value: 'activo', label: 'Activos' },
+            { value: 'pausado', label: 'Pausados' },
+          ]}
+          value={activeTab}
+          onChange={setActiveTab}
+          ariaLabel="Estado de los presupuestos"
+        />
       </div>
 
       {/* ── Content ────────────────────────────────────────────────────────── */}

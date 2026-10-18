@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCcw, ArrowRight, Pencil, RotateCcw, CheckCircle, Lightbulb, HelpCircle } from '@/components/ui/icons';
 import { MontoInput, LunarLoader } from '@/components/ui';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import { formatMonto } from '@/utils/format';
 import type { IPCData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
@@ -691,44 +692,32 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
                       {/* 2. Modalidad de financiación */}
                       <div className={styles.wbField}>
                         <label className={styles.wbFieldLabel}>Modalidad de financiación</label>
-                        <div className={styles.wbSegmented}>
-                          <button
-                            type="button"
-                            className={`${styles.wbSegmentedBtn} ${!formData.tiene_interes ? styles.wbSegmentedBtnActive : ''}`}
-                            onClick={() => handleChange('tiene_interes', false)}
-                          >
-                            Cuotas fijas / Total
-                          </button>
-                          <button
-                            type="button"
-                            className={`${styles.wbSegmentedBtn} ${formData.tiene_interes ? styles.wbSegmentedBtnActive : ''}`}
-                            onClick={() => handleChange('tiene_interes', true)}
-                          >
-                            Con tasa (TNA)
-                          </button>
-                        </div>
+                        <SegmentedControl<'fijas' | 'tna'>
+                          options={[
+                            { value: 'fijas', label: 'Cuotas fijas / Total' },
+                            { value: 'tna', label: 'Con tasa (TNA)' },
+                          ]}
+                          value={formData.tiene_interes ? 'tna' : 'fijas'}
+                          onChange={(v) => handleChange('tiene_interes', v === 'tna')}
+                          ariaLabel="Modalidad de financiación"
+                          fullWidth
+                        />
 
                         {/* Si es cuotas fijas */}
                         {!formData.tiene_interes && (
                           <div className={styles.wbFixedModeArea}>
                             <div className={styles.wbSubModeRow}>
                               <span className={styles.wbSubModePrompt}>Modo de ingreso:</span>
-                              <div className={styles.wbSubModePills}>
-                                <button
-                                  type="button"
-                                  className={`${styles.wbSubPill} ${fixedMode === 'total' ? styles.wbSubPillActive : ''}`}
-                                  onClick={() => setFixedMode('total')}
-                                >
-                                  Total en cuotas
-                                </button>
-                                <button
-                                  type="button"
-                                  className={`${styles.wbSubPill} ${fixedMode === 'cuota' ? styles.wbSubPillActive : ''}`}
-                                  onClick={() => setFixedMode('cuota')}
-                                >
-                                  Valor por cuota
-                                </button>
-                              </div>
+                              <SegmentedControl<'total' | 'cuota'>
+                                options={[
+                                  { value: 'total', label: 'Total en cuotas' },
+                                  { value: 'cuota', label: 'Valor por cuota' },
+                                ]}
+                                value={fixedMode}
+                                onChange={(v) => setFixedMode(v)}
+                                ariaLabel="Modo de ingreso"
+                                fullWidth
+                              />
                             </div>
 
                             {fixedMode === 'total' ? (

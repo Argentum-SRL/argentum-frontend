@@ -8,6 +8,7 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .badgeRecurrente {
@@ -24,4 +25,15 @@
 
 .badgeText {
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .badgeText {
+    display: none;
+  }
+
+  .badge {
+    padding: 2.5px 4.5px;
+    border-radius: 4px;
+  }
 }

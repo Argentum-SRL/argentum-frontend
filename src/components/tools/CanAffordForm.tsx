@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar, Coins } from '@/components/ui/icons';
 import { Button, MontoInput } from '@/components/ui';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import { formatMonto } from '@/utils/format';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import styles from './ToolsComponents.module.css';
@@ -117,24 +118,16 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
           {/* Modo pago */}
           <div className={styles.formGroup}>
             <label className={styles.label}>¿Cómo lo vas a pagar?</label>
-            <div className={styles.pillToggle}>
-              <button
-                type="button"
-                className={`${styles.pillOption} ${formData.modo === 'contado' ? styles.pillOptionActive : ''}`}
-                onClick={() => handleChange('modo', 'contado')}
-              >
-                <Coins size={14} />
-                De contado
-              </button>
-              <button
-                type="button"
-                className={`${styles.pillOption} ${formData.modo === 'cuotas' ? styles.pillOptionActive : ''}`}
-                onClick={() => handleChange('modo', 'cuotas')}
-              >
-                <Calendar size={14} />
-                En cuotas
-              </button>
-            </div>
+            <SegmentedControl<'contado' | 'cuotas'>
+              options={[
+                { value: 'contado', label: 'De contado', icon: <Coins size={15} /> },
+                { value: 'cuotas', label: 'En cuotas', icon: <Calendar size={15} /> },
+              ]}
+              value={formData.modo}
+              onChange={(v) => handleChange('modo', v)}
+              ariaLabel="¿Cómo lo vas a pagar?"
+              fullWidth
+            />
           </div>
 
           {/* Cantidad de cuotas */}
@@ -184,22 +177,16 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
           {formData.modo === 'cuotas' && (
             <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
               <label className={styles.label}>¿Las cuotas tienen interés?</label>
-              <div className={styles.pillToggle}>
-                <button
-                  type="button"
-                  className={`${styles.pillOption} ${!tieneInteres ? styles.pillOptionActive : ''}`}
-                  onClick={() => setTieneInteres(false)}
-                >
-                  Sin interés
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.pillOption} ${tieneInteres ? styles.pillOptionActive : ''}`}
-                  onClick={() => setTieneInteres(true)}
-                >
-                  Con interés
-                </button>
-              </div>
+              <SegmentedControl<'sin' | 'con'>
+                options={[
+                  { value: 'sin', label: 'Sin interés' },
+                  { value: 'con', label: 'Con interés' },
+                ]}
+                value={tieneInteres ? 'con' : 'sin'}
+                onChange={(v) => setTieneInteres(v === 'con')}
+                ariaLabel="¿Las cuotas tienen interés?"
+                fullWidth
+              />
             </div>
           )}
 

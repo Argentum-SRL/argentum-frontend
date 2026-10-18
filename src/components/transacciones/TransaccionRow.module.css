@@ -132,6 +132,7 @@
 .infoArea {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -143,9 +144,12 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+  width: 100%;
 }
 
 .title {
+  flex: 0 1 auto;
+  min-width: 0;
   font-size: 14.5px;
   font-weight: 600;
   color: var(--text);
@@ -321,7 +325,29 @@
 .mobileSubtitleRow {
   display: flex;
   align-items: center;
+  gap: 6px;
   min-width: 0;
+}
+
+.mobilePendingBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #B45309;
+  background: #FEF3C7;
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  padding: 1px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .mobilePendingBadge {
+  color: #FBBF24;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
 }
 
 .mobileCategoryText {
@@ -331,6 +357,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* ── 3. Amount Column ───────────────────────────────────────────────── */
@@ -342,6 +369,8 @@
   gap: 2px;
   flex-shrink: 0;
   text-align: right;
+  min-width: max-content;
+  z-index: 1;
 }
 
 .amount {
@@ -501,6 +530,7 @@
   }
 
   .badge {
-    padding: 2px 4px;
+    padding: 2.5px 4.5px;
+    border-radius: 4px;
   }
 }

@@ -16,6 +16,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import GoalCard from '@/components/goals/GoalCard'
 import GoalsBarChart from './GoalsBarChart'
 import { EmptyState, PageSummaryBar, GoalsSkeleton } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 
 export default function MetasPage() {
   const { open, confirm } = useModal()
@@ -231,29 +232,16 @@ export default function MetasPage() {
 
       {/* ── Controls Row (Tabs) ──────────────────────────────── */}
       <div className={styles.controlsRow}>
-        <div className={styles.tabs}>
-          <button 
-            type="button"
-            className={`${styles.tab} ${activeTab === 'activa' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('activa')}
-          >
-            Activas
-          </button>
-          <button 
-            type="button"
-            className={`${styles.tab} ${activeTab === 'completada' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('completada')}
-          >
-            Completadas
-          </button>
-          <button 
-            type="button"
-            className={`${styles.tab} ${activeTab === 'pausada' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('pausada')}
-          >
-            Pausadas
-          </button>
-        </div>
+        <SegmentedControl<'activa' | 'completada' | 'pausada'>
+          options={[
+            { value: 'activa', label: 'Activas' },
+            { value: 'completada', label: 'Completadas' },
+            { value: 'pausada', label: 'Pausadas' },
+          ]}
+          value={activeTab}
+          onChange={setActiveTab}
+          ariaLabel="Estado de las metas"
+        />
       </div>
 
       {/* ── Content ──────────────────────────────────────────────────── */}

@@ -11,9 +11,25 @@ import {
 } from '@/components/ui/icons'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
-import { formatMonto, formatHora } from '@/utils/format'
+import { formatMonto } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import styles from './TransaccionRow.module.css'
+
+const REDUNDANT_ETIQUETAS = new Set([
+  'gasto',
+  'ingreso',
+  'inversión',
+  'inversion',
+  'transferencia',
+  'aporte a meta',
+  'retiro de meta',
+  'pago de tarjeta',
+  'ahorro',
+  'rendimiento',
+  'ajuste',
+  'saldo inicial',
+  'por confirmar',
+])
 
 interface TransaccionRowProps {
   transaccion: Transaccion
@@ -60,12 +76,6 @@ const TransaccionRow = memo(({
   )
   const isAporteMeta = isMeta && transaccion.tipo === 'egreso'
   const isRetiroMeta = isMeta && transaccion.tipo === 'ingreso'
-
-  const hora = useMemo(() => {
-    const fecha = transaccion.fecha_creacion || transaccion.fecha
-    if (!fecha || !fecha.includes('T')) return ''
-    return formatHora(fecha)
-  }, [transaccion.fecha_creacion, transaccion.fecha])
 
   const metodoLabel = useMemo(() => {
     if (transaccion.tipo === 'ingreso' && (transaccion.metodo_pago === 'debito' || transaccion.metodo_pago === 'credito')) {
@@ -161,10 +171,10 @@ const TransaccionRow = memo(({
           </span>
 
           <div className={styles.badgesWrapper}>
-            {isPendienteIA && (
-              <span className={`${styles.badge} ${styles.badgePendiente}`}>
+            {isPendiente && (
+              <span className={`${styles.badge} ${styles.badgePendiente} ${styles.desktopOnly}`}>
                 <Sparkles size={10} strokeWidth={2.5} />
-                <span className={styles.badgeText}>Pendiente IA</span>
+                <span className={styles.badgeText}>{isPendienteIA ? 'Pendiente IA' : 'Por confirmar'}</span>
               </span>
             )}
             {transaccion.es_cuota_hija && (
@@ -176,15 +186,15 @@ const TransaccionRow = memo(({
             {Boolean(transaccion.suscripcion_id) && (
               <DebitoAutomaticoBadge />
             )}
-            {etiqueta && etiqueta !== 'Gasto' && etiqueta !== 'Ingreso' && (
-              <span className={styles.badgeEtiqueta}>
+            {etiqueta && !REDUNDANT_ETIQUETAS.has(etiqueta.trim().toLowerCase()) && (
+              <span className={`${styles.badgeEtiqueta} ${styles.desktopOnly}`}>
                 {etiqueta}
               </span>
             )}
           </div>
         </div>
 
-        {/* Desktop Metadata Row (Categoría limpia + Chip billetera opcional + Hora) */}
+        {/* Desktop Metadata Row (Categoría limpia + Chip billetera opcional) */}
         <div className={`${styles.metaRow} ${styles.desktopOnly}`}>
           <span className={styles.categoryPath} title={categoryDisplayText}>
             {categoryDisplayText}
@@ -210,20 +220,17 @@ const TransaccionRow = memo(({
               </div>
             </>
           )}
-
-          {hora && (
-            <>
-              <div className={styles.metaBullet}>•</div>
-              <span className={styles.metaTime}>{hora}</span>
-            </>
-          )}
         </div>
 
         {/* Mobile-Only Clean Subtitle */}
         <div className={`${styles.mobileSubtitleRow} ${styles.mobileOnly}`}>
+          {isPendiente && (
+            <span className={styles.mobilePendingBadge}>
+              Por confirmar
+            </span>
+          )}
           <span className={styles.mobileCategoryText} title={categoryDisplayText}>
             {categoryDisplayText}
-            {hora ? ` · ${hora}` : ''}
           </span>
         </div>
       </div>
@@ -253,7 +260,7 @@ const TransaccionRow = memo(({
         {/* En Mobile: Solo mostrar billetera si no está en la página de la billetera */}
         {!hideWallet && (
           <span className={`${styles.mobileWalletName} ${styles.mobileOnly}`} title={walletDisplayName}>
-            {isAporteMeta ? `Apartado · ${walletDisplayName}` : walletDisplayName}
+            {walletDisplayName}
           </span>
         )}
       </div>

@@ -64,11 +64,34 @@
   /* ── Colores del Selector Cápsula ── */
   --selector-pill-bg-active: var(--primary); /* Fondo del botón de selección activo */
   --selector-pill-text-active: #FFFFFF; /* Color del texto del botón de selección activo */
+
+  /* ── Escala de Pantalla y Anchos Adaptativos ── */
+  --screen-scale: 1; /* Factor de escala base para pantallas estándar */
+  --modal-w-sm: calc(400px * var(--screen-scale)); /* Ancho de modal pequeño adaptativo */
+  --modal-w-md: calc(520px * var(--screen-scale)); /* Ancho de modal mediano adaptativo */
+  --modal-w-md-wide: calc(540px * var(--screen-scale)); /* Ancho de modal mediano extendido adaptativo */
+  --modal-w-lg: calc(800px * var(--screen-scale)); /* Ancho de modal grande adaptativo */
+  --modal-w-xl: calc(1000px * var(--screen-scale)); /* Ancho de modal extra grande adaptativo */
+  --content-max-w: calc(1600px * var(--screen-scale)); /* Ancho máximo de contenido principal adaptativo */
 }
 
 @media (pointer: coarse) {
   :root {
     --selector-pill-h: 44px; /* Altura táctil mejorada para WCAG 2.5.5 */
+  }
+}
+
+/* Escala adaptativa para monitores grandes */
+@media (min-width: 1920px) {
+  :root {
+    --screen-scale: 1.1; /* Escala aumentada al 110% en pantallas de 1920px o más */
+  }
+}
+
+/* Escala adaptativa para monitores muy grandes */
+@media (min-width: 2560px) {
+  :root {
+    --screen-scale: 1.2; /* Escala aumentada al 120% en pantallas de 2560px o más */
   }
 }
 

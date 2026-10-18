@@ -7,6 +7,7 @@ import tarjetaService from '@/services/tarjeta.service'
 import movimientoService from '@/services/movimiento.service'
 import categoriaService from '@/services/categoria.service'
 import { EmptyState, BilleteraDetalleSkeleton, TransactionsListSkeleton, CardsGridSkeleton } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
@@ -625,26 +626,17 @@ const BilleteraDetallePage: React.FC = () => {
 
       {/* Switch de pestañas solo para mobile (solo si no es efectivo) */}
       {!billetera.es_efectivo && (
-        <div className={styles.tabsContainer} role="tablist" aria-label="Secciones de la billetera">
-          <button 
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'movimientos'}
-            className={`${styles.tabBtn} ${activeTab === 'movimientos' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('movimientos')}
-          >
-            Movimientos
-          </button>
-          <button 
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'credito'}
-            className={`${styles.tabBtn} ${activeTab === 'credito' ? styles.tabBtnActive : ''}`}
-            onClick={() => setActiveTab('credito')}
-          >
-            Crédito
-          </button>
-        </div>
+        <SegmentedControl<'movimientos' | 'credito'>
+          options={[
+            { value: 'movimientos', label: 'Movimientos' },
+            { value: 'credito', label: 'Crédito' },
+          ]}
+          value={activeTab}
+          onChange={setActiveTab}
+          fullWidth
+          ariaLabel="Secciones de la billetera"
+          className={styles.tabsMobileOnly}
+        />
       )}
 
       <div className={styles.contentGrid}>

@@ -20,6 +20,7 @@ import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { EmptyState, GruposCuotasSkeleton } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import GrupoCuotasAvatar from './GrupoCuotasAvatar'
 import GrupoCuotasDetalleModal from './GrupoCuotasDetalleModal'
 import GrupoCuotasEditarModal from './GrupoCuotasEditarModal'
@@ -636,29 +637,17 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         {/* Mobile controls bar (hidden when search expanded) */}
         <div className={`${styles.mobileControlsBar} ${mobileSearchOpen ? styles.mobileControlsHidden : ''}`}>
           <div className={styles.filterTabsWrapperMobile}>
-            <div className={styles.filterTabs}>
-              <button
-                type="button"
-                className={`${styles.filterTab} ${statusFilter === 'activas' ? styles.filterTabActive : ''}`}
-                onClick={() => setStatusFilter('activas')}
-              >
-                Activas ({metricas.cuotasActivas})
-              </button>
-              <button
-                type="button"
-                className={`${styles.filterTab} ${statusFilter === 'completadas' ? styles.filterTabActive : ''}`}
-                onClick={() => setStatusFilter('completadas')}
-              >
-                Finalizadas
-              </button>
-              <button
-                type="button"
-                className={`${styles.filterTab} ${statusFilter === 'todas' ? styles.filterTabActive : ''}`}
-                onClick={() => setStatusFilter('todas')}
-              >
-                Todas ({grupos.length})
-              </button>
-            </div>
+            <SegmentedControl<'activas' | 'completadas' | 'todas'>
+              options={[
+                { value: 'activas', label: `Activas (${metricas.cuotasActivas})` },
+                { value: 'completadas', label: 'Finalizadas' },
+                { value: 'todas', label: `Todas (${grupos.length})` },
+              ]}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              fullWidth
+              ariaLabel="Filtrar cuotas por estado"
+            />
           </div>
 
           <button 
@@ -694,29 +683,16 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
 
         {/* Desktop Controls */}
         <div className={styles.desktopControlsContainer}>
-          <div className={styles.filterTabs}>
-            <button
-              type="button"
-              className={`${styles.filterTab} ${statusFilter === 'activas' ? styles.filterTabActive : ''}`}
-              onClick={() => setStatusFilter('activas')}
-            >
-              Activas ({metricas.cuotasActivas})
-            </button>
-            <button
-              type="button"
-              className={`${styles.filterTab} ${statusFilter === 'completadas' ? styles.filterTabActive : ''}`}
-              onClick={() => setStatusFilter('completadas')}
-            >
-              Finalizadas
-            </button>
-            <button
-              type="button"
-              className={`${styles.filterTab} ${statusFilter === 'todas' ? styles.filterTabActive : ''}`}
-              onClick={() => setStatusFilter('todas')}
-            >
-              Todas ({grupos.length})
-            </button>
-          </div>
+          <SegmentedControl<'activas' | 'completadas' | 'todas'>
+            options={[
+              { value: 'activas', label: `Activas (${metricas.cuotasActivas})` },
+              { value: 'completadas', label: 'Finalizadas' },
+              { value: 'todas', label: `Todas (${grupos.length})` },
+            ]}
+            value={statusFilter}
+            onChange={setStatusFilter}
+            ariaLabel="Filtrar cuotas por estado"
+          />
 
           <div className={styles.searchBoxDesktop}>
             <Search size={15} className={styles.searchIcon} />

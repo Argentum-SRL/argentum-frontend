@@ -1,7 +1,7 @@
 /* ==========================================================================
    SegmentedControl.module.css — Selector Cápsula Oficial de Argentum (Opción 4)
    Diseño final sin pista contenedora (sin card ni fondo detrás de los botones):
-   - Botones sueltos en fila con gap var(--selector-gap) (o multilínea con .trackWrap y .pillWrap).
+   - Botones sueltos en fila con gap var(--selector-gap).
    - Píldora inactiva: transparente, sin borde, color var(--text-2), 13px, peso 600,
      min-height var(--selector-pill-h), radio var(--radius-selector-pill).
    - Píldora activa: background var(--selector-pill-bg-active), color var(--selector-pill-text-active),
@@ -14,14 +14,13 @@
 
 .track {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--selector-gap);
+  width: max-content;
+  max-width: 100%;
   box-sizing: border-box;
   margin: 0;
   overflow: visible;
-}
-
-.trackWrap {
-  flex-wrap: wrap;
 }
 
 .fullWidth {
@@ -29,8 +28,8 @@
 }
 
 .pill {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 0;
+  min-width: max-content;
   min-height: var(--selector-pill-h);
   border: 0;
   border-radius: var(--radius-selector-pill);
@@ -47,8 +46,9 @@
   gap: var(--space-sm);
   cursor: pointer;
   box-sizing: border-box;
-  padding: 0;
+  padding: 0 var(--space-lg);
   margin: 0;
+  white-space: nowrap;
   user-select: none;
   -webkit-user-select: none;
   transition: color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
@@ -60,22 +60,14 @@
   gap: var(--space-xs);
 }
 
-.pillWrap {
-  flex: 1 1 auto;
-  padding: 0 var(--space-md);
-}
-
 .text {
   /* Contenedor vertical para opciones con etiqueta y descripción */
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 0;
 }
 
 .label {
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -86,8 +78,6 @@
   line-height: 1.2;
   opacity: 0.8;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .icon {

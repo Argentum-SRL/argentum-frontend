@@ -17,6 +17,7 @@ import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { TransferenciaModal, TransferenciasTab } from '@/components/transferencias'
 import transferenciaService from '@/services/transferencia.service'
 import type { TransferenciaInterna } from '@/types'
@@ -369,27 +370,18 @@ export default function BilleterasPage() {
         </div>
       </div>
 
-      {/* Switch de pestañas solo para mobile */}
-      <div className={styles.tabsContainer} role="tablist" aria-label="Secciones de billeteras">
-        <button 
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'billeteras'}
-          className={`${styles.tabBtn} ${activeTab === 'billeteras' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('billeteras')}
-        >
-          Mis Billeteras
-        </button>
-        <button 
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'transferencias'}
-          className={`${styles.tabBtn} ${activeTab === 'transferencias' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('transferencias')}
-        >
-          Transferencias
-        </button>
-      </div>
+      {/* Selector de pestañas oficial solo para mobile */}
+      <SegmentedControl<'billeteras' | 'transferencias'>
+        options={[
+          { value: 'billeteras', label: 'Mis Billeteras' },
+          { value: 'transferencias', label: 'Transferencias' },
+        ]}
+        value={activeTab}
+        onChange={setActiveTab}
+        fullWidth
+        ariaLabel="Secciones de billeteras"
+        className={styles.tabsMobileOnly}
+      />
 
       {activeTab === 'billeteras' ? (
         <>

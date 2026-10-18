@@ -100,7 +100,6 @@
   padding-top: 14px;
   border-top: 1px solid var(--border);
   margin-top: 4px;
-  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
 }
 
 .cancelBtn {

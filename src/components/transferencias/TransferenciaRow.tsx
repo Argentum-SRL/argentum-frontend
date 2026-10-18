@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { Trash2 } from '@/components/ui/icons'
 import type { TransferenciaInterna, Billetera } from '@/types'
-import { formatMonto, formatHora } from '@/utils/format'
+import { formatMonto } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './TransferenciaRow.module.css'
 
@@ -52,10 +52,6 @@ export const TransferenciaRow = memo(({
   const visOrigen = getBankVisuals(billeteraOrigen, 'Origen')
   const visDestino = getBankVisuals(billeteraDestino, 'Destino')
 
-  const hora = transferencia.fecha_creacion && transferencia.fecha_creacion.includes('T')
-    ? formatHora(transferencia.fecha_creacion)
-    : ''
-
   const monedaOrigen = transferencia.moneda_origen || billeteraOrigen?.moneda || transferencia.moneda
   const monedaDestino = transferencia.moneda_destino || billeteraDestino?.moneda || transferencia.moneda
   const esCrossCurrency = monedaOrigen !== monedaDestino
@@ -105,25 +101,11 @@ export const TransferenciaRow = memo(({
           )}
         </div>
 
-        {(transferencia.notas || hora) && (
+        {Boolean(transferencia.notas) && (
           <div className={styles.meta}>
-            {transferencia.notas ? (
-              <>
-                <span className={styles.metaDesc} title={transferencia.notas}>
-                  {transferencia.notas}
-                </span>
-                {hora && (
-                  <span className={`${styles.metaDivider} ${styles.desktopOnly}`}> · </span>
-                )}
-                {hora && (
-                  <span className={`${styles.metaHora} ${styles.desktopOnly}`}>{hora}</span>
-                )}
-              </>
-            ) : (
-              hora && (
-                <span className={styles.metaHora}>{hora}</span>
-              )
-            )}
+            <span className={styles.metaDesc} title={transferencia.notas || undefined}>
+              {transferencia.notas}
+            </span>
           </div>
         )}
       </div>

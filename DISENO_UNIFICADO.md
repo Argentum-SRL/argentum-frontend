@@ -290,7 +290,38 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 
 ---
 
-## 12. Estado de Migración de Pantallas
+## 12. Sistema Responsive
+
+### Escala de Puntos de Corte Permitida y Rangos de Dispositivos
+La arquitectura responsive de Argentum se rige por la escala canónica custodiada por R15 (`{360, 479, 480, 639, 640, 719, 720, 767, 768, 1023, 1024, 1279, 1280, 1439, 1440, 1919, 1920, 2559, 2560}`):
+
+| Rango de Ancho | Clasificación de Dispositivo | Escala / Variables |
+| :--- | :--- | :--- |
+| `320px - 359px` | Teléfonos chicos (iPhone SE) | Vista compacta, sin truncamiento en selectores |
+| `360px - 479px` | Teléfonos estándar | Vista móvil base |
+| `480px - 767px` | Teléfonos grandes y tablet vertical | Bottom sheets activos |
+| `768px - 1023px` | Tablet | Modales flotantes centrados |
+| `1024px - 1439px` | Notebook | Layout de escritorio estándar |
+| `1440px - 1919px` | Monitor | Layout amplio (`--screen-scale: 1`) |
+| `1920px - 2559px` | Monitor grande | Factor de escala `--screen-scale: 1.1` (+10%) |
+| `2560px` o más | Monitor muy grande / 4K | Factor de escala `--screen-scale: 1.2` (+20%) |
+
+### Reglas Normativas Responsive
+1. **Contención de la Cápsula (`SegmentedControl`):** La cápsula nunca corta texto con ellipsis (`text-overflow`) ni oculta contenido (`overflow: hidden`). Si el contenedor no tiene espacio suficiente, el track pasa fluidamente a la siguiente fila (`flex-wrap: wrap`).
+2. **Propiedad `fullWidth`:** El modificador `fullWidth` solo se permite dentro de modales o en selectores que se ocultan en escritorio (`MOBILE-ONLY`). Los grupos de nivel página en escritorio no deben llevar `fullWidth`.
+3. **Anchos Centralizados de Modales y Bottom Sheets:** Todos los modales y bottom sheets derivan sus medidas exclusivamente de las clases base del componente `Modal` (`.sm`, `.md`, `.lg`, `.xl`) y variables asociadas (`--modal-w-sm`, `--modal-w-md`, `--modal-w-md-wide`, `--modal-w-lg`, `--modal-w-xl`). Si un modal requiere un ancho específico, declara localmente `--modal-w: var(--modal-w-md-wide);` sin duplicar bloques de `@media` ni pisar con `!important`.
+4. **Prohibición de Anchos Rígidos con `!important`:** Queda terminantemente prohibido declarar `width` o `max-width` fijos de 300px o más con `!important` en archivos CSS (custodiado por regla R17).
+5. **Áreas Seguras Móviles (Safe Area):** Todo bottom sheet debe respetar el margen inferior del sistema mediante `padding-bottom: max(var(--modal-content-pad-bottom), env(safe-area-inset-bottom, 0px))` y análogamente en el footer.
+
+### Matriz de Prueba
+Toda verificación o certificación responsive debe comprobar el correcto renderizado en la siguiente matriz de resoluciones y condiciones:
+- **Anchos:** 320px, 375px, 390px, 430px, 768px, 1024px, 1440px, 1920px, 2560px y 3840px.
+- **Temas:** Modo Claro y Modo Oscuro.
+- **Orientación:** Vertical y Horizontal en dispositivos móviles.
+
+---
+
+## 13. Estado de Migración de Pantallas
 
 | Pantalla / Módulo | Estado | Tanda Planificada |
 | :--- | :--- | :--- |
@@ -302,6 +333,10 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 | Carruseles de billeteras y tarjetas (6 copias) | Hecho | Tanda 3e |
 | Espaciado modales: Transacciones y Transferencias | Hecho | Tanda 3f |
 | Espaciado modales: resto | Hecho | Tanda 3g |
+| Pestañas, filtros y grupos de opciones (Transacciones, Billeteras, Metas, Presupuestos, filtros, Cuotas, Explicativo, Presupuesto, Herramientas) | Hecho | Tanda 3h |
+| Bottom sheets de filtros | Hecho | Tanda 3i |
+| Tamaños de modal y bottom sheet centralizados | Hecho | Tanda 3i |
+| Pestañas y selectores pendientes (Perfil: animación hover en íconos; Administración: AdminPage, AnimacionPreviewPage, MonitorWppPanel; Dashboard: switch $/%; PresupuestoModal: presets multiselección; PagarResumenModal: quickChips; tarjetas de elección: onboarding, CicloFinancieroSelector, StepMoneda, SuscripcionModal catálogo; BalanceCard: botones de moneda) | Pendiente | Tandas siguientes |
 | Espaciado modales: reglas saltadas (márgenes negativos y rem: SuscripcionModal.module.css, NotificacionesConfigModal.module.css, ProyeccionModal.module.css) | Pendiente | Tanda de estructura |
 | Altura adaptativa: resto de modales | Pendiente | Tandas siguientes |
 | Transacciones | Pendiente | Fases Futuras |
@@ -317,7 +352,7 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 
 ---
 
-## 13. Referencias y Fuentes Normativas
+## 14. Referencias y Fuentes Normativas
 
 - **Queensland Government Design System — Spacing System:**  
   https://designsystem.qld.gov.au/styles/spacing

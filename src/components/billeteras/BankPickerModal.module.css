@@ -1,19 +1,12 @@
 /* ── Modal Root Wrapper ─────────────────────────────────────────────────── */
 .modalRoot {
-  width: 520px;
+  width: 100%;
   max-width: 100%;
   background: var(--surface);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-}
-
-@media (max-width: 640px) {
-  .modalRoot {
-    width: 100%;
-    max-height: 90dvh;
-  }
 }
 
 /* ── Indicador de pasos ───────────────────────────────────────────────────── */

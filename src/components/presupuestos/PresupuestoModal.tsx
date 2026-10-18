@@ -20,6 +20,7 @@ import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './PresupuestoModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
@@ -860,21 +861,17 @@ export default function PresupuestoModal({
 
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>Periodo de tiempo</label>
-                  <div className={styles.periodSegmentedWrap} role="radiogroup" aria-label="Periodo de tiempo">
-                    {(['semanal', 'quincenal', 'mensual'] as const).map(p => (
-                      <button
-                        type="button"
-                        key={p}
-                        role="radio"
-                        aria-checked={periodo === p}
-                        className={`${styles.periodBtn} ${periodo === p ? styles.periodBtnActive : ''}`}
-                        onClick={() => setField('periodo', p)}
-                      >
-                        <Calendar size={15} strokeWidth={1.75} className={styles.periodBtnIcon} />
-                        <span className={styles.periodBtnLabel}>{etiquetaPeriodoPresupuesto(p)}</span>
-                      </button>
-                    ))}
-                  </div>
+                  <SegmentedControl<'semanal' | 'quincenal' | 'mensual'>
+                    options={[
+                      { value: 'semanal', label: etiquetaPeriodoPresupuesto('semanal'), icon: <Calendar size={15} /> },
+                      { value: 'quincenal', label: etiquetaPeriodoPresupuesto('quincenal'), icon: <Calendar size={15} /> },
+                      { value: 'mensual', label: etiquetaPeriodoPresupuesto('mensual'), icon: <Calendar size={15} /> },
+                    ]}
+                    value={periodo}
+                    onChange={(v) => setField('periodo', v)}
+                    ariaLabel="Periodo de tiempo"
+                    fullWidth
+                  />
                 </div>
 
                 <div className={styles.formField}>

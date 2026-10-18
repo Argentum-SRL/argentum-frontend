@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { X, Sparkles, TrendingUp, Activity, Layers, CheckCircle2 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './ExplicativoFinancieroModal.module.css'
 
 interface ExplicativoFinancieroModalProps {
@@ -40,40 +41,24 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
           </button>
         </div>
 
-        {/* Tabs segmentadas estilo FilterBar */}
+        {/* Selector de pestañas oficial */}
         <div className={styles.tabsWrapper}>
-          <div className={styles.tabs} role="tablist" aria-label="Secciones de la guía">
-            <button
-              type="button"
-              role="tab"
-              id="tab-perfil"
-              aria-selected={activeTab === 'perfil'}
-              aria-controls="panel-perfil"
-              className={`${styles.tab} ${activeTab === 'perfil' ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab('perfil')}
-            >
-              <Activity size={14} />
-              <span>Tu perfil financiero</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              id="tab-proyeccion"
-              aria-selected={activeTab === 'proyeccion'}
-              aria-controls="panel-proyeccion"
-              className={`${styles.tab} ${activeTab === 'proyeccion' ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab('proyeccion')}
-            >
-              <TrendingUp size={14} />
-              <span>Proyección del ciclo</span>
-            </button>
-          </div>
+          <SegmentedControl<'perfil' | 'proyeccion'>
+            options={[
+              { value: 'perfil', label: 'Tu perfil financiero', icon: <Activity size={15} /> },
+              { value: 'proyeccion', label: 'Proyección del ciclo', icon: <TrendingUp size={15} /> },
+            ]}
+            value={activeTab}
+            onChange={setActiveTab}
+            fullWidth
+            ariaLabel="Secciones del explicativo financiero"
+          />
         </div>
 
         {/* Cuerpo del Modal */}
         <div className={styles.body}>
           {activeTab === 'perfil' ? (
-            <div id="panel-perfil" role="tabpanel" aria-labelledby="tab-perfil">
+            <div role="tabpanel" aria-label="Tu perfil financiero">
               <div className={styles.introBox}>
                 Un diagnóstico objetivo de tus hábitos de dinero que evalúa la regularidad de tus ingresos y gastos a lo largo del tiempo, clasificándolos sin juicios morales para mostrar tu margen de maniobra real.
               </div>
@@ -130,7 +115,7 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
               </div>
             </div>
           ) : (
-            <div id="panel-proyeccion" role="tabpanel" aria-labelledby="tab-proyeccion">
+            <div role="tabpanel" aria-label="Proyección del ciclo">
               <div className={styles.introBox}>
                 Una estimación estadística predictiva de cómo vas a terminar tu ciclo financiero actual (entre tus fechas de cobro), ayudándote a anticipar imprevistos antes del cierre.
               </div>

@@ -23,6 +23,7 @@ import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
 import GruposCuotasTab from '@/components/transacciones/GruposCuotasTab'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 
 const PAGE_SIZE = 50
 
@@ -484,27 +485,18 @@ export default function TransaccionesPage() {
         </div>
       </div>
 
-      {/* Switch de pestañas solo para mobile */}
-      <div className={styles.tabsContainer} role="tablist" aria-label="Secciones de transacciones">
-        <button 
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'historial'}
-          className={`${styles.tabBtn} ${activeTab === 'historial' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('historial')}
-        >
-          Historial
-        </button>
-        <button 
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'cuotas'}
-          className={`${styles.tabBtn} ${activeTab === 'cuotas' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('cuotas')}
-        >
-          Cuotas
-        </button>
-      </div>
+      {/* Selector de pestañas oficial solo para mobile */}
+      <SegmentedControl<'historial' | 'cuotas'>
+        options={[
+          { value: 'historial', label: 'Historial' },
+          { value: 'cuotas', label: 'Cuotas' },
+        ]}
+        value={activeTab}
+        onChange={setActiveTab}
+        fullWidth
+        ariaLabel="Secciones de transacciones"
+        className={styles.tabsMobileOnly}
+      />
 
       {activeTab === 'historial' ? (
         <>

@@ -53,6 +53,8 @@
      Must separate definitively from the modal floor without clipping. */
   --elevation-selection-modal: 0 12px 26px -3px rgba(var(--shadow-color-rgb), 0.24),
                                0 4px 8px -1px rgba(var(--shadow-color-rgb), 0.12);
+  /* Selección contenida dentro de carruseles de modales (alcance 18px) */
+  --elevation-selection-carousel: 0 6px 12px -3px rgba(var(--shadow-color-rgb), 0.22);
 
   /* Píldora activa de la cápsula (sombra suave más corta para no salirse de la pista) */
   --elevation-pill: 0 2px 6px -1px rgba(var(--shadow-color-rgb), 0.14),
@@ -69,6 +71,7 @@
   --elevation-reach-xl: 60px;
   --elevation-reach-selection: 38px;
   --elevation-reach-selection-modal: 44px;
+  --elevation-reach-selection-carousel: 20px;
 
   /* ── Backward Compatibility Aliases ── */
   --shadow-none: var(--elevation-none);
@@ -120,6 +123,8 @@
 
   --elevation-selection-modal: 0 14px 30px -3px rgba(0, 0, 0, 0.75),
                                0 4px 10px -1px rgba(0, 0, 0, 0.45);
+  /* Selección contenida dentro de carruseles de modales en modo oscuro (alcance 20px) */
+  --elevation-selection-carousel: 0 6px 14px -3px rgba(0, 0, 0, 0.60);
 
   /* Píldora activa de la cápsula (dark mode) */
   --elevation-pill: 0 2px 8px -1px rgba(0, 0, 0, 0.55),

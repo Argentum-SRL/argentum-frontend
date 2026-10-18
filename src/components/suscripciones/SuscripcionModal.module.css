@@ -385,20 +385,23 @@
 /* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
 .billeterasCarouselScroller {
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: hidden;
   -ms-overflow-style: none;
+  padding: var(--carousel-pad) 0;
 }
 
 .billeterasCarouselScroller::-webkit-scrollbar {
   display: none;
 }
 
+/* Carrusel canónico: padding = alcance de la sombra de selección (ver DISENO_UNIFICADO.md, carruseles) */
 .billeterasCarousel {
+  --elevation-selection-modal: var(--elevation-selection-carousel);
   display: flex;
   gap: 14px;
   overflow: visible;
   scroll-snap-type: x mandatory;
-  padding: 14px 40px 24px;
+  padding: 0 var(--carousel-pad);
   -ms-overflow-style: none;
   min-width: 100%;
   box-sizing: border-box;

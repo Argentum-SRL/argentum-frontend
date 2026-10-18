@@ -466,7 +466,7 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
-  padding: 6px 0 10px;
+  padding: var(--carousel-pad) 0;
   margin: 0;
   touch-action: pan-x;
 }
@@ -475,12 +475,14 @@
   display: none;
 }
 
+/* Carrusel canónico: padding = alcance de la sombra de selección (ver DISENO_UNIFICADO.md, carruseles) */
 .billeterasCarousel {
+  --elevation-selection-modal: var(--elevation-selection-carousel);
   display: flex;
   gap: 12px;
   overflow: visible;
   scroll-snap-type: x mandatory;
-  padding: 4px 14px 6px;
+  padding: 0 var(--carousel-pad);
   -ms-overflow-style: none;
   scrollbar-width: none;
   min-width: 100%;

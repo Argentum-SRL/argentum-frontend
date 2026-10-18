@@ -10,3 +10,4 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
 6. **Verificación Previa:** Correr `npm run lint` (incluye `audit:rules`) y `npm run build` antes de subir cambios. La línea base no puede subir.
 7. **Dudas o Casos no Cubiertos:** Preguntar directamente a Sebastián antes de inventar nuevos estilos o excepciones.
 8. Antes de cada push corre solo un control (se instala con npm install o npm run dev). Si corta el push, corregí lo que marca. No uses --no-verify.
+9. **Carruseles de Tarjetas en Modales:** El contenedor `.billeterasCarouselScroller` lleva `overflow-y: hidden` y `padding: var(--carousel-pad) 0` (sin márgenes negativos). La pista `.billeterasCarousel` lleva `padding: 0 var(--carousel-pad)` y redirige `--elevation-selection-modal: var(--elevation-selection-carousel);` en su regla base para contener la sombra de selección (alcance 20px) sin recortarla contra las paredes ni generar scroll parásito.

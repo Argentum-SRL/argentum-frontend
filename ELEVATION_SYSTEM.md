@@ -43,6 +43,7 @@ Todos los tokens de elevación están centralizados y controlados en [elevation.
   /* Selección contextual de tarjetas e ítems */
   --elevation-selection:       0 3px 8px -1px rgba(var(--shadow-color-rgb), 0.08), 0 1px 3px rgba(var(--shadow-color-rgb), 0.04);
   --elevation-selection-modal: 0 4px 10px -2px rgba(var(--shadow-color-rgb), 0.10), 0 1px 3px rgba(var(--shadow-color-rgb), 0.04);
+  --elevation-selection-carousel: 0 6px 12px -3px rgba(var(--shadow-color-rgb), 0.22);
 }
 
 :root.dark, [data-theme="dark"] {
@@ -61,6 +62,7 @@ Todos los tokens de elevación están centralizados y controlados en [elevation.
   /* Selección contextual Dark Mode */
   --elevation-selection:       0 3px 8px -1px rgba(0, 0, 0, 0.22), 0 1px 3px rgba(0, 0, 0, 0.12);
   --elevation-selection-modal: 0 4px 10px -2px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.14);
+  --elevation-selection-carousel: 0 6px 14px -3px rgba(0, 0, 0, 0.60);
 }
 ```
 
@@ -101,6 +103,7 @@ Página / Canvas (Nivel 0)
 | **5** | `--elevation-xl` | `20px / 40px` | Máxima elevación: alertas flotantes (`Sileo Toast`), botones de acción flotante fijos (`FAB`), mockups de presentación flotantes. |
 | **SEL** | `--elevation-selection` | `3px / 8px` | Selección física en páginas: tarjeta de método de pago, opción de plan o moneda en vista estándar. |
 | **SEL-M** | `--elevation-selection-modal` | `4px / 10px` | Selección física dentro de modales: tarjeta de billetera seleccionada en carrusel de transacción. |
+| **SEL-C** | `--elevation-selection-carousel` | `6px / 12px` (alcance `20px`) | Selección física contenida en carruseles de modales (evita recorte contra las paredes). |
 
 ---
 

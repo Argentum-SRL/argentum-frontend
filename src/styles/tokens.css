@@ -47,6 +47,7 @@
   --modal-footer-pad-bottom: var(--space-lg); /* Padding inferior del pie del modal */
   --modal-footer-gap: var(--space-md); /* Separación horizontal entre los dos botones del pie */
   --modal-max-h: 90dvh; /* Altura máxima permitida para el diálogo modal */
+  --carousel-pad: var(--space-2xl); /* Padding de carruseles = alcance de la sombra de selección (--elevation-reach-selection-carousel, 20px) más elevación y escala de la tarjeta elegida (4px) */
 
   /* ── Puntos de Paso (StepDots) ── */
   --stepdots-pad: var(--space-lg) var(--space-xl) var(--space-xs); /* Padding superior, lateral e inferior del indicador de pasos */

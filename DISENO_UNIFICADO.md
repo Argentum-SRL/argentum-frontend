@@ -55,6 +55,7 @@ Para sombras compuestas por múltiples capas, rige el valor máximo entre capas.
 | Nivel 5 (Máxima) | `--elevation-xl` | 60px | 60px | `--elevation-reach-xl`: `60px` |
 | Selección Tarjeta | `--elevation-selection` | 34px | 38px | `--elevation-reach-selection`: `38px` |
 | Selección en Modal | `--elevation-selection-modal` | 38px | 44px | `--elevation-reach-selection-modal`: `44px` |
+| Selección en Carrusel | `--elevation-selection-carousel` | 18px | 20px | `--elevation-reach-selection-carousel`: `20px` |
 
 ### Regla Fundamental de Contención
 Un contenedor con `overflow: hidden`, `overflow: auto` o `overflow: clip` **debe tener un padding mayor o igual al alcance de la sombra mayor de sus hijos en ese eje**.  
@@ -218,6 +219,16 @@ La estructura de modales en Argentum sigue un patrón invariable:
 
 > **Modales de varios pasos:** el paso activo va en el flujo normal y los inactivos en absolute y ocultos; la cadena de contenedores es flex en columna con min-height:0 y el tope es var(--modal-max-h); sin min-height fijo ni medición en JS. TransaccionModal ya lo aplica; el resto de los modales sigue con el hook useAdaptiveModalHeight hasta su migración.
 
+### Carruseles de tarjetas
+Los carruseles de billeteras y tarjetas dentro de modales (`.billeterasCarouselScroller` y `.billeterasCarousel`) implementan dos reglas canónicas para contener físicamente la sombra de selección sin recortarla contra las paredes ni generar barras de scroll parásitas:
+1. **Contenedor Scroller (`.billeterasCarouselScroller`):**  
+   `overflow-y: hidden` (con `overflow-x: auto`), `padding: var(--carousel-pad) 0`, y `margin: 0` (si tenía márgenes negativos para compensar; si no tenía, no se agrega).
+2. **Pista de Tarjetas (`.billeterasCarousel`):**  
+   `padding: 0 var(--carousel-pad)` y `--elevation-selection-modal: var(--elevation-selection-carousel);` (declarada en la regla base para que todas las tarjetas hijas la hereden). Si la copia tiene `scroll-padding`, se establece en `0 var(--carousel-pad)`.
+
+**Por qué (alcance):** El padding `--carousel-pad` (`var(--space-2xl)` = 24px) contiene holgadamente el alcance de la sombra reducida de carrusel (`--elevation-reach-selection-carousel` = 20px) más el desplazamiento vertical y escala de la tarjeta seleccionada (4px).  
+Está terminantemente prohibido utilizar márgenes negativos para "compensar" el padding.
+
 ---
 
 ## 8. Reglas de Contención y Entorno
@@ -287,6 +298,7 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 | Selectores de TransaccionModal y TransferenciaModal | Hecho (tanda 3b) | Tanda 3b |
 | Selectores de Metas, Presupuestos, Pagar resumen y Suscripción | Hecho | Tanda 3c |
 | Altura adaptativa: TransaccionModal | Hecho | Tanda 3d |
+| Carruseles de billeteras y tarjetas (6 copias) | Hecho | Tanda 3e |
 | Altura adaptativa: resto de modales | Pendiente | Tandas siguientes |
 | Transacciones | Pendiente | Fases Futuras |
 | Transferencias | Pendiente | Fases Futuras |

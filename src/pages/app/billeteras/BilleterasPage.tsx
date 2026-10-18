@@ -293,6 +293,7 @@ export default function BilleterasPage() {
         es_inversion: payload.es_inversion,
         tna: payload.tna,
         bank_id: payload.bank_id,
+        fecha_saldo: payload.fecha_saldo,
       })
       await fetchPageData()
       sileo.success({ title: `"${payload.nombre}" creada exitosamente` })

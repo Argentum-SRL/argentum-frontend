@@ -70,7 +70,17 @@ const billeteraService = {
     return data
   },
 
-  create: async (payload: { nombre: string; moneda: string; saldo_inicial?: number; es_principal?: boolean; es_efectivo?: boolean; es_inversion?: boolean; tna?: number | null; bank_id?: string | null }) => {
+  create: async (payload: {
+    nombre: string
+    moneda: string
+    saldo_inicial?: number
+    es_principal?: boolean
+    es_efectivo?: boolean
+    es_inversion?: boolean
+    tna?: number | null
+    bank_id?: string | null
+    fecha_saldo?: string | null
+  }) => {
     const { data } = await api.post<Billetera>('/billeteras', payload)
     invalidateBilleteras()
     return data

@@ -32,6 +32,7 @@ import memoriaStyles from './MemoriaComercioDialog.module.css'
 import { useResumenDeCompra, formatDDMM } from '@/hooks/useResumenDeCompra'
 import DebitoEnDolares from './DebitoEnDolares'
 import CalculoCuotasResumen from './CalculoCuotasResumen'
+import AvisoSaldoAnterior from './AvisoSaldoAnterior'
 
 function isBankLight(b: Billetera): boolean {
   const bank = b.bank_id ? getBankById(b.bank_id) : findBankByNombre(b.nombre)
@@ -1082,20 +1083,28 @@ export default function TransaccionModal({
                 </div>
 
                 <div className={styles.formFields}>
-                  {/* Descripción + Fecha */}
-                  <div className={styles.descFechaRow}>
-                    <div className={`${styles.formField} ${styles.descCol}`}>
-                      <label className={styles.fieldLabel} htmlFor="tx-desc">Descripción</label>
-                      <input id="tx-desc" type="text" className={styles.fieldInput} value={descripcion}
-                        onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'descripcion', value: e.target.value })}
-                        placeholder="Ej: Supermercado" />
+                  {/* Descripción + Fecha y aviso de saldo */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                    <div className={styles.descFechaRow}>
+                      <div className={`${styles.formField} ${styles.descCol}`}>
+                        <label className={styles.fieldLabel} htmlFor="tx-desc">Descripción</label>
+                        <input id="tx-desc" type="text" className={styles.fieldInput} value={descripcion}
+                          onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'descripcion', value: e.target.value })}
+                          placeholder="Ej: Supermercado" />
+                      </div>
+                      <div className={`${styles.formField} ${styles.fechaCol}`}>
+                        <label className={styles.fieldLabel} htmlFor="tx-fecha">Fecha</label>
+                        <DateInput id="tx-fecha" value={fecha}
+                          onChange={(val) => dispatch({ type: 'SET_FIELD', field: 'fecha', value: val })}
+                          disabled={isCuotaHija} className={styles.fieldInput} />
+                      </div>
                     </div>
-                    <div className={`${styles.formField} ${styles.fechaCol}`}>
-                      <label className={styles.fieldLabel} htmlFor="tx-fecha">Fecha</label>
-                      <DateInput id="tx-fecha" value={fecha}
-                        onChange={(val) => dispatch({ type: 'SET_FIELD', field: 'fecha', value: val })}
-                        disabled={isCuotaHija} className={styles.fieldInput} />
-                    </div>
+
+                    <AvisoSaldoAnterior
+                      billetera={billeteraSeleccionada}
+                      fecha={fecha}
+                      metodoPago={metodoPago}
+                    />
                   </div>
 
                   {/* Categoría y Subcategoría (reusado CategoriaSelector) */}

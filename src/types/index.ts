@@ -202,6 +202,8 @@ export interface Billetera {
   fecha_ultimo_rendimiento?: string | null
   estado: 'activa' | 'archivada'
   fecha_creacion: string
+  fecha_saldo?: string | null
+  fecha_saldo_efectiva?: string
   bank_id?: string | null
   nivel_tasa?: string | null
   entidad_efectiva?: string | null

@@ -384,7 +384,7 @@ export default function AdminPage() {
       <div className={styles.pageHeader}>
         <div className={styles.titleGroup}>
           <h1>Panel de Administración</h1>
-          <p className={styles.subtitle}>
+          <div className={styles.subtitle}>
             {loadingStats ? (
               <span style={{ display: 'inline-block', verticalAlign: 'middle' }} aria-hidden="true">
                 <Skeleton variant="text" width={180} height={12} />
@@ -392,7 +392,7 @@ export default function AdminPage() {
             ) : (
               `${stats?.total || 0} usuarios registrados en total`
             )}
-          </p>
+          </div>
         </div>
         <div className={styles.headerActions}>
           <Link

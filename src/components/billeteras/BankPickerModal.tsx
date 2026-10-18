@@ -7,6 +7,7 @@ import { getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import styles from './BankPickerModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import Modal from '@/components/ui/Modal/Modal'
+import { DateInput } from '@/components/ui'
 import { useAdaptiveModalHeight } from '@/hooks/useAdaptiveModalHeight'
 import billeteraService from '@/services/billetera.service'
 import { formatMonto } from '@/utils/format'
@@ -19,6 +20,21 @@ export interface CreatePayload {
   es_inversion?: boolean
   bank_id: string | null
   tna?: number | null
+  fecha_saldo?: string | null
+}
+
+function todayLocal(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function formatFechaDDMMAAAA(fechaIso: string): string {
+  const clean = fechaIso.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`
+  }
+  return clean
 }
 
 function formatDiaMes(fechaStr?: string | null): string {
@@ -135,6 +151,8 @@ interface ModalState {
   colorCustom: string
   isSubmitting: boolean
   isEditingName: boolean
+  mostrarFechaSaldo: boolean
+  fechaSaldo: string
 }
 
 type ModalAction = 
@@ -160,6 +178,8 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
         colorCustom: CUSTOM_COLORS[0],
         isSubmitting: false,
         isEditingName: false,
+        mostrarFechaSaldo: false,
+        fechaSaldo: '',
       }
     case 'SET_STEP':
       return { 
@@ -207,6 +227,8 @@ export default function BankPickerModal({
     colorCustom: CUSTOM_COLORS[0],
     isSubmitting: false,
     isEditingName: false,
+    mostrarFechaSaldo: false,
+    fechaSaldo: '',
   })
 
   const [entidades, setEntidades] = useState<EntidadTasa[]>([])
@@ -225,6 +247,8 @@ export default function BankPickerModal({
     colorCustom,
     isSubmitting,
     isEditingName,
+    mostrarFechaSaldo,
+    fechaSaldo,
   } = state
 
   const nameInputRef = useRef<HTMLInputElement>(null)
@@ -337,6 +361,8 @@ export default function BankPickerModal({
       return
     }
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
+    const hoy = todayLocal()
+    const fechaFinal = fechaSaldo && fechaSaldo !== hoy ? fechaSaldo : null
     try {
       await onCrear({
         nombre: nombre.trim(),
@@ -345,6 +371,7 @@ export default function BankPickerModal({
         es_principal: esPrincipal,
         es_inversion: esInversion,
         bank_id: bankSeleccionado.id === 'custom' ? null : bankSeleccionado.id,
+        fecha_saldo: fechaFinal,
       })
       onClose()
     } finally {
@@ -603,6 +630,11 @@ export default function BankPickerModal({
               <div className={styles.formFields}>
                 {/* Saldo inicial (Hero MontoInput full size) */}
                 <div className={styles.montoHeroField}>
+                  <p style={{ margin: '0 0 8px', fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
+                    {fechaSaldo && fechaSaldo !== todayLocal()
+                      ? `Saldo al ${formatFechaDDMMAAAA(fechaSaldo)}. Los movimientos de ese día en adelante lo modifican; los anteriores no.`
+                      : 'Es lo que tenés hoy en la cuenta. Los gastos de días anteriores no lo cambian.'}
+                  </p>
                   <MontoInput
                     value={saldo}
                     onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
@@ -612,6 +644,34 @@ export default function BankPickerModal({
                     allowDecimals
                     autoFocus
                   />
+                  <div style={{ marginTop: '8px', fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
+                    {!mostrarFechaSaldo ? (
+                      <button
+                        type="button"
+                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'mostrarFechaSaldo', value: true })}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          color: 'var(--primary, #3b82f6)',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          font: 'inherit',
+                        }}
+                      >
+                        ¿Tu saldo es de otro día? Cambiar fecha
+                      </button>
+                    ) : (
+                      <div style={{ marginTop: '6px' }}>
+                        <DateInput
+                          id="billetera-fecha-saldo"
+                          value={fechaSaldo || todayLocal()}
+                          max={todayLocal()}
+                          onChange={(val) => dispatch({ type: 'SET_FIELD', field: 'fechaSaldo', value: val })}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Panel de configuración inteligente & interactivo */}

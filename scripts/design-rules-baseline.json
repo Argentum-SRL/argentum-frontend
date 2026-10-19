@@ -9,14 +9,16 @@
     "R07": 20,
     "R08": 414,
     "R09": 2,
-    "R10": 849,
+    "R10": 846,
     "R11": 3,
     "R12": 17,
     "R13": 9,
     "R14": 0,
-    "R15": 50,
+    "R15": 48,
     "R16": 0,
-    "R17": 1
+    "R17": 1,
+    "R18": 0,
+    "R19": 3
   },
   "files": {
     "components/auth/AuthLayout/AuthLayout.module.css": {
@@ -36,7 +38,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css": {
       "R01": 0,
@@ -55,7 +59,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/billeteras/ActualizarSaldoModal.module.css": {
       "R01": 0,
@@ -74,7 +80,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/billeteras/BankPickerModal.module.css": {
       "R01": 2,
@@ -91,9 +99,11 @@
       "R12": 0,
       "R13": 0,
       "R14": 0,
-      "R15": 2,
+      "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/billeteras/BilleteraCard.module.css": {
       "R01": 4,
@@ -112,7 +122,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/billeteras/EditBilleteraModal.module.css": {
       "R01": 4,
@@ -131,7 +143,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ciclo/CicloFinancieroSelector.module.css": {
       "R01": 7,
@@ -143,14 +157,16 @@
       "R07": 0,
       "R08": 8,
       "R09": 0,
-      "R10": 23,
+      "R10": 20,
       "R11": 0,
       "R12": 0,
       "R13": 0,
       "R14": 0,
       "R15": 4,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/dashboard/BalanceCard/BalanceCard.module.css": {
       "R01": 0,
@@ -169,7 +185,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal.module.css": {
       "R01": 0,
@@ -188,7 +206,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/dashboard/ProyeccionCard/ProyeccionCard.module.css": {
       "R01": 0,
@@ -207,7 +227,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/dashboard/ProyeccionModal/ProyeccionModal.module.css": {
       "R01": 0,
@@ -226,7 +248,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/facturas/FacturaPanel.module.css": {
       "R01": 0,
@@ -245,7 +269,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/goals/GoalCard.module.css": {
       "R01": 0,
@@ -264,7 +290,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/goals/GoalContributionModal.module.css": {
       "R01": 3,
@@ -283,7 +311,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/goals/GoalDetailModal.module.css": {
       "R01": 0,
@@ -302,7 +332,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/goals/GoalModal.module.css": {
       "R01": 1,
@@ -321,7 +353,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/layout/AppLayout/AppLayout.module.css": {
       "R01": 3,
@@ -340,7 +374,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/layout/MobileBottomNav/MobileBottomNav.module.css": {
       "R01": 1,
@@ -359,7 +395,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/layout/MobileBottomNav/MobileMoreSheet.module.css": {
       "R01": 2,
@@ -378,7 +416,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/layout/MobileBottomNav/MobileMoreSheet.tsx": {
       "R01": 0,
@@ -397,7 +437,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/mock/DashboardMockup/DashboardMockup.module.css": {
       "R01": 3,
@@ -416,7 +458,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/mock/WppChatMockup/WppChatMockup.module.css": {
       "R01": 3,
@@ -435,7 +479,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/notificaciones/NotificacionesConfigModal.module.css": {
       "R01": 1,
@@ -454,7 +500,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/notificaciones/NotificacionesDrawer.module.css": {
       "R01": 5,
@@ -473,7 +521,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/onboarding/StepMoneda.module.css": {
       "R01": 4,
@@ -492,7 +542,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/onboarding/StepWhatsApp.module.css": {
       "R01": 0,
@@ -511,7 +563,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/perfil/FotoCropModal.module.css": {
       "R01": 0,
@@ -530,7 +584,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/perfil/PerfilFinancieroCard.module.css": {
       "R01": 1,
@@ -549,7 +605,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/presupuestos/PresupuestoDetailModal.module.css": {
       "R01": 1,
@@ -568,7 +626,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/presupuestos/PresupuestoModal.module.css": {
       "R01": 5,
@@ -587,7 +647,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/suscripciones/SuscripcionCard.module.css": {
       "R01": 0,
@@ -606,7 +668,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/suscripciones/SuscripcionModal.module.css": {
       "R01": 3,
@@ -625,7 +689,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tarjetas/FechasResumenModal.module.css": {
       "R01": 0,
@@ -644,7 +710,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tarjetas/PagarResumenModal.module.css": {
       "R01": 0,
@@ -663,7 +731,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tarjetas/PresionFuturaCard.module.css": {
       "R01": 0,
@@ -682,7 +752,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tarjetas/TarjetaCard.module.css": {
       "R01": 1,
@@ -701,7 +773,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tarjetas/TarjetaModal.module.css": {
       "R01": 4,
@@ -720,7 +794,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tarjetas/TarjetaSummary.module.css": {
       "R01": 0,
@@ -739,7 +815,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/importacion/ImportacionResumenSection.module.css": {
       "R01": 0,
@@ -758,7 +836,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/importacion/ModalesImportacion.module.css": {
       "R01": 0,
@@ -777,7 +857,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/importacion/TablaPreviewImportacion.module.css": {
       "R01": 0,
@@ -796,7 +878,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/ToolsComponents.parte1.css": {
       "R01": 0,
@@ -815,7 +899,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/ToolsComponents.parte2.css": {
       "R01": 1,
@@ -834,7 +920,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/ToolsComponents.parte3.css": {
       "R01": 0,
@@ -853,7 +941,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/ToolsComponents.parte4.css": {
       "R01": 0,
@@ -872,7 +962,9 @@
       "R14": 0,
       "R15": 3,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/tools/ToolsComponents.parte5.css": {
       "R01": 0,
@@ -891,7 +983,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/DayGroup.module.css": {
       "R01": 0,
@@ -910,7 +1004,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/DebitoEnDolares.module.css": {
       "R01": 0,
@@ -929,7 +1025,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/FilterBar.parte1.css": {
       "R01": 0,
@@ -948,7 +1046,9 @@
       "R14": 0,
       "R15": 9,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/FilterBar.parte2.css": {
       "R01": 0,
@@ -967,7 +1067,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/GruposCuotasTab.parte1.css": {
       "R01": 0,
@@ -986,7 +1088,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/GruposCuotasTab.parte2.css": {
       "R01": 1,
@@ -1005,7 +1109,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/GruposCuotasTab.parte3.css": {
       "R01": 2,
@@ -1022,9 +1128,11 @@
       "R12": 0,
       "R13": 0,
       "R14": 0,
-      "R15": 2,
+      "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/MemoriaComercioDialog.module.css": {
       "R01": 0,
@@ -1043,7 +1151,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/MovimientoRow.module.css": {
       "R01": 0,
@@ -1062,7 +1172,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/TransaccionModal.parte1.css": {
       "R01": 1,
@@ -1081,7 +1193,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/TransaccionModal.parte2.css": {
       "R01": 3,
@@ -1100,7 +1214,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/TransaccionModal.parte3.css": {
       "R01": 0,
@@ -1119,7 +1235,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transacciones/TransaccionRow.module.css": {
       "R01": 0,
@@ -1138,7 +1256,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transferencias/TransferenciaModal.module.css": {
       "R01": 3,
@@ -1157,7 +1277,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transferencias/TransferenciaRow.module.css": {
       "R01": 0,
@@ -1176,7 +1298,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/transferencias/TransferenciasFilterBar.module.css": {
       "R01": 0,
@@ -1195,7 +1319,9 @@
       "R14": 0,
       "R15": 3,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/AtmosphericBackground/AtmosphericBackground.module.css": {
       "R01": 4,
@@ -1214,7 +1340,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/AtmosphericBackground/LunarLoading.module.css": {
       "R01": 2,
@@ -1233,7 +1361,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/Button/Button.module.css": {
       "R01": 0,
@@ -1252,7 +1382,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/CategoriaSelector/CategoriaSelector.module.css": {
       "R01": 2,
@@ -1271,7 +1403,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/ColorPicker/ColorPicker.module.css": {
       "R01": 3,
@@ -1290,7 +1424,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/ConfirmModal/ConfirmModal.module.css": {
       "R01": 0,
@@ -1309,7 +1445,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/DateInput/DateInput.module.css": {
       "R01": 3,
@@ -1328,7 +1466,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge.module.css": {
       "R01": 0,
@@ -1347,7 +1487,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/Drawer/Drawer.module.css": {
       "R01": 1,
@@ -1366,7 +1508,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/Drawer/Drawer.tsx": {
       "R01": 0,
@@ -1385,7 +1529,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/EmptyState/EmptyState.module.css": {
       "R01": 0,
@@ -1404,7 +1550,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/ErrorBoundary/ModalErrorBoundary.module.css": {
       "R01": 1,
@@ -1423,7 +1571,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/ErrorBoundary/ModalErrorBoundary.tsx": {
       "R01": 0,
@@ -1442,7 +1592,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/Field/Field.module.css": {
       "R01": 0,
@@ -1461,7 +1613,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/GoogleLoginButton/GoogleLoginButton.module.css": {
       "R01": 0,
@@ -1480,7 +1634,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/LunarLoader/LunarLoader.module.css": {
       "R01": 0,
@@ -1499,7 +1655,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/Modal/Modal.module.css": {
       "R01": 1,
@@ -1518,7 +1676,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/MontoInput/MontoInput.module.css": {
       "R01": 0,
@@ -1537,7 +1697,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/PageSummaryBar/PageSummaryBar.module.css": {
       "R01": 0,
@@ -1556,7 +1718,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/PhoneCountrySelect/PhoneCountrySelect.module.css": {
       "R01": 2,
@@ -1575,7 +1739,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/SelectableSurface/SelectableSurface.module.css": {
       "R01": 3,
@@ -1594,7 +1760,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/SelectInput/SelectInput.module.css": {
       "R01": 2,
@@ -1613,7 +1781,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/Skeleton/Skeleton.module.css": {
       "R01": 0,
@@ -1632,7 +1802,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/ThemeToggle/ThemeToggle.module.css": {
       "R01": 1,
@@ -1651,7 +1823,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/ui/TimeInput/TimeInput.module.css": {
       "R01": 2,
@@ -1670,7 +1844,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "components/whatsapp/VinculacionWhatsAppCard.module.css": {
       "R01": 0,
@@ -1689,7 +1865,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "index.css": {
       "R01": 0,
@@ -1708,7 +1886,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/AnimacionPreviewPage.module.css": {
       "R01": 4,
@@ -1727,7 +1907,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/components/MonitorWppPanel.module.css": {
       "R01": 0,
@@ -1746,7 +1928,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/components/SchedulerPanel.module.css": {
       "R01": 0,
@@ -1765,7 +1949,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/DisenoAuditFindings.module.css": {
       "R01": 0,
@@ -1784,7 +1970,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/DisenoCatalogView.module.css": {
       "R01": 0,
@@ -1803,7 +1991,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/DisenoCategoryNav.module.css": {
       "R01": 0,
@@ -1822,7 +2012,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/DisenoComparisonMatrix.module.css": {
       "R01": 0,
@@ -1841,7 +2033,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/DisenoHeader.module.css": {
       "R01": 0,
@@ -1860,7 +2054,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/DisenoMetricsBar.module.css": {
       "R01": 0,
@@ -1879,7 +2075,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/DisenoSpecificationView.module.css": {
       "R01": 0,
@@ -1898,7 +2096,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/admin/diseno/components/InteractiveDemos.module.css": {
       "R01": 0,
@@ -1917,7 +2117,30 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
+    },
+    "pages/admin/diseno/DisenoPage.module.css": {
+      "R01": 0,
+      "R02": 0,
+      "R03": 0,
+      "R04": 0,
+      "R05": 0,
+      "R06": 0,
+      "R07": 0,
+      "R08": 0,
+      "R09": 0,
+      "R10": 0,
+      "R11": 0,
+      "R12": 0,
+      "R13": 0,
+      "R14": 0,
+      "R15": 0,
+      "R16": 0,
+      "R17": 0,
+      "R18": 0,
+      "R19": 1
     },
     "pages/AdminPage.module.css": {
       "R01": 0,
@@ -1936,7 +2159,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/billeteras/BilleteraDetallePage.module.css": {
       "R01": 0,
@@ -1955,7 +2180,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/billeteras/BilleterasPage.module.css": {
       "R01": 0,
@@ -1974,7 +2201,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/dashboard/DashboardPage.module.css": {
       "R01": 0,
@@ -1993,7 +2222,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/dashboard/DashboardPage.parte1.css": {
       "R01": 1,
@@ -2012,7 +2243,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/dashboard/DashboardPage.parte2.css": {
       "R01": 1,
@@ -2031,7 +2264,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/dashboard/DashboardPage.parte3.css": {
       "R01": 1,
@@ -2050,7 +2285,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/lo-que-se-repite/LoQueSeRepitePage.module.css": {
       "R01": 1,
@@ -2069,7 +2306,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/metas/GoalsBarChart.module.css": {
       "R01": 2,
@@ -2088,7 +2327,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/metas/MetasPage.module.css": {
       "R01": 0,
@@ -2107,7 +2348,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/perfil/components/EliminarCuentaModal.module.css": {
       "R01": 0,
@@ -2126,7 +2369,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/perfil/PerfilPage.parte1.css": {
       "R01": 0,
@@ -2145,7 +2390,9 @@
       "R14": 0,
       "R15": 1,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/perfil/PerfilPage.parte2.css": {
       "R01": 2,
@@ -2164,7 +2411,9 @@
       "R14": 0,
       "R15": 2,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/perfil/PerfilPage.parte3.css": {
       "R01": 1,
@@ -2183,7 +2432,9 @@
       "R14": 0,
       "R15": 5,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/presupuestos/BudgetBarChart.module.css": {
       "R01": 1,
@@ -2202,7 +2453,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/presupuestos/BudgetCard.module.css": {
       "R01": 0,
@@ -2221,7 +2474,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/presupuestos/PresupuestosPage.module.css": {
       "R01": 0,
@@ -2240,7 +2495,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/suscripciones/SuscripcionesPage.module.css": {
       "R01": 2,
@@ -2259,7 +2516,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 1
     },
     "pages/app/tools/ToolsPage.module.css": {
       "R01": 0,
@@ -2278,7 +2537,9 @@
       "R14": 0,
       "R15": 2,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/app/transacciones/TransaccionesPage.module.css": {
       "R01": 0,
@@ -2297,7 +2558,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/auth/login/LoginPage.module.css": {
       "R01": 0,
@@ -2316,7 +2579,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/auth/register/RegisterPage.module.css": {
       "R01": 0,
@@ -2335,7 +2600,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/auth/verificar-telefono/VerificarTelefono.module.css": {
       "R01": 0,
@@ -2354,7 +2621,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/onboarding/OnboardingPage.module.css": {
       "R01": 1,
@@ -2373,7 +2642,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "pages/TermsPage.module.css": {
       "R01": 1,
@@ -2392,7 +2663,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 1
     },
     "styles/elevation.css": {
       "R01": 0,
@@ -2411,7 +2684,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 0
+      "R17": 0,
+      "R18": 0,
+      "R19": 0
     },
     "styles/sileo.css": {
       "R01": 2,
@@ -2430,7 +2705,9 @@
       "R14": 0,
       "R15": 0,
       "R16": 0,
-      "R17": 1
+      "R17": 1,
+      "R18": 0,
+      "R19": 0
     }
   }
 }

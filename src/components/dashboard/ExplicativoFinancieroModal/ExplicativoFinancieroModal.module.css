@@ -10,14 +10,14 @@
   overflow: hidden;
   position: relative;
   box-shadow: var(--elevation-lg);
-  max-height: 88dvh;
+  max-height: var(--modal-max-h);
 }
 
 @media (max-width: 640px) {
   .modalRoot {
     max-width: 100%;
     border-radius: 20px 20px 0 0;
-    max-height: 92dvh;
+    max-height: var(--modal-max-h);
   }
 }
 

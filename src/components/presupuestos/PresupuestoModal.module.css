@@ -169,7 +169,6 @@
 .formBodyStep2 {
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  min-height: 220px;
   max-height: calc(88dvh - 140px);
   padding-right: 16px;
 }

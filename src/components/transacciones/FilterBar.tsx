@@ -442,7 +442,7 @@ export default function FilterBar({
           value={localHasta}
           onChange={(val) => setLocalHasta(val)}
         />
-        <button type="submit" className={`${styles.typePillActive} ${styles.dateSubmitBtn}`}>
+        <button type="submit" className={styles.dateSubmitBtn}>
           Aplicar
         </button>
       </form>

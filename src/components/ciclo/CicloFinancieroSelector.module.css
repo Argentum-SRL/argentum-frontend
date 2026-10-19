@@ -178,34 +178,6 @@
   flex-wrap: wrap;
 }
 
-.quickDayBtn {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-2);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.quickDayBtn:hover {
-  border-color: var(--primary);
-  color: var(--text);
-}
-
-.quickDayBtnActive {
-  background: var(--primary) !important;
-  color: #ffffff !important;
-  border-color: var(--primary) !important;
-}
-
-:global([data-theme="dark"]) .quickDayBtn {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
 .dayGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);

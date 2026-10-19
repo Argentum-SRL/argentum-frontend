@@ -72,7 +72,7 @@
   box-shadow: var(--elevation-lg);
   width: 100%;
   max-width: 280px;
-  max-height: 60vh;
+  max-height: 60dvh;
   overflow-y: auto;
 }
 

@@ -88,9 +88,9 @@ El apilamiento z-index está estructurado por capas semánticas fijas. Todo cont
 
 ## 5. Selector Cápsula Oficial (`SegmentedControl`)
 
-El selector cápsula es el control oficial unificado para selección mutuamente excluyente (pestañas, tipos de movimiento, métodos de pago, filtros, frecuencias, etc.). Corresponde al componente oficial "Opción 4".
+El selector cápsula es el control oficial unificado para selección mutuamente excluyente (pestañas, tipos de movimiento, métodos de pago, filtros, frecuencias, etc.). Corresponde a la cápsula de la "Opción 1" de la página admin Diseño (sin pista, sin card, sin fondo detrás), con el botón elegido en `var(--primary)` y texto blanco; la "Opción 4" tiene pista o card y NO es la oficial.
 Diseño final sin pista contenedora (sin card ni fondo detrás de los botones): botones sueltos en fila con gap 6px (`--selector-gap`). El botón inactivo no tiene fondo ni borde, con texto gris (`var(--text-2)`), 13px y peso 600. El botón elegido se destaca con fondo `var(--primary)`, texto `#FFFFFF`, peso 700 y sombra suave `var(--elevation-pill)` (alcance 8px), idéntico al punto activo del indicador de pasos. El hover sobre botones inactivos solo cambia el color del texto a `var(--text)` sin aplicar fondo.
-La Opción 1 de la página admin Diseño es una copia independiente y su botón elegido es blanco; el componente oficial (Opción 4) usa el color primario por decisión de Sebastián del 17/10.
+ui/SegmentedControl ES la cápsula de la "Opción 1" de la página admin Diseño (sin pista, sin card, sin fondo detrás), con el botón elegido en `var(--primary)` y texto blanco por decisión de Sebastián del 17/10; la "Opción 4" tiene pista o card y NO es la oficial.
 
 ### Tokens y Medidas del Selector
 - `--radius-selector-pill`: `10px` (radio del botón de selección).
@@ -122,11 +122,18 @@ El componente `SegmentedControl` admite la opción `layout="wrap"` (además de `
 
 ### Estado de Migración a SegmentedControl
 | Ubicación | Componente / Selector | Estado | Observación |
+| :--- | :--- | :--- | :--- |
 | `BalanceCard.tsx` | Toggle de Moneda (Pesos / Dólares) | Excepción explícita | Se preserva el diseño original redondeado con píldora blanca activa y track translúcido (.currencyToggle / .currencyBtn) por preferencia visual expresa de Sebastián. NO migrar a SegmentedControl. |
-| `TabFinanzas.tsx` | Selector de Moneda Principal (Pesos / Dólares) | Migrado | `fullWidth={false}` en página de usuario. Limpieza de `.currencySelectGrid`, `.currencyOptionCard` |
-| `DashboardPage.tsx` | Tabs de unidad ($ / %) | No migrado | Requiere modificar `DashboardPage.parte1.css` fuera de permitidas.txt |
-| `CicloFinancieroSelector.tsx` | Selector de Modo y Calendario | No migrado | No es selector de opciones excluyentes de texto corto (grilla compleja de tarjetas y días del mes) |
-| `TabFinanzas.tsx` | Tarjetas de Tipo de Dólar | No migrado | Grilla de tarjetas informativas complejas con cotizaciones dinámicas (compra/venta) |
+| `CicloFinancieroSelector.tsx` | Días Frecuentes (Presets Rápidos) | Migrado | `fullWidth={false}`, `layout="inline"`. Limpieza de `.quickDayBtn`, `.quickDayBtnActive`. |
+| `CicloFinancieroSelector.tsx` | Modo, Calendario y Reglas hábiles | No migrado | No es selector de opciones excluyentes de texto corto: tarjetas explicativas con subtítulos y grilla 1..31. |
+| `GoalDetailModal.tsx` | Pill de Moneda | No migrado | Badge informativo de solo lectura (`<span>`), no es un control interactivo de selección. |
+| `PresupuestoDetailModal.tsx` | Pills de Moneda y Período | No migrado | Badges informativos de solo lectura (`<span>`), no son controles interactivos de selección. |
+| `PresupuestoModal.tsx` | Atajos de Categorías (`presetsBar`) y `catCard*` | No migrado | Atajos por lote sobre estado multiselección con acción "Limpiar", y tarjetas colapsables con subcategorías. |
+| `PagarResumenModal.tsx` | Chips de Monto Rápido (`quickChipsRow`) | No migrado | Atajos para prellenar input numérico libre (`MontoInput`); el modal ya usa `SegmentedControl` para `tipoPago`. |
+| `FilterBar.tsx` | Presets de fecha y submit `Aplicar` | No migrado | Selector de tipo ya usa `SegmentedControl`; `typePillActive` eliminado del submit; presets de fecha son acciones rápidas de popover. |
+| `TabFinanzas.tsx` | Selector de Moneda Principal (Pesos / Dólares) | Migrado | `fullWidth={false}` en página de usuario. Limpieza de `.currencySelectGrid`, `.currencyOptionCard`. |
+| `DashboardPage.tsx` | Tabs de unidad ($ / %) | No migrado | Requiere modificar `DashboardPage.parte1.css` fuera de permitidas.txt. |
+| `TabFinanzas.tsx` | Tarjetas de Tipo de Dólar | No migrado | Grilla de tarjetas informativas complejas con cotizaciones dinámicas (compra/venta). |
 
 ### Ejemplo Canónico de Uso en React:
 ```tsx
@@ -226,7 +233,7 @@ La estructura de modales en Argentum sigue un patrón invariable:
 </Modal>
 ```
 
-> **Altura de modales y modales de varios pasos:** todos los modales resuelven su altura exclusivamente mediante CSS (`max-height: var(--modal-max-h); overflow: hidden; min-height: 0;`), con el cuerpo scrolleando por dentro (`overflow-y: auto; flex: 1;`) y el footer siempre visible fijo al fondo (`flex-shrink: 0;`). Sin mediciones en JS ni hooks de altura adaptativa (100% de los modales migrados del hook `useAdaptiveModalHeight` al patrón CSS estándar). En modales de varios pasos, el paso activo va en el flujo normal y los inactivos en absolute y ocultos.
+> **Altura de modales y modales de varios pasos:** todos los modales resuelven su altura exclusivamente mediante CSS (`max-height: var(--modal-max-h); overflow: hidden; min-height: 0;`), con el cuerpo scrolleando por dentro (`overflow-y: auto; flex: 1;`) y el footer siempre visible fijo al fondo (`flex-shrink: 0;`). Sin mediciones en JS ni hooks de altura adaptativa (100% de los modales migrados del hook `useAdaptiveModalHeight` al patrón CSS estándar). En modales de varios pasos, el paso activo va en el flujo normal y los inactivos en absolute y ocultos. Los pasos de un modal no tienen alto fijo; alto por contenido con tope var(--modal-max-h); en modales y hojas solo dvh.
 
 ### Carruseles de tarjetas
 Los carruseles de billeteras y tarjetas dentro de modales (`.billeterasCarouselScroller` y `.billeterasCarousel`) implementan dos reglas canónicas para contener físicamente la sombra de selección sin recortarla contra las paredes ni generar barras de scroll parásitas:
@@ -346,7 +353,7 @@ Toda verificación o certificación responsive debe comprobar el correcto render
 | Tamaños de modal y bottom sheet centralizados | Hecho | Tanda 3i |
 | Pestañas y selectores pendientes (Perfil: animación hover en íconos; Administración: AdminPage, AnimacionPreviewPage, MonitorWppPanel; Dashboard: switch $/%; PresupuestoModal: presets multiselección; PagarResumenModal: quickChips; tarjetas de elección: onboarding, CicloFinancieroSelector, StepMoneda, SuscripcionModal catálogo; BalanceCard: botones de moneda) | Pendiente | Tandas siguientes |
 | Espaciado modales: reglas saltadas (márgenes negativos y rem: SuscripcionModal.module.css, NotificacionesConfigModal.module.css, ProyeccionModal.module.css) | Pendiente | Tanda de estructura |
-| Altura adaptativa: resto de modales | Pendiente | Tandas siguientes |
+| Altura adaptativa: resto de modales | Hecho | Tanda 3l |
 | Transacciones | Pendiente | Fases Futuras |
 | Transferencias | Pendiente | Fases Futuras |
 | Tarjetas | Pendiente | Fases Futuras |

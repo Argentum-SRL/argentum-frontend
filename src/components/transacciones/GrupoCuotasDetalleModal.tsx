@@ -1,7 +1,7 @@
 /**
  * Modal de detalle y acciones (prepago y cancelación) para un grupo de compras en cuotas.
  */
-import type { CSSProperties, RefObject } from 'react'
+import type { RefObject } from 'react'
 import {
   Trash2,
   X,
@@ -24,8 +24,6 @@ export interface GrupoCuotasDetalleModalProps {
   selectedGrupo: GrupoCuotasResumen | null
   detailSlide: 'detail' | 'prepay'
   detailSlideDirection: 'forward' | 'back'
-  detailContainerStyle?: CSSProperties
-  detailDynamicHeight?: number | null
   detailSelectedCat?: Categoria
   categorias?: Categoria[]
   subcategorias?: Subcategoria[]
@@ -44,8 +42,6 @@ export interface GrupoCuotasDetalleModalProps {
   handleBackToDetail: () => void
   ejecutarPrepago: (grupoId: string) => Promise<void> | void
   setBilleteraSeleccionada: (id: string) => void
-  detailBodyRef: RefObject<HTMLDivElement | null>
-  detailFooterRef: RefObject<HTMLDivElement | null>
   detailWalletsCarouselRef: RefObject<HTMLDivElement | null>
 }
 
@@ -53,8 +49,6 @@ export default function GrupoCuotasDetalleModal({
   selectedGrupo,
   detailSlide,
   detailSlideDirection,
-  detailContainerStyle,
-  detailDynamicHeight,
   detailSelectedCat,
   categorias = [],
   subcategorias = [],
@@ -73,8 +67,6 @@ export default function GrupoCuotasDetalleModal({
   handleBackToDetail,
   ejecutarPrepago,
   setBilleteraSeleccionada,
-  detailBodyRef,
-  detailFooterRef,
   detailWalletsCarouselRef,
 }: GrupoCuotasDetalleModalProps) {
   const tieneTarjeta = Boolean(selectedGrupo?.tarjeta_nombre || selectedGrupo?.vencimiento_adelanto)
@@ -91,13 +83,7 @@ export default function GrupoCuotasDetalleModal({
       >
         {selectedGrupo && (
           <div className={styles.modalRoot}>
-            <div
-              className={`${styles.slidesContainer} ${detailSlide === 'detail' ? styles.detailStep1 : styles.detailStep2}`}
-              style={
-                detailContainerStyle ||
-                (detailDynamicHeight ? { height: `${detailDynamicHeight}px`, maxHeight: '85dvh' } : undefined)
-              }
-            >
+            <div className={styles.slidesContainer}>
               
               {/* ──── SLIDE 1: Vista Detalle ──── */}
               <div
@@ -111,7 +97,6 @@ export default function GrupoCuotasDetalleModal({
               >
                   <div className={styles.formContainer}>
                     <div
-                      ref={detailSlide === 'detail' ? detailBodyRef : undefined}
                       className={`${styles.formBody} ${styles.formBodyWithHeader}`}
                     >
                       {/* Header */}
@@ -279,7 +264,7 @@ export default function GrupoCuotasDetalleModal({
                     </div>
 
                     {/* Footer Actions */}
-                    <div ref={detailSlide === 'detail' ? detailFooterRef : undefined} className={styles.detailFormFooter}>
+                    <div className={styles.detailFormFooter}>
                       <div className={styles.detailFooterLeftGroup}>
                         {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
                           <button
@@ -351,7 +336,6 @@ export default function GrupoCuotasDetalleModal({
                     }}
                   >
                     <div
-                      ref={detailSlide === 'prepay' ? detailBodyRef : undefined}
                       className={`${styles.formBody} ${styles.formBodyWithHeader}`}
                     >
                       <div className={styles.formHeader}>
@@ -454,7 +438,7 @@ export default function GrupoCuotasDetalleModal({
                       </div>
                     </div>
 
-                    <div ref={detailSlide === 'prepay' ? detailFooterRef : undefined} className={styles.formFooter}>
+                    <div className={styles.formFooter}>
                       <button
                         type="button"
                         className={styles.cancelBtn}

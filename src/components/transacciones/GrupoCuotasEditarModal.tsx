@@ -22,7 +22,6 @@ export interface GrupoCuotasEditarModalProps {
   setEditingGrupo: (grupo: GrupoCuotasResumen | null) => void
   editStep: 1 | 2
   editSlideDirection: 'forward' | 'back'
-  editDynamicHeight?: number | null
   editMonto: number | null
   setEditMonto: (val: number | null) => void
   tarjetasCarousel: TarjetaCredito[]
@@ -44,8 +43,6 @@ export interface GrupoCuotasEditarModalProps {
   goEditStep1: () => void
   goEditStep2: (e?: React.FormEvent) => void
   handleSave: (e: React.FormEvent) => Promise<void> | void
-  editBodyRef: RefObject<HTMLDivElement | null>
-  editFooterRef: RefObject<HTMLDivElement | null>
   tarjetasCarouselRef: RefObject<HTMLDivElement | null>
 }
 
@@ -54,7 +51,6 @@ export default function GrupoCuotasEditarModal({
   setEditingGrupo,
   editStep,
   editSlideDirection,
-  editDynamicHeight,
   editMonto,
   setEditMonto,
   tarjetasCarousel,
@@ -76,8 +72,6 @@ export default function GrupoCuotasEditarModal({
   goEditStep1,
   goEditStep2,
   handleSave,
-  editBodyRef,
-  editFooterRef,
   tarjetasCarouselRef,
 }: GrupoCuotasEditarModalProps) {
   return (
@@ -99,10 +93,7 @@ export default function GrupoCuotasEditarModal({
               <div className={`${styles.dot} ${editStep === 2 ? styles.dotActive : styles.dotInactive}`} />
             </div>
 
-            <div
-              className={`${styles.slidesContainer} ${editStep === 1 ? styles.editStep1 : styles.editStep2}`}
-              style={editDynamicHeight ? { height: `${editDynamicHeight}px`, maxHeight: '85dvh' } : undefined}
-            >
+            <div className={styles.slidesContainer}>
               
               {/* ──── PASO 1: Monto y Tarjeta ──── */}
               <div
@@ -116,7 +107,6 @@ export default function GrupoCuotasEditarModal({
               >
                 <form className={styles.formContainer} onSubmit={goEditStep2}>
                   <div
-                    ref={editStep === 1 ? editBodyRef : undefined}
                     className={`${styles.formBody} ${styles.formBodyWithHeader} ${styles.formBodyStep1}`}
                   >
                     <div className={styles.formHeader}>
@@ -200,7 +190,7 @@ export default function GrupoCuotasEditarModal({
                     </div>
                   </div>
 
-                  <div ref={editStep === 1 ? editFooterRef : undefined} className={styles.formFooter}>
+                  <div className={styles.formFooter}>
                     <button
                       type="button"
                       className={styles.cancelBtn}
@@ -227,7 +217,6 @@ export default function GrupoCuotasEditarModal({
               >
                 <form className={styles.formContainer} onSubmit={handleSave}>
                   <div
-                    ref={editStep === 2 ? editBodyRef : undefined}
                     className={`${styles.formBody} ${styles.formBodyWithHeader}`}
                   >
                     <div className={styles.formHeader}>
@@ -310,7 +299,7 @@ export default function GrupoCuotasEditarModal({
                     </div>
                   </div>
 
-                  <div ref={editStep === 2 ? editFooterRef : undefined} className={styles.formFooter}>
+                  <div className={styles.formFooter}>
                     <button
                       type="button"
                       className={styles.cancelBtn}

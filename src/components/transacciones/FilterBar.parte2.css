@@ -141,11 +141,6 @@
   opacity: 0.9;
 }
 
-.typePillActive {
-  background: var(--primary);
-  color: #ffffff;
-}
-
 /* ── Mobile Modal Drawer Content Styles ── */
 .mobileDrawerContainer {
   display: flex;

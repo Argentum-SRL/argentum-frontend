@@ -40,6 +40,8 @@ export const RULE_DEFS = {
   R15: '@media con (min|max)-(width|height) en px fuera de la escala permitida',
   R16: 'text-overflow: ellipsis o overflow: hidden en .label, .description o .pill de SegmentedControl',
   R17: 'width o max-width >= 300px con !important en CSS',
+  R18: 'height o min-height en px >= 120 dentro de selectores con Step, slide, slidesContainer, modalRoot o formBody',
+  R19: 'unidad vh (no dvh) en height, min-height o max-height en CSS',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
@@ -79,7 +81,7 @@ function auditCssFile(filePath, relPath, content) {
     R01: 0, R02: 0, R03: 0, R04: 0, R05: 0,
     R06: 0, R07: 0, R08: 0, R09: 0, R10: 0,
     R11: 0, R12: 0, R13: 0, R14: 0,
-    R15: 0, R16: 0, R17: 0,
+    R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -278,6 +280,49 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
+  // R18 & R19 con contador de llaves (parseCssBlocks)
+  const cssBlocks = parseCssBlocks(cleanContent);
+  for (const block of cssBlocks) {
+    const sel = block.selector;
+    if (sel.startsWith('@keyframes') || sel.startsWith('@font-face')) continue;
+
+    // Declaraciones dentro del cuerpo del bloque
+    const declarations = block.body.split(';');
+    for (const rawDecl of declarations) {
+      const decl = rawDecl.trim();
+      if (!decl) continue;
+      const colonIdx = decl.indexOf(':');
+      if (colonIdx === -1) continue;
+      const prop = decl.substring(0, colonIdx).trim().toLowerCase();
+      const val = decl.substring(colonIdx + 1).trim();
+
+      // R18: height o min-height en px >= 120 dentro de selectores con Step, slide, slidesContainer, modalRoot o formBody
+      // Excluir billeteraSelectWrap, tarjetaSelectWrap, cropArea y cropCanvas con comprobación por nombre de clase
+      if (prop === 'height' || prop === 'min-height') {
+        const matchesSelector = /(?:Step|slide|slidesContainer|modalRoot|formBody)/i.test(sel);
+        const isExcluded = /(?:billeteraSelectWrap|tarjetaSelectWrap|cropArea|cropCanvas)/.test(sel);
+        if (matchesSelector && !isExcluded) {
+          const pxMatches = val.match(/\b(\d+)px\b/g);
+          if (pxMatches) {
+            for (const pxStr of pxMatches) {
+              const num = parseInt(pxStr.replace('px', ''), 10);
+              if (num >= 120) {
+                violations.R18++;
+              }
+            }
+          }
+        }
+      }
+
+      // R19: unidad vh (no dvh) en height, min-height o max-height de cualquier CSS
+      if (prop === 'height' || prop === 'min-height' || prop === 'max-height') {
+        if (/(?<![dsl])vh\b/i.test(val)) {
+          violations.R19++;
+        }
+      }
+    }
+  }
+
   return violations;
 }
 
@@ -287,7 +332,7 @@ function auditTsxFile(filePath, relPath, content) {
     R01: 0, R02: 0, R03: 0, R04: 0, R05: 0,
     R06: 0, R07: 0, R08: 0, R09: 0, R10: 0,
     R11: 0, R12: 0, R13: 0, R14: 0,
-    R15: 0, R16: 0, R17: 0,
+    R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
   };
 
   const fileName = path.basename(filePath);

@@ -3,6 +3,7 @@ import { Calendar, Building2, Check, AlertCircle } from '@/components/ui/icons'
 import { LunarLoader } from '@/components/ui'
 import { getPreviewFechaCobro } from '@/services/onboarding.service'
 import { REGLAS_CICLO } from '@/lib/utils/ciclo'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './CicloFinancieroSelector.module.css'
 
 export interface CicloValue {
@@ -218,17 +219,13 @@ export const CicloFinancieroSelector: React.FC<Props> = ({
             {/* Presets rápidos */}
             <div className={styles.quickDaysRow}>
               <span className={styles.blockHint}>Frecuentes:</span>
-              {PRESET_DAYS.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => handleDaySelect(d)}
-                  className={`${styles.quickDayBtn} ${valor === d ? styles.quickDayBtnActive : ''}`}
-                >
-                  {d}
-                </button>
-              ))}
+              <SegmentedControl
+                options={PRESET_DAYS.map((d) => ({ value: d, label: d, disabled }))}
+                value={valor}
+                onChange={handleDaySelect}
+                ariaLabel="Días frecuentes"
+                layout="inline"
+              />
             </div>
 
             {/* Grilla completa 1 a 31 */}

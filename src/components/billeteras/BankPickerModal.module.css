@@ -43,43 +43,11 @@
   position: relative;
   width: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   max-height: var(--modal-max-h);
-}
-
-.pickerStep {
-  height: 580px;
-}
-
-.formStep {
-  height: 440px;
-}
-
-.formStepCustom {
-  height: 500px;
-}
-
-@media (max-height: 740px) {
-  .pickerStep {
-    height: 75dvh;
-  }
-  .formStep {
-    height: min(440px, 75dvh);
-  }
-  .formStepCustom {
-    height: min(500px, 78dvh);
-  }
-}
-
-@media (max-width: 640px) {
-  .pickerStep {
-    height: 78dvh;
-  }
-  .formStep {
-    height: min(440px, 78dvh);
-  }
-  .formStepCustom {
-    height: min(500px, 80dvh);
-  }
 }
 
 .slide {
@@ -87,38 +55,45 @@
   inset: 0;
   display: flex;
   flex-direction: column;
-  transition: transform 300ms ease, opacity 300ms ease;
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms ease, visibility 300ms;
 }
 
 .slideVisible {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
   transform: translateX(0);
   opacity: 1;
   pointer-events: all;
-  /* NO position: relative — mantener absolute para que la altura quede definida */
+  visibility: visible;
 }
 
 .slideExitLeft {
   transform: translateX(-100%);
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .slideExitRight {
   transform: translateX(100%);
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .slideEnterRight {
   transform: translateX(100%);
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .slideEnterLeft {
   transform: translateX(-100%);
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 /* ── Botón cerrar ─────────────────────────────────────────────────────────── */

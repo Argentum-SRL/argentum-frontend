@@ -390,15 +390,7 @@ export default function BankPickerModal({
         </div>
 
         {/* Contenedor con transición de slides y altura adaptativa */}
-        <div
-          className={`${styles.slidesContainer} ${
-            step === 'picker'
-              ? styles.pickerStep
-              : isCustom
-              ? styles.formStepCustom
-              : styles.formStep
-          }`}
-        >
+        <div className={styles.slidesContainer}>
         {/* ── PASO 1: PICKER ── */}
         <div
           className={`${styles.slide} ${

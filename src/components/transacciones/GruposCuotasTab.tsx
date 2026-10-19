@@ -122,10 +122,6 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
 
   const { confirm } = useModal()
   const { lastDataUpdate } = useNotificaciones()
-  const detailBodyRef = useRef<HTMLDivElement | null>(null)
-  const detailFooterRef = useRef<HTMLDivElement | null>(null)
-  const editBodyRef = useRef<HTMLDivElement | null>(null)
-  const editFooterRef = useRef<HTMLDivElement | null>(null)
 
   const fetchGrupos = useCallback(async () => {
     try {
@@ -814,8 +810,6 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         selectedGrupo={selectedGrupo}
         detailSlide={detailSlide}
         detailSlideDirection={detailSlideDirection}
-        detailContainerStyle={undefined}
-        detailDynamicHeight={undefined}
         detailSelectedCat={detailSelectedCat}
         categorias={categorias}
         subcategorias={subcategorias}
@@ -834,8 +828,6 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         handleBackToDetail={handleBackToDetail}
         ejecutarPrepago={ejecutarPrepago}
         setBilleteraSeleccionada={setBilleteraSeleccionada}
-        detailBodyRef={detailBodyRef}
-        detailFooterRef={detailFooterRef}
         detailWalletsCarouselRef={detailWalletsCarouselRef}
       />
 
@@ -845,7 +837,6 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         setEditingGrupo={setEditingGrupo}
         editStep={editStep}
         editSlideDirection={editSlideDirection}
-        editDynamicHeight={undefined}
         editMonto={editMonto}
         setEditMonto={setEditMonto}
         tarjetasCarousel={tarjetasCarousel}
@@ -867,8 +858,6 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         goEditStep1={goEditStep1}
         goEditStep2={goEditStep2}
         handleSave={handleSave}
-        editBodyRef={editBodyRef}
-        editFooterRef={editFooterRef}
         tarjetasCarouselRef={tarjetasCarouselRef}
       />
 

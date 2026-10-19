@@ -23,14 +23,15 @@ export default function AvisoSaldoAnterior({
   if (!billetera || !fecha) return null
   if (metodoPago === 'credito') return null
 
-  const fechaClean = fecha.split('T')[0]
-  const fechaEfectiva = billetera.fecha_saldo_efectiva
-    ? billetera.fecha_saldo_efectiva.split('T')[0]
-    : billetera.fecha_saldo
-    ? billetera.fecha_saldo.split('T')[0]
-    : billetera.fecha_creacion?.split('T')[0]
+  // Decisión 9: No se muestra si fecha_saldo_efectiva es null
+  if (!billetera.fecha_saldo_efectiva) {
+    return null
+  }
 
-  if (!fechaEfectiva || fechaClean >= fechaEfectiva) {
+  const fechaClean = fecha.split('T')[0]
+  const fechaEfectiva = billetera.fecha_saldo_efectiva.split('T')[0]
+
+  if (fechaClean >= fechaEfectiva) {
     return null
   }
 
@@ -46,7 +47,7 @@ export default function AvisoSaldoAnterior({
         width: '100%',
       }}
     >
-      Esta fecha es anterior al saldo de «{billetera.nombre}» ({fechaFormateada}). Va a figurar en tus movimientos y en el mes, pero no cambia lo que tenés hoy en la cuenta.
+      Es anterior al saldo de «{billetera.nombre}» ({fechaFormateada}): cuenta en tus gastos, pero no cambia tu saldo.
     </p>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, CreditCard, Plus, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2 } from '@/components/ui/icons'
+import { ChevronLeft, ChevronRight, CreditCard, Plus, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2, Calendar } from '@/components/ui/icons'
 import type { Billetera, TarjetaCredito, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo, EntidadTasa, MovimientoItem } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
@@ -16,6 +16,7 @@ import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
 import { PresionFuturaCard } from '@/components/tarjetas/PresionFuturaCard'
 import RegistrarRendimientoModal from '@/components/billeteras/RegistrarRendimientoModal'
 import ActualizarSaldoModal from '@/components/billeteras/ActualizarSaldoModal'
+import CambiarFechaSaldoModal from '@/components/billeteras/CambiarFechaSaldoModal'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -56,6 +57,7 @@ const BilleteraDetallePage: React.FC = () => {
   const [rendimientoEstimado, setRendimientoEstimado] = useState<RendimientoEstimadoResponse | null>(null)
   const [isRegistrarModalOpen, setIsRegistrarModalOpen] = useState(false)
   const [isActualizarModalOpen, setIsActualizarModalOpen] = useState(false)
+  const [isFechaSaldoModalOpen, setIsFechaSaldoModalOpen] = useState(false)
   const [ajustesData, setAjustesData] = useState<AjustesBilleteraResponse | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
@@ -540,6 +542,19 @@ const BilleteraDetallePage: React.FC = () => {
                 <span>Actualizar saldo</span>
               </button>
             )}
+
+            {billetera.estado !== 'archivada' && billetera.tiene_punto_partida && (
+              <button
+                type="button"
+                className={styles.headerActualizarBtn}
+                onClick={() => setIsFechaSaldoModalOpen(true)}
+                title="Fecha del saldo"
+                aria-label="Fecha del saldo"
+              >
+                <Calendar size={13} />
+                <span>Fecha del saldo</span>
+              </button>
+            )}
           </div>
 
           {/* Saldo */}
@@ -834,6 +849,13 @@ const BilleteraDetallePage: React.FC = () => {
         onClose={() => setIsActualizarModalOpen(false)}
         onActualizado={refreshData}
         onCargarMovimiento={handleCargarMovimiento}
+      />
+
+      <CambiarFechaSaldoModal
+        billetera={billetera}
+        isOpen={isFechaSaldoModalOpen}
+        onClose={() => setIsFechaSaldoModalOpen(false)}
+        onActualizado={refreshData}
       />
     </div>
   )

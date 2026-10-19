@@ -1,0 +1,228 @@
+/* ─── CambiarFechaSaldoModal.module.css ────────────────────────────────────── */
+
+.modalCambiarFechaSaldo {
+  --modal-w: var(--modal-w-md);
+}
+
+.modalContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: var(--modal-max-h);
+  min-height: 0;
+  overflow: hidden;
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Figtree', sans-serif;
+  border-radius: 20px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px var(--modal-pad-x) 6px;
+  border-bottom: none;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.headerTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.headerSubtitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.billeteraBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+.modalBody {
+  padding: 16px var(--modal-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+.fieldBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.descriptionText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+  margin: 0;
+}
+
+/* ── Preview & Error text ────────────────────────────────────────────────── */
+.previewBox {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.previewText {
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--text);
+  margin: 0;
+  font-weight: 600;
+}
+
+.previewError {
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--danger, #ef4444);
+  margin: 0;
+  font-weight: 500;
+}
+
+.previewLoading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.modalFooter {
+  padding: 16px var(--modal-pad-x);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: none;
+  flex-shrink: 0;
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 120ms ease;
+  font-family: inherit;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitBtn {
+  flex: 1.5;
+  height: 46px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary, #0D2045);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 120ms ease, box-shadow 120ms ease;
+  box-shadow: var(--elevation-xs);
+  font-family: inherit;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.92;
+  box-shadow: var(--elevation-sm);
+}
+
+.submitBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .modalHeader {
+    padding: 14px var(--modal-pad-x) 10px;
+  }
+
+  .modalBody {
+    padding: 14px var(--modal-pad-x);
+    gap: 20px;
+  }
+
+  .modalFooter {
+    padding: 12px var(--modal-pad-x) 16px;
+  }
+
+  .cancelBtn,
+  .submitBtn {
+    height: 44px;
+    font-size: 13.5px;
+  }
+}

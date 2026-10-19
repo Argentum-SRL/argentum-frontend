@@ -203,11 +203,20 @@ export interface Billetera {
   estado: 'activa' | 'archivada'
   fecha_creacion: string
   fecha_saldo?: string | null
-  fecha_saldo_efectiva?: string
+  fecha_saldo_efectiva?: string | null
+  tiene_punto_partida?: boolean
   bank_id?: string | null
   nivel_tasa?: string | null
   entidad_efectiva?: string | null
   tiene_transacciones: boolean
+}
+
+export interface PrevisualizarFechaSaldoResponse {
+  saldo_actual: number
+  saldo_nuevo: number
+  cantidad_movimientos: number
+  fecha_actual: string
+  fecha_nueva: string
 }
 
 export interface OpcionTasa {

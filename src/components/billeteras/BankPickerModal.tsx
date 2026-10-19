@@ -10,6 +10,8 @@ import Modal from '@/components/ui/Modal/Modal'
 import { DateInput } from '@/components/ui'
 import billeteraService from '@/services/billetera.service'
 import { formatMonto } from '@/utils/format'
+import SegmentedControl from '@/components/ui/SegmentedControl'
+import { usePeriodoActual } from '@/hooks/usePeriodoActual'
 
 export interface CreatePayload {
   nombre: string
@@ -150,8 +152,6 @@ interface ModalState {
   colorCustom: string
   isSubmitting: boolean
   isEditingName: boolean
-  mostrarFechaSaldo: boolean
-  fechaSaldo: string
 }
 
 type ModalAction = 
@@ -177,8 +177,6 @@ function modalReducer(state: ModalState, action: ModalAction): ModalState {
         colorCustom: CUSTOM_COLORS[0],
         isSubmitting: false,
         isEditingName: false,
-        mostrarFechaSaldo: false,
-        fechaSaldo: '',
       }
     case 'SET_STEP':
       return { 
@@ -226,12 +224,16 @@ export default function BankPickerModal({
     colorCustom: CUSTOM_COLORS[0],
     isSubmitting: false,
     isEditingName: false,
-    mostrarFechaSaldo: false,
-    fechaSaldo: '',
   })
 
   const [entidades, setEntidades] = useState<EntidadTasa[]>([])
   const [estimacion, setEstimacion] = useState<EstimacionRendimiento | null>(null)
+  const { periodo, loading: loadingPeriodo } = usePeriodoActual()
+  const [tipoPuntoPartida, setTipoPuntoPartida] = useState<'hoy' | 'ciclo'>('hoy')
+  const [fechaSaldoManual, setFechaSaldoManual] = useState<string | null>(null)
+
+  const mostrarOpcionCiclo = !loadingPeriodo && Boolean(periodo?.fecha_inicio)
+  const fechaSaldoCiclo = fechaSaldoManual ?? (periodo?.fecha_inicio || todayLocal())
 
   const {
     step,
@@ -246,8 +248,6 @@ export default function BankPickerModal({
     colorCustom,
     isSubmitting,
     isEditingName,
-    mostrarFechaSaldo,
-    fechaSaldo,
   } = state
 
   const nameInputRef = useRef<HTMLInputElement>(null)
@@ -259,6 +259,8 @@ export default function BankPickerModal({
     if (isOpen) {
       dispatch({ type: 'RESET', monedaPrincipal: monedaPrincipalUsuario })
       setEstimacion(null)
+      setTipoPuntoPartida('hoy')
+      setFechaSaldoManual(null)
     }
   }
 
@@ -351,7 +353,13 @@ export default function BankPickerModal({
     }
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     const hoy = todayLocal()
-    const fechaFinal = fechaSaldo && fechaSaldo !== hoy ? fechaSaldo : null
+    let fechaFinal: string | null = null
+    if (saldo && saldo > 0 && tipoPuntoPartida === 'ciclo' && mostrarOpcionCiclo) {
+      const fCiclo = fechaSaldoCiclo || periodo?.fecha_inicio || ''
+      if (fCiclo && fCiclo !== hoy) {
+        fechaFinal = fCiclo
+      }
+    }
     try {
       await onCrear({
         nombre: nombre.trim(),
@@ -606,11 +614,6 @@ export default function BankPickerModal({
               <div className={styles.formFields}>
                 {/* Saldo inicial (Hero MontoInput full size) */}
                 <div className={styles.montoHeroField}>
-                  <p style={{ margin: '0 0 8px', fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
-                    {fechaSaldo && fechaSaldo !== todayLocal()
-                      ? `Saldo al ${formatFechaDDMMAAAA(fechaSaldo)}. Los movimientos de ese día en adelante lo modifican; los anteriores no.`
-                      : 'Es lo que tenés hoy en la cuenta. Los gastos de días anteriores no lo cambian.'}
-                  </p>
                   <MontoInput
                     value={saldo}
                     onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
@@ -620,34 +623,42 @@ export default function BankPickerModal({
                     allowDecimals
                     autoFocus
                   />
-                  <div style={{ marginTop: '8px', fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
-                    {!mostrarFechaSaldo ? (
-                      <button
-                        type="button"
-                        onClick={() => dispatch({ type: 'SET_FIELD', field: 'mostrarFechaSaldo', value: true })}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          padding: 0,
-                          color: 'var(--primary, #3b82f6)',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                          font: 'inherit',
-                        }}
-                      >
-                        ¿Tu saldo es de otro día? Cambiar fecha
-                      </button>
-                    ) : (
-                      <div style={{ marginTop: '6px' }}>
-                        <DateInput
-                          id="billetera-fecha-saldo"
-                          value={fechaSaldo || todayLocal()}
-                          max={todayLocal()}
-                          onChange={(val) => dispatch({ type: 'SET_FIELD', field: 'fechaSaldo', value: val })}
+
+                  {(!saldo || saldo <= 0) ? (
+                    <p style={{ margin: '8px 0 0', fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
+                      Sin saldo: todo lo que cargues suma o resta, con cualquier fecha.
+                    </p>
+                  ) : (
+                    <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {mostrarOpcionCiclo && (
+                        <SegmentedControl<'hoy' | 'ciclo'>
+                          ariaLabel="Punto de partida del saldo"
+                          fullWidth
+                          value={tipoPuntoPartida}
+                          onChange={(val) => setTipoPuntoPartida(val)}
+                          options={[
+                            { value: 'hoy', label: 'Lo que tengo hoy' },
+                            { value: 'ciclo', label: 'Con lo que arranqué el ciclo' },
+                          ]}
                         />
-                      </div>
-                    )}
-                  </div>
+                      )}
+                      <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
+                        {tipoPuntoPartida === 'ciclo' && mostrarOpcionCiclo
+                          ? `Saldo al ${formatFechaDDMMAAAA(fechaSaldoCiclo)}. Lo que cargues desde esa fecha lo cambia.`
+                          : 'Los gastos de días anteriores no lo cambian.'}
+                      </p>
+                      {tipoPuntoPartida === 'ciclo' && mostrarOpcionCiclo && (
+                        <div style={{ marginTop: '4px' }}>
+                          <DateInput
+                            id="billetera-fecha-saldo"
+                            value={fechaSaldoCiclo}
+                            max={todayLocal()}
+                            onChange={(val) => setFechaSaldoManual(val)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Panel de configuración inteligente & interactivo */}

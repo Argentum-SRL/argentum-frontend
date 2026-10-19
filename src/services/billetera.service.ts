@@ -7,6 +7,7 @@ import type {
   AjustesBilleteraResponse,
   EntidadTasa,
   EstimacionRendimiento,
+  PrevisualizarFechaSaldoResponse,
 } from '@/types'
 import { createUserCache } from '@/utils/sessionCleanup'
 
@@ -156,6 +157,31 @@ const billeteraService = {
 
   desarchivar: async (id: string) => {
     const { data } = await api.post<Billetera>(`/billeteras/${id}/desarchivar`)
+    invalidateBilleteras()
+    return data
+  },
+
+  previsualizarFechaSaldo: async (
+    id: string,
+    fecha_saldo: string,
+    signal?: AbortSignal
+  ): Promise<PrevisualizarFechaSaldoResponse> => {
+    const { data } = await api.post<PrevisualizarFechaSaldoResponse>(
+      `/billeteras/${id}/fecha-saldo/previsualizar`,
+      { fecha_saldo },
+      { signal }
+    )
+    return data
+  },
+
+  cambiarFechaSaldo: async (
+    id: string,
+    fecha_saldo: string
+  ): Promise<Billetera> => {
+    const { data } = await api.patch<Billetera>(
+      `/billeteras/${id}/fecha-saldo`,
+      { fecha_saldo }
+    )
     invalidateBilleteras()
     return data
   }

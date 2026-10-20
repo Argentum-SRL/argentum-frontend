@@ -219,7 +219,7 @@ export const BalanceCard = memo(function BalanceCard({
           </div>
           <span className={styles.accountName}>{b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}</span>
           {b.es_principal && (
-            <Star size={10} fill="currentColor" className={styles.starIcon} />
+            <Star size={12} strokeWidth={2.4} fill="currentColor" className={styles.starIcon} />
           )}
         </div>
         <span className={styles.accountAmount}>

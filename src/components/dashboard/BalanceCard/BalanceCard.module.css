@@ -485,7 +485,12 @@
 
 .starIcon {
   flex-shrink: 0;
-  color: #FBBF24;
+  color: #FCD34D;
+}
+
+:global([data-theme="dark"]) .starIcon,
+[data-theme="dark"] .starIcon {
+  color: #FCD34D;
 }
 
 .accountAmount {

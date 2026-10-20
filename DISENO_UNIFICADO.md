@@ -23,11 +23,11 @@ La escala de espaciado de Argentum está calibrada para ofrecer ritmo vertical a
 | `--space-2xs` | `2px` | Ajustes sub-pixel, bordes internos, microalineación. |
 | `--space-xs` | `4px` | Padding interno de controles compactos. |
 | `--space-icon` | `6px` | Separación exclusiva entre ícono y texto; separación interna de controles. |
-| `--space-sm` | `8px` | Gap entre etiqueta y campo (`--modal-label-gap`), grupos compactos. |
-| `--space-md` | `12px` | Padding vertical de secciones, gap entre botones de footer (`--modal-footer-gap`). |
-| `--space-lg` | `16px` | Separación estándar entre campos (`--modal-field-gap`), padding de tarjetas. |
-| `--space-xl` | `20px` | Padding lateral obligatorio en modales y sheets (`--modal-pad-x`). |
-| `--space-2xl` | `24px` | Separación vertical entre bloques principales de contenido (`--modal-group-gap`). |
+| `--space-sm` | `8px` | Gap entre etiqueta y campo (`--modal-label-gap`), grupos de opciones (`--modal-option-gap`). |
+| `--space-md` | `12px` | Separación entre campos (`--modal-field-gap`), gap entre botones de footer (`--modal-footer-btn-gap`). |
+| `--space-lg` | `16px` | Separación entre bloques en móviles `<= 480px` (`--modal-block-gap`), padding de tarjetas. |
+| `--space-xl` | `20px` | Separación entre bloques (`--modal-block-gap`), header a contenido (`--modal-header-gap`), padding lateral (`--modal-pad-x`). |
+| `--space-2xl` | `24px` | Separación vertical de último contenido a footer (`--modal-footer-gap`). |
 | `--space-3xl` | `32px` | Separación entre módulos o secciones mayores. |
 | `--space-4xl` | `40px` | Márgenes estructurales y descansos visuales amplios. |
 | `--space-5xl` | `48px` | Separación máxima entre macrosecciones de layout. |
@@ -187,7 +187,7 @@ El componente canónico `ui/Button` estandariza las interacciones principales en
   El footer de todo modal debe contener exactamente **dos botones**, sin línea divisoria superior:
   - Botón "Cancelar" o secundario: `flex: 1`
   - Botón "Confirmar" / principal: `flex: 2`
-  - Gap entre botones: `--modal-footer-gap` (`var(--space-md)` = 12px).
+  - Gap entre botones: `--modal-footer-btn-gap` (`12px`).
 
 ---
 
@@ -215,6 +215,7 @@ El sistema de espaciado para formularios, modales y hojas inferiores de Argentum
 | `--modal-section-title-gap` | `10px` | Separación vertical entre el subtítulo de un bloque y su primer elemento. |
 | `--modal-header-gap` | `20px` | Separación vertical entre el encabezado del modal y el primer bloque de contenido. |
 | `--modal-footer-gap` | `24px` | Separación vertical entre el último bloque de contenido y la botonera del pie (footer). |
+| `--modal-footer-btn-gap` | `12px` | Separación (gap) horizontal o vertical entre los botones de acción del footer. |
 | `--modal-pad-x` | `20px` | Relleno lateral uniforme en el cuerpo y pie del modal. |
 
 Regla de Gestalt: ninguna distancia entre campos (`12px`) puede ser mayor o igual que la distancia entre bloques (`20px` / `16px`). Los grupos de opciones (`8px`) y las etiquetas/ayudas (`8px`) se mantienen cohesionados con su control.
@@ -239,7 +240,7 @@ Para evitar CSS duplicado o ad-hoc en cada modal, el espaciado se gobierna centr
    - Tokens: `--stepdots-pad`, `--stepdot-height` (5px), `--stepdot-active-width` (20px), `--stepdot-inactive-width` (6px), `--stepdot-gap` (`var(--space-icon)` = 6px). Definición única en `Modal.module.css`.
 2. **Encabezado y Contenido:**
    - `--modal-pad-x`: `20px` lateral.
-   - `--modal-header-gap`: `24px` de separación hacia el contenido.
+   - `--modal-header-gap`: `20px` de separación hacia el contenido.
    - `--modal-radius`: `var(--radius-modal)` (`20px`).
    - `--modal-max-h`: `90dvh` (solo unidades dvh en modales y hojas).
    - Altura fluida por contenido scrolleable interno con footer fijo.
@@ -248,7 +249,7 @@ Para evitar CSS duplicado o ad-hoc en cada modal, el espaciado se gobierna centr
 4. **Footer:**
    - Implementado mediante `ModalFooter` (`secondary?: ReactNode`, `primary: ReactNode`).
    - Separación hacia el contenido: `var(--modal-footer-gap)` (`24px`).
-   - Gap entre botones: `12px`.
+   - Gap entre botones: `var(--modal-footer-btn-gap)` (`12px`).
    - Sin borde divisor superior (`border-top: none`).
    - Cancelar: `flex: 1`, Confirmar / Principal: `flex: 2`. Sin acción secundaria: el principal ocupa todo el ancho.
 5. **Apilamiento y Cierre de Modales Múltiples:**
@@ -284,7 +285,7 @@ Todos los carruseles horizontales de tarjetas de billeteras o crédito dentro de
   - Sangrado lateral *full-bleed*: `margin-inline: calc(-1 * var(--modal-pad-x))` con comentario `r03-ok`, compensado exactamente con `padding-inline: var(--modal-pad-x)` y `scroll-padding-inline: var(--modal-pad-x)`. La primera card queda perfectamente alineada al contenido (a 20px) y al deslizar se ve continua hasta el borde del modal.
   - Alojamiento vertical de sombras: `padding-top: var(--carousel-reach-top)` (3px) y `padding-bottom: var(--carousel-reach-bottom)` (15px), correspondientes al alcance real de `--elevation-selection-carousel`.
   - Compensación vertical sin agrandar el layout: `margin-top: calc(-1 * var(--carousel-reach-top))` y `margin-bottom: calc(-1 * var(--carousel-reach-bottom))` con el comentario normativo de patrón (4): `/* r03-ok: compensa el padding que aloja la sombra de selección para que el carrusel mida lo mismo que sus cards */`.
-  - Resultado: la distancia visible de la etiqueta a la card es exactamente `--modal-label-gap` (8px) y de la card al siguiente bloque es `--modal-block-gap` (32px/24px) o `--modal-footer-gap` (24px), sin holguras sobrantes.
+  - Resultado: la distancia visible de la etiqueta a la card es exactamente `--modal-label-gap` (8px) y de la card al siguiente bloque es `--modal-block-gap` (20px / 16px en <=480px) o `--modal-footer-gap` (24px), sin holguras sobrantes.
 - **Pista (`[data-modal-carousel-track]`):**
   - Flexbox en fila con `gap: 12px` y `scroll-snap-type: x mandatory`.
   - Centrado automático cuando hay una sola card (`carouselCenter`) y alineación al inicio (`carouselStart`) cuando hay varias.
@@ -492,3 +493,44 @@ Toda verificación o certificación responsive debe comprobar el correcto render
   https://github.com/w3c/csswg-drafts/issues/9107
 - **W3C WCAG 2.2 — Understanding Target Size (Enhanced) Success Criterion 2.5.5:**  
   https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html
+
+---
+
+## 15. Sistema Canónico de Controles Base, Foco y Movimiento (Fase fv3n)
+
+### 15.1 Tokens de Control de Entrada y Botones
+Todos los controles estándar del sistema (`Input`, `Field`, `SelectInput`, `DateInput`, `TimeInput`, `PhoneCountrySelect`, `ColorPicker` y `Button`) derivan obligatoriamente de la escala centralizada en `tokens.css`:
+
+| Token | Valor | Propósito |
+| :--- | :--- | :--- |
+| `--control-h` | `44px` | Altura estándar de todos los controles de entrada y botones interactivos. Satisface WCAG 2.5.5. |
+| `--control-h-sm` | `36px` | Altura compacta exclusiva para controles o botones secundarios acotados. |
+| `--control-radius` | `12px` | Radio de curvatura unificado para todos los controles del sistema (alineado con `Button`). |
+| `--control-pad-x` | `14px` | Relleno horizontal uniforme en controles de texto y selectores. |
+| `--control-font` | `15px` | Tamaño tipográfico en controles para pantallas de escritorio. |
+| `--control-font-mobile` | `16px` | Tamaño tipográfico normativo en controles editables (`input`, `select`, `textarea`) en pantallas `<= 768px` para prevenir zoom automático indeseado en Safari iOS. |
+| `--control-disabled-opacity` | `0.5` | Opacidad estándar para controles en estado deshabilitado (`:disabled` / `aria-disabled="true"`). |
+| `--focus-ring` | `0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent)` | Indicador de foco por teclado de alta visibilidad (contraste `>= 3:1` sobre superficies del sistema). |
+
+> **MontoInput (Tarjeta Hero):** Preserva su altura hero, tipografía protagónica y radio de 16px por identidad de producto, pero hereda estrictamente `--control-disabled-opacity`, `--focus-ring` y el token de color de error del sistema.
+
+### 15.2 Foco Accesible (Regla R28)
+Todo selector interactivo que aplique `outline: none` o `outline: 0` debe declarar obligatoriamente en el mismo bloque o mediante su variante `:focus-visible` un indicador visual visible (`box-shadow: var(--focus-ring);` o borde perimetral en `var(--primary)`). Se prohíbe silenciar el foco por teclado sin proporcionar retorno físico equivalente (R28 = 0).
+
+### 15.3 Transiciones y Accesibilidad de Movimiento (Reglas R29 y R30)
+- **Prohibición de `transition: all` (R29):** Queda terminantemente prohibido el uso indiscriminado de `transition: all` en componentes base y estructuras de layout. Cada regla debe explicitar exactamente las propiedades transicionadas (`transform`, `opacity`, `background-color`, `border-color`, `box-shadow`, `color`).
+- **Tokens de Movimiento Físico:**
+  - `--motion-fast`: `150ms` (interacciones inmediatas, feedback táctil).
+  - `--motion-base`: `220ms` (transiciones de estado y elevación).
+  - `--ease-out`: `cubic-bezier(0.16, 1, 0.3, 1)` (curva física canónica de desaceleración sin rebote).
+- **Cobertura Obligatoria de Reduced-Motion (R30):** Toda animación (`@keyframes` / `animation`) o transición CSS en `ui/` y `layout/` debe incluir cobertura explícita bajo `@media (prefers-reduced-motion: reduce)` en el mismo módulo (`transition: none !important; animation: none !important;`), preservando en loaders e indicadores de carga un latido o pulso atenuado que garantice el feedback de progreso sin inducir mareo visual.
+
+### 15.4 Prevención de Hover Pegado en Pantallas Táctiles (Regla R31)
+Todo efecto de interacción `:hover` que induzca movimiento o cambio dimensional (`transform`, `translate`, `scale`) debe estar estrictamente confinado dentro de `@media (hover: hover) and (pointer: fine)`. Esto previene que los elementos queden permanentemente elevados o distorsionados tras una pulsación táctil en dispositivos móviles o tabletas (R31 = 0). Las mutaciones cromáticas neutrales (`background-color`, `color`, `box-shadow`) pueden residir fuera de dicha media query para feedback inmediato.
+
+### 15.5 Política y Contención de `!important`
+Queda prohibido introducir declaraciones `!important` nuevas en el código fuente. Para las declaraciones preexistentes rige la siguiente clasificación sistemática:
+1. **Redundantes probadas (a):** Reglas donde ninguna otra regla del sistema compite por la propiedad; se eliminan sin alteración de especificidad.
+2. **Orden interno resuelto (b):** Declaraciones que competían exclusivamente con reglas del mismo archivo; se resuelven reordenando el bloque en la cascada tras verificación de equivalencia estricta.
+3. **Externas / Defensivas justificadas (c):** Declaraciones indispensables para neutralizar estilos globales o inline de dependencias de terceros; se conservan y listan con su justificación técnica en el inventario.
+

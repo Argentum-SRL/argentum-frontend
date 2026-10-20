@@ -36,15 +36,20 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.65rem 1.5rem;
-  border-radius: 12px;
+  border-radius: var(--control-radius);
   background: var(--primary, #0d2045);
   color: #ffffff;
   border: none;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
   font-family: inherit;
+}
+
+.closeBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .closeBtn:hover {
@@ -53,6 +58,12 @@
 
 .closeBtn:active {
   transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closeBtn {
+    transition: none;
+  }
 }
 
 @keyframes fadeIn {

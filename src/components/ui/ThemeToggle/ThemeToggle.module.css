@@ -9,17 +9,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out);
   box-shadow: var(--elevation-sm);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
+.toggleBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .toggleBtn:hover {
   background: var(--surface-alt);
   color: var(--text);
-  transform: scale(1.05);
   box-shadow: var(--elevation-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .toggleBtn:hover {
+    transform: scale(1.05);
+  }
 }
 
 .toggleBtn:active {
@@ -41,16 +51,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--motion-base) var(--ease-out);
 }
 
-.toggleBtn:hover .iconWrap {
-  transform: rotate(15deg);
+@media (hover: hover) and (pointer: fine) {
+  .toggleBtn:hover .iconWrap {
+    transform: rotate(15deg);
+  }
 }
 
 .iconSun {
   color: #FAF7F2;
-  transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color var(--motion-base) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggleBtn,
+  .iconWrap,
+  .iconSun {
+    transition: none;
+  }
 }
 
 :global([data-theme="dark"]) .iconSun,

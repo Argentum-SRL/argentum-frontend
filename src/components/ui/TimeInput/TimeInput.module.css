@@ -20,20 +20,28 @@
 
 .input {
   width: 100%;
-  height: 40px;
-  padding: 0 36px 0 14px;
+  height: var(--control-h);
+  padding: 0 36px 0 var(--control-pad-x);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--control-radius);
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--control-font);
   font-weight: 600;
   color: var(--text);
   outline: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: border-color var(--motion-fast) var(--ease-out),
+              background-color var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-fast) var(--ease-out);
   white-space: nowrap;
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .input {
+    font-size: var(--control-font-mobile);
+  }
 }
 
 .input:hover {
@@ -41,9 +49,11 @@
   background: var(--surface-alt);
 }
 
-.input:focus {
+.input:focus,
+.input:focus-visible {
+  outline: none;
   border-color: var(--primary);
-  box-shadow: var(--elevation-none);
+  box-shadow: var(--focus-ring);
 }
 
 .inputError {
@@ -51,7 +61,7 @@
 }
 
 .inputDisabled {
-  opacity: 0.45;
+  opacity: var(--control-disabled-opacity);
   cursor: not-allowed;
 }
 
@@ -192,7 +202,7 @@
   cursor: pointer;
   padding: 6px 12px;
   border-radius: 8px;
-  transition: all 0.12s;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 
 .nowBtn:hover {
@@ -209,9 +219,17 @@
   cursor: pointer;
   padding: 6px 16px;
   border-radius: 8px;
-  transition: all 0.12s;
+  transition: opacity var(--motion-fast) var(--ease-out);
 }
 
 .doneBtn:hover {
   opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .nowBtn,
+  .doneBtn {
+    transition: none;
+  }
 }

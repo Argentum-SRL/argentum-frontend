@@ -432,7 +432,7 @@
 .formFooter {
   padding: 0 var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial v3 */
   display: flex;
-  gap: var(--modal-footer-gap);
+  gap: var(--modal-footer-btn-gap);
   border-top: none;
   background: var(--surface);
   border-radius: 0 0 var(--modal-radius) var(--modal-radius);

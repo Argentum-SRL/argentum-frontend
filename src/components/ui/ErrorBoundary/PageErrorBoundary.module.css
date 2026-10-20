@@ -41,15 +41,21 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.4rem;
-  border-radius: 12px;
+  border-radius: var(--control-radius);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out);
   font-family: inherit;
   width: 100%;
   box-sizing: border-box;
   text-decoration: none;
+}
+
+.retryBtn:focus-visible,
+.homeBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .retryBtn {
@@ -61,8 +67,13 @@
 
 .retryBtn:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
   box-shadow: var(--elevation-xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .retryBtn:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .retryBtn:active {
@@ -86,7 +97,12 @@
 
 .homeBtn:hover {
   background: var(--border);
-  transform: translateY(-1px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .homeBtn:hover {
+    transform: translateY(-1px);
+  }
 }
 
 :global([data-theme="dark"]) .homeBtn:hover {
@@ -96,4 +112,11 @@
 
 .homeBtn:active {
   transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retryBtn,
+  .homeBtn {
+    transition: none;
+  }
 }

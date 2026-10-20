@@ -16,15 +16,24 @@
 
 .input {
   width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  border-radius: 10px;
+  height: var(--control-h);
+  padding: 0 var(--control-pad-x);
+  border-radius: var(--control-radius);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-  font-size: 1rem;
+  font-size: var(--control-font);
+  box-sizing: border-box;
   outline: none;
-  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+  transition: border-color var(--motion-fast) var(--ease-out),
+              background-color var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-fast) var(--ease-out);
+}
+
+@media (max-width: 768px) {
+  .input {
+    font-size: var(--control-font-mobile);
+  }
 }
 
 :global([data-theme="dark"]) .input,
@@ -33,13 +42,15 @@
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-.input:focus {
+.input:focus,
+.input:focus-visible {
+  outline: none;
   border-color: var(--primary);
-  box-shadow: var(--elevation-none);
+  box-shadow: var(--focus-ring);
 }
 
 .input:disabled {
-  opacity: 0.5;
+  opacity: var(--control-disabled-opacity);
   cursor: not-allowed;
 }
 
@@ -69,3 +80,10 @@
   color: var(--text-3);
   margin-top: 4px;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .input {
+    transition: none;
+  }
+}
+

@@ -350,7 +350,7 @@
   border-top: none;
   background: var(--surface);
   display: flex;
-  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
+  gap: var(--modal-footer-btn-gap); /* Separación oficial entre botones del pie */
   flex-shrink: 0;
 }
 

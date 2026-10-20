@@ -51,6 +51,10 @@ export const RULE_DEFS = {
   R25: 'Renderers de movimientos que dibujan íconos específicos (ArrowDownLeft, etc.) directamente dentro de un .map de transacciones/movimientos/cuotas fuera de MovimientoAvatar',
   R26: 'data-modal-stack en un contenedor que tenga como hijo un header o footer del modal',
   R27: 'estilo inline con margin/padding vertical dentro de un modal',
+  R28: 'outline: none o outline: 0 sin :focus-visible equivalente en el mismo módulo CSS (ui/ y layout/)',
+  R29: 'transition: all o transition-property: all en componentes ui/ o layout/',
+  R30: 'animation o transition en ui/ o layout/ sin cobertura por @media (prefers-reduced-motion: reduce)',
+  R31: 'regla :hover con transform/scale/translate fuera de @media (hover: hover) en ui/ o layout/',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
@@ -92,7 +96,7 @@ function auditCssFile(filePath, relPath, content) {
     R11: 0, R12: 0, R13: 0, R14: 0,
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
-    R26: 0, R27: 0,
+    R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -244,6 +248,7 @@ function auditCssFile(filePath, relPath, content) {
         // R04: valor propio
         const cleanVal = val.replace(/!important/g, '').trim();
         const isAllowed = cleanVal.includes('var(--elevation-') ||
+                          cleanVal.includes('var(--focus-ring') ||
                           ['none', 'inherit', 'initial', 'unset'].includes(cleanVal);
         if (!isAllowed) {
           violations.R04++;
@@ -441,7 +446,78 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
+  // Reglas de Fase fv3n (componentes base ui/ y layout/)
+  const isUiOrLayout = relPath.startsWith('components/ui/') || relPath.startsWith('components/layout/') || relPath.startsWith('components\\ui\\') || relPath.startsWith('components\\layout\\');
+  const isExemptFv3n = relPath.includes('SegmentedControl');
+
+  if (isUiOrLayout && !isExemptFv3n) {
+    // R28: outline: none o 0 sin :focus-visible en el mismo módulo
+    const hasOutlineNone = /(?:^|[;\s])outline\s*:\s*(?:none|0)(?:[;\s]|$)/i.test(cleanContent);
+    if (hasOutlineNone) {
+      const hasFocusVisible = cleanContent.includes(':focus-visible');
+      if (!hasFocusVisible) {
+        violations.R28++;
+      }
+    }
+
+    // R29: transition: all o transition-property: all en ui/ o layout/
+    const r29Matches = cleanContent.match(/(?:transition|transition-property)\s*:\s*all\b/gi);
+    if (r29Matches) {
+      violations.R29 += r29Matches.length;
+    }
+
+    // R30: animation o transition sin prefers-reduced-motion
+    const strippedMotion = cleanContent
+      .replace(/animation\s*:\s*none(?:\s*!important)?/gi, '')
+      .replace(/transition\s*:\s*none(?:\s*!important)?/gi, '');
+    const hasActiveMotion = /(?:transition\s*:\s*(?!0s\b|0ms\b)[^;]+|animation\s*:\s*[^;]+)/i.test(strippedMotion);
+    if (hasActiveMotion) {
+      const hasReducedMotion = /@media[^{]*prefers-reduced-motion/i.test(cleanContent);
+      if (!hasReducedMotion) {
+        violations.R30++;
+      }
+    }
+
+    // R31: regla :hover con transform/scale/translate fuera de @media (hover: hover)
+    violations.R31 += checkHoverTransformOutsideMedia(cleanContent);
+  }
+
   return violations;
+}
+
+// Helper para R31: verifica si existen reglas :hover con transform/scale/translate fuera de @media (hover: hover)
+function checkHoverTransformOutsideMedia(css) {
+  let violationsCount = 0;
+  let i = 0;
+  const n = css.length;
+  while (i < n) {
+    const braceOpen = css.indexOf('{', i);
+    if (braceOpen === -1) break;
+    const header = css.substring(i, braceOpen).trim();
+    let depth = 1;
+    let j = braceOpen + 1;
+    while (j < n && depth > 0) {
+      if (css[j] === '{') depth++;
+      else if (css[j] === '}') depth--;
+      j++;
+    }
+    const body = css.substring(braceOpen + 1, j - 1);
+    if (header.startsWith('@media')) {
+      const isHoverMedia = /hover\s*:\s*hover/i.test(header);
+      if (!isHoverMedia) {
+        violationsCount += checkHoverTransformOutsideMedia(body);
+      }
+    } else {
+      if (header.includes(':hover')) {
+        const hasTransform = /(?:^|[;\s])(?:transform\s*:|scale\(|translate)/i.test(body);
+        if (hasTransform) {
+          violationsCount++;
+        }
+      }
+    }
+    i = j;
+  }
+  return violationsCount;
 }
 
 // Analizar archivo TSX
@@ -452,7 +528,7 @@ function auditTsxFile(filePath, relPath, content) {
     R11: 0, R12: 0, R13: 0, R14: 0,
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
-    R26: 0, R27: 0,
+    R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
   };
 
   const fileName = path.basename(filePath);

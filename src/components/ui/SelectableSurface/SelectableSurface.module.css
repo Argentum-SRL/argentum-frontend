@@ -26,6 +26,11 @@
   outline: none;
 }
 
+.surface:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 /* ── Contextual Elevation Resolution ── */
 .surface[data-context="page"] {
   --surface-elevation-selected: var(--elevation-selection);
@@ -138,5 +143,8 @@
   .surface[data-selected="true"] {
     transition: none !important;
     transform: none !important;
+  }
+  .indicator {
+    animation: none;
   }
 }

@@ -18,14 +18,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 44px;
-  padding: 0 14px;
+  height: var(--control-h);
+  padding: 0 var(--control-pad-x);
   background: var(--surface-alt);
   border: 1.5px solid transparent;
-  border-radius:12px;
+  border-radius: var(--control-radius);
   cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color var(--motion-fast) var(--ease-out),
+              background-color var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-fast) var(--ease-out);
   width: 100%;
 }
 
@@ -34,9 +38,13 @@
   border-color: var(--border);
 }
 
+.trigger:focus,
+.trigger:focus-visible,
 .triggerOpen {
+  outline: none;
   border-color: var(--primary);
   background: var(--surface);
+  box-shadow: var(--focus-ring);
 }
 
 .swatch {
@@ -122,9 +130,14 @@
 }
 
 .presetBtn:hover {
-  transform: translateY(-0.5px) scale(1.03);
   box-shadow: var(--elevation-xs);
   z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .presetBtn:hover {
+    transform: translateY(-0.5px) scale(1.03);
+  }
 }
 
 .presetBtnActive {
@@ -285,5 +298,9 @@
   .bottomSheet,
   .panel {
     animation: none !important;
+  }
+  .trigger,
+  .doneBtn {
+    transition: none;
   }
 }

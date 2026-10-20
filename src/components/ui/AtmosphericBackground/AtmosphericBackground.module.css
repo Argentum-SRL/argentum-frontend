@@ -253,6 +253,15 @@
   .card {
     animation: none !important;
   }
+  .container,
+  .lightSourceGlow,
+  .ambientCounterGlow,
+  .hallmarkGroup,
+  .topVignette,
+  .bottomVignette,
+  .card {
+    transition: none;
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {

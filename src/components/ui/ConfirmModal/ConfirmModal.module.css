@@ -90,6 +90,11 @@
   font-size: 1rem;
 }
 
+.requireInput:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .actions {
   display: flex;
   gap: 8px;
@@ -107,12 +112,12 @@
 .cancelBtn {
   flex: 1;
   max-width: 130px;
-  height: 42px;
-  border-radius: 12px;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   border: 1.5px solid var(--surface-alt);
   background: transparent;
   color: var(--text-2);
-  font-size: 13.5px;
+  font-size: var(--control-font);
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -134,21 +139,21 @@
 }
 
 .cancelBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .cancelBtn:disabled {
-  opacity: 0.4;
+  opacity: var(--control-disabled-opacity);
   cursor: not-allowed;
 }
 
 .confirmBtn {
   flex: 2;
-  height: 42px;
-  border-radius: 12px;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   border: none;
-  font-size: 13.5px;
+  font-size: var(--control-font);
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -170,8 +175,8 @@
 }
 
 .confirmBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .confirmBtnDanger { 
@@ -180,7 +185,8 @@
 }
 
 .confirmBtnDanger:focus-visible {
-  outline-color: var(--error);
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .confirmBtnDefault { 
@@ -200,7 +206,7 @@
 }
 
 .confirmBtn:disabled { 
-  opacity: 0.4; 
+  opacity: var(--control-disabled-opacity); 
   cursor: not-allowed; 
 }
 
@@ -266,7 +272,18 @@
     width: 100%;
     max-width: none;
     flex: none;
-    height: 42px;
+    height: var(--control-h);
     font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cancelBtn,
+  .confirmBtn {
+    transition: none;
+  }
+  .spinner {
+    animation-duration: 1.5s;
+    opacity: 0.8;
   }
 }

@@ -251,7 +251,7 @@
   padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   background: var(--surface);
   display: flex;
-  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
+  gap: var(--modal-footer-btn-gap); /* Separación oficial entre botones del pie */
   flex-shrink: 0;
 }
 
@@ -317,7 +317,7 @@
 
   .formFooter {
     padding: var(--modal-footer-pad-top) var(--modal-pad-x) max(var(--modal-footer-pad-bottom), env(safe-area-inset-bottom, 0px)); /* Espaciado oficial del pie con safe-area */
-    gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
+    gap: var(--modal-footer-btn-gap); /* Separación oficial entre botones del pie */
   }
 
   .cancelBtn {

@@ -562,7 +562,7 @@
   padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
   background: var(--surface);
   display: flex;
-  gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */
+  gap: var(--modal-footer-btn-gap); /* Separación oficial entre botones del pie */
   align-items: center;
   border-top: none;
   box-sizing: border-box;

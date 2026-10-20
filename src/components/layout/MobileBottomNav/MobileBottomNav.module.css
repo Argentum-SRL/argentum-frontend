@@ -102,3 +102,11 @@
   pointer-events: none;
   transition: transform 150ms cubic-bezier(0.2, 0.9, 0.3, 1);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator,
+  .mobileNavItem,
+  .mobileNavIcon {
+    transition: none;
+  }
+}

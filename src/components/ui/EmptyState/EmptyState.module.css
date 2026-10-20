@@ -111,14 +111,19 @@
   justify-content: center;
   gap: 6px;
   padding: 0 16px;
-  height: 38px;
-  border-radius:12px;
+  height: var(--control-h-sm);
+  border-radius: var(--control-radius);
   font-size: 13px;
   font-weight: 700;
   border: none;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 120ms ease, transform 120ms ease, background-color 120ms ease;
+  transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .btn:active {
@@ -130,9 +135,11 @@
   color: white;
 }
 
-.btnPrimary:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .btnPrimary:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
 }
 
 .btnSecondary {
@@ -141,9 +148,17 @@
   border: 1px solid var(--border);
 }
 
-.btnSecondary:hover {
-  background: var(--border);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .btnSecondary:hover {
+    background: var(--border);
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
 }
 
 /* Dark theme overrides for standard button colors if needed */

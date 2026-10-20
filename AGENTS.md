@@ -14,6 +14,7 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
      - 10px subtítulo de bloque a primer elemento (`--modal-section-title-gap`).
      - 20px header a primer bloque (`--modal-header-gap`).
      - 24px último bloque a botonera de footer (`--modal-footer-gap`).
+     - 12px separación entre botones de footer (`--modal-footer-btn-gap`).
      - 20px lateral (`--modal-pad-x`).
    - Mecanismo único centralizado por atributos de marcado en `Modal.module.css`:
      - `[data-modal-frame]`: contenedores estructurales (slide, `modalContainer`, `formContainer`, `slidesContainer`, `mobileDrawerContainer`) con flex columna y `gap: 0`.
@@ -28,7 +29,7 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
    - Componente `Modal` canónico con soporte `variant?: 'dialog' | 'sheet'` (sheet anclado abajo, handle superior, radio 20px 20px 0 0, `safe-area-inset-bottom`, overlay en `var(--z-modal)`).
    - Apilamiento robusto: contador de scroll lock a nivel módulo y pila de escape (`modalEscapeStack`) para cerrar solo el modal superior sin cerrar los inferiores.
    - Indicador de pasos unificado: prop `stepDots={{ total, current }}` en `<Modal>`, definición única en `Modal.module.css` (R13 = 1).
-   - Pie de modal unificado con `ModalFooter` (Cancelar flex 1, Confirmar flex 2, sin border-top divisor).
+   - Pie de modal unificado con `ModalFooter` (Cancelar flex 1, Confirmar flex 2, gap 12px con `--modal-footer-btn-gap`, sin border-top divisor).
    - Capa de overlay en `z-index: var(--z-modal)`. Altura adaptativa por CSS natural con tope `var(--modal-max-h: 90dvh)` y scroll interno.
    - Criterio de scroll legítimo y form body único: En modales de formulario el scroll reside exclusivamente en el `Modal` base (`.content`). Prohibido doble scroll en `.formBody` o pasos; `overflow-y: auto` propio solo es legítimo en pickers o listas acotadas por diseño (bancos, búsqueda, notificaciones, cuentas en filtros).
 5. **Componentes Canónicos de Dominio:**
@@ -51,8 +52,14 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
    - Prohibido modales con formularios que omitan `[data-modal-block]` (R22 = 0).
    - Prohibido selectores propios de carrusel/card de billetera fuera de Modal base y BilleteraCard/RealCardPreview (R23 = 0).
    - Prohibido renderers de movimientos con SubcategoriaIcon/CategoriaIcon directamente en loops `.map` fuera de MovimientoAvatar (R24 = 0).
-   - Prohibido tocar `BalanceCard.tsx` y `BalanceCard.module.css` (excepción permanente).
-8. **Verificación Previa y Candado:**
+   - Prohibido tocar `BalanceCard.tsx` y `BalanceCard.module.css` (salvo la estrella unificada de cuenta principal en tamaño 12 y strokeWidth 2.4).
+8. **Controles Base, Foco y Movimiento (Fase fv3n):**
+   - **Controles Unificados:** Todos los controles (`Input`, `Field`, `SelectInput`, `DateInput`, `TimeInput`, `PhoneCountrySelect`, `ColorPicker`, `Button`) derivan de tokens `--control-h` (44px, sm 36px), `--control-radius` (12px), `--control-pad-x` (14px), `--control-font` (15px, 16px en `<= 768px` para evitar auto-zoom iOS), y `--control-disabled-opacity` (0.5).
+   - **Foco Accesible (R28):** Cero `outline: none|0` sin `:focus-visible` con `var(--focus-ring)` en el mismo módulo (R28 = 0).
+   - **Movimiento y Accesibilidad (R29, R30):** Cero `transition: all` en ui/layout (R29 = 0). Tokens `--motion-fast` (150ms), `--motion-base` (220ms), `--ease-out: cubic-bezier(0.16, 1, 0.3, 1)`. Todo movimiento cubierto por `@media (prefers-reduced-motion: reduce)` (R30 = 0).
+   - **Hover Táctil (R31):** Efectos hover con `transform`/`scale` confinados a `@media (hover: hover) and (pointer: fine)` (R31 = 0).
+   - **Contención de `!important`:** Prohibido agregar `!important` nuevos.
+9. **Verificación Previa y Candado:**
    - Correr `npm run lint` y `node scripts/audit-design-rules.mjs` antes de cualquier commit.
    - La línea base solo se actualiza con `node scripts/audit-design-rules.mjs --update-baseline` y nunca debe sufrir aumentos.
    - En cada push corre el candado automático; está prohibido usar `--no-verify`.

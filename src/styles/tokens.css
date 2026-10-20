@@ -45,6 +45,7 @@
   --modal-section-title-gap: 10px; /* Subtítulo de un bloque a su primer elemento (10px) */
   --modal-header-gap: 20px; /* Título/header del modal al primer bloque (20px) */
   --modal-footer-gap: 24px; /* Último bloque a la fila de botones del footer (24px) */
+  --modal-footer-btn-gap: 12px; /* Separación entre botones del footer, horizontal o vertical */
   --modal-content-pad-top: var(--modal-header-gap); /* Padding superior del contenido del modal (20px) */
   --modal-content-pad-bottom: var(--modal-footer-gap); /* Padding inferior del contenido del modal (24px) */
   --modal-footer-pad-top: 0px; /* Padding superior del pie del modal (sin sumar al gap) */
@@ -55,6 +56,21 @@
   --carousel-reach-bottom: 15px; /* Alcance vertical inferior de la sombra de selección (6 + 12 - 3) */
   --select-card-w-min: 208px; /* Ancho mínimo de card de billetera/tarjeta selectora en carrusel */
   --select-card-w-max: 248px; /* Ancho máximo de card de billetera/tarjeta selectora en carrusel */
+
+  /* ── Tokens de Controles Interactivos (Decisión 3) ── */
+  --control-h: 44px; /* Alto de todos los controles de entrada y botones estándar */
+  --control-h-sm: 36px; /* Alto para botones o controles explícitamente compactos */
+  --control-radius: 12px; /* Radio de curvatura unificado para todos los controles interactivos */
+  --control-pad-x: 14px; /* Relleno horizontal para controles de texto y selectores */
+  --control-font: 15px; /* Tamaño de letra de controles en pantallas de escritorio */
+  --control-font-mobile: 16px; /* Tamaño de letra de controles en <=768px para evitar zoom en iOS */
+  --control-disabled-opacity: 0.5; /* Opacidad estándar para controles en estado deshabilitado */
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent); /* Anillo perimetral de foco por teclado */
+
+  /* ── Movimiento y Transiciones ── */
+  --motion-fast: 150ms; /* Duración para microinteracciones rápidas y retroalimentación inmediata */
+  --motion-base: 220ms; /* Duración base para transiciones de estado e interfaces */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* Curva de aceleración suave estándar sin rebotes */
 
   /* ── Puntos de Paso (StepDots) ── */
   --stepdots-pad: var(--space-lg) var(--space-xl) var(--space-xs); /* Padding superior, lateral e inferior del indicador de pasos */

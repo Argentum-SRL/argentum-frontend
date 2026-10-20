@@ -51,10 +51,21 @@
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.retryBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .retryBtn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-1, #ffffff);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retryBtn {
+    transition: none;
+  }
 }

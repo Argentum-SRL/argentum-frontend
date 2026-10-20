@@ -33,11 +33,11 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.4rem;
-  border-radius: 12px;
+  border-radius: var(--control-radius);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out);
   font-family: inherit;
   width: 100%;
   box-sizing: border-box;
@@ -47,13 +47,29 @@
   box-shadow: var(--elevation-none);
 }
 
+.reloadBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .reloadBtn:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
   box-shadow: var(--elevation-xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .reloadBtn:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .reloadBtn:active {
   transform: translateY(0);
   box-shadow: var(--elevation-none);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reloadBtn {
+    transition: none;
+  }
 }

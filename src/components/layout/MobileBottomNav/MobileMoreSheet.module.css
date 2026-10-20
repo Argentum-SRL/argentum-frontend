@@ -3,7 +3,7 @@
 }
 
 .sheetInner {
-  padding: 8px 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px;
+  padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   display: flex;
   flex-direction: column;
 }
@@ -182,5 +182,14 @@
 .itemDanger.itemPressed .itemLabel {
   color: var(--error) !important;
   transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .handle,
+  .item,
+  .iconWrapper,
+  .itemLabel {
+    transition: none;
+  }
 }
 

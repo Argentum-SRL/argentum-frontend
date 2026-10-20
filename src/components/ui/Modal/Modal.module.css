@@ -152,6 +152,11 @@
   line-height: 1;
 }
 
+.closeButton:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .closeButton:hover {
   background: var(--border);
   color: var(--text);
@@ -180,7 +185,7 @@
   padding: 0 var(--modal-pad-x) var(--modal-pad-x);
   display: flex;
   justify-content: flex-end;
-  gap: var(--modal-footer-gap);
+  gap: var(--modal-footer-btn-gap);
   flex-shrink: 0;
 }
 
@@ -308,7 +313,7 @@
 /* Acciones canónicas del pie del modal */
 .footerActions {
   display: flex;
-  gap: var(--modal-footer-gap);
+  gap: var(--modal-footer-btn-gap);
   width: 100%;
 }
 

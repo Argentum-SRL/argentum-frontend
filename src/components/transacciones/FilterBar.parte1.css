@@ -16,7 +16,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 10px 12px;
+    gap: 8px 12px;
   }
 }
 
@@ -236,7 +236,7 @@
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 0 10px;
   height: 34px;
   font-size: 12.5px;
@@ -288,7 +288,7 @@
 .pillIconFlex {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   width: 100%;
 }
 
@@ -332,6 +332,7 @@
   align-items: center;
   justify-content: center;
   margin-left: 3px;
+  /* r03-ok: alineacion optica del boton quitar dentro del chip de filtro */
   margin-right: -4px;
   padding: 2px;
   border-radius: 50%;

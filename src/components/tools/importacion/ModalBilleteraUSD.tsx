@@ -69,23 +69,10 @@ export const ModalBilleteraUSD: React.FC<ModalBilleteraUSDProps> = ({
       showHeader={true}
       title="Tenés gastos en dólares"
       size="md"
+      stepDots={totalSteps > 1 ? { total: totalSteps, current: currentStep } : undefined}
     >
-      <div className={styles.formContainer}>
-        {/* Step Indicator Dots */}
-        {totalSteps > 1 && (
-          <div className={styles.stepDots}>
-            {Array.from({ length: totalSteps }).map((_, idx) => (
-              <div
-                key={idx}
-                className={`${styles.stepDot} ${
-                  idx === currentStep ? styles.stepDotActive : styles.stepDotInactive
-                }`}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className={styles.formBody}>
+      <div className={styles.formContainer} data-modal-frame>
+        <div className={styles.formBody} data-modal-stack>
           <p className={styles.modalText}>
             Detectamos transacciones en dólares en tu resumen. ¿Cómo querés gestionarlas?
           </p>
@@ -103,7 +90,8 @@ export const ModalBilleteraUSD: React.FC<ModalBilleteraUSDProps> = ({
             </div>
           ) : (
             /* Caso con billeteras USD */
-            <div className={styles.radioGroup}>
+            <div data-modal-block>
+            <div className={styles.radioGroup} data-modal-options>
               {/* Opción Importar */}
               <div
                 className={`${styles.checkboxItem} ${
@@ -158,6 +146,7 @@ export const ModalBilleteraUSD: React.FC<ModalBilleteraUSDProps> = ({
                 />
                 <label htmlFor="usd-opt-ignore" className={styles.checkboxLabel}>Ignorar transacciones en dólares</label>
               </div>
+            </div>
             </div>
           )}
         </div>

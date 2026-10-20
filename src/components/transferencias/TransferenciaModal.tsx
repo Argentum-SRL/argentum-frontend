@@ -10,6 +10,7 @@ import {
 import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { DateInput } from '@/components/ui'
+import SelectableSurface from '@/components/ui/SelectableSurface'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import type { Billetera, CotizacionDolar, CotizacionesDolarResponse } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
@@ -161,7 +162,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     const timer = setTimeout(() => {
       const card = cardRefs.current.get(idToScroll)
       if (card) {
-        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+        const scroller = card.closest('[data-modal-carousel]') as HTMLElement | null
         if (scroller) {
           const cardRect = card.getBoundingClientRect()
           const scrollerRect = scroller.getBoundingClientRect()
@@ -395,25 +396,19 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       showHeader={false}
       noPadding
       autoHeight
+      stepDots={{
+        total: tipoOperacion === 'fx' ? 4 : 3,
+        current: (tipoOperacion !== 'fx' && step === 4) ? 2 : step - 1
+      }}
       className={styles.modalTransferencia}
       ariaLabel="Transferir y Cambiar"
     >
       <div
         className={styles.slidesContainer}
       >
-        {/* ── Step Indicator Dots (Idéntico a TransaccionModal) ── */}
-        <div className={styles.stepDots}>
-          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          {tipoOperacion === 'fx' && (
-            <div className={`${styles.stepDot} ${step === 3 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          )}
-          <div className={`${styles.stepDot} ${step === 4 ? styles.stepDotActive : styles.stepDotInactive}`} />
-        </div>
-
         {/* ════════════════════ PASO 1: Monto, Operación y Origen ════════════════════ */}
         {step === 1 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -428,7 +423,8 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </button>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`} data-modal-stack>
+                <div data-modal-block>
                 {/* Selector de Operación (SegmentedControl cápsula oficial) */}
                 <SegmentedControl<'entre_cuentas' | 'compra' | 'venta'>
                   ariaLabel="Tipo de operación"
@@ -465,7 +461,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 />
 
                 {/* Cuenta de Origen con Carrusel idéntico a TransaccionModal */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>
                     {tipoOperacion === 'fx'
                       ? fxDirection === 'compra'
@@ -477,32 +473,26 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   {billeterasOrigenDisponibles.length === 0 ? (
                     <p className={styles.noWalletsText}>No tenés cuentas disponibles para este tipo de operación.</p>
                   ) : (
-                    <div className={styles.billeterasCarouselScroller}>
-                      <div className={styles.billeterasCarousel} ref={carouselOrigenRef}>
+                    <div data-modal-carousel>
+                      <div data-modal-carousel-track ref={carouselOrigenRef}>
                         {billeterasOrigenDisponibles.map(b => (
-                          <div
+                          <SelectableSurface
                             key={b.id}
-                            className={styles.billeteraSelectWrap}
-                            data-active={billeteraOrigenId === b.id}
+                            selected={billeteraOrigenId === b.id}
+                            context="modal"
+                            onClick={() => setSelectedOrigenId(b.id)}
                             ref={(el) => {
                               if (el) cardRefs.current.set(b.id, el)
                               else cardRefs.current.delete(b.id)
                             }}
+                            title={`Seleccionar ${b.nombre}`}
+                            aria-label={`Seleccionar ${b.nombre}`}
                           >
                             <BilleteraCard
                               billetera={b}
-                              className={styles.fullHeightCard}
-                              disableNavigation={true}
-                              hideCurrencyChip={true}
+                              variant="select"
                             />
-                            <button
-                              type="button"
-                              className={styles.billeteraOverlay}
-                              onClick={() => setSelectedOrigenId(b.id)}
-                              title={`Seleccionar ${b.nombre}`}
-                              aria-label={`Seleccionar ${b.nombre}`}
-                            />
-                          </div>
+                          </SelectableSurface>
                         ))}
                       </div>
                     </div>
@@ -516,6 +506,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     El monto supera el saldo disponible ({formatMonto(saldoOrigenActual, effectiveMoneda)})
                   </div>
                 )}
+                </div>
               </div>
 
               <div className={styles.formFooter}>
@@ -532,7 +523,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
 
         {/* ════════════════════ PASO 2: Cuenta Destino ════════════════════ */}
         {step === 2 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -550,7 +541,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </button>
               </div>
 
-              <div className={styles.formBody}>
+              <div className={styles.formBody} data-modal-stack>
                 {/* Selector de Billetera de Destino (Carrusel) */}
                 <div className={styles.formField}>
                   <label className={styles.fieldLabel}>
@@ -564,32 +555,26 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   {billeterasDestinoDisponibles.length === 0 ? (
                     <p className={styles.noWalletsText}>No tenés otras cuentas disponibles para este destino.</p>
                   ) : (
-                    <div className={styles.billeterasCarouselScroller}>
-                      <div className={styles.billeterasCarousel} ref={carouselDestinoRef}>
+                    <div data-modal-carousel>
+                      <div data-modal-carousel-track ref={carouselDestinoRef}>
                         {billeterasDestinoDisponibles.map(b => (
-                          <div
+                          <SelectableSurface
                             key={b.id}
-                            className={styles.billeteraSelectWrap}
-                            data-active={billeteraDestinoId === b.id}
+                            selected={billeteraDestinoId === b.id}
+                            context="modal"
+                            onClick={() => setSelectedDestinoId(b.id)}
                             ref={(el) => {
                               if (el) cardRefs.current.set(b.id, el)
                               else cardRefs.current.delete(b.id)
                             }}
+                            title={`Seleccionar ${b.nombre}`}
+                            aria-label={`Seleccionar ${b.nombre}`}
                           >
                             <BilleteraCard
                               billetera={b}
-                              className={styles.fullHeightCard}
-                              disableNavigation={true}
-                              hideCurrencyChip={true}
+                              variant="select"
                             />
-                            <button
-                              type="button"
-                              className={styles.billeteraOverlay}
-                              onClick={() => setSelectedDestinoId(b.id)}
-                              title={`Seleccionar ${b.nombre}`}
-                              aria-label={`Seleccionar ${b.nombre}`}
-                            />
-                          </div>
+                          </SelectableSurface>
                         ))}
                       </div>
                     </div>
@@ -611,7 +596,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
 
         {/* ════════════════════ PASO 3: Tipo de Cambio y Cotización (Solo FX) ════════════════════ */}
         {step === 3 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -629,9 +614,10 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </button>
               </div>
 
-              <div className={styles.formBody}>
+              <div className={styles.formBody} data-modal-stack>
+                <div data-modal-block>
                 {/* Selector de Tipos de Cambio para Dólares (FX) */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Tipo de cambio de referencia</label>
                   <SegmentedControl<'oficial' | 'mep' | 'blue' | 'manual'>
                     ariaLabel="Tipo de cambio de referencia"
@@ -665,7 +651,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </div>
 
                 {/* Input de Cotización con diseño Hero MontoInput */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Cotización aplicada (1 Dólar = $)</label>
                   <MontoInput
                     value={cotizacionActivaValor}
@@ -688,6 +674,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     </span>
                   </div>
                 </div>
+                </div>
               </div>
 
               <div className={styles.formFooter}>
@@ -704,7 +691,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
 
         {/* ════════════════════ PASO 4: Fecha, Nota y Confirmación (Para Entre Cuentas y FX) ════════════════════ */}
         {step === 4 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -722,7 +709,8 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 </button>
               </div>
 
-              <div className={styles.formBody}>
+              <div className={styles.formBody} data-modal-stack>
+                <div data-modal-block>
                 {/* Descripción/Nota + Fecha (Idéntico a Paso 3 de TransaccionModal) */}
                 <div className={styles.descFechaRow}>
                   <div className={`${styles.formField} ${styles.flex2}`}>
@@ -800,6 +788,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       </span>
                     </div>
                   </div>
+                </div>
                 </div>
               </div>
 

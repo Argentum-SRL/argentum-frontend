@@ -97,28 +97,36 @@ export function ConfirmModal({
           e.preventDefault()
           if (canConfirm) handleConfirm()
         }}
+        data-modal-frame
       >
-        <div className={[styles.iconWrap, iconClassMap[variant]].join(' ')}>
-          {iconMap[variant]}
-        </div>
-        
-        <h2 className={styles.title}>{title}</h2>
-        <p className={styles.description}>{description}</p>
-
-        {requireTyping && (
-          <div className={styles.requireWrap}>
-            <p className={styles.requireLabel}>Escribí <strong>{requireTyping}</strong> para confirmar</p>
-            <input
-              type="text"
-              className={styles.requireInput}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="..."
-              disabled={isLoading}
-              autoFocus
-            />
+        <div className={styles.modalHeader}>
+          <div className={[styles.iconWrap, iconClassMap[variant]].join(' ')}>
+            {iconMap[variant]}
           </div>
-        )}
+          
+          <h2 className={styles.title}>{title}</h2>
+        </div>
+
+        <div className={styles.modalBody} data-modal-stack>
+          <p className={styles.description}>{description}</p>
+
+          {requireTyping && (
+            <div data-modal-block>
+            <div className={styles.requireWrap} data-modal-field>
+              <p className={styles.requireLabel}>Escribí <strong>{requireTyping}</strong> para confirmar</p>
+              <input
+                type="text"
+                className={styles.requireInput}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="..."
+                disabled={isLoading}
+                autoFocus
+              />
+            </div>
+            </div>
+          )}
+        </div>
 
         <div className={styles.actions}>
           <button
@@ -134,6 +142,7 @@ export function ConfirmModal({
             className={[styles.confirmBtn, confirmBtnClassMap[variant]].join(' ')}
             disabled={!canConfirm}
             autoFocus={!requireTyping}
+            data-modal-delete={variant === 'danger' ? '' : undefined}
           >
             {isLoading && <LunarLoader size={16} />}
             {confirmLabel}

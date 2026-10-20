@@ -118,7 +118,7 @@ export default function CambiarFechaSaldoModal({
       isCancelled = true
       clearTimeout(timer)
     }
-  }, [isOpen, billetera?.id, fechaNueva, validationError])
+  }, [isOpen, billetera, fechaNueva, validationError])
 
   if (!isOpen || !billetera) return null
 
@@ -152,7 +152,7 @@ export default function CambiarFechaSaldoModal({
       autoHeight
       ariaLabel="Fecha del saldo"
     >
-      <form onSubmit={handleCambiar} className={styles.modalContainer}>
+      <form onSubmit={handleCambiar} className={styles.modalContainer} data-modal-frame>
         {/* Header */}
         <div className={styles.modalHeader}>
           <div className={styles.headerLeft}>
@@ -176,18 +176,20 @@ export default function CambiarFechaSaldoModal({
         </div>
 
         {/* Body */}
-        <div className={styles.modalBody}>
-          <div className={styles.fieldBlock}>
+        <div className={styles.modalBody} data-modal-stack>
+          <div className={styles.fieldBlock} data-modal-block>
             <p className={styles.descriptionText}>
               Tu saldo es del {formatFechaDDMMAAAA(fechaEfectiva)}. Si era de antes, elegí esa fecha.
             </p>
-            <DateInput
-              id="cambiar-fecha-saldo"
-              value={fechaNueva}
-              max={maxFecha}
-              min={minFecha}
-              onChange={(val) => setFechaNueva(val)}
-            />
+            <div data-modal-field>
+              <DateInput
+                id="cambiar-fecha-saldo"
+                value={fechaNueva}
+                max={maxFecha}
+                min={minFecha}
+                onChange={(val) => setFechaNueva(val)}
+              />
+            </div>
           </div>
 
           <div className={styles.previewBox}>

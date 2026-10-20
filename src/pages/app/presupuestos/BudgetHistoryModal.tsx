@@ -46,7 +46,7 @@ export default function BudgetHistoryModal({
       autoHeight 
       ariaLabel={`Historial de ${presupuesto?.nombre}`}
     >
-      <div className={styles.modalContent}>
+      <div className={styles.modalContent} data-modal-frame>
         <div className={styles.header}>
           <h2 className={styles.headerTitle}>Historial</h2>
           <button className={styles.closeBtn} onClick={onClose} title="Cerrar">
@@ -68,12 +68,12 @@ export default function BudgetHistoryModal({
           </div>
         )}
 
-        <div className={styles.historyBody}>
+        <div className={styles.historyBody} data-modal-stack>
           {loading ? (
             <div className={styles.historyList}>
               {[1, 2, 3].map(i => (
-                <div key={i} className={styles.historyItem} style={{ padding: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div key={i} className={`${styles.historyItem} ${styles.skeletonItem}`}>
+                  <div className={styles.skeletonHeader}>
                     <Skeleton variant="text" width={100} height={14} />
                     <Skeleton variant="text" width={70} height={14} />
                   </div>

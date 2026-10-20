@@ -8,6 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,9 +24,9 @@ const BREAKPOINTS_PERMITIDOS = new Set([
 
 // Nombres y descripciones de reglas fijas
 export const RULE_DEFS = {
-  R01: 'z-index con valor literal fuera de escala (-1, 0, 1, 2, 3 o var(--z-*))',
+  R01: 'z-index con literal >= 100 fuera de var(--z-*) o negativo (0-99 permitido para orden local)',
   R02: 'border-radius con 24px en cualquier forma',
-  R03: 'Margen negativo (margin o margin-* con valor negativo)',
+  R03: 'Margen negativo sin comentario r03-ok válido (solapamiento, sangrado, alineación óptica)',
   R04: 'box-shadow con valor propio (distinto de var(--elevation-*), none, inherit o unset)',
   R05: 'box-shadow con !important',
   R06: 'cubic-bezier con rebote (y1 o y2 mayor a 1)',
@@ -42,6 +43,14 @@ export const RULE_DEFS = {
   R17: 'width o max-width >= 300px con !important en CSS',
   R18: 'height o min-height en px >= 120 dentro de selectores con Step, slide, slidesContainer, modalRoot o formBody',
   R19: 'unidad vh (no dvh) en height, min-height o max-height en CSS',
+  R20: 'en CSS de modales/hojas, clases de formulario/campo/grupo/sección/bloque/fila/body/contenido con margin-top, margin-bottom, gap o row-gap en px distinto de 8, 16 o 24 (o sin var(--modal-*))',
+  R21: 'contenedor con overflow que recorta cuyo padding es menor que el alcance de la sombra o levantamiento de lo que contiene (análisis estático best effort)',
+  R22: 'TSX que usa el Modal base y contiene elementos de formulario sin ningún data-modal-block',
+  R23: 'Selectores de carrusel/card de billetera (.billeterasCarousel*, .billeteraSelectWrap, .tarjetaSelectWrap, :global(.wc, :global(.chip) fuera de Modal base y BilleteraCard/RealCardPreview',
+  R24: 'Renderers de movimientos que dibujan SubcategoriaIcon/CategoriaIcon directamente dentro de un .map de transacciones/movimientos/cuotas fuera de MovimientoAvatar',
+  R25: 'Renderers de movimientos que dibujan íconos específicos (ArrowDownLeft, etc.) directamente dentro de un .map de transacciones/movimientos/cuotas fuera de MovimientoAvatar',
+  R26: 'data-modal-stack en un contenedor que tenga como hijo un header o footer del modal',
+  R27: 'estilo inline con margin/padding vertical dentro de un modal',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
@@ -82,6 +91,8 @@ function auditCssFile(filePath, relPath, content) {
     R06: 0, R07: 0, R08: 0, R09: 0, R10: 0,
     R11: 0, R12: 0, R13: 0, R14: 0,
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
+    R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
+    R26: 0, R27: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -125,6 +136,52 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
+  // R03: margen negativo sin comentario r03-ok válido (Decisión 7)
+  const lines = content.split('\n');
+  let inMultiComment = false;
+  for (let idx = 0; idx < lines.length; idx++) {
+    const rawLine = lines[idx];
+    const stripped = rawLine.trim();
+    if (stripped.includes('/*') && !stripped.includes('*/')) {
+      inMultiComment = true;
+      continue;
+    }
+    if (inMultiComment) {
+      if (stripped.includes('*/')) inMultiComment = false;
+      continue;
+    }
+    const lineNoComment = rawLine.replace(/\/\*(?!.*r03-ok)[\s\S]*?\*\//g, '');
+    const m = /(?:^|[;\s])(margin(?:-[a-z]+)?)\s*:\s*([^;!}]+)/i.exec(lineNoComment);
+    if (m) {
+      const prop = m[1].toLowerCase();
+      const val = m[2].trim();
+      if (!prop.includes('collapse')) {
+        const isNeg = /-\d+(?:\.\d+)?(?:px|rem|em|%|vh|vw|dvh|cqi)?\b/.test(val) ||
+                      val.includes('calc(-1') ||
+                      (val.includes('clamp(') && val.includes('-'));
+        if (isNeg) {
+          let hasValidComment = false;
+          const mCurr = /\/\*\s*r03-ok:\s*([^*/]+?)\s*\*\//.exec(rawLine);
+          if (mCurr && mCurr[1].trim().length >= 15) {
+            hasValidComment = true;
+          } else {
+            let lookBack = idx - 1;
+            while (lookBack >= 0 && !lines[lookBack].trim()) lookBack--;
+            if (lookBack >= 0) {
+              const mPrev = /\/\*\s*r03-ok:\s*([^*/]+?)\s*\*\//.exec(lines[lookBack]);
+              if (mPrev && mPrev[1].trim().length >= 15) {
+                hasValidComment = true;
+              }
+            }
+          }
+          if (!hasValidComment) {
+            violations.R03++;
+          }
+        }
+      }
+    }
+  }
+
   // Analizar bloques y reglas CSS
   // Separamos bloques selector { cuerpo }
   const ruleBlockRegex = /([^{}]+)\{([^{}]+)\}/g;
@@ -156,13 +213,18 @@ function auditCssFile(filePath, relPath, content) {
       const prop = decl.substring(0, colonIdx).trim().toLowerCase();
       const val = decl.substring(colonIdx + 1).trim();
 
-      // R01: z-index
+      // R01: z-index (Decisión 7: 0-99 permitido para orden local; >= 100 requiere var(--z-*); negativos fuera de escala)
       if (prop === 'z-index') {
         const cleanVal = val.replace(/!important/g, '').trim();
-        const allowedLiterals = new Set(['0', '1', '2', '3', '-1', 'auto', 'inherit', 'initial', 'unset']);
         const isVarZ = /^var\(--z-[a-z0-9-]+\)$/i.test(cleanVal);
-        if (!allowedLiterals.has(cleanVal) && !isVarZ) {
-          violations.R01++;
+        const standardKeywords = new Set(['auto', 'inherit', 'initial', 'unset']);
+        if (!isVarZ && !standardKeywords.has(cleanVal)) {
+          const num = Number(cleanVal);
+          if (Number.isInteger(num) && num >= -1 && num <= 99) {
+            // Válido: entero -1 a 99 para orden local
+          } else {
+            violations.R01++;
+          }
         }
       }
 
@@ -170,15 +232,6 @@ function auditCssFile(filePath, relPath, content) {
       if (prop.startsWith('border-') && prop.includes('radius')) {
         if (/\b24px\b/i.test(val)) {
           violations.R02++;
-        }
-      }
-
-      // R03: margen negativo
-      if (prop === 'margin' || (prop.startsWith('margin-') && !prop.includes('collapse'))) {
-        const cleanVal = val.replace(/!important/g, '').trim();
-        // Detectar si algun token empieza con signo negativo seguido de digito
-        if (/-\d+(?:\.\d+)?(?:px|rem|em|%|vh|vw)?\b/.test(cleanVal)) {
-          violations.R03++;
         }
       }
 
@@ -323,6 +376,71 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
+
+  // R20: Espaciado no canónico en CSS de modales/hojas
+  const isModalCss = /(?:Modal|Dialog|Sheet|Drawer)/i.test(relPath);
+  if (isModalCss && !relPath.endsWith('Modal.module.css')) {
+    const modalBlocks = parseCssBlocks(cleanContent);
+    const targetSelectorRegex = /(?:form|field|group|seccion|section|block|bloque|fila|body|content|contenido)/i;
+    for (const b of modalBlocks) {
+      if (targetSelectorRegex.test(b.selector)) {
+        const decls = b.body.split(';');
+        for (const rawDecl of decls) {
+          const decl = rawDecl.trim();
+          if (!decl) continue;
+          const colonIdx = decl.indexOf(':');
+          if (colonIdx === -1) continue;
+          const prop = decl.substring(0, colonIdx).trim().toLowerCase();
+          const val = decl.substring(colonIdx + 1).trim();
+          if (['margin-top', 'margin-bottom', 'gap', 'row-gap'].includes(prop)) {
+            // Permitir vars oficiales y 0
+            if (val.includes('var(--modal-') || val.includes('var(--space-') || val === '0' || val === '0px' || val === 'none') {
+              continue;
+            }
+            const pxMatches = val.match(/(\d+)px/g);
+            if (pxMatches) {
+              for (const pxStr of pxMatches) {
+                const num = parseInt(pxStr.replace('px', ''), 10);
+                if (![0, 8, 16, 24].includes(num)) {
+                  violations.R20++;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // R21: Contenedor con overflow que recorta cuyo padding es menor al alcance de sombra/levantamiento
+  const overflowBlocks = parseCssBlocks(cleanContent);
+  for (const b of overflowBlocks) {
+    const hasOverflowClip = /(?:^|[;\s])overflow(?:-[xy])?\s*:\s*(?:hidden|auto|scroll|clip)/i.test(b.body);
+    if (hasOverflowClip) {
+      const hasShadowOrLift = /(?:box-shadow|--elevation-|transform\s*:|scale\()/i.test(b.body);
+      const hasPadding = /(?:^|[;\s])(?:padding|scroll-padding|padding-inline|padding-block)\s*:/i.test(b.body);
+      // Si el mismo contenedor tiene desborde que recorta y tiene sombra/levantamiento interno sin padding/scroll-padding suficiente
+      if (hasShadowOrLift && !hasPadding) {
+        // Excluir resets y utilitarios globales
+        if (!b.selector.includes('html') && !b.selector.includes('body') && !b.selector.includes(':root')) {
+          violations.R21++;
+        }
+      }
+    }
+  }
+
+  // R23: Selectores de carrusel / card de billetera fuera de Modal base y BilleteraCard/RealCardPreview
+  const isAllowedR23 = relPath.endsWith('Modal.module.css') ||
+                       relPath.endsWith('BilleteraCard.module.css') ||
+                       relPath.endsWith('RealCardPreview.module.css') ||
+                       relPath.endsWith('RealCardPreview.css');
+  if (!isAllowedR23) {
+    const r23Matches = cleanContent.match(/\.billeterasCarousel|\.billeteraSelectWrap|\.tarjetaSelectWrap|:global\(\.wc|:global\(\.chip/g);
+    if (r23Matches) {
+      violations.R23 = r23Matches.length;
+    }
+  }
+
   return violations;
 }
 
@@ -333,19 +451,129 @@ function auditTsxFile(filePath, relPath, content) {
     R06: 0, R07: 0, R08: 0, R09: 0, R10: 0,
     R11: 0, R12: 0, R13: 0, R14: 0,
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
+    R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
+    R26: 0, R27: 0,
   };
 
   const fileName = path.basename(filePath);
   const isModalCandidate = /Modal|Dialog|Drawer|Sheet/.test(fileName);
   const isCanonicalModal = relPath.endsWith('ui/Modal/Modal.tsx') || relPath.endsWith('ui\\Modal\\Modal.tsx');
+  const usesModal = content.includes('<Modal') || content.includes('ui/Modal') || content.includes('@/components/ui/Modal');
 
-  // R11: Modales propios que no usan Modal canónico
-  if (isModalCandidate && !isCanonicalModal) {
-    const usesModalTag = content.includes('<Modal');
-    const importsModal = content.includes('ui/Modal') || content.includes('@/components/ui/Modal');
-    if (!usesModalTag && !importsModal) {
+  // R11: Modales y hojas propios que no usan Modal canónico (endurecido)
+  if (!isCanonicalModal) {
+    if (isModalCandidate && !usesModal) {
       violations.R11 = 1;
+    } else if (content.includes('createPortal(') && !usesModal) {
+      const hasInteractiveContent = /<form|<input|<button|<select|<textarea|role="dialog"/i.test(content);
+      if (hasInteractiveContent) {
+        violations.R11 = 1;
+      }
     }
+  }
+
+  // R22: TSX que usa el Modal base y contiene elementos de formulario sin ningún data-modal-block
+  if (usesModal && !isCanonicalModal) {
+    const hasFormElements = /<(?:input|select|textarea|MontoInput|DateInput|TimeInput|SelectInput|PhoneCountrySelect|ColorPicker|SegmentedControl)\b/.test(content);
+    if (hasFormElements && !content.includes('data-modal-block')) {
+      violations.R22 = 1;
+    }
+  }
+
+  // R24: Renderers de movimientos con SubcategoriaIcon/CategoriaIcon directamente en .map fuera de MovimientoAvatar
+  const isExemptR24 = relPath.includes('MovimientoAvatar') ||
+                      relPath.includes('GrupoCuotasAvatar') ||
+                      relPath.includes('SubcategoriaIcon') ||
+                      relPath.includes('CategoriaIcon') ||
+                      relPath.includes('Chart') ||
+                      relPath.includes('Selector') ||
+                      relPath.includes('importacion');
+  if (!isExemptR24) {
+    const lines = content.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.includes('.map(') && /(?:transaccion|movimiento|cuota|grupo)/i.test(line)) {
+        const nextLines = lines.slice(i, Math.min(i + 35, lines.length)).join('\n');
+        if ((nextLines.includes('<SubcategoriaIcon') || nextLines.includes('<CategoriaIcon')) && !nextLines.includes('<MovimientoAvatar')) {
+          violations.R24++;
+        }
+      }
+    }
+  }
+
+  // R25: Renderers de movimientos con íconos directos (ArrowDownLeft, etc.) en .map fuera de MovimientoAvatar
+  const isExemptR25 = relPath.includes('MovimientoAvatar') ||
+                      relPath.includes('GrupoCuotasAvatar') ||
+                      relPath.includes('TransaccionRow') ||
+                      relPath.includes('MovimientoRow') ||
+                      relPath.includes('Chart') ||
+                      relPath.includes('Selector') ||
+                      relPath.includes('importacion');
+  if (!isExemptR25) {
+    const lines = content.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.includes('.map(') && /(?:transaccion|movimiento|cuota|grupo)/i.test(line)) {
+        const nextLines = lines.slice(i, Math.min(i + 35, lines.length)).join('\n');
+        const hasDirectIcon = /<(?:ArrowDownLeft|ArrowUpRight|ArrowDown|ArrowUp|CreditCard|TrendingUp|TrendingDown|Trophy|DollarSign)\b/.test(nextLines);
+        if (hasDirectIcon && !nextLines.includes('<MovimientoAvatar') && !nextLines.includes('<GrupoCuotasAvatar')) {
+          violations.R25++;
+        }
+      }
+    }
+  }
+
+  // R26: data-modal-stack en un contenedor que tenga como hijo un header o footer del modal
+  if (content.includes('data-modal-stack')) {
+    const sf = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    function checkR26(node) {
+      if (ts.isJsxElement(node)) {
+        let hasStack = false;
+        for (const attr of node.openingElement.attributes.properties) {
+          if (ts.isJsxAttribute(attr) && attr.name && attr.name.getText(sf) === 'data-modal-stack') {
+            hasStack = true;
+            break;
+          }
+        }
+        if (hasStack) {
+          for (const child of node.children) {
+            if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child)) {
+              const open = ts.isJsxElement(child) ? child.openingElement : child;
+              const tag = open.tagName.getText(sf);
+              let cls = '';
+              for (const ca of open.attributes.properties) {
+                if (ts.isJsxAttribute(ca) && ca.name && ca.name.getText(sf) === 'className' && ca.initializer) {
+                  cls = ca.initializer.getText(sf).toLowerCase();
+                }
+              }
+              const isHeader = tag === 'ModalHeader' || /(?:modal|form|step|sheet|picker|dialog)header/i.test(cls) || (tag === 'h2');
+              const isFooter = tag === 'ModalFooter' || /(?:modal|form|step|sheet|picker|dialog)footer/i.test(cls) || /(?:actionsrow|draweractions)/i.test(cls);
+              if (isHeader || isFooter) {
+                violations.R26++;
+              }
+            }
+          }
+        }
+      }
+      ts.forEachChild(node, checkR26);
+    }
+    checkR26(sf);
+  }
+
+  // R27: estilo inline con margin/padding vertical dentro de un modal
+  const isExcludedR27 = /Page|Layout|Provider|Chart/.test(fileName);
+  if (isModalCandidate && !isCanonicalModal && !isExcludedR27) {
+    const sf = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    function checkR27(node) {
+      if (ts.isJsxAttribute(node) && node.name && node.name.getText(sf) === 'style' && node.initializer) {
+        const text = node.initializer.getText(sf);
+        if (/(?:margin(?:Top|Bottom)?|padding(?:Top|Bottom)?)\s*:/i.test(text)) {
+          violations.R27++;
+        }
+      }
+      ts.forEachChild(node, checkR27);
+    }
+    checkR27(sf);
   }
 
   return violations;
@@ -517,6 +745,9 @@ function cli() {
           if (isNewRule) continue;
 
           const oldCount = oldFileViolations[rule] || 0;
+          // R10 es la cantidad total de !important del repositorio, se evalúa a nivel global
+          if (rule === 'R10') continue;
+
           if (count > oldCount) {
             regressions.push({
               file,
@@ -527,6 +758,16 @@ function cli() {
             });
           }
         }
+      }
+
+      if (totalViolations.R10 > (oldBaseline.totalViolations?.R10 ?? 828)) {
+        regressions.push({
+          file: 'TOTAL_REPOSITORIO',
+          rule: 'R10',
+          oldCount: oldBaseline.totalViolations?.R10 ?? 828,
+          newCount: totalViolations.R10,
+          diff: totalViolations.R10 - (oldBaseline.totalViolations?.R10 ?? 828),
+        });
       }
 
       if (regressions.length > 0) {
@@ -574,6 +815,7 @@ function cli() {
   for (const [file, violations] of Object.entries(auditResults)) {
     const baseViolations = baseline.files?.[file] || {};
     for (const [rule, count] of Object.entries(violations)) {
+      if (rule === 'R10') continue; // R10 se controla a nivel de conteo total de repositorio
       const baseCount = baseViolations[rule] || 0;
       if (count > baseCount) {
         regressions.push({
@@ -585,6 +827,16 @@ function cli() {
         });
       }
     }
+  }
+
+  if (totalViolations.R10 > (baseline.totalViolations?.R10 ?? 828)) {
+    regressions.push({
+      file: 'TOTAL_REPOSITORIO',
+      rule: 'R10',
+      baseCount: baseline.totalViolations?.R10 ?? 828,
+      count: totalViolations.R10,
+      diff: totalViolations.R10 - (baseline.totalViolations?.R10 ?? 828),
+    });
   }
 
   if (regressions.length > 0) {

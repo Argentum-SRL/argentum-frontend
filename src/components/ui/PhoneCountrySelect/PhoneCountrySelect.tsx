@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { ChevronDown, Check } from '@/components/ui/icons'
+import Modal from '@/components/ui/Modal/Modal'
 import styles from './PhoneCountrySelect.module.css'
 
 export interface Country {
@@ -69,7 +70,7 @@ export const PhoneCountrySelect: React.FC<PhoneCountrySelectProps> = ({
   const selected = countries.find(c => c.codigo === value)
 
   const optionsList = (
-    <div className={styles.optionsList}>
+    <div className={styles.optionsList} data-modal-block>
       {countries.map(c => (
         <button
           key={c.codigo}
@@ -88,12 +89,15 @@ export const PhoneCountrySelect: React.FC<PhoneCountrySelectProps> = ({
 
   const panel = open ? (
     isMobile ? (
-      <div className={styles.mobileOverlay} onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
-        <div className={styles.mobilePanelWrap} ref={panelRef}>
-          <div className={styles.mobilePanelTitle}>Código de país</div>
-          {optionsList}
-        </div>
-      </div>
+      <Modal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        variant="sheet"
+        title="Código de país"
+        size="sm"
+      >
+        {optionsList}
+      </Modal>
     ) : (
       <div ref={panelRef} className={styles.panel}>
         {optionsList}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Check, Wallet, Banknote, ChevronDown, Star } from '@/components/ui/icons'
+import { Check, Wallet, Banknote, ChevronDown, Star, TrendingUp } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, sortBilleteras } from '@/lib/utils/billeteras.utils'
@@ -38,7 +38,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
   const [localTipo, setLocalTipo] = useState<TipoOperacionFilter>(tipoOperacion)
   const [localBilleteraId, setLocalBilleteraId] = useState<string | undefined>(billeteraId)
   const [localPeriodoPreset, setLocalPeriodoPreset] = useState<PeriodoPresetFilter>(periodoPreset)
-  const [isAccountsOpen, setIsAccountsOpen] = useState(true)
+  const [isAccountsOpen, setIsAccountsOpen] = useState(false)
 
   // Sincronizar estado local al abrir el modal sin causar renders en cascada
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
@@ -48,7 +48,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
       setLocalTipo(tipoOperacion)
       setLocalBilleteraId(billeteraId)
       setLocalPeriodoPreset(periodoPreset)
-      setIsAccountsOpen(true)
+      setIsAccountsOpen(false)
     }
   }
 
@@ -79,9 +79,10 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Filtros">
-      <div className={styles.mobileDrawerContainer}>
-        {/* ── Período ── */}
-        <div>
+      <div className={styles.mobileDrawerContainer} data-modal-frame>
+        <div className={styles.mobileDrawerBody} data-modal-stack>
+          {/* ── Período ── */}
+        <div data-modal-block>
           <div className={styles.drawerSectionTitle}>Período</div>
           <SegmentedControl<'ciclo' | 'ciclo_anterior' | 'ultimos_30d' | 'todos'>
             options={[
@@ -98,7 +99,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
         </div>
 
         {/* ── Tipo de Operación ── */}
-        <div>
+        <div data-modal-block>
           <div className={styles.drawerSectionTitle}>Tipo de operación</div>
           <SegmentedControl<'todas' | 'cuentas' | 'fx'>
             options={[
@@ -114,7 +115,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
         </div>
 
         {/* ── Cuenta / Billetera (Diseño Dashboard) ── */}
-        <div>
+        <div data-modal-block>
           <div className={styles.drawerSectionTitle}>Cuenta / Billetera</div>
           <div className={styles.accountsSection}>
             <button
@@ -187,7 +188,10 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
                           )}
                           <span className={styles.accountName}>{b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}</span>
                           {b.es_principal && (
-                            <Star size={10} fill="currentColor" className={styles.starIcon} />
+                            <Star size={12} strokeWidth={2.2} className={styles.starIcon} title="Billetera principal" />
+                          )}
+                          {b.es_inversion && (
+                            <TrendingUp size={12} strokeWidth={2.2} className={styles.inversionIcon} title="Cuenta de inversión" />
                           )}
                         </div>
                         <span className={styles.accountAmount}>
@@ -200,6 +204,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
               </div>
             )}
           </div>
+        </div>
         </div>
 
         {/* ── Action Row ── */}

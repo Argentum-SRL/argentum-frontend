@@ -4,7 +4,7 @@
   width: 100%;
   max-width: 540px;
   background: var(--surface);
-  border-radius: 24px;
+  border-radius:20px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -16,7 +16,7 @@
 @media (max-width: 640px) {
   .modalRoot {
     max-width: 100%;
-    border-radius: 20px 20px 0 0;
+    border-radius:20px 20px 0 0;
     max-height: var(--modal-max-h);
   }
 }
@@ -26,8 +26,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px var(--modal-pad-x) 14px; /* Separación lateral oficial */
-  border-bottom: 1px solid var(--border);
+  padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
+  border-bottom: none;
   background: var(--surface);
   flex-shrink: 0;
 }
@@ -42,7 +42,7 @@
 .headerIconPill {
   width: 36px;
   height: 36px;
-  border-radius: 12px;
+  border-radius:12px;
   background: rgba(13, 32, 69, 0.08);
   color: var(--primary);
   display: flex;
@@ -73,7 +73,7 @@
 .closeButton {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius:50%;
   border: none;
   background: transparent;
   color: var(--text-3);
@@ -92,21 +92,18 @@
 
 /* ── Tabs (FilterBar Segmented Control Pattern) ── */
 .tabsWrapper {
-  padding: 14px 24px 4px;
+  padding: var(--modal-header-gap) var(--modal-pad-x) 0;
   background: var(--surface);
   flex-shrink: 0;
 }
 
-
-
 /* ── Modal Body Content ── */
 .body {
-  padding: 16px var(--modal-pad-x) 20px; /* Separación lateral oficial */
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
   overflow-y: auto;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
 }
 
 .introBox {
@@ -115,7 +112,7 @@
   color: var(--text-2);
   background: var(--surface-alt);
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius:12px;
   border: 1px solid var(--border);
 }
 
@@ -138,9 +135,9 @@
 .kpiItem {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius:10px;
   background: var(--page);
   border: 1px solid var(--border);
 }
@@ -149,7 +146,7 @@
   font-size: 11px;
   font-weight: 700;
   padding: 2px 7px;
-  border-radius: 6px;
+  border-radius:6px;
   background: var(--surface);
   color: var(--primary);
   border: 1px solid var(--border);
@@ -176,7 +173,7 @@
 /* ── Proyección Blocks ── */
 .modeCard {
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius:12px;
   border: 1px solid var(--border);
   background: var(--page);
   display: flex;
@@ -207,7 +204,7 @@
   font-size: 12px;
   color: var(--text-3);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius:8px;
   background: var(--surface-alt);
   border: 1px dashed var(--border);
 }
@@ -215,7 +212,7 @@
 /* ── Footer ── */
 .footer {
   padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
-  border-top: 1px solid var(--border);
+  border-top: none;
   background: var(--surface);
   display: flex;
   justify-content: flex-end;
@@ -225,7 +222,7 @@
 
 .actionButton {
   padding: 9px 22px;
-  border-radius: 10px;
+  border-radius:10px;
   font-size: 13px;
   font-weight: 600;
   background: var(--primary);

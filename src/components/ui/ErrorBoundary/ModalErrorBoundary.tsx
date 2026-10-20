@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { AlertCircle, X } from '@/components/ui/icons'
 import { reportarErrorFrontend } from '@/services/reporteError.service'
+import Modal from '@/components/ui/Modal'
 import styles from './ModalErrorBoundary.module.css'
 
 interface Props {
@@ -41,8 +42,15 @@ export class ModalErrorBoundary extends Component<Props, State> {
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className={styles.overlay} role="dialog" aria-modal="true">
-          <div className={styles.modal}>
+        <Modal
+          isOpen={true}
+          onClose={this.handleClose}
+          size="sm"
+          showHeader={false}
+          autoHeight
+          ariaLabel="Error al abrir ventana"
+        >
+          <div className={styles.modalContent}>
             <div className={styles.iconWrapper}>
               <AlertCircle size={28} />
             </div>
@@ -55,7 +63,7 @@ export class ModalErrorBoundary extends Component<Props, State> {
               <span>Cerrar</span>
             </button>
           </div>
-        </div>
+        </Modal>
       )
     }
 

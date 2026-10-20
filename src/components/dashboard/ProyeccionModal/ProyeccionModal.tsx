@@ -100,52 +100,54 @@ const ProyeccionModal: React.FC<ProyeccionModalProps> = ({ isOpen, onClose, proy
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Cómo calculamos tu proyección">
-      <div className={styles.modalContent}>
-        <section className={styles.section}>
-          <h3>En qué se basa</h3>
-          <p>
-            Descomponemos tus finanzas en tres partes: compromisos ciertos (cuotas y suscripciones), recurrentes ya debitados, y gastos variables. Para los variables, analizamos tus últimos {n_ciclos} {n_ciclos === 1 ? 'ciclo completo' : 'ciclos completos'} filtrando compras atípicas y calculando una distribución de probabilidad calibrada.
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h3>Cómo estimamos el gasto variable</h3>
-          <p>
-            Calculamos tu gasto diario básico descartando el decil superior de compras únicas para no contaminar la proyección. Luego modelamos la variabilidad con cuantiles empíricos ajustados por días restantes del ciclo y calibrados sobre el historial.
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h3>Los compromisos fijos</h3>
-          <p>
-            Las cuotas y suscripciones que ya tenés programadas para los días que quedan del ciclo se suman como número exacto y cierto, nunca como estimación.
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h3>Prueba de calibración individual</h3>
-          <p>
-            {proyeccion?.calibracion?.pasa_puerta ? (
-              `Esta proyección superó la prueba de calibración estadística sobre tu propia historia con una cobertura observada del ${Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% en ${proyeccion.calibracion.ciclos_evaluados} ciclos cerrados evaluados en backtest.`
-            ) : (
-              proyeccion?.calibracion?.mensaje || 'Para evitar estimaciones engañosas, la proyección probabilística solo se activa si el modelo demuestra una cobertura empírica mínima del 80% y un rango informativo sobre tus ciclos cerrados.'
-            )}
-          </p>
-        </section>
-
-        {advertencias.length > 0 && (
-          <section className={styles.section}>
-            <h3>Tené en cuenta</h3>
-            <div className={styles.advertenciasList}>
-              {advertencias.map((adv, index) => (
-                <div key={index} className={styles.advertenciaItem}>
-                  <AlertTriangle size={18} className={styles.advertenciaIcon} />
-                  <span className={styles.advertenciaText}>{adv}</span>
-                </div>
-              ))}
-            </div>
+      <div className={styles.modalContent} data-modal-frame>
+        <div data-modal-stack>
+          <section className={styles.section} data-modal-block>
+            <h3 data-modal-section-title>En qué se basa</h3>
+            <p>
+              Descomponemos tus finanzas en tres partes: compromisos ciertos (cuotas y suscripciones), recurrentes ya debitados, y gastos variables. Para los variables, analizamos tus últimos {n_ciclos} {n_ciclos === 1 ? 'ciclo completo' : 'ciclos completos'} filtrando compras atípicas y calculando una distribución de probabilidad calibrada.
+            </p>
           </section>
-        )}
+
+          <section className={styles.section} data-modal-block>
+            <h3 data-modal-section-title>Cómo estimamos el gasto variable</h3>
+            <p>
+              Calculamos tu gasto diario básico descartando el decil superior de compras únicas para no contaminar la proyección. Luego modelamos la variabilidad con cuantiles empíricos ajustados por días restantes del ciclo y calibrados sobre el historial.
+            </p>
+          </section>
+
+          <section className={styles.section} data-modal-block>
+            <h3 data-modal-section-title>Los compromisos fijos</h3>
+            <p>
+              Las cuotas y suscripciones que ya tenés programadas para los días que quedan del ciclo se suman como número exacto y cierto, nunca como estimación.
+            </p>
+          </section>
+
+          <section className={styles.section} data-modal-block>
+            <h3 data-modal-section-title>Prueba de calibración individual</h3>
+            <p>
+              {proyeccion?.calibracion?.pasa_puerta ? (
+                `Esta proyección superó la prueba de calibración estadística sobre tu propia historia con una cobertura observada del ${Math.round((proyeccion.calibracion.cobertura_80 ?? 0.8) * 100)}% en ${proyeccion.calibracion.ciclos_evaluados} ciclos cerrados evaluados en backtest.`
+              ) : (
+                proyeccion?.calibracion?.mensaje || 'Para evitar estimaciones engañosas, la proyección probabilística solo se activa si el modelo demuestra una cobertura empírica mínima del 80% y un rango informativo sobre tus ciclos cerrados.'
+              )}
+            </p>
+          </section>
+
+          {advertencias.length > 0 && (
+            <section className={styles.section} data-modal-block>
+              <h3 data-modal-section-title>Tené en cuenta</h3>
+              <div className={styles.advertenciasList}>
+                {advertencias.map((adv, index) => (
+                  <div key={index} className={styles.advertenciaItem}>
+                    <AlertTriangle size={18} className={styles.advertenciaIcon} />
+                    <span className={styles.advertenciaText}>{adv}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
 
         {pasaPuerta && (
           <footer className={styles.footer}>

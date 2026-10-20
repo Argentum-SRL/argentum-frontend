@@ -156,7 +156,7 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
         size="md"
         ariaLabel="Notificaciones"
       >
-        <div className={styles.formContainer}>
+        <div className={styles.formContainer} data-modal-frame>
           {/* Cabecera con estética de TransaccionModal */}
           <div className={styles.formHeader}>
             <div className={styles.titleArea}>
@@ -202,7 +202,7 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
           )}
 
           {/* Cuerpo del modal / Lista scrollable */}
-          <div className={styles.formBody}>
+          <div className={styles.formBody} data-modal-stack>
             <div className={styles.scrollArea}>
               {isLoading && notificaciones.length === 0 ? (
                 <div className={styles.list}>

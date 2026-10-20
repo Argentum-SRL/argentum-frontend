@@ -101,7 +101,7 @@ const initialState: FormState = {
   tarjetaId: '',
   fecha: todayLocal(),
   metodoPago: 'debito',
-  cantidadCuotas: 2,
+  cantidadCuotas: 1,
   cuotaInicial: 1,
   proximoResumen: false,
   tasaInteres: 0,
@@ -517,7 +517,7 @@ export default function TransaccionModal({
     const timer = setTimeout(() => {
       const card = cardRefs.current.get(idToScroll)
       if (card) {
-        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+        const scroller = card.closest('[data-modal-carousel]') as HTMLElement | null
         if (scroller) {
           const cardRect = card.getBoundingClientRect()
           const scrollerRect = scroller.getBoundingClientRect()
@@ -745,6 +745,7 @@ export default function TransaccionModal({
                 ? styles.slideExitLeft
                 : styles.slideExitRight
             }`}
+            data-modal-frame
           >
             <form 
               className={styles.formContainer}
@@ -770,6 +771,7 @@ export default function TransaccionModal({
                         onClick={handleDeleteTransaction}
                         title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
                         aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
+                        data-modal-delete
                       >
                         <Trash2 size={16} />
                       </button>
@@ -780,177 +782,174 @@ export default function TransaccionModal({
                   </div>
                 </div>
 
-                <div className={styles.formFields}>
-                  {isCuotaHija && (
-                    <div className={styles.cuotaHijaWarning}>
-                      Monto, moneda, tipo y billetera no se pueden cambiar porque esta transacción es parte de una compra en cuotas.
-                    </div>
-                  )}
+                <div className={styles.formFields} data-modal-stack>
+                  {/* Bloque 1: Tipo + Monto */}
+                  <div data-modal-block>
+                    {isCuotaHija && (
+                      <div className={styles.cuotaHijaWarning}>
+                        Monto, moneda, tipo y billetera no se pueden cambiar porque esta transacción es parte de una compra en cuotas.
+                      </div>
+                    )}
 
-                  {/* 0. Tipo Ingreso/Egreso (SegmentedControl cápsula oficial) */}
-                  <SegmentedControl<'egreso' | 'ingreso'>
-                    ariaLabel="Tipo de transacción"
-                    fullWidth
-                    value={tipo}
-                    onChange={handleSelectTipo}
-                    options={[
-                      {
-                        value: 'egreso',
-                        label: 'Egreso',
-                        icon: <ArrowUpRight size={15} strokeWidth={2.2} />,
-                        disabled: isCuotaHija,
-                      },
-                      {
-                        value: 'ingreso',
-                        label: 'Ingreso',
-                        icon: <ArrowDownLeft size={15} strokeWidth={2.2} />,
-                        disabled: isCuotaHija,
-                      },
-                    ]}
-                  />
-
-                  {/* Hero monto */}
-                  <MontoInput
-                    value={monto}
-                    onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
-                    moneda={moneda}
-                    onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
-                    disabled={isCuotaHija}
-                    autoFocus={step === 1}
-                    allowDecimals
-                  />
-
-                  {/* 1. Método de Pago (se oculta automáticamente si solo hay 1 método disponible) */}
-                  {availableMethods.length > 1 && (
-                    <div className={styles.formField}>
-                      <label className={styles.fieldLabel}>{tipo === 'ingreso' ? '¿Cómo recibiste?' : '¿Cómo pagaste?'}</label>
-                      <SegmentedControl<'debito' | 'transferencia' | 'credito' | 'efectivo'>
-                        layout="stacked"
-                        fullWidth
-                        ariaLabel="Método de pago"
-                        options={availableMethods.map(({ key, icon, label }) => ({
-                          value: key,
-                          label,
-                          icon,
+                    {/* 0. Tipo Ingreso/Egreso (SegmentedControl cápsula oficial) */}
+                    <SegmentedControl<'egreso' | 'ingreso'>
+                      ariaLabel="Tipo de transacción"
+                      fullWidth
+                      value={tipo}
+                      onChange={handleSelectTipo}
+                      options={[
+                        {
+                          value: 'egreso',
+                          label: 'Egreso',
+                          icon: <ArrowUpRight size={15} strokeWidth={2.2} />,
                           disabled: isCuotaHija,
-                        }))}
-                        value={metodoPago}
-                        onChange={handleSelectMetodo}
-                      />
+                        },
+                        {
+                          value: 'ingreso',
+                          label: 'Ingreso',
+                          icon: <ArrowDownLeft size={15} strokeWidth={2.2} />,
+                          disabled: isCuotaHija,
+                        },
+                      ]}
+                    />
+
+                    {/* Hero monto */}
+                    <MontoInput
+                      value={monto}
+                      onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
+                      moneda={moneda}
+                      onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
+                      disabled={isCuotaHija}
+                      autoFocus={step === 1}
+                      allowDecimals
+                    />
+                  </div>
+
+                  {/* Bloque 2: Método de Pago (se oculta automáticamente si solo hay 1 método disponible) */}
+                  {availableMethods.length > 1 && (
+                    <div data-modal-block>
+                      <div data-modal-field>
+                        <label className={styles.fieldLabel}>{tipo === 'ingreso' ? '¿Cómo recibiste?' : '¿Cómo pagaste?'}</label>
+                        <SegmentedControl<'debito' | 'transferencia' | 'credito' | 'efectivo'>
+                          layout="stacked"
+                          fullWidth
+                          ariaLabel="Método de pago"
+                          options={availableMethods.map(({ key, icon, label }) => ({
+                            value: key,
+                            label,
+                            icon,
+                            disabled: isCuotaHija,
+                          }))}
+                          value={metodoPago}
+                          onChange={handleSelectMetodo}
+                        />
+                      </div>
                     </div>
                   )}
 
-                  {/* 2. Origen Dinámico */}
-                  <div className={styles.formField}>
-                    <label className={styles.fieldLabel}>
-                      {metodoPago === 'credito'
-                        ? 'Seleccioná tu tarjeta'
-                        : (tipo === 'ingreso' ? '¿A qué billetera?' : '¿De qué billetera?')}
-                    </label>
+                  {/* Bloque 3: Origen Dinámico */}
+                  <div data-modal-block>
+                    <div data-modal-field>
+                      <label className={styles.fieldLabel}>
+                        {metodoPago === 'credito'
+                          ? 'Seleccioná tu tarjeta'
+                          : (tipo === 'ingreso' ? '¿A qué billetera?' : '¿De qué billetera?')}
+                      </label>
 
-                    {metodoPago === 'credito' ? (
-                      tarjetasCarousel.length === 0 ? (
-                        <div className={styles.emptyWalletBox}>
-                          <div className={styles.emptyWalletIcon}>
-                            <CreditCard size={22} strokeWidth={1.75} />
+                      {metodoPago === 'credito' ? (
+                        tarjetasCarousel.length === 0 ? (
+                          <div className={styles.emptyWalletBox}>
+                            <div className={styles.emptyWalletIcon}>
+                              <CreditCard size={22} strokeWidth={1.75} />
+                            </div>
+                            <p className={styles.emptyWalletTitle}>No tenés tarjetas de crédito activas</p>
+                            <p className={styles.emptyWalletSub}>
+                              Agregá una tarjeta desde la sección de Tarjetas para poder financiar en cuotas.
+                            </p>
                           </div>
-                          <p className={styles.emptyWalletTitle}>No tenés tarjetas de crédito activas</p>
-                          <p className={styles.emptyWalletSub}>
-                            Agregá una tarjeta desde la sección de Tarjetas para poder financiar en cuotas.
-                          </p>
-                        </div>
-                      ) : (
-                        <div className={styles.billeterasCarouselScroller}>
-                          <div className={styles.billeterasCarousel} ref={carouselRef}>
-                            {tarjetasCarousel.map(t => (
-                              <SelectableSurface
-                                key={t.id}
-                                selected={tarjetaId === t.id}
-                                context="modal"
-                                className={`${styles.billeteraSelectWrap} ${styles.tarjetaSelectWrap}`}
-                                data-active={tarjetaId === t.id}
-                                ref={(el) => setCardNode(t.id, el as HTMLDivElement | null)}
-                              >
-                                <RealCardPreview
-                                  ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
-                                  red={t.red}
-                                  titular={t.nombre}
-                                  diaCierre={t.dia_cierre}
-                                  diaVencimiento={t.dia_vencimiento}
-                                  proximoCierre={t.proximo_cierre}
-                                  proximoVencimiento={t.proximo_vencimiento}
-                                  color={t.color || '#0D2045'}
-                                  billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
-                                  className={styles.fullHeightCard}
-                                />
-                                <button
-                                  type="button"
-                                  className={styles.billeteraOverlay}
+                        ) : (
+                          <div data-modal-carousel>
+                            <div data-modal-carousel-track ref={carouselRef}>
+                              {tarjetasCarousel.map(t => (
+                                <SelectableSurface
+                                  key={t.id}
+                                  selected={tarjetaId === t.id}
+                                  context="modal"
                                   onClick={() => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t.id })}
+                                  ref={(el) => setCardNode(t.id, el as HTMLDivElement | null)}
                                   title={`Seleccionar tarjeta ${t.nombre}`}
                                   aria-label={`Seleccionar tarjeta ${t.nombre}`}
-                                />
-                              </SelectableSurface>
-                            ))}
+                                >
+                                  <RealCardPreview
+                                    ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
+                                    red={t.red}
+                                    titular={t.nombre}
+                                    diaCierre={t.dia_cierre}
+                                    diaVencimiento={t.dia_vencimiento}
+                                    proximoCierre={t.proximo_cierre}
+                                    proximoVencimiento={t.proximo_vencimiento}
+                                    color={t.color || '#0D2045'}
+                                    billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
+                                  />
+                                </SelectableSurface>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )
-                    ) : (
-                      billeterasCarousel.length === 0 ? (
-                        <div className={styles.emptyWalletBox}>
-                          <div className={styles.emptyWalletIcon}>
-                            <Wallet size={22} strokeWidth={1.75} />
-                          </div>
-                          <p className={styles.emptyWalletTitle}>
-                            {hasBancos || hasEfectivo
-                              ? `No tenés billeteras para este método en ${moneda}`
-                              : `No tenés billeteras en ${moneda}`}
-                          </p>
-                          <p className={styles.emptyWalletSub}>
-                            {hasBancos || hasEfectivo
-                              ? 'Probá cambiando el método de pago o creá una nueva billetera.'
-                              : `Creá una billetera en ${moneda} desde la sección de Billeteras para registrar tus movimientos.`}
-                          </p>
-                        </div>
+                        )
                       ) : (
-                        <div className={styles.billeterasCarouselScroller}>
-                          <div className={styles.billeterasCarousel} ref={carouselRef}>
-                            {billeterasCarousel.map(b => (
-                              <SelectableSurface
-                                key={b.id}
-                                selected={billeteraId === b.id}
-                                context="modal"
-                                className={styles.billeteraSelectWrap}
-                                data-active={billeteraId === b.id}
-                                ref={(el) => setCardNode(b.id, el as HTMLDivElement | null)}
-                              >
-                                <BilleteraCard billetera={b} className={styles.fullHeightCard} disableNavigation={true} hideCurrencyChip={true} />
-                                {moneda === 'USD' && b.moneda === 'ARS' && (
-                                  <span className={`${styles.cuentaEnPesosChip} ${isBankLight(b) ? '' : styles.cuentaEnPesosChipDark}`}>
-                                    Cuenta en pesos
-                                  </span>
-                                )}
-                                <button
-                                  type="button"
-                                  className={styles.billeteraOverlay}
+                        billeterasCarousel.length === 0 ? (
+                          <div className={styles.emptyWalletBox}>
+                            <div className={styles.emptyWalletIcon}>
+                              <Wallet size={22} strokeWidth={1.75} />
+                            </div>
+                            <p className={styles.emptyWalletTitle}>
+                              {hasBancos || hasEfectivo
+                                ? `No tenés billeteras para este método en ${moneda}`
+                                : `No tenés billeteras en ${moneda}`}
+                            </p>
+                            <p className={styles.emptyWalletSub}>
+                              {hasBancos || hasEfectivo
+                                ? 'Probá cambiando el método de pago o creá una nueva billetera.'
+                                : `Creá una billetera en ${moneda} desde la sección de Billeteras para registrar tus movimientos.`}
+                            </p>
+                          </div>
+                        ) : (
+                          <div data-modal-carousel>
+                            <div data-modal-carousel-track ref={carouselRef}>
+                              {billeterasCarousel.map(b => (
+                                <SelectableSurface
+                                  key={b.id}
+                                  selected={billeteraId === b.id}
+                                  context="modal"
                                   onClick={() => !isCuotaHija && dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })}
                                   disabled={isCuotaHija}
+                                  ref={(el) => setCardNode(b.id, el as HTMLDivElement | null)}
                                   title={`Seleccionar billetera ${b.nombre}`}
                                   aria-label={`Seleccionar billetera ${b.nombre}`}
-                                />
-                              </SelectableSurface>
-                            ))}
+                                >
+                                  <BilleteraCard
+                                    billetera={b}
+                                    variant="select"
+                                    slotBadge={moneda === 'USD' && b.moneda === 'ARS' ? (
+                                      <span className={`${styles.cuentaEnPesosChip} ${isBankLight(b) ? '' : styles.cuentaEnPesosChipDark}`}>
+                                        Cuenta en pesos
+                                      </span>
+                                    ) : undefined}
+                                  />
+                                </SelectableSurface>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )
-                    )}
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className={styles.formFooter}>
                 {isEdit ? (
-                  <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction}>
+                  <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction} data-modal-delete>
                     {isCuotaHija ? 'Eliminar cuota' : 'Eliminar'}
                   </button>
                 ) : (
@@ -971,6 +970,7 @@ export default function TransaccionModal({
                   ? styles.slideEnterRight
                   : styles.slideExitLeft
               }`}
+              data-modal-frame
             >
               <form 
                 className={styles.formContainer}
@@ -981,6 +981,7 @@ export default function TransaccionModal({
               >
                 <div
                   className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+                  data-modal-block
                 >
                   <div className={styles.formHeader}>
                     <div className={styles.headerLeft}>
@@ -1040,6 +1041,7 @@ export default function TransaccionModal({
                 ? (slideDirection === 'forward' ? styles.slideEnterRight : styles.slideEnterLeft)
                 : (slideDirection === 'forward' ? styles.slideExitLeft : styles.slideExitRight)
             }`}
+            data-modal-frame
           >
             <form 
               className={styles.formContainer}
@@ -1072,6 +1074,7 @@ export default function TransaccionModal({
                         onClick={handleDeleteTransaction}
                         title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
                         aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
+                        data-modal-delete
                       >
                         <Trash2 size={16} />
                       </button>
@@ -1082,7 +1085,7 @@ export default function TransaccionModal({
                   </div>
                 </div>
 
-                <div className={styles.formFields}>
+                <div className={styles.formFields} data-modal-stack>
                   {/* Descripción + Fecha y aviso de saldo */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
                     <div className={styles.descFechaRow}>
@@ -1159,6 +1162,7 @@ export default function TransaccionModal({
                   ? styles.slideEnterRight
                   : styles.slideEnterLeft
               }`}
+              data-modal-frame
             >
               {(step === 4 || step === 3) && (
                 <form 
@@ -1187,7 +1191,7 @@ export default function TransaccionModal({
                       </div>
                     </div>
 
-                    <div className={styles.formFields}>
+                    <div className={styles.formFields} data-modal-stack>
                       <DebitoEnDolares
                         montoUsd={monto}
                         montoPesos={montoPesosDebito}

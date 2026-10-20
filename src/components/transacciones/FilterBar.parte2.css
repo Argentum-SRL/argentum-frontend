@@ -143,16 +143,20 @@
 
 /* ── Mobile Modal Drawer Content Styles ── */
 .mobileDrawerContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
   padding: 0 4px 10px;
 }
+
+.mobileDrawerBody {
+  display: flex;
+  flex-direction: column;
+}
+
 
 .activePillsRowMobile {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  /* r03-ok: alineacion optica vertical de fila de chips activos en movil */
   margin-bottom: -8px;
 }
 
@@ -326,7 +330,7 @@
 .accountsList {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   max-height: 220px;
   overflow-y: auto;
   padding-right: 2px;
@@ -416,6 +420,12 @@
   margin-left: 2px;
 }
 
+.inversionIcon {
+  color: #10B981;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
 .accountAmount {
   font-size: 12px;
   font-weight: 700;
@@ -473,7 +483,7 @@
 .categoriaRowLeftMobile {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .allCatsIconMobile {
@@ -510,7 +520,7 @@
 .catGroupMobile {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   margin-top: 8px;
 }
 

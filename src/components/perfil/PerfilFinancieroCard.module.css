@@ -8,7 +8,7 @@
   box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
   height: auto;
   animation: pfFadeIn 0.35s ease-out;
@@ -30,13 +30,13 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .pfHeaderLeft {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -68,7 +68,7 @@
 .pfHeaderRight {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .pfUpdateTime {
@@ -340,7 +340,7 @@
 @media (max-width: 640px) {
   .pfMetricsStrip {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px 0;
+    gap: 8px 0;
   }
   .pfKpiCell:nth-child(3n) {
     border-right: 1px solid var(--border);

@@ -44,41 +44,14 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── Step Indicator Dots (Pills) ─────────────────────────────────────────── */
-.stepDots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 20px 0;
-  flex-shrink: 0;
-  background: var(--surface);
-  position: relative;
-  z-index: 10;
-}
 
-.stepDot {
-  height: 5px;
-  border-radius: 99px;
-  transition: all 260ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.stepDotActive {
-  width: 20px;
-  background: var(--primary);
-}
-
-.stepDotInactive {
-  width: 6px;
-  background: var(--border);
-}
 
 /* ── Header Integrado ──────────────────────────────────────────────────────── */
 .formHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 0 2px;
+  padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
   border-bottom: none;
   flex-shrink: 0;
 }
@@ -86,7 +59,7 @@
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .headerTitle {
@@ -137,8 +110,7 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
-  padding: 16px var(--modal-pad-x) 8px; /* Separación lateral oficial */
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
   overflow-y: auto;
   min-height: 0;
   flex: 1;
@@ -169,7 +141,7 @@
 .identityInfo {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
   flex: 1;
 }
@@ -222,7 +194,7 @@
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .statusPillSuperado {
@@ -234,7 +206,7 @@
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .statusPillAlerta {
@@ -246,7 +218,7 @@
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 :global([data-theme="dark"]) .statusPillAlerta {
@@ -256,7 +228,7 @@
 .dateMeta {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .dateIcon {
@@ -281,13 +253,13 @@
 .categoryChipsList {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
 }
 
 .catChip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 3px 8px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -305,7 +277,7 @@
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .heroAmounts {
@@ -318,7 +290,7 @@
 .amountBlock {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
 }
 
 .limitBlock {
@@ -369,7 +341,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 11.5px;
 }
 
@@ -459,7 +431,7 @@
 .movimientosNavLeft {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .movimientosNavIconBox {
@@ -477,7 +449,7 @@
 .movimientosNavInfo {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
 }
 
 .movimientosNavTitle {
@@ -532,8 +504,7 @@
 .contentSection {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-height: 140px;
+  gap: 8px;
 }
 
 .txList,
@@ -547,7 +518,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   padding: 9px 12px;
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -562,17 +533,17 @@
 .txLeft {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   flex: 1;
 }
 
 .txIconWrap {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--error-bg);
-  color: var(--error);
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--surface-alt);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -582,7 +553,7 @@
 .txDetails {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
   min-width: 0;
   flex: 1;
 }
@@ -619,7 +590,7 @@
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   color: var(--text-2);
 }
 
@@ -654,7 +625,7 @@
   background: var(--surface);
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
 .historyHeader {
@@ -816,7 +787,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -908,3 +879,16 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.historySkeletonCard {
+  padding: 14px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+}
+
+.historySkeletonHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+

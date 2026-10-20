@@ -32,28 +32,16 @@ export const ModalCargosBancarios: React.FC<ModalCargosBancariosProps> = ({
       showHeader={true}
       title="Encontramos cargos del banco"
       size="md"
+      stepDots={totalSteps > 1 ? { total: totalSteps, current: currentStep } : undefined}
     >
-      <div className={styles.formContainer}>
-        {/* Step Indicator Dots */}
-        {totalSteps > 1 && (
-          <div className={styles.stepDots}>
-            {Array.from({ length: totalSteps }).map((_, idx) => (
-              <div
-                key={idx}
-                className={`${styles.stepDot} ${
-                  idx === currentStep ? styles.stepDotActive : styles.stepDotInactive
-                }`}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className={styles.formBody}>
+      <div className={styles.formContainer} data-modal-frame>
+        <div className={styles.formBody} data-modal-stack>
           <p className={styles.modalText}>
             Detectamos transacciones que corresponden a comisiones, mantenimientos o cargos del banco. ¿Qué querés hacer con ellos?
           </p>
 
-          <div className={styles.radioGroup}>
+          <div data-modal-block>
+          <div className={styles.radioGroup} data-modal-options>
             <div
               className={`${styles.checkboxItem} ${
                 decision === 'importar' ? styles.checkboxItemActive : ''
@@ -89,6 +77,7 @@ export const ModalCargosBancarios: React.FC<ModalCargosBancariosProps> = ({
               />
               <label htmlFor="cargo-ignorar" className={styles.checkboxLabel}>Ignorarlos</label>
             </div>
+          </div>
           </div>
         </div>
 

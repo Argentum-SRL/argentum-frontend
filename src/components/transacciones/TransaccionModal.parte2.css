@@ -1,183 +1,4 @@
 
-@media (hover: hover) and (pointer: fine) {
-  .billeteraSelectWrap[data-active="false"]:hover,
-  .billeteraSelectWrap[data-selected="false"]:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-    box-shadow: var(--elevation-xs);
-    z-index: 2;
-  }
-}
-
-/* ── Active / Selected Card: Micro-elevation contextual to modal ──
-   Selected card communicates physical presence strictly via micro-elevation (-2px)
-   and contextual ambient depth (--elevation-selection-modal).
-   No scale distortion (strictly 1.0), no colored glow, no artificial border, opacity strictly 1.0. */
-.billeteraSelectWrap[data-active="true"],
-.billeteraSelectWrap[data-selected="true"] {
-  transform: translateY(-3px) scale(1.02);
-  filter: none;
-  opacity: 1;
-  z-index: 10;
-  box-shadow: var(--elevation-selection-modal);
-}
-
-:global([data-theme="dark"]) .billeteraSelectWrap[data-active="true"],
-:global([data-theme="dark"]) .billeteraSelectWrap[data-selected="true"] {
-  box-shadow: var(--elevation-selection-modal);
-}
-
-/* Selección táctil instantánea */
-.billeteraSelectWrap:active {
-  transform: translateY(-1px) scale(1.01);
-  transition-duration: 80ms;
-}
-
-.billeteraOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  cursor: pointer;
-  border-radius: inherit;
-  border: none;
-  background: transparent;
-}
-
-.billeteraSelectWrap :global(.wcKebab) {
-  display: none !important;
-}
-
-.billeteraSelectWrap :global(.chipMoneda) {
-  display: none !important;
-}
-
-.fullHeightCard {
-  height: 100% !important;
-  aspect-ratio: auto !important;
-  border-radius: 16px !important;
-}
-
-/* Tactile specular sheen on card surface */
-.billeteraSelectWrap :global(.wc) {
-  border-radius: 16px !important;
-  overflow: hidden !important;
-}
-
-.billeteraSelectWrap :global(.wcBg)::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(0, 0, 0, 0.16) 100%);
-  pointer-events: none;
-  border-radius: inherit;
-  box-shadow: var(--elevation-none);
-}
-
-/* Card inner layout: top header + centered balance */
-.billeteraSelectWrap :global(.wcInner) {
-  padding: 10px 14px !important;
-  height: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  box-sizing: border-box !important;
-}
-
-.billeteraSelectWrap :global(.wcTop) {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  width: 100% !important;
-}
-
-.billeteraSelectWrap :global(.wcLogo) {
-  width: 28px !important;
-  height: 28px !important;
-  min-width: 28px !important;
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
-  box-shadow: var(--elevation-none) !important;
-}
-
-
-/* Horizontal alignment of Name + Principal Badge */
-.billeteraSelectWrap :global(.wcIdentity) {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-  gap: 6px !important;
-}
-
-.billeteraSelectWrap :global(.wcName) {
-  font-size: 14px !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.2px !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-.billeteraSelectWrap :global(.wcChipRow) {
-  margin: 0 !important;
-  flex-shrink: 0 !important;
-}
-
-.billeteraSelectWrap :global(.chip) {
-  font-size: 8.5px !important;
-  font-weight: 700 !important;
-  padding: 2px 6px !important;
-  border-radius: 9999px !important;
-  letter-spacing: 0.25px !important;
-  text-transform: uppercase !important;
-}
-
-/* Hero Center Balance */
-.billeteraSelectWrap :global(.wcBalance) {
-  min-width: 0 !important;
-  width: 100% !important;
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  margin: 0 !important;
-  padding: 2px 0 0 !important;
-}
-
-.billeteraSelectWrap :global(.wcBalAmt) {
-  font-size: 22px !important;
-  font-weight: 900 !important;
-  line-height: 1.15 !important;
-  letter-spacing: -0.6px !important;
-  text-align: center !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  display: block !important;
-  font-variant-numeric: tabular-nums !important;
-}
-
-.billeteraSelectWrap :global(.balAmtLight) {
-  color: #ffffff !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
-}
-
-.billeteraSelectWrap :global(.balAmtDark) {
-  color: #0f172a !important;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5) !important;
-}
-
-.billeteraSelectWrap :global(.wcBalLbl) {
-  display: none !important;
-}
 
 /* ── Badge "Cuenta en pesos" en Billeteras (mismo lenguaje visual que chip Principal) ── */
 .cuentaEnPesosChip {
@@ -196,7 +17,7 @@
   align-items: center;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--elevation-xs);
   background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -245,13 +66,13 @@
 .financiacionContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .planSelectorSection {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .planGrid {
@@ -263,7 +84,7 @@
 @media (max-width: 480px) {
   .planGrid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
+    gap: 4px;
   }
 }
 

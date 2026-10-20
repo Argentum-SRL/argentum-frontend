@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 9000;
+  z-index: var(--z-modal);
   background: rgba(10, 13, 18, 0.5);
   /* Very subtle blur of the content behind the overlay */
   -webkit-backdrop-filter: blur(1px);
@@ -12,6 +12,11 @@
   justify-content: center;
   padding: 20px;
   animation: fadeIn 180ms ease;
+}
+
+.sheetOverlay {
+  align-items: flex-end;
+  padding: 0;
 }
 
 .container {
@@ -51,6 +56,22 @@
   .xl { width: var(--modal-w, var(--modal-w-xl)); }
 }
 
+.sheet {
+  width: 100%;
+  max-width: var(--modal-w, var(--modal-w-md));
+  margin: 0 auto;
+  border-radius: var(--modal-radius) var(--modal-radius) 0 0;
+  animation: slideUpMobile 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sheet .content {
+  padding-bottom: max(var(--modal-content-pad-bottom), env(safe-area-inset-bottom, 0px));
+}
+
+.sheet .footer {
+  padding-bottom: max(var(--modal-footer-pad-bottom), env(safe-area-inset-bottom, 0px));
+}
+
 @media (max-width: 767px) {
   .overlay {
     align-items: flex-end;
@@ -85,8 +106,18 @@
   }
 }
 
+.sheetHandle {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-alt);
+  margin: 12px auto 0;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
 .header {
-  padding: var(--space-xl) var(--modal-pad-x) var(--space-sm);
+  padding: var(--modal-pad-x) var(--modal-pad-x) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -127,10 +158,13 @@
 }
 
 .content {
-  padding: var(--modal-content-pad-top) var(--modal-pad-x) var(--modal-content-pad-bottom);
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-block-gap);
 }
 
 .content::-webkit-scrollbar {
@@ -143,11 +177,105 @@
 }
 
 .footer {
-  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom);
+  padding: 0 var(--modal-pad-x) var(--modal-pad-x);
   display: flex;
   justify-content: flex-end;
   gap: var(--modal-footer-gap);
   flex-shrink: 0;
+}
+
+/* ── Mecanismo de Espaciado Unificado por Atributos de Markup (Sistema v3) ── */
+:global([data-modal-frame]) {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-height: 0;
+}
+
+:global([data-modal-stack]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-block-gap);
+  width: 100%;
+}
+
+:global([data-modal-block]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-field-gap);
+  width: 100%;
+}
+
+:global([data-modal-options]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-option-gap);
+  width: 100%;
+}
+
+:global([data-modal-field]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-label-gap);
+  width: 100%;
+}
+
+:global([data-modal-section-title]) {
+  margin-bottom: var(--modal-section-title-gap);
+  display: block;
+}
+
+/* [data-modal-delete]: Marcador estructural para botón o contenedor de eliminación de entidad */
+
+/* ── Carrusel Canónico de Modales (Decisión 4) ── */
+:global([data-modal-carousel]) {
+  container-type: inline-size;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scroll-snap-type: x mandatory;
+  /* r03-ok: compensa el padding que aloja la sombra de selección para que el carrusel mida lo mismo que sus cards */
+  margin-top: calc(-1 * var(--carousel-reach-top));
+  /* r03-ok: compensa el padding que aloja la sombra de selección para que el carrusel mida lo mismo que sus cards */
+  margin-bottom: calc(-1 * var(--carousel-reach-bottom));
+  /* r03-ok: sangrado lateral al borde del modal */
+  margin-left: calc(-1 * var(--modal-pad-x));
+  /* r03-ok: sangrado lateral al borde del modal */
+  margin-right: calc(-1 * var(--modal-pad-x));
+  padding-top: var(--carousel-reach-top);
+  padding-bottom: var(--carousel-reach-bottom);
+  padding-left: var(--modal-pad-x);
+  padding-right: var(--modal-pad-x);
+  scroll-padding-inline: var(--modal-pad-x);
+}
+
+:global([data-modal-carousel])::-webkit-scrollbar {
+  display: none;
+}
+
+:global([data-modal-carousel-track]) {
+  --elevation-selection-modal: var(--elevation-selection-carousel);
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start;
+  justify-content: safe center;
+  align-items: center;
+}
+
+:global([data-modal-carousel-track]) > * {
+  width: min(clamp(var(--select-card-w-min), 72cqi, var(--select-card-w-max)), calc(100cqi - 48px));
+  aspect-ratio: 1.65 / 1;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: 16px;
+  box-sizing: border-box;
 }
 
 /* Indicadores de pasos canónicos (StepDots) */

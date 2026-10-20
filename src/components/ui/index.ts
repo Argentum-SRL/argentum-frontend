@@ -1,5 +1,4 @@
 import Button from './Button/Button.tsx'
-import Drawer from './Drawer/Drawer.tsx'
 import Field from './Field/Field.tsx'
 import MontoInput from './MontoInput/MontoInput.tsx'
 import Modal, { type ModalStepDots } from './Modal/Modal.tsx'
@@ -18,7 +17,6 @@ import type { SegmentedControlOption, SegmentedControlProps } from './SegmentedC
 
 export { 
   Button, 
-  Drawer, 
   Field, 
   MontoInput, 
   Modal, 

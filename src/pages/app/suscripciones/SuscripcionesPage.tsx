@@ -14,6 +14,7 @@ import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
 import { getSubcategoriaVisual } from '@/lib/utils/categoria.utils'
 import SuscripcionCard from '@/components/suscripciones/SuscripcionCard'
 import SuscripcionModal from '@/components/suscripciones/SuscripcionModal'
+import { setCachedSuscripciones } from '@/lib/utils/movimientoVisual.utils'
 import styles from './SuscripcionesPage.module.css'
 
 interface FloatingItemConfig {
@@ -100,6 +101,7 @@ const SuscripcionesPage: React.FC = () => {
       ])
       if (signal?.aborted) return
 
+      setCachedSuscripciones(data)
       setBilleteras(bills)
       setTarjetas(cards)
       setCategorias(cats)
@@ -280,6 +282,7 @@ const SuscripcionesPage: React.FC = () => {
         </div>
 
         <SuscripcionModal 
+          key={selectedSuscripcion ? `edit-${selectedSuscripcion.id}` : 'new'}
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           suscripcion={selectedSuscripcion}
@@ -376,6 +379,7 @@ const SuscripcionesPage: React.FC = () => {
       </div>
 
       <SuscripcionModal 
+        key={selectedSuscripcion ? `edit-${selectedSuscripcion.id}` : 'new'}
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         suscripcion={selectedSuscripcion}

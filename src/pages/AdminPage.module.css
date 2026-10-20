@@ -188,7 +188,7 @@
 .filtersGroup {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 8px;
   flex: 2;
 }
 
@@ -196,7 +196,7 @@
   .filtersGroup {
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
   }
 }
 
@@ -512,7 +512,7 @@
 .detailFieldLabel {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   font-size: 12px;
   color: var(--text-3);
   font-weight: 400;
@@ -592,14 +592,14 @@
 .actionsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 
 .actionBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   padding: 9px 12px;
   border-radius: 10px;
   font-size: 12px;
@@ -673,7 +673,7 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   margin-top: 10px;
   animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -748,7 +748,7 @@
 .confirmCheckboxLabel {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   font-size: 12px;
   color: var(--text-3);
   cursor: pointer;
@@ -773,7 +773,7 @@
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   animation: pulse 0.2s ease-out;
 }
 
@@ -808,12 +808,12 @@
 .kpiStrip {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .kpiRow {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .kpiRow4 {
@@ -874,7 +874,7 @@
 .providerRow {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
   margin-top: 16px;
 }
 
@@ -891,7 +891,7 @@
   padding: 14px 18px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   box-sizing: border-box;
 }
 
@@ -965,6 +965,7 @@
   font-weight: 500;
   color: var(--text-3);
   border-bottom: 2px solid transparent;
+  /* r03-ok: colapso de borde de 1px entre pestana y contenedor activo */
   margin-bottom: -1px;
   transition: all 0.2s ease;
   outline: none;

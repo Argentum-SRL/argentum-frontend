@@ -103,7 +103,7 @@
 
 /* ── Cuerpo y Área de Scroll ─────────────────────────────────────────────── */
 .formBody {
-  padding: 14px var(--modal-pad-x); /* Separación lateral oficial */
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -118,7 +118,7 @@
   padding: 4px 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .scrollArea::-webkit-scrollbar {
@@ -181,7 +181,7 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* ── Cards de Notificaciones ──────────────────────────────────────────────── */
@@ -503,7 +503,7 @@
 }
 
 .cardActiveMenu {
-  z-index: 100 !important;
+  z-index: var(--z-dropdown) !important;
 }
 
 .menuBackdrop {
@@ -543,7 +543,7 @@
 
   .card {
     padding: 11px 13px;
-    gap: 10px;
+    gap: 8px;
     border-radius: 10px;
   }
 

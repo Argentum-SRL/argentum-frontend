@@ -353,8 +353,8 @@ export default function EditBilleteraModal({
           </div>
 
           {/* Campos del form agrupados en formFields */}
-          <div className={styles.formFields}>
-            <div className={styles.settingsCardsList}>
+          <div className={styles.formFields} data-modal-stack>
+            <div className={styles.settingsCardsList} data-modal-options>
               {/* Card 1: Marcar como principal */}
               <button
                 type="button"
@@ -468,10 +468,10 @@ export default function EditBilleteraModal({
 
             {/* Contenido desplegable de Opciones avanzadas */}
             {!billetera.es_efectivo && opcionesAvanzadasOpen && (
-              <div className={styles.opcionesAvanzadasContent}>
+              <div className={styles.opcionesAvanzadasContent} data-modal-block>
                 {/* 1. Selector Nivel de tasa (solo si la entidad tiene niveles) */}
                 {tieneNiveles && (
-                  <div className={styles.advancedField}>
+                  <div className={styles.advancedField} data-modal-field>
                     <SelectInput
                       id="edit-nivel"
                       label="Nivel de tasa"
@@ -492,7 +492,7 @@ export default function EditBilleteraModal({
                 )}
 
                 {/* 2. Tasa propia (TNA %) usando Field global */}
-                <div className={styles.advancedField}>
+                <div className={styles.advancedField} data-modal-field>
                   <Field
                     id="edit-tna-propia"
                     label="Tasa propia (TNA %)"

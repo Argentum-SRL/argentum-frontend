@@ -236,7 +236,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
       title={tituloModal}
       size="sm"
     >
-      <div className={styles.container}>
+      <div className={styles.container} data-modal-stack>
         {loading && <FacturaPanelSkeleton />}
 
         {!loading && factura && (
@@ -278,8 +278,8 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
                 </Button>
               </div>
             ) : (
-              <div className={styles.formSection}>
-                <div className={styles.fieldGroup}>
+              <div className={styles.formSection} data-modal-block>
+                <div className={styles.fieldGroup} data-modal-field>
                   <label className={styles.fieldLabel} htmlFor="factura-billetera">
                     ¿Con qué la pagaste?
                   </label>
@@ -293,7 +293,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
                   />
                 </div>
 
-                <div className={styles.fieldGroup}>
+                <div className={styles.fieldGroup} data-modal-field>
                   <label className={styles.fieldLabel} htmlFor="factura-fecha">
                     Fecha del pago
                   </label>
@@ -315,6 +315,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
                         variant="danger"
                         onClick={handleDescartar}
                         loading={submitting}
+                        data-modal-delete
                       >
                         Sí, borrar
                       </Button>
@@ -342,6 +343,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
                       onClick={() => setConfirmandoBorrado(true)}
                       disabled={submitting}
                       className={styles.btnBorrar}
+                      data-modal-delete
                     >
                       Borrar
                     </Button>

@@ -161,14 +161,14 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
 
   return (
     <Modal isOpen={open} onClose={handleClose} showHeader={false} noPadding ariaLabel="Ajustar foto de perfil">
-      <div className={styles.slidesContainer}>
+      <div className={styles.slidesContainer} data-modal-frame>
         <div className={styles.formContainer}>
           <div className={styles.formHeader}>
             <h2 className={styles.headerTitle}>Ajustar foto de perfil</h2>
             <button type="button" className={styles.closeBtn} onClick={handleClose} title="Cerrar"><X size={16} /></button>
           </div>
 
-          <div className={styles.formBody}>
+          <div className={styles.formBody} data-modal-stack>
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -180,13 +180,13 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
             />
 
             {!imageSrc ? (
-              <div className={styles.dropZone} onClick={() => fileInputRef.current?.click()}>
+              <div className={styles.dropZone} data-modal-block onClick={() => fileInputRef.current?.click()}>
                 <Camera size={32} className={styles.dropZoneIcon} />
                 <span className={styles.dropZoneText}>Seleccioná una foto</span>
                 <span className={styles.dropZoneSubtext}>JPG, PNG o WebP · Máx 5MB</span>
               </div>
             ) : (
-              <div className={styles.cropWrapper}>
+              <div className={styles.cropWrapper} data-modal-block>
                 <div 
                   className={`${styles.cropArea} ${isDragging ? styles.grabbing : ''}`}
                   onMouseDown={handleMouseDown}
@@ -205,7 +205,7 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
                   />
                 </div>
 
-                <div className={styles.zoomRow}>
+                <div className={styles.zoomRow} data-modal-field>
                   <span className={styles.zoomLabel}>Zoom</span>
                   <input 
                     type="range" 

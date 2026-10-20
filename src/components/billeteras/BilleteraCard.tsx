@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw, TrendingUp } from '@/components/ui/icons'
+import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw, TrendingUp, Star } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
 import { formatMonto } from '@/utils/format'
@@ -10,6 +10,8 @@ import styles from './BilleteraCard.module.css'
 
 export interface BilleteraCardProps {
   billetera: Billetera
+  variant?: 'full' | 'select'
+  slotBadge?: React.ReactNode
   isFront?: boolean
   onSetFront?: () => void
   onArchivar?: (id: string) => void
@@ -28,6 +30,8 @@ const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
 
 const BilleteraCard = memo(({ 
   billetera, 
+  variant = 'full',
+  slotBadge,
   isFront,
   onSetFront,
   onArchivar, 
@@ -90,9 +94,91 @@ const BilleteraCard = memo(({
     }
   }, [background])
 
+  if (variant === 'select') {
+    return (
+      <div 
+        className={`${styles.wcSelect} ${className || ''}`}
+        data-icon-parent
+      >
+        {/* Fondo clipeado */}
+        <div className={styles.wcBg} ref={bgRef}>
+          <div className={styles.decoA} aria-hidden="true" />
+          <div className={styles.decoB} aria-hidden="true" />
+        </div>
+
+        <div className={styles.selectInner}>
+          {/* Top: Logo + Nombre + Estrella / Inversión + Slot */}
+          <div className={styles.selectTop}>
+            <div className={styles.selectLogoGroup}>
+              <div className={styles.selectLogo}>
+                {billetera.es_efectivo ? (
+                  <DollarSign size={16} strokeWidth={2} color="white" />
+                ) : bankLogoUrl && !logoErr ? (
+                  <img src={bankLogoUrl} alt={bank?.nombre || billetera.nombre} onError={() => setLogoErr(true)} />
+                ) : (
+                  <span className={styles.selectLogoFallback}>
+                    {getInitials(bank?.nombre ?? billetera.nombre)}
+                  </span>
+                )}
+              </div>
+
+              <div className={styles.selectIdentity}>
+                <span className={`${styles.selectName} ${isLight ? styles.textLight : styles.textDark}`}>
+                  {billetera.es_efectivo
+                    ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
+                    : billetera.nombre}
+                </span>
+                {billetera.es_principal && (
+                  <span
+                    className={`${styles.selectBadgeIcon} ${isLight ? styles.starLight : styles.starDark}`}
+                    title="Billetera principal"
+                    aria-label="Billetera principal"
+                  >
+                    <Star size={13} strokeWidth={2.4} />
+                  </span>
+                )}
+                {billetera.es_inversion && (
+                  <span
+                    className={`${styles.selectBadgeIcon} ${isLight ? styles.inversionLight : styles.inversionDark}`}
+                    title="Cuenta de inversión"
+                    aria-label="Cuenta de inversión"
+                  >
+                    <TrendingUp size={13} strokeWidth={2.4} />
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {slotBadge && (
+              <div className={styles.selectSlotBadge}>
+                {slotBadge}
+              </div>
+            )}
+          </div>
+
+          {/* Bottom: Tipo + Moneda (pastilla) + Saldo */}
+          <div className={styles.selectBottom}>
+            <div className={styles.selectMetaRow}>
+              <span className={`${styles.selectTipo} ${isLight ? styles.metaLight : styles.metaDark}`}>
+                {billetera.es_inversion ? 'Inversión' : billetera.es_efectivo ? 'Efectivo' : 'Cuenta'}
+              </span>
+              <span className={`${styles.selectMonedaBadge} ${isLight ? styles.monedaBadgeLight : styles.monedaBadgeDark}`}>
+                {billetera.moneda}
+              </span>
+            </div>
+            <div className={`${styles.selectSaldo} ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>
+              {formatMonto(billetera.saldo_actual, billetera.moneda)}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div 
       className={`${styles.wc} wc ${menuOpen ? styles.wcMenuOpen : ''} ${billetera.estado === 'archivada' ? styles.archived : ''} ${isFront ? styles.frontCard : ''} ${className || ''}`}
+      data-icon-parent
     >
       {/* Fondo clipeado */}
       <div className={`${styles.wcBg} wcBg`} ref={bgRef}>
@@ -136,33 +222,44 @@ const BilleteraCard = memo(({
           {/* Identidad */}
           <div className={`${styles.wcIdentity} wcIdentity`}>
             <div className={`${styles.wcName} wcName ${isLight ? styles.textLight : styles.textDark}`}>
-              {billetera.es_efectivo
-                ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
-                : billetera.nombre}
-            </div>
-            <div className={`${styles.wcChipRow} wcChipRow`}>
+              <span className={`${styles.wcNameText} wcNameText`}>
+                {billetera.es_efectivo
+                  ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
+                  : billetera.nombre}
+              </span>
               {billetera.es_principal && (
-                <span className={`${styles.chip} chip ${isLight ? styles.chipPrincipalLight : styles.chipPrincipalDark}`}>
-                  Principal
-                </span>
-              )}
-              {!hideCurrencyChip && (
-                <span className={`${styles.chip} chip chipMoneda ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
-                  {billetera.moneda === 'USD' ? 'Dólares' : 'Pesos'}
-                </span>
-              )}
-              {billetera.es_efectivo && (
-                <span className={`${styles.chip} chip ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
-                  Efectivo
+                <span
+                  className={`${styles.starBadge} ${isLight ? styles.starLight : styles.starDark}`}
+                  title="Billetera principal"
+                  aria-label="Billetera principal"
+                >
+                  <Star size={15} strokeWidth={2.4} />
                 </span>
               )}
               {billetera.es_inversion && (
-                <span className={`${styles.chip} chip ${styles.chipInversion} ${isLight ? styles.chipInversionLight : styles.chipInversionDark}`}>
-                  <TrendingUp size={9} strokeWidth={2.2} />
-                  Inversión
+                <span
+                  className={`${styles.inversionBadge} ${isLight ? styles.inversionLight : styles.inversionDark}`}
+                  title="Cuenta de inversión"
+                  aria-label="Cuenta de inversión"
+                >
+                  <TrendingUp size={15} strokeWidth={2.4} />
                 </span>
               )}
             </div>
+            {(!hideCurrencyChip || billetera.es_efectivo) && (
+              <div className={`${styles.wcChipRow} wcChipRow`}>
+                {!hideCurrencyChip && (
+                  <span className={`${styles.chip} chip chipMoneda ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                    {billetera.moneda === 'USD' ? 'Dólares' : 'Pesos'}
+                  </span>
+                )}
+                {billetera.es_efectivo && (
+                  <span className={`${styles.chip} chip ${isLight ? styles.chipMonedaLight : styles.chipMonedaDark}`}>
+                    Efectivo
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Kebab — opciones de gestión */}

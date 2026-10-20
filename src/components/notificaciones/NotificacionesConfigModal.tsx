@@ -137,11 +137,11 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
 
   return (
     <Modal isOpen={open} onClose={onClose} title="Preferencias de Notificaciones" size="lg">
-      <form onSubmit={handleSave} className={styles.form}>
-        <div className={styles.topGrid}>
+      <form onSubmit={handleSave} className={styles.form} data-modal-frame>
+        <div className={styles.topGrid} data-modal-stack>
           {/* --- GENERAL DE CANALES --- */}
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>
+          <section className={styles.section} data-modal-block>
+            <h3 className={styles.sectionTitle} data-modal-section-title>
               <Settings size={16} /> Resumen por WhatsApp
             </h3>
             <div className={styles.card}>

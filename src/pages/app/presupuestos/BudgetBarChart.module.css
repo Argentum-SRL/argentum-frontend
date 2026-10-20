@@ -1,6 +1,6 @@
 .chartWrapper {
   background: var(--surface);
-  border-radius: 20px;
+  border-radius:20px;
   padding: 20px 0 16px 0;
   border: 1px solid var(--border);
   display: flex;
@@ -32,7 +32,7 @@
   color: var(--text-3);
   background: var(--surface-alt);
   padding: 3px 10px;
-  border-radius: 20px;
+  border-radius:20px;
 }
 
 /* Horizontal Scroll Container */
@@ -79,8 +79,8 @@
   justify-content: flex-end;
   align-items: center;
   position: relative;
-  border-radius: 30px;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius:30px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .columnWrapper:active .barArea {
@@ -94,7 +94,7 @@
   left: 0;
   width: 100%;
   border: 2.5px dashed rgba(0, 0, 0, 0.22);
-  border-radius: 30px;
+  border-radius:30px;
   pointer-events: none;
   z-index: 3;
   box-sizing: border-box;
@@ -118,7 +118,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  border-radius: 30px;
+  border-radius:30px;
   overflow: hidden;
   z-index: 2;
   pointer-events: none;
@@ -130,7 +130,7 @@
   left: 0;
   width: 100%;
   z-index: 2;
-  transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
 
@@ -155,7 +155,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 3px;
+  gap: 2px;
   z-index: 4;
   pointer-events: none;
   box-sizing: border-box;
@@ -234,7 +234,7 @@
 .sheetIcon {
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius:14px;
   background: var(--surface-alt);
   display: flex;
   align-items: center;
@@ -258,7 +258,7 @@
   color: var(--text-3);
   background: var(--surface-alt);
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius:4px;
   display: inline-block;
   margin-top: 4px;
 }
@@ -266,7 +266,7 @@
 .sheetCloseBtn {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius:50%;
   border: none;
   background: var(--surface-alt);
   color: var(--text-2);
@@ -279,7 +279,7 @@
 /* Quick Summary Card Inside Sheet */
 .sheetSummaryCard {
   background: var(--surface-alt);
-  border-radius: 16px;
+  border-radius:16px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
@@ -314,13 +314,13 @@
 .sheetProgressBar {
   height: 8px;
   background: var(--surface);
-  border-radius: 4px;
+  border-radius:4px;
   overflow: hidden;
 }
 
 .sheetProgressFill {
   height: 100%;
-  border-radius: 4px;
+  border-radius:4px;
   transition: width 0.6s ease;
 }
 
@@ -344,7 +344,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  border-radius: 14px;
+  border-radius:14px;
   border: 1px solid var(--border);
   background: var(--surface);
   cursor: pointer;
@@ -359,7 +359,7 @@
 .sheetActionIcon {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius:10px;
   background: var(--surface-alt);
   color: var(--text);
   display: flex;
@@ -413,7 +413,7 @@
 @media (min-width: 768px) {
   .chartWrapper {
     padding: 24px 0 20px 0;
-    border-radius: 24px;
+    border-radius:20px;
   }
 
   .chartHeader {
@@ -442,16 +442,16 @@
 
   .barArea {
     width: 104px;
-    border-radius: 36px;
+    border-radius:36px;
   }
 
   .dashedFrame {
-    border-radius: 36px;
+    border-radius:36px;
     border-width: 3px;
   }
 
   .fillTrack {
-    border-radius: 36px;
+    border-radius:36px;
   }
 
   .barContent {

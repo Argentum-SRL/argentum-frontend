@@ -6,11 +6,10 @@ import {
   Trash2, 
   Wallet,
   Banknote,
-  ChevronRight,
-  Target
+  ChevronRight
 } from '@/components/ui/icons'
 import type { Transaccion, Billetera, Categoria } from '@/types'
-import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
+import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import { formatMonto } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
 import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
@@ -130,16 +129,20 @@ const TransaccionRow = memo(({
       <div className={`${styles.avatarContainer} ${
         isAporteMeta ? styles.avatarApartado : isRetiroMeta ? styles.avatarRetiroMeta : isIngreso ? styles.avatarIngreso : styles.avatarEgreso
       }`}>
-        {isAporteMeta || isRetiroMeta ? (
-          <Target size={22} className={styles.avatarIconMeta} />
-        ) : (
-          <SubcategoriaIcon 
-            nombre={transaccion.subcategoria?.nombre} 
-            parentCategory={categoriaNombre} 
-            size={24}
-            className={styles.avatarIcon}
-          />
-        )}
+        <MovimientoAvatar
+          movimiento={{
+            descripcion: transaccion.descripcion,
+            suscripcion_id: transaccion.suscripcion_id,
+            movimiento_meta_id: transaccion.movimiento_meta_id,
+            subcategoria_nombre: transaccion.subcategoria?.nombre,
+            categoria_nombre: categoriaNombre,
+            origen: transaccion.origen,
+            estado_verificacion: transaccion.estado_verificacion,
+            tipo: transaccion.tipo,
+          }}
+          size={isAporteMeta || isRetiroMeta ? 22 : 24}
+          className={isAporteMeta || isRetiroMeta ? styles.avatarIconMeta : styles.avatarIcon}
+        />
         {isPendienteIA && (
           <div className={styles.avatarBadge} title="Pendiente IA">
             <Sparkles size={10} className={styles.sparkleIcon} />

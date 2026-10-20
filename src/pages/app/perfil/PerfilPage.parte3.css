@@ -89,14 +89,14 @@
   .timeSectionBody {
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: 12px;
   }
 }
 
 .timeSectionInfo {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex: 1;
   min-width: 0;
 }
@@ -116,7 +116,7 @@
 .timeControlsRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -155,7 +155,7 @@
 @media (max-width: 640px) {
   .notifCardsGrid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
   }
 }
 
@@ -175,7 +175,7 @@
 .notifCardHeader {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -232,7 +232,7 @@
 .inlineNumberControl {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 11.5px;
   color: var(--text-2);
   font-weight: 500;
@@ -260,7 +260,7 @@
 .channelsGroup {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   margin-left: auto;
 }
 
@@ -368,7 +368,7 @@
 .deleteBtnModern {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   height: 40px;
   padding: 0 18px;
   border-radius: 10px;
@@ -392,7 +392,7 @@
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 9500;
+  z-index: var(--z-modal);
   background: rgba(0, 0, 0, 0.6);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
@@ -466,10 +466,7 @@
 }
 
 .modalFormBody {
-  padding: 14px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -613,7 +610,7 @@
 
 .modalFormFooter {
   padding: 12px 20px 16px;
-  border-top: 1px solid var(--surface-alt);
+  border-top: none;
   background: var(--surface);
   display: flex;
   gap: 8px;

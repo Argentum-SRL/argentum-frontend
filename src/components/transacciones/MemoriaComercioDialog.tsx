@@ -116,7 +116,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
     >
       <div className={styles.modalRoot}>
         {step === 1 ? (
-          <div className={styles.formContainer}>
+          <div className={styles.formContainer} data-modal-frame>
             <div className={styles.formHeader}>
               <h2 className={styles.headerTitle}>¿Siempre así?</h2>
               <button
@@ -130,7 +130,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
               </button>
             </div>
 
-            <div className={styles.formBody}>
+            <div className={styles.formBody} data-modal-stack>
               <p className={styles.questionText}>
                 ¿Siempre que diga &quot;<strong>{clave}</strong>&quot; lo pongo en <strong>{categoriaTexto}</strong>?
               </p>
@@ -172,7 +172,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
             </div>
           </div>
         ) : (
-          <div className={styles.formContainer}>
+          <div className={styles.formContainer} data-modal-frame>
             <div className={styles.formHeader}>
               <h2 className={styles.headerTitle}>Movimientos anteriores</h2>
               <button
@@ -186,7 +186,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
               </button>
             </div>
 
-            <div className={styles.formBody}>
+            <div className={styles.formBody} data-modal-stack>
               <p className={styles.description}>
                 Tenés <strong>{anteriores.length}</strong> movimiento(s) anterior(es) de &quot;<strong>{clave}</strong>&quot; en otra categoría.
               </p>

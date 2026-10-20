@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, CreditCard, Plus, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2, Calendar } from '@/components/ui/icons'
+import { ChevronLeft, ChevronRight, CreditCard, Plus, DollarSign, TrendingUp, Edit2, RefreshCw, Trash2, Calendar, Star } from '@/components/ui/icons'
 import type { Billetera, TarjetaCredito, Categoria, RendimientoEstimadoResponse, AjustesBilleteraResponse, AjusteSaldo, EntidadTasa, MovimientoItem } from '@/types'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
@@ -32,15 +32,6 @@ function formatDiaMesAnio(fechaStr: string | null | undefined): string {
   return clean
 }
 
-function formatDiaMes(fechaStr: string | null | undefined): string {
-  if (!fechaStr) return ''
-  const clean = fechaStr.split('T')[0]
-  const parts = clean.split('-')
-  if (parts.length >= 3) {
-    return `${parts[2]}/${parts[1]}`
-  }
-  return clean
-}
 
 const EFECTIVO_BG: Record<'ARS' | 'USD', string> = {
   ARS: 'linear-gradient(135deg, #1A3D28 0%, #0D2A1A 100%)',
@@ -509,52 +500,68 @@ const BilleteraDetallePage: React.FC = () => {
             </div>
 
             {/* Nombre y badge */}
-            <div className={styles.headerIdentity}>
+            <div className={styles.headerIdentity} data-icon-parent>
               <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
                 {billetera.nombre}
               </h1>
               {billetera.es_principal && (
-                <span className={`${styles.principal} ${isLight ? styles.textLight : styles.textDark}`}>
-                  Principal
+                <span
+                  className={`${styles.starBadge} ${isLight ? styles.starLight : styles.starDark}`}
+                  title="Billetera principal"
+                  aria-label="Billetera principal"
+                >
+                  <Star size={18} strokeWidth={2.4} />
+                </span>
+              )}
+              {billetera.es_inversion && (
+                <span
+                  className={`${styles.inversionBadge} ${isLight ? styles.inversionLight : styles.inversionDark}`}
+                  title="Cuenta de inversión"
+                  aria-label="Cuenta de inversión"
+                >
+                  <TrendingUp size={18} strokeWidth={2.4} />
                 </span>
               )}
             </div>
 
-            <button
-              type="button"
-              className={styles.headerEditBtn}
-              onClick={handleEditarBilletera}
-              title="Editar billetera"
-              aria-label="Editar billetera"
-            >
-              <Edit2 size={14} />
-            </button>
-
-            {billetera.estado !== 'archivada' && (
+            {/* Acciones */}
+            <div className={styles.headerActions}>
               <button
                 type="button"
-                className={styles.headerActualizarBtn}
-                onClick={() => setIsActualizarModalOpen(true)}
-                title="Actualizar saldo"
-                aria-label="Actualizar saldo"
+                className={styles.headerEditBtn}
+                onClick={handleEditarBilletera}
+                title="Editar billetera"
+                aria-label="Editar billetera"
               >
-                <RefreshCw size={13} />
-                <span>Actualizar saldo</span>
+                <Edit2 size={14} />
               </button>
-            )}
 
-            {billetera.estado !== 'archivada' && billetera.tiene_punto_partida && (
-              <button
-                type="button"
-                className={styles.headerActualizarBtn}
-                onClick={() => setIsFechaSaldoModalOpen(true)}
-                title="Fecha del saldo"
-                aria-label="Fecha del saldo"
-              >
-                <Calendar size={13} />
-                <span>Fecha del saldo</span>
-              </button>
-            )}
+              {billetera.estado !== 'archivada' && (
+                <button
+                  type="button"
+                  className={styles.headerActualizarBtn}
+                  onClick={() => setIsActualizarModalOpen(true)}
+                  title="Actualizar saldo"
+                  aria-label="Actualizar saldo"
+                >
+                  <RefreshCw size={13} />
+                  <span>Actualizar saldo</span>
+                </button>
+              )}
+
+              {billetera.estado !== 'archivada' && billetera.tiene_punto_partida && (
+                <button
+                  type="button"
+                  className={styles.headerActualizarBtn}
+                  onClick={() => setIsFechaSaldoModalOpen(true)}
+                  title="Fecha del saldo"
+                  aria-label="Fecha del saldo"
+                >
+                  <Calendar size={13} />
+                  <span>Fecha del saldo</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Saldo */}
@@ -575,13 +582,14 @@ const BilleteraDetallePage: React.FC = () => {
           <div className={styles.rendimientoCard}>
             <div className={styles.rendimientoLeft}>
               <div className={styles.rendimientoIconCircle}>
-                <TrendingUp size={20} strokeWidth={2.2} />
+                <TrendingUp size={16} strokeWidth={2.4} />
               </div>
               <div className={styles.rendimientoInfo}>
                 <div className={styles.rendimientoHeaderRow}>
-                  <span className={styles.rendimientoTitle}>Rendimiento estimado</span>
-                  <span className={styles.rendimientoBadgeEstimado}>Estimado</span>
-                  <span className={styles.rendimientoTnaTag}>TNA {billetera.tna}%</span>
+                  <span className={styles.rendimientoTitle}>Rendimiento</span>
+                  <span className={styles.rendimientoTnaTag} title={`Tasa según ${tasaFuenteNombre}`}>
+                    TNA {billetera.tna}%
+                  </span>
                 </div>
                 <div className={styles.rendimientoMontoRow}>
                   <span className={styles.rendimientoMonto}>
@@ -593,35 +601,24 @@ const BilleteraDetallePage: React.FC = () => {
                       : 'calculando...'}
                   </span>
                 </div>
-                <div className={styles.rendimientoDisclaimer}>
-                  {rendimientoEstimado?.tasa_vieja ? (
-                    <span>
-                      No tenemos la tasa actualizada de {entidadNombre} (último dato del {formatDiaMesAnio(rendimientoEstimado.fecha_dato_tasa)}). Cuando te paguen, anotalo con «Registrar rendimiento».
-                    </span>
-                  ) : rendimientoEstimado?.origen_tasa === 'manual' ? (
+                {rendimientoEstimado?.tasa_vieja ? (
+                  <div className={styles.rendimientoDisclaimer}>
+                    <span>Tasa desactualizada ({formatDiaMesAnio(rendimientoEstimado.fecha_dato_tasa)})</span>
+                  </div>
+                ) : (rendimientoEstimado?.origen_tasa === 'manual' && rendimientoEstimado?.tna_automatica != null) ? (
+                  <div className={styles.rendimientoDisclaimer}>
                     <div className={styles.rendimientoManualRow}>
-                      <span>
-                        {billetera.tna}% TNA · tasa que cargaste.
-                        {rendimientoEstimado.tna_automatica != null && ` La de hoy de ${entidadNombre} es ${rendimientoEstimado.tna_automatica}%. `}
-                      </span>
-                      {rendimientoEstimado.tna_automatica != null && (
-                        <button
-                          type="button"
-                          className={styles.usarAutomaticaBtn}
-                          onClick={handleUsarTasaAutomatica}
-                        >
-                          Usar la automática
-                        </button>
-                      )}
+                      <span>Hoy en {entidadNombre}: {rendimientoEstimado.tna_automatica}%.</span>
+                      <button
+                        type="button"
+                        className={styles.usarAutomaticaBtn}
+                        onClick={handleUsarTasaAutomatica}
+                      >
+                        Usar automática
+                      </button>
                     </div>
-                  ) : (
-                    <span>
-                      {billetera.tna}% TNA · tasa de hoy de {tasaFuenteNombre}
-                      {rendimientoEstimado?.fecha_dato_tasa ? ` (dato del ${formatDiaMes(rendimientoEstimado.fecha_dato_tasa)})` : ''}
-                      {rendimientoEstimado?.tope != null && rendimientoEstimado.tope > 0 ? `. Rinde hasta ${formatMonto(rendimientoEstimado.tope, billetera.moneda)}.` : ''}
-                    </span>
-                  )}
-                </div>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -631,8 +628,9 @@ const BilleteraDetallePage: React.FC = () => {
                 className={styles.registrarRendimientoBtn}
                 onClick={() => setIsRegistrarModalOpen(true)}
               >
-                <Plus size={16} strokeWidth={2.5} />
-                Registrar rendimiento
+                <Plus size={14} strokeWidth={2.5} />
+                <span className={styles.btnTextShort}>Registrar</span>
+                <span className={styles.btnTextLong}>Registrar rendimiento</span>
               </button>
             </div>
           </div>

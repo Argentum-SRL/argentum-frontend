@@ -216,28 +216,28 @@ export default function GoalDetailModal({
     >
       <div 
         className={styles.modalContainer}
+        data-modal-frame
       >
-        {/* ── Modal Body (Scrollable Content) ─────────────────────────── */}
-        <div className={styles.body}>
-          
-          {/* Header integrado en el flujo de scroll */}
-          <div className={styles.formHeader}>
-            <div className={styles.headerLeft}>
-              <h2 className={styles.headerTitle}>Detalle de meta</h2>
-            </div>
-            <div className={styles.headerRightActions}>
-              <button 
-                type="button" 
-                className={styles.closeBtn} 
-                onClick={onClose}
-                aria-label="Cerrar"
-                title="Cerrar"
-              >
-                <X size={18} strokeWidth={1.75} />
-              </button>
-            </div>
+        {/* Header integrado */}
+        <div className={styles.formHeader}>
+          <div className={styles.headerLeft}>
+            <h2 className={styles.headerTitle}>Detalle de meta</h2>
           </div>
+          <div className={styles.headerRightActions}>
+            <button 
+              type="button" 
+              className={styles.closeBtn} 
+              onClick={onClose}
+              aria-label="Cerrar"
+              title="Cerrar"
+            >
+              <X size={18} strokeWidth={1.75} />
+            </button>
+          </div>
+        </div>
 
+        {/* ── Modal Body (Scrollable Content) ─────────────────────────── */}
+        <div className={styles.body} data-modal-stack>
           {/* Tarjeta de Identidad de la Meta */}
           <div className={styles.identityCard}>
             <div 
@@ -475,6 +475,7 @@ export default function GoalDetailModal({
               onClick={handleDeleteGoal}
               title="Eliminar meta"
               aria-label="Eliminar meta"
+              data-modal-delete
             >
               <Trash2 size={15} />
             </button>

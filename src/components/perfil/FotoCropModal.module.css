@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px var(--modal-pad-x) 10px; /* Separación lateral oficial */
+  padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
   flex-shrink: 0;
 }
 
@@ -55,10 +55,9 @@
 }
 
 .formBody {
-  padding: 14px var(--modal-pad-x); /* Separación lateral oficial */
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -75,7 +74,7 @@
 
 .formFooter {
   padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
-  border-top: 1px solid var(--surface-alt);
+  border-top: none;
   background: var(--surface);
   display: flex;
   gap: var(--modal-footer-gap); /* Separación oficial entre botones del pie */

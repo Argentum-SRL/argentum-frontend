@@ -131,6 +131,7 @@
 .forgotContainer {
   display: flex;
   justify-content: flex-end;
+  /* r03-ok: alineacion optica vertical de enlace olvide contrasena */
   margin-top: -8px;
   margin-bottom: 20px;
 }

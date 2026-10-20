@@ -9,7 +9,7 @@
 
 @media (min-width: 768px) {
   .root {
-    gap: 28px;
+    gap: 24px;
   }
 }
 
@@ -24,7 +24,7 @@
 .titleGroup {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
   flex: 1;
 }
@@ -107,9 +107,10 @@
 
 @media (max-width: 767px) {
   .grid > *:not(button) {
-    margin-bottom: -100px; /* Fuerte superposición tipo billetera real */
+    /* r03-ok: solapamiento intencional para pila de tarjetas tipo billetera real */
+    margin-bottom: -100px;
     position: relative;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1), margin 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1), margin 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
   }
 }
 
@@ -118,7 +119,7 @@
   .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+    gap: 12px;
     align-items: start;
     padding-bottom: 0;
   }
@@ -186,7 +187,7 @@
 .emptyBtn {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   margin-top: 8px;
   padding: 0 22px;
   height: 44px;

@@ -2,7 +2,7 @@
 .demoGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 22px;
+  gap: 20px;
   width: 100%;
 }
 
@@ -16,7 +16,7 @@
 .variantCard {
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 18px;
+  border-radius:18px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@
   font-size: 11px;
   font-weight: 700;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius:6px;
   background: var(--surface-alt);
   color: var(--text-2);
 }
@@ -65,7 +65,7 @@
 /* ── Canvas de Demostración ─────────────────────────────────────────────── */
 .demoCanvas {
   background: var(--page);
-  border-radius: 14px;
+  border-radius:14px;
   padding: 20px;
   min-height: 120px;
   display: flex;
@@ -88,7 +88,7 @@
   gap: 8px;
   width: 100%;
   padding: 10px 16px;
-  border-radius: 12px;
+  border-radius:12px;
   background: var(--surface-alt);
   border: 1.5px solid var(--border);
   color: var(--text);
@@ -110,7 +110,7 @@
   background: rgba(201, 162, 39, 0.18) !important;
   color: var(--gold) !important;
   border-color: var(--gold) !important;
-  box-shadow: 0 0 14px rgba(201, 162, 39, 0.25);
+  box-shadow: var(--elevation-glow-gold);
 }
 
 /* ==========================================================================
@@ -136,7 +136,7 @@
   gap: 8px;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius:10px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
@@ -160,7 +160,7 @@
 .segmentedBorderRow {
   display: flex;
   width: 100%;
-  gap: 10px;
+  gap: 8px;
 }
 
 .segmentedBorderPill {
@@ -172,7 +172,7 @@
   gap: 8px;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
@@ -201,7 +201,7 @@
   width: 100%;
   background: var(--surface-3);
   padding: 4px;
-  border-radius: 12px;
+  border-radius:12px;
   gap: 4px;
 }
 
@@ -213,7 +213,7 @@
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: 9px;
+  border-radius:9px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
@@ -235,18 +235,18 @@
 .renewalList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
 .renewalOption {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 14px 16px;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 14px;
+  border-radius:14px;
   cursor: pointer;
   transition: all 160ms ease;
 }
@@ -258,13 +258,13 @@
 .renewalOptionActive {
   border-color: var(--gold) !important;
   background: var(--surface) !important;
-  box-shadow: 0 0 10px rgba(201, 162, 39, 0.15);
+  box-shadow: var(--elevation-glow-gold);
 }
 
 .renewalRadio {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border-radius:50%;
   border: 2px solid var(--border);
   display: flex;
   align-items: center;
@@ -280,7 +280,7 @@
 .renewalRadioDot {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  border-radius:50%;
   background: var(--gold);
 }
 
@@ -305,7 +305,7 @@
 .paymentGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -318,7 +318,7 @@
   padding: 14px 10px;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   cursor: pointer;
   color: var(--text-2);
   font-family: inherit;
@@ -343,12 +343,12 @@
 .surfaceDemoBox {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
   padding: 16px;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 14px;
+  border-radius:14px;
   cursor: pointer;
   transition: all 180ms ease;
 }
@@ -359,13 +359,13 @@
 
 .surfaceDemoBoxActive {
   border-color: var(--gold) !important;
-  box-shadow: 0 0 12px rgba(201, 162, 39, 0.2);
+  box-shadow: var(--elevation-glow-gold);
 }
 
 .surfaceIconBox {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius:10px;
   background: rgba(201, 162, 39, 0.14);
   color: var(--gold);
   display: flex;
@@ -377,7 +377,7 @@
 .surfaceTextBox {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .surfaceTextTitle {
@@ -397,13 +397,13 @@
 .buttonsStack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
 .modalButtonsPair {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -415,7 +415,7 @@
   justify-content: center;
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   color: var(--text);
   font-size: 13px;
   font-weight: 600;
@@ -436,7 +436,7 @@
   justify-content: center;
   background: var(--primary);
   border: 1px solid var(--primary);
-  border-radius: 12px;
+  border-radius:12px;
   color: #fff;
   font-size: 13px;
   font-weight: 700;
@@ -480,7 +480,7 @@
   padding: 0 14px;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   color: var(--text);
   font-size: 14px;
   font-family: inherit;
@@ -534,7 +534,7 @@
 .txAmountsCompare {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -544,7 +544,7 @@
   justify-content: space-between;
   padding: 12px 14px;
   background: var(--surface);
-  border-radius: 12px;
+  border-radius:12px;
   border: 1px solid var(--border);
 }
 
@@ -573,7 +573,7 @@
   width: 100%;
   padding: 16px 20px;
   background: var(--surface-3);
-  border-radius: 16px;
+  border-radius:16px;
   text-align: center;
 }
 
@@ -605,15 +605,15 @@
 }
 
 .modalFrameRadius16 {
-  border-radius: 16px;
+  border-radius:16px;
 }
 
 .modalFrameRadius20 {
-  border-radius: 20px;
+  border-radius:20px;
 }
 
 .modalFrameRadius24 {
-  border-radius: 24px;
+  border-radius:20px;
 }
 
 .modalFrameHeader {
@@ -633,7 +633,7 @@
 .modalFrameClose {
   width: 26px;
   height: 26px;
-  border-radius: 50%;
+  border-radius:50%;
   background: var(--surface-alt);
   border: none;
   display: flex;
@@ -662,7 +662,7 @@
   gap: 8px;
   padding: 12px 18px;
   background: var(--page);
-  border-top: 1px solid var(--border);
+  border-top: none;
 }
 
 /* ==========================================================================
@@ -673,7 +673,7 @@
   align-items: center;
   background: var(--surface);
   padding: 4px;
-  border-radius: 26px;
+  border-radius:26px;
   border: 1px solid var(--border);
   box-shadow: var(--elevation-md);
   gap: 4px;
@@ -684,7 +684,7 @@
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border-radius: 20px;
+  border-radius:20px;
   border: none;
   background: transparent;
   color: var(--text-2);
@@ -708,7 +708,7 @@
   width: 100%;
   background: var(--surface);
   padding: 10px 14px;
-  border-radius: 18px;
+  border-radius:18px;
   border: 1px solid var(--border);
   box-shadow: var(--elevation-sm);
 }
@@ -738,7 +738,7 @@
 .badgesGroupWrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -749,7 +749,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius:8px;
   font-size: 12px;
   font-weight: 700;
 }
@@ -781,9 +781,9 @@
 .alertBoxBanner {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 12px 16px;
-  border-radius: 12px;
+  border-radius:12px;
   width: 100%;
   font-size: 13px;
   box-sizing: border-box;
@@ -820,13 +820,13 @@
   width: 100%;
   padding: 16px;
   background: var(--surface);
-  border-radius: 14px;
+  border-radius:14px;
   border: 1px solid var(--border);
 }
 
 .skeletonLine {
   height: 14px;
-  border-radius: 6px;
+  border-radius:6px;
   background: linear-gradient(90deg, var(--surface-alt) 25%, var(--border) 50%, var(--surface-alt) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite;
@@ -835,7 +835,7 @@
 .skeletonCircle {
   width: 44px;
   height: 44px;
-  border-radius: 50%;
+  border-radius:50%;
   background: var(--surface-alt);
 }
 
@@ -850,7 +850,7 @@
 .switchesStack {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -860,7 +860,7 @@
   justify-content: space-between;
   padding: 12px 16px;
   background: var(--surface);
-  border-radius: 12px;
+  border-radius:12px;
   border: 1px solid var(--border);
   cursor: pointer;
 }
@@ -874,7 +874,7 @@
 .switchTrack {
   width: 46px;
   height: 26px;
-  border-radius: 13px;
+  border-radius:13px;
   background: var(--surface-alt);
   border: 1px solid var(--border);
   position: relative;
@@ -890,13 +890,13 @@
 .switchThumb {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border-radius:50%;
   background: #fff;
   position: absolute;
   top: 2px;
   left: 2px;
   transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: var(--elevation-xs);
 }
 
 .switchThumbOn {

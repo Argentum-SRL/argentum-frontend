@@ -11,7 +11,6 @@ import {
   ArrowLeftRight,
   Receipt,
   History,
-  ArrowDownLeft,
   ChevronLeft,
   ChevronRight,
   RefreshCw,
@@ -28,6 +27,7 @@ import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { EmptyState, Skeleton } from '@/components/ui'
 import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import styles from './PresupuestoDetailModal.module.css'
 
 interface PresupuestoDetailModalProps {
@@ -360,50 +360,45 @@ export default function PresupuestoDetailModal({
       showHeader={false}
       noPadding
       autoHeight
+      stepDots={{ total: 2, current: step - 1 }}
       ariaLabel={`Detalle de ${presupuesto.nombre}`}
       className={styles.modalDialog}
     >
       <div 
         className={styles.slidesContainer}
       >
-        {/* Indicador de pasos superior centrado (Pill Dots) */}
-        <div className={styles.stepDots} aria-hidden="true">
-          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-        </div>
-
         {/* ──── SOLAPA 1: Resumen y métricas del presupuesto ──── */}
         {step === 1 && (
-          <div className={`${styles.slide} ${animClass}`}>
-            {/* Modal Body (Scrollable Content) */}
-            <div className={styles.body}>
-              {/* Header integrado */}
-              <div className={styles.formHeader}>
-                <div className={styles.headerLeft}>
-                  <h2 className={styles.headerTitle}>Detalle de presupuesto</h2>
-                </div>
-                <div className={styles.headerRightActions}>
-                  <button 
-                    type="button" 
-                    className={styles.nextSlideBtn} 
-                    onClick={() => handleGoStep(2)}
-                    aria-label="Ver gastos e historial"
-                    title="Ver gastos e historial"
-                  >
-                    <ChevronRight size={18} strokeWidth={2} />
-                  </button>
-                  <button 
-                    type="button" 
-                    className={styles.closeBtn} 
-                    onClick={onClose}
-                    aria-label="Cerrar"
-                    title="Cerrar"
-                  >
-                    <X size={18} strokeWidth={1.75} />
-                  </button>
-                </div>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
+            {/* Header integrado */}
+            <div className={styles.formHeader}>
+              <div className={styles.headerLeft}>
+                <h2 className={styles.headerTitle}>Detalle de presupuesto</h2>
               </div>
+              <div className={styles.headerRightActions}>
+                <button 
+                  type="button" 
+                  className={styles.nextSlideBtn} 
+                  onClick={() => handleGoStep(2)}
+                  aria-label="Ver gastos e historial"
+                  title="Ver gastos e historial"
+                >
+                  <ChevronRight size={18} strokeWidth={2} />
+                </button>
+                <button 
+                  type="button" 
+                  className={styles.closeBtn} 
+                  onClick={onClose}
+                  aria-label="Cerrar"
+                  title="Cerrar"
+                >
+                  <X size={18} strokeWidth={1.75} />
+                </button>
+              </div>
+            </div>
 
+            {/* Modal Body (Scrollable Content) */}
+            <div className={styles.body} data-modal-stack>
               {/* Tarjeta de Identidad */}
               <div className={styles.identityCard}>
                 <div className={styles.budgetAvatar} style={avatarStyle}>
@@ -598,6 +593,7 @@ export default function PresupuestoDetailModal({
                   onClick={handleDelete}
                   title="Eliminar presupuesto"
                   aria-label="Eliminar presupuesto"
+                  data-modal-delete
                 >
                   <Trash2 size={15} />
                 </button>
@@ -617,35 +613,35 @@ export default function PresupuestoDetailModal({
 
         {/* ──── SOLAPA 2: Movimientos de Gastos e Historial de Ciclos ──── */}
         {step === 2 && (
-          <div className={`${styles.slide} ${animClass}`}>
-            <div className={styles.body}>
-              {/* Header integrado con botón volver y cerrar */}
-              <div className={styles.formHeader}>
-                <div className={styles.headerLeft}>
-                  <button 
-                    type="button" 
-                    className={styles.backBtn} 
-                    onClick={() => handleGoStep(1)}
-                    aria-label="Volver al resumen"
-                    title="Volver"
-                  >
-                    <ChevronLeft size={18} strokeWidth={2.2} />
-                  </button>
-                  <h2 className={styles.headerTitle}>Gastos e historial</h2>
-                </div>
-                <div className={styles.headerRightActions}>
-                  <button 
-                    type="button" 
-                    className={styles.closeBtn} 
-                    onClick={onClose}
-                    aria-label="Cerrar"
-                    title="Cerrar"
-                  >
-                    <X size={18} strokeWidth={1.75} />
-                  </button>
-                </div>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
+            {/* Header integrado con botón volver y cerrar */}
+            <div className={styles.formHeader}>
+              <div className={styles.headerLeft}>
+                <button 
+                  type="button" 
+                  className={styles.backBtn} 
+                  onClick={() => handleGoStep(1)}
+                  aria-label="Volver al resumen"
+                  title="Volver"
+                >
+                  <ChevronLeft size={18} strokeWidth={2.2} />
+                </button>
+                <h2 className={styles.headerTitle}>Gastos e historial</h2>
               </div>
+              <div className={styles.headerRightActions}>
+                <button 
+                  type="button" 
+                  className={styles.closeBtn} 
+                  onClick={onClose}
+                  aria-label="Cerrar"
+                  title="Cerrar"
+                >
+                  <X size={18} strokeWidth={1.75} />
+                </button>
+              </div>
+            </div>
 
+            <div className={styles.body} data-modal-stack>
               <SegmentedControl<'gastos' | 'historial'>
                 options={[
                   {
@@ -668,7 +664,7 @@ export default function PresupuestoDetailModal({
               />
 
               {/* Contenido de la pestaña activa */}
-              <div className={styles.contentSection}>
+              <div className={styles.contentSection} data-modal-block>
                 {activeTab === 'gastos' ? (
                   loadingTx ? (
                     <div className={styles.txList} aria-hidden="true">
@@ -714,7 +710,16 @@ export default function PresupuestoDetailModal({
                           <div key={t.id} className={styles.txItem}>
                             <div className={styles.txLeft}>
                               <div className={styles.txIconWrap}>
-                                <ArrowDownLeft size={13} strokeWidth={2.5} />
+                                <MovimientoAvatar
+                                  movimiento={{
+                                    descripcion: t.descripcion,
+                                    suscripcion_id: t.suscripcion_id,
+                                    subcategoria: t.subcategoria,
+                                    categoria_nombre: catName,
+                                    tipo: t.tipo || 'egreso',
+                                  }}
+                                  size={24}
+                                />
                               </div>
                               <div className={styles.txDetails}>
                                 <span className={styles.txTitle}>
@@ -738,8 +743,8 @@ export default function PresupuestoDetailModal({
                   loadingHistorial ? (
                     <div className={styles.historyList} aria-hidden="true">
                       {[1, 2, 3].map(i => (
-                        <div key={i} style={{ padding: '14px', background: 'var(--surface-alt)', borderRadius: '12px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <div key={i} className={styles.historySkeletonCard}>
+                          <div className={styles.historySkeletonHeader}>
                             <Skeleton variant="text" width={110} height={14} />
                             <Skeleton variant="text" width={70} height={14} />
                           </div>

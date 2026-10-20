@@ -28,6 +28,38 @@
 
 .formBody {
   padding: 16px var(--modal-pad-x); /* Separación lateral oficial */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.formBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.formBody::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px var(--modal-pad-x) 10px; /* Separación lateral oficial */
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.formBody {
+  padding: 16px var(--modal-pad-x); /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
   gap: var(--modal-field-gap); /* Separación estándar entre campos */
@@ -45,37 +77,12 @@
   border-radius: 4px;
 }
 
-/* ── Step Indicator Dots ─────────────────────────────────────────────────── */
-.stepDots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 20px 0;
-  flex-shrink: 0;
-}
 
-.stepDot {
-  height: 5px;
-  border-radius: 99px;
-  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
-  background: var(--surface-alt);
-}
-
-.stepDotActive {
-  background: var(--primary);
-  width: 20px;
-}
-
-.stepDotInactive {
-  width: 6px;
-  opacity: 0.4;
-}
 
 /* ── Botones y Footer ─────────────────────────────────────────────────────── */
 .formFooter {
   padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
-  border-top: 1px solid var(--surface-alt);
+  border-top: none;
   background: var(--surface);
   display: flex;
   flex-direction: column;
@@ -260,7 +267,7 @@
 .radioGroup {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .radioRow {

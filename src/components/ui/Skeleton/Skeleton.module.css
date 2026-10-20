@@ -24,20 +24,20 @@
 
 .text {
   height: 14px;
-  border-radius: 6px;
+  border-radius:6px;
 }
 
 .circular {
-  border-radius: 50%;
+  border-radius:50%;
   flex-shrink: 0;
 }
 
 .rounded {
-  border-radius: 12px;
+  border-radius:12px;
 }
 
 .rectangular {
-  border-radius: 8px;
+  border-radius:8px;
 }
 
 .srOnly {
@@ -45,9 +45,11 @@
   width: 1px;
   height: 1px;
   padding: 0;
+  /* r03-ok: colapso de 1px para accesibilidad y lectores de pantalla */
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border-width: 0;
 }
@@ -63,6 +65,7 @@
 
 @media (max-width: 767px) {
   .cardsGridOverlap > * {
+    /* r03-ok: solapamiento intencional del esqueleto de tarjetas apiladas */
     margin-bottom: -100px;
     position: relative;
   }
@@ -75,7 +78,7 @@
   .cardsGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+    gap: 12px;
     padding-bottom: 0;
   }
   .cardsGridOverlap > * {
@@ -85,7 +88,7 @@
 
 .cardSkeleton {
   height: 140px;
-  border-radius: 18px;
+  border-radius:18px;
   background: linear-gradient(
     90deg,
     var(--surface-alt) 0%,
@@ -99,7 +102,7 @@
 @media (min-width: 768px) {
   .cardSkeleton {
     height: unset;
-    border-radius: 20px;
+    border-radius:20px;
     aspect-ratio: 1.75 / 1;
   }
 }
@@ -115,21 +118,21 @@
 .dayGroupSkeleton {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
 .dayHeaderSkeleton {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 2px 4px;
 }
 
 .txContainerCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius:16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -138,7 +141,7 @@
 .txRowSkeleton {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 13px 16px;
   border-bottom: 1px solid var(--border);
 }
@@ -174,7 +177,7 @@
 .cuotasMetricsBar {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius:16px;
   padding: 16px 20px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -190,23 +193,23 @@
 .cuotasList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .cuotasCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius:14px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .cuotasCardTop {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 /* ── 4. Transferencias Skeleton ──────────────────────────────────────────── */
@@ -220,18 +223,18 @@
 .transferRowSkeleton {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 14px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius:14px;
 }
 
 /* ── 5. Importación de Resumen Skeleton ──────────────────────────────────── */
 .importWrapper {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius:20px;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -251,7 +254,7 @@
 .importDropzone {
   min-height: 180px;
   border: 2px dashed var(--border);
-  border-radius: 16px;
+  border-radius:16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -278,7 +281,7 @@
 
 .billeteraHeroCard {
   height: 180px;
-  border-radius: 24px;
+  border-radius:20px;
   width: 100%;
   background: linear-gradient(
     90deg,
@@ -307,7 +310,7 @@
 .summaryBarSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius:16px;
   padding: 16px 20px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -336,7 +339,7 @@
 
 .suscripcionCardSkeleton {
   height: 120px;
-  border-radius: 16px;
+  border-radius:16px;
   background: linear-gradient(
     90deg,
     var(--surface-alt) 0%,
@@ -351,7 +354,7 @@
 .tableContainerSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius:16px;
   overflow: hidden;
   width: 100%;
 }
@@ -388,9 +391,9 @@
 .goalsMobileChartSkeleton {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   height: 140px;
-  border-radius: 18px;
+  border-radius:18px;
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 16px;
@@ -419,7 +422,7 @@
 .goalCardSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius:20px;
   padding: 22px;
   display: flex;
   flex-direction: column;
@@ -462,11 +465,11 @@
 .presupuestoCardSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius:20px;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .presupuestoHeader {
@@ -479,7 +482,7 @@
 .tarjetaSummarySkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius:18px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -503,7 +506,7 @@
 
 .tarjetaSummaryActions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-top: 4px;
 }
 
@@ -512,7 +515,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   padding: 10px 0;
   width: 100%;
 }
@@ -523,7 +526,7 @@
   gap: 12px;
   width: 100%;
   background: var(--surface-alt);
-  border-radius: 14px;
+  border-radius:14px;
   padding: 16px;
 }
 
@@ -542,7 +545,7 @@
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius:20px;
   padding: 32px 28px;
   display: flex;
   flex-direction: column;

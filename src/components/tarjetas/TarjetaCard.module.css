@@ -242,11 +242,12 @@
   width: 100% !important;
   max-width: 100% !important;
   height: 100% !important;
-  box-shadow: none !important;
+  box-shadow: none;
   border-radius: inherit !important;
 }
 
 .cardBack {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -258,8 +259,11 @@
 .magneticStripe {
   background: #0f172a;
   height: clamp(22px, 9cqi, 32px);
+  /* r03-ok: sangrado a los bordes laterales para banda magnetica completa */
   margin-left: clamp(-20px, -5.5cqi, -12px);
+  /* r03-ok: sangrado a los bordes laterales para banda magnetica completa */
   margin-right: clamp(-20px, -5.5cqi, -12px);
+  /* r03-ok: alineacion optica superior de banda magnetica en tarjeta */
   margin-top: clamp(-6px, -2cqi, -2px);
   box-shadow: var(--elevation-xs);
 }
@@ -333,7 +337,7 @@
 .backActions {
   display: flex;
   justify-content: center;
-  gap: clamp(6px, 2.5cqi, 10px);
+  gap: clamp(6px, 2.5cqi, 8px);
   margin-top: auto;
   margin-bottom: clamp(2px, 1cqi, 6px);
   z-index: 5;

@@ -94,7 +94,7 @@
 .modeText {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex: 1;
 }
 
@@ -168,7 +168,7 @@
 .dayPickerContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .quickDaysRow {
@@ -262,7 +262,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 3px;
+  gap: 2px;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -322,7 +322,7 @@
 .businessDayCards {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 @media (min-width: 520px) {
@@ -384,7 +384,7 @@
 .businessCardContent {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex: 1;
 }
 
@@ -475,7 +475,7 @@
 .previewCard {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 14px 16px;
   background: linear-gradient(135deg, rgba(72, 120, 184, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
   border: 1.5px solid rgba(72, 120, 184, 0.25);
@@ -505,7 +505,7 @@
 .previewContent {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex: 1;
   min-width: 200px;
 }
@@ -532,7 +532,7 @@
 .previewBadge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 0.725rem;
   font-weight: 600;
   padding: 4px 10px;

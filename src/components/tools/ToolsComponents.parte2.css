@@ -203,7 +203,7 @@
 .bannerText {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .bannerTitle {
@@ -268,7 +268,7 @@
   border-radius: 16px;
   padding: 18px 20px;
   display: flex;
-  gap: 14px;
+  gap: 12px;
   align-items: flex-start;
   animation: fadeSlideUp 0.35s ease both;
 }
@@ -319,7 +319,7 @@
 .semBody {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .semLabel {
@@ -341,7 +341,7 @@
 .metricsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 @media (min-width: 480px) {
@@ -434,7 +434,7 @@
 .progressFill {
   height: 100%;
   border-radius: 99px;
-  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .progressGreen  { background: var(--success); }
@@ -446,7 +446,7 @@
 .interestCallout {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   background: rgba(240, 180, 40, 0.08);
   border: 1px solid rgba(240, 180, 40, 0.2);
   border-radius: 12px;
@@ -481,7 +481,7 @@
   font-size: 12px;
   color: var(--text-3);
   line-height: 1.5;
-  border-top: 1px solid var(--border);
+  border-top: none;
   padding-top: 16px;
 }
 

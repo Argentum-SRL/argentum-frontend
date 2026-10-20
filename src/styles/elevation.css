@@ -73,6 +73,18 @@
   --elevation-reach-selection-modal: 44px;
   --elevation-reach-selection-carousel: 20px;
 
+  /* ── Tokens Semánticos Específicos ── */
+  --elevation-focus-error: 0 0 0 2px var(--error-bg);
+  --elevation-reach-focus-error: 2px;
+  --elevation-atmospheric: 0 24px 60px -12px rgba(20, 22, 29, 0.08),
+                           0 6px 18px -4px rgba(194, 94, 46, 0.05),
+                           inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --elevation-reach-atmospheric: 84px;
+  --elevation-glow-gold: 0 0 14px rgba(201, 162, 39, 0.25);
+  --elevation-reach-glow-gold: 14px;
+  --elevation-glow-success: 0 0 6px rgba(34, 197, 94, 0.4);
+  --elevation-reach-glow-success: 6px;
+
   /* ── Backward Compatibility Aliases ── */
   --shadow-none: var(--elevation-none);
   --shadow-xs: var(--elevation-xs);
@@ -129,6 +141,13 @@
   /* Píldora activa de la cápsula (dark mode) */
   --elevation-pill: 0 2px 8px -1px rgba(0, 0, 0, 0.55),
                     0 1px 3px rgba(0, 0, 0, 0.35);
+
+  --elevation-focus-error: 0 0 0 2px var(--error-bg);
+  --elevation-atmospheric: 0 28px 72px -12px rgba(0, 0, 0, 0.70),
+                           0 6px 20px -4px rgba(56, 189, 248, 0.04),
+                           inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --elevation-glow-gold: 0 0 14px rgba(201, 162, 39, 0.25);
+  --elevation-glow-success: 0 0 6px rgba(34, 197, 94, 0.4);
 }
 
 /* ==========================================================================
@@ -136,7 +155,7 @@
    ========================================================================== */
 
 .elevation-none {
-  box-shadow: var(--elevation-none) !important;
+  box-shadow: var(--elevation-none);
 }
 
 .elevation-xs {

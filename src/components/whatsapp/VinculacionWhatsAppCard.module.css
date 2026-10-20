@@ -179,7 +179,7 @@
 .timerBadge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 0.75rem;
   color: var(--text-2);
   background: var(--surface);

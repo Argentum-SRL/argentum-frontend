@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, TrendingUp, Lightbulb } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
+import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import billeteraService from '@/services/billetera.service'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -26,8 +27,8 @@ export default function RegistrarRendimientoModal({
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
   const [prevRendimiento, setPrevRendimiento] = useState(rendimientoEstimado)
 
-  const [monto, setMonto] = useState<string>(
-    rendimientoEstimado != null && rendimientoEstimado > 0 ? String(rendimientoEstimado) : ''
+  const [monto, setMonto] = useState<number | null>(
+    rendimientoEstimado != null && rendimientoEstimado > 0 ? rendimientoEstimado : null
   )
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
@@ -35,22 +36,23 @@ export default function RegistrarRendimientoModal({
     setPrevIsOpen(isOpen)
     setPrevRendimiento(rendimientoEstimado)
     if (isOpen) {
-      setMonto(rendimientoEstimado != null && rendimientoEstimado > 0 ? String(rendimientoEstimado) : '')
+      setMonto(rendimientoEstimado != null && rendimientoEstimado > 0 ? rendimientoEstimado : null)
       setIsSubmitting(false)
     }
   }
 
   if (!isOpen || !billetera) return null
 
+  const isValid = monto !== null && !isNaN(monto) && monto > 0
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const parsedMonto = parseFloat(monto)
-    if (isNaN(parsedMonto) || parsedMonto <= 0 || isSubmitting) return
+    if (!isValid || monto === null || isSubmitting) return
 
     setIsSubmitting(true)
     try {
       const updated = await billeteraService.confirmarRendimiento(billetera.id, {
-        monto: parsedMonto,
+        monto,
       })
       sileo.success({ title: 'Rendimiento registrado exitosamente' })
       onSuccess(updated)
@@ -64,10 +66,6 @@ export default function RegistrarRendimientoModal({
     }
   }
 
-  const simboloMoneda = billetera.moneda === 'USD' ? 'US$' : '$'
-  const parsedMonto = parseFloat(monto)
-  const isValid = !isNaN(parsedMonto) && parsedMonto > 0
-
   return (
     <Modal
       isOpen={isOpen}
@@ -80,6 +78,7 @@ export default function RegistrarRendimientoModal({
       <form
         onSubmit={handleSubmit}
         className={styles.formContainer}
+        data-modal-frame
       >
         <div
           className={`${styles.formBody} ${styles.formBodyWithHeader}`}
@@ -105,31 +104,25 @@ export default function RegistrarRendimientoModal({
             </button>
           </div>
 
-          <div className={styles.formFields}>
-            <div className={styles.formField}>
-              <label className={styles.fieldLabel} htmlFor="rendimiento-monto">
-                Monto a acreditar
-              </label>
-              <div className={styles.saldoWrap}>
-                <span className={styles.saldoPrefix}>{simboloMoneda}</span>
-                <input
+          <div className={styles.formFields} data-modal-stack>
+            <div className={styles.formField} data-modal-block>
+              <div data-modal-field>
+                <MontoInput
                   id="rendimiento-monto"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  className={styles.saldoInput}
+                  label="Monto a acreditar"
                   value={monto}
-                  onChange={(e) => setMonto(e.target.value)}
-                  placeholder="0.00"
-                  required
+                  onChange={setMonto}
+                  moneda={billetera.moneda}
+                  allowDecimals
+                  placeholder="0"
                   autoFocus
                 />
+                {rendimientoEstimado != null && (
+                  <span className={styles.montoHint}>
+                    Estimado según TNA: <strong>+{formatMonto(rendimientoEstimado, billetera.moneda)}</strong>
+                  </span>
+                )}
               </div>
-              {rendimientoEstimado != null && (
-                <span className={styles.settingSub} style={{ marginTop: 4 }}>
-                  Estimado según TNA: <strong>+{formatMonto(rendimientoEstimado, billetera.moneda)}</strong>
-                </span>
-              )}
             </div>
 
             <div className={styles.warningBox} style={{ background: 'rgba(16, 185, 129, 0.08)', borderColor: 'rgba(16, 185, 129, 0.25)' }}>

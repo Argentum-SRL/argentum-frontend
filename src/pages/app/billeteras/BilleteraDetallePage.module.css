@@ -2,7 +2,7 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 @media (max-width: 767px) {
@@ -106,14 +106,14 @@
 .headerLeftCol {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
 }
 
 @media (min-width: 640px) {
   .headerLeftCol {
-    gap: 14px;
+    gap: 12px;
     flex: 1;
     width: auto;
   }
@@ -191,6 +191,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 @media (min-width: 640px) {
@@ -203,6 +204,38 @@
   .headerName {
     font-size: 20px;
   }
+}
+
+.starBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1.5px;
+}
+
+.starLight {
+  color: #FCD34D;
+}
+
+.starDark {
+  color: #D97706;
+}
+
+.inversionBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1.5px;
+}
+
+.inversionLight {
+  color: #34D399;
+}
+
+.inversionDark {
+  color: #059669;
 }
 
 .principal {
@@ -219,6 +252,21 @@
   flex-shrink: 0;
 }
 
+/* ── Header Actions ──────────────────────────────────────────────────────── */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+@media (min-width: 640px) {
+  .headerActions {
+    margin-left: 0;
+  }
+}
+
 /* ── Header Edit Button ──────────────────────────────────────────────────── */
 .headerEditBtn {
   display: flex;
@@ -233,19 +281,12 @@
   cursor: pointer;
   transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 .headerEditBtn:hover {
   background: rgba(255, 255, 255, 0.24);
   color: white;
   transform: scale(1.05);
-}
-
-@media (min-width: 640px) {
-  .headerEditBtn {
-    margin-left: 0;
-  }
 }
 
 /* ── Header Saldo — adaptable ────────────────────────────────────────────── */
@@ -367,6 +408,7 @@
   transform: scale(0.65) translateZ(0);
   transform-origin: top center;
   height: 135px;
+  /* r03-ok: alineacion optica vertical de carrusel compactado */
   margin-bottom: -5px;
 }
 
@@ -672,37 +714,37 @@
 
 .rendimientoCard {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px 20px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: var(--elevation-sm);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .rendimientoCard {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 24px;
-    gap: 20px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    gap: 16px;
   }
 }
 
 .rendimientoLeft {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
+  align-items: center;
+  gap: 8px;
   flex: 1;
+  min-width: 0;
 }
 
 .rendimientoIconCircle {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   background: rgba(16, 185, 129, 0.12);
   color: #10B981;
   display: flex;
@@ -714,74 +756,76 @@
 .rendimientoInfo {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .rendimientoHeaderRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-wrap: nowrap;
 }
 
 .rendimientoTitle {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.rendimientoBadgeEstimado {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: rgba(247, 168, 0, 0.12);
-  color: #F7A800;
-  letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .rendimientoTnaTag {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 1.5px 6px;
+  border-radius: 5px;
   background: rgba(16, 185, 129, 0.12);
   color: #10B981;
+  white-space: nowrap;
 }
 
 .rendimientoMontoRow {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .rendimientoMonto {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   color: #10B981;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.4px;
   line-height: 1.2;
 }
 
+@media (min-width: 640px) {
+  .rendimientoMonto {
+    font-size: 19px;
+  }
+}
+
 .rendimientoDias {
-  font-size: 13px;
+  font-size: 11.5px;
   color: var(--text-3);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .rendimientoDisclaimer {
   margin: 2px 0 0 0;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-3);
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 .rendimientoManualRow {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -790,7 +834,7 @@
   border: none;
   padding: 0;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--primary);
   cursor: pointer;
@@ -811,24 +855,42 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 10px;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
   background: var(--surface-alt);
   color: var(--text);
   border: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
-  width: 100%;
 }
 
-@media (min-width: 768px) {
+.btnTextLong {
+  display: none;
+}
+
+.btnTextShort {
+  display: inline;
+}
+
+@media (min-width: 640px) {
   .registrarRendimientoBtn {
-    width: auto;
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .btnTextLong {
+    display: inline;
+  }
+
+  .btnTextShort {
+    display: none;
   }
 }
 
@@ -840,28 +902,49 @@
   transform: translateY(-1px);
 }
 
+.registrarRendimientoBtn:active {
+  transform: translateY(0);
+}
+
 /* ── Botón Actualizar Saldo en Header ─────────────────────────────────────── */
 .headerActualizarBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 10px;
+  justify-content: center;
+  width: 32px;
   height: 32px;
+  padding: 0;
   border-radius: 8px;
   border: none;
   background: rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.95);
-  font-size: 12.5px;
-  font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
   flex-shrink: 0;
+}
+
+.headerActualizarBtn span {
+  display: none;
 }
 
 .headerActualizarBtn:hover {
   background: rgba(255, 255, 255, 0.24);
   color: white;
   transform: scale(1.02);
+}
+
+@media (min-width: 768px) {
+  .headerActualizarBtn {
+    width: auto;
+    padding: 0 10px;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  .headerActualizarBtn span {
+    display: inline;
+  }
 }
 
 /* ── Sección Controles de Saldo ───────────────────────────────────────────── */
@@ -908,7 +991,7 @@
 .controlInfo {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .controlFecha {

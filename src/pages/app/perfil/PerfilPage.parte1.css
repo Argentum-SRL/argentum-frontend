@@ -15,7 +15,7 @@
 @media (max-width: 640px) {
   .page {
     padding-top: max(8px, env(safe-area-inset-top, 8px));
-    gap: 14px;
+    gap: 12px;
   }
 }
 
@@ -115,7 +115,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 20px;
   z-index: 1;
   width: 100%;
 }
@@ -128,7 +128,7 @@
   .heroInner {
     flex-direction: row;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
   }
   .avatarWrapper {
     width: 56px !important;
@@ -241,7 +241,7 @@
 .heroDetails {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
   width: 100%;
@@ -251,14 +251,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .nameBadgeGroup {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -308,7 +308,7 @@
 .statusChip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 3px 9px;
   border-radius: 6px;
   font-size: 11px;
@@ -403,7 +403,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   height: 36px;
   padding: 0 16px;
   border-radius: 9px;
@@ -426,13 +426,13 @@
   background: var(--surface) !important;
   color: var(--text) !important;
   font-weight: 700 !important;
-  box-shadow: var(--elevation-xs) !important;
+  box-shadow: var(--elevation-xs);
 }
 
 [data-theme="dark"] .tabActive {
   background: var(--surface) !important;
   color: #60a5fa !important;
-  box-shadow: var(--elevation-xs) !important;
+  box-shadow: var(--elevation-xs);
 }
 
 .tabDanger {
@@ -447,7 +447,7 @@
 .tabDangerActive {
   background: rgba(239, 68, 68, 0.12) !important;
   color: var(--error, #ef4444) !important;
-  box-shadow: var(--elevation-xs) !important;
+  box-shadow: var(--elevation-xs);
 }
 
 /* ── 4. General Tab & Generic Section Cards ──────────────────────── */
@@ -472,7 +472,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   width: 100%;
   box-shadow: var(--elevation-sm);
 }
@@ -481,7 +481,7 @@
   .sectionCard {
     padding: 16px;
     border-radius: 16px;
-    gap: 14px;
+    gap: 12px;
   }
 }
 
@@ -555,7 +555,7 @@
 .actionBtnOutlineSm {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 5px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -576,7 +576,7 @@
 .fieldsGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -633,7 +633,7 @@
 .contactList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 

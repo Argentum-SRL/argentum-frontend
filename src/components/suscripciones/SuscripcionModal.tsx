@@ -1,6 +1,5 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef, useCallback } from 'react'
-import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check } from '@/components/ui/icons'
-import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
+import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Pencil } from '@/components/ui/icons'
 import { nombreInicial, preseleccionCategoria } from '@/lib/utils/sugerirCategoriaSuscripcion'
 import { ICONOS_GENERICOS } from '@/lib/constants/suscripciones'
 import Modal from '@/components/ui/Modal/Modal'
@@ -17,11 +16,13 @@ import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, TarjetaCredito, Categoria, Suscripcion, CotizacionDolar } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
+import SelectableSurface from '@/components/ui/SelectableSurface'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './SuscripcionModal.module.css'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
+import { setCachedSuscripciones } from '@/lib/utils/movimientoVisual.utils'
 
 interface SuscripcionModalProps {
   open: boolean
@@ -53,6 +54,7 @@ type FormAction =
   | { type: 'SET_STEP'; step: 1 | 2 | 3; direction: 'forward' | 'back' }
   | { type: 'SET_FIELD'; field: keyof FormState; value: string | number | boolean | null }
   | { type: 'RESET'; data?: Suscripcion | null; defaultBilleteraId?: string; defaultTarjetaId?: string }
+  | { type: 'SET_DEFAULT_PAYMENT_METHODS'; defaultBilleteraId?: string; defaultTarjetaId?: string }
 
 const getHoyLocal = (): string => {
   const d = new Date()
@@ -81,12 +83,39 @@ const initialState: FormState = {
   isSubmitting: false,
 }
 
+const getInitialFormState = (suscripcion?: Suscripcion | null): FormState => {
+  if (suscripcion) {
+    return {
+      ...initialState,
+      isEdit: true,
+      step: 2,
+      nombrePersonalizado: suscripcion.nombre,
+      monto: suscripcion.precio_actual?.monto || null,
+      moneda: suscripcion.precio_actual?.moneda || 'ARS',
+      frecuencia: suscripcion.frecuencia,
+      proximo_cobro: suscripcion.proximo_cobro,
+      metodoCobro: suscripcion.tarjeta_id ? 'tarjeta' : 'debito',
+      tarjetaId: suscripcion.tarjeta_id || '',
+      billeteraId: suscripcion.billetera_id || '',
+      categoriaId: suscripcion.categoria_id || '',
+      subcategoriaId: suscripcion.subcategoria_id || ''
+    }
+  }
+  return initialState
+}
+
 function reducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
     case 'SET_STEP':
       return { ...state, step: action.step, slideDirection: action.direction }
     case 'SET_FIELD':
       return { ...state, [action.field]: action.value }
+    case 'SET_DEFAULT_PAYMENT_METHODS':
+      return {
+        ...state,
+        billeteraId: state.billeteraId || action.defaultBilleteraId || '',
+        tarjetaId: state.tarjetaId || action.defaultTarjetaId || '',
+      }
     case 'RESET':
       if (action.data) {
         const s = action.data as Suscripcion
@@ -117,7 +146,7 @@ function reducer(state: FormState, action: FormAction): FormState {
 }
 
 const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, suscripcion, onSuccess }) => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, suscripcion, getInitialFormState)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -126,8 +155,23 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
   const [searchTerm, setSearchTerm] = useState('')
   const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({})
   const [cotizacion, setCotizacion] = useState<CotizacionDolar | null>(null)
+  const [isEditingName, setIsEditingName] = useState(false)
+
+  const [prevOpen, setPrevOpen] = useState(open)
+  const [prevSuscripcion, setPrevSuscripcion] = useState(suscripcion)
+
+  if (open !== prevOpen || suscripcion !== prevSuscripcion) {
+    setPrevOpen(open)
+    setPrevSuscripcion(suscripcion)
+    if (open) {
+      dispatch({ type: 'RESET', data: suscripcion })
+      setSearchTerm('')
+      setIsEditingName(false)
+    }
+  }
 
   useEffect(() => {
+    let isMounted = true
     const loadInitialData = async () => {
       try {
         const [b, t, c, cotiz] = (await Promise.all([
@@ -136,6 +180,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
           categoriaService.getCategorias(),
           dashboardService.getCotizacion().catch(() => null)
         ])) as [Billetera[], TarjetaCredito[], Categoria[], CotizacionDolar | null]
+        if (!isMounted) return
         const validBilleteras = sortBilleteras(b.filter(x => !x.es_efectivo && x.estado === 'activa'))
         const validTarjetas = t.filter(x => x.estado === 'activa')
         setBilleteras(validBilleteras)
@@ -149,12 +194,10 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
         const defT = validTarjetas[0]?.id || ''
         
         dispatch({ 
-          type: 'RESET', 
-          data: suscripcion, 
+          type: 'SET_DEFAULT_PAYMENT_METHODS', 
           defaultBilleteraId: defB, 
           defaultTarjetaId: defT 
         })
-        setSearchTerm('')
       } catch (error) {
         console.error(error)
       }
@@ -163,6 +206,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     if (open) {
       loadInitialData()
     }
+    return () => { isMounted = false }
   }, [open, suscripcion])
 
   const selectedMedio = useMemo(() => {
@@ -200,7 +244,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
     const timer = setTimeout(() => {
       const card = cardRefs.current.get(idToScroll)
       if (card) {
-        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+        const scroller = card.closest('[data-modal-carousel]') as HTMLElement | null
         if (scroller) {
           const cardRect = card.getBoundingClientRect()
           const scrollerRect = scroller.getBoundingClientRect()
@@ -372,6 +416,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
         await suscripcionService.createSuscripcion(payload)
         sileo.success({ title: 'Suscripción creada' })
       }
+      void suscripcionService.getSuscripciones().then(setCachedSuscripciones)
       onSuccess()
       onClose()
     } catch (error: unknown) {
@@ -383,31 +428,33 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
   const animClass = state.slideDirection === 'forward' ? styles.slideForward : styles.slideBack
 
-  const currentItemsCount = state.metodoCobro === 'tarjeta' ? tarjetas.length : billeteras.length
-
   return (
-    <Modal isOpen={open} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Nueva suscripción" className={styles.modalCustom}>
+    <Modal 
+      isOpen={open} 
+      onClose={onClose} 
+      showHeader={false} 
+      noPadding 
+      autoHeight 
+      ariaLabel={state.isEdit ? "Editar suscripción" : "Nueva suscripción"} 
+      className={styles.modalCustom}
+      stepDots={{ total: state.isEdit ? 2 : 3, current: state.isEdit ? state.step - 2 : state.step - 1 }}
+    >
       <div className={styles.slidesContainer}>
-        {/* Step Indicators */}
-        <div className={styles.stepDots}>
-          <div className={`${styles.stepDot} ${state.step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${state.step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${state.step === 3 ? styles.stepDotActive : styles.stepDotInactive}`} />
-        </div>
 
         {/* PASO 1: Selección de Servicio */}
         {state.step === 1 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={handleStep1Submit}
             >
-              <div className={styles.formHeader}>
+              <div className={styles.stepHeaderRow}>
                 <h2 className={styles.headerTitle}>¿Qué suscripción querés agregar?</h2>
                 <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
-              <div className={styles.formBody}>
+              <div className={styles.formBody} data-modal-stack>
+
                 <div className={styles.searchWrapper}>
                   <div className={styles.inputWrapperIcon}>
                     <Search size={18} className={styles.inputIconLeft} />
@@ -499,18 +546,68 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
         {/* PASO 2: Monto y Método de Cobro */}
         {state.step === 2 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={goNextFromStep2}
             >
-              <div className={styles.formHeader}>
-                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
-                <h2 className={styles.headerTitle}>Configuración de {state.nombrePersonalizado}</h2>
+              <div className={styles.stepHeaderRow}>
+                {!state.isEdit ? (
+                  <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
+                ) : <div style={{ width: 32 }} />}
+                <div className={styles.headerTitleRow}>
+                  <span className={styles.headerTitleStatic}>Configuración de</span>
+                  {isEditingName ? (
+                    <div className={styles.bankPreviewInputWrapper}>
+                      <input
+                        className={styles.bankPreviewNombreInput}
+                        value={state.nombrePersonalizado}
+                        onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
+                        onBlur={() => {
+                          if (!state.nombrePersonalizado.trim()) {
+                            dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: suscripcion?.nombre || serv?.nombre || 'Suscripción' })
+                          }
+                          setIsEditingName(false)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            if (!state.nombrePersonalizado.trim()) {
+                              dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: suscripcion?.nombre || serv?.nombre || 'Suscripción' })
+                            }
+                            setIsEditingName(false)
+                          } else if (e.key === 'Escape') {
+                            dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: suscripcion?.nombre || serv?.nombre || 'Suscripción' })
+                            setIsEditingName(false)
+                          }
+                        }}
+                        placeholder={suscripcion?.nombre || serv?.nombre || 'Nombre'}
+                        maxLength={40}
+                        autoFocus
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.bankPreviewNombreBtn}
+                      onClick={() => setIsEditingName(true)}
+                      title="Editar nombre"
+                    >
+                      <span className={styles.bankPreviewNombreText}>
+                        {state.nombrePersonalizado.trim() || suscripcion?.nombre || serv?.nombre || 'Suscripción'}
+                      </span>
+                      <span className={styles.pencilIconWrapper} aria-hidden="true">
+                        <Pencil size={13} strokeWidth={2} />
+                      </span>
+                    </button>
+                  )}
+                </div>
                 <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
-              <div className={styles.formBody}>
+              <div className={styles.formBody} data-modal-stack>
+                <div data-modal-block>
+
                 <MontoInput
                   value={state.monto}
                   onChange={(v: number | null) => dispatch({ type: 'SET_FIELD', field: 'monto', value: v })}
@@ -525,51 +622,19 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   </div>
                 )}
 
-                {(serv?.generico || state.isEdit) && (
-                  <div className={styles.formField}>
-                    <label className={styles.fieldLabel}>Nombre</label>
-                    <input
-                      className={styles.fieldInput}
-                      value={state.nombrePersonalizado}
-                      maxLength={100}
-                      onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
-                      placeholder="Nombre del servicio o débito"
-                    />
-                  </div>
-                )}
-
-                {(serv?.generico || state.servicioId === 'other' || state.isEdit) && (
-                  <div className={styles.formField} style={{ marginTop: '12px' }}>
-                    <CategoriaSelector
-                      categorias={categorias}
-                      categoriaId={state.categoriaId}
-                      subcategoriaId={state.subcategoriaId}
-                      tipo="egreso"
-                      onSelectCategoria={id => {
-                        dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: true })
-                        dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: id })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: '' })
-                      }}
-                      onSelectSubcategoria={id => {
-                        dispatch({ type: 'SET_FIELD', field: 'categoriaModificadaManualmente', value: true })
-                        dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: id })
-                      }}
-                    />
-                  </div>
-                )}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>¿Cómo se cobra?</label>
-                  <SegmentedControl<'tarjeta' | 'debito'>
+                  <SegmentedControl<'debito' | 'tarjeta'>
                     options={[
+                      {
+                        value: 'debito',
+                        label: 'Billetera',
+                        icon: <Wallet size={15} />,
+                      },
                       {
                         value: 'tarjeta',
                         label: 'Tarjeta de crédito',
                         icon: <CreditCard size={15} />,
-                      },
-                      {
-                        value: 'debito',
-                        label: 'Cuenta / Billetera',
-                        icon: <Wallet size={15} />,
                       },
                     ]}
                     value={state.metodoCobro}
@@ -579,22 +644,23 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   />
                 </div>
 
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>
                     {state.metodoCobro === 'tarjeta' ? 'Seleccioná tu tarjeta' : '¿De qué billetera?'}
                   </label>
                   
-                  <div className={styles.billeterasCarouselScroller}>
-                    <div 
-                      className={`${styles.billeterasCarousel} ${currentItemsCount === 1 ? styles.carouselCenter : styles.carouselStart}`}
-                    >
+                  <div data-modal-carousel>
+                    <div data-modal-carousel-track>
                       {state.metodoCobro === 'tarjeta' ? (
                         tarjetas.map(t => (
-                          <div
+                          <SelectableSurface
                             key={t.id}
-                            className={styles.billeteraSelectWrap}
-                            data-active={state.tarjetaId === t.id}
-                            ref={(el) => { if (el) cardRefs.current.set(t.id, el); else cardRefs.current.delete(t.id) }}
+                            selected={state.tarjetaId === t.id}
+                            context="modal"
+                            onClick={() => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t.id })}
+                            ref={(el) => { if (el) cardRefs.current.set(t.id, el as HTMLDivElement); else cardRefs.current.delete(t.id) }}
+                            title={`Seleccionar tarjeta ${t.nombre}`}
+                            aria-label={`Seleccionar tarjeta ${t.nombre}`}
                           >
                             <RealCardPreview
                               ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
@@ -607,39 +673,36 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                               color={t.color || '#0D2045'}
                               billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
                             />
-                            <button
-                              type="button"
-                              className={styles.billeteraOverlay}
-                              onClick={() => dispatch({ type: 'SET_FIELD', field: 'tarjetaId', value: t.id })}
-                              aria-label={`Seleccionar tarjeta ${t.nombre}`}
-                            />
-                          </div>
+                          </SelectableSurface>
                         ))
                       ) : (
                         billeteras.map(b => (
-                          <div
+                          <SelectableSurface
                             key={b.id}
-                            className={styles.billeteraSelectWrap}
-                            data-active={state.billeteraId === b.id}
-                            ref={(el) => { if (el) cardRefs.current.set(b.id, el); else cardRefs.current.delete(b.id) }}
+                            selected={state.billeteraId === b.id}
+                            context="modal"
+                            onClick={() => dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })}
+                            ref={(el) => { if (el) cardRefs.current.set(b.id, el as HTMLDivElement); else cardRefs.current.delete(b.id) }}
+                            title={`Seleccionar billetera ${b.nombre}`}
+                            aria-label={`Seleccionar billetera ${b.nombre}`}
                           >
-                            <BilleteraCard billetera={b} className={styles.fullHeightCard} disableNavigation={true} />
-                            <button
-                              type="button"
-                              className={styles.billeteraOverlay}
-                              onClick={() => dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })}
-                              aria-label={`Seleccionar billetera ${b.nombre}`}
+                            <BilleteraCard
+                              billetera={b}
+                              variant="select"
                             />
-                          </div>
+                          </SelectableSurface>
                         ))
                       )}
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
 
               <div className={styles.formFooter}>
-                <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                <button type="button" className={styles.cancelBtn} onClick={state.isEdit ? onClose : goBack}>
+                  {state.isEdit ? 'Cancelar' : 'Atrás'}
+                </button>
                 <button 
                   type="submit"
                   className={styles.submitBtn} 
@@ -654,7 +717,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
 
         {/* PASO 3: Frecuencia y Fecha */}
         {state.step === 3 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -662,14 +725,20 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                 handleSave()
               }}
             >
-              <div className={styles.formHeader}>
+              <div className={styles.stepHeaderRow}>
                 <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás"><ChevronLeft size={20} /></button>
-                <h2 className={styles.headerTitle}>Configuración de {state.nombrePersonalizado}</h2>
+                <div className={styles.headerTitleRow}>
+                  <span className={styles.headerTitleStatic}>Configuración de</span>
+                  <span className={styles.bankPreviewNombreText}>
+                    {state.nombrePersonalizado.trim() || suscripcion?.nombre || serv?.nombre || 'Suscripción'}
+                  </span>
+                </div>
                 <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar"><X size={16} /></button>
               </div>
 
-              <div className={styles.formBody}>
-                <div className={styles.formField}>
+              <div className={styles.formBody} data-modal-stack>
+                <div data-modal-block>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Frecuencia de cobro</label>
                   <SegmentedControl<typeof state.frecuencia>
                     options={[
@@ -690,15 +759,18 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                   )}
                 </div>
 
-                <DateInput
-                  id="proximo-cobro"
-                  variant="compact"
-                  label="Próximo cobro"
-                  min={getHoyLocal()}
-                  value={state.proximo_cobro}
-                  onChange={val => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: val })}
-                  error={state.proximo_cobro && state.proximo_cobro < getHoyLocal() ? 'Tiene que ser hoy o una fecha futura.' : undefined}
-                />
+                <div className={styles.formField} data-modal-field>
+                  <DateInput
+                    id="proximo-cobro"
+                    variant="compact"
+                    label="Próximo cobro"
+                    min={getHoyLocal()}
+                    value={state.proximo_cobro}
+                    onChange={val => dispatch({ type: 'SET_FIELD', field: 'proximo_cobro', value: val })}
+                    error={state.proximo_cobro && state.proximo_cobro < getHoyLocal() ? 'Tiene que ser hoy o una fecha futura.' : undefined}
+                  />
+                </div>
+                </div>
               </div>
 
               <div className={styles.formFooter}>

@@ -8,14 +8,10 @@
   mask-image: none !important;
 }
 
-/* ── Pagar Resumen Modal Container ───────────────────────────────────────── */
 .modalContainer {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: var(--modal-max-h);
-  min-height: 0;
-  overflow: hidden;
   background: var(--surface);
   color: var(--text);
   font-family: 'Figtree', sans-serif;
@@ -26,10 +22,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px var(--modal-pad-x) 6px; /* Separación lateral oficial */
+  padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar */
   border-bottom: none;
   flex-shrink: 0;
   gap: 12px;
+}
+
+.headerLeftRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.backBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.backBtn:hover:not(:disabled) {
+  background: var(--border);
+  color: var(--text);
+}
+
+.backBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .headerLeft {
@@ -58,7 +86,7 @@
 .tarjetaBadge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 2px 8px;
   border-radius: 6px;
   background: var(--surface-alt);
@@ -103,23 +131,8 @@
 
 /* ── Body ────────────────────────────────────────────────────────────────── */
 .modalBody {
-  padding: 14px var(--modal-pad-x) 18px; /* Separación lateral oficial */
-  display: flex;
-  flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.modalBody::-webkit-scrollbar {
-  width: 5px;
-}
-
-.modalBody::-webkit-scrollbar-thumb {
-  background: var(--surface-alt);
-  border-radius: 4px;
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
+  width: 100%;
 }
 
 /* ── Form Fields ─────────────────────────────────────────────────────────── */
@@ -154,6 +167,24 @@
 .fieldSelect:focus {
   border-color: var(--border);
   box-shadow: var(--elevation-none);
+}
+
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-block-gap);
+  width: 100%;
+}
+
+
+.noWalletsText {
+  font-size: 13px;
+  color: var(--text-3);
+  margin: 12px 0 0;
+  text-align: center;
+  padding: 16px;
+  background: var(--surface-alt);
+  border-radius: 12px;
 }
 
 /* ── Hero Monto Card (Modo Pagar Total) ───────────────────────────────────── */
@@ -303,7 +334,7 @@
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -662,7 +693,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   transition: all 120ms ease;
 }
 
@@ -678,7 +709,7 @@
 .excedenteRadioRow {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 
 .excedenteRadio {
@@ -690,7 +721,7 @@
 .excedenteTextos {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .excedenteOpcionLabel {

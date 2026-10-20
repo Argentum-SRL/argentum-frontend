@@ -80,6 +80,11 @@ El apilamiento z-index está estructurado por capas semánticas fijas. Todo cont
 | `--z-toast` | `600` | Notificaciones flotantes globales y toasts de feedback. |
 | `--z-tooltip` | `700` | Capa superior absoluta para información contextual de ayuda. |
 
+> **Política de Z-Index (Regla R01):**  
+> - Los valores enteros literales de `0` a `99` son **VÁLIDOS** para control de orden y apilamiento local dentro de un componente o subárbol aislado.  
+> - A partir de `100` inclusive, o cualquier valor negativo menor a 0, debe utilizarse obligatoriamente un token semántico `var(--z-*)`.  
+> - Todo selector con z-index fuera de ese rango es auditado y bloqueado por R01.
+
 > **Contextos de Apilamiento (Stacking Context):** Un elemento con `z-index: 500` crea un nuevo contexto para sus hijos. Cualquier menú desplegable abierto dentro de un modal que deba montar en portal requiere `--z-popover-top` (550) para quedar indefectiblemente por encima del cuerpo del modal sin competir con toasts globales (`--z-toast: 600`).
 > 
 > **Filtros desplegables:** la barra de filtros lleva z-index var(--z-dropdown) y el listado nunca lleva z-index mayor.
@@ -87,6 +92,10 @@ El apilamiento z-index está estructurado por capas semánticas fijas. Todo cont
 ---
 
 ## 5. Selector Cápsula Oficial (`SegmentedControl`)
+
+### Excepción Permanente de Diseño: BalanceCard
+El selector de moneda (Pesos/Dólares) del componente `BalanceCard` (`src/components/dashboard/BalanceCard/BalanceCard.tsx` y `BalanceCard.module.css`; clases `.currencyToggle`, `.currencyBtn`, `.currencyBtnActive`) conserva de forma permanente e inalterable su diseño redondeado original por directiva de producto de Sebastián. Queda estrictamente excluido de migraciones de selectores, remapeos de elevaciones y escalas de gap.
+
 
 El selector cápsula es el control oficial unificado para selección mutuamente excluyente (pestañas, tipos de movimiento, métodos de pago, filtros, frecuencias, etc.). Corresponde a la cápsula de la "Opción 1" de la página admin Diseño (sin pista, sin card, sin fondo detrás), con el botón elegido en `var(--primary)` y texto blanco; la "Opción 4" tiene pista o card y NO es la oficial.
 Diseño final sin pista contenedora (sin card ni fondo detrás de los botones): botones sueltos en fila con gap 6px (`--selector-gap`). El botón inactivo no tiene fondo ni borde, con texto gris (`var(--text-2)`), 13px y peso 600. El botón elegido se destaca con fondo `var(--primary)`, texto `#FFFFFF`, peso 700 y sombra suave `var(--elevation-pill)` (alcance 8px), idéntico al punto activo del indicador de pasos. El hover sobre botones inactivos solo cambia el color del texto a `var(--text)` sin aplicar fondo.
@@ -182,38 +191,71 @@ El componente canónico `ui/Button` estandariza las interacciones principales en
 
 ---
 
-## 7. Anatomía Unificada del Modal
+## 7. Anatomía Unificada del Modal y Sistema de Espaciado
 
-La estructura de modales en Argentum sigue un patrón invariable:
+### Fundamento y Principios de Diseño
+El sistema de espaciado para formularios, modales y hojas inferiores de Argentum se basa en las mejores prácticas internacionales de diseño de interacción y sistemas de diseño de gobierno e industria, fundamentadas en el principio de proximidad de Gestalt (la relación espacial comunica relación semántica con una razón de distancias de al menos 2:1 entre niveles jerárquicos):
+- **Scottish Government Design System — Form Spacing:** [designsystem.gov.scot/guidance/forms/form-spacing](https://designsystem.gov.scot/guidance/forms/form-spacing) (separaciones consistentes entre etiqueta-campo y grupos de campos).
+- **Hennepin County Design System — Spacing and Sizing in Forms:** [hennepincounty.gov/design-system/patterns/forms/spacing-sizing](https://hennepincounty.gov/design-system/patterns/forms/spacing-sizing) (distancia entre campos 24px o 50-75% de la altura del control; secciones al doble o triple).
+- **Phoenix Group — Compound Design System:** [compound.thephoenixgroup.com](https://compound.thephoenixgroup.com) (etiqueta a campo 8px, entre grupos de campos 16px, entre fieldsets 16-32px, último campo a botones 32px, error a siguiente grupo 16px).
+- **Liferay Lexicon — Forms Design Pattern:** [liferay.design/lexicon/core-components/forms](https://liferay.design/lexicon/core-components/forms) (relleno 24px escritorio / 16px móvil, 24px entre componentes consecutivos, 48px/32px título a formulario).
+- **IBM Carbon Design System — Form Style:** [carbondesignsystem.com/components/form/style](https://carbondesignsystem.com/components/form/style) (escala estructurada y ritmo vertical predecible).
+- **Ontario Design System — Spacing:** [designsystem.ontario.ca](https://designsystem.ontario.ca) (etiquetas vinculadas estrechamente a sus controles en base 8px).
+- **Nielsen Norman Group — Web Form Design Best Practices:** [nngroup.com/articles/web-form-design](https://nngroup.com/articles/web-form-design) (la etiqueta debe estar perceptiblemente más cerca de su campo que de cualquier otro elemento; una sola columna de lectura).
+
+### Escala Canónica de Espaciado en Modales (Sistema v3 por Relación)
+El sistema de espaciado para formularios, modales y hojas inferiores de Argentum se basa en el principio de proximidad de Gestalt (el espacio entre elementos comunica su grado de relación semántica; cosas relacionadas van juntas, cosas distintas separadas):
+
+| Token | Valor | Propósito Semántico |
+| :--- | :--- | :--- |
+| `--modal-label-gap` | `8px` | Separación vertical entre etiqueta, texto de ayuda o mensaje de error y su control. El texto de ayuda va adentro del campo. |
+| `--modal-option-gap` | `8px` | Separación entre ítems de una misma pregunta: filas de opciones/toggles, radios, chips, tarjetas de lista corta, pestañas (`[data-modal-options]`). |
+| `--modal-field-gap` | `12px` | Separación vertical entre campos consecutivos dentro del mismo bloque temático (misma pregunta o tema). |
+| `--modal-block-gap` | `20px` (`16px` en `max-width: 480px`) | Separación vertical entre bloques temáticos independientes (preguntas distintas). Se reduce en móviles para optimizar altura. |
+| `--modal-section-title-gap` | `10px` | Separación vertical entre el subtítulo de un bloque y su primer elemento. |
+| `--modal-header-gap` | `20px` | Separación vertical entre el encabezado del modal y el primer bloque de contenido. |
+| `--modal-footer-gap` | `24px` | Separación vertical entre el último bloque de contenido y la botonera del pie (footer). |
+| `--modal-pad-x` | `20px` | Relleno lateral uniforme en el cuerpo y pie del modal. |
+
+Regla de Gestalt: ninguna distancia entre campos (`12px`) puede ser mayor o igual que la distancia entre bloques (`20px` / `16px`). Los grupos de opciones (`8px`) y las etiquetas/ayudas (`8px`) se mantienen cohesionados con su control.
+
+### Mecanismo Único por Atributos de Marcado
+Para evitar CSS duplicado o ad-hoc en cada modal, el espaciado se gobierna centralizadamente desde `Modal.module.css` mediante atributos HTML semánticos:
+- `[data-modal-frame]`: Contenedores estructurales (slide, `modalContainer`, `formContainer`, `slidesContainer`, `mobileDrawerContainer`, etc.). Aplica `display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 0;`. Header, cuerpo y footer se separan exclusivamente por sus tokens normativos, nunca por gap del frame estructural.
+- `[data-modal-stack]`: SOLO el contenedor del CUERPO del modal (el área de contenido scrolleable o editable). Gap = `--modal-block-gap` (20px / 16px). NUNCA en contenedores estructurales ni en elementos que contengan directamente header o footer (R26 = 0).
+- `[data-modal-block]`: Contenedor de un grupo de elementos de UNA sola pregunta o tema con gap `--modal-field-gap` (12px). Un aviso/alerta que comenta al grupo va dentro del mismo bloque a 12px.
+- `[data-modal-field]`: Contenedor de control + su etiqueta/ayuda/error con gap `--modal-label-gap` (8px). El texto de ayuda vive DENTRO del campo, debajo del control, sin márgenes propios inline.
+- `[data-modal-options]`: Contenedor de lista de ítems de una misma pregunta (toggles, tarjetas de opción, radios, chips) con gap `--modal-option-gap` (8px).
+- `[data-modal-section-title]`: Subtítulo o encabezado de bloque; aplica `margin-bottom: var(--modal-section-title-gap)` (10px).
+- `[data-modal-delete]`: Identifica la acción destructiva de eliminar la entidad del modal; se ubica exclusivamente al final del contenido (último bloque), nunca en el header ni en el footer.
+- **Prohibición de estilos inline en modales (R27):** Queda terminantemente prohibido usar estilos inline con `margin` o `padding` vertical para forzar separaciones dentro de modales; el ritmo visual se gobierna exclusivamente por los tokens y atributos del sistema.
+
+### Estructura Canónica del Modal
 
 1. **Indicador de Pasos Superior (`stepDots`):**
    - Fijo en la parte superior del modal a través de la prop opcional `stepDots={{ total, current }}` (current empieza en 0).
    - Si el modal tiene **una sola etapa** (`total <= 1`), NO se muestran puntos de paso.
    - Con `total > 1`, se expone como un contenedor accesible `role="progressbar"` con `aria-valuenow`, `aria-valuemin="1"`, `aria-valuemax` y `aria-label="Paso X de Y"`.
-   - Tokens: `--stepdots-pad`, `--stepdot-height` (5px), `--stepdot-active-width` (20px), `--stepdot-inactive-width` (6px), `--stepdot-gap` (`var(--space-icon)` = 6px).
+   - Tokens: `--stepdots-pad`, `--stepdot-height` (5px), `--stepdot-active-width` (20px), `--stepdot-inactive-width` (6px), `--stepdot-gap` (`var(--space-icon)` = 6px). Definición única en `Modal.module.css`.
 2. **Encabezado y Contenido:**
-   - El título y los botones de volver/cerrar pertenecen al flujo del contenido scrolleable, no a una cabecera fija que robe espacio.
-   - `--modal-pad-x`: `var(--space-xl)` (`20px`) en todo el lateral.
-   - `--modal-content-pad-top`: `var(--space-md)` (`12px`).
-   - `--modal-content-pad-bottom`: `var(--space-lg)` (`16px`).
-   - `--modal-field-gap`: `var(--space-lg)` (`16px`) entre campos consecutivos.
-   - `--modal-group-gap`: `var(--space-2xl)` (`24px`) entre bloques temáticos (la separación de 24px entre bloques todavía no está aplicada, pendiente de definir bloques por familia).
-   - `--modal-label-gap`: `var(--space-sm)` (`8px`) entre etiqueta e input.
+   - `--modal-pad-x`: `20px` lateral.
+   - `--modal-header-gap`: `24px` de separación hacia el contenido.
    - `--modal-radius`: `var(--radius-modal)` (`20px`).
-   - `--modal-max-h`: `90dvh`.
-   - **Aplicación en modales:** Las separaciones oficiales (20px lateral con `--modal-pad-x`, 16px entre campos con `--modal-field-gap`, 8px etiqueta-campo con `--modal-label-gap` y footer con sus variables) están aplicadas en todos los modales salvo las reglas con márgenes negativos o rem en `SuscripcionModal.module.css`, `NotificacionesConfigModal.module.css` y `ProyeccionModal.module.css` (saltadas para la tanda de estructura); la separación de 24px entre bloques temáticos continúa pendiente de definir por familia.
+   - `--modal-max-h`: `90dvh` (solo unidades dvh en modales y hojas).
+   - Altura fluida por contenido scrolleable interno con footer fijo.
 3. **Acciones Destructivas:**
-   - Botones de peligro como "Eliminar" se colocan al final del contenido del modal con confirmación, **nunca** compartiendo el footer de navegación.
+   - Botón marcado con `[data-modal-delete]` al final del último bloque de contenido con confirmación, **nunca** compartiendo el footer.
 4. **Footer:**
-   - Implementado mediante el componente canónico `ModalFooter` (`secondary?: ReactNode`, `primary: ReactNode`).
-   - `--modal-footer-pad-top`: `var(--space-md)` (`12px`).
-   - `--modal-footer-pad-bottom`: `var(--space-lg)` (`16px`).
-   - `--modal-footer-gap`: `var(--space-md)` (`12px`).
-   - **Sin borde divisor superior** (`border-top: none`).
-   - Con acción secundaria: Cancelar (`flex: 1`) + Confirmar / Principal (`flex: 2`).
-   - Sin acción secundaria: el botón principal ocupa todo el ancho disponible.
-
-> **Aclaración sobre Capas:** El overlay del Modal base sigue en su capa actual (`z-index: 9000`) hasta la tanda que remapee todas las capas de portales a los tokens canónicos `--z-*`.
+   - Implementado mediante `ModalFooter` (`secondary?: ReactNode`, `primary: ReactNode`).
+   - Separación hacia el contenido: `var(--modal-footer-gap)` (`24px`).
+   - Gap entre botones: `12px`.
+   - Sin borde divisor superior (`border-top: none`).
+   - Cancelar: `flex: 1`, Confirmar / Principal: `flex: 2`. Sin acción secundaria: el principal ocupa todo el ancho.
+5. **Apilamiento y Cierre de Modales Múltiples:**
+   - Soporte para modales y hojas anidadas (por ejemplo selectores de fecha o país abiertos desde un modal):
+   - Contador de bloqueo de scroll a nivel de módulo en `Modal.tsx` (`activeModalsCount`) que restaura el scroll del body solo al desmontar el último modal abierto.
+   - Pila de escape (`modalEscapeStack`) que garantiza que al presionar la tecla `Escape` se cierre exclusivamente el modal superior (último montado) sin cerrar el modal inferior.
+   - Overlay unificado en capa `z-index: var(--z-modal)`.
 
 ### Ejemplo Canónico de Uso en React:
 ```tsx
@@ -235,23 +277,79 @@ La estructura de modales en Argentum sigue un patrón invariable:
 
 > **Altura de modales y modales de varios pasos:** todos los modales resuelven su altura exclusivamente mediante CSS (`max-height: var(--modal-max-h); overflow: hidden; min-height: 0;`), con el cuerpo scrolleando por dentro (`overflow-y: auto; flex: 1;`) y el footer siempre visible fijo al fondo (`flex-shrink: 0;`). Sin mediciones en JS ni hooks de altura adaptativa (100% de los modales migrados del hook `useAdaptiveModalHeight` al patrón CSS estándar). En modales de varios pasos, el paso activo va en el flujo normal y los inactivos en absolute y ocultos. Los pasos de un modal no tienen alto fijo; alto por contenido con tope var(--modal-max-h); en modales y hojas solo dvh.
 
-### Carruseles de tarjetas
-Los carruseles de billeteras y tarjetas dentro de modales (`.billeterasCarouselScroller` y `.billeterasCarousel`) implementan dos reglas canónicas para contener físicamente la sombra de selección sin recortarla contra las paredes ni generar barras de scroll parásitas:
-1. **Contenedor Scroller (`.billeterasCarouselScroller`):**  
-   `overflow-y: hidden` (con `overflow-x: auto`), `padding: var(--carousel-pad) 0`, y `margin: 0` (si tenía márgenes negativos para compensar; si no tenía, no se agrega).
-2. **Pista de Tarjetas (`.billeterasCarousel`):**  
-   `padding: 0 var(--carousel-pad)` y `--elevation-selection-modal: var(--elevation-selection-carousel);` (declarada en la regla base para que todas las tarjetas hijas la hereden). Si la copia tiene `scroll-padding`, se establece en `0 var(--carousel-pad)`.
+### Carrusel Canónico Único (`[data-modal-carousel]`)
+Todos los carruseles horizontales de tarjetas de billeteras o crédito dentro de modales se definen de manera unificada mediante atributos semánticos en `Modal.module.css`:
+- **Scroller (`[data-modal-carousel]`):**
+  - Desplazamiento horizontal con `overflow-x: auto; overflow-y: hidden;`.
+  - Sangrado lateral *full-bleed*: `margin-inline: calc(-1 * var(--modal-pad-x))` con comentario `r03-ok`, compensado exactamente con `padding-inline: var(--modal-pad-x)` y `scroll-padding-inline: var(--modal-pad-x)`. La primera card queda perfectamente alineada al contenido (a 20px) y al deslizar se ve continua hasta el borde del modal.
+  - Alojamiento vertical de sombras: `padding-top: var(--carousel-reach-top)` (3px) y `padding-bottom: var(--carousel-reach-bottom)` (15px), correspondientes al alcance real de `--elevation-selection-carousel`.
+  - Compensación vertical sin agrandar el layout: `margin-top: calc(-1 * var(--carousel-reach-top))` y `margin-bottom: calc(-1 * var(--carousel-reach-bottom))` con el comentario normativo de patrón (4): `/* r03-ok: compensa el padding que aloja la sombra de selección para que el carrusel mida lo mismo que sus cards */`.
+  - Resultado: la distancia visible de la etiqueta a la card es exactamente `--modal-label-gap` (8px) y de la card al siguiente bloque es `--modal-block-gap` (32px/24px) o `--modal-footer-gap` (24px), sin holguras sobrantes.
+- **Pista (`[data-modal-carousel-track]`):**
+  - Flexbox en fila con `gap: 12px` y `scroll-snap-type: x mandatory`.
+  - Centrado automático cuando hay una sola card (`carouselCenter`) y alineación al inicio (`carouselStart`) cuando hay varias.
+  - Prohibido crear clases duplicadas como `.billeterasCarouselScroller`, `.billeteraSelectWrap`, `.tarjetaSelectWrap` o overrides `:global(.wc*)` en modales (custodiado por regla R23).
 
-**Por qué (alcance):** El padding `--carousel-pad` (`var(--space-2xl)` = 24px) contiene holgadamente el alcance de la sombra reducida de carrusel (`--elevation-reach-selection-carousel` = 20px) más el desplazamiento vertical y escala de la tarjeta seleccionada (4px).  
-Está terminantemente prohibido utilizar márgenes negativos para "compensar" el padding.
+### Card de Billetera Unificada (`BilleteraCard`)
+El componente `BilleteraCard` soporta dos variantes unificadas:
+1. `variant="full"` (por defecto): Geometría inalterable para la página Billeteras y su pila de tarjetas móviles (con menú kebab, navegación y frontCard activa).
+2. `variant="select"`: Variante estándar obligatoria para todo carrusel o selector en modales:
+   - Proporción estricta de tarjeta ID-1 (1.65 / 1).
+   - Ancho fluido gobernado por contenedor: `width: min(clamp(var(--select-card-w-min, 208px), 72cqi, var(--select-card-w-max, 248px)), calc(100cqi - 48px))` sobre `[data-modal-carousel]` (`container-type: inline-size`).
+   - Pisos tipográficos de legibilidad estricta: `.selectTipo` piso 10px (`clamp(10px, 4.4cqi, 10.5px)`) y `.selectMonedaBadge` piso 9px (`clamp(9px, 4cqi, 9.5px)`).
+   - Dimensionamiento interno escalable mediante Container Queries (`container-type: inline-size` y unidades `cqi`).
+   - Contenido unificado: Logo circular de 28px, nombre en una línea con ellipsis, estrella de billetera principal o ícono de inversión, y slot opcional para insignias contextuales (ej. "Cuenta en pesos"). Sin kebab ni botones de navegación.
+   - Zona inferior: Línea de metadatos con el tipo ("Cuenta", "Efectivo", "Inversión") y chip de moneda ("ARS" / "USD"), y el saldo principal grande en formato tabular que nunca se corta.
+   - La previsualización de tarjetas de crédito (`RealCardPreview`) adopta la misma proporción 1.65:1 y dimensiones para convivir armónicamente en carruseles mixtos.
+
+### Criterio de Scroll Legítimo y Form Body Único (Decisión 4)
+- **Scroll Único del Modal Base:** En formularios y diálogos estándar, el scroll vertical es único y reside exclusivamente en el contenedor `.content` del `Modal` base. Se prohíbe el doble scroll interno en `.formBody`, slides o pasos de formulario (`overflow-y: auto` ilegítimo).
+- **Excepciones Legítimas Acotadas por Diseño:** Un `overflow-y: auto` propio es legítimo únicamente en:
+  1. Catálogos y pickers de selección acotados con buscador (ej. `BankPickerModal.pickerBody`, `SearchModal`).
+  2. Listas de cuentas o entidades dentro de filtros (ej. `TransferenciasFilterMobileModal.accountsList` con max-height).
+  3. Feeds de actividad o notificaciones (ej. `NotificacionesDrawer.scrollArea`).
+  4. Historiales temporales y áreas de recorte (ej. `BudgetHistoryModal`, `FotoCropModal`).
+- **Paddings Internos de Sub-tarjetas vs Duplicados Perimetrales:** Se distingue estrictamente el padding interno de tarjetas o acordeones (ej. `.opcionesAvanzadasContent { padding: 14px }` en `EditBilleteraModal`), el cual es justificado, del padding perimetral que duplica los márgenes del modal base (eliminado en `ModalErrorBoundary`, `BalanceCicloModal`, `ProyeccionModal`, etc.).
+
+### Ícono de Movimiento Unificado (`MovimientoAvatar` y `resolverVisualMovimiento`)
+Todo listado o fila de transacciones, cuotas o movimientos debe utilizar exclusivamente el componente canónico `ui/MovimientoAvatar`, alimentado por la función pura `resolverVisualMovimiento(entrada)` (`src/lib/utils/movimientoVisual.utils.ts`).  
+El orden estricto de resolución es:
+- **S1 (Suscripciones):** Si el movimiento proviene de una suscripción (`suscripcion_id`, cuota de grupo con suscripción, o coincidencia exacta de descripción con el catálogo), muestra el logo oficial de la marca vía `findServicioCatalogo(nombre)`. Si es una suscripción sin logo o genérica (ej. "Gimnasio"), recurre al `SubcategoriaIcon` de su subcategoría.
+- **S2 (Aportes/Retiros de Metas):** Ícono unificado `Target` en todos los listados (eliminando inconsistencias con íconos genéricos de ahorro).
+- **S3 (Subcategoría específica):** `SubcategoriaIcon` correspondiente a la subcategoría del movimiento.
+- **S4 (Subcategoría general u otros):** `CategoriaIcon` de la categoría padre (o ícono por defecto).
+- **S5 (Movimientos pendientes de IA):** Ícono por defecto con distintivo de chispa.
+- **S6 (Transferencias):** Ícono vectorial propio de transferencia.
+Prohibido renderizar íconos de subcategoría o categoría directamente dentro de bucles `.map` de movimientos fuera de `MovimientoAvatar` (regla R24).
+
+#### Caché de Suscripciones (Decisión 6)
+`MovimientoAvatar` dispara en su primer montaje la carga compartida de suscripciones vía una única promesa (`getCachedSuscripciones()`), incluso cuando el movimiento no incluye `suscripcion_id`, permitiendo matchear por nombre servicios como Netflix en el Dashboard. Dicha caché se invalida reactivamente llamando a `setCachedSuscripciones(data)` desde `SuscripcionesPage` y `SuscripcionModal` tras crear, modificar o eliminar registros.
+
+### Regla Canónica para Inputs de Monto (`MontoInput`)
+Todo campo de formulario destinado a ingresar o editar montos de dinero debe utilizar de manera obligatoria el componente canónico `ui/MontoInput`. Los campos numéricos dedicados a cuotas, porcentajes, plazos o tasas de cambio conservan inputs numéricos estándar.
 
 ---
+
+### Variante Bottom Sheet (`variant="sheet"`)
+El componente `Modal` soporta la prop `variant?: 'dialog' | 'sheet'` (por defecto `'dialog'`).
+- En modo `'sheet'`, el modal se ancla al fondo de la pantalla en todas las resoluciones, adopta bordes redondeados superiores (`border-radius: var(--modal-radius) var(--modal-radius) 0 0`), ancho completo responsivo hasta un máximo canónico y padding inferior adaptado al área segura (`env(safe-area-inset-bottom)`).
+- Todos los diálogos, modales de error y sheets (incluyendo `MobileMoreSheet` y `ModalErrorBoundary`) componen sobre esta base unificada.
+- El overlay se apila rigurosamente en `z-index: var(--z-modal)`.
+- Indicador de pasos: se gestiona exclusivamente a través de la prop `stepDots={{ total, current }}` del Modal base.
 
 ## 8. Reglas de Contención y Entorno
 
 - **Caja Confinada:** Ningún elemento interactivo puede generar desbordes laterales o barras de scroll involuntarias.
-- **Prohibición de Márgenes Negativos:** Los márgenes negativos para "compensar" padding o estirar fondos violan el modelo de contención y están prohibidos.
+- **Política de Márgenes Negativos (Regla R03):** Queda terminantemente prohibido el uso arbitrario de márgenes negativos. Un margen negativo es VÁLIDO únicamente si responde a uno de los cuatro patrones documentados de diseño:
+  1. *Solapamiento intencional:* Efecto físico de cartas o tarjetas apiladas (ejemplo: pila interactiva de tarjetas en billeteras).
+  2. *Sangrado a los bordes (full-bleed):* Extensión intencional de un elemento hacia los extremos dentro de un contenedor con padding perimetral (ejemplo: carruseles dentro de modales).
+  3. *Alineación óptica o colapso de borde:* Ajuste sub-píxel de 1 a 2 px para microalineación visual.
+  4. *Compensación de padding de sombra de selección en carrusel:* Compensa el padding vertical necesario para alojar la sombra de selección y elevación sin alterar la altura visible del carrusel ni la distancia a sus etiquetas/elementos adyacentes (`/* r03-ok: compensa el padding que aloja la sombra de selección para que el carrusel mida lo mismo que sus cards */`).
+  Cada margen negativo válido debe contar obligatoriamente en la línea inmediatamente anterior con un comentario estructurado:
+  `/* r03-ok: <motivo concreto en español, mínimo 15 caracteres, redactado analizando el componente> */`.
+  Cualquier margen negativo sin esta anotación es computado como violación estricta por el auditor (R03).
 - **Focos Seguros:** Todo `focus-visible` debe usar un `outline-offset: -2px` hacia adentro para evitar ser recortado por contenedores con `overflow: hidden`.
+- **Política de Borrado por Terminal:** Queda terminantemente prohibido borrar archivos desde la terminal o scripts salvo autorización explícita de Sebastián en el prompt del paso, cumpliendo rigurosamente las 4 pruebas de orfandad (sin imports estáticos/dinámicos, sin referencias en configs/json, sin menciones en código y tsc idéntico antes/después).
 
 ---
 
@@ -265,9 +363,9 @@ Está terminantemente prohibido utilizar márgenes negativos para "compensar" el
 
 ## 10. Lo Terminantemente Prohibido
 
-1. ❌ Usar `z-index` con literales arbitrarios fuera de `-1, 0, 1, 2, 3` o de las variables `--z-*`.
+1. ❌ Usar `z-index` con literales $\ge 100$ o negativos fuera de `var(--z-*)` (los valores 0 a 99 son válidos exclusivamente para orden local dentro de un componente).
 2. ❌ Usar `border-radius: 24px` (el radio estándar es `--radius-modal: 20px` o `--radius-control: 12px`).
-3. ❌ Márgenes negativos en cualquier propiedad `margin`.
+3. ❌ Márgenes negativos en cualquier propiedad `margin` sin comentario `/* r03-ok: ... */` que documente su patrón legítimo.
 4. ❌ Sombras hardcodeadas que no usen `var(--elevation-*)`.
 5. ❌ Sombras con `!important`.
 6. ❌ Curvas `cubic-bezier` con valores de aceleración $> 1.0$.
@@ -276,7 +374,10 @@ Está terminantemente prohibido utilizar márgenes negativos para "compensar" el
 9. ❌ `overflow-x: hidden !important`.
 10. ❌ Nuevos componentes modales en TSX que no compongan sobre `ui/Modal`.
 11. ❌ Nuevas implementaciones ad-hoc de barras segmentadas fuera de `SegmentedControl`.
-12. ❌ Nuevas definiciones dispersas de `.stepDots` en CSS.
+12. ❌ Definiciones duplicadas de `.stepDots` en CSS (R13 = 1: únicamente en `Modal.module.css`).
+13. ❌ Espaciados no canónicos en CSS de modales/hojas (R20): prohibido margin-top/bottom o gap fuera de 8px, 16px o 24px, o sin usar tokens `var(--modal-*)`.
+14. ❌ Contenedores con overflow que recorta sin padding suficiente para contener sombras o levantamientos (R21).
+15. ❌ Modales con elementos de formulario que no implementen `[data-modal-block]` (R22).
 
 ---
 
@@ -369,6 +470,20 @@ Toda verificación o certificación responsive debe comprobar el correcto render
 
 ## 14. Referencias y Fuentes Normativas
 
+- **Scottish Government Design System — Form Spacing:**  
+  https://designsystem.gov.scot/guidance/forms/form-spacing
+- **Hennepin County Design System — Spacing and Sizing in Forms:**  
+  https://hennepincounty.gov/design-system/patterns/forms/spacing-sizing
+- **Phoenix Group — Compound Design System Forms Spacing:**  
+  https://compound.thephoenixgroup.com
+- **Liferay Lexicon — Forms Design Pattern:**  
+  https://liferay.design/lexicon/core-components/forms
+- **IBM Carbon Design System — Form Style:**  
+  https://carbondesignsystem.com/components/form/style
+- **Ontario Design System — Spacing:**  
+  https://designsystem.ontario.ca
+- **Nielsen Norman Group — Web Form Design Best Practices:**  
+  https://nngroup.com/articles/web-form-design
 - **Queensland Government Design System — Spacing System:**  
   https://designsystem.qld.gov.au/styles/spacing
 - **Dylan Tarre — Z-Index Scale Architecture:**  

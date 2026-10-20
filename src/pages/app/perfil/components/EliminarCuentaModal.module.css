@@ -126,7 +126,7 @@
 
 .passwordInput:focus {
   border-color: var(--error);
-  box-shadow: 0 0 0 2px var(--error-bg);
+  box-shadow: var(--elevation-focus-error);
 }
 
 .passwordInput:disabled {
@@ -146,7 +146,7 @@
 @media (max-width: 480px) {
   .googleWrap {
     margin-bottom: 14px;
-    gap: 10px;
+    gap: 8px;
   }
 }
 

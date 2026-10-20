@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Clock } from '@/components/ui/icons'
 import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
 import '@ncdai/react-wheel-picker/style.css'
+import Modal from '@/components/ui/Modal/Modal'
 import styles from './TimeInput.module.css'
 
 const WHEEL_DRAG_SENSITIVITY = 6
@@ -256,23 +257,19 @@ export const TimeInput: React.FC<TimeInputProps> = ({
         )}
 
       {/* Bottom Sheet Mobile */}
-      {open && isMobile && typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            className={styles.bottomSheetOverlay}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) setOpen(false)
-            }}
-          >
-            <div className={styles.bottomSheet}>
-              <div className={styles.bottomSheetHandle} />
-              <div className={styles.bottomSheetContent}>
-                {pickerContent}
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
+      {open && isMobile && (
+        <Modal
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          variant="sheet"
+          showHeader={false}
+          noPadding
+        >
+          <div className={styles.bottomSheetContent} data-modal-block>
+            {pickerContent}
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

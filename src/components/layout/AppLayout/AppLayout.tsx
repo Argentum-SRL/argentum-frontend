@@ -1,4 +1,4 @@
-import { useId, useState, useEffect, type ReactNode } from 'react'
+import { useId, useState, useEffect, useRef, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw, Repeat,
@@ -64,9 +64,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
   const [prevPath, setPrevPath] = useState(location.pathname)
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [hoveredBtn, setHoveredBtn] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isProfileOpen) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setIsProfileOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isProfileOpen])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -178,7 +190,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
 
           {/* Pill 2: User Profile */}
-          <div className={styles.profileWrapper}>
+          <div className={styles.profileWrapper} ref={profileRef}>
             <button
               className={styles.profilePill}
               onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -207,19 +219,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </button>
             
             {isProfileOpen && (
-              <>
-                <div className={styles.profileOverlay} onClick={() => setIsProfileOpen(false)} />
-                <div className={styles.profileDropdown}>
-                  <Link to="/app/perfil" className={styles.dropdownItem} onClick={() => setIsProfileOpen(false)}>
-                    <User size={16} />
-                    <span>Mi perfil</span>
-                  </Link>
-                  <button className={styles.dropdownItem} onClick={() => { setIsProfileOpen(false); void logout(); }}>
-                    <LogOut size={16} />
-                    <span>Cerrar sesión</span>
-                  </button>
-                </div>
-              </>
+              <div className={styles.profileDropdown}>
+                <Link to="/app/perfil" className={styles.dropdownItem} onClick={() => setIsProfileOpen(false)}>
+                  <User size={16} />
+                  <span>Mi perfil</span>
+                </Link>
+                <button className={styles.dropdownItem} onClick={() => { setIsProfileOpen(false); void logout(); }}>
+                  <LogOut size={16} />
+                  <span>Cerrar sesión</span>
+                </button>
+              </div>
             )}
           </div>
         </div>

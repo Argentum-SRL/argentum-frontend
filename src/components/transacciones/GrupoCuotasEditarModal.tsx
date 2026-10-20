@@ -14,6 +14,7 @@ import { DateInput } from '@/components/ui'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
 import RealCardPreview from '@/components/tarjetas/RealCardPreview'
+import SelectableSurface from '@/components/ui/SelectableSurface'
 import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import Modal from '@/components/ui/Modal/Modal'
 
@@ -104,6 +105,7 @@ export default function GrupoCuotasEditarModal({
                     ? styles.slideExitLeft
                     : styles.slideExitRight
                 }`}
+                data-modal-frame
               >
                 <form className={styles.formContainer} onSubmit={goEditStep2}>
                   <div
@@ -126,9 +128,10 @@ export default function GrupoCuotasEditarModal({
                       </div>
                     </div>
 
-                    <div className={styles.formFields}>
+                    <div className={styles.formFields} data-modal-stack>
+                      <div data-modal-block>
                       {/* 1. Hero Monto */}
-                      <div className={styles.formField}>
+                      <div className={styles.formField} data-modal-field>
                         <label className={styles.fieldLabel}>Monto total recalculado</label>
                         <MontoInput
                           value={editMonto}
@@ -140,7 +143,7 @@ export default function GrupoCuotasEditarModal({
                       </div>
 
                       {/* 2. Tarjeta Carousel */}
-                      <div className={styles.formField}>
+                      <div className={styles.formField} data-modal-field>
                         <label className={styles.fieldLabel}>Tarjeta de crédito</label>
                         {tarjetasCarousel.length === 0 ? (
                           <div className={styles.emptyWalletBox}>
@@ -150,14 +153,18 @@ export default function GrupoCuotasEditarModal({
                             <p className={styles.emptyWalletTitle}>No tenés tarjetas activas</p>
                           </div>
                         ) : (
-                          <div className={styles.billeterasCarouselScroller}>
-                            <div className={styles.billeterasCarousel} ref={tarjetasCarouselRef}>
+                          <div data-modal-carousel>
+                            <div data-modal-carousel-track ref={tarjetasCarouselRef}>
                               {tarjetasCarousel.map(t => (
-                                <div
+                                <SelectableSurface
                                   key={t.id}
                                   data-id={t.id}
-                                  className={`${styles.billeteraSelectWrap} ${styles.tarjetaSelectWrap}`}
-                                  data-active={editTarjetaId === t.id}
+                                  selected={editTarjetaId === t.id}
+                                  onClick={() => {
+                                    setEditTarjetaId(t.id)
+                                    setEditTarjetaTouched(true)
+                                  }}
+                                  aria-label={`Seleccionar tarjeta ${t.nombre}`}
                                 >
                                   <RealCardPreview
                                     ultimos4={t.nombre.replace('•••• ', '').slice(-4)}
@@ -169,23 +176,13 @@ export default function GrupoCuotasEditarModal({
                                     proximoVencimiento={t.proximo_vencimiento}
                                     color={t.color || '#0D2045'}
                                     billeteraNombre={billeteras.find(b => b.id === t.billetera_id)?.nombre || RED_LABEL[t.red]}
-                                    className={styles.fullHeightCard}
                                   />
-                                  <button
-                                    type="button"
-                                    className={styles.billeteraOverlay}
-                                    onClick={() => {
-                                      setEditTarjetaId(t.id)
-                                      setEditTarjetaTouched(true)
-                                    }}
-                                    title={`Seleccionar tarjeta ${t.nombre}`}
-                                    aria-label={`Seleccionar tarjeta ${t.nombre}`}
-                                  />
-                                </div>
+                                </SelectableSurface>
                               ))}
                             </div>
                           </div>
                         )}
+                      </div>
                       </div>
                     </div>
                   </div>
@@ -214,6 +211,7 @@ export default function GrupoCuotasEditarModal({
                     ? styles.slideEnterRight
                     : styles.slideEnterLeft
                 }`}
+                data-modal-frame
               >
                 <form className={styles.formContainer} onSubmit={handleSave}>
                   <div
@@ -247,10 +245,11 @@ export default function GrupoCuotasEditarModal({
                       </div>
                     </div>
 
-                    <div className={styles.formFields}>
+                    <div className={styles.formFields} data-modal-stack>
+                      <div data-modal-block>
                       {/* Descripción + Fecha */}
                       <div className={styles.descFechaRow}>
-                        <div className={`${styles.formField} ${styles.descCol}`}>
+                        <div className={`${styles.formField} ${styles.descCol}`} data-modal-field>
                           <label className={styles.fieldLabel} htmlFor="edit-cuota-desc">Descripción</label>
                           <input
                             id="edit-cuota-desc"
@@ -261,7 +260,7 @@ export default function GrupoCuotasEditarModal({
                             placeholder="Ej: Smart TV 55"
                           />
                         </div>
-                        <div className={`${styles.formField} ${styles.fechaCol}`}>
+                        <div className={`${styles.formField} ${styles.fechaCol}`} data-modal-field>
                           <label className={styles.fieldLabel} htmlFor="edit-cuota-fecha">Fecha compra</label>
                           <DateInput
                             id="edit-cuota-fecha"
@@ -291,10 +290,11 @@ export default function GrupoCuotasEditarModal({
 
                       {/* Recalculation Notice */}
                       <div className={styles.editRecalcNotice}>
-                        <Lightbulb size={15} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2, color: '#C9A227' }} aria-hidden="true" />
+                        <Lightbulb size={15} strokeWidth={2} className={styles.prepayNoticeIcon} aria-hidden="true" />
                         <span>
                           Al modificar el monto total o tarjeta, se recalcularán automáticamente las <strong>{editingGrupo.cantidad_pendientes} cuotas pendientes</strong>.
                         </span>
+                      </div>
                       </div>
                     </div>
                   </div>

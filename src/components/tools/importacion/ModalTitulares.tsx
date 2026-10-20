@@ -46,23 +46,10 @@ export const ModalTitulares: React.FC<ModalTitularesProps> = ({
       showHeader={true}
       title="¿De quién son estos gastos?"
       size="md"
+      stepDots={totalSteps > 1 ? { total: totalSteps, current: currentStep } : undefined}
     >
-      <div className={styles.formContainer}>
-        {/* Step Indicator Dots */}
-        {totalSteps > 1 && (
-          <div className={styles.stepDots}>
-            {Array.from({ length: totalSteps }).map((_, idx) => (
-              <div
-                key={idx}
-                className={`${styles.stepDot} ${
-                  idx === currentStep ? styles.stepDotActive : styles.stepDotInactive
-                }`}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className={styles.formBody}>
+      <div className={styles.formContainer} data-modal-frame>
+        <div className={styles.formBody} data-modal-stack>
           <p className={styles.modalText}>
             Detectamos consumos de múltiples personas en este resumen. Seleccioná de quiénes querés importar los gastos.
           </p>
@@ -76,7 +63,8 @@ export const ModalTitulares: React.FC<ModalTitularesProps> = ({
             Seleccionar todos
           </button>
 
-          <div className={styles.checkboxGroup}>
+          <div data-modal-block>
+          <div className={styles.checkboxGroup} data-modal-options>
             {titulares.map(titular => {
               const isChecked = seleccionados.includes(titular)
               return (
@@ -98,6 +86,7 @@ export const ModalTitulares: React.FC<ModalTitularesProps> = ({
                 </div>
               )
             })}
+          </div>
           </div>
         </div>
 

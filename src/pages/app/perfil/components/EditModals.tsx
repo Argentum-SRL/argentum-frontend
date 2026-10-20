@@ -124,7 +124,7 @@ const DatosPersonalesForm: React.FC<{
   })()
 
   return (
-    <form onSubmit={handleSubmit} className={styles.modalFormContainer}>
+    <form onSubmit={handleSubmit} className={styles.modalFormContainer} data-modal-frame>
       {errorMsg && (
         <div className={styles.modalAlertError}>
           <AlertCircle size={15} />
@@ -132,7 +132,8 @@ const DatosPersonalesForm: React.FC<{
         </div>
       )}
 
-      <div className={styles.modalFormBody}>
+      <div className={styles.modalFormBody} data-modal-stack>
+        <div data-modal-block>
         <div className={styles.formRowDual}>
           <div className={styles.formField}>
             <label htmlFor="modal-nombre" className={styles.fieldLabel}>
@@ -186,6 +187,7 @@ const DatosPersonalesForm: React.FC<{
             onChange={(val) => setFormDatos({ ...formDatos, sexo: val })}
             options={OPCIONES_SEXO}
           />
+        </div>
         </div>
       </div>
 
@@ -272,7 +274,7 @@ const EmailForm: React.FC<{
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.modalFormContainer} autoComplete="off">
+    <form onSubmit={handleSubmit} className={styles.modalFormContainer} autoComplete="off" data-modal-frame>
       {errorMsg && (
         <div className={styles.modalAlertError}>
           <AlertCircle size={15} />
@@ -280,7 +282,8 @@ const EmailForm: React.FC<{
         </div>
       )}
 
-      <div className={styles.modalFormBody}>
+      <div className={styles.modalFormBody} data-modal-stack>
+        <div data-modal-block>
         <div className={styles.formField}>
           <label htmlFor="modal-email-nuevo" className={styles.fieldLabel}>
             Nuevo correo electrónico *
@@ -329,6 +332,7 @@ const EmailForm: React.FC<{
             </div>
           </div>
         )}
+        </div>
       </div>
 
       <div className={styles.modalFormFooter}>

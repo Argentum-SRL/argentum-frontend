@@ -199,7 +199,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 20px 20px;
+  padding: 0 var(--modal-pad-x) var(--modal-pad-x);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
   mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
 }
@@ -414,8 +414,8 @@
 .formHeader {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px var(--modal-pad-x) 14px; /* Separación lateral oficial */
+  gap: 8px;
+  padding: 20px var(--modal-pad-x) 0; /* Separación lateral oficial, bottom 0 para no sumar al gap */
   flex-shrink: 0;
 }
 
@@ -442,7 +442,7 @@
 .bankPreview {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
 }
 
@@ -577,7 +577,6 @@
   padding: 20px var(--modal-pad-x); /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
   mask-image: linear-gradient(to bottom, transparent 0px, black 14px, black 100%);
 }
@@ -588,14 +587,13 @@
 }
 
 .formBodyWithHeader .formHeader {
-  padding: 16px var(--modal-pad-x) 14px; /* Separación lateral oficial */
+  padding: 20px var(--modal-pad-x) 0; /* Separación lateral oficial, bottom 0 para no sumar */
 }
 
 .formFields {
-  padding: 14px var(--modal-pad-x) 16px; /* Separación lateral oficial */
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
 }
 
 .formBody::-webkit-scrollbar {
@@ -610,7 +608,25 @@
 /* Campos */
 .montoHeroField {
   width: 100%;
-  margin-bottom: 2px;
+  margin-bottom: 0;
+}
+
+.montoHint {
+  font-size: 12px;
+  color: var(--text-3);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.cicloOptionsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-label-gap);
+  margin: 0;
+}
+
+.dateInputWrapper {
+  margin: 0;
 }
 
 .formField {
@@ -773,7 +789,7 @@
 .settingsCardsList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--modal-option-gap);
   width: 100%;
 }
 
@@ -1062,7 +1078,7 @@
 .warningBox {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   padding: 12px 14px;
   border-radius: 12px;
   background: rgba(201, 162, 39, 0.08);

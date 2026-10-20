@@ -9,6 +9,7 @@ import { formatMonto } from '@/utils/format'
 import { EmptyState, TarjetaSummarySkeleton } from '@/components/ui'
 import PagarResumenModal from './PagarResumenModal'
 import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
+import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import styles from './TarjetaSummary.module.css'
 
 interface TarjetaSummaryProps {
@@ -473,6 +474,14 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
               {currentTicket.cuotas.length > 0 ? (
                 currentTicket.cuotas.map((cuota, idx) => (
                   <div key={cuota.id || idx} className={styles.itemRow}>
+                    <MovimientoAvatar
+                      movimiento={{
+                        descripcion: cuota.descripcion,
+                        suscripcion_id: cuota.suscripcion_id,
+                        subcategoria_nombre: cuota.subcategoria_nombre,
+                      }}
+                      size={24}
+                    />
                     <div className={styles.itemMain}>
                       <div className={styles.itemTitleRow}>
                         <span className={`${styles.itemTitle} ${cuota.pagada ? styles.itemTitlePaid : ''}`}>
@@ -515,9 +524,14 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                 <div className={styles.bimonedaContainer}>
                   {/* Bloque Pesos */}
                   <div className={styles.monedaBlock}>
-                    <div className={styles.monedaBlockHeader}>
-                      <span className={styles.monedaBadge}>Pesos</span>
+                    <div className={styles.monedaMainRow}>
+                      <div className={styles.monedaBadgeGroup}>
+                        <span className={styles.monedaBadge}>Pesos</span>
+                        <span className={styles.heroTotalLabel}>Total a pagar</span>
+                      </div>
+                      <span className={styles.heroTotalValue}>{formatMonto(currentTicket.totalAPagarARS || 0, 'ARS')}</span>
                     </div>
+
                     {/* Solo mostrar desglose si hay deuda anterior o saldo financiado */}
                     {((currentTicket.totalVencidoAnteriorARS || 0) > 0 || (currentTicket.saldoArrastradoARS || 0) > 0) && (
                       <div className={styles.breakdownList}>
@@ -539,10 +553,7 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                         )}
                       </div>
                     )}
-                    <div className={styles.heroTotalRow}>
-                      <span className={styles.heroTotalLabel}>Total a pagar</span>
-                      <span className={styles.heroTotalValue}>{formatMonto(currentTicket.totalAPagarARS || 0, 'ARS')}</span>
-                    </div>
+
                     {currentTicket.pagoMinimoARS !== undefined && currentTicket.pagoMinimoARS > 0 && (
                       <div className={styles.minimoRow}>
                         <span className={styles.minimoLabel}>
@@ -554,11 +565,18 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                     )}
                   </div>
 
+                  <div className={styles.bimonedaDivider} />
+
                   {/* Bloque Dólares */}
                   <div className={styles.monedaBlock}>
-                    <div className={styles.monedaBlockHeader}>
-                      <span className={styles.monedaBadge}>Dólares</span>
+                    <div className={styles.monedaMainRow}>
+                      <div className={styles.monedaBadgeGroup}>
+                        <span className={styles.monedaBadge}>Dólares</span>
+                        <span className={styles.heroTotalLabel}>Total a pagar</span>
+                      </div>
+                      <span className={styles.heroTotalValue}>{formatMonto(currentTicket.totalAPagarUSD || 0, 'USD')}</span>
                     </div>
+
                     {/* Solo mostrar desglose si hay deuda anterior o saldo financiado */}
                     {((currentTicket.totalVencidoAnteriorUSD || 0) > 0 || (currentTicket.saldoArrastradoUSD || 0) > 0) && (
                       <div className={styles.breakdownList}>
@@ -580,27 +598,29 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                         )}
                       </div>
                     )}
-                    <div className={styles.heroTotalRow}>
-                      <span className={styles.heroTotalLabel}>Total a pagar</span>
-                      <span className={styles.heroTotalValue}>{formatMonto(currentTicket.totalAPagarUSD || 0, 'USD')}</span>
-                    </div>
-                    {currentTicket.totalEstimadoARSUSD !== undefined && currentTicket.totalEstimadoARSUSD !== null && (
-                      <div className={styles.monedaEstimacionRow}>
-                        <span className={styles.monedaEstimacionVal}>
-                          ≈ {formatMonto(currentTicket.totalEstimadoARSUSD, 'ARS')}
-                        </span>
-                        <span className={styles.monedaEstimacionTag}>
-                          (Oficial ${currentTicket.cotizacionOficialUSD || ''} + {currentTicket.porcentajePercepcionUSD ?? 30}%)
-                        </span>
-                      </div>
-                    )}
-                    {currentTicket.pagoMinimoUSD !== undefined && currentTicket.pagoMinimoUSD > 0 && (
-                      <div className={styles.minimoRow}>
-                        <span className={styles.minimoLabel}>
-                          Pago mínimo
-                          <span className={styles.minimoTag}>Estimado</span>
-                        </span>
-                        <span className={styles.minimoVal}>{formatMonto(currentTicket.pagoMinimoUSD, 'USD')}</span>
+
+                    {((currentTicket.totalEstimadoARSUSD !== undefined && currentTicket.totalEstimadoARSUSD !== null) ||
+                      (currentTicket.pagoMinimoUSD !== undefined && currentTicket.pagoMinimoUSD > 0)) && (
+                      <div className={styles.monedaSubRow}>
+                        {currentTicket.totalEstimadoARSUSD !== undefined && currentTicket.totalEstimadoARSUSD !== null && (
+                          <div className={styles.monedaEstimacionRow}>
+                            <span className={styles.monedaEstimacionVal}>
+                              ≈ {formatMonto(currentTicket.totalEstimadoARSUSD, 'ARS')}
+                            </span>
+                            <span className={styles.monedaEstimacionTag}>
+                              (Oficial ${currentTicket.cotizacionOficialUSD || ''} + {currentTicket.porcentajePercepcionUSD ?? 30}%)
+                            </span>
+                          </div>
+                        )}
+                        {currentTicket.pagoMinimoUSD !== undefined && currentTicket.pagoMinimoUSD > 0 && (
+                          <div className={styles.minimoRow}>
+                            <span className={styles.minimoLabel}>
+                              Pago mínimo
+                              <span className={styles.minimoTag}>Estimado</span>
+                            </span>
+                            <span className={styles.minimoVal}>{formatMonto(currentTicket.pagoMinimoUSD, 'USD')}</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -239,7 +239,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       const container = tarjetasCarouselRef.current
       if (!container) return
       const card = container.querySelector(`[data-id="${editTarjetaId}"]`) as HTMLElement | null
-      const scroller = container.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+      const scroller = container.closest('[data-modal-carousel]') as HTMLElement | null
       if (card && scroller) {
         const cardRect = card.getBoundingClientRect()
         const scrollerRect = scroller.getBoundingClientRect()
@@ -303,7 +303,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       const container = detailWalletsCarouselRef.current
       if (!container) return
       const card = container.querySelector(`[data-id="${billeteraSeleccionada}"]`) as HTMLElement | null
-      const scroller = container.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+      const scroller = container.closest('[data-modal-carousel]') as HTMLElement | null
       if (card && scroller) {
         const cardRect = card.getBoundingClientRect()
         const scrollerRect = scroller.getBoundingClientRect()

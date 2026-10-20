@@ -6,7 +6,7 @@
 .trigger {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   height: 40px;
   padding: 0 10px 0 12px;
   background: transparent;
@@ -43,45 +43,13 @@
 
 .panel {
   position: fixed;
-  z-index: 9100;
+  z-index: var(--z-modal);
   background: var(--surface);
   border: 1px solid var(--surface-alt);
   border-radius: 12px;
   box-shadow: var(--elevation-md);
   overflow: hidden;
   padding: 4px;
-}
-
-/* ─── MOBILE ──────────────────────────────────────── */
-
-.mobileOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9200;
-  background: rgba(10, 13, 18, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.mobilePanelWrap {
-  background: var(--surface);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: var(--elevation-lg);
-  width: 100%;
-  max-width: 280px;
-  max-height: 60dvh;
-  overflow-y: auto;
-}
-
-.mobilePanelTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-2);
-  padding: 14px 16px 8px;
-  border-bottom: 0.5px solid var(--surface-alt);
 }
 
 /* ─── OPCIONES ────────────────────────────────────── */

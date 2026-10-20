@@ -2,14 +2,14 @@
   width: 100%;
   display: flex;
   height: 14px;
-  border-radius: 99px;
+  border-radius:99px;
   overflow: hidden;
   background: var(--surface-alt);
 }
 
 .distSegment {
   height: 100%;
-  transition: width 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: width 0.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .distSegmentPrevio   { background: var(--primary); }
@@ -22,7 +22,7 @@
 .distLegend {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px 16px;
+  gap: 8px 16px;
 }
 
 @media (min-width: 640px) {
@@ -40,7 +40,7 @@
 .distDot {
   width: 11px;
   height: 11px;
-  border-radius: 3px;
+  border-radius:3px;
   flex-shrink: 0;
   margin-top: 3px;
 }
@@ -48,7 +48,7 @@
 .distLegendInfo {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
   min-width: 0;
 }
 
@@ -102,7 +102,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius:10px;
   box-shadow: var(--elevation-md);
 }
 
@@ -128,7 +128,7 @@
 /* ── Accordion (ExplicacionCalculo) ──────────────────────────────────────── */
 .accordion {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius:14px;
   overflow: hidden;
 }
 
@@ -178,7 +178,7 @@
 .formulaBlock {
   background: var(--page);
   padding: 12px;
-  border-radius: 8px;
+  border-radius:8px;
   font-family: 'Courier New', monospace;
   text-align: center;
   font-size: 12px;
@@ -198,7 +198,7 @@
   background: rgba(168, 144, 90, 0.1);
   color: var(--gold);
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius:6px;
   letter-spacing: 0.04em;
 }
 
@@ -209,7 +209,7 @@
 /* ── Pre-calculation Preview Cards ────────────────────────────────────────── */
 .previewPlaceholderCard {
   background: var(--surface);
-  border-radius: 20px;
+  border-radius:20px;
   border: 1px dashed var(--border);
   padding: 20px;
   display: flex;
@@ -223,14 +223,14 @@
 @media (min-width: 768px) {
   .previewPlaceholderCard {
     padding: 24px;
-    gap: 18px;
+    gap: 16px;
   }
 }
 
 .previewHeader {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .previewIconBox {
@@ -239,7 +239,7 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius:12px;
   background: rgba(13, 32, 69, 0.06);
   color: var(--primary);
   flex-shrink: 0;
@@ -253,7 +253,7 @@
 .previewTitleGroup {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .previewTitle {
@@ -285,7 +285,7 @@
   align-items: flex-start;
   gap: 12px;
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius:12px;
   background: var(--surface-alt);
   border: 1px solid transparent;
   transition: all 0.2s ease;
@@ -331,7 +331,7 @@
 .fwShell {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius:20px;
   padding: 40px 24px 48px;
   display: flex;
   flex-direction: column;
@@ -359,7 +359,7 @@
 .fwDot {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius:50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -462,7 +462,7 @@
 .fwHeroBlock {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .fwEyebrow {
@@ -513,7 +513,7 @@
   gap: 6px;
   background: var(--surface-alt);
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   padding: 8px 14px;
   cursor: pointer;
   font-family: inherit;
@@ -549,7 +549,7 @@
 .fwSection {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .fwSectionLabelRow {
@@ -621,7 +621,7 @@
   align-items: center;
   justify-content: center;
   padding: 8px 16px;
-  border-radius: 10px;
+  border-radius:10px;
   font-size: 13.5px;
   font-weight: 700;
   border: 1.5px solid var(--border);
@@ -658,7 +658,7 @@
 .fwToggleRow {
   display: flex;
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   overflow: hidden;
   background: var(--surface-alt);
 }

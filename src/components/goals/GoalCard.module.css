@@ -7,7 +7,7 @@
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.2s ease,
               box-shadow 0.2s ease,
@@ -121,7 +121,7 @@
 .metaRow {
   display: flex;
   align-items: center;
-  gap: 4.5px;
+  gap: 4.4px;
   font-size: 11.5px;
   line-height: 1;
   color: var(--text-3);
@@ -192,7 +192,7 @@
 .targetGroup {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
 }
 
 .targetGroup {
@@ -259,7 +259,7 @@
   font-weight: 500;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .remainingAmount {

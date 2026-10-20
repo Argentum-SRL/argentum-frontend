@@ -7,13 +7,14 @@ export interface ModalStepDots {
   current: number
 }
 
-interface ModalProps {
+export interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title?: React.ReactNode
   children: React.ReactNode
   footer?: React.ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl'
+  variant?: 'dialog' | 'sheet'
   showHeader?: boolean
   noPadding?: boolean
   className?: string
@@ -24,6 +25,20 @@ interface ModalProps {
   stepDots?: ModalStepDots
 }
 
+// Estado a nivel de módulo para modales apilados (bloqueo de scroll y Escape jerárquico)
+let openModalCount = 0
+const modalEscapeStack: Array<() => void> = []
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && modalEscapeStack.length > 0) {
+      const topCloseHandler = modalEscapeStack[modalEscapeStack.length - 1]
+      topCloseHandler()
+      e.stopPropagation()
+    }
+  })
+}
+
 const Modal: React.FC<ModalProps> = ({ 
   isOpen, 
   onClose, 
@@ -31,6 +46,7 @@ const Modal: React.FC<ModalProps> = ({
   children, 
   footer,
   size = 'md',
+  variant = 'dialog',
   showHeader = true,
   noPadding = false,
   className = '',
@@ -41,22 +57,29 @@ const Modal: React.FC<ModalProps> = ({
   stepDots,
 }) => {
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return
+
+    openModalCount++
+    if (openModalCount === 1) {
       document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
     }
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && closeOnEscape) {
-        onClose()
-      }
+    if (closeOnEscape) {
+      modalEscapeStack.push(onClose)
     }
 
-    document.addEventListener('keydown', handleKeyDown)
     return () => {
-      document.body.style.overflow = 'unset'
-      document.removeEventListener('keydown', handleKeyDown)
+      openModalCount = Math.max(0, openModalCount - 1)
+      if (openModalCount === 0) {
+        document.body.style.overflow = 'unset'
+      }
+
+      if (closeOnEscape) {
+        const idx = modalEscapeStack.lastIndexOf(onClose)
+        if (idx !== -1) {
+          modalEscapeStack.splice(idx, 1)
+        }
+      }
     }
   }, [isOpen, onClose, closeOnEscape])
 
@@ -64,13 +87,13 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div 
-      className={styles.overlay} 
+      className={`${styles.overlay} ${variant === 'sheet' ? styles.sheetOverlay : ''}`} 
       onClick={closeOnOverlayClick ? onClose : undefined}
     >
       <div 
         className={`
           ${styles.container} 
-          ${styles[size]} 
+          ${variant === 'sheet' ? styles.sheet : styles[size]} 
           ${noPadding ? styles.noPadding : ''} 
           ${autoHeight ? styles.modalAuto : ''}
           ${className}
@@ -80,6 +103,10 @@ const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         aria-label={ariaLabel}
       >
+        {/* Handle superior unificado para hojas inferiores (variant="sheet") */}
+        {variant === 'sheet' && (
+          <div className={styles.sheetHandle} aria-hidden="true" />
+        )}
         {/* Indicador de pasos superior opcional (solo se muestra si total > 1) */}
         {stepDots && stepDots.total > 1 && (
           <div

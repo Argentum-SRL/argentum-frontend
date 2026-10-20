@@ -1,33 +1,4 @@
 
-.profileSheet {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  max-height: var(--modal-max-h);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  background: var(--surface);
-  border-radius: 24px 24px 0 0;
-  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
-  z-index: 1001;
-  box-shadow: var(--elevation-lg);
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.profileSheetTitle {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
-  padding-left: 4px;
-}
-
 .profileSheetItem {
   display: flex;
   align-items: center;
@@ -39,7 +10,7 @@
   color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
-  border-radius: 16px;
+  border-radius:16px;
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.1s ease;
   text-decoration: none;
@@ -53,16 +24,6 @@
 .profileSheetItemDanger {
   color: var(--error);
   background: var(--error-bg);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
 }
 
 .progressDivider {
@@ -96,7 +57,7 @@
 .pagoIconContainer {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius:12px;
   background: var(--surface-alt);
   color: var(--primary);
   display: flex;
@@ -127,7 +88,7 @@
   background: var(--surface-alt);
   color: var(--text-2);
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius:6px;
   display: inline-block;
   margin-bottom: 4px;
 }
@@ -203,7 +164,7 @@
 .balanceFooter {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .balanceTrends {
@@ -215,7 +176,7 @@
 .balanceTrendItem {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 
 .trendUp {
@@ -237,7 +198,7 @@
 
 .balanceFooterDivider {
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
   margin: 0;
 }
 
@@ -366,7 +327,7 @@
   background: var(--surface-card, rgba(255, 255, 255, 0.04));
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-left: 3px solid var(--primary, #00bb7d);
-  border-radius: 12px;
+  border-radius:12px;
   margin-bottom: 20px;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
@@ -391,7 +352,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius:8px;
   background: rgba(0, 187, 125, 0.12);
   color: var(--primary, #00bb7d);
   flex-shrink: 0;
@@ -427,7 +388,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius:4px;
   background: rgba(0, 187, 125, 0.16);
   color: var(--primary, #00bb7d);
 }
@@ -460,7 +421,7 @@
   color: #fff;
   background: var(--primary, #00bb7d);
   border: none;
-  border-radius: 8px;
+  border-radius:8px;
   text-decoration: none;
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.15s ease;
@@ -477,7 +438,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius:50%;
   background: transparent;
   border: none;
   color: var(--text-3, rgba(255, 255, 255, 0.4));
@@ -496,17 +457,17 @@
     padding: 6px 8px 6px 10px;
     gap: 8px;
     margin-bottom: 12px;
-    border-radius: 10px;
+    border-radius:10px;
   }
 
   .whatsappBannerMainLink {
-    gap: 10px;
+    gap: 8px;
   }
 
   .whatsappBannerIconBox {
     width: 26px;
     height: 26px;
-    border-radius: 6px;
+    border-radius:6px;
   }
 
   .whatsappBannerTitle {
@@ -550,4 +511,4 @@
 }
 
 
-
+

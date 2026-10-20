@@ -89,7 +89,7 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
           </div>
         }
       >
-        <form onSubmit={handleSubmit} className={styles.modalFormContainer} noValidate>
+        <form onSubmit={handleSubmit} className={styles.modalFormContainer} data-modal-frame noValidate>
           {errorMsg && (
             <div className={styles.modalAlertError} role="alert">
               <AlertCircle size={15} />
@@ -97,7 +97,7 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
             </div>
           )}
 
-          <div className={styles.modalFormBody}>
+          <div className={styles.modalFormBody} data-modal-stack>
             <div className={styles.explanationBanner}>
               <Info size={16} />
               <span>
@@ -105,58 +105,60 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
               </span>
             </div>
 
-            <div className={styles.formField}>
-              <label htmlFor="bloqueo-nueva-pw" className={styles.fieldLabel}>
-                Nueva contraseña *
-              </label>
-              <div className={styles.passwordInputWrap}>
-                <input
-                  id="bloqueo-nueva-pw"
-                  type={showPassword ? 'text' : 'password'}
-                  className={styles.fieldInput}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Ingresá una contraseña segura"
-                  autoComplete="new-password"
-                  required
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  className={styles.modalPwEyeBtn}
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+            <div data-modal-block>
+              <div className={styles.formField} data-modal-field>
+                <label htmlFor="bloqueo-nueva-pw" className={styles.fieldLabel}>
+                  Nueva contraseña *
+                </label>
+                <div className={styles.passwordInputWrap}>
+                  <input
+                    id="bloqueo-nueva-pw"
+                    type={showPassword ? 'text' : 'password'}
+                    className={styles.fieldInput}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Ingresá una contraseña segura"
+                    autoComplete="new-password"
+                    required
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className={styles.modalPwEyeBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className={styles.formField}>
-              <label htmlFor="bloqueo-confirm-pw" className={styles.fieldLabel}>
-                Confirmar nueva contraseña *
-              </label>
-              <div className={styles.passwordInputWrap}>
-                <input
-                  id="bloqueo-confirm-pw"
-                  type={showPasswordConfirm ? 'text' : 'password'}
-                  className={styles.fieldInput}
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  placeholder="Repetí la contraseña"
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className={styles.modalPwEyeBtn}
-                  onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                  aria-label={showPasswordConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  tabIndex={-1}
-                >
-                  {showPasswordConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+              <div className={styles.formField} data-modal-field>
+                <label htmlFor="bloqueo-confirm-pw" className={styles.fieldLabel}>
+                  Confirmar nueva contraseña *
+                </label>
+                <div className={styles.passwordInputWrap}>
+                  <input
+                    id="bloqueo-confirm-pw"
+                    type={showPasswordConfirm ? 'text' : 'password'}
+                    className={styles.fieldInput}
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    placeholder="Repetí la contraseña"
+                    autoComplete="new-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={styles.modalPwEyeBtn}
+                    onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                    aria-label={showPasswordConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    tabIndex={-1}
+                  >
+                    {showPasswordConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
             </div>
 

@@ -15,6 +15,7 @@ import { TipoMovimientoMeta } from '@/types/goals'
 import type { Billetera } from '@/types'
 import goalsService from '@/services/goals.service'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
+import SelectableSurface from '@/components/ui/SelectableSurface'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import SegmentedControl from '@/components/ui/SegmentedControl'
@@ -155,7 +156,7 @@ export default function GoalContributionModal({
     const timer = setTimeout(() => {
       const card = cardRefs.current.get(billetera_id)
       if (card) {
-        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+        const scroller = card.closest('[data-modal-carousel]') as HTMLElement | null
         if (scroller) {
           const cardRect = card.getBoundingClientRect()
           const scrollerRect = scroller.getBoundingClientRect()
@@ -254,19 +255,14 @@ export default function GoalContributionModal({
       autoHeight
       className={styles.modalContribution}
       ariaLabel={`${tipo === 'aporte' ? 'Aportar a' : 'Retirar de'} meta`}
+      stepDots={{ total: 2, current: step - 1 }}
     >
       <div
         className={styles.slidesContainer}
       >
-        {/* Indicador de pasos superior centrado (Pill Dots) */}
-        <div className={styles.stepDots} aria-hidden="true">
-          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-        </div>
-
         {/* ──── PASO 1: Monto, Tipo y Billetera ──── */}
         {step === 1 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -287,7 +283,7 @@ export default function GoalContributionModal({
                 </div>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`} data-modal-stack>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -295,6 +291,7 @@ export default function GoalContributionModal({
                   </div>
                 )}
 
+                <div data-modal-block>
                 {/* Operation Bar (SegmentedControl) */}
                 <SegmentedControl<TipoMovimientoMeta>
                   options={[
@@ -316,7 +313,7 @@ export default function GoalContributionModal({
                 />
 
                 {/* Monto Hero */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <MontoInput
                     value={monto}
                     onChange={v => setField('monto', v)}
@@ -335,7 +332,7 @@ export default function GoalContributionModal({
                 </div>
 
                 {/* Selector de Billetera */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <div className={styles.labelWithBalance}>
                     <label className={styles.fieldLabel}>
                       {tipo === 'aporte' ? '¿De dónde sale la plata?' : '¿A dónde va la plata?'}
@@ -346,38 +343,33 @@ export default function GoalContributionModal({
                       </span>
                     )}
                   </div>
-                  <div className={styles.billeterasCarouselScroller}>
-                    <div className={styles.billeterasCarousel}>
+                  <div data-modal-carousel>
+                    <div data-modal-carousel-track>
                       {filteredBilleteras.length === 0 ? (
                         <div className={`${styles.localErrorAlert} ${styles.fullWidth}`}>
                           <AlertCircle size={16} />
                           <span>No tenés billeteras activas en {moneda === 'ARS' ? 'pesos' : 'dólares'}</span>
                         </div>
                       ) : filteredBilleteras.map(b => (
-                        <div
+                        <SelectableSurface
                           key={b.id}
-                          className={styles.billeteraSelectWrap}
-                          data-active={billetera_id === b.id}
-                          ref={el => { if (el) cardRefs.current.set(b.id, el) }}
+                          selected={billetera_id === b.id}
+                          context="modal"
+                          onClick={() => setField('billetera_id', b.id)}
+                          ref={el => { if (el) cardRefs.current.set(b.id, el as HTMLDivElement) }}
+                          title={`Seleccionar billetera ${b.nombre}`}
+                          aria-label={`Seleccionar billetera ${b.nombre}`}
                         >
                           <BilleteraCard 
                             billetera={b} 
-                            className={styles.fullHeightCard} 
-                            disableNavigation={true}
-                            hideCurrencyChip={true}
+                            variant="select"
                           />
-                          <button
-                            type="button"
-                            className={styles.billeteraOverlay}
-                            onClick={() => setField('billetera_id', b.id)}
-                            title={`Seleccionar billetera ${b.nombre}`}
-                            aria-label={`Seleccionar billetera ${b.nombre}`}
-                          />
-                        </div>
+                        </SelectableSurface>
                       ))}
                     </div>
                   </div>
                 </div>
+              </div>
               </div>
 
               <div className={styles.formFooter}>
@@ -394,7 +386,7 @@ export default function GoalContributionModal({
 
         {/* ──── PASO 2: Confirmación, Fecha y Conversión ──── */}
         {step === 2 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -418,13 +410,15 @@ export default function GoalContributionModal({
                 </div>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep2}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep2}`} data-modal-stack>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
                     <span>{localError}</span>
                   </div>
                 )}
+
+                <div data-modal-block>
 
                 {/* Tarjeta Resumen de Impacto en la Meta */}
                 <div className={styles.summaryCard}>
@@ -504,13 +498,14 @@ export default function GoalContributionModal({
                 )}
 
                 {/* Fecha */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Fecha de la operación</label>
                   <DateInput
                     value={fecha}
                     onChange={val => setField('fecha', val)}
                   />
                 </div>
+              </div>
               </div>
 
               <div className={styles.formFooter}>

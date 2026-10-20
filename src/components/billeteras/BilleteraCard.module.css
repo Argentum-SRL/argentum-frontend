@@ -24,7 +24,8 @@
   .frontCard {
     order: 99;
     transform: translateY(-16px);
-    margin-bottom: -84px !important; /* -100px + 16px para hacer espacio al levantarse */
+    /* r03-ok: solapamiento intencional de tarjeta activa en la pila móvil */
+    margin-bottom: -84px !important;
     z-index: 10;
   }
 }
@@ -98,7 +99,10 @@
 .wcTop {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
   /* Cuando hay logo de tarjeta, el contenido (wcCardLogoRow + chips) se apila
      en columna dentro del flex. El kebab queda auto-push a la derecha. */
 }
@@ -125,6 +129,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 }
 
 /* ── Logo de tarjeta libre (sin círculo) ─────────────────────────────────── */
@@ -165,12 +170,54 @@
 }
 
 .wcName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
   font-weight: 700;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.wcNameText {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2;
+  min-width: 0;
+}
+
+.starBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  pointer-events: auto;
+}
+
+.starLight {
+  color: #FCD34D;
+}
+
+.starDark {
+  color: #D97706;
+}
+
+.inversionBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  pointer-events: auto;
+}
+
+.inversionLight {
+  color: #34D399;
+}
+
+.inversionDark {
+  color: #059669;
 }
 
 .textLight { color: white; }
@@ -179,7 +226,7 @@
 .wcChipRow {
   display: flex;
   gap: 4px;
-  margin-top: 3px;
+  margin-top: 4px;
   flex-wrap: wrap;
 }
 
@@ -197,7 +244,7 @@
 .chipPrincipalLight { background: rgba(255,255,255,0.22); color: white; }
 .chipMonedaDark     { background: rgba(0,0,0,0.10); color: rgba(0,0,0,0.60); }
 .chipPrincipalDark  { background: rgba(0,0,0,0.14); color: rgba(0,0,0,0.80); }
-.chipInversion      { display: inline-flex; align-items: center; gap: 3px; }
+.chipInversion      { display: inline-flex; align-items: center; gap: 2px; }
 .chipInversionLight { background: rgba(255,255,255,0.20); color: white; }
 .chipInversionDark  { background: rgba(0,0,0,0.12); color: rgba(0,0,0,0.80); }
 
@@ -232,7 +279,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   padding: 0;
   transition: background 120ms ease;
 }
@@ -258,7 +305,7 @@
   border: 1px solid #EDECEA;
   overflow: hidden;
   min-width: 148px;
-  z-index: 100;
+  z-index: var(--z-dropdown);
   animation: dropIn 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -270,7 +317,7 @@
 .dropdownItem {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   width: 100%;
   padding: 10px 14px;
   font-size: 13px;
@@ -384,7 +431,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     padding: 0;
     border-radius: 20px;
     border: 1.5px dashed #D4D1C7;
@@ -522,4 +569,162 @@
 .overlayBtn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* ─── Variante Select: Card Canónica Unificada de Selector / Carrusel (Decisión 5) ─── */
+.wcSelect {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1.65 / 1;
+  border-radius: inherit;
+  overflow: hidden;
+  box-sizing: border-box;
+  container-type: inline-size;
+  user-select: none;
+}
+
+.selectInner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: clamp(10px, 4.8cqi, 14px) clamp(12px, 5.8cqi, 16px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.selectTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 28px;
+}
+
+.selectLogoGroup {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 3.2cqi, 8px);
+  min-width: 0;
+  flex: 1;
+}
+
+.selectLogo {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.selectLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.selectLogoFallback {
+  font-size: 11px;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-transform: uppercase;
+}
+
+.selectIdentity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.selectName {
+  font-size: clamp(12px, 5.8cqi, 14px);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.selectBadgeIcon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.selectSlotBadge {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.selectBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.selectMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: clamp(10px, 4.8cqi, 11px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.selectTipo {
+  text-transform: uppercase;
+  font-size: clamp(10px, 4.4cqi, 10.5px);
+  letter-spacing: 0.04em;
+}
+
+.metaLight {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.metaDark {
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.selectMonedaBadge {
+  font-size: clamp(9px, 4cqi, 9.5px);
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.monedaBadgeLight {
+  background: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+}
+
+.monedaBadgeDark {
+  background: rgba(0, 0, 0, 0.12);
+  color: #0F172A;
+}
+
+.selectSaldo {
+  font-size: clamp(15px, 7.5cqi, 18px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }

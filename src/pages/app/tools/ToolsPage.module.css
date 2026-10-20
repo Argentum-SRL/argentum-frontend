@@ -41,7 +41,7 @@
 .titleGroup {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex-shrink: 0;
 }
 

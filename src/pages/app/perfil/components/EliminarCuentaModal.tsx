@@ -76,57 +76,64 @@ export const EliminarCuentaModal: React.FC<EliminarCuentaModalProps> = ({
       autoHeight
       className={styles.modal}
     >
-      <form className={confirmStyles.modalContent} onSubmit={handleSubmit}>
-        <div className={[confirmStyles.iconWrap, confirmStyles.iconWrapDanger, styles.iconWrap].join(' ')}>
-          <AlertTriangle className={styles.iconAlert} size={32} />
+      <form className={confirmStyles.modalContent} onSubmit={handleSubmit} data-modal-frame>
+        <div className={confirmStyles.modalHeader}>
+          <div className={[confirmStyles.iconWrap, confirmStyles.iconWrapDanger, styles.iconWrap].join(' ')}>
+            <AlertTriangle className={styles.iconAlert} size={32} />
+          </div>
+
+          <h2 className={[confirmStyles.title, styles.title].join(' ')}>
+            ¿Eliminar tu cuenta de Argentum permanentemente?
+          </h2>
         </div>
 
-        <h2 className={[confirmStyles.title, styles.title].join(' ')}>
-          ¿Eliminar tu cuenta de Argentum permanentemente?
-        </h2>
-        <p className={[confirmStyles.description, styles.description].join(' ')}>
-          <span className={styles.descDesktop}>
-            Esta acción es IRREVERSIBLE. Se borrarán todas tus billeteras, transacciones, presupuestos, suscripciones y datos personales sin posibilidad de recuperación.
-          </span>
-          <span className={styles.descMobile}>
-            Esta acción es <strong>IRREVERSIBLE</strong>. Se borrarán todas tus billeteras, transacciones y datos sin posibilidad de recuperación.
-          </span>
-        </p>
+        <div className={confirmStyles.modalBody} data-modal-stack>
+          <p className={[confirmStyles.description, styles.description].join(' ')}>
+            <span className={styles.descDesktop}>
+              Esta acción es IRREVERSIBLE. Se borrarán todas tus billeteras, transacciones, presupuestos, suscripciones y datos personales sin posibilidad de recuperación.
+            </span>
+            <span className={styles.descMobile}>
+              Esta acción es <strong>IRREVERSIBLE</strong>. Se borrarán todas tus billeteras, transacciones y datos sin posibilidad de recuperación.
+            </span>
+          </p>
 
-        {tienePassword ? (
-          <div className={styles.inputWrap}>
-            <input
-              type="password"
-              autoComplete="current-password"
-              placeholder="Tu contraseña"
-              className={styles.passwordInput}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value)
-                if (errorMsg) setErrorMsg(null)
-              }}
-              disabled={isSubmitting}
-              autoFocus
-            />
-          </div>
-        ) : (
-          <div className={styles.googleWrap}>
-            <p className={styles.googleInstruction}>Para confirmar, elegí tu cuenta de Google.</p>
-            <div className={styles.googleBtnContainer}>
-              <GoogleLoginButton
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
+          <div data-modal-block>
+          {tienePassword ? (
+            <div className={styles.inputWrap} data-modal-field>
+              <input
+                type="password"
+                autoComplete="current-password"
+                placeholder="Tu contraseña"
+                className={styles.passwordInput}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  if (errorMsg) setErrorMsg(null)
+                }}
+                disabled={isSubmitting}
+                autoFocus
               />
             </div>
+          ) : (
+            <div className={styles.googleWrap} data-modal-field>
+              <p className={styles.googleInstruction}>Para confirmar, elegí tu cuenta de Google.</p>
+              <div className={styles.googleBtnContainer}>
+                <GoogleLoginButton
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                />
+              </div>
+            </div>
+          )}
           </div>
-        )}
 
-        {errorMsg && (
-          <div className={styles.errorAlert}>
-            <AlertCircle size={15} />
-            <span>{errorMsg}</span>
-          </div>
-        )}
+          {errorMsg && (
+            <div className={styles.errorAlert}>
+              <AlertCircle size={15} />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+        </div>
 
         <div className={[confirmStyles.actions, styles.actions].join(' ')}>
           <button
@@ -142,6 +149,7 @@ export const EliminarCuentaModal: React.FC<EliminarCuentaModalProps> = ({
               type="submit"
               className={[confirmStyles.confirmBtn, confirmStyles.confirmBtnDanger, styles.confirmBtn].join(' ')}
               disabled={!password.trim() || isSubmitting}
+              data-modal-delete
             >
               {isSubmitting && <LunarLoader size={16} />}
               Eliminar cuenta definitivamente

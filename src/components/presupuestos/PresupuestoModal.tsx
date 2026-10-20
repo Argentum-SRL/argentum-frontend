@@ -469,22 +469,16 @@ export default function PresupuestoModal({
       showHeader={false}
       noPadding
       autoHeight
+      stepDots={{ total: 3, current: step - 1 }}
       className={styles.modalPresupuesto}
       ariaLabel="Gestionar presupuesto"
     >
       <div
         className={styles.slidesContainer}
       >
-        {/* Indicador de pasos superior centrado (Pill Dots) */}
-        <div className={styles.stepDots} aria-hidden="true">
-          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 3 ? styles.stepDotActive : styles.stepDotInactive}`} />
-        </div>
-
         {/* ──── STEP 1: Nombre y Monto Límite ──── */}
         {step === 1 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -504,6 +498,7 @@ export default function PresupuestoModal({
                       onClick={handleDelete}
                       title="Eliminar presupuesto"
                       aria-label="Eliminar presupuesto"
+                      data-modal-delete
                     >
                       <Trash2 size={16} />
                     </button>
@@ -514,7 +509,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`} data-modal-stack>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -522,7 +517,8 @@ export default function PresupuestoModal({
                   </div>
                 )}
 
-                <div className={styles.formField}>
+                <div data-modal-block>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Nombre del presupuesto</label>
                   <input
                     type="text"
@@ -535,7 +531,7 @@ export default function PresupuestoModal({
                   />
                 </div>
 
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <MontoInput
                     value={monto}
                     onChange={v => setField('monto', v)}
@@ -546,6 +542,7 @@ export default function PresupuestoModal({
                     label="Monto límite"
                   />
                   <p className={styles.fieldHint}>Este será el límite máximo de gasto para el periodo seleccionado.</p>
+                </div>
                 </div>
               </div>
 
@@ -563,7 +560,7 @@ export default function PresupuestoModal({
 
         {/* ──── STEP 2: Selección de Categorías de Egreso ──── */}
         {step === 2 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -585,7 +582,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep2}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep2}`} data-modal-stack>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -801,7 +798,7 @@ export default function PresupuestoModal({
 
         {/* ──── STEP 3: Frecuencia y Renovación ──── */}
         {step === 3 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -823,7 +820,7 @@ export default function PresupuestoModal({
                 </div>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep3}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep3}`} data-modal-stack>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -831,7 +828,8 @@ export default function PresupuestoModal({
                   </div>
                 )}
 
-                <div className={styles.formField}>
+                <div data-modal-block>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Periodo de tiempo</label>
                   <SegmentedControl<'semanal' | 'quincenal' | 'mensual'>
                     options={[
@@ -846,7 +844,7 @@ export default function PresupuestoModal({
                   />
                 </div>
 
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Renovación</label>
                   <div className={styles.renewalOptions} role="radiogroup" aria-label="Tipo de renovación">
                     <div
@@ -889,6 +887,7 @@ export default function PresupuestoModal({
                       </div>
                     </div>
                   </div>
+                </div>
                 </div>
               </div>
 

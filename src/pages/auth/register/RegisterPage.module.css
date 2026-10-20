@@ -204,7 +204,7 @@
 .termsRow {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 20px;
   text-align: left;
 }

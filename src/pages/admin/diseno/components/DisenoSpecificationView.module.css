@@ -20,7 +20,7 @@
 .headerLeft {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
 }
 
 .specIconWrap {
@@ -54,7 +54,7 @@
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -140,7 +140,7 @@
 .fieldsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 12px;
 }
 
 .fieldCol {
@@ -227,7 +227,7 @@
   padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .a11yHeader {
@@ -281,7 +281,7 @@
 .conflictAlertText {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 13px;
   font-weight: 600;
 }

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Check } from '@/components/ui/icons'
+import { Check } from '@/components/ui/icons'
+import Modal from '@/components/ui/Modal/Modal'
 import styles from './ColorPicker.module.css'
 
 const PRESET_COLORS = [
@@ -235,44 +236,19 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         )}
 
       {/* Mobile Bottom Sheet */}
-      {open && isMobile && typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            className={styles.bottomSheetOverlay}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) setOpen(false)
-            }}
-            role="presentation"
-          >
-            <div
-              className={styles.bottomSheet}
-              ref={panelRef}
-              role="dialog"
-              aria-modal="true"
-              aria-label={label || 'Seleccionar color'}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className={styles.dragHandle} aria-hidden="true" />
-              
-              <div className={styles.bottomSheetHeader}>
-                <span className={styles.bottomSheetTitle}>{label || 'Color distintivo'}</span>
-                <button
-                  type="button"
-                  className={styles.closeBtn}
-                  onClick={() => setOpen(false)}
-                  aria-label="Cerrar selector de color"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className={styles.contentWrap}>
-                {renderContent('mobile')}
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
+      {open && isMobile && (
+        <Modal
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          variant="sheet"
+          title={label || 'Color distintivo'}
+          size="sm"
+        >
+          <div className={styles.contentWrap} data-modal-block>
+            {renderContent('mobile')}
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

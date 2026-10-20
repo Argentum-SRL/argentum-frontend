@@ -334,10 +334,10 @@ export const ImportacionResumenSection: React.FC = () => {
       ) : (
         <div className={styles.formContainer}>
           {/* Step Indicator Dots */}
-          <div className={styles.stepDots}>
-            <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-            <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-            <div className={`${styles.stepDot} ${step === 3 ? styles.stepDotActive : styles.stepDotInactive}`} />
+          <div className={styles.sectionStepDots}>
+            <div className={`${styles.stepDot} ${step === 1 ? styles.sectionStepDotActive : styles.sectionStepDotInactive}`} />
+            <div className={`${styles.stepDot} ${step === 2 ? styles.sectionStepDotActive : styles.sectionStepDotInactive}`} />
+            <div className={`${styles.stepDot} ${step === 3 ? styles.sectionStepDotActive : styles.sectionStepDotInactive}`} />
           </div>
 
           <div className={styles.formHeader}>

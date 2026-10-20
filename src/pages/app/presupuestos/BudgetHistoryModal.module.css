@@ -1,14 +1,22 @@
 .modalContent {
   display: flex;
   flex-direction: column;
-  padding: 32px;
-  gap: 24px;
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.skeletonItem {
+  padding: 16px;
+}
+
+.skeletonHeader {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 8px;
 }
 
@@ -71,9 +79,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: 480px;
-  overflow-y: auto;
-  padding-right: 8px;
 }
 
 .historyItem {

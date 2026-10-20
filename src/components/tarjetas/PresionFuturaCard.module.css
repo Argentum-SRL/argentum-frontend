@@ -5,7 +5,7 @@
 .summaryContainer {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -51,14 +51,14 @@
 .headerLeft {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
 .titleRow {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -103,7 +103,7 @@
   align-items: flex-end;
   text-align: right;
   flex-shrink: 0;
-  gap: 1px;
+  gap: 0px;
 }
 
 .totalLabel {
@@ -132,7 +132,7 @@
 .monthRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 6px 8px;
   border-radius: 8px;
   transition: background-color 0.15s ease;
@@ -192,7 +192,7 @@
 .emptyCard {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;

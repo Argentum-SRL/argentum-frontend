@@ -51,7 +51,7 @@
 /* ── Header ─────────────────────────────────────────────────────────────── */
 .header {
   display: flex;
-  gap: 14px;
+  gap: 12px;
 }
 
 .logoWrapper {
@@ -121,7 +121,7 @@
 .proximoCobro {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 12px;
   font-weight: 500;
 }

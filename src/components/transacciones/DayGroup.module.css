@@ -6,7 +6,7 @@
   margin-bottom: 22px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .dayGroupWrapper:last-child {

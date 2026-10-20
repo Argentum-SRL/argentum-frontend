@@ -35,19 +35,26 @@
   --z-toast: 600; /* Notificaciones flotantes tipo toast */
   --z-tooltip: 700; /* Tooltips de ayuda en la capa superior absoluta */
 
-  /* ── Medidas del Modal ── */
+  /* ── Medidas y Espaciado del Modal (Sistema v3: Espaciado por Relación) ── */
   --modal-radius: var(--radius-modal); /* Radio de esquina del contenedor del modal */
-  --modal-pad-x: var(--space-xl); /* Padding horizontal constante en modales (20px) */
-  --modal-content-pad-top: var(--space-md); /* Padding superior del contenido del modal */
-  --modal-content-pad-bottom: var(--space-lg); /* Padding inferior del contenido del modal */
-  --modal-field-gap: var(--space-lg); /* Separación estándar entre campos consecutivos */
-  --modal-group-gap: var(--space-2xl); /* Separación entre grupos o bloques temáticos de campos */
-  --modal-label-gap: var(--space-sm); /* Separación entre etiqueta y su respectivo campo de entrada */
-  --modal-footer-pad-top: var(--space-md); /* Padding superior del pie del modal */
-  --modal-footer-pad-bottom: var(--space-lg); /* Padding inferior del pie del modal */
-  --modal-footer-gap: var(--space-md); /* Separación horizontal entre los dos botones del pie */
+  --modal-pad-x: 20px; /* Padding horizontal lateral constante en modales (20px) */
+  --modal-label-gap: 8px; /* Etiqueta, texto de ayuda o error a su control (8px) */
+  --modal-option-gap: 8px; /* Opciones o toggles de una misma pregunta (8px) */
+  --modal-field-gap: 12px; /* Campo a campo dentro del mismo bloque (12px) */
+  --modal-block-gap: 20px; /* Bloque a bloque en >480px (20px; en <=480px pasa a 16px) */
+  --modal-section-title-gap: 10px; /* Subtítulo de un bloque a su primer elemento (10px) */
+  --modal-header-gap: 20px; /* Título/header del modal al primer bloque (20px) */
+  --modal-footer-gap: 24px; /* Último bloque a la fila de botones del footer (24px) */
+  --modal-content-pad-top: var(--modal-header-gap); /* Padding superior del contenido del modal (20px) */
+  --modal-content-pad-bottom: var(--modal-footer-gap); /* Padding inferior del contenido del modal (24px) */
+  --modal-footer-pad-top: 0px; /* Padding superior del pie del modal (sin sumar al gap) */
+  --modal-footer-pad-bottom: var(--space-xl); /* Padding inferior del pie del modal hacia el borde (20px) */
   --modal-max-h: 90dvh; /* Altura máxima permitida para el diálogo modal */
-  --carousel-pad: var(--space-2xl); /* Padding de carruseles = alcance de la sombra de selección (--elevation-reach-selection-carousel, 20px) más elevación y escala de la tarjeta elegida (4px) */
+  --carousel-pad: var(--space-2xl); /* Padding de carruseles */
+  --carousel-reach-top: 3px; /* Alcance vertical superior de la sombra de selección (12 - 3 - 6) */
+  --carousel-reach-bottom: 15px; /* Alcance vertical inferior de la sombra de selección (6 + 12 - 3) */
+  --select-card-w-min: 208px; /* Ancho mínimo de card de billetera/tarjeta selectora en carrusel */
+  --select-card-w-max: 248px; /* Ancho máximo de card de billetera/tarjeta selectora en carrusel */
 
   /* ── Puntos de Paso (StepDots) ── */
   --stepdots-pad: var(--space-lg) var(--space-xl) var(--space-xs); /* Padding superior, lateral e inferior del indicador de pasos */
@@ -59,7 +66,7 @@
   /* ── Medidas del Selector Cápsula ── */
   --selector-gap: var(--space-icon); /* Separación horizontal entre botones de selección (6px) */
   --selector-pill-h: 40px; /* Altura mínima de la píldora para diseño horizontal o inline (44px en táctil) */
-  --selector-pill-h-stacked: 56px; /* Altura mínima de la píldora para diseño vertical o apilado */
+  --selector-pill-h-stacked: 48px; /* Altura mínima de la píldora para diseño vertical o apilado */
 
   /* ── Colores del Selector Cápsula ── */
   --selector-pill-bg-active: var(--primary); /* Fondo del botón de selección activo */
@@ -94,4 +101,12 @@
     --screen-scale: 1.2; /* Escala aumentada al 120% en pantallas de 2560px o más */
   }
 }
+
+/* Espaciado de bloques en celulares chicos (<=480px: 16px) */
+@media (max-width: 480px) {
+  :root {
+    --modal-block-gap: 16px;
+  }
+}
+
 

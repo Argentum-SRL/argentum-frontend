@@ -43,32 +43,7 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── Step Indicator Dots ─────────────────────────────────────────────────── */
-.stepDots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 20px 0;
-  flex-shrink: 0;
-}
 
-.stepDot {
-  height: 5px;
-  border-radius: 99px;
-  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
-  background: var(--surface-alt);
-}
-
-.stepDotActive {
-  background: var(--primary);
-  width: 20px;
-}
-
-.stepDotInactive {
-  width: 6px;
-  opacity: 0.4;
-}
 
 /* ── Formulario Base ─────────────────────────────────────────────────────── */
 .formContainer {
@@ -84,7 +59,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px var(--modal-pad-x) 8px; /* Separación lateral oficial */
+  padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
   flex-shrink: 0;
 }
 
@@ -117,34 +92,10 @@
 }
 
 .formBody {
-  padding: 4px var(--modal-pad-x) 12px; /* Separación lateral oficial */
-  display: flex;
-  flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-}
-
-/* En el Paso 1 todo el contenido cabe perfectamente, por lo que se elimina el scroll vertical */
-.formBodyStep1 {
-  overflow-y: hidden;
-}
-
-@media (max-height: 620px) {
-  .formBodyStep1 {
-    overflow-y: auto;
-  }
-}
-
-.formBody::-webkit-scrollbar {
-  width: 4px;
-}
-
-.formBody::-webkit-scrollbar-thumb {
-  background: var(--surface-alt);
-  border-radius: 4px;
+  overflow: visible;
 }
 
 .formField {
@@ -188,237 +139,6 @@
 
 
 
-/* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
-.billeterasCarouselScroller {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  overscroll-behavior-x: contain;
-  padding: var(--carousel-pad) 0;
-  margin: 0;
-}
-
-.billeterasCarouselScroller::-webkit-scrollbar {
-  display: none;
-}
-
-/* Carrusel canónico: padding = alcance de la sombra de selección (ver DISENO_UNIFICADO.md, carruseles) */
-.billeterasCarousel {
-  --elevation-selection-modal: var(--elevation-selection-carousel);
-  display: flex;
-  gap: 16px;
-  overflow: visible;
-  scroll-snap-type: x mandatory;
-  padding: 0 var(--carousel-pad);
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  min-width: 100%;
-  box-sizing: border-box;
-  justify-content: flex-start;
-  justify-content: safe center;
-  align-items: center;
-}
-
-.billeterasCarousel::-webkit-scrollbar {
-  display: none;
-}
-
-.billeteraSelectWrap {
-  position: relative;
-  width: 260px;
-  height: 148px;
-  flex-shrink: 0;
-  scroll-snap-align: center;
-  border-radius: 20px;
-  transform: translateY(0);
-  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 240ms ease,
-              filter 240ms ease;
-  -webkit-tap-highlight-color: transparent;
-  cursor: pointer;
-}
-
-/* Inactive Card: Resting flat on surface */
-.billeteraSelectWrap[data-active="false"] {
-  transform: translateY(0);
-  opacity: 1;
-  box-shadow: var(--elevation-none);
-  z-index: 1;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .billeteraSelectWrap[data-active="false"]:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--elevation-xs);
-    z-index: 2;
-  }
-}
-
-/* Active Card: Subtle contextual elevation inside modal */
-.billeteraSelectWrap[data-active="true"] {
-  transform: translateY(-3.5px) scale(1.025);
-  opacity: 1;
-  z-index: 10;
-  box-shadow: var(--elevation-selection-modal);
-}
-
-.billeteraSelectWrap:active {
-  transform: translateY(-1px) scale(1.01);
-  transition-duration: 80ms;
-}
-
-.billeteraOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  cursor: pointer;
-  border-radius: inherit;
-  border: none;
-  background: transparent;
-}
-
-.billeteraSelectWrap :global(.wcKebab) {
-  display: none !important;
-}
-
-.billeteraSelectWrap :global(.chipMoneda) {
-  display: none !important;
-}
-
-.fullHeightCard {
-  height: 100% !important;
-  aspect-ratio: auto !important;
-  border-radius: 20px !important;
-}
-
-/* Tactile specular sheen on card surface */
-.billeteraSelectWrap :global(.wc) {
-  border-radius: 20px !important;
-  overflow: hidden !important;
-}
-
-.billeteraSelectWrap :global(.wcBg)::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(0, 0, 0, 0.16) 100%);
-  pointer-events: none;
-  border-radius: inherit;
-  box-shadow: var(--elevation-none);
-}
-
-/* Card inner layout: top header + centered balance */
-.billeteraSelectWrap :global(.wcInner) {
-  padding: 16px 18px !important;
-  height: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  box-sizing: border-box !important;
-}
-
-.billeteraSelectWrap :global(.wcTop) {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  width: 100% !important;
-}
-
-.billeteraSelectWrap :global(.wcLogo) {
-  width: 36px !important;
-  height: 36px !important;
-  min-width: 36px !important;
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
-  box-shadow: var(--elevation-none) !important;
-}
-
-
-/* Horizontal alignment of Name + Principal Badge */
-.billeteraSelectWrap :global(.wcIdentity) {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-  gap: 8px !important;
-}
-
-.billeteraSelectWrap :global(.wcName) {
-  font-size: 16.5px !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.3px !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-.billeteraSelectWrap :global(.wcChipRow) {
-  margin: 0 !important;
-  flex-shrink: 0 !important;
-}
-
-.billeteraSelectWrap :global(.chip) {
-  font-size: 9.5px !important;
-  font-weight: 700 !important;
-  padding: 2.5px 8px !important;
-  border-radius: 9999px !important;
-  letter-spacing: 0.3px !important;
-  text-transform: uppercase !important;
-}
-
-/* Hero Center Balance */
-.billeteraSelectWrap :global(.wcBalance) {
-  min-width: 0 !important;
-  width: 100% !important;
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  margin: 0 !important;
-  padding: 6px 0 0 !important;
-}
-
-.billeteraSelectWrap :global(.wcBalAmt) {
-  font-size: 28px !important;
-  font-weight: 900 !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.9px !important;
-  text-align: center !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  display: block !important;
-  font-variant-numeric: tabular-nums !important;
-}
-
-.billeteraSelectWrap :global(.balAmtLight) {
-  color: #ffffff !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
-}
-
-.billeteraSelectWrap :global(.balAmtDark) {
-  color: #0f172a !important;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5) !important;
-}
-
-.billeteraSelectWrap :global(.wcBalLbl) {
-  display: none !important;
-}
-
-.billeteraSelectWrap :global(.wcChipRow) {
-  margin-top: 2px !important;
-}
-
 .noWalletsText {
   font-size: 13px;
   color: var(--text-3);
@@ -455,7 +175,7 @@
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .summaryHeader {
@@ -579,9 +299,7 @@
 
 /* ── Mobile Responsive Bottom Sheet Refinements (<768px) ─────────────────── */
 @media (max-width: 767px) {
-  .stepDots {
-    padding: 6px 16px 2px;
-  }
+  
 
   .formHeader {
     padding: 10px var(--modal-pad-x) 6px; /* Separación lateral oficial */
@@ -596,53 +314,6 @@
     gap: var(--modal-field-gap); /* Separación estándar entre campos */
   }
 
-  .billeterasCarousel {
-    scroll-padding: 0 var(--carousel-pad);
-    align-items: center;
-  }
-
-  .billeteraSelectWrap {
-    width: 245px;
-    height: 138px;
-    border-radius: 18px;
-  }
-
-  .billeteraSelectWrap[data-active="false"] {
-    transform: translateY(0);
-    opacity: 1;
-    box-shadow: var(--elevation-none);
-  }
-
-  .billeteraSelectWrap[data-active="true"] {
-    transform: translateY(-3.5px) scale(1.025);
-    opacity: 1;
-    z-index: 10;
-    box-shadow: var(--elevation-selection-modal);
-  }
-
-  .billeteraSelectWrap:active {
-    transform: translateY(-1px) scale(1.01);
-    transition-duration: 80ms;
-  }
-
-  .billeteraSelectWrap :global(.wcInner) {
-    padding: 13px 15px !important;
-  }
-
-  .billeteraSelectWrap :global(.wcLogo) {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-  }
-
-  .billeteraSelectWrap :global(.wcName) {
-    font-size: 15px !important;
-  }
-
-  .billeteraSelectWrap :global(.wcBalAmt) {
-    font-size: 24px !important;
-    letter-spacing: -0.7px !important;
-  }
 
   .formFooter {
     padding: var(--modal-footer-pad-top) var(--modal-pad-x) max(var(--modal-footer-pad-bottom), env(safe-area-inset-bottom, 0px)); /* Espaciado oficial del pie con safe-area */

@@ -68,7 +68,7 @@
 .diaBtnActive {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-xs);
 }
 
 .refreshBtn {
@@ -121,8 +121,8 @@
   padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  gap: 12px;
+  box-shadow: var(--elevation-xs);
 }
 
 .cardHeader {
@@ -144,7 +144,7 @@
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   font-size: 13px;
   color: var(--text);
 }
@@ -229,7 +229,7 @@
 .tableSection {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;

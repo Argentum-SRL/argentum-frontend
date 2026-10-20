@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Check, X, Wallet, Banknote, ArrowUpRight, ArrowDownLeft, ChevronDown, Star } from '@/components/ui/icons'
+import { Check, X, Wallet, Banknote, ArrowUpRight, ArrowDownLeft, ChevronDown, Star, TrendingUp } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -248,8 +248,9 @@ export default function FilterBarMobileDrawer({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Filtros">
-      <div className={styles.mobileDrawerContainer}>
-        {/* Active Pill for Pendientes IA */}
+      <div className={styles.mobileDrawerContainer} data-modal-frame>
+        <div className={styles.mobileDrawerBody} data-modal-stack>
+          {/* Active Pill for Pendientes IA */}
         {localFilters.estado_verificacion === 'pendiente' && (
           <div className={styles.activePillsRowMobile}>
             <div className={`${styles.pill} ${styles.pillActive}`}>
@@ -266,7 +267,7 @@ export default function FilterBarMobileDrawer({
         )}
 
         {/* Tipo Selector */}
-        <div>
+        <div data-modal-block>
           <div className={styles.popoverTitle}>Tipo de movimiento</div>
           <SegmentedControl<'todos' | 'egreso' | 'ingreso'>
             options={[
@@ -283,7 +284,7 @@ export default function FilterBarMobileDrawer({
 
         {/* Moneda Selector */}
         {showMonedaFilter && (
-          <div>
+          <div data-modal-block>
             <div className={styles.popoverTitle}>Moneda</div>
             <SegmentedControl<'todas' | 'ARS' | 'USD'>
               options={[
@@ -367,7 +368,10 @@ export default function FilterBarMobileDrawer({
                             {bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}
                           </span>
                           {bill.es_principal && (
-                            <Star size={10} fill="currentColor" className={styles.starIcon} />
+                            <Star size={12} strokeWidth={2.2} className={styles.starIcon} title="Billetera principal" />
+                          )}
+                          {bill.es_inversion && (
+                            <TrendingUp size={12} strokeWidth={2.2} className={styles.inversionIcon} title="Cuenta de inversión" />
                           )}
                         </div>
                         {bill.saldo_actual !== undefined && (
@@ -551,6 +555,7 @@ export default function FilterBarMobileDrawer({
               className={styles.dateFieldMobile}
             />
           </div>
+        </div>
         </div>
 
         {/* Action Row */}

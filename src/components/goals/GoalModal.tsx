@@ -202,19 +202,14 @@ export default function GoalModal({
       autoHeight
       className={styles.modalGoal}
       ariaLabel="Gestionar meta"
+      stepDots={{ total: 2, current: step - 1 }}
     >
       <div
         className={styles.slidesContainer}
       >
-        {/* Indicador de pasos superior centrado (Pill Dots) */}
-        <div className={styles.stepDots} aria-hidden="true">
-          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-        </div>
-
         {/* ──── STEP 1: Nombre y Monto Objetivo ──── */}
         {step === 1 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -233,7 +228,7 @@ export default function GoalModal({
                 </div>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep1}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep1}`} data-modal-stack>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -241,7 +236,8 @@ export default function GoalModal({
                   </div>
                 )}
 
-                <div className={styles.formField}>
+                <div data-modal-block>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Nombre de la meta</label>
                   <input
                     type="text"
@@ -254,7 +250,7 @@ export default function GoalModal({
                   />
                 </div>
 
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <MontoInput
                     value={monto_objetivo}
                     onChange={v => setField('monto_objetivo', v)}
@@ -270,6 +266,7 @@ export default function GoalModal({
                       No podés cambiar la moneda porque ya hay movimientos registrados.
                     </p>
                   )}
+                </div>
                 </div>
               </div>
 
@@ -287,7 +284,7 @@ export default function GoalModal({
 
         {/* ──── STEP 2: Detalles Finales ──── */}
         {step === 2 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form 
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -309,7 +306,7 @@ export default function GoalModal({
                 </div>
               </div>
 
-              <div className={`${styles.formBody} ${styles.formBodyStep2}`}>
+              <div className={`${styles.formBody} ${styles.formBodyStep2}`} data-modal-stack>
                 {localError && (
                   <div className={styles.localErrorAlert}>
                     <AlertCircle size={16} />
@@ -317,15 +314,16 @@ export default function GoalModal({
                   </div>
                 )}
 
+                <div data-modal-block>
                 <div className={styles.row}>
-                  <div className={styles.formField}>
+                  <div className={styles.formField} data-modal-field>
                     <label className={styles.fieldLabel}>Fecha límite</label>
                     <DateInput
                       value={fecha_limite}
                       onChange={val => setField('fecha_limite', val)}
                     />
                   </div>
-                  <div className={styles.formField}>
+                  <div className={styles.formField} data-modal-field>
                     <label className={styles.fieldLabel}>Color distintivo</label>
                     <ColorPicker
                       value={color}
@@ -334,7 +332,7 @@ export default function GoalModal({
                   </div>
                 </div>
 
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Notas o motivación</label>
                   <textarea
                     className={styles.textarea}
@@ -347,7 +345,7 @@ export default function GoalModal({
                 </div>
 
                 {isEdit && (
-                  <div className={styles.formField}>
+                  <div className={styles.formField} data-modal-field>
                     <label className={styles.fieldLabel}>Estado de la meta</label>
                     <SegmentedControl<EstadoMeta>
                       options={[
@@ -367,6 +365,7 @@ export default function GoalModal({
                     </p>
                   </div>
                 )}
+                </div>
               </div>
 
               <div className={styles.formFooter}>

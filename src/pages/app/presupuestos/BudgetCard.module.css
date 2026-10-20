@@ -126,7 +126,7 @@
 .metaRow {
   display: flex;
   align-items: center;
-  gap: 4.5px;
+  gap: 4.4px;
   font-size: 11.5px;
   line-height: 1;
   color: var(--text-3);
@@ -189,8 +189,9 @@
 .categoryChips {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   flex-wrap: wrap;
+  /* r03-ok: alineacion optica vertical de chips de categoria en tarjeta */
   margin-top: -2px;
 }
 
@@ -245,7 +246,7 @@
 .limitGroup {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
 }
 
 .limitGroup {
@@ -311,7 +312,7 @@
   font-weight: 500;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .remainingAmount {
@@ -333,7 +334,7 @@
 .conversionNotice {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 10.5px;
   color: var(--text-3);
   padding-top: 2px;

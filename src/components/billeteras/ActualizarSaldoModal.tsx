@@ -130,7 +130,7 @@ export default function ActualizarSaldoModal({
       autoHeight
       ariaLabel="Actualizar saldo"
     >
-      <div className={styles.modalContainer}>
+      <div className={styles.modalContainer} data-modal-frame>
         {/* Header */}
         <div className={styles.modalHeader}>
           <div className={styles.headerLeft}>
@@ -160,27 +160,29 @@ export default function ActualizarSaldoModal({
         <div className={styles.modalBody}>
           {/* Paso 1: Ingreso de monto */}
           {step === 1 && (
-            <form id="actualizar-saldo-form" onSubmit={handleRevisar} className={styles.formFields}>
-              <div className={styles.montoHeroSection}>
-                <MontoInput
-                  label={`¿Cuánto tenés hoy en ${nombreBilletera}?`}
-                  value={monto}
-                  onChange={setMonto}
-                  moneda={billetera.moneda}
-                  allowDecimals
-                  placeholder="0"
-                  autoFocus
-                  disabled={isLoadingPreview}
-                />
+            <form id="actualizar-saldo-form" onSubmit={handleRevisar} className={styles.formFields} data-modal-stack>
+              <div className={styles.montoHeroSection} data-modal-block>
+                <div data-modal-field>
+                  <MontoInput
+                    label={`¿Cuánto tenés hoy en ${nombreBilletera}?`}
+                    value={monto}
+                    onChange={setMonto}
+                    moneda={billetera.moneda}
+                    allowDecimals
+                    placeholder="0"
+                    autoFocus
+                    disabled={isLoadingPreview}
+                  />
+                </div>
               </div>
             </form>
           )}
 
           {/* Paso 2: Revisión y ayuda */}
           {step === 2 && preview && (
-            <div className={styles.formFields}>
+            <div className={styles.formFields} data-modal-stack>
               {preview.diferencia === 0 ? (
-                <div className={styles.matchCard}>
+                <div className={styles.matchCard} data-modal-block>
                   <div className={styles.matchIconWrap}>
                     <CheckCircle2 size={24} className={styles.matchIcon} />
                   </div>
@@ -194,7 +196,7 @@ export default function ActualizarSaldoModal({
               ) : (
                 <>
                   {/* Resumen de diferencia / Breakdown Card */}
-                  <div className={styles.diffBreakdownCard}>
+                  <div className={styles.diffBreakdownCard} data-modal-block>
                     <div className={styles.diffRow}>
                       <span className={styles.diffLabel}>En Argentum figuran</span>
                       <span className={styles.diffVal}>
@@ -228,8 +230,8 @@ export default function ActualizarSaldoModal({
 
                   {/* Rendimiento propuesto si existe */}
                   {preview.rendimiento_propuesto != null && preview.rendimiento_propuesto > 0 && (
-                    <div className={styles.rendimientoCard}>
-                      <label className={styles.checkboxLabel}>
+                    <div className={styles.rendimientoCard} data-modal-block>
+                      <label className={styles.checkboxLabel} data-modal-field>
                         <input
                           type="checkbox"
                           className={styles.checkboxInput}
@@ -252,7 +254,7 @@ export default function ActualizarSaldoModal({
 
                   {/* Bloque de ayuda si la diferencia es grande */}
                   {preview.es_grande && (
-                    <div className={styles.ayudaCard}>
+                    <div className={styles.ayudaCard} data-modal-block>
                       <div className={styles.ayudaHeader}>
                         <AlertTriangle size={16} className={styles.ayudaIcon} />
                         <span className={styles.ayudaTitle}>Antes de ajustar, fijate:</span>

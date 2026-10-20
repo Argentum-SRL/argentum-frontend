@@ -44,6 +44,16 @@ Todos los tokens de elevación están centralizados y controlados en [elevation.
   --elevation-selection:       0 3px 8px -1px rgba(var(--shadow-color-rgb), 0.08), 0 1px 3px rgba(var(--shadow-color-rgb), 0.04);
   --elevation-selection-modal: 0 4px 10px -2px rgba(var(--shadow-color-rgb), 0.10), 0 1px 3px rgba(var(--shadow-color-rgb), 0.04);
   --elevation-selection-carousel: 0 6px 12px -3px rgba(var(--shadow-color-rgb), 0.22);
+  /* Tokens Especiales y de Estado (Fase fv3m) */
+  --elevation-focus-error:     0 0 0 3px rgba(239, 68, 68, 0.25);
+  --elevation-atmospheric:     0 20px 50px rgba(0, 0, 0, 0.25);
+  --elevation-glow-gold:       0 0 16px rgba(245, 166, 35, 0.35);
+  --elevation-glow-success:    0 0 16px rgba(16, 185, 129, 0.35);
+
+  --elevation-reach-focus-error: 6px;
+  --elevation-reach-atmospheric: 50px;
+  --elevation-reach-glow-gold:   16px;
+  --elevation-reach-glow-success: 16px;
 }
 
 :root.dark, [data-theme="dark"] {
@@ -67,6 +77,32 @@ Todos los tokens de elevación están centralizados y controlados en [elevation.
 ```
 
 ---
+
+
+---
+
+## 5. REGLA FUNDAMENTAL DE CONTENCIÓN ESTRICTA (R21)
+
+Ningún contenedor que recorta (`overflow: hidden`, `overflow: auto`, `overflow: scroll`, `overflow: clip` o `contain: paint`) puede cortar la sombra, el levantamiento físico (`transform: translateY(...)`, `scale(...)`) ni el anillo de foco (`focus-visible`) de sus elementos hijos.
+
+### Especificaciones de Contención:
+1. **Padding Perimetral:** El contenedor exterior debe tener un padding mayor o igual al alcance (`reach`) máximo de la elevación o levantamiento del hijo.
+2. **Carruseles de Billeteras y Tarjetas con Scroll:**
+   - Contenedor scroller (`.billeterasCarouselScroller`):
+     ```css
+     overflow-x: auto;
+     overflow-y: hidden;
+     padding: var(--carousel-pad) 0;
+     scroll-padding: 0 var(--carousel-pad);
+     scroll-padding-inline: var(--carousel-pad);
+     ```
+   - Pista interior (`.billeterasCarousel`):
+     ```css
+     --elevation-selection-modal: var(--elevation-selection-carousel);
+     padding: 0 var(--carousel-pad);
+     overflow: visible;
+     ```
+3. **Prohibición Absoluta de Márgenes Negativos:** Se prohíbe el uso de márgenes negativos (`margin: -...`) para compensar recortes de contenedor (custodiado por R03 = 0).
 
 ## 3. JERARQUÍA ESPACIAL Y CONTEXTO
 

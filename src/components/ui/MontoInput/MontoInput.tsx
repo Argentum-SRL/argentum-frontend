@@ -3,6 +3,7 @@ import { formatMonto } from '@/utils/format'
 import styles from './MontoInput.module.css'
 
 interface MontoInputProps {
+  id?: string
   value: number | null
   onChange: (value: number | null) => void
   moneda?: 'ARS' | 'USD'
@@ -33,6 +34,7 @@ function limpiarParaNumero(str: string): string {
 }
 
 const MontoInput = memo(({
+  id,
   value,
   onChange,
   moneda = 'ARS',
@@ -55,7 +57,7 @@ const MontoInput = memo(({
   const [prevValue, setPrevValue] = useState(value)
   const [inputValue, setInputValue] = useState(() => {
     if (value === null || value === undefined) return ''
-    return value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+    return formatearParaMostrar(value.toString().replace('.', ','))
   })
 
   if (value !== prevValue) {
@@ -71,7 +73,7 @@ const MontoInput = memo(({
       const valorActualLimpio = limpiarParaNumero(inputValue)
       const valorActualNum = parseFloat(valorActualLimpio)
       if (valorActualNum !== value) {
-        const formatted = value.toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+        const formatted = formatearParaMostrar(value.toString().replace('.', ','))
         setInputValue(formatted)
       }
     }
@@ -169,7 +171,7 @@ const MontoInput = memo(({
   return (
     <div className={[styles.wrap, className].filter(Boolean).join(' ')}>
       {label && (
-        <label className={styles.label}>
+        <label className={styles.label} htmlFor={id}>
           {label}
         </label>
       )}
@@ -200,6 +202,7 @@ const MontoInput = memo(({
         <div className={styles.montoHeroInput}>
           <span className={styles.montoHeroPrefix}>{moneda === 'USD' ? 'US$' : '$'}</span>
           <input
+            id={id}
             ref={inputRef}
             type="text"
             inputMode="decimal"

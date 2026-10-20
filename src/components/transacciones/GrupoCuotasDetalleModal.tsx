@@ -17,6 +17,7 @@ import styles from './GruposCuotasTab.module.css'
 import type { GrupoCuotasResumen, Billetera, Categoria, Subcategoria, Suscripcion } from '@/types'
 import { formatMonto } from '@/utils/format'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
+import SelectableSurface from '@/components/ui/SelectableSurface'
 import Modal from '@/components/ui/Modal/Modal'
 import GrupoCuotasAvatar from './GrupoCuotasAvatar'
 
@@ -94,38 +95,41 @@ export default function GrupoCuotasDetalleModal({
                     ? styles.slideExitLeft
                     : styles.slideExitRight
                 }`}
+                data-modal-frame
               >
-                  <div className={styles.formContainer}>
-                    <div
-                      className={`${styles.formBody} ${styles.formBodyWithHeader}`}
-                    >
-                      {/* Header */}
-                      <div className={styles.formHeader}>
-                        <div className={styles.headerLeft}>
-                          <h2 className={styles.headerTitle}>Detalle de cuotas</h2>
-                        </div>
-                        <div className={styles.headerRightActions}>
-                          <button
-                            type="button"
-                            className={styles.deleteHeaderBtn}
-                            onClick={() => handleDeleteClick(selectedGrupo.id)}
-                            title="Eliminar compra"
-                            aria-label="Eliminar compra"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.closeBtn}
-                            onClick={handleCloseDetail}
-                            title="Cerrar"
-                            aria-label="Cerrar"
-                          >
-                            <X size={18} strokeWidth={1.75} />
-                          </button>
-                        </div>
+                  <div className={styles.formContainer} data-modal-frame>
+                    {/* Header */}
+                    <div className={styles.formHeader}>
+                      <div className={styles.headerLeft}>
+                        <h2 className={styles.headerTitle}>Detalle de cuotas</h2>
                       </div>
+                      <div className={styles.headerRightActions}>
+                        <button
+                          type="button"
+                          className={styles.deleteHeaderBtn}
+                          onClick={() => handleDeleteClick(selectedGrupo.id)}
+                          title="Eliminar compra"
+                          aria-label="Eliminar compra"
+                          data-modal-delete
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.closeBtn}
+                          onClick={handleCloseDetail}
+                          title="Cerrar"
+                          aria-label="Cerrar"
+                        >
+                          <X size={18} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    </div>
 
+                    <div
+                      className={styles.formBody}
+                      data-modal-stack
+                    >
                       {/* Main Content */}
                       <div className={styles.detailBodyContent}>
                         
@@ -327,6 +331,7 @@ export default function GrupoCuotasDetalleModal({
                       ? styles.slideEnterRight
                       : styles.slideEnterLeft
                   }`}
+                  data-modal-frame
                 >
                   <form
                     className={styles.formContainer}
@@ -334,38 +339,40 @@ export default function GrupoCuotasDetalleModal({
                       e.preventDefault()
                       ejecutarPrepago(selectedGrupo.id)
                     }}
+                    data-modal-frame
                   >
-                    <div
-                      className={`${styles.formBody} ${styles.formBodyWithHeader}`}
-                    >
-                      <div className={styles.formHeader}>
-                        <div className={styles.headerLeft}>
-                          <button
-                            type="button"
-                            className={styles.backBtn}
-                            onClick={handleBackToDetail}
-                            title="Volver al detalle"
-                            aria-label="Volver al detalle"
-                          >
-                            <ChevronLeft size={18} strokeWidth={2} />
-                          </button>
-                          <div>
-                            <h2 className={styles.headerTitle}>Prepagar cuotas</h2>
-                          </div>
-                        </div>
-                        <div className={styles.headerRightActions}>
-                          <button
-                            type="button"
-                            className={styles.closeBtn}
-                            onClick={handleCloseDetail}
-                            title="Cerrar"
-                            aria-label="Cerrar"
-                          >
-                            <X size={18} strokeWidth={1.75} />
-                          </button>
+                    <div className={styles.formHeader}>
+                      <div className={styles.headerLeft}>
+                        <button
+                          type="button"
+                          className={styles.backBtn}
+                          onClick={handleBackToDetail}
+                          title="Volver al detalle"
+                          aria-label="Volver al detalle"
+                        >
+                          <ChevronLeft size={18} strokeWidth={2} />
+                        </button>
+                        <div>
+                          <h2 className={styles.headerTitle}>Prepagar cuotas</h2>
                         </div>
                       </div>
+                      <div className={styles.headerRightActions}>
+                        <button
+                          type="button"
+                          className={styles.closeBtn}
+                          onClick={handleCloseDetail}
+                          title="Cerrar"
+                          aria-label="Cerrar"
+                        >
+                          <X size={18} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    </div>
 
+                    <div
+                      className={styles.formBody}
+                      data-modal-stack
+                    >
                       <div className={styles.formFields}>
                         {/* 1. Hero Prepay Banner */}
                         <div className={styles.prepayHeroBanner}>
@@ -399,29 +406,21 @@ export default function GrupoCuotasDetalleModal({
                               </p>
                             </div>
                           ) : (
-                            <div className={styles.billeterasCarouselScroller}>
-                              <div className={styles.billeterasCarousel} ref={detailWalletsCarouselRef}>
+                            <div data-modal-carousel>
+                              <div data-modal-carousel-track ref={detailWalletsCarouselRef}>
                                 {detailMatchingWallets.map((b) => (
-                                  <div
+                                  <SelectableSurface
                                     key={b.id}
                                     data-id={b.id}
-                                    className={styles.billeteraSelectWrap}
-                                    data-active={billeteraSeleccionada === b.id}
+                                    selected={billeteraSeleccionada === b.id}
+                                    onClick={() => setBilleteraSeleccionada(b.id)}
+                                    aria-label={`Seleccionar cuenta ${b.nombre}`}
                                   >
                                     <BilleteraCard
                                       billetera={b}
-                                      className={styles.fullHeightCard}
-                                      disableNavigation={true}
-                                      hideCurrencyChip={true}
+                                      variant="select"
                                     />
-                                    <button
-                                      type="button"
-                                      className={styles.billeteraOverlay}
-                                      onClick={() => setBilleteraSeleccionada(b.id)}
-                                      title={`Seleccionar cuenta ${b.nombre}`}
-                                      aria-label={`Seleccionar cuenta ${b.nombre}`}
-                                    />
-                                  </div>
+                                  </SelectableSurface>
                                 ))}
                               </div>
                             </div>
@@ -430,7 +429,7 @@ export default function GrupoCuotasDetalleModal({
 
                         {/* 3. Notice */}
                         <div className={styles.prepayNoticeTip}>
-                          <Lightbulb size={15} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2, color: '#C9A227' }} aria-hidden="true" />
+                          <Lightbulb size={15} strokeWidth={2} className={styles.prepayNoticeIcon} aria-hidden="true" />
                           <span>
                             Al confirmar el pago, las <strong>{selectedGrupo.cantidad_pendientes} cuotas pendientes</strong> se registrarán como pagadas inmediatamente y se debitarán de tu cuenta.
                           </span>

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, Check, AlertCircle } from '@/components/ui/icons'
+import Modal from '@/components/ui/Modal/Modal'
 import styles from './SelectInput.module.css'
 
 export interface SelectOption {
@@ -109,7 +110,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
   }
 
   const optionsList = (
-    <div className={styles.optionsList}>
+    <div className={styles.optionsList} data-modal-block>
       {options.map(opt => (
         <button
           key={opt.value}
@@ -134,25 +135,25 @@ export const SelectInput: React.FC<SelectInputProps> = ({
 
   const panel = open ? (
     isMobile ? (
-      <div
-        className={styles.mobileOverlay}
-        onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
-      >
-        <div className={styles.mobileBottomSheet} ref={panelRef}>
-          <div className={styles.handleContainer} onClick={() => setOpen(false)}>
-            <div className={styles.handle} />
-          </div>
-          {label && <div className={styles.mobilePanelTitle}>{label}</div>}
-          {optionsList}
-        </div>
-      </div>
-    ) : (
-      <div
-        ref={panelRef}
-        className={styles.panel}
+      <Modal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        variant="sheet"
+        title={label || 'Seleccionar opción'}
+        size="sm"
       >
         {optionsList}
-      </div>
+      </Modal>
+    ) : (
+      typeof document !== 'undefined' ? createPortal(
+        <div
+          ref={panelRef}
+          className={styles.panel}
+        >
+          {optionsList}
+        </div>,
+        document.body
+      ) : null
     )
   ) : null
 
@@ -193,7 +194,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
           {error}
         </span>
       )}
-      {panel && typeof document !== 'undefined' && createPortal(panel, document.body)}
+      {panel}
     </div>
   )
 }

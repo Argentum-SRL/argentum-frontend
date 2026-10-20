@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type FC, type ReactNode } from 'react'
+import { useRef, useState, type FC, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Target,
@@ -12,6 +12,7 @@ import {
   LogOut,
   type LucideIcon,
 } from '@/components/ui/icons'
+import Modal from '@/components/ui/Modal/Modal'
 import styles from './MobileMoreSheet.module.css'
 
 interface MobileMoreSheetProps {
@@ -44,40 +45,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
 }) => {
   const navigate = useNavigate()
   const sheetRef = useRef<HTMLDivElement | null>(null)
-
-  // Mounting and visibility state for CSS-driven enter/exit transitions
-  const [shouldRender, setShouldRender] = useState(isOpen)
-  const [isVisible, setIsVisible] = useState(isOpen)
   const [pressedId, setPressedId] = useState<string | null>(null)
-
-  // Single effect managing animation state from the isOpen prop
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>
-    if (isOpen) {
-      const frameId = requestAnimationFrame(() => {
-        setShouldRender(true)
-        timer = setTimeout(() => {
-          setIsVisible(true)
-        }, 20)
-      })
-      return () => {
-        cancelAnimationFrame(frameId)
-        clearTimeout(timer)
-      }
-    } else {
-      const frameId = requestAnimationFrame(() => {
-        setIsVisible(false)
-      })
-      return () => cancelAnimationFrame(frameId)
-    }
-  }, [isOpen])
-
-  // Native onTransitionEnd callback to unmount only after exit animation finishes
-  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
-    if (e.target === sheetRef.current && e.propertyName === 'transform' && !isOpen) {
-      setShouldRender(false)
-    }
-  }
 
   // Drag-to-dismiss refs
   const dragStartYRef = useRef(0)
@@ -87,18 +55,6 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   // Item touch tracking refs
   const itemTouchStartXRef = useRef(0)
   const itemTouchStartYRef = useRef(0)
-
-  // ESC key listener
-  useEffect(() => {
-    if (!isOpen) return
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
 
   // ── Drag to dismiss handlers ──────────────────────────────────────────────
 
@@ -221,8 +177,6 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
     }, 120)
   }
 
-  if (!shouldRender) return null
-
   // Financial and tool modules
   const mainItems: MenuItemConfig[] = [
     { id: 'metas', label: 'Metas', Icon: Target, path: '/app/metas' },
@@ -286,23 +240,16 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   }
 
   return (
-    <>
-      {/* Backdrop overlay */}
-      <div
-        className={`${styles.overlay} ${isVisible ? styles.overlayVisible : ''}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Floating Bottom Sheet */}
-      <div
-        ref={sheetRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Más opciones"
-        className={`${styles.sheet} ${isVisible ? styles.sheetVisible : ''}`}
-        onTransitionEnd={handleTransitionEnd}
-      >
+    <Modal
+      variant="sheet"
+      isOpen={isOpen}
+      onClose={onClose}
+      showHeader={false}
+      noPadding
+      ariaLabel="Más opciones"
+      className={styles.modalSheet}
+    >
+      <div ref={sheetRef} className={styles.sheetInner} data-modal-frame>
         {/* Drag handle */}
         <div
           className={styles.handleContainer}
@@ -321,7 +268,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
         </div>
 
         {/* Main navigation options */}
-        <div className={styles.itemsList}>
+        <div className={styles.itemsList} data-modal-options>
           {mainItems.map(renderItem)}
         </div>
 
@@ -329,11 +276,11 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
         <div className={styles.separator} />
 
         {/* Utility / Account options */}
-        <div className={styles.itemsList}>
+        <div className={styles.itemsList} data-modal-options>
           {utilityItems.map(renderItem)}
         </div>
       </div>
-    </>
+    </Modal>
   )
 }
 

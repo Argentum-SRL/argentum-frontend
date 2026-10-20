@@ -244,7 +244,7 @@
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 0 10px;
   height: 34px;
   font-size: 12.5px;
@@ -296,7 +296,7 @@
 .pillIconFlex {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   width: 100%;
 }
 
@@ -340,6 +340,7 @@
   align-items: center;
   justify-content: center;
   margin-left: 3px;
+  /* r03-ok: alineacion optica del boton quitar dentro del chip de filtro */
   margin-right: -4px;
   padding: 2px;
   border-radius: 50%;
@@ -536,11 +537,14 @@
 
 /* ── Mobile Modal Drawer Content Styles ── */
 .mobileDrawerContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
   padding: 0 4px 10px;
 }
+
+.mobileDrawerBody {
+  display: flex;
+  flex-direction: column;
+}
+
 
 .drawerSectionTitle {
   font-size: 13px;
@@ -688,7 +692,7 @@
 .accountsList {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   max-height: 220px;
   overflow-y: auto;
   padding-right: 2px;
@@ -773,6 +777,12 @@
 
 .starIcon {
   color: #F59E0B;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+.inversionIcon {
+  color: #10B981;
   flex-shrink: 0;
   margin-left: 2px;
 }

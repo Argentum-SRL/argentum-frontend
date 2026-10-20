@@ -14,7 +14,7 @@
 .headerTitleGroup {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: var(--text);
 }
 
@@ -59,7 +59,7 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .familyAlertHeader {
@@ -224,7 +224,7 @@
 .coverageStatsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .coverageStatItem {

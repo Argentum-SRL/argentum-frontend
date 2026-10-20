@@ -18,7 +18,7 @@
 .catGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px;
+  gap: 6px;
   width: 100%;
   padding: 2px 0;
   overflow: visible;
@@ -27,7 +27,7 @@
 @media (max-width: 480px) {
   .catGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 5px;
+    gap: 4px;
     padding: 1px 0 2px;
   }
 }
@@ -218,7 +218,7 @@
 .selectedCatText {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
 }
 
 .selectedCatLabel {
@@ -295,7 +295,7 @@
 .subcatChip {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   padding: 7px 13px;
   background: var(--page);
   border: 1px solid var(--border);
@@ -318,7 +318,7 @@
   .subcatChip {
     padding: 6px 11px;
     font-size: 12px;
-    gap: 5px;
+    gap: 4px;
     border-radius: 10px;
   }
 }

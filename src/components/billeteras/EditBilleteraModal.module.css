@@ -4,28 +4,13 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: var(--modal-max-h);
-  min-height: 0;
-  overflow: hidden;
   background: var(--surface);
   box-sizing: border-box;
 }
 
 .formBody {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: 100%;
   box-sizing: border-box;
-}
-
-.formBody::-webkit-scrollbar {
-  width: 4px;
-}
-
-.formBody::-webkit-scrollbar-thumb {
-  background: var(--surface-alt);
-  border-radius: 4px;
 }
 
 .formBodyWithHeader {
@@ -186,14 +171,13 @@
   padding: 8px var(--modal-pad-x) 12px; /* Separación lateral oficial */
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
   box-sizing: border-box;
 }
 
 .settingsCardsList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--modal-option-gap);
 }
 
 .settingCard {
@@ -537,7 +521,7 @@
 .warningBox {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   padding: 11px 13px;
   border-radius: 12px;
   background: rgba(201, 162, 39, 0.08);

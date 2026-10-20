@@ -5,6 +5,7 @@ import { es } from 'date-fns/locale/es'
 import { Calendar, AlertCircle, Keyboard } from '@/components/ui/icons'
 import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
 import '@ncdai/react-wheel-picker/style.css'
+import Modal from '@/components/ui/Modal/Modal'
 import styles from './DateInput.module.css'
 
 // Formato interno (lo que se almacena y comunica al padre)
@@ -571,29 +572,25 @@ export const DateInput: React.FC<DateInputProps> = ({
             {error}
           </span>
         )}
-        {open && createPortal(
-          isMobile ? (
-            <div
-              className={styles.bottomSheetOverlay}
-              data-portal="date-picker"
-              onMouseDown={(e) => {
-                if (e.target === e.currentTarget) closePicker()
-              }}
-            >
-              <div className={styles.bottomSheet} ref={popoverRef}>
-                <div className={styles.bottomSheetHandle} />
-                <div className={styles.bottomSheetContent}>
-                  {wheelPickerContent}
-                </div>
-                {footerContent}
-              </div>
-            </div>
-          ) : (
-            <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
+        {open && isMobile && (
+          <Modal
+            isOpen={open}
+            onClose={closePicker}
+            variant="sheet"
+            showHeader={false}
+            noPadding
+          >
+            <div className={styles.bottomSheetContent} data-modal-block>
               {wheelPickerContent}
-              {footerContent}
             </div>
-          ),
+            {footerContent}
+          </Modal>
+        )}
+        {open && !isMobile && createPortal(
+          <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
+            {wheelPickerContent}
+            {footerContent}
+          </div>,
           document.body
         )}
       </div>
@@ -665,29 +662,25 @@ export const DateInput: React.FC<DateInputProps> = ({
           {error}
         </span>
       )}
-      {open && createPortal(
-        isMobile ? (
-          <div
-            className={styles.bottomSheetOverlay}
-            data-portal="date-picker"
-            onMouseDown={(e) => {
-              if (e.target === e.currentTarget) closePicker()
-            }}
-          >
-            <div className={styles.bottomSheet} ref={popoverRef}>
-              <div className={styles.bottomSheetHandle} />
-              <div className={styles.bottomSheetContent}>
-                {wheelPickerContent}
-              </div>
-              {footerContent}
-            </div>
-          </div>
-        ) : (
-          <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
+      {open && isMobile && (
+        <Modal
+          isOpen={open}
+          onClose={closePicker}
+          variant="sheet"
+          showHeader={false}
+          noPadding
+        >
+          <div className={styles.bottomSheetContent} data-modal-block>
             {wheelPickerContent}
-            {footerContent}
           </div>
-        ),
+          {footerContent}
+        </Modal>
+      )}
+      {open && !isMobile && createPortal(
+        <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
+          {wheelPickerContent}
+          {footerContent}
+        </div>,
         document.body
       )}
     </div>

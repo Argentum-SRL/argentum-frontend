@@ -20,6 +20,7 @@ import type { Billetera, Categoria, TarjetaCredito, Transaccion, Presupuesto } f
 import type { Goal } from '@/types/goals'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
+import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import styles from './SearchModal.module.css'
 
 interface SearchModalProps {
@@ -347,11 +348,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       size="lg"
       ariaLabel="Buscador global"
     >
-      <div className={styles.formContainer} onKeyDown={handleKeyDown}>
+      <div className={styles.formContainer} onKeyDown={handleKeyDown} data-modal-frame>
         
         {/* Header Search Input */}
         <div className={styles.formHeader}>
-          <div className={styles.searchTitleArea}>
+          <div className={styles.searchTitleArea} data-modal-field>
             <Search size={18} className={styles.searchIcon} />
             <input
               ref={inputRef}
@@ -386,12 +387,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         </div>
 
         {/* Content Area */}
-        <div className={styles.formBody}>
+        <div className={styles.formBody} data-modal-stack>
           <div className={styles.scrollArea}>
             {loadingTransactions && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px' }} aria-hidden="true">
+              <div className={styles.skeletonList} aria-hidden="true">
                 {[1, 2, 3].map(i => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 12px', background: 'var(--surface-alt)', borderRadius: '10px' }}>
+                  <div key={i} className={styles.skeletonItem}>
                     <Skeleton variant="rounded" width={28} height={28} borderRadius={8} />
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <Skeleton variant="text" width={i === 1 ? '50%' : '35%'} height={13} />
@@ -416,7 +417,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               <>
                 {/* Category: Navegación */}
                 {filteredNav.length > 0 && (
-                  <div className={styles.group}>
+                  <div className={styles.group} data-modal-block>
                     <h4 className={styles.groupTitle}>Navegación</h4>
                     <div className={styles.grid}>
                       {filteredNav.map(n => {
@@ -444,7 +445,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                 {/* Category: Acciones Rápidas */}
                 {filteredAcciones.length > 0 && (
-                  <div className={styles.group}>
+                  <div className={styles.group} data-modal-block>
                     <h4 className={styles.groupTitle}>Acciones Rápidas</h4>
                     <div className={styles.grid}>
                       {filteredAcciones.map(a => {
@@ -473,7 +474,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                 {/* Category: Billeteras */}
                 {visibleBilleteras.length > 0 && (
-                  <div className={styles.group}>
+                  <div className={styles.group} data-modal-block>
                     <h4 className={styles.groupTitle}>Billeteras ({filteredBilleteras.length})</h4>
                     <div className={styles.grid}>
                       {visibleBilleteras.map(b => {
@@ -506,7 +507,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                 {/* Category: Presupuestos */}
                 {visiblePresupuestos.length > 0 && (
-                  <div className={styles.group}>
+                  <div className={styles.group} data-modal-block>
                     <h4 className={styles.groupTitle}>Presupuestos ({filteredPresupuestos.length})</h4>
                     <div className={styles.grid}>
                       {visiblePresupuestos.map(p => {
@@ -539,7 +540,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                 {/* Category: Metas */}
                 {visibleMetas.length > 0 && (
-                  <div className={styles.group}>
+                  <div className={styles.group} data-modal-block>
                     <h4 className={styles.groupTitle}>Metas de Ahorro ({filteredMetas.length})</h4>
                     <div className={styles.grid}>
                       {visibleMetas.map(g => {
@@ -572,7 +573,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                 {/* Category: Transacciones */}
                 {transacciones.length > 0 && (
-                  <div className={styles.group}>
+                  <div className={styles.group} data-modal-block>
                     <h4 className={styles.groupTitle}>Transacciones ({transacciones.length})</h4>
                     <div className={styles.grid}>
                       {transacciones.map(t => {
@@ -589,7 +590,17 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             onMouseEnter={() => setSelectedIndex(idx)}
                           >
                             <div className={`${styles.iconWrapper} ${styles.nivel_transaccion}`}>
-                              <item.Icon size={18} />
+                              <MovimientoAvatar
+                                movimiento={{
+                                  descripcion: t.descripcion,
+                                  suscripcion_id: t.suscripcion_id,
+                                  movimiento_meta_id: t.movimiento_meta_id,
+                                  subcategoria_nombre: t.subcategoria?.nombre,
+                                  categoria_nombre: categorias.find(c => c.id === t.categoria_id)?.nombre,
+                                  tipo: t.tipo,
+                                }}
+                                size={18}
+                              />
                             </div>
                             <div className={styles.cardBody}>
                               <span className={styles.cardTitle}>{item.title}</span>

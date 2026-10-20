@@ -13,6 +13,7 @@ import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import { getBankById, findBankByNombre, sortBilleteras } from '@/lib/utils/billeteras.utils'
 import type { Billetera, TarjetaCredito, TarjetaCreditoCreate } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
+import SelectableSurface from '@/components/ui/SelectableSurface'
 import RealCardPreview from './RealCardPreview'
 import { formatMonto } from '@/utils/format'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
@@ -324,7 +325,7 @@ export const TarjetaModal: React.FC = () => {
     const timer = setTimeout(() => {
       const card = cardRefs.current.get(state.billeteraId)
       if (card) {
-        const scroller = card.closest(`.${styles.billeterasCarouselScroller}`) as HTMLElement | null
+        const scroller = card.closest('[data-modal-carousel]') as HTMLElement | null
         if (scroller) {
           const cardRect = card.getBoundingClientRect()
           const scrollerRect = scroller.getBoundingClientRect()
@@ -527,22 +528,16 @@ export const TarjetaModal: React.FC = () => {
       showHeader={false}
       noPadding
       autoHeight
+      stepDots={{ total: 3, current: step - 1 }}
       className={styles.modalTarjeta}
       ariaLabel={data.tarjeta ? 'Editar Tarjeta' : 'Nueva Tarjeta'}
     >
       <div
         className={styles.slidesContainer}
       >
-        {/* ── Step Indicator Dots (Funden fluidamente con el body) ── */}
-        <div className={styles.stepDots}>
-          <div className={`${styles.stepDot} ${step === 1 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 2 ? styles.stepDotActive : styles.stepDotInactive}`} />
-          <div className={`${styles.stepDot} ${step === 3 ? styles.stepDotActive : styles.stepDotInactive}`} />
-        </div>
-
         {/* ════════════════════ PASO 1: Identificación y Red ════════════════════ */}
         {step === 1 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -550,19 +545,21 @@ export const TarjetaModal: React.FC = () => {
                 goNext()
               }}
             >
-              <div className={styles.formBody}>
-                {/* Header integrado directamente en el Body */}
-                <div className={styles.formHeader}>
-                  <h2 className={styles.headerTitle}>
-                    {data.tarjeta ? 'Editar Tarjeta' : 'Nueva Tarjeta'}
-                  </h2>
-                  <button type="button" className={styles.closeBtn} onClick={() => close('tarjeta')} title="Cerrar">
-                    <X size={16} />
-                  </button>
-                </div>
+              {/* Header integrado directamente en el Frame */}
+              <div className={styles.formHeader}>
+                <h2 className={styles.headerTitle}>
+                  {data.tarjeta ? 'Editar Tarjeta' : 'Nueva Tarjeta'}
+                </h2>
+                <button type="button" className={styles.closeBtn} onClick={() => close('tarjeta')} title="Cerrar">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className={styles.formBody} data-modal-stack>
+                <div data-modal-block>
 
                 {/* Red de la tarjeta (Apple Interactive Brand Tiles con efecto 3D Wallet) */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Red de la tarjeta</label>
                   <div className={styles.redGrid}>
                     {Object.entries(RED_CUSTOM_LABELS).map(([id, label]) => {
@@ -596,7 +593,7 @@ export const TarjetaModal: React.FC = () => {
                 </div>
 
                 {/* Últimos 4 Dígitos en un único renglón estricto */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel} htmlFor="tarjeta-ultimos4">
                     Últimos 4 dígitos
                   </label>
@@ -619,7 +616,7 @@ export const TarjetaModal: React.FC = () => {
                 </div>
 
                 {/* Apodo / Identificador */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel} htmlFor="tarjeta-apodo">
                     Apodo
                   </label>
@@ -639,42 +636,35 @@ export const TarjetaModal: React.FC = () => {
 
                 {/* Selector de billetera solo si no viene fija */}
                 {(!data.billeteraId && !data.tarjeta && bancarias.length > 0) && (
-                  <div className={styles.formField}>
+                  <div className={styles.formField} data-modal-field>
                     <label className={styles.fieldLabel}>Cuenta bancaria asociada</label>
-                    <div className={styles.billeterasCarouselScroller}>
-                      <div className={styles.billeterasCarousel} ref={carouselRef}>
+                    <div data-modal-carousel>
+                      <div data-modal-carousel-track ref={carouselRef}>
                         {bancarias.map((b: Billetera) => (
-                          <div
+                          <SelectableSurface
                             key={b.id}
-                            className={styles.billeteraSelectWrap}
-                            data-active={state.billeteraId === b.id}
+                            selected={state.billeteraId === b.id}
+                            onClick={() => {
+                              dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })
+                              dispatch({ type: 'SET_FIELD', field: 'moneda', value: b.moneda })
+                            }}
                             ref={(el) => {
                               if (el) cardRefs.current.set(b.id, el)
                               else cardRefs.current.delete(b.id)
                             }}
+                            aria-label={`Seleccionar ${b.nombre}`}
                           >
                             <BilleteraCard
                               billetera={b}
-                              className={styles.fullHeightCard}
-                              disableNavigation={true}
-                              hideCurrencyChip={true}
+                              variant="select"
                             />
-                            <button
-                              type="button"
-                              className={styles.billeteraOverlay}
-                              onClick={() => {
-                                dispatch({ type: 'SET_FIELD', field: 'billeteraId', value: b.id })
-                                dispatch({ type: 'SET_FIELD', field: 'moneda', value: b.moneda })
-                              }}
-                              title={`Seleccionar ${b.nombre}`}
-                              aria-label={`Seleccionar ${b.nombre}`}
-                            />
-                          </div>
+                          </SelectableSurface>
                         ))}
                       </div>
                     </div>
                   </div>
                 )}
+                </div>
               </div>
 
               <div className={styles.formFooter}>
@@ -691,7 +681,7 @@ export const TarjetaModal: React.FC = () => {
 
         {/* ════════════════════ PASO 2: Ciclo y Límites ════════════════════ */}
         {step === 2 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -699,20 +689,22 @@ export const TarjetaModal: React.FC = () => {
                 goNext()
               }}
             >
-              <div className={styles.formBody}>
-                {/* Header integrado directamente en el Body */}
-                <div className={styles.formHeader}>
-                  <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
-                    <ChevronLeft size={20} />
-                  </button>
-                  <h2 className={styles.headerTitle}>Ciclo y Límites</h2>
-                  <button type="button" className={styles.closeBtn} onClick={() => close('tarjeta')} title="Cerrar">
-                    <X size={16} />
-                  </button>
-                </div>
+              {/* Header integrado directamente en el Frame */}
+              <div className={styles.formHeader}>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
+                  <ChevronLeft size={20} />
+                </button>
+                <h2 className={styles.headerTitle}>Ciclo y Límites</h2>
+                <button type="button" className={styles.closeBtn} onClick={() => close('tarjeta')} title="Cerrar">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className={styles.formBody} data-modal-stack>
+                <div data-modal-block>
 
                 {/* Fechas del resumen */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <div className={styles.fieldHeader}>
                     <label className={styles.fieldLabel}>Fechas del resumen</label>
                     <span className={styles.fieldHintTighter}>
@@ -774,7 +766,7 @@ export const TarjetaModal: React.FC = () => {
                 </div>
 
                 {/* Límite de Crédito (Componente Universal MontoInput) */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <MontoInput
                     label="Límite de crédito"
                     value={state.limiteCredito}
@@ -785,7 +777,7 @@ export const TarjetaModal: React.FC = () => {
                 </div>
 
                 {/* Percepción Moneda Extranjera (Settings Row Card) */}
-                <div className={styles.formField}>
+                <div className={styles.formField} data-modal-field>
                   <div className={styles.percepcionCard}>
                     <div className={styles.percepcionInfo}>
                       <span className={styles.percepcionTitle}>Recargo compras en Dólares</span>
@@ -808,6 +800,7 @@ export const TarjetaModal: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
 
               <div className={styles.formFooter}>
@@ -824,7 +817,7 @@ export const TarjetaModal: React.FC = () => {
 
         {/* ════════════════════ PASO 3: Diseño y Confirmación ════════════════════ */}
         {step === 3 && (
-          <div className={`${styles.slide} ${animClass}`}>
+          <div className={`${styles.slide} ${animClass}`} data-modal-frame>
             <form
               className={styles.formContainer}
               onSubmit={(e) => {
@@ -832,17 +825,18 @@ export const TarjetaModal: React.FC = () => {
                 handleSubmit()
               }}
             >
-              <div className={styles.formBody}>
-                {/* Header integrado directamente en el Body */}
-                <div className={styles.formHeader}>
-                  <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
-                    <ChevronLeft size={20} />
-                  </button>
-                  <h2 className={styles.headerTitle}>Diseño y Confirmación</h2>
-                  <button type="button" className={styles.closeBtn} onClick={() => close('tarjeta')} title="Cerrar">
-                    <X size={16} />
-                  </button>
-                </div>
+              {/* Header integrado directamente en el Frame */}
+              <div className={styles.formHeader}>
+                <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás">
+                  <ChevronLeft size={20} />
+                </button>
+                <h2 className={styles.headerTitle}>Diseño y Confirmación</h2>
+                <button type="button" className={styles.closeBtn} onClick={() => close('tarjeta')} title="Cerrar">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className={styles.formBody} data-modal-stack>
 
                 {/* Preview de Tarjeta Física */}
                 <div className={styles.previewSection}>

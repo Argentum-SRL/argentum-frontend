@@ -11,7 +11,7 @@
   display: flex;
   align-items: stretch;
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   overflow: hidden;
   background: var(--surface);
   transition: border-color 0.18s ease;
@@ -53,7 +53,7 @@
 .fwSyncBtn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: var(--surface-alt);
   border: none;
   border-left: 1.5px solid var(--border);
@@ -75,10 +75,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   padding: 16px 24px;
-  border-radius: 14px;
+  border-radius:14px;
   background: var(--primary);
   color: #fff;
   font-size: 16px;
@@ -111,7 +111,7 @@
   height: 17px;
   border: 2.5px solid rgba(255,255,255,0.35);
   border-top-color: #fff;
-  border-radius: 50%;
+  border-radius:50%;
   animation: fwSpin 0.7s linear infinite;
   flex-shrink: 0;
 }
@@ -124,7 +124,7 @@
   align-items: flex-start;
   gap: 16px;
   padding: 20px 22px;
-  border-radius: 18px;
+  border-radius:18px;
   border: 1.5px solid transparent;
   animation: fwReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -142,7 +142,7 @@
   flex-shrink: 0;
   width: 46px;
   height: 46px;
-  border-radius: 13px;
+  border-radius:13px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,7 +184,7 @@
   padding: 20px 22px;
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius:16px;
 }
 
 @media (max-width: 600px) {
@@ -245,7 +245,7 @@
 .fwMetric {
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius:14px;
   padding: 14px 18px;
   display: flex;
   flex-direction: column;
@@ -268,7 +268,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
   flex-wrap: wrap;
@@ -277,9 +277,9 @@
 .fwActionSecondary {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius:10px;
   border: 1.5px solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
@@ -295,9 +295,9 @@
 .fwActionGhost {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   padding: 10px 16px;
-  border-radius: 10px;
+  border-radius:10px;
   border: none;
   background: transparent;
   color: var(--text-2);
@@ -346,7 +346,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius:999px;
   box-shadow: var(--elevation-xs);
 }
 
@@ -362,7 +362,7 @@
   color: var(--text-3);
   font-size: 13px;
   font-weight: 600;
-  border-radius: 999px;
+  border-radius:999px;
   transition: all 0.2s ease;
   outline: none;
 }
@@ -381,7 +381,7 @@
 .wbStepDot {
   width: 22px;
   height: 22px;
-  border-radius: 50%;
+  border-radius:50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -435,7 +435,7 @@
   margin: 16px auto 36px auto;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 24px;
+  border-radius:20px;
   padding: 40px 36px;
   box-shadow: var(--elevation-sm);
   display: flex;
@@ -487,11 +487,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: 14px;
+  border-radius:14px;
   font-size: 15px;
   font-weight: 700;
   font-family: inherit;
@@ -518,7 +518,7 @@
   margin: 0 auto;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 24px;
+  border-radius:20px;
   box-shadow: var(--elevation-sm);
   overflow: hidden;
   box-sizing: border-box;
@@ -551,7 +551,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 22px;
+  gap: 20px;
   box-sizing: border-box;
 }
 
@@ -590,18 +590,18 @@
 .wbBadgeDot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius:50%;
   background: var(--primary);
 }
 
 .wbEditBtn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius:8px;
   font-size: 11.5px;
   font-weight: 700;
   color: var(--text-2);
@@ -634,10 +634,10 @@
 .wbInlineEditWrap {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   background: var(--surface);
   padding: 12px;
-  border-radius: 14px;
+  border-radius:14px;
   border: 1px solid var(--border);
   animation: wbFadeUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -650,7 +650,7 @@
   background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius:8px;
   cursor: pointer;
   font-family: inherit;
   transition: opacity 0.15s ease;

@@ -19,7 +19,7 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding ariaLabel="Guía de Salud y Proyección Financiera">
-      <div className={styles.modalRoot}>
+      <div className={styles.modalRoot} data-modal-frame>
         {/* Header con estética Senior Fintech */}
         <div className={styles.header}>
           <div className={styles.headerTitleWrap}>
@@ -58,14 +58,14 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
         {/* Cuerpo del Modal */}
         <div className={styles.body}>
           {activeTab === 'perfil' ? (
-            <div role="tabpanel" aria-label="Tu perfil financiero">
+            <div role="tabpanel" aria-label="Tu perfil financiero" data-modal-stack>
               <div className={styles.introBox}>
                 Un diagnóstico objetivo de tus hábitos de dinero que evalúa la regularidad de tus ingresos y gastos a lo largo del tiempo, clasificándolos sin juicios morales para mostrar tu margen de maniobra real.
               </div>
 
-              <div className={styles.sectionTitle}>Tus 6 indicadores clave</div>
+              <div className={styles.sectionTitle} data-modal-section-title>Tus 6 indicadores clave</div>
 
-              <div className={styles.kpiList}>
+              <div className={styles.kpiList} data-modal-block>
                 <div className={styles.kpiItem}>
                   <span className={styles.kpiBadge}>Ahorro</span>
                   <p className={styles.kpiText}>
@@ -115,36 +115,38 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
               </div>
             </div>
           ) : (
-            <div role="tabpanel" aria-label="Proyección del ciclo">
+            <div role="tabpanel" aria-label="Proyección del ciclo" data-modal-stack>
               <div className={styles.introBox}>
                 Una estimación estadística predictiva de cómo vas a terminar tu ciclo financiero actual (entre tus fechas de cobro), ayudándote a anticipar imprevistos antes del cierre.
               </div>
 
-              <div className={styles.sectionTitle}>Comportamiento según tu historial</div>
+              <div className={styles.sectionTitle} data-modal-section-title>Comportamiento según tu historial</div>
 
-              <div className={styles.modeCard}>
-                <div className={styles.modeHeader}>
-                  <Layers size={15} />
-                  <span>1. Compromisos ciertos</span>
+              <div data-modal-block>
+                <div className={styles.modeCard}>
+                  <div className={styles.modeHeader}>
+                    <Layers size={15} />
+                    <span>1. Compromisos ciertos</span>
+                  </div>
+                  <p className={styles.modeDesc}>
+                    Si estás en tus primeros meses con Argentum, muestra exclusivamente tus obligaciones fijas confirmadas: cuotas de tarjetas del ciclo actual y suscripciones vigentes.
+                  </p>
                 </div>
-                <p className={styles.modeDesc}>
-                  Si estás en tus primeros meses con Argentum, muestra exclusivamente tus obligaciones fijas confirmadas: cuotas de tarjetas del ciclo actual y suscripciones vigentes.
-                </p>
+
+                <div className={styles.modeCard}>
+                  <div className={styles.modeHeader}>
+                    <TrendingUp size={15} />
+                    <span>2. Proyección calibrada</span>
+                  </div>
+                  <p className={styles.modeDesc}>
+                    A partir de 3 ciclos observados, el modelo estadístico proyecta además el ritmo de tus gastos variables diarios basándose en tus patrones históricos reales.
+                  </p>
+                </div>
               </div>
 
-              <div className={styles.modeCard}>
-                <div className={styles.modeHeader}>
-                  <TrendingUp size={15} />
-                  <span>2. Proyección calibrada</span>
-                </div>
-                <p className={styles.modeDesc}>
-                  A partir de 3 ciclos observados, el modelo estadístico proyecta además el ritmo de tus gastos variables diarios basándose en tus patrones históricos reales.
-                </p>
-              </div>
+              <div className={styles.sectionTitle} data-modal-section-title>Conceptos clave de la proyección</div>
 
-              <div className={styles.sectionTitle}>Conceptos clave de la proyección</div>
-
-              <div className={styles.kpiList}>
+              <div className={styles.kpiList} data-modal-block>
                 <div className={styles.kpiItem}>
                   <span className={styles.kpiBadge}>Cierre esperado</span>
                   <p className={styles.kpiText}>

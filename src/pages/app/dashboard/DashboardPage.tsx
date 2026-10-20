@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { createPortal } from 'react-dom'
+import { Modal } from '@/components/ui/Modal'
 import { 
   ArrowUpDown, 
   ChevronRight,
@@ -34,6 +34,7 @@ import { formatMonto, formatFecha } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
+import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
 
 import { getFotoUrl } from '@/utils/fotoUrl'
@@ -123,47 +124,47 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
         </button>
       </div>
 
-      {isMenuOpen && createPortal(
-        <>
-          <div className={styles.profileOverlay} onClick={() => setIsMenuOpen(false)} />
-          <div className={styles.profileSheet}>
-            <div className={styles.profileSheetTitle}>Mi Cuenta</div>
-            
-            <button 
-              className={styles.profileSheetItem}
-              onClick={() => {
-                setIsMenuOpen(false)
-                navigate('/app/perfil')
-              }}
-            >
-              <User size={18} />
-              <span>Editar Perfil</span>
-            </button>
+      <Modal
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        variant="sheet"
+        title="Mi Cuenta"
+        size="sm"
+      >
+        <div data-modal-block>
+          <button 
+            className={styles.profileSheetItem}
+            onClick={() => {
+              setIsMenuOpen(false)
+              navigate('/app/perfil')
+            }}
+          >
+            <User size={18} />
+            <span>Editar Perfil</span>
+          </button>
 
-            <button 
-              className={styles.profileSheetItem}
-              onClick={() => {
-                toggleTheme()
-              }}
-            >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              <span>Cambiar a Modo {theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
-            </button>
+          <button 
+            className={styles.profileSheetItem}
+            onClick={() => {
+              toggleTheme()
+            }}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            <span>Cambiar a Modo {theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
+          </button>
 
-            <button 
-              className={`${styles.profileSheetItem} ${styles.profileSheetItemDanger}`}
-              onClick={() => {
-                setIsMenuOpen(false)
-                void logout()
-              }}
-            >
-              <LogOut size={18} />
-              <span>Cerrar Sesión</span>
-            </button>
-          </div>
-        </>,
-        document.body
-      )}
+          <button 
+            className={`${styles.profileSheetItem} ${styles.profileSheetItemDanger}`}
+            onClick={() => {
+              setIsMenuOpen(false)
+              void logout()
+            }}
+          >
+            <LogOut size={18} />
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </Modal>
     </>
   )
 })
@@ -1151,9 +1152,15 @@ export default function DashboardPage() {
                       return (
                         <div key={m.id} className={styles.listItem}>
                           <div className={styles.itemIcon}>
-                            <SubcategoriaIcon
-                              nombre={isMeta ? 'ahorro' : m.subcategoria_nombre}
-                              parentCategory={isMeta ? 'Ahorro' : m.categoria_nombre}
+                            <MovimientoAvatar
+                              movimiento={{
+                                descripcion: m.descripcion,
+                                suscripcion_id: (m as { suscripcion_id?: string | null }).suscripcion_id ?? undefined,
+                                movimiento_meta_id: m.movimiento_meta_id,
+                                subcategoria_nombre: m.subcategoria_nombre,
+                                categoria_nombre: m.categoria_nombre,
+                                tipo: m.tipo,
+                              }}
                               size={32}
                             />
                           </div>

@@ -149,7 +149,7 @@
 .taskInfo {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   max-width: 320px;
 }
 
@@ -372,7 +372,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 
 .cardTitle {

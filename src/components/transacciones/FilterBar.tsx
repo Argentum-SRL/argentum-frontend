@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign, Check } from '@/components/ui/icons'
+import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign, Check, Star, TrendingUp } from '@/components/ui/icons'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
 import type { Billetera, Categoria } from '@/types'
@@ -280,7 +280,15 @@ export default function FilterBar({
             ) : (
               <Wallet size={15} />
             )}
-            {bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}
+            <span className={styles.popoverItemText}>
+              {bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}
+            </span>
+            {bill.es_principal && (
+              <Star size={12} strokeWidth={2.2} className={styles.starIcon} title="Billetera principal" />
+            )}
+            {bill.es_inversion && (
+              <TrendingUp size={12} strokeWidth={2.2} className={styles.inversionIcon} title="Cuenta de inversión" />
+            )}
           </button>
         )
       })}

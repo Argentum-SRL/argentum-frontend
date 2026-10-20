@@ -21,7 +21,7 @@
 
 /* Contenedor del Viewport */
 [data-sileo-viewport] {
-  z-index: 99999 !important;
+  z-index: var(--z-modal) !important;
   pointer-events: none !important;
 }
 
@@ -95,7 +95,7 @@
     max-width: min(360px, calc(100vw - 32px)) !important;
     padding: 0 !important;
     gap: 8px !important;
-    z-index: 99999 !important;
+    z-index: var(--z-modal) !important;
   }
 }
 
@@ -108,7 +108,7 @@
     transform: none !important;
     align-items: flex-end !important;
     flex-direction: column !important;
-    max-width: 380px !important;
+    max-width: 380px;
     padding: 0 !important;
     gap: 8px !important;
   }

@@ -1,13 +1,12 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
 }
 
 .topGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: var(--modal-block-gap);
 }
 
 @media (min-width: 768px) {
@@ -62,12 +61,12 @@
 .card {
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius:12px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 .cardHeader {
@@ -139,7 +138,7 @@
 .numberInput {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius:6px;
   padding: 6px 10px;
   color: var(--text);
   font-size: 13px;
@@ -151,7 +150,7 @@
 .timeInput {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius:8px;
   padding: 6px 12px;
   color: var(--text);
   font-size: 13px;
@@ -174,7 +173,7 @@
 .selectInput {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius:6px;
   padding: 6px 10px;
   color: var(--text);
   font-size: 13px;
@@ -211,7 +210,7 @@
   bottom: 0;
   background-color: var(--text-3);
   transition: .3s;
-  border-radius: 24px;
+  border-radius:20px;
 }
 
 .slider:before {
@@ -223,7 +222,7 @@
   bottom: 3px;
   background-color: white;
   transition: .3s;
-  border-radius: 50%;
+  border-radius:50%;
 }
 
 .switch input:checked + .slider {
@@ -246,10 +245,13 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 20px;
+  /* r03-ok: sangrado a los bordes laterales e inferior dentro del contenedor */
   margin-left: -20px;
+  /* r03-ok: sangrado a los bordes laterales e inferior dentro del contenedor */
   margin-right: -20px;
+  /* r03-ok: sangrado a los bordes laterales e inferior dentro del contenedor */
   margin-bottom: -20px;
-  border-top: 1px solid var(--surface-alt);
+  border-top: none;
   background: var(--surface);
   position: sticky;
   bottom: -20px;
@@ -260,7 +262,7 @@
 .btnCancel {
   background: none;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius:8px;
   padding: 8px 16px;
   font-family: inherit;
   font-size: 14px;
@@ -278,7 +280,7 @@
 .btnSave {
   background: var(--primary);
   border: none;
-  border-radius: 8px;
+  border-radius:8px;
   padding: 8px 16px;
   font-family: inherit;
   font-size: 14px;

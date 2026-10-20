@@ -29,7 +29,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .titleGroup {
@@ -109,7 +109,7 @@
 .certezasCompactHero {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -183,7 +183,7 @@
 .heroMetric {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .heroLabel {
@@ -291,7 +291,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--border);
 }
@@ -352,7 +352,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   width: 100%;
 }

@@ -296,8 +296,8 @@
 .cardFooter {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border-top: 1px dashed var(--border);
+  gap: 8px;
+  border-top: none;
   padding-top: 12px;
   margin-top: 4px;
 }

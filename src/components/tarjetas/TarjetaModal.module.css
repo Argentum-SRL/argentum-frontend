@@ -49,33 +49,7 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── Step Indicator Dots (Funden fluidamente con el body) ────────────────── */
-.stepDots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 14px 20px 4px;
-  background: var(--surface);
-  flex-shrink: 0;
-}
 
-.stepDot {
-  height: 5px;
-  border-radius: 99px;
-  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
-  background: var(--surface-alt);
-}
-
-.stepDotActive {
-  background: var(--primary);
-  width: 20px;
-}
-
-.stepDotInactive {
-  width: 6px;
-  opacity: 0.4;
-}
 
 /* ── Formulario Base ─────────────────────────────────────────────────────── */
 .formContainer {
@@ -91,7 +65,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 0 8px;
+  padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
   flex-shrink: 0;
 }
 
@@ -124,24 +98,10 @@
 }
 
 .formBody {
-  padding: 4px var(--modal-pad-x) 14px; /* Separación lateral oficial */
-  display: flex;
-  flex-direction: column;
-  gap: var(--modal-field-gap); /* Separación estándar entre campos */
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior-y: contain;
-}
-
-.formBody::-webkit-scrollbar {
-  width: 4px;
-}
-
-.formBody::-webkit-scrollbar-thumb {
-  background: var(--surface-alt);
-  border-radius: 4px;
+  overflow: visible;
 }
 
 .formField {
@@ -190,7 +150,7 @@
 .redGrid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   padding: 8px 2px 14px;
   overflow: visible;
@@ -206,7 +166,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   cursor: pointer;
   padding: 8px 4px 6px;
   outline: none;
@@ -301,7 +261,7 @@
 .cardDigitsHero {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: var(--page);
   border: 1.5px solid var(--surface-alt);
   border-radius: 14px;
@@ -350,107 +310,6 @@
 .cardDigitsInput::placeholder {
   color: var(--text-3);
   opacity: 0.4;
-}
-
-/* ── Carrusel de Billeteras ──────────────────────────────────────────────── */
-.billeterasCarouselScroller {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  overscroll-behavior-x: contain;
-  padding: var(--carousel-pad) 0;
-  margin: 0;
-}
-
-.billeterasCarouselScroller::-webkit-scrollbar {
-  display: none;
-}
-
-/* Carrusel canónico: padding = alcance de la sombra de selección (ver DISENO_UNIFICADO.md, carruseles) */
-.billeterasCarousel {
-  --elevation-selection-modal: var(--elevation-selection-carousel);
-  display: flex;
-  gap: 16px;
-  overflow: visible;
-  scroll-snap-type: x mandatory;
-  padding: 0 var(--carousel-pad);
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  min-width: 100%;
-  box-sizing: border-box;
-  justify-content: flex-start;
-  justify-content: safe center;
-  align-items: center;
-}
-
-.billeterasCarousel::-webkit-scrollbar {
-  display: none;
-}
-
-.billeteraSelectWrap {
-  position: relative;
-  width: 260px;
-  height: 148px;
-  flex-shrink: 0;
-  scroll-snap-align: center;
-  border-radius: 20px;
-  transform: translateY(0);
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
-  -webkit-tap-highlight-color: transparent;
-  cursor: pointer;
-}
-
-.billeteraSelectWrap[data-active="false"] {
-  transform: translateY(0);
-  opacity: 1;
-  box-shadow: var(--elevation-none);
-  z-index: 1;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .billeteraSelectWrap[data-active="false"]:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--elevation-xs);
-    z-index: 2;
-  }
-}
-
-.billeteraSelectWrap[data-active="true"] {
-  transform: translateY(-3.5px) scale(1.025);
-  opacity: 1;
-  z-index: 10;
-  box-shadow: var(--elevation-selection-modal);
-}
-
-.billeteraSelectWrap:active {
-  transform: translateY(-1px) scale(1.01);
-  transition-duration: 80ms;
-}
-
-.billeteraOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  cursor: pointer;
-  border-radius: inherit;
-  border: none;
-  background: transparent;
-}
-
-.billeteraSelectWrap :global(.wcKebab) {
-  display: none !important;
-}
-
-.billeteraSelectWrap :global(.chipMoneda) {
-  display: none !important;
-}
-
-.fullHeightCard {
-  height: 100% !important;
-  aspect-ratio: auto !important;
-  border-radius: 20px !important;
 }
 
 /* ── Solapa 2: Ciclo de Facturación Dual Card ─────────────────────────────── */
@@ -551,7 +410,7 @@
 .fechasResumenGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   margin-top: 2px;
 }
@@ -620,7 +479,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
 }
 
@@ -705,7 +564,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -734,11 +593,11 @@
 .realCard {
   width: 100%;
   max-width: 360px;
-  aspect-ratio: 1.586 / 1;
+  aspect-ratio: 1.65 / 1;
   border-radius: clamp(10px, 4cqi, 16px);
   position: relative;
   overflow: hidden;
-  padding: clamp(12px, 4.8cqi, 18px) clamp(14px, 5.8cqi, 22px);
+  padding: clamp(10px, 4.8cqi, 16px) clamp(12px, 5.8cqi, 20px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -827,13 +686,13 @@
 
 .cardInfoRow {
   display: flex;
-  gap: clamp(10px, 3.8cqi, 16px);
+  gap: clamp(8px, 3.8cqi, 16px);
 }
 
 .cardInfoGroup {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
 }
 
 .cardInfoLabel {
@@ -1019,9 +878,7 @@
 
 /* ── Responsive Mobile (<768px) ──────────────────────────────────────────── */
 @media (max-width: 767px) {
-  .stepDots {
-    padding: 10px 16px 2px;
-  }
+  
 
   .formHeader {
     padding: 2px 0 6px;
@@ -1056,11 +913,6 @@
     font-size: 9.5px;
   }
 
-
-  .billeteraSelectWrap {
-    width: 245px;
-    height: 138px;
-  }
 
   .formFooter {
     padding: 10px var(--modal-pad-x) max(14px, env(safe-area-inset-bottom, 14px)); /* Separación lateral oficial */

@@ -398,7 +398,7 @@ export default function BankPickerModal({
         </div>
 
         {/* Contenedor con transición de slides y altura adaptativa */}
-        <div className={styles.slidesContainer}>
+        <div className={styles.slidesContainer} data-modal-frame>
         {/* ── PASO 1: PICKER ── */}
         <div
           className={`${styles.slide} ${
@@ -408,6 +408,7 @@ export default function BankPickerModal({
               ? styles.slideExitLeft
               : styles.slideExitRight
           }`}
+          data-modal-frame
         >
           {/* Cuerpo scrolleable que incluye el header */}
           <div className={styles.pickerBody}>
@@ -513,9 +514,10 @@ export default function BankPickerModal({
               ? styles.slideEnterRight
               : styles.slideEnterLeft
           }`}
+          data-modal-frame
         >
           {bankSeleccionado && (
-            <form onSubmit={handleSubmit} className={styles.formContainer}>
+            <form onSubmit={handleSubmit} className={styles.formContainer} data-modal-frame>
               {/* Cuerpo scrolleable que incluye el header */}
               <div
 
@@ -611,60 +613,61 @@ export default function BankPickerModal({
               </div>
 
               {/* Campos del form */}
-              <div className={styles.formFields}>
+              <div className={styles.formFields} data-modal-stack>
                 {/* Saldo inicial (Hero MontoInput full size) */}
-                <div className={styles.montoHeroField}>
-                  <MontoInput
-                    value={saldo}
-                    onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
-                    moneda={moneda}
-                    onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
-                    placeholder="0"
-                    allowDecimals
-                    autoFocus
-                  />
+                <div className={styles.montoHeroField} data-modal-block>
+                  <div data-modal-field>
+                    <MontoInput
+                      value={saldo}
+                      onChange={(v) => dispatch({ type: 'SET_FIELD', field: 'saldo', value: v })}
+                      moneda={moneda}
+                      onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
+                      placeholder="0"
+                      allowDecimals
+                      autoFocus
+                    />
 
-                  {(!saldo || saldo <= 0) ? (
-                    <p style={{ margin: '8px 0 0', fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
-                      Sin saldo: todo lo que cargues suma o resta, con cualquier fecha.
-                    </p>
-                  ) : (
-                    <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {mostrarOpcionCiclo && (
-                        <SegmentedControl<'hoy' | 'ciclo'>
-                          ariaLabel="Punto de partida del saldo"
-                          fullWidth
-                          value={tipoPuntoPartida}
-                          onChange={(val) => setTipoPuntoPartida(val)}
-                          options={[
-                            { value: 'hoy', label: 'Lo que tengo hoy' },
-                            { value: 'ciclo', label: 'Con lo que arranqué el ciclo' },
-                          ]}
-                        />
-                      )}
-                      <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.4', color: 'var(--text-3, #8e8e93)' }}>
-                        {tipoPuntoPartida === 'ciclo' && mostrarOpcionCiclo
-                          ? `Saldo al ${formatFechaDDMMAAAA(fechaSaldoCiclo)}. Lo que cargues desde esa fecha lo cambia.`
-                          : 'Los gastos de días anteriores no lo cambian.'}
+                    {(!saldo || saldo <= 0) ? (
+                      <p className={styles.montoHint}>
+                        Sin saldo: todo lo que cargues suma o resta.
                       </p>
-                      {tipoPuntoPartida === 'ciclo' && mostrarOpcionCiclo && (
-                        <div style={{ marginTop: '4px' }}>
-                          <DateInput
-                            id="billetera-fecha-saldo"
-                            value={fechaSaldoCiclo}
-                            max={todayLocal()}
-                            onChange={(val) => setFechaSaldoManual(val)}
+                    ) : (
+                      <div className={styles.cicloOptionsBlock}>
+                        {mostrarOpcionCiclo && (
+                          <SegmentedControl<'hoy' | 'ciclo'>
+                            ariaLabel="Punto de partida del saldo"
+                            fullWidth
+                            value={tipoPuntoPartida}
+                            onChange={(val) => setTipoPuntoPartida(val)}
+                            options={[
+                              { value: 'hoy', label: 'Lo que tengo hoy' },
+                              { value: 'ciclo', label: 'Con lo que arranqué el ciclo' },
+                            ]}
                           />
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        )}
+                        <p className={styles.montoHint}>
+                          {tipoPuntoPartida === 'ciclo' && mostrarOpcionCiclo
+                            ? `Saldo al ${formatFechaDDMMAAAA(fechaSaldoCiclo)}. Cambia desde esa fecha.`
+                            : 'Los gastos anteriores no lo cambian.'}
+                        </p>
+                        {tipoPuntoPartida === 'ciclo' && mostrarOpcionCiclo && (
+                          <div className={styles.dateInputWrapper}>
+                            <DateInput
+                              id="billetera-fecha-saldo"
+                              value={fechaSaldoCiclo}
+                              max={todayLocal()}
+                              onChange={(val) => setFechaSaldoManual(val)}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Panel de configuración inteligente & interactivo */}
-                <div className={styles.settingsCardsList}>
-                  {/* Card 1: Rendimiento (TNA) automático */}
-                  {mostrarTarjetaRendimiento && (
+                {/* Card 1: Rendimiento (TNA) automático */}
+                {mostrarTarjetaRendimiento && (
+                  <div data-modal-block>
                     <div className={styles.settingCard}>
                       <div className={`${styles.settingIconBox} ${styles.iconBoxPrimary}`}>
                         <TrendingUp size={18} strokeWidth={2} />
@@ -704,7 +707,11 @@ export default function BankPickerModal({
                         )}
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
+
+                {/* Panel de configuración inteligente & interactivo */}
+                <div className={styles.settingsCardsList} data-modal-options>
 
 
                   {/* Card 2: Marcar como principal */}

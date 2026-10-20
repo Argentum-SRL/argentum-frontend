@@ -134,3 +134,14 @@
   text-align: center;
   padding: 10px 0;
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .codeInput,
+.submitBtn,
+.backBtn,
+.resendBtn {
+    transition: none;
+    animation: none;
+  }
+}

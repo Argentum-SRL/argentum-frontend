@@ -31,6 +31,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.surface:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 /* ── Contextual Elevation Resolution ── */
 .surface[data-context="page"] {
   --surface-elevation-selected: var(--elevation-selection);
@@ -140,7 +145,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .surface,
-  .surface[data-selected="true"] {
+  .surface[data-selected="true"],
+  .surface:active,
+  .surface[data-clickable="true"]:not([data-disabled="true"]):active {
     transition: none !important;
     transform: none !important;
   }
@@ -148,3 +155,4 @@
     animation: none;
   }
 }
+

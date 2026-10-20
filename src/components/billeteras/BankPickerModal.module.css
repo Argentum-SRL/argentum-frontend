@@ -271,8 +271,13 @@
 }
 
 .pickerItem:hover {
-  transform: translateY(-1px);
   box-shadow: var(--elevation-xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pickerItem:hover {
+  transform: translateY(-1px);
+  }
 }
 
 .pickerItem:active {
@@ -556,6 +561,12 @@
   transition: border-color 140ms ease;
 }
 
+.inlineNameInput,
+.bankPreviewNombreInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .inlineNameInput:focus,
 .bankPreviewNombreInput:focus {
   outline: none;
@@ -704,6 +715,11 @@
   font-weight: 600;
 }
 
+.saldoInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 /* Color picker */
 .colorPicker {
   display: flex;
@@ -725,8 +741,13 @@
 }
 
 .colorSwatch:hover {
-  transform: scale(1.15);
   border-color: rgba(0, 0, 0, 0.2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .colorSwatch:hover {
+  transform: scale(1.15);
+  }
 }
 
 /* Fila "marcar como principal" */
@@ -864,7 +885,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), color 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .iconBoxDefault {
@@ -1256,3 +1277,17 @@
   margin-top: 2px;
 }
 
+@media (max-width: 768px) {
+  .searchInput, .fieldInput { font-size: var(--control-font-mobile); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, .dot, .closeBtn, .searchInput, .fieldInput, .colorSwatch, .principalRow,
+  .pickerItem, .otraBtn, .customBtn, .backBtn, .pencilIconWrapper, .inlineNameInput,
+  .bankPreviewNombreInput, .saldoWrap, .checkbox, .settingCard, .settingIconBox,
+  .settingSub, .tnaInputBadge, .customSwitch, .customSwitchThumb, .cancelBtn, .crearBtn {
+    transition: none;
+    transform: none;
+    animation: none;
+  }
+}

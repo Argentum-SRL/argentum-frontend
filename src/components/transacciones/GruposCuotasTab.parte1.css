@@ -111,7 +111,7 @@
   color: var(--text-2);
   cursor: pointer;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .mobileSearchTriggerBtn:hover {
@@ -229,6 +229,11 @@
     border-color: var(--primary);
     outline: none;
   }
+
+  .searchInput:focus:focus-visible {
+    outline: 2px solid var(--focus-ring, #3b82f6);
+    outline-offset: 2px;
+  }
 }
 
 /* ── 3. Listado de Cuotas (Mini-bloques individuales) ─────────────── */
@@ -274,8 +279,14 @@
 
 .row:hover {
   background: var(--surface-alt);
-  transform: translateY(-1.5px);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .row:hover {
+  transform: translateY(-1.5px);
+  }
 }
 
 :global([data-theme="dark"]) .row,
@@ -324,8 +335,10 @@
   }
 }
 
-.row:hover .rowAvatar {
-  transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .row:hover .rowAvatar {
+    transform: scale(1.05);
+  }
 }
 
 :global([data-theme="dark"]) .rowAvatar,
@@ -531,7 +544,13 @@
 
 .row:hover .rowChevron {
   opacity: 0.9;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .row:hover .rowChevron {
   transform: translateX(2px);
+  }
 }
 
 .emptyFilterState {
@@ -543,4 +562,17 @@
   background: var(--surface);
   border-radius: 16px;
   border: 1px dashed var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .mobileSearchTriggerBtn,
+.mobileExpandedSearch,
+.row,
+.rowAvatar,
+.miniProgressFill,
+.rowChevron {
+    transition: none;
+    animation: none;
+  }
 }

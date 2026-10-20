@@ -243,3 +243,14 @@
   color: var(--silver);
   opacity: 0.7;
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .decoMoon,
+.messages,
+.typingDot,
+.bubbleWrap {
+    transition: none;
+    animation: none;
+  }
+}

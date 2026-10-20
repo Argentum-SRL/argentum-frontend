@@ -32,15 +32,26 @@
   background: var(--surface);
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   outline: none;
+}
+
+.modeCard:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .modeCard:hover {
   border-color: rgba(72, 120, 184, 0.4);
   background: var(--surface-alt);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .modeCard:hover {
   transform: translateY(-1px);
+  }
 }
 
 .modeCardActive {
@@ -79,7 +90,7 @@
   justify-content: center;
   color: var(--text-2);
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .modeCardActive .modeIconWrap {
@@ -128,7 +139,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 :global([data-theme="dark"]) .sectionBlock {
@@ -202,14 +213,20 @@
   font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 0;
 }
 
 .dayBtn:hover {
   border-color: var(--primary);
   background: var(--surface-alt);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .dayBtn:hover {
   transform: scale(1.05);
+  }
 }
 
 .dayBtnActive {
@@ -269,7 +286,7 @@
   background: var(--surface);
   cursor: pointer;
   text-align: left;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .contingencyCard:hover {
@@ -341,14 +358,20 @@
   background: var(--surface);
   cursor: pointer;
   text-align: left;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
 .businessCard:hover {
   border-color: rgba(72, 120, 184, 0.4);
   background: var(--surface-alt);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .businessCard:hover {
   transform: translateY(-1px);
+  }
 }
 
 .businessCardActive {
@@ -452,7 +475,7 @@
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .customDayPill:hover {
@@ -480,7 +503,7 @@
   background: linear-gradient(135deg, rgba(72, 120, 184, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
   border: 1.5px solid rgba(72, 120, 184, 0.25);
   border-radius: 12px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   flex-wrap: wrap;
 }
 
@@ -555,4 +578,19 @@
   color: var(--text-3);
   font-size: 0.8125rem;
   font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .modeCard,
+.modeIconWrap,
+.sectionBlock,
+.dayBtn,
+.contingencyCard,
+.businessCard,
+.customDayPill,
+.previewCard {
+    transition: none;
+    animation: none;
+  }
 }

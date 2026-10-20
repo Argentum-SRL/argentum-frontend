@@ -246,3 +246,14 @@
   min-height: 65px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+
+  .phoneInputWrap,
+.submitBtn,
+.altBtn,
+.termsLink {
+    transition: none;
+    animation: none;
+  }
+}
+

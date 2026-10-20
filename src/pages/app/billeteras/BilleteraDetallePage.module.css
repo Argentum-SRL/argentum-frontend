@@ -143,7 +143,13 @@
 .backBtn:hover {
   background: rgba(255, 255, 255, 0.24);
   color: white;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .backBtn:hover {
   transform: scale(1.04);
+  }
 }
 
 /* ── Header Logo circular ────────────────────────────────────────────────── */
@@ -286,7 +292,13 @@
 .headerEditBtn:hover {
   background: rgba(255, 255, 255, 0.24);
   color: white;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .headerEditBtn:hover {
   transform: scale(1.05);
+  }
 }
 
 /* ── Header Saldo — adaptable ────────────────────────────────────────────── */
@@ -393,7 +405,7 @@
   width: 100%;
   max-width: 440px;
   margin: 0 auto 20px auto;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
 }
 
@@ -423,7 +435,7 @@
   border: 1px solid var(--surface-alt);
   color: var(--text-3);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   flex-shrink: 0;
   box-shadow: var(--elevation-xs);
 }
@@ -438,7 +450,13 @@
 .carouselBtn:hover {
   background: var(--surface-alt);
   color: var(--primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .carouselBtn:hover {
   transform: scale(1.08);
+  }
 }
 
 .carouselBtn:active {
@@ -466,7 +484,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   color: var(--text-3);
   box-sizing: border-box;
 }
@@ -475,7 +493,13 @@
   border-color: var(--primary);
   color: var(--primary);
   background: var(--surface-alt);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .nuevaTarjetaGhost:hover {
   transform: translateY(-4px);
+  }
 }
 
 .ghostInner {
@@ -509,7 +533,7 @@
   background: var(--surface-alt);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 0;
 }
 
@@ -700,7 +724,13 @@
 .headerEditBtn:hover {
   background: rgba(255, 255, 255, 0.24);
   color: white;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .headerEditBtn:hover {
   transform: scale(1.05);
+  }
 }
 
 .headerEditBtn:active {
@@ -865,7 +895,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
 
@@ -899,7 +929,13 @@
   color: white;
   border-color: var(--primary);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .registrarRendimientoBtn:hover {
   transform: translateY(-1px);
+  }
 }
 
 .registrarRendimientoBtn:active {
@@ -930,7 +966,13 @@
 .headerActualizarBtn:hover {
   background: rgba(255, 255, 255, 0.24);
   color: white;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .headerActualizarBtn:hover {
   transform: scale(1.02);
+  }
 }
 
 @media (min-width: 768px) {
@@ -1043,7 +1085,7 @@
   background: var(--surface-alt);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .verMasBtn:hover {
@@ -1054,6 +1096,26 @@
 .verMasBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .backBtn,
+.headerEditBtn,
+.carouselContainer,
+.carouselBtn,
+.nuevaTarjetaGhost,
+.indicator,
+.rendimientoCard,
+.usarAutomaticaBtn,
+.registrarRendimientoBtn,
+.headerActualizarBtn,
+.controlRow,
+.deleteControlBtn,
+.verMasBtn {
+    transition: none;
+    animation: none;
+  }
 }
 
 

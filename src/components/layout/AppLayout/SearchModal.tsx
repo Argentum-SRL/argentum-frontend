@@ -352,7 +352,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         
         {/* Header Search Input */}
         <div className={styles.formHeader}>
-          <div className={styles.searchTitleArea} data-modal-field>
+          <div className={styles.searchTitleArea}>
             <Search size={18} className={styles.searchIcon} />
             <input
               ref={inputRef}

@@ -190,3 +190,12 @@
 @keyframes fade-tx {
   to { opacity: 1; transform: translateY(0); }
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .decoMoon,
+.txRow {
+    transition: none;
+    animation: none;
+  }
+}

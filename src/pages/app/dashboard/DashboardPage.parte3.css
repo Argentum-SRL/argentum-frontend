@@ -118,7 +118,13 @@
 
 .backBtn:hover {
   color: var(--primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .backBtn:hover {
   transform: translateX(-2px);
+  }
 }
 
 .backBtn .cardTitle {
@@ -429,7 +435,13 @@
 
 .whatsappBannerBtn:hover {
   opacity: 0.9;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .whatsappBannerBtn:hover {
   transform: translateY(-1px);
+  }
 }
 
 .whatsappBannerCloseBtn {
@@ -507,6 +519,19 @@
   .whatsappBannerCloseBtn {
     width: 26px;
     height: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .profileSheetItem,
+.backBtn,
+.balanceMain,
+.whatsappBanner,
+.whatsappBannerBtn,
+.whatsappBannerCloseBtn {
+    transition: none;
+    animation: none;
   }
 }
 

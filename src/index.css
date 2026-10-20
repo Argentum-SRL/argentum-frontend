@@ -41,10 +41,12 @@ a svg,
   will-change: transform;
 }
 
-button:hover svg,
-a:hover svg,
-[role="button"]:hover svg {
-  transform: scale(1.12);
+@media (hover: hover) and (pointer: fine) {
+  button:hover svg,
+  a:hover svg,
+  [role="button"]:hover svg {
+    transform: scale(1.12);
+  }
 }
 
 button:active svg,
@@ -242,6 +244,21 @@ body {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  button svg,
+a svg,
+[role="button"] svg,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+button:active svg:not(.animate-spin):not([data-no-animate]),
+a:active svg:not(.animate-spin):not([data-no-animate]),
+[role="button"]:active svg:not(.animate-spin):not([data-no-animate]),
+[class*="btn"]:active svg:not(.animate-spin):not([data-no-animate]),
+[class*="Btn"]:active svg:not(.animate-spin):not([data-no-animate]){
+    transition: none;
+    animation: none;
   }
 }
 

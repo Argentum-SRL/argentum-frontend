@@ -77,7 +77,13 @@
 
 .nuevaBtn:hover {
   opacity: 0.88;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .nuevaBtn:hover {
   transform: translateY(-1px);
+  }
 }
 
 .btnSuffix { display: none; }
@@ -267,5 +273,15 @@
 
   .summaryBar {
     display: flex !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nuevaBtn,
+.skeleton,
+.progressBar {
+    transition: none;
+    animation: none;
   }
 }

@@ -56,7 +56,7 @@
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: inherit;
   width: 100%;
   box-sizing: border-box;
@@ -72,8 +72,14 @@
 
 .primaryButton:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .primaryButton:hover {
+  transform: translateY(-1px);
+  }
 }
 
 .primaryButton:active {
@@ -96,7 +102,13 @@
 
 .secondaryButton:hover {
   background: var(--border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .secondaryButton:hover {
   transform: translateY(-1px);
+  }
 }
 
 :global([data-theme="dark"]) .secondaryButton:hover {
@@ -106,4 +118,13 @@
 
 .secondaryButton:active {
   transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .primaryButton,
+.secondaryButton {
+    transition: none;
+    animation: none;
+  }
 }

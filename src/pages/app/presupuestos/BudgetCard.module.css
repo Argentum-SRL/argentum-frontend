@@ -19,9 +19,15 @@
 }
 
 .card:hover {
-  transform: translateY(-2px);
   border-color: rgba(var(--primary-rgb), 0.28);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .card:hover {
+  transform: translateY(-2px);
+  }
 }
 
 :global([data-theme="dark"]) .card:hover {
@@ -80,8 +86,10 @@
   transition: transform 0.2s ease;
 }
 
-.card:hover .budgetAvatar {
-  transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .budgetAvatar {
+    transform: scale(1.05);
+  }
 }
 
 .headerText {
@@ -343,4 +351,14 @@
 .conversionNotice svg {
   flex-shrink: 0;
   color: var(--text-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+.budgetAvatar,
+.progressFill {
+    transition: none;
+    animation: none;
+  }
 }

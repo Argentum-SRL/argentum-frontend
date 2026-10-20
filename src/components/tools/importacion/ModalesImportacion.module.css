@@ -92,7 +92,7 @@
 
 .actionRow {
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-btn-gap);
   width: 100%;
 }
 
@@ -185,7 +185,7 @@
   border: 1.5px solid var(--surface-alt);
   background: var(--page);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
 .checkboxItem:hover {
@@ -263,6 +263,12 @@
   border-color: var(--primary);
 }
 
+.selectField:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--primary);
+}
+
 /* ── Radio Pills (Cargos / Billetera USD) ────────────────────────────────── */
 .radioGroup {
   display: flex;
@@ -293,7 +299,7 @@
   font-weight: 600;
   color: var(--text-2);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .pillActiveEgreso {
@@ -356,4 +362,26 @@
   text-transform: uppercase;
   letter-spacing: 0.7px;
   margin-bottom: 2px;
+}
+
+@media (max-width: 768px) {
+  .selectField {
+    font-size: var(--control-font-mobile);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cancelBtn,
+  .submitBtn,
+  .cancelImportBtn,
+  .checkboxItem,
+  .radioPill,
+  .selectField {
+    transition: none;
+    transform: none;
+  }
+  .selectAllBtn {
+    transition: none;
+    animation: none;
+  }
 }

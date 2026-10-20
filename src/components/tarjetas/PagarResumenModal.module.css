@@ -244,16 +244,18 @@
   font-weight: 600;
   color: var(--text-2);
   cursor: pointer;
-  transition: all 140ms ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
   box-shadow: var(--elevation-none);
 }
 
-.quickChip:hover {
-  background: var(--surface-alt);
-  color: var(--text);
-  border-color: var(--border);
-  box-shadow: var(--elevation-xs);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .quickChip:hover {
+    background: var(--surface-alt);
+    color: var(--text);
+    border-color: var(--border);
+    box-shadow: var(--elevation-xs);
+    transform: translateY(-1px);
+  }
 }
 
 .quickChipActive {
@@ -404,6 +406,12 @@
 .inlineInput:focus {
   border-color: var(--border);
   box-shadow: var(--elevation-none);
+}
+
+@media (max-width: 768px) {
+  .inlineInput {
+    font-size: var(--control-font-mobile);
+  }
 }
 
 .pesificacionTotalRow {
@@ -575,7 +583,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
 }
 
 .cancelBtn:hover:not(:disabled) {
@@ -608,8 +616,13 @@
 
 .submitBtn:hover:not(:disabled) {
   opacity: 0.92;
-  transform: translateY(-1px);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  }
 }
 
 .submitBtn:active:not(:disabled) {
@@ -694,7 +707,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: all 120ms ease;
+  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
 }
 
 .excedenteOpcion:hover {
@@ -740,4 +753,22 @@
 .excedenteCategoriaSelectorWrap {
   padding-top: 8px;
   border-top: 1px dashed var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quickChip,
+  .cancelBtn,
+  .submitBtn,
+  .closeBtn,
+  .pesificarSwitchBtn {
+    transition: none;
+    transform: none;
+  }
+  .backBtn,
+.fieldSelect,
+.montoHeroCard,
+.excedenteOpcion {
+    transition: none;
+    animation: none;
+  }
 }

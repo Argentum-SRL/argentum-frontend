@@ -300,7 +300,13 @@
 
 .submitBtn:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .submitBtn:hover:not(:disabled) {
   transform: translateY(-1px);
+  }
 }
 
 .submitBtn:active:not(:disabled) {
@@ -334,4 +340,15 @@
   margin-bottom: 0;
   line-height: 1.4;
   font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .closeBtn,
+.cancelBtn,
+.submitBtn,
+.spinner {
+    transition: none;
+    animation: none;
+  }
 }

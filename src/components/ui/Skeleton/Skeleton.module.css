@@ -555,8 +555,11 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton,
   .cardSkeleton,
+  .billeteraHeroCard,
+  .suscripcionCardSkeleton,
   [class*="Skeleton"] {
     animation: none;
   }
 }
+
 

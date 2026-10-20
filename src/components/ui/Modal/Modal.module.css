@@ -157,6 +157,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.closeButton:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .closeButton:hover {
   background: var(--border);
   color: var(--text);
@@ -346,7 +351,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .container,
-  .overlay {
+  .overlay,
+  .sheet {
     animation: none;
   }
+  .closeButton,
+  .stepDot {
+    transition: none;
+  }
 }
+

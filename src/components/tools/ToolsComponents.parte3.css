@@ -288,12 +288,18 @@
   border-radius:12px;
   background: var(--surface-alt);
   border: 1px solid transparent;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .previewFeatureItem:hover {
   border-color: var(--border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .previewFeatureItem:hover {
   transform: translateX(2px);
+  }
 }
 
 .previewFeatureIcon {
@@ -369,7 +375,7 @@
   color: var(--text-3);
   border: 1.5px solid var(--border);
   cursor: pointer;
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: inherit;
   flex-shrink: 0;
   outline: none;
@@ -445,6 +451,20 @@
   .fwStage, .fwStageFwd, .fwStageBwd {
     animation: none !important;
     transform: none !important;
+  }
+  .distSegment,
+.accordionSummary,
+.accordionContent,
+.previewPlaceholderCard,
+.previewFeatureItem,
+.fwDot,
+.fwDotLine,
+.fwRecapChip,
+.fwLiveCuota,
+.fwChip,
+.fwToggleBtn {
+    transition: none;
+    animation: none;
   }
 }
 
@@ -638,7 +658,13 @@
   border-color: var(--primary);
   color: var(--text);
   background: var(--surface);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .fwChip:hover {
   transform: translateY(-1px);
+  }
 }
 
 .fwChipActive {

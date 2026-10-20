@@ -335,3 +335,12 @@
     display: flex;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .tr,
+.card {
+    transition: none;
+    animation: none;
+  }
+}

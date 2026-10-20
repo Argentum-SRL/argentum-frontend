@@ -232,3 +232,12 @@
   line-height: 1.4;
   padding: 2px 0;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .unifiedCard,
+.resetBtn,
+.pulseDot {
+    transition: none;
+    animation: none;
+  }
+}

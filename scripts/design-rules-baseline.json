@@ -30,7 +30,9 @@
     "R28": 0,
     "R29": 0,
     "R30": 0,
-    "R31": 0
+    "R31": 0,
+    "R32": 0,
+    "R33": 0
   },
   "files": {
     "components/auth/AuthLayout/AuthLayout.module.css": {

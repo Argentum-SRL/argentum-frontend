@@ -316,3 +316,14 @@
     width: 75px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+.monthRow,
+.barFill,
+.skeletonItem {
+    transition: none;
+    animation: none;
+  }
+}

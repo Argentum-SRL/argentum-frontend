@@ -231,3 +231,13 @@
 .changeFotoBtn:hover {
   text-decoration: underline;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .closeBtn,
+.cancelBtn,
+.submitBtn,
+.dropZone {
+    transition: none;
+    animation: none;
+  }
+}

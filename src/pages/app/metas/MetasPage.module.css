@@ -77,7 +77,13 @@
 
 .nuevaBtn:hover {
   opacity: 0.88;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .nuevaBtn:hover {
   transform: translateY(-1px);
+  }
 }
 
 .btnSuffix { display: none; }
@@ -199,5 +205,14 @@
 @media (min-width: 768px) {
   .desktopSummaryBar {
     display: flex !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nuevaBtn,
+.skeletonCard::after {
+    transition: none;
+    animation: none;
   }
 }

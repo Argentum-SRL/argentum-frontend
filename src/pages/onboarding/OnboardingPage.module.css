@@ -117,3 +117,16 @@
 :global([data-theme="dark"]) .loading {
   color: #ffffff;
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .inner,
+.headerMoon,
+.logoText,
+.card,
+.stepWrap,
+.footer {
+    transition: none;
+    animation: none;
+  }
+}

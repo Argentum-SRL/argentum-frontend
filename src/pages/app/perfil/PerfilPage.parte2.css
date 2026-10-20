@@ -41,7 +41,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
 
@@ -64,7 +64,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
 
@@ -242,7 +242,7 @@
   border: 1.5px solid var(--border);
   background: var(--surface-alt);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   text-align: left;
   width: 100%;
   box-sizing: border-box;
@@ -381,7 +381,13 @@
 
 .saveBtnPrimary:hover {
   opacity: 0.9;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .saveBtnPrimary:hover {
   transform: translateY(-1px);
+  }
 }
 
 .saveBtnPrimary:disabled {
@@ -465,7 +471,7 @@
   font-family: inherit;
   font-size: 14px;
   outline: none;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   box-sizing: border-box;
 }
 
@@ -550,7 +556,7 @@
   gap: 6px;
   font-size: 12px;
   color: var(--text-3);
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .reqDot {
@@ -608,4 +614,20 @@
   gap: 2px;
   flex: 1;
   min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .editContactBtn,
+.unlinkContactBtn,
+.verifyDirectBtn,
+.slider,
+.slider:before,
+.dolarOptionCard,
+.saveBtnPrimary,
+.cleanInput,
+.reqItem {
+    transition: none;
+    animation: none;
+  }
 }

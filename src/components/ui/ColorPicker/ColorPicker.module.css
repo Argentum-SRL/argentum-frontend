@@ -47,6 +47,20 @@
   box-shadow: var(--focus-ring);
 }
 
+.trigger:focus,
+.trigger:focus-visible,
+.triggerOpen:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
+.trigger:focus,
+.trigger:focus-visible,
+.triggerOpen:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .swatch {
   width: 22px;
   height: 22px;
@@ -228,6 +242,19 @@
   background: var(--surface);
 }
 
+.hexInput:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+@media (max-width: 768px) {
+  .hexInput {
+    font-size: var(--control-font-mobile);
+  }
+}
+
 /* ─── DONE BUTTON ─────────────────────────────────── */
 .doneBtn {
   display: flex;
@@ -300,7 +327,10 @@
     animation: none !important;
   }
   .trigger,
-  .doneBtn {
+  .doneBtn,
+  .presetBtn,
+  .hexInput {
     transition: none;
+    transform: none;
   }
 }

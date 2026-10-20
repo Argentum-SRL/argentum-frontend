@@ -136,6 +136,11 @@
   box-shadow: var(--elevation-none);
 }
 
+.bankPreviewNombreInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .bankPreviewTipo {
   font-size: 12px;
   color: var(--text-3);
@@ -153,7 +158,7 @@
   border: none;
   color: var(--text-3);
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
   flex-shrink: 0;
 }
 
@@ -255,7 +260,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 150ms ease;
+  transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
 }
 
 .iconBoxDefault {
@@ -602,7 +607,13 @@
 
 .crearBtn:hover:not(:disabled) {
   opacity: 0.92;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .crearBtn:hover:not(:disabled) {
   transform: translateY(-1px);
+  }
 }
 
 .crearBtn:disabled {
@@ -644,3 +655,20 @@
 [data-bank="ppi"] { --bank-color: #1E293B; }
 [data-bank="cohen"] { --bank-color: #1B365D; }
 [data-bank="custom"] { --bank-color: #8A95A8; }
+@media (prefers-reduced-motion: reduce) {
+
+  .pencilIconWrapper,
+.closeBtn,
+.settingCard,
+.settingIconBox,
+.customSwitch,
+.customSwitchThumb,
+.chevronWrapper,
+.opcionesAvanzadasContent,
+.usarAutomaticaBtn,
+.cancelBtn,
+.crearBtn {
+    transition: none;
+    animation: none;
+  }
+}

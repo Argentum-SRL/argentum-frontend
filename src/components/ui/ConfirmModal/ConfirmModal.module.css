@@ -95,9 +95,14 @@
   box-shadow: var(--focus-ring);
 }
 
+.requireInput:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .actions {
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-btn-gap);
   align-items: center;
   width: 100%;
   box-sizing: border-box;
@@ -141,6 +146,11 @@
 .cancelBtn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.cancelBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .cancelBtn:disabled {
@@ -187,6 +197,11 @@
 .confirmBtnDanger:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.confirmBtnDanger:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .confirmBtnDefault { 
@@ -244,7 +259,7 @@
   }
 
   .actions {
-    gap: 8px;
+    gap: var(--modal-footer-btn-gap);
   }
 
   .cancelBtn {
@@ -264,7 +279,7 @@
 @media (max-width: 340px) {
   .actions {
     flex-direction: column-reverse;
-    gap: 8px;
+    gap: var(--modal-footer-btn-gap);
   }
 
   .cancelBtn,

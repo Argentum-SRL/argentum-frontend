@@ -77,3 +77,13 @@
   color: var(--text);
   font-weight: 600;
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .connector,
+.circle,
+.label {
+    transition: none;
+    animation: none;
+  }
+}

@@ -130,6 +130,12 @@
   border-color: var(--primary);
 }
 
+.fieldInput:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--primary);
+}
+
 /* ── Radio Pills / Solapas (Idéntico a TransaccionModal) ─────────────────── */
 .radioGroup {
   display: flex;
@@ -341,4 +347,25 @@
     padding: 12px 14px;
     gap: 8px;
   }
+
+  .fieldInput {
+    font-size: var(--control-font-mobile);
+  }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .cancelBtn,
+  .submitBtn,
+  .backBtn,
+  .closeBtn,
+  .fieldInput {
+    transition: none;
+    transform: none;
+  }
+  .slideForward,
+.slideBack {
+    transition: none;
+    animation: none;
+  }
+}
+

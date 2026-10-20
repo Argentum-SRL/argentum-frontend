@@ -32,6 +32,11 @@
   min-width: 0;
 }
 
+.fwNumInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .fwNumInput::placeholder {
   color: var(--text-3);
   font-weight: 400;
@@ -92,8 +97,14 @@
 }
 
 .fwCta:hover:not(:disabled) {
-  transform: translateY(-2px);
   box-shadow: var(--elevation-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .fwCta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  }
 }
 
 .fwCta:active:not(:disabled) { transform: translateY(0); }
@@ -363,7 +374,7 @@
   font-size: 13px;
   font-weight: 600;
   border-radius:999px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   outline: none;
 }
 
@@ -390,7 +401,7 @@
   background: var(--surface-alt);
   color: var(--text-2);
   border: 1px solid var(--border);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   line-height: 1;
 }
 
@@ -497,12 +508,18 @@
   font-family: inherit;
   cursor: pointer;
   box-shadow: var(--elevation-sm);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wbInitialCta:hover:not(:disabled) {
-  transform: translateY(-1.5px);
   box-shadow: var(--elevation-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .wbInitialCta:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  }
 }
 
 .wbInitialCta:disabled {
@@ -607,7 +624,7 @@
   color: var(--text-2);
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .wbEditBtn:hover {
@@ -664,5 +681,34 @@
   height: 1px;
   background: var(--border);
   width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .fwInlineInput,
+.fwSyncBtn,
+.fwCta,
+.fwCtaSpinner,
+.fwVerdict,
+.fwActionSecondary,
+.fwActionGhost,
+.fwFadeIn,
+.iconRotating,
+.wbStepItem,
+.wbStepDot,
+.wbStepDivider,
+.wbInitialShell,
+.wbInitialCta,
+.wbShell {
+    transition: none;
+    animation: none;
+  }
+
+  .wbEditBtn,
+.wbInlineEditWrap,
+.wbInlineSaveBtn {
+    transition: none;
+    animation: none;
+  }
 }
 

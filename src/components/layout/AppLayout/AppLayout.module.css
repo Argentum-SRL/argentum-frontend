@@ -163,6 +163,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.profilePill:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 :global([data-theme="dark"]) .profilePill,
 :global(.dark) .profilePill {
   /* Anterior: var(--sb-bg) / #091120 */
@@ -208,6 +213,11 @@
 .topBarBtn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.topBarBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .topBarBtn:hover { 
@@ -436,6 +446,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.dropdownItem:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .dropdownItem:hover {
   background: rgba(0,0,0,0.05);
 }
@@ -474,6 +489,11 @@
 .navItem:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.navItem:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -673,6 +693,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.mobileIconBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .mobileIconBtn:hover {
   background: var(--surface-alt);
 }
@@ -718,8 +743,10 @@
   .navItem,
   .navIcon,
   .navLabel,
-  .mobileIconBtn {
+  .mobileIconBtn,
+  .navItem:hover .navIcon {
     transition: none;
     animation: none;
   }
 }
+

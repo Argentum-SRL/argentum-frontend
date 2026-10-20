@@ -16,7 +16,7 @@
   border-radius: 12px;
   padding: 12px 14px;
   box-shadow: var(--elevation-xs);
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .resumenImpagoContent {
@@ -55,12 +55,17 @@
   font-weight: 600;
   padding: 6px 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .impagoBtnPrimary:hover {
   filter: brightness(1.1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .impagoBtnPrimary:hover {
   transform: translateY(-1px);
+  }
 }
 
 .impagoBtnSecondary {
@@ -72,7 +77,7 @@
   font-weight: 600;
   padding: 6px 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .impagoBtnSecondary:hover {
@@ -119,7 +124,7 @@
   border: 1px solid var(--surface-alt);
   color: var(--text-2);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   flex-shrink: 0;
   box-shadow: var(--elevation-xs);
 }
@@ -128,7 +133,12 @@
   background: var(--surface-alt);
   color: var(--primary);
   border-color: var(--border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .navBtn:hover:not(:disabled) {
   transform: scale(1.06);
+  }
 }
 
 .navBtn:active:not(:disabled) {
@@ -195,7 +205,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease, opacity 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
   box-sizing: border-box;
   width: 100%;
 }
@@ -515,7 +525,7 @@
   border-radius: 10px;
   background: var(--surface-alt);
   color: var(--text-2);
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .vencimientoLeft {
@@ -590,7 +600,7 @@
   justify-content: center;
   gap: 6px;
   width: 100%;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   box-shadow: var(--elevation-sm);
@@ -598,8 +608,13 @@
 
 .payBtn:hover:not(:disabled) {
   opacity: 0.92;
-  transform: translateY(-1px);
   box-shadow: var(--elevation-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .payBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  }
 }
 
 .payBtn:active:not(:disabled) {
@@ -630,14 +645,19 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   box-shadow: var(--elevation-sm);
 }
 
 .payBtnSecondary:hover:not(:disabled) {
   opacity: 0.92;
-  transform: translateY(-1px);
   box-shadow: var(--elevation-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .payBtnSecondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  }
 }
 
 .paidBadge {
@@ -744,4 +764,22 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resumenImpagoBanner,
+.impagoBtnPrimary,
+.impagoBtnSecondary,
+.impagoBtnGhost,
+.navBtn,
+.summaryCard,
+.itemRow,
+.vencimientoRow,
+.payBtn,
+.payBtnSecondary,
+.expandBtn,
+.loadingSkeleton {
+    transition: none;
+    animation: none;
+  }
 }

@@ -137,7 +137,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: var(--modal-footer-btn-gap);
   border-top: none;
   flex-shrink: 0;
 }
@@ -155,7 +155,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 120ms ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
   font-family: inherit;
 }
 
@@ -183,7 +183,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: opacity 120ms ease, box-shadow 120ms ease;
+  transition: opacity var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
   box-shadow: var(--elevation-xs);
   font-family: inherit;
 }
@@ -220,3 +220,16 @@
     font-size: 13.5px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .cancelBtn,
+  .submitBtn {
+    transition: none;
+    transform: none;
+  }
+  .closeBtn {
+    transition: none;
+    animation: none;
+  }
+}
+

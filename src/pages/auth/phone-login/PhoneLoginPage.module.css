@@ -64,6 +64,11 @@
   border: none;
 }
 
+.phoneInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .phonePreview {
   font-size: 0.75rem;
   color: var(--text-3);
@@ -321,4 +326,17 @@
   color: var(--text-3);
   line-height: 1.4;
   margin-bottom: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .phoneInputWrap,
+.otpBox,
+.submitBtn,
+.altBtn,
+.resendBtn,
+.backBtn {
+    transition: none;
+    animation: none;
+  }
 }

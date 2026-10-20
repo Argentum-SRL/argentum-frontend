@@ -161,6 +161,11 @@
   max-width: 170px;
 }
 
+.bankPreviewNombreInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .backBtn, .closeBtn {
   width: 32px;
   height: 32px;
@@ -298,18 +303,39 @@
   line-height: 1;
 }
 
+.montoHeroField:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 /* ── Catálogo Grid ───────────────────────────────────────────────────────── */
 .searchWrapper {
   margin-bottom: 12px;
 }
 
 .catalogScroll {
+  max-height: clamp(260px, 48dvh, 380px);
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-left: 4px;
   padding-right: 4px;
+  padding-bottom: 8px;
   /* r03-ok: sangrado a los bordes para alineacion del scroll horizontal */
   margin-left: -4px;
   /* r03-ok: sangrado a los bordes para alineacion del scroll horizontal */
   margin-right: -4px;
+  overscroll-behavior: contain;
+  position: relative;
+  z-index: 1;
+}
+
+.catalogScroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.catalogScroll::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 10px;
 }
 
 .catalogGroup {
@@ -341,13 +367,15 @@
   border: 1.5px solid transparent; /* Removed visible border */
   background: transparent; /* Removed background */
   cursor: pointer;
-  transition: all 180ms ease;
+  transition: transform 180ms ease, background-color 180ms ease;
   position: relative;
 }
 
-.catalogItem:hover {
-  transform: translateY(-4px) scale(1.05);
-  background: var(--surface-alt);
+@media (hover: hover) and (pointer: fine) {
+  .catalogItem:hover {
+    transform: translateY(-4px) scale(1.05);
+    background: var(--surface-alt);
+  }
 }
 
 .catalogItemActive {
@@ -416,7 +444,7 @@
   border: 1.5px dashed var(--border);
   cursor: pointer;
   margin-top: 10px;
-  transition: all 150ms;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
 .otherOption:hover {
@@ -438,6 +466,8 @@
   border-radius: 0 0 var(--modal-radius) var(--modal-radius);
   flex-shrink: 0;
   margin-top: auto;
+  position: relative;
+  z-index: 20;
 }
 
 .submitBtn {
@@ -450,13 +480,18 @@
   font-size: 15px;
   border: none;
   cursor: pointer;
-  transition: all 150ms;
+  transition: transform 150ms, opacity 150ms, background-color 150ms, border-color 150ms, box-shadow 150ms, color 150ms;
   box-shadow: var(--elevation-xs);
 }
 
 .submitBtn:hover:not(:disabled) {
-  transform: translateY(-1px);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  }
 }
 
 .submitBtn:active:not(:disabled) {
@@ -514,6 +549,11 @@
   font-weight: 500;
   outline: none;
   width: 100%;
+}
+
+.fieldInputIcon:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 
@@ -583,5 +623,32 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--text, #fff);
+}
+
+@media (max-width: 768px) {
+  .fieldInput,
+  .fullWidthInput {
+    font-size: var(--control-font-mobile);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalogItem,
+  .otherOption,
+  .monedaToggleChip,
+  .submitBtn,
+  .deleteBtn,
+  .closeBtn {
+    transition: none;
+    transform: none;
+  }
+  .slideForward,
+.slideBack,
+.pencilIconWrapper,
+.backBtn,
+.fieldInput {
+    transition: none;
+    animation: none;
+  }
 }
 

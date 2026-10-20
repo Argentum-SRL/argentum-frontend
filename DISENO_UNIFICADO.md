@@ -511,26 +511,59 @@ Todos los controles estándar del sistema (`Input`, `Field`, `SelectInput`, `Dat
 | `--control-font-mobile` | `16px` | Tamaño tipográfico normativo en controles editables (`input`, `select`, `textarea`) en pantallas `<= 768px` para prevenir zoom automático indeseado en Safari iOS. |
 | `--control-disabled-opacity` | `0.5` | Opacidad estándar para controles en estado deshabilitado (`:disabled` / `aria-disabled="true"`). |
 | `--focus-ring` | `0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent)` | Indicador de foco por teclado de alta visibilidad (contraste `>= 3:1` sobre superficies del sistema). |
+| `--modal-footer-btn-gap` | `12px` | Separación estándar oficial entre botones de acción en el pie de modales y hojas. |
 
-> **MontoInput (Tarjeta Hero):** Preserva su altura hero, tipografía protagónica y radio de 16px por identidad de producto, pero hereda estrictamente `--control-disabled-opacity`, `--focus-ring` y el token de color de error del sistema.
+#### Tabla de Controles del Sistema (Valores Resueltos)
 
-### 15.2 Foco Accesible (Regla R28)
-Todo selector interactivo que aplique `outline: none` o `outline: 0` debe declarar obligatoriamente en el mismo bloque o mediante su variante `:focus-visible` un indicador visual visible (`box-shadow: var(--focus-ring);` o borde perimetral en `var(--primary)`). Se prohíbe silenciar el foco por teclado sin proporcionar retorno físico equivalente (R28 = 0).
+| Control | Alto | Radio | Padding-X | Font Desktop | Font Mobile (<=768px) | Opacidad Deshabilitado | Foco Visible | Dentro del Sistema |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `ui/Input` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/Field` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/SelectInput` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/DateInput` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/TimeInput` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/PhoneCountrySelect` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/ColorPicker` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/Button` | `44px` (`36px` sm) | `12px` | `16px` (`14px` sm) | `15px` | `15px` | `0.5` | `var(--focus-ring)` | SÍ |
+| `ui/MontoInput (Hero)` | auto | `16px` | `16px` | `36px` | `36px` | `0.5` | `var(--focus-ring)` en contenedor | DESVÍO IDENTIDAD |
+| `ui/MontoInput (Outlined)` | `44px` | `12px` | `14px` | `15px` (prefijo `16px`) | `16px` | `0.5` | `var(--focus-ring)` en contenedor | SÍ |
+
+### 15.2 Foco Accesible por Selector Base (Regla R28)
+Todo selector interactivo en todo el alcance que aplique `outline: none` o `outline: 0` debe contar obligatoriamente en el mismo selector base con una regla `:focus`, `:focus-visible` o `:focus-within` que declare un indicador visual perceptible (`box-shadow: var(--focus-ring);`, borde perimetral en `var(--primary)` o `outline` visible). Se prohíbe silenciar el foco por teclado sin proporcionar retorno físico equivalente (R28 = 0).
 
 ### 15.3 Transiciones y Accesibilidad de Movimiento (Reglas R29 y R30)
-- **Prohibición de `transition: all` (R29):** Queda terminantemente prohibido el uso indiscriminado de `transition: all` en componentes base y estructuras de layout. Cada regla debe explicitar exactamente las propiedades transicionadas (`transform`, `opacity`, `background-color`, `border-color`, `box-shadow`, `color`).
+- **Prohibición de `transition: all` (R29):** Queda terminantemente prohibido el uso de `transition: all` en componentes base, páginas y dominio. Cada regla debe explicitar exactamente las propiedades transicionadas (`transform`, `opacity`, `background-color`, `border-color`, `box-shadow`, `color`). R29 = 0.
 - **Tokens de Movimiento Físico:**
   - `--motion-fast`: `150ms` (interacciones inmediatas, feedback táctil).
   - `--motion-base`: `220ms` (transiciones de estado y elevación).
   - `--ease-out`: `cubic-bezier(0.16, 1, 0.3, 1)` (curva física canónica de desaceleración sin rebote).
-- **Cobertura Obligatoria de Reduced-Motion (R30):** Toda animación (`@keyframes` / `animation`) o transición CSS en `ui/` y `layout/` debe incluir cobertura explícita bajo `@media (prefers-reduced-motion: reduce)` en el mismo módulo (`transition: none !important; animation: none !important;`), preservando en loaders e indicadores de carga un latido o pulso atenuado que garantice el feedback de progreso sin inducir mareo visual.
+- **Cobertura Obligatoria de Reduced-Motion por Selector Base (R30):** Toda animación (`@keyframes` / `animation`) o transición CSS en todo el alcance debe incluir cobertura explícita bajo `@media (prefers-reduced-motion: reduce)` en el mismo selector base (`transition: none; animation: none;`), preservando en loaders e indicadores de carga un ritmo atenuado sin inducir fatiga visual. R30 = 0.
 
 ### 15.4 Prevención de Hover Pegado en Pantallas Táctiles (Regla R31)
-Todo efecto de interacción `:hover` que induzca movimiento o cambio dimensional (`transform`, `translate`, `scale`) debe estar estrictamente confinado dentro de `@media (hover: hover) and (pointer: fine)`. Esto previene que los elementos queden permanentemente elevados o distorsionados tras una pulsación táctil en dispositivos móviles o tabletas (R31 = 0). Las mutaciones cromáticas neutrales (`background-color`, `color`, `box-shadow`) pueden residir fuera de dicha media query para feedback inmediato.
+Todo efecto de interacción `:hover` que induzca movimiento o cambio dimensional (`transform`, `translate`, `scale`) en componentes o páginas del alcance debe estar estrictamente confinado dentro de `@media (hover: hover) and (pointer: fine)`. Esto previene que los elementos queden permanentemente elevados o distorsionados tras una pulsación táctil en dispositivos móviles o tabletas (R31 = 0). Las mutaciones cromáticas neutrales (`background-color`, `color`, `box-shadow`) pueden residir fuera de dicha media query para feedback inmediato.
 
-### 15.5 Política y Contención de `!important`
-Queda prohibido introducir declaraciones `!important` nuevas en el código fuente. Para las declaraciones preexistentes rige la siguiente clasificación sistemática:
-1. **Redundantes probadas (a):** Reglas donde ninguna otra regla del sistema compite por la propiedad; se eliminan sin alteración de especificidad.
-2. **Orden interno resuelto (b):** Declaraciones que competían exclusivamente con reglas del mismo archivo; se resuelven reordenando el bloque en la cascada tras verificación de equivalencia estricta.
-3. **Externas / Defensivas justificadas (c):** Declaraciones indispensables para neutralizar estilos globales o inline de dependencias de terceros; se conservan y listan con su justificación técnica en el inventario.
+### 15.5 Prevención de Auto-Zoom en Safari iOS (Regla R32)
+Todo control de entrada real (`<input>`, `<select>`, `<textarea>`) en pantallas `<= 768px` debe resolver su tamaño de fuente a un mínimo normativo de `16px` (mediante `--control-font-mobile: 16px` o la regla defensiva de `index.css`). Queda prohibido el uso de tamaños inferiores a 16px en campos interactivos en vista móvil, eliminando el zoom forzado de viewport de iOS (R32 = 0).
+
+### 15.6 Separación Unificada en Botoneras de Pie de Modal (Regla R33)
+Toda fila o contenedor directo de botones de acción en el pie de un modal (`ModalFooter` o prop `footer`) debe usar obligatoriamente `gap: var(--modal-footer-btn-gap)` (12px). Se prohíbe el uso de separaciones divergentes (6px, 8px, literales sueltos) en pies de diálogo o wizard (R33 = 0).
+
+### 15.7 Cobertura y Excepciones de Alcance (Fase fv3o)
+Las reglas R28 a R33 aplican de forma universal a:
+- Componentes base (`src/components/ui/` y `src/components/layout/`).
+- Componentes de dominio (todas las carpetas de `src/components/` fuera de ui/layout).
+- Pantallas de la aplicación (`src/pages/app/` y `src/pages/auth/`, onboarding, términos, 404).
+- Hojas globales (`src/index.css` y `src/styles/*.css`).
+**Excepciones Permanentes:**
+- Administración (`src/pages/admin/**` y `src/pages/AdminPage.*`): reservadas para la fase final `fv3p`.
+- `ui/SegmentedControl.*`: componente primitivo canónico intocable.
+- `src/components/dashboard/BalanceCard/*`: componente con excepción de diseño consolidada.
+
+### 15.8 Sistema de Equivalencia Estricta D0
+Para garantizar cero regresiones visuales accidentales, los cambios de cascada y especificidad se verifican estáticamente mediante el script `12_equivalencia.mjs`:
+- Resolución completa de cascada y especificidad PostCSS por selector compuesto.
+- Matriz de 10 viewports (320x568 a 1440x900, incluyendo 844x390 y 390x844).
+- 2 perfiles de interacción: escritorio (`hover: hover + pointer: fine`) y táctil (`hover: none + pointer: coarse`).
+- 2 temas visuales: claro y oscuro (`[data-theme="dark"]`).
+- Veredicto estricto: Todo cambio debe coincidir exactamente con un token aprobado del sistema (`--control-*`, `--modal-footer-btn-gap`, `--focus-ring`) o neutralización táctil documentada. Diferencias no declaradas = FALLO.
 

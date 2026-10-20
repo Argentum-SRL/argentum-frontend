@@ -19,9 +19,15 @@
 }
 
 .card:hover {
-  transform: translateY(-2px);
   border-color: rgba(var(--primary-rgb), 0.28);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .card:hover {
+  transform: translateY(-2px);
+  }
 }
 
 :global([data-theme="dark"]) .card:hover {
@@ -76,8 +82,10 @@
   transition: transform 0.2s ease;
 }
 
-.card:hover .goalAvatar {
-  transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .goalAvatar {
+    transform: scale(1.05);
+  }
 }
 
 .headerText {
@@ -298,7 +306,13 @@
 
 .primaryBtn:hover {
   opacity: 0.9;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .primaryBtn:hover {
   transform: translateY(-1px);
+  }
 }
 
 .primaryBtn:active {
@@ -315,4 +329,15 @@
   background: var(--page);
   border-color: var(--text-3);
   opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+.goalAvatar,
+.progressFill,
+.primaryBtn {
+    transition: none;
+    animation: none;
+  }
 }

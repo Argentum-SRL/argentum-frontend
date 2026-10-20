@@ -38,7 +38,7 @@
   justify-content: center;
   cursor: pointer;
   color: var(--text-3);
-  transition: all 0.2s;
+  transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
 }
 
 .closeBtn:hover {
@@ -86,13 +86,19 @@
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 20px;
-  transition: all 0.2s;
+  transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
 }
 
 .historyItem:hover {
   border-color: var(--primary);
-  transform: translateY(-2px);
   box-shadow: var(--elevation-xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .historyItem:hover {
+  transform: translateY(-2px);
+  }
 }
 
 .itemHeader {
@@ -196,4 +202,14 @@
   font-size: 16px;
   font-weight: 700;
   margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .closeBtn,
+.historyItem,
+.progressBar {
+    transition: none;
+    animation: none;
+  }
 }

@@ -4,7 +4,7 @@
 }
 
 .iconWrap {
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .iconAlert {
@@ -120,11 +120,23 @@
 @media (max-width: 480px) {
   .passwordInput {
     padding: 11px 14px;
-    font-size: 0.875rem;
+    font-size: var(--control-font-mobile);
+  }
+}
+
+@media (max-width: 768px) {
+  .passwordInput {
+    font-size: var(--control-font-mobile);
   }
 }
 
 .passwordInput:focus {
+  border-color: var(--error);
+  box-shadow: var(--elevation-focus-error);
+}
+
+.passwordInput:focus-visible {
+  outline: none;
   border-color: var(--error);
   box-shadow: var(--elevation-focus-error);
 }
@@ -204,5 +216,16 @@
     font-size: 12px !important;
     padding: 0 8px !important;
     white-space: nowrap !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .passwordInput {
+    transition: none;
+    transform: none;
+  }
+  .iconWrap {
+    transition: none;
+    animation: none;
   }
 }

@@ -103,7 +103,7 @@
   border-radius: 20px;
   display: inline-block;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .cycleDates:hover {
@@ -128,7 +128,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   padding: 0;
 }
 
@@ -256,7 +256,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .actionBtn:hover {
@@ -306,6 +306,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.mobileAvatarBtn:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .mobileAvatar {
@@ -510,44 +515,20 @@
     padding-right: 4px;
   }
 }
+@media (prefers-reduced-motion: reduce) {
 
-/* Unit Tabs ($ / %) - Misma estética tipográfica minimalista que currencyTabs */
-.unitTabs {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  .headerLeft,
+.cycleDates,
+.navBtn,
+.datePickerPopover,
+.actionBtn,
+.mobileAvatar,
+.topRow,
+.topRowCompact .card,
+.topRowExpanded .card {
+    transition: none;
+    animation: none;
+  }
 }
 
-.unitTab {
-  background: transparent;
-  border: none;
-  padding: 4px 2px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  font-family: inherit;
-}
-
-.unitTab:hover:not(.unitTabActive) {
-  color: var(--text-2);
-}
-
-.unitTabActive {
-  color: var(--text);
-  font-weight: 700;
-  border-bottom: 2px solid var(--text);
-}
-
-.unitTabSep {
-  font-size: 0.75rem;
-  color: var(--text-3);
-  opacity: 0.5;
-  -webkit-user-select: none;
-  user-select: none;
-}
 

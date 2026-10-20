@@ -479,3 +479,13 @@
     margin-top: 12px;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+
+  .barArea,
+.solidFill,
+.sheetProgressFill,
+.sheetActionItem {
+    transition: none;
+    animation: none;
+  }
+}

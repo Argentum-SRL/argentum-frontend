@@ -14,21 +14,27 @@
   gap: 12px;
 }
 
-.searchTitleArea {
+.searchTitleArea,
+.searchTitleArea[data-modal-field] {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 12px;
   flex: 1;
+  min-width: 0;
 }
 
 .searchIcon {
   color: var(--text-3);
   opacity: 0.8;
   flex-shrink: 0;
+  display: block;
 }
 
 .input {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   border: none;
   background: transparent;
   outline: none;
@@ -36,10 +42,19 @@
   font-weight: 500;
   color: var(--text);
   font-family: inherit;
+  padding: 0;
+  line-height: normal;
 }
 
 .input:focus-visible {
   outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--control-radius);
+}
+
+.input:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .input::placeholder {
@@ -81,6 +96,11 @@
 .closeBtn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.closeBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .closeBtn:hover {
@@ -209,6 +229,11 @@
 .gridCard:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.gridCard:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .gridCard:hover, .gridCardActive {
@@ -388,5 +413,25 @@
   padding: 8px 12px;
   background: var(--surface-alt);
   border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .input {
+    font-size: var(--control-font-mobile);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closeBtn,
+  .actionItem,
+  .resultCard {
+    transition: none;
+    transform: none;
+  }
+  .gridCard,
+.iconWrapper {
+    transition: none;
+    animation: none;
+  }
 }
 

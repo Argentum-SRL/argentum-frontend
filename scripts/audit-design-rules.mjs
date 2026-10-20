@@ -51,10 +51,12 @@ export const RULE_DEFS = {
   R25: 'Renderers de movimientos que dibujan íconos específicos (ArrowDownLeft, etc.) directamente dentro de un .map de transacciones/movimientos/cuotas fuera de MovimientoAvatar',
   R26: 'data-modal-stack en un contenedor que tenga como hijo un header o footer del modal',
   R27: 'estilo inline con margin/padding vertical dentro de un modal',
-  R28: 'outline: none o outline: 0 sin :focus-visible equivalente en el mismo módulo CSS (ui/ y layout/)',
-  R29: 'transition: all o transition-property: all en componentes ui/ o layout/',
-  R30: 'animation o transition en ui/ o layout/ sin cobertura por @media (prefers-reduced-motion: reduce)',
-  R31: 'regla :hover con transform/scale/translate fuera de @media (hover: hover) en ui/ o layout/',
+  R28: 'outline: none o outline: 0 sin :focus, :focus-visible o :focus-within con indicador visible en el mismo selector base (alcance decisión 3)',
+  R29: 'transition: all o transition-property: all en componentes o páginas del alcance decisión 3',
+  R30: 'animation o transition sin cobertura por @media (prefers-reduced-motion: reduce) en el mismo selector base (alcance decisión 3)',
+  R31: 'regla :hover con transform/scale/translate fuera de @media (hover: hover) en el alcance decisión 3',
+  R32: 'input, textarea o select real con tamaño de fuente resuelto < 16px en pantallas móviles (<= 768px)',
+  R33: 'fila de botones del footer de modal con separación (gap) distinta de var(--modal-footer-btn-gap)',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
@@ -97,6 +99,7 @@ function auditCssFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
+    R32: 0, R33: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -446,27 +449,49 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
-  // Reglas de Fase fv3n (componentes base ui/ y layout/)
-  const isUiOrLayout = relPath.startsWith('components/ui/') || relPath.startsWith('components/layout/') || relPath.startsWith('components\\ui\\') || relPath.startsWith('components\\layout\\');
-  const isExemptFv3n = relPath.includes('SegmentedControl');
+  // Reglas de Fase fv3o (alcance extendido de decisión 3: ui/, layout/, components/ y pages/ salvo admin, SegmentedControl y BalanceCard)
+  const isExcludedDecision3 = relPath.startsWith('pages/admin/') ||
+                              relPath.startsWith('pages\\admin\\') ||
+                              relPath.startsWith('pages/AdminPage.') ||
+                              relPath.startsWith('pages\\AdminPage.') ||
+                              relPath.includes('SegmentedControl') ||
+                              relPath.includes('BalanceCard');
+  const isInScopeDecision3 = !isExcludedDecision3;
 
-  if (isUiOrLayout && !isExemptFv3n) {
-    // R28: outline: none o 0 sin :focus-visible en el mismo módulo
-    const hasOutlineNone = /(?:^|[;\s])outline\s*:\s*(?:none|0)(?:[;\s]|$)/i.test(cleanContent);
-    if (hasOutlineNone) {
-      const hasFocusVisible = cleanContent.includes(':focus-visible');
-      if (!hasFocusVisible) {
-        violations.R28++;
+  if (isInScopeDecision3) {
+    // R28: outline: none o 0 sin indicador visible en el mismo selector base
+    const blocks = parseCssBlocks(cleanContent);
+    for (const b of blocks) {
+      if (/(?:^|[;\s])outline\s*:\s*(?:none|0)(?:[;\s]|$)/i.test(b.body)) {
+        const cleanSel = b.selector.replace(/\/\*[\s\S]*?\*\//g, '').trim();
+        const baseSel = cleanSel.replace(/:[a-zA-Z0-9_-]+(\([^)]*\))?/g, '').trim();
+        let hasFocusIndicator = false;
+        if (cleanContent.includes('focus-ring') || cleanContent.includes(':focus-within')) {
+          hasFocusIndicator = true;
+        } else {
+          for (const other of blocks) {
+            const otherSel = other.selector.replace(/\/\*[\s\S]*?\*\//g, '').trim();
+            if (otherSel.includes(baseSel) && (otherSel.includes(':focus') || otherSel.includes(':focus-visible'))) {
+              if (/(?:box-shadow|border(?:-[a-z]+)?|outline)\s*:/i.test(other.body)) {
+                hasFocusIndicator = true;
+                break;
+              }
+            }
+          }
+        }
+        if (!hasFocusIndicator) {
+          violations.R28++;
+        }
       }
     }
 
-    // R29: transition: all o transition-property: all en ui/ o layout/
+    // R29: transition: all o transition-property: all en componentes o páginas del alcance
     const r29Matches = cleanContent.match(/(?:transition|transition-property)\s*:\s*all\b/gi);
     if (r29Matches) {
       violations.R29 += r29Matches.length;
     }
 
-    // R30: animation o transition sin prefers-reduced-motion
+    // R30: animation o transition sin cobertura por @media (prefers-reduced-motion: reduce)
     const strippedMotion = cleanContent
       .replace(/animation\s*:\s*none(?:\s*!important)?/gi, '')
       .replace(/transition\s*:\s*none(?:\s*!important)?/gi, '');
@@ -529,6 +554,7 @@ function auditTsxFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
+    R32: 0, R33: 0,
   };
 
   const fileName = path.basename(filePath);
@@ -650,6 +676,133 @@ function auditTsxFile(filePath, relPath, content) {
       ts.forEachChild(node, checkR27);
     }
     checkR27(sf);
+  }
+
+  // R32: Inputs reales en TSX con font-size móvil < 16px (B7)
+  const isExcludedR32_R33 = relPath.startsWith('pages/admin/') || relPath.startsWith('pages\\admin\\') || relPath.startsWith('pages/AdminPage.') || relPath.startsWith('pages\\AdminPage.');
+  if (!isExcludedR32_R33 && /<(?:input|select|textarea)\b/i.test(content)) {
+    const sf = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    const cssImports = [];
+    for (const st of sf.statements) {
+      if (ts.isImportDeclaration(st) && st.moduleSpecifier) {
+        const mod = st.moduleSpecifier.text;
+        if (mod.endsWith('.css')) cssImports.push(path.resolve(path.dirname(filePath), mod));
+      }
+    }
+    function checkInputs(n) {
+      if (ts.isJsxElement(n) || ts.isJsxSelfClosingElement(n)) {
+        const elem = ts.isJsxElement(n) ? n.openingElement : n;
+        const tag = elem.tagName.getText(sf);
+        if (['input', 'select', 'textarea'].includes(tag)) {
+          let type = '';
+          let cls = '';
+          for (const a of elem.attributes.properties) {
+            if (ts.isJsxAttribute(a) && a.name) {
+              if (a.name.getText(sf) === 'type' && a.initializer) type = a.initializer.text || '';
+              if (a.name.getText(sf) === 'className' && a.initializer) cls = a.initializer.getText(sf);
+            }
+          }
+          if (type !== 'checkbox' && type !== 'radio' && type !== 'hidden') {
+            const m = cls.match(/styles\.([a-zA-Z0-9_-]+)/);
+            if (m) {
+              const clsName = m[1];
+              for (const cp of cssImports) {
+                if (!fs.existsSync(cp)) continue;
+                const cssContent = fs.readFileSync(cp, 'utf-8');
+                if (cssContent.includes('.' + clsName)) {
+                  const reg = new RegExp('\\.' + clsName + '\\b[^{]*\\{([^}]+)\\}', 'g');
+                  let rm;
+                  while ((rm = reg.exec(cssContent)) !== null) {
+                    const b = rm[1];
+                    const fm = b.match(/font-size\s*:\s*([0-9.]+)px/i);
+                    if (fm && parseFloat(fm[1]) < 16) {
+                      if (!cssContent.includes('--control-font-mobile') && !/max-width\s*:\s*(?:768|767)px/.test(cssContent)) {
+                        violations.R32++;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      ts.forEachChild(n, checkInputs);
+    }
+    checkInputs(sf);
+  }
+
+  // R33: Filas de botones del footer de modal con gap distinto de var(--modal-footer-btn-gap) (B8)
+  if (!isExcludedR32_R33 && (content.includes('Modal') || content.includes('modal'))) {
+    const sf = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    const cssImports = [];
+    for (const st of sf.statements) {
+      if (ts.isImportDeclaration(st) && st.moduleSpecifier) {
+        const mod = st.moduleSpecifier.text;
+        if (mod.endsWith('.css')) cssImports.push(path.resolve(path.dirname(filePath), mod));
+      }
+    }
+    function checkFooterNode(node) {
+      if (!node) return;
+      if (ts.isJsxElement(node)) checkButtonContainer(node);
+      ts.forEachChild(node, checkFooterNode);
+    }
+    function checkButtonContainer(elem) {
+      let btnCount = 0;
+      for (const ch of elem.children) {
+        if (ts.isJsxElement(ch) || ts.isJsxSelfClosingElement(ch)) {
+          const tag = (ts.isJsxElement(ch) ? ch.openingElement : ch).tagName.getText(sf);
+          if (['Button', 'button'].includes(tag)) btnCount++;
+        }
+      }
+      if (btnCount >= 2) {
+        let cls = '';
+        for (const a of elem.openingElement.attributes.properties) {
+          if (ts.isJsxAttribute(a) && a.name && a.name.getText(sf) === 'className' && a.initializer) {
+            cls = a.initializer.getText(sf);
+          }
+        }
+        const m = cls.match(/styles\.([a-zA-Z0-9_-]+)/);
+        if (m) {
+          const clsName = m[1];
+          for (const cp of cssImports) {
+            if (!fs.existsSync(cp)) continue;
+            const cssContent = fs.readFileSync(cp, 'utf-8');
+            const reg = new RegExp('\\.' + clsName + '\\b[^{]*\\{([^}]+)\\}', 'g');
+            let rm;
+            while ((rm = reg.exec(cssContent)) !== null) {
+              const b = rm[1];
+              const gm = b.match(/(?:^|[;\s])(?:gap|column-gap)\s*:\s*([^;]+)/i);
+              if (gm) {
+                const v = gm[1].trim();
+                if (!v.includes('var(--modal-footer-btn-gap)') && v !== '12px') {
+                  violations.R33++;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    function checkFooters(n, inFooter = false) {
+      let curFooter = inFooter;
+      if (ts.isJsxElement(n)) {
+        const tag = n.openingElement.tagName.getText(sf);
+        if (tag === 'ModalFooter') curFooter = true;
+        if (tag === 'Modal') {
+          for (const a of n.openingElement.attributes.properties) {
+            if (ts.isJsxAttribute(a) && a.name && a.name.getText(sf) === 'footer') {
+              checkFooterNode(a.initializer);
+            }
+          }
+        }
+      }
+      if (curFooter && ts.isJsxElement(n)) {
+        checkButtonContainer(n);
+      }
+      ts.forEachChild(n, ch => checkFooters(ch, curFooter));
+    }
+    checkFooters(sf, false);
   }
 
   return violations;

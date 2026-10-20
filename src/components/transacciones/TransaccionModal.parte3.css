@@ -37,7 +37,7 @@
   justify-content: center;
   gap: 2px;
   cursor: pointer;
-  transition: all 160ms ease;
+  transition: transform 160ms ease, opacity 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
   min-height: 54px;
 }
 
@@ -94,7 +94,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
 }
 
 .stepperBtn:hover {
@@ -381,7 +381,7 @@
   background: var(--surface-alt);
   gap: 8px;
   box-sizing: border-box;
-  transition: all 200ms ease;
+  transition: transform 200ms ease, opacity 200ms ease, background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, color 200ms ease;
 }
 
 .emptyWalletIcon {
@@ -425,6 +425,22 @@
   .cancelBtn, .btnDelete, .submitBtn {
     height: 40px;
     font-size: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+
+  .planCustomBtn,
+.customStepperRow,
+.stepperBtn,
+.advancedToggleBtn,
+.advancedDrawer,
+.advInput,
+.cancelBtn,
+.btnDelete,
+.submitBtn,
+.emptyWalletBox {
+    transition: none;
+    animation: none;
   }
 }
 

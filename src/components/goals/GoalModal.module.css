@@ -278,9 +278,11 @@
   justify-content: center;
 }
 
-.submitBtn:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .submitBtn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
 }
 
 .submitBtn:disabled {
@@ -310,3 +312,31 @@
   30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
   40%, 60% { transform: translate3d(4px, 0, 0); }
 }
+
+@media (max-width: 768px) {
+  .fieldInput,
+  .textarea {
+    font-size: var(--control-font-mobile);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cancelBtn,
+  .submitBtn,
+  .fieldInput,
+  .textarea {
+    transition: none;
+    transform: none;
+  }
+  .localErrorAlert {
+    animation: none;
+  }
+  .slideForward,
+.slideBack,
+.backBtn,
+.closeBtn {
+    transition: none;
+    animation: none;
+  }
+}
+

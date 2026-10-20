@@ -55,7 +55,7 @@
   border: none;
   color: var(--text-2);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -389,7 +389,7 @@
   justify-content: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   margin-top: 4px;
 }
 
@@ -500,7 +500,7 @@
   border: 1px solid transparent;
   color: var(--text-3);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   padding: 0;
 }
 
@@ -584,7 +584,7 @@
 .footerSecondaryGroup {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--modal-footer-btn-gap);
 }
 
 .footerIconBtn {
@@ -598,7 +598,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
   padding: 0;
 }
 
@@ -632,12 +632,14 @@
   justify-content: center;
   gap: 6px;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 }
 
-.primaryBtn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .primaryBtn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
 }
 
 .primaryBtn:active {
@@ -655,3 +657,20 @@
   border-color: var(--text-3);
   opacity: 1;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .footerIconBtn,
+  .primaryBtn {
+    transition: none;
+    transform: none;
+  }
+  .closeBtn,
+.progressFill,
+.toggleMovementsBtn,
+.movementItem,
+.deleteMovBtn {
+    transition: none;
+    animation: none;
+  }
+}
+

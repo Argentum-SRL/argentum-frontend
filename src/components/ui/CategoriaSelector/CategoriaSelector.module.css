@@ -65,6 +65,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.catBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 @media (max-width: 480px) {
   .catBtn {
     min-height: 52px;
@@ -335,6 +340,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.subcatChip:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 @media (max-width: 480px) {
   .subcatChip {
     padding: 6px 11px;
@@ -375,6 +385,7 @@
 @media (prefers-reduced-motion: reduce) {
   .catBtn,
   .catIconWrapper,
+  .catName,
   .selectedCatBanner,
   .changeCatBtn,
   .subcatChip {

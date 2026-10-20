@@ -150,7 +150,11 @@
   .container {
     animation: none !important;
   }
-  .coronaHalo {
+  .coronaHalo,
+  .brandSignature,
+  .tagline {
     transition: none !important;
+    transform: none !important;
   }
 }
+

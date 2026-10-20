@@ -65,8 +65,10 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.rowClickable:hover .avatarContainer {
-  transform: scale(1.04);
+@media (hover: hover) and (pointer: fine) {
+  .rowClickable:hover .avatarContainer {
+    transform: scale(1.04);
+  }
 }
 
 .avatarEgreso {
@@ -461,7 +463,13 @@
 
 .row:hover .deleteBtn {
   opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .row:hover .deleteBtn {
   transform: scale(1);
+  }
 }
 
 .deleteBtn:hover {
@@ -480,7 +488,13 @@
 
 .rowClickable:hover .chevronAffordance {
   opacity: 0.9;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .rowClickable:hover .chevronAffordance {
   transform: translateX(2px);
+  }
 }
 
 /* ── Visibilidad Condicional Desktop vs Mobile ──────────────────────── */
@@ -532,5 +546,16 @@
   .badge {
     padding: 2.5px 4.5px;
     border-radius: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .rowClickable,
+.avatarContainer,
+.deleteBtn,
+.chevronAffordance {
+    transition: none;
+    animation: none;
   }
 }

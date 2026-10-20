@@ -10,6 +10,10 @@
   outline: none;
   -webkit-tap-highlight-color: transparent;
 }
+.wc:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
 
 .wcMenuOpen {
   z-index: 35 !important;
@@ -40,8 +44,13 @@
   }
 
   .wc:hover {
-    transform: translateY(-3px);
     box-shadow: var(--elevation-md);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .wc:hover {
+    transform: translateY(-3px);
+    }
   }
 }
 
@@ -50,8 +59,18 @@
   transition: filter 0.3s ease;
 }
 
+@media (hover: hover) and (pointer: fine) {
+
 .archived:hover {
   filter: grayscale(0.3) opacity(0.9);
+}
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+.archived:hover {
+  filter: grayscale(0.3) opacity(0.9);
+}
 }
 
 /* ── Fondo clipeado ──────────────────────────────────────────────────────── */
@@ -408,7 +427,7 @@
   color: white;
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   z-index: 20;
   box-shadow: none; /* SIN SOMBRA para no romper la ilusión de recorte */
   width: max-content;
@@ -448,10 +467,15 @@
   }
 
   .wcAdd:hover {
-    transform: translateY(-3px);
     border-color: var(--primary);
     background: var(--surface-alt);
     box-shadow: var(--elevation-sm);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .wcAdd:hover {
+    transform: translateY(-3px);
+    }
   }
 }
 
@@ -465,7 +489,7 @@
   flex-direction: column;
   justify-content: space-between;
   min-height: 180px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
@@ -543,6 +567,16 @@
   @media (hover: hover) {
     .wcKebab { opacity: 0; }
     .wc:hover .wcKebab, .wcMenuOpen .wcKebab { opacity: 1; }
+  }
+
+  .archived,
+.kebabBtn,
+.dropdownItem,
+.card,
+.addIcon,
+.addTitle {
+    transition: none;
+    animation: none;
   }
 }
 

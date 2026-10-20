@@ -91,3 +91,12 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .input,
+.submitBtn {
+    transition: none;
+    animation: none;
+  }
+}

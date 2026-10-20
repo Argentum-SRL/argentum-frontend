@@ -340,7 +340,7 @@
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 }
 
@@ -399,6 +399,11 @@
   outline: none;
   font-family: inherit;
   min-width: 0;
+}
+
+.wbCustomInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .wbCustomSuffix {
@@ -544,7 +549,7 @@
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -582,13 +587,18 @@
   cursor: pointer;
   font-family: inherit;
   box-shadow: var(--elevation-sm);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 }
 
 .wbCtaButton:hover:not(:disabled) {
-  transform: translateY(-1.5px);
   box-shadow: var(--elevation-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wbCtaButton:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  }
 }
 
 .wbCtaButton:focus-visible {
@@ -602,5 +612,21 @@
   cursor: not-allowed;
   box-shadow: var(--elevation-none);
   transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbPulseDot,
+.wbBarFillContado,
+.wbBarFillCuotasSame,
+.wbBarFillCuotasSurcharge,
+.wbChip,
+.wbCustomCuotasWrap,
+.wbFixedModeArea,
+.wbStandardInputWrap,
+.wbIpcSyncBtn,
+.wbCtaButton {
+    transition: none;
+    animation: none;
+  }
 }
 

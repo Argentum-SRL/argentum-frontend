@@ -111,7 +111,13 @@
 
 .whatsappBtn:hover {
   opacity: 0.92;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .whatsappBtn:hover {
   transform: translateY(-1px);
+  }
 }
 
 .whatsappBtn:active {
@@ -332,5 +338,16 @@
   color: var(--text-2);
   margin-top: 2px;
   line-height: 1.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .whatsappBtn,
+.copyBtn,
+.renewBtn,
+.skipBtn {
+    transition: none;
+    animation: none;
+  }
 }
 

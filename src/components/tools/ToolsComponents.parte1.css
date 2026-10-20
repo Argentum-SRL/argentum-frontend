@@ -92,7 +92,7 @@
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.03em;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   user-select: none;
 }
 
@@ -543,7 +543,7 @@
   font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
   white-space: nowrap;
 }
 
@@ -551,7 +551,12 @@
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .summaryEditBtn:hover {
   transform: translateY(-1px);
+  }
 }
 
 [data-theme="dark"] .summaryEditBtn {
@@ -621,6 +626,22 @@
   font-weight: 600;
   color: var(--error);
   margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animateFadeIn,
+.stepBadge,
+.step1Box,
+.step2ConfigZone,
+.liveSummaryPanel,
+.stepConfirmBadge,
+.compactInflationBox,
+.ctaSection,
+.comparisonBand,
+.stepBackBtn,
+.summaryBarCard,
+.summaryEditBtn { transition: none; animation: none;
+  }
 }
 
 

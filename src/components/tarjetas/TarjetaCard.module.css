@@ -11,8 +11,10 @@
   gap: 0;
 }
 
-.card:hover:not(.cardShrunk) {
-  transform: translateY(-4px);
+@media (hover: hover) and (pointer: fine) {
+  .card:hover:not(.cardShrunk) {
+    transform: translateY(-4px);
+  }
 }
 
 .cardShrunk {
@@ -356,9 +358,14 @@
   font-size: clamp(10.5px, 3.2cqi, 12px);
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   outline: none;
   white-space: nowrap;
+}
+
+.backActionBtn:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .backActionBtn svg {
@@ -369,7 +376,13 @@
 .backActionBtn:hover {
   background: var(--btn-hover-bg, rgba(255, 255, 255, 0.32)) !important;
   border-color: var(--btn-hover-border, rgba(255, 255, 255, 0.5)) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .backActionBtn:hover {
   transform: translateY(-2px);
+  }
 }
 
 .backActionBtn:active {
@@ -390,5 +403,16 @@
   letter-spacing: 0.08em;
   pointer-events: none;
   font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+.animatingToBack,
+.animatingToFront,
+.backActionBtn {
+    transition: none;
+    animation: none;
+  }
 }
 

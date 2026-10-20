@@ -92,3 +92,11 @@
     display: none;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cardContainer {
+    transition: none;
+    animation: none;
+  }
+}

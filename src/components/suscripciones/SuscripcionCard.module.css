@@ -7,14 +7,20 @@
   padding: 16px;
   border-radius: 20px;
   background: var(--surface);
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
 }
 
 .card:hover {
-  transform: translateY(-2px);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .card:hover {
+  transform: translateY(-2px);
+  }
 }
 
 .cardPausada {
@@ -188,13 +194,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   color: inherit;
 }
 
 .actionBtn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.25);
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .actionBtn:hover:not(:disabled) {
   transform: translateY(-1px);
+  }
 }
 
 .actionBtn:disabled {
@@ -211,4 +223,13 @@
 .actionBtnDelete:hover {
   background: #ef4444 !important;
   color: white !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+.actionBtn {
+    transition: none;
+    animation: none;
+  }
 }

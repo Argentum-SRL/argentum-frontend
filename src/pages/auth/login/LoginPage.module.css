@@ -148,3 +148,13 @@
   text-decoration: underline;
   opacity: 0.85;
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .submitBtn,
+.altBtn,
+.forgotLink {
+    transition: none;
+    animation: none;
+  }
+}

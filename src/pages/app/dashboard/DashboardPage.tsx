@@ -35,6 +35,7 @@ import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
 
 import { getFotoUrl } from '@/utils/fotoUrl'
@@ -957,27 +958,16 @@ export default function DashboardPage() {
                   <h3 className={styles.cardTitle}>Gastos por categoría</h3>
                 )}
               </div>
-              <div className={styles.unitTabs} role="tablist" aria-label="Unidad de visualización">
-                <button 
-                  type="button"
-                  role="tab"
-                  aria-selected={!showChartPercent}
-                  className={`${styles.unitTab} ${!showChartPercent ? styles.unitTabActive : ''}`} 
-                  onClick={() => setShowChartPercent(false)}
-                >
-                  $
-                </button>
-                <span className={styles.unitTabSep}>/</span>
-                <button 
-                  type="button"
-                  role="tab"
-                  aria-selected={showChartPercent}
-                  className={`${styles.unitTab} ${showChartPercent ? styles.unitTabActive : ''}`} 
-                  onClick={() => setShowChartPercent(true)}
-                >
-                  %
-                </button>
-              </div>
+              <SegmentedControl
+                options={[
+                  { value: 'monto', label: '$' },
+                  { value: 'porcentaje', label: '%' },
+                ]}
+                value={showChartPercent ? 'porcentaje' : 'monto'}
+                onChange={(val) => setShowChartPercent(val === 'porcentaje')}
+                ariaLabel="Unidad de visualización"
+                layout="inline"
+              />
             </div>
             <div className={styles.chartCardContent}>
               {selectedCategoria ? (

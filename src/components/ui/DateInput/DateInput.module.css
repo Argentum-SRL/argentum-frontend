@@ -72,6 +72,20 @@
   box-shadow: var(--focus-ring);
 }
 
+.input:focus,
+.inputFocused,
+.input:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
+.input:focus,
+.inputFocused,
+.input:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 :global([data-theme="dark"]) .input:focus,
 :global(.dark) .input:focus,
 :global([data-theme="dark"]) .inputFocused,
@@ -408,6 +422,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.clearBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .clearBtn:hover {
   background: var(--error-bg);
   border-color: var(--error);
@@ -429,6 +448,11 @@
 .todayBtn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.todayBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .todayBtn:hover {
@@ -458,6 +482,11 @@
 .confirmBtn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.confirmBtn:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
 }
 
 .confirmBtn:hover {
@@ -511,7 +540,13 @@
   .calendarBtn,
   .clearBtn,
   .todayBtn,
-  .confirmBtn {
+  .confirmBtn,
+  .formatHintBadge,
+  .compactRow {
     transition: none;
   }
+  .sheet {
+    animation: none;
+  }
 }
+

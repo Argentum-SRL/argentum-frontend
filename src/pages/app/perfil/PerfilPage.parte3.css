@@ -32,7 +32,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .revokeSingleBtn:hover {
@@ -57,7 +57,7 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .revokeAllBtn:hover {
@@ -250,7 +250,7 @@
   font-weight: 700;
   text-align: center;
   outline: none;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .smallNumberInput:focus {
@@ -277,7 +277,7 @@
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .channelPill:hover {
@@ -385,7 +385,13 @@
 
 .deleteBtnModern:hover {
   opacity: 0.9;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .deleteBtnModern:hover {
   transform: translateY(-1px);
+  }
 }
 
 /* ── 9. Edit Modals (Datos, Email, Teléfono) ──────────────────────── */
@@ -448,7 +454,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .modalCloseBtn:hover {
@@ -613,7 +619,7 @@
   border-top: none;
   background: var(--surface);
   display: flex;
-  gap: 8px;
+  gap: var(--modal-footer-btn-gap);
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
@@ -678,4 +684,24 @@
   color: var(--error, #ef4444);
   font-size: 12px;
   font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modalCancelBtn,
+  .modalSubmitBtn {
+    transition: none;
+    transform: none;
+  }
+  .revokeSingleBtn,
+.revokeAllBtn,
+.smallNumberInput,
+.channelPill,
+.deleteBtnModern,
+.modalCard,
+.modalCloseBtn,
+.fieldInput,
+.modalPwEyeBtn {
+    transition: none;
+    animation: none;
+  }
 }

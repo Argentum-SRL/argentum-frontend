@@ -273,7 +273,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .actionBtn:hover:not(:disabled) {
@@ -507,5 +507,20 @@
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .undoBanner,
+.undoBtn,
+.card,
+.actionBtn,
+.moverPopover,
+.moverOption,
+.skeletonCard::after,
+.retryBtn {
+    transition: none;
+    animation: none;
   }
 }

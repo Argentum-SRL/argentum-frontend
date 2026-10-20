@@ -38,3 +38,11 @@
   text-decoration: underline;
   opacity: 0.85;
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+  .linkBtn {
+    transition: none;
+    animation: none;
+  }
+}

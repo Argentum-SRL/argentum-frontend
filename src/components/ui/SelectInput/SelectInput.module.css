@@ -60,6 +60,18 @@
   box-shadow: var(--focus-ring);
 }
 
+.trigger:focus,
+.trigger:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
+.trigger:focus,
+.trigger:focus-visible:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .triggerPlaceholder {
   color: var(--text-3);
   font-weight: 400;
@@ -199,7 +211,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .trigger,
-  .chevron {
+  .chevron,
+  .option {
     transition: none;
   }
 }
+

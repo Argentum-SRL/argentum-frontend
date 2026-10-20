@@ -32,7 +32,12 @@
 .deleteHeaderBtn:hover {
   background: rgba(239, 68, 68, 0.16);
   color: #DC2626;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .deleteHeaderBtn:hover {
   transform: scale(1.05);
+  }
 }
 
 /* ── 1. Hero Identity Surface ─────────────────────────────────────────── */
@@ -368,7 +373,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--modal-footer-btn-gap);
   padding: 10px 20px 16px;
   border-top: none;
   background: var(--surface);
@@ -379,7 +384,7 @@
 .detailFooterRightGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--modal-footer-btn-gap);
 }
 
 .detailCancelCuotasBtn {
@@ -392,7 +397,7 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 140ms ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
   background: transparent;
   color: var(--text-3);
   border: 1px solid var(--border);
@@ -420,7 +425,7 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 140ms ease;
+  transition: transform 140ms ease, opacity 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
   background: var(--surface-alt);
   color: var(--text);
   border: 1px solid var(--border);
@@ -448,7 +453,7 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 140ms ease;
+  transition: transform 140ms ease, opacity 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
   background: var(--primary);
   color: #ffffff;
   border: none;
@@ -460,8 +465,14 @@
 .detailPrepayActionBtn:hover,
 .detailAdelantarActionBtn:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
   box-shadow: var(--elevation-sm);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .detailPrepayActionBtn:hover,
+.detailAdelantarActionBtn:hover {
+  transform: translateY(-1px);
+  }
 }
 
 .detailPrepayActionBtn:active,
@@ -472,7 +483,7 @@
 @media (max-width: 480px) {
   .detailFormFooter {
     flex-direction: column;
-    gap: 8px;
+    gap: var(--modal-footer-btn-gap);
     padding: 8px 14px 14px;
     border-top: none;
   }
@@ -483,7 +494,7 @@
   .detailFooterRightGroup {
     order: 1;
     display: flex;
-    gap: 8px;
+    gap: var(--modal-footer-btn-gap);
   }
   .detailFooterLeftGroup {
     order: 2;
@@ -668,4 +679,20 @@
 .dotActive {
   width: 20px;
   background: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detailCancelCuotasBtn,
+  .detailEditActionBtn,
+  .detailPrepayActionBtn,
+  .detailAdelantarActionBtn,
+  .dot {
+    transition: none;
+    transform: none;
+  }
+  .deleteHeaderBtn,
+.progressBarFill {
+    transition: none;
+    animation: none;
+  }
 }

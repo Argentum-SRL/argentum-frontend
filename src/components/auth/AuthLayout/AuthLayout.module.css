@@ -186,3 +186,13 @@
   background: var(--surface-alt);
   color: var(--text);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .standaloneCard,
+.standalone .logoText,
+.standalone .title,
+.themeToggle {
+    transition: none;
+    animation: none;
+  }
+}

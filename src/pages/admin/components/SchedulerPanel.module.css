@@ -45,7 +45,7 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .refreshBtn:hover:not(:disabled) {
@@ -306,7 +306,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
   white-space: nowrap;
 }
 
@@ -434,4 +434,14 @@
   color: var(--text-2);
   gap: 12px;
   font-size: 14px;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .actionBtn,
+  .toggleBtn,
+  .cronBtn {
+    transition: none;
+    animation: none;
+  }
 }

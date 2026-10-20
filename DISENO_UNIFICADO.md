@@ -526,13 +526,15 @@ Todos los controles estándar del sistema (`Input`, `Field`, `SelectInput`, `Dat
 | `ui/ColorPicker` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
 | `ui/Button` | `44px` (`36px` sm) | `12px` | `16px` (`14px` sm) | `15px` | `15px` | `0.5` | `var(--focus-ring)` | SÍ |
 | `ui/MontoInput (Hero)` | auto | `16px` | `16px` | `36px` | `36px` | `0.5` | `var(--focus-ring)` en contenedor | DESVÍO IDENTIDAD |
+| `ui/MontoInput (Compact)` | auto | `12px` | `14px` | `36px` | `36px` | `0.5` | `var(--focus-ring)` en contenedor | DESVÍO IDENTIDAD |
 | `ui/MontoInput (Outlined)` | `44px` | `12px` | `14px` | `15px` (prefijo `16px`) | `16px` | `0.5` | `var(--focus-ring)` en contenedor | SÍ |
+| `ui/MontoInput (Compact+Outlined)` | `44px` | `12px` | `14px` | `15px` (prefijo `16px`) | `16px` | `0.5` | `var(--focus-ring)` en contenedor | SÍ |
 
 ### 15.2 Foco Accesible por Selector Base (Regla R28)
 Todo selector interactivo en todo el alcance que aplique `outline: none` o `outline: 0` debe contar obligatoriamente en el mismo selector base con una regla `:focus`, `:focus-visible` o `:focus-within` que declare un indicador visual perceptible (`box-shadow: var(--focus-ring);`, borde perimetral en `var(--primary)` o `outline` visible). Se prohíbe silenciar el foco por teclado sin proporcionar retorno físico equivalente (R28 = 0).
 
 ### 15.3 Transiciones y Accesibilidad de Movimiento (Reglas R29 y R30)
-- **Prohibición de `transition: all` (R29):** Queda terminantemente prohibido el uso de `transition: all` en componentes base, páginas y dominio. Cada regla debe explicitar exactamente las propiedades transicionadas (`transform`, `opacity`, `background-color`, `border-color`, `box-shadow`, `color`). R29 = 0.
+- **Prohibición de `transition: all` (R29):** Queda terminantemente prohibido el uso de `transition: all` en componentes base, páginas, dominio y administración. Cada regla debe explicitar exactamente las propiedades transicionadas (`transform`, `opacity`, `background-color`, `border-color`, `box-shadow`, `color`, `filter`). R29 = 0.
 - **Tokens de Movimiento Físico:**
   - `--motion-fast`: `150ms` (interacciones inmediatas, feedback táctil).
   - `--motion-base`: `220ms` (transiciones de estado y elevación).
@@ -548,22 +550,38 @@ Todo control de entrada real (`<input>`, `<select>`, `<textarea>`) en pantallas 
 ### 15.6 Separación Unificada en Botoneras de Pie de Modal (Regla R33)
 Toda fila o contenedor directo de botones de acción en el pie de un modal (`ModalFooter` o prop `footer`) debe usar obligatoriamente `gap: var(--modal-footer-btn-gap)` (12px). Se prohíbe el uso de separaciones divergentes (6px, 8px, literales sueltos) en pies de diálogo o wizard (R33 = 0).
 
-### 15.7 Cobertura y Excepciones de Alcance (Fase fv3o)
-Las reglas R28 a R33 aplican de forma universal a:
-- Componentes base (`src/components/ui/` y `src/components/layout/`).
-- Componentes de dominio (todas las carpetas de `src/components/` fuera de ui/layout).
-- Pantallas de la aplicación (`src/pages/app/` y `src/pages/auth/`, onboarding, términos, 404).
-- Hojas globales (`src/index.css` y `src/styles/*.css`).
-**Excepciones Permanentes:**
-- Administración (`src/pages/admin/**` y `src/pages/AdminPage.*`): reservadas para la fase final `fv3p`.
-- `ui/SegmentedControl.*`: componente primitivo canónico intocable.
-- `src/components/dashboard/BalanceCard/*`: componente con excepción de diseño consolidada.
+### 15.7 Cobertura Universal y Cierre del Rediseño (Fase fv3p)
+El rediseño visual por capas ha concluido exitosamente cubriendo el 100% de `src/`:
+- **Capas previas completadas:** fv3m a fv3m5 (unificación canónica de modales y hojas), fv3n (unificación de controles base `src/components/ui/` y estructura `src/components/layout/`), fv3o (pantallas `src/pages/app/`, `src/pages/auth/`, onboarding, dominio y hojas globales).
+- **Cierre en fv3p:** Extensión de reglas R28 a R33 a la administración interna (`src/pages/admin/**` y `src/pages/AdminPage.module.css`), corrección de regresión en `MontoInput` compact (36px restaurado), neutralización de conflictos en `data-modal-field` con filas, ajuste de transiciones con propiedades faltantes, normalización de EOL y actualización del baseline.
+- **Excepciones Permanentes:**
+  - `ui/SegmentedControl.*`: componente primitivo canónico intocable.
+  - `src/components/dashboard/BalanceCard/*`: componente con excepción de diseño consolidada (selector `.currencyToggle` conserva diseño original).
 
-### 15.8 Sistema de Equivalencia Estricta D0
-Para garantizar cero regresiones visuales accidentales, los cambios de cascada y especificidad se verifican estáticamente mediante el script `12_equivalencia.mjs`:
-- Resolución completa de cascada y especificidad PostCSS por selector compuesto.
-- Matriz de 10 viewports (320x568 a 1440x900, incluyendo 844x390 y 390x844).
-- 2 perfiles de interacción: escritorio (`hover: hover + pointer: fine`) y táctil (`hover: none + pointer: coarse`).
-- 2 temas visuales: claro y oscuro (`[data-theme="dark"]`).
-- Veredicto estricto: Todo cambio debe coincidir exactamente con un token aprobado del sistema (`--control-*`, `--modal-footer-btn-gap`, `--focus-ring`) o neutralización táctil documentada. Diferencias no declaradas = FALLO.
+### 15.8 Regla Normativa para data-modal-field en Filas Flex (D1-B)
+El atributo `data-modal-field` inyecta desde `Modal.module.css` la regla `:global([data-modal-field]) { display: flex; flex-direction: column; width: 100%; gap: var(--modal-label-gap); }` con especificidad `0,1,0`. Cuando un control o grupo de controles requiera internamente disposición en fila horizontal (`display: flex; flex-direction: row;`), su clase CSS debe declararse explícitamente como selector compuesto:
+```css
+.miFila,
+.miFila[data-modal-field] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+}
+```
+La especificidad `0,2,0` garantiza que la fila flex prevalezca de forma determinista sobre la cascada del modal independientemente del orden de importación de módulos CSS.
+
+### 15.9 Sistema de Equivalencia Estricta (Script Claude 12_equivalencia.mjs)
+Para certificar cero regresiones visuales accidentales, los cambios de cascada y especificidad se auditan con el verificador de PostCSS de Claude:
+- Evaluación exhaustiva en 40 entornos: 10 viewports (320x568 a 1440x900, incluyendo 844x390 y 390x844) x 2 perfiles de interacción (escritorio `hover: hover` / táctil `hover: none`) x 2 temas (claro / oscuro).
+- Resolución estricta de cascada modular (`!important` > especificidad > orden de aparición), resolviendo `var()` a partir de `tokens.css` y `rem` a `px`.
+- Límites documentados del análisis estático: no modela DOM en tiempo de ejecución, cascada cruzada entre archivos distintos ni estilos inline de TSX. Todo cambio no cubierto por tokens ni neutralización táctil documentada se clasifica estrictamente en fichas de control.
+
+### 15.10 Pendientes de Decisión para Validación Visual de Sebastián
+1. **BalanceCard y SegmentedControl:** Conservan transiciones y selectores internos sin alterar.
+2. **Selectores Heredados (R12):** 17 definiciones de selectores de tabs/pills/toggles propios listadas para eventual migración tras validación en capturas reales.
+3. **Controles Propios de Administración:** La administración conserva sus dimensiones internas funcionales (altos, radios y paddings propios) sin unificación forzada a escala de app.
+4. **Declaraciones `!important` en Administración:** 53 declaraciones conservadas en 6 módulos de `pages/admin/**` y `AdminPage.module.css`.
+5. **Desbordes Estáticos (B8):** Fondos ambientales decorativos de ancho amplio y contenedores de página con ancho natural gobernado por `AppLayout`.
 

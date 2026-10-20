@@ -192,8 +192,10 @@
   border-radius: 16px;
 }
 
-.zoomRow {
+.zoomRow,
+.zoomRow[data-modal-field] {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
   width: 280px;

@@ -65,6 +65,11 @@
   cursor: pointer;
 }
 
+.selectInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .comparisonGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -209,5 +214,14 @@
   .selectorsRow,
   .comparisonGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .matrixCard,
+  .tableRow {
+    transition: none;
+    animation: none;
   }
 }

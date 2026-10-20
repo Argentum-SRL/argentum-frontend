@@ -1,28 +1,28 @@
 {
-  "timestamp": "2026-10-20T14:23:15.149Z",
-  "executionTimeMs": 3872,
+  "timestamp": "2026-10-20T23:14:50.018Z",
+  "executionTimeMs": 3146,
   "scannedFiles": {
     "total": 490,
     "tsxAndTs": 341,
     "css": 149,
-    "cssRules": 6836
+    "cssRules": 7205
   },
   "inventorySummary": {
-    "totalVariantsDetected": 3876,
-    "sharedComponents": 175,
-    "localImplementations": 3701,
-    "divergencesAndDuplications": 3701,
-    "uniqueSharedPrimitives": 175
+    "totalVariantsDetected": 3904,
+    "sharedComponents": 178,
+    "localImplementations": 3726,
+    "divergencesAndDuplications": 3726,
+    "uniqueSharedPrimitives": 178
   },
   "categoryDistribution": {
-    "selectores_segmentados": 47,
+    "selectores_segmentados": 48,
     "opciones_seleccionables": 99,
     "campos_entrada": 189,
     "seleccion_avanzada": 7,
     "botones_accion": 598,
-    "tarjetas_paneles": 554,
-    "modales_dialogos": 1882,
-    "navegacion": 13,
+    "tarjetas_paneles": 555,
+    "modales_dialogos": 1911,
+    "navegacion": 10,
     "elementos_informativos": 232,
     "estados_interfaz": 138,
     "elementos_financieros": 93,

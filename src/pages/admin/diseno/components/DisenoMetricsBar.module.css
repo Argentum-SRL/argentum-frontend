@@ -193,3 +193,11 @@
   margin-top: 2px;
 }
 
+
+
+@media (prefers-reduced-motion: reduce) {
+  .metricCard {
+    transition: none;
+    animation: none;
+  }
+}

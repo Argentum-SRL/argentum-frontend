@@ -163,12 +163,12 @@
 }
 
 .montoHeroCompact .montoHeroPrefix {
-  font-size: 18px;
+  /* Tamaño base de 36px conservado; se impone históricamente sobre compact */
   letter-spacing: -0.5px;
 }
 
 .montoHeroCompact .montoHeroField {
-  font-size: 18px;
+  /* Tamaño base de 36px conservado; se impone históricamente sobre compact */
   letter-spacing: -0.5px;
 }
 

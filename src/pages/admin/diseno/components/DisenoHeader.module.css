@@ -222,3 +222,11 @@
 }
 
 
+
+
+@media (prefers-reduced-motion: reduce) {
+  .rescanBtn {
+    transition: none;
+    animation: none;
+  }
+}

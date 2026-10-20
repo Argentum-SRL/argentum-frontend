@@ -76,7 +76,7 @@
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 160ms ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
 }
 
 .statusBtnActive {
@@ -99,13 +99,18 @@
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  transition: all 180ms ease;
+  transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   box-shadow: var(--elevation-xs);
 }
 
 .saveSpecBtn:hover {
   opacity: 0.95;
-  transform: translateY(-0.5px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .saveSpecBtn:hover {
+    transform: translateY(-0.5px);
+  }
 }
 
 .specEditorGrid {
@@ -169,6 +174,12 @@
   outline: none;
 }
 
+.selectField:focus-visible,
+.textareaField:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .notesSection {
   display: flex;
   flex-direction: column;
@@ -192,7 +203,7 @@
   max-width: 440px;
   gap: 4px;
   border: 1px solid var(--border);
-  transition: all 200ms ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
   box-sizing: border-box;
 }
 
@@ -206,7 +217,7 @@
   color: var(--text-2);
   cursor: pointer;
   font-family: inherit;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
   white-space: nowrap;
   padding: 0 8px;
 }
@@ -300,3 +311,14 @@
   align-items: center;
 }
 
+
+
+@media (prefers-reduced-motion: reduce) {
+  .statusBtn,
+  .saveSpecBtn,
+  .dynamicUnifiedContainer,
+  .dynamicUnifiedPill {
+    transition: none;
+    animation: none;
+  }
+}

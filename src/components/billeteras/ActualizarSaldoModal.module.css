@@ -254,8 +254,10 @@
   gap: 8px;
 }
 
-.checkboxLabel {
+.checkboxLabel,
+.checkboxLabel[data-modal-field] {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   gap: 8px;
   cursor: pointer;

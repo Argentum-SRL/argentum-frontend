@@ -127,6 +127,11 @@
   border-color: var(--primary);
 }
 
+.notesInput:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .decisionActions {
   display: flex;
   justify-content: space-between;
@@ -162,7 +167,7 @@
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  transition: all 180ms ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
   box-shadow: var(--elevation-xs);
 }
 
@@ -224,7 +229,7 @@
   flex-direction: column;
   gap: 8px;
   box-shadow: var(--elevation-xs);
-  transition: all 180ms ease;
+  transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
 }
 
 .variantRow:hover {
@@ -886,3 +891,12 @@
 }
 
 
+
+
+@media (prefers-reduced-motion: reduce) {
+  .filterBtn,
+  .instanceCard {
+    transition: none;
+    animation: none;
+  }
+}

@@ -58,7 +58,7 @@
   font-weight: 600;
   border-radius: 7px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .diaBtn:hover:not(.diaBtnActive) {
@@ -83,7 +83,7 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .refreshBtn:hover:not(:disabled) {
@@ -254,6 +254,11 @@
   outline: none;
 }
 
+.filterSelect:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
 .tableWrapper {
   overflow-x: auto;
   width: 100%;
@@ -330,7 +335,7 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
 }
 
 .pageBtn:hover:not(:disabled) {
@@ -347,4 +352,14 @@
   padding: 30px;
   color: var(--text-2);
   font-size: 14px;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .actionBtn,
+  .reconectarBtn,
+  .logToggleBtn {
+    transition: none;
+    animation: none;
+  }
 }

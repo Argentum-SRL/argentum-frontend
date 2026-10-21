@@ -33,7 +33,9 @@ import { useResumenDeCompra, formatDDMM } from '@/hooks/useResumenDeCompra'
 import DebitoEnDolares from './DebitoEnDolares'
 import CalculoCuotasResumen from './CalculoCuotasResumen'
 import AvisoSaldoAnterior from './AvisoSaldoAnterior'
-import ReintegroBloque, { ReintegroSwitchCard } from './ReintegroBloque'
+import { ReintegroSwitchCard } from './ReintegroBloque'
+import ReintegroPaso from './ReintegroPaso'
+import { initialState, formReducer, calcularPasosConClaves } from './pasosTransaccion'
 import { useReintegro } from './useReintegro'
 
 function isBankLight(b: Billetera): boolean {
@@ -53,136 +55,6 @@ interface TransaccionModalProps {
   onSuccess: (tx?: Transaccion | null) => void
 }
 
-interface FormState {
-  step: 1 | 2 | 3 | 4 | 5
-  slideDirection: 'forward' | 'back'
-  tipo: 'ingreso' | 'egreso'
-  monto: number | null
-  moneda: 'ARS' | 'USD'
-  descripcion: string
-  categoriaId: string
-  subcategoriaId: string
-  billeteraId: string
-  tarjetaId: string
-  fecha: string
-  metodoPago: 'debito' | 'efectivo' | 'credito' | 'transferencia'
-  cantidadCuotas: number
-  cuotaInicial: number
-  proximoResumen: boolean
-  tasaInteres: number
-  isSubmitting: boolean
-  montoPesosDebito: number | null
-}
-
-type FormAction =
-  | {
-      type: 'RESET'
-      transaccion: Transaccion | null
-      billeteras: Billetera[]
-      billeteraInicialId?: string
-      tipoInicial?: 'egreso' | 'ingreso'
-    }
-  | { type: 'SET_STEP'; step: 1 | 2 | 3 | 4 | 5; direction: 'forward' | 'back' }
-  | { [K in keyof FormState]: { type: 'SET_FIELD'; field: K; value: FormState[K] } }[keyof FormState]
-
-function todayLocal(): string {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-const initialState: FormState = {
-  step: 1,
-  slideDirection: 'forward',
-  tipo: 'egreso',
-  monto: null,
-  moneda: 'ARS',
-  descripcion: '',
-  categoriaId: '',
-  subcategoriaId: '',
-  billeteraId: '',
-  tarjetaId: '',
-  fecha: todayLocal(),
-  metodoPago: 'debito',
-  cantidadCuotas: 1,
-  cuotaInicial: 1,
-  proximoResumen: false,
-  tasaInteres: 0,
-  isSubmitting: false,
-  montoPesosDebito: null,
-}
-
-function formReducer(state: FormState, action: FormAction): FormState {
-  switch (action.type) {
-    case 'RESET':
-      if (action.transaccion) {
-        const wallet = action.billeteras.find(b => b.id === action.transaccion?.billetera_id)
-        let metodoDeducido: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
-          action.transaccion.metodo_pago || (
-            action.transaccion.tarjeta_id
-              ? 'credito'
-              : wallet?.es_efectivo
-                ? 'efectivo'
-                : (action.transaccion.tipo === 'ingreso' ? 'transferencia' : 'debito')
-          )
-        if (action.transaccion.tipo === 'ingreso' && (metodoDeducido === 'debito' || metodoDeducido === 'credito')) {
-          metodoDeducido = wallet?.es_efectivo ? 'efectivo' : 'transferencia'
-        }
-        const esDebitoOriginalUSD = action.transaccion.moneda === 'ARS' && action.transaccion.moneda_original === 'USD' && Number(action.transaccion.monto_original) > 0
-        const monedaInicial = esDebitoOriginalUSD ? 'USD' : action.transaccion.moneda
-        const montoInicial = esDebitoOriginalUSD ? Number(action.transaccion.monto_original) : action.transaccion.monto
-        const pesosInicial = esDebitoOriginalUSD ? Number(action.transaccion.monto) : null
-        return {
-          ...initialState,
-          tipo: action.transaccion.tipo,
-          monto: montoInicial,
-          moneda: monedaInicial,
-          descripcion: action.transaccion.descripcion || '',
-          categoriaId: action.transaccion.categoria_id || '',
-          subcategoriaId: action.transaccion.subcategoria_id || '',
-          billeteraId: action.transaccion.billetera_id,
-          tarjetaId: action.transaccion.tarjeta_id || '',
-          fecha: action.transaccion.fecha.split('T')[0],
-          metodoPago: metodoDeducido,
-          montoPesosDebito: pesosInicial,
-        }
-      } else {
-        const activas = action.billeteras.filter(b => b.estado === 'activa')
-        const sorted = sortBilleteras(activas)
-
-        const chosenWallet = action.billeteraInicialId
-          ? action.billeteras.find(b => b.id === action.billeteraInicialId)
-          : undefined
-
-        const best = chosenWallet || sorted[0]
-        const monedaInicial = best?.moneda || 'ARS'
-        const bestForCurrency = chosenWallet || sorted.find(b => b.moneda === monedaInicial) || best
-        const hasBancosInMoneda = sorted.some(b => !b.es_efectivo && b.moneda === monedaInicial)
-        const tipoInicialVal = action.tipoInicial || 'egreso'
-        const metodoInicial: 'debito' | 'efectivo' | 'credito' | 'transferencia' = 
-          tipoInicialVal === 'ingreso'
-            ? ((!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'transferencia')
-            : ((!hasBancosInMoneda || bestForCurrency?.es_efectivo) ? 'efectivo' : 'debito')
-
-        return {
-          ...initialState,
-          tipo: tipoInicialVal,
-          fecha: todayLocal(),
-          billeteraId: bestForCurrency?.id || '',
-          moneda: monedaInicial,
-          metodoPago: metodoInicial,
-        }
-      }
-    case 'SET_STEP':
-      return { ...state, step: action.step, slideDirection: action.direction }
-    case 'SET_FIELD':
-      if (action.field === 'tarjetaId') {
-        return { ...state, tarjetaId: action.value, proximoResumen: false }
-      }
-      return { ...state, [action.field]: action.value }
-    default:
-      return state
-  }
-}
 
 export default function TransaccionModal({
   open, onClose, transaccion, billeteraInicialId, tipoInicial, billeteras, categorias, tarjetas, onSuccess,
@@ -296,20 +168,13 @@ export default function TransaccionModal({
 
   // Secuencia dinámica de pasos según tipo, método de pago y reintegros
   const activeSteps = useMemo(() => {
-    const steps: Array<{ step: 1 | 2 | 3 | 4 | 5; key: string }> = [
-      { step: 1, key: 'origen' },
-    ]
-    if (metodoPago === 'credito') {
-      steps.push({ step: 2, key: 'cuotas' })
-    }
-    steps.push({ step: 3, key: 'detalles' })
-    if (tipo === 'egreso' && !isCuotaHija && reintegroHook.tieneReintegro) {
-      steps.push({ step: 4, key: 'reintegro' })
-    }
-    if (esDebitoUsdEnPesos) {
-      steps.push({ step: 5, key: 'usd_debito' })
-    }
-    return steps
+    return calcularPasosConClaves({
+      metodoPago,
+      tipo,
+      isCuotaHija,
+      tieneReintegro: reintegroHook.tieneReintegro,
+      esDebitoUsdEnPesos,
+    })
   }, [metodoPago, tipo, isCuotaHija, reintegroHook.tieneReintegro, esDebitoUsdEnPesos])
 
   const currentStepIndex = activeSteps.findIndex(s => s.step === step)
@@ -1254,85 +1119,24 @@ export default function TransaccionModal({
 
           {/* ════════════════════ PASO 4: Reintegro ════════════════════ */}
           {tipo === 'egreso' && !isCuotaHija && (
-            <div
-              className={`${styles.slide} ${
-                step === 4
-                  ? styles.slideVisible
-                  : step < 4
-                  ? (slideDirection === 'forward' ? styles.slideEnterRight : styles.slideEnterLeft)
-                  : (slideDirection === 'forward' ? styles.slideExitLeft : styles.slideExitRight)
-              }`}
-              data-modal-frame
-            >
-              <form 
-                className={styles.formContainer}
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  if (esDebitoUsdEnPesos) {
-                    goNext()
-                  } else {
-                    handleSubmit()
-                  }
-                }}
-              >
-                <div
-                  className={`${styles.formBody} ${styles.formBodyWithHeader}`}
-                >
-                  <div className={styles.formHeader}>
-                    <div className={styles.headerLeft}>
-                      <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
-                        <ChevronLeft size={18} strokeWidth={2} />
-                      </button>
-                      <div>
-                        <h2 className={styles.headerTitle}>Reintegro</h2>
-                      </div>
-                    </div>
-                    <div className={styles.headerRightActions}>
-                      {isEdit && (
-                        <button
-                          type="button"
-                          className={styles.deleteHeaderBtn}
-                          onClick={handleDeleteTransaction}
-                          title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
-                          aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
-                          data-modal-delete
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
-                      <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
-                        <X size={18} strokeWidth={1.75} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className={styles.formFields} data-modal-stack>
-                    <ReintegroBloque
-                      reintegro={reintegroHook}
-                      isEdit={isEdit}
-                      onToggleOff={() => {
-                        dispatch({ type: 'SET_STEP', step: 3, direction: 'back' })
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.formFooter}>
-                  <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
-                  <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                    {esDebitoUsdEnPesos
-                      ? 'Continuar'
-                      : isSubmitting
-                      ? 'Guardando...'
-                      : isPendienteIA
-                      ? 'Confirmar transacción'
-                      : isEdit
-                      ? 'Guardar cambios'
-                      : 'Guardar transacción'}
-                  </button>
-                </div>
-              </form>
-            </div>
+            <ReintegroPaso
+              step={step}
+              slideDirection={slideDirection}
+              isEdit={isEdit}
+              isCuotaHija={isCuotaHija}
+              isSubmitting={isSubmitting}
+              isPendienteIA={isPendienteIA}
+              esDebitoUsdEnPesos={esDebitoUsdEnPesos}
+              reintegroHook={reintegroHook}
+              onGoBack={goBack}
+              onGoNext={goNext}
+              onSubmit={handleSubmit}
+              onClose={onClose}
+              onDelete={handleDeleteTransaction}
+              onToggleOff={() => {
+                dispatch({ type: 'SET_STEP', step: 3, direction: 'back' })
+              }}
+            />
           )}
 
           {/* ════════════════════ PASO 5: Resumen de Cobro (Débito USD en pesos) ════════════════════ */}

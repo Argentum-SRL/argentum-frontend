@@ -329,7 +329,7 @@
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
-  transition: border-color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
+  transition: border-color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 
 .paymentBtn:hover {

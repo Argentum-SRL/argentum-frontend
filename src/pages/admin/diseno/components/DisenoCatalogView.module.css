@@ -112,15 +112,22 @@
 
 .notesInput {
   width: 100%;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 12px var(--control-pad-x);
+  border-radius: var(--control-radius);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--control-font);
   font-family: inherit;
   resize: vertical;
   outline: none;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .notesInput {
+    font-size: var(--control-font-mobile);
+  }
 }
 
 .notesInput:focus {

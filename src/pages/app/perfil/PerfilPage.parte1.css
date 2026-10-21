@@ -377,6 +377,22 @@
   display: none;
 }
 
+@media (max-width: 768px) {
+  .controlsRow {
+    flex-wrap: wrap;
+    overflow: visible;
+    row-gap: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .controlsRow {
+    flex-wrap: wrap;
+    overflow: visible;
+    row-gap: 8px;
+  }
+}
+
 .dangerTabWrapper {
   display: inline-flex;
   align-items: center;

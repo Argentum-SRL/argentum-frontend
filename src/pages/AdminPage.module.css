@@ -739,14 +739,22 @@
 
 .confirmEmailInput {
   width: 100%;
-  padding: 9px 12px;
+  height: var(--control-h);
+  padding: 0 var(--control-pad-x);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--control-radius);
   background-color: var(--page);
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--control-font);
   outline: none;
+  box-sizing: border-box;
   transition: border-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
+}
+
+@media (max-width: 768px) {
+  .confirmEmailInput {
+    font-size: var(--control-font-mobile);
+  }
 }
 
 .confirmEmailInput:focus {

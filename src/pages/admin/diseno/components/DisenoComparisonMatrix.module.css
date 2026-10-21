@@ -53,16 +53,23 @@
 }
 
 .selectInput {
-  height: 40px;
-  padding: 0 12px;
-  border-radius: 8px;
+  height: var(--control-h);
+  padding: 0 var(--control-pad-x);
+  border-radius: var(--control-radius);
   border: 1px solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--control-font);
   font-family: inherit;
   outline: none;
   cursor: pointer;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .selectInput {
+    font-size: var(--control-font-mobile);
+  }
 }
 
 .selectInput:focus-visible {

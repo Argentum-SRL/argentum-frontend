@@ -181,48 +181,7 @@
   gap: 8px;
 }
 
-.buttonGroup {
-  display: inline-flex;
-  padding: 3px;
-  border-radius:10px;
-  background: rgba(13, 32, 69, 0.06);
-}
 
-:global([data-theme="dark"]) .buttonGroup {
-  background: rgba(0, 0, 0, 0.35);
-}
-
-.tabBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius:8px;
-  border: none;
-  background: transparent;
-  color: var(--text-2);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
-}
-
-:global([data-theme="dark"]) .tabBtn {
-  color: var(--silver, #cbd5e1);
-}
-
-.tabBtnActive {
-  background: #FFFFFF;
-  color: var(--primary);
-  font-weight: 600;
-  box-shadow: var(--elevation-xs);
-}
-
-:global([data-theme="dark"]) .tabBtnActive {
-  background: rgba(255, 255, 255, 0.14);
-  color: #FFFFFF;
-  box-shadow: var(--elevation-xs);
-}
 
 .selectInput {
   padding: 5px 10px;

@@ -34,6 +34,7 @@ import { getFotoUrl } from '@/utils/fotoUrl'
 import { formatFecha, formatFechaHora } from '@/utils/format'
 import { SchedulerPanel } from './admin/components/SchedulerPanel'
 import { MonitorWppPanel } from './admin/components/MonitorWppPanel'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './AdminPage.module.css'
 
 // TableAvatar component to fetch and render user profile picture or fallback initials
@@ -499,29 +500,19 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* ── Tab Bar ─────────────────────────────────────────────────────────────────────── */}
-      <div className={styles.tabBar}>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'usuarios' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('usuarios')}
-        >
-          <Users size={16} />
-          <span>Usuarios</span>
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'wpp' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('wpp')}
-        >
-          <MessageSquare size={16} />
-          <span>Monitor WPP / AI</span>
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'scheduler' ? styles.tabBtnActive : ''}`}
-          onClick={() => setActiveTab('scheduler')}
-        >
-          <Clock size={16} />
-          <span>Scheduler</span>
-        </button>
+      {/* ── Tab Bar (Cápsula Oficial) ─────────────────────────────────────────────────────── */}
+      <div style={{ marginTop: 20 }}>
+        <SegmentedControl
+          options={[
+            { value: 'usuarios', label: 'Usuarios', icon: <Users size={16} /> },
+            { value: 'wpp', label: 'Monitor WPP / AI', icon: <MessageSquare size={16} /> },
+            { value: 'scheduler', label: 'Scheduler', icon: <Clock size={16} /> },
+          ]}
+          value={activeTab}
+          onChange={(val: string) => setActiveTab(val as 'usuarios' | 'wpp' | 'scheduler')}
+          ariaLabel="Secciones de administración"
+          layout="inline"
+        />
       </div>
 
       {/* ── Tab Content ─────────────────────────────────────────────────────────────────── */}

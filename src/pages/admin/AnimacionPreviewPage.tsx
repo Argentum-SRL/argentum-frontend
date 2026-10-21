@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from '@/components/ui/icons'
 import { IconPlayground } from './components/IconPlayground'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './AnimacionPreviewPage.module.css'
 
 const PREVIEW_PHRASES = [
@@ -233,41 +234,19 @@ export default function AnimacionPreviewPage() {
           </div>
 
           <div className={styles.dockRow}>
-            {/* Selector de modo */}
-            <div className={styles.buttonGroup}>
-              <button
-                type="button"
-                className={`${styles.tabBtn} ${viewMode === 'icons' ? styles.tabBtnActive : ''}`}
-                onClick={() => setViewMode('icons')}
-              >
-                <Sparkles size={13} />
-                <span>Iconos Animados</span>
-              </button>
-              <button
-                type="button"
-                className={`${styles.tabBtn} ${viewMode === 'hero' ? styles.tabBtnActive : ''}`}
-                onClick={() => setViewMode('hero')}
-              >
-                <Shield size={13} />
-                <span>Hero Loader</span>
-              </button>
-              <button
-                type="button"
-                className={`${styles.tabBtn} ${viewMode === 'ambient' ? styles.tabBtnActive : ''}`}
-                onClick={() => setViewMode('ambient')}
-              >
-                <AtmosphericMoonIcon size={14} />
-                <span>Fondo Ambiental</span>
-              </button>
-              <button
-                type="button"
-                className={`${styles.tabBtn} ${viewMode === 'modular' ? styles.tabBtnActive : ''}`}
-                onClick={() => setViewMode('modular')}
-              >
-                <LunarLoader size={14} />
-                <span>LunarLoader Modular</span>
-              </button>
-            </div>
+            {/* Selector de modo (Cápsula Oficial) */}
+            <SegmentedControl
+              options={[
+                { value: 'icons', label: 'Iconos Animados', icon: <Sparkles size={13} /> },
+                { value: 'hero', label: 'Hero Loader', icon: <Shield size={13} /> },
+                { value: 'ambient', label: 'Fondo Ambiental', icon: <AtmosphericMoonIcon size={14} /> },
+                { value: 'modular', label: 'LunarLoader Modular', icon: <LunarLoader size={14} /> },
+              ]}
+              value={viewMode}
+              onChange={(val: string) => setViewMode(val as typeof viewMode)}
+              ariaLabel="Modos de animación"
+              layout="inline"
+            />
 
             {/* Alternar Tema Light / Dark */}
             <button

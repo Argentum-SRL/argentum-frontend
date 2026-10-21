@@ -21,6 +21,7 @@ import { TabFinanzas } from './components/TabFinanzas'
 import { TabSeguridad } from './components/TabSeguridad'
 import { TabNotificaciones } from './components/TabNotificaciones'
 import { DangerZone } from './components/DangerZone'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { EditModals } from './components/EditModals'
 
 import styles from './PerfilPage.module.css'
@@ -36,8 +37,6 @@ export default function PerfilPage() {
   const tabParam = new URLSearchParams(location.search).get('tab') as TabType | null
   const validTabs: TabType[] = ['perfil', 'finanzas', 'seguridad', 'notificaciones', 'peligro']
   const activeTab: TabType = validTabs.includes(tabParam as TabType) ? (tabParam as TabType) : 'perfil'
-
-  const [hoveredTab, setHoveredTab] = useState<string | null>(null)
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/app/perfil?tab=${tab}`, { replace: true })
@@ -93,67 +92,31 @@ export default function PerfilPage() {
         onOpenCrop={() => setFotoCropOpen(true)}
       />
 
-      {/* ── Segmented Tab Navigation Bar (Estilo Presupuestos) ──── */}
+      {/* ── Segmented Tab Navigation Bar (Cápsula Oficial) ──── */}
       <div className={styles.controlsRow}>
-        <div className={styles.tabs} role="tablist" aria-label="Secciones de perfil">
-          <button
-            type="button"
-            className={`${styles.tab} ${activeTab === 'perfil' ? styles.tabActive : ''}`}
-            onClick={() => handleTabChange('perfil')}
-            onMouseEnter={() => setHoveredTab('perfil')}
-            onMouseLeave={() => setHoveredTab(null)}
-          >
-            <User size={15} isHovered={hoveredTab === 'perfil'} />
-            <span>General</span>
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.tab} ${activeTab === 'finanzas' ? styles.tabActive : ''}`}
-            onClick={() => handleTabChange('finanzas')}
-            onMouseEnter={() => setHoveredTab('finanzas')}
-            onMouseLeave={() => setHoveredTab(null)}
-          >
-            <Coins size={15} isHovered={hoveredTab === 'finanzas'} />
-            <span>Finanzas & Moneda</span>
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.tab} ${activeTab === 'seguridad' ? styles.tabActive : ''}`}
-            onClick={() => handleTabChange('seguridad')}
-            onMouseEnter={() => setHoveredTab('seguridad')}
-            onMouseLeave={() => setHoveredTab(null)}
-          >
-            <Shield size={15} isHovered={hoveredTab === 'seguridad'} />
-            <span>Seguridad</span>
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.tab} ${activeTab === 'notificaciones' ? styles.tabActive : ''}`}
-            onClick={() => handleTabChange('notificaciones')}
-            onMouseEnter={() => setHoveredTab('notificaciones')}
-            onMouseLeave={() => setHoveredTab(null)}
-          >
-            <Bell size={15} isHovered={hoveredTab === 'notificaciones'} />
-            <span>Notificaciones</span>
-          </button>
-        </div>
+        <SegmentedControl
+          options={[
+            { value: 'perfil', label: 'General', icon: <User size={15} /> },
+            { value: 'finanzas', label: 'Finanzas & Moneda', icon: <Coins size={15} /> },
+            { value: 'seguridad', label: 'Seguridad', icon: <Shield size={15} /> },
+            { value: 'notificaciones', label: 'Notificaciones', icon: <Bell size={15} /> },
+          ]}
+          value={activeTab === 'peligro' ? '' : activeTab}
+          onChange={(val) => handleTabChange(val as TabType)}
+          ariaLabel="Secciones de perfil"
+          layout="inline"
+        />
 
         <div className={styles.dangerTabWrapper}>
-          <button
-            type="button"
-            className={`${styles.tab} ${styles.tabDanger} ${
-              activeTab === 'peligro' ? styles.tabDangerActive : ''
-            }`}
-            onClick={() => handleTabChange('peligro')}
-            onMouseEnter={() => setHoveredTab('peligro')}
-            onMouseLeave={() => setHoveredTab(null)}
-          >
-            <AlertTriangle size={15} isHovered={hoveredTab === 'peligro'} />
-            <span>Zona de Peligro</span>
-          </button>
+          <SegmentedControl
+            options={[
+              { value: 'peligro', label: 'Zona de Peligro', icon: <AlertTriangle size={15} /> },
+            ]}
+            value={activeTab === 'peligro' ? 'peligro' : ''}
+            onChange={() => handleTabChange('peligro')}
+            ariaLabel="Zona de peligro de perfil"
+            layout="inline"
+          />
         </div>
       </div>
 

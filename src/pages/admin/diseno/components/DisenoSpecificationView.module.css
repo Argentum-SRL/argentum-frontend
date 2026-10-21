@@ -161,17 +161,38 @@
   text-transform: uppercase;
 }
 
-.selectField,
-.textareaField {
+.selectField {
   width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
+  height: var(--control-h, 44px);
+  padding: 0 14px;
+  border-radius: var(--control-radius, 12px);
   border: 1px solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--control-font, 15px);
   font-family: inherit;
   outline: none;
+  box-sizing: border-box;
+}
+
+.textareaField {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--control-radius, 12px);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: var(--control-font, 15px);
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .selectField,
+  .textareaField {
+    font-size: var(--control-font-mobile, 16px);
+  }
 }
 
 .selectField:focus-visible,

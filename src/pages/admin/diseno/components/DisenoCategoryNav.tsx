@@ -2,6 +2,7 @@ import { Search } from '@/components/ui/icons'
 import type { DesignDecision } from '@/types/diseno'
 import { CATEGORIES_CONFIG } from '../constants'
 import styles from './DisenoCategoryNav.module.css'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 
 interface Props {
   selectedCategory: string
@@ -32,29 +33,17 @@ export default function DisenoCategoryNav(props: Props) {
   } = props
   return (
     <aside className={styles.navContainer}>
-      {/* Selector de Vista Principal */}
-      <div className={styles.viewModeTabs} role="tablist">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeView === 'catalogo'}
-          className={`${styles.viewModeBtn} ${activeView === 'catalogo' ? styles.viewModeBtnActive : ''}`}
-          onClick={() => onSelectView('catalogo')}
-          title="Ver opciones y elegir el diseño oficial"
-        >
-          🎨 Explorar y Elegir
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeView === 'comparador'}
-          className={`${styles.viewModeBtn} ${activeView === 'comparador' ? styles.viewModeBtnActive : ''}`}
-          onClick={() => onSelectView('comparador')}
-          title="Comparar dos variantes frente a frente"
-        >
-          ⚖️ Comparar Lado a Lado
-        </button>
-      </div>
+      {/* Selector de Vista Principal (Cápsula Oficial) */}
+      <SegmentedControl
+        options={[
+          { value: 'catalogo', label: '🎨 Explorar y Elegir' },
+          { value: 'comparador', label: '⚖️ Comparar Lado a Lado' },
+        ]}
+        value={activeView}
+        onChange={(val) => onSelectView(val as 'catalogo' | 'comparador')}
+        ariaLabel="Vista principal de diseño"
+        layout="inline"
+      />
 
       {/* Barra de Búsqueda y Filtros */}
       <div className={styles.searchAndFilters}>

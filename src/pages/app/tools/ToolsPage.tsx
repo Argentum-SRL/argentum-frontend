@@ -6,6 +6,7 @@ import FinancialContextBanner from '@/components/tools/FinancialContextBanner';
 import CanAffordForm from '@/components/tools/CanAffordForm';
 import CanAffordResult from '@/components/tools/CanAffordResult';
 import ParametersSummaryBar from '@/components/tools/ParametersSummaryBar';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import pageStyles from './ToolsPage.module.css';
 import { useAuth } from '@/hooks/useAuth';
 import ImportacionResumenSection from '@/components/tools/importacion/ImportacionResumenSection';
@@ -113,30 +114,21 @@ export default function ToolsPage() {
           </p>
         </div>
 
-        <div className={pageStyles.tabSwitcher} role="tablist" aria-label="Herramientas disponibles">
-          {visibleTabs.map((tab) => {
+        <SegmentedControl
+          options={visibleTabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = currentTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                role="tab"
-                aria-selected={isActive}
-                className={`${pageStyles.toolTabBtn} ${isActive ? pageStyles.toolTabBtnActive : ''}`}
-                onClick={() => handleSelectTab(tab.id)}
-                type="button"
-              >
-                <div className={`${pageStyles.toolTabIconBox} ${isActive ? pageStyles.toolTabIconBoxActive : ''}`}>
-                  <Icon size={16} strokeWidth={2.2} />
-                </div>
-                <div className={pageStyles.toolTabTextGroup}>
-                  <span className={pageStyles.toolTabTitle}>{tab.title}</span>
-                  <span className={pageStyles.toolTabSubtitle}>{tab.subtitle}</span>
-                </div>
-              </button>
-            );
+            return {
+              value: tab.id,
+              label: tab.title,
+              description: tab.subtitle,
+              icon: <Icon size={16} strokeWidth={2.2} />,
+            };
           })}
-        </div>
+          value={currentTab}
+          onChange={(val) => handleSelectTab(val as TabId)}
+          ariaLabel="Herramientas disponibles"
+          layout="inline"
+        />
       </div>
 
       {/* ── Tab: Cuotas vs Contado (Financial Wizard Shell) ─────────────── */}

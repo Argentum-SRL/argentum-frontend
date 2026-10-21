@@ -69,118 +69,6 @@
   line-height: 1.4;
 }
 
-/* ── Segmented Tool Switcher (Pill Toolbar) ───────────────────────────────── */
-.tabSwitcher {
-  display: inline-flex;
-  align-items: center;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  padding: 4px;
-  border-radius: 16px;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 600px) {
-  .tabSwitcher {
-    display: flex;
-    width: 100%;
-    overflow-x: auto;
-  }
-}
-
-.toolTabBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: left;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  outline: none;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.toolTabBtn:focus-visible {
-  outline: 2px solid var(--focus-ring, #3b82f6);
-  outline-offset: 2px;
-}
-
-.toolTabBtn:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--text);
-}
-
-[data-theme="dark"] .toolTabBtn:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.toolTabBtnActive {
-  background: var(--surface);
-  border-color: var(--border);
-  box-shadow: var(--elevation-xs);
-}
-
-[data-theme="dark"] .toolTabBtnActive {
-  background: var(--surface);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: var(--elevation-xs);
-}
-
-.toolTabIconBox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-2);
-  flex-shrink: 0;
-  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-}
-
-.toolTabIconBoxActive {
-  background: var(--primary);
-  color: #ffffff;
-}
-
-[data-theme="dark"] .toolTabIconBoxActive {
-  background: #2563eb;
-  color: #ffffff;
-}
-
-.toolTabTextGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 0;
-}
-
-.toolTabTitle {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-2);
-  line-height: 1.2;
-  white-space: nowrap;
-  transition: color 0.15s ease;
-}
-
-.toolTabBtnActive .toolTabTitle {
-  color: var(--primary);
-}
-
-[data-theme="dark"] .toolTabBtnActive .toolTabTitle {
-  color: #60a5fa;
-}
-
-.toolTabSubtitle {
-  display: none;
-}
 
 /* ── 50/50 Split Grid (Form Left, Results Right) ─────────────────────────── */
 .grid {
@@ -224,9 +112,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .page,
-.toolTabBtn,
-.toolTabIconBox,
-.toolTabTitle,
 .skeleton {
     transition: none;
     animation: none;

@@ -63,7 +63,12 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
    - **Alcance Universal y Excepciones:** Aplica al 100% de `src/`, incluyendo administración (`src/pages/admin/**` y `src/pages/AdminPage.module.css`). Excepciones permanentes intocables: `ui/SegmentedControl.*` y `BalanceCard.*`.
    - **Regla data-modal-field en Filas:** Controles en fila flex usan `.clase, .clase[data-modal-field] { display: flex; flex-direction: row; }` (especificidad 0,2,0) para no colapsar a columna flex.
    - **Contención de `!important`:** Prohibido agregar `!important` nuevos.
-9. **Verificación Previa y Candado:**
+9. **Selectores de Elección Unificados (Fase fv3r):**
+   - **Cápsula Oficial Universal:** TODO selector de elección propio del producto (tabs, pills, toggles) usa la cápsula oficial `ui/SegmentedControl`, incluidas las pantallas Perfil, Herramientas, Admin y Diseño.
+   - **Excepciones Permanentes:** `ui/SegmentedControl.*` y `BalanceCard.*` (su `.currencyToggle` no se migra).
+   - **Selectores No Cápsula por Naturaleza (no se migran):** Grilla de días del mes (`CicloFinancieroSelector` `.dayGrid`), muestras de color (`ColorPicker`), grilla de categorías (`CategoriaSelector` `.catGrid`), listas de filtros complejos (`FilterBar`), tarjetas de elección con contenido rico (`ui/SelectableSurface`, `PresupuestoModal` `.renewalOptions`, `CalculoCuotasResumen` `.planGrid`), y muestrarios comparativos de diseño (`InteractiveDemos`).
+   - **Tokens de Controles de Admin:** Controles reales de formulario de admin (`searchInput`, `filterSelect`, etc.) usan altura 44px, radio 12px, padding-x 14px, fuente 15px (16px en <= 768px para R32 = 0).
+10. **Verificación Previa y Candado:**
    - Correr `npm run lint` y `node scripts/audit-design-rules.mjs` antes de cualquier commit.
    - La línea base solo se actualiza con `node scripts/audit-design-rules.mjs --update-baseline` y nunca debe sufrir aumentos.
    - En cada push corre el candado automático; está prohibido usar `--no-verify`.

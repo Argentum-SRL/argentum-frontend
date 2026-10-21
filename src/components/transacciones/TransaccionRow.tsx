@@ -8,6 +8,7 @@ import {
   Banknote,
   ChevronRight
 } from '@/components/ui/icons'
+import { BadgePercent } from 'lucide-react'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import { formatMonto } from '@/utils/format'
@@ -238,6 +239,27 @@ const TransaccionRow = memo(({
         }`}>
           <span className={styles.amountSign}>{isIngreso ? '+' : '-'}</span>
           <span className={styles.amountNumber}>{formatMonto(transaccion.monto, transaccion.moneda)}</span>
+          {transaccion.reintegro && (
+            <span
+              className={
+                transaccion.reintegro.estado === 'recibido'
+                  ? styles.reintegroIconRecibido
+                  : styles.reintegroIconPendiente
+              }
+              title={
+                transaccion.reintegro.estado === 'recibido'
+                  ? `Pagaste ${formatMonto(transaccion.monto + transaccion.reintegro.monto, transaccion.moneda)} · Te devolvieron ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)}`
+                  : `Reintegro de ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)} pendiente`
+              }
+              aria-label={
+                transaccion.reintegro.estado === 'recibido'
+                  ? `Pagaste ${formatMonto(transaccion.monto + transaccion.reintegro.monto, transaccion.moneda)} · Te devolvieron ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)}`
+                  : `Reintegro de ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)} pendiente`
+              }
+            >
+              <BadgePercent size={14} />
+            </span>
+          )}
         </div>
 
         {/* En Desktop: Método de pago o indicador de apartado */}

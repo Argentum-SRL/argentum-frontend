@@ -33,6 +33,8 @@ import { useResumenDeCompra, formatDDMM } from '@/hooks/useResumenDeCompra'
 import DebitoEnDolares from './DebitoEnDolares'
 import CalculoCuotasResumen from './CalculoCuotasResumen'
 import AvisoSaldoAnterior from './AvisoSaldoAnterior'
+import ReintegroBloque, { ReintegroSwitchCard } from './ReintegroBloque'
+import { useReintegro } from './useReintegro'
 
 function isBankLight(b: Billetera): boolean {
   const bank = b.bank_id ? getBankById(b.bank_id) : findBankByNombre(b.nombre)
@@ -52,7 +54,7 @@ interface TransaccionModalProps {
 }
 
 interface FormState {
-  step: 1 | 2 | 3 | 4
+  step: 1 | 2 | 3 | 4 | 5
   slideDirection: 'forward' | 'back'
   tipo: 'ingreso' | 'egreso'
   monto: number | null
@@ -80,7 +82,7 @@ type FormAction =
       billeteraInicialId?: string
       tipoInicial?: 'egreso' | 'ingreso'
     }
-  | { type: 'SET_STEP'; step: 1 | 2 | 3 | 4; direction: 'forward' | 'back' }
+  | { type: 'SET_STEP'; step: 1 | 2 | 3 | 4 | 5; direction: 'forward' | 'back' }
   | { [K in keyof FormState]: { type: 'SET_FIELD'; field: K; value: FormState[K] } }[keyof FormState]
 
 function todayLocal(): string {
@@ -282,6 +284,53 @@ export default function TransaccionModal({
     proximoResumen
   )
   const vencimientoDDMM = resumenCompra?.fecha_vencimiento ? formatDDMM(resumenCompra.fecha_vencimiento) : ''
+
+  const reintegroHook = useReintegro({
+    transaccion,
+    montoCompra: monto,
+    fechaCompra: fecha,
+    moneda,
+    isEdit,
+    onReintegroQuitado: () => onSuccess(transaccion),
+  })
+
+  // Secuencia dinámica de pasos según tipo, método de pago y reintegros
+  const activeSteps = useMemo(() => {
+    const steps: Array<{ step: 1 | 2 | 3 | 4 | 5; key: string }> = [
+      { step: 1, key: 'origen' },
+    ]
+    if (metodoPago === 'credito') {
+      steps.push({ step: 2, key: 'cuotas' })
+    }
+    steps.push({ step: 3, key: 'detalles' })
+    if (tipo === 'egreso' && !isCuotaHija && reintegroHook.tieneReintegro) {
+      steps.push({ step: 4, key: 'reintegro' })
+    }
+    if (esDebitoUsdEnPesos) {
+      steps.push({ step: 5, key: 'usd_debito' })
+    }
+    return steps
+  }, [metodoPago, tipo, isCuotaHija, reintegroHook.tieneReintegro, esDebitoUsdEnPesos])
+
+  const currentStepIndex = activeSteps.findIndex(s => s.step === step)
+  const isStep3Last = !activeSteps.some(s => s.step > 3)
+
+  const handleToggleReintegroFromStep3 = () => {
+    if (!reintegroHook.tieneReintegro) {
+      if (!categoriaId) {
+        sileo.error({ title: 'Seleccioná una categoría primero' })
+        return
+      }
+      if (!subcategoriaId) {
+        sileo.error({ title: 'Seleccioná una subcategoría primero' })
+        return
+      }
+      reintegroHook.setTieneReintegro(true)
+      dispatch({ type: 'SET_STEP', step: 4, direction: 'forward' })
+    } else {
+      reintegroHook.setTieneReintegro(false)
+    }
+  }
 
   useEffect(() => {
     submittingRef.current = false
@@ -543,37 +592,65 @@ export default function TransaccionModal({
     }
   }, [step, moneda])
 
-  const goNext = () => {
-    if (!monto || (metodoPago === 'credito' ? !tarjetaId : !billeteraId)) {
-      sileo.error({ title: metodoPago === 'credito' ? 'Seleccioná una tarjeta' : 'Seleccioná una billetera' })
-      return
+  // Asegurar que si cambian opciones (tipo, método), el paso actual exista en activeSteps
+  useEffect(() => {
+    if (!open) return
+    const isValid = activeSteps.some(s => s.step === step)
+    if (!isValid) {
+      const fallback = activeSteps[0]?.step ?? 1
+      dispatch({ type: 'SET_STEP', step: fallback, direction: 'back' })
     }
+  }, [open, activeSteps, step])
 
-    let nextStep: 1 | 2 | 3 | 4 = 2
+  const goNext = () => {
     if (step === 1) {
-      nextStep = metodoPago === 'credito' ? 2 : 3
+      if (!monto || Number(monto) <= 0 || !Number.isFinite(Number(monto))) {
+        sileo.error({ title: 'El monto debe ser mayor a cero' })
+        return
+      }
+      if (metodoPago === 'credito' ? !tarjetaId : !billeteraId) {
+        sileo.error({ title: metodoPago === 'credito' ? 'Seleccioná una tarjeta' : 'Seleccioná una billetera' })
+        return
+      }
     } else if (step === 2) {
-      nextStep = 3
+      if (!Number.isInteger(cantidadCuotas) || cantidadCuotas < 1 || cantidadCuotas > 120) {
+        sileo.error({ title: 'La cantidad de cuotas debe ser un número entero entre 1 y 120' })
+        return
+      }
     } else if (step === 3) {
-      if (esDebitoUsdEnPesos) {
-        nextStep = 4
+      if (!categoriaId) {
+        sileo.error({ title: 'Seleccioná una categoría' })
+        return
+      }
+      if (!subcategoriaId) {
+        sileo.error({ title: 'Seleccioná una subcategoría' })
+        return
+      }
+    } else if (step === 4) {
+      if (reintegroHook.tieneReintegro) {
+        const montoReintegro = reintegroHook.montoFinal
+        if (!montoReintegro || montoReintegro <= 0) {
+          sileo.error({ title: 'Ingresá el monto o porcentaje del reintegro' })
+          return
+        }
+        if (monto && montoReintegro > Number(monto)) {
+          sileo.error({ title: 'El reintegro no puede ser mayor al total de la compra' })
+          return
+        }
       }
     }
 
-    dispatch({ type: 'SET_STEP', step: nextStep, direction: 'forward' })
+    if (currentStepIndex >= 0 && currentStepIndex < activeSteps.length - 1) {
+      const nextStep = activeSteps[currentStepIndex + 1].step
+      dispatch({ type: 'SET_STEP', step: nextStep, direction: 'forward' })
+    }
   }
 
   const goBack = () => {
-    let prevStep: 1 | 2 | 3 | 4 = 1
-    if (step === 4) {
-      prevStep = 3
-    } else if (step === 3) {
-      prevStep = metodoPago === 'credito' ? 2 : 1
-    } else if (step === 2) {
-      prevStep = 1
+    if (currentStepIndex > 0) {
+      const prevStep = activeSteps[currentStepIndex - 1].step
+      dispatch({ type: 'SET_STEP', step: prevStep, direction: 'back' })
     }
-
-    dispatch({ type: 'SET_STEP', step: prevStep, direction: 'back' })
   }
 
   const isPendienteIA = isEdit &&
@@ -602,6 +679,18 @@ export default function TransaccionModal({
     if (!subcategoriaId) {
       sileo.error({ title: 'Seleccioná una subcategoría' })
       return
+    }
+
+    if (tipo === 'egreso' && !isCuotaHija && reintegroHook.tieneReintegro) {
+      const montoReintegro = reintegroHook.montoFinal
+      if (!montoReintegro || montoReintegro <= 0) {
+        sileo.error({ title: 'Ingresá el monto o porcentaje del reintegro' })
+        return
+      }
+      if (monto && montoReintegro > Number(monto)) {
+        sileo.error({ title: 'El reintegro no puede ser mayor al total de la compra' })
+        return
+      }
     }
 
     let resolvedBilleteraId = billeteraId
@@ -677,6 +766,14 @@ export default function TransaccionModal({
       let savedTx: Transaccion | null = null
       if (!isEdit) {
         savedTx = await transaccionService.createTransaccion(payload)
+        if (savedTx && tipo === 'egreso' && !isCuotaHija && reintegroHook.debeGuardarReintegro) {
+          try {
+            await reintegroHook.guardarReintegro(savedTx.id)
+          } catch (err) {
+            console.error(err)
+            sileo.error({ title: getErrorMessage(err, 'No se pudo guardar el reintegro') })
+          }
+        }
         sileo.success({
           title: metodoPago === 'credito' ? 'Compra en cuotas registrada' : 'Transacción creada'
         })
@@ -684,6 +781,14 @@ export default function TransaccionModal({
         onClose()
       } else if (transaccion) {
         savedTx = await transaccionService.updateTransaccion(transaccion.id, payload)
+        if (savedTx && tipo === 'egreso' && !isCuotaHija && reintegroHook.debeGuardarReintegro) {
+          try {
+            await reintegroHook.guardarReintegro(transaccion.id)
+          } catch (err) {
+            console.error(err)
+            sileo.error({ title: getErrorMessage(err, 'No se pudo guardar el reintegro') })
+          }
+        }
         if (isPendienteIA) {
           await transaccionService.confirmarIA(transaccion.id)
           sileo.success({ title: 'Transacción confirmada' })
@@ -707,29 +812,16 @@ export default function TransaccionModal({
     <Modal isOpen={open && !showMemoriaDialog} onClose={onClose} showHeader={false} noPadding autoHeight ariaLabel="Nueva transacción">
       <div className={styles.modalRoot}>
         {/* Indicador de pasos superior centrado (estilo Nueva Billetera / BankPickerModal) */}
-        <div className={styles.stepIndicator} aria-hidden="true">
-          <div className={`${styles.dot} ${step === 1 ? styles.dotActive : styles.dotInactive}`} />
-          {(metodoPago === 'credito' || esDebitoUsdEnPesos) && (
-            <div
-              className={`${styles.dot} ${
-                (metodoPago === 'credito' ? step === 2 : step === 3)
-                  ? styles.dotActive
-                  : styles.dotInactive
-              }`}
-            />
-          )}
-          <div
-            className={`${styles.dot} ${
-              (metodoPago === 'credito'
-                ? step === 3
-                : esDebitoUsdEnPesos
-                ? step === 4
-                : step === 3)
-                ? styles.dotActive
-                : styles.dotInactive
-            }`}
-          />
-        </div>
+        {activeSteps.length > 1 && (
+          <div className={styles.stepIndicator} aria-hidden="true">
+            {activeSteps.map((s) => (
+              <div
+                key={s.key}
+                className={`${styles.dot} ${step === s.step ? styles.dotActive : styles.dotInactive}`}
+              />
+            ))}
+          </div>
+        )}
 
         <div
           ref={slidesContainerRef}
@@ -1047,10 +1139,10 @@ export default function TransaccionModal({
               className={styles.formContainer}
               onSubmit={(e) => {
                 e.preventDefault()
-                if (esDebitoUsdEnPesos) {
-                  goNext()
-                } else {
+                if (isStep3Last) {
                   handleSubmit()
+                } else {
+                  goNext()
                 }
               }}
             >
@@ -1132,13 +1224,21 @@ export default function TransaccionModal({
                       Categoría que usaste antes para &quot;{sugerenciaClave}&quot;.
                     </p>
                   )}
+
+                  {/* En egresos: botón switch para habilitar reintegro */}
+                  {tipo === 'egreso' && !isCuotaHija && (
+                    <ReintegroSwitchCard
+                      tieneReintegro={reintegroHook.tieneReintegro}
+                      onToggle={handleToggleReintegroFromStep3}
+                    />
+                  )}
                 </div>
               </div>
 
               <div className={styles.formFooter}>
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                  {esDebitoUsdEnPesos
+                  {!isStep3Last
                     ? 'Continuar'
                     : isSubmitting
                     ? 'Guardando...'
@@ -1152,11 +1252,94 @@ export default function TransaccionModal({
             </form>
           </div>
 
-          {/* ════════════════════ PASO 4: Resumen de Cobro (Débito USD en pesos) ════════════════════ */}
-          {esDebitoUsdEnPesos && (
+          {/* ════════════════════ PASO 4: Reintegro ════════════════════ */}
+          {tipo === 'egreso' && !isCuotaHija && (
             <div
               className={`${styles.slide} ${
                 step === 4
+                  ? styles.slideVisible
+                  : step < 4
+                  ? (slideDirection === 'forward' ? styles.slideEnterRight : styles.slideEnterLeft)
+                  : (slideDirection === 'forward' ? styles.slideExitLeft : styles.slideExitRight)
+              }`}
+              data-modal-frame
+            >
+              <form 
+                className={styles.formContainer}
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (esDebitoUsdEnPesos) {
+                    goNext()
+                  } else {
+                    handleSubmit()
+                  }
+                }}
+              >
+                <div
+                  className={`${styles.formBody} ${styles.formBodyWithHeader}`}
+                >
+                  <div className={styles.formHeader}>
+                    <div className={styles.headerLeft}>
+                      <button type="button" className={styles.backBtn} onClick={goBack} title="Atrás" aria-label="Atrás">
+                        <ChevronLeft size={18} strokeWidth={2} />
+                      </button>
+                      <div>
+                        <h2 className={styles.headerTitle}>Reintegro</h2>
+                      </div>
+                    </div>
+                    <div className={styles.headerRightActions}>
+                      {isEdit && (
+                        <button
+                          type="button"
+                          className={styles.deleteHeaderBtn}
+                          onClick={handleDeleteTransaction}
+                          title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
+                          aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
+                          data-modal-delete
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                      <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
+                        <X size={18} strokeWidth={1.75} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.formFields} data-modal-stack>
+                    <ReintegroBloque
+                      reintegro={reintegroHook}
+                      isEdit={isEdit}
+                      onToggleOff={() => {
+                        dispatch({ type: 'SET_STEP', step: 3, direction: 'back' })
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.formFooter}>
+                  <button type="button" className={styles.cancelBtn} onClick={goBack}>Atrás</button>
+                  <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                    {esDebitoUsdEnPesos
+                      ? 'Continuar'
+                      : isSubmitting
+                      ? 'Guardando...'
+                      : isPendienteIA
+                      ? 'Confirmar transacción'
+                      : isEdit
+                      ? 'Guardar cambios'
+                      : 'Guardar transacción'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* ════════════════════ PASO 5: Resumen de Cobro (Débito USD en pesos) ════════════════════ */}
+          {esDebitoUsdEnPesos && (
+            <div
+              className={`${styles.slide} ${
+                step === 5
                   ? styles.slideVisible
                   : slideDirection === 'forward'
                   ? styles.slideEnterRight
@@ -1164,7 +1347,7 @@ export default function TransaccionModal({
               }`}
               data-modal-frame
             >
-              {(step === 4 || step === 3) && (
+              {(step === 5 || step === 4) && (
                 <form 
                   className={styles.formContainer}
                   onSubmit={(e) => {
@@ -1199,7 +1382,7 @@ export default function TransaccionModal({
                         descripcion={descripcion}
                         categoriaNombre={categorias.find(c => c.id === categoriaId)?.nombre}
                         onChangeMontoPesos={(val) => dispatch({ type: 'SET_FIELD', field: 'montoPesosDebito', value: val })}
-                        autoFocus={step === 4}
+                        autoFocus={step === 5}
                       />
                     </div>
                   </div>

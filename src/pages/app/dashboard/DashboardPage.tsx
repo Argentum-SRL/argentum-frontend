@@ -17,6 +17,7 @@ import {
   MessageSquare,
   X,
 } from '@/components/ui/icons'
+import { BadgePercent } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { sileo } from 'sileo'
@@ -1185,6 +1186,30 @@ export default function DashboardPage() {
                             return (
                               <div className={`${styles.itemAmount} ${amountColorClass}`}>
                                 {sign}{formatMonto(m.monto, m.moneda)}
+                                {m.reintegro && (
+                                  <span
+                                    style={{
+                                      color: m.reintegro.estado === 'recibido' ? 'var(--success)' : 'var(--text-2)',
+                                      marginLeft: 4,
+                                      verticalAlign: 'middle',
+                                      flexShrink: 0,
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                    }}
+                                    title={
+                                      m.reintegro.estado === 'recibido'
+                                        ? `Pagaste ${formatMonto(m.monto + m.reintegro.monto, m.moneda)} · Te devolvieron ${formatMonto(m.reintegro.monto, m.moneda)}`
+                                        : `Reintegro de ${formatMonto(m.reintegro.monto, m.moneda)} pendiente`
+                                    }
+                                    aria-label={
+                                      m.reintegro.estado === 'recibido'
+                                        ? `Pagaste ${formatMonto(m.monto + m.reintegro.monto, m.moneda)} · Te devolvieron ${formatMonto(m.reintegro.monto, m.moneda)}`
+                                        : `Reintegro de ${formatMonto(m.reintegro.monto, m.moneda)} pendiente`
+                                    }
+                                  >
+                                    <BadgePercent size={14} />
+                                  </span>
+                                )}
                               </div>
                             )
                           })()}

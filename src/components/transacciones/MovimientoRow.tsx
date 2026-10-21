@@ -7,6 +7,7 @@ import {
   SlidersHorizontal,
   Wallet,
 } from '@/components/ui/icons'
+import { BadgePercent } from 'lucide-react'
 import { formatMonto } from '@/utils/format'
 import styles from './MovimientoRow.module.css'
 
@@ -156,6 +157,27 @@ const MovimientoRow = memo(({
         <div className={`${styles.amount} ${amountColorClass}`}>
           {sign && <span className={styles.amountSign}>{sign}</span>}
           <span className={styles.amountNumber}>{formatMonto(movimiento.monto, movimiento.moneda)}</span>
+          {movimiento.reintegro && (
+            <span
+              className={
+                movimiento.reintegro.estado === 'recibido'
+                  ? styles.reintegroIconRecibido
+                  : styles.reintegroIconPendiente
+              }
+              title={
+                movimiento.reintegro.estado === 'recibido'
+                  ? `Pagaste ${formatMonto(movimiento.monto + movimiento.reintegro.monto, movimiento.moneda)} · Te devolvieron ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)}`
+                  : `Reintegro de ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)} pendiente`
+              }
+              aria-label={
+                movimiento.reintegro.estado === 'recibido'
+                  ? `Pagaste ${formatMonto(movimiento.monto + movimiento.reintegro.monto, movimiento.moneda)} · Te devolvieron ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)}`
+                  : `Reintegro de ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)} pendiente`
+              }
+            >
+              <BadgePercent size={14} />
+            </span>
+          )}
         </div>
       </div>
     </div>

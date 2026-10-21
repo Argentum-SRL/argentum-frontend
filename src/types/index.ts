@@ -368,6 +368,13 @@ export interface Transaccion {
   cotizacion_aplicada?: number | null
   tipo_dolar_usado?: string | null
   factura_id?: string | null
+  reintegro?: ReintegroInfo | null
+}
+
+export interface ReintegroInfo {
+  estado: 'pendiente' | 'recibido'
+  monto: number
+  fecha_recibido: string | null
 }
 
 export interface SugerenciaPesosResponse {
@@ -485,6 +492,7 @@ export interface MovimientoDashboard {
   etiqueta?: string
   aclaracion?: string | null
   cuota_texto?: string | null
+  reintegro?: ReintegroInfo | null
 }
 
 export interface PagoDashboard {
@@ -1180,3 +1188,9 @@ export interface DeshacerDecisionPayload {
 }
 
 export * from './movimiento'
+
+declare module './movimiento' {
+  interface MovimientoItem {
+    reintegro?: ReintegroInfo | null
+  }
+}

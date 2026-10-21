@@ -559,3 +559,17 @@
     animation: none;
   }
 }
+
+.reintegroIconRecibido {
+  color: var(--success);
+  margin-left: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.reintegroIconPendiente {
+  color: var(--text-2);
+  margin-left: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}

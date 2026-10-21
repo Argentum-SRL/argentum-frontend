@@ -284,6 +284,47 @@ export default function TransaccionesPage() {
     return () => window.removeEventListener('argentum:transaccion-creada', handleTxCreated)
   }, [refresh])
 
+  // 6. Si la URL trae ?transaccion=<id>, abrir modal de edición y sacar el parámetro de la URL
+  const paramTransaccionId = searchParams.get('transaccion')
+  const handledTxRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!paramTransaccionId || handledTxRef.current === paramTransaccionId) return
+    handledTxRef.current = paramTransaccionId
+
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      next.delete('transaccion')
+      return next
+    }, { replace: true })
+
+    const fetchAndOpenTx = async () => {
+      try {
+        const tx = await transaccionService.getTransaccion(paramTransaccionId)
+        if (tx) {
+          const [b, c, t] = await Promise.all([
+            billeteras.length > 0 ? Promise.resolve(billeteras) : billeteraService.list(),
+            categorias.length > 0 ? Promise.resolve(categorias) : categoriaService.getCategorias(),
+            tarjetas.length > 0 ? Promise.resolve(tarjetas) : tarjetaService.getTarjetas(),
+          ])
+          open('transaccion', {
+            data: {
+              transaccion: tx,
+              billeteras: b,
+              categorias: c,
+              tarjetas: t,
+              onSuccess: refresh,
+            },
+          })
+        }
+      } catch (err) {
+        console.error('Error al abrir transacción desde URL:', err)
+      }
+    }
+
+    void fetchAndOpenTx()
+  }, [paramTransaccionId, setSearchParams, billeteras, categorias, tarjetas, open, refresh])
+
   const handleEdit = useCallback((id: string) => {
     // Si id viene como "transaccion:<uuid>" o "<uuid>"
     const rawId = id.includes(':') ? id.split(':')[1] : id

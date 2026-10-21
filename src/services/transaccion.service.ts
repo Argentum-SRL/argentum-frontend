@@ -111,7 +111,32 @@ const transaccionService = {
     invalidateResumen()
     invalidatePresupuestos()
     return response.data
+  },
+
+  setReintegro: async (id: string, data: { monto: number; recibido: boolean; fecha_recibido?: string }) => {
+    const response = await api.put<Transaccion>(`/transacciones/${id}/reintegro`, data)
+    invalidateBilleteras()
+    invalidateResumen()
+    invalidatePresupuestos()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: response.data }))
+    }
+    return response.data
+  },
+
+  quitarReintegro: async (id: string) => {
+    const response = await api.delete<Transaccion>(`/transacciones/${id}/reintegro`)
+    invalidateBilleteras()
+    invalidateResumen()
+    invalidatePresupuestos()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: response.data }))
+    }
+    return response.data
   }
 }
+
+export const setReintegro = transaccionService.setReintegro
+export const quitarReintegro = transaccionService.quitarReintegro
 
 export default transaccionService

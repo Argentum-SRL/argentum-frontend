@@ -1,0 +1,298 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-field-gap, 14px);
+  width: 100%;
+}
+
+/* ── Tarjeta con switch estilo iOS (Dimensiones idénticas a Billetera) ────── */
+.settingCard {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-subtle);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  font-family: inherit;
+  position: relative;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+[data-theme="dark"] .settingCard {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.settingCardClickable {
+  cursor: pointer;
+}
+
+.settingCardClickable:hover {
+  background: var(--surface-3);
+  border-color: rgba(var(--primary-rgb), 0.2);
+}
+
+[data-theme="dark"] .settingCardClickable:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.settingCardClickable:active {
+  transform: scale(0.992);
+}
+
+.settingCardActiveGreen {
+  border-color: rgba(46, 204, 113, 0.45) !important;
+  background: rgba(46, 204, 113, 0.05) !important;
+}
+
+[data-theme="dark"] .settingCardActiveGreen {
+  border-color: rgba(46, 204, 113, 0.4) !important;
+  background: rgba(46, 204, 113, 0.08) !important;
+}
+
+/* Icon Box */
+.settingIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.iconBoxDefault {
+  background: var(--surface);
+  color: var(--text-3);
+  border: 1px solid var(--border-subtle);
+}
+
+[data-theme="dark"] .iconBoxDefault {
+  background: var(--surface-3);
+  color: var(--text-3);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.iconBoxGreen {
+  background: rgba(46, 204, 113, 0.18);
+  color: var(--success, #2ECC71);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+}
+
+/* Info de texto */
+.settingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.settingLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settingLabel {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.settingSub {
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 150ms ease;
+}
+
+.badgePillGreen {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(46, 204, 113, 0.2);
+  color: var(--success, #2ECC71);
+}
+
+/* Switch Deslizable iOS */
+.customSwitch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .customSwitch {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.switchActiveGreen {
+  background: var(--success, #2ECC71) !important;
+}
+
+.customSwitchThumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: var(--elevation-xs);
+  transform: translateX(0);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.switchThumbActive {
+  transform: translateX(16px);
+}
+
+/* ── Campos con reintegro activo ─────────────────────────────────────────── */
+.bloqueCampos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-field-gap, 14px);
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 12px);
+  animation: fadeInDown 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bloqueCampos {
+    animation: none;
+  }
+}
+
+.preguntaGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-label-gap, 6px);
+}
+
+.preguntaLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.porcentajeWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.porcentajeInput {
+  height: var(--control-h, 40px);
+  border-radius: var(--control-radius, 10px);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 var(--control-pad-x, 12px);
+  font-size: var(--control-font, 14px);
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .porcentajeInput {
+    font-size: 16px;
+  }
+}
+
+.porcentajeInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.sonMontoTexto {
+  font-size: 13px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.sonMontoValor {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.recibidoCard {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.recibidoTexto {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.quitarBtn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  color: var(--danger, #EF4444);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 6px);
+  transition: opacity var(--motion-fast, 150ms) var(--ease-out, ease-out);
+}
+
+.quitarBtn:hover {
+  opacity: 0.8;
+}
+
+.quitarBtn:focus-visible {
+  outline: 2px solid var(--danger, #EF4444);
+  outline-offset: 2px;
+}
+
+.quitarBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quitarBtn {
+    transition: none;
+  }
+}

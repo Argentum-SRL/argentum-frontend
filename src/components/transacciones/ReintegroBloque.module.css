@@ -1,16 +1,16 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap, 14px);
+  gap: var(--modal-field-gap);
   width: 100%;
 }
 
 /* ── Tarjeta con switch estilo iOS (Dimensiones idénticas a Billetera) ────── */
 .settingCard {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 10px 14px;
   border-radius: 12px;
@@ -47,14 +47,24 @@
   transform: scale(0.992);
 }
 
-.settingCardActiveGreen {
-  border-color: rgba(46, 204, 113, 0.45) !important;
-  background: rgba(46, 204, 113, 0.05) !important;
+.settingCard.settingCardActiveGreen {
+  border-color: rgba(46, 204, 113, 0.45);
+  background: rgba(46, 204, 113, 0.05);
 }
 
-[data-theme="dark"] .settingCardActiveGreen {
-  border-color: rgba(46, 204, 113, 0.4) !important;
-  background: rgba(46, 204, 113, 0.08) !important;
+.settingCardClickable.settingCardActiveGreen:hover {
+  background: rgba(46, 204, 113, 0.08);
+  border-color: rgba(46, 204, 113, 0.55);
+}
+
+[data-theme="dark"] .settingCard.settingCardActiveGreen {
+  border-color: rgba(46, 204, 113, 0.4);
+  background: rgba(46, 204, 113, 0.08);
+}
+
+[data-theme="dark"] .settingCardClickable.settingCardActiveGreen:hover {
+  background: rgba(46, 204, 113, 0.12);
+  border-color: rgba(46, 204, 113, 0.5);
 }
 
 /* Icon Box */
@@ -150,8 +160,12 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
-.switchActiveGreen {
-  background: var(--success, #2ECC71) !important;
+.customSwitch.switchActiveGreen {
+  background: var(--success, #2ECC71);
+}
+
+[data-theme="dark"] .customSwitch.switchActiveGreen {
+  background: var(--success, #2ECC71);
 }
 
 .customSwitchThumb {
@@ -172,7 +186,7 @@
 .bloqueCampos {
   display: flex;
   flex-direction: column;
-  gap: var(--modal-field-gap, 14px);
+  gap: var(--modal-field-gap);
   padding: 14px 16px;
   background: var(--surface-2);
   border: 1px solid var(--border);

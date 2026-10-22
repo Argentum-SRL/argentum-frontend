@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { RefreshCw, MessageSquare, AlertTriangle, DollarSign, Activity } from 'lucide-react'
+import { RefreshCw, MessageSquare, AlertTriangle, DollarSign, Activity, Send } from 'lucide-react'
 import { sileo } from 'sileo'
 import adminService from '../../../services/adminService'
 import type {
@@ -337,6 +337,64 @@ export const MonitorWppPanel: React.FC = () => {
                 {`${resumen?.salud.avisos_whatsapp_enviados ?? 0} enviados, ${resumen?.salud.avisos_whatsapp_sin_enviar ?? 0} sin enviar`}
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* Tarjeta 5: Mensajes del bot */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>Mensajes del bot</h3>
+            <Send size={16} className="text-primary" />
+          </div>
+          <div className={styles.cardBody}>
+            <div className={styles.metricRow}>
+              <span className={styles.metricLabel}>Enviados este mes:</span>
+              <span className={styles.metricValue}>
+                {(resumen?.whatsapp_salientes?.mes.enviados ?? 0).toLocaleString('es-AR')}
+              </span>
+            </div>
+            <div className={styles.metricRow}>
+              <span className={styles.metricLabel}>Cupo gratis de Meta:</span>
+              <span className={styles.metricValue}>
+                {`${(resumen?.whatsapp_salientes?.mes.cupo_usado ?? 0).toLocaleString('es-AR')} de ${(resumen?.whatsapp_salientes?.mes.cupo_gratis ?? 1000).toLocaleString('es-AR')} usados`}
+              </span>
+            </div>
+            <div className={styles.metricRow}>
+              <span className={styles.metricLabel}>Cobrados por Meta este mes:</span>
+              <span className={styles.metricValue}>
+                {(resumen?.whatsapp_salientes?.mes.cobrados_meta ?? 0).toLocaleString('es-AR')}
+              </span>
+            </div>
+            <div className={styles.metricRow}>
+              <span className={styles.metricLabel}>Sin dato de Meta todavía:</span>
+              <span className={styles.metricValue}>
+                {(resumen?.whatsapp_salientes?.mes.sin_dato_meta ?? 0).toLocaleString('es-AR')}
+              </span>
+            </div>
+            <div className={styles.metricRow}>
+              <span className={styles.metricLabel}>Sin enviar este mes:</span>
+              <span className={styles.metricValue}>
+                {(resumen?.whatsapp_salientes?.mes.no_enviados ?? 0).toLocaleString('es-AR')}
+              </span>
+            </div>
+            <div className={styles.metricRow}>
+              <span className={styles.metricLabel}>Mensajes con más de una respuesta:</span>
+              <span className={styles.metricValue}>
+                {(resumen?.whatsapp_salientes?.entrantes_con_mas_de_una_respuesta ?? 0).toLocaleString('es-AR')}
+              </span>
+            </div>
+
+            {resumen?.whatsapp_salientes?.por_dia && resumen.whatsapp_salientes.por_dia.length > 0 && (
+              <div className={styles.subList}>
+                {resumen.whatsapp_salientes.por_dia.map((d) => (
+                  <div key={d.fecha} className={styles.subItem}>
+                    <span>
+                      {`${d.fecha}: ${d.total.toLocaleString('es-AR')} (respuestas ${d.respuestas.toLocaleString('es-AR')}, plantillas ${d.plantillas.toLocaleString('es-AR')}, otros ${d.otros.toLocaleString('es-AR')})`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

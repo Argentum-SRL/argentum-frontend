@@ -93,11 +93,38 @@ export interface SaludResumen {
   avisos_whatsapp_sin_enviar: number
 }
 
+export interface SalientesMes {
+  enviados: number
+  plantillas: number
+  cobrados_meta: number
+  gratis_meta: number
+  sin_dato_meta: number
+  cupo_gratis: number
+  cupo_usado: number
+  no_enviados: number
+}
+
+export interface SalientesPorDia {
+  fecha: string
+  total: number
+  respuestas: number
+  plantillas: number
+  otros: number
+}
+
+export interface SalientesWppResumen {
+  mes: SalientesMes
+  por_dia: SalientesPorDia[]
+  no_enviados_por_motivo: Record<string, number>
+  entrantes_con_mas_de_una_respuesta: number
+}
+
 export interface MonitorWppResumen {
   calidad: CalidadResumen
   costo: CostoResumen
   topes_hoy: TopesHoyResumen
   salud: SaludResumen
+  whatsapp_salientes?: SalientesWppResumen
 }
 
 export interface ConversacionMonitorItem {

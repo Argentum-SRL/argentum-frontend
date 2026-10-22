@@ -450,6 +450,69 @@
   box-sizing: border-box;
 }
 
+.currencyToggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-alt);
+  padding: 2px;
+  border-radius: 999px;
+  border: none;
+}
+
+.currencyBtn {
+  background: transparent;
+  border: none;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1.2;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.currencyBtn:hover:not(.currencyBtnActive) {
+  color: var(--text);
+}
+
+.currencyBtnActive {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 650;
+  box-shadow: var(--elevation-xs);
+}
+
+.currencyBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+:global([data-theme="dark"]) .currencyToggle,
+:global(.dark) .currencyToggle {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme="dark"]) .currencyBtn,
+:global(.dark) .currencyBtn {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+:global([data-theme="dark"]) .currencyBtn:hover:not(.currencyBtnActive),
+:global(.dark) .currencyBtn:hover:not(.currencyBtnActive) {
+  color: #ffffff;
+}
+
+:global([data-theme="dark"]) .currencyBtnActive,
+:global(.dark) .currencyBtnActive {
+  background: #ffffff;
+  color: #08101E;
+}
+
 .cardTitle {
   font-size: 1rem;
   font-weight: 700;
@@ -516,7 +579,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-
+  .currencyBtn,
   .headerLeft,
 .cycleDates,
 .navBtn,

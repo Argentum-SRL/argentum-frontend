@@ -20,6 +20,7 @@ import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import AvisoSaldoTransferencia from './AvisoSaldoTransferencia'
 import styles from './TransferenciaModal.module.css'
 
 interface TransferenciaModalProps {
@@ -734,6 +735,12 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     />
                   </div>
                 </div>
+
+                <AvisoSaldoTransferencia
+                  origen={billeteraOrigen}
+                  destino={billeteraDestino}
+                  fecha={fecha}
+                />
 
                 {/* Resumen Financiero Completo con Detección Automática */}
                 <div className={styles.summaryBox}>

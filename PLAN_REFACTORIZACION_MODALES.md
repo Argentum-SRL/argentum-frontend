@@ -1,3 +1,5 @@
+> HISTÓRICO (23/09/2026; marcado el 21/10/2026). ModalContext.ts y modalRegistry.ts ya existen en src/context. Las reglas vigentes de modales están en AGENTS.md y DISENO_UNIFICADO.md. No usar este plan como guía.
+
 # 🎯 PLAN COMPLETO: REFACTORIZACIÓN CENTRALIZADA DE MODALES
 
 ## 📋 ÍNDICE

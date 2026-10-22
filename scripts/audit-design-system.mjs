@@ -33,15 +33,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const FRONTEND_ROOT = path.resolve(__dirname, '..');
 const SRC_DIR = path.resolve(FRONTEND_ROOT, 'src');
-const AUDITORIAS_DIR = path.resolve(FRONTEND_ROOT, '../auditorias');
+const AUDITORIAS_DIR = process.env.ARGENTUM_AUDITORIAS_DIR
+  ? path.resolve(process.env.ARGENTUM_AUDITORIAS_DIR)
+  : path.resolve('D:\\Argentum\\auditorias');
+
+if (!fs.existsSync(AUDITORIAS_DIR)) {
+  process.stderr.write(`No existe la carpeta de auditorías: ${AUDITORIAS_DIR}\n`);
+  process.exit(1);
+}
 
 // Asegurar directorios de salida
 const DATA_DIR = path.resolve(SRC_DIR, 'data');
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-if (!fs.existsSync(AUDITORIAS_DIR)) {
-  fs.mkdirSync(AUDITORIAS_DIR, { recursive: true });
 }
 
 // ---------------------------------------------------------------------------

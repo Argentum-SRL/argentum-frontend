@@ -9,8 +9,19 @@ const cacheDir = process.env.LOCALAPPDATA
   ? path.resolve(process.env.LOCALAPPDATA, 'argentum-frontend-vite-cache')
   : path.resolve(os.tmpdir(), 'argentum-frontend-vite-cache')
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+
+  if (command === 'serve') {
+    const apiUrl = (process.env.VITE_API_URL || env.VITE_API_URL || '').trim()
+    if (apiUrl) {
+      const isRelative = apiUrl.startsWith('/')
+      const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/.*)?$/i.test(apiUrl)
+      if (!isRelative && !isLocalhost) {
+        throw new Error('En tu PC el front usa solo el backend local: sacá VITE_API_URL del .env del front.')
+      }
+    }
+  }
   const turnstileSiteKey =
     process.env.TURNSTILE_SITE_KEY ||
     process.env.VITE_TURNSTILE_SITE_KEY ||

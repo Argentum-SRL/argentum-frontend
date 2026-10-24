@@ -133,7 +133,7 @@ export default function ToolsPage() {
 
       {/* ── Tab: Cuotas vs Contado (Financial Wizard Shell) ─────────────── */}
       {currentTab === 'conveniencia' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
           {ipcLoading ? (
             <div className={`${pageStyles.skeleton} ${pageStyles.skeletonCard}`} />
           ) : (

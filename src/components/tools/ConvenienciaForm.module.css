@@ -1,0 +1,51 @@
+/* ── Transiciones entre Vista de Resultado y Vista de Gráfico (Paso 3) ── */
+.viewContainer {
+  width: 100%;
+}
+
+.slideFromRight {
+  animation: slideInFromRight 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.slideFromLeft {
+  animation: slideInFromLeft 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideFromRight,
+  .slideFromLeft {
+    animation: fadeInMinimal 150ms ease forwards;
+    transform: none;
+  }
+}
+
+@keyframes fadeInMinimal {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

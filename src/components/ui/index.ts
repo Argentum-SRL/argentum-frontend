@@ -1,6 +1,6 @@
 import Button from './Button/Button.tsx'
 import Field from './Field/Field.tsx'
-import MontoInput from './MontoInput/MontoInput.tsx'
+import MontoInput, { BanderaArgentina, BanderaUSA } from './MontoInput/MontoInput.tsx'
 import Modal, { type ModalStepDots } from './Modal/Modal.tsx'
 import { ModalFooter, type ModalFooterProps } from './Modal/ModalFooter.tsx'
 import { Input } from './Input/Input.tsx'
@@ -19,6 +19,8 @@ export {
   Button, 
   Field, 
   MontoInput, 
+  BanderaArgentina,
+  BanderaUSA,
   Modal, 
   type ModalStepDots,
   ModalFooter,

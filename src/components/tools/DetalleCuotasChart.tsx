@@ -91,6 +91,16 @@ export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
     'Valor Real': item.cuota_valor_presente,
   }));
 
+  const totalMeses = chartData.length;
+  const xAxisInterval =
+    totalMeses <= 6
+      ? 0
+      : totalMeses <= 12
+      ? 1
+      : totalMeses <= 24
+      ? 2
+      : Math.ceil(totalMeses / 8);
+
   return (
     <div className={styles.chartContainer}>
       <h3 className={styles.chartTitle}>¿Cómo pierde valor cada cuota con el tiempo?</h3>
@@ -104,6 +114,7 @@ export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
             <XAxis
               dataKey="mes"
+              interval={xAxisInterval}
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 11, fill: 'var(--text-3)' }}

@@ -26,13 +26,17 @@ export const useTools = () => {
     inflacion_mensual: string;
     tiene_interes: boolean;
     tna: string;
+    hasCapitalToInvest: boolean;
+    investmentTna: string;
   }>({
     precio_contado: null,
     precio_total_cuotas: null,
     cantidad_cuotas: 12,
     inflacion_mensual: '',
     tiene_interes: false,
-    tna: ''
+    tna: '',
+    hasCapitalToInvest: false,
+    investmentTna: '',
   });
   
   const [resultado, setResultado] = useState<ConvenienciaResult | null>(null);
@@ -101,6 +105,13 @@ export const useTools = () => {
         return false;
       }
     }
+    if (formData.hasCapitalToInvest) {
+      const parsedInvTna = parseFloat(formData.investmentTna);
+      if (isNaN(parsedInvTna) || parsedInvTna < 0.1 || parsedInvTna > 3000) {
+        sileo.error({ title: 'Debe ingresar una TNA de inversión válida entre 0.1% y 3000%' });
+        return false;
+      }
+    }
     
     setCalculando(true);
     try {
@@ -110,7 +121,8 @@ export const useTools = () => {
         cantidad_cuotas: cuotas,
         inflacion_mensual: inflacion,
         tiene_interes,
-        tna: tiene_interes ? parseFloat(tnaVal) : undefined
+        tna: tiene_interes ? parseFloat(tnaVal) : undefined,
+        tna_billetera_inversion: formData.hasCapitalToInvest ? parseFloat(formData.investmentTna) : undefined
       });
       setResultado(res);
       sileo.success({ title: 'Cálculo realizado con éxito' });

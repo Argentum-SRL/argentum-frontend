@@ -27,6 +27,9 @@ export interface ConvenienciaResult {
   tna_usada?: number | null;
   interes_total?: number | null;
   precio_total_cuotas_con_interes?: number | null;
+  tna_billetera_inversion_usada?: number | null;
+  saldo_final_inversion?: number | null;
+  remanente_vpn?: number | null;
 }
 
 export interface ConvenienciaRequest {
@@ -36,6 +39,7 @@ export interface ConvenienciaRequest {
   inflacion_mensual: number;
   tiene_interes?: boolean;
   tna?: number;
+  tna_billetera_inversion?: number | null;
 }
 
 export interface CurrencyFinancialData {

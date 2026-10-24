@@ -11,8 +11,8 @@
 
 @media (min-width: 768px) {
   .page {
-    gap: 24px;
-    padding-bottom: 40px;
+    gap: 16px;
+    padding-bottom: 24px;
   }
 }
 

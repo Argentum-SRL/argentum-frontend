@@ -147,12 +147,11 @@ export function LunarLoading({
     rimColor = '#E2E8F0'
     haloBackground = `radial-gradient(circle, rgba(148, 163, 184, ${0.15 + eclipseFactor * 0.22}) 0%, rgba(96, 165, 250, ${0.06 + eclipseFactor * 0.10}) 45%, transparent 72%)`
   } else {
-    // Modo Claro: Eclipse Lunar — SIEMPRE NARANJA, NUNCA NEGRA NI AZUL
-    // Durante la plenitud adopta un naranja terracota profundo; en crecientes y cuartos un naranja cobrizo vibrante
-    moonColor = eclipseFactor > 0.4 ? '#CC4D14' : '#E06224'
-    shadowColor = 'rgba(224, 98, 36, 0.12)'
-    rimColor = '#E06224'
-    haloBackground = `radial-gradient(circle, rgba(224, 98, 36, ${0.28 + eclipseFactor * 0.25}) 0%, rgba(217, 130, 43, ${0.14 + eclipseFactor * 0.16}) 45%, transparent 72%)`
+    // Modo Claro: Azul cobalto y zafiro luminoso sobre marfil cálido
+    moonColor = eclipseFactor > 0.4 ? '#1D4ED8' : '#2563EB'
+    shadowColor = 'rgba(37, 99, 235, 0.18)'
+    rimColor = '#2563EB'
+    haloBackground = `radial-gradient(circle, rgba(59, 130, 246, ${0.22 + eclipseFactor * 0.20}) 0%, rgba(147, 197, 253, ${0.10 + eclipseFactor * 0.12}) 45%, transparent 72%)`
   }
 
   // Gestión de frases rotativas dinámicas
@@ -220,7 +219,7 @@ export function LunarLoading({
               rimColor={rimColor}
               rimOpacity={isDark ? 0.35 : 0.55}
               eclipseIntensity={eclipseFactor}
-              eclipseColor={isDark ? '#93C5FD' : '#E06224'}
+              eclipseColor={isDark ? '#93C5FD' : '#3B82F6'}
             />
           </div>
         </div>

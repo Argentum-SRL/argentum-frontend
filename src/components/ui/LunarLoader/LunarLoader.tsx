@@ -164,7 +164,7 @@ export const LunarLoader = memo(
     const haloBackground = isBrand
       ? isDark
         ? `radial-gradient(circle, rgba(148, 163, 184, ${0.30 + eclipseFactor * 0.35}) 0%, rgba(96, 165, 250, ${0.15 + eclipseFactor * 0.20}) 42%, transparent 72%)`
-        : `radial-gradient(circle, rgba(224, 98, 36, ${0.40 + eclipseFactor * 0.35}) 0%, rgba(255, 163, 51, ${0.22 + eclipseFactor * 0.22}) 42%, transparent 72%)`
+        : `radial-gradient(circle, rgba(59, 130, 246, ${0.35 + eclipseFactor * 0.30}) 0%, rgba(147, 197, 253, ${0.18 + eclipseFactor * 0.18}) 42%, transparent 72%)`
       : `radial-gradient(circle, currentColor 0%, transparent 68%)`
 
     const glowClass = showGlow
@@ -231,12 +231,12 @@ export const LunarLoader = memo(
                   <stop offset="100%" stopColor={eclipseFactor > 0 ? '#93C5FD' : '#A5B4FC'} />
                 </linearGradient>
               ) : (
-                // Eclipse Argentum (Luz solar ámbar, cobre y terracota profundo)
+                // Modo Claro (Azul zafiro, cobalto y azul cielo luminoso)
                 <linearGradient id={`${uid}-illuminated`} x1="15%" y1="15%" x2="85%" y2="85%">
-                  <stop offset="0%" stopColor="#FFF2D6" />
-                  <stop offset="30%" stopColor="#FFA439" />
-                  <stop offset="70%" stopColor="#E06224" />
-                  <stop offset="100%" stopColor={eclipseFactor > 0.4 ? '#CC4D14' : '#B83E0A'} />
+                  <stop offset="0%" stopColor="#DBEAFE" />
+                  <stop offset="30%" stopColor="#60A5FA" />
+                  <stop offset="70%" stopColor="#2563EB" />
+                  <stop offset="100%" stopColor={eclipseFactor > 0.4 ? '#1E40AF' : '#1D4ED8'} />
                 </linearGradient>
               )
             ) : (
@@ -257,9 +257,9 @@ export const LunarLoader = memo(
                 </radialGradient>
               ) : (
                 <radialGradient id={`${uid}-shadow`} cx="42%" cy="42%" r="58%">
-                  <stop offset="0%" stopColor="#FCE7D6" stopOpacity="0.25" />
-                  <stop offset="65%" stopColor="#E06224" stopOpacity="0.32" />
-                  <stop offset="100%" stopColor="#9C2F04" stopOpacity="0.48" />
+                  <stop offset="0%" stopColor="#DBEAFE" stopOpacity="0.25" />
+                  <stop offset="65%" stopColor="#3B82F6" stopOpacity="0.32" />
+                  <stop offset="100%" stopColor="#1E40AF" stopOpacity="0.48" />
                 </radialGradient>
               )
             ) : (
@@ -279,9 +279,9 @@ export const LunarLoader = memo(
                 </linearGradient>
               ) : (
                 <linearGradient id={`${uid}-rim`} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFC875" stopOpacity="0.95" />
-                  <stop offset="50%" stopColor="#E06224" stopOpacity="0.75" />
-                  <stop offset="100%" stopColor="#CC4D14" stopOpacity="0.55" />
+                  <stop offset="0%" stopColor="#93C5FD" stopOpacity="0.95" />
+                  <stop offset="50%" stopColor="#3B82F6" stopOpacity="0.75" />
+                  <stop offset="100%" stopColor="#1D4ED8" stopOpacity="0.55" />
                 </linearGradient>
               )
             ) : (

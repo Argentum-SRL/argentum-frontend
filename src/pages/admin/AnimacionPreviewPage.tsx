@@ -89,7 +89,7 @@ export default function AnimacionPreviewPage() {
             <p className={styles.ambientDemoText}>
               Claroscuro volumétrico con mareas armónicas de liquidez y luz (curvas cáusticas de Bézier)
               junto al sello de filigrana de plata 925. Cero planetarios, cero diagramas orbitales y
-              cero esferas detrás del contenido. Fase lunar en Modo Claro (azul zafiro y marfil) y
+              cero esferas detrás del contenido. Fase lunar en Modo Claro (azul marino Argentum y marfil) y
               Noche Lunar en Modo Oscuro (plata líquida y obsidiana).
             </p>
             <button

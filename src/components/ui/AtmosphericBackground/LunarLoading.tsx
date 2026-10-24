@@ -147,11 +147,11 @@ export function LunarLoading({
     rimColor = '#E2E8F0'
     haloBackground = `radial-gradient(circle, rgba(148, 163, 184, ${0.15 + eclipseFactor * 0.22}) 0%, rgba(96, 165, 250, ${0.06 + eclipseFactor * 0.10}) 45%, transparent 72%)`
   } else {
-    // Modo Claro: Azul cobalto y zafiro luminoso sobre marfil cálido
-    moonColor = eclipseFactor > 0.4 ? '#1D4ED8' : '#2563EB'
-    shadowColor = 'rgba(37, 99, 235, 0.18)'
-    rimColor = '#2563EB'
-    haloBackground = `radial-gradient(circle, rgba(59, 130, 246, ${0.22 + eclipseFactor * 0.20}) 0%, rgba(147, 197, 253, ${0.10 + eclipseFactor * 0.12}) 45%, transparent 72%)`
+    // Modo Claro: Azul institucional Argentum (#0D2045 / #1A3568) sobre marfil cálido
+    moonColor = eclipseFactor > 0.4 ? '#08142C' : '#0D2045'
+    shadowColor = 'rgba(13, 32, 69, 0.16)'
+    rimColor = '#1A3568'
+    haloBackground = `radial-gradient(circle, rgba(13, 32, 69, ${0.16 + eclipseFactor * 0.14}) 0%, rgba(26, 53, 104, ${0.07 + eclipseFactor * 0.08}) 45%, transparent 72%)`
   }
 
   // Gestión de frases rotativas dinámicas
@@ -219,7 +219,7 @@ export function LunarLoading({
               rimColor={rimColor}
               rimOpacity={isDark ? 0.35 : 0.55}
               eclipseIntensity={eclipseFactor}
-              eclipseColor={isDark ? '#93C5FD' : '#3B82F6'}
+              eclipseColor={isDark ? '#93C5FD' : '#1A3568'}
             />
           </div>
         </div>

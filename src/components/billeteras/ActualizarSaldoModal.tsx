@@ -1,10 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { X, Wallet, Check, AlertTriangle, CheckCircle2, ArrowLeft } from '@/components/ui/icons'
 import { LunarLoader } from '@/components/ui'
 import type { Billetera, ControlSaldoPreview } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import billeteraService from '@/services/billetera.service'
+import { nuevaClaveOperacion } from '@/services/api'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
@@ -42,6 +43,13 @@ export default function ActualizarSaldoModal({
   const [incluirRendimiento, setIncluirRendimiento] = useState<boolean>(true)
   const [isLoadingPreview, setIsLoadingPreview] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const claveOperacionRef = useRef<string>('')
+
+  useEffect(() => {
+    if (isOpen) {
+      claveOperacionRef.current = nuevaClaveOperacion()
+    }
+  }, [isOpen])
 
   // Reset state when modal opens
   if (prevIsOpen !== isOpen) {
@@ -97,7 +105,9 @@ export default function ActualizarSaldoModal({
       await billeteraService.actualizarSaldo(billetera.id, {
         saldo_declarado: preview.saldo_declarado,
         rendimiento: rendimientoToSend,
-      })
+      }, claveOperacionRef.current)
+
+      claveOperacionRef.current = nuevaClaveOperacion()
 
       sileo.success({
         title: preview.diferencia === 0 ? 'Control guardado.' : 'Saldo actualizado.',

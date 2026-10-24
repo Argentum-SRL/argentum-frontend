@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Modal, Button, DateInput, SelectInput, FacturaPanelSkeleton } from '@/components/ui'
 import { AlertCircle } from '@/components/ui/icons'
 import type { Factura, Billetera } from '@/types'
 import facturaService from '@/services/factura.service'
 import transaccionService from '@/services/transaccion.service'
+import { nuevaClaveOperacion } from '@/services/api'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
@@ -60,6 +61,13 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
   const [fechaPago, setFechaPago] = useState<string>(getTodayArgentina)
   const [confirmandoBorrado, setConfirmandoBorrado] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const claveOperacionRef = useRef<string>('')
+
+  useEffect(() => {
+    if (isOpen) {
+      claveOperacionRef.current = nuevaClaveOperacion()
+    }
+  }, [isOpen])
 
   // Cargar factura al abrir el panel (depende solo de isOpen y facturaId)
   useEffect(() => {
@@ -165,8 +173,9 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
         metodo_pago: metodoPago,
         origen: 'manual',
         factura_id: factura.id,
-      })
+      }, claveOperacionRef.current)
 
+      claveOperacionRef.current = nuevaClaveOperacion()
       sileo.success({ title: 'Listo, la anoté como gasto.' })
       onClose()
       onSuccess()

@@ -24,6 +24,7 @@ import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
 import { DateInput } from '@/components/ui'
 import { getErrorMessage } from '@/utils/errorMessages'
+import { nuevaClaveOperacion } from '@/services/api'
 
 interface GoalContributionModalProps {
   open: boolean
@@ -103,6 +104,7 @@ export default function GoalContributionModal({
   const [state, dispatch] = useReducer(formReducer, initialState)
   const [animClass, setAnimClass] = useState('')
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const claveOperacionRef = useRef<string>('')
 
   const {
     step, tipo, monto, moneda, billetera_id, fecha, cotizacion_usada, isSubmitting, localError
@@ -137,6 +139,7 @@ export default function GoalContributionModal({
 
   useEffect(() => {
     if (open) {
+      claveOperacionRef.current = nuevaClaveOperacion()
       const timer = setTimeout(() => {
         dispatch({ type: 'RESET', goal, billeteras })
         setAnimClass('')
@@ -234,7 +237,8 @@ export default function GoalContributionModal({
         fecha,
         moneda_movimiento: moneda,
         cotizacion_usada: needsExchangeRate ? cotizacion_usada : null
-      })
+      }, claveOperacionRef.current)
+      claveOperacionRef.current = nuevaClaveOperacion()
       sileo.success({ title: tipo === 'aporte' ? 'Aporte registrado con éxito' : 'Retiro registrado con éxito' })
       onSuccess()
       onClose()

@@ -1,4 +1,4 @@
-import api from './api'
+import api, { encabezadoClave } from './api'
 import type {
   Billetera,
   RendimientoEstimadoResponse,
@@ -111,8 +111,8 @@ const billeteraService = {
     return data
   },
 
-  confirmarRendimiento: async (id: string, payload: { monto: number; fecha?: string }): Promise<Billetera> => {
-    const { data } = await api.post<Billetera>(`/billeteras/${id}/rendimiento`, payload)
+  confirmarRendimiento: async (id: string, payload: { monto: number; fecha?: string }, clave?: string): Promise<Billetera> => {
+    const { data } = await api.post<Billetera>(`/billeteras/${id}/rendimiento`, payload, encabezadoClave(clave))
     invalidateBilleteras()
     return data
   },
@@ -126,8 +126,8 @@ const billeteraService = {
     return data
   },
 
-  actualizarSaldo: async (billeteraId: string, payload: ActualizarSaldoPayload): Promise<Billetera> => {
-    const { data } = await api.post<Billetera>(`/billeteras/${billeteraId}/ajustes`, payload)
+  actualizarSaldo: async (billeteraId: string, payload: ActualizarSaldoPayload, clave?: string): Promise<Billetera> => {
+    const { data } = await api.post<Billetera>(`/billeteras/${billeteraId}/ajustes`, payload, encabezadoClave(clave))
     invalidateBilleteras()
     return data
   },

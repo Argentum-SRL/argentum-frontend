@@ -124,4 +124,22 @@ api.interceptors.response.use(
   },
 )
 
+export function nuevaClaveOperacion(): string {
+  if (typeof crypto !== 'undefined') {
+    if (typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID()
+    }
+    if (typeof crypto.getRandomValues === 'function') {
+      const bytes = new Uint8Array(16)
+      crypto.getRandomValues(bytes)
+      return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+    }
+  }
+  return 'key_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36)
+}
+
+export function encabezadoClave(clave?: string): { headers?: { 'Idempotency-Key': string } } {
+  return clave ? { headers: { 'Idempotency-Key': clave } } : {}
+}
+
 export default api

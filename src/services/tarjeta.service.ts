@@ -1,4 +1,4 @@
-import api from './api'
+import api, { encabezadoClave } from './api'
 import type { TarjetaCredito, TarjetaCreditoCreate, ResumenTarjeta, PresionFuturaData, PagarTarjetaPayload, SimularPesificacionResponse, ResultadoPagoTarjeta, ResumenDeCompraResponse } from '@/types'
 
 const tarjetaService = {
@@ -56,15 +56,21 @@ const tarjetaService = {
   pagarResumenTarjeta: async (
     id: string,
     payloadOrFechaPago?: PagarTarjetaPayload | string,
-    fechaResumen?: string,
-    monto?: number
+    fechaResumenOrClave?: string,
+    monto?: number,
+    claveParam?: string
   ): Promise<ResultadoPagoTarjeta> => {
-    const body: PagarTarjetaPayload =
-      typeof payloadOrFechaPago === 'string' || payloadOrFechaPago === undefined
-        ? { fecha_pago: payloadOrFechaPago, fecha_resumen: fechaResumen, monto }
-        : payloadOrFechaPago
+    let body: PagarTarjetaPayload
+    let clave: string | undefined
+    if (typeof payloadOrFechaPago === 'object' && payloadOrFechaPago !== null) {
+      body = payloadOrFechaPago
+      clave = typeof fechaResumenOrClave === 'string' ? fechaResumenOrClave : claveParam
+    } else {
+      body = { fecha_pago: payloadOrFechaPago, fecha_resumen: fechaResumenOrClave, monto }
+      clave = claveParam
+    }
 
-    const { data } = await api.post<ResultadoPagoTarjeta>(`/tarjetas/${id}/pagar`, body)
+    const { data } = await api.post<ResultadoPagoTarjeta>(`/tarjetas/${id}/pagar`, body, encabezadoClave(clave))
     return data
   },
   simularPesificacion: async (

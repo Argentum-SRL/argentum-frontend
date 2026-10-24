@@ -1,4 +1,4 @@
-import api from './api'
+import api, { encabezadoClave } from './api'
 import type { TransferenciaInterna } from '@/types'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
@@ -14,8 +14,8 @@ const transferenciaService = {
     return response.data
   },
 
-  createTransferencia: async (data: Omit<TransferenciaInterna, 'id' | 'fecha_creacion'>) => {
-    const response = await api.post<TransferenciaInterna>('/transferencias', data)
+  createTransferencia: async (data: Omit<TransferenciaInterna, 'id' | 'fecha_creacion'>, clave?: string) => {
+    const response = await api.post<TransferenciaInterna>('/transferencias', data, encabezadoClave(clave))
     invalidateBilleteras()
     invalidateResumen()
     return response.data

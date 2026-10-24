@@ -1,4 +1,4 @@
-import api from './api'
+import api, { encabezadoClave } from './api'
 import type { Goal, GoalMovement } from '@/types/goals'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
@@ -29,8 +29,8 @@ const goalsService = {
     await api.delete(`/goals/${id}`)
   },
 
-  addMovement: async (id: string, data: Partial<GoalMovement>): Promise<GoalMovement> => {
-    const response = await api.post<GoalMovement>(`/goals/${id}/movimientos`, data)
+  addMovement: async (id: string, data: Partial<GoalMovement>, clave?: string): Promise<GoalMovement> => {
+    const response = await api.post<GoalMovement>(`/goals/${id}/movimientos`, data, encabezadoClave(clave))
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()

@@ -14,6 +14,7 @@ import SelectableSurface from '@/components/ui/SelectableSurface'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import type { Billetera, CotizacionDolar, CotizacionesDolarResponse } from '@/types'
 import transferenciaService from '@/services/transferencia.service'
+import { nuevaClaveOperacion } from '@/services/api'
 import { getCotizaciones } from '@/services/onboarding.service'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
@@ -92,10 +93,12 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   const carouselOrigenRef = useRef<HTMLDivElement>(null)
   const carouselDestinoRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const claveOperacionRef = useRef<string>('')
 
-  // Cargar cotizaciones completas al montar/abrir
+  // Cargar cotizaciones completas al montar/abrir y renovar clave
   useEffect(() => {
     if (!isOpen) return
+    claveOperacionRef.current = nuevaClaveOperacion()
     let active = true
     getCotizaciones()
       .then(res => {
@@ -373,7 +376,9 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
         moneda_comision: null,
         fecha,
         notas: notas.trim() || null,
-      })
+      }, claveOperacionRef.current)
+
+      claveOperacionRef.current = nuevaClaveOperacion()
 
       sileo.success({
         title: successToastTitle,

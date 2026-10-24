@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/icons'
 import styles from './GruposCuotasTab.module.css'
 import grupoCuotasService from '@/services/grupoCuotas.service'
+import { nuevaClaveOperacion } from '@/services/api'
 import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
@@ -67,6 +68,13 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const [billeteraSeleccionada, setBilleteraSeleccionada] = useState<string>('')
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const detailWalletsCarouselRef = useRef<HTMLDivElement>(null)
+  const claveOperacionRef = useRef<string>('')
+
+  useEffect(() => {
+    if (selectedGrupo) {
+      claveOperacionRef.current = nuevaClaveOperacion()
+    }
+  }, [selectedGrupo])
 
   // Categories and subscriptions lists
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -397,7 +405,8 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     if (!billeteraSeleccionada) return
     setSaving(true)
     try {
-      await grupoCuotasService.prepagarGrupo(grupoId, billeteraSeleccionada)
+      await grupoCuotasService.prepagarGrupo(grupoId, billeteraSeleccionada, claveOperacionRef.current)
+      claveOperacionRef.current = nuevaClaveOperacion()
       sileo.success({ title: '¡Listo! Las cuotas restantes se saldaron con éxito.' })
       handleCloseDetail()
       fetchGrupos()

@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { X, TrendingUp, Lightbulb } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import billeteraService from '@/services/billetera.service'
+import { nuevaClaveOperacion } from '@/services/api'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
@@ -31,6 +32,13 @@ export default function RegistrarRendimientoModal({
     rendimientoEstimado != null && rendimientoEstimado > 0 ? rendimientoEstimado : null
   )
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const claveOperacionRef = useRef<string>('')
+
+  useEffect(() => {
+    if (isOpen) {
+      claveOperacionRef.current = nuevaClaveOperacion()
+    }
+  }, [isOpen])
 
   if (prevIsOpen !== isOpen || prevRendimiento !== rendimientoEstimado) {
     setPrevIsOpen(isOpen)
@@ -53,7 +61,8 @@ export default function RegistrarRendimientoModal({
     try {
       const updated = await billeteraService.confirmarRendimiento(billetera.id, {
         monto,
-      })
+      }, claveOperacionRef.current)
+      claveOperacionRef.current = nuevaClaveOperacion()
       sileo.success({ title: 'Rendimiento registrado exitosamente' })
       onSuccess(updated)
       onClose()

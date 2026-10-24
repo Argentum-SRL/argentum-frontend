@@ -14,6 +14,7 @@ import {
 import Modal from '@/components/ui/Modal/Modal'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
 import transaccionService from '@/services/transaccion.service'
+import { nuevaClaveOperacion } from '@/services/api'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
 import styles from './TransaccionModal.module.css'
 import SegmentedControl from '@/components/ui/SegmentedControl'
@@ -67,6 +68,13 @@ export default function TransaccionModal({
   const slidesContainerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const submittingRef = useRef(false)
+  const claveOperacionRef = useRef<string>('')
+
+  useEffect(() => {
+    if (open) {
+      claveOperacionRef.current = nuevaClaveOperacion()
+    }
+  }, [open])
 
   const {
     sugerenciaClave,
@@ -630,7 +638,8 @@ export default function TransaccionModal({
           }
       let savedTx: Transaccion | null = null
       if (!isEdit) {
-        savedTx = await transaccionService.createTransaccion(payload)
+        savedTx = await transaccionService.createTransaccion(payload, claveOperacionRef.current)
+        claveOperacionRef.current = nuevaClaveOperacion()
         if (savedTx && tipo === 'egreso' && !isCuotaHija && reintegroHook.debeGuardarReintegro) {
           try {
             await reintegroHook.guardarReintegro(savedTx.id)

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { AlertCircle, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, CreditCard, Calendar, Clock, CheckCircle2 } from '@/components/ui/icons'
 import type { TarjetaCredito, ResumenTarjeta, CuotaResumen, Billetera, ItemSaldoArrastrado, PagarTarjetaPayload } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import notificacionService from '@/services/notificacion.service'
+import { nuevaClaveOperacion } from '@/services/api'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { formatMonto } from '@/utils/format'
@@ -86,6 +87,13 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
   const [modalInitialMonto, setModalInitialMonto] = useState<number | null>(null)
   const [modalFechaResumen, setModalFechaResumen] = useState<string | undefined>(undefined)
   const [dismissedNotifId, setDismissedNotifId] = useState<string | null>(null)
+  const claveOperacionRef = useRef<string>('')
+
+  useEffect(() => {
+    if (isPagarModalOpen) {
+      claveOperacionRef.current = nuevaClaveOperacion()
+    }
+  }, [isPagarModalOpen])
 
 
 
@@ -321,7 +329,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       const res = await tarjetaService.pagarResumenTarjeta(tarjeta.id, {
         ...payload,
         fecha_resumen: fechaResumenFinal
-      })
+      }, claveOperacionRef.current)
+      claveOperacionRef.current = nuevaClaveOperacion()
       // Aviso de éxito según respuesta del servidor
       if (res?.monto_diferencia && Number(res.monto_diferencia) > 0) {
         const tipoLabel = payload.diferencia_tipo === 'cargos_banco' 

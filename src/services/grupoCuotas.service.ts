@@ -1,4 +1,4 @@
-import api from './api'
+import api, { encabezadoClave } from './api'
 import type { GrupoCuotasResumen, GrupoCuotasUpdate } from '@/types'
 import { invalidateResumen } from './dashboard.service'
 import { invalidateBilleteras } from './billetera.service'
@@ -34,8 +34,8 @@ const grupoCuotasService = {
     return response.data
   },
 
-  prepagarGrupo: async (grupoId: string, billeteraId: string): Promise<GrupoCuotasResumen> => {
-    const response = await api.post<GrupoCuotasResumen>(`/grupos-cuotas/${grupoId}/prepagar`, { billetera_id: billeteraId })
+  prepagarGrupo: async (grupoId: string, billeteraId: string, clave?: string): Promise<GrupoCuotasResumen> => {
+    const response = await api.post<GrupoCuotasResumen>(`/grupos-cuotas/${grupoId}/prepagar`, { billetera_id: billeteraId }, encabezadoClave(clave))
     invalidateResumen()
     invalidateBilleteras()
     invalidatePresupuestos()

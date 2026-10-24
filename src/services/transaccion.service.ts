@@ -1,4 +1,4 @@
-import api from './api'
+import api, { encabezadoClave } from './api'
 import type { Transaccion, SugerenciaPesosResponse } from '@/types'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
@@ -54,8 +54,8 @@ const transaccionService = {
     return response.data
   },
 
-  createTransaccion: async (data: Partial<Transaccion> & { info_cuotas?: { cantidad_cuotas?: number } }) => {
-    const response = await api.post<Transaccion>('/transacciones', data)
+  createTransaccion: async (data: Partial<Transaccion> & { info_cuotas?: { cantidad_cuotas?: number } }, clave?: string) => {
+    const response = await api.post<Transaccion>('/transacciones', data, encabezadoClave(clave))
     invalidateBilleteras()
     invalidateResumen()
     invalidatePresupuestos()

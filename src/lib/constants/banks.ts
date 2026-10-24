@@ -123,7 +123,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'banco_tradicional',
     colorPrimario: '#FF8C00',
     colorTexto: 'white',
-    logoPath: 'galicia.svg',
+    logoPath: 'galicia.png',
     gradiente: 'linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%)',
   },
   {
@@ -160,7 +160,7 @@ export const BANKS: BankDefinition[] = [
     tipo: 'banco_tradicional',
     colorPrimario: '#4682B4',
     colorTexto: 'white',
-    logoPath: 'nacion.svg',
+    logoPath: 'nacion.png',
     gradiente: 'linear-gradient(135deg, #4682B4 0%, #315F86 100%)',
   },
   {

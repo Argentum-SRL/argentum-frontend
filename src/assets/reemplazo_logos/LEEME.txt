@@ -1,0 +1,2 @@
+Dejá acá los nuevos logos (formato .png, .svg, .webp, etc.).
+Cuando me avises, los reviso, los reemplazo en src/assets/suscripciones/ (vinculando catalogo_suscripciones.json si cambia extensión) y los elimino de acá.

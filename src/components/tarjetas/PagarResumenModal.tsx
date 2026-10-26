@@ -534,7 +534,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                                 Intereses por no pagar el total
                               </span>
                               <span className={styles.excedenteOpcionSublabel}>
-                                Se anota como gasto en Banco &gt; Intereses pagados.
+                                Se anota como gasto en Banco &gt; Intereses.
                               </span>
                             </div>
                           </div>

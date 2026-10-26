@@ -1,5 +1,8 @@
 # REGLAS OBLIGATORIAS DE FRONTEND — ARGENTUM
 
+## Cómo responderle a Sebastián (regla n.º 1, 26/10/2026)
+Sin explicaciones y sin vueltas. Solo: indicaciones, prompts, pushear o no, comandos completos y decisiones de negocio, siempre en pasos simples. Nada de causas técnicas, diagnósticos ni hallazgos.
+
 Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es la fuente canónica.
 
 1. **Constitución Visual:** Leer `DISENO_UNIFICADO.md` antes de tocar cualquier CSS o TSX de interfaz.

@@ -280,7 +280,6 @@ export default function GrupoCuotasEditarModal({
                         categoriaId={editCategoriaId}
                         subcategoriaId={editSubcategoriaId}
                         tipo="egreso"
-                        autoseleccionarPrimeraSubcategoria={true}
                         onSelectCategoria={(id) => {
                           setEditCategoriaId(id)
                           setEditSubcategoriaId('')

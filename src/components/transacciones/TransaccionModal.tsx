@@ -194,10 +194,6 @@ export default function TransaccionModal({
         sileo.error({ title: 'Seleccioná una categoría primero' })
         return
       }
-      if (!subcategoriaId) {
-        sileo.error({ title: 'Seleccioná una subcategoría primero' })
-        return
-      }
       reintegroHook.setTieneReintegro(true)
       dispatch({ type: 'SET_STEP', step: 4, direction: 'forward' })
     } else {
@@ -495,10 +491,6 @@ export default function TransaccionModal({
         sileo.error({ title: 'Seleccioná una categoría' })
         return
       }
-      if (!subcategoriaId) {
-        sileo.error({ title: 'Seleccioná una subcategoría' })
-        return
-      }
     } else if (step === 4) {
       if (reintegroHook.tieneReintegro) {
         const montoReintegro = reintegroHook.montoFinal
@@ -546,11 +538,6 @@ export default function TransaccionModal({
 
     if (!categoriaId) {
       sileo.error({ title: 'Seleccioná una categoría' })
-      return
-    }
-
-    if (!subcategoriaId) {
-      sileo.error({ title: 'Seleccioná una subcategoría' })
       return
     }
 
@@ -1082,7 +1069,6 @@ export default function TransaccionModal({
                     categoriaId={categoriaId}
                     subcategoriaId={subcategoriaId}
                     tipo={tipo}
-                    autoseleccionarPrimeraSubcategoria={true}
                     onSelectCategoria={(id) => {
                       marcarCategoriaManual()
                       dispatch({ type: 'SET_FIELD', field: 'categoriaId', value: id })

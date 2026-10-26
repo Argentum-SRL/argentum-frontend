@@ -24,14 +24,15 @@ import { sileo } from 'sileo'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { useModal } from '@/hooks/useModal'
 import { triggerBienvenidaFinancieraOnce, resetBienvenidaTriggerState } from '@/utils/bienvenidaFinancieraManager'
-import { getErrorMessage } from '@/utils/errorMessages'
 import { dashboardService } from '@/services/dashboard.service'
+import categoriaService from '@/services/categoria.service'
 import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { hasProyeccionVisible } from '@/components/dashboard/ProyeccionCard/proyeccionUtils'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { BalanceCard } from '@/components/dashboard/BalanceCard'
 import { formatMonto, formatFecha } from '@/utils/format'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
@@ -191,24 +192,43 @@ const ListSkeleton = memo(() => (
 ))
 ListSkeleton.displayName = 'ListSkeleton'
 
+// Cache de colores por ID provistos por la API (Decisión 15.g)
+const API_CATEGORY_COLORS: Record<string, string> = {}
+categoriaService.getCategorias().then(cats => {
+  for (const c of cats) {
+    if (c.id && c.color) {
+      API_CATEGORY_COLORS[c.id] = c.color
+    }
+  }
+}).catch(() => {})
+
 const COLORES_CATEGORIA: Record<string, string> = {
-  'Alimentación':             '#F97316',  // Naranja
-  'Indumentaria':             '#7C3AED',  // Violeta
-  'Vivienda':                 '#EAB308',  // Dorado / Amarillo
-  'Servicios':                '#EAB308',  // Fallback
-  'Equipamiento del hogar':   '#8B5CF6',  // Púrpura
-  'Hogar':                    '#8B5CF6',  // Fallback
-  'Salud':                    '#10B981',  // Esmeralda
-  'Transporte':               '#0284C7',  // Azul cielo
-  'Comunicación':             '#6366F1',  // Índigo
-  'Entretenimiento':          '#EC4899',  // Rosa / Magenta
-  'Recreativo':               '#EC4899',  // Fallback
-  'Educación':                '#DC2626',  // Rojo
-  'Gastronomía':              '#F59E0B',  // Ámbar
-  'Restaurante':              '#F59E0B',  // Ámbar
-  'Restaurantes y delivery':  '#F59E0B',  // Fallback
-  'Otros':                    '#6B7280',  // Gris neutro
-  'Banco':                    '#64748B',  // Slate / Gris azulado
+  'Alimentación':             '#F97316',
+  'Gastronomía':              '#F59E0B',
+  'Transporte':               '#0284C7',
+  'Vivienda':                 '#EAB308',
+  'Hogar':                    '#8B5CF6',
+  'Salud':                    '#10B981',
+  'Cuidado personal':         '#C026D3',
+  'Ocio':                     '#EC4899',
+  'Educación':                '#DC2626',
+  'Indumentaria':             '#7C3AED',
+  'Tecnología':               '#6366F1',
+  'Impuestos':                '#78716C',
+  'Banco':                    '#64748B',
+  'Otros':                    '#6B7280',
+  'Ahorro':                   '#2563EB',
+  'Trabajo':                  '#16A34A',
+  'Jubilación y AUH':         '#65A30D',
+  'Inversiones':              '#2563EB',
+  // Fallbacks de nombres anteriores
+  'Recreativo':               '#EC4899',
+  'Comunicación':             '#6366F1',
+  'Equipamiento del hogar':   '#8B5CF6',
+  'Servicios':                '#EAB308',
+  'Restaurante':              '#F59E0B',
+  'Restaurantes y delivery':  '#F59E0B',
+  'Entretenimiento':          '#EC4899',
 }
 
 const DEFAULT_COLOR = '#8A95A8'
@@ -267,7 +287,7 @@ const CategoriasChart = memo(({
   const dynamicCSS = activeCategories.map((entry) => {
     const val = Number(entry.monto)
     const fillPct = maxVal > 0 ? Math.max(0, Math.min(100, (val / maxVal) * 100)) : 0
-    const color = COLORES_CATEGORIA[entry.categoria_nombre] ?? DEFAULT_COLOR
+    const color = (entry.categoria_id && API_CATEGORY_COLORS[entry.categoria_id]) || COLORES_CATEGORIA[entry.categoria_nombre] || DEFAULT_COLOR
     const classPrefix = moneda === 'ARS' ? 'bar-fill-ars' : 'bar-fill-usd'
     const safeCatId = (entry.categoria_id || entry.categoria_nombre).replace(/[^a-zA-Z0-9_-]/g, '')
     return `.${classPrefix}-${safeCatId}{width:${fillPct.toFixed(2)}%;background:${color}}`
@@ -349,11 +369,13 @@ const SubcategoriasChart = memo(({
   data, 
   showPercent, 
   parentCategoryName,
+  parentCategoryId,
   moneda = 'ARS'
 }: { 
   data: SubcategoriaGasto[], 
   showPercent: boolean,
   parentCategoryName: string,
+  parentCategoryId?: string | null,
   moneda?: 'ARS' | 'USD'
 }) => {
   const [showAll, setShowAll] = useState(false)
@@ -398,7 +420,7 @@ const SubcategoriasChart = memo(({
   }
 
   const maxVal = getVal(activeSubcats[0]) || 0
-  const parentColor = COLORES_CATEGORIA[parentCategoryName] ?? DEFAULT_COLOR
+  const parentColor = (parentCategoryId && API_CATEGORY_COLORS[parentCategoryId]) || COLORES_CATEGORIA[parentCategoryName] || DEFAULT_COLOR
   const fillPrefix = moneda === 'ARS' ? 'subbar-fill-ars' : 'subbar-fill-usd'
 
   const dynamicCSS = activeSubcats.map((entry) => {
@@ -988,6 +1010,7 @@ export default function DashboardPage() {
                     data={subcategoriasData} 
                     showPercent={showChartPercent} 
                     parentCategoryName={selectedCategoria.nombre}
+                    parentCategoryId={selectedCategoria.id}
                     moneda={moneda}
                   />
                 )

@@ -500,8 +500,8 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                       </div>
                       <span className={styles.itemSub}>
                         Cuota {cuota.numero_cuota}/{cuota.total_cuotas}
-                        {(cuota.subcategoria_nombre || 'General') !== cuota.descripcion && (
-                          <> • {cuota.subcategoria_nombre || 'General'}</>
+                        {(cuota.subcategoria_nombre || 'Otros') !== cuota.descripcion && (
+                          <> • {cuota.subcategoria_nombre || 'Otros'}</>
                         )}
                       </span>
                     </div>

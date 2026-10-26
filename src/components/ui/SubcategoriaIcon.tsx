@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { getSubcategoriaVisual, getCategoriaVisual } from '@/lib/utils/categoria.utils'
 
 interface SubcategoriaIconProps {
@@ -10,19 +10,20 @@ interface SubcategoriaIconProps {
 }
 
 export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, className, onError }: SubcategoriaIconProps) => {
-  // 1. Intentamos buscar el visual de la subcategoría
-  const visual = getSubcategoriaVisual(nombre)
-  let iconSrc = visual?.iconSrc
+  const [imgFailed, setImgFailed] = useState(false)
+  const visual = getSubcategoriaVisual(nombre, parentCategory)
+  const parentVisual = parentCategory ? getCategoriaVisual(parentCategory) : null
 
-  // 2. Si no hay icono de subcategoría específico, intentamos usar el del padre.
-  if (!iconSrc && parentCategory) {
-    const parentVisual = getCategoriaVisual(parentCategory)
-    iconSrc = parentVisual?.iconSrc
-  }
-
-  // 3. Fallback default si tampoco se encontró el del padre
+  let iconSrc = !imgFailed && visual?.iconSrc ? visual.iconSrc : parentVisual?.iconSrc
   if (!iconSrc) {
     iconSrc = getCategoriaVisual('default').iconSrc
+  }
+
+  const handleError = () => {
+    if (!imgFailed && parentVisual?.iconSrc && visual?.iconSrc !== parentVisual.iconSrc) {
+      setImgFailed(true)
+    }
+    onError?.()
   }
 
   return (
@@ -34,7 +35,7 @@ export const SubcategoriaIcon = memo(({ nombre, parentCategory, size = 24, class
       loading="lazy"
       style={{ objectFit: 'contain' }}
       className={className}
-      onError={onError}
+      onError={handleError}
     />
   )
 })

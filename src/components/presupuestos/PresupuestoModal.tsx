@@ -128,7 +128,7 @@ export default function PresupuestoModal({
         categoriaService.getAllSubcategorias(),
         categorias.length === 0 ? categoriaService.getCategorias() : Promise.resolve([])
       ])
-      setAllSubcategorias(subs)
+      setAllSubcategorias(subs.filter(s => !s.es_sistema))
       if (cats && cats.length > 0) {
         setFallbackCategorias(cats.filter(c => c.tipo === 'egreso'))
       }

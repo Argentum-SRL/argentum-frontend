@@ -329,6 +329,7 @@ export interface Categoria {
   id: string
   nombre: string
   tipo: 'ingreso' | 'egreso'
+  orden?: number
   icono: string | null
   color: string | null
   estado: 'activa' | 'archivada'
@@ -339,6 +340,7 @@ export interface Subcategoria {
   categoria_id: string
   nombre: string
   orden?: number
+  es_sistema?: boolean
   estado: 'activa' | 'archivada'
 }
 

@@ -631,7 +631,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   {(!cotizacionOficialPropuesta && !cotizacionCustom) && (
                     <div className={styles.cotizacionAlert}>
                       <AlertTriangle size={15} />
-                      <span>Ingresá la cotización oficial del día de cierre del resumen.</span>
+                      <span>Ingresá el dólar oficial vendedor del día del pago.</span>
                     </div>
                   )}
 
@@ -643,7 +643,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   <div className={styles.pesificacionRow}>
                     <span className={styles.pesificacionLabelWithHelp}>
                       Cotización oficial aplicada
-                      <span title="Dólar oficial vendedor al cierre del resumen" className={styles.helpIcon}>
+                      <span title="Dólar oficial vendedor del día del pago (o del vencimiento, si pagás después)" className={styles.helpIcon}>
                         <Info size={13} />
                       </span>
                     </span>

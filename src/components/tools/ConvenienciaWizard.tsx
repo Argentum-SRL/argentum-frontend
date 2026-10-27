@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { IPCData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
+import type { PlanCuotas } from '@/types';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import ConvenienciaForm from './ConvenienciaForm';
 import ConvenienciaSidebar from './ConvenienciaSidebar';
@@ -32,6 +33,7 @@ export interface ConvenienciaWizardProps {
   calcular: () => Promise<boolean>;
   resetCalculadora: () => void;
   cuotaCalculada: number | null;
+  planCuotas?: PlanCuotas | null;
   ipcData: IPCData | null;
   ipcLoading: boolean;
   ipcError: boolean;
@@ -45,6 +47,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   calcular,
   resetCalculadora,
   cuotaCalculada,
+  planCuotas = null,
   ipcData,
   ipcLoading,
   ipcError,
@@ -211,29 +214,20 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
     }
   };
 
-  const cuotaEstimada = (() => {
-    if (cuotaCalculada !== null) return cuotaCalculada;
-    if (formData.precio_total_cuotas && formData.cantidad_cuotas) {
-      return formData.precio_total_cuotas / formData.cantidad_cuotas;
-    }
-    return null;
-  })();
+  const cuotaEstimada = cuotaCalculada;
 
   const totalFinanciadoDisplay = (() => {
-    if (!formData.tiene_interes && formData.precio_total_cuotas != null) {
+    if (!formData.tiene_interes) {
       return formData.precio_total_cuotas;
     }
-    if (formData.tiene_interes && cuotaEstimada !== null && formData.cantidad_cuotas) {
-      return Math.round(cuotaEstimada * formData.cantidad_cuotas);
-    }
-    return null;
+    return planCuotas ? planCuotas.total_financiado : null;
   })();
 
   const recargoNominal = (() => {
-    if (!formData.precio_contado || totalFinanciadoDisplay == null) return null;
-    const diff = totalFinanciadoDisplay - formData.precio_contado;
-    const pct = (diff / formData.precio_contado) * 100;
-    return { diff, pct };
+    if (planCuotas && planCuotas.recargo !== null && planCuotas.recargo_porcentaje !== null) {
+      return { diff: planCuotas.recargo, pct: planCuotas.recargo_porcentaje };
+    }
+    return null;
   })();
 
   const { contadoBarPct, cuotasBarPct } = (() => {

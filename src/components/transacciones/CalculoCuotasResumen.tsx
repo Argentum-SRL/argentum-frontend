@@ -1,7 +1,8 @@
 import { memo, useState, useMemo } from 'react'
 import { SlidersHorizontal, Plus, Minus } from '@/components/ui/icons'
 import { formatMonto } from '@/utils/format'
-import type { ResumenDeCompraResponse } from '@/types'
+import type { ResumenDeCompraResponse, PlanCuotas } from '@/types'
+import { useSimularCuotas } from '@/hooks/useSimularCuotas'
 import ResumenDeCompraInfo from './ResumenDeCompraInfo'
 import styles from './TransaccionModal.module.css'
 
@@ -39,21 +40,32 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
   const [isCustomOverride, setIsCustomOverride] = useState(false)
   const isCustomCuotas = isCustomOverride || ![1, 3, 6, 12].includes(cantidadCuotas)
 
-  const getCuotaPreview = (n: number) => {
-    const m = Number(monto) || 0
-    if (!m) return ''
-    return `${formatMonto(m / n, moneda)}/mes`
-  }
+  const cantidades = useMemo(() => {
+    const base = [3, 6, 12]
+    if (cantidadCuotas && !base.includes(cantidadCuotas)) {
+      return [...base, cantidadCuotas]
+    }
+    return base
+  }, [cantidadCuotas])
 
-  const calculoCuotas = useMemo(() => {
-    const cant = cantidadCuotas || 1
-    const tasa = tasaInteres ? tasaInteres / 100 : 0
-    const m = monto || 0
-    const valorCuota = tasa > 0
-      ? (m * tasa * Math.pow(1 + tasa, cant)) / (Math.pow(1 + tasa, cant) - 1)
-      : m / cant
-    return { total: valorCuota * cant, cuota: valorCuota }
-  }, [monto, cantidadCuotas, tasaInteres])
+  const { simulacion } = useSimularCuotas({
+    montoTotal: monto,
+    cantidades,
+    tasaTna: tasaInteres > 0 ? tasaInteres : null,
+    enabled: Boolean(monto && monto > 0),
+  })
+
+  const planMap = useMemo(() => {
+    const map = new Map<number, PlanCuotas>()
+    if (simulacion?.planes) {
+      for (const p of simulacion.planes) {
+        map.set(p.cantidad_cuotas, p)
+      }
+    }
+    return map
+  }, [simulacion])
+
+  const currentPlan = planMap.get(cantidadCuotas)
 
   return (
     <div className={`${styles.formFields} ${styles.financiacionContainer}`}>
@@ -63,6 +75,7 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
         <div className={styles.planGrid}>
           {[1, 3, 6, 12].map((n) => {
             const isSelected = !isCustomCuotas && cantidadCuotas === n
+            const planN = planMap.get(n)
             return (
               <button
                 type="button"
@@ -78,8 +91,10 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
               >
                 <span className={styles.planCuotasNum}>{n}</span>
                 <span className={styles.planCuotasLbl}>{n === 1 ? 'pago' : 'cuotas'}</span>
-                {n > 1 && monto ? (
-                  <span className={styles.planCuotasAmt}>{getCuotaPreview(n)}</span>
+                {n > 1 && monto && planN ? (
+                  <span className={styles.planCuotasAmt}>
+                    {formatMonto(planN.monto_cuota, moneda)}/mes
+                  </span>
                 ) : null}
               </button>
             )
@@ -161,12 +176,12 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
           {showAdvanced && (
             <div className={styles.advancedDrawer}>
               <div className={styles.advField}>
-                <label className={styles.advLabel}>Interés % mensual</label>
+                <label className={styles.advLabel}>Interés anual (TNA %)</label>
                 <input
                   type="number"
                   step="0.1"
                   min={0}
-                  max={100}
+                  max={3000}
                   placeholder="0% (Sin interés)"
                   value={tasaInteres === 0 ? '' : tasaInteres}
                   onChange={(e) => {
@@ -200,15 +215,15 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
         <div className={styles.heroFinancingTop}>
           <div>
             <span className={styles.heroInstallmentAmount}>
-              {formatMonto(calculoCuotas.cuota, moneda)}
+              {currentPlan ? formatMonto(currentPlan.monto_cuota, moneda) : 'Calculando…'}
             </span>
             <span className={styles.heroInstallmentSuffix}>
               {cantidadCuotas === 1 ? ' pago único' : '/mes'}
             </span>
           </div>
-          {cantidadCuotas > 1 && tasaInteres > 0 && (
+          {cantidadCuotas > 1 && tasaInteres > 0 && currentPlan && (
             <div className={styles.heroTotalBadge}>
-              Total: {formatMonto(calculoCuotas.total, moneda)}
+              Total: {formatMonto(currentPlan.total_financiado, moneda)}
             </div>
           )}
         </div>
@@ -224,7 +239,7 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
             </>
           ) : (
             <>
-              Pagarás <strong>{cantidadCuotas} cuotas</strong> {tasaInteres > 0 ? `(con ${tasaInteres}% int.)` : '(sin interés)'}, empezando en {vencimientoDDMM ? <>el resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>el próximo resumen</strong>}.
+              Pagarás <strong>{cantidadCuotas} cuotas</strong> {tasaInteres > 0 ? `(con ${tasaInteres}% TNA)` : '(sin interés)'}, empezando en {vencimientoDDMM ? <>el resumen que vence el <strong>{vencimientoDDMM}</strong></> : <strong>el próximo resumen</strong>}.
             </>
           )}
         </p>

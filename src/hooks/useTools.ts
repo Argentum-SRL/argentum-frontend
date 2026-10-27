@@ -1,14 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import toolsService from '@/services/toolsService';
 import type { IPCData, ConvenienciaResult, FinancialContext, CanAffordResult } from '@/types/tools';
+import { useSimularCuotas } from '@/hooks/useSimularCuotas';
 import { sileo } from 'sileo';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
-
-const calcularCuotaConInteres = (capital: number, n: number, tnaVal: number): number => {
-  const i = tnaVal / 100 / 12;
-  if (i === 0) return capital / n;
-  return capital * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1);
-};
 
 export const useTools = () => {
   // Tab switching: 'conveniencia' is the Cuotas vs Contado tab, 'can-afford' is the "¿Me lo puedo permitir?" tab, 'importar-resumen' is the Importación de resúmenes tab
@@ -142,15 +137,21 @@ export const useTools = () => {
     setResultado(null);
   };
 
-  const cuotaCalculada = (() => {
-    if (!formData.cantidad_cuotas) return null;
-    if (formData.tiene_interes) {
-      const parsedTna = parseFloat(formData.tna);
-      if (!formData.precio_contado || isNaN(parsedTna) || parsedTna <= 0) return null;
-      return calcularCuotaConInteres(formData.precio_contado, formData.cantidad_cuotas, parsedTna);
-    }
-    return formData.precio_total_cuotas ? formData.precio_total_cuotas / formData.cantidad_cuotas : null;
-  })();
+  // Simulación unificada para Calculadora Cuotas vs Contado (Decisión 3.f)
+  const parsedTnaConveniencia = formData.tiene_interes ? parseFloat(formData.tna) : null;
+  const montoTotalConveniencia = formData.tiene_interes ? formData.precio_contado : formData.precio_total_cuotas;
+  const cantidadesConveniencia = useMemo(() => (formData.cantidad_cuotas ? [formData.cantidad_cuotas] : []), [formData.cantidad_cuotas]);
+
+  const { simulacion: simulacionConveniencia } = useSimularCuotas({
+    montoTotal: montoTotalConveniencia,
+    cantidades: cantidadesConveniencia,
+    tasaTna: formData.tiene_interes && parsedTnaConveniencia && parsedTnaConveniencia > 0 ? parsedTnaConveniencia : null,
+    precioContado: formData.precio_contado ?? null,
+    enabled: Boolean(montoTotalConveniencia && montoTotalConveniencia > 0 && cantidadesConveniencia.length > 0),
+  });
+
+  const planCuotas = simulacionConveniencia?.planes?.[0] ?? null;
+  const cuotaCalculada = planCuotas?.monto_cuota ?? null;
 
   // ── Tab 2: ¿Me lo puedo permitir? ────────────────────────────────────────
   const [financialContext, setFinancialContext] = useState<FinancialContext | null>(null);
@@ -181,7 +182,6 @@ export const useTools = () => {
     }
   };
 
-
   const loadFinancialContext = useCallback(async () => {
     setFinancialContextLoading(true);
     setFinancialContextError(false);
@@ -206,6 +206,21 @@ export const useTools = () => {
     }
   }, [activeTab, financialContext, financialContextLoading, financialContextError, loadFinancialContext]);
 
+  // Simulación unificada para ¿Me lo puedo permitir? (Decisión 3.f)
+  const parsedTnaCanAfford = tieneInteres ? parseFloat(tna) : null;
+  const cantidadesCanAfford = useMemo(
+    () => (canAffordForm.modo === 'cuotas' && canAffordForm.cantidad_cuotas ? [canAffordForm.cantidad_cuotas] : []),
+    [canAffordForm.modo, canAffordForm.cantidad_cuotas]
+  );
+
+  const { simulacion: simulacionCanAfford } = useSimularCuotas({
+    montoTotal: canAffordForm.precio_total,
+    cantidades: cantidadesCanAfford,
+    tasaTna: tieneInteres && parsedTnaCanAfford && parsedTnaCanAfford > 0 ? parsedTnaCanAfford : null,
+    enabled: Boolean(canAffordForm.modo === 'cuotas' && canAffordForm.precio_total && canAffordForm.precio_total > 0 && cantidadesCanAfford.length > 0),
+  });
+
+  const cuotaPreviewCanAfford = simulacionCanAfford?.planes?.[0]?.monto_cuota ?? null;
 
   const canAffordCalcular = async () => {
     const precio = canAffordForm.precio_total;
@@ -278,6 +293,7 @@ export const useTools = () => {
     calculando,
     calcular,
     resetCalculadora,
+    planCuotas,
     cuotaCalculada,
     loadIPC,
     // Can Afford (¿Me lo puedo permitir?)
@@ -295,9 +311,8 @@ export const useTools = () => {
     setTieneInteres: handleSetTieneInteres,
     tna,
     setTna,
-    calcularCuotaConInteres
+    cuotaPreviewCanAfford,
   };
 };
 
 export default useTools;
-

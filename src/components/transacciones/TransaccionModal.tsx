@@ -572,8 +572,8 @@ export default function TransaccionModal({
           sileo.error({ title: 'La cuota inicial debe estar entre 1 y la cantidad total' })
           return
         }
-        if (!Number.isFinite(tasaInteres) || tasaInteres < 0 || tasaInteres > 1000) {
-          sileo.error({ title: 'La tasa de interés debe estar entre 0% y 1000% anual o mensual según la operación.' })
+        if (!Number.isFinite(tasaInteres) || tasaInteres < 0 || tasaInteres > 3000) {
+          sileo.error({ title: 'La tasa de interés (TNA) debe estar entre 0% y 3000%.' })
           return
         }
       }

@@ -64,6 +64,7 @@ export default function ToolsPage() {
     calculando,
     calcular,
     resetCalculadora,
+    planCuotas,
     cuotaCalculada,
     // Tab 2: Can Afford
     financialContext,
@@ -79,7 +80,7 @@ export default function ToolsPage() {
     setTieneInteres,
     tna,
     setTna,
-    calcularCuotaConInteres
+    cuotaPreviewCanAfford
   } = useTools();
 
   const { is_admin } = useAuth();
@@ -145,6 +146,7 @@ export default function ToolsPage() {
               calcular={calcular}
               resetCalculadora={resetCalculadora}
               cuotaCalculada={cuotaCalculada}
+              planCuotas={planCuotas}
               ipcData={ipcData}
               ipcLoading={ipcLoading}
               ipcError={ipcError}
@@ -176,7 +178,7 @@ export default function ToolsPage() {
                 setTieneInteres={setTieneInteres}
                 tna={tna}
                 setTna={setTna}
-                calcularCuotaConInteres={calcularCuotaConInteres}
+                cuotaPreview={cuotaPreviewCanAfford}
               />
             </>
           ) : (

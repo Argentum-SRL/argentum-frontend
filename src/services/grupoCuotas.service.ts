@@ -1,12 +1,38 @@
 import api, { encabezadoClave } from './api'
-import type { GrupoCuotasResumen, GrupoCuotasUpdate } from '@/types'
+import type { GrupoCuotasResumen, GrupoCuotasUpdate, SimularCuotasResponse } from '@/types'
 import { invalidateResumen } from './dashboard.service'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidatePresupuestos } from './presupuesto.service'
 
+export interface SimularCuotasParams {
+  monto_total: number
+  cantidades: number[]
+  tasa_tna?: number | null
+  precio_contado?: number | null
+}
+
 const grupoCuotasService = {
   getGruposCuotas: async () => {
     const response = await api.get<GrupoCuotasResumen[]>('/grupos-cuotas')
+    return response.data
+  },
+
+  simularCuotas: async (params: SimularCuotasParams, signal?: AbortSignal): Promise<SimularCuotasResponse> => {
+    const cleanParams: Record<string, unknown> = {
+      monto_total: params.monto_total,
+      cantidades: params.cantidades,
+    }
+    if (params.tasa_tna !== undefined && params.tasa_tna !== null) {
+      cleanParams.tasa_tna = params.tasa_tna
+    }
+    if (params.precio_contado !== undefined && params.precio_contado !== null) {
+      cleanParams.precio_contado = params.precio_contado
+    }
+    const response = await api.get<SimularCuotasResponse>('/grupos-cuotas/simular', {
+      params: cleanParams,
+      paramsSerializer: { indexes: null },
+      signal,
+    })
     return response.data
   },
 

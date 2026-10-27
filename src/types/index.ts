@@ -1003,6 +1003,23 @@ export interface GrupoCuotasUpdate {
   fecha_referencia?: string | null
 }
 
+export interface PlanCuotas {
+  cantidad_cuotas: number
+  monto_cuota: number
+  total_financiado: number
+  ultima_cuota: number
+  recargo: number | null
+  recargo_porcentaje: number | null
+}
+
+export interface SimularCuotasResponse {
+  tasa_tna: number | null
+  tna: number | null
+  tea: number | null
+  cft_estimado: number | null
+  planes: PlanCuotas[]
+}
+
 
 // ===== PERFIL FINANCIERO =====
 

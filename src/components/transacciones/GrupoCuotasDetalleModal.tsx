@@ -162,7 +162,11 @@ export default function GrupoCuotasDetalleModal({
                                   </span>
                                 )}
                                 {selectedGrupo.tiene_interes ? (
-                                  <span className={styles.interesBadge}>Con Interés</span>
+                                  <span className={styles.interesBadge}>
+                                    {selectedGrupo.tna != null
+                                      ? `Con interés · TNA ${selectedGrupo.tna.toLocaleString('es-AR')}%`
+                                      : 'Con Interés'}
+                                  </span>
                                 ) : (
                                   <span className={styles.sinInteresBadge}>Sin Interés</span>
                                 )}

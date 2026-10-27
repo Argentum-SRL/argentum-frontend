@@ -29,7 +29,7 @@ interface CanAffordFormProps {
   setTieneInteres: (val: boolean) => void;
   tna: string;
   setTna: (val: string) => void;
-  calcularCuotaConInteres: (capital: number, n: number, tna: number) => number;
+  cuotaPreview: number | null;
 }
 
 export const CanAffordForm: React.FC<CanAffordFormProps> = ({
@@ -43,7 +43,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   setTieneInteres,
   tna,
   setTna,
-  calcularCuotaConInteres
+  cuotaPreview
 }) => {
   const handleChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -79,12 +79,10 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
       if (pct >= 999) return 'Representa más del 100% de tu saldo disponible';
       return `Representa el ${pct.toFixed(1)}% de tu saldo disponible`;
     }
-    if (formData.cantidad_cuotas && formData.cantidad_cuotas > 0) {
-      let cuota = formData.precio_total / formData.cantidad_cuotas;
-      if (tieneInteres && tna && !isNaN(parseFloat(tna)) && parseFloat(tna) > 0) {
-        cuota = calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna));
+    if (formData.modo === 'cuotas') {
+      if (cuotaPreview !== null && cuotaPreview > 0) {
+        return `La cuota mensual sería de ${formatMonto(cuotaPreview, 'ARS')}`;
       }
-      if (cuota > 0) return `La cuota mensual sería de ${formatMonto(cuota, 'ARS')}`;
     }
     return null;
   })();
@@ -220,7 +218,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
                   <div className={`${styles.cuotaPreview} ${styles.animateFadeIn}`}>
                     <span>Cuota estimada:</span>
                     <span className={styles.cuotaPreviewValue}>
-                      {formatMonto(calcularCuotaConInteres(formData.precio_total, formData.cantidad_cuotas, parseFloat(tna)), 'ARS')}
+                      {cuotaPreview !== null ? formatMonto(cuotaPreview, 'ARS') : 'Calculando…'}
                     </span>
                     <span style={{ color: 'var(--text-3)', fontSize: 12 }}>/ mes</span>
                   </div>

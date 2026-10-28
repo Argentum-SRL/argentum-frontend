@@ -77,10 +77,20 @@ const tarjetaService = {
     id: string,
     fechaResumen?: string,
     montoUsd?: number,
+    cotizacion?: number,
+    montoPesos?: number,
+    montoPercepcion?: number,
     signal?: AbortSignal
   ): Promise<SimularPesificacionResponse> => {
+    const params: Record<string, unknown> = {}
+    if (fechaResumen) params.fecha_resumen = fechaResumen
+    if (montoUsd !== undefined && montoUsd !== null) params.monto_usd = montoUsd
+    if (cotizacion !== undefined && cotizacion !== null) params.cotizacion = cotizacion
+    if (montoPesos !== undefined && montoPesos !== null) params.monto_pesos = montoPesos
+    if (montoPercepcion !== undefined && montoPercepcion !== null) params.monto_percepcion = montoPercepcion
+
     const { data } = await api.get<SimularPesificacionResponse>(`/tarjetas/${id}/simular-pesificacion`, {
-      params: { fecha_resumen: fechaResumen, monto_usd: montoUsd },
+      params,
       signal
     })
     return data

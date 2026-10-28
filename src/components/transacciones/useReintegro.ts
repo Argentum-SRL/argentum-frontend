@@ -1,6 +1,8 @@
 import { useState, useMemo, useCallback } from 'react'
 import type { Transaccion } from '@/types'
 import transaccionService from '@/services/transaccion.service'
+import { montoDesdePorcentaje } from '@/utils/ayudasEscritura'
+import { armarPayloadReintegro } from '@/utils/reintegroPayload'
 
 function todayLocal(): string {
   const d = new Date()
@@ -56,7 +58,7 @@ export function useReintegro({
   // Monto calculado a partir del porcentaje
   const montoCalculadoPorcentaje = useMemo(() => {
     if (!montoCompra || !porcentaje || porcentaje <= 0) return null
-    return Math.round((montoCompra * porcentaje / 100) * 100) / 100
+    return montoDesdePorcentaje(montoCompra, porcentaje)
   }, [montoCompra, porcentaje])
 
   const montoFinal = modoMonto === 'monto' ? montoManual : montoCalculadoPorcentaje
@@ -81,46 +83,34 @@ export function useReintegro({
   }, [transaccion?.id, onReintegroQuitado])
 
   const guardarReintegro = useCallback(async (txId: string) => {
-    if (!tieneReintegro) {
-      if (teniaReintegroInicial) {
-        await transaccionService.quitarReintegro(txId)
-      }
-      return
-    }
-
-    // Si ya era una compra recibida y no se quitó, permanece intacto
-    if (isCompraRecibidaInicial) {
-      return
-    }
-
-    const monto = modoMonto === 'monto' ? montoManual : montoCalculadoPorcentaje
-    if (!monto || monto <= 0) {
-      return
-    }
-
-    let fRecibido: string | undefined = undefined
-    if (yaRecibido) {
-      if (!isEdit) {
-        // Al CREAR con "Sí": fecha_recibido = fecha de la compra (no se muestra campo de fecha)
-        fRecibido = fechaCompra
-      } else {
-        // Al EDITAR una compra pendiente y elegir "Sí": fecha_recibido del DateInput
-        fRecibido = fechaRecibido || todayLocal()
-      }
-    }
-
-    await transaccionService.setReintegro(txId, {
-      monto,
-      recibido: yaRecibido,
-      fecha_recibido: fRecibido,
+    const res = armarPayloadReintegro({
+      tieneReintegro,
+      teniaReintegroInicial,
+      isCompraRecibidaInicial,
+      modoMonto,
+      montoManual,
+      porcentaje,
+      montoCompra,
+      yaRecibido,
+      isEdit,
+      fechaCompra,
+      fechaRecibido,
+      hoy: todayLocal(),
     })
+
+    if (res.accion === 'quitar') {
+      await transaccionService.quitarReintegro(txId)
+    } else if (res.accion === 'guardar') {
+      await transaccionService.setReintegro(txId, res.payload)
+    }
   }, [
     tieneReintegro,
     teniaReintegroInicial,
     isCompraRecibidaInicial,
     modoMonto,
     montoManual,
-    montoCalculadoPorcentaje,
+    porcentaje,
+    montoCompra,
     yaRecibido,
     isEdit,
     fechaCompra,

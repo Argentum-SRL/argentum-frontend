@@ -15,7 +15,9 @@
     "graph:update": "graphify . --output graphify-out",
     "audit:elevation": "node scripts/audit-hardcoded-shadows.mjs",
     "audit:design": "node scripts/audit-design-system.mjs",
-    "audit:rules": "node scripts/audit-design-rules.mjs"
+    "audit:rules": "node scripts/audit-design-rules.mjs",
+    "audit:plata": "node scripts/audit-formulas-plata.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ncdai/react-wheel-picker": "^1.2.2",
@@ -57,6 +59,7 @@
     "tailwindcss": "^3.4.19",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^5.0.5"
   }
 }

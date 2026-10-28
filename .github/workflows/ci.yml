@@ -34,6 +34,14 @@ jobs:
       - name: Reglas de diseño
         run: npm run audit:rules
 
+      # Ejecucion de pruebas unitarias del frontend
+      - name: Pruebas del frontend
+        run: npm test
+
+      # Verificacion de cuentas de plata en el frontend
+      - name: Cuentas de plata
+        run: npm run audit:plata
+
       # Verificacion de tipos TypeScript y construccion del proyecto con Vite
       - name: Compilar aplicacion frontend (build)
         run: npm run build

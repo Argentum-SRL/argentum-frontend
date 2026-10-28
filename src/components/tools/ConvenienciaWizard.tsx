@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { IPCData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import type { PlanCuotas } from '@/types';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
+import { totalDesdeCuota, cuotaDesdeTotal } from '@/utils/ayudasEscritura';
 import ConvenienciaForm from './ConvenienciaForm';
 import ConvenienciaSidebar from './ConvenienciaSidebar';
 
@@ -63,7 +64,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   const [fixedMode, setFixedMode] = useState<'cuota' | 'total'>('total');
   const [cuotaInputValue, setCuotaInputValue] = useState<number | null>(() => {
     if (formData.precio_total_cuotas && formData.cantidad_cuotas) {
-      return Math.round((formData.precio_total_cuotas / formData.cantidad_cuotas) * 100) / 100;
+      return cuotaDesdeTotal(formData.precio_total_cuotas, formData.cantidad_cuotas);
     }
     return null;
   });
@@ -128,14 +129,14 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   const handleFixedModeChange = (mode: 'total' | 'cuota') => {
     setFixedMode(mode);
     if (mode === 'cuota' && formData.precio_total_cuotas && formData.cantidad_cuotas) {
-      setCuotaInputValue(Math.round((formData.precio_total_cuotas / formData.cantidad_cuotas) * 100) / 100);
+      setCuotaInputValue(cuotaDesdeTotal(formData.precio_total_cuotas, formData.cantidad_cuotas));
     }
   };
 
   const handleCuotaValChange = (val: number | null) => {
     setCuotaInputValue(val);
     if (val !== null && val > 0 && formData.cantidad_cuotas) {
-      handleChange('precio_total_cuotas', Math.round(val * formData.cantidad_cuotas));
+      handleChange('precio_total_cuotas', totalDesdeCuota(val, formData.cantidad_cuotas));
     } else {
       handleChange('precio_total_cuotas', null);
     }
@@ -144,7 +145,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   const handleTotalValChange = (val: number | null) => {
     handleChange('precio_total_cuotas', val);
     if (val !== null && val > 0 && formData.cantidad_cuotas) {
-      setCuotaInputValue(Math.round((val / formData.cantidad_cuotas) * 100) / 100);
+      setCuotaInputValue(cuotaDesdeTotal(val, formData.cantidad_cuotas));
     } else {
       setCuotaInputValue(null);
     }
@@ -154,9 +155,9 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
     handleChange('cantidad_cuotas', n);
     if (n && n > 0) {
       if (fixedMode === 'cuota' && cuotaInputValue) {
-        handleChange('precio_total_cuotas', Math.round(cuotaInputValue * n));
+        handleChange('precio_total_cuotas', totalDesdeCuota(cuotaInputValue, n));
       } else if (fixedMode === 'total' && formData.precio_total_cuotas) {
-        setCuotaInputValue(Math.round((formData.precio_total_cuotas / n) * 100) / 100);
+        setCuotaInputValue(cuotaDesdeTotal(formData.precio_total_cuotas, n));
       }
     }
   };

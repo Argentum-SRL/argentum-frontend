@@ -7,6 +7,8 @@ import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelect
 import categoriaService from '@/services/categoria.service'
 import { formatMonto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
+import { mitadRedondeada, excedente } from '@/utils/ayudasEscritura'
+import { useSimularPesificacion } from '@/hooks/useSimularPesificacion'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import SelectableSurface from '@/components/ui/SelectableSurface'
@@ -69,7 +71,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
   const [modoUSD, setModoUSD] = useState<'dolares' | 'pesificar'>('dolares')
   const [billeteraUSDId, setBilleteraUSDId] = useState<string>('')
   const [billeteraARSId, setBilleteraARSId] = useState<string>('')
-  
+
   // Pesificación custom inputs
   const [cotizacionCustom, setCotizacionCustom] = useState<string | null>(null)
   const [montoPesosCustom, setMontoPesosCustom] = useState<string>('')
@@ -77,7 +79,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      categoriaService.getCategorias().then(setCategorias).catch(() => {})
+      categoriaService.getCategorias().then(setCategorias).catch(() => { })
     }
   }, [isOpen])
 
@@ -150,13 +152,13 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
   const cotizacionEfectiva = cotizacionCustom ?? (cotizacionOficialPropuesta ? String(cotizacionOficialPropuesta) : '')
 
-  const numMonto = tipoPago === 'total' 
-    ? totalAPagar 
+  const numMonto = tipoPago === 'total'
+    ? totalAPagar
     : (montoCustom ?? 0)
 
   const isPesificacion = monedaAPagar === 'USD' && modoUSD === 'pesificar'
   const isExcedente = tipoPago === 'otro' && (montoCustom ?? 0) > totalAPagar
-  const diferencia = isExcedente ? ((montoCustom ?? 0) - totalAPagar) : 0
+  const diferencia = isExcedente ? excedente(montoCustom ?? 0, totalAPagar) : 0
 
   const isMenorQueTotal = !isExcedente && tipoPago === 'otro' && numMonto < totalAPagar && numMonto > 0
   const isMenorQueMinimo = !isExcedente && tipoPago === 'otro' && pagoMinimoEstimado > 0 && numMonto < pagoMinimoEstimado && numMonto > 0
@@ -167,20 +169,28 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
   const isExcedenteValid = !isExcedente || diferenciaTipo === 'cargos_banco' || diferenciaTipo === 'intereses' || (diferenciaTipo === 'compras_no_cargadas' && Boolean(diferenciaCategoriaId))
 
-  // Calculations for Pesification
+  // Simulación de Pesificación con el backend
   const cotizacionNum = parseFloat(cotizacionEfectiva) || 0
   const percPercent = porcentajePercepcion ?? 30
+  const montoPesosCustomNum = montoPesosCustom !== '' ? parseFloat(montoPesosCustom) : undefined
+  const montoPercepcionCustomNum = montoPercepcionCustom !== '' ? parseFloat(montoPercepcionCustom) : undefined
 
-  const subtotalPesosCalculado = cotizacionNum > 0 ? Number((numMonto * cotizacionNum).toFixed(2)) : 0
-  const subtotalPesosFinal = montoPesosCustom !== '' ? (parseFloat(montoPesosCustom) || 0) : subtotalPesosCalculado
+  const {
+    simulacion: pesificacionSim,
+    cargando: cargandoPesificacion,
+    error: errorPesificacion,
+  } = useSimularPesificacion({
+    tarjetaId: tarjeta?.id,
+    fechaResumen,
+    montoUsd: isPesificacion ? numMonto : null,
+    cotizacion: cotizacionNum > 0 ? cotizacionNum : undefined,
+    montoPesos: montoPesosCustomNum,
+    montoPercepcion: montoPercepcionCustomNum,
+    enabled: isPesificacion && numMonto > 0,
+  })
 
-  const percepcionCalculada = Number((subtotalPesosFinal * (percPercent / 100)).toFixed(2))
-  const percepcionFinal = montoPercepcionCustom !== '' ? (parseFloat(montoPercepcionCustom) || 0) : percepcionCalculada
-
-  const totalPesosFinal = Number((subtotalPesosFinal + percepcionFinal).toFixed(2))
-
-  const isPesificacionValid = monedaAPagar === 'USD' && modoUSD === 'pesificar' 
-    ? (cotizacionNum > 0 && subtotalPesosFinal > 0 && billeteraARSId !== '')
+  const isPesificacionValid = monedaAPagar === 'USD' && modoUSD === 'pesificar'
+    ? (cotizacionNum > 0 && billeteraARSId !== '' && Boolean(pesificacionSim) && !errorPesificacion)
     : true
 
   const isDolaresDirectoValid = monedaAPagar === 'USD' && modoUSD === 'dolares'
@@ -258,7 +268,17 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
       autoHeight
       stepDots={monedaAPagar === 'USD' ? { total: 2, current: step - 1 } : undefined}
     >
-      <div className={styles.modalContainer} data-modal-frame>
+      <div
+        className={styles.modalContainer}
+        data-modal-frame
+        style={{
+          maxHeight: 'calc(var(--modal-max-h) - 32px)',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
         {/* Header */}
         <div className={styles.modalHeader}>
           <div className={styles.headerLeftRow}>
@@ -302,7 +322,16 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className={styles.modalBody}>
+        <div
+          className={styles.modalBody}
+          style={{
+            flex: '1 1 auto',
+            minHeight: 0,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
           {/* ═══════════ ETAPA 1 (USD): Modo de pago y Billetera a debitar ═══════════ */}
           {monedaAPagar === 'USD' && step === 1 && (
             <div className={styles.stepContainer} data-modal-stack>
@@ -439,158 +468,158 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   ariaLabel="Tipo de pago"
                 />
 
-              {/* Hero Monto Card / MontoInput */}
-              {tipoPago === 'total' ? (
-                <div className={styles.montoHeroCard}>
-                  <span className={styles.montoHeroLabel}>Total a liquidar</span>
-                  <div className={styles.montoHeroAmountDisplay}>
-                    {formatMonto(totalAPagar, monedaAPagar)}
+                {/* Hero Monto Card / MontoInput */}
+                {tipoPago === 'total' ? (
+                  <div className={styles.montoHeroCard}>
+                    <span className={styles.montoHeroLabel}>Total a liquidar</span>
+                    <div className={styles.montoHeroAmountDisplay}>
+                      {formatMonto(totalAPagar, monedaAPagar)}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className={styles.montoCustomSection}>
-                  <MontoInput
-                    label="Monto a abonar"
-                    value={montoCustom}
-                    onChange={setMontoCustom}
-                    moneda={monedaAPagar}
-                    hideCurrency
-                    allowDecimals
-                    placeholder={isPesificacion ? `Hasta ${formatMonto(totalAPagar, monedaAPagar)}` : undefined}
-                    max={isPesificacion ? totalAPagar : undefined}
-                    autoFocus
-                    disabled={isPaying}
-                  />
+                ) : (
+                  <div className={styles.montoCustomSection}>
+                    <MontoInput
+                      label="Monto a abonar"
+                      value={montoCustom}
+                      onChange={setMontoCustom}
+                      moneda={monedaAPagar}
+                      hideCurrency
+                      allowDecimals
+                      placeholder={isPesificacion ? `Hasta ${formatMonto(totalAPagar, monedaAPagar)}` : undefined}
+                      max={isPesificacion ? totalAPagar : undefined}
+                      autoFocus
+                      disabled={isPaying}
+                    />
 
-                  {/* Quick chips si elige otro monto y no supera el total */}
-                  {totalAPagar > 0 && !isExcedente && (
-                    <div className={styles.quickChipsRow}>
-                      {pagoMinimoEstimado > 0 && pagoMinimoEstimado < totalAPagar && (
+                    {/* Quick chips si elige otro monto y no supera el total */}
+                    {totalAPagar > 0 && !isExcedente && (
+                      <div className={styles.quickChipsRow}>
+                        {pagoMinimoEstimado > 0 && pagoMinimoEstimado < totalAPagar && (
+                          <button
+                            type="button"
+                            className={`${styles.quickChip} ${numMonto === pagoMinimoEstimado ? styles.quickChipActive : ''}`}
+                            onClick={() => handleQuickChip(pagoMinimoEstimado)}
+                          >
+                            Mínimo ({formatMonto(pagoMinimoEstimado, monedaAPagar)})
+                          </button>
+                        )}
                         <button
                           type="button"
-                          className={`${styles.quickChip} ${numMonto === pagoMinimoEstimado ? styles.quickChipActive : ''}`}
-                          onClick={() => handleQuickChip(pagoMinimoEstimado)}
+                          className={`${styles.quickChip} ${numMonto === mitadRedondeada(totalAPagar) ? styles.quickChipActive : ''}`}
+                          onClick={() => handleQuickChip(mitadRedondeada(totalAPagar))}
                         >
-                          Mínimo ({formatMonto(pagoMinimoEstimado, monedaAPagar)})
+                          50% ({formatMonto(mitadRedondeada(totalAPagar), monedaAPagar)})
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        className={`${styles.quickChip} ${numMonto === Math.round(totalAPagar * 0.5) ? styles.quickChipActive : ''}`}
-                        onClick={() => handleQuickChip(Math.round(totalAPagar * 0.5))}
-                      >
-                        50% ({formatMonto(Math.round(totalAPagar * 0.5), monedaAPagar)})
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Bloque de excedente cuando montoCustom > totalAPagar */}
-                  {isExcedente && (
-                    <div className={styles.excedenteCard}>
-                      <div className={styles.excedenteHeader}>
-                        <span className={styles.excedenteTitulo}>
-                          Pagás {formatMonto(diferencia, monedaAPagar)} más que el total que calcula Argentum.
-                        </span>
                       </div>
+                    )}
 
-                      <div className={styles.excedenteOpciones}>
-                        <label
-                          className={`${styles.excedenteOpcion} ${diferenciaTipo === 'cargos_banco' ? styles.excedenteOpcionActiva : ''}`}
-                          onClick={() => setDiferenciaTipo('cargos_banco')}
-                        >
-                          <div className={styles.excedenteRadioRow}>
-                            <input
-                              type="radio"
-                              name="diferencia_tipo"
-                              checked={diferenciaTipo === 'cargos_banco'}
-                              onChange={() => setDiferenciaTipo('cargos_banco')}
-                              className={styles.excedenteRadio}
-                            />
-                            <div className={styles.excedenteTextos}>
-                              <span className={styles.excedenteOpcionLabel}>
-                                Cargos del banco (comisiones e impuestos)
-                              </span>
-                              <span className={styles.excedenteOpcionSublabel}>
-                                Se anota como gasto en Banco &gt; Impuestos.
-                              </span>
-                            </div>
-                          </div>
-                        </label>
+                    {/* Bloque de excedente cuando montoCustom > totalAPagar */}
+                    {isExcedente && (
+                      <div className={styles.excedenteCard}>
+                        <div className={styles.excedenteHeader}>
+                          <span className={styles.excedenteTitulo}>
+                            Pagás {formatMonto(diferencia, monedaAPagar)} más que el total que calcula Argentum.
+                          </span>
+                        </div>
 
-                        <label
-                          className={`${styles.excedenteOpcion} ${diferenciaTipo === 'intereses' ? styles.excedenteOpcionActiva : ''}`}
-                          onClick={() => setDiferenciaTipo('intereses')}
-                        >
-                          <div className={styles.excedenteRadioRow}>
-                            <input
-                              type="radio"
-                              name="diferencia_tipo"
-                              checked={diferenciaTipo === 'intereses'}
-                              onChange={() => setDiferenciaTipo('intereses')}
-                              className={styles.excedenteRadio}
-                            />
-                            <div className={styles.excedenteTextos}>
-                              <span className={styles.excedenteOpcionLabel}>
-                                Intereses por no pagar el total
-                              </span>
-                              <span className={styles.excedenteOpcionSublabel}>
-                                Se anota como gasto en Banco &gt; Intereses.
-                              </span>
-                            </div>
-                          </div>
-                        </label>
-
-                        <label
-                          className={`${styles.excedenteOpcion} ${diferenciaTipo === 'compras_no_cargadas' ? styles.excedenteOpcionActiva : ''}`}
-                          onClick={() => setDiferenciaTipo('compras_no_cargadas')}
-                        >
-                          <div className={styles.excedenteRadioRow}>
-                            <input
-                              type="radio"
-                              name="diferencia_tipo"
-                              checked={diferenciaTipo === 'compras_no_cargadas'}
-                              onChange={() => setDiferenciaTipo('compras_no_cargadas')}
-                              className={styles.excedenteRadio}
-                            />
-                            <div className={styles.excedenteTextos}>
-                              <span className={styles.excedenteOpcionLabel}>
-                                Compras que no cargué
-                              </span>
-                            </div>
-                          </div>
-
-                          {diferenciaTipo === 'compras_no_cargadas' && (
-                            <div className={styles.excedenteCategoriaSelectorWrap} onClick={(e) => e.stopPropagation()}>
-                              <CategoriaSelector
-                                categorias={categorias}
-                                categoriaId={diferenciaCategoriaId || ''}
-                                subcategoriaId={diferenciaSubcategoriaId || ''}
-                                tipo="egreso"
-                                onSelectCategoria={(id) => {
-                                  setDiferenciaCategoriaId(id)
-                                  setDiferenciaSubcategoriaId(null)
-                                }}
-                                onSelectSubcategoria={(id) => {
-                                  setDiferenciaSubcategoriaId(id)
-                                }}
+                        <div className={styles.excedenteOpciones}>
+                          <label
+                            className={`${styles.excedenteOpcion} ${diferenciaTipo === 'cargos_banco' ? styles.excedenteOpcionActiva : ''}`}
+                            onClick={() => setDiferenciaTipo('cargos_banco')}
+                          >
+                            <div className={styles.excedenteRadioRow}>
+                              <input
+                                type="radio"
+                                name="diferencia_tipo"
+                                checked={diferenciaTipo === 'cargos_banco'}
+                                onChange={() => setDiferenciaTipo('cargos_banco')}
+                                className={styles.excedenteRadio}
                               />
+                              <div className={styles.excedenteTextos}>
+                                <span className={styles.excedenteOpcionLabel}>
+                                  Cargos del banco (comisiones e impuestos)
+                                </span>
+                                <span className={styles.excedenteOpcionSublabel}>
+                                  Se anota como gasto en Banco &gt; Impuestos.
+                                </span>
+                              </div>
                             </div>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                          </label>
 
-            {/* Desglose: solo si hay conceptos adicionales (deuda anterior o saldo financiado) */}
-            {hasBreakdown && (
-              <div className={styles.breakdownCard} data-modal-block>
+                          <label
+                            className={`${styles.excedenteOpcion} ${diferenciaTipo === 'intereses' ? styles.excedenteOpcionActiva : ''}`}
+                            onClick={() => setDiferenciaTipo('intereses')}
+                          >
+                            <div className={styles.excedenteRadioRow}>
+                              <input
+                                type="radio"
+                                name="diferencia_tipo"
+                                checked={diferenciaTipo === 'intereses'}
+                                onChange={() => setDiferenciaTipo('intereses')}
+                                className={styles.excedenteRadio}
+                              />
+                              <div className={styles.excedenteTextos}>
+                                <span className={styles.excedenteOpcionLabel}>
+                                  Intereses por no pagar el total
+                                </span>
+                                <span className={styles.excedenteOpcionSublabel}>
+                                  Se anota como gasto en Banco &gt; Intereses.
+                                </span>
+                              </div>
+                            </div>
+                          </label>
+
+                          <label
+                            className={`${styles.excedenteOpcion} ${diferenciaTipo === 'compras_no_cargadas' ? styles.excedenteOpcionActiva : ''}`}
+                            onClick={() => setDiferenciaTipo('compras_no_cargadas')}
+                          >
+                            <div className={styles.excedenteRadioRow}>
+                              <input
+                                type="radio"
+                                name="diferencia_tipo"
+                                checked={diferenciaTipo === 'compras_no_cargadas'}
+                                onChange={() => setDiferenciaTipo('compras_no_cargadas')}
+                                className={styles.excedenteRadio}
+                              />
+                              <div className={styles.excedenteTextos}>
+                                <span className={styles.excedenteOpcionLabel}>
+                                  Compras que no cargué
+                                </span>
+                              </div>
+                            </div>
+
+                            {diferenciaTipo === 'compras_no_cargadas' && (
+                              <div className={styles.excedenteCategoriaSelectorWrap} onClick={(e) => e.stopPropagation()}>
+                                <CategoriaSelector
+                                  categorias={categorias}
+                                  categoriaId={diferenciaCategoriaId || ''}
+                                  subcategoriaId={diferenciaSubcategoriaId || ''}
+                                  tipo="egreso"
+                                  onSelectCategoria={(id) => {
+                                    setDiferenciaCategoriaId(id)
+                                    setDiferenciaSubcategoriaId(null)
+                                  }}
+                                  onSelectSubcategoria={(id) => {
+                                    setDiferenciaSubcategoriaId(id)
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Desglose: solo si hay conceptos adicionales (deuda anterior o saldo financiado) */}
+              {hasBreakdown && (
+                <div className={styles.breakdownCard} data-modal-block>
                   <span className={styles.breakdownTitle}>
                     Desglose del resumen
                   </span>
-                  
+
                   <div className={styles.breakdownRow}>
                     <span>Cuotas del período</span>
                     <span className={styles.breakdownVal}>{formatMonto(cuotasPeriodo, monedaAPagar)}</span>
@@ -668,9 +697,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                         compact
                         variant="outlined"
                         allowDecimals
-                        value={montoPesosCustom !== '' ? Number(montoPesosCustom) : (subtotalPesosCalculado > 0 ? subtotalPesosCalculado : null)}
+                        value={montoPesosCustom !== '' ? Number(montoPesosCustom) : (pesificacionSim?.monto_convertido_ars ?? null)}
                         onChange={(val) => setMontoPesosCustom(val !== null ? String(val) : '')}
-                        placeholder={subtotalPesosCalculado > 0 ? subtotalPesosCalculado.toFixed(2) : '0'}
+                        placeholder={pesificacionSim?.monto_convertido_ars != null ? String(pesificacionSim.monto_convertido_ars) : '0'}
                       />
                     </div>
                   </div>
@@ -683,9 +712,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                         compact
                         variant="outlined"
                         allowDecimals
-                        value={montoPercepcionCustom !== '' ? Number(montoPercepcionCustom) : (percepcionCalculada > 0 ? percepcionCalculada : null)}
+                        value={montoPercepcionCustom !== '' ? Number(montoPercepcionCustom) : (pesificacionSim?.monto_percepcion_ars ?? null)}
                         onChange={(val) => setMontoPercepcionCustom(val !== null ? String(val) : '')}
-                        placeholder={percepcionCalculada > 0 ? percepcionCalculada.toFixed(2) : '0'}
+                        placeholder={pesificacionSim?.monto_percepcion_ars != null ? String(pesificacionSim.monto_percepcion_ars) : '0'}
                       />
                     </div>
                   </div>
@@ -695,7 +724,13 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   <div className={styles.pesificacionTotalRow}>
                     <span className={styles.pesificacionTotalLabel}>Total final a debitar</span>
                     <span className={styles.pesificacionTotalVal}>
-                      {formatMonto(totalPesosFinal, 'ARS')}
+                      {cargandoPesificacion
+                        ? 'Calculando…'
+                        : errorPesificacion
+                          ? 'No se pudo calcular'
+                          : pesificacionSim?.total_estimado_ars != null
+                            ? formatMonto(pesificacionSim.total_estimado_ars, 'ARS')
+                            : 'Calculando…'}
                     </span>
                   </div>
                 </div>
@@ -787,7 +822,9 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                     <Check size={16} strokeWidth={2.5} />
                     <span>
                       {monedaAPagar === 'USD' && modoUSD === 'pesificar'
-                        ? `Confirmar (${formatMonto(totalPesosFinal, 'ARS')})`
+                        ? (pesificacionSim?.total_estimado_ars != null
+                          ? `Confirmar (${formatMonto(pesificacionSim.total_estimado_ars, 'ARS')})`
+                          : 'Confirmar')
                         : `Confirmar pago (${formatMonto(numMonto, monedaAPagar)})`
                       }
                     </span>

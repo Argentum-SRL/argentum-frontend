@@ -21,6 +21,7 @@ import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import useSimularTransferencia from '@/hooks/useSimularTransferencia'
 import AvisoSaldoTransferencia from './AvisoSaldoTransferencia'
 import styles from './TransferenciaModal.module.css'
 
@@ -206,14 +207,10 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
     }
     if (tipoRate === 'oficial' && cotizacionOficial) {
       if (fxDirection === 'compra') {
-        return cotizacionOficial.venta ?? cotizacionOficial.promedio ?? cotizacionOficial.compra ?? 1090
+        return cotizacionOficial.venta ?? cotizacionOficial.promedio ?? cotizacionOficial.compra ?? null
       }
-      return cotizacionOficial.compra ?? cotizacionOficial.promedio ?? cotizacionOficial.venta ?? 1050
+      return cotizacionOficial.compra ?? cotizacionOficial.promedio ?? cotizacionOficial.venta ?? null
     }
-    // Valores de referencia de mercado si aún no cargó la API
-    if (tipoRate === 'oficial') return fxDirection === 'compra' ? 1090 : 1050
-    if (tipoRate === 'mep') return fxDirection === 'compra' ? 1415 : 1410
-    if (tipoRate === 'blue') return fxDirection === 'compra' ? 1440 : 1420
     return null
   }, [cotizacionesData, fxDirection, cotizacionOficial, cotizacionManual])
 
@@ -221,24 +218,23 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   const cotizacionActivaValor = useMemo(() => {
     if (tipoOperacion !== 'fx') return null
     if (tipoCotizacion === 'manual') {
-      return cotizacionManual ?? 1440
+      return cotizacionManual
     }
-    return getRateValue(tipoCotizacion) ?? cotizacionManual ?? 1440
+    return getRateValue(tipoCotizacion)
   }, [tipoOperacion, tipoCotizacion, cotizacionManual, getRateValue])
 
-  // Cálculo del monto en destino si es FX
-  const montoDestinoCalculado = useMemo(() => {
-    if (tipoOperacion !== 'fx' || !monto || monto <= 0 || !cotizacionActivaValor) {
-      return null
-    }
-
-    if (fxDirection === 'compra') {
-      // Paga ARS, recibe USD
-      return Number((monto / cotizacionActivaValor).toFixed(2))
-    }
-    // Entrega USD, recibe ARS
-    return Number((monto * cotizacionActivaValor).toFixed(2))
-  }, [tipoOperacion, fxDirection, monto, cotizacionActivaValor])
+  // Simulación del monto en destino mediante el backend
+  const {
+    simulacion: simularTransferenciaData,
+    cargando: cargandoSimulacion,
+    error: errorSimulacion,
+  } = useSimularTransferencia({
+    monto,
+    cotizacion: cotizacionActivaValor,
+    monedaOrigen: billeteraOrigen?.moneda,
+    monedaDestino: billeteraDestino?.moneda,
+    enabled: tipoOperacion === 'fx',
+  })
 
   // Detección automática del tipo de movimiento (Opción 1)
   const tipoMovimientoDetectado = useMemo<'extraccion' | 'deposito' | 'transferencia' | 'fx'>(() => {
@@ -353,6 +349,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   // Envío final
   const handleSubmit = async () => {
     if (isSubmitting || !billeteraOrigenId || !billeteraDestinoId || !monto) return
+    if (tipoOperacion === 'fx' && (!simularTransferenciaData || Boolean(errorSimulacion))) return
 
     setIsSubmitting(true)
     try {
@@ -360,15 +357,13 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       const monedaDestino = billeteraDestino?.moneda || (tipoOperacion === 'fx' ? (fxDirection === 'compra' ? 'USD' : 'ARS') : effectiveMoneda)
       const esMismaMoneda = monedaOrigen === monedaDestino
 
-      const finalMontoDestino = esMismaMoneda ? Number(monto) : Number(montoDestinoCalculado || monto)
-
       await transferenciaService.createTransferencia({
         billetera_origen_id: billeteraOrigenId,
         billetera_destino_id: billeteraDestinoId,
         monto: Number(monto),
         moneda: monedaOrigen,
         monto_origen: Number(monto),
-        monto_destino: finalMontoDestino,
+        ...(esMismaMoneda ? { monto_destino: Number(monto) } : {}),
         moneda_origen: monedaOrigen,
         moneda_destino: monedaDestino,
         cotizacion: esMismaMoneda ? null : (cotizacionActivaValor ? Number(cotizacionActivaValor) : null),
@@ -431,87 +426,87 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
 
               <div className={`${styles.formBody} ${styles.formBodyStep1}`} data-modal-stack>
                 <div data-modal-block>
-                {/* Selector de Operación (SegmentedControl cápsula oficial) */}
-                <SegmentedControl<'entre_cuentas' | 'compra' | 'venta'>
-                  ariaLabel="Tipo de operación"
-                  fullWidth
-                  value={tipoOperacion === 'entre_cuentas' ? 'entre_cuentas' : fxDirection}
-                  onChange={handleSelectOperacion}
-                  options={[
-                    {
-                      value: 'entre_cuentas',
-                      label: 'Entre cuentas',
-                      icon: <ArrowRightLeft size={15} strokeWidth={2} />,
-                    },
-                    {
-                      value: 'compra',
-                      label: 'Comprar',
-                      icon: <ArrowDownLeft size={15} strokeWidth={2.2} />,
-                    },
-                    {
-                      value: 'venta',
-                      label: 'Vender',
-                      icon: <ArrowUpRight size={15} strokeWidth={2.2} />,
-                    },
-                  ]}
-                />
+                  {/* Selector de Operación (SegmentedControl cápsula oficial) */}
+                  <SegmentedControl<'entre_cuentas' | 'compra' | 'venta'>
+                    ariaLabel="Tipo de operación"
+                    fullWidth
+                    value={tipoOperacion === 'entre_cuentas' ? 'entre_cuentas' : fxDirection}
+                    onChange={handleSelectOperacion}
+                    options={[
+                      {
+                        value: 'entre_cuentas',
+                        label: 'Entre cuentas',
+                        icon: <ArrowRightLeft size={15} strokeWidth={2} />,
+                      },
+                      {
+                        value: 'compra',
+                        label: 'Comprar',
+                        icon: <ArrowDownLeft size={15} strokeWidth={2.2} />,
+                      },
+                      {
+                        value: 'venta',
+                        label: 'Vender',
+                        icon: <ArrowUpRight size={15} strokeWidth={2.2} />,
+                      },
+                    ]}
+                  />
 
-                {/* Hero Monto */}
-                <MontoInput
-                  value={monto}
-                  onChange={setMonto}
-                  moneda={effectiveMoneda}
-                  onMonedaChange={setMoneda}
-                  autoFocus
-                  allowDecimals
-                />
+                  {/* Hero Monto */}
+                  <MontoInput
+                    value={monto}
+                    onChange={setMonto}
+                    moneda={effectiveMoneda}
+                    onMonedaChange={setMoneda}
+                    autoFocus
+                    allowDecimals
+                  />
 
-                {/* Cuenta de Origen con Carrusel idéntico a TransaccionModal */}
-                <div className={styles.formField} data-modal-field>
-                  <label className={styles.fieldLabel}>
-                    {tipoOperacion === 'fx'
-                      ? fxDirection === 'compra'
-                        ? '¿De qué cuenta salen los pesos?'
-                        : '¿De qué cuenta salen los dólares?'
-                      : '¿De qué cuenta sale el dinero?'}
-                  </label>
+                  {/* Cuenta de Origen con Carrusel idéntico a TransaccionModal */}
+                  <div className={styles.formField} data-modal-field>
+                    <label className={styles.fieldLabel}>
+                      {tipoOperacion === 'fx'
+                        ? fxDirection === 'compra'
+                          ? '¿De qué cuenta salen los pesos?'
+                          : '¿De qué cuenta salen los dólares?'
+                        : '¿De qué cuenta sale el dinero?'}
+                    </label>
 
-                  {billeterasOrigenDisponibles.length === 0 ? (
-                    <p className={styles.noWalletsText}>No tenés cuentas disponibles para este tipo de operación.</p>
-                  ) : (
-                    <div data-modal-carousel>
-                      <div data-modal-carousel-track ref={carouselOrigenRef}>
-                        {billeterasOrigenDisponibles.map(b => (
-                          <SelectableSurface
-                            key={b.id}
-                            selected={billeteraOrigenId === b.id}
-                            context="modal"
-                            onClick={() => setSelectedOrigenId(b.id)}
-                            ref={(el) => {
-                              if (el) cardRefs.current.set(b.id, el)
-                              else cardRefs.current.delete(b.id)
-                            }}
-                            title={`Seleccionar ${b.nombre}`}
-                            aria-label={`Seleccionar ${b.nombre}`}
-                          >
-                            <BilleteraCard
-                              billetera={b}
-                              variant="select"
-                            />
-                          </SelectableSurface>
-                        ))}
+                    {billeterasOrigenDisponibles.length === 0 ? (
+                      <p className={styles.noWalletsText}>No tenés cuentas disponibles para este tipo de operación.</p>
+                    ) : (
+                      <div data-modal-carousel>
+                        <div data-modal-carousel-track ref={carouselOrigenRef}>
+                          {billeterasOrigenDisponibles.map(b => (
+                            <SelectableSurface
+                              key={b.id}
+                              selected={billeteraOrigenId === b.id}
+                              context="modal"
+                              onClick={() => setSelectedOrigenId(b.id)}
+                              ref={(el) => {
+                                if (el) cardRefs.current.set(b.id, el)
+                                else cardRefs.current.delete(b.id)
+                              }}
+                              title={`Seleccionar ${b.nombre}`}
+                              aria-label={`Seleccionar ${b.nombre}`}
+                            >
+                              <BilleteraCard
+                                billetera={b}
+                                variant="select"
+                              />
+                            </SelectableSurface>
+                          ))}
+                        </div>
                       </div>
+                    )}
+                  </div>
+
+                  {/* Alerta de saldo insuficiente */}
+                  {isOverdraft && (
+                    <div className={styles.overdraftWarning}>
+                      <AlertCircle size={15} />
+                      El monto supera el saldo disponible ({formatMonto(saldoOrigenActual, effectiveMoneda)})
                     </div>
                   )}
-                </div>
-
-                {/* Alerta de saldo insuficiente */}
-                {isOverdraft && (
-                  <div className={styles.overdraftWarning}>
-                    <AlertCircle size={15} />
-                    El monto supera el saldo disponible ({formatMonto(saldoOrigenActual, effectiveMoneda)})
-                  </div>
-                )}
                 </div>
               </div>
 
@@ -622,64 +617,66 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
 
               <div className={styles.formBody} data-modal-stack>
                 <div data-modal-block>
-                {/* Selector de Tipos de Cambio para Dólares (FX) */}
-                <div className={styles.formField} data-modal-field>
-                  <label className={styles.fieldLabel}>Tipo de cambio de referencia</label>
-                  <SegmentedControl<'oficial' | 'mep' | 'blue' | 'manual'>
-                    ariaLabel="Tipo de cambio de referencia"
-                    fullWidth
-                    layout="stacked"
-                    value={tipoCotizacion}
-                    onChange={(val) => {
-                      setTipoCotizacion(val)
-                      if (val !== 'manual') {
-                        const v = getRateValue(val)
-                        if (v) setCotizacionManual(v)
-                      }
-                    }}
-                    options={(['oficial', 'mep', 'blue', 'manual'] as const).map(tipoRate => {
-                      const getRateDisplay = () => {
-                        if (tipoRate === 'manual') {
-                          return cotizacionManual ? `$ ${Number(cotizacionManual).toLocaleString('es-AR')}` : 'Manual'
+                  {/* Selector de Tipos de Cambio para Dólares (FX) */}
+                  <div className={styles.formField} data-modal-field>
+                    <label className={styles.fieldLabel}>Tipo de cambio de referencia</label>
+                    <SegmentedControl<'oficial' | 'mep' | 'blue' | 'manual'>
+                      ariaLabel="Tipo de cambio de referencia"
+                      fullWidth
+                      layout="stacked"
+                      value={tipoCotizacion}
+                      onChange={(val) => {
+                        setTipoCotizacion(val)
+                        if (val !== 'manual') {
+                          const v = getRateValue(val)
+                          if (v) setCotizacionManual(v)
                         }
-                        const v = getRateValue(tipoRate)
-                        return v ? `$ ${Number(v).toLocaleString('es-AR')}` : '-'
-                      }
-                      const rateDisplay = getRateDisplay()
+                      }}
+                      options={(['oficial', 'mep', 'blue', 'manual'] as const).map(tipoRate => {
+                        const getRateDisplay = () => {
+                          if (tipoRate === 'manual') {
+                            return cotizacionManual ? `$ ${Number(cotizacionManual).toLocaleString('es-AR')}` : 'Manual'
+                          }
+                          const v = getRateValue(tipoRate)
+                          return v ? `$ ${Number(v).toLocaleString('es-AR')}` : '-'
+                        }
+                        const rateDisplay = getRateDisplay()
 
-                      return {
-                        value: tipoRate,
-                        label: tipoRate.toUpperCase(),
-                        description: rateDisplay,
-                      }
-                    })}
-                  />
-                </div>
-
-                {/* Input de Cotización con diseño Hero MontoInput */}
-                <div className={styles.formField} data-modal-field>
-                  <label className={styles.fieldLabel}>Cotización aplicada (1 Dólar = $)</label>
-                  <MontoInput
-                    value={cotizacionActivaValor}
-                    onChange={(val) => {
-                      setTipoCotizacion('manual')
-                      setCotizacionManual(val)
-                    }}
-                    moneda="ARS"
-                    placeholder="0"
-                    allowDecimals
-                  />
-                </div>
-
-                {/* Monto proyectado a recibir */}
-                <div className={styles.summaryBox}>
-                  <div className={styles.summaryRow}>
-                    <span className={styles.summaryLbl}>Recibís en destino:</span>
-                    <span className={styles.summaryVal} style={{ color: '#16a34a', fontSize: 16 }}>
-                      {formatMonto(montoDestinoCalculado || 0, fxDirection === 'compra' ? 'USD' : 'ARS')}
-                    </span>
+                        return {
+                          value: tipoRate,
+                          label: tipoRate.toUpperCase(),
+                          description: rateDisplay,
+                        }
+                      })}
+                    />
                   </div>
-                </div>
+
+                  {/* Input de Cotización con diseño Hero MontoInput */}
+                  <div className={styles.formField} data-modal-field>
+                    <label className={styles.fieldLabel}>Cotización aplicada (1 Dólar = $)</label>
+                    <MontoInput
+                      value={cotizacionActivaValor}
+                      onChange={(val) => {
+                        setTipoCotizacion('manual')
+                        setCotizacionManual(val)
+                      }}
+                      moneda="ARS"
+                      placeholder="0"
+                      allowDecimals
+                    />
+                  </div>
+
+                  {/* Monto proyectado a recibir */}
+                  <div className={styles.summaryBox}>
+                    <div className={styles.summaryRow}>
+                      <span className={styles.summaryLbl}>Recibís en destino:</span>
+                      <span className={styles.summaryVal} style={{ color: '#16a34a', fontSize: 16 }}>
+                        {simularTransferenciaData?.monto_destino != null
+                          ? formatMonto(simularTransferenciaData.monto_destino, fxDirection === 'compra' ? 'USD' : 'ARS')
+                          : 'Calculando…'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -717,90 +714,105 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
 
               <div className={styles.formBody} data-modal-stack>
                 <div data-modal-block>
-                {/* Descripción/Nota + Fecha (Idéntico a Paso 3 de TransaccionModal) */}
-                <div className={styles.descFechaRow}>
-                  <div className={`${styles.formField} ${styles.flex2}`}>
-                    <label className={styles.fieldLabel} htmlFor="tx-nota">Concepto / Nota</label>
-                    <input
-                      id="tx-nota"
-                      type="text"
-                      className={styles.fieldInput}
-                      value={notas}
-                      onChange={e => setNotas(e.target.value)}
-                      placeholder={placeholderNota}
-                    />
-                  </div>
-                  <div className={`${styles.formField} ${styles.flex1}`}>
-                    <label className={styles.fieldLabel} htmlFor="tx-fecha">Fecha</label>
-                    <DateInput
-                      id="tx-fecha"
-                      value={fecha}
-                      onChange={setFecha}
-                      className={styles.fieldInput}
-                    />
-                  </div>
-                </div>
-
-                <AvisoSaldoTransferencia
-                  origen={billeteraOrigen}
-                  destino={billeteraDestino}
-                  fecha={fecha}
-                />
-
-                {/* Resumen Financiero Completo con Detección Automática */}
-                <div className={styles.summaryBox}>
-                  <div className={styles.summaryHeader}>
-                    <span>
-                      {tipoMovimientoDetectado === 'extraccion'
-                        ? 'Extracción de efectivo'
-                        : tipoMovimientoDetectado === 'deposito'
-                          ? 'Depósito en cuenta'
-                          : tipoMovimientoDetectado === 'fx'
-                            ? fxDirection === 'compra'
-                              ? 'Compra de dólares (FX)'
-                              : 'Venta de dólares (FX)'
-                            : 'Transferencia entre cuentas'}
-                    </span>
-                    {tipoOperacion === 'fx' && cotizacionActivaValor && (
-                      <span className={styles.ratePill}>
-                        1 Dólar = $ {cotizacionActivaValor} ({tipoCotizacion.toUpperCase()})
-                      </span>
-                    )}
-                  </div>
-
-                  <div className={styles.summaryRow}>
-                    <div className={styles.summaryCol}>
-                      <span className={styles.summaryLbl}>
-                        {tipoMovimientoDetectado === 'deposito' ? 'Efectivo a entregar' : 'Cuenta de origen'}
-                      </span>
-                      <span className={styles.summaryVal}>{billeteraOrigen?.nombre}</span>
+                  {/* Descripción/Nota + Fecha (Idéntico a Paso 3 de TransaccionModal) */}
+                  <div className={styles.descFechaRow}>
+                    <div className={`${styles.formField} ${styles.flex2}`}>
+                      <label className={styles.fieldLabel} htmlFor="tx-nota">Concepto / Nota</label>
+                      <input
+                        id="tx-nota"
+                        type="text"
+                        className={styles.fieldInput}
+                        value={notas}
+                        onChange={e => setNotas(e.target.value)}
+                        placeholder={placeholderNota}
+                      />
                     </div>
-                    <div className={`${styles.summaryCol} ${styles.summaryColRight}`}>
-                      <span className={styles.summaryLbl}>Importe a debitar</span>
-                      <span className={styles.summaryVal} style={{ color: '#ef4444' }}>
-                        - {formatMonto(monto || 0, billeteraOrigen?.moneda || effectiveMoneda)}
-                      </span>
+                    <div className={`${styles.formField} ${styles.flex1}`}>
+                      <label className={styles.fieldLabel} htmlFor="tx-fecha">Fecha</label>
+                      <DateInput
+                        id="tx-fecha"
+                        value={fecha}
+                        onChange={setFecha}
+                        className={styles.fieldInput}
+                      />
                     </div>
                   </div>
 
-                  <div className={styles.summaryRow}>
-                    <div className={styles.summaryCol}>
-                      <span className={styles.summaryLbl}>
-                        {tipoMovimientoDetectado === 'extraccion' ? 'Efectivo a recibir' : 'Cuenta de destino'}
+                  <AvisoSaldoTransferencia
+                    origen={billeteraOrigen}
+                    destino={billeteraDestino}
+                    fecha={fecha}
+                  />
+
+                  {/* Resumen Financiero Completo con Detección Automática */}
+                  <div className={styles.summaryBox}>
+                    <div className={styles.summaryHeader}>
+                      <span>
+                        {tipoMovimientoDetectado === 'extraccion'
+                          ? 'Extracción de efectivo'
+                          : tipoMovimientoDetectado === 'deposito'
+                            ? 'Depósito en cuenta'
+                            : tipoMovimientoDetectado === 'fx'
+                              ? fxDirection === 'compra'
+                                ? 'Compra de dólares (FX)'
+                                : 'Venta de dólares (FX)'
+                              : 'Transferencia entre cuentas'}
                       </span>
-                      <span className={styles.summaryVal}>{billeteraDestino?.nombre}</span>
+                      {tipoOperacion === 'fx' && cotizacionActivaValor && (
+                        <span className={styles.ratePill}>
+                          1 Dólar = $ {cotizacionActivaValor} ({tipoCotizacion.toUpperCase()})
+                        </span>
+                      )}
                     </div>
-                    <div className={`${styles.summaryCol} ${styles.summaryColRight}`}>
-                      <span className={styles.summaryLbl}>Importe a acreditar</span>
-                      <span className={styles.summaryVal} style={{ color: '#16a34a' }}>
-                        + {formatMonto(
-                          tipoOperacion === 'fx' ? (montoDestinoCalculado || 0) : (monto || 0),
-                          billeteraDestino?.moneda || effectiveMoneda
-                        )}
-                      </span>
+
+                    <div className={styles.summaryRow}>
+                      <div className={styles.summaryCol}>
+                        <span className={styles.summaryLbl}>
+                          {tipoMovimientoDetectado === 'deposito' ? 'Efectivo a entregar' : 'Cuenta de origen'}
+                        </span>
+                        <span className={styles.summaryVal}>{billeteraOrigen?.nombre}</span>
+                      </div>
+                      <div className={`${styles.summaryCol} ${styles.summaryColRight}`}>
+                        <span className={styles.summaryLbl}>Importe a debitar</span>
+                        <span className={styles.summaryVal} style={{ color: '#ef4444' }}>
+                          - {formatMonto(monto || 0, billeteraOrigen?.moneda || effectiveMoneda)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.summaryRow}>
+                      <div className={styles.summaryCol}>
+                        <span className={styles.summaryLbl}>
+                          {tipoMovimientoDetectado === 'extraccion' ? 'Efectivo a recibir' : 'Cuenta de destino'}
+                        </span>
+                        <span className={styles.summaryVal}>{billeteraDestino?.nombre}</span>
+                      </div>
+                      <div className={`${styles.summaryCol} ${styles.summaryColRight}`}>
+                        <span className={styles.summaryLbl}>Importe a acreditar</span>
+                        <span className={styles.summaryVal} style={{ color: '#16a34a' }}>
+                          {tipoOperacion === 'fx' ? (
+                            cargandoSimulacion ? (
+                              'Calculando…'
+                            ) : errorSimulacion ? (
+                              'No se pudo calcular'
+                            ) : simularTransferenciaData?.monto_destino != null ? (
+                              `+ ${formatMonto(
+                                simularTransferenciaData.monto_destino,
+                                billeteraDestino?.moneda || effectiveMoneda
+                              )}`
+                            ) : (
+                              'Calculando…'
+                            )
+                          ) : (
+                            `+ ${formatMonto(
+                              monto || 0,
+                              billeteraDestino?.moneda || effectiveMoneda
+                            )}`
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
                 </div>
               </div>
 
@@ -808,7 +820,11 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                 <button type="button" className={styles.cancelBtn} onClick={goBack}>
                   Atrás
                 </button>
-                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                <button
+                  type="submit"
+                  className={styles.submitBtn}
+                  disabled={isSubmitting || (tipoOperacion === 'fx' && !simularTransferenciaData)}
+                >
                   {isSubmitting ? 'Procesando...' : submitTitle}
                 </button>
               </div>

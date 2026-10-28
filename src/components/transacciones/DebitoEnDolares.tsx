@@ -23,7 +23,7 @@ export function DebitoEnDolares({
 }: DebitoEnDolaresProps) {
   const prevMontoUsdRef = useRef(montoUsd)
 
-  const { cotizacion, percepcion, montoPesosSugerido, loading, sinCotizacion } = useDebitoEnDolares({
+  const { cotizacion, cotizacionTarjeta, percepcion, montoPesosSugerido, loading, sinCotizacion } = useDebitoEnDolares({
     montoUsd,
     enabled: Boolean(montoUsd && montoUsd > 0),
     onMontoPesosCalculado: (sugerido) => {
@@ -34,12 +34,6 @@ export function DebitoEnDolares({
       }
     },
   })
-
-  // Dólar tarjeta aproximado (oficial * (1 + percepción/100))
-  const dolarTarjeta =
-    cotizacion != null
-      ? Math.round(cotizacion * (1 + (percepcion || 30) / 100))
-      : null
 
   const esMontoSugerido =
     montoPesosSugerido != null && montoPesos === montoPesosSugerido
@@ -97,12 +91,12 @@ export function DebitoEnDolares({
               <span className={styles.pulseDot} />
               <span>Calculando cotización estimada de hoy...</span>
             </div>
-          ) : cotizacion != null && dolarTarjeta != null ? (
+          ) : cotizacion != null && cotizacionTarjeta != null ? (
             <div className={styles.calcBody}>
               <div className={styles.formulaRow}>
                 <div className={styles.formulaText}>
                   <span>
-                    <strong>US$ {montoUsd}</strong> × <strong>{formatMonto(dolarTarjeta)}</strong>
+                    <strong>US$ {montoUsd}</strong> × <strong>{formatMonto(cotizacionTarjeta)}</strong>
                   </span>
                   <span className={styles.formulaTag}>dólar tarjeta</span>
                 </div>

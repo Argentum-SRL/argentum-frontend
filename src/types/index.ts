@@ -383,6 +383,7 @@ export interface SugerenciaPesosResponse {
   cotizacion: number | null
   percepcion: number
   monto_pesos: number | null
+  cotizacion_tarjeta: number | null
 }
 
 export interface TransferenciaInterna {
@@ -402,6 +403,11 @@ export interface TransferenciaInterna {
   fecha: string
   notas: string | null
   fecha_creacion: string
+}
+
+export interface SimularTransferenciaResponse {
+  monto_destino: number
+  cotizacion: number
 }
 
 export interface DashboardResumen {

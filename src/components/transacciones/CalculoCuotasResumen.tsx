@@ -48,7 +48,7 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
     return base
   }, [cantidadCuotas])
 
-  const { simulacion } = useSimularCuotas({
+  const { simulacion, error } = useSimularCuotas({
     montoTotal: monto,
     cantidades,
     tasaTna: tasaInteres > 0 ? tasaInteres : null,
@@ -215,7 +215,11 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
         <div className={styles.heroFinancingTop}>
           <div>
             <span className={styles.heroInstallmentAmount}>
-              {currentPlan ? formatMonto(currentPlan.monto_cuota, moneda) : 'Calculando…'}
+              {currentPlan
+                ? formatMonto(currentPlan.monto_cuota, moneda)
+                : error
+                  ? 'No se pudo calcular'
+                  : 'Calculando…'}
             </span>
             <span className={styles.heroInstallmentSuffix}>
               {cantidadCuotas === 1 ? ' pago único' : '/mes'}

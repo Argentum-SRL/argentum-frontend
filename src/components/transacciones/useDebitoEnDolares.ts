@@ -13,6 +13,7 @@ export function useDebitoEnDolares({
   onMontoPesosCalculado,
 }: UseDebitoEnDolaresOptions) {
   const [cotizacion, setCotizacion] = useState<number | null>(null)
+  const [cotizacionTarjeta, setCotizacionTarjeta] = useState<number | null>(null)
   const [percepcion, setPercepcion] = useState<number>(30)
   const [montoPesosSugerido, setMontoPesosSugerido] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
@@ -32,6 +33,7 @@ export function useDebitoEnDolares({
     const timeoutId = setTimeout(async () => {
       if (!enabled || !montoUsd || montoUsd <= 0) {
         setCotizacion(null)
+        setCotizacionTarjeta(null)
         setMontoPesosSugerido(null)
         setSinCotizacion(false)
         setLoading(false)
@@ -49,11 +51,13 @@ export function useDebitoEnDolares({
 
         if (data.cotizacion != null && data.monto_pesos != null) {
           setCotizacion(data.cotizacion)
+          setCotizacionTarjeta(data.cotizacion_tarjeta ?? null)
           setMontoPesosSugerido(data.monto_pesos)
           setSinCotizacion(false)
           onMontoPesosCalculadoRef.current?.(data.monto_pesos)
         } else {
           setCotizacion(null)
+          setCotizacionTarjeta(null)
           setMontoPesosSugerido(null)
           setSinCotizacion(true)
           onMontoPesosCalculadoRef.current?.(null)
@@ -62,6 +66,7 @@ export function useDebitoEnDolares({
         const isAbort = err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError')
         if (!isAbort) {
           setCotizacion(null)
+          setCotizacionTarjeta(null)
           setMontoPesosSugerido(null)
           setSinCotizacion(true)
           onMontoPesosCalculadoRef.current?.(null)
@@ -81,6 +86,7 @@ export function useDebitoEnDolares({
 
   return {
     cotizacion,
+    cotizacionTarjeta,
     percepcion,
     montoPesosSugerido,
     loading,

@@ -1,0 +1,737 @@
+[
+  {
+    "archivo": "src/components/dashboard/BalanceCard/BalanceCard.tsx",
+    "expresion": "(cuotasPendientes || 0) + (suscripcionesPendientes || 0)",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Suma de compromisos mensuales pendientes en balance (se migra en Bloque H)"
+  },
+  {
+    "archivo": "src/components/dashboard/BalanceCard/BalanceCard.tsx",
+    "expresion": "Math.round(Number(item.percepcion))",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de porcentaje de percepción para etiqueta visual"
+  },
+  {
+    "archivo": "src/components/dashboard/ProyeccionCard/ProyeccionCard.tsx",
+    "expresion": "Math.round((actual / totalProyectado) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de proyección de gastos mensual"
+  },
+  {
+    "archivo": "src/components/dashboard/ProyeccionCard/ProyeccionCard.tsx",
+    "expresion": "Math.round((catActual / catTotal) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de proyección por categoría"
+  },
+  {
+    "archivo": "src/components/goals/GoalContributionModal.tsx",
+    "expresion": "(goal.monto_actual || 0) + delta",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo acumulativo de nuevo monto de meta (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/goals/GoalContributionModal.tsx",
+    "expresion": "Math.round((nuevoMontoActual / goal.monto_objetivo) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de avance de meta tras aporte"
+  },
+  {
+    "archivo": "src/components/goals/GoalContributionModal.tsx",
+    "expresion": "monto * cotizacion_usada",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Conversión ARS/USD en aporte de meta (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/goals/GoalContributionModal.tsx",
+    "expresion": "monto / cotizacion_usada",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Conversión USD/ARS en aporte de meta (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/layout/AppLayout/SearchModal.tsx",
+    "expresion": "(g.monto_actual / g.monto_objetivo) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje de progreso para barra visual de meta en buscador"
+  },
+  {
+    "archivo": "src/components/onboarding/StepIndicator.tsx",
+    "expresion": "total - 1",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de índice de pasos para indicador de progreso"
+  },
+  {
+    "archivo": "src/components/perfil/PerfilFinancieroCard.tsx",
+    "expresion": "Math.round(capAhorroRaw * 100)",
+    "cantidad": 3,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de capacidad de ahorro"
+  },
+  {
+    "archivo": "src/components/presupuestos/PresupuestoDetailModal.tsx",
+    "expresion": "(gastado / limite) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de consumo de presupuesto"
+  },
+  {
+    "archivo": "src/components/presupuestos/PresupuestoDetailModal.tsx",
+    "expresion": "acc + Number(h.monto_usado || 0)",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Suma acumulativa de gasto histórico de presupuesto (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/presupuestos/PresupuestoDetailModal.tsx",
+    "expresion": "gastado - limite",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de exceso presupuestario (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/presupuestos/PresupuestoDetailModal.tsx",
+    "expresion": "limite - gastado",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de remanente disponible de presupuesto (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/suscripciones/SuscripcionModal.tsx",
+    "expresion": "state.monto * cotizValor",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Conversión ARS/USD en formulario de suscripción (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/suscripciones/SuscripcionModal.tsx",
+    "expresion": "state.monto / cotizValor",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Conversión USD/ARS en formulario de suscripción (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/suscripciones/SuscripcionModal.tsx",
+    "expresion": "state.monto / DIVISORES[state.frecuencia]",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Normalización de monto mensual de suscripción (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/tarjetas/PresionFuturaCard.tsx",
+    "expresion": "(mesTotal / maxMonto) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje de altura para barras de presión futura mensual"
+  },
+  {
+    "archivo": "src/components/tarjetas/PresionFuturaCard.tsx",
+    "expresion": "acc + (t.total || 0)",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de totales de tickets de presión futura (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/tarjetas/PresionFuturaCard.tsx",
+    "expresion": "acc + m.total.ars",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de totales en pesos de presión futura (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/tarjetas/PresionFuturaCard.tsx",
+    "expresion": "acc + m.total.usd",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de totales en dólares de presión futura (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/tarjetas/PresionFuturaCard.tsx",
+    "expresion": "Math.round(mesTotal)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de monto para etiqueta visual en gráfico de presión futura"
+  },
+  {
+    "archivo": "src/components/tarjetas/PresionFuturaCard.tsx",
+    "expresion": "Math.round(totalComprometido)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de total para etiqueta visual en gráfico de presión futura"
+  },
+  {
+    "archivo": "src/components/tarjetas/TarjetaSummary.tsx",
+    "expresion": "currentTicket.cuotas.length + (currentTicket.itemsSaldoArrastrado?.length || 0)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Conteo total de elementos para etiqueta visual en resumen de tarjeta"
+  },
+  {
+    "archivo": "src/components/tools/CanAffordForm.tsx",
+    "expresion": "(formData.precio_total / saldoDisponibleContext) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para indicador visual de impacto presupuestario"
+  },
+  {
+    "archivo": "src/components/tools/CanAffordResult.tsx",
+    "expresion": "ingreso_promedio_usado * 0.1",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de umbral orientativo del 10% (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/tools/CanAffordResult.tsx",
+    "expresion": "ingreso_promedio_usado * 0.3",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de umbral orientativo del 30% (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/tools/ConvenienciaSidebar.tsx",
+    "expresion": "Math.round((pContado / max) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de ancho porcentual para barra visual de precio de contado"
+  },
+  {
+    "archivo": "src/components/tools/ConvenienciaWizard.tsx",
+    "expresion": "Math.round((pContado / max) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de ancho porcentual para barra comparativa visual de contado"
+  },
+  {
+    "archivo": "src/components/tools/ConvenienciaWizard.tsx",
+    "expresion": "Math.round((pCuotas / max) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de ancho porcentual para barra comparativa visual de cuotas"
+  },
+  {
+    "archivo": "src/components/tools/DetalleCuotasChart.tsx",
+    "expresion": "totalMeses / 8",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Escala de espaciado visual para el eje horizontal del gráfico de cuotas"
+  },
+  {
+    "archivo": "src/components/tools/IncomeDistributionBar.tsx",
+    "expresion": "(montoCuota / ingreso) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje de ancho para segmento visual de cuota en barra"
+  },
+  {
+    "archivo": "src/components/tools/IncomeDistributionBar.tsx",
+    "expresion": "cargaPreviaPct + montoCuotaPct + gastoVariablePct + librePct",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Suma de porcentajes de segmentos para escala visual de barra"
+  },
+  {
+    "archivo": "src/components/tools/IncomeDistributionBar.tsx",
+    "expresion": "ingreso - cargaPrevia - montoCuota - gastoVariable",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de ingreso disponible residual (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/tools/IncomeDistributionBar.tsx",
+    "expresion": "montoCuotaPct * scale",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Escalamiento de ancho visual de segmento de cuota en barra"
+  },
+  {
+    "archivo": "src/components/transacciones/CalculoCuotasResumen.tsx",
+    "expresion": "cantidadCuotas - 1",
+    "cantidad": 1,
+    "categoria": "ayuda_escritura",
+    "motivo": "Ayuda de escritura para navegación de stepper de cuotas personalizadas"
+  },
+  {
+    "archivo": "src/components/transacciones/CalculoCuotasResumen.tsx",
+    "expresion": "cantidadCuotas - cuotaInicial + 1",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Texto narrativo descriptivo de cantidad de cuotas restantes"
+  },
+  {
+    "archivo": "src/components/transacciones/CalculoCuotasResumen.tsx",
+    "expresion": "cantidadCuotas + 1",
+    "cantidad": 1,
+    "categoria": "ayuda_escritura",
+    "motivo": "Ayuda de escritura para navegación de stepper de cuotas personalizadas"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "(grupo.cantidad_pagadas / grupo.cantidad_cuotas) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de avance de cuotas pagadas"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "cuotaMensualARS += Number(g.monto_cuota) || 0",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de cuota mensual total ARS (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "cuotaMensualUSD += Number(g.monto_cuota) || 0",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de cuota mensual total USD (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "deudaPendienteARS += Number(g.total_pendiente) || 0",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de deuda total pendiente ARS (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "deudaPendienteUSD += Number(g.total_pendiente) || 0",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de deuda total pendiente USD (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "Math.round((selectedGrupo.cantidad_pagadas / Math.max(selectedGrupo.cantidad_cuotas, 1)) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de avance en detalle de cuotas"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "Math.round(metricas.cuotaMensualARS)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de valor para etiqueta visual de cuota mensual ARS"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "Math.round(metricas.cuotaMensualUSD)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de valor para etiqueta visual de cuota mensual USD"
+  },
+  {
+    "archivo": "src/components/transacciones/GruposCuotasTab.tsx",
+    "expresion": "saldoB - saldoA",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Comparación para ordenamiento visual de grupos de cuotas"
+  },
+  {
+    "archivo": "src/components/transacciones/MovimientoRow.tsx",
+    "expresion": "movimiento.monto + movimiento.reintegro.monto",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de monto neto con reintegro para fila de movimiento (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/transacciones/pasosTransaccion.ts",
+    "expresion": "saldoB - saldoA",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Comparación para ordenamiento visual de billeteras por saldo"
+  },
+  {
+    "archivo": "src/components/transacciones/TransaccionModal.tsx",
+    "expresion": "saldoB - saldoA",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Comparación para ordenamiento visual de billeteras por saldo en modal"
+  },
+  {
+    "archivo": "src/components/transacciones/TransaccionRow.tsx",
+    "expresion": "transaccion.monto + transaccion.reintegro.monto",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de monto neto con reintegro para fila de transacción (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/transferencias/useTransferenciasFilters.ts",
+    "expresion": "ars += monto",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de totales filtrados en ARS (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/transferencias/useTransferenciasFilters.ts",
+    "expresion": "usd += monto",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de totales filtrados en USD (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/components/ui/SegmentedControl.tsx",
+    "expresion": "index - i + total",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo visual de índice cíclico para selección de pestañas"
+  },
+  {
+    "archivo": "src/components/ui/SegmentedControl.tsx",
+    "expresion": "total - 1",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de índice del último elemento para bordes de pestañas"
+  },
+  {
+    "archivo": "src/lib/utils/billeteras.utils.ts",
+    "expresion": "acc + Number(b.saldo_actual)",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Agregación de saldos totales de billeteras (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/lib/utils/billeteras.utils.ts",
+    "expresion": "saldoB - saldoA",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Comparación para ordenamiento numérico de lista de billeteras"
+  },
+  {
+    "archivo": "src/lib/utils/billeteras.utils.ts",
+    "expresion": "totalARS + totalUSD * cotizacionUSD",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Consolidación de patrimonio neto con cotización (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/admin/components/MonitorWppPanel.tsx",
+    "expresion": "conversacionesData.total / 50",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de cantidad de páginas de paginación en monitor"
+  },
+  {
+    "archivo": "src/pages/admin/components/MonitorWppPanel.tsx",
+    "expresion": "resumen.calidad.total - resumen.calidad.correcciones",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de métrica visual de mensajes correctos sin corrección"
+  },
+  {
+    "archivo": "src/pages/admin/diseno/components/DisenoAuditFindings.tsx",
+    "expresion": "(count / total) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de hallazgos de diseño"
+  },
+  {
+    "archivo": "src/pages/admin/diseno/components/DisenoMetricsBar.tsx",
+    "expresion": "Math.round((decisionStats.aprobadas / decisionStats.total) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de decisiones aprobadas de diseño"
+  },
+  {
+    "archivo": "src/pages/AdminPage.tsx",
+    "expresion": "Math.round(((stats.por_proveedor?.EMAIL ?? 0) / stats.total) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje visual para distribución de proveedores en admin"
+  },
+  {
+    "archivo": "src/pages/AdminPage.tsx",
+    "expresion": "Math.round(((stats.por_proveedor?.GOOGLE ?? 0) / stats.total) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje visual para distribución de proveedores en admin"
+  },
+  {
+    "archivo": "src/pages/AdminPage.tsx",
+    "expresion": "Math.round(((stats.por_proveedor?.TELEFONO ?? 0) / stats.total) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje visual para distribución de proveedores en admin"
+  },
+  {
+    "archivo": "src/pages/AdminPage.tsx",
+    "expresion": "Math.round((stats.onboarding_completo / stats.total) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de usuarios con onboarding completo"
+  },
+  {
+    "archivo": "src/pages/AdminPage.tsx",
+    "expresion": "Math.round((stats.whatsapp_vinculados / stats.total) * 100)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de usuarios con whatsapp vinculado"
+  },
+  {
+    "archivo": "src/pages/app/dashboard/DashboardPage.tsx",
+    "expresion": "acc + Number(curr.monto)",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de totales para tarjeta de gastos en dashboard (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/dashboard/DashboardPage.tsx",
+    "expresion": "b.monto - a.monto",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Comparación para ordenamiento visual por monto en dashboard"
+  },
+  {
+    "archivo": "src/pages/app/dashboard/DashboardPage.tsx",
+    "expresion": "m.monto + m.reintegro.monto",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de monto neto con reintegro para tabla en dashboard (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/dashboard/DashboardPage.tsx",
+    "expresion": "Math.round((sum / total) * 100)",
+    "cantidad": 2,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para gráfico de distribución de gastos en dashboard"
+  },
+  {
+    "archivo": "src/pages/app/dashboard/DashboardPage.tsx",
+    "expresion": "Math.round((val / total) * 100)",
+    "cantidad": 2,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para gráfico circular de categorías en dashboard"
+  },
+  {
+    "archivo": "src/pages/app/lo-que-se-repite/textos.ts",
+    "expresion": "(sumasPorMoneda[monedaNorm] || 0) + monto",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de montos de pagos recurrentes (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/metas/GoalsBarChart.tsx",
+    "expresion": "Math.round(monto)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de valor para etiqueta de eje en gráfico de metas"
+  },
+  {
+    "archivo": "src/pages/app/metas/GoalsBarChart.tsx",
+    "expresion": "monto / 1_000",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Abreviación de miles para etiqueta en gráfico de metas"
+  },
+  {
+    "archivo": "src/pages/app/metas/GoalsBarChart.tsx",
+    "expresion": "monto / 1_000_000",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Abreviación de millones para etiqueta en gráfico de metas"
+  },
+  {
+    "archivo": "src/pages/app/metas/MetasPage.tsx",
+    "expresion": "acc + Number(g.monto_actual)",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Suma acumulativa de saldos acumulados en metas (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/metas/MetasPage.tsx",
+    "expresion": "acc + Number(g.monto_objetivo)",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Suma acumulativa de montos objetivo de metas (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetBarChart.tsx",
+    "expresion": "(gastado / limite) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para ancho de barra de consumo presupuestario"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetBarChart.tsx",
+    "expresion": "limite / maxLimite",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Escalamiento relativo para ancho visual de barras de presupuestos"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetBarChart.tsx",
+    "expresion": "Math.round(monto)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de valor para etiqueta en gráfico de presupuestos"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetBarChart.tsx",
+    "expresion": "monto / 1_000",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Abreviación de miles para etiqueta en gráfico de presupuestos"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetBarChart.tsx",
+    "expresion": "monto / 1_000_000",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Abreviación de millones para etiqueta en gráfico de presupuestos"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetCard.tsx",
+    "expresion": "(gastado / limite) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra visual de progreso de presupuesto"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetCard.tsx",
+    "expresion": "gastado - limite",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de exceso presupuestario en tarjeta (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetCard.tsx",
+    "expresion": "limite - gastado",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de remanente disponible en tarjeta de presupuesto (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/BudgetHistoryModal.tsx",
+    "expresion": "acc + Number(h.monto_usado || 0)",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de gasto presupuestario histórico (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/PresupuestosPage.tsx",
+    "expresion": "(totalGastadoNum / totalLimiteNum) * 100",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Porcentaje para barra general de ejecución presupuestaria"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/PresupuestosPage.tsx",
+    "expresion": "acc + Number(p.periodo_actual?.monto_limite || 0)",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de límites presupuestarios totales (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/PresupuestosPage.tsx",
+    "expresion": "acc + Number(p.periodo_actual?.monto_usado || 0)",
+    "cantidad": 2,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de gastos presupuestarios totales (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/pages/app/presupuestos/PresupuestosPage.tsx",
+    "expresion": "gastado / limite",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Cálculo de ratio de consumo para color visual de barra"
+  },
+  {
+    "archivo": "src/pages/app/transacciones/TransaccionesPage.tsx",
+    "expresion": "Math.round(monto)",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Redondeo de monto para presentación visual en transacciones"
+  },
+  {
+    "archivo": "src/pages/app/transacciones/TransaccionesPage.tsx",
+    "expresion": "totalIngresos - totalGastos",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Cálculo de balance del periodo en página de transacciones (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/services/exportPdf.service.ts",
+    "expresion": "(tx.tipo === 'ingreso' ? '+' : '-') + simbolo + formatMonto(Number(tx.monto))",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Formato visual de cadena para línea de transacción en documento PDF"
+  },
+  {
+    "archivo": "src/services/exportPdf.service.ts",
+    "expresion": "egrARS += monto",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de egresos en ARS para sumario en PDF (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/services/exportPdf.service.ts",
+    "expresion": "egrUSD += monto",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de egresos en USD para sumario en PDF (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/services/exportPdf.service.ts",
+    "expresion": "ingARS += monto",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de ingresos en ARS para sumario en PDF (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/services/exportPdf.service.ts",
+    "expresion": "ingUSD += monto",
+    "cantidad": 1,
+    "categoria": "pendiente",
+    "motivo": "Acumulación de ingresos en USD para sumario en PDF (se migra en Bloque J)"
+  },
+  {
+    "archivo": "src/services/exportPdf.service.ts",
+    "expresion": "signo + simbolo + formatMonto(Number(m.monto))",
+    "cantidad": 1,
+    "categoria": "dibujo",
+    "motivo": "Formato visual de cadena para fila en reporte PDF"
+  },
+  {
+    "archivo": "src/utils/ayudasEscritura.ts",
+    "expresion": "Math.round((monto * porcentaje / 100) * 100) / 100",
+    "cantidad": 1,
+    "categoria": "ayuda_escritura",
+    "motivo": "Ayuda de escritura para cálculo de monto a partir de porcentaje"
+  },
+  {
+    "archivo": "src/utils/ayudasEscritura.ts",
+    "expresion": "Math.round((montoIngresado - total) * 100) / 100",
+    "cantidad": 1,
+    "categoria": "ayuda_escritura",
+    "motivo": "Ayuda de escritura para cálculo de excedente o diferencia"
+  },
+  {
+    "archivo": "src/utils/ayudasEscritura.ts",
+    "expresion": "Math.round((total / cantidad) * 100) / 100",
+    "cantidad": 1,
+    "categoria": "ayuda_escritura",
+    "motivo": "Ayuda de escritura para cálculo de cuota a partir del total"
+  },
+  {
+    "archivo": "src/utils/ayudasEscritura.ts",
+    "expresion": "Math.round(cuota * cantidad * 100) / 100",
+    "cantidad": 1,
+    "categoria": "ayuda_escritura",
+    "motivo": "Ayuda de escritura para cálculo del total a partir de la cuota"
+  },
+  {
+    "archivo": "src/utils/ayudasEscritura.ts",
+    "expresion": "Math.round(monto * 0.5)",
+    "cantidad": 1,
+    "categoria": "ayuda_escritura",
+    "motivo": "Ayuda de escritura para chip de 50% redondeado a enteros"
+  }
+]

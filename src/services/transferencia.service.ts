@@ -1,9 +1,24 @@
 import api, { encabezadoClave } from './api'
-import type { TransferenciaInterna } from '@/types'
+import type { TransferenciaInterna, SimularTransferenciaResponse } from '@/types'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
 
 const transferenciaService = {
+  simularTransferencia: async (
+    params: {
+      monto: number
+      cotizacion: number
+      moneda_origen: 'ARS' | 'USD'
+      moneda_destino: 'ARS' | 'USD'
+    },
+    signal?: AbortSignal
+  ): Promise<SimularTransferenciaResponse> => {
+    const response = await api.get<SimularTransferenciaResponse>('/transferencias/simular', {
+      params,
+      signal,
+    })
+    return response.data
+  },
   getTransferencias: async () => {
     const response = await api.get<TransferenciaInterna[]>('/transferencias')
     return response.data

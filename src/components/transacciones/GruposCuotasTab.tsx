@@ -63,7 +63,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const [saving, setSaving] = useState(false)
 
   // States for the 2-slide Detail & Prepay modal
-  const [detailSlide, setDetailSlide] = useState<'detail' | 'prepay'>('detail')
+  const [detailSlide, setDetailSlide] = useState<'detail' | 'prepay' | 'reintegro'>('detail')
   const [detailSlideDirection, setDetailSlideDirection] = useState<'forward' | 'back'>('forward')
   const [billeteraSeleccionada, setBilleteraSeleccionada] = useState<string>('')
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -350,6 +350,30 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const handleGoPrepay = () => {
     setDetailSlideDirection('forward')
     setDetailSlide('prepay')
+  }
+
+  const handleGoReintegro = () => {
+    setDetailSlideDirection('forward')
+    setDetailSlide('reintegro')
+  }
+
+  const handleReintegroGuardado = async () => {
+    sileo.success({ title: 'Listo' })
+    try {
+      const data = await grupoCuotasService.getGruposCuotas()
+      setGrupos(data)
+      if (selectedGrupo) {
+        const updated = data.find(g => g.id === selectedGrupo.id)
+        if (updated) {
+          setSelectedGrupo(updated)
+        }
+      }
+    } catch (e) {
+      console.error(e)
+    }
+    onRefreshNeeded?.()
+    setDetailSlideDirection('back')
+    setDetailSlide('detail')
   }
 
   const handleBackToDetail = () => {
@@ -834,7 +858,9 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         handleAdelantar={handleAdelantar}
         handleEditClick={handleEditClick}
         handleGoPrepay={handleGoPrepay}
+        handleGoReintegro={handleGoReintegro}
         handleBackToDetail={handleBackToDetail}
+        handleReintegroGuardado={handleReintegroGuardado}
         ejecutarPrepago={ejecutarPrepago}
         setBilleteraSeleccionada={setBilleteraSeleccionada}
         detailWalletsCarouselRef={detailWalletsCarouselRef}

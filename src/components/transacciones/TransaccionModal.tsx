@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useReducer, useRef, useCallback } from 'react'
+import { useState, useMemo, useEffect, useReducer, useRef, useCallback } from 'react'
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -12,15 +12,15 @@ import {
   Wallet,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
-import type { Transaccion, Billetera, Categoria, TarjetaCredito } from '@/types'
+import type { Transaccion, Billetera, Categoria, TarjetaCredito, Subcategoria } from '@/types'
 import transaccionService from '@/services/transaccion.service'
+import categoriaService from '@/services/categoria.service'
 import { nuevaClaveOperacion } from '@/services/api'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
 import styles from './TransaccionModal.module.css'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import { sileo } from 'sileo'
-import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { DateInput, SelectableSurface } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
@@ -38,13 +38,16 @@ import { ReintegroSwitchCard } from './ReintegroBloque'
 import ReintegroPaso from './ReintegroPaso'
 import { initialState, formReducer, calcularPasosConClaves } from './pasosTransaccion'
 import { useReintegro } from './useReintegro'
+import QueEsEstaPlataBloque from './QueEsEstaPlataBloque'
+import { useQueEsEstaPlata } from './useQueEsEstaPlata'
+import { useEliminarTransaccion } from './useEliminarTransaccion'
 
 function isBankLight(b: Billetera): boolean {
   const bank = b.bank_id ? getBankById(b.bank_id) : findBankByNombre(b.nombre)
   return !bank || bank.colorTexto === 'white'
 }
 
-interface TransaccionModalProps {
+export interface TransaccionModalProps {
   open: boolean
   onClose: () => void
   transaccion?: Transaccion | null
@@ -62,17 +65,18 @@ export default function TransaccionModal({
 }: TransaccionModalProps) {
   const isEdit = !!transaccion
   const isCuotaHija = isEdit && !!transaccion?.es_cuota_hija
-  const { confirm } = useModal()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const carouselRef = useRef<HTMLDivElement>(null)
   const slidesContainerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const submittingRef = useRef(false)
   const claveOperacionRef = useRef<string>('')
+  const claveQueEsRef = useRef<string>('')
 
   useEffect(() => {
     if (open) {
       claveOperacionRef.current = nuevaClaveOperacion()
+      claveQueEsRef.current = nuevaClaveOperacion()
     }
   }, [open])
 
@@ -106,48 +110,12 @@ export default function TransaccionModal({
     }
   }, [])
 
-  const handleDeleteTransaction = () => {
-    if (!transaccion) return
-
-    if (isCuotaHija) {
-      confirm({
-        title: '¿Eliminar esta cuota?',
-        description: 'Se eliminará únicamente esta cuota pendiente. El resto de las cuotas y la compra se mantendrán intactas.',
-        variant: 'danger',
-        confirmLabel: 'Eliminar cuota',
-        onConfirm: async () => {
-          try {
-            await transaccionService.deleteCuotaIndividual(transaccion.id)
-            sileo.success({ title: 'Cuota eliminada correctamente' })
-            onSuccess()
-            onClose()
-          } catch (e) {
-            console.error(e)
-            sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar la cuota') })
-          }
-        }
-      })
-      return
-    }
-
-    confirm({
-      title: '¿Eliminar transacción?',
-      description: 'Esta acción no se puede deshacer y restaurará el saldo correspondiente.',
-      variant: 'danger',
-      confirmLabel: 'Eliminar',
-      onConfirm: async () => {
-        try {
-          await transaccionService.deleteTransaccion(transaccion.id)
-          sileo.success({ title: 'Transacción eliminada correctamente' })
-          onSuccess()
-          onClose()
-        } catch (e) {
-          console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar la transacción') })
-        }
-      }
-    })
-  }
+  const { handleDeleteTransaction } = useEliminarTransaccion({
+    transaccion,
+    isCuotaHija,
+    onSuccess,
+    onClose,
+  })
 
   const {
     step, slideDirection, tipo, monto, moneda, descripcion, categoriaId, subcategoriaId,
@@ -172,6 +140,45 @@ export default function TransaccionModal({
     moneda,
     isEdit,
     onReintegroQuitado: () => onSuccess(transaccion),
+  })
+
+  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
+
+  useEffect(() => {
+    if (!categoriaId) return
+    let active = true
+    categoriaService
+      .getSubcategorias(categoriaId)
+      .then((data) => {
+        if (active) setSubcategorias(data)
+      })
+      .catch(console.error)
+    return () => {
+      active = false
+    }
+  }, [categoriaId])
+
+  const subcategoriaNombre = useMemo(() => {
+    if (!subcategoriaId) return ''
+    const found = subcategorias.find((s) => s.id === subcategoriaId)
+    if (found) return found.nombre
+    if (transaccion?.subcategoria_id === subcategoriaId && transaccion?.subcategoria?.nombre) {
+      return transaccion.subcategoria.nombre
+    }
+    return ''
+  }, [subcategoriaId, subcategorias, transaccion])
+
+  const mostrarQueEsEstaPlata = useMemo(() => {
+    if (tipo !== 'ingreso') return false
+    const nom = subcategoriaNombre.trim().toLowerCase()
+    return nom === 'cobros de personas' || nom === 'pasó por mi cuenta' || nom === 'paso por mi cuenta'
+  }, [tipo, subcategoriaNombre])
+
+  const queEsPlataHook = useQueEsEstaPlata({
+    subcategoriaNombre: mostrarQueEsEstaPlata ? subcategoriaNombre : null,
+    moneda,
+    fecha,
+    monto: monto ? Number(monto) : null,
   })
 
   // Secuencia dinámica de pasos según tipo, método de pago y reintegros
@@ -541,6 +548,14 @@ export default function TransaccionModal({
       return
     }
 
+    if (tipo === 'ingreso' && mostrarQueEsEstaPlata) {
+      const val = queEsPlataHook.validar()
+      if (!val.valido) {
+        sileo.error({ title: val.mensaje || 'Completá los datos requeridos' })
+        return
+      }
+    }
+
     if (tipo === 'egreso' && !isCuotaHija && reintegroHook.tieneReintegro) {
       const montoReintegro = reintegroHook.montoFinal
       if (!montoReintegro || montoReintegro <= 0) {
@@ -635,6 +650,14 @@ export default function TransaccionModal({
             sileo.error({ title: getErrorMessage(err, 'No se pudo guardar el reintegro') })
           }
         }
+        if (savedTx && tipo === 'ingreso' && mostrarQueEsEstaPlata) {
+          try {
+            await queEsPlataHook.responderQueEs(savedTx.id, claveQueEsRef.current)
+          } catch (err) {
+            console.error(err)
+            sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el motivo del ingreso') })
+          }
+        }
         sileo.success({
           title: metodoPago === 'credito' ? 'Compra en cuotas registrada' : 'Transacción creada'
         })
@@ -648,6 +671,14 @@ export default function TransaccionModal({
           } catch (err) {
             console.error(err)
             sileo.error({ title: getErrorMessage(err, 'No se pudo guardar el reintegro') })
+          }
+        }
+        if (savedTx && tipo === 'ingreso' && mostrarQueEsEstaPlata) {
+          try {
+            await queEsPlataHook.responderQueEs(transaccion.id, claveQueEsRef.current)
+          } catch (err) {
+            console.error(err)
+            sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el motivo del ingreso') })
           }
         }
         if (isPendienteIA) {
@@ -1083,6 +1114,15 @@ export default function TransaccionModal({
                     <p className={memoriaStyles.sugerenciaText}>
                       Categoría que usaste antes para &quot;{sugerenciaClave}&quot;.
                     </p>
+                  )}
+
+                  {/* ¿Qué es esta plata? para ingresos */}
+                  {mostrarQueEsEstaPlata && (
+                    <QueEsEstaPlataBloque
+                      hook={queEsPlataHook}
+                      moneda={moneda}
+                      categorias={categorias}
+                    />
                   )}
 
                   {/* En egresos: botón switch para habilitar reintegro */}

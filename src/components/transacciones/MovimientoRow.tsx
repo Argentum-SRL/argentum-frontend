@@ -24,6 +24,14 @@ interface MovimientoRowProps {
 
 import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 
+function formatDDMM(fechaIso?: string | null): string {
+  if (!fechaIso) return ''
+  const clean = fechaIso.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length < 3) return fechaIso
+  return `${parts[2]}/${parts[1]}`
+}
+
 const MovimientoRow = memo(({
   movimiento,
   categoria,
@@ -35,7 +43,7 @@ const MovimientoRow = memo(({
   modo = 'general',
 }: MovimientoRowProps) => {
   if (movimiento.clase === 'transaccion' && movimiento.transaccion) {
-    const hasCuotasGroup = Boolean(movimiento.grupo_cuotas_id)
+    const hasCuotasGroup = Boolean(movimiento.grupo_cuotas_id) && !movimiento.transaccion.reintegro_de_id
     return (
       <TransaccionRow
         transaccion={movimiento.transaccion}
@@ -157,27 +165,25 @@ const MovimientoRow = memo(({
         <div className={`${styles.amount} ${amountColorClass}`}>
           {sign && <span className={styles.amountSign}>{sign}</span>}
           <span className={styles.amountNumber}>{formatMonto(movimiento.monto, movimiento.moneda)}</span>
-          {movimiento.reintegro && (
-            <span
-              className={
-                movimiento.reintegro.estado === 'recibido'
-                  ? styles.reintegroIconRecibido
-                  : styles.reintegroIconPendiente
-              }
-              title={
-                movimiento.reintegro.estado === 'recibido'
-                  ? `Pagaste ${formatMonto(movimiento.monto + movimiento.reintegro.monto, movimiento.moneda)} · Te devolvieron ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)}`
-                  : `Reintegro de ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)} pendiente`
-              }
-              aria-label={
-                movimiento.reintegro.estado === 'recibido'
-                  ? `Pagaste ${formatMonto(movimiento.monto + movimiento.reintegro.monto, movimiento.moneda)} · Te devolvieron ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)}`
-                  : `Reintegro de ${formatMonto(movimiento.reintegro.monto, movimiento.moneda)} pendiente`
-              }
-            >
-              <BadgePercent size={14} />
-            </span>
-          )}
+          {movimiento.reintegro && (() => {
+            const { monto: rMonto, estado: rEstado, fecha_recibido: rFecha } = movimiento.reintegro
+            const label = rEstado === 'recibido'
+              ? `Te devolvieron ${formatMonto(rMonto, movimiento.moneda)} el ${formatDDMM(rFecha)}`
+              : `Reintegro de ${formatMonto(rMonto, movimiento.moneda)} pendiente`
+            return (
+              <span
+                className={
+                  rEstado === 'recibido'
+                    ? styles.reintegroIconRecibido
+                    : styles.reintegroIconPendiente
+                }
+                title={label}
+                aria-label={label}
+              >
+                <BadgePercent size={14} />
+              </span>
+            )
+          })()}
         </div>
       </div>
     </div>

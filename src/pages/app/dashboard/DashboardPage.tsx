@@ -39,6 +39,14 @@ import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
 
+function formatDDMM(fechaIso?: string | null): string {
+  if (!fechaIso) return ''
+  const clean = fechaIso.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length < 3) return fechaIso
+  return `${parts[2]}/${parts[1]}`
+}
+
 import { getFotoUrl } from '@/utils/fotoUrl'
 import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 import FacturaPanel from '@/components/facturas/FacturaPanel'
@@ -1218,30 +1226,28 @@ export default function DashboardPage() {
                             return (
                               <div className={`${styles.itemAmount} ${amountColorClass}`}>
                                 {sign}{formatMonto(m.monto, m.moneda)}
-                                {m.reintegro && (
-                                  <span
-                                    style={{
-                                      color: m.reintegro.estado === 'recibido' ? 'var(--success)' : 'var(--text-2)',
-                                      marginLeft: 4,
-                                      verticalAlign: 'middle',
-                                      flexShrink: 0,
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                    }}
-                                    title={
-                                      m.reintegro.estado === 'recibido'
-                                        ? `Pagaste ${formatMonto(m.monto + m.reintegro.monto, m.moneda)} · Te devolvieron ${formatMonto(m.reintegro.monto, m.moneda)}`
-                                        : `Reintegro de ${formatMonto(m.reintegro.monto, m.moneda)} pendiente`
-                                    }
-                                    aria-label={
-                                      m.reintegro.estado === 'recibido'
-                                        ? `Pagaste ${formatMonto(m.monto + m.reintegro.monto, m.moneda)} · Te devolvieron ${formatMonto(m.reintegro.monto, m.moneda)}`
-                                        : `Reintegro de ${formatMonto(m.reintegro.monto, m.moneda)} pendiente`
-                                    }
-                                  >
-                                    <BadgePercent size={14} />
-                                  </span>
-                                )}
+                                {m.reintegro && (() => {
+                                  const { monto: rMonto, estado: rEstado, fecha_recibido: rFecha } = m.reintegro
+                                  const rLabel = rEstado === 'recibido'
+                                    ? `Te devolvieron ${formatMonto(rMonto, m.moneda)} el ${formatDDMM(rFecha)}`
+                                    : `Reintegro de ${formatMonto(rMonto, m.moneda)} pendiente`
+                                  return (
+                                    <span
+                                      style={{
+                                        color: rEstado === 'recibido' ? 'var(--success)' : 'var(--text-2)',
+                                        marginLeft: 4,
+                                        verticalAlign: 'middle',
+                                        flexShrink: 0,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                      }}
+                                      title={rLabel}
+                                      aria-label={rLabel}
+                                    >
+                                      <BadgePercent size={14} />
+                                    </span>
+                                  )
+                                })()}
                               </div>
                             )
                           })()}

@@ -1,5 +1,5 @@
 import api, { encabezadoClave } from './api'
-import type { Transaccion, SugerenciaPesosResponse } from '@/types'
+import type { Transaccion, SugerenciaPesosResponse, GastoParaVincular } from '@/types'
 import { invalidateBilleteras } from './billetera.service'
 import { invalidateResumen } from './dashboard.service'
 import { invalidatePresupuestos } from './presupuesto.service'
@@ -133,10 +133,42 @@ const transaccionService = {
       window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: response.data }))
     }
     return response.data
+  },
+
+  getGastosParaVincular: async (
+    params: { moneda: 'ARS' | 'USD'; fecha: string; monto: number },
+    signal?: AbortSignal
+  ) => {
+    const response = await api.get<GastoParaVincular[]>('/transacciones/gastos-para-vincular', {
+      params,
+      signal,
+    })
+    return response.data
+  },
+
+  responderQueEsEstaPlata: async (
+    id: string,
+    payload: { opcion: 'me_pagaron' | 'parte_de_gasto' | 'paso_por_mi_cuenta'; gasto_id?: string | null },
+    clave?: string
+  ) => {
+    const response = await api.post<Transaccion>(
+      `/transacciones/${id}/que-es-esta-plata`,
+      payload,
+      encabezadoClave(clave)
+    )
+    invalidateBilleteras()
+    invalidateResumen()
+    invalidatePresupuestos()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('argentum:transaccion-creada', { detail: response.data }))
+    }
+    return response.data
   }
 }
 
 export const setReintegro = transaccionService.setReintegro
 export const quitarReintegro = transaccionService.quitarReintegro
+export const getGastosParaVincular = transaccionService.getGastosParaVincular
+export const responderQueEsEstaPlata = transaccionService.responderQueEsEstaPlata
 
 export default transaccionService

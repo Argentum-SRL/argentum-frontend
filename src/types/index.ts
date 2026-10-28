@@ -371,6 +371,21 @@ export interface Transaccion {
   tipo_dolar_usado?: string | null
   factura_id?: string | null
   reintegro?: ReintegroInfo | null
+  reintegro_de_id?: string | null
+  tipo_espejo?: 'reintegro' | 'parte' | null
+}
+
+export interface GastoParaVincular {
+  id: string
+  descripcion: string
+  fecha: string
+  monto: number
+  disponible: number
+  categoria_id?: string | null
+  subcategoria_id?: string | null
+  categoria_nombre?: string | null
+  subcategoria_nombre?: string | null
+  suscripcion_id?: string | null
 }
 
 export interface ReintegroInfo {
@@ -997,6 +1012,7 @@ export interface GrupoCuotasResumen {
   categoria_id?: string | null
   subcategoria_id?: string | null
   suscripcion_id?: string | null
+  reintegro?: ReintegroInfo | null
 }
 
 export interface GrupoCuotasUpdate {

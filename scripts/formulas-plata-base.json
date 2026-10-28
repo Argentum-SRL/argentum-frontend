@@ -336,13 +336,6 @@
     "motivo": "Comparación para ordenamiento visual de grupos de cuotas"
   },
   {
-    "archivo": "src/components/transacciones/MovimientoRow.tsx",
-    "expresion": "movimiento.monto + movimiento.reintegro.monto",
-    "cantidad": 2,
-    "categoria": "pendiente",
-    "motivo": "Cálculo de monto neto con reintegro para fila de movimiento (se migra en Bloque J)"
-  },
-  {
     "archivo": "src/components/transacciones/pasosTransaccion.ts",
     "expresion": "saldoB - saldoA",
     "cantidad": 1,
@@ -355,13 +348,6 @@
     "cantidad": 1,
     "categoria": "dibujo",
     "motivo": "Comparación para ordenamiento visual de billeteras por saldo en modal"
-  },
-  {
-    "archivo": "src/components/transacciones/TransaccionRow.tsx",
-    "expresion": "transaccion.monto + transaccion.reintegro.monto",
-    "cantidad": 2,
-    "categoria": "pendiente",
-    "motivo": "Cálculo de monto neto con reintegro para fila de transacción (se migra en Bloque J)"
   },
   {
     "archivo": "src/components/transferencias/useTransferenciasFilters.ts",
@@ -488,13 +474,6 @@
     "cantidad": 1,
     "categoria": "dibujo",
     "motivo": "Comparación para ordenamiento visual por monto en dashboard"
-  },
-  {
-    "archivo": "src/pages/app/dashboard/DashboardPage.tsx",
-    "expresion": "m.monto + m.reintegro.monto",
-    "cantidad": 2,
-    "categoria": "pendiente",
-    "motivo": "Cálculo de monto neto con reintegro para tabla en dashboard (se migra en Bloque J)"
   },
   {
     "archivo": "src/pages/app/dashboard/DashboardPage.tsx",

@@ -1,7 +1,7 @@
 /**
  * Modal de detalle y acciones (prepago y cancelación) para un grupo de compras en cuotas.
  */
-import type { RefObject } from 'react'
+import { useMemo, useState, type RefObject } from 'react'
 import {
   Trash2,
   X,
@@ -20,10 +20,14 @@ import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import SelectableSurface from '@/components/ui/SelectableSurface'
 import Modal from '@/components/ui/Modal/Modal'
 import GrupoCuotasAvatar from './GrupoCuotasAvatar'
+import ReintegroBloque, { ReintegroSwitchCard } from './ReintegroBloque'
+import { useReintegro } from './useReintegro'
+import { sileo } from 'sileo'
+import { getErrorMessage } from '@/utils/errorMessages'
 
 export interface GrupoCuotasDetalleModalProps {
   selectedGrupo: GrupoCuotasResumen | null
-  detailSlide: 'detail' | 'prepay'
+  detailSlide: 'detail' | 'prepay' | 'reintegro'
   detailSlideDirection: 'forward' | 'back'
   detailSelectedCat?: Categoria
   categorias?: Categoria[]
@@ -40,7 +44,9 @@ export interface GrupoCuotasDetalleModalProps {
   handleAdelantar?: (grupo: GrupoCuotasResumen) => void
   handleEditClick: (grupo: GrupoCuotasResumen) => void
   handleGoPrepay: () => void
+  handleGoReintegro: () => void
   handleBackToDetail: () => void
+  handleReintegroGuardado: () => void
   ejecutarPrepago: (grupoId: string) => Promise<void> | void
   setBilleteraSeleccionada: (id: string) => void
   detailWalletsCarouselRef: RefObject<HTMLDivElement | null>
@@ -65,12 +71,29 @@ export default function GrupoCuotasDetalleModal({
   handleAdelantar,
   handleEditClick,
   handleGoPrepay,
+  handleGoReintegro,
   handleBackToDetail,
+  handleReintegroGuardado,
   ejecutarPrepago,
   setBilleteraSeleccionada,
   detailWalletsCarouselRef,
 }: GrupoCuotasDetalleModalProps) {
   const tieneTarjeta = Boolean(selectedGrupo?.tarjeta_nombre || selectedGrupo?.vencimiento_adelanto)
+  const [savingReintegro, setSavingReintegro] = useState(false)
+  // Objeto estable: useReintegro reinicia su estado cuando cambia la transacción (un objeto nuevo en cada render lo reiniciaría sin fin)
+  const padreId = selectedGrupo?.transaccion_padre_id ?? null
+  const padreReintegro = selectedGrupo?.reintegro ?? null
+  const transaccionPadre = useMemo(
+    () => (padreId ? { id: padreId, reintegro: padreReintegro } : null),
+    [padreId, padreReintegro]
+  )
+  const reintegroHook = useReintegro({
+    transaccion: transaccionPadre,
+    montoCompra: selectedGrupo?.monto_total ?? null,
+    fechaCompra: selectedGrupo?.fecha_compra ? selectedGrupo.fecha_compra.split('T')[0] : '',
+    moneda: (selectedGrupo?.moneda as 'ARS' | 'USD') || 'ARS',
+    isEdit: true,
+  })
   return (
     <>
       {/* ── MODAL DE DETALLE & ACCIONES DE CUOTA ────────────────────────── */}
@@ -268,6 +291,17 @@ export default function GrupoCuotasDetalleModal({
                           </div>
                         )}
 
+                        {/* Reintegro switch card */}
+                        {selectedGrupo.transaccion_padre_id && (
+                          <ReintegroSwitchCard
+                            tieneReintegro={Boolean(selectedGrupo.reintegro)}
+                            onToggle={() => {
+                              reintegroHook.setTieneReintegro(true)
+                              handleGoReintegro()
+                            }}
+                          />
+                        )}
+
                       </div>
                     </div>
 
@@ -458,6 +492,95 @@ export default function GrupoCuotasDetalleModal({
                         {saving
                           ? 'Procesando pago...'
                           : `Confirmar pago (${formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)})`}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* ──── SLIDE 3: Devolución o reintegro ──── */}
+                <div
+                  className={`${styles.slide} ${
+                    detailSlide === 'reintegro'
+                      ? styles.slideVisible
+                      : detailSlideDirection === 'forward'
+                      ? styles.slideEnterRight
+                      : styles.slideEnterLeft
+                  }`}
+                  data-modal-frame
+                >
+                  <form
+                    className={styles.formContainer}
+                    onSubmit={async (e) => {
+                      e.preventDefault()
+                      if (!selectedGrupo.transaccion_padre_id) return
+                      setSavingReintegro(true)
+                      try {
+                        await reintegroHook.guardarReintegro(selectedGrupo.transaccion_padre_id)
+                        handleReintegroGuardado()
+                      } catch (err) {
+                        console.error(err)
+                        sileo.error({ title: getErrorMessage(err, 'No pudimos guardar el reintegro.') })
+                      } finally {
+                        setSavingReintegro(false)
+                      }
+                    }}
+                    data-modal-frame
+                  >
+                    <div className={styles.formHeader}>
+                      <div className={styles.headerLeft}>
+                        <button
+                          type="button"
+                          className={styles.backBtn}
+                          onClick={handleBackToDetail}
+                          title="Volver al detalle"
+                          aria-label="Volver al detalle"
+                        >
+                          <ChevronLeft size={18} strokeWidth={2} />
+                        </button>
+                        <div>
+                          <h2 className={styles.headerTitle}>Devolución o reintegro</h2>
+                        </div>
+                      </div>
+                      <div className={styles.headerRightActions}>
+                        <button
+                          type="button"
+                          className={styles.closeBtn}
+                          onClick={handleCloseDetail}
+                          title="Cerrar"
+                          aria-label="Cerrar"
+                        >
+                          <X size={18} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      className={styles.formBody}
+                      data-modal-stack
+                    >
+                      <div className={styles.formFields}>
+                        <ReintegroBloque
+                          reintegro={reintegroHook}
+                          isEdit={true}
+                        />
+                      </div>
+                    </div>
+
+                    <div className={styles.formFooter}>
+                      <button
+                        type="button"
+                        className={styles.cancelBtn}
+                        onClick={handleBackToDetail}
+                        disabled={savingReintegro}
+                      >
+                        Atrás
+                      </button>
+                      <button
+                        type="submit"
+                        className={styles.submitBtn}
+                        disabled={savingReintegro}
+                      >
+                        {savingReintegro ? 'Guardando...' : 'Guardar'}
                       </button>
                     </div>
                   </form>

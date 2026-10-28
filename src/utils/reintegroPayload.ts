@@ -4,7 +4,7 @@ export interface EntradaArmarPayloadReintegro {
   tieneReintegro: boolean
   teniaReintegroInicial: boolean
   isCompraRecibidaInicial: boolean
-  modoMonto: 'monto' | 'porcentaje'
+  modoMonto: 'monto' | 'porcentaje' | 'todo'
   montoManual: number | null
   porcentaje: number | null
   montoCompra: number | null
@@ -62,11 +62,13 @@ export function armarPayloadReintegro(
   }
 
   const monto =
-    modoMonto === 'monto'
-      ? montoManual
-      : montoCompra && porcentaje && porcentaje > 0
-        ? montoDesdePorcentaje(montoCompra, porcentaje)
-        : null
+    modoMonto === 'todo'
+      ? montoCompra
+      : modoMonto === 'monto'
+        ? montoManual
+        : montoCompra && porcentaje && porcentaje > 0
+          ? montoDesdePorcentaje(montoCompra, porcentaje)
+          : null
 
   if (!monto || monto <= 0) {
     return { accion: 'nada' }

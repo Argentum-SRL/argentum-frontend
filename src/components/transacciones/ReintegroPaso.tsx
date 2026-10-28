@@ -67,7 +67,7 @@ export default function ReintegroPaso({
                 <ChevronLeft size={18} strokeWidth={2} />
               </button>
               <div>
-                <h2 className={styles.headerTitle}>Reintegro</h2>
+                <h2 className={styles.headerTitle}>Devolución o reintegro</h2>
               </div>
             </div>
             <div className={styles.headerRightActions}>

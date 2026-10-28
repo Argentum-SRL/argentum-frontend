@@ -240,6 +240,7 @@ export const SUBCATEGORIA_VISUAL: Record<string, SubcategoriaVisual> = {
 
   // Otros (ingreso)
   'cobros de personas':       { iconSrc: '/assets/icons/subcategorias/personas%20Background%20Removed.png', label: 'Cobros de personas' },
+  'paso por mi cuenta':       { iconSrc: '/assets/icons/categorias/dineroenmano%20Background%20Removed.png', label: 'Pasó por mi cuenta' },
   'reintegros':               { iconSrc: '/assets/icons/categorias/dineroenmano%20Background%20Removed.png', label: 'Reintegros' },
 
   'otros':                    { iconSrc: '/assets/icons/categorias/herramienta%20Background%20Removed.png', label: 'Otros' },

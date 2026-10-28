@@ -116,5 +116,33 @@ describe('reintegroPayload', () => {
     })
     expect(res).toEqual({ accion: 'nada' })
   })
+
+  it('crear con modoMonto todo, montoCompra 100000 y "Sí"', () => {
+    const res = armarPayloadReintegro({
+      ...baseEntrada,
+      modoMonto: 'todo',
+      montoCompra: 100000,
+      montoManual: null,
+      yaRecibido: true,
+    })
+    expect(res).toEqual({
+      accion: 'guardar',
+      payload: {
+        monto: 100000,
+        recibido: true,
+        fecha_recibido: '2026-10-20',
+      },
+    })
+  })
+
+  it('modoMonto todo con montoCompra null', () => {
+    const res = armarPayloadReintegro({
+      ...baseEntrada,
+      modoMonto: 'todo',
+      montoCompra: null,
+      montoManual: null,
+    })
+    expect(res).toEqual({ accion: 'nada' })
+  })
 })
 

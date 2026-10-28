@@ -1,0 +1,144 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 8px);
+  margin-top: var(--spacing-md, 16px);
+}
+
+.titulo {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-2, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding: 0;
+}
+
+.gastosSeccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 6px);
+  margin-top: var(--spacing-sm, 8px);
+}
+
+.gastosLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-1, #111827);
+  margin: 0;
+}
+
+.estadoTexto {
+  font-size: 0.875rem;
+  color: var(--text-2, #6b7280);
+  padding: var(--spacing-sm, 8px) 0;
+  font-style: italic;
+}
+
+.gastosLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 6px);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.gastoItem {
+  padding: var(--spacing-sm, 10px) var(--spacing-md, 14px);
+  border-radius: var(--radius-md, 10px);
+  cursor: pointer;
+}
+
+.gastoItemContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm, 12px);
+  width: 100%;
+}
+
+.gastoPrincipal {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 12px);
+  min-width: 0;
+  flex: 1;
+}
+
+.avatarContainer {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  background: #F8F9FA;
+}
+
+[data-theme="dark"] .avatarContainer {
+  background: #1C232E;
+  border-color: #273140;
+}
+
+.avatarIcon {
+  color: var(--text-1);
+}
+
+.gastoTitulo {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-1, #111827);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gastoDetalle {
+  font-size: 0.8125rem;
+  color: var(--text-2, #6b7280);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.modalHeaderTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: var(--text-3, #9ca3af);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm, 6px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.deleteBtn:hover {
+  color: var(--danger, #ef4444);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md, 16px);
+  padding: 4px 0;
+}
+
+.modalTexto {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-1, #111827);
+  line-height: 1.5;
+}
+

@@ -34,7 +34,7 @@ export function ReintegroSwitchCard({ tieneReintegro, onToggle, disabled }: Rein
       disabled={disabled}
       role="switch"
       aria-checked={tieneReintegro}
-      aria-label="Me devuelven plata (reintegro)"
+      aria-label="Me devolvieron plata (reintegro o devolución)"
     >
       <div
         className={`${styles.settingIconBox} ${
@@ -46,13 +46,13 @@ export function ReintegroSwitchCard({ tieneReintegro, onToggle, disabled }: Rein
 
       <div className={styles.settingInfo}>
         <div className={styles.settingLabelRow}>
-          <span className={styles.settingLabel}>Me devuelven plata (reintegro)</span>
+          <span className={styles.settingLabel}>Me devolvieron plata (reintegro o devolución)</span>
           {tieneReintegro && <span className={styles.badgePillGreen}>Activo</span>}
         </div>
         <span className={styles.settingSub}>
           {tieneReintegro
-            ? 'Se registrará el reintegro para esta compra'
-            : 'Activalo si tenés una promoción o reintegro'}
+            ? 'Se registrará para esta compra'
+            : 'Activalo si tenés una promoción o te devolvieron la compra'}
         </span>
       </div>
 
@@ -96,6 +96,7 @@ export function ReintegroBloque({ reintegro, isEdit, onToggleOff }: ReintegroBlo
     isQuitting,
     quitarReintegroInmediato,
     moneda,
+    montoCompra,
   } = reintegro
 
   const handleToggle = () => {
@@ -146,7 +147,7 @@ export function ReintegroBloque({ reintegro, isEdit, onToggleOff }: ReintegroBlo
               {/* ¿Cuánto te devuelven? */}
               <div className={styles.preguntaGrupo}>
                 <label className={styles.preguntaLabel}>¿Cuánto te devuelven?</label>
-                <SegmentedControl<'monto' | 'porcentaje'>
+                <SegmentedControl<'monto' | 'porcentaje' | 'todo'>
                   ariaLabel="¿Cuánto te devuelven?"
                   fullWidth
                   value={modoMonto}
@@ -154,9 +155,21 @@ export function ReintegroBloque({ reintegro, isEdit, onToggleOff }: ReintegroBlo
                   options={[
                     { value: 'monto', label: 'Monto' },
                     { value: 'porcentaje', label: 'Porcentaje' },
+                    { value: 'todo', label: 'Todo' },
                   ]}
                 />
-                {modoMonto === 'monto' ? (
+                {modoMonto === 'todo' ? (
+                  montoCompra != null && (
+                    <div className={styles.porcentajeWrapper}>
+                      <span className={styles.sonMontoTexto}>
+                        Son{' '}
+                        <strong className={styles.sonMontoValor}>
+                          {formatMonto(montoCompra, moneda)}
+                        </strong>
+                      </span>
+                    </div>
+                  )
+                ) : modoMonto === 'monto' ? (
                   <MontoInput
                     value={montoManual}
                     onChange={setMontoManual}

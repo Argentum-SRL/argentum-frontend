@@ -16,6 +16,14 @@ import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/bille
 import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 import styles from './TransaccionRow.module.css'
 
+function formatDDMM(fechaIso?: string | null): string {
+  if (!fechaIso) return ''
+  const clean = fechaIso.split('T')[0]
+  const parts = clean.split('-')
+  if (parts.length < 3) return fechaIso
+  return `${parts[2]}/${parts[1]}`
+}
+
 interface TransaccionRowProps {
   transaccion: Transaccion
   titulo?: string
@@ -227,7 +235,9 @@ const TransaccionRow = memo(({
       {/* ── 3. Amount & Secondary Column ─────────────────────────────────── */}
       <div className={styles.amountArea}>
         <div className={`${styles.amount} ${
-          cuentaComo === 'nada'
+          transaccion.reintegro_de_id
+            ? styles.amountIngreso
+            : cuentaComo === 'nada'
             ? styles.amountNada
             : isAporteMeta
             ? styles.amountApartado
@@ -237,29 +247,27 @@ const TransaccionRow = memo(({
             ? styles.amountIngreso
             : styles.amountEgreso
         }`}>
-          <span className={styles.amountSign}>{isIngreso ? '+' : '-'}</span>
-          <span className={styles.amountNumber}>{formatMonto(transaccion.monto, transaccion.moneda)}</span>
-          {transaccion.reintegro && (
-            <span
-              className={
-                transaccion.reintegro.estado === 'recibido'
-                  ? styles.reintegroIconRecibido
-                  : styles.reintegroIconPendiente
-              }
-              title={
-                transaccion.reintegro.estado === 'recibido'
-                  ? `Pagaste ${formatMonto(transaccion.monto + transaccion.reintegro.monto, transaccion.moneda)} · Te devolvieron ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)}`
-                  : `Reintegro de ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)} pendiente`
-              }
-              aria-label={
-                transaccion.reintegro.estado === 'recibido'
-                  ? `Pagaste ${formatMonto(transaccion.monto + transaccion.reintegro.monto, transaccion.moneda)} · Te devolvieron ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)}`
-                  : `Reintegro de ${formatMonto(transaccion.reintegro.monto, transaccion.moneda)} pendiente`
-              }
-            >
-              <BadgePercent size={14} />
-            </span>
-          )}
+          <span className={styles.amountSign}>{transaccion.reintegro_de_id ? '+' : isIngreso ? '+' : '-'}</span>
+          <span className={styles.amountNumber}>{formatMonto(transaccion.reintegro_de_id ? Math.abs(transaccion.monto) : transaccion.monto, transaccion.moneda)}</span>
+          {transaccion.reintegro && (() => {
+            const { monto: rMonto, estado: rEstado, fecha_recibido: rFecha } = transaccion.reintegro
+            const label = rEstado === 'recibido'
+              ? `Te devolvieron ${formatMonto(rMonto, transaccion.moneda)} el ${formatDDMM(rFecha)}`
+              : `Reintegro de ${formatMonto(rMonto, transaccion.moneda)} pendiente`
+            return (
+              <span
+                className={
+                  rEstado === 'recibido'
+                    ? styles.reintegroIconRecibido
+                    : styles.reintegroIconPendiente
+                }
+                title={label}
+                aria-label={label}
+              >
+                <BadgePercent size={14} />
+              </span>
+            )
+          })()}
         </div>
 
         {/* En Desktop: Método de pago o indicador de apartado */}

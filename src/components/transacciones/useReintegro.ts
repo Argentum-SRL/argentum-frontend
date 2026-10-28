@@ -10,7 +10,7 @@ function todayLocal(): string {
 }
 
 export interface UseReintegroOptions {
-  transaccion?: Transaccion | null
+  transaccion?: Pick<Transaccion, 'id' | 'reintegro'> | null
   montoCompra: number | null
   fechaCompra: string
   moneda: 'ARS' | 'USD'
@@ -31,7 +31,7 @@ export function useReintegro({
   const isCompraRecibidaInicial = Boolean(isEdit && reintegroExistente?.estado === 'recibido')
 
   const [tieneReintegro, setTieneReintegro] = useState<boolean>(teniaReintegroInicial)
-  const [modoMonto, setModoMonto] = useState<'monto' | 'porcentaje'>('monto')
+  const [modoMonto, setModoMonto] = useState<'monto' | 'porcentaje' | 'todo'>('monto')
   const [montoManual, setMontoManual] = useState<number | null>(reintegroExistente?.monto ?? null)
   const [porcentaje, setPorcentaje] = useState<number | null>(null)
   const [yaRecibido, setYaRecibido] = useState<boolean>(
@@ -61,7 +61,8 @@ export function useReintegro({
     return montoDesdePorcentaje(montoCompra, porcentaje)
   }, [montoCompra, porcentaje])
 
-  const montoFinal = modoMonto === 'monto' ? montoManual : montoCalculadoPorcentaje
+  const montoFinal =
+    modoMonto === 'todo' ? montoCompra : modoMonto === 'monto' ? montoManual : montoCalculadoPorcentaje
 
   const isCompraRecibida = isCompraRecibidaInicial && tieneReintegro
 
@@ -139,5 +140,6 @@ export function useReintegro({
     guardarReintegro,
     debeGuardarReintegro,
     moneda,
+    montoCompra,
   }
 }

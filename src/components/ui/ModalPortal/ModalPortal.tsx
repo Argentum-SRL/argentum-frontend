@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import { ModalContext } from '@/context/ModalContext'
 import BankPickerModal from '@/components/billeteras/BankPickerModal'
 import EditBilleteraModal from '@/components/billeteras/EditBilleteraModal'
-import TransaccionModal from '@/components/transacciones/TransaccionModal'
+import TransaccionModalEntrada from '@/components/transacciones/TransaccionModalEntrada'
 import TarjetaModal from '@/components/tarjetas/TarjetaModal'
 import FilterBarMobileDrawer from '@/components/transacciones/FilterBarMobileDrawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
@@ -65,7 +65,7 @@ export function ModalPortal() {
 
       {typedModals.transaccion?.isOpen && transaccionData && (
         <ModalErrorBoundary modalName="transaccion" onClose={() => closeModal('transaccion')}>
-          <TransaccionModal
+          <TransaccionModalEntrada
             open={true}
             onClose={() => closeModal('transaccion')}
             transaccion={transaccionData.transaccion}

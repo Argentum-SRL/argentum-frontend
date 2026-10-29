@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { X, Wallet, Check, AlertTriangle, CheckCircle2, ArrowLeft } from '@/components/ui/icons'
 import { LunarLoader } from '@/components/ui'
 import type { Billetera, ControlSaldoPreview } from '@/types'
@@ -180,7 +181,7 @@ export default function ActualizarSaldoModal({
                     moneda={billetera.moneda}
                     allowDecimals
                     placeholder="0"
-                    autoFocus
+                    autoFocus={esPunteroFino()}
                     disabled={isLoadingPreview}
                   />
                 </div>

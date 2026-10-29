@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { X, Search, ChevronDown, Filter, Calendar, Wallet, Banknote, DollarSign, Check, Star, TrendingUp } from '@/components/ui/icons'
 import styles from './FilterBar.module.css'
 import type { TransaccionFilters } from '@/services/transaccion.service'
@@ -309,7 +310,7 @@ export default function FilterBar({
             placeholder="Buscar categoría..."
             value={catSearch}
             onChange={(e) => setCatSearch(e.target.value)}
-            autoFocus
+            autoFocus={esPunteroFino()}
           />
           {catSearch && (
             <button 

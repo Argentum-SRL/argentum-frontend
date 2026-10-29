@@ -1,4 +1,5 @@
 import { type FormEvent, useState, useEffect, useRef } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { ArrowLeft } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
@@ -40,7 +41,7 @@ export default function VerificarEmail() {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (!yaVerificado && !modoIngresoEmail) {
+    if (!yaVerificado && !modoIngresoEmail && esPunteroFino()) {
       inputRef.current?.focus()
     }
   }, [yaVerificado, modoIngresoEmail])
@@ -166,7 +167,7 @@ export default function VerificarEmail() {
             }}
             placeholder="tu@email.com"
             error={emailInputError}
-            autoFocus
+            autoFocus={esPunteroFino()}
           />
 
           {apiError && <p className={styles.error}>{apiError}</p>}

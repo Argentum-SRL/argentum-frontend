@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { Link } from 'react-router-dom'
 import { Layout } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -949,7 +950,7 @@ export default function AdminPage() {
                           placeholder={`Escribí ${confirmAction.expectedEmail}`}
                           autoComplete="off"
                           spellCheck={false}
-                          autoFocus
+                          autoFocus={esPunteroFino()}
                         />
                         {emailConfirmInput.length > 0 &&
                           emailConfirmInput.trim().toLowerCase() !== confirmAction.expectedEmail?.trim().toLowerCase() && (

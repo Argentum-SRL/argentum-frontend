@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { Shield, Eye, EyeOff, Check, AlertCircle, Save, LogOut, Info } from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
@@ -120,7 +121,7 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
                     placeholder="Ingresá una contraseña segura"
                     autoComplete="new-password"
                     required
-                    autoFocus
+                    autoFocus={esPunteroFino()}
                   />
                   <button
                     type="button"

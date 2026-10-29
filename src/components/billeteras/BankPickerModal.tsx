@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useReducer, useRef } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { X, ChevronLeft, Search, Check, Pencil, TrendingUp, Star, Landmark, AlertTriangle } from '@/components/ui/icons'
 import { BANKS, BANK_SECTIONS, CUSTOM_COLORS } from '@/lib/constants/banks'
 import type { BankDefinition } from '@/lib/constants/banks'
@@ -437,7 +438,7 @@ export default function BankPickerModal({
                   placeholder="Buscar banco o billetera..."
                   value={searchQuery}
                   onChange={(e) => dispatch({ type: 'SET_SEARCH', query: e.target.value })}
-                  autoFocus
+                  autoFocus={esPunteroFino()}
                 />
                 {searchQuery && (
                   <button
@@ -624,7 +625,7 @@ export default function BankPickerModal({
                       onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                       placeholder="0"
                       allowDecimals
-                      autoFocus
+                      autoFocus={esPunteroFino()}
                     />
 
                     {(!saldo || saldo <= 0) ? (

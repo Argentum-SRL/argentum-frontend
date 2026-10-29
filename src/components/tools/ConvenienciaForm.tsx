@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { esPunteroFino } from '@/utils/foco'
 import {
   RefreshCcw,
   ArrowRight,
@@ -318,7 +319,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 value={formData.precio_contado}
                 onChange={(val) => handleChange('precio_contado', val)}
                 allowDecimals
-                autoFocus
+                autoFocus={esPunteroFino()}
               />
               {isContadoExceeded && (
                 <span className="text-xs text-red-500 font-medium">
@@ -417,7 +418,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       step="1"
                       className="w-12 h-6 text-xs font-bold text-center bg-transparent text-slate-900 dark:text-slate-100 outline-none"
                       inputMode="numeric"
-                      autoFocus
+                      autoFocus={esPunteroFino()}
                     />
                     <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">cuotas</span>
                   </div>

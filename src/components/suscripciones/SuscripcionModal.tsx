@@ -1,4 +1,5 @@
 import React, { useReducer, useEffect, useState, useMemo, useRef, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { Plus, ChevronLeft, X, CreditCard, Wallet, Search, Check, Pencil } from '@/components/ui/icons'
 import { nombreInicial, preseleccionCategoria } from '@/lib/utils/sugerirCategoriaSuscripcion'
 import { ICONOS_GENERICOS } from '@/lib/constants/suscripciones'
@@ -523,7 +524,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                         value={state.nombrePersonalizado}
                         maxLength={100}
                         onChange={e => dispatch({ type: 'SET_FIELD', field: 'nombrePersonalizado', value: e.target.value })}
-                        autoFocus
+                        autoFocus={esPunteroFino()}
                       />
                     </div>
                   )}
@@ -583,7 +584,7 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                         }}
                         placeholder={suscripcion?.nombre || serv?.nombre || 'Nombre'}
                         maxLength={40}
-                        autoFocus
+                        autoFocus={esPunteroFino()}
                       />
                     </div>
                   ) : (

@@ -102,6 +102,7 @@ const Modal: React.FC<ModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
+        tabIndex={-1}
       >
         {/* Handle superior unificado para hojas inferiores (variant="sheet") */}
         {variant === 'sheet' && (

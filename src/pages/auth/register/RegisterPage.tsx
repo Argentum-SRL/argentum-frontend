@@ -1,4 +1,5 @@
 import { type FormEvent, useState, useEffect, useCallback, useRef } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff } from '@/components/ui/icons'
 import GoogleLoginButton from '@/components/ui/GoogleLoginButton/GoogleLoginButton'
@@ -306,7 +307,7 @@ export default function RegisterPage() {
               type="text"
               value={nombre}
               onChange={setNombre}
-              autoFocus
+              autoFocus={esPunteroFino()}
               error={nombreError}
               placeholder="Juan"
             />

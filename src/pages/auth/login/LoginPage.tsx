@@ -1,4 +1,5 @@
 import { type FormEvent, useState, useCallback, useEffect } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, CheckCircle2 } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
@@ -117,7 +118,7 @@ export default function LoginPage() {
           type="email"
           value={email}
           onChange={setEmail}
-          autoFocus
+          autoFocus={esPunteroFino()}
           error={emailError}
           placeholder="tu@email.com"
         />

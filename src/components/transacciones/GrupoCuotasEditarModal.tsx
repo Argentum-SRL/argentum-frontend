@@ -1,6 +1,7 @@
 /**
  * Modal de edición en dos pasos para compras en cuotas.
  */
+import { esPunteroFino } from '@/utils/foco'
 import type { RefObject } from 'react'
 import {
   CreditCard,
@@ -138,7 +139,7 @@ export default function GrupoCuotasEditarModal({
                           onChange={(v) => setEditMonto(v)}
                           moneda={(editingGrupo.moneda as 'ARS' | 'USD') || 'ARS'}
                           allowDecimals
-                          autoFocus
+                          autoFocus={esPunteroFino()}
                         />
                       </div>
 

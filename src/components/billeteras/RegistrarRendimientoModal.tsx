@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { X, TrendingUp, Lightbulb } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
@@ -124,7 +125,7 @@ export default function RegistrarRendimientoModal({
                   moneda={billetera.moneda}
                   allowDecimals
                   placeholder="0"
-                  autoFocus
+                  autoFocus={esPunteroFino()}
                 />
                 {rendimientoEstimado != null && (
                   <span className={styles.montoHint}>

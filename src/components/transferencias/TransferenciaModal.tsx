@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import {
   ArrowRightLeft,
   ArrowUpRight,
@@ -457,7 +458,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                     onChange={setMonto}
                     moneda={effectiveMoneda}
                     onMonedaChange={setMoneda}
-                    autoFocus
+                    autoFocus={esPunteroFino()}
                     allowDecimals
                   />
 

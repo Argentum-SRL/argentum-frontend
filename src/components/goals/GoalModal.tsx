@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useState, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import {
   X,
   ChevronLeft,
@@ -246,7 +247,7 @@ export default function GoalModal({
                     onChange={e => setField('nombre', e.target.value)}
                     placeholder="Ej: Nueva Notebook, Fondo de Emergencia..."
                     maxLength={100}
-                    autoFocus
+                    autoFocus={esPunteroFino()}
                   />
                 </div>
 

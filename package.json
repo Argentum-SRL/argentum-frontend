@@ -17,6 +17,7 @@
     "audit:design": "node scripts/audit-design-system.mjs",
     "audit:rules": "node scripts/audit-design-rules.mjs",
     "audit:plata": "node scripts/audit-formulas-plata.mjs",
+    "audit:autofocus": "node scripts/audit-no-autofocus.mjs",
     "test": "vitest run"
   },
   "dependencies": {

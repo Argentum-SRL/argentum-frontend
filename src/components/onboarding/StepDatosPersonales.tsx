@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { guardarDatosPersonales } from '@/services/onboarding.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -112,7 +113,7 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
           onChange={setNombre}
           error={nombreError}
           placeholder="¿Cómo te llamás?"
-          autoFocus
+          autoFocus={esPunteroFino()}
           autoComplete="given-name"
           maxLength={100}
         />

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { AlertTriangle, AlertCircle } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { LunarLoader } from '@/components/ui/LunarLoader'
@@ -111,7 +112,7 @@ export const EliminarCuentaModal: React.FC<EliminarCuentaModalProps> = ({
                   if (errorMsg) setErrorMsg(null)
                 }}
                 disabled={isSubmitting}
-                autoFocus
+                autoFocus={esPunteroFino()}
               />
             </div>
           ) : (

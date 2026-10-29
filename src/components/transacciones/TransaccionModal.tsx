@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useReducer, useRef, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -804,7 +805,7 @@ export default function TransaccionModal({
                       moneda={moneda}
                       onMonedaChange={(m) => dispatch({ type: 'SET_FIELD', field: 'moneda', value: m })}
                       disabled={isCuotaHija}
-                      autoFocus={step === 1}
+                      autoFocus={step === 1 && esPunteroFino()}
                       allowDecimals
                     />
                   </div>
@@ -1221,7 +1222,7 @@ export default function TransaccionModal({
                         descripcion={descripcion}
                         categoriaNombre={categorias.find(c => c.id === categoriaId)?.nombre}
                         onChangeMontoPesos={(val) => dispatch({ type: 'SET_FIELD', field: 'montoPesosDebito', value: val })}
-                        autoFocus={step === 5}
+                        autoFocus={step === 5 && esPunteroFino()}
                       />
                     </div>
                   </div>

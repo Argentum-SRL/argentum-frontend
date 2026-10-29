@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, CheckCircle2, ArrowLeft } from '@/components/ui/icons'
 import AuthLayout from '@/components/auth/AuthLayout/AuthLayout'
@@ -340,7 +341,7 @@ export default function RecuperarPassword() {
           type="email"
           value={email}
           onChange={setEmail}
-          autoFocus
+          autoFocus={esPunteroFino()}
           error={emailError}
         />
 

@@ -1,4 +1,5 @@
 import React, { useState, useReducer, useRef, useEffect, useMemo } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import {
   X,
   ChevronLeft,
@@ -610,7 +611,7 @@ export const TarjetaModal: React.FC = () => {
                       placeholder="0000"
                       maxLength={4}
                       inputMode="numeric"
-                      autoFocus
+                      autoFocus={esPunteroFino()}
                     />
                   </div>
                 </div>

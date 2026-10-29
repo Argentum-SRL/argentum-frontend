@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { AlertTriangle, Info } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { LunarLoader } from '@/components/ui/LunarLoader'
@@ -121,7 +122,7 @@ export function ConfirmModal({
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="..."
                 disabled={isLoading}
-                autoFocus
+                autoFocus={esPunteroFino()}
               />
             </div>
             </div>

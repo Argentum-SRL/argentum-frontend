@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useReducer, useState, useCallback } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import {
   Target,
   Calendar,
@@ -527,7 +528,7 @@ export default function PresupuestoModal({
                     onChange={e => setField('nombre', e.target.value)}
                     placeholder="Ej. Supermercado, Salidas, Transporte"
                     maxLength={100}
-                    autoFocus
+                    autoFocus={esPunteroFino()}
                   />
                 </div>
 

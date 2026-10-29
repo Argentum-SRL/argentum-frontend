@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
+import { esPunteroFino } from '@/utils/foco'
 import { X, CreditCard, CheckCircle2, Edit3, AlertTriangle, Info, Check, DollarSign, ArrowRightLeft, ChevronLeft, ArrowRight } from '@/components/ui/icons'
 import type { TarjetaCredito, Billetera, PagarTarjetaPayload, Categoria, ResultadoPagoTarjeta } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
@@ -487,7 +488,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                       allowDecimals
                       placeholder={isPesificacion ? `Hasta ${formatMonto(totalAPagar, monedaAPagar)}` : undefined}
                       max={isPesificacion ? totalAPagar : undefined}
-                      autoFocus
+                      autoFocus={esPunteroFino()}
                       disabled={isPaying}
                     />
 

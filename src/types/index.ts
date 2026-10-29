@@ -296,6 +296,7 @@ export interface ControlSaldoPreview {
   ultimo_movimiento: string | null
   huecos: HuecoRead[]
   posibles_duplicados: DuplicadoRead[]
+  guardar_directo: boolean
 }
 
 export interface ActualizarSaldoPayload {
@@ -425,6 +426,21 @@ export interface SimularTransferenciaResponse {
   cotizacion: number
 }
 
+export interface Frescura {
+  ultima_carga: string | null
+  dias_sin_cargar: number | null
+  umbral_dias: number
+  intervalos: number
+  datos_viejos: boolean
+}
+
+export interface ResumenCompletoResponse {
+  billeteras: Billetera[]
+  resumen: DashboardResumen
+  cotizacion: CotizacionDolar
+  frescura?: Frescura | null
+}
+
 export interface DashboardResumen {
   periodo: { fecha_inicio: string; fecha_fin: string; primera_transaccion?: string }
   balance: {
@@ -479,6 +495,7 @@ export interface DashboardResumen {
   }
   ultimos_movimientos: MovimientoDashboard[]
   proximos_pagos: PagoDashboard[]
+  frescura?: Frescura | null
 }
 
 export interface CompromisoDisponibleItem {

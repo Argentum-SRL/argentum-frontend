@@ -26,7 +26,7 @@ import { useModal } from '@/hooks/useModal'
 import { triggerBienvenidaFinancieraOnce, resetBienvenidaTriggerState } from '@/utils/bienvenidaFinancieraManager'
 import { dashboardService } from '@/services/dashboard.service'
 import categoriaService from '@/services/categoria.service'
-import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '@/types'
+import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse, Frescura } from '@/types'
 import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
 import { hasProyeccionVisible } from '@/components/dashboard/ProyeccionCard/proyeccionUtils'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
@@ -38,6 +38,7 @@ import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
+import AvisosConfianza from '@/components/dashboard/AvisosConfianza/AvisosConfianza'
 
 function formatDDMM(fechaIso?: string | null): string {
   if (!fechaIso) return ''
@@ -651,7 +652,7 @@ export default function DashboardPage() {
     try {
       const res = await dashboardService.getResumenCompleto(undefined, undefined, billeterasSeleccionadas, signal)
       if (signal?.aborted) return
-      setData(res.resumen)
+      setData({ ...res.resumen, frescura: (res as { frescura?: Frescura | null }).frescura ?? null })
       setBilleteras(res.billeteras)
 
       // Sanitizar billeteras seleccionadas para que no queden IDs ajenos
@@ -675,7 +676,7 @@ export default function DashboardPage() {
         try {
           const retryRes = await dashboardService.getResumenCompleto(undefined, undefined, [], signal)
           if (signal?.aborted) return
-          setData(retryRes.resumen)
+          setData({ ...retryRes.resumen, frescura: (retryRes as { frescura?: Frescura | null }).frescura ?? null })
           setBilleteras(retryRes.billeteras)
           return
         } catch {
@@ -932,6 +933,8 @@ export default function DashboardPage() {
           </button>
         </div>
       )}
+
+      <AvisosConfianza frescura={data?.frescura ?? null} onActualizado={() => { void fetchData() }} />
 
       {/* ── Top Row (3 Cols) ──────────────────────────────────────────────── */}
       <div className={`${styles.topRow} ${isAnyTopRowExpanded ? styles.topRowExpanded : styles.topRowCompact}`}>

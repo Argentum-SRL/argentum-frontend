@@ -18,6 +18,7 @@ interface ActualizarSaldoModalProps {
   onClose: () => void
   onActualizado: () => void
   onCargarMovimiento: (tipo: 'egreso' | 'ingreso') => void
+  previewInicial?: ControlSaldoPreview | null
 }
 
 function formatDiaMes(fechaStr: string): string {
@@ -36,6 +37,7 @@ export default function ActualizarSaldoModal({
   onClose,
   onActualizado,
   onCargarMovimiento,
+  previewInicial,
 }: ActualizarSaldoModalProps) {
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
   const [step, setStep] = useState<1 | 2>(1)
@@ -56,9 +58,15 @@ export default function ActualizarSaldoModal({
   if (prevIsOpen !== isOpen) {
     setPrevIsOpen(isOpen)
     if (isOpen) {
-      setStep(1)
-      setMonto(null)
-      setPreview(null)
+      if (previewInicial) {
+        setStep(2)
+        setMonto(previewInicial.saldo_declarado)
+        setPreview(previewInicial)
+      } else {
+        setStep(1)
+        setMonto(null)
+        setPreview(null)
+      }
       setIncluirRendimiento(true)
       setIsLoadingPreview(false)
       setIsSubmitting(false)

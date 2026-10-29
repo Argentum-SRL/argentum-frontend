@@ -184,6 +184,15 @@ const billeteraService = {
     )
     invalidateBilleteras()
     return data
+  },
+
+  getPreguntaSaldo: async (signal?: AbortSignal): Promise<{ billetera: Billetera | null }> => {
+    const { data } = await api.get<{ billetera: Billetera | null }>('/billeteras/pregunta-saldo', { signal })
+    return data
+  },
+
+  saltearPreguntaSaldo: async (id: string): Promise<void> => {
+    await api.post(`/billeteras/${id}/pregunta-saldo/saltear`)
   }
 }
 

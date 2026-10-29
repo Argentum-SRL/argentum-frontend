@@ -10,10 +10,12 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from '../PerfilPage.module.css'
 import SesionesYDatos from './SesionesYDatos'
+import { PerfilSeguridadSkeleton } from '@/components/ui'
 
 interface TabSeguridadProps {
   usuario: Usuario | null
   metodosLogin?: MetodosLogin | null
+  loadingMetodos?: boolean
   updateUsuario: (u: Usuario) => void
   onEditEmail: () => void
   onVerificarEmail: () => void
@@ -21,6 +23,7 @@ interface TabSeguridadProps {
 
 export const TabSeguridad: React.FC<TabSeguridadProps> = ({
   usuario,
+  loadingMetodos = false,
   updateUsuario,
   onEditEmail,
   onVerificarEmail,
@@ -126,6 +129,10 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
     } finally {
       setIsUpdatingPermiso(false)
     }
+  }
+
+  if (loadingMetodos && !usuario) {
+    return <PerfilSeguridadSkeleton />
   }
 
   return (

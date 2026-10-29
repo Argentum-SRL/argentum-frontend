@@ -138,7 +138,7 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
               {[1, 2, 3, 4].map(i => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'var(--surface-alt)', borderRadius: '10px' }} aria-hidden="true">
                   <Skeleton variant="rounded" width={24} height={24} borderRadius={6} />
-                  <Skeleton variant="text" width={60} height={12} />
+                  <Skeleton variant="text" width="60%" height={12} />
                 </div>
               ))}
             </>

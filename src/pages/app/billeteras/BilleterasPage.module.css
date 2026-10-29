@@ -135,31 +135,7 @@
 }
 
 /* ── Skeleton ──────────────────────────────────────────────────────────────── */
-.skeletonCard {
-  height: 140px; /* altura fija en mobile */
-  border-radius: 18px;
-  background: linear-gradient(
-    90deg,
-    var(--surface-alt) 0%,
-    var(--surface) 50%,
-    var(--surface-alt) 100%
-  );
-  background-size: 200% 100%;
-  animation: skeletonPulse 1.5s ease infinite;
-}
-
-@media (min-width: 768px) {
-  .skeletonCard {
-    height: unset;
-    border-radius: 20px;
-    aspect-ratio: 1.75 / 1;
-  }
-}
-
-@keyframes skeletonPulse {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
+/* skeletonCard unificado en CardsGridSkeleton */
 
 /* ── Estado vacío ──────────────────────────────────────────────────────────── */
 .emptyState {

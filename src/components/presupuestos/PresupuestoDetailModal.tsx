@@ -673,11 +673,11 @@ export default function PresupuestoDetailModal({
                           <div className={styles.txLeft}>
                             <Skeleton variant="rounded" width={28} height={28} borderRadius={8} />
                             <div className={styles.txDetails}>
-                              <Skeleton variant="text" width={110} height={14} />
-                              <Skeleton variant="text" width={70} height={11} />
+                              <Skeleton variant="text" width="60%" height={14} />
+                              <Skeleton variant="text" width="35%" height={11} />
                             </div>
                           </div>
-                          <Skeleton variant="text" width={60} height={14} />
+                          <Skeleton variant="text" width="25%" height={14} />
                         </div>
                       ))}
                     </div>
@@ -745,8 +745,8 @@ export default function PresupuestoDetailModal({
                       {[1, 2, 3].map(i => (
                         <div key={i} className={styles.historySkeletonCard}>
                           <div className={styles.historySkeletonHeader}>
-                            <Skeleton variant="text" width={110} height={14} />
-                            <Skeleton variant="text" width={70} height={14} />
+                            <Skeleton variant="text" width="55%" height={14} />
+                            <Skeleton variant="text" width="35%" height={14} />
                           </div>
                           <Skeleton variant="rounded" height={6} borderRadius={4} />
                         </div>

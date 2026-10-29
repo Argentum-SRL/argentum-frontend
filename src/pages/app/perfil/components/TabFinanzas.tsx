@@ -10,6 +10,7 @@ import { CicloFinancieroSelector, type CicloValue } from '@/components/ciclo/Cic
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from '../PerfilPage.module.css'
 import ComerciosRecordados from './ComerciosRecordados'
+import { Skeleton } from '@/components/ui'
 
 const MONEDA_PRINCIPAL_OPTIONS = [
   { value: 'ARS', label: 'Pesos ($)', description: 'Peso Argentino' },
@@ -47,6 +48,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
   )
   const [tipoDolar, setTipoDolar] = useState(usuario?.tipo_dolar || 'blue')
   const [cotizaciones, setCotizaciones] = useState<CotizacionesDolarResponse | null>(null)
+  const [loadingCotizaciones, setLoadingCotizaciones] = useState(true)
   const [isSavingMoneda, setIsSavingMoneda] = useState(false)
 
   useEffect(() => {
@@ -54,6 +56,11 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     getCotizaciones(controller.signal)
       .then(setCotizaciones)
       .catch(() => setCotizaciones(null))
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setLoadingCotizaciones(false)
+        }
+      })
     return () => controller.abort()
   }, [])
 
@@ -192,7 +199,12 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
                         {tipoDolar === opt.value && <Check size={14} className={styles.checkIcon} />}
                       </div>
 
-                      {cotiz && (cotiz.compra != null || cotiz.venta != null) && (
+                      {loadingCotizaciones ? (
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                          <Skeleton variant="text" width="40%" height={12} />
+                          <Skeleton variant="text" width="40%" height={12} />
+                        </div>
+                      ) : cotiz && (cotiz.compra != null || cotiz.venta != null) && (
                         <div className={styles.dolarRatesRow}>
                           {cotiz.compra != null && (
                             <div className={styles.rateCol}>

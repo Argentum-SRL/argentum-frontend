@@ -398,7 +398,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       <Skeleton variant="text" width={i === 1 ? '50%' : '35%'} height={13} />
                       <Skeleton variant="text" width="25%" height={10} />
                     </div>
-                    <Skeleton variant="text" width={50} height={13} />
+                    <Skeleton variant="text" width="20%" height={13} style={{ minWidth: 40 }} />
                   </div>
                 ))}
               </div>

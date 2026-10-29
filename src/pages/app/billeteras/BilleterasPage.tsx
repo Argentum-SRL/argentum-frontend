@@ -16,24 +16,13 @@ import billeteraService from '@/services/billetera.service'
 import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
-import { EmptyState, PageSummaryBar } from '@/components/ui'
+import { EmptyState, PageSummaryBar, CardsGridSkeleton } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { TransferenciaModal, TransferenciasTab } from '@/components/transferencias'
 import transferenciaService from '@/services/transferencia.service'
 import type { TransferenciaInterna } from '@/types'
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
-
-const SkeletonGrid = memo(() => {
-  return (
-    <div className={styles.grid}>
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className={styles.skeletonCard} aria-hidden="true" />
-      ))}
-    </div>
-  )
-})
-SkeletonGrid.displayName = 'SkeletonGrid'
+// ── Skeleton unificado vía CardsGridSkeleton ──────────────────────────────────
 
 // ── Estado vacío ──────────────────────────────────────────────────────────────
 
@@ -425,7 +414,7 @@ export default function BilleterasPage() {
 
           {/* ── Grid / Skeleton / Estado vacío ────────────────────────────────── */}
           {isLoading ? (
-            <SkeletonGrid />
+            <CardsGridSkeleton count={4} />
           ) : billeterasActivas.length === 0 ? (
             <EstadoVacio onCrear={openCrearModal} />
           ) : (

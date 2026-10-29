@@ -74,8 +74,8 @@ export default function BudgetHistoryModal({
               {[1, 2, 3].map(i => (
                 <div key={i} className={`${styles.historyItem} ${styles.skeletonItem}`}>
                   <div className={styles.skeletonHeader}>
-                    <Skeleton variant="text" width={100} height={14} />
-                    <Skeleton variant="text" width={70} height={14} />
+                    <Skeleton variant="text" width="55%" height={14} />
+                    <Skeleton variant="text" width="35%" height={14} />
                   </div>
                   <Skeleton variant="rounded" height={6} borderRadius={4} />
                 </div>

@@ -488,10 +488,10 @@ export default function TransaccionesPage() {
         <div className={styles.titleGroup}>
           <h1>Transacciones</h1>
           {loadingPeriodo || !periodoActual ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '18px' }} aria-hidden="true">
-              <Skeleton variant="text" width={110} height={12} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '18px', width: '100%', maxWidth: 220 }} aria-hidden="true">
+              <Skeleton variant="text" width="55%" height={12} style={{ maxWidth: 110 }} />
               <span style={{ color: 'var(--text-3)' }}>·</span>
-              <Skeleton variant="text" width={75} height={12} />
+              <Skeleton variant="text" width="40%" height={12} style={{ maxWidth: 75 }} />
             </div>
           ) : (
             <p className={styles.subtitle}>{periodoActual.label} · {loading ? '—' : `${totalItems} movimientos`}</p>

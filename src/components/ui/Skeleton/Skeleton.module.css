@@ -20,6 +20,8 @@
   animation: skeletonPulse 1.5s ease infinite;
   display: block;
   user-select: none;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .text {
@@ -175,19 +177,29 @@
 }
 
 .cuotasMetricsBar {
+  display: none;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:16px;
+  border-radius: 16px;
   padding: 16px 20px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .cuotasMetricsBar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
 }
 
 .cuotasMetricItem {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .cuotasList {
@@ -310,17 +322,23 @@
 .summaryBarSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:16px;
+  border-radius: 16px;
   padding: 16px 20px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 767px) {
   .summaryBarSkeleton {
     grid-template-columns: 1fr;
-    height: 110px;
+    height: auto;
+    padding: 16px;
+  }
+  .summaryBarSkeleton > *:nth-child(n+2) {
+    display: none;
   }
 }
 
@@ -550,6 +568,135 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+/* ── 14. Balance Card Skeleton (Dashboard) ────────────────────────────────── */
+.balanceCardSkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-shadow: var(--elevation-sm);
+}
+
+/* ── 15. Dashboard List Skeleton (Dashboard rows) ─────────────────────────── */
+.dashboardListSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.dashboardListRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+/* ── 16. Proyección Card Skeleton (Dashboard) ─────────────────────────────── */
+.proyeccionCardSkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-shadow: var(--elevation-sm);
+}
+
+.proyeccionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.proyeccionMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 8px 0;
+}
+
+/* ── 17. Conveniencia Wizard Skeleton (Tools) ────────────────────────────── */
+.wizardSkeletonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.wizardCardBody {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  box-shadow: var(--elevation-sm);
+}
+
+.wizardGridCols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .wizardGridCols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── 18. Comercios Recordados Skeleton (Perfil) ───────────────────────────── */
+.comerciosSkeletonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.comercioRowSkeleton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+/* ── 19. Perfil Seguridad Skeleton (Perfil) ───────────────────────────────── */
+.seguridadSkeletonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.seguridadCardSkeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {

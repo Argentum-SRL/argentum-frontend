@@ -44,16 +44,22 @@ export default function PerfilPage() {
 
   // ── 2. Login Methods Fetching ────────────────────────────────────────────
   const [metodosLogin, setMetodosLogin] = useState<MetodosLogin | null>(null)
+  const [loadingMetodos, setLoadingMetodos] = useState(true)
 
   useEffect(() => {
     const controller = new AbortController()
     const fetchMetodos = async () => {
+      setLoadingMetodos(true)
       try {
         const data = await usuarioService.getMetodosLogin(controller.signal)
         if (!controller.signal.aborted) setMetodosLogin(data)
       } catch (err) {
         if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) return
         console.error('Error fetching metodos login:', err)
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingMetodos(false)
+        }
       }
     }
     fetchMetodos()
@@ -161,6 +167,7 @@ export default function PerfilPage() {
           <TabSeguridad
             usuario={usuario}
             metodosLogin={metodosLogin}
+            loadingMetodos={loadingMetodos}
             updateUsuario={updateUsuario}
             onEditEmail={() => setActiveModal('email')}
             onVerificarEmail={handleVerificarEmailActual}

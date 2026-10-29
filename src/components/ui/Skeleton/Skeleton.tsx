@@ -47,7 +47,7 @@ export const Skeleton = memo(function Skeleton({
 Skeleton.displayName = 'Skeleton'
 
 /**
- * Grid de Tarjetas (Como en Billeteras)
+ * Grid de Tarjetas (Billeteras y Listados Grid)
  */
 export const CardsGridSkeleton = memo(function CardsGridSkeleton({
   count = 3,
@@ -96,9 +96,9 @@ export const TransactionsListSkeleton = memo(function TransactionsListSkeleton({
         <div key={gIdx} className={styles.dayGroupSkeleton}>
           {/* Header del día */}
           <div className={styles.dayHeaderSkeleton}>
-            <Skeleton variant="rounded" width={16} height={16} />
-            <Skeleton variant="text" width={gIdx === 0 ? 60 : 130} height={14} />
-            {gIdx === 0 && <Skeleton variant="text" width={110} height={12} />}
+            <Skeleton variant="rounded" width={16} height={16} borderRadius={4} />
+            <Skeleton variant="text" width={gIdx === 0 ? '25%' : '45%'} height={14} />
+            {gIdx === 0 && <Skeleton variant="text" width="30%" height={12} />}
           </div>
 
           {/* Tarjeta contenedora de filas */}
@@ -116,8 +116,8 @@ export const TransactionsListSkeleton = memo(function TransactionsListSkeleton({
 
                 {/* Monto y método */}
                 <div className={styles.txAmountSkeleton}>
-                  <Skeleton variant="text" width={75} height={16} />
-                  <Skeleton variant="text" width={50} height={11} />
+                  <Skeleton variant="text" width="65px" height={16} />
+                  <Skeleton variant="text" width="45px" height={11} />
                 </div>
               </div>
             ))}
@@ -150,16 +150,16 @@ export const GruposCuotasSkeleton = memo(function GruposCuotasSkeleton({
       {/* Barra de métricas superior */}
       <div className={styles.cuotasMetricsBar}>
         <div className={styles.cuotasMetricItem}>
-          <Skeleton variant="text" width={90} height={12} />
-          <Skeleton variant="text" width={40} height={20} />
+          <Skeleton variant="text" width="60%" height={12} />
+          <Skeleton variant="text" width="40%" height={20} />
         </div>
         <div className={styles.cuotasMetricItem}>
-          <Skeleton variant="text" width={110} height={12} />
-          <Skeleton variant="text" width={80} height={20} />
+          <Skeleton variant="text" width="70%" height={12} />
+          <Skeleton variant="text" width="50%" height={20} />
         </div>
         <div className={styles.cuotasMetricItem}>
-          <Skeleton variant="text" width={130} height={12} />
-          <Skeleton variant="text" width={95} height={20} />
+          <Skeleton variant="text" width="65%" height={12} />
+          <Skeleton variant="text" width="45%" height={20} />
         </div>
       </div>
 
@@ -174,8 +174,8 @@ export const GruposCuotasSkeleton = memo(function GruposCuotasSkeleton({
                 <Skeleton variant="text" width="30%" height={12} />
               </div>
               <div className={styles.txAmountSkeleton}>
-                <Skeleton variant="text" width={70} height={16} />
-                <Skeleton variant="text" width={55} height={11} />
+                <Skeleton variant="text" width="65px" height={16} />
+                <Skeleton variant="text" width="45px" height={11} />
               </div>
             </div>
             {/* Barra de progreso de cuotas */}
@@ -213,8 +213,8 @@ export const TransferenciasListSkeleton = memo(function TransferenciasListSkelet
             <Skeleton variant="text" width="30%" height={12} />
           </div>
           <div className={styles.txAmountSkeleton}>
-            <Skeleton variant="text" width={80} height={16} />
-            <Skeleton variant="text" width={50} height={11} />
+            <Skeleton variant="text" width="65px" height={16} />
+            <Skeleton variant="text" width="45px" height={11} />
           </div>
         </div>
       ))}
@@ -242,9 +242,9 @@ export const BilleteraDetalleSkeleton = memo(function BilleteraDetalleSkeleton({
       <div className={styles.billeteraHeroCard} />
 
       {/* Tabs placeholder */}
-      <div style={{ display: 'flex', gap: '8px', padding: '4px 0' }}>
-        <Skeleton variant="rounded" width={110} height={36} borderRadius={10} />
-        <Skeleton variant="rounded" width={90} height={36} borderRadius={10} />
+      <div style={{ display: 'flex', gap: '8px', padding: '4px 0', width: '100%' }}>
+        <Skeleton variant="rounded" width="50%" height={36} borderRadius={10} style={{ maxWidth: 110 }} />
+        <Skeleton variant="rounded" width="40%" height={36} borderRadius={10} style={{ maxWidth: 90 }} />
       </div>
 
       {/* Filas de movimientos */}
@@ -257,7 +257,7 @@ export const BilleteraDetalleSkeleton = memo(function BilleteraDetalleSkeleton({
               <Skeleton variant="text" width="25%" height={12} />
             </div>
             <div className={styles.txAmountSkeleton}>
-              <Skeleton variant="text" width={70} height={16} />
+              <Skeleton variant="text" width="60px" height={16} />
             </div>
           </div>
         ))}
@@ -292,20 +292,20 @@ export const ImportacionResumenSkeleton = memo(function ImportacionResumenSkelet
 
       {/* Header */}
       <div className={styles.importHeader}>
-        <Skeleton variant="text" width={220} height={22} />
-        <Skeleton variant="rounded" width={90} height={24} borderRadius={12} />
+        <Skeleton variant="text" width="60%" height={22} />
+        <Skeleton variant="rounded" width="25%" height={24} borderRadius={12} />
       </div>
 
       {/* Dropzone container */}
       <div className={styles.importDropzone}>
         <Skeleton variant="rounded" width={48} height={48} borderRadius={14} />
-        <Skeleton variant="text" width={260} height={16} />
-        <Skeleton variant="text" width={180} height={13} />
+        <Skeleton variant="text" width="65%" height={16} />
+        <Skeleton variant="text" width="45%" height={13} />
       </div>
 
       {/* Footer buttons */}
       <div className={styles.importFooter}>
-        <Skeleton variant="rounded" width={100} height={40} borderRadius={10} />
+        <Skeleton variant="rounded" width="30%" height={40} borderRadius={10} />
       </div>
     </div>
   )
@@ -331,22 +331,22 @@ export const SuscripcionesSkeleton = memo(function SuscripcionesSkeleton({
       {/* Resumen */}
       <div className={styles.summaryBarSkeleton}>
         <div className={styles.cuotasMetricItem}>
-          <Skeleton variant="text" width={120} height={12} />
-          <Skeleton variant="text" width={90} height={20} />
+          <Skeleton variant="text" width="60%" height={12} />
+          <Skeleton variant="text" width="45%" height={20} />
         </div>
         <div className={styles.cuotasMetricItem}>
-          <Skeleton variant="text" width={140} height={12} />
-          <Skeleton variant="text" width={80} height={20} />
+          <Skeleton variant="text" width="70%" height={12} />
+          <Skeleton variant="text" width="40%" height={20} />
         </div>
         <div className={styles.cuotasMetricItem}>
-          <Skeleton variant="text" width={60} height={12} />
-          <Skeleton variant="text" width={30} height={20} />
+          <Skeleton variant="text" width="50%" height={12} />
+          <Skeleton variant="text" width="25%" height={20} />
         </div>
       </div>
 
       {/* Sección Activas */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <Skeleton variant="text" width={100} height={20} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Skeleton variant="text" width="25%" height={20} />
         <div className={styles.suscripcionesGrid}>
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className={styles.suscripcionCardSkeleton} />
@@ -416,8 +416,8 @@ export const GoalsSkeleton = memo(function GoalsSkeleton({
 
       {/* Gráfico comparativo placeholder en mobile */}
       <div className={styles.goalsMobileChartSkeleton}>
-        <Skeleton variant="text" width={140} height={14} />
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', height: '80px', marginTop: '10px' }}>
+        <Skeleton variant="text" width="40%" height={14} />
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', height: '80px', marginTop: '12px' }}>
           <Skeleton variant="rounded" width="30%" height="45%" borderRadius={8} />
           <Skeleton variant="rounded" width="30%" height="80%" borderRadius={8} />
           <Skeleton variant="rounded" width="30%" height="60%" borderRadius={8} />
@@ -437,15 +437,15 @@ export const GoalsSkeleton = memo(function GoalsSkeleton({
             </div>
 
             <div className={styles.goalAmountsRow}>
-              <Skeleton variant="text" width={110} height={20} />
-              <Skeleton variant="text" width={80} height={14} />
+              <Skeleton variant="text" width="45%" height={20} />
+              <Skeleton variant="text" width="30%" height={14} />
             </div>
 
             <Skeleton variant="rounded" height={8} borderRadius={4} />
 
             <div className={styles.goalActionsRow}>
-              <Skeleton variant="rounded" width={80} height={32} borderRadius={8} />
-              <Skeleton variant="rounded" width={80} height={32} borderRadius={8} />
+              <Skeleton variant="rounded" width="45%" height={32} borderRadius={8} />
+              <Skeleton variant="rounded" width="45%" height={32} borderRadius={8} />
             </div>
           </div>
         ))}
@@ -476,26 +476,26 @@ export const PresupuestosSkeleton = memo(function PresupuestosSkeleton({
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} className={styles.presupuestoCardSkeleton}>
             <div className={styles.presupuestoHeader}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
                 <Skeleton variant="rounded" width={38} height={38} borderRadius={10} />
                 <div className={styles.txInfoSkeleton}>
                   <Skeleton variant="text" width="55%" height={15} />
                   <Skeleton variant="text" width="35%" height={12} />
                 </div>
               </div>
-              <Skeleton variant="rounded" width={70} height={22} borderRadius={11} />
+              <Skeleton variant="rounded" width="20%" height={22} borderRadius={11} />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '4px' }}>
-              <Skeleton variant="text" width={120} height={22} />
-              <Skeleton variant="text" width={90} height={14} />
+              <Skeleton variant="text" width="45%" height={22} />
+              <Skeleton variant="text" width="30%" height={14} />
             </div>
 
             <Skeleton variant="rounded" height={8} borderRadius={4} />
 
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Skeleton variant="text" width={100} height={12} />
-              <Skeleton variant="text" width={60} height={12} />
+              <Skeleton variant="text" width="40%" height={12} />
+              <Skeleton variant="text" width="25%" height={12} />
             </div>
           </div>
         ))}
@@ -524,26 +524,26 @@ export const TarjetaSummarySkeleton = memo(function TarjetaSummarySkeleton({
       {/* Navegador de mes */}
       <div className={styles.tarjetaSummaryNav}>
         <Skeleton variant="circular" width={28} height={28} />
-        <Skeleton variant="text" width={120} height={16} />
+        <Skeleton variant="text" width="50%" height={16} />
         <Skeleton variant="circular" width={28} height={28} />
       </div>
 
       {/* Total a pagar */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center', padding: '10px 0' }}>
-        <Skeleton variant="text" width={100} height={12} />
-        <Skeleton variant="text" width={180} height={28} />
-        <Skeleton variant="text" width={110} height={14} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center', padding: '12px 0' }}>
+        <Skeleton variant="text" width="35%" height={12} />
+        <Skeleton variant="text" width="60%" height={28} />
+        <Skeleton variant="text" width="40%" height={14} />
       </div>
 
       {/* Fechas de cierre y vencimiento */}
       <div className={styles.tarjetaSummaryDates}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'var(--surface-alt)', padding: '12px', borderRadius: '12px' }}>
-          <Skeleton variant="text" width={50} height={11} />
-          <Skeleton variant="text" width={80} height={14} />
+          <Skeleton variant="text" width="50%" height={11} />
+          <Skeleton variant="text" width="75%" height={14} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'var(--surface-alt)', padding: '12px', borderRadius: '12px' }}>
-          <Skeleton variant="text" width={65} height={11} />
-          <Skeleton variant="text" width={80} height={14} />
+          <Skeleton variant="text" width="50%" height={11} />
+          <Skeleton variant="text" width="75%" height={14} />
         </div>
       </div>
 
@@ -571,21 +571,21 @@ export const FacturaPanelSkeleton = memo(function FacturaPanelSkeleton({
       className={`${styles.facturaPanelSkeleton} ${className}`.trim()}
     >
       <span className={styles.srOnly}>Cargando datos de la factura...</span>
-      <Skeleton variant="text" width={160} height={32} />
-      <Skeleton variant="rounded" width={120} height={24} borderRadius={12} />
+      <Skeleton variant="text" width="50%" height={32} />
+      <Skeleton variant="rounded" width="35%" height={24} borderRadius={12} />
 
       <div className={styles.facturaDetailsList}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Skeleton variant="text" width={80} height={14} />
-          <Skeleton variant="text" width={110} height={14} />
+          <Skeleton variant="text" width="40%" height={14} />
+          <Skeleton variant="text" width="50%" height={14} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Skeleton variant="text" width={70} height={14} />
-          <Skeleton variant="text" width={90} height={14} />
+          <Skeleton variant="text" width="35%" height={14} />
+          <Skeleton variant="text" width="45%" height={14} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Skeleton variant="text" width={90} height={14} />
-          <Skeleton variant="text" width={75} height={14} />
+          <Skeleton variant="text" width="45%" height={14} />
+          <Skeleton variant="text" width="35%" height={14} />
         </div>
       </div>
 
@@ -612,7 +612,7 @@ export const OnboardingSkeleton = memo(function OnboardingSkeleton({
       <span className={styles.srOnly}>Cargando asistente de bienvenida...</span>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Skeleton variant="circular" width={32} height={32} />
-        <Skeleton variant="text" width={90} height={20} />
+        <Skeleton variant="text" width="35%" height={20} />
       </div>
 
       <div style={{ display: 'flex', gap: '8px' }}>
@@ -626,15 +626,271 @@ export const OnboardingSkeleton = memo(function OnboardingSkeleton({
         <Skeleton variant="text" width="60%" height={24} />
         <Skeleton variant="text" width="85%" height={14} />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '8px' }}>
           <Skeleton variant="rounded" height={44} borderRadius={12} />
           <Skeleton variant="rounded" height={44} borderRadius={12} />
         </div>
 
-        <Skeleton variant="rounded" height={48} borderRadius={12} style={{ marginTop: '12px' }} />
+        <Skeleton variant="rounded" height={48} borderRadius={12} style={{ marginTop: '8px' }} />
       </div>
     </div>
   )
 })
 OnboardingSkeleton.displayName = 'OnboardingSkeleton'
 
+/**
+ * Template de Tarjeta de Balance del Dashboard (BalanceCard)
+ */
+export const BalanceCardSkeleton = memo(function BalanceCardSkeleton({
+  className = '',
+}: {
+  className?: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando balance..."
+      className={`${styles.balanceCardSkeleton} ${className}`.trim()}
+    >
+      <span className={styles.srOnly}>Cargando balance...</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Skeleton variant="text" width="40%" height={14} />
+        <Skeleton variant="circular" width={28} height={28} />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '12px 0 6px' }}>
+        <Skeleton variant="text" width="65%" height={36} />
+        <Skeleton variant="text" width="35%" height={13} />
+      </div>
+
+      <div style={{ display: 'flex', gap: '8px', padding: '4px 0' }}>
+        <Skeleton variant="rounded" width="45%" height={26} borderRadius={8} />
+        <Skeleton variant="rounded" width="45%" height={26} borderRadius={8} />
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '45%' }}>
+          <Skeleton variant="rounded" width={20} height={20} borderRadius={6} />
+          <Skeleton variant="text" width="70%" height={14} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '45%', justifyContent: 'flex-end' }}>
+          <Skeleton variant="rounded" width={20} height={20} borderRadius={6} />
+          <Skeleton variant="text" width="70%" height={14} />
+        </div>
+      </div>
+    </div>
+  )
+})
+BalanceCardSkeleton.displayName = 'BalanceCardSkeleton'
+
+/**
+ * Template de Filas de Dashboard (Categorías / Próximos Pagos / Últimos Movimientos)
+ */
+export const DashboardListSkeleton = memo(function DashboardListSkeleton({
+  count = 4,
+  className = '',
+}: {
+  count?: number
+  className?: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando lista del dashboard..."
+      className={`${styles.dashboardListSkeleton} ${className}`.trim()}
+    >
+      <span className={styles.srOnly}>Cargando lista del dashboard...</span>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className={styles.dashboardListRow}>
+          <Skeleton variant="rounded" width={40} height={40} borderRadius={12} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+            <Skeleton variant="text" width={i % 2 === 0 ? '60%' : '45%'} height={14} />
+            <Skeleton variant="text" width={i % 2 === 0 ? '35%' : '25%'} height={12} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
+            <Skeleton variant="text" width="65px" height={15} />
+            <Skeleton variant="text" width="40px" height={11} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+})
+DashboardListSkeleton.displayName = 'DashboardListSkeleton'
+
+/**
+ * Template de Tarjeta de Proyección (ProyeccionCard)
+ */
+export const ProyeccionCardSkeleton = memo(function ProyeccionCardSkeleton({
+  className = '',
+}: {
+  className?: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando proyección..."
+      className={`${styles.proyeccionCardSkeleton} ${className}`.trim()}
+    >
+      <span className={styles.srOnly}>Cargando proyección...</span>
+      <div className={styles.proyeccionHeader}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+          <Skeleton variant="rounded" width={18} height={18} borderRadius={4} />
+          <Skeleton variant="text" width="45%" height={16} />
+          <Skeleton variant="rounded" width="25%" height={18} borderRadius={12} />
+        </div>
+        <Skeleton variant="rounded" width={24} height={24} borderRadius={6} />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '6px 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Skeleton variant="text" width="30%" height={13} />
+          <Skeleton variant="text" width="20%" height={13} />
+        </div>
+        <Skeleton variant="rounded" width="100%" height={8} borderRadius={4} />
+      </div>
+
+      <div className={styles.proyeccionMetricsGrid}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <Skeleton variant="text" width="50%" height={12} />
+          <Skeleton variant="text" width="70%" height={20} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <Skeleton variant="text" width="50%" height={12} />
+          <Skeleton variant="text" width="70%" height={20} />
+        </div>
+      </div>
+    </div>
+  )
+})
+ProyeccionCardSkeleton.displayName = 'ProyeccionCardSkeleton'
+
+/**
+ * Template de Wizard de Conveniencia (ToolsPage)
+ */
+export const ConvenienciaWizardSkeleton = memo(function ConvenienciaWizardSkeleton({
+  className = '',
+}: {
+  className?: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando asistente de conveniencia..."
+      className={`${styles.wizardSkeletonWrapper} ${className}`.trim()}
+    >
+      <span className={styles.srOnly}>Cargando asistente de conveniencia...</span>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', padding: '8px 0' }}>
+        <Skeleton variant="rounded" width={32} height={8} borderRadius={4} />
+        <Skeleton variant="rounded" width={32} height={8} borderRadius={4} />
+        <Skeleton variant="rounded" width={32} height={8} borderRadius={4} />
+      </div>
+
+      <div className={styles.wizardCardBody}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <Skeleton variant="text" width="55%" height={22} />
+          <Skeleton variant="text" width="80%" height={14} />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <Skeleton variant="text" width="30%" height={14} />
+            <Skeleton variant="rounded" width="100%" height={48} borderRadius={12} />
+          </div>
+          <div className={styles.wizardGridCols}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Skeleton variant="text" width="50%" height={14} />
+              <Skeleton variant="rounded" width="100%" height={48} borderRadius={12} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Skeleton variant="text" width="50%" height={14} />
+              <Skeleton variant="rounded" width="100%" height={48} borderRadius={12} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+          <Skeleton variant="rounded" width="100%" height={48} borderRadius={12} />
+        </div>
+      </div>
+    </div>
+  )
+})
+ConvenienciaWizardSkeleton.displayName = 'ConvenienciaWizardSkeleton'
+
+/**
+ * Template de Comercios Recordados (Perfil)
+ */
+export const ComerciosRecordadosSkeleton = memo(function ComerciosRecordadosSkeleton({
+  count = 3,
+  className = '',
+}: {
+  count?: number
+  className?: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando comercios recordados..."
+      className={`${styles.comerciosSkeletonWrapper} ${className}`.trim()}
+    >
+      <span className={styles.srOnly}>Cargando comercios recordados...</span>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className={styles.comercioRowSkeleton}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+            <Skeleton variant="text" width={i % 2 === 0 ? '45%' : '35%'} height={14} />
+            <Skeleton variant="text" width={i % 2 === 0 ? '60%' : '50%'} height={12} />
+          </div>
+          <Skeleton variant="rounded" width={56} height={28} borderRadius={8} />
+        </div>
+      ))}
+    </div>
+  )
+})
+ComerciosRecordadosSkeleton.displayName = 'ComerciosRecordadosSkeleton'
+
+/**
+ * Template de Seguridad de Perfil
+ */
+export const PerfilSeguridadSkeleton = memo(function PerfilSeguridadSkeleton({
+  className = '',
+}: {
+  className?: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando opciones de seguridad..."
+      className={`${styles.seguridadSkeletonWrapper} ${className}`.trim()}
+    >
+      <span className={styles.srOnly}>Cargando opciones de seguridad...</span>
+      {/* Contraseña Card Skeleton */}
+      <div className={styles.seguridadCardSkeleton}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Skeleton variant="rounded" width={32} height={32} borderRadius={8} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <Skeleton variant="text" width="40%" height={16} />
+            <Skeleton variant="text" width="60%" height={12} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+          <Skeleton variant="rounded" height={44} borderRadius={10} />
+          <Skeleton variant="rounded" height={44} borderRadius={10} />
+        </div>
+      </div>
+
+      {/* WhatsApp Card Skeleton */}
+      <div className={styles.seguridadCardSkeleton}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Skeleton variant="rounded" width={32} height={32} borderRadius={8} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <Skeleton variant="text" width="35%" height={16} />
+            <Skeleton variant="text" width="50%" height={12} />
+          </div>
+        </div>
+        <Skeleton variant="rounded" height={40} borderRadius={10} style={{ marginTop: '12px' }} />
+      </div>
+    </div>
+  )
+})
+PerfilSeguridadSkeleton.displayName = 'PerfilSeguridadSkeleton'

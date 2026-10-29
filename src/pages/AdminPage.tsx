@@ -388,8 +388,8 @@ export default function AdminPage() {
           <h1>Panel de Administración</h1>
           <div className={styles.subtitle}>
             {loadingStats ? (
-              <span style={{ display: 'inline-block', verticalAlign: 'middle' }} aria-hidden="true">
-                <Skeleton variant="text" width={180} height={12} />
+              <span style={{ display: 'inline-block', verticalAlign: 'middle', width: '180px', maxWidth: '100%' }} aria-hidden="true">
+                <Skeleton variant="text" width="60%" height={12} style={{ maxWidth: 180 }} />
               </span>
             ) : (
               `${stats?.total || 0} usuarios registrados en total`

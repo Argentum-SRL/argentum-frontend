@@ -142,9 +142,9 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
               <div className={styles.cotizacionGrid} aria-hidden="true">
                 {[1, 2, 3].map(i => (
                   <div key={i} className={styles.cotizacionCard} style={{ pointerEvents: 'none', minHeight: '80px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <Skeleton variant="text" width={60} height={12} />
-                    <Skeleton variant="text" width={80} height={18} />
-                    <Skeleton variant="text" width={110} height={10} />
+                    <Skeleton variant="text" width="50%" height={12} />
+                    <Skeleton variant="text" width="75%" height={18} />
+                    <Skeleton variant="text" width="90%" height={10} />
                   </div>
                 ))}
               </div>

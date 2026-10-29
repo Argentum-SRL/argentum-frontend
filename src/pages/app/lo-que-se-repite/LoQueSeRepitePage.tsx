@@ -223,8 +223,8 @@ export const LoQueSeRepitePage: React.FC = () => {
       <div className={styles.root}>
         <header className={styles.header}>
           <h1 className={styles.title}>{TEXTOS.TITULO_PAGINA}</h1>
-          <div style={{ height: '18px', display: 'flex', alignItems: 'center' }} aria-hidden="true">
-            <Skeleton variant="text" width={240} height={13} />
+          <div style={{ height: '18px', display: 'flex', alignItems: 'center', width: '100%', maxWidth: 240 }} aria-hidden="true">
+            <Skeleton variant="text" width="70%" height={13} style={{ maxWidth: 240 }} />
           </div>
         </header>
         <div className={styles.sections}>

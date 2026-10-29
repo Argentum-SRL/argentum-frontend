@@ -230,17 +230,17 @@ export default function VinculacionWhatsAppCard({
         <div className={styles.twoColGrid} aria-hidden="true" style={{ opacity: 0.85 }}>
           <div className={styles.qrCol}>
             <div className={styles.qrContainer}>
-              <Skeleton variant="rounded" width={200} height={200} borderRadius={16} />
-              <div style={{ marginTop: 12 }}>
-                <Skeleton variant="text" width={220} height={12} />
+              <Skeleton variant="rounded" width="100%" height={200} borderRadius={16} style={{ maxWidth: 200, aspectRatio: '1/1' }} />
+              <div style={{ marginTop: 12, width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <Skeleton variant="text" width="85%" height={12} style={{ maxWidth: 220 }} />
               </div>
             </div>
           </div>
           <div className={styles.detailsCol}>
             <div className={styles.codeCard}>
-              <Skeleton variant="text" width={160} height={13} />
+              <Skeleton variant="text" width="70%" height={13} style={{ maxWidth: 160 }} />
               <div style={{ margin: '10px 0' }}>
-                <Skeleton variant="text" width={140} height={32} />
+                <Skeleton variant="text" width="60%" height={32} style={{ maxWidth: 140 }} />
               </div>
               <Skeleton variant="text" width="90%" height={12} />
             </div>

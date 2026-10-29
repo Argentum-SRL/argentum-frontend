@@ -37,7 +37,7 @@ import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
-import { EmptyState, WidgetErrorBoundary } from '@/components/ui'
+import { EmptyState, WidgetErrorBoundary, BalanceCardSkeleton, DashboardListSkeleton } from '@/components/ui'
 import AvisosConfianza from '@/components/dashboard/AvisosConfianza/AvisosConfianza'
 
 function formatDDMM(fechaIso?: string | null): string {
@@ -180,26 +180,6 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
   )
 })
 MobileGreeting.displayName = 'MobileGreeting'
-
-const BalanceSkeleton = memo(() => (
-  <div className={`${styles.skeleton} ${styles.skeletonBalance}`} />
-))
-BalanceSkeleton.displayName = 'BalanceSkeleton'
-
-const ListSkeleton = memo(() => (
-  <div className={styles.list}>
-    {[1, 2, 3, 4].map(i => (
-      <div key={i} className={styles.skeletonRow}>
-        <div className={`${styles.skeleton} ${styles.skeletonIcon}`} />
-        <div className={styles.skeletonLines}>
-          <div className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonWidth60}`} />
-          <div className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonWidth40}`} />
-        </div>
-      </div>
-    ))}
-  </div>
-))
-ListSkeleton.displayName = 'ListSkeleton'
 
 // Cache de colores por ID provistos por la API (Decisión 15.g)
 const API_CATEGORY_COLORS: Record<string, string> = {}
@@ -557,8 +537,10 @@ export default function DashboardPage() {
     }
   }, [proyeccion?.mostrar_modal_bienvenida, open])
 
-  const tieneProyeccion = useMemo(() => {
-    return Boolean(!customRange && !loadingProyeccion && hasProyeccionVisible(proyeccion, moneda))
+  const mostrarColumnaProyeccion = useMemo(() => {
+    if (customRange) return false
+    if (loadingProyeccion) return true
+    return hasProyeccionVisible(proyeccion, moneda)
   }, [customRange, loadingProyeccion, proyeccion, moneda])
   const [showChartPercent, setShowChartPercent] = useState(false)
   const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
@@ -941,7 +923,7 @@ export default function DashboardPage() {
         {/* Col 1: Balance */}
         <WidgetErrorBoundary title="Saldo disponible">
           {loading ? (
-            <BalanceSkeleton />
+            <BalanceCardSkeleton />
           ) : (
             data && (
               <BalanceCard
@@ -1015,7 +997,7 @@ export default function DashboardPage() {
             <div className={styles.chartCardContent}>
               {selectedCategoria ? (
                 loadingSubcategorias ? (
-                  <ListSkeleton />
+                  <DashboardListSkeleton count={4} />
                 ) : (
                   <SubcategoriasChart 
                     data={subcategoriasData} 
@@ -1027,7 +1009,7 @@ export default function DashboardPage() {
                 )
               ) : (
                 loading ? (
-                  <ListSkeleton />
+                  <DashboardListSkeleton count={4} />
                 ) : (
                   <CategoriasChart
                     data={data?.gastos_por_categoria?.[moneda === 'ARS' ? 'ars' : 'usd'] ?? []}
@@ -1051,7 +1033,7 @@ export default function DashboardPage() {
             </div>
             <div className={styles.cardContent}>
               {loading ? (
-                <ListSkeleton />
+                <DashboardListSkeleton count={3} />
               ) : (() => {
                 const pagosFiltrados = (data?.proximos_pagos ?? []).filter(p => p.moneda === moneda)
                 if (pagosFiltrados.length === 0) {
@@ -1139,9 +1121,9 @@ export default function DashboardPage() {
       </WidgetErrorBoundary>
 
       {/* ── Bottom Row (2 Cols si hay proyección, 1 Col full width si no) ─── */}
-      <div className={`${styles.bottomRow} ${!tieneProyeccion ? styles.bottomRowSingle : ''}`}>
+      <div className={`${styles.bottomRow} ${!mostrarColumnaProyeccion ? styles.bottomRowSingle : ''}`}>
         {/* Col 1: Proyección */}
-        {tieneProyeccion && (
+        {mostrarColumnaProyeccion && (
           <div className={styles.proyeccionSection}>
             <WidgetErrorBoundary title="Proyección">
               <ProyeccionCard data={proyeccion} loading={loadingProyeccion} moneda={moneda} />
@@ -1151,7 +1133,7 @@ export default function DashboardPage() {
 
         {/* Col 2 (o Col 1 full width): Últimos Movimientos */}
         <WidgetErrorBoundary title="Últimos movimientos">
-          <div className={`${styles.card} ${!tieneProyeccion ? styles.cardFullWidth : ''}`}>
+          <div className={`${styles.card} ${!mostrarColumnaProyeccion ? styles.cardFullWidth : ''}`}>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>Últimos movimientos</h3>
               <Link to="/app/transacciones" className={styles.seeAll}>
@@ -1160,7 +1142,7 @@ export default function DashboardPage() {
             </div>
             <div className={styles.cardContent}>
               {loading ? (
-                <ListSkeleton />
+                <DashboardListSkeleton count={4} />
               ) : (() => {
                 const movsFiltrados = (data?.ultimos_movimientos ?? []).filter(m => m.moneda === moneda)
                 if (movsFiltrados.length === 0) {

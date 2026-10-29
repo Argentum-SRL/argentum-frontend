@@ -6,6 +6,7 @@ import { useModal } from '@/hooks/useModal'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from '../PerfilPage.module.css'
+import { ComerciosRecordadosSkeleton } from '@/components/ui'
 
 export const ComerciosRecordados: React.FC = () => {
   const { confirm } = useModal()
@@ -62,9 +63,7 @@ export const ComerciosRecordados: React.FC = () => {
 
       <div className={styles.contactList}>
         {isLoading ? (
-          <div className={styles.contactItemBox}>
-            <span className={styles.contactItemValue}>Cargando...</span>
-          </div>
+          <ComerciosRecordadosSkeleton count={3} />
         ) : comercios.length === 0 ? (
           <div className={styles.contactItemBox}>
             <span className={styles.contactItemValue}>Todavía no hay comercios recordados.</span>

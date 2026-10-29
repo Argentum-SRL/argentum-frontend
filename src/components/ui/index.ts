@@ -82,6 +82,12 @@ export {
   TarjetaSummarySkeleton,
   FacturaPanelSkeleton,
   OnboardingSkeleton,
+  BalanceCardSkeleton,
+  DashboardListSkeleton,
+  ProyeccionCardSkeleton,
+  ConvenienciaWizardSkeleton,
+  ComerciosRecordadosSkeleton,
+  PerfilSeguridadSkeleton,
   type SkeletonProps,
 } from './Skeleton'
 

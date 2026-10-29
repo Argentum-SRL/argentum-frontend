@@ -7,6 +7,7 @@ import type { Proyeccion, ProyeccionesResponse } from '@/types'
 import styles from './ProyeccionCard.module.css'
 import { useModal } from '@/hooks/useModal'
 import { hasProyeccionVisible } from './proyeccionUtils'
+import { ProyeccionCardSkeleton } from '@/components/ui'
 
 const ProgressBar = ({ progress }: { progress: number }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -350,7 +351,15 @@ const ProyeccionCard: React.FC<ProyeccionCardProps> = ({ data, loading: external
     }
   }, [data, fetchProyeccion])
 
-  if (loading || error || !proyeccion) {
+  if (loading) {
+    return (
+      <div className={styles.proyeccionesContainer}>
+        <ProyeccionCardSkeleton />
+      </div>
+    )
+  }
+
+  if (error || !proyeccion) {
     return null
   }
 

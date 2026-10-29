@@ -19,8 +19,8 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
   if (loading) {
     return (
       <div className={styles.contextSkeleton}>
-        <Skeleton variant="text" width={180} height={16} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px 20px', marginTop: '12px' }}>
+        <Skeleton variant="text" width="50%" height={16} style={{ maxWidth: 180 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px 20px', marginTop: '12px' }}>
           {[0, 1, 2, 3].map((i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <Skeleton variant="text" width="60%" height={12} />

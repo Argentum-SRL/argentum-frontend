@@ -7,6 +7,7 @@ import CanAffordForm from '@/components/tools/CanAffordForm';
 import CanAffordResult from '@/components/tools/CanAffordResult';
 import ParametersSummaryBar from '@/components/tools/ParametersSummaryBar';
 import SegmentedControl from '@/components/ui/SegmentedControl';
+import { ConvenienciaWizardSkeleton } from '@/components/ui';
 import pageStyles from './ToolsPage.module.css';
 import { useAuth } from '@/hooks/useAuth';
 import ImportacionResumenSection from '@/components/tools/importacion/ImportacionResumenSection';
@@ -136,7 +137,7 @@ export default function ToolsPage() {
       {currentTab === 'conveniencia' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
           {ipcLoading ? (
-            <div className={`${pageStyles.skeleton} ${pageStyles.skeletonCard}`} />
+            <ConvenienciaWizardSkeleton />
           ) : (
             <ConvenienciaWizard
               formData={formData}

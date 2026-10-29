@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   User,
@@ -64,6 +64,23 @@ export default function PerfilPage() {
   const [fotoCropOpen, setFotoCropOpen] = useState(false)
   const [activeModal, setActiveModal] = useState<'datos' | 'email' | null>(null)
 
+  // ── 4. Mobile Carousel Auto-scroll ───────────────────────────────────────
+  const controlsRowRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const container = controlsRowRef.current
+    if (!container) return
+    const activePill = container.querySelector('[aria-checked="true"]') as HTMLElement | null
+    if (activePill) {
+      const containerRect = container.getBoundingClientRect()
+      const pillRect = activePill.getBoundingClientRect()
+      if (pillRect.left < containerRect.left || pillRect.right > containerRect.right) {
+        const scrollOffset = activePill.offsetLeft - 16
+        container.scrollTo({ left: Math.max(0, scrollOffset), behavior: 'smooth' })
+      }
+    }
+  }, [activeTab])
+
   const handleVerificarEmailActual = async () => {
     if (!usuario?.email) return
     try {
@@ -92,9 +109,10 @@ export default function PerfilPage() {
         onOpenCrop={() => setFotoCropOpen(true)}
       />
 
-      {/* ── Segmented Tab Navigation Bar (Cápsula Oficial) ──── */}
-      <div className={styles.controlsRow}>
+      {/* ── Segmented Tab Navigation Bar (Cápsula Oficial / Carrusel Móvil) ──── */}
+      <div ref={controlsRowRef} className={styles.controlsRow}>
         <SegmentedControl
+          className={styles.navTrack}
           options={[
             { value: 'perfil', label: 'General', icon: <User size={15} /> },
             { value: 'finanzas', label: 'Finanzas & Moneda', icon: <Coins size={15} /> },
@@ -109,6 +127,7 @@ export default function PerfilPage() {
 
         <div className={styles.dangerTabWrapper}>
           <SegmentedControl
+            className={styles.navTrack}
             options={[
               { value: 'peligro', label: 'Zona de Peligro', icon: <AlertTriangle size={15} /> },
             ]}

@@ -5,6 +5,7 @@ import type {
   MemoriaComercioGuardarResponse,
   MemoriaComercioAplicarPayload,
   MemoriaComercioAplicarResponse,
+  MemoriaComercio,
 } from '@/types'
 
 const memoriaComercioService = {
@@ -34,6 +35,15 @@ const memoriaComercioService = {
   ): Promise<MemoriaComercioAplicarResponse> => {
     const { data } = await api.post<MemoriaComercioAplicarResponse>('/memoria-comercios/aplicar', payload, { signal })
     return data
+  },
+
+  listar: async (signal?: AbortSignal): Promise<MemoriaComercio[]> => {
+    const { data } = await api.get<MemoriaComercio[]>('/memoria-comercios', { signal })
+    return data
+  },
+
+  eliminar: async (id: string, signal?: AbortSignal): Promise<void> => {
+    await api.delete(`/memoria-comercios/${id}`, { signal })
   },
 }
 

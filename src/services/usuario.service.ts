@@ -93,7 +93,15 @@ const usuarioService = {
   actualizarPermisoMensajes: async (permitido: boolean) => {
     const { data } = await api.put<Usuario>('/usuarios/me/permiso-mensajes', { permitido })
     return data
-  }
+  },
+
+  descargarMisDatos: async (signal?: AbortSignal): Promise<Blob> => {
+    const { data } = await api.get<Blob>('/usuarios/me/exportar', {
+      responseType: 'blob',
+      signal,
+    })
+    return data
+  },
 }
 
 export default usuarioService

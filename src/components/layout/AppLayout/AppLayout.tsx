@@ -13,6 +13,7 @@ import SearchModal from './SearchModal'
 import MobileBottomNav from '@/components/layout/MobileBottomNav/MobileBottomNav'
 import MobileMoreSheet from '@/components/layout/MobileBottomNav/MobileMoreSheet'
 import { getFotoUrl } from '@/utils/fotoUrl'
+import usoService from '@/services/uso.service'
 import styles from './AppLayout.module.css'
 
 // ── Icons ──────────────────────────────────────────────────────────────────
@@ -68,6 +69,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [prevPath, setPrevPath] = useState(location.pathname)
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [hoveredBtn, setHoveredBtn] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Registrar evento de visita de forma transparente sin bloquear ni alertar al usuario
+    usoService.registrarVisita().catch(() => {
+      // Silencioso: la medición de uso interna nunca debe interrumpir la navegación ni alertar al usuario
+    })
+  }, [])
 
   useEffect(() => {
     if (!isProfileOpen) return

@@ -9,6 +9,7 @@ import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
 import styles from '../PerfilPage.module.css'
+import SesionesYDatos from './SesionesYDatos'
 
 interface TabSeguridadProps {
   usuario: Usuario | null
@@ -128,340 +129,351 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
   }
 
   return (
-    <div className={styles.tabGrid}>
-      {/* 1. Métodos de Acceso Vinculados */}
-      <section className={styles.sectionCard}>
-        <div className={styles.sectionHeader}>
-          <div className={styles.sectionIconWrap}>
-            <Shield size={18} />
+    <div className={styles.tabGridColumns}>
+      {/* Columna Izquierda: Credenciales & Acceso */}
+      <div className={styles.tabCol}>
+        {/* 1. Métodos de Inicio de Sesión */}
+        <section className={styles.sectionCard}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIconWrap}>
+              <Shield size={18} />
+            </div>
+            <div className={styles.sectionHeaderText}>
+              <h3>Métodos de Inicio de Sesión</h3>
+            </div>
           </div>
-          <div className={styles.sectionHeaderText}>
-            <h3>Métodos de Inicio de Sesión</h3>
-          </div>
-        </div>
 
-        <div className={styles.contactList}>
-          {/* Email y Contraseña: solo si password_configurada es true */}
-          {usuario?.password_configurada && (
-            <div className={styles.contactItemBox}>
-              <div className={styles.contactItemInfo}>
-                <div className={styles.contactItemLabelRow}>
-                  <span className={styles.contactItemLabel}>Email y Contraseña</span>
-                  <span className={styles.verifiedBadge}>
-                    <CheckCircle2 size={11} /> Activo
+          <div className={styles.contactList}>
+            {/* Email y Contraseña: solo si password_configurada es true */}
+            {usuario?.password_configurada && (
+              <div className={styles.contactItemBox}>
+                <div className={styles.contactItemInfo}>
+                  <div className={styles.contactItemLabelRow}>
+                    <span className={styles.contactItemLabel}>Email y Contraseña</span>
+                    <span className={styles.verifiedBadge}>
+                      <CheckCircle2 size={11} /> Activo
+                    </span>
+                  </div>
+                  <span className={styles.contactItemValue}>
+                    {usuario?.email || 'Sin correo asignado'}
                   </span>
                 </div>
-                <span className={styles.contactItemValue}>
-                  {usuario?.email || 'Sin correo asignado'}
-                </span>
-              </div>
 
-              <div className={styles.contactItemAction}>
-                {!usuario?.email_verificado && usuario?.email && (
-                  <button
-                    type="button"
-                    className={styles.verifyDirectBtn}
-                    onClick={onVerificarEmail}
-                  >
-                    Reenviar código
-                  </button>
-                )}
-                {usuario?.auth_provider !== 'google' && (
-                  <button
-                    type="button"
-                    className={styles.editContactBtn}
-                    onClick={onEditEmail}
-                  >
-                    <Edit3 size={13} />
-                    <span>Cambiar</span>
-                  </button>
-                )}
+                <div className={styles.contactItemAction}>
+                  {!usuario?.email_verificado && usuario?.email && (
+                    <button
+                      type="button"
+                      className={styles.verifyDirectBtn}
+                      onClick={onVerificarEmail}
+                    >
+                      Reenviar código
+                    </button>
+                  )}
+                  {usuario?.auth_provider !== 'google' && (
+                    <button
+                      type="button"
+                      className={styles.editContactBtn}
+                      onClick={onEditEmail}
+                    >
+                      <Edit3 size={13} />
+                      <span>Cambiar</span>
+                    </button>
+                  )}
+                </div>
               </div>
+            )}
+
+            {/* Google OAuth: solo si auth_provider es google */}
+            {usuario?.auth_provider === 'google' && (
+              <div className={styles.contactItemBox}>
+                <div className={styles.contactItemInfo}>
+                  <div className={styles.contactItemLabelRow}>
+                    <span className={styles.contactItemLabel}>Google OAuth</span>
+                    <span className={styles.verifiedBadge}>
+                      <CheckCircle2 size={11} /> Vinculado
+                    </span>
+                  </div>
+                  <span className={styles.contactItemValue}>
+                    {`Vinculado como ${usuario?.email}`}
+                  </span>
+                </div>
+
+                <div className={styles.contactItemAction}>
+                  <span className={styles.lockedTag} title="Cuenta vinculada con Google">
+                    <Lock size={12} /> Google
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 2. Cambiar o Configurar Contraseña */}
+        <section className={styles.sectionCard}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIconWrap}>
+              <Key size={18} />
             </div>
-          )}
+            <div className={styles.sectionHeaderText}>
+              <h3>Contraseña de Acceso</h3>
+            </div>
+          </div>
 
-          {/* Google OAuth: solo si auth_provider es google */}
           {usuario?.auth_provider === 'google' && (
-            <div className={styles.contactItemBox}>
-              <div className={styles.contactItemInfo}>
-                <div className={styles.contactItemLabelRow}>
-                  <span className={styles.contactItemLabel}>Google OAuth</span>
-                  <span className={styles.verifiedBadge}>
-                    <CheckCircle2 size={11} /> Vinculado
-                  </span>
+            <div className={styles.googleAuthInfoBanner}>
+              <div className={styles.googleIconBox}>
+                <svg width="22" height="22" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+              </div>
+              <div className={styles.googleAuthInfoText}>
+                <h4>Cuenta vinculada con Google</h4>
+                <p>
+                  Tu cuenta está asociada a <strong>Google OAuth</strong>. Conservás tu acceso con Google en todo momento y además podés gestionar tu contraseña para ingresar con email y contraseña.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSavePassword} className={styles.formInsideCard}>
+            {pwError && (
+              <div className={styles.formAlertError}>
+                <AlertCircle size={15} />
+                <span>{pwError}</span>
+              </div>
+            )}
+
+            {usuario?.password_configurada && (
+              <div className={styles.formGroup}>
+                <label htmlFor="pw-actual-input" className={styles.formGroupLabel}>
+                  Contraseña actual *
+                </label>
+                <div className={styles.passwordInputWrap}>
+                  <input
+                    id="pw-actual-input"
+                    name="current_account_pw"
+                    type={showPwActual ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    className={styles.cleanInput}
+                    value={passwordActual}
+                    onChange={(e) => setPasswordActual(e.target.value)}
+                    placeholder="Ingresá tu contraseña actual"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={styles.pwEyeBtn}
+                    onClick={() => setShowPwActual(!showPwActual)}
+                    tabIndex={-1}
+                    aria-label={showPwActual ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'}
+                  >
+                    {showPwActual ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
-                <span className={styles.contactItemValue}>
-                  {`Vinculado como ${usuario?.email}`}
-                </span>
               </div>
+            )}
 
-              <div className={styles.contactItemAction}>
-                <span className={styles.lockedTag} title="Cuenta vinculada con Google">
-                  <Lock size={12} /> Google
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 2. Vinculación del Asistente WhatsApp */}
-      <section className={styles.sectionCard}>
-        <div className={styles.sectionHeader}>
-          <div className={styles.sectionIconWrap}>
-            <MessageSquare size={18} />
-          </div>
-          <div className={styles.sectionHeaderText}>
-            <h3>Asistente de WhatsApp</h3>
-          </div>
-        </div>
-
-        <div className={styles.contactList}>
-          <div className={styles.contactItemBox}>
-            <div className={styles.contactItemInfo}>
-              <div className={styles.contactItemLabelRow}>
-                <span className={styles.contactItemLabel}>Asistente Financiero por WhatsApp</span>
-                {usuario?.telefono_verificado ? (
-                  <span className={styles.verifiedBadge}>
-                    <CheckCircle2 size={11} /> Vinculado
-                  </span>
-                ) : (
-                  <span className={styles.unverifiedBadge}>
-                    <AlertCircle size={11} /> No vinculado
-                  </span>
-                )}
-              </div>
-              <span className={styles.contactItemValue}>
-                {usuario?.telefono
-                  ? usuario?.telefono_verificado
-                    ? formatearTelefonoVisual(usuario.telefono)
-                    : `${formatearTelefonoVisual(usuario.telefono)} (Sin verificar)`
-                  : 'Sin WhatsApp asignado'}
-              </span>
-            </div>
-
-            <div className={styles.contactItemAction}>
-              {!usuario?.telefono_verificado ? (
-                <button
-                  type="button"
-                  className={styles.verifyDirectBtn}
-                  onClick={() => navigate('/auth/verificar-telefono', { state: { from: '/app/perfil?tab=seguridad' } })}
-                >
-                  Vincular WhatsApp
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className={styles.editContactBtn}
-                    onClick={() => navigate('/auth/verificar-telefono', { state: { from: '/app/perfil?tab=seguridad' } })}
-                  >
-                    <Edit3 size={13} />
-                    <span>Cambiar número</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.unlinkContactBtn}
-                    onClick={handleDesvincular}
-                    disabled={isDesvinculando}
-                  >
-                    <Unlink size={13} />
-                    <span>{isDesvinculando ? 'Desvinculando...' : 'Desvincular'}</span>
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Permiso de lectura para mejorar el asistente */}
-          <div className={styles.contactItemBox}>
-            <div className={styles.contactItemInfo}>
-              <div className={styles.contactItemLabelRow}>
-                <span className={styles.contactItemLabel}>
-                  Permitir que el equipo de Argentum lea mis mensajes con el asistente para mejorarlo.
-                </span>
-              </div>
-              <span className={styles.contactItemValue}>
-                Si lo apagás, el equipo deja de ver también los mensajes anteriores.
-              </span>
-            </div>
-
-            <div className={styles.contactItemAction}>
-              <label className={styles.switch}>
-                <input
-                  type="checkbox"
-                  checked={Boolean(usuario?.permiso_lectura_mensajes_en)}
-                  onChange={handleTogglePermisoMensajes}
-                  disabled={isUpdatingPermiso}
-                  aria-label="Permitir que el equipo de Argentum lea mis mensajes con el asistente para mejorarlo"
-                />
-                <span className={styles.slider} />
-              </label>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Cambiar o Configurar Contraseña */}
-      <section className={styles.sectionCard}>
-        <div className={styles.sectionHeader}>
-          <div className={styles.sectionIconWrap}>
-            <Key size={18} />
-          </div>
-          <div className={styles.sectionHeaderText}>
-            <h3>Contraseña de Acceso</h3>
-          </div>
-        </div>
-
-        {usuario?.auth_provider === 'google' && (
-          <div className={styles.googleAuthInfoBanner}>
-            <div className={styles.googleIconBox}>
-              <svg width="22" height="22" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-              </svg>
-            </div>
-            <div className={styles.googleAuthInfoText}>
-              <h4>Cuenta vinculada con Google</h4>
-              <p>
-                Tu cuenta está asociada a <strong>Google OAuth</strong>. Conservás tu acceso con Google en todo momento y además podés gestionar tu contraseña para ingresar con email y contraseña.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <form onSubmit={handleSavePassword} className={styles.formInsideCard}>
-          {pwError && (
-            <div className={styles.formAlertError}>
-              <AlertCircle size={15} />
-              <span>{pwError}</span>
-            </div>
-          )}
-
-          {usuario?.password_configurada && (
             <div className={styles.formGroup}>
-              <label htmlFor="pw-actual-input" className={styles.formGroupLabel}>
-                Contraseña actual *
+              <label htmlFor="pw-nueva-input" className={styles.formGroupLabel}>
+                Nueva contraseña *
               </label>
               <div className={styles.passwordInputWrap}>
                 <input
-                  id="pw-actual-input"
-                  name="current_account_pw"
-                  type={showPwActual ? 'text' : 'password'}
-                  autoComplete="current-password"
+                  id="pw-nueva-input"
+                  name="new_account_pw"
+                  type={showPwNueva ? 'text' : 'password'}
+                  autoComplete="new-password"
                   className={styles.cleanInput}
-                  value={passwordActual}
-                  onChange={(e) => setPasswordActual(e.target.value)}
-                  placeholder="Ingresá tu contraseña actual"
+                  value={passwordNueva}
+                  onChange={(e) => setPasswordNueva(e.target.value)}
+                  placeholder="Ingresá tu nueva contraseña"
                   required
                 />
                 <button
                   type="button"
                   className={styles.pwEyeBtn}
-                  onClick={() => setShowPwActual(!showPwActual)}
+                  onClick={() => setShowPwNueva(!showPwNueva)}
                   tabIndex={-1}
+                  aria-label={showPwNueva ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
                 >
-                  {showPwActual ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPwNueva ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
-          )}
 
-          <div className={styles.formGroup}>
-            <label htmlFor="pw-nueva-input" className={styles.formGroupLabel}>
-              Nueva contraseña *
-            </label>
-            <div className={styles.passwordInputWrap}>
-              <input
-                id="pw-nueva-input"
-                name="new_account_pw"
-                type={showPwNueva ? 'text' : 'password'}
-                autoComplete="new-password"
-                className={styles.cleanInput}
-                value={passwordNueva}
-                onChange={(e) => setPasswordNueva(e.target.value)}
-                placeholder="Ingresá tu nueva contraseña"
-                required
-              />
-              <button
-                type="button"
-                className={styles.pwEyeBtn}
-                onClick={() => setShowPwNueva(!showPwNueva)}
-                tabIndex={-1}
-              >
-                {showPwNueva ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="pw-confirm-input" className={styles.formGroupLabel}>
-              Confirmar nueva contraseña *
-            </label>
-            <div className={styles.passwordInputWrap}>
-              <input
-                id="pw-confirm-input"
-                name="confirm_new_account_pw"
-                type="password"
-                autoComplete="new-password"
-                className={styles.cleanInput}
-                value={passwordConfirm}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-                placeholder="Repetí la nueva contraseña"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Realtime checklist: only shown if invalid while typing */}
-          {(passwordNueva.length > 0 || passwordConfirm.length > 0) && !isPwValid && (
-            <div className={styles.pwChecklist}>
-              <span className={styles.pwChecklistTitle}>Requisitos de seguridad:</span>
-              <div className={styles.pwChecklistGrid}>
-                <div className={`${styles.reqItem} ${reqs.length ? styles.reqSuccess : ''}`}>
-                  {reqs.length ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Mínimo 8 caracteres</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.upper ? styles.reqSuccess : ''}`}>
-                  {reqs.upper ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Al menos una mayúscula</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.lower ? styles.reqSuccess : ''}`}>
-                  {reqs.lower ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Al menos una minúscula</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.number ? styles.reqSuccess : ''}`}>
-                  {reqs.number ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Al menos un número</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.match ? styles.reqSuccess : ''}`}>
-                  {reqs.match ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Las contraseñas coinciden</span>
-                </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="pw-confirm-input" className={styles.formGroupLabel}>
+                Confirmar nueva contraseña *
+              </label>
+              <div className={styles.passwordInputWrap}>
+                <input
+                  id="pw-confirm-input"
+                  name="confirm_new_account_pw"
+                  type="password"
+                  autoComplete="new-password"
+                  className={styles.cleanInput}
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  placeholder="Repetí la nueva contraseña"
+                  required
+                />
               </div>
             </div>
-          )}
 
-          <div className={styles.cardFooterActions}>
-            <button
-              type="submit"
-              disabled={isSavingPw || !isPwValid}
-              className={styles.saveBtnPrimary}
-            >
-              <Save size={15} />
-              <span>
-                {isSavingPw
-                  ? 'Guardando...'
-                  : usuario?.password_configurada
-                  ? 'Actualizar contraseña'
-                  : 'Crear contraseña'}
-              </span>
-            </button>
+            {/* Realtime checklist: only shown if invalid while typing */}
+            {(passwordNueva.length > 0 || passwordConfirm.length > 0) && !isPwValid && (
+              <div className={styles.pwChecklist}>
+                <span className={styles.pwChecklistTitle}>Requisitos de seguridad:</span>
+                <div className={styles.pwChecklistGrid}>
+                  <div className={`${styles.reqItem} ${reqs.length ? styles.reqSuccess : ''}`}>
+                    {reqs.length ? <Check size={13} /> : <span className={styles.reqDot} />}
+                    <span>Mínimo 8 caracteres</span>
+                  </div>
+                  <div className={`${styles.reqItem} ${reqs.upper ? styles.reqSuccess : ''}`}>
+                    {reqs.upper ? <Check size={13} /> : <span className={styles.reqDot} />}
+                    <span>Al menos una mayúscula</span>
+                  </div>
+                  <div className={`${styles.reqItem} ${reqs.lower ? styles.reqSuccess : ''}`}>
+                    {reqs.lower ? <Check size={13} /> : <span className={styles.reqDot} />}
+                    <span>Al menos una minúscula</span>
+                  </div>
+                  <div className={`${styles.reqItem} ${reqs.number ? styles.reqSuccess : ''}`}>
+                    {reqs.number ? <Check size={13} /> : <span className={styles.reqDot} />}
+                    <span>Al menos un número</span>
+                  </div>
+                  <div className={`${styles.reqItem} ${reqs.match ? styles.reqSuccess : ''}`}>
+                    {reqs.match ? <Check size={13} /> : <span className={styles.reqDot} />}
+                    <span>Las contraseñas coinciden</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className={styles.cardFooterActions}>
+              <button
+                type="submit"
+                disabled={isSavingPw || !isPwValid}
+                className={styles.saveBtnPrimary}
+              >
+                <Save size={15} />
+                <span>
+                  {isSavingPw
+                    ? 'Guardando...'
+                    : usuario?.password_configurada
+                    ? 'Actualizar contraseña'
+                    : 'Crear contraseña'}
+                </span>
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      {/* Columna Derecha: Canales, Sesiones & Datos */}
+      <div className={styles.tabCol}>
+        {/* 3. Vinculación del Asistente WhatsApp */}
+        <section className={styles.sectionCard}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIconWrap}>
+              <MessageSquare size={18} />
+            </div>
+            <div className={styles.sectionHeaderText}>
+              <h3>Asistente de WhatsApp</h3>
+            </div>
           </div>
-        </form>
-      </section>
+
+          <div className={styles.contactList}>
+            <div className={styles.contactItemBox}>
+              <div className={styles.contactItemInfo}>
+                <div className={styles.contactItemLabelRow}>
+                  <span className={styles.contactItemLabel}>Asistente Financiero por WhatsApp</span>
+                  {usuario?.telefono_verificado ? (
+                    <span className={styles.verifiedBadge}>
+                      <CheckCircle2 size={11} /> Vinculado
+                    </span>
+                  ) : (
+                    <span className={styles.unverifiedBadge}>
+                      <AlertCircle size={11} /> No vinculado
+                    </span>
+                  )}
+                </div>
+                <span className={styles.contactItemValue}>
+                  {usuario?.telefono
+                    ? usuario?.telefono_verificado
+                      ? formatearTelefonoVisual(usuario.telefono)
+                      : `${formatearTelefonoVisual(usuario.telefono)} (Sin verificar)`
+                    : 'Sin WhatsApp asignado'}
+                </span>
+              </div>
+
+              <div className={styles.contactItemAction}>
+                {!usuario?.telefono_verificado ? (
+                  <button
+                    type="button"
+                    className={styles.verifyDirectBtn}
+                    onClick={() => navigate('/auth/verificar-telefono', { state: { from: '/app/perfil?tab=seguridad' } })}
+                  >
+                    Vincular WhatsApp
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={styles.editContactBtn}
+                      onClick={() => navigate('/auth/verificar-telefono', { state: { from: '/app/perfil?tab=seguridad' } })}
+                    >
+                      <Edit3 size={13} />
+                      <span>Cambiar número</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.unlinkContactBtn}
+                      onClick={handleDesvincular}
+                      disabled={isDesvinculando}
+                    >
+                      <Unlink size={13} />
+                      <span>{isDesvinculando ? 'Desvinculando...' : 'Desvincular'}</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Permiso de lectura para mejorar el asistente */}
+            <div className={`${styles.contactItemBox} ${styles.contactItemBoxToggle}`}>
+              <div className={styles.contactItemInfo}>
+                <div className={styles.contactItemLabelRow}>
+                  <span className={styles.contactItemToggleLabel}>
+                    Permitir que el equipo de Argentum lea mis mensajes con el asistente para mejorarlo.
+                  </span>
+                </div>
+                <span className={styles.contactItemDesc}>
+                  Si lo apagás, el equipo deja de ver también los mensajes anteriores.
+                </span>
+              </div>
+
+              <div className={styles.contactItemAction}>
+                <label className={styles.switch}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(usuario?.permiso_lectura_mensajes_en)}
+                    onChange={handleTogglePermisoMensajes}
+                    disabled={isUpdatingPermiso}
+                    aria-label="Permitir que el equipo de Argentum lea mis mensajes con el asistente para mejorarlo"
+                  />
+                  <span className={styles.slider} />
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Sesiones & 5. Tus datos */}
+        <SesionesYDatos />
+      </div>
     </div>
   )
 }

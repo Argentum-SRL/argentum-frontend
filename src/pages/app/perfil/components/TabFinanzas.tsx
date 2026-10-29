@@ -9,6 +9,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import { CicloFinancieroSelector, type CicloValue } from '@/components/ciclo/CicloFinancieroSelector'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from '../PerfilPage.module.css'
+import ComerciosRecordados from './ComerciosRecordados'
 
 const MONEDA_PRINCIPAL_OPTIONS = [
   { value: 'ARS', label: 'Pesos ($)', description: 'Peso Argentino' },
@@ -262,6 +263,8 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           </div>
         </form>
       </section>
+
+      <ComerciosRecordados />
     </div>
   )
 }

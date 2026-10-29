@@ -11,7 +11,7 @@
   color: var(--error);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .iconWrap {
     width: 52px !important;
     height: 52px !important;
@@ -52,7 +52,7 @@
   }
 }
 
-@media (max-width: 350px) {
+@media (max-width: 360px) {
   .title {
     font-size: 1.05rem !important;
   }
@@ -97,7 +97,7 @@
   margin-bottom: 16px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .inputWrap {
     margin-bottom: 14px;
   }
@@ -117,7 +117,7 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .passwordInput {
     padding: 11px 14px;
     font-size: var(--control-font-mobile);
@@ -155,7 +155,7 @@
   gap: 12px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .googleWrap {
     margin-bottom: 14px;
     gap: 8px;
@@ -193,7 +193,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .errorAlert {
     padding: 8px 12px;
     font-size: 0.8125rem;
@@ -205,7 +205,7 @@
   width: 100%;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .cancelBtn {
     max-width: 100px !important;
     padding: 0 10px !important;

@@ -1172,6 +1172,19 @@ export interface MemoriaComercioAplicarResponse {
   omitidas: number
 }
 
+export interface MemoriaComercio {
+  id: string
+  usuario_id: string
+  clave: string
+  tipo: string
+  categoria_id: string
+  categoria_nombre: string
+  subcategoria_id?: string | null
+  subcategoria_nombre?: string | null
+  fecha_creacion: string
+  fecha_actualizacion: string
+}
+
 export * from './importacion'
 
 // ============================================================================

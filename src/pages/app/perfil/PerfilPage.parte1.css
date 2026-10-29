@@ -12,7 +12,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .page {
     padding-top: max(8px, env(safe-area-inset-top, 8px));
     gap: 12px;
@@ -32,7 +32,7 @@
   margin-bottom: 36px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .mainContent {
     margin-bottom: 12px;
   }
@@ -45,7 +45,7 @@
   gap: 12px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .pageHeader {
     display: none;
   }
@@ -120,34 +120,51 @@
   width: 100%;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .heroCard {
-    padding: 14px 16px;
+    padding: 16px;
     border-radius: 16px;
   }
   .heroInner {
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 12px;
   }
   .avatarWrapper {
-    width: 56px !important;
-    height: 56px !important;
+    width: 60px;
+    height: 60px;
   }
   .avatarFallback {
-    font-size: 22px !important;
+    font-size: 24px;
   }
   .heroName {
-    font-size: 17px !important;
-  }
-  .heroContacts {
-    display: none !important;
-  }
-  .heroBadges {
-    display: none !important;
+    font-size: 18px;
   }
   .heroDetails {
-    gap: 4px !important;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+  .heroContacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+  .contactItem {
+    font-size: 12px;
+    padding: 4px 8px;
+    max-width: 100%;
+  }
+  .heroBadges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .statusChip {
+    font-size: 10.5px;
+    padding: 2px 7px;
   }
 }
 
@@ -293,7 +310,17 @@
   border-radius: 8px;
   border: 1px solid var(--border);
   cursor: pointer;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.contactItem span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .contactItem:hover {
@@ -354,7 +381,7 @@
   margin-left: 2px;
 }
 
-/* ── 3. Segmented Navigation Tabs ────────────────────────────────── */
+/* ── 3. Segmented Navigation Tabs (Carrusel en Móvil y Tablet) ──── */
 .controlsRow {
   display: flex;
   align-items: center;
@@ -362,9 +389,25 @@
   gap: 12px;
   width: 100%;
   flex-shrink: 0;
-  overflow-x: auto;
-  -ms-overflow-style: none;
-  padding: 2px 0;
+  box-sizing: border-box;
+}
+
+.navTrack {
+  flex-wrap: nowrap;
+  width: max-content;
+  max-width: none;
+}
+
+.navTrack [role="radio"] {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.dangerTabWrapper {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 @supports (scrollbar-width: none) {
@@ -379,24 +422,31 @@
 
 @media (max-width: 768px) {
   .controlsRow {
-    flex-wrap: wrap;
-    overflow: visible;
-    row-gap: 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 8px;
+    padding: 2px 0 6px 0;
+    width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-}
 
-@media (max-width: 768px) {
-  .controlsRow {
-    flex-wrap: wrap;
-    overflow: visible;
-    row-gap: 8px;
+  .controlsRow .navTrack {
+    flex-wrap: nowrap;
+    max-width: none;
+    width: max-content;
+    flex-shrink: 0;
   }
-}
 
-.dangerTabWrapper {
-  display: inline-flex;
-  align-items: center;
-  margin-left: auto;
+  .dangerTabWrapper {
+    margin-left: 0;
+    flex-shrink: 0;
+    padding-right: 16px;
+  }
 }
 
 .dangerTabWrapper [role="radio"] {
@@ -416,14 +466,50 @@
 /* ── 4. General Tab & Generic Section Cards ──────────────────────── */
 .tabGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-items: start;
 }
 
 @media (min-width: 1024px) {
   .tabGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.tabGridColumns {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .tabGridColumns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 20px;
+  }
+}
+
+.tabCol {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .tabGridFullCol {
+    grid-column: 1 / -1;
   }
 }
 
@@ -437,10 +523,11 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  min-width: 0;
   box-shadow: var(--elevation-sm);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .sectionCard {
     padding: 16px;
     border-radius: 16px;
@@ -538,14 +625,14 @@
 /* Fields Grid (Datos Personales) */
 .fieldsGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   width: 100%;
 }
 
-@media (min-width: 540px) {
+@media (min-width: 640px) {
   .fieldsGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -557,6 +644,8 @@
   background: var(--surface-alt);
   border-radius: 12px;
   border: 1px solid var(--border);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .fieldLabel {
@@ -611,6 +700,40 @@
   border: 1px solid var(--border);
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 639px) {
+  .contactItemBox {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.contactItemBox.contactItemBoxToggle {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contactItemBox.contactItemBoxToggle .contactItemInfo {
+  flex: 1 1 0%;
+  min-width: 0;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.contactItemBox.contactItemBoxToggle .contactItemAction {
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  margin-left: auto;
+  padding-top: 2px;
 }
 
 .contactItemInfo {

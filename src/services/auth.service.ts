@@ -158,3 +158,13 @@ export async function confirmarResetPassword(
   return data
 }
 
+export async function cerrarSesionEnTodos(): Promise<void> {
+  await api.post('/auth/logout-all')
+}
+
+const authService = {
+  cerrarSesionEnTodos,
+}
+
+export default authService
+

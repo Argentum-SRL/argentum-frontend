@@ -1,0 +1,218 @@
+/* ==========================================================================
+   ComerciosRecordados - Full-width Responsive Component
+   ========================================================================== */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.searchWrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 38px;
+  padding: 0 var(--space-md) 0 36px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 0.875rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+@media (max-width: 768px) {
+  .searchInput {
+    font-size: 16px;
+  }
+}
+
+.searchInput:focus {
+  border-color: var(--primary);
+  outline: 2px solid rgba(var(--primary-rgb), 0.25);
+  outline-offset: 1px;
+}
+
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+
+.merchantRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--control-pad-x);
+  box-sizing: border-box;
+  width: 100%;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.merchantRow + .merchantRow {
+  border-top: 1px solid var(--border-subtle);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .merchantRow:hover {
+    background: var(--surface-alt);
+  }
+}
+
+.merchantLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
+  flex: 1;
+}
+
+.merchantAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-selector-pill);
+  background: rgba(var(--primary-rgb), 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+:global([data-theme="dark"]) .merchantAvatar {
+  background: rgba(255, 255, 255, 0.08);
+  color: #93c5fd;
+}
+
+.merchantInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.merchantName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoryTag {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deleteBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-selector-pill);
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.deleteBtn:focus-visible {
+  outline: 2px solid var(--error);
+  outline-offset: 1px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .deleteBtn:hover {
+    color: var(--error);
+    background: var(--error-bg);
+  }
+}
+
+.deleteBtn:active {
+  transform: scale(0.92);
+}
+
+/* Empty State */
+.emptyCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+  gap: var(--space-sm);
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+
+.emptyIconBox {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-selector-pill);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  margin-bottom: var(--space-2xs);
+}
+
+.emptyTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.emptyDesc {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  max-width: 340px;
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .searchInput,
+  .merchantRow,
+  .deleteBtn {
+    transition: none !important;
+  }
+}

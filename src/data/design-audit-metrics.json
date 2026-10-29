@@ -1,31 +1,31 @@
 {
-  "timestamp": "2026-10-22T00:10:11.608Z",
-  "executionTimeMs": 3694,
+  "timestamp": "2026-10-29T14:50:14.833Z",
+  "executionTimeMs": 3017,
   "scannedFiles": {
-    "total": 495,
-    "tsxAndTs": 345,
-    "css": 150,
-    "cssRules": 7235
+    "total": 528,
+    "tsxAndTs": 375,
+    "css": 153,
+    "cssRules": 7343
   },
   "inventorySummary": {
-    "totalVariantsDetected": 3924,
-    "sharedComponents": 178,
-    "localImplementations": 3746,
-    "divergencesAndDuplications": 3746,
-    "uniqueSharedPrimitives": 178
+    "totalVariantsDetected": 3982,
+    "sharedComponents": 189,
+    "localImplementations": 3793,
+    "divergencesAndDuplications": 3793,
+    "uniqueSharedPrimitives": 189
   },
   "categoryDistribution": {
-    "selectores_segmentados": 56,
-    "opciones_seleccionables": 100,
+    "selectores_segmentados": 57,
+    "opciones_seleccionables": 101,
     "campos_entrada": 192,
     "seleccion_avanzada": 7,
-    "botones_accion": 602,
-    "tarjetas_paneles": 556,
-    "modales_dialogos": 1911,
-    "navegacion": 7,
-    "elementos_informativos": 236,
-    "estados_interfaz": 138,
-    "elementos_financieros": 95,
+    "botones_accion": 625,
+    "tarjetas_paneles": 560,
+    "modales_dialogos": 1939,
+    "navegacion": 8,
+    "elementos_informativos": 230,
+    "estados_interfaz": 136,
+    "elementos_financieros": 103,
     "controles_especiales": 24
   },
   "criticalDivergenceFamilies": [

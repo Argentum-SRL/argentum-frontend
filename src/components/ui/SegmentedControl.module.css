@@ -25,6 +25,12 @@
 
 .fullWidth {
   width: 100%;
+  flex-wrap: nowrap;
+}
+
+.fullWidth .pill {
+  min-width: 0;
+  padding: 0 var(--space-sm);
 }
 
 .pill {

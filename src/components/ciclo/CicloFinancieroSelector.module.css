@@ -1,596 +1,526 @@
 /* ==========================================================================
-   CicloFinancieroSelector - Argentum Design System
+   CicloFinancieroSelector - Minimalist & Low Cognitive Load Component
    ========================================================================== */
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-md);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── 1. Selector de Modalidad ── */
+.modeTrack {
   width: 100%;
 }
 
-/* ── Mode selector cards (Paso 1) ───────────────────────────────────────── */
-.modeGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-@media (min-width: 520px) {
-  .modeGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.modeCard {
+/* ── 2. Card de Configuración Unificada ── */
+.configCard {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 14px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
+  flex-direction: column;
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ── 2A. Opciones de Días Hábiles ── */
+.businessOptionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  min-height: 52px;
+  background: transparent;
+  border: none;
+  width: 100%;
   cursor: pointer;
   text-align: left;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
   outline: none;
+  box-sizing: border-box;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease;
 }
 
-.modeCard:focus-visible {
-  outline: 2px solid var(--focus-ring, #3b82f6);
-  outline-offset: 2px;
-}
-
-.modeCard:hover {
-  border-color: rgba(72, 120, 184, 0.4);
-  background: var(--surface-alt);
+.businessOptionRow + .businessOptionRow {
+  border-top: 1px solid var(--border-subtle);
 }
 
 @media (hover: hover) and (pointer: fine) {
-
-  .modeCard:hover {
-  transform: translateY(-1px);
+  .businessOptionRow:hover:not(:disabled) {
+    background: var(--surface-alt);
   }
 }
 
-.modeCardActive {
-  border-color: rgba(72, 120, 184, 0.35) !important;
-  background: rgba(72, 120, 184, 0.08) !important;
-  box-shadow: var(--elevation-selection);
-  transform: translateY(-3px) scale(1.025);
-  z-index: 8;
-}
-
-:global([data-theme="dark"]) .modeCard {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-:global([data-theme="dark"]) .modeCard:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-:global([data-theme="dark"]) .modeCardActive {
-  background: rgba(72, 120, 184, 0.18) !important;
-  border-color: rgba(72, 120, 184, 0.45) !important;
-  box-shadow: var(--elevation-selection);
-  transform: translateY(-3px) scale(1.025);
-  z-index: 8;
-}
-
-.modeIconWrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+.businessOptionRow:active:not(:disabled) {
   background: var(--surface-alt);
+}
+
+.businessOptionRow:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.businessLeft {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--text-2);
-  flex-shrink: 0;
-  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-}
-
-.modeCardActive .modeIconWrap {
-  background: var(--primary);
-  color: #ffffff;
-}
-
-:global([data-theme="dark"]) .modeIconWrap {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.modeText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: var(--space-md);
+  min-width: 0;
   flex: 1;
 }
 
-.modeTitle {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.modeSubtitle {
-  font-size: 0.775rem;
-  line-height: 1.35;
-  color: var(--text-3);
-}
-
-.checkBadge {
-  color: var(--primary);
-  opacity: 0.85;
-  transform: scale(0.9);
-}
-
-/* ── Sección Dinámica (Paso 2) ─────────────────────────────────────────── */
-.sectionBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px;
-  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-}
-
-:global([data-theme="dark"]) .sectionBlock {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.blockHeader {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.blockTitle {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.blockHint {
-  font-size: 0.75rem;
-  color: var(--text-3);
-}
-
-.highlightPill {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--primary);
-  background: rgba(72, 120, 184, 0.12);
-  padding: 2px 8px;
-  border-radius: 6px;
-}
-
-/* ── Day Picker Grid (1..31) ───────────────────────────────────────────── */
-.dayPickerContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.quickDaysRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.dayGrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-
-@media (max-width: 400px) {
-  .dayGrid {
-    gap: 4px;
-  }
-}
-
-.dayBtn {
-  aspect-ratio: 1;
+.rowChevron {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  color: var(--text-3);
+  transition: transform var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.rowChevronOpen {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+.checkCircle {
+  width: var(--space-xl);
+  height: var(--space-xl);
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.businessOptionRow[aria-checked="true"] .checkCircle {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+:global([data-theme="dark"]) .businessOptionRow[aria-checked="true"] .checkCircle {
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.rowTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
   color: var(--text);
+  line-height: 1.3;
+}
+
+/* ── Panel Popover Desktop para Otro Día Hábil ── */
+.pickerPanel {
+  position: fixed;
+  z-index: var(--z-modal);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--elevation-md);
+  overflow-y: auto;
+  max-height: 260px;
+  padding: var(--space-xs);
+  box-sizing: border-box;
+}
+
+:global([data-theme="dark"]) .pickerPanel {
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: var(--elevation-md);
+}
+
+.pickerOptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+}
+
+.pickerOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: var(--radius-selector-pill);
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pickerOption:hover {
+    background: var(--surface-alt);
+  }
+}
+
+.pickerOptionSelected {
+  color: var(--primary);
+  font-weight: 600;
+  background: rgba(var(--primary-rgb), 0.08);
+}
+
+:global([data-theme="dark"]) .pickerOptionSelected {
+  color: #93c5fd;
+  background: rgba(147, 197, 253, 0.12);
+}
+
+.pickerOptionLabel {
+  flex: 1;
+  min-width: 0;
+}
+
+.pickerOptionCheck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+:global([data-theme="dark"]) .pickerOptionCheck {
+  color: #93c5fd;
+}
+
+/* ── 2B. Día Fijo / Tambor Apple ── */
+.fixedDaySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-lg);
+  gap: var(--space-md);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Visor cilíndrico del tambor Apple */
+.wheelViewport {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  height: 200px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  outline: none;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 15%,
+    black 35%,
+    black 65%,
+    rgba(0, 0, 0, 0.4) 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 15%,
+    black 35%,
+    black 65%,
+    rgba(0, 0, 0, 0.4) 85%,
+    transparent 100%
+  );
+}
+
+.wheelViewport:focus-visible {
+  border-radius: 10px;
+  outline: 2px solid var(--primary);
+}
+
+.wheelCenterLens {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  height: 44px;
+  border-radius: var(--radius-selector-pill);
+  background: rgba(var(--primary-rgb), 0.1);
+  border: 1.5px solid rgba(var(--primary-rgb), 0.35);
+  box-shadow: var(--elevation-xs);
+  pointer-events: none;
+  z-index: 1;
+}
+
+:global([data-theme="dark"]) .wheelCenterLens {
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+.wheelTrack {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 78px 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wheelTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.wheelTrack:active {
+  cursor: grabbing;
+}
+
+.wheelItem {
+  height: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-3);
+  opacity: 0.35;
+  transform: scale(0.88);
+  transition: opacity 0.15s ease, transform 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+  border: none;
+  background: transparent;
+  width: 100%;
+}
+
+.wheelItemNear {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text-2);
+  opacity: 0.65;
+  transform: scale(0.96);
+}
+
+.wheelItemActive {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text);
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.wheelItemText {
+  pointer-events: none;
+  line-height: 1;
+}
+
+.wheelSummary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  text-align: center;
+  width: 100%;
+}
+
+.wheelSummaryTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.wheelSummaryHint {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  line-height: 1.35;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.hintDesktop {
+  display: inline;
+}
+
+.hintMobile {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .hintDesktop {
+    display: none;
+  }
+
+  .hintMobile {
+    display: inline;
+    font-size: 0.6875rem;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Fila de contingencia compacta (Adaptativa estilo monedaBlock) */
+.contingencyRow {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
+  width: 100%;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  box-sizing: border-box;
+}
+
+.contingencyControlWrap {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .contingencyRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  .contingencyControlWrap {
+    width: auto;
+    flex-shrink: 0;
+    min-width: 270px;
+  }
+}
+
+@media (max-width: 639px) {
+  .fixedDaySection {
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .wheelViewport {
+    height: 132px;
+    max-width: 200px;
+  }
+
+  .wheelTrack {
+    padding: 44px 0;
+  }
+
+  .contingencyRow {
+    padding-top: var(--space-sm);
+  }
+
+  .contingencyLabel {
+    font-size: 0.8125rem;
+  }
+}
+
+.contingencyLabelGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-icon);
+  color: var(--text-2);
+}
+
+.contingencyIcon {
+  color: #d97706;
+}
+
+:global([data-theme="dark"]) .contingencyIcon {
+  color: #fcd34d;
+}
+
+.contingencyLabel {
   font-size: 0.8125rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 0;
 }
 
-.dayBtn:hover {
-  border-color: var(--primary);
-  background: var(--surface-alt);
-}
-
-@media (hover: hover) and (pointer: fine) {
-
-  .dayBtn:hover {
-  transform: scale(1.05);
-  }
-}
-
-.dayBtnActive {
-  background: var(--primary) !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  border-color: var(--primary) !important;
-  box-shadow: var(--elevation-sm);
-  transform: translateY(-2px) scale(1.06);
-  z-index: 6;
-}
-
-:global([data-theme="dark"]) .dayBtn {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-:global([data-theme="dark"]) .dayBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* ── Contingency Selector (Ajuste Feriado/Finde) ───────────────────────── */
-.contingencyWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-  padding-top: 14px;
-  border-top: 1px dashed var(--border);
-}
-
-:global([data-theme="dark"]) .contingencyWrapper {
-  border-top-color: rgba(255, 255, 255, 0.08);
-}
-
-.contingencyCards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-
-@media (min-width: 500px) {
-  .contingencyCards {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.contingencyCard {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  text-align: left;
-  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-}
-
-.contingencyCard:hover {
-  border-color: rgba(72, 120, 184, 0.4);
-  background: var(--surface-alt);
-}
-
-.contingencyCardActive {
-  border-color: rgba(72, 120, 184, 0.4) !important;
-  background: rgba(72, 120, 184, 0.1) !important;
-  box-shadow: var(--elevation-selection);
-  transform: translateY(-2px) scale(1.025);
-  z-index: 6;
-}
-
-:global([data-theme="dark"]) .contingencyCard {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-:global([data-theme="dark"]) .contingencyCard:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-:global([data-theme="dark"]) .contingencyCardActive {
-  background: rgba(72, 120, 184, 0.2) !important;
-  border-color: rgba(72, 120, 184, 0.5) !important;
-  box-shadow: var(--elevation-selection);
-  transform: translateY(-2px) scale(1.025);
-  z-index: 6;
-}
-
-.contingencyTitle {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text);
+/* ── 3. Indicador de Próximo Reinicio Limpio ── */
+.previewLine {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-selector-pill);
+  background: rgba(var(--primary-rgb), 0.04);
+  border: 1px solid var(--border-subtle);
   width: 100%;
+  box-sizing: border-box;
 }
 
-.contingencyDesc {
-  font-size: 0.7rem;
-  line-height: 1.3;
-  color: var(--text-3);
-}
-
-/* ── Business Day Chips Selector ───────────────────────────────────────── */
-.businessDayCards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-
-@media (min-width: 520px) {
-  .businessDayCards {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.businessCard {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  text-align: left;
-  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-}
-
-.businessCard:hover {
-  border-color: rgba(72, 120, 184, 0.4);
-  background: var(--surface-alt);
-}
-
-@media (hover: hover) and (pointer: fine) {
-
-  .businessCard:hover {
-  transform: translateY(-1px);
-  }
-}
-
-.businessCardActive {
-  border-color: rgba(72, 120, 184, 0.35) !important;
-  background: rgba(72, 120, 184, 0.09) !important;
-  box-shadow: var(--elevation-selection);
-  transform: translateY(-3px) scale(1.025);
-  z-index: 8;
-}
-
-:global([data-theme="dark"]) .businessCard {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-:global([data-theme="dark"]) .businessCardActive {
-  border-color: rgba(72, 120, 184, 0.45) !important;
-  box-shadow: var(--elevation-selection);
-  transform: translateY(-3px) scale(1.025);
-  z-index: 8;
-}
-
-:global([data-theme="dark"]) .businessCard:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-:global([data-theme="dark"]) .businessCardActive {
-  background: rgba(72, 120, 184, 0.18) !important;
-  border-color: rgba(72, 120, 184, 0.5) !important;
-}
-
-.businessCardContent {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-}
-
-.businessCardTitle {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.businessCardSubtitle {
-  font-size: 0.75rem;
-  color: var(--text-3);
-  line-height: 1.3;
-}
-
-.badgePopular {
-  font-size: 0.675rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-}
-
-/* ── Custom Business Day Sub-Picker (2° al 10°) ────────────────────────── */
-.customDaySelector {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  margin-top: 4px;
-}
-
-:global([data-theme="dark"]) .customDaySelector {
+:global([data-theme="dark"]) .previewLine {
   background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.customDayLabel {
-  font-size: 0.775rem;
-  font-weight: 600;
-  color: var(--text-2);
-}
-
-.customDayPills {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.customDayPill {
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
-  color: var(--text);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-}
-
-.customDayPill:hover {
-  border-color: var(--primary);
-  background: var(--surface);
-}
-
-.customDayPillActive {
-  background: var(--primary) !important;
-  color: #ffffff !important;
-  border-color: var(--primary) !important;
-}
-
-:global([data-theme="dark"]) .customDayPill {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-/* ── Preview Card en Vivo (Paso 3) ─────────────────────────────────────── */
-.previewCard {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  background: linear-gradient(135deg, rgba(72, 120, 184, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
-  border: 1.5px solid rgba(72, 120, 184, 0.25);
-  border-radius: 12px;
-  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-  flex-wrap: wrap;
-}
-
-:global([data-theme="dark"]) .previewCard {
-  background: linear-gradient(135deg, rgba(72, 120, 184, 0.12) 0%, rgba(20, 30, 50, 0.4) 100%);
-  border-color: rgba(72, 120, 184, 0.35);
-}
-
-.previewIconBox {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--primary);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: var(--elevation-xs);
 }
 
 .previewContent {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 200px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-icon);
+  font-size: 0.8125rem;
 }
 
-.previewEyebrow {
-  font-size: 0.725rem;
-  font-weight: 600;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.previewPrefix {
+  color: var(--text-2);
 }
 
 .previewDate {
-  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.01em;
+  text-transform: capitalize;
 }
 
-.previewDate::first-letter {
-  text-transform: uppercase;
-}
-
-.previewBadge {
+.previewAdjustBadge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.725rem;
+  gap: var(--space-xs);
+  font-size: 0.6875rem;
   font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #d97706;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #b45309;
+  background: #fef3c7;
+  padding: 1px var(--space-icon);
+  border-radius: var(--space-xs);
 }
 
-:global([data-theme="dark"]) .previewBadge {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.4);
+:global([data-theme="dark"]) .previewAdjustBadge {
+  color: #fde68a;
+  background: rgba(253, 230, 138, 0.15);
 }
 
 .previewLoading {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: var(--text-3);
+  gap: var(--space-sm);
   font-size: 0.8125rem;
-  font-style: italic;
+  color: var(--text-2);
 }
 
 @media (prefers-reduced-motion: reduce) {
-
-  .modeCard,
-.modeIconWrap,
-.sectionBlock,
-.dayBtn,
-.contingencyCard,
-.businessCard,
-.customDayPill,
-.previewCard {
+  .businessOptionRow,
+  .checkCircle,
+  .wheelItem {
     transition: none;
-    animation: none;
   }
 }

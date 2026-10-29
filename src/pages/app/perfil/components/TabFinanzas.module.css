@@ -1,0 +1,468 @@
+/* ==========================================================================
+   TabFinanzas - Full-width Responsive Financial Settings
+   ========================================================================== */
+
+.tabContainer {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+  .tabContainer {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 20px));
+  }
+}
+
+/* ── 1. Layouts Principales ── */
+.tabForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mainGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .mainGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--space-xl);
+  }
+}
+
+.formStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.monedaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--control-pad-x);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.monedaControlWrap {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .monedaBlock {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .monedaControlWrap {
+    width: auto;
+    flex-shrink: 0;
+  }
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.settingTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.settingLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.settingSubtitle {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  line-height: 1.35;
+}
+
+/* Switch Apple-style */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--border);
+  border-radius: 28px;
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: var(--elevation-xs);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.switch input:checked + .slider {
+  background-color: var(--primary);
+}
+
+:global([data-theme="dark"]) .switch input:checked + .slider {
+  background-color: #2563eb;
+}
+
+.switch input:focus-visible + .slider {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* ── 2. Grid de Cotizaciones de Dólar (2x2 Compacto) ── */
+.dolarSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.dolarGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.dolarCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  min-height: 48px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-selector-pill);
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  box-sizing: border-box;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dolarCard:hover {
+    background: var(--surface-alt);
+    border-color: rgba(var(--primary-rgb), 0.3);
+  }
+}
+
+.dolarCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.dolarCardActive {
+  border-color: var(--primary) !important;
+  background: rgba(var(--primary-rgb), 0.04) !important;
+  box-shadow: var(--elevation-xs);
+}
+
+:global([data-theme="dark"]) .dolarCardActive {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+}
+
+.dolarCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-icon);
+  width: 100%;
+}
+
+.dolarName {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.radioIndicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.dolarCardActive .radioIndicator {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+:global([data-theme="dark"]) .dolarCardActive .radioIndicator {
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.dolarPricesGroup {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.dolarPriceVenta {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* ── 3. Barra Unificada de Guardado ── */
+.unifiedActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--elevation-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 639px) {
+  .unifiedActionBar {
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+}
+
+.dirtyStatusText {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-icon);
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 639px) {
+  .dirtyStatusText {
+    font-size: 0.75rem;
+    gap: var(--space-xs);
+  }
+}
+
+.dirtyDotAmber {
+  width: var(--space-sm);
+  height: var(--space-sm);
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.saveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  height: 38px;
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-selector-pill);
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (max-width: 639px) {
+  .saveButton {
+    height: 36px;
+    padding: 0 var(--space-md);
+    gap: var(--space-icon);
+    font-size: 0.8125rem;
+  }
+}
+
+.saveButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .saveButton:hover:not(:disabled) {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-sm);
+  }
+}
+
+.saveButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveButtonClean {
+  background: var(--surface);
+  color: var(--text-2);
+  border-color: var(--border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .saveButtonClean:hover:not(:disabled) {
+    background: var(--surface-alt);
+    color: var(--text);
+    box-shadow: none;
+  }
+}
+
+/* ── 4. Sección de Comercios Recordados (Secundaria y Colapsable) ── */
+.comerciosSection {
+  margin-top: var(--space-lg);
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .comerciosSection {
+    margin-top: var(--space-xl);
+  }
+}
+
+.comerciosHeader {
+  width: 100%;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.comerciosHeader:focus-visible {
+  outline: 2px solid var(--primary);
+  border-radius: var(--radius-control);
+}
+
+.comerciosTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.comerciosBadge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.1);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-control);
+}
+
+:global([data-theme="dark"]) .comerciosBadge {
+  color: #93c5fd;
+  background: rgba(147, 197, 253, 0.15);
+}
+
+.chevronIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-left: auto;
+}
+
+.chevronExpanded {
+  transform: rotate(180deg);
+}
+
+.comerciosContent {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  width: 100%;
+}
+
+/* ── 5. Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .saveButton,
+  .dolarCard,
+  .slider,
+  .slider::before,
+  .radioIndicator,
+  .chevronIcon {
+    transition: none !important;
+  }
+}

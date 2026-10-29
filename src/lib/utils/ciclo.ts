@@ -4,45 +4,33 @@ export interface ReglaCicloOpcion {
   label: string
   title: string
   subtitle?: string
-  badge?: string
   destacada?: boolean
 }
 
 // Lista única de reglas de ciclo financiero vigentes y sus textos visibles
 export const REGLAS_CICLO: ReglaCicloOpcion[] = [
-  // Reglas principales (destacadas en el selector)
   {
-    id: 'dia_habil_4',
-    title: '4° día hábil del mes',
-    label: '4° día hábil del mes',
-    subtitle: 'Estándar Ley de Contrato de Trabajo (Comercio, Estatales)',
-    badge: 'Más común',
+    id: 'primer_dia_habil',
+    title: '1° día hábil del mes',
+    label: '1° día hábil del mes',
     destacada: true,
   },
   {
     id: 'ultimo_dia_habil',
     title: 'Último día hábil del mes',
     label: 'Último día hábil del mes',
-    subtitle: 'Liquidación a fin de mes (Bancos, Empresas privadas)',
-    badge: 'Popular',
     destacada: true,
   },
-  {
-    id: 'primer_dia_habil',
-    title: '1° día hábil del mes',
-    label: '1° día hábil del mes',
-    subtitle: 'Cobro el primer día laborable bancario',
-    destacada: true,
-  },
-  // Opciones adicionales dentro de "Otro día" (días hábiles específicos y regla de último viernes del mes)
-  { id: 'dia_habil_2', label: '2° día hábil', title: '2° día hábil' },
-  { id: 'dia_habil_3', label: '3° día hábil', title: '3° día hábil' },
-  { id: 'dia_habil_5', label: '5° día hábil', title: '5° día hábil' },
-  { id: 'dia_habil_6', label: '6° día hábil', title: '6° día hábil' },
-  { id: 'dia_habil_7', label: '7° día hábil', title: '7° día hábil' },
-  { id: 'dia_habil_8', label: '8° día hábil', title: '8° día hábil' },
-  { id: 'dia_habil_9', label: '9° día hábil', title: '9° día hábil' },
-  { id: 'dia_habil_10', label: '10° día hábil', title: '10° día hábil' },
+  // Resto de opciones para el selector desplegable
+  { id: 'dia_habil_2', label: '2° día hábil del mes', title: '2° día hábil del mes' },
+  { id: 'dia_habil_3', label: '3° día hábil del mes', title: '3° día hábil del mes' },
+  { id: 'dia_habil_4', label: '4° día hábil del mes', title: '4° día hábil del mes' },
+  { id: 'dia_habil_5', label: '5° día hábil del mes', title: '5° día hábil del mes' },
+  { id: 'dia_habil_6', label: '6° día hábil del mes', title: '6° día hábil del mes' },
+  { id: 'dia_habil_7', label: '7° día hábil del mes', title: '7° día hábil del mes' },
+  { id: 'dia_habil_8', label: '8° día hábil del mes', title: '8° día hábil del mes' },
+  { id: 'dia_habil_9', label: '9° día hábil del mes', title: '9° día hábil del mes' },
+  { id: 'dia_habil_10', label: '10° día hábil del mes', title: '10° día hábil del mes' },
   { id: 'ultimo_viernes', label: 'Último viernes del mes', title: 'Último viernes del mes' },
 ]
 

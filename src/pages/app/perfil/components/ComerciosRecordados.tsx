@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react'
-import { Receipt } from '@/components/ui/icons'
+import React, { useEffect, useState, useMemo } from 'react'
+import { Receipt, Search, Trash2 } from '@/components/ui/icons'
 import type { MemoriaComercio } from '@/types'
 import memoriaComercioService from '@/services/memoriaComercio.service'
 import { useModal } from '@/hooks/useModal'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import styles from '../PerfilPage.module.css'
 import { ComerciosRecordadosSkeleton } from '@/components/ui'
+import styles from './ComerciosRecordados.module.css'
 
 export const ComerciosRecordados: React.FC = () => {
   const { confirm } = useModal()
   const [comercios, setComercios] = useState<MemoriaComercio[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -31,17 +32,17 @@ export const ComerciosRecordados: React.FC = () => {
     return () => controller.abort()
   }, [])
 
-  const handleBorrar = (id: string) => {
+  const handleBorrar = (id: string, nombreComercio: string) => {
     confirm({
-      title: '¿Borrar este comercio?',
-      description: 'La app deja de sugerir esa categoría. Tus movimientos no cambian.',
+      title: `¿Borrar "${nombreComercio}"?`,
+      description: 'La app dejará de sugerir automáticamente esta categoría al registrar movimientos. Tus gastos pasados no cambiarán.',
       variant: 'danger',
-      confirmLabel: 'Borrar',
+      confirmLabel: 'Borrar regla',
       onConfirm: async () => {
         try {
           await memoriaComercioService.eliminar(id)
           setComercios((prev) => prev.filter((c) => c.id !== id))
-          sileo.success({ title: 'Listo, ya no lo recuerda.' })
+          sileo.success({ title: 'Comercio eliminado de la memoria' })
         } catch (err: unknown) {
           sileo.error({ title: getErrorMessage(err, 'No pudimos borrar el comercio recordado.') })
         }
@@ -49,56 +50,89 @@ export const ComerciosRecordados: React.FC = () => {
     })
   }
 
-  return (
-    <section className={`${styles.sectionCard} ${styles.tabGridFullCol}`}>
-      <div className={styles.sectionHeader}>
-        <div className={styles.sectionIconWrap}>
-          <Receipt size={18} />
-        </div>
-        <div className={styles.sectionHeaderText}>
-          <h3>Comercios recordados</h3>
-          <p>Cuando cambiás la categoría de un comercio y decís que sí, la app la recuerda. Si te equivocaste, borrala.</p>
-        </div>
-      </div>
+  const filteredComercios = useMemo(() => {
+    if (!searchQuery.trim()) return comercios
+    const q = searchQuery.toLowerCase().trim()
+    return comercios.filter((c) => {
+      const matchClave = c.clave.toLowerCase().includes(q)
+      const matchCat = c.categoria_nombre?.toLowerCase().includes(q)
+      const matchSub = c.subcategoria_nombre?.toLowerCase().includes(q)
+      return matchClave || matchCat || matchSub
+    })
+  }, [comercios, searchQuery])
 
-      <div className={styles.contactList}>
-        {isLoading ? (
-          <ComerciosRecordadosSkeleton count={3} />
-        ) : comercios.length === 0 ? (
-          <div className={styles.contactItemBox}>
-            <span className={styles.contactItemValue}>Todavía no hay comercios recordados.</span>
+  return (
+    <div className={styles.container}>
+      {comercios.length > 3 && (
+        <div className={styles.searchWrapper}>
+          <Search size={16} className={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="Buscar comercio o categoría..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+            aria-label="Buscar comercios recordados"
+          />
+        </div>
+      )}
+
+      {isLoading ? (
+        <ComerciosRecordadosSkeleton count={3} />
+      ) : comercios.length === 0 ? (
+        <div className={styles.emptyCard}>
+          <div className={styles.emptyIconBox}>
+            <Receipt size={20} />
           </div>
-        ) : (
-          comercios.map((comercio) => {
+          <span className={styles.emptyTitle}>No hay comercios recordados</span>
+          <p className={styles.emptyDesc}>
+            Cuando categorices un movimiento en tus transacciones y confirmes recordarlo, Argentum aprenderá a clasificarlo automáticamente.
+          </p>
+        </div>
+      ) : filteredComercios.length === 0 ? (
+        <div className={styles.emptyCard}>
+          <span className={styles.emptyTitle}>Sin coincidencias</span>
+          <p className={styles.emptyDesc}>No encontramos comercios que coincidan con &ldquo;{searchQuery}&rdquo;.</p>
+        </div>
+      ) : (
+        <div className={styles.listWrapper} role="list" aria-label="Lista de comercios recordados">
+          {filteredComercios.map((comercio) => {
             const categoriaTexto = comercio.subcategoria_nombre
-              ? `${comercio.categoria_nombre} > ${comercio.subcategoria_nombre}`
-              : comercio.categoria_nombre || ''
+              ? `${comercio.categoria_nombre} › ${comercio.subcategoria_nombre}`
+              : comercio.categoria_nombre || 'Sin categoría'
 
             return (
-              <div key={comercio.id} className={styles.contactItemBox}>
-                <div className={styles.contactItemInfo}>
-                  <div className={styles.contactItemLabelRow}>
-                    <span className={styles.contactItemLabel}>{comercio.clave}</span>
+              <div key={comercio.id} className={styles.merchantRow} role="listitem">
+                <div className={styles.merchantLeft}>
+                  <div className={styles.merchantAvatar}>
+                    <Receipt size={16} />
                   </div>
-                  <span className={styles.contactItemValue}>{categoriaTexto}</span>
+                  <div className={styles.merchantInfo}>
+                    <span className={styles.merchantName} title={comercio.clave}>
+                      {comercio.clave}
+                    </span>
+                    <span className={styles.categoryTag} title={categoriaTexto}>
+                      {categoriaTexto}
+                    </span>
+                  </div>
                 </div>
-                <div className={styles.contactItemAction}>
-                  <button
-                    type="button"
-                    onClick={() => handleBorrar(comercio.id)}
-                    className={styles.unlinkContactBtn}
-                  >
-                    Borrar
-                  </button>
-                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleBorrar(comercio.id, comercio.clave)}
+                  className={styles.deleteBtn}
+                  aria-label={`Borrar regla para ${comercio.clave}`}
+                  title="Borrar regla"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             )
-          })
-        )}
-      </div>
-    </section>
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 
 export default ComerciosRecordados
-

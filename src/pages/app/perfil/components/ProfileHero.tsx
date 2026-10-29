@@ -1,11 +1,16 @@
 import React from 'react'
-import { Camera, Trash2, CheckCircle2, AlertCircle, Copy, Check } from '@/components/ui/icons'
+import {
+  Camera,
+  Trash2,
+  AlertCircle,
+  Coins,
+  Calendar,
+} from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import { useModal } from '@/hooks/useModal'
 import { sileo } from 'sileo'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { formatearTelefonoVisual } from '@/utils/telefono.utils'
 import { getFotoUrl } from '@/utils/fotoUrl'
 import styles from '../PerfilPage.module.css'
 
@@ -21,7 +26,6 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
   onOpenCrop,
 }) => {
   const { confirm } = useModal()
-  const [copiedField, setCopiedField] = React.useState<string | null>(null)
   const [fotoError, setFotoError] = React.useState(false)
 
   const isGoogle = usuario?.auth_provider === 'google'
@@ -36,13 +40,9 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
 
   const fotoUrl = fotoError ? null : fotoUrlRaw
 
-  const handleCopy = (text: string, label: string) => {
-    if (!text) return
-    navigator.clipboard.writeText(text)
-    setCopiedField(label)
-    sileo.info({ title: `${label} copiado al portapapeles` })
-    setTimeout(() => setCopiedField(null), 2000)
-  }
+  const isEmailPending = usuario ? !usuario.email_verificado : false
+  const isPhonePending = usuario ? !usuario.telefono_verificado : false
+  const hasPending = isEmailPending || isPhonePending
 
   const handleDeletePhoto = () => {
     confirm({
@@ -73,119 +73,118 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
   return (
     <div className={styles.heroCard}>
       {/* Background ambient lighting */}
-      <div className={styles.heroGlow} />
+      <div className={styles.heroGlow} aria-hidden="true" />
 
       <div className={styles.heroInner}>
-        {/* Left: Avatar with interactive actions */}
-        <div className={styles.avatarSection}>
-          <div className={styles.avatarWrapper} title={isGoogle ? 'Foto gestionada por Google' : undefined}>
-            {fotoUrl ? (
-              <img
-                src={fotoUrl}
-                alt={usuario?.nombre || 'Usuario'}
-                className={styles.avatarImg}
-                referrerPolicy="no-referrer"
-                onError={() => setFotoError(true)}
-              />
-            ) : (
-              <div className={styles.avatarFallback}>
-                {usuario?.nombre?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
-            )}
-
-            {/* Hover overlay with Camera only for non-Google */}
-            {!isGoogle && (
-              <button
-                type="button"
-                className={styles.avatarOverlayBtn}
-                onClick={onOpenCrop}
-                aria-label="Cambiar foto de perfil"
-                title="Cambiar foto de perfil"
-              >
-                <Camera size={18} />
-                <span>Cambiar</span>
-              </button>
-            )}
-          </div>
-
-          {!isGoogle && fotoUrl && (
-            <button
-              type="button"
-              className={styles.deletePhotoBtn}
-              onClick={handleDeletePhoto}
-              title="Eliminar foto"
-              aria-label="Eliminar foto"
-            >
-              <Trash2 size={13} />
-            </button>
-          )}
-        </div>
-
-        {/* Center: User Details */}
-        <div className={styles.heroDetails}>
-          <div className={styles.heroTopRow}>
-            <div className={styles.nameBadgeGroup}>
-              <h2 className={styles.heroName}>
-                {usuario?.nombre ? `${usuario.nombre} ${usuario.apellido || ''}` : 'Tu Cuenta'}
-              </h2>
-            </div>
-          </div>
-
-          {/* Contact Details with Copy Actions */}
-          <div className={styles.heroContacts}>
-            {usuario?.email && (
-              <button
-                type="button"
-                className={styles.contactItem}
-                onClick={() => handleCopy(usuario.email!, 'Email')}
-                title="Click para copiar email"
-              >
-                <span>{usuario.email}</span>
-                {copiedField === 'Email' ? <Check size={13} className={styles.copyCheck} /> : <Copy size={13} />}
-              </button>
-            )}
-            {usuario?.telefono && (
-              <button
-                type="button"
-                className={styles.contactItem}
-                onClick={() => handleCopy(usuario.telefono!, 'Teléfono')}
-                title="Click para copiar teléfono"
-              >
-                <span>{formatearTelefonoVisual(usuario.telefono)}</span>
-                {copiedField === 'Teléfono' ? <Check size={13} className={styles.copyCheck} /> : <Copy size={13} />}
-              </button>
-            )}
-          </div>
-
-          {/* Badges Row */}
-          <div className={styles.heroBadges}>
+        {/* Left: User Identity & Contact Actions */}
+        <div className={styles.heroIdentityZone}>
+          <div className={styles.avatarSection}>
             <div
-              className={`${styles.statusChip} ${
-                usuario?.email_verificado ? styles.chipSuccess : styles.chipWarning
-              }`}
+              className={`${styles.avatarWrapper} ${!isGoogle ? styles.avatarInteractive : ''}`}
+              title={isGoogle ? 'Foto gestionada por Google' : 'Cambiar foto de perfil'}
+              onClick={!isGoogle ? onOpenCrop : undefined}
+              role={!isGoogle ? 'button' : undefined}
+              tabIndex={!isGoogle ? 0 : undefined}
+              onKeyDown={
+                !isGoogle
+                  ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        onOpenCrop()
+                      }
+                    }
+                  : undefined
+              }
             >
-              {usuario?.email_verificado ? <CheckCircle2 size={13} /> : <AlertCircle size={13} />}
-              <span>{usuario?.email_verificado ? 'Email verificado' : 'Email pendiente'}</span>
-            </div>
+              {fotoUrl ? (
+                <img
+                  src={fotoUrl}
+                  alt={usuario?.nombre || 'Usuario'}
+                  className={styles.avatarImg}
+                  referrerPolicy="no-referrer"
+                  onError={() => setFotoError(true)}
+                />
+              ) : (
+                <div className={styles.avatarFallback}>
+                  {usuario?.nombre?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+              )}
 
-            <div
-              className={`${styles.statusChip} ${
-                usuario?.telefono_verificado ? styles.chipSuccess : styles.chipNeutral
-              }`}
-            >
-              {usuario?.telefono_verificado ? <CheckCircle2 size={13} /> : <AlertCircle size={13} />}
-              <span>{usuario?.telefono_verificado ? 'WhatsApp activo' : 'WhatsApp pendiente'}</span>
-            </div>
-
-            <div className={`${styles.statusChip} ${styles.chipInfo}`}>
-              <span>Moneda: <strong>{usuario?.moneda_principal === 'USD' ? 'Dólares' : 'Pesos'}</strong></span>
-              {usuario?.moneda_secundaria_activa && (
-                <span className={styles.chipSub}>({usuario.tipo_dolar?.toUpperCase() || 'Dólar'})</span>
+              {/* Desktop hover overlay only */}
+              {!isGoogle && (
+                <div className={styles.avatarOverlayBtn} aria-hidden="true">
+                  <Camera size={16} />
+                  <span>Cambiar</span>
+                </div>
               )}
             </div>
 
-            <div className={`${styles.statusChip} ${styles.chipInfo}`}>
-              <span>Ciclo: <strong>{getCicloLabel()}</strong></span>
+            {!isGoogle && fotoUrl && (
+              <button
+                type="button"
+                className={styles.deletePhotoBtn}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDeletePhoto()
+                }}
+                title="Eliminar foto de perfil"
+                aria-label="Eliminar foto de perfil"
+              >
+                <Trash2 size={12} />
+              </button>
+            )}
+          </div>
+
+          <div className={styles.heroDetails}>
+            <div className={styles.heroTopRow}>
+              <h2 className={styles.heroName}>
+                {usuario?.nombre ? `${usuario.nombre} ${usuario.apellido || ''}`.trim() : 'Tu Cuenta'}
+              </h2>
+
+              {/* Alertas pendientes discretas (micro-tags sutiles que no compiten con el nombre) */}
+              {hasPending && (
+                <div className={styles.heroAlertsInline}>
+                  {isEmailPending && (
+                    <span
+                      className={`${styles.statusChip} ${styles.chipWarning}`}
+                      title="Email pendiente de verificación"
+                    >
+                      <AlertCircle size={10} />
+                      <span>Email pendiente</span>
+                    </span>
+                  )}
+
+                  {isPhonePending && (
+                    <span
+                      className={`${styles.statusChip} ${styles.chipNeutral}`}
+                      title="WhatsApp pendiente"
+                    >
+                      <AlertCircle size={10} />
+                      <span>WhatsApp pendiente</span>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Resumen Financiero: meta-línea integrada, limpia, sin cajas ni bordes anidados */}
+            <div className={styles.heroGlanceZone}>
+              <span className={styles.glanceItem} title="Moneda principal">
+                <Coins size={12} className={styles.glanceIcon} />
+                <span className={styles.glanceValue}>
+                  {usuario?.moneda_principal === 'USD' ? 'Dólares' : 'Pesos'}
+                </span>
+                {usuario?.moneda_secundaria_activa && (
+                  <span className={styles.glancePill}>
+                    {usuario.tipo_dolar?.toUpperCase() || 'MEP'}
+                  </span>
+                )}
+              </span>
+              <span className={styles.glanceSep} aria-hidden="true">•</span>
+              <span className={styles.glanceItem} title="Ciclo financiero">
+                <Calendar size={12} className={styles.glanceIcon} />
+                <span className={styles.glanceValue}>{getCicloLabel()}</span>
+              </span>
             </div>
           </div>
         </div>

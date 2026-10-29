@@ -274,8 +274,8 @@
   align-items: center;
   gap: 4px;
   height: 28px;
-  padding: 0 8px;
-  border-radius: 7px;
+  padding: 0 10px;
+  border-radius: var(--radius-selector-pill);
   border: 1.5px solid var(--border);
   background: var(--surface);
   color: var(--text-3);

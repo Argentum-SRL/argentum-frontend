@@ -81,10 +81,10 @@
 /* ── 2. Master Profile Hero Card ─────────────────────────────────── */
 .heroCard {
   position: relative;
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 22px 24px;
+  border-radius: var(--radius-control);
+  padding: var(--space-xl) var(--space-2xl);
   box-sizing: border-box;
   flex-shrink: 0;
   box-shadow: var(--elevation-sm);
@@ -96,7 +96,8 @@
 
 [data-theme="dark"] .heroCard {
   box-shadow: var(--elevation-sm);
-  background: linear-gradient(180deg, rgba(22, 27, 36, 0.98) 0%, rgba(18, 22, 30, 0.98) 100%);
+  background: var(--surface-2);
+  border-color: var(--border);
 }
 
 .heroGlow {
@@ -105,7 +106,7 @@
   right: -60px;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(168, 144, 90, 0.15) 0%, rgba(13, 32, 69, 0.08) 50%, transparent 80%);
+  background: radial-gradient(circle, rgba(var(--primary-rgb), 0.07) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   filter: blur(40px);
@@ -115,57 +116,20 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  gap: var(--space-2xl);
   z-index: 1;
   width: 100%;
+  min-width: 0;
 }
 
-@media (max-width: 639px) {
-  .heroCard {
-    padding: 16px;
-    border-radius: 16px;
-  }
-  .heroInner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .avatarWrapper {
-    width: 60px;
-    height: 60px;
-  }
-  .avatarFallback {
-    font-size: 24px;
-  }
-  .heroName {
-    font-size: 18px;
-  }
-  .heroDetails {
-    gap: 8px;
-    width: 100%;
-    min-width: 0;
-  }
-  .heroContacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    width: 100%;
-  }
-  .contactItem {
-    font-size: 12px;
-    padding: 4px 8px;
-    max-width: 100%;
-  }
-  .heroBadges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    width: 100%;
-  }
-  .statusChip {
-    font-size: 10.5px;
-    padding: 2px 7px;
-  }
+/* ── Primary Identity Section (Avatar + Name + Contacts + Badges) ── */
+.heroIdentityZone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  min-width: 0;
+  flex: 1;
 }
 
 .avatarSection {
@@ -175,16 +139,27 @@
 
 .avatarWrapper {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--surface);
+  border: 2px solid var(--surface-alt);
   box-shadow: var(--elevation-xs);
   background: var(--surface-alt);
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
+}
+
+.avatarInteractive {
+  cursor: pointer;
+  outline: none;
+}
+
+.avatarInteractive:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .avatarImg {
@@ -195,7 +170,7 @@
 }
 
 .avatarFallback {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--primary);
   display: flex;
@@ -209,158 +184,126 @@
 .avatarOverlayBtn {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--space-2xs);
   color: #ffffff;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   opacity: 0;
   transition: opacity 0.2s ease;
-  border: none;
-  cursor: pointer;
+  pointer-events: none;
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 }
 
-.avatarWrapper:hover .avatarOverlayBtn,
-.avatarOverlayBtn:focus-visible {
+.avatarInteractive:hover .avatarOverlayBtn,
+.avatarInteractive:focus-visible .avatarOverlayBtn {
   opacity: 1;
 }
 
 .deletePhotoBtn {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 24px;
-  height: 24px;
+  top: -3px;
+  right: -3px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   color: var(--error, #e53e3e);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-shadow: var(--elevation-xs);
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   z-index: 2;
+  outline: none;
 }
 
 .deletePhotoBtn:hover {
-  background: rgba(229, 62, 62, 0.1);
+  background: var(--surface-alt);
+  color: var(--error, #e53e3e);
+  border-color: var(--error, #e53e3e);
+}
+
+.deletePhotoBtn:focus-visible {
+  outline: 2px solid var(--error);
+  outline-offset: 2px;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .deletePhotoBtn:hover {
-  transform: scale(1.1);
+    transform: scale(1.08);
   }
 }
 
 .heroDetails {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-xs);
   flex: 1;
   min-width: 0;
-  width: 100%;
 }
 
 .heroTopRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.nameBadgeGroup {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: var(--space-sm);
+  min-width: 0;
 }
 
 .heroName {
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text);
   margin: 0;
   line-height: 1.2;
-}
-
-.heroContacts {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.contactItem {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-2);
-  background: var(--surface-alt);
-  padding: 4px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  max-width: 100%;
-  box-sizing: border-box;
-  min-width: 0;
-  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-}
-
-.contactItem span {
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
 }
 
-.contactItem:hover {
-  background: var(--surface);
-  color: var(--text);
-  border-color: var(--primary);
-}
-
-.heroBadges {
-  display: flex;
+.heroAlertsInline {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: wrap;
-  margin-top: 2px;
 }
 
 .statusChip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 9px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
+  gap: var(--space-2xs);
+  height: 18px;
+  padding: 0 6px;
+  border-radius: var(--radius-selector-pill);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .chipSuccess {
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(16, 185, 129, 0.08);
   color: #10b981;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .chipWarning {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.08);
   color: var(--error, #ef4444);
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .chipNeutral {
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(245, 158, 11, 0.08);
   color: #f59e0b;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
@@ -379,6 +322,175 @@
   font-size: 10px;
   color: var(--text-3);
   margin-left: 2px;
+}
+
+/* ── Financial Glance Snapshot (Meta-línea limpia e integrada) ───── */
+.heroGlanceZone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  min-width: 0;
+}
+
+.glanceItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-2);
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.glanceIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.glanceValue {
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.glanceSep {
+  color: var(--text-3);
+  font-size: 11px;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.glancePill {
+  font-size: 9px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--primary);
+  padding: 1px 5px;
+  border-radius: var(--radius-selector-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* ── Responsive Adaptations: Tablet (640px - 1023px) ─────────────── */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .heroCard {
+    padding: var(--space-lg) var(--space-xl);
+    border-radius: var(--radius-control);
+  }
+
+  .heroInner {
+    gap: var(--space-lg);
+  }
+
+  .avatarWrapper {
+    width: 54px;
+    height: 54px;
+  }
+
+  .avatarFallback {
+    font-size: 21px;
+  }
+
+  .heroName {
+    font-size: 18px;
+  }
+
+  .glanceItem {
+    font-size: 12px;
+  }
+}
+
+/* ── Responsive Adaptations: Mobile (< 640px) ────────────────────── */
+@media (max-width: 639px) {
+  .heroCard {
+    padding: var(--space-md);
+    border-radius: var(--radius-control);
+  }
+
+  .heroInner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+  }
+
+  .heroIdentityZone {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+    min-width: 0;
+  }
+
+  .avatarWrapper {
+    width: 48px;
+    height: 48px;
+    border-width: 2px;
+  }
+
+  .avatarFallback {
+    font-size: 19px;
+  }
+
+  .avatarOverlayBtn {
+    display: none;
+  }
+
+  .deletePhotoBtn {
+    width: 20px;
+    height: 20px;
+    top: -3px;
+    right: -3px;
+  }
+
+  .heroDetails {
+    gap: var(--space-2xs);
+    width: 100%;
+    min-width: 0;
+  }
+
+  .heroTopRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  .heroName {
+    font-size: 16.5px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .heroGlanceZone {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    margin-top: 1px;
+  }
+
+  .glanceItem {
+    font-size: 11.5px;
+    gap: 4px;
+  }
+
+  .glanceValue {
+    font-size: 11.5px;
+  }
+
+  .glanceSep {
+    font-size: 10px;
+  }
 }
 
 /* ── 3. Segmented Navigation Tabs (Carrusel en Móvil y Tablet) ──── */
@@ -767,18 +879,19 @@
   font-weight: 700;
   color: #10b981;
   background: rgba(16, 185, 129, 0.1);
-  padding: 2px 7px;
-  border-radius: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .heroCard,
-.avatarOverlayBtn,
-.deletePhotoBtn,
-.contactItem,
-.actionBtnOutline,
-.actionBtnOutlineSm {
+  .avatarOverlayBtn,
+  .deletePhotoBtn,
+  .contactItem,
+  .copyIcon,
+  .actionBtnOutline,
+  .actionBtnOutlineSm {
     transition: none;
     animation: none;
   }

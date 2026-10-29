@@ -423,12 +423,19 @@
 }
 
 .comerciosBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.6875rem;
   font-weight: 600;
+  line-height: 1;
   color: var(--primary);
   background: rgba(var(--primary-rgb), 0.1);
-  padding: var(--space-2xs) var(--space-sm);
-  border-radius: var(--radius-control);
+  padding: 0 var(--space-sm);
+  height: 20px;
+  border-radius: var(--radius-selector-pill);
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 :global([data-theme="dark"]) .comerciosBadge {

@@ -472,8 +472,7 @@ export const PresupuestosSkeleton = memo(function PresupuestosSkeleton({
       className={`${styles.presupuestosWrapper} ${className}`.trim()}
     >
       <span className={styles.srOnly}>Cargando presupuestos...</span>
-      <div className={styles.presupuestosWrapper}>
-        {Array.from({ length: count }).map((_, i) => (
+      {Array.from({ length: count }).map((_, i) => (
           <div key={i} className={styles.presupuestoCardSkeleton}>
             <div className={styles.presupuestoHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
@@ -498,8 +497,7 @@ export const PresupuestosSkeleton = memo(function PresupuestosSkeleton({
               <Skeleton variant="text" width="25%" height={12} />
             </div>
           </div>
-        ))}
-      </div>
+      ))}
     </div>
   )
 })
@@ -686,13 +684,17 @@ BalanceCardSkeleton.displayName = 'BalanceCardSkeleton'
 /**
  * Template de Filas de Dashboard (Categorías / Próximos Pagos / Últimos Movimientos)
  */
+export interface DashboardListSkeletonProps {
+  count?: number
+  variant?: 'categoria' | 'pago' | 'movimiento' | 'default'
+  className?: string
+}
+
 export const DashboardListSkeleton = memo(function DashboardListSkeleton({
   count = 4,
+  variant = 'default',
   className = '',
-}: {
-  count?: number
-  className?: string
-}) {
+}: DashboardListSkeletonProps) {
   return (
     <div
       role="status"
@@ -700,19 +702,65 @@ export const DashboardListSkeleton = memo(function DashboardListSkeleton({
       className={`${styles.dashboardListSkeleton} ${className}`.trim()}
     >
       <span className={styles.srOnly}>Cargando lista del dashboard...</span>
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className={styles.dashboardListRow}>
-          <Skeleton variant="rounded" width={40} height={40} borderRadius={12} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
-            <Skeleton variant="text" width={i % 2 === 0 ? '60%' : '45%'} height={14} />
-            <Skeleton variant="text" width={i % 2 === 0 ? '35%' : '25%'} height={12} />
+      {Array.from({ length: count }).map((_, i) => {
+        if (variant === 'categoria') {
+          return (
+            <div key={i} className={styles.dashboardCategoryRow}>
+              <Skeleton variant="rounded" width={30} height={30} borderRadius={8} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Skeleton variant="text" width={i % 2 === 0 ? '50%' : '35%'} height={13} />
+                  <Skeleton variant="text" width="46px" height={13} />
+                </div>
+                <Skeleton variant="rounded" width="100%" height={4} borderRadius={999} />
+              </div>
+            </div>
+          )
+        }
+
+        if (variant === 'pago') {
+          return (
+            <div key={i} className={styles.dashboardPagoRow}>
+              <Skeleton variant="rounded" width={36} height={36} borderRadius={10} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                <Skeleton variant="text" width={i % 2 === 0 ? '55%' : '40%'} height={14} />
+                <Skeleton variant="text" width="30%" height={12} />
+              </div>
+              <div style={{ flexShrink: 0 }}>
+                <Skeleton variant="text" width="60px" height={14} />
+              </div>
+            </div>
+          )
+        }
+
+        if (variant === 'movimiento') {
+          return (
+            <div key={i} className={styles.dashboardMovimientoRow}>
+              <Skeleton variant="circular" width={32} height={32} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                <Skeleton variant="text" width={i % 2 === 0 ? '60%' : '45%'} height={14} />
+                <Skeleton variant="text" width="40%" height={12} />
+              </div>
+              <div style={{ flexShrink: 0 }}>
+                <Skeleton variant="text" width="65px" height={15} />
+              </div>
+            </div>
+          )
+        }
+
+        return (
+          <div key={i} className={styles.dashboardListRow}>
+            <Skeleton variant="rounded" width={36} height={36} borderRadius={10} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+              <Skeleton variant="text" width={i % 2 === 0 ? '55%' : '40%'} height={14} />
+              <Skeleton variant="text" width="30%" height={12} />
+            </div>
+            <div style={{ flexShrink: 0 }}>
+              <Skeleton variant="text" width="60px" height={14} />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
-            <Skeleton variant="text" width="65px" height={15} />
-            <Skeleton variant="text" width="40px" height={11} />
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 })
@@ -864,31 +912,95 @@ export const PerfilSeguridadSkeleton = memo(function PerfilSeguridadSkeleton({
       className={`${styles.seguridadSkeletonWrapper} ${className}`.trim()}
     >
       <span className={styles.srOnly}>Cargando opciones de seguridad...</span>
-      {/* Contraseña Card Skeleton */}
-      <div className={styles.seguridadCardSkeleton}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Skeleton variant="rounded" width={32} height={32} borderRadius={8} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <Skeleton variant="text" width="40%" height={16} />
-            <Skeleton variant="text" width="60%" height={12} />
+
+      {/* Grid superior de 2 columnas en desktop / 1 en mobile */}
+      <div className={styles.seguridadGridSkeleton}>
+        {/* Card 1: Acceso y credenciales */}
+        <div className={styles.seguridadCardSkeleton}>
+          <div className={styles.seguridadHeaderSkeleton}>
+            <Skeleton variant="rounded" width={38} height={38} borderRadius={10} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="45%" height={16} />
+              <Skeleton variant="text" width="65%" height={12} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+            {/* Row Email */}
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="35%" height={14} />
+                <Skeleton variant="text" width="60%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={72} height={30} borderRadius={8} />
+            </div>
+            {/* Row Password */}
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="40%" height={14} />
+                <Skeleton variant="text" width="55%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={96} height={30} borderRadius={8} />
+            </div>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-          <Skeleton variant="rounded" height={44} borderRadius={10} />
-          <Skeleton variant="rounded" height={44} borderRadius={10} />
+
+        {/* Card 2: Asistente de WhatsApp */}
+        <div className={styles.seguridadCardSkeleton}>
+          <div className={styles.seguridadHeaderSkeleton}>
+            <Skeleton variant="rounded" width={38} height={38} borderRadius={10} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="45%" height={16} />
+              <Skeleton variant="text" width="60%" height={12} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+            {/* Row WhatsApp */}
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="40%" height={14} />
+                <Skeleton variant="text" width="50%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={96} height={32} borderRadius={8} />
+            </div>
+            {/* Row Permiso Mensajes Toggle */}
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="50%" height={14} />
+                <Skeleton variant="text" width="75%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={42} height={24} borderRadius={12} />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* WhatsApp Card Skeleton */}
+      {/* Card 3: Dispositivos y datos (Ancho completo inferior) */}
       <div className={styles.seguridadCardSkeleton}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Skeleton variant="rounded" width={32} height={32} borderRadius={8} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div className={styles.seguridadHeaderSkeleton}>
+          <Skeleton variant="rounded" width={38} height={38} borderRadius={10} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
             <Skeleton variant="text" width="35%" height={16} />
-            <Skeleton variant="text" width="50%" height={12} />
+            <Skeleton variant="text" width="55%" height={12} />
           </div>
         </div>
-        <Skeleton variant="rounded" height={40} borderRadius={10} style={{ marginTop: '12px' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+          {/* Row Cerrar Sesiones */}
+          <div className={styles.seguridadRowSkeleton}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="50%" height={14} />
+              <Skeleton variant="text" width="80%" height={12} />
+            </div>
+            <Skeleton variant="rounded" width={96} height={30} borderRadius={8} />
+          </div>
+          {/* Row Descargar Datos */}
+          <div className={styles.seguridadRowSkeleton}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="45%" height={14} />
+              <Skeleton variant="text" width="70%" height={12} />
+            </div>
+            <Skeleton variant="rounded" width={96} height={30} borderRadius={8} />
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -878,52 +878,54 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* ── WhatsApp Linking Banner ─────────────────────────────────────────── */}
-      {!usuario?.telefono_verificado && !bannerDismissed && (
-        <div className={styles.whatsappBanner}>
-          <Link to="/auth/verificar-telefono" className={styles.whatsappBannerMainLink}>
-            <div className={styles.whatsappBannerIconBox}>
-              <MessageSquare size={16} className={styles.whatsappBannerIcon} />
-            </div>
-            <div className={styles.whatsappBannerText}>
-              <div className={styles.whatsappBannerTitleRow}>
-                <span className={styles.whatsappBannerTitle}>Vinculá tu WhatsApp</span>
-                <span className={styles.whatsappBannerBadge}>Nuevo</span>
+      {/* ── Avisos y Banners Superiores ─────────────────────────────────────── */}
+      <div className={styles.topBannersStack}>
+        {!usuario?.telefono_verificado && !bannerDismissed && (
+          <div className={styles.whatsappBanner}>
+            <Link to="/auth/verificar-telefono" className={styles.whatsappBannerMainLink}>
+              <div className={styles.whatsappBannerIconBox}>
+                <MessageSquare size={16} className={styles.whatsappBannerIcon} />
               </div>
-              <p className={styles.whatsappBannerSubtitle}>
-                Registrá gastos al instante enviando audios o mensajes a tu asistente inteligente.
-              </p>
-            </div>
-            <div className={styles.whatsappBannerActionMobile}>
-              <span className={styles.whatsappBannerActionMobileText}>Vincular</span>
-              <ChevronRight size={14} className={styles.whatsappBannerArrow} />
-            </div>
-          </Link>
-          <div className={styles.whatsappBannerActionsDesktop}>
-            <Link to="/auth/verificar-telefono" className={styles.whatsappBannerBtn}>
-              Vincular ahora
+              <div className={styles.whatsappBannerText}>
+                <div className={styles.whatsappBannerTitleRow}>
+                  <span className={styles.whatsappBannerTitle}>Vinculá tu WhatsApp</span>
+                  <span className={styles.whatsappBannerBadge}>Nuevo</span>
+                </div>
+                <p className={styles.whatsappBannerSubtitle}>
+                  Registrá gastos al instante enviando audios o mensajes a tu asistente inteligente.
+                </p>
+              </div>
+              <div className={styles.whatsappBannerActionMobile}>
+                <span className={styles.whatsappBannerActionMobileText}>Vincular</span>
+                <ChevronRight size={14} className={styles.whatsappBannerArrow} />
+              </div>
             </Link>
+            <div className={styles.whatsappBannerActionsDesktop}>
+              <Link to="/auth/verificar-telefono" className={styles.whatsappBannerBtn}>
+                Vincular ahora
+              </Link>
+            </div>
+            <button
+              type="button"
+              className={styles.whatsappBannerCloseBtn}
+              onClick={handleDismissBanner}
+              aria-label="Cerrar aviso"
+              title="Cerrar aviso"
+            >
+              <X size={15} />
+            </button>
           </div>
-          <button
-            type="button"
-            className={styles.whatsappBannerCloseBtn}
-            onClick={handleDismissBanner}
-            aria-label="Cerrar aviso"
-            title="Cerrar aviso"
-          >
-            <X size={15} />
-          </button>
-        </div>
-      )}
+        )}
 
-      <AvisosConfianza frescura={data?.frescura ?? null} onActualizado={() => { void fetchData() }} />
+        <AvisosConfianza frescura={data?.frescura ?? null} onActualizado={() => { void fetchData() }} />
+      </div>
 
       {/* ── Top Row (3 Cols) ──────────────────────────────────────────────── */}
       <div className={`${styles.topRow} ${isAnyTopRowExpanded ? styles.topRowExpanded : styles.topRowCompact}`}>
         {/* Col 1: Balance */}
         <WidgetErrorBoundary title="Saldo disponible">
           {loading ? (
-            <BalanceCardSkeleton />
+            <BalanceCardSkeleton className={styles.balanceCardSkeletonWrap} />
           ) : (
             data && (
               <BalanceCard
@@ -997,7 +999,7 @@ export default function DashboardPage() {
             <div className={styles.chartCardContent}>
               {selectedCategoria ? (
                 loadingSubcategorias ? (
-                  <DashboardListSkeleton count={4} />
+                  <DashboardListSkeleton variant="categoria" count={4} />
                 ) : (
                   <SubcategoriasChart 
                     data={subcategoriasData} 
@@ -1009,7 +1011,7 @@ export default function DashboardPage() {
                 )
               ) : (
                 loading ? (
-                  <DashboardListSkeleton count={4} />
+                  <DashboardListSkeleton variant="categoria" count={4} />
                 ) : (
                   <CategoriasChart
                     data={data?.gastos_por_categoria?.[moneda === 'ARS' ? 'ars' : 'usd'] ?? []}
@@ -1033,7 +1035,7 @@ export default function DashboardPage() {
             </div>
             <div className={styles.cardContent}>
               {loading ? (
-                <DashboardListSkeleton count={3} />
+                <DashboardListSkeleton variant="pago" count={3} />
               ) : (() => {
                 const pagosFiltrados = (data?.proximos_pagos ?? []).filter(p => p.moneda === moneda)
                 if (pagosFiltrados.length === 0) {
@@ -1142,7 +1144,7 @@ export default function DashboardPage() {
             </div>
             <div className={styles.cardContent}>
               {loading ? (
-                <DashboardListSkeleton count={4} />
+                <DashboardListSkeleton variant="movimiento" count={4} />
               ) : (() => {
                 const movsFiltrados = (data?.ultimos_movimientos ?? []).filter(m => m.moneda === moneda)
                 if (movsFiltrados.length === 0) {

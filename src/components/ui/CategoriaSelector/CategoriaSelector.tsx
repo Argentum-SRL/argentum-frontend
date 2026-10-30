@@ -136,7 +136,7 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
           {loadingSubcats ? (
             <>
               {[1, 2, 3, 4].map(i => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'var(--surface-alt)', borderRadius: '10px' }} aria-hidden="true">
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'var(--surface-alt)', borderRadius: '10px', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} aria-hidden="true">
                   <Skeleton variant="rounded" width={24} height={24} borderRadius={6} />
                   <Skeleton variant="text" width="60%" height={12} />
                 </div>

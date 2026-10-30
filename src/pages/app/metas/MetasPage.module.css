@@ -164,10 +164,13 @@
 
 .skeletonCard {
   height: 320px;
-  border-radius:20px;
+  border-radius: 20px;
   background: var(--surface-alt);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .skeletonCard::after {

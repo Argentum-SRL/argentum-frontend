@@ -323,6 +323,22 @@
   }
 }
 
+/* ── Top Banners Stack ────────────────────────────────────────────────────── */
+.topBannersStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.topBannersStack:has(> *) {
+  margin-bottom: var(--space-xl);
+}
+
+.topBannersStack:empty {
+  display: none;
+  margin-bottom: 0;
+}
+
 /* ── WhatsApp Linking Banner ──────────────────────────────────────────────── */
 .whatsappBanner {
   display: flex;
@@ -334,7 +350,7 @@
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-left: 3px solid var(--primary, #00bb7d);
   border-radius:12px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
@@ -465,10 +481,14 @@
 }
 
 @media (max-width: 640px) {
+  .topBannersStack:has(> *) {
+    margin-bottom: var(--space-md);
+  }
+
   .whatsappBanner {
     padding: 6px 8px 6px 10px;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 0;
     border-radius:10px;
   }
 

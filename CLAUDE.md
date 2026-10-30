@@ -113,6 +113,38 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
       3. *Resumen Financiero Integrado y Sin Cajas (`.heroGlanceZone`):* Eliminación total de contenedores, tarjetas, bordes y fondos anidados. Se integra como una línea de estado limpia y tipográfica (`display: inline-flex; align-items: center; gap: 4px`) dentro de `.heroDetails`: ícono SVG de moneda (`Coins` 12px) + valor (`Pesos`, con pill `MEP` si aplica) + separador de punto (`•`) + ícono SVG de calendario (`Calendar` 12px) + ciclo (`Día 30 del mes`).
     - **Ultra-compactación Móvil y Layout de Fila Única (iPhone SE 375x667):**
       - En dispositivos móviles (< 640px), la tarjeta no se divide en dos filas ni contiene barras flotantes inferiores: el avatar se ubica a la izquierda y a su derecha se apilan en solo dos líneas compactas: 1. Nombre + micro-tag de alerta, 2. Meta-línea de moneda y ciclo.
+      - *Botón de Edición Móvil:* En dispositivos móviles (< 640px), el botón de edición de datos personales oculta el texto "Editar perfil" y muestra únicamente el ícono del lápiz (`Pencil` 13px) en un botón compacto (`.editProfileHeroBtn`), optimizando el espacio horizontal al lado del nombre de usuario y badges.
       - Altura total reducida a ~72px (ahorro de más de 60px respecto a layouts previos), 100% de visibilidad above the fold, cero scroll horizontal y cero contenedores anidados.
     - **Cero símbolos de moneda redundantes:** Eliminación universal de "($)" y "(US$)" en todo el módulo de perfil, reservándolos exclusivamente dentro de los botones del selector de moneda de `TabFinanzas`.
     - **Tokens y Accesibilidad:** Uso exclusivo de tokens `--surface`, `--surface-alt`, `--border`, `--radius-modal`, `--elevation-sm`, `--space-*`, foco visible en avatar interactivo y botones, hover de escala confinado a puntero fino, y cobertura total bajo `@media (prefers-reduced-motion: reduce)`.
+
+15. **Banners, Avisos y Botones de Cierre en Toda la Aplicación (Fase G6, 30/10/2026):**
+    - **Botones de Cierre (X) Redondos Universales:** Todo botón de cierre, descarte o remoción con ícono `X` en cualquier componente, modal, drawer, banner, aviso o chip de toda la aplicación debe ser estrictamente circular (`border-radius: 50%`). La sombra y fondo de interacción (`:hover`, `:active`) de la `X` debe ser 100% redonda en toda la app. Quedan terminantemente prohibidas sombras o fondos de `X` cuadrados o rectangulares.
+    - **Pila Unificada de Banners:** Todos los avisos y banners apilados en cualquier pantalla (Dashboard, Transacciones, Presupuestos, etc.) se agrupan con separación consistente `gap: var(--space-sm)` (8px), eliminando márgenes individuales desincronizados. La separación hacia el contenido principal la gestiona el contenedor con `margin-bottom: var(--space-xl)` (20px) en desktop y `var(--space-md)` (12px) en mobile.
+    - **Avisos Informativos Limpios y Despojados (Sin inputs inline ni botones redundantes):**
+      - Prohibido el uso de inputs inline de monto o botones invasivos que se corten o rompan el diseño responsivo dentro de banners o avisos informativos.
+      - El banner presenta exclusivamente el mensaje informativo conciso ("Hace X días que no cargás nada...", "¿Cuánto tenés hoy en [Billetera]?"), ícono contextual y un botón de cierre `X` circular (`border-radius: 50%`) discreto a la derecha para descartar.
+      - Al hacer clic sobre el cuerpo del banner o en su acción principal se abre el diálogo correspondiente (`ActualizarSaldoModal` con teclado adaptativo completo y validación sin truncamiento de dígitos, o el modal de carga de movimientos), delegando los flujos de escritura a modales espaciosos.
+
+16. **Contención Universal y Mirroring de Skeletons (Fase G7, 30/10/2026):**
+    - **Guardrail Universal de Contención:** Todo skeleton, contenedor, tarjeta, fila, grilla o elemento de carga debe definir obligatoriamente `box-sizing: border-box;` y `max-width: 100%;`. Ningún esqueleto puede desbordar su contenedor por suma de padding o bordes (`width: 100% + padding` prohibido sin `box-sizing: border-box`).
+    - **Espejo Fiel del Layout en Todas las Pantallas:** Los esqueletos deben replicar la estructura exacta de la pantalla final:
+      - `DashboardListSkeleton`: Implementa variantes fidedignas (`categoria`, `pago`, `movimiento`) que replican la anatomía real de `.barItem` (30x30, barra progreso 4px), `.pagoItem` (36x36 calendario) y `.listItem` (32x32 avatar) sin bordes ni fondos anidados de tarjeta que inflen la altura vertical.
+      - `DashboardPage` Top Row: Contención estricta con `grid-template-rows: minmax(0, 1fr)`, `max-height: 260px` en modo compacto, y `overflow: hidden` en `.card` y sus contenedores para garantizar que ninguna columna desborde ni se solape sobre la fila inferior.
+      - `PerfilSeguridadSkeleton`: Proyecta la grilla superior de 2 columnas en escritorio (`min-width: 1024px`) y 1 en móvil (Tarjetas 1 y 2 con sus filas de credenciales y WhatsApp), más la tarjeta inferior de ancho completo (Tarjeta 3 de dispositivos y datos).
+      - `PresupuestosSkeleton`: Grilla responsive única sin wrappers anidados duplicados.
+    - **Validación Automática:** Testeado y garantizado en `src/utils/skeletonsResponsive.test.ts` para todas las resoluciones (320px móvil a desktop 1920px+).
+
+17. **Rediseño Unificado de Tab Seguridad y Privacidad (Fase G8, 30/10/2026):**
+    - **Arquitectura de Grilla Desktop Equilibrada:**
+      - Grilla superior de dos columnas en escritorio (`min-width: 1024px`) con `align-items: stretch` para que ambas tarjetas principales tengan idéntica altura y presencia visual armónica:
+        1. *Tarjeta 1 (Acceso y credenciales):* Correo electrónico con badge de estado (`Verificado` / `Pendiente`) + botón cambiar, y Contraseña con badge (`Configurada` / `Sin clave`) + botón para desplegar el formulario integrado de cambio de contraseña con validación de requisitos en tiempo real.
+        2. *Tarjeta 2 (Asistente de WhatsApp):* Estado de vinculación (`Vinculado` / `No vinculado`) + botón vincular, y toggle de privacidad para auditoría del asistente con diálogo de confirmación.
+      - *Sección Inferior de Ancho Completo (`.bottomSection`):*
+        3. *Tarjeta 3 (Dispositivos y datos):* Absorbe y unifica la gestión de seguridad y exportación eliminando definitivamente el componente obsoleto `SesionesYDatos.tsx`. Incluye fila de dispositivos activos con botón para cerrar sesiones remotas, y fila de exportación de datos (descarga en formatos JSON y CSV con indicador de estado y loading).
+    - **Adaptación Responsiva Móvil Estricta (iPhone SE 375x667):**
+      - Eliminación absoluta de quiebres letra por letra en textos y badges (`word-break: normal; overflow-wrap: break-word; hyphens: none`).
+      - Filas con envoltura flexible (`display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm)`): el grupo de textos ocupa `flex: 1 1 180px` y los botones de acción se reposicionan fluidamente en pantallas estrechas sin estrangular las etiquetas.
+      - Altura táctil mínima de 44px en botones y controles interactivos en mobile.
+    - **Modularidad y Tokens Oficiales:**
+      - Estilos centralizados en `TabSeguridad.module.css` usando tokens semánticos oficiales (`--surface`, `--surface-alt`, `--border`, `--text-1`, `--text-2`, `--primary`). Cero clases huérfanas y compilación estricta sin advertencias.

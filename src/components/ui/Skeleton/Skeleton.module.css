@@ -1,5 +1,19 @@
 /* ─── Skeleton & Loading Templates (Argentum Design System) ───────────────── */
 
+/* ── Universal Container & Containment Guardrail ─────────────────────────── */
+.skeleton,
+.skeleton *,
+[class*="Wrapper"],
+[class*="Skeleton"],
+[class*="Card"],
+[class*="Row"],
+[class*="Grid"],
+[class*="Header"],
+[class*="Item"],
+[class*="Bar"] {
+  box-sizing: border-box;
+}
+
 @keyframes skeletonPulse {
   0% {
     background-position: 200% 0;
@@ -26,20 +40,24 @@
 
 .text {
   height: 14px;
-  border-radius:6px;
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 
 .circular {
-  border-radius:50%;
+  border-radius: 50%;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .rounded {
-  border-radius:12px;
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
 .rectangular {
-  border-radius:8px;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .srOnly {
@@ -54,6 +72,7 @@
   clip-path: inset(50%);
   white-space: nowrap;
   border-width: 0;
+  box-sizing: border-box;
 }
 
 /* ── 1. Grid de Tarjetas (Billeteras / Suscripciones / Presupuestos / Metas) ── */
@@ -63,6 +82,8 @@
   gap: 0;
   padding-bottom: 24px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 767px) {
@@ -79,7 +100,7 @@
 @media (min-width: 768px) {
   .cardsGrid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     padding-bottom: 0;
   }
@@ -90,7 +111,7 @@
 
 .cardSkeleton {
   height: 140px;
-  border-radius:18px;
+  border-radius: 18px;
   background: linear-gradient(
     90deg,
     var(--surface-alt) 0%,
@@ -99,12 +120,14 @@
   );
   background-size: 200% 100%;
   animation: skeletonPulse 1.5s ease infinite;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
   .cardSkeleton {
     height: unset;
-    border-radius:20px;
+    border-radius: 20px;
     aspect-ratio: 1.75 / 1;
   }
 }
@@ -115,6 +138,8 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .dayGroupSkeleton {
@@ -122,6 +147,8 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .dayHeaderSkeleton {
@@ -129,15 +156,20 @@
   align-items: center;
   gap: 8px;
   padding: 2px 4px;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .txContainerCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:16px;
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .txRowSkeleton {
@@ -146,6 +178,9 @@
   gap: 12px;
   padding: 13px 16px;
   border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .txRowSkeleton:last-child {
@@ -158,6 +193,7 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .txAmountSkeleton {
@@ -166,6 +202,7 @@
   align-items: flex-end;
   gap: 6px;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* ── 3. Grupos de Cuotas Skeleton ────────────────────────────────────────── */
@@ -174,6 +211,8 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .cuotasMetricsBar {
@@ -183,6 +222,7 @@
   border-radius: 16px;
   padding: 16px 20px;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -200,28 +240,38 @@
   gap: 6px;
   min-width: 0;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .cuotasList {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .cuotasCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:14px;
+  border-radius: 14px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .cuotasCardTop {
   display: flex;
   align-items: center;
   gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 4. Transferencias Skeleton ──────────────────────────────────────────── */
@@ -230,6 +280,8 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .transferRowSkeleton {
@@ -239,14 +291,17 @@
   padding: 14px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:14px;
+  border-radius: 14px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 5. Importación de Resumen Skeleton ──────────────────────────────────── */
 .importWrapper {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:20px;
+  border-radius: 20px;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -254,6 +309,7 @@
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .importHeader {
@@ -261,12 +317,15 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .importDropzone {
   min-height: 180px;
   border: 2px dashed var(--border);
-  border-radius:16px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -274,6 +333,9 @@
   gap: 12px;
   padding: 32px 20px;
   background: var(--surface-alt);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .importFooter {
@@ -281,6 +343,9 @@
   justify-content: flex-end;
   gap: 12px;
   margin-top: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 6. Billetera Detalle Skeleton ───────────────────────────────────────── */
@@ -289,12 +354,15 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .billeteraHeroCard {
   height: 180px;
-  border-radius:20px;
+  border-radius: 20px;
   width: 100%;
+  max-width: 100%;
   background: linear-gradient(
     90deg,
     var(--surface-alt) 0%,
@@ -303,6 +371,7 @@
   );
   background-size: 200% 100%;
   animation: skeletonPulse 1.5s ease infinite;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -317,6 +386,8 @@
   flex-direction: column;
   gap: 24px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .summaryBarSkeleton {
@@ -328,6 +399,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -346,6 +418,9 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -357,7 +432,7 @@
 
 .suscripcionCardSkeleton {
   height: 120px;
-  border-radius:16px;
+  border-radius: 16px;
   background: linear-gradient(
     90deg,
     var(--surface-alt) 0%,
@@ -366,15 +441,20 @@
   );
   background-size: 200% 100%;
   animation: skeletonPulse 1.5s ease infinite;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 8. Table Skeleton (Admin / Data Views) ───────────────────────────────── */
 .tableContainerSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:16px;
+  border-radius: 16px;
   overflow: hidden;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .tableHeaderSkeleton {
@@ -384,6 +464,9 @@
   padding: 14px 20px;
   background: var(--surface-alt);
   border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .tableRowSkeleton {
@@ -392,6 +475,9 @@
   gap: 16px;
   padding: 14px 20px;
   border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .tableRowSkeleton:last-child {
@@ -404,6 +490,8 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .goalsMobileChartSkeleton {
@@ -411,10 +499,13 @@
   flex-direction: column;
   gap: 8px;
   height: 140px;
-  border-radius:18px;
+  border-radius: 18px;
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -428,6 +519,8 @@
   grid-template-columns: 1fr;
   gap: 16px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -440,29 +533,42 @@
 .goalCardSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:20px;
+  border-radius: 20px;
   padding: 22px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .goalCardHeader {
   display: flex;
   align-items: center;
   gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .goalAmountsRow {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .goalActionsRow {
   display: flex;
   gap: 8px;
   margin-top: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 10. Presupuestos Skeleton ────────────────────────────────────────────── */
@@ -471,6 +577,8 @@
   grid-template-columns: 1fr;
   gap: 16px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -483,29 +591,38 @@
 .presupuestoCardSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:20px;
+  border-radius: 20px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .presupuestoHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 11. Tarjeta Summary Skeleton ─────────────────────────────────────────── */
 .tarjetaSummarySkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:18px;
+  border-radius: 18px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .tarjetaSummaryNav {
@@ -514,18 +631,27 @@
   align-items: center;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .tarjetaSummaryDates {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .tarjetaSummaryActions {
   display: flex;
   gap: 8px;
   margin-top: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 12. Factura Panel Skeleton ───────────────────────────────────────────── */
@@ -536,6 +662,8 @@
   gap: 16px;
   padding: 10px 0;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .facturaDetailsList {
@@ -543,9 +671,11 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
+  max-width: 100%;
   background: var(--surface-alt);
-  border-radius:14px;
+  border-radius: 14px;
   padding: 16px;
+  box-sizing: border-box;
 }
 
 /* ── 13. Onboarding Skeleton ──────────────────────────────────────────────── */
@@ -557,17 +687,20 @@
   max-width: 480px;
   margin: 0 auto;
   gap: 24px;
+  box-sizing: border-box;
 }
 
 .onboardingCardSkeleton {
   width: 100%;
+  max-width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius:20px;
+  border-radius: 20px;
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  box-sizing: border-box;
 }
 
 /* ── 14. Balance Card Skeleton (Dashboard) ────────────────────────────────── */
@@ -578,27 +711,75 @@
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 12px;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   box-shadow: var(--elevation-sm);
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .balanceCardSkeleton {
+    height: 100%;
+    min-height: 0;
+  }
 }
 
 /* ── 15. Dashboard List Skeleton (Dashboard rows) ─────────────────────────── */
 .dashboardListSkeleton {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.dashboardCategoryRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dashboardPagoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dashboardMovimientoRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .dashboardListRow {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* ── 16. Proyección Card Skeleton (Dashboard) ─────────────────────────────── */
@@ -611,6 +792,9 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   box-shadow: var(--elevation-sm);
 }
 
@@ -619,6 +803,9 @@
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .proyeccionMetricsGrid {
@@ -626,6 +813,9 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   padding: 8px 0;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── 17. Conveniencia Wizard Skeleton (Tools) ────────────────────────────── */
@@ -636,6 +826,7 @@
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .wizardCardBody {
@@ -647,6 +838,9 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   box-shadow: var(--elevation-sm);
 }
 
@@ -654,6 +848,9 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -668,6 +865,8 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .comercioRowSkeleton {
@@ -678,6 +877,10 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* ── 19. Perfil Seguridad Skeleton (Perfil) ───────────────────────────────── */
@@ -686,17 +889,73 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.seguridadGridSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .seguridadGridSkeleton {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: stretch;
+  }
 }
 
 .seguridadCardSkeleton {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 20px;
+  border-radius: 18px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  box-shadow: var(--elevation-sm);
+}
+
+@media (max-width: 639px) {
+  .seguridadCardSkeleton {
+    padding: 16px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+}
+
+.seguridadHeaderSkeleton {
+  display: flex;
+  align-items: center;
   gap: 12px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.seguridadRowSkeleton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -708,5 +967,3 @@
     animation: none;
   }
 }
-
-

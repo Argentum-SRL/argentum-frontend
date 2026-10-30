@@ -12,12 +12,18 @@
 
 .skeletonItem {
   padding: 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .skeletonHeader {
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .headerTitle {

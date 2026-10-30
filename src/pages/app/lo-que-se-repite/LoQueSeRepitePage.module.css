@@ -56,6 +56,9 @@
   margin-bottom: 24px;
   font-size: 13.5px;
   color: var(--text);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -399,6 +402,9 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -415,6 +421,9 @@
   height: 124px;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .skeletonCard::after {

@@ -1,0 +1,674 @@
+/* ==========================================================================
+   TabSeguridad.module.css - Rediseño Unificado de Seguridad y Privacidad
+   ========================================================================== */
+
+.tabContainer {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+  .tabContainer {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
+  }
+}
+
+.tabForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── 1. Grid Principal (2 Columnas en Desktop, 1 en Mobile) ──────────────── */
+.mainGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .mainGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--space-xl);
+  }
+
+  .mainGridEditing {
+    align-items: start;
+  }
+}
+
+.cardStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+/* ── 2. Filas de Seguridad (Setting Rows) ────────────────────────────────── */
+.securityRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.securityRowExpandable {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-md);
+}
+
+.securityRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.rowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.rowLabelGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.rowLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.rowSubtitle {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  line-height: 1.45;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+@media (max-width: 639px) {
+  .securityRow:not(.securityRowToggle) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .securityRowHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+    width: 100%;
+  }
+
+  .rowInfo {
+    width: 100%;
+  }
+
+  .rowLabel {
+    font-size: 0.875rem;
+  }
+
+  .rowLabelGroup {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    width: 100%;
+  }
+
+  .securityRow:not(.securityRowToggle) .rowActions,
+  .securityRowHeader .rowActions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: 2px;
+  }
+
+  .securityRow:not(.securityRowToggle) .rowActions button,
+  .securityRow:not(.securityRowToggle) .rowActions a,
+  .securityRowHeader .rowActions button {
+    width: 100%;
+    flex: 1;
+    justify-content: center;
+    height: 38px;
+  }
+
+  .securityRowToggle {
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+
+  .securityRowToggle .rowInfo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .securityRowToggle .rowActions {
+    flex-shrink: 0;
+    width: auto;
+  }
+}
+
+/* ── 3. Badges de Estado (Micro-tags canónicos) ───────────────────────────── */
+.badgeVerified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--radius-selector-pill);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+:global([data-theme="dark"]) .badgeVerified {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+.badgePending {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--radius-selector-pill);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+:global([data-theme="dark"]) .badgePending {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+.badgeNeutral {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--radius-selector-pill);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ── 4. Botones de Acción Canónicos ───────────────────────────────────────── */
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-selector-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btnSecondary:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnSecondary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.btnSecondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-selector-pill);
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-selector-pill);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: transparent;
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: #ef4444;
+}
+
+.btnDanger:focus-visible {
+  outline: 2px solid #ef4444;
+  outline-offset: 1px;
+}
+
+.btnDanger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 639px) {
+  .btnSecondary,
+  .btnPrimary,
+  .btnDanger {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 0.8125rem;
+  }
+}
+
+/* ── 5. Formulario Expandible de Contraseña ──────────────────────────────── */
+.passwordExpandPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.fieldLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.fieldInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 40px 0 12px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+:global([data-theme="dark"]) .fieldInput,
+:global(.dark) .fieldInput {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+
+.fieldInput:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+
+@media (max-width: 768px) {
+  .fieldInput {
+    font-size: 16px;
+    height: 44px;
+  }
+}
+
+.eyeToggleBtn {
+  position: absolute;
+  right: 6px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0;
+  transition: color 0.12s ease;
+}
+
+.eyeToggleBtn:hover {
+  color: var(--text);
+}
+
+.eyeToggleBtn:focus-visible {
+  outline: 2px solid var(--primary);
+}
+
+/* Checklist de requerimientos */
+.reqChecklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.reqTitle {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+@media (max-width: 639px) {
+  .reqGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reqItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-3);
+  transition: color 0.15s ease;
+}
+
+.reqDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-3);
+  flex-shrink: 0;
+}
+
+.reqPassed {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.reqPassed svg {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+@media (max-width: 639px) {
+  .formActions {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+}
+
+.alertError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ── 6. Switch Apple-style (Idéntico a TabFinanzas) ───────────────────────── */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--border);
+  border-radius: 28px;
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: var(--elevation-xs);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.switch input:checked + .slider {
+  background-color: var(--primary);
+}
+
+:global([data-theme="dark"]) .switch input:checked + .slider {
+  background-color: #2563eb;
+}
+
+.switch input:focus-visible + .slider {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* ── 7. Banner Google OAuth ──────────────────────────────────────────────── */
+.googleBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.googleIconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.googleBannerText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.googleBannerTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.googleBannerDesc {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* ── 8. Sección Inferior (Dispositivos y Datos) ──────────────────────────── */
+.bottomSection {
+  margin-top: 0;
+  width: 100%;
+}
+
+/* ── 9. Prefers Reduced Motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .btnSecondary,
+  .btnPrimary,
+  .btnDanger,
+  .fieldInput,
+  .eyeToggleBtn,
+  .slider,
+  .slider::before,
+  .passwordExpandPanel {
+    transition: none !important;
+    animation: none !important;
+  }
+}

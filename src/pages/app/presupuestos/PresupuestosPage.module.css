@@ -165,6 +165,8 @@
   background: linear-gradient(90deg, var(--surface-alt) 25%, var(--surface) 50%, var(--surface-alt) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @keyframes loading {
@@ -175,6 +177,9 @@
 .skeletonCard {
   height: 240px;
   border-radius: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -198,6 +203,9 @@
   display: flex;
   gap: 12px;
   color: var(--text-2);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .suggestionTitle { font-weight: 800; font-size: 14px; margin: 0 0 4px; }

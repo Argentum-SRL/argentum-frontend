@@ -141,4 +141,36 @@ describe('Skeletons responsive y mirroring (fase_g3_skeletons_responsive)', () =
     expect(wppContent).not.toMatch(/<Skeleton\s+variant="text"\s+width=\{220\}/)
     expect(wppContent).not.toMatch(/<Skeleton\s+variant="rounded"\s+width=\{200\}/)
   })
+
+  it('Skeleton.module.css y Skeleton.tsx previenen desbordes en Presupuestos y PerfilSeguridad', () => {
+    const cssPath = path.resolve(rootDir, 'src/components/ui/Skeleton/Skeleton.module.css')
+    const cssContent = fs.readFileSync(cssPath, 'utf-8')
+    expect(cssContent).toContain('.seguridadGridSkeleton')
+    expect(cssContent).toContain('.seguridadCardSkeleton')
+    expect(cssContent).toContain('.seguridadRowSkeleton')
+
+    const tsxPath = path.resolve(rootDir, 'src/components/ui/Skeleton/Skeleton.tsx')
+    const tsxContent = fs.readFileSync(tsxPath, 'utf-8')
+    // No debe haber anidamiento redundante de presupuestosWrapper
+    expect(tsxContent).not.toContain('<div className={styles.presupuestosWrapper}>\n        {Array.from({ length: count })')
+    expect(tsxContent).not.toContain('<div className={styles.presupuestosWrapper}>\r\n        {Array.from({ length: count })')
+    // PerfilSeguridadSkeleton debe renderizar la grilla responsive
+    expect(tsxContent).toContain('styles.seguridadGridSkeleton')
+  })
+
+  it('Banners y botones de remocion/cierre en toda la app definen contencion y redondez 50%', () => {
+    // Importacion de resumen removeFileBtn es redondo (border-radius: 50%)
+    const importCss = fs.readFileSync(path.resolve(rootDir, 'src/components/tools/importacion/ImportacionResumenSection.module.css'), 'utf-8')
+    expect(importCss).toMatch(/\.removeFileBtn\s*\{[^}]*border-radius:\s*50%/)
+
+    // Banners en transacciones, presupuestos y tarjetas definen box-sizing: border-box
+    const txCss = fs.readFileSync(path.resolve(rootDir, 'src/pages/app/transacciones/TransaccionesPage.module.css'), 'utf-8')
+    expect(txCss).toMatch(/\.pendientesBanner\s*\{[^}]*box-sizing:\s*border-box/)
+
+    const cardCss = fs.readFileSync(path.resolve(rootDir, 'src/components/tarjetas/TarjetaSummary.module.css'), 'utf-8')
+    expect(cardCss).toMatch(/\.resumenImpagoBanner\s*\{[^}]*box-sizing:\s*border-box/)
+
+    const presupuestosCss = fs.readFileSync(path.resolve(rootDir, 'src/pages/app/presupuestos/PresupuestosPage.module.css'), 'utf-8')
+    expect(presupuestosCss).toMatch(/\.suggestionBanner\s*\{[^}]*box-sizing:\s*border-box/)
+  })
 })

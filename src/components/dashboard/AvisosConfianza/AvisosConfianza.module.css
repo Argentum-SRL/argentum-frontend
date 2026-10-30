@@ -3,29 +3,38 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 6px 8px 6px 12px;
   background: var(--surface-card, rgba(255, 255, 255, 0.04));
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-left: 3px solid var(--primary, #00bb7d);
   border-radius: 12px;
-  margin-bottom: 20px;
   box-sizing: border-box;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.datosViejosBox {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
+.container:hover {
+  border-color: var(--border-hover, rgba(0, 187, 125, 0.3));
 }
 
-.leftGroup {
+.mainAction {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
   flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  border-radius: 6px;
+}
+
+.mainAction:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .iconBox {
@@ -40,6 +49,29 @@
   flex-shrink: 0;
 }
 
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, #fff);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-2, rgba(255, 255, 255, 0.6));
+  margin: 0;
+  line-height: 1.35;
+}
+
 .datosViejosText {
   font-size: 0.875rem;
   font-weight: 500;
@@ -48,179 +80,67 @@
   line-height: 1.35;
 }
 
-.preguntaSaldoBox {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  width: 100%;
-}
-
-.preguntaSaldoInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.preguntaSaldoTitle {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text, #fff);
-  margin: 0;
-  line-height: 1.25;
-}
-
-.preguntaSaldoSubtitle {
-  font-size: 0.8125rem;
-  color: var(--text-2, rgba(255, 255, 255, 0.6));
-  margin: 0;
-  line-height: 1.35;
-}
-
-.preguntaSaldoForm {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.montoWrap {
-  width: 140px;
-  flex-shrink: 0;
-}
-
-.btnCargar {
+.closeBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 6px 14px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--primary, #00bb7d);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: opacity 0.15s ease;
-}
-
-.btnCargar:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.btnCargar:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btnListo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 14px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--primary, #00bb7d);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: opacity 0.15s ease;
-}
-
-.btnListo:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.btnListo:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btnSaltear {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-2, rgba(255, 255, 255, 0.6));
   background: transparent;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-  border-radius: 8px;
+  color: var(--text-3, rgba(255, 255, 255, 0.4));
   cursor: pointer;
-  white-space: nowrap;
   flex-shrink: 0;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-.btnSaltear:hover {
+.closeBtn:hover {
   color: var(--text, #fff);
-  border-color: var(--border-hover, rgba(255, 255, 255, 0.25));
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.btnGroup {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.closeBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 @media (max-width: 640px) {
   .container {
-    padding: 12px;
+    padding: 6px 8px 6px 10px;
+    gap: 8px;
+    border-radius: 10px;
   }
 
-  .datosViejosBox {
-    flex-direction: column;
-    align-items: stretch;
+  .mainAction {
     gap: 8px;
   }
 
-  .btnCargar {
-    width: 100%;
+  .iconBox {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
   }
 
-  .preguntaSaldoBox {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+  .title,
+  .datosViejosText {
+    font-size: 0.8125rem;
   }
 
-  .preguntaSaldoForm {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    gap: 8px;
+  .subtitle {
+    display: none;
   }
 
-  .montoWrap {
-    width: 100%;
-  }
-
-  .btnGroup {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .btnGroup > button {
-    flex: 1;
+  .closeBtn {
+    width: 26px;
+    height: 26px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btnCargar,
-  .btnListo,
-  .btnSaltear {
+  .container,
+  .closeBtn {
     transition: none;
+    animation: none;
   }
 }
-

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  User,
   Coins,
   Shield,
   Bell,
@@ -16,7 +15,6 @@ import type { MetodosLogin } from '@/types'
 import FotoCropModal from '@/components/perfil/FotoCropModal'
 
 import { ProfileHero } from './components/ProfileHero'
-import { TabGeneral } from './components/TabGeneral'
 import { TabFinanzas } from './components/TabFinanzas'
 import { TabSeguridad } from './components/TabSeguridad'
 import { TabNotificaciones } from './components/TabNotificaciones'
@@ -26,7 +24,7 @@ import { EditModals } from './components/EditModals'
 
 import styles from './PerfilPage.module.css'
 
-type TabType = 'perfil' | 'finanzas' | 'seguridad' | 'notificaciones' | 'peligro'
+type TabType = 'finanzas' | 'seguridad' | 'notificaciones' | 'peligro'
 
 export default function PerfilPage() {
   const { usuario, updateUsuario } = useAuth()
@@ -35,8 +33,8 @@ export default function PerfilPage() {
 
   // ── 1. Tab Routing Sync ──────────────────────────────────────────────────
   const tabParam = new URLSearchParams(location.search).get('tab') as TabType | null
-  const validTabs: TabType[] = ['perfil', 'finanzas', 'seguridad', 'notificaciones', 'peligro']
-  const activeTab: TabType = validTabs.includes(tabParam as TabType) ? (tabParam as TabType) : 'perfil'
+  const validTabs: TabType[] = ['finanzas', 'seguridad', 'notificaciones', 'peligro']
+  const activeTab: TabType = validTabs.includes(tabParam as TabType) ? (tabParam as TabType) : 'finanzas'
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/app/perfil?tab=${tab}`, { replace: true })
@@ -113,6 +111,7 @@ export default function PerfilPage() {
         usuario={usuario}
         updateUsuario={updateUsuario}
         onOpenCrop={() => setFotoCropOpen(true)}
+        onEditDatos={() => setActiveModal('datos')}
       />
 
       {/* ── Segmented Tab Navigation Bar (Cápsula Oficial / Carrusel Móvil) ──── */}
@@ -120,7 +119,6 @@ export default function PerfilPage() {
         <SegmentedControl
           className={styles.navTrack}
           options={[
-            { value: 'perfil', label: 'General', icon: <User size={15} /> },
             { value: 'finanzas', label: 'Finanzas & Moneda', icon: <Coins size={15} /> },
             { value: 'seguridad', label: 'Seguridad', icon: <Shield size={15} /> },
             { value: 'notificaciones', label: 'Notificaciones', icon: <Bell size={15} /> },
@@ -147,15 +145,6 @@ export default function PerfilPage() {
 
       {/* ── Tab Views Content ─────────────────────────────────────── */}
       <main className={styles.mainContent}>
-        {activeTab === 'perfil' && (
-          <TabGeneral
-            usuario={usuario}
-            onEditDatos={() => setActiveModal('datos')}
-            onEditEmail={() => setActiveModal('email')}
-            onVerificarEmail={handleVerificarEmailActual}
-          />
-        )}
-
         {activeTab === 'finanzas' && (
           <TabFinanzas
             usuario={usuario}

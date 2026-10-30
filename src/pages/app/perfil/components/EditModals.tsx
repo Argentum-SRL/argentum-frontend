@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Save, AlertCircle, Eye, EyeOff } from '@/components/ui/icons'
+import { X, AlertCircle, Eye, EyeOff } from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { Modal, DateInput, SelectInput, type SelectOption } from '@/components/ui'
+import { Modal, DateInput, type SelectOption } from '@/components/ui'
 import styles from '../PerfilPage.module.css'
 
 const OPCIONES_SEXO: SelectOption[] = [
@@ -23,7 +23,7 @@ interface EditModalsProps {
   updateUsuario: (u: Usuario) => void
 }
 
-// ── 1. Formulario de Datos Personales ──────────────────────────────────────
+// ── 1. Formulario de Datos Personales (Diseño TransaccionModal) ──────────────────────────
 const DatosPersonalesForm: React.FC<{
   usuario: Usuario | null
   onClose: () => void
@@ -124,92 +124,120 @@ const DatosPersonalesForm: React.FC<{
   })()
 
   return (
-    <form onSubmit={handleSubmit} className={styles.modalFormContainer} data-modal-frame>
-      {errorMsg && (
-        <div className={styles.modalAlertError}>
-          <AlertCircle size={15} />
-          <span>{errorMsg}</span>
-        </div>
-      )}
-
-      <div className={styles.modalFormBody} data-modal-stack>
-        <div data-modal-block>
-        <div className={styles.formRowDual}>
-          <div className={styles.formField}>
-            <label htmlFor="modal-nombre" className={styles.fieldLabel}>
-              Nombre *
-            </label>
-            <input
-              id="modal-nombre"
-              type="text"
-              maxLength={100}
-              className={styles.fieldInput}
-              value={formDatos.nombre}
-              onChange={(e) => setFormDatos({ ...formDatos, nombre: e.target.value })}
-              placeholder="Ej: Lucas"
-              required
-            />
+    <form onSubmit={handleSubmit} className={styles.formContainer} data-modal-frame>
+      <div className={`${styles.formBody} ${styles.formBodyWithHeader}`}>
+        <div className={styles.formHeader}>
+          <div className={styles.headerLeft}>
+            <h2 className={styles.headerTitle}>Editar datos personales</h2>
           </div>
-          <div className={styles.formField}>
-            <label htmlFor="modal-apellido" className={styles.fieldLabel}>
-              Apellido *
-            </label>
-            <input
-              id="modal-apellido"
-              type="text"
-              maxLength={100}
-              className={styles.fieldInput}
-              value={formDatos.apellido}
-              onChange={(e) => setFormDatos({ ...formDatos, apellido: e.target.value })}
-              placeholder="Ej: González"
-              required
-            />
+          <div className={styles.headerRightActions}>
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              title="Cerrar"
+              aria-label="Cerrar"
+            >
+              <X size={18} strokeWidth={1.75} />
+            </button>
           </div>
         </div>
 
-        <div className={styles.formField}>
-          <DateInput
-            id="modal-nacimiento"
-            label="Fecha de nacimiento"
-            value={formDatos.fecha_nacimiento}
-            min={minBirthDate}
-            max={maxBirthDate}
-            defaultYear={2000}
-            onChange={(val) => setFormDatos({ ...formDatos, fecha_nacimiento: val })}
-          />
-        </div>
+        {errorMsg && (
+          <div className={styles.modalAlertError}>
+            <AlertCircle size={15} />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-        <div className={styles.formField}>
-          <SelectInput
-            id="modal-sexo"
-            label="Sexo / Género"
-            value={formDatos.sexo}
-            onChange={(val) => setFormDatos({ ...formDatos, sexo: val })}
-            options={OPCIONES_SEXO}
-          />
-        </div>
+        <div className={styles.formFields} data-modal-stack>
+          <div data-modal-block className={styles.modalStackBlock}>
+            <div className={styles.formRowDual}>
+              <div className={styles.formField}>
+                <label htmlFor="modal-nombre" className={styles.fieldLabel}>
+                  Nombre
+                </label>
+                <input
+                  id="modal-nombre"
+                  type="text"
+                  maxLength={100}
+                  className={styles.fieldInput}
+                  value={formDatos.nombre}
+                  onChange={(e) => setFormDatos({ ...formDatos, nombre: e.target.value })}
+                  placeholder="Ej: Tester"
+                  required
+                />
+              </div>
+              <div className={styles.formField}>
+                <label htmlFor="modal-apellido" className={styles.fieldLabel}>
+                  Apellido
+                </label>
+                <input
+                  id="modal-apellido"
+                  type="text"
+                  maxLength={100}
+                  className={styles.fieldInput}
+                  value={formDatos.apellido}
+                  onChange={(e) => setFormDatos({ ...formDatos, apellido: e.target.value })}
+                  placeholder="Ej: Argentum"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className={styles.formField}>
+              <label htmlFor="modal-nacimiento" className={styles.fieldLabel}>
+                Fecha de nacimiento
+              </label>
+              <DateInput
+                id="modal-nacimiento"
+                value={formDatos.fecha_nacimiento}
+                min={minBirthDate}
+                max={maxBirthDate}
+                defaultYear={2000}
+                onChange={(val) => setFormDatos({ ...formDatos, fecha_nacimiento: val })}
+              />
+            </div>
+
+            <div className={styles.formField}>
+              <label htmlFor="modal-sexo" className={styles.fieldLabel}>
+                Sexo / Género
+              </label>
+              <select
+                id="modal-sexo"
+                className={`${styles.fieldInput} ${styles.selectInput}`}
+                value={formDatos.sexo}
+                onChange={(e) => setFormDatos({ ...formDatos, sexo: e.target.value })}
+              >
+                {OPCIONES_SEXO.map((op) => (
+                  <option key={op.value} value={op.value}>
+                    {op.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className={styles.modalFormFooter}>
+      <div className={styles.formFooter}>
         <button
           type="button"
-          className={styles.modalCancelBtn}
+          className={styles.cancelBtn}
           onClick={onClose}
           disabled={isSaving}
         >
           Cancelar
         </button>
-        <button type="submit" disabled={isSaving} className={styles.modalSubmitBtn}>
-          <Save size={15} />
-          <span>{isSaving ? 'Guardando...' : 'Guardar cambios'}</span>
+        <button type="submit" disabled={isSaving} className={styles.submitBtn}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </button>
       </div>
     </form>
   )
 }
 
-// ── 2. Formulario de Email ────────────────────────────────────────────────
+// ── 2. Formulario de Email (Diseño TransaccionModal) ──────────────────────────
 const EmailForm: React.FC<{
   usuario: Usuario | null
   onClose: () => void
@@ -274,86 +302,105 @@ const EmailForm: React.FC<{
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.modalFormContainer} autoComplete="off" data-modal-frame>
-      {errorMsg && (
-        <div className={styles.modalAlertError}>
-          <AlertCircle size={15} />
-          <span>{errorMsg}</span>
-        </div>
-      )}
-
-      <div className={styles.modalFormBody} data-modal-stack>
-        <div data-modal-block>
-        <div className={styles.formField}>
-          <label htmlFor="modal-email-nuevo" className={styles.fieldLabel}>
-            Nuevo correo electrónico *
-          </label>
-          <input
-            id="modal-email-nuevo"
-            name="new_email_address"
-            type="email"
-            autoComplete="email"
-            className={styles.fieldInput}
-            value={emailNuevo}
-            onChange={(e) => setEmailNuevo(e.target.value)}
-            placeholder="nombre@ejemplo.com"
-            required
-          />
-          <span className={styles.modalFieldHint}>
-            Enviaremos un código de seguridad de 6 dígitos a esta nueva casilla.
-          </span>
+    <form onSubmit={handleSubmit} className={styles.formContainer} autoComplete="off" data-modal-frame>
+      <div className={`${styles.formBody} ${styles.formBodyWithHeader}`}>
+        <div className={styles.formHeader}>
+          <div className={styles.headerLeft}>
+            <h2 className={styles.headerTitle}>Actualizar correo electrónico</h2>
+          </div>
+          <div className={styles.headerRightActions}>
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              title="Cerrar"
+              aria-label="Cerrar"
+            >
+              <X size={18} strokeWidth={1.75} />
+            </button>
+          </div>
         </div>
 
-        {hasPassword && (
-          <div className={styles.formField}>
-            <label htmlFor="modal-email-pw" className={styles.fieldLabel}>
-              Contraseña actual *
-            </label>
-            <div className={styles.passwordInputWrap}>
-              <input
-                id="modal-email-pw"
-                name="current_security_pw"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                className={styles.fieldInput}
-                value={passwordActual}
-                onChange={(e) => setPasswordActual(e.target.value)}
-                placeholder="Ingresá tu contraseña"
-                required
-              />
-              <button
-                type="button"
-                className={styles.modalPwEyeBtn}
-                onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
+        {errorMsg && (
+          <div className={styles.modalAlertError}>
+            <AlertCircle size={15} />
+            <span>{errorMsg}</span>
           </div>
         )}
+
+        <div className={styles.formFields} data-modal-stack>
+          <div data-modal-block className={styles.modalStackBlock}>
+            <div className={styles.formField}>
+              <label htmlFor="modal-email-nuevo" className={styles.fieldLabel}>
+                Nuevo correo electrónico
+              </label>
+              <input
+                id="modal-email-nuevo"
+                name="new_email_address"
+                type="email"
+                autoComplete="email"
+                className={styles.fieldInput}
+                value={emailNuevo}
+                onChange={(e) => setEmailNuevo(e.target.value)}
+                placeholder="nombre@ejemplo.com"
+                required
+              />
+              <span className={styles.modalFieldHint}>
+                Enviaremos un código de seguridad de 6 dígitos a esta nueva casilla.
+              </span>
+            </div>
+
+            {hasPassword && (
+              <div className={styles.formField}>
+                <label htmlFor="modal-email-pw" className={styles.fieldLabel}>
+                  Contraseña actual
+                </label>
+                <div className={styles.passwordInputWrap}>
+                  <input
+                    id="modal-email-pw"
+                    name="current_security_pw"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className={styles.fieldInput}
+                    value={passwordActual}
+                    onChange={(e) => setPasswordActual(e.target.value)}
+                    placeholder="Ingresá tu contraseña"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={styles.modalPwEyeBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className={styles.modalFormFooter}>
+      <div className={styles.formFooter}>
         <button
           type="button"
-          className={styles.modalCancelBtn}
+          className={styles.cancelBtn}
           onClick={onClose}
           disabled={isSaving}
         >
           Cancelar
         </button>
-        <button type="submit" disabled={isSaving} className={styles.modalSubmitBtn}>
-          <Save size={15} />
-          <span>{isSaving ? 'Actualizando...' : 'Actualizar y verificar'}</span>
+        <button type="submit" disabled={isSaving} className={styles.submitBtn}>
+          {isSaving ? 'Actualizando...' : 'Actualizar y verificar'}
         </button>
       </div>
     </form>
   )
 }
 
-// ── Modal Maestro ─────────────────────────────────────────────────────────
+// ── Modal Maestro ─────────────────────────────────────────────────────────────
 export const EditModals: React.FC<EditModalsProps> = ({
   activeModal,
   onClose,
@@ -364,29 +411,35 @@ export const EditModals: React.FC<EditModalsProps> = ({
     <Modal
       isOpen={!!activeModal}
       onClose={onClose}
-      title={
+      showHeader={false}
+      noPadding
+      autoHeight
+      size="md"
+      ariaLabel={
         activeModal === 'datos'
-          ? 'Editar Datos Personales'
+          ? 'Editar datos personales'
           : activeModal === 'email'
-          ? 'Actualizar Correo Electrónico'
-          : ''
+          ? 'Actualizar correo electrónico'
+          : 'Editar perfil'
       }
     >
-      {activeModal === 'datos' && (
-        <DatosPersonalesForm
-          usuario={usuario}
-          onClose={onClose}
-          updateUsuario={updateUsuario}
-        />
-      )}
+      <div className={styles.modalRoot}>
+        {activeModal === 'datos' && (
+          <DatosPersonalesForm
+            usuario={usuario}
+            onClose={onClose}
+            updateUsuario={updateUsuario}
+          />
+        )}
 
-      {activeModal === 'email' && (
-        <EmailForm
-          usuario={usuario}
-          onClose={onClose}
-          updateUsuario={updateUsuario}
-        />
-      )}
+        {activeModal === 'email' && (
+          <EmailForm
+            usuario={usuario}
+            onClose={onClose}
+            updateUsuario={updateUsuario}
+          />
+        )}
+      </div>
     </Modal>
   )
 }

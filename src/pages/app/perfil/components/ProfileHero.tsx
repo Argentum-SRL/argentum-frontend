@@ -5,6 +5,8 @@ import {
   AlertCircle,
   Coins,
   Calendar,
+  Edit3,
+  User,
 } from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import { useModal } from '@/hooks/useModal'
@@ -18,12 +20,14 @@ interface ProfileHeroProps {
   usuario: Usuario | null
   updateUsuario: (u: Usuario) => void
   onOpenCrop: () => void
+  onEditDatos: () => void
 }
 
 export const ProfileHero: React.FC<ProfileHeroProps> = ({
   usuario,
   updateUsuario,
   onOpenCrop,
+  onEditDatos,
 }) => {
   const { confirm } = useModal()
   const [fotoError, setFotoError] = React.useState(false)
@@ -68,6 +72,26 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
       return `Día ${usuario.ciclo_valor || '1'} del mes`
     }
     return usuario.ciclo_valor ? usuario.ciclo_valor.replace(/_/g, ' ') : 'Regla personalizada'
+  }
+
+  const getEdadLabel = () => {
+    if (!usuario?.fecha_nacimiento) return null
+    try {
+      const parts = usuario.fecha_nacimiento.split('-')
+      if (parts.length === 3) {
+        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
+        const today = new Date()
+        let age = today.getFullYear() - d.getFullYear()
+        const m = today.getMonth() - d.getMonth()
+        if (m < 0 || (m === 0 && today.getDate() < d.getDate())) {
+          age--
+        }
+        return `${age} años`
+      }
+    } catch {
+      return null
+    }
+    return null
   }
 
   return (
@@ -141,7 +165,7 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
                 {usuario?.nombre ? `${usuario.nombre} ${usuario.apellido || ''}`.trim() : 'Tu Cuenta'}
               </h2>
 
-              {/* Alertas pendientes discretas (micro-tags sutiles que no compiten con el nombre) */}
+              {/* Alertas pendientes discretas */}
               {hasPending && (
                 <div className={styles.heroAlertsInline}>
                   {isEmailPending && (
@@ -167,7 +191,7 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
               )}
             </div>
 
-            {/* Resumen Financiero: meta-línea integrada, limpia, sin cajas ni bordes anidados */}
+            {/* Resumen Financiero y Perfil: meta-línea integrada, limpia, sin cajas ni bordes anidados */}
             <div className={styles.heroGlanceZone}>
               <span className={styles.glanceItem} title="Moneda principal">
                 <Coins size={12} className={styles.glanceIcon} />
@@ -185,8 +209,31 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
                 <Calendar size={12} className={styles.glanceIcon} />
                 <span className={styles.glanceValue}>{getCicloLabel()}</span>
               </span>
+              {getEdadLabel() && (
+                <>
+                  <span className={styles.glanceSep} aria-hidden="true">•</span>
+                  <span className={styles.glanceItem} title="Edad">
+                    <User size={12} className={styles.glanceIcon} />
+                    <span className={styles.glanceValue}>{getEdadLabel()}</span>
+                  </span>
+                </>
+              )}
             </div>
           </div>
+        </div>
+
+        {/* Right: Acción directa de edición de datos personales */}
+        <div className={styles.heroActionZone}>
+          <button
+            type="button"
+            className={styles.editProfileHeroBtn}
+            onClick={onEditDatos}
+            title="Editar datos personales"
+            aria-label="Editar datos personales"
+          >
+            <Edit3 size={14} />
+            <span className={styles.editProfileHeroBtnText}>Editar perfil</span>
+          </button>
         </div>
       </div>
     </div>

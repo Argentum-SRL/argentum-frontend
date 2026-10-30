@@ -2,14 +2,17 @@
 .unverifiedBadge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-2xs);
+  height: 18px;
+  padding: 0 6px;
+  border-radius: var(--radius-selector-pill);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 500;
   color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
-  padding: 2px 7px;
-  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.08);
   border: 1px solid rgba(245, 158, 11, 0.2);
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .contactItemValue {
@@ -64,7 +67,7 @@
   gap: 4px;
   height: 32px;
   padding: 0 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-selector-pill);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -112,27 +115,29 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 28px;
-  padding: 0 9px;
-  border-radius: 8px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: var(--radius-selector-pill);
   background: var(--surface);
   border: 1px solid var(--border);
-  color: var(--text-3);
-  font-size: 11px;
-  font-weight: 600;
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .verifyDirectBtn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   height: 32px;
-  padding: 0 10px;
-  border-radius: 8px;
+  padding: 0 12px;
+  border-radius: var(--radius-selector-pill);
   background: var(--primary);
   color: #ffffff;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   border: none;
   cursor: pointer;
   transition: opacity 0.15s ease;

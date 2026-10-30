@@ -377,6 +377,45 @@
   letter-spacing: 0.02em;
 }
 
+.heroActionZone {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.editProfileHeroBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-selector-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.editProfileHeroBtn:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.editProfileHeroBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.editProfileHeroBtnText {
+  display: inline;
+}
+
 /* ── Responsive Adaptations: Tablet (640px - 1023px) ─────────────── */
 @media (min-width: 640px) and (max-width: 1023px) {
   .heroCard {
@@ -416,8 +455,22 @@
   .heroInner {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    justify-content: space-between;
+    gap: var(--space-sm);
     width: 100%;
+  }
+
+  .editProfileHeroBtn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+    border-radius: var(--radius-selector-pill);
+    flex-shrink: 0;
+  }
+
+  .editProfileHeroBtnText {
+    display: none;
   }
 
   .heroIdentityZone {
@@ -697,7 +750,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 9px;
+  border-radius: var(--radius-selector-pill);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -754,18 +807,18 @@
   gap: 4px;
   padding: 12px 14px;
   background: var(--surface-alt);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   border: 1px solid var(--border);
   min-width: 0;
   box-sizing: border-box;
+  transition: border-color 0.15s ease;
 }
 
 .fieldLabel {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 500;
   color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: normal;
 }
 
 .fieldValue {
@@ -864,11 +917,10 @@
 }
 
 .contactItemLabel {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 500;
   color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: normal;
 }
 
 .verifiedBadge {
@@ -891,7 +943,8 @@
   .contactItem,
   .copyIcon,
   .actionBtnOutline,
-  .actionBtnOutlineSm {
+  .actionBtnOutlineSm,
+  .editProfileHeroBtn {
     transition: none;
     animation: none;
   }

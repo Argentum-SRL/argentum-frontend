@@ -1,4 +1,4 @@
-
+﻿
 .sessionDeviceName {
   font-size: 13px;
   font-weight: 700;
@@ -64,7 +64,7 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
-/* ── 7. Notificaciones Tab ───────────────────────────────────────── */
+/* â”€â”€ 7. Notificaciones Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .notifContainer {
   display: flex;
   flex-direction: column;
@@ -320,7 +320,7 @@
   }
 }
 
-/* ── 8. Danger Zone Tab ──────────────────────────────────────────── */
+/* â”€â”€ 8. Danger Zone Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .dangerSingleCard {
   display: flex;
   align-items: center;
@@ -399,7 +399,7 @@
   }
 }
 
-/* ── 9. Edit Modals (Datos, Email, Teléfono) ──────────────────────── */
+/* â”€â”€ 9. Edit Modals (Datos, Email, TelÃ©fono) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -467,70 +467,199 @@
   color: var(--text);
 }
 
-/* ── Modal Forms (Matching TransaccionModal style) ─────────────────────── */
+
+/* ── Modal Layout & Forms (Estilo TransaccionModal) ────────────────────────── */
+.modalRoot {
+  width: 100%;
+  max-width: 100%;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.slidesContainer {
+  width: 100%;
+  height: 100%;
+  max-height: var(--modal-max-h);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.formContainer,
 .modalFormContainer {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.modalFormBody {
-  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px var(--modal-pad-x) 0;
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.headerRightActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.closeBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.closeBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.formBody,
+.modalFormBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.formBody::-webkit-scrollbar,
 .modalFormBody::-webkit-scrollbar {
   width: 4px;
 }
 
+.formBody::-webkit-scrollbar-thumb,
 .modalFormBody::-webkit-scrollbar-thumb {
   background: var(--surface-alt);
   border-radius: 4px;
 }
 
+.formBodyWithHeader {
+  padding: 0;
+  gap: 0;
+}
+
+.formFields {
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-field-gap);
+}
+
+.modalStackBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-field-gap);
+  width: 100%;
+}
+
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--modal-label-gap);
   width: 100%;
 }
 
 .fieldLabel {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
-  letter-spacing: 0.7px;
+  letter-spacing: 0.6px;
 }
 
 .fieldInput {
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1.5px solid var(--surface-alt);
-  background: var(--page);
+  height: var(--control-h);
+  padding: 0 var(--control-pad-x);
+  border-radius: var(--control-radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text);
-  font-size: 15px;
+  font-size: var(--control-font);
   font-weight: 500;
   outline: none;
-  transition: border-color 150ms ease;
+  transition: border-color var(--motion-fast) var(--ease-out),
+              background-color var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-fast) var(--ease-out);
   font-family: inherit;
   box-sizing: border-box;
   width: 100%;
 }
 
+:global([data-theme="dark"]) .fieldInput,
+:global(.dark) .fieldInput {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 .fieldInput:focus {
   border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+
+.fieldInput:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+
+.selectInput {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E9198' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.selectInput option {
+  background: var(--surface);
+  color: var(--text);
 }
 
 @media (max-width: 768px) {
-  .fieldInput {
-    font-size: 16px;
+  .fieldInput,
+  .selectInput {
+    font-size: var(--control-font-mobile);
   }
   .smallNumberInput {
     font-size: 16px;
@@ -562,10 +691,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 44px;
+  height: var(--control-h);
   padding: 0 12px;
-  border-radius: 12px;
-  border: 1.5px solid var(--surface-alt);
+  border-radius: var(--control-radius);
+  border: 1px solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
   font-size: 13px;
@@ -628,8 +757,14 @@
   color: var(--text);
 }
 
+.modalPwEyeBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.formFooter,
 .modalFormFooter {
-  padding: 12px 20px 16px;
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom);
   border-top: none;
   background: var(--surface);
   display: flex;
@@ -639,14 +774,15 @@
   box-sizing: border-box;
 }
 
+.cancelBtn,
 .modalCancelBtn {
   flex: 1;
-  height: 44px;
-  border-radius: 12px;
+  height: 42px;
+  border-radius: var(--control-radius);
   border: 1.5px solid var(--surface-alt);
   background: transparent;
   color: var(--text-2);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease;
@@ -655,19 +791,27 @@
   justify-content: center;
 }
 
+.cancelBtn:hover,
 .modalCancelBtn:hover {
   background: var(--surface-alt);
   color: var(--text);
 }
 
+.cancelBtn:focus-visible,
+.modalCancelBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.submitBtn,
 .modalSubmitBtn {
   flex: 2;
-  height: 44px;
-  border-radius: 12px;
+  height: 42px;
+  border-radius: var(--control-radius);
   border: none;
   background: var(--primary);
   color: white;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   transition: opacity 120ms ease;
@@ -677,13 +821,21 @@
   gap: 6px;
 }
 
+.submitBtn:hover:not(:disabled),
 .modalSubmitBtn:hover:not(:disabled) {
   opacity: 0.88;
 }
 
+.submitBtn:disabled,
 .modalSubmitBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.submitBtn:focus-visible,
+.modalSubmitBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
 }
 
 .modalAlertError {
@@ -701,21 +853,23 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .closeBtn,
+  .cancelBtn,
+  .submitBtn,
   .modalCancelBtn,
-  .modalSubmitBtn {
-    transition: none;
-    transform: none;
-  }
+  .modalSubmitBtn,
+  .fieldInput,
+  .selectInput,
+  .modalPwEyeBtn,
   .revokeSingleBtn,
-.revokeAllBtn,
-.smallNumberInput,
-.channelPill,
-.deleteBtnModern,
-.modalCard,
-.modalCloseBtn,
-.fieldInput,
-.modalPwEyeBtn {
+  .revokeAllBtn,
+  .smallNumberInput,
+  .channelPill,
+  .deleteBtnModern,
+  .modalCard,
+  .modalCloseBtn {
     transition: none;
     animation: none;
+    transform: none;
   }
 }

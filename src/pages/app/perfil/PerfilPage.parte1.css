@@ -568,13 +568,6 @@
   white-space: nowrap;
 }
 
-.dangerTabWrapper {
-  display: inline-flex;
-  align-items: center;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
 @supports (scrollbar-width: none) {
   .controlsRow {
     scrollbar-width: none;
@@ -606,26 +599,6 @@
     width: max-content;
     flex-shrink: 0;
   }
-
-  .dangerTabWrapper {
-    margin-left: 0;
-    flex-shrink: 0;
-    padding-right: 16px;
-  }
-}
-
-.dangerTabWrapper [role="radio"] {
-  color: var(--error, #ef4444);
-}
-
-.dangerTabWrapper [role="radio"]:hover {
-  background: rgba(239, 68, 68, 0.08);
-  color: var(--error, #ef4444);
-}
-
-.dangerTabWrapper [role="radio"][aria-checked="true"] {
-  background: rgba(239, 68, 68, 0.12);
-  color: var(--error, #ef4444);
 }
 
 /* ── 4. General Tab & Generic Section Cards ──────────────────────── */

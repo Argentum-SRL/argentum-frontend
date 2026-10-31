@@ -86,6 +86,7 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
       - Elementos cuadrangulares, tarjetas o avatares deben usar `aspect-ratio` o tokens de tamaño relativo.
     - **Centralización en Design System:** Todos los templates de skeleton deben residir y exportarse desde `src/components/ui/Skeleton/Skeleton.tsx` con estilos en `Skeleton.module.css` usando exclusivamente tokens oficiales (`--surface`, `--surface-alt`, `--border`). Prohibido definir clases ad-hoc `.skeleton` sueltas en CSS modules de páginas.
     - **Accesibilidad y Movimiento:** Todo skeleton debe incluir `role="status"`, `aria-label` descriptivo, texto oculto `.srOnly` para lectores de pantalla, y `animation: none` bajo `@media (prefers-reduced-motion: reduce)`.
+    - **Referencia Canónica:** Ver la doctrina integral de contención, catálogo de errores comunes y checklist en la Regla 16.
 
 13. **Ciclo Financiero y Finanzas de Perfil (Fase G4, 29/10/2026):**
     - **Heurística de Reducción de Carga Cognitiva (Ley de Hick y Diseño Minimalista Nielsen #8):** Máxima densidad informativa útil, mínima carga mental. Prohibido incluir párrafos explicativos obvios o notas redundantes a pie de tarjeta (`.cardNote`). Textos directos, jerarquía visual limpia y eliminación de cajas anidadas artificiales.
@@ -126,25 +127,99 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
       - El banner presenta exclusivamente el mensaje informativo conciso ("Hace X días que no cargás nada...", "¿Cuánto tenés hoy en [Billetera]?"), ícono contextual y un botón de cierre `X` circular (`border-radius: 50%`) discreto a la derecha para descartar.
       - Al hacer clic sobre el cuerpo del banner o en su acción principal se abre el diálogo correspondiente (`ActualizarSaldoModal` con teclado adaptativo completo y validación sin truncamiento de dígitos, o el modal de carga de movimientos), delegando los flujos de escritura a modales espaciosos.
 
-16. **Contención Universal y Mirroring de Skeletons (Fase G7, 30/10/2026):**
-    - **Guardrail Universal de Contención:** Todo skeleton, contenedor, tarjeta, fila, grilla o elemento de carga debe definir obligatoriamente `box-sizing: border-box;` y `max-width: 100%;`. Ningún esqueleto puede desbordar su contenedor por suma de padding o bordes (`width: 100% + padding` prohibido sin `box-sizing: border-box`).
-    - **Espejo Fiel del Layout en Todas las Pantallas:** Los esqueletos deben replicar la estructura exacta de la pantalla final:
-      - `DashboardListSkeleton`: Implementa variantes fidedignas (`categoria`, `pago`, `movimiento`) que replican la anatomía real de `.barItem` (30x30, barra progreso 4px), `.pagoItem` (36x36 calendario) y `.listItem` (32x32 avatar) sin bordes ni fondos anidados de tarjeta que inflen la altura vertical.
-      - `DashboardPage` Top Row: Contención estricta con `grid-template-rows: minmax(0, 1fr)`, `max-height: 260px` en modo compacto, y `overflow: hidden` en `.card` y sus contenedores para garantizar que ninguna columna desborde ni se solape sobre la fila inferior.
-      - `PerfilSeguridadSkeleton`: Proyecta la grilla superior de 2 columnas en escritorio (`min-width: 1024px`) y 1 en móvil (Tarjetas 1 y 2 con sus filas de credenciales y WhatsApp), más la tarjeta inferior de ancho completo (Tarjeta 3 de dispositivos y datos).
-      - `PresupuestosSkeleton`: Grilla responsive única sin wrappers anidados duplicados.
-    - **Validación Automática:** Testeado y garantizado en `src/utils/skeletonsResponsive.test.ts` para todas las resoluciones (320px móvil a desktop 1920px+).
+16. **Doctrina Universal de Skeletons y Contención Estricta ("Los divs deben estar dentro de sus divs") (Fase G7, 30/10/2026):**
+    - **Principio Fundamental de Contención Estricta:**
+      - *Regla de Oro:* "Los divs deben estar dentro de sus divs". Jamás un elemento hijo (sea esqueleto de carga, tarjeta, contenedor de lista, gráfico o control interactivo) puede sobresalir, desbordar o perforar el perímetro delimitado por su elemento padre.
+      - *Guardrail Box-Sizing:* Todo skeleton, contenedor, tarjeta, fila, grilla o bloque de carga DEBE definir obligatoriamente `box-sizing: border-box;` y `max-width: 100%;`. Ningún esqueleto o caja puede desbordar por sumatoria de padding, border o margin (`width: 100%` con padding lateral sin `box-sizing: border-box` queda estrictamente prohibido).
+      - *Boundary de Recorte y Shrinkage:* Tarjetas (`.card`), envoltorios (`.cardContent`, `.chartCardContent`) y contenedores de grilla deben contar con `overflow: hidden;` (o `overflow: clip;`), `min-height: 0;` y `min-width: 0;` para habilitar el algoritmo de encogimiento flex/grid de la especificación CSS. Sin `min-height: 0`, un hijo flex/grid toma `min-height: auto` y desborda forzosamente al padre.
+      - *Contención de Pistas en CSS Grid:* En grillas con alturas definidas o contenidas (ej. `.topRowCompact` o grillas de dashboard con `max-height: 260px`), es MANDATORIO declarar `grid-template-rows: minmax(0, 1fr)`. Si se omite o queda en `auto`, cualquier item hijo expande la pista de la grilla más allá de la altura de la grilla, solapándose y tapando físicamente las filas subsiguientes (`bottomRow`).
+      - *Equilibrio en Grillas Desktop (`align-items: stretch`):* En filas de 2 o más columnas en escritorio donde se busca armonía visual simétrica, las tarjetas deben acompañar `align-items: stretch` con `height: 100%; display: flex; flex-direction: column; justify-content: space-between;`, evitando que una tarjeta corta flote o deje huecos mientras la adyacente se estira.
 
-17. **Rediseño Unificado de Tab Seguridad y Privacidad (Fase G8, 30/10/2026):**
+    - **Catálogo de Errores Comunes Encontrados (y Solución Canónica):**
+      1. *Error 1: "Cajas dentro de cajas" (Cards inside cards) en skeletons:*
+         - *Síntoma:* El skeleton desborda verticalmente por más de 100px y se sale de su tarjeta padre.
+         - *Causa:* Aplicar bordes (`border: 1px solid var(--border)`), fondos de superficie (`background: var(--surface)`) o padding de tarjeta a items de lista internos (por ej. barras de categorías en gráficos, filas de próximos pagos o avatares de movimientos) que ya residen dentro de una tarjeta `.card`. Esto infla la altura de cada fila de ~38px a 66px+.
+         - *Solución:* Skeletons planos sin bordes ni cajas duplicadas. Los items internos deben replicar exactamente la estructura plana del componente real montado (`.barItem`, `.pagoItem`, `.listItem`) con avatares o íconos SVG de su tamaño exacto y barras de texto proporcionales, sin decoraciones de tarjeta añadidas.
+      2. *Error 2: Desborde y solapamiento de filas por track expansion en CSS Grid:*
+         - *Síntoma:* La fila superior de tarjetas se proyecta hacia abajo e invade el espacio de la fila inferior (`bottomRow`), montándose encima de los siguientes widgets.
+         - *Causa:* En CSS Grid, `grid-template-rows: auto` (por defecto) ignora `max-height` en la grilla y calcula la altura por contenido. Si el skeleton excede la altura nominal, la fila completa crece y pisa el contenido siguiente.
+         - *Solución:* Declarar `grid-template-rows: minmax(0, 1fr)` en el contenedor `.topRowCompact` o grilla padre, y `overflow: hidden; max-height: 100%; min-height: 0;` en los contenedores hijos.
+      3. *Error 3: Desnivel visual entre columnas adyacentes en Desktop:*
+         - *Síntoma:* Dos tarjetas de configuración o información colocadas una al lado de la otra tienen alturas dispares, viéndose desbalanceadas.
+         - *Causa:* Una tarjeta tiene 2 filas y la otra tiene 3 o textos más largos, y no se declara contención con `height: 100%` y `align-items: stretch`.
+         - *Solución:* Configurar `align-items: stretch` en la grilla desktop (`min-width: 1024px`) y `height: 100%` con distribución flexible (`justify-content: space-between`) en los hijos para anclar botones y pies de tarjeta al fondo simétrico.
+      4. *Error 4: "Double Wrapper Bug" (Márgenes y envolturas redundantes duplicadas):*
+         - *Síntoma:* En móvil, el skeleton se ve desplazado o con márgenes laterales excesivos que achican el contenido a un hilo ilegible.
+         - *Causa:* El skeleton añade un div contenedor externo que duplica el padding/margin que ya aplica la página o el layout principal (ej. `.presupuestosWrapper` anidado dos veces).
+         - *Solución:* El skeleton debe insertarse directamente en el mismo punto del DOM donde se monta el componente definitivo, sin añadir envolturas decorativas ni márgenes exteriores propios.
+      5. *Error 5: Anchos rígidos en píxeles que quiebran pantallas móviles:*
+         - *Síntoma:* Scroll horizontal no deseado, textos que se cortan de a una letra por renglón vertical, o desborde en iPhone SE (320px/375px).
+         - *Causa:* Declarar anchos en px fijos (`width: 320px`, `width: 200px`) en esqueletos de texto o badges sin contenedor elástico.
+         - *Solución:* Usar siempre porcentajes deliberados (`width: 40%`, `60%`, `80%`, `100%`), `min-width: 0`, y clases flex con `flex-wrap: wrap` y `word-break: normal; overflow-wrap: break-word; hyphens: none;`.
+
+    - **Reglas Responsivas Multi-Pantalla (320px a 1920px+):**
+      - *Mobile Estricto (320px - 639px, ej. iPhone SE 375x667):*
+        - Grillas se colapsan a 1 sola columna (`grid-template-columns: 1fr`).
+        - En filas con botones o controles interactivos, usar envoltura flexible (`display: flex; flex-wrap: wrap; gap: var(--space-sm)`). El grupo de texto toma `flex: 1 1 180px` y los botones fluyen debajo fluidamente sin estrangular las etiquetas.
+        - Altura táctil mínima de 44px en controles interactivos (R32: fuentes de input >= 16px para evitar auto-zoom iOS).
+        - Cero scroll horizontal permitido (`max-width: 100%`).
+      - *Tablet (640px - 1023px):*
+        - Transición fluida a 1 o 2 columnas según la densidad.
+        - Separaciones intermedias (`gap: var(--space-md)`).
+      - *Desktop (1024px - 1920px+):*
+        - Grillas de 2 o 3 columnas (`repeat(N, minmax(0, 1fr))`).
+        - Columnas simétricas estiradas (`align-items: stretch`).
+        - Máxima densidad informativa sin espacios vacíos desproporcionados ni cajas infladas artificialmente.
+
+    - **Checklist y Protocolo Obligatorio para Todo Módulo Futuro:**
+      1. ¿El skeleton reproduce fielmente el DOM del componente montado (Mirroring 1:1)?
+      2. ¿Se eliminaron fondos (`--surface`) y bordes (`--border`) de items internos planos?
+      3. ¿Todos los elementos respetan `box-sizing: border-box`, `max-width: 100%` y `min-height: 0`?
+      4. ¿Las grillas definen `grid-template-rows: minmax(0, 1fr)` para evitar solapamiento de filas?
+      5. ¿Se probó la vista en 320px (iPhone SE) asegurando ausencia total de scroll horizontal y de quiebres letra a letra?
+      6. ¿El componente reside y se exporta desde `src/components/ui/Skeleton/Skeleton.tsx` con estilos en `Skeleton.module.css` usando tokens semánticos?
+      7. ¿Se incluyó la prueba unitaria correspondiente en `src/utils/skeletonsResponsive.test.ts`?
+
+17. **Rediseño Unificado de Tab Seguridad y Privacidad (Fase G8, 30/10/2026 - 31/10/2026):**
     - **Arquitectura de Grilla Desktop Equilibrada:**
       - Grilla superior de dos columnas en escritorio (`min-width: 1024px`) con `align-items: stretch` para que ambas tarjetas principales tengan idéntica altura y presencia visual armónica:
         1. *Tarjeta 1 (Acceso y credenciales):* Correo electrónico con badge de estado (`Verificado` / `Pendiente`) + botón cambiar, y Contraseña con badge (`Configurada` / `Sin clave`) + botón para desplegar el formulario integrado de cambio de contraseña con validación de requisitos en tiempo real.
-        2. *Tarjeta 2 (Asistente de WhatsApp):* Estado de vinculación (`Vinculado` / `No vinculado`) + botón vincular, y toggle de privacidad para auditoría del asistente con diálogo de confirmación.
+        2. *Tarjeta 2 (Asistente de WhatsApp):* Estado de vinculación (`Vinculado` / `No vinculado`) + botón vincular, y toggle de privacidad para auditoría del asistente con texto conciso ("Auditoría de conversaciones para optimizar las respuestas del asistente").
       - *Sección Inferior de Ancho Completo (`.bottomSection`):*
-        3. *Tarjeta 3 (Dispositivos y datos):* Absorbe y unifica la gestión de seguridad y exportación eliminando definitivamente el componente obsoleto `SesionesYDatos.tsx`. Incluye fila de dispositivos activos con botón para cerrar sesiones remotas, y fila de exportación de datos (descarga en formatos JSON y CSV con indicador de estado y loading).
+        3. *Tarjeta 3 (Dispositivos y cuenta):* Absorbe y unifica la gestión de dispositivos, exportación de datos y ciclo de vida de la cuenta, eliminando definitivamente la pestaña redundante "Zona de Peligro" y su componente obsoleto `DangerZone.tsx`.
+           - Fila 1: *Cerrar sesiones activas* (botón rojo `.btnDanger` para revocar sesiones remotas).
+           - Fila 2: *Descargar copia de mis datos* (botón secundario para exportación de registros).
+           - Fila 3: *Eliminar cuenta definitivamente* (botón rojo `.btnDanger` que dispara `EliminarCuentaModal` con reautenticación y borrado irreversible en backend).
+    - **Eliminación Definitiva de Pestaña "Zona de Peligro":**
+      - La barra de navegación de `PerfilPage.tsx` queda simplificada a 3 pestañas limpias (`Finanzas & Moneda`, `Seguridad`, `Notificaciones`), eliminando el contenedor `.dangerTabWrapper`, el botón aislado de peligro y código muerto de estilos en `PerfilPage.parte1.css` y `PerfilPage.parte3.css`. En caso de recibir URL con `?tab=peligro`, redirige automáticamente a la pestaña `seguridad`.
     - **Adaptación Responsiva Móvil Estricta (iPhone SE 375x667):**
+      - Textos directos y no condescendientes sin párrafos excesivos.
       - Eliminación absoluta de quiebres letra por letra en textos y badges (`word-break: normal; overflow-wrap: break-word; hyphens: none`).
       - Filas con envoltura flexible (`display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm)`): el grupo de textos ocupa `flex: 1 1 180px` y los botones de acción se reposicionan fluidamente en pantallas estrechas sin estrangular las etiquetas.
       - Altura táctil mínima de 44px en botones y controles interactivos en mobile.
     - **Modularidad y Tokens Oficiales:**
       - Estilos centralizados en `TabSeguridad.module.css` usando tokens semánticos oficiales (`--surface`, `--surface-alt`, `--border`, `--text-1`, `--text-2`, `--primary`). Cero clases huérfanas y compilación estricta sin advertencias.
+    - **Barra Unificada de Guardado con Estado Dirty:**
+      - Integración de la barra canónica `.unifiedActionBar` al pie de la pestaña (idéntica a `TabFinanzas`), con punto ámbar (`.dirtyDotAmber`) y texto "Cambios pendientes" cuando se modifica el permiso de auditoría del asistente (`permiso_lectura_mensajes_en`), o "Preferencias al día" con botón desactivado limpio (`.saveButtonClean`) cuando no hay cambios.
+    - **Skeleton Mirroring 1:1:**
+      - `PerfilSeguridadSkeleton` en `Skeleton.tsx` replica exactamente las 3 filas de la tarjeta de Dispositivos y cuenta.
+
+18. **Rediseño Unificado de Tab Notificaciones (Fase G9, 30/10/2026 - 31/10/2026):**
+    - **Aclaración Canónica y Concisa de Canales (Web vs WhatsApp):**
+      - Banner superior `.noticeCard`: Redacción ultra breve ("Alertas en la app y WhatsApp. Avisos y alertas en la app web. Resumen mensual al corte de ciclo por WhatsApp"). Padding compacto (10px 14px en móvil), sin redundancias ni menciones obvias (ej. "(icono de campana)").
+    - **Eliminación Universal de Botones "Web" Redundantes y Filas Estáticas:**
+      - Se removieron todas las píldoras repetitivas `[Web]`, subtítulos "Canales de entrega" y filas estáticas no configurables (ej. alertas de seguridad fijas). Cada fila cuenta únicamente con su switch iOS-style on/off y su componente `Stepper` numérico compacto si requiere parametrización.
+    - **Textos Directos y No Paternalistas:**
+      - Subtítulos y etiquetas breves de 1 renglón ("Aviso previo al cierre y vencimiento para evitar intereses", "Avisos al alcanzar el tope de una categoría", etc.), sin condescendencia ni explicaciones burocráticas largas.
+    - **Arquitectura de Grilla 2 Columnas Desktop (`min-width: 1024px`) y 1 en Mobile:**
+      - *Columna 1 (Pagos y compromisos):* Vencimiento de tarjetas y cuotas (switch + Stepper de anticipación), Límites de presupuesto (switch + Stepper de umbral), y Suscripciones y servicios (switch + Stepper de anticipación).
+      - *Columna 2 (Monitoreo y hábitos):* Metas cumplidas (switch), Recordatorio por inactividad (switch + Stepper de días), Gastos inusuales (switch), y Resumen semanal en app (switch).
+      - *Sección Inferior (`.bottomSection`):* Reporte mensual por WhatsApp al día de corte (switch) y Horario de entrega (selector con `TimeInput`).
+    - **Optimización de Espacio en Pantallas Chicas (Móviles / iPhone SE 375x667):**
+      - `.subPanel` inline horizontal (`justify-content: space-between; align-items: center;`): el label queda a la izquierda ("Anticipación", "Umbral", "Inactividad") y el stepper a la derecha en una sola línea de 32px de alto, eliminando el apilado vertical forzado a 100% que inflaba cada tarjeta a 140px+.
+      - Filas `.settingRow` compactas (padding 10px 14px, gap 8px), permitiendo ver múltiples opciones en pantalla sin que la barra inferior de navegación las tape.
+    - **Barra Unificada de Guardado con Detección de Cambios (Dirty State):**
+      - Barra de acción `.unifiedActionBar` con punto ámbar (`.dirtyDotAmber`) y texto "Cambios pendientes" ante cualquier cambio de switch, stepper o selector horario; o "Preferencias al día" con botón desactivado limpio (`.saveButtonClean`).
+      - Persistencia vía `sileo.success` y feedback de loading con `LunarLoader`.
+    - **Skeleton Mirroring Dedicado:**
+      - Componente `PerfilNotificacionesSkeleton` en `Skeleton.tsx` que reproduce la estructura de 2 columnas superiores, 1 tarjeta inferior de WhatsApp (2 filas) y la barra de guardado durante la carga inicial.

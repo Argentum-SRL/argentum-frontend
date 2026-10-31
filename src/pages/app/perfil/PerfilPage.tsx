@@ -4,7 +4,6 @@ import {
   Coins,
   Shield,
   Bell,
-  AlertTriangle,
 } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
@@ -18,13 +17,12 @@ import { ProfileHero } from './components/ProfileHero'
 import { TabFinanzas } from './components/TabFinanzas'
 import { TabSeguridad } from './components/TabSeguridad'
 import { TabNotificaciones } from './components/TabNotificaciones'
-import { DangerZone } from './components/DangerZone'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { EditModals } from './components/EditModals'
 
 import styles from './PerfilPage.module.css'
 
-type TabType = 'finanzas' | 'seguridad' | 'notificaciones' | 'peligro'
+type TabType = 'finanzas' | 'seguridad' | 'notificaciones'
 
 export default function PerfilPage() {
   const { usuario, updateUsuario } = useAuth()
@@ -32,9 +30,9 @@ export default function PerfilPage() {
   const location = useLocation()
 
   // ── 1. Tab Routing Sync ──────────────────────────────────────────────────
-  const tabParam = new URLSearchParams(location.search).get('tab') as TabType | null
-  const validTabs: TabType[] = ['finanzas', 'seguridad', 'notificaciones', 'peligro']
-  const activeTab: TabType = validTabs.includes(tabParam as TabType) ? (tabParam as TabType) : 'finanzas'
+  const tabParam = new URLSearchParams(location.search).get('tab')
+  const validTabs: TabType[] = ['finanzas', 'seguridad', 'notificaciones']
+  const activeTab: TabType = tabParam === 'peligro' ? 'seguridad' : (tabParam && validTabs.includes(tabParam as TabType) ? (tabParam as TabType) : 'finanzas')
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/app/perfil?tab=${tab}`, { replace: true })
@@ -123,24 +121,11 @@ export default function PerfilPage() {
             { value: 'seguridad', label: 'Seguridad', icon: <Shield size={15} /> },
             { value: 'notificaciones', label: 'Notificaciones', icon: <Bell size={15} /> },
           ]}
-          value={activeTab === 'peligro' ? '' : activeTab}
+          value={activeTab}
           onChange={(val) => handleTabChange(val as TabType)}
           ariaLabel="Secciones de perfil"
           layout="inline"
         />
-
-        <div className={styles.dangerTabWrapper}>
-          <SegmentedControl
-            className={styles.navTrack}
-            options={[
-              { value: 'peligro', label: 'Zona de Peligro', icon: <AlertTriangle size={15} /> },
-            ]}
-            value={activeTab === 'peligro' ? 'peligro' : ''}
-            onChange={() => handleTabChange('peligro')}
-            ariaLabel="Zona de peligro de perfil"
-            layout="inline"
-          />
-        </div>
       </div>
 
       {/* ── Tab Views Content ─────────────────────────────────────── */}
@@ -165,10 +150,6 @@ export default function PerfilPage() {
 
         {activeTab === 'notificaciones' && (
           <TabNotificaciones />
-        )}
-
-        {activeTab === 'peligro' && (
-          <DangerZone />
         )}
       </main>
 

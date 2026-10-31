@@ -658,8 +658,116 @@
   width: 100%;
 }
 
-/* ── 9. Prefers Reduced Motion ───────────────────────────────────────────── */
+/* ── 9. Barra Unificada de Guardado ──────────────────────────────────────── */
+.unifiedActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--elevation-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 639px) {
+  .unifiedActionBar {
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+}
+
+.dirtyStatusText {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-icon);
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 639px) {
+  .dirtyStatusText {
+    font-size: 0.75rem;
+    gap: var(--space-xs);
+  }
+}
+
+.dirtyDotAmber {
+  width: var(--space-sm);
+  height: var(--space-sm);
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.saveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  height: 38px;
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-selector-pill);
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (max-width: 639px) {
+  .saveButton {
+    height: 36px;
+    padding: 0 var(--space-md);
+    gap: var(--space-icon);
+    font-size: 0.8125rem;
+  }
+}
+
+.saveButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .saveButton:hover:not(:disabled) {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-sm);
+  }
+}
+
+.saveButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveButtonClean {
+  background: var(--surface);
+  color: var(--text-2);
+  border-color: var(--border);
+}
+
+/* ── 10. Prefers Reduced Motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  .saveButton {
+    transition: none;
+  }
   .btnSecondary,
   .btnPrimary,
   .btnDanger,

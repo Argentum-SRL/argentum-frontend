@@ -968,6 +968,9 @@ export interface ConfiguracionNotificacion {
   inactividad_dias: number
   inactividad_web: boolean
   inactividad_whatsapp: boolean
+  resumen_ciclo_activo?: boolean
+  resumen_ciclo_web?: boolean
+  resumen_ciclo_whatsapp?: boolean
   whatsapp_hora_envio: number
   whatsapp_minuto_envio: number
   updated_at?: string | null

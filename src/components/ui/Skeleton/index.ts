@@ -19,5 +19,6 @@ export {
   ConvenienciaWizardSkeleton,
   ComerciosRecordadosSkeleton,
   PerfilSeguridadSkeleton,
+  PerfilNotificacionesSkeleton,
   type SkeletonProps,
 } from './Skeleton'

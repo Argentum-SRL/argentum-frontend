@@ -1000,9 +1000,157 @@ export const PerfilSeguridadSkeleton = memo(function PerfilSeguridadSkeleton({
             </div>
             <Skeleton variant="rounded" width={96} height={30} borderRadius={8} />
           </div>
+          {/* Row Eliminar Cuenta */}
+          <div className={styles.seguridadRowSkeleton}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="48%" height={14} />
+              <Skeleton variant="text" width="75%" height={12} />
+            </div>
+            <Skeleton variant="rounded" width={96} height={30} borderRadius={8} />
+          </div>
         </div>
       </div>
     </div>
   )
 })
 PerfilSeguridadSkeleton.displayName = 'PerfilSeguridadSkeleton'
+
+/**
+ * Template de Notificaciones de Perfil
+ */
+export const PerfilNotificacionesSkeleton = memo(function PerfilNotificacionesSkeleton({
+  className = '',
+}: {
+  className?: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando configuración de notificaciones..."
+      className={`${styles.seguridadSkeletonWrapper} ${className}`.trim()}
+    >
+      <span className={styles.srOnly}>Cargando configuración de notificaciones...</span>
+
+      {/* Banner superior informativo */}
+      <div className={styles.seguridadRowSkeleton} style={{ padding: '16px 20px', borderRadius: '12px' }}>
+        <Skeleton variant="circular" width={34} height={34} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+          <Skeleton variant="text" width="45%" height={16} />
+          <Skeleton variant="text" width="85%" height={12} />
+        </div>
+      </div>
+
+      {/* Grid superior de 2 columnas en desktop / 1 en mobile */}
+      <div className={styles.seguridadGridSkeleton} style={{ marginTop: '16px' }}>
+        {/* Card 1: Pagos y compromisos */}
+        <div className={styles.seguridadCardSkeleton}>
+          <div className={styles.seguridadHeaderSkeleton}>
+            <Skeleton variant="rounded" width={38} height={38} borderRadius={10} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="50%" height={16} />
+              <Skeleton variant="text" width="70%" height={12} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="45%" height={14} />
+                <Skeleton variant="text" width="70%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+            </div>
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="40%" height={14} />
+                <Skeleton variant="text" width="65%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+            </div>
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="45%" height={14} />
+                <Skeleton variant="text" width="60%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+            </div>
+          </div>
+        </div>
+
+        {/* Card 2: Hábitos y monitoreo */}
+        <div className={styles.seguridadCardSkeleton}>
+          <div className={styles.seguridadHeaderSkeleton}>
+            <Skeleton variant="rounded" width={38} height={38} borderRadius={10} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="50%" height={16} />
+              <Skeleton variant="text" width="70%" height={12} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="45%" height={14} />
+                <Skeleton variant="text" width="65%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+            </div>
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="40%" height={14} />
+                <Skeleton variant="text" width="70%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+            </div>
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="42%" height={14} />
+                <Skeleton variant="text" width="60%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+            </div>
+            <div className={styles.seguridadRowSkeleton}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+                <Skeleton variant="text" width="45%" height={14} />
+                <Skeleton variant="text" width="65%" height={12} />
+              </div>
+              <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Card 3: WhatsApp Reporte Mensual (Ancho Completo Inferior) */}
+      <div className={styles.seguridadCardSkeleton} style={{ marginTop: '16px' }}>
+        <div className={styles.seguridadHeaderSkeleton}>
+          <Skeleton variant="rounded" width={38} height={38} borderRadius={10} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+            <Skeleton variant="text" width="35%" height={16} />
+            <Skeleton variant="text" width="60%" height={12} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+          <div className={styles.seguridadRowSkeleton}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="40%" height={14} />
+              <Skeleton variant="text" width="65%" height={12} />
+            </div>
+            <Skeleton variant="rounded" width={48} height={28} borderRadius={14} />
+          </div>
+          <div className={styles.seguridadRowSkeleton}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <Skeleton variant="text" width="35%" height={14} />
+              <Skeleton variant="text" width="55%" height={12} />
+            </div>
+            <Skeleton variant="rounded" width={110} height={36} borderRadius={10} />
+          </div>
+        </div>
+      </div>
+
+      {/* Barra de acción inferior */}
+      <div className={styles.seguridadRowSkeleton} style={{ marginTop: '16px', padding: '14px 20px', borderRadius: '12px' }}>
+        <Skeleton variant="text" width="120px" height={14} />
+        <Skeleton variant="rounded" width={140} height={38} borderRadius={19} />
+      </div>
+    </div>
+  )
+})
+PerfilNotificacionesSkeleton.displayName = 'PerfilNotificacionesSkeleton'

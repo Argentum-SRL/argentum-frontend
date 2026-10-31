@@ -1,4 +1,4 @@
-﻿
+
 .sessionDeviceName {
   font-size: 13px;
   font-weight: 700;
@@ -64,7 +64,7 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
-/* â”€â”€ 7. Notificaciones Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── 7. Notificaciones Tab ───────────────────────────────────────── */
 .notifContainer {
   display: flex;
   flex-direction: column;
@@ -320,86 +320,7 @@
   }
 }
 
-/* â”€â”€ 8. Danger Zone Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.dangerSingleCard {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px 24px;
-  border-radius: 16px;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  background: var(--surface);
-  box-sizing: border-box;
-  width: 100%;
-}
-
-[data-theme="dark"] .dangerSingleCard {
-  background: rgba(239, 68, 68, 0.04);
-}
-
-@media (max-width: 639px) {
-  .dangerSingleCard {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 16px 18px;
-  }
-  .dangerSingleCard button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-.dangerRowInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.dangerActionTitleDestructive {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--error, #ef4444);
-}
-
-.dangerActionDesc {
-  font-size: 12.5px;
-  color: var(--text-2);
-  line-height: 1.45;
-}
-
-.deleteBtnModern {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 10px;
-  background: var(--error, #ef4444);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.deleteBtnModern:hover {
-  opacity: 0.9;
-}
-
-@media (hover: hover) and (pointer: fine) {
-
-  .deleteBtnModern:hover {
-  transform: translateY(-1px);
-  }
-}
-
-/* â”€â”€ 9. Edit Modals (Datos, Email, TelÃ©fono) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── 9. Edit Modals (Datos, Email, Teléfono) ──────────────────────── */
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -468,7 +389,7 @@
 }
 
 
-/* ── Modal Layout & Forms (Estilo TransaccionModal) ────────────────────────── */
+/* -- Modal Layout & Forms (Estilo TransaccionModal) -------------------------- */
 .modalRoot {
   width: 100%;
   max-width: 100%;

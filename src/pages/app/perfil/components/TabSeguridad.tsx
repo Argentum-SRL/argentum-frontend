@@ -15,6 +15,7 @@ import {
   LogOut,
   Download,
   Lock,
+  Trash2,
 } from '@/components/ui/icons'
 import type { Usuario, MetodosLogin } from '@/types'
 import { formatearTelefonoVisual } from '@/utils/telefono.utils'
@@ -26,9 +27,10 @@ import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
+import { EliminarCuentaModal } from './EliminarCuentaModal'
 import perfilStyles from '../PerfilPage.module.css'
 import localStyles from './TabSeguridad.module.css'
-import { PerfilSeguridadSkeleton } from '@/components/ui'
+import { LunarLoader, PerfilSeguridadSkeleton } from '@/components/ui'
 
 interface TabSeguridadProps {
   usuario: Usuario | null
@@ -119,8 +121,20 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
     }
   }
 
-  // ── WhatsApp Actions ─────────────────────────────────────────────────────
+  // ── WhatsApp Actions & Privacidad ───────────────────────────────────────
   const [isDesvinculando, setIsDesvinculando] = useState(false)
+  const serverPermiso = Boolean(usuario?.permiso_lectura_mensajes_en)
+  const [prevServerPermiso, setPrevServerPermiso] = useState(serverPermiso)
+  const [permisoMensajes, setPermisoMensajes] = useState<boolean>(serverPermiso)
+  const [isSavingSecurity, setIsSavingSecurity] = useState(false)
+  const [isEliminarModalOpen, setIsEliminarModalOpen] = useState(false)
+
+  if (serverPermiso !== prevServerPermiso) {
+    setPrevServerPermiso(serverPermiso)
+    setPermisoMensajes(serverPermiso)
+  }
+
+  const isDirty = permisoMensajes !== serverPermiso
 
   const handleDesvincular = () => {
     confirm({
@@ -144,18 +158,25 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
     })
   }
 
-  const [isUpdatingPermiso, setIsUpdatingPermiso] = useState(false)
+  const handleTogglePermisoMensajes = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPermisoMensajes(e.target.checked)
+  }
 
-  const handleTogglePermisoMensajes = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nuevoValor = e.target.checked
-    setIsUpdatingPermiso(true)
+  const handleSaveAll = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!isDirty || isSavingSecurity) return
+
+    setIsSavingSecurity(true)
     try {
-      const usuarioActualizado = await usuarioService.actualizarPermisoMensajes(nuevoValor)
-      updateUsuario(usuarioActualizado)
+      if (permisoMensajes !== Boolean(usuario?.permiso_lectura_mensajes_en)) {
+        const usuarioActualizado = await usuarioService.actualizarPermisoMensajes(permisoMensajes)
+        updateUsuario(usuarioActualizado)
+      }
+      sileo.success({ title: 'Preferencias de seguridad guardadas' })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el permiso de lectura de mensajes.') })
+      sileo.error({ title: getErrorMessage(err, 'No se pudieron guardar las preferencias.') })
     } finally {
-      setIsUpdatingPermiso(false)
+      setIsSavingSecurity(false)
     }
   }
 
@@ -552,7 +573,7 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
                     <span className={localStyles.rowLabel}>Mejora del asistente financiero</span>
                   </div>
                   <span className={localStyles.rowSubtitle}>
-                    Permitir que el equipo de Argentum audite las conversaciones para optimizar las respuestas. Si lo apagás, se dejan de ver también los mensajes anteriores.
+                    Auditoría de conversaciones para optimizar las respuestas del asistente.
                   </span>
                 </div>
 
@@ -560,9 +581,8 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
                   <label className={localStyles.switch}>
                     <input
                       type="checkbox"
-                      checked={Boolean(usuario?.permiso_lectura_mensajes_en)}
+                      checked={permisoMensajes}
                       onChange={handleTogglePermisoMensajes}
-                      disabled={isUpdatingPermiso}
                       aria-label="Permitir que el equipo de Argentum lea mis mensajes con el asistente para mejorarlo"
                     />
                     <span className={localStyles.slider} />
@@ -573,14 +593,14 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
           </section>
         </div>
 
-        {/* ── Card 3: Dispositivos y Datos (Ancho Completo Inferior) ────────── */}
+        {/* ── Card 3: Dispositivos y Cuenta (Ancho Completo Inferior) ───────── */}
         <section className={`${perfilStyles.sectionCard} ${localStyles.bottomSection}`}>
           <div className={perfilStyles.sectionHeader}>
             <div className={perfilStyles.sectionIconWrap} style={{ color: '#8b5cf6' }}>
               <Lock size={18} />
             </div>
             <div className={perfilStyles.sectionHeaderText}>
-              <h3>Dispositivos y datos</h3>
+              <h3>Dispositivos y cuenta</h3>
             </div>
           </div>
 
@@ -589,10 +609,10 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
             <div className={localStyles.securityRow}>
               <div className={localStyles.rowInfo}>
                 <div className={localStyles.rowLabelGroup}>
-                  <span className={localStyles.rowLabel}>Cerrar sesión en todos los dispositivos</span>
+                  <span className={localStyles.rowLabel}>Cerrar sesiones activas</span>
                 </div>
                 <span className={localStyles.rowSubtitle}>
-                  Desconecta de inmediato todas las sesiones abiertas en computadoras y teléfonos (incluyendo este navegador).
+                  Desconecta de inmediato tus sesiones en otros navegadores y teléfonos.
                 </span>
               </div>
 
@@ -615,7 +635,7 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
                   <span className={localStyles.rowLabel}>Descargar copia de mis datos</span>
                 </div>
                 <span className={localStyles.rowSubtitle}>
-                  Exportá un archivo estructurado con todos tus movimientos, billeteras, tarjetas, metas, presupuestos y suscripciones.
+                  Exportá un archivo con todos tus movimientos y registros contables.
                 </span>
               </div>
 
@@ -631,8 +651,69 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
                 </button>
               </div>
             </div>
+
+            {/* Row: Eliminar Cuenta Definitivamente */}
+            <div className={localStyles.securityRow}>
+              <div className={localStyles.rowInfo}>
+                <div className={localStyles.rowLabelGroup}>
+                  <span className={localStyles.rowLabel}>Eliminar cuenta definitivamente</span>
+                </div>
+                <span className={localStyles.rowSubtitle}>
+                  Borra todos tus registros, balances y cuentas para siempre de forma irreversible.
+                </span>
+              </div>
+
+              <div className={localStyles.rowActions}>
+                <button
+                  type="button"
+                  onClick={() => setIsEliminarModalOpen(true)}
+                  className={localStyles.btnDanger}
+                >
+                  <Trash2 size={13} />
+                  <span>Eliminar mi cuenta</span>
+                </button>
+              </div>
+            </div>
           </div>
         </section>
+
+        <EliminarCuentaModal
+          isOpen={isEliminarModalOpen}
+          onClose={() => setIsEliminarModalOpen(false)}
+        />
+
+        {/* ── BARRA UNIFICADA DE GUARDADO ─────────────────────────────────── */}
+        <div className={localStyles.unifiedActionBar}>
+          <div className={localStyles.dirtyStatusText}>
+            {isDirty ? (
+              <>
+                <span className={localStyles.dirtyDotAmber} />
+                <span>Cambios pendientes</span>
+              </>
+            ) : (
+              <span>Preferencias al día</span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => handleSaveAll()}
+            disabled={isSavingSecurity || !isDirty}
+            className={`${localStyles.saveButton} ${!isDirty ? localStyles.saveButtonClean : ''}`}
+          >
+            {isSavingSecurity ? (
+              <>
+                <LunarLoader size={16} />
+                <span>Guardando...</span>
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                <span>Guardar cambios</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )

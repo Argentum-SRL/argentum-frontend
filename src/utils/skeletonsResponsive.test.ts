@@ -173,4 +173,20 @@ describe('Skeletons responsive y mirroring (fase_g3_skeletons_responsive)', () =
     const presupuestosCss = fs.readFileSync(path.resolve(rootDir, 'src/pages/app/presupuestos/PresupuestosPage.module.css'), 'utf-8')
     expect(presupuestosCss).toMatch(/\.suggestionBanner\s*\{[^}]*box-sizing:\s*border-box/)
   })
+
+  it('TabNotificaciones.tsx y PerfilNotificacionesSkeleton implementan grilla responsive y mirroring', () => {
+    const tsxPath = path.resolve(rootDir, 'src/components/ui/Skeleton/Skeleton.tsx')
+    const tsxContent = fs.readFileSync(tsxPath, 'utf-8')
+    expect(tsxContent).toContain('export const PerfilNotificacionesSkeleton')
+
+    const tabPath = path.resolve(rootDir, 'src/pages/app/perfil/components/TabNotificaciones.tsx')
+    const tabContent = fs.readFileSync(tabPath, 'utf-8')
+    expect(tabContent).toContain('PerfilNotificacionesSkeleton')
+    expect(tabContent).toContain('localStyles.mainGrid')
+
+    const tabCssPath = path.resolve(rootDir, 'src/pages/app/perfil/components/TabNotificaciones.module.css')
+    const tabCss = fs.readFileSync(tabCssPath, 'utf-8')
+    expect(tabCss).toContain('.mainGrid')
+    expect(tabCss).toContain('repeat(2, minmax(0, 1fr))')
+  })
 })

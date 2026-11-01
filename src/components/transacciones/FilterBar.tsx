@@ -29,15 +29,17 @@ function useClickOutside(
 ) {
   useEffect(() => {
     const listener = (e: MouseEvent | TouchEvent) => {
-      if (!ref.current || ref.current.contains(e.target as Node)) return
-      if (ignoreSelector && (e.target as HTMLElement).closest(ignoreSelector)) return
+      const target = e.target as HTMLElement | null
+      if (!target || !ref.current) return
+      if (e.composedPath && e.composedPath().includes(ref.current)) return
+      if (ref.current.contains(target)) return
+      const element = target instanceof Element ? target : (target as Node).parentElement
+      if (ignoreSelector && element?.closest(ignoreSelector)) return
       handler()
     }
-    document.addEventListener('mousedown', listener)
-    document.addEventListener('touchstart', listener)
+    document.addEventListener('click', listener)
     return () => {
-      document.removeEventListener('mousedown', listener)
-      document.removeEventListener('touchstart', listener)
+      document.removeEventListener('click', listener)
     }
   }, [ref, handler, ignoreSelector])
 }
@@ -88,8 +90,65 @@ export default function FilterBar({
     setCatPopoverOpen(false)
     setCatSearch('')
   })
-  useClickOutside(dateRef, () => setDatePopoverOpen(false), '[data-portal="date-picker"]')
+  useClickOutside(dateRef, () => setDatePopoverOpen(false), '[data-portal="date-picker"], .react-wheel-picker')
   useClickOutside(monedaRef, () => setMonedaPopoverOpen(false))
+
+  const toggleWalletPopover = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setWalletPopoverOpen(prev => {
+      const next = !prev
+      if (next) {
+        setCatPopoverOpen(false)
+        setCatSearch('')
+        setDatePopoverOpen(false)
+        setMonedaPopoverOpen(false)
+      }
+      return next
+    })
+  }
+
+  const toggleCatPopover = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCatPopoverOpen(prev => {
+      const next = !prev
+      if (next) {
+        setWalletPopoverOpen(false)
+        setDatePopoverOpen(false)
+        setMonedaPopoverOpen(false)
+      } else {
+        setCatSearch('')
+      }
+      return next
+    })
+  }
+
+  const toggleDatePopover = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setDatePopoverOpen(prev => {
+      const next = !prev
+      if (next) {
+        setWalletPopoverOpen(false)
+        setCatPopoverOpen(false)
+        setCatSearch('')
+        setMonedaPopoverOpen(false)
+      }
+      return next
+    })
+  }
+
+  const toggleMonedaPopover = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setMonedaPopoverOpen(prev => {
+      const next = !prev
+      if (next) {
+        setWalletPopoverOpen(false)
+        setCatPopoverOpen(false)
+        setCatSearch('')
+        setDatePopoverOpen(false)
+      }
+      return next
+    })
+  }
 
   // Debounce para la búsqueda
   useEffect(() => {
@@ -166,6 +225,7 @@ export default function FilterBar({
 
   const handleBilleteraRemove = () => {
     onFilterChange({ ...filters, billetera_id: undefined })
+    setWalletPopoverOpen(false)
   }
 
   const handleCategoriaSelect = (catId?: string) => {
@@ -189,6 +249,7 @@ export default function FilterBar({
     setLocalDesde(desde || '')
     setLocalHasta(hasta || '')
     onFilterChange({ ...filters, fecha_desde: desde, fecha_hasta: hasta })
+    setDatePopoverOpen(false)
   }
 
   const handleApplyPreset = (preset: 'ciclo' | 'ciclo_anterior' | 'ultimos_30d') => {
@@ -535,9 +596,12 @@ export default function FilterBar({
 
           {/* Billetera Popover */}
           <div className={`${styles.pill} ${styles.pillRelative} ${activeBilletera ? styles.pillActive : ''}`} ref={walletRef}>
-            <div 
+            <button 
+              type="button"
               className={styles.pillIconFlex} 
-              onClick={() => setWalletPopoverOpen(!walletPopoverOpen)}
+              onClick={toggleWalletPopover}
+              aria-expanded={walletPopoverOpen}
+              aria-haspopup="dialog"
             >
               <Wallet size={14} className={styles.pillIcon} />
               <span className={styles.pillText}>
@@ -546,7 +610,7 @@ export default function FilterBar({
                   : 'Billetera'}
               </span>
               <ChevronDown size={14} className={styles.pillChevron} />
-            </div>
+            </button>
             {activeBilletera && (
               <button 
                 type="button"
@@ -570,7 +634,13 @@ export default function FilterBar({
             className={`${styles.pill} ${styles.pillRelative} ${((filters.categoria_ids && filters.categoria_ids.length > 0) || activeCategoria) ? styles.pillActive : ''}`} 
             ref={catRef}
           >
-            <div className={styles.pillIconFlex} onClick={() => setCatPopoverOpen(!catPopoverOpen)}>
+            <button
+              type="button"
+              className={styles.pillIconFlex} 
+              onClick={toggleCatPopover}
+              aria-expanded={catPopoverOpen}
+              aria-haspopup="dialog"
+            >
               <CategoriaIcon 
                 nombre={activeCategoria?.nombre} 
                 size={14} 
@@ -583,7 +653,7 @@ export default function FilterBar({
                   : 'Categoría'}
               </span>
               <ChevronDown size={14} className={styles.pillChevron} />
-            </div>
+            </button>
             {((filters.categoria_ids && filters.categoria_ids.length > 0) || activeCategoria) && (
               <button 
                 type="button"
@@ -620,11 +690,17 @@ export default function FilterBar({
 
           {/* Período Popover */}
           <div className={`${styles.pill} ${styles.pillRelative} ${isCustomDate ? styles.pillActive : ''}`} ref={dateRef}>
-            <div className={styles.pillIconFlex} onClick={() => setDatePopoverOpen(!datePopoverOpen)}>
+            <button
+              type="button"
+              className={styles.pillIconFlex} 
+              onClick={toggleDatePopover}
+              aria-expanded={datePopoverOpen}
+              aria-haspopup="dialog"
+            >
               <Calendar size={14} className={styles.pillIcon} />
               <span className={styles.pillText}>Período</span>
               <ChevronDown size={14} className={styles.pillChevron} />
-            </div>
+            </button>
             {isCustomDate && (
               <button 
                 type="button"
@@ -649,18 +725,28 @@ export default function FilterBar({
           {/* Moneda Popover */}
           {showMonedaFilter && (
             <div className={`${styles.pill} ${styles.pillRelative} ${filters.moneda ? styles.pillActive : ''}`} ref={monedaRef}>
-              <div className={styles.pillIconFlex} onClick={() => setMonedaPopoverOpen(!monedaPopoverOpen)}>
+              <button
+                type="button"
+                className={styles.pillIconFlex} 
+                onClick={toggleMonedaPopover}
+                aria-expanded={monedaPopoverOpen}
+                aria-haspopup="dialog"
+              >
                 <DollarSign size={14} className={styles.pillIcon} />
                 <span className={styles.pillText}>
                   {filters.moneda ? (filters.moneda === 'ARS' ? 'Pesos' : 'Dólares') : 'Moneda'}
                 </span>
                 <ChevronDown size={14} className={styles.pillChevron} />
-              </div>
+              </button>
               {filters.moneda && (
                 <button 
                   type="button"
                   className={styles.pillRemove} 
-                  onClick={(e) => { e.stopPropagation(); onFilterChange({ ...filters, moneda: undefined }); }} 
+                  onClick={(e) => { 
+                    e.stopPropagation()
+                    onFilterChange({ ...filters, moneda: undefined })
+                    setMonedaPopoverOpen(false)
+                  }} 
                   aria-label="Remover filtro de moneda"
                 >
                   <X size={13} />

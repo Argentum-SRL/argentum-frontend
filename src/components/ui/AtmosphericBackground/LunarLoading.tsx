@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { updateSystemBars } from '@/utils/systemTheme'
 import { LunarPhase } from './LunarPhase'
+import { ArgentumCrescent } from './ArgentumCrescent'
+import { ConstellationCanvas } from './ConstellationCanvas'
 import { DEFAULT_LUNAR_PHRASES } from './lunarConstants'
 import styles from './LunarLoading.module.css'
 
@@ -195,6 +197,9 @@ export function LunarLoading({
       aria-live="polite"
       aria-label={`${currentDisplayPhrase} — Argentum`}
     >
+      {/* Atmósfera Estelar: Sistema de Constelaciones de Alta Relojería */}
+      <ConstellationCanvas intensity="hero" />
+
       <div className={styles.compositionStage}>
         {/* Marco de la Luna sin diagramas ni líneas planetarias */}
         <div className={styles.moonFrame}>
@@ -224,8 +229,11 @@ export function LunarLoading({
           </div>
         </div>
 
-        {/* Jerarquía tipográfica editorial */}
+        {/* Jerarquía tipográfica editorial con medialuna oficial exclusiva */}
         <div className={styles.typographyGroup}>
+          <div className={styles.brandCrescentWrap} aria-hidden="true">
+            <ArgentumCrescent size={22} color={isDark ? '#CBD5E1' : '#0D2045'} />
+          </div>
           <span className={styles.brandSignature}>Argentum</span>
           <span className={`${styles.tagline} ${isFading ? styles.taglineFading : ''}`}>
             {currentDisplayPhrase}

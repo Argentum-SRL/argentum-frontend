@@ -1,0 +1,122 @@
+/* ── Argentum Constellation Canvas — Alta Relojería & Grabado 925 ──────── */
+
+.container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+/* ── Resplandor Difuso Ambiental Fuera de Cuadro ─────────────────────────── */
+.ambientGlow {
+  position: absolute;
+  top: -15%;
+  right: -10%;
+  width: 65vw;
+  height: 65vw;
+  min-width: 420px;
+  min-height: 420px;
+  max-width: 860px;
+  max-height: 860px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(50px);
+  opacity: 0.6;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.ambientGlowHero {
+  opacity: 0.85;
+}
+
+/* ── Lienzo Vectorial de Precisión ───────────────────────────────────────── */
+.skySvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+  shape-rendering: geometricPrecision;
+}
+
+/* ── Micro-titileo astronómico desincronizado (muy sutil) ───────────────── */
+.twinkleStar {
+  animation: starBreathe ease-in-out infinite alternate;
+}
+
+@keyframes starBreathe {
+  0% {
+    opacity: var(--base-opacity, 0.35);
+  }
+  100% {
+    opacity: calc(var(--base-opacity, 0.35) * 1.55);
+  }
+}
+
+/* ── Trazado de Grabado Metálico ─────────────────────────────────────────── */
+.constellationLine {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.4s ease;
+}
+
+/* Resplandor contenido en modo hero (loading) */
+.heroLineGlow {
+  filter: drop-shadow(0 0 1.5px rgba(203, 213, 225, 0.35));
+}
+
+:global([data-theme="light"]) .heroLineGlow {
+  filter: drop-shadow(0 0 1px rgba(13, 32, 69, 0.20));
+}
+
+/* ── Estrella Guía (Puntero de Alta Relojería) ───────────────────────────── */
+.guideStarCore {
+  transition: opacity 0.25s ease;
+}
+
+.guideStarHalo {
+  transition: opacity 0.25s ease;
+}
+
+/* ── Estrellas de la Constelación ────────────────────────────────────────── */
+.constellationStar {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.primaryStarPulse {
+  animation: primaryStarGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes primaryStarGlow {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.1);
+  }
+}
+
+/* ── Accesibilidad: prefers-reduced-motion ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .twinkleStar {
+    animation: none;
+  }
+  .primaryStarPulse {
+    animation: none;
+  }
+  .guideStarCore,
+  .guideStarHalo {
+    display: none;
+  }
+  .constellationLine {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+}

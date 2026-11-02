@@ -17,7 +17,11 @@ import {
   Shield,
   Check,
   Sparkles,
+  Play,
+  Pause,
+  RotateCcw,
 } from '@/components/ui/icons'
+import type { ConstellationPhase } from '@/components/ui/AtmosphericBackground/constellations.config'
 import { IconPlayground } from './components/IconPlayground'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import styles from './AnimacionPreviewPage.module.css'
@@ -45,6 +49,18 @@ export default function AnimacionPreviewPage() {
   const [showControls, setShowControls] = useState(true)
   const [simulatedReducedMotion, setSimulatedReducedMotion] = useState(false)
   const [demoBtnLoading, setDemoBtnLoading] = useState(true)
+
+  // Estados de prueba para el Sistema de Constelaciones (Fondo Ambiental)
+  const [ambientIntensity, setAmbientIntensity] = useState<'ambient' | 'hero'>('ambient')
+  const [constellationSelect, setConstellationSelect] = useState<'both' | 'capricorn' | 'leo'>('both')
+  const [speedMultiplier, setSpeedMultiplier] = useState<number>(1)
+  const [starDensity, setStarDensity] = useState<'low' | 'medium' | 'high'>('medium')
+  const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [resetKey, setResetKey] = useState<number>(0)
+  const [cycleInfo, setCycleInfo] = useState<{ constellation: string; phase: ConstellationPhase }>({
+    constellation: 'capricorn',
+    phase: 'draw',
+  })
 
   // Escuchar tecla Escape para alternar controles (modo inmersivo limpio)
   useEffect(() => {
@@ -76,30 +92,55 @@ export default function AnimacionPreviewPage() {
         />
       )}
 
-      {/* ── Vista 2: Ambient Background (Demostración detrás de modales/módulos) */}
+      {/* ── Vista 2: Ambient Background (Sistema de Constelaciones de Alta Relojería) */}
       {viewMode === 'ambient' && (
         <AtmosphericBackground
           fullScreen={true}
           centered={true}
-          intensity="ambient"
+          variant="constellations"
+          intensity={ambientIntensity}
+          constellationProps={{
+            constellationSelect,
+            speedMultiplier,
+            isPaused,
+            starDensity,
+            resetKey,
+            onCycleUpdate: setCycleInfo,
+          }}
         >
           <div className={styles.ambientDemoCard}>
-            <AtmosphericMoonIcon size={42} />
-            <h2 className={styles.ambientDemoTitle}>Mareas de Luz · Filigrana Argentum</h2>
+            <div className={styles.ambientBadgeRow}>
+              <span className={styles.celestialBadge}>
+                {cycleInfo.constellation === 'capricorn' ? 'Capricornio' : 'Leo'}
+              </span>
+              <span className={styles.phaseBadge}>
+                {cycleInfo.phase === 'draw'
+                  ? 'Dibujo progresivo (6s)'
+                  : cycleInfo.phase === 'hold'
+                    ? 'Permanencia (2.5s)'
+                    : cycleInfo.phase === 'fade'
+                      ? 'Desvanecimiento (3.2s)'
+                      : 'Pausa'}
+              </span>
+            </div>
+
+            <h2 className={styles.ambientDemoTitle}>Cielo de Relojería · Plata 925</h2>
             <p className={styles.ambientDemoText}>
-              Claroscuro volumétrico con mareas armónicas de liquidez y luz (curvas cáusticas de Bézier)
-              junto al sello de filigrana de plata 925. Cero planetarios, cero diagramas orbitales y
-              cero esferas detrás del contenido. Fase lunar en Modo Claro (azul marino Argentum y marfil) y
-              Noche Lunar en Modo Oscuro (plata líquida y obsidiana).
+              Cielo permanente de estrellas discretas y geometría astronómica verificada. Una estrella
+              guía plateada recorre las conexiones de <strong>Capricornio</strong> y <strong>Leo</strong>{' '}
+              con precisión de grabado, iluminando sus líneas de plata esterlina 925 antes de desvanecerse lentamente.
             </p>
-            <button
-              type="button"
-              className={styles.demoBtn}
-              onClick={() => setViewMode('hero')}
-            >
-              <Check size={16} />
-              <span>Ver pantalla de carga fullscreen (6s)</span>
-            </button>
+
+            <div className={styles.ambientCardActions}>
+              <button
+                type="button"
+                className={styles.demoBtn}
+                onClick={() => setViewMode('hero')}
+              >
+                <Check size={16} />
+                <span>Comparar con pantalla de carga oficial</span>
+              </button>
+            </div>
           </div>
         </AtmosphericBackground>
       )}
@@ -206,7 +247,9 @@ export default function AnimacionPreviewPage() {
               <span className={styles.dockTitle}>
                 {viewMode === 'icons'
                   ? 'Iconografía Animada · Calidad Animate UI'
-                  : 'Mareas de Luz & Filigrana 925'}
+                  : viewMode === 'ambient'
+                    ? 'Constelaciones · Relojería & Plata 925'
+                    : 'Hero Loading · Fases Lunares'}
               </span>
             </div>
 
@@ -284,6 +327,92 @@ export default function AnimacionPreviewPage() {
               </select>
             )}
           </div>
+
+          {/* ── Fila de Controles Astronómicos Específicos para Fondo Ambiental ── */}
+          {viewMode === 'ambient' && (
+            <div className={styles.dockSubRow}>
+              {/* Selector de Constelación */}
+              <div className={styles.controlGroup}>
+                <span className={styles.controlLabel}>Figura:</span>
+                <select
+                  className={styles.selectInput}
+                  value={constellationSelect}
+                  onChange={(e) => setConstellationSelect(e.target.value as typeof constellationSelect)}
+                  aria-label="Seleccionar figura astronómica"
+                >
+                  <option value="both">Ciclo continuo (Capricornio ⇄ Leo)</option>
+                  <option value="capricorn">Solo Capricornio</option>
+                  <option value="leo">Solo Leo</option>
+                </select>
+              </div>
+
+              {/* Intensidad Atmosférica */}
+              <div className={styles.controlGroup}>
+                <span className={styles.controlLabel}>Intensidad:</span>
+                <button
+                  type="button"
+                  className={`${styles.actionIconBtn} ${ambientIntensity === 'hero' ? styles.actionIconBtnActive : ''}`}
+                  onClick={() => setAmbientIntensity((prev) => (prev === 'ambient' ? 'hero' : 'ambient'))}
+                  title="Alternar entre variante ambiental estándar y hero (loading)"
+                >
+                  {ambientIntensity === 'hero' ? 'Hero (Loading)' : 'Ambiente estándar'}
+                </button>
+              </div>
+
+              {/* Velocidad del Trazado */}
+              <div className={styles.controlGroup}>
+                <span className={styles.controlLabel}>Velocidad:</span>
+                <select
+                  className={styles.selectInput}
+                  value={speedMultiplier}
+                  onChange={(e) => setSpeedMultiplier(Number(e.target.value))}
+                  aria-label="Velocidad del trazado"
+                >
+                  <option value={0.5}>0.5x (Lenta)</option>
+                  <option value={1}>1.0x (Normal)</option>
+                  <option value={1.5}>1.5x (Rápida)</option>
+                  <option value={2}>2.0x (Doble)</option>
+                </select>
+              </div>
+
+              {/* Densidad de Estrellas */}
+              <div className={styles.controlGroup}>
+                <span className={styles.controlLabel}>Densidad:</span>
+                <select
+                  className={styles.selectInput}
+                  value={starDensity}
+                  onChange={(e) => setStarDensity(e.target.value as typeof starDensity)}
+                  aria-label="Densidad del campo estelar"
+                >
+                  <option value="low">Baja (45)</option>
+                  <option value="medium">Media (80)</option>
+                  <option value="high">Alta (130)</option>
+                </select>
+              </div>
+
+              {/* Pausar / Reanudar */}
+              <button
+                type="button"
+                className={`${styles.actionIconBtn} ${isPaused ? styles.actionIconBtnActive : ''}`}
+                onClick={() => setIsPaused((prev) => !prev)}
+                title={isPaused ? 'Reanudar trazado' : 'Pausar trazado'}
+              >
+                {isPaused ? <Play size={13} /> : <Pause size={13} />}
+                <span>{isPaused ? 'Reanudar' : 'Pausar'}</span>
+              </button>
+
+              {/* Reiniciar ciclo */}
+              <button
+                type="button"
+                className={styles.actionIconBtn}
+                onClick={() => setResetKey((prev) => prev + 1)}
+                title="Reiniciar ciclo de animación desde el inicio"
+              >
+                <RotateCcw size={13} />
+                <span>Reiniciar</span>
+              </button>
+            </div>
+          )}
         </aside>
       )}
     </div>

@@ -452,6 +452,119 @@
 
 
 
+.ambientBadgeRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.celestialBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(13, 32, 69, 0.1);
+  color: #0D2045;
+}
+
+:global([data-theme="dark"]) .celestialBadge {
+  background: rgba(203, 213, 225, 0.18);
+  color: #CBD5E1;
+}
+
+.phaseBadge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(72, 120, 184, 0.12);
+  color: var(--primary, #4878b8);
+}
+
+:global([data-theme="dark"]) .phaseBadge {
+  background: rgba(96, 165, 250, 0.15);
+  color: #93c5fd;
+}
+
+.ambientCardActions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.dockSubRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(13, 32, 69, 0.08);
+}
+
+:global([data-theme="dark"]) .dockSubRow {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.controlGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controlLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.actionIconBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(13, 32, 69, 0.12);
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+:global([data-theme="dark"]) .actionIconBtn {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.actionIconBtn:hover {
+  background: rgba(13, 32, 69, 0.06);
+}
+
+:global([data-theme="dark"]) .actionIconBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.actionIconBtnActive {
+  background: rgba(13, 32, 69, 0.12);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+:global([data-theme="dark"]) .actionIconBtnActive {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reopenControlsBtn,
   .minimizeBtn,

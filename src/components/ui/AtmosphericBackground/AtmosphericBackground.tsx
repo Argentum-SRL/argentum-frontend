@@ -3,6 +3,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { updateSystemBars } from '@/utils/systemTheme'
 import { ArgentumCrescent } from './ArgentumCrescent'
 import { LunarLoading, type LunarLoadingProps } from './LunarLoading'
+import { ConstellationCanvas, type ConstellationCanvasProps } from './ConstellationCanvas'
 import styles from './AtmosphericBackground.module.css'
 
 export interface DecoMoonDef {
@@ -221,6 +222,15 @@ export interface AtmosphericBackgroundProps {
   children?: ReactNode
   /** Nivel de intensidad visual: 'ambient' para módulos y modales, 'hero' para loading */
   intensity?: 'ambient' | 'hero'
+  /**
+   * Variante de la atmósfera:
+   * - 'constellations': Nuevo cielo estelar astronómico de alta relojería con trazado de Leo y Capricornio
+   * - 'classic' | 'tides': Sistema clásico de mareas y filigrana (conservado para pantallas existentes no migradas)
+   * En esta fase inicial, 'constellations' se activa exclusivamente en el loading y en /animacion (Ambient).
+   */
+  variant?: 'constellations' | 'classic' | 'tides'
+  /** Opciones de configuración para el lienzo de constelaciones (modo de prueba o personalización) */
+  constellationProps?: Omit<ConstellationCanvasProps, 'intensity'>
   fullScreen?: boolean
   centered?: boolean
   compensateBottomNav?: boolean
@@ -235,6 +245,8 @@ export interface AtmosphericBackgroundProps {
 export function AtmosphericBackground({
   children,
   intensity = 'ambient',
+  variant = 'classic',
+  constellationProps,
   fullScreen = true,
   centered = true,
   compensateBottomNav = true,
@@ -277,13 +289,17 @@ export function AtmosphericBackground({
       role={role}
       aria-live={ariaLive}
     >
-      {/* Atmósfera Editorial: Mareas de Luz, Claroscuro y Filigrana */}
+      {/* Atmósfera Editorial: Mareas de Luz o Sistema de Constelaciones de Relojería */}
       <div className={styles.decorationsLayer} aria-hidden="true">
         {/* Viñeta de protección para iOS status bar y Dynamic Island */}
         <div className={styles.topVignette} />
 
-        {/* Escena de Mareas y Luz */}
-        {intensity === 'ambient' && <TidalAtmosphereScene />}
+        {/* Escena de fondo ambiental */}
+        {variant === 'constellations' ? (
+          <ConstellationCanvas intensity={intensity} {...constellationProps} />
+        ) : (
+          intensity === 'ambient' && <TidalAtmosphereScene />
+        )}
 
         {/* Viñeta de protección para home bar y barra inferior */}
         <div className={styles.bottomVignette} />
@@ -354,5 +370,13 @@ export function AtmosphericLoading({
 // Aliases canónicos para nueva semántica
 export const LunarBackground = AtmosphericBackground
 export const LunarMoonIcon = AtmosphericMoonIcon
+
+export { ConstellationCanvas, type ConstellationCanvasProps } from './ConstellationCanvas'
+export {
+  CONSTELLATIONS,
+  CONSTELLATION_TIMINGS,
+  CONSTELLATION_PALETTE,
+  STARFIELD_PRESETS,
+} from './constellations.config'
 
 export default AtmosphericBackground

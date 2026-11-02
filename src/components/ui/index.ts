@@ -51,6 +51,8 @@ export {
   AtmosphericMoonIcon,
   LunarBackground,
   LunarMoonIcon,
+  ConstellationCanvas,
+  type ConstellationCanvasProps,
   type AtmosphericBackgroundProps,
   type AtmosphericCardProps,
   type AtmosphericLoadingProps,

@@ -105,6 +105,13 @@
   z-index: 5;
 }
 
+.brandCrescentWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
 .brandSignature {
   font-family: 'Figtree', sans-serif;
   font-size: 1.25rem;

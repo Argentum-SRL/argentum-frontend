@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Plus, 
-  PieChart
+  PieChart,
+  Download
 } from '@/components/ui/icons'
 import styles from './PresupuestosPage.module.css'
 import presupuestoService from '@/services/presupuesto.service'
@@ -22,6 +23,7 @@ import { getErrorMessage } from '@/utils/errorMessages'
 import BudgetCard from './BudgetCard'
 import BudgetBarChart from './BudgetBarChart'
 import BudgetHistoryModal from './BudgetHistoryModal'
+import DescargarExcelModal from './DescargarExcelModal'
 import { EmptyState, PageSummaryBar, PresupuestosSkeleton } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 
@@ -33,6 +35,7 @@ export default function PresupuestosPage() {
   const [activeTab, setActiveTab] = useState<'activo' | 'pausado'>('activo')
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([])
   const [loading, setLoading] = useState(true)
+  const [showDescargarExcel, setShowDescargarExcel] = useState(false)
   
   // Data for forms
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -273,9 +276,21 @@ export default function PresupuestosPage() {
           <p className={styles.subtitle}>Controlá tus límites de gasto por categoría</p>
         </div>
         <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.excelBtn}
+            onClick={() => setShowDescargarExcel(true)}
+            aria-label="Descargar en Excel"
+            title="Descargar en Excel"
+          >
+            <Download size={16} />
+            <span className={styles.excelBtnText}>
+              Descargar<span className={styles.btnSuffix}> en Excel</span>
+            </span>
+          </button>
           <button className={styles.nuevaBtn} onClick={handleOpenNew}>
             <Plus size={16} strokeWidth={2.5} />
-            Nuevo<span className={styles.btnSuffix}> presupuesto</span>
+            <span>Nuevo<span className={styles.btnSuffix}> presupuesto</span></span>
           </button>
         </div>
       </div>
@@ -373,6 +388,11 @@ export default function PresupuestosPage() {
         presupuesto={selectedPresupuesto}
         historial={historial}
         loading={loadingHistory}
+      />
+
+      <DescargarExcelModal
+        isOpen={showDescargarExcel}
+        onClose={() => setShowDescargarExcel(false)}
       />
     </div>
   )

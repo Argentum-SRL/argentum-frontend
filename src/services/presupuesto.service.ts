@@ -6,6 +6,7 @@ import type {
   PeriodoPresupuesto 
 } from '@/types'
 import { createKeyedUserCache } from '@/utils/sessionCleanup'
+import { nombreArchivoExcel } from '@/utils/excelPresupuestos'
 
 // Cache storage con validación automática por usuario autenticado
 const PRESUPUESTOS_TTL = 30 * 1000 // 30 seconds
@@ -78,6 +79,18 @@ const presupuestoService = {
   getHistorial: async (id: string, signal?: AbortSignal): Promise<PeriodoPresupuesto[]> => {
     const response = await api.get<PeriodoPresupuesto[]>(`/presupuestos/${id}/historial`, { signal })
     return response.data
+  },
+
+  descargarExcel: async (alcance: '12' | 'todo'): Promise<{ blob: Blob; nombreArchivo: string }> => {
+    const response = await api.get<Blob>('/presupuestos/exportar-excel', {
+      params: { alcance },
+      responseType: 'blob'
+    })
+    const nombreArchivo = nombreArchivoExcel(
+      response.headers['content-disposition'],
+      new Date()
+    )
+    return { blob: response.data, nombreArchivo }
   }
 }
 

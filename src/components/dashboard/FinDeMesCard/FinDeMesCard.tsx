@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import type { FinDeMesResponse } from '@/types'
 import { lineasFinDeMes } from '@/utils/finDeMes'
 import { ProyeccionCardSkeleton } from '@/components/ui'
+import { Calendar, ChevronDown, CircleCheck } from '@/components/ui/icons'
 import styles from './FinDeMesCard.module.css'
 
 export interface FinDeMesCardProps {
@@ -24,24 +25,30 @@ export const FinDeMesCard: React.FC<FinDeMesCardProps> = ({ data, loading, moned
   const bloque = moneda === 'USD' ? data.usd : data.ars
   const { textos, calendario } = bloque
   const lineas = lineasFinDeMes(textos)
-  const tieneCompromisos = calendario && calendario.length > 0
+  const tieneCompromisos = Boolean(calendario && calendario.length > 0)
 
   return (
     <article className={styles.card}>
       <header className={styles.header}>
-        <h2 className={styles.title}>{textos.titulo}</h2>
+        <div className={styles.titleGroup}>
+          <Calendar size={18} className={styles.headerIcon} />
+          <h2 className={styles.title}>{textos.titulo}</h2>
+        </div>
       </header>
 
       <div className={styles.content}>
-        <p className={styles.monto}>{textos.monto}</p>
-        <p className={styles.subtitulo}>{textos.subtitulo}</p>
+        <div className={styles.montoGroup}>
+          <p className={styles.monto}>{textos.monto}</p>
+          <p className={styles.subtitulo}>{textos.subtitulo}</p>
+        </div>
 
         {lineas.length > 0 && (
-          <div className={styles.lineasLista}>
+          <div className={styles.metricGroup}>
             {lineas.map((linea, idx) => (
-              <p key={idx} className={styles.lineaTexto}>
-                {linea}
-              </p>
+              <div key={idx} className={styles.lineaItem}>
+                <span className={styles.lineaDot} aria-hidden="true" />
+                <p className={styles.lineaTexto}>{linea}</p>
+              </div>
             ))}
           </div>
         )}
@@ -56,7 +63,15 @@ export const FinDeMesCard: React.FC<FinDeMesCardProps> = ({ data, loading, moned
               onClick={() => setMostrarCalendario((prev) => !prev)}
               aria-expanded={mostrarCalendario}
             >
-              {mostrarCalendario ? 'Ocultar calendario' : 'Ver calendario'}
+              <span className={styles.toggleLeft}>
+                <Calendar size={14} className={styles.toggleIcon} />
+                <span>{mostrarCalendario ? 'Ocultar calendario' : 'Ver calendario'}</span>
+                <span className={styles.counterBadge}>{calendario.length}</span>
+              </span>
+              <ChevronDown
+                size={14}
+                className={`${styles.chevronIcon} ${mostrarCalendario ? styles.chevronIconOpen : ''}`}
+              />
             </button>
 
             {mostrarCalendario && (
@@ -74,7 +89,10 @@ export const FinDeMesCard: React.FC<FinDeMesCardProps> = ({ data, loading, moned
             )}
           </>
         ) : (
-          <p className={styles.sinPagosTexto}>No tenés pagos hasta esa fecha.</p>
+          <div className={styles.sinPagosCard}>
+            <CircleCheck size={16} className={styles.sinPagosIcon} />
+            <p className={styles.sinPagosTexto}>No tenés pagos hasta esa fecha.</p>
+          </div>
         )}
       </div>
     </article>
@@ -82,4 +100,3 @@ export const FinDeMesCard: React.FC<FinDeMesCardProps> = ({ data, loading, moned
 }
 
 export default FinDeMesCard
-

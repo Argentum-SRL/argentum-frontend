@@ -1,5 +1,5 @@
 import api from './api'
-import type { DashboardResumen, CotizacionDolar, Billetera, SubcategoriaGasto, ProyeccionesResponse } from '../types'
+import type { DashboardResumen, CotizacionDolar, Billetera, SubcategoriaGasto, ProyeccionesResponse, FinDeMesResponse } from '../types'
 import { createUserCache, createKeyedUserCache } from '@/utils/sessionCleanup'
 
 // Cache storage con validación automática por usuario autenticado
@@ -13,6 +13,9 @@ let resumenPromises: Record<string, Promise<DashboardResumen> | undefined> = {}
 
 const proyeccionCache = createUserCache<ProyeccionesResponse>(DEFAULT_TTL)
 let proyeccionPromise: Promise<ProyeccionesResponse> | null = null
+
+const finDeMesCache = createUserCache<FinDeMesResponse>(DEFAULT_TTL)
+let finDeMesPromise: Promise<FinDeMesResponse> | null = null
 
 export interface PeriodoActualData {
   fecha_inicio: string
@@ -127,6 +130,28 @@ export const dashboardService = {
     return fetchPromise
   },
 
+  getFinDeMes: async (signal?: AbortSignal): Promise<FinDeMesResponse> => {
+    if (!signal && finDeMesPromise) return finDeMesPromise
+
+    const cached = finDeMesCache.get()
+    if (cached) {
+      return cached
+    }
+
+    const fetchPromise = (async () => {
+      try {
+        const response = await api.get<FinDeMesResponse>('/dashboard/fin-de-mes', { signal })
+        finDeMesCache.set(response.data)
+        return response.data
+      } finally {
+        if (!signal) finDeMesPromise = null
+      }
+    })()
+
+    if (!signal) finDeMesPromise = fetchPromise
+    return fetchPromise
+  },
+
   getResumenCompleto: async (desde?: string, hasta?: string, billeteraIds?: string[], signal?: AbortSignal): Promise<{
     billeteras: Billetera[];
     resumen: DashboardResumen;
@@ -166,9 +191,11 @@ export const invalidateDashboardCache = () => {
   resumenCache.clear()
   cotizacionCache.clear()
   proyeccionCache.clear()
+  finDeMesCache.clear()
   periodoActualCache.clear()
   cotizacionPromise = null
   proyeccionPromise = null
+  finDeMesPromise = null
   periodoActualPromise = null
   resumenPromises = {}
 }

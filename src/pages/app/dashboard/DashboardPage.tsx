@@ -26,9 +26,8 @@ import { useModal } from '@/hooks/useModal'
 import { triggerBienvenidaFinancieraOnce, resetBienvenidaTriggerState } from '@/utils/bienvenidaFinancieraManager'
 import { dashboardService } from '@/services/dashboard.service'
 import categoriaService from '@/services/categoria.service'
-import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, ProyeccionesResponse, Frescura } from '@/types'
-import ProyeccionCard from '@/components/dashboard/ProyeccionCard/ProyeccionCard'
-import { hasProyeccionVisible } from '@/components/dashboard/ProyeccionCard/proyeccionUtils'
+import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, FinDeMesResponse, Frescura } from '@/types'
+import FinDeMesCard from '@/components/dashboard/FinDeMesCard/FinDeMesCard'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { BalanceCard } from '@/components/dashboard/BalanceCard'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -526,22 +525,18 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const customRange = null
-  const [proyeccion, setProyeccion] = useState<ProyeccionesResponse | null>(null)
-  const [loadingProyeccion, setLoadingProyeccion] = useState(true)
+  const [finDeMes, setFinDeMes] = useState<FinDeMesResponse | null>(null)
+  const [loadingFinDeMes, setLoadingFinDeMes] = useState(true)
   const { open } = useModal()
 
   // Trigger de primera vez para el modal explicativo si la proyección lo indica
   useEffect(() => {
-    if (proyeccion?.mostrar_modal_bienvenida) {
+    if (finDeMes?.mostrar_modal_bienvenida) {
       triggerBienvenidaFinancieraOnce(open, 'proyeccion')
     }
-  }, [proyeccion?.mostrar_modal_bienvenida, open])
+  }, [finDeMes?.mostrar_modal_bienvenida, open])
 
-  const mostrarColumnaProyeccion = useMemo(() => {
-    if (customRange) return false
-    if (loadingProyeccion) return true
-    return hasProyeccionVisible(proyeccion, moneda)
-  }, [customRange, loadingProyeccion, proyeccion, moneda])
+  const mostrarColumnaProyeccion = !customRange && (loadingFinDeMes || finDeMes !== null)
   const [showChartPercent, setShowChartPercent] = useState(false)
   const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
   const [subcategoriasData, setSubcategoriasData] = useState<SubcategoriaGasto[]>([])
@@ -580,7 +575,7 @@ export default function DashboardPage() {
       setSelectedCategoria(null)
       setSubcategoriasData([])
       setData(null)
-      setProyeccion(null)
+      setFinDeMes(null)
       resetBienvenidaTriggerState()
     }
     prevUserIdRef.current = usuario?.id ?? null
@@ -702,21 +697,21 @@ export default function DashboardPage() {
     setSubcategoriasData([])
   }, [billeteras])
 
-  const fetchProyeccion = useCallback(async (signal?: AbortSignal) => {
+  const fetchFinDeMes = useCallback(async (signal?: AbortSignal) => {
     try {
-      setLoadingProyeccion(true)
-      const res = await dashboardService.getProyeccion(signal)
+      setLoadingFinDeMes(true)
+      const res = await dashboardService.getFinDeMes(signal)
       if (signal?.aborted) return
-      setProyeccion(res)
+      setFinDeMes(res)
     } catch (err) {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      console.error('Error loading proyeccion:', err)
+      console.error('Error loading fin de mes:', err)
       sileo.error({ title: getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.') })
     } finally {
       if (!signal?.aborted) {
-        setLoadingProyeccion(false)
+        setLoadingFinDeMes(false)
       }
     }
   }, [])
@@ -730,7 +725,7 @@ export default function DashboardPage() {
 
       void fetchData(controller.signal)
       if (!customRange) {
-        void fetchProyeccion(controller.signal)
+        void fetchFinDeMes(controller.signal)
       }
     }
 
@@ -739,7 +734,7 @@ export default function DashboardPage() {
     return () => {
       controller.abort()
     }
-  }, [fetchData, fetchProyeccion, customRange])
+  }, [fetchData, fetchFinDeMes, customRange])
 
   // Auto-refresco en vivo ante eventos SSE de actualización de datos
   useEffect(() => {
@@ -748,7 +743,7 @@ export default function DashboardPage() {
       const tid = setTimeout(() => {
         void fetchData(controller.signal)
         if (!customRange) {
-          void fetchProyeccion(controller.signal)
+          void fetchFinDeMes(controller.signal)
         }
       }, 0)
       return () => {
@@ -756,7 +751,7 @@ export default function DashboardPage() {
         controller.abort()
       }
     }
-  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchData, fetchProyeccion, customRange])
+  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchData, fetchFinDeMes, customRange])
 
   useEffect(() => {
     if (!selectedCategoria) {
@@ -1127,8 +1122,8 @@ export default function DashboardPage() {
         {/* Col 1: Proyección */}
         {mostrarColumnaProyeccion && (
           <div className={styles.proyeccionSection}>
-            <WidgetErrorBoundary title="Proyección">
-              <ProyeccionCard data={proyeccion} loading={loadingProyeccion} moneda={moneda} />
+            <WidgetErrorBoundary title="Libre hasta tu próximo ingreso">
+              <FinDeMesCard data={finDeMes} loading={loadingFinDeMes} moneda={moneda} />
             </WidgetErrorBoundary>
           </div>
         )}

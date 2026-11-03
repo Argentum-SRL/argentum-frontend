@@ -1,10 +1,10 @@
 [
   {
-    "archivo": "src/components/dashboard/BalanceCard/BalanceCard.tsx",
-    "expresion": "(cuotasPendientes || 0) + (suscripcionesPendientes || 0)",
+    "archivo": "src/components/ui/AtmosphericBackground/ConstellationCanvas.tsx",
+    "expresion": "progressNorm * totalLen",
     "cantidad": 1,
-    "categoria": "pendiente",
-    "motivo": "Suma de compromisos mensuales pendientes en balance (se migra en Bloque H)"
+    "categoria": "dibujo",
+    "motivo": "Avance de la animación de constelaciones (no es plata)"
   },
   {
     "archivo": "src/components/dashboard/BalanceCard/BalanceCard.tsx",

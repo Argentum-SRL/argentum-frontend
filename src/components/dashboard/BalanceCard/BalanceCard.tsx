@@ -45,6 +45,8 @@ export interface BalanceCardProps {
   onToggleCompromisos?: () => void
   onCloseDropdowns?: () => void
   compromisos?: CompromisoItem[]
+  lineaSaldo?: string | null
+  totalCompromisos: number
 }
 
 const fmt = (n: number, moneda: 'ARS' | 'USD' = 'ARS') => {
@@ -106,6 +108,8 @@ export const BalanceCard = memo(function BalanceCard({
   onToggleCompromisos,
   onCloseDropdowns,
   compromisos,
+  lineaSaldo,
+  totalCompromisos,
 }: BalanceCardProps) {
   const [internalAccountsOpen, setInternalAccountsOpen] = useState(false)
   const [internalCompromisosOpen, setInternalCompromisosOpen] = useState(false)
@@ -169,7 +173,6 @@ export const BalanceCard = memo(function BalanceCard({
     }
   }, [isAccountsOpen, isCompromisosOpen, onCloseDropdowns])
 
-  const totalCompromisos = (cuotasPendientes || 0) + (suscripcionesPendientes || 0)
   const hasCompromisos = totalCompromisos > 0
   const isDeficit = saldoDisponible < 0
 
@@ -288,6 +291,9 @@ export const BalanceCard = memo(function BalanceCard({
           <h2 className={`${styles.totalAmount} ${saldoTotal < 0 ? styles.amountNegative : ''}`}>
             {showBalance ? fmt(saldoTotal, moneda) : '••••••••'}
           </h2>
+          {lineaSaldo && showBalance && (
+            <p className={styles.lineaSaldo}>{lineaSaldo}</p>
+          )}
         </div>
 
         {/* Saldo Disponible Real */}

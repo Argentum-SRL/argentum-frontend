@@ -28,6 +28,7 @@ import { dashboardService } from '@/services/dashboard.service'
 import categoriaService from '@/services/categoria.service'
 import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, FinDeMesResponse, Frescura } from '@/types'
 import FinDeMesCard from '@/components/dashboard/FinDeMesCard/FinDeMesCard'
+import { debeMostrarLineaSaldo, debeMostrarTarjetaFinDeMes } from '@/utils/finDeMes'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { BalanceCard } from '@/components/dashboard/BalanceCard'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -526,7 +527,6 @@ export default function DashboardPage() {
   const [error, setError] = useState(false)
   const customRange = null
   const [finDeMes, setFinDeMes] = useState<FinDeMesResponse | null>(null)
-  const [loadingFinDeMes, setLoadingFinDeMes] = useState(true)
   const { open } = useModal()
 
   // Trigger de primera vez para el modal explicativo si la proyección lo indica
@@ -536,7 +536,7 @@ export default function DashboardPage() {
     }
   }, [finDeMes?.mostrar_modal_bienvenida, open])
 
-  const mostrarColumnaProyeccion = !customRange && (loadingFinDeMes || finDeMes !== null)
+  const mostrarColumnaProyeccion = debeMostrarTarjetaFinDeMes(moneda, customRange, finDeMes)
   const [showChartPercent, setShowChartPercent] = useState(false)
   const [selectedCategoria, setSelectedCategoria] = useState<{ id: string; nombre: string } | null>(null)
   const [subcategoriasData, setSubcategoriasData] = useState<SubcategoriaGasto[]>([])
@@ -699,7 +699,6 @@ export default function DashboardPage() {
 
   const fetchFinDeMes = useCallback(async (signal?: AbortSignal) => {
     try {
-      setLoadingFinDeMes(true)
       const res = await dashboardService.getFinDeMes(signal)
       if (signal?.aborted) return
       setFinDeMes(res)
@@ -709,10 +708,6 @@ export default function DashboardPage() {
       }
       console.error('Error loading fin de mes:', err)
       sileo.error({ title: getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.') })
-    } finally {
-      if (!signal?.aborted) {
-        setLoadingFinDeMes(false)
-      }
     }
   }, [])
 
@@ -944,6 +939,8 @@ export default function DashboardPage() {
                 onToggleCompromisos={handleToggleCompromisos}
                 onCloseDropdowns={handleCloseDropdowns}
                 compromisos={compromisos}
+                totalCompromisos={saldoInfo ? Number(saldoInfo.total_compromisos) : 0}
+                lineaSaldo={debeMostrarLineaSaldo(moneda, customRange, billeterasSeleccionadas.length) ? (finDeMes?.linea_saldo ?? null) : null}
               />
             )
           )}
@@ -1120,10 +1117,10 @@ export default function DashboardPage() {
       {/* ── Bottom Row (2 Cols si hay proyección, 1 Col full width si no) ─── */}
       <div className={`${styles.bottomRow} ${!mostrarColumnaProyeccion ? styles.bottomRowSingle : ''}`}>
         {/* Col 1: Proyección */}
-        {mostrarColumnaProyeccion && (
+        {mostrarColumnaProyeccion && finDeMes?.tarjeta && (
           <div className={styles.proyeccionSection}>
-            <WidgetErrorBoundary title="Libre hasta tu próximo ingreso">
-              <FinDeMesCard data={finDeMes} loading={loadingFinDeMes} moneda={moneda} />
+            <WidgetErrorBoundary title="¿Cómo llegás a fin de mes?">
+              <FinDeMesCard tarjeta={finDeMes.tarjeta} />
             </WidgetErrorBoundary>
           </div>
         )}

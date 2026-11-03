@@ -478,6 +478,7 @@ export interface DashboardResumen {
       suscripciones_pendientes: number | string
       facturas_pendientes?: number | string
       saldo_disponible: number | string
+      total_compromisos: number | string
       compromisos?: CompromisoDisponibleItem[]
     }
     usd: {
@@ -486,6 +487,7 @@ export interface DashboardResumen {
       suscripciones_pendientes: number | string
       facturas_pendientes?: number | string
       saldo_disponible: number | string
+      total_compromisos: number | string
       compromisos?: CompromisoDisponibleItem[]
     }
   }
@@ -628,34 +630,22 @@ export interface ProyeccionesResponse {
   mostrar_modal_bienvenida?: boolean
 }
 
-export interface FinDeMesTextos {
+export interface FinDeMesTarjeta {
   titulo: string
   monto: string
   subtitulo: string
-  linea_rango: string | null
   linea_riesgo: string | null
-  linea_estado: string | null
+  linea_cobro: string | null
   linea_cobertura: string | null
-  linea_saldo: string | null
-}
-
-export interface FinDeMesFila {
-  fecha: string
-  nombre: string
-  monto: string
-}
-
-export interface FinDeMesMoneda {
-  textos: FinDeMesTextos
-  calendario: FinDeMesFila[]
 }
 
 export interface FinDeMesResponse {
   estado: 'completo' | 'solo_seguro' | 'sin_ingreso' | 'datos_viejos'
-  fecha_limite: string
+  mostrar_tarjeta: boolean
+  fin_ciclo: string
+  linea_saldo: string
+  tarjeta: FinDeMesTarjeta | null
   mostrar_modal_bienvenida: boolean
-  ars: FinDeMesMoneda
-  usd: FinDeMesMoneda
 }
 
 export interface ProyeccionCategoria {

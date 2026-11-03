@@ -3,15 +3,15 @@
 .card {
   background: linear-gradient(165deg, #0C1728 0%, #11223B 60%, #0E1B2E 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 18px 20px;
+  border-radius: var(--radius-modal);
+  padding: var(--space-lg) var(--space-xl);
   color: #ffffff;
   position: relative;
   box-shadow: var(--elevation-md);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 10px;
+  gap: var(--space-md);
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -34,7 +34,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   width: 100%;
   min-height: 28px;
 }
@@ -104,12 +104,12 @@
   color: #08101E;
 }
 
-/* ── 2. Los Dos Saldos (Protagonistas Absolutos) ───────────────────── */
+/* ── 2. Los Dos Saldos (Protagonistas Absolutos con Espaciado Canónico) ──── */
 
 .saldosHero {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-md);
   width: 100%;
   min-width: 0;
 }
@@ -117,7 +117,7 @@
 .saldoMain {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-2xs);
   min-width: 0;
 }
 
@@ -137,7 +137,7 @@
 }
 
 .totalAmount {
-  font-size: clamp(1.85rem, 6cqw, 2.35rem);
+  font-size: clamp(1.75rem, 5.5cqw, 2.15rem);
   font-weight: 800;
   margin: 0;
   letter-spacing: -0.035em;
@@ -149,23 +149,33 @@
   overflow-wrap: break-word;
 }
 
+.lineaSaldo {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.42);
+  margin: var(--space-xs) 0 0 0;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 .saldoSecondary {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-2xs);
   min-width: 0;
 }
 
 .availableRow {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
   min-width: 0;
 }
 
 .availableAmount {
-  font-size: clamp(1.15rem, 4cqw, 1.42rem);
+  font-size: clamp(1.05rem, 3.8cqw, 1.32rem);
   font-weight: 700;
   color: #34D399;
   letter-spacing: -0.02em;
@@ -181,7 +191,7 @@
   margin: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-icon);
   cursor: pointer;
   color: inherit;
   font-family: inherit;
@@ -221,7 +231,7 @@
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  gap: 1.5px;
+  gap: var(--space-2xs);
 }
 
 .compromisoDetalle {
@@ -263,7 +273,7 @@
 .accountsSection {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
   width: 100%;
   min-width: 0;
 }
@@ -288,9 +298,9 @@
 .triggerContent {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
+  gap: var(--space-icon);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.72rem;
   font-weight: 500;
   transition: color 0.18s ease;
 }
@@ -329,8 +339,8 @@
 .accountsDropdown {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 6px;
+  gap: var(--space-icon);
+  padding-top: var(--space-icon);
   border-top: 1px solid rgba(255, 255, 255, 0.07);
   animation: dropdownFadeIn 0.16s ease-out;
 }
@@ -350,7 +360,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 4px;
+  padding-bottom: var(--space-xs);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -450,7 +460,7 @@
 .rowLeft {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-icon);
   min-width: 0;
   overflow: hidden;
   flex: 1;
@@ -509,9 +519,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-md);
   flex-wrap: wrap;
-  padding-top: 10px;
+  padding-top: var(--space-sm);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin-top: auto;
 }
@@ -519,8 +529,8 @@
 .trendItem {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.8125rem;
+  gap: var(--space-icon);
+  font-size: 0.775rem;
   font-weight: 600;
 }
 
@@ -544,8 +554,8 @@
 
 @container (max-width: 320px) {
   .card {
-    padding: 16px 14px;
-    gap: 14px;
+    padding: var(--space-md) var(--space-md);
+    gap: var(--space-md);
   }
 
   .currencyBtn {
@@ -554,15 +564,15 @@
   }
 
   .totalAmount {
-    font-size: 1.85rem;
+    font-size: 1.75rem;
   }
 
   .availableAmount {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
 
   .trendsBar {
-    gap: 8px;
-    padding-top: 10px;
+    gap: var(--space-sm);
+    padding-top: var(--space-sm);
   }
 }

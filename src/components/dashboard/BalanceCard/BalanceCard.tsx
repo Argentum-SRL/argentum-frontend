@@ -296,146 +296,148 @@ export const BalanceCard = memo(function BalanceCard({
           )}
         </div>
 
-        {/* Saldo Disponible Real */}
-        <div className={styles.saldoSecondary}>
-          <span className={styles.saldoLabel}>Disponible libre</span>
-          <div className={styles.availableRow}>
-            {hasCompromisos && !isDeficit ? (
-              <button
-                type="button"
-                className={`${styles.availableTrigger} ${isCompromisosOpen ? styles.triggerActive : ''}`}
-                onClick={toggleCompromisos}
-                aria-expanded={isCompromisosOpen}
-                title={isCompromisosOpen ? 'Contraer detalle de compromisos' : 'Ver compromisos descontados'}
-              >
-                <span className={styles.availableAmount}>
+        {/* ── 2b. Bloque Secundario Compacto: Disponible Libre & Cuentas ── */}
+        <div className={styles.secondaryGroup}>
+          <div className={styles.saldoSecondary}>
+            <span className={`${styles.saldoLabel} ${styles.saldoLabelDisponible}`}>Disponible libre</span>
+            <div className={styles.availableRow}>
+              {hasCompromisos && !isDeficit ? (
+                <button
+                  type="button"
+                  className={`${styles.availableTrigger} ${isCompromisosOpen ? styles.triggerActive : ''}`}
+                  onClick={toggleCompromisos}
+                  aria-expanded={isCompromisosOpen}
+                  title={isCompromisosOpen ? 'Contraer detalle de compromisos' : 'Ver compromisos descontados'}
+                >
+                  <span className={styles.availableAmount}>
+                    {showBalance ? fmt(saldoDisponible, moneda) : '••••••••'}
+                  </span>
+                  <ChevronDown
+                    size={13}
+                    className={`${styles.chevron} ${isCompromisosOpen ? styles.chevronOpen : ''}`}
+                  />
+                </button>
+              ) : (
+                <span className={`${styles.availableAmount} ${isDeficit ? styles.amountNegative : ''}`}>
                   {showBalance ? fmt(saldoDisponible, moneda) : '••••••••'}
                 </span>
-                <ChevronDown
-                  size={13}
-                  className={`${styles.chevron} ${isCompromisosOpen ? styles.chevronOpen : ''}`}
-                />
-              </button>
-            ) : (
-              <span className={`${styles.availableAmount} ${isDeficit ? styles.amountNegative : ''}`}>
-                {showBalance ? fmt(saldoDisponible, moneda) : '••••••••'}
-              </span>
-            )}
-            {isDeficit && (
-              <span className={styles.deficitBadge}>
-                Déficit de {showBalance ? fmt(Math.abs(saldoDisponible), moneda) : '••••'}
-              </span>
+              )}
+              {isDeficit && (
+                <span className={styles.deficitBadge}>
+                  Déficit de {showBalance ? fmt(Math.abs(saldoDisponible), moneda) : '••••'}
+                </span>
+              )}
+            </div>
+
+            {/* Panel Colapsable de Compromisos Descontados (Mismo diseño integrado que cuentas) */}
+            {isCompromisosOpen && hasCompromisos && !isDeficit && (
+              <div className={styles.accountsDropdown}>
+                <div className={styles.dropdownHeader}>
+                  <span className={styles.dropdownTitle}>Compromisos descontados</span>
+                  <span className={styles.dropdownBadge}>
+                    -{showBalance ? fmt(totalCompromisos, moneda) : '••••'}
+                  </span>
+                </div>
+
+                <div className={styles.accountsList} role="list">
+                  {itemsCompromisos.map((item: CompromisoItem) => {
+                    const isDolaresConPesos = item.tipo === 'dolares_con_pesos'
+                    const displayName = isDolaresConPesos ? formatCompromisoNombre(item) : item.nombre
+                    const detalle = isDolaresConPesos ? formatCompromisoDetalle(item) : null
+
+                    return (
+                      <div key={item.id} className={styles.accountRow}>
+                        <div className={styles.rowLeft}>
+                          <span className={styles.itemDot} />
+                          <div className={styles.accountTextCol}>
+                            <span className={styles.accountName}>{displayName}</span>
+                            {detalle && (
+                              <span className={styles.compromisoDetalle}>
+                                {detalle}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <span className={styles.compromisoAmount}>
+                          -{showBalance ? fmt(item.monto, moneda) : '••••'}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             )}
           </div>
 
-          {/* Panel Colapsable de Compromisos Descontados (Mismo diseño integrado que cuentas) */}
-          {isCompromisosOpen && hasCompromisos && !isDeficit && (
-            <div className={styles.accountsDropdown}>
-              <div className={styles.dropdownHeader}>
-                <span className={styles.dropdownTitle}>Compromisos descontados</span>
-                <span className={styles.dropdownBadge}>
-                  -{showBalance ? fmt(totalCompromisos, moneda) : '••••'}
-                </span>
-              </div>
+          {/* ── 3. Selector de Cuentas (Disimulado e integrado) ──────────── */}
+          {billeterasActivas.length > 1 && (
+            <div className={styles.accountsSection}>
+              <button
+                type="button"
+                className={`${styles.accountsTrigger} ${isAccountsOpen ? styles.triggerActive : ''}`}
+                onClick={toggleAccounts}
+                aria-expanded={isAccountsOpen}
+                title={isAccountsOpen ? 'Contraer cuentas' : 'Filtrar por cuenta'}
+              >
+                <div className={styles.triggerContent}>
+                  <span className={styles.triggerDot} />
+                  <span className={styles.triggerText}>
+                    {billeterasSeleccionadas.length === 0
+                      ? `Todas las cuentas (${billeterasActivas.length})`
+                      : billeterasSeleccionadas.length === 1
+                        ? (() => {
+                            const b = billeterasActivas.find(x => x.id === billeterasSeleccionadas[0])
+                            if (!b) return '1 cuenta'
+                            return b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre
+                          })()
+                        : `${billeterasSeleccionadas.length} cuentas seleccionadas`}
+                  </span>
+                  <ChevronDown
+                    size={13}
+                    className={`${styles.chevron} ${isAccountsOpen ? styles.chevronOpen : ''}`}
+                  />
+                </div>
+              </button>
 
-              <div className={styles.accountsList} role="list">
-                {itemsCompromisos.map((item: CompromisoItem) => {
-                  const isDolaresConPesos = item.tipo === 'dolares_con_pesos'
-                  const displayName = isDolaresConPesos ? formatCompromisoNombre(item) : item.nombre
-                  const detalle = isDolaresConPesos ? formatCompromisoDetalle(item) : null
+              {/* Panel Colapsable */}
+              {isAccountsOpen && (
+                <div className={styles.accountsDropdown}>
+                  <div className={styles.dropdownHeader}>
+                    <span className={styles.dropdownTitle}>Filtrar cuentas</span>
+                    <button
+                      type="button"
+                      className={`${styles.resetBtn} ${billeterasSeleccionadas.length === 0 ? styles.resetBtnActive : ''}`}
+                      onClick={() => onToggleBilletera(null)}
+                    >
+                      Todas ({billeterasActivas.length})
+                    </button>
+                  </div>
 
-                  return (
-                    <div key={item.id} className={styles.accountRow}>
-                      <div className={styles.rowLeft}>
-                        <span className={styles.itemDot} />
-                        <div className={styles.accountTextCol}>
-                          <span className={styles.accountName}>{displayName}</span>
-                          {detalle && (
-                            <span className={styles.compromisoDetalle}>
-                              {detalle}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <span className={styles.compromisoAmount}>
-                        -{showBalance ? fmt(item.monto, moneda) : '••••'}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
+                  <div className={styles.accountsList} role="listbox">
+                    {billeterasVisibles.map(renderFilaBilletera)}
+
+                    {billeterasEnCero.length > 0 && (
+                      <button
+                        type="button"
+                        className={styles.zeroAccountsToggleBtn}
+                        onClick={() => setMostrarEnCero(prev => !prev)}
+                      >
+                        {mostrarEnCero
+                          ? 'Ocultar las de $0'
+                          : billeterasEnCero.length === 1
+                            ? 'Ver 1 en $0'
+                            : `Ver ${billeterasEnCero.length} en $0`}
+                      </button>
+                    )}
+
+                    {mostrarEnCero && billeterasEnCero.map(renderFilaBilletera)}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
-
-      {/* ── 3. Selector de Cuentas (Disimulado e integrado) ──────────── */}
-      {billeterasActivas.length > 1 && (
-        <div className={styles.accountsSection}>
-          <button
-            type="button"
-            className={`${styles.accountsTrigger} ${isAccountsOpen ? styles.triggerActive : ''}`}
-            onClick={toggleAccounts}
-            aria-expanded={isAccountsOpen}
-            title={isAccountsOpen ? 'Contraer cuentas' : 'Filtrar por cuenta'}
-          >
-            <div className={styles.triggerContent}>
-              <span className={styles.triggerDot} />
-              <span className={styles.triggerText}>
-                {billeterasSeleccionadas.length === 0
-                  ? `Todas las cuentas (${billeterasActivas.length})`
-                  : billeterasSeleccionadas.length === 1
-                    ? (() => {
-                        const b = billeterasActivas.find(x => x.id === billeterasSeleccionadas[0])
-                        if (!b) return '1 cuenta'
-                        return b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre
-                      })()
-                    : `${billeterasSeleccionadas.length} cuentas seleccionadas`}
-              </span>
-              <ChevronDown
-                size={13}
-                className={`${styles.chevron} ${isAccountsOpen ? styles.chevronOpen : ''}`}
-              />
-            </div>
-          </button>
-
-          {/* Panel Colapsable */}
-          {isAccountsOpen && (
-            <div className={styles.accountsDropdown}>
-              <div className={styles.dropdownHeader}>
-                <span className={styles.dropdownTitle}>Filtrar cuentas</span>
-                <button
-                  type="button"
-                  className={`${styles.resetBtn} ${billeterasSeleccionadas.length === 0 ? styles.resetBtnActive : ''}`}
-                  onClick={() => onToggleBilletera(null)}
-                >
-                  Todas ({billeterasActivas.length})
-                </button>
-              </div>
-
-              <div className={styles.accountsList} role="listbox">
-                {billeterasVisibles.map(renderFilaBilletera)}
-
-                {billeterasEnCero.length > 0 && (
-                  <button
-                    type="button"
-                    className={styles.zeroAccountsToggleBtn}
-                    onClick={() => setMostrarEnCero(prev => !prev)}
-                  >
-                    {mostrarEnCero
-                      ? 'Ocultar las de $0'
-                      : billeterasEnCero.length === 1
-                        ? 'Ver 1 en $0'
-                        : `Ver ${billeterasEnCero.length} en $0`}
-                  </button>
-                )}
-
-                {mostrarEnCero && billeterasEnCero.map(renderFilaBilletera)}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* ── 4. Resumen de Flujo (Solo flechas, limpio y financiero) ──── */}
       <div className={styles.trendsBar}>

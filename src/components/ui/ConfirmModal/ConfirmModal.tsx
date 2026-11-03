@@ -91,6 +91,7 @@ export function ConfirmModal({
       showHeader={false}
       size={size}
       autoHeight
+      className={styles.confirmModal}
     >
       <form 
         className={styles.modalContent}

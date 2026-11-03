@@ -1,8 +1,5 @@
 import { memo, useMemo } from 'react'
-import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
 import { 
-  Sparkles, 
-  CreditCard, 
   Trash2, 
   Wallet,
   Banknote,
@@ -11,9 +8,9 @@ import {
 import { BadgePercent } from 'lucide-react'
 import type { Transaccion, Billetera, Categoria } from '@/types'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
+import MovimientoIconos from './MovimientoIconos'
 import { formatMonto } from '@/utils/format'
 import { getBankById, findBankByNombre, getBankLogoUrl } from '@/lib/utils/billeteras.utils'
-import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 import styles from './TransaccionRow.module.css'
 
 function formatDDMM(fechaIso?: string | null): string {
@@ -27,6 +24,7 @@ function formatDDMM(fechaIso?: string | null): string {
 interface TransaccionRowProps {
   transaccion: Transaccion
   titulo?: string
+  iconos?: string[]
   categoria?: Categoria
   billetera?: Billetera
   onEdit?: (id: string) => void
@@ -40,27 +38,18 @@ interface TransaccionRowProps {
   modo?: 'general' | 'billetera'
 }
 
-const METODO_PAGO_LABELS: Record<string, string> = {
-  transferencia: 'Transferencia',
-  debito: 'Débito',
-  credito: 'Crédito',
-  efectivo: 'Efectivo',
-}
-
 const TransaccionRow = memo(({
   transaccion,
   titulo,
+  iconos = [],
   categoria,
   billetera,
   onEdit,
   onDelete,
   hideWallet = false,
-  etiqueta,
   cuentaComo,
 }: TransaccionRowProps) => {
   const isIngreso = transaccion.tipo === 'ingreso'
-  const isPendiente = transaccion.estado_verificacion === 'pendiente'
-  const isPendienteIA = isPendiente && ['ia_wpp', 'ia_pdf'].includes(transaccion.origen)
 
   const isMeta = Boolean(
     transaccion.movimiento_meta_id ||
@@ -69,13 +58,6 @@ const TransaccionRow = memo(({
   )
   const isAporteMeta = isMeta && transaccion.tipo === 'egreso'
   const isRetiroMeta = isMeta && transaccion.tipo === 'ingreso'
-
-  const metodoLabel = useMemo(() => {
-    if (transaccion.tipo === 'ingreso' && (transaccion.metodo_pago === 'debito' || transaccion.metodo_pago === 'credito')) {
-      return billetera?.es_efectivo ? 'Efectivo' : 'Transferencia'
-    }
-    return METODO_PAGO_LABELS[transaccion.metodo_pago] || transaccion.metodo_pago || 'Movimiento'
-  }, [transaccion.metodo_pago, transaccion.tipo, billetera?.es_efectivo])
 
   // Obtener info del banco / logo si aplica
   const bankInfo = useMemo(() => {
@@ -99,16 +81,14 @@ const TransaccionRow = memo(({
   const subcategoriaNombre = isMeta ? 'Metas' : (transaccion.subcategoria?.nombre || 'General')
   const walletDisplayName = bankInfo?.name || billetera?.nombre || 'Billetera'
 
-  // Limpieza inteligente de categorías para evitar duplicaciones (ej: "Transporte / Transporte") y recortes innecesarios
+  // Limpieza inteligente de categorías para evitar duplicaciones
   const categoryDisplayText = useMemo(() => {
-    if (isAporteMeta) return 'Apartado para meta'
+    if (isAporteMeta) return 'Aporte a meta'
     if (isRetiroMeta) return 'Retiro de meta'
     
     const cat = categoriaNombre.trim()
     const sub = subcategoriaNombre.trim()
     
-    // Si hay una subcategoría específica distinta de "General" y distinta del nombre de categoría,
-    // mostrar directamente la subcategoría para evitar saturar el espacio.
     if (sub && sub.toLowerCase() !== 'general' && sub.toLowerCase() !== cat.toLowerCase()) {
       return sub
     }
@@ -131,7 +111,7 @@ const TransaccionRow = memo(({
           }
         },
       } : {})}
-      className={`${styles.row} ${isClickable ? styles.rowClickable : styles.rowStatic} ${isPendiente ? styles.rowPendiente : ''}`}
+      className={`${styles.row} ${isClickable ? styles.rowClickable : styles.rowStatic}`}
       aria-label={`Transacción ${title}, monto ${formatMonto(transaccion.monto, transaccion.moneda)}`}
     >
       {/* ── 1. Category Squircle Avatar ──────────────────────────────────── */}
@@ -152,43 +132,15 @@ const TransaccionRow = memo(({
           size={isAporteMeta || isRetiroMeta ? 22 : 24}
           className={isAporteMeta || isRetiroMeta ? styles.avatarIconMeta : styles.avatarIcon}
         />
-        {isPendienteIA && (
-          <div className={styles.avatarBadge} title="Pendiente IA">
-            <Sparkles size={10} className={styles.sparkleIcon} />
-          </div>
-        )}
       </div>
 
       {/* ── 2. Central Details Area ──────────────────────────────────────── */}
       <div className={styles.infoArea}>
-        {/* Main Title & Badges */}
+        {/* Main Title */}
         <div className={styles.titleRow}>
           <span className={styles.title} title={title}>
             {title}
           </span>
-
-          <div className={styles.badgesWrapper}>
-            {isPendiente && (
-              <span className={`${styles.badge} ${styles.badgePendiente} ${styles.desktopOnly}`}>
-                <Sparkles size={10} strokeWidth={2.5} />
-                <span className={styles.badgeText}>{isPendienteIA ? 'Pendiente IA' : 'Por confirmar'}</span>
-              </span>
-            )}
-            {transaccion.es_cuota_hija && (
-              <span className={`${styles.badge} ${styles.badgeCuota}`}>
-                <CreditCard size={10} strokeWidth={2.5} />
-                <span className={styles.badgeText}>Cuota</span>
-              </span>
-            )}
-            {Boolean(transaccion.suscripcion_id) && (
-              <DebitoAutomaticoBadge />
-            )}
-            {etiqueta && !esEtiquetaRedundante(etiqueta) && (
-              <span className={`${styles.badgeEtiqueta} ${styles.desktopOnly}`}>
-                {etiqueta}
-              </span>
-            )}
-          </div>
         </div>
 
         {/* Desktop Metadata Row (Categoría limpia + Chip billetera opcional) */}
@@ -221,11 +173,6 @@ const TransaccionRow = memo(({
 
         {/* Mobile-Only Clean Subtitle */}
         <div className={`${styles.mobileSubtitleRow} ${styles.mobileOnly}`}>
-          {isPendiente && (
-            <span className={styles.mobilePendingBadge}>
-              {isPendienteIA ? 'Pendiente IA' : 'Por confirmar'}
-            </span>
-          )}
           <span className={styles.mobileCategoryText} title={categoryDisplayText}>
             {categoryDisplayText}
           </span>
@@ -268,12 +215,8 @@ const TransaccionRow = memo(({
               </span>
             )
           })()}
+          <MovimientoIconos iconos={iconos} />
         </div>
-
-        {/* En Desktop: Método de pago o indicador de apartado */}
-        <span className={`${styles.paymentMethod} ${styles.desktopOnly}`}>
-          {isAporteMeta ? 'Apartado para meta' : isRetiroMeta ? 'Retiro de meta' : metodoLabel}
-        </span>
 
         {/* En Mobile: Solo mostrar billetera si no está en la página de la billetera */}
         {!hideWallet && (

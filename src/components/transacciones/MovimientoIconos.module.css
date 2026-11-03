@@ -1,0 +1,20 @@
+.iconosWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.iconoItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  line-height: 1;
+}
+
+.iconoReintegro {
+  color: var(--success);
+}
+

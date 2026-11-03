@@ -11,6 +11,7 @@ import SegmentedControl from '@/components/ui/SegmentedControl'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import DayGroup from '@/components/transacciones/DayGroup'
+import ProximosBloque from '@/components/transacciones/ProximosBloque'
 import TarjetaCard from '@/components/tarjetas/TarjetaCard'
 import TarjetaSummary from '@/components/tarjetas/TarjetaSummary'
 import { PresionFuturaCard } from '@/components/tarjetas/PresionFuturaCard'
@@ -53,6 +54,8 @@ const BilleteraDetallePage: React.FC = () => {
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
   const [tarjetas, setTarjetas] = useState<TarjetaCredito[]>([])
   const [movimientos, setMovimientos] = useState<MovimientoItem[]>([])
+  const [proximos, setProximos] = useState<MovimientoItem[]>([])
+  const [proximosTotal, setProximosTotal] = useState(0)
   const [hasMoreMovimientos, setHasMoreMovimientos] = useState(false)
   const [loadingMoreMovimientos, setLoadingMoreMovimientos] = useState(false)
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -181,6 +184,8 @@ const BilleteraDetallePage: React.FC = () => {
 
         setMovimientos(movRes.items)
         setHasMoreMovimientos(movRes.hay_mas)
+        setProximos(movRes.proximos ?? [])
+        setProximosTotal(movRes.proximos_total ?? 0)
         setCategorias(cats)
         setBilleteras(allBills)
 
@@ -237,6 +242,8 @@ const BilleteraDetallePage: React.FC = () => {
       ])
       setMovimientos(movRes.items)
       setHasMoreMovimientos(movRes.hay_mas)
+      setProximos(movRes.proximos ?? [])
+      setProximosTotal(movRes.proximos_total ?? 0)
       setBilletera(bill)
       setTarjetas(cards)
       setAjustesData(ajustesRes)
@@ -660,38 +667,50 @@ const BilleteraDetallePage: React.FC = () => {
             <div style={{ padding: '8px 0' }}>
               <TransactionsListSkeleton groupsCount={1} rowsPerGroup={3} />
             </div>
-          ) : groupedMovimientos.length === 0 ? (
-            <EmptyState
-              icon={CreditCard}
-              title="Sin movimientos"
-              description="Esta billetera aún no tiene transacciones registradas."
-            />
           ) : (
-            <div className={styles.movimientosList}>
-              {groupedMovimientos.map(([fecha, movs]) => (
-                <DayGroup
-                  key={fecha}
-                  fecha={fecha}
-                  movimientos={movs}
-                  categorias={categorias}
-                  billeteras={[billetera]}
-                  hideWallet={true}
-                  modo="billetera"
+            <>
+              <ProximosBloque
+                proximos={proximos}
+                total={proximosTotal}
+                categorias={categorias}
+                billeteras={[billetera]}
+                hideWallet={true}
+                modo="billetera"
+              />
+              {groupedMovimientos.length === 0 ? (
+                <EmptyState
+                  icon={CreditCard}
+                  title="Sin movimientos"
+                  description="Esta billetera aún no tiene transacciones registradas."
                 />
-              ))}
-              {hasMoreMovimientos && (
-                <div className={styles.verMasContainer}>
-                  <button
-                    type="button"
-                    className={styles.verMasBtn}
-                    onClick={handleLoadMoreMovimientos}
-                    disabled={loadingMoreMovimientos}
-                  >
-                    {loadingMoreMovimientos ? 'Cargando...' : 'Ver más'}
-                  </button>
+              ) : (
+                <div className={styles.movimientosList}>
+                  {groupedMovimientos.map(([fecha, movs]) => (
+                    <DayGroup
+                      key={fecha}
+                      fecha={fecha}
+                      movimientos={movs}
+                      categorias={categorias}
+                      billeteras={[billetera]}
+                      hideWallet={true}
+                      modo="billetera"
+                    />
+                  ))}
+                  {hasMoreMovimientos && (
+                    <div className={styles.verMasContainer}>
+                      <button
+                        type="button"
+                        className={styles.verMasBtn}
+                        onClick={handleLoadMoreMovimientos}
+                        disabled={loadingMoreMovimientos}
+                      >
+                        {loadingMoreMovimientos ? 'Cargando...' : 'Ver más'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
+            </>
           )}
           {/* Sección Controles de Saldo — visible solo si hay ajustes */}
           {ajustesData && ajustesData.ajustes.length > 0 && (

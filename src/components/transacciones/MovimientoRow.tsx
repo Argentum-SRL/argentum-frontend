@@ -22,8 +22,6 @@ interface MovimientoRowProps {
   modo?: 'general' | 'billetera'
 }
 
-import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
-
 function formatDDMM(fechaIso?: string | null): string {
   if (!fechaIso) return ''
   const clean = fechaIso.split('T')[0]
@@ -47,7 +45,8 @@ const MovimientoRow = memo(({
     return (
       <TransaccionRow
         transaccion={movimiento.transaccion}
-        titulo={movimiento.cuota_texto ? movimiento.descripcion : undefined}
+        titulo={movimiento.titulo}
+        iconos={movimiento.iconos}
         categoria={categoria}
         billetera={billetera}
         onEdit={hasCuotasGroup && onOpenCuotasGroup ? () => onOpenCuotasGroup(movimiento.grupo_cuotas_id!) : onEdit}
@@ -103,7 +102,7 @@ const MovimientoRow = memo(({
       : styles.amountEgreso
 
   const isTransferencia = movimiento.clase === 'transferencia'
-  const title = isTransferencia ? 'Transferencia' : movimiento.descripcion
+  const title = movimiento.titulo || (isTransferencia ? 'Transferencia' : movimiento.descripcion)
 
   const recorridoTransferencia =
     movimiento.billetera_nombre && movimiento.billetera_destino_nombre
@@ -120,10 +119,6 @@ const MovimientoRow = memo(({
             : movimiento.billetera_nombre)
         : null)
 
-  const showEtiqueta = Boolean(
-    movimiento.etiqueta && !esEtiquetaRedundante(movimiento.etiqueta)
-  )
-
   return (
     <div
       className={`${styles.row} ${styles.rowStatic}`}
@@ -136,14 +131,6 @@ const MovimientoRow = memo(({
           <span className={styles.title} title={title}>
             {title}
           </span>
-
-          {showEtiqueta && (
-            <div className={`${styles.badgesWrapper} ${styles.desktopOnly}`}>
-              <span className={styles.badgeEtiqueta}>
-                {movimiento.etiqueta}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Desktop metadata */}

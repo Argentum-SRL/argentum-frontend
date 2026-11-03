@@ -449,12 +449,14 @@ export interface DashboardResumen {
       egresos: number
       balance: number
       variacion_vs_ciclo_anterior: number | null
+      linea_metas?: string | null
     }
     usd: {
       ingresos: number
       egresos: number
       balance: number
       variacion_vs_ciclo_anterior: number | null
+      linea_metas?: string | null
     }
   }
   disponible_real: {
@@ -535,6 +537,8 @@ export interface MovimientoDashboard {
   aclaracion?: string | null
   cuota_texto?: string | null
   reintegro?: ReintegroInfo | null
+  titulo?: string
+  iconos?: string[]
 }
 
 export interface PagoDashboard {
@@ -1286,5 +1290,11 @@ export * from './movimiento'
 declare module './movimiento' {
   interface MovimientoItem {
     reintegro?: ReintegroInfo | null
+    titulo?: string
+    iconos?: string[]
+  }
+  interface MovimientosResponse {
+    proximos?: MovimientoItem[]
+    proximos_total?: number
   }
 }

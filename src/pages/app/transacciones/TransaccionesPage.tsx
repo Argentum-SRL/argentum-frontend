@@ -21,6 +21,7 @@ import { useNotificaciones } from '@/hooks/useNotificaciones'
 
 import FilterBar from '@/components/transacciones/FilterBar'
 import DayGroup from '@/components/transacciones/DayGroup'
+import ProximosBloque from '@/components/transacciones/ProximosBloque'
 import GruposCuotasTab from '@/components/transacciones/GruposCuotasTab'
 import { EmptyState, PageSummaryBar } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
@@ -75,6 +76,8 @@ export default function TransaccionesPage() {
   }
   
   const [movimientos, setMovimientos] = useState<MovimientoItem[]>([])
+  const [proximos, setProximos] = useState<MovimientoItem[]>([])
+  const [proximosTotal, setProximosTotal] = useState(0)
   const [totalesServidor, setTotalesServidor] = useState<Record<string, TotalesMoneda>>({})
   const [totalItems, setTotalItems] = useState(0)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -116,6 +119,8 @@ export default function TransaccionesPage() {
         setTotalesServidor(resp.totales)
         setTotalItems(resp.total_items)
         setHasMore(resp.hay_mas)
+        setProximos(resp.proximos ?? [])
+        setProximosTotal(resp.proximos_total ?? 0)
       }
     } catch (err) {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
@@ -548,6 +553,9 @@ export default function TransaccionesPage() {
               <span className={`${styles.splitValue} ${resumen.balance < 0 ? styles.colorRed : styles.colorGreen}`}>
                 {resumen.balance < 0 ? '-' : '+'}{formatCurrency(Math.abs(resumen.balance))}
               </span>
+              {totalesMonedaActiva.linea_metas && (
+                <p className={styles.lineaSaldo}>{totalesMonedaActiva.linea_metas}</p>
+              )}
             </div>
             <div className={styles.splitDivider} />
             <div className={styles.splitItem}>
@@ -577,6 +585,9 @@ export default function TransaccionesPage() {
                   {resumen.balance < 0 ? '-' : '+'}
                   {formatCurrency(Math.abs(resumen.balance))}
                 </span>
+                {totalesMonedaActiva.linea_metas && (
+                  <p className={styles.lineaSaldo}>{totalesMonedaActiva.linea_metas}</p>
+                )}
               </div>
             }
             items={[
@@ -624,48 +635,63 @@ export default function TransaccionesPage() {
           <div className={styles.listContainer}>
             {loading || loadingPeriodo ? (
               <TransactionsListSkeleton groupsCount={2} rowsPerGroup={3} />
-            ) : grupos.length === 0 ? (
-              <EmptyState
-                icon={ArrowLeftRight}
-                title={hasActiveFilters ? 'No se encontraron resultados' : 'Sin movimientos en este ciclo'}
-                description={
-                  hasActiveFilters 
-                    ? 'No encontramos transacciones con esos filtros.' 
-                    : 'Todavía no registraste ningún movimiento.'
-                }
-                actionLabel={hasActiveFilters ? 'Limpiar filtros' : 'Registrar primera transacción'}
-                onActionClick={hasActiveFilters ? handleClearFilters : openNewTransaccion}
-              />
             ) : (
               <>
-                {grupos.map(([fecha, movs]) => (
-                  <DayGroup
-                    key={fecha}
-                    fecha={fecha}
-                    movimientos={movs}
-                    categorias={categorias}
-                    billeteras={billeteras}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onOpenCuotasGroup={handleOpenCuotasGroup}
-                    modo="general"
+                <ProximosBloque
+                  proximos={proximos}
+                  total={proximosTotal}
+                  categorias={categorias}
+                  billeteras={billeteras}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onOpenCuotasGroup={handleOpenCuotasGroup}
+                  modo="general"
+                />
+
+                {grupos.length === 0 ? (
+                  <EmptyState
+                    icon={ArrowLeftRight}
+                    title={hasActiveFilters ? 'No se encontraron resultados' : 'Sin movimientos en este ciclo'}
+                    description={
+                      hasActiveFilters 
+                        ? 'No encontramos transacciones con esos filtros.' 
+                        : 'Todavía no registraste ningún movimiento.'
+                    }
+                    actionLabel={hasActiveFilters ? 'Limpiar filtros' : 'Registrar primera transacción'}
+                    onActionClick={hasActiveFilters ? handleClearFilters : openNewTransaccion}
                   />
-                ))}
+                ) : (
+                  <>
+                    {grupos.map(([fecha, movs]) => (
+                      <DayGroup
+                        key={fecha}
+                        fecha={fecha}
+                        movimientos={movs}
+                        categorias={categorias}
+                        billeteras={billeteras}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onOpenCuotasGroup={handleOpenCuotasGroup}
+                        modo="general"
+                      />
+                    ))}
 
-                {/* Sentinel para IntersectionObserver */}
-                <div ref={sentinelRef} style={{ height: 1, margin: 0, padding: 0 }} />
+                    {/* Sentinel para IntersectionObserver */}
+                    <div ref={sentinelRef} style={{ height: 1, margin: 0, padding: 0 }} />
 
-                {loadingMore && (
-                  <div className={styles.loadingMore}>
-                    <LunarLoader size={16} />
-                    Cargando más movimientos...
-                  </div>
-                )}
+                    {loadingMore && (
+                      <div className={styles.loadingMore}>
+                        <LunarLoader size={16} />
+                        Cargando más movimientos...
+                      </div>
+                    )}
 
-                {!hasMore && movimientos.length > 0 && (
-                  <div className={styles.endOfList}>
-                    Llegaste al final de las transacciones
-                  </div>
+                    {!hasMore && movimientos.length > 0 && (
+                      <div className={styles.endOfList}>
+                        Llegaste al final de las transacciones
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}

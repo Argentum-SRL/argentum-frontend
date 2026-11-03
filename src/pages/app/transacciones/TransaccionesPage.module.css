@@ -376,6 +376,16 @@
   line-height: 1.1;
 }
 
+.lineaSaldo {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.42);
+  margin: 4px 0 0 0;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 @media (min-width: 768px) {
   .balanceCicloValue {
     font-size: 28px; /* Desktop size */

@@ -31,6 +31,7 @@ export interface TotalesMoneda {
   gastos: number
   ingresos: number
   balance: number
+  linea_metas?: string | null
 }
 
 export interface MovimientosResponse {

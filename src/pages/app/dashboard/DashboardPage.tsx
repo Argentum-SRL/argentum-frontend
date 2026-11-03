@@ -37,6 +37,7 @@ import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
+import MovimientoIconos from '@/components/transacciones/MovimientoIconos'
 import { EmptyState, WidgetErrorBoundary, BalanceCardSkeleton, DashboardListSkeleton } from '@/components/ui'
 import AvisosConfianza from '@/components/dashboard/AvisosConfianza/AvisosConfianza'
 
@@ -49,7 +50,6 @@ function formatDDMM(fechaIso?: string | null): string {
 }
 
 import { getFotoUrl } from '@/utils/fotoUrl'
-import { esEtiquetaRedundante } from '@/lib/utils/etiquetas.utils'
 import FacturaPanel from '@/components/facturas/FacturaPanel'
 import facturaStyles from '@/components/facturas/FacturaPanel.module.css'
 import styles from './DashboardPage.module.css'
@@ -933,6 +933,7 @@ export default function DashboardPage() {
                 onTogglePrivacy={handleTogglePrivacy}
                 ingresos={moneda === 'ARS' ? (data.balance?.ars?.ingresos ?? 0) : (data.balance?.usd?.ingresos ?? 0)}
                 egresos={moneda === 'ARS' ? (data.balance?.ars?.egresos ?? 0) : (data.balance?.usd?.egresos ?? 0)}
+                lineaMetas={moneda === 'ARS' ? (data.balance?.ars?.linea_metas ?? null) : (data.balance?.usd?.linea_metas ?? null)}
                 isAccountsOpen={isAccountsOpen}
                 onToggleAccounts={handleToggleAccounts}
                 isCompromisosOpen={isCompromisosOpen}
@@ -1176,16 +1177,11 @@ export default function DashboardPage() {
                           </div>
                           <div className={styles.itemMeta}>
                             <p className={styles.itemName}>
-                              {m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
-                              {m.etiqueta && !esEtiquetaRedundante(m.etiqueta) && (
-                                <span className={styles.badgeEtiqueta}>
-                                  {m.etiqueta}
-                                </span>
-                              )}
+                              {m.titulo || m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
                             </p>
                             <p className={styles.itemSub}>
                               {formatFecha(m.fecha)} • {m.billetera_nombre}
-                              {isAporte && ' • Apartado para meta'}
+                              {isAporte && ' • Aporte a meta'}
                               {isRetiro && ' • Retiro de meta'}
                             </p>
                           </div>
@@ -1227,6 +1223,7 @@ export default function DashboardPage() {
                                     </span>
                                   )
                                 })()}
+                                <MovimientoIconos iconos={m.iconos ?? []} />
                               </div>
                             )
                           })()}

@@ -46,7 +46,6 @@ export interface BalanceCardProps {
   onCloseDropdowns?: () => void
   compromisos?: CompromisoItem[]
   lineaSaldo?: string | null
-  lineaMetas?: string | null
   totalCompromisos: number
 }
 
@@ -110,7 +109,6 @@ export const BalanceCard = memo(function BalanceCard({
   onCloseDropdowns,
   compromisos,
   lineaSaldo,
-  lineaMetas,
   totalCompromisos,
 }: BalanceCardProps) {
   const [internalAccountsOpen, setInternalAccountsOpen] = useState(false)
@@ -457,10 +455,6 @@ export const BalanceCard = memo(function BalanceCard({
           </span>
         </div>
       </div>
-
-      {lineaMetas && showBalance && (
-        <p className={styles.lineaSaldo}>{lineaMetas}</p>
-      )}
     </div>
   )
 })

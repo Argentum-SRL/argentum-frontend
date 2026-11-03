@@ -933,7 +933,6 @@ export default function DashboardPage() {
                 onTogglePrivacy={handleTogglePrivacy}
                 ingresos={moneda === 'ARS' ? (data.balance?.ars?.ingresos ?? 0) : (data.balance?.usd?.ingresos ?? 0)}
                 egresos={moneda === 'ARS' ? (data.balance?.ars?.egresos ?? 0) : (data.balance?.usd?.egresos ?? 0)}
-                lineaMetas={moneda === 'ARS' ? (data.balance?.ars?.linea_metas ?? null) : (data.balance?.usd?.linea_metas ?? null)}
                 isAccountsOpen={isAccountsOpen}
                 onToggleAccounts={handleToggleAccounts}
                 isCompromisosOpen={isCompromisosOpen}
@@ -1186,35 +1185,42 @@ export default function DashboardPage() {
                             </p>
                           </div>
                           {(() => {
+                            const isEspejoReintegro = Boolean(
+                              m.iconos?.includes('reintegro') ||
+                              (m.reintegro_de_id && m.tipo_espejo !== 'parte') ||
+                              (m.descripcion && m.descripcion.toLowerCase().startsWith('reintegro'))
+                            )
                             const isNada = m.cuenta_como
                               ? m.cuenta_como === 'nada'
                               : (m.tipo === 'transferencia' || isAporte || isRetiro)
-                            const sign = m.sentido
-                              ? (m.sentido === 'entra' ? '+' : m.sentido === 'sale' ? '−' : '')
-                              : (m.tipo === 'transferencia' ? '' : (m.tipo === 'ingreso' ? '+' : '−'))
+                            const sign = isEspejoReintegro
+                              ? '+'
+                              : m.sentido
+                              ? (m.sentido === 'entra' ? '+' : m.sentido === 'sale' ? '-' : '')
+                              : (m.tipo === 'transferencia' ? '' : (m.tipo === 'ingreso' ? '+' : '-'))
                             const amountColorClass = isNada
                               ? styles.amountNada
+                              : isEspejoReintegro
+                              ? styles.amountPos
                               : (m.sentido ? m.sentido === 'entra' : m.tipo === 'ingreso')
                               ? styles.amountPos
                               : styles.amountNeg
 
                             return (
                               <div className={`${styles.itemAmount} ${amountColorClass}`}>
-                                {sign}{formatMonto(m.monto, m.moneda)}
-                                {m.reintegro && (() => {
+                                <span className={styles.amountValue}>
+                                  {sign}{formatMonto(Math.abs(m.monto), m.moneda)}
+                                </span>
+                                {!isEspejoReintegro && m.reintegro && (() => {
                                   const { monto: rMonto, estado: rEstado, fecha_recibido: rFecha } = m.reintegro
                                   const rLabel = rEstado === 'recibido'
                                     ? `Te devolvieron ${formatMonto(rMonto, m.moneda)} el ${formatDDMM(rFecha)}`
                                     : `Reintegro de ${formatMonto(rMonto, m.moneda)} pendiente`
                                   return (
                                     <span
+                                      className={styles.dashboardReintegroIcon}
                                       style={{
                                         color: rEstado === 'recibido' ? 'var(--success)' : 'var(--text-2)',
-                                        marginLeft: 4,
-                                        verticalAlign: 'middle',
-                                        flexShrink: 0,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
                                       }}
                                       title={rLabel}
                                       aria-label={rLabel}

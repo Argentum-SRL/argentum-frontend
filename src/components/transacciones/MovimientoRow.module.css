@@ -163,13 +163,19 @@
 
 .amount {
   display: inline-flex;
-  align-items: baseline;
-  gap: 2px;
+  align-items: center;
+  gap: 6px;
   font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
   white-space: nowrap;
+}
+
+.amountValue {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
 }
 
 .amountSign {
@@ -182,7 +188,7 @@
 }
 
 .amountEgreso {
-  color: var(--text);
+  color: var(--error, #C0392B);
 }
 
 .amountNada {

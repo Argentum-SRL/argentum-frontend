@@ -539,6 +539,8 @@ export interface MovimientoDashboard {
   reintegro?: ReintegroInfo | null
   titulo?: string
   iconos?: string[]
+  reintegro_de_id?: string | null
+  tipo_espejo?: 'reintegro' | 'parte' | null
 }
 
 export interface PagoDashboard {

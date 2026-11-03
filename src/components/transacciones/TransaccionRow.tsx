@@ -181,8 +181,13 @@ const TransaccionRow = memo(({
 
       {/* ── 3. Amount & Secondary Column ─────────────────────────────────── */}
       <div className={styles.amountArea}>
-        <div className={`${styles.amount} ${
-          transaccion.reintegro_de_id
+        {(() => {
+          const isEspejoReintegro = Boolean(
+            (transaccion.reintegro_de_id && transaccion.tipo_espejo !== 'parte') ||
+            iconos.includes('reintegro') ||
+            (transaccion.descripcion && transaccion.descripcion.toLowerCase().startsWith('reintegro'))
+          )
+          const amountColorClass = isEspejoReintegro
             ? styles.amountIngreso
             : cuentaComo === 'nada'
             ? styles.amountNada
@@ -193,30 +198,38 @@ const TransaccionRow = memo(({
             : isIngreso
             ? styles.amountIngreso
             : styles.amountEgreso
-        }`}>
-          <span className={styles.amountSign}>{transaccion.reintegro_de_id ? '+' : isIngreso ? '+' : '-'}</span>
-          <span className={styles.amountNumber}>{formatMonto(transaccion.reintegro_de_id ? Math.abs(transaccion.monto) : transaccion.monto, transaccion.moneda)}</span>
-          {transaccion.reintegro && (() => {
-            const { monto: rMonto, estado: rEstado, fecha_recibido: rFecha } = transaccion.reintegro
-            const label = rEstado === 'recibido'
-              ? `Te devolvieron ${formatMonto(rMonto, transaccion.moneda)} el ${formatDDMM(rFecha)}`
-              : `Reintegro de ${formatMonto(rMonto, transaccion.moneda)} pendiente`
-            return (
-              <span
-                className={
-                  rEstado === 'recibido'
-                    ? styles.reintegroIconRecibido
-                    : styles.reintegroIconPendiente
-                }
-                title={label}
-                aria-label={label}
-              >
-                <BadgePercent size={14} />
+          const amountSign = isEspejoReintegro ? '+' : isIngreso ? '+' : '-'
+          const amountNumber = formatMonto(Math.abs(transaccion.monto), transaccion.moneda)
+
+          return (
+            <div className={`${styles.amount} ${amountColorClass}`}>
+              <span className={styles.amountValue}>
+                <span className={styles.amountSign}>{amountSign}</span>
+                <span className={styles.amountNumber}>{amountNumber}</span>
               </span>
-            )
-          })()}
-          <MovimientoIconos iconos={iconos} />
-        </div>
+              {!isEspejoReintegro && transaccion.reintegro && (() => {
+                const { monto: rMonto, estado: rEstado, fecha_recibido: rFecha } = transaccion.reintegro
+                const label = rEstado === 'recibido'
+                  ? `Te devolvieron ${formatMonto(rMonto, transaccion.moneda)} el ${formatDDMM(rFecha)}`
+                  : `Reintegro de ${formatMonto(rMonto, transaccion.moneda)} pendiente`
+                return (
+                  <span
+                    className={
+                      rEstado === 'recibido'
+                        ? styles.reintegroIconRecibido
+                        : styles.reintegroIconPendiente
+                    }
+                    title={label}
+                    aria-label={label}
+                  >
+                    <BadgePercent size={14} />
+                  </span>
+                )
+              })()}
+              <MovimientoIconos iconos={iconos} />
+            </div>
+          )
+        })()}
 
         {/* En Mobile: Solo mostrar billetera si no está en la página de la billetera */}
         {!hideWallet && (

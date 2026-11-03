@@ -8,6 +8,7 @@ import {
   Wallet,
 } from '@/components/ui/icons'
 import { BadgePercent } from 'lucide-react'
+import MovimientoIconos from './MovimientoIconos'
 import { formatMonto } from '@/utils/format'
 import styles from './MovimientoRow.module.css'
 
@@ -92,14 +93,27 @@ const MovimientoRow = memo(({
     }
   }
 
-  const sign = movimiento.sentido === 'entra' ? '+' : movimiento.sentido === 'sale' ? '-' : ''
+  const isEspejoReintegro = Boolean(
+    (movimiento.transaccion?.reintegro_de_id && movimiento.transaccion?.tipo_espejo !== 'parte') ||
+    movimiento.iconos?.includes('reintegro') ||
+    (movimiento.descripcion && movimiento.descripcion.toLowerCase().startsWith('reintegro'))
+  )
 
-  const amountColorClass =
-    movimiento.cuenta_como === 'nada'
-      ? styles.amountNada
-      : movimiento.cuenta_como === 'ingreso'
-      ? styles.amountIngreso
-      : styles.amountEgreso
+  const sign = isEspejoReintegro
+    ? '+'
+    : movimiento.sentido === 'entra'
+    ? '+'
+    : movimiento.sentido === 'sale'
+    ? '-'
+    : ''
+
+  const amountColorClass = isEspejoReintegro
+    ? styles.amountIngreso
+    : movimiento.cuenta_como === 'nada'
+    ? styles.amountNada
+    : movimiento.cuenta_como === 'ingreso'
+    ? styles.amountIngreso
+    : styles.amountEgreso
 
   const isTransferencia = movimiento.clase === 'transferencia'
   const title = movimiento.titulo || (isTransferencia ? 'Transferencia' : movimiento.descripcion)
@@ -150,9 +164,13 @@ const MovimientoRow = memo(({
 
       <div className={styles.amountArea}>
         <div className={`${styles.amount} ${amountColorClass}`}>
-          {sign && <span className={styles.amountSign}>{sign}</span>}
-          <span className={styles.amountNumber}>{formatMonto(movimiento.monto, movimiento.moneda)}</span>
-          {movimiento.reintegro && (() => {
+          <span className={styles.amountValue}>
+            {sign && <span className={styles.amountSign}>{sign}</span>}
+            <span className={styles.amountNumber}>
+              {formatMonto(Math.abs(movimiento.monto), movimiento.moneda)}
+            </span>
+          </span>
+          {!isEspejoReintegro && movimiento.reintegro && (() => {
             const { monto: rMonto, estado: rEstado, fecha_recibido: rFecha } = movimiento.reintegro
             const label = rEstado === 'recibido'
               ? `Te devolvieron ${formatMonto(rMonto, movimiento.moneda)} el ${formatDDMM(rFecha)}`
@@ -171,6 +189,7 @@ const MovimientoRow = memo(({
               </span>
             )
           })()}
+          <MovimientoIconos iconos={movimiento.iconos} />
         </div>
       </div>
     </div>

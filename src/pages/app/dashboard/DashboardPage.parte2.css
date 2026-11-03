@@ -266,6 +266,22 @@
   font-size: 0.9375rem;
   font-weight: 700;
   text-align: right;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.amountValue {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.dashboardReintegroIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .amountPos { color: var(--success); }

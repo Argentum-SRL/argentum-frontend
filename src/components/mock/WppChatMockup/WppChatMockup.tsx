@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { MessageCircle, PieChart, Play, RefreshCw } from '@/components/ui/icons'
+import { ConstellationCanvas } from '@/components/ui'
 import styles from './WppChatMockup.module.css'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -35,49 +36,11 @@ const ALL_MSGS: Msg[] = [
   },
 ]
 
-// ─── Decorative moons ─────────────────────────────────────────────────────────
-interface DecoMoonDef {
-  id: string; top: string; left?: string; right?: string
-  size: number; opacity: number; anim: string
-}
-
-const DECO_MOONS: DecoMoonDef[] = [
-  { id: 'w1', top: '8%',  right: '8%',  size: 80,  opacity: 0.08, anim: 'float-slow 9s ease-in-out infinite' },
-  { id: 'w2', top: '65%', left:  '5%',  size: 48,  opacity: 0.12, anim: 'float-medium 7s ease-in-out infinite 1.5s' },
-  { id: 'w3', top: '80%', right: '12%', size: 120, opacity: 0.05, anim: 'float-slow 11s ease-in-out infinite 3s' },
-  { id: 'w4', top: '25%', left:  '3%',  size: 32,  opacity: 0.15, anim: 'float-medium 8s ease-in-out infinite 0.8s' },
-  { id: 'w5', top: '45%', right: '3%',  size: 64,  opacity: 0.07, anim: 'float-slow 13s ease-in-out infinite 2s' },
-]
-
 const reducedMotion =
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // ─── Components ───────────────────────────────────────────────────────────────
-function DecoMoon({ id, top, left, right, size, opacity, anim }: DecoMoonDef) {
-  return (
-    <svg
-      width={size} height={size} viewBox="0 0 100 100" aria-hidden="true"
-      className={styles.decoMoon}
-      style={{ 
-        '--top': top, 
-        '--left': left, 
-        '--right': right, 
-        '--opacity': opacity, 
-        '--anim': reducedMotion ? 'none' : anim 
-      } as React.CSSProperties}
-    >
-      <defs>
-        <mask id={`deco-${id}`}>
-          <circle cx="50" cy="50" r="24" fill="white" />
-          <circle cx="58" cy="50" r="19" fill="black" />
-        </mask>
-      </defs>
-      <circle cx="50" cy="50" r="24" fill="var(--silver)" mask={`url(#deco-${id})`} />
-    </svg>
-  )
-}
-
 function MoonIcon({ size, color = 'var(--silver)' }: { size: number; color?: string }) {
   const maskId = `m${useId().replace(/[^a-z0-9]/gi, '')}`
   return (
@@ -194,7 +157,7 @@ export default function WppChatMockup() {
 
   return (
     <div className={styles.root}>
-      {DECO_MOONS.map((m) => <DecoMoon key={m.id} {...m} />)}
+      <ConstellationCanvas intensity="hero" themeOverride="dark" />
 
       {/* Logo */}
       <div className={styles.logoArea}>

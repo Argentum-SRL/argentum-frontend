@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useId } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import {
   CONSTELLATIONS,
@@ -15,6 +15,10 @@ export interface ConstellationCanvasProps {
   intensity?: 'ambient' | 'hero'
   /** Selección de constelación a mostrar: alternar ambas o una fija */
   constellationSelect?: 'both' | 'capricorn' | 'leo'
+  /** Constelación inicial cuando constellationSelect es 'both' */
+  initialConstellation?: 'capricorn' | 'leo'
+  /** Forzar paleta de tema ('dark' | 'light') independientemente del tema global */
+  themeOverride?: 'dark' | 'light'
   /** Multiplicador de velocidad para pruebas (por defecto 1) */
   speedMultiplier?: number
   /** Pausar la animación de trazado */
@@ -30,6 +34,8 @@ export interface ConstellationCanvasProps {
 export function ConstellationCanvas({
   intensity = 'ambient',
   constellationSelect = 'both',
+  initialConstellation = 'capricorn',
+  themeOverride,
   speedMultiplier = 1,
   isPaused = false,
   starDensity,
@@ -37,8 +43,11 @@ export function ConstellationCanvas({
   onCycleUpdate,
 }: ConstellationCanvasProps) {
   const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const resolvedTheme = themeOverride ?? theme
+  const isDark = resolvedTheme === 'dark'
   const palette = isDark ? CONSTELLATION_PALETTE.dark : CONSTELLATION_PALETTE.light
+  const rawUid = useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const guideGlowId = `argGuideGlow-${rawUid}`
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -73,7 +82,7 @@ export function ConstellationCanvas({
   }, [resolvedStarDensity])
 
   // Constelación de ciclo alternante
-  const [cycleId, setCycleId] = useState<'capricorn' | 'leo'>('capricorn')
+  const [cycleId, setCycleId] = useState<'capricorn' | 'leo'>(initialConstellation)
 
   // Identificador activo resuelto (si se especifica uno fijo, toma precedencia)
   const activeId =
@@ -266,7 +275,7 @@ export function ConstellationCanvas({
       >
         <defs>
           {/* Filtro tenue para el halo de la estrella guía */}
-          <radialGradient id="argGuideGlow" cx="50%" cy="50%" r="50%">
+          <radialGradient id={guideGlowId} cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={palette.guideStarCore} stopOpacity="0.9" />
             <stop offset="45%" stopColor={palette.guideStarHalo} stopOpacity="0.4" />
             <stop offset="100%" stopColor={palette.guideStarBlur} stopOpacity="0" />
@@ -372,7 +381,7 @@ export function ConstellationCanvas({
             className={styles.guideStarCore}
           >
             {/* Halo sutil contenido */}
-            <circle cx="0" cy="0" r="7" fill="url(#argGuideGlow)" />
+            <circle cx="0" cy="0" r="7" fill={`url(#${guideGlowId})`} />
             {/* Anillo de precisión de grabado */}
             <circle
               cx="0"

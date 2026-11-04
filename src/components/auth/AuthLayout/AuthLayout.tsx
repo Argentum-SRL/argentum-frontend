@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { AtmosphericBackground, AtmosphericMoonIcon, ConstellationCanvas, ThemeToggle } from '@/components/ui'
+import { AtmosphericBackground, AtmosphericMoonIcon, ThemeToggle } from '@/components/ui'
 import styles from './AuthLayout.module.css'
 
 interface FormContentProps {
@@ -58,7 +58,6 @@ export default function AuthLayout({
           {themeBtn}
           <div className={styles.leftPanel}>{leftPanel}</div>
           <div className={styles.rightPanel}>
-            <ConstellationCanvas intensity="ambient" initialConstellation="leo" />
             <div className={styles.formWrap}>
               <FormContent title={title} compact>{children}</FormContent>
             </div>
@@ -68,7 +67,6 @@ export default function AuthLayout({
         {/* Mobile: full screen */}
         <div className={styles.mobile}>
           {themeBtn}
-          <ConstellationCanvas intensity="ambient" />
           <div className={styles.mobileInner}>
             <FormContent title={title}>{children}</FormContent>
           </div>
@@ -82,7 +80,6 @@ export default function AuthLayout({
       fullScreen={false}
       centered
       compensateBottomNav={false}
-      variant="constellations"
       className={styles.standalone}
     >
       {themeBtn}

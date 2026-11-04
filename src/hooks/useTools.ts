@@ -175,13 +175,19 @@ export const useTools = () => {
 
   const [canAffordForm, setCanAffordForm] = useState<{
     precio_total: number | null;
-    modo: 'contado' | 'cuotas' | 'mensual';
+    modo: 'contado' | 'cuotas';
     cantidad_cuotas: number | null;
   }>({
     precio_total: null,
     modo: 'contado',
     cantidad_cuotas: 12,
   });
+
+  // ── Bloque Gasto Fijo (Decisión Sebastián 04/11) ──
+  const [gastoFijoAbierto, setGastoFijoAbierto] = useState<boolean>(false);
+  const [gastoFijoMonto, setGastoFijoMonto] = useState<number | null>(null);
+  const [gastoFijoResult, setGastoFijoResult] = useState<CanAffordResult | null>(null);
+  const [gastoFijoCalculando, setGastoFijoCalculando] = useState<boolean>(false);
 
   const [canAffordResult, setCanAffordResult] = useState<CanAffordResult | null>(null);
   const [canAffordCalculando, setCanAffordCalculando] = useState(false);
@@ -250,6 +256,7 @@ export const useTools = () => {
         tiene_interes: canAffordForm.modo === 'cuotas' ? tieneInteres : false,
         tna: canAffordForm.modo === 'cuotas' && tieneInteres && tna ? parseFloat(tna) : undefined,
       });
+      cerrarGastoFijo();
       setCanAffordResult(res);
       sileo.success({ title: 'Análisis realizado con éxito' });
     } catch (err: unknown) {
@@ -262,8 +269,54 @@ export const useTools = () => {
     }
   };
 
+  const abrirGastoFijo = () => {
+    setGastoFijoAbierto(true);
+  };
+
+  const cerrarGastoFijo = () => {
+    setGastoFijoAbierto(false);
+    setGastoFijoResult(null);
+    setGastoFijoMonto(null);
+  };
+
+  const volverGastoFijo = () => {
+    setGastoFijoResult(null);
+  };
+
+  const gastoFijoCalcular = async () => {
+    const monto = gastoFijoMonto;
+    if (monto === null || isNaN(monto) || monto <= 0) {
+      sileo.error({ title: 'El precio de la compra debe ser mayor a 0' });
+      return;
+    }
+    if (monto > MAX_MONTO_INTEGRIDAD) {
+      sileo.error({ title: 'El precio de la compra excede el límite permitido' });
+      return;
+    }
+
+    setGastoFijoCalculando(true);
+    try {
+      const res = await toolsService.calculateCanAfford({
+        precio_total: monto,
+        modo: 'mensual',
+        cantidad_cuotas: 1,
+        tiene_interes: false,
+      });
+      setGastoFijoResult(res);
+      sileo.success({ title: 'Análisis realizado con éxito' });
+    } catch (err: unknown) {
+      console.error(err);
+      const error = err as import('axios').AxiosError<{ error?: { message?: string } }>;
+      const detail = error.response?.data?.error?.message || 'No pudimos realizar el análisis de compra.';
+      sileo.error({ title: detail });
+    } finally {
+      setGastoFijoCalculando(false);
+    }
+  };
+
   const resetCanAfford = () => {
     setCanAffordResult(null);
+    cerrarGastoFijo();
   };
 
   return {
@@ -297,6 +350,16 @@ export const useTools = () => {
     setTieneInteres: handleSetTieneInteres,
     tna,
     setTna,
+    // Gasto Fijo
+    gastoFijoAbierto,
+    gastoFijoMonto,
+    setGastoFijoMonto,
+    gastoFijoResult,
+    gastoFijoCalculando,
+    abrirGastoFijo,
+    cerrarGastoFijo,
+    volverGastoFijo,
+    gastoFijoCalcular,
   };
 };
 

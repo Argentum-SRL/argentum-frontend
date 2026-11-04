@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { claseResultado, filasAhorros, etiquetaMonto } from './permitirse';
+import { claseResultado, filasAhorros, etiquetaMonto, mostrarLinkGastoFijo, OPCIONES_MODO_PAGO } from './permitirse';
 import { formatMonto } from '@/utils/format';
 
 describe('permitirse utils', () => {
@@ -47,5 +47,16 @@ describe('permitirse utils', () => {
     expect(etiquetaMonto('contado')).toBe('¿Cuánto sale?');
     expect(etiquetaMonto('cuotas')).toBe('¿Cuánto sale en total?');
     expect(etiquetaMonto('mensual')).toBe('¿Cuánto por mes?');
+  });
+  it('mostrarLinkGastoFijo devuelve true solo si no hay compra y el bloque no esta abierto', () => {
+    expect(mostrarLinkGastoFijo(false, false)).toBe(true);
+    expect(mostrarLinkGastoFijo(false, true)).toBe(false);
+    expect(mostrarLinkGastoFijo(true, false)).toBe(false);
+    expect(mostrarLinkGastoFijo(true, true)).toBe(false);
+  });
+
+  it('OPCIONES_MODO_PAGO contiene contado y cuotas y no incluye mensual', () => {
+    expect(OPCIONES_MODO_PAGO).toEqual(['contado', 'cuotas']);
+    expect(OPCIONES_MODO_PAGO).not.toContain('mensual');
   });
 });

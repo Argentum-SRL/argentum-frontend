@@ -25,10 +25,10 @@ export const ParametersSummaryBar: React.FC<ParametersSummaryBarProps> = ({
   showStepper = false,
 }) => {
   return (
-    <div className={styles.summaryBarCard} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
+    <div className={styles.summaryBarCard}>
       {/* ── Stepper Line (if enabled) ── */}
       {showStepper && (
-        <div className={styles.stepperTrack} style={{ width: '100%', paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
+        <div className={styles.stepperTrack}>
           <div className={`${styles.stepBadge} ${styles.stepBadgeDone}`} onClick={onEdit} role="button" title="Volver a modificar precio">
             <Check size={12} strokeWidth={3} />
             <span>01 Compra</span>
@@ -45,32 +45,32 @@ export const ParametersSummaryBar: React.FC<ParametersSummaryBarProps> = ({
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 14, flexWrap: 'wrap' }}>
-        <div className={styles.summaryBarLeft}>
+      <div className={styles.summaryBarMain}>
+        <div className={styles.summaryBarHeader}>
           <div className={styles.summaryBarIconBox}>
-            <Icon size={18} strokeWidth={2.2} />
+            <Icon size={16} strokeWidth={2.2} />
           </div>
-          <div className={styles.summaryBarHeader}>
-            <span className={styles.summaryBarTitle}>{title}</span>
-            <div className={styles.summaryPills}>
-              {items.map((item, idx) => (
-                <div key={idx} className={styles.summaryPill}>
-                  <span className={styles.summaryPillLabel}>{item.label}:</span>
-                  <span className={styles.summaryPillValue}>{item.value}</span>
-                </div>
-              ))}
+          <span className={styles.summaryBarTitle}>{title}</span>
+        </div>
+
+        <div className={styles.summaryPills}>
+          {items.map((item, idx) => (
+            <div key={idx} className={styles.summaryPill}>
+              <span className={styles.summaryPillLabel}>{item.label}:</span>
+              <span className={styles.summaryPillValue}>{item.value}</span>
             </div>
-          </div>
+          ))}
         </div>
 
         <button
           type="button"
           onClick={onEdit}
           className={styles.summaryEditBtn}
-          title="Modificar parámetros ingresados"
+          title={editLabel}
+          aria-label={editLabel}
         >
           <Pencil size={14} />
-          <span>{editLabel}</span>
+          <span className={styles.summaryEditBtnText}>{editLabel}</span>
         </button>
       </div>
     </div>

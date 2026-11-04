@@ -79,3 +79,14 @@ export function filasAhorros(ahorros: AhorrosDetalle | null | undefined): FilaAh
   return filas;
 }
 
+export const OPCIONES_MODO_PAGO = ['contado', 'cuotas'] as const;
+
+/**
+ * Determina si se muestra el link de gasto fijo debajo del resultado de compra.
+ * True únicamente si hay resultado de compra y el bloque de gasto fijo no está abierto.
+ */
+export function mostrarLinkGastoFijo(hayResultadoCompra: boolean, bloqueAbierto: boolean): boolean {
+  return !hayResultadoCompra && !bloqueAbierto;
+}
+
+

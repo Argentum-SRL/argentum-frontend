@@ -132,3 +132,17 @@
   align-items: center;
   gap: 8px;
 }
+
+/* ── Link a Gasto Fijo Responsive (1 renglón) ── */
+.btnLinkGastoFijo {
+  padding: 0 8px;
+  font-size: 13px;
+  max-width: 100%;
+}
+
+@media (max-width: 479px) {
+  .btnLinkGastoFijo {
+    font-size: 12px;
+    padding: 0 4px;
+  }
+}

@@ -9,6 +9,7 @@ import styles from './ToolsComponents.module.css';
 interface CanAffordResultProps {
   resultado: ICanAffordResult;
   onReset: () => void;
+  textoReset?: string;
 }
 
 const ICONO_AHORRO: Record<string, React.ReactNode> = {
@@ -20,6 +21,7 @@ const ICONO_AHORRO: Record<string, React.ReactNode> = {
 export const CanAffordResult: React.FC<CanAffordResultProps> = ({
   resultado,
   onReset,
+  textoReset = 'Analizar otra compra',
 }) => {
   const {
     resultado: resKey,
@@ -130,7 +132,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
       >
         <span className={styles.btnResetContent}>
           <RotateCcw size={16} />
-          <span>Analizar otra compra</span>
+          <span>{textoReset}</span>
         </span>
       </Button>
     </div>

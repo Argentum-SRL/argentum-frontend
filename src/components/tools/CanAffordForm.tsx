@@ -1,22 +1,33 @@
 import React from 'react';
-import { Calendar, Coins, Repeat } from '@/components/ui/icons';
+import { Calendar, Coins } from '@/components/ui/icons';
 import { Button, MontoInput } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
-import { etiquetaMonto } from '@/utils/permitirse';
+import { OPCIONES_MODO_PAGO, etiquetaMonto } from '@/utils/permitirse';
 import styles from './ToolsComponents.module.css';
 
 const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
 
+const MODO_CONFIG = {
+  contado: { label: 'De contado', icon: <Coins size={15} /> },
+  cuotas: { label: 'En cuotas', icon: <Calendar size={15} /> },
+} as const;
+
+const MODO_OPTIONS = OPCIONES_MODO_PAGO.map((modo) => ({
+  value: modo,
+  label: MODO_CONFIG[modo].label,
+  icon: MODO_CONFIG[modo].icon,
+}));
+
 interface CanAffordFormProps {
   formData: {
     precio_total: number | null;
-    modo: 'contado' | 'cuotas' | 'mensual';
+    modo: 'contado' | 'cuotas';
     cantidad_cuotas: number | null;
   };
   setFormData: React.Dispatch<React.SetStateAction<{
     precio_total: number | null;
-    modo: 'contado' | 'cuotas' | 'mensual';
+    modo: 'contado' | 'cuotas';
     cantidad_cuotas: number | null;
   }>>;
   calculando: boolean;
@@ -87,13 +98,9 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
           {/* Modo pago */}
           <div className={styles.formGroup}>
             <label className={styles.label}>¿Cómo lo vas a pagar?</label>
-            <SegmentedControl<'contado' | 'cuotas' | 'mensual'>
+            <SegmentedControl<'contado' | 'cuotas'>
               className={styles.modoPagoSelector}
-              options={[
-                { value: 'contado', label: 'De contado', icon: <Coins size={15} /> },
-                { value: 'cuotas', label: 'En cuotas', icon: <Calendar size={15} /> },
-                { value: 'mensual', label: 'Todos los meses', icon: <Repeat size={15} /> },
-              ]}
+              options={MODO_OPTIONS}
               value={formData.modo}
               onChange={(v) => handleChange('modo', v)}
               ariaLabel="¿Cómo lo vas a pagar?"

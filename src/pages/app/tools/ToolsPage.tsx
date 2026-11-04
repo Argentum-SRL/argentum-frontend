@@ -1,18 +1,21 @@
 import { useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Scale, HelpCircle, FileSpreadsheet } from '@/components/ui/icons';
+import { Scale, HelpCircle, FileSpreadsheet, Repeat } from '@/components/ui/icons';
 import useTools from '@/hooks/useTools';
 import ConvenienciaWizard from '@/components/tools/ConvenienciaWizard';
 import FinancialContextBanner from '@/components/tools/FinancialContextBanner';
 import CanAffordForm from '@/components/tools/CanAffordForm';
 import CanAffordResult from '@/components/tools/CanAffordResult';
+import GastoFijoForm from '@/components/tools/GastoFijoForm';
 import ParametersSummaryBar from '@/components/tools/ParametersSummaryBar';
 import SegmentedControl from '@/components/ui/SegmentedControl';
-import { ConvenienciaWizardSkeleton } from '@/components/ui';
+import { Button, ConvenienciaWizardSkeleton } from '@/components/ui';
 import pageStyles from './ToolsPage.module.css';
+import toolsStyles from '@/components/tools/ToolsComponents.module.css';
 import { useAuth } from '@/hooks/useAuth';
 import ImportacionResumenSection from '@/components/tools/importacion/ImportacionResumenSection';
 import { formatMonto } from '@/utils/format';
+import { mostrarLinkGastoFijo } from '@/utils/permitirse';
 
 type TabId = 'conveniencia' | 'can-afford' | 'importar-resumen';
 
@@ -78,6 +81,15 @@ export default function ToolsPage() {
     setTieneInteres,
     tna,
     setTna,
+    // Gasto Fijo
+    gastoFijoAbierto,
+    gastoFijoMonto,
+    setGastoFijoMonto,
+    gastoFijoResult,
+    gastoFijoCalculando,
+    abrirGastoFijo,
+    volverGastoFijo,
+    gastoFijoCalcular,
   } = useTools();
 
   const { is_admin } = useAuth();
@@ -175,7 +187,7 @@ export default function ToolsPage() {
       {currentTab === 'can-afford' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
           {!canAffordResult ? (
-            /* Estado 1: Contexto Financiero + Formulario de Carga */
+            /* Estado 1: Contexto Financiero + Formulario de Carga + Bloque Gasto Fijo */
             <>
               <FinancialContextBanner
                 context={financialContext}
@@ -193,9 +205,61 @@ export default function ToolsPage() {
                 tna={tna}
                 setTna={setTna}
               />
+
+              {/* Bloque gasto fijo: link si está cerrado, formulario o resultado si está abierto */}
+              {mostrarLinkGastoFijo(Boolean(canAffordResult), gastoFijoAbierto) && (
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  type="button"
+                  onClick={abrirGastoFijo}
+                  className={toolsStyles.btnLinkGastoFijo}
+                >
+                  <span className={toolsStyles.btnResetContent}>
+                    <Repeat size={16} />
+                    <span>¿Querés ver si te entra un gasto fijo?</span>
+                  </span>
+                </Button>
+              )}
+
+              {gastoFijoAbierto && (
+                !gastoFijoResult ? (
+                  <GastoFijoForm
+                    monto={gastoFijoMonto}
+                    setMonto={setGastoFijoMonto}
+                    calculando={gastoFijoCalculando}
+                    calcular={gastoFijoCalcular}
+                  />
+                ) : (
+                  <>
+                    <ParametersSummaryBar
+                      title="¿Te entra un gasto fijo?"
+                      icon={Repeat}
+                      items={[
+                        {
+                          label: 'Gasto por mes',
+                          value: formatMonto(gastoFijoMonto || 0, 'ARS'),
+                        },
+                        {
+                          label: 'Saldo líquido',
+                          value: formatMonto(financialContext?.saldo_disponible || 0, 'ARS'),
+                        },
+                      ]}
+                      onEdit={volverGastoFijo}
+                      editLabel="Cambiar monto"
+                    />
+
+                    <CanAffordResult
+                      resultado={gastoFijoResult}
+                      onReset={volverGastoFijo}
+                      textoReset="Probar otro monto"
+                    />
+                  </>
+                )
+              )}
             </>
           ) : (
-            /* Estado 2: Modo Análisis (Barra Resumen Superior + Diagnóstico y Semáforo) */
+            /* Estado 2: Modo Análisis de Compra (sin gasto fijo) */
             <>
               <ParametersSummaryBar
                 title="¿Me lo puedo permitir?"
@@ -204,7 +268,7 @@ export default function ToolsPage() {
                   { label: 'Precio compra', value: formatMonto(canAffordForm.precio_total || 0, 'ARS') },
                   {
                     label: 'Modalidad',
-                    value: canAffordForm.modo === 'contado' ? 'Contado' : canAffordForm.modo === 'mensual' ? 'Todos los meses' : `${canAffordForm.cantidad_cuotas} cuotas`
+                    value: canAffordForm.modo === 'contado' ? 'Contado' : `${canAffordForm.cantidad_cuotas} cuotas`
                   },
                   {
                     label: 'Saldo líquido',

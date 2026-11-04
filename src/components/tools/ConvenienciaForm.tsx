@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/icons';
 import { MontoInput } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
-import type { IPCData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
+import type { InflacionEsperadaData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { formatMonto } from '@/utils/format';
 import DetalleCuotasChart from './DetalleCuotasChart';
@@ -38,7 +38,7 @@ export interface ConvenienciaFormProps {
     investmentTna: string;
   };
   handleChange: (field: string, value: string | number | boolean | null) => void;
-  ipcData: IPCData | null;
+  ipcData: InflacionEsperadaData | null;
   ipcLoading: boolean;
   ipcError: boolean;
   isIpcOfficialUsed: boolean;
@@ -644,7 +644,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                           type="button"
                           className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-primary text-xs font-bold hover:bg-white dark:hover:bg-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                           onClick={syncIpc}
-                          title="Restablecer valor oficial del INDEC"
+                          title={ipcData?.fuente_texto ? `Restablecer valor oficial (${ipcData.fuente_texto})` : "Restablecer valor oficial"}
                         >
                           <RefreshCcw size={12} className={isRotating ? 'animate-spin' : ''} />
                           <span>{ipcData.valor_mensual}%</span>

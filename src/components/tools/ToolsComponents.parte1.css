@@ -22,13 +22,15 @@
   background: var(--surface);
   border-radius: 20px;
   border: 1px solid var(--border);
-  padding: 20px;
+  padding: 16px;
   box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
   gap: 16px;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
@@ -46,14 +48,16 @@
 /* ── 2-Column Responsive Form Layout (Fits 100% in viewport) ─────────────── */
 .formGrid2 {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
   .formGrid2 {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 16px 20px;
     align-items: start;
   }
@@ -63,6 +67,42 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* ── Responsive Selectors for CanAfford ───────────────────────────────────── */
+.modoPagoSelector {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 479px) {
+  .modoPagoSelector {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .modoPagoSelector [role="radio"] {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .modoPagoSelector [role="radio"]:last-child {
+    flex: 1 1 100%;
+  }
+}
+
+.interesSelector {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* ── Stepper Header (01 Compra -> 02 Financiación -> 03 Análisis) ────────── */

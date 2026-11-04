@@ -1,5 +1,5 @@
 import api from './api';
-import type { IPCData, ConvenienciaRequest, ConvenienciaResult, FinancialContext, CanAffordRequest, CanAffordResult } from '@/types/tools';
+import type { IPCData, ConvenienciaRequest, ConvenienciaResult, FinancialContext, CanAffordRequest, CanAffordResult, InflacionEsperadaData } from '@/types/tools';
 
 interface StandardResponse<T> {
   success: boolean;
@@ -11,6 +11,11 @@ interface StandardResponse<T> {
 }
 
 export const toolsService = {
+  getInflacionEsperada: async (): Promise<InflacionEsperadaData | null> => {
+    const response = await api.get<StandardResponse<InflacionEsperadaData | null>>('/api/v1/tools/inflacion-esperada');
+    return response.data.data;
+  },
+
   getIPCActual: async (): Promise<IPCData> => {
     const response = await api.get<StandardResponse<IPCData>>('/api/v1/tools/ipc/current');
     return response.data.data;

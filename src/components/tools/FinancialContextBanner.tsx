@@ -65,7 +65,9 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
 
         {/* Carga mensual comprometida */}
         <div className={styles.contextStat}>
-          <span className={styles.contextStatLabel}>Carga mensual comprometida</span>
+          <span className={styles.contextStatLabel}>
+            Carga mensual<span className={styles.labelDesktopOnly}> comprometida</span>
+          </span>
           <span className={styles.contextStatValue}>
             {formatMonto(carga_mensual_comprometida, 'ARS')}
           </span>
@@ -103,7 +105,9 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
 
         {/* Margen libre */}
         <div className={styles.contextStat}>
-          <span className={styles.contextStatLabel}>Margen libre mensual</span>
+          <span className={styles.contextStatLabel}>
+            Margen libre<span className={styles.labelDesktopOnly}> mensual</span>
+          </span>
           {margen_libre_mensual !== null ? (
             <span className={`${styles.contextStatValue} ${margen_libre_mensual >= 0 ? styles.contextStatValuePositive : styles.contextStatValueNegative}`}>
               {formatMonto(margen_libre_mensual, 'ARS')}
@@ -120,7 +124,8 @@ export const FinancialContextBanner: React.FC<FinancialContextBannerProps> = ({
       {showPocoHistorial && (
         <div className={styles.contextWarn}>
           <AlertTriangle size={14} className={styles.contextWarnIcon} />
-          <span>Tenés poco historial en Argentum. El análisis financiero puede ser menos preciso hasta que registres más ciclos.</span>
+          <span className={styles.labelDesktopOnly}>Tenés poco historial en Argentum. El análisis financiero puede ser menos preciso hasta que registres más ciclos.</span>
+          <span className={styles.labelMobileOnly}>Poco historial: análisis estimado.</span>
         </div>
       )}
     </div>

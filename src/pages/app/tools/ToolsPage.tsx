@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Scale, HelpCircle, FileSpreadsheet } from '@/components/ui/icons';
 import useTools from '@/hooks/useTools';
@@ -18,7 +19,6 @@ type TabId = 'conveniencia' | 'can-afford' | 'importar-resumen';
 interface TabItem {
   id: TabId;
   title: string;
-  subtitle: string;
   icon: typeof Scale;
   adminOnly?: boolean;
 }
@@ -27,19 +27,16 @@ const TOOL_TABS: TabItem[] = [
   {
     id: 'conveniencia',
     title: 'Cuotas vs Contado',
-    subtitle: 'Calculadora de inflación & TNA',
     icon: Scale,
   },
   {
     id: 'can-afford',
     title: '¿Me lo puedo permitir?',
-    subtitle: 'Capacidad de pago & salud financiera',
     icon: HelpCircle,
   },
   {
     id: 'importar-resumen',
     title: 'Importar Resumen',
-    subtitle: 'Extractos y resúmenes de tarjeta',
     icon: FileSpreadsheet,
     adminOnly: true,
   },
@@ -81,7 +78,6 @@ export default function ToolsPage() {
     setTieneInteres,
     tna,
     setTna,
-    cuotaPreviewCanAfford
   } = useTools();
 
   const { is_admin } = useAuth();
@@ -102,6 +98,23 @@ export default function ToolsPage() {
     }, { replace: true });
   };
 
+    // ── Mobile Carousel Auto-scroll ──────────────────────────────────────────
+  const controlsRowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = controlsRowRef.current;
+    if (!container) return;
+    const activePill = container.querySelector('[aria-checked="true"]') as HTMLElement | null;
+    if (activePill) {
+      const containerRect = container.getBoundingClientRect();
+      const pillRect = activePill.getBoundingClientRect();
+      if (pillRect.left < containerRect.left || pillRect.right > containerRect.right) {
+        const scrollOffset = activePill.offsetLeft - 16;
+        container.scrollTo({ left: Math.max(0, scrollOffset), behavior: 'smooth' });
+      }
+    }
+  }, [currentTab]);
+
   const visibleTabs = TOOL_TABS.filter(t => !t.adminOnly || is_admin);
 
   return (
@@ -116,21 +129,23 @@ export default function ToolsPage() {
           </p>
         </div>
 
-        <SegmentedControl
-          options={visibleTabs.map((tab) => {
-            const Icon = tab.icon;
-            return {
-              value: tab.id,
-              label: tab.title,
-              description: tab.subtitle,
-              icon: <Icon size={16} strokeWidth={2.2} />,
-            };
-          })}
-          value={currentTab}
-          onChange={(val) => handleSelectTab(val as TabId)}
-          ariaLabel="Herramientas disponibles"
-          layout="inline"
-        />
+        <div ref={controlsRowRef} className={pageStyles.controlsRow}>
+          <SegmentedControl
+            className={pageStyles.navTrack}
+            options={visibleTabs.map((tab) => {
+              const Icon = tab.icon;
+              return {
+                value: tab.id,
+                label: tab.title,
+                icon: <Icon size={16} strokeWidth={2.2} />,
+              };
+            })}
+            value={currentTab}
+            onChange={(val) => handleSelectTab(val as TabId)}
+            ariaLabel="Herramientas disponibles"
+            layout="inline"
+          />
+        </div>
       </div>
 
       {/* ── Tab: Cuotas vs Contado (Financial Wizard Shell) ─────────────── */}
@@ -173,13 +188,10 @@ export default function ToolsPage() {
                 setFormData={setCanAffordForm}
                 calculando={canAffordCalculando}
                 calcular={canAffordCalcular}
-                ingresoPromedioContext={financialContext?.ingreso_promedio_mensual ?? null}
-                saldoDisponibleContext={financialContext?.saldo_disponible ?? 0}
                 tieneInteres={tieneInteres}
                 setTieneInteres={setTieneInteres}
                 tna={tna}
                 setTna={setTna}
-                cuotaPreview={cuotaPreviewCanAfford}
               />
             </>
           ) : (
@@ -192,7 +204,7 @@ export default function ToolsPage() {
                   { label: 'Precio compra', value: formatMonto(canAffordForm.precio_total || 0, 'ARS') },
                   {
                     label: 'Modalidad',
-                    value: canAffordForm.modo === 'contado' ? 'Contado' : `${canAffordForm.cantidad_cuotas} cuotas`
+                    value: canAffordForm.modo === 'contado' ? 'Contado' : canAffordForm.modo === 'mensual' ? 'Todos los meses' : `${canAffordForm.cantidad_cuotas} cuotas`
                   },
                   {
                     label: 'Saldo líquido',
@@ -205,7 +217,6 @@ export default function ToolsPage() {
 
               <CanAffordResult
                 resultado={canAffordResult}
-                ciclosConHistoria={financialContext?.ciclos_con_historia ?? 0}
                 onReset={resetCanAfford}
               />
             </>

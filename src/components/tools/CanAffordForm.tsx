@@ -1,9 +1,9 @@
 import React from 'react';
-import { Calendar, Coins } from '@/components/ui/icons';
+import { Calendar, Coins, Repeat } from '@/components/ui/icons';
 import { Button, MontoInput } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
-import { formatMonto } from '@/utils/format';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
+import { etiquetaMonto } from '@/utils/permitirse';
 import styles from './ToolsComponents.module.css';
 
 const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
@@ -11,25 +11,20 @@ const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
 interface CanAffordFormProps {
   formData: {
     precio_total: number | null;
-    modo: 'contado' | 'cuotas';
+    modo: 'contado' | 'cuotas' | 'mensual';
     cantidad_cuotas: number | null;
-    ingreso_manual: number | null;
   };
   setFormData: React.Dispatch<React.SetStateAction<{
     precio_total: number | null;
-    modo: 'contado' | 'cuotas';
+    modo: 'contado' | 'cuotas' | 'mensual';
     cantidad_cuotas: number | null;
-    ingreso_manual: number | null;
   }>>;
   calculando: boolean;
   calcular: () => void;
-  ingresoPromedioContext: number | null;
-  saldoDisponibleContext: number;
   tieneInteres: boolean;
   setTieneInteres: (val: boolean) => void;
   tna: string;
   setTna: (val: string) => void;
-  cuotaPreview: number | null;
 }
 
 export const CanAffordForm: React.FC<CanAffordFormProps> = ({
@@ -37,19 +32,14 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   setFormData,
   calculando,
   calcular,
-  ingresoPromedioContext,
-  saldoDisponibleContext,
   tieneInteres,
   setTieneInteres,
   tna,
   setTna,
-  cuotaPreview
 }) => {
   const handleChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
-
-  const showManualIncome = ingresoPromedioContext === null;
 
   const isFormInvalid =
     formData.precio_total === null ||
@@ -63,63 +53,46 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
     )) ||
     (formData.modo === 'cuotas' && tieneInteres && (
       !tna || isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000
-    )) ||
-    (showManualIncome &&
-      formData.ingreso_manual !== null && (
-        formData.ingreso_manual <= 0 || formData.ingreso_manual > MAX_MONTO_INTEGRIDAD
-      ));
-
-  // Preview text en tiempo real
-  const previewText = (() => {
-    if (!formData.precio_total || formData.precio_total <= 0) return null;
-    if (formData.modo === 'contado') {
-      const pct = saldoDisponibleContext > 0
-        ? (formData.precio_total / saldoDisponibleContext) * 100
-        : 999;
-      if (pct >= 999) return 'Representa más del 100% de tu saldo disponible';
-      return `Representa el ${pct.toFixed(1)}% de tu saldo disponible`;
-    }
-    if (formData.modo === 'cuotas') {
-      if (cuotaPreview !== null && cuotaPreview > 0) {
-        return `La cuota mensual sería de ${formatMonto(cuotaPreview, 'ARS')}`;
-      }
-    }
-    return null;
-  })();
+    ));
 
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>¿Qué estás pensando comprar?</h2>
         <p className={styles.cardSubtitle}>
-          Analizá si tu situación financiera actual aguanta este nuevo gasto
+          Analizá si podés permitirte esta compra
         </p>
       </div>
 
       <div className={styles.formGrid2}>
         {/* ── Columna Izquierda: Precio & Modo ── */}
         <div className={styles.formCol}>
-          {/* Precio */}
+          {/* Precio con etiqueta dinámica */}
           <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="ca_precio_total">
+              {etiquetaMonto(formData.modo)}
+            </label>
             <MontoInput
-              label="Precio de la compra"
+              id="ca_precio_total"
+              variant="outlined"
+              size="lg"
               placeholder="0"
               value={formData.precio_total}
               onChange={(val) => handleChange('precio_total', val)}
               allowDecimals
-              hideCurrency
-              compact
             />
-            <span className={styles.inputDesc}>El costo total del producto o servicio</span>
+            <span className={styles.inputDesc}>El importe en pesos a evaluar</span>
           </div>
 
           {/* Modo pago */}
           <div className={styles.formGroup}>
             <label className={styles.label}>¿Cómo lo vas a pagar?</label>
-            <SegmentedControl<'contado' | 'cuotas'>
+            <SegmentedControl<'contado' | 'cuotas' | 'mensual'>
+              className={styles.modoPagoSelector}
               options={[
                 { value: 'contado', label: 'De contado', icon: <Coins size={15} /> },
                 { value: 'cuotas', label: 'En cuotas', icon: <Calendar size={15} /> },
+                { value: 'mensual', label: 'Todos los meses', icon: <Repeat size={15} /> },
               ]}
               value={formData.modo}
               onChange={(v) => handleChange('modo', v)}
@@ -127,131 +100,92 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
               fullWidth
             />
           </div>
-
-          {/* Cantidad de cuotas */}
-          {formData.modo === 'cuotas' && (
-            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
-              <label className={styles.label} htmlFor="ca_cuotas">¿En cuántas cuotas?</label>
-
-              <div className={styles.chipsRow}>
-                {QUICK_CUOTAS.map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    className={`${styles.chip} ${formData.cantidad_cuotas === n ? styles.chipActive : ''}`}
-                    onClick={() => handleChange('cantidad_cuotas', n)}
-                  >
-                    {n}x
-                  </button>
-                ))}
-              </div>
-
-              <input
-                id="ca_cuotas"
-                type="number"
-                placeholder="Ej: 12"
-                value={formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) ? '' : formData.cantidad_cuotas}
-                onChange={(e) => {
-                  const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
-                  handleChange('cantidad_cuotas', val);
-                }}
-                min="2"
-                max="120"
-                step="1"
-                className={styles.tnaInput}
-                inputMode="numeric"
-              />
-              {formData.cantidad_cuotas !== null && !isNaN(formData.cantidad_cuotas) &&
-                (formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120) && (
-                  <span className={styles.errorText}>Entre 2 y 120 cuotas</span>
-                )}
-            </div>
-          )}
         </div>
 
-        {/* ── Columna Derecha: Interés, Ingreso & Preview ── */}
+        {/* ── Columna Derecha: Cuotas e Interés ── */}
         <div className={styles.formCol}>
-          {/* Interés */}
           {formData.modo === 'cuotas' && (
-            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
-              <label className={styles.label}>¿Las cuotas tienen interés?</label>
-              <SegmentedControl<'sin' | 'con'>
-                options={[
-                  { value: 'sin', label: 'Sin interés' },
-                  { value: 'con', label: 'Con interés' },
-                ]}
-                value={tieneInteres ? 'con' : 'sin'}
-                onChange={(v) => setTieneInteres(v === 'con')}
-                ariaLabel="¿Las cuotas tienen interés?"
-                fullWidth
-              />
-            </div>
-          )}
+            <>
+              {/* Cantidad de cuotas */}
+              <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
+                <label className={styles.label} htmlFor="ca_cuotas">¿En cuántas cuotas?</label>
 
-          {/* TNA */}
-          {formData.modo === 'cuotas' && tieneInteres && (
-            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
-              <label className={styles.label} htmlFor="ca_tna">TNA (Tasa Nominal Anual)</label>
-              <div className={styles.tnaWrapper}>
+                <div className={styles.chipsRow}>
+                  {QUICK_CUOTAS.map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={`${styles.chip} ${formData.cantidad_cuotas === n ? styles.chipActive : ''}`}
+                      onClick={() => handleChange('cantidad_cuotas', n)}
+                    >
+                      {n}x
+                    </button>
+                  ))}
+                </div>
+
                 <input
-                  id="ca_tna"
+                  id="ca_cuotas"
                   type="number"
-                  step="0.1"
-                  min="0.1"
-                  max="3000"
-                  placeholder="Ej: 120"
-                  value={tna}
-                  onChange={(e) => setTna(e.target.value)}
-                  className={styles.tnaInput}
-                  inputMode="decimal"
+                  placeholder="Ej: 12"
+                  value={formData.cantidad_cuotas === null || isNaN(formData.cantidad_cuotas) ? '' : formData.cantidad_cuotas}
+                  onChange={(e) => {
+                    const val = e.target.value === '' ? null : parseInt(e.target.value, 10);
+                    handleChange('cantidad_cuotas', val);
+                  }}
+                  min="2"
+                  max="120"
+                  step="1"
+                  className={styles.cuotasInput}
+                  inputMode="numeric"
                 />
-                <span className={styles.tnaUnit}>%</span>
+                {formData.cantidad_cuotas !== null && !isNaN(formData.cantidad_cuotas) &&
+                  (formData.cantidad_cuotas < 2 || formData.cantidad_cuotas > 120) && (
+                    <span className={styles.errorText}>Entre 2 y 120 cuotas</span>
+                  )}
               </div>
-              {tna !== '' && (isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000) && (
-                <span className={styles.errorText}>TNA debe estar entre 0.1% y 3000%</span>
-              )}
-              <span className={styles.inputDesc}>Figura en la web del comercio. Ej: 120% anual.</span>
 
-              {/* Cuota preview con TNA */}
-              {tna && parseFloat(tna) > 0 && formData.precio_total && formData.precio_total > 0 &&
-                formData.cantidad_cuotas && formData.cantidad_cuotas > 0 && (
-                  <div className={`${styles.cuotaPreview} ${styles.animateFadeIn}`}>
-                    <span>Cuota estimada:</span>
-                    <span className={styles.cuotaPreviewValue}>
-                      {cuotaPreview !== null ? formatMonto(cuotaPreview, 'ARS') : 'Calculando…'}
-                    </span>
-                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>/ mes</span>
+              {/* Interés */}
+              <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
+                <label className={styles.label}>¿Las cuotas tienen interés?</label>
+                <SegmentedControl<'sin' | 'con'>
+                  className={styles.interesSelector}
+                  options={[
+                    { value: 'sin', label: 'Sin interés' },
+                    { value: 'con', label: 'Con interés' },
+                  ]}
+                  value={tieneInteres ? 'con' : 'sin'}
+                  onChange={(v) => setTieneInteres(v === 'con')}
+                  ariaLabel="¿Las cuotas tienen interés?"
+                  fullWidth
+                />
+              </div>
+
+              {/* TNA */}
+              {tieneInteres && (
+                <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
+                  <label className={styles.label} htmlFor="ca_tna">TNA (Tasa Nominal Anual)</label>
+                  <div className={styles.tnaWrapper}>
+                    <input
+                      id="ca_tna"
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      max="3000"
+                      placeholder="Ej: 120"
+                      value={tna}
+                      onChange={(e) => setTna(e.target.value)}
+                      className={styles.tnaInput}
+                      inputMode="decimal"
+                    />
+                    <span className={styles.tnaUnit}>%</span>
                   </div>
-                )}
-            </div>
-          )}
-
-          {/* Ingreso manual */}
-          {showManualIncome && (
-            <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
-              <MontoInput
-                label="Tu ingreso mensual estimado"
-                placeholder="0"
-                value={formData.ingreso_manual}
-                onChange={(val) => handleChange('ingreso_manual', val)}
-                allowDecimals
-                hideCurrency
-                compact
-              />
-              {formData.ingreso_manual !== null && formData.ingreso_manual <= 0 && (
-                <span className={styles.errorText}>El ingreso debe ser mayor a 0</span>
+                  {tna !== '' && (isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000) && (
+                    <span className={styles.errorText}>TNA debe estar entre 0.1% y 3000%</span>
+                  )}
+                  <span className={styles.inputDesc}>Figura en la web del comercio. Ej: 120% anual.</span>
+                </div>
               )}
-              <span className={styles.inputDesc}>
-                No tenemos ingresos registrados. Completalo para ver la capacidad.
-              </span>
-            </div>
-          )}
-
-          {/* Preview en tiempo real */}
-          {previewText && (
-            <div className={`${styles.realtimeInfo} ${styles.animateFadeIn}`}>
-              <span>{previewText}</span>
-            </div>
+            </>
           )}
         </div>
       </div>

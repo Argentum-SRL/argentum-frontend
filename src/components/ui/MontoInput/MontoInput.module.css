@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .label {
@@ -23,6 +27,10 @@
   gap: 12px;
   border: 1.5px solid transparent;
   transition: background-color 150ms ease;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .montoHero:focus-within {
@@ -182,6 +190,9 @@
   border-radius: var(--control-radius);
   padding: 0 var(--control-pad-x);
   height: var(--control-h);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   transition: border-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
 }

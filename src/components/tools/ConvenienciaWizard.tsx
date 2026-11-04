@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { IPCData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
+import type { InflacionEsperadaData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import type { PlanCuotas } from '@/types';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { totalDesdeCuota, cuotaDesdeTotal } from '@/utils/ayudasEscritura';
@@ -35,7 +35,7 @@ export interface ConvenienciaWizardProps {
   resetCalculadora: () => void;
   cuotaCalculada: number | null;
   planCuotas?: PlanCuotas | null;
-  ipcData: IPCData | null;
+  ipcData: InflacionEsperadaData | null;
   ipcLoading: boolean;
   ipcError: boolean;
 }

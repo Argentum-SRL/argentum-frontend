@@ -61,9 +61,24 @@ export interface FinancialContext {
   margen_libre_mensual: number | null;
 }
 
+export interface AhorrosDetalle {
+  inversiones: number;
+  dolares_usd: number;
+  dolares_en_pesos: number;
+  metas: number;
+  total: number;
+}
+
+export interface InflacionEsperadaData {
+  valor_mensual: number;
+  meses: number[];
+  fuente_texto: string;
+  es_respaldo: boolean;
+}
+
 export interface CanAffordRequest {
   precio_total: number;
-  modo: 'contado' | 'cuotas';
+  modo: 'contado' | 'cuotas' | 'mensual';
   cantidad_cuotas?: number;
   tiene_interes?: boolean;
   tna?: number;
@@ -71,32 +86,19 @@ export interface CanAffordRequest {
 }
 
 export interface CanAffordResult {
-  modo: 'contado' | 'cuotas';
+  modo: 'contado' | 'cuotas' | 'mensual';
+  resultado: 'bien' | 'justo' | 'ahorros' | 'no_alcanza';
+  motivo?: 'datos_viejos' | 'sin_ingreso' | 'pocos_datos' | null;
+  titulo: string;
+  linea_principal: string;
+  lineas_plan?: string[];
+  linea_ahorros?: string | null;
+  ahorros?: AhorrosDetalle | null;
+  linea_liberacion?: string | null;
+  linea_compensar?: string | null;
+  linea_frescura?: string | null;
+  libre: number;
   precio_total: number;
-  
-  // Contado mode fields
-  saldo_disponible_actual?: number;
-  saldo_restante_post_compra?: number;
-  porcentaje_del_saldo?: number;
-  porcentaje_del_ingreso_mensual?: number | null;
-  
-  // Cuotas mode fields
-  monto_cuota?: number;
-  cantidad_cuotas?: number;
-  carga_mensual_previa?: number;
-  carga_mensual_nueva_total?: number;
-  porcentaje_carga_sobre_ingreso?: number | null;
-  margen_libre_post_compra?: number | null;
-  gasto_variable_promedio?: number;
-  tiene_interes?: boolean;
-  tna_usada?: number | null;
-  precio_total_real?: number;
-  interes_total?: number;
-
-  // Common fields
-  semaforo: 'verde' | 'amarillo' | 'rojo' | 'negro' | 'gris';
-  mensaje_principal: string;
-  ingreso_promedio_usado: number | null;
-  ingreso_es_manual: boolean;
+  fuente_inflacion?: string | null;
 }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import toolsService from '@/services/toolsService';
-import type { IPCData, ConvenienciaResult, FinancialContext, CanAffordResult } from '@/types/tools';
+import type { InflacionEsperadaData, ConvenienciaResult, FinancialContext, CanAffordResult } from '@/types/tools';
 import { useSimularCuotas } from '@/hooks/useSimularCuotas';
 import { sileo } from 'sileo';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
@@ -10,7 +10,7 @@ export const useTools = () => {
   const [activeTab, setActiveTab] = useState<'conveniencia' | 'can-afford' | 'importar-resumen'>('conveniencia');
   
   // ── Tab 1: Cuotas vs Contado ─────────────────────────────────────────────
-  const [ipcData, setIpcData] = useState<IPCData | null>(null);
+  const [ipcData, setIpcData] = useState<InflacionEsperadaData | null>(null);
   const [ipcLoading, setIpcLoading] = useState(true);
   const [ipcError, setIpcError] = useState(false);
   
@@ -38,16 +38,31 @@ export const useTools = () => {
   const [calculando, setCalculando] = useState(false);
 
   const loadIPC = useCallback(async () => {
+    setIpcLoading(true);
     try {
-      const data = await toolsService.getIPCActual();
-      setIpcData(data);
+      const data = await toolsService.getInflacionEsperada();
+      if (data && data.valor_mensual != null) {
+        setIpcData(data);
+        setFormData(prev => ({
+          ...prev,
+          inflacion_mensual: data.valor_mensual.toString()
+        }));
+        setIpcError(false);
+      } else {
+        setIpcData(null);
+        setFormData(prev => ({
+          ...prev,
+          inflacion_mensual: ''
+        }));
+        setIpcError(true);
+      }
+    } catch (err) {
+      console.error('Error al cargar inflación esperada:', err);
+      setIpcData(null);
       setFormData(prev => ({
         ...prev,
-        inflacion_mensual: data.valor_mensual.toString()
+        inflacion_mensual: ''
       }));
-      setIpcError(false);
-    } catch (err) {
-      console.error('Error al cargar IPC:', err);
       setIpcError(true);
     } finally {
       setIpcLoading(false);
@@ -160,14 +175,12 @@ export const useTools = () => {
 
   const [canAffordForm, setCanAffordForm] = useState<{
     precio_total: number | null;
-    modo: 'contado' | 'cuotas';
+    modo: 'contado' | 'cuotas' | 'mensual';
     cantidad_cuotas: number | null;
-    ingreso_manual: number | null;
   }>({
     precio_total: null,
     modo: 'contado',
     cantidad_cuotas: 12,
-    ingreso_manual: null
   });
 
   const [canAffordResult, setCanAffordResult] = useState<CanAffordResult | null>(null);
@@ -206,22 +219,6 @@ export const useTools = () => {
     }
   }, [activeTab, financialContext, financialContextLoading, financialContextError, loadFinancialContext]);
 
-  // Simulación unificada para ¿Me lo puedo permitir? (Decisión 3.f)
-  const parsedTnaCanAfford = tieneInteres ? parseFloat(tna) : null;
-  const cantidadesCanAfford = useMemo(
-    () => (canAffordForm.modo === 'cuotas' && canAffordForm.cantidad_cuotas ? [canAffordForm.cantidad_cuotas] : []),
-    [canAffordForm.modo, canAffordForm.cantidad_cuotas]
-  );
-
-  const { simulacion: simulacionCanAfford } = useSimularCuotas({
-    montoTotal: canAffordForm.precio_total,
-    cantidades: cantidadesCanAfford,
-    tasaTna: tieneInteres && parsedTnaCanAfford && parsedTnaCanAfford > 0 ? parsedTnaCanAfford : null,
-    enabled: Boolean(canAffordForm.modo === 'cuotas' && canAffordForm.precio_total && canAffordForm.precio_total > 0 && cantidadesCanAfford.length > 0),
-  });
-
-  const cuotaPreviewCanAfford = simulacionCanAfford?.planes?.[0]?.monto_cuota ?? null;
-
   const canAffordCalcular = async () => {
     const precio = canAffordForm.precio_total;
     if (precio === null || isNaN(precio) || precio <= 0) {
@@ -243,16 +240,6 @@ export const useTools = () => {
         return;
       }
     }
-    if (canAffordForm.ingreso_manual !== null && canAffordForm.ingreso_manual !== undefined) {
-      if (canAffordForm.ingreso_manual <= 0) {
-        sileo.error({ title: 'El ingreso mensual estimado debe ser mayor a 0' });
-        return;
-      }
-      if (canAffordForm.ingreso_manual > MAX_MONTO_INTEGRIDAD) {
-        sileo.error({ title: 'El ingreso mensual estimado excede el límite permitido' });
-        return;
-      }
-    }
 
     setCanAffordCalculando(true);
     try {
@@ -262,7 +249,6 @@ export const useTools = () => {
         cantidad_cuotas: canAffordForm.modo === 'cuotas' ? (canAffordForm.cantidad_cuotas || 2) : 1,
         tiene_interes: canAffordForm.modo === 'cuotas' ? tieneInteres : false,
         tna: canAffordForm.modo === 'cuotas' && tieneInteres && tna ? parseFloat(tna) : undefined,
-        ingreso_manual: canAffordForm.ingreso_manual
       });
       setCanAffordResult(res);
       sileo.success({ title: 'Análisis realizado con éxito' });
@@ -311,7 +297,6 @@ export const useTools = () => {
     setTieneInteres: handleSetTieneInteres,
     tna,
     setTna,
-    cuotaPreviewCanAfford,
   };
 };
 

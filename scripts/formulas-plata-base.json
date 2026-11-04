@@ -14,20 +14,6 @@
     "motivo": "Redondeo de porcentaje de percepción para etiqueta visual"
   },
   {
-    "archivo": "src/components/dashboard/ProyeccionCard/ProyeccionCard.tsx",
-    "expresion": "Math.round((actual / totalProyectado) * 100)",
-    "cantidad": 1,
-    "categoria": "dibujo",
-    "motivo": "Porcentaje para barra visual de proyección de gastos mensual"
-  },
-  {
-    "archivo": "src/components/dashboard/ProyeccionCard/ProyeccionCard.tsx",
-    "expresion": "Math.round((catActual / catTotal) * 100)",
-    "cantidad": 1,
-    "categoria": "dibujo",
-    "motivo": "Porcentaje para barra visual de proyección por categoría"
-  },
-  {
     "archivo": "src/components/goals/GoalContributionModal.tsx",
     "expresion": "(goal.monto_actual || 0) + delta",
     "cantidad": 1,

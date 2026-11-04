@@ -1,5 +1,5 @@
 import api from './api'
-import type { DashboardResumen, CotizacionDolar, Billetera, SubcategoriaGasto, ProyeccionesResponse, FinDeMesResponse } from '../types'
+import type { DashboardResumen, CotizacionDolar, Billetera, SubcategoriaGasto, FinDeMesResponse } from '../types'
 import { createUserCache, createKeyedUserCache } from '@/utils/sessionCleanup'
 
 // Cache storage con validación automática por usuario autenticado
@@ -10,9 +10,6 @@ let cotizacionPromise: Promise<CotizacionDolar> | null = null
 
 const resumenCache = createKeyedUserCache<DashboardResumen>(DEFAULT_TTL)
 let resumenPromises: Record<string, Promise<DashboardResumen> | undefined> = {}
-
-const proyeccionCache = createUserCache<ProyeccionesResponse>(DEFAULT_TTL)
-let proyeccionPromise: Promise<ProyeccionesResponse> | null = null
 
 const finDeMesCache = createUserCache<FinDeMesResponse>(DEFAULT_TTL)
 let finDeMesPromise: Promise<FinDeMesResponse> | null = null
@@ -108,28 +105,6 @@ export const dashboardService = {
     return fetchPromise
   },
 
-  getProyeccion: async (signal?: AbortSignal): Promise<ProyeccionesResponse> => {
-    if (!signal && proyeccionPromise) return proyeccionPromise
-
-    const cached = proyeccionCache.get()
-    if (cached) {
-      return cached
-    }
-
-    const fetchPromise = (async () => {
-      try {
-        const response = await api.get<ProyeccionesResponse>('/dashboard/proyeccion', { signal })
-        proyeccionCache.set(response.data)
-        return response.data
-      } finally {
-        if (!signal) proyeccionPromise = null
-      }
-    })()
-
-    if (!signal) proyeccionPromise = fetchPromise
-    return fetchPromise
-  },
-
   getFinDeMes: async (signal?: AbortSignal): Promise<FinDeMesResponse> => {
     if (!signal && finDeMesPromise) return finDeMesPromise
 
@@ -190,11 +165,9 @@ export const dashboardService = {
 export const invalidateDashboardCache = () => {
   resumenCache.clear()
   cotizacionCache.clear()
-  proyeccionCache.clear()
   finDeMesCache.clear()
   periodoActualCache.clear()
   cotizacionPromise = null
-  proyeccionPromise = null
   finDeMesPromise = null
   periodoActualPromise = null
   resumenPromises = {}

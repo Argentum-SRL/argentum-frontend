@@ -222,7 +222,7 @@ export function clearUserStorage(): void {
  * Toda nueva caché en la aplicación DEBE registrar aquí su limpiador.
  */
 const CACHE_CLEANERS: Array<() => void> = [
-  () => invalidateDashboardCache(), // Limpia proyeccionCache, resumenCache, cotizacionCache, periodoActualCache
+  () => invalidateDashboardCache(), // Limpia resumenCache, cotizacionCache, periodoActualCache
   () => invalidateBilleteras(),     // Limpia billeterasCache
   () => invalidatePresupuestos(),   // Limpia presupuestosCache
   () => invalidateCategorias(),     // Limpia categoriesCache

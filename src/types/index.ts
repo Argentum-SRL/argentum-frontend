@@ -577,65 +577,6 @@ export interface Factura {
   vencida: boolean
 }
 
-export interface Proyeccion {
-  periodo: {
-    fecha_inicio: string
-    fecha_fin: string
-    dias_transcurridos: number
-    dias_restantes: number
-    dias_totales: number
-  }
-  gasto_proyectado_total: number | null
-  rango: { piso: number; central: number; techo: number } | null
-  rango_poco_informativo?: boolean | null
-  balance_proyectado: number | null
-  ingresos_proyectados: number | null
-  certezas: {
-    cuotas_restantes: number
-    suscripciones_restantes: number
-    compromisos_restantes?: number
-    total: number
-  }
-  desglose_por_categoria: ProyeccionCategoria[] | null
-  nivel_confianza?: 'alto' | 'medio' | 'bajo' | 'sin_datos' | 'inicial' | 'alta' | 'media' | 'baja' | null
-  ciclos_analizados?: number
-  pesos?: { historial: number; ciclo_actual: number } | null
-  advertencias?: string[]
-  datos_suficientes?: boolean
-  clasificacion?: { comprometidos: number; recurrentes_detectados: number; variables: number } | null
-  distribucion?: Record<string, number> | null
-  intervalos?: {
-    intervalo_50: { piso: number; techo: number }
-    intervalo_80: { piso: number; techo: number }
-    intervalo_95: { piso: number; techo: number }
-  } | null
-  descomposicion?: {
-    cierto: number
-    recurrente_ya_ocurrido: number
-    variable_proyectado: number | null
-  } | null
-  mensaje_insuficiente?: string | null
-  mensaje?: string | null
-  calibracion?: {
-    pasa_puerta: boolean
-    ciclos_evaluados: number
-    cobertura_50?: number | null
-    cobertura_80?: number | null
-    cobertura_95?: number | null
-    ancho_medio_80_rel?: number | null
-    motivo?: 'pocos_ciclos' | 'cobertura_insuficiente' | 'intervalo_no_informativo' | 'calibracion_pendiente' | string | null
-    mensaje?: string | null
-  } | null
-  mostrar_card?: boolean
-}
-
-export interface ProyeccionesResponse {
-  ars: Proyeccion
-  usd: Proyeccion
-  mostrar_card?: boolean
-  mostrar_modal_bienvenida?: boolean
-}
-
 export interface FinDeMesTarjeta {
   titulo: string
   monto: string
@@ -652,17 +593,6 @@ export interface FinDeMesResponse {
   linea_saldo: string
   tarjeta: FinDeMesTarjeta | null
   mostrar_modal_bienvenida: boolean
-}
-
-export interface ProyeccionCategoria {
-  categoria_id: string
-  categoria_nombre: string
-  gasto_actual_ciclo: number
-  promedio_historico: number
-  proyectado: number
-  rango_piso: number
-  rango_techo: number
-  fuera_de_patron: boolean
 }
 
 export interface CuotaResumen {

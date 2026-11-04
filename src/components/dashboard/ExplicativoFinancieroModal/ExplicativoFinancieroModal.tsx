@@ -18,7 +18,7 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
   const [activeTab, setActiveTab] = useState<'perfil' | 'proyeccion'>(initialTab)
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding ariaLabel="Guía de Salud y Proyección Financiera">
+    <Modal isOpen={isOpen} onClose={onClose} showHeader={false} noPadding ariaLabel="Guía de tu perfil y tu fin de mes">
       <div className={styles.modalRoot} data-modal-frame>
         {/* Header con estética Senior Fintech */}
         <div className={styles.header}>
@@ -28,7 +28,7 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
             </div>
             <div>
               <h2 className={styles.headerTitle}>Guía de tus métricas</h2>
-              <p className={styles.headerSubtitle}>Cómo interpretar tu perfil y proyección</p>
+              <p className={styles.headerSubtitle}>Cómo leer tu perfil y tu fin de mes</p>
             </div>
           </div>
           <button
@@ -46,7 +46,7 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
           <SegmentedControl<'perfil' | 'proyeccion'>
             options={[
               { value: 'perfil', label: 'Tu perfil financiero', icon: <Activity size={15} /> },
-              { value: 'proyeccion', label: 'Proyección del ciclo', icon: <TrendingUp size={15} /> },
+              { value: 'proyeccion', label: 'Fin de mes', icon: <TrendingUp size={15} /> },
             ]}
             value={activeTab}
             onChange={setActiveTab}
@@ -115,58 +115,38 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
               </div>
             </div>
           ) : (
-            <div role="tabpanel" aria-label="Proyección del ciclo" data-modal-stack>
+            <div role="tabpanel" aria-label="Fin de mes" data-modal-stack>
               <div className={styles.introBox}>
-                Una estimación estadística predictiva de cómo vas a terminar tu ciclo financiero actual (entre tus fechas de cobro), ayudándote a anticipar imprevistos antes del cierre.
+                La tarjeta «¿Cómo llegás a fin de mes?» te dice con cuánta plata llegarías al último día de tu ciclo si gastás como en tus meses anteriores.
               </div>
 
-              <div className={styles.sectionTitle} data-modal-section-title>Comportamiento según tu historial</div>
+              <div className={styles.sectionTitle} data-modal-section-title>Qué te muestra</div>
 
               <div data-modal-block>
                 <div className={styles.modeCard}>
                   <div className={styles.modeHeader}>
                     <Layers size={15} />
-                    <span>1. Compromisos ciertos</span>
+                    <span>El número grande</span>
                   </div>
                   <p className={styles.modeDesc}>
-                    Si estás en tus primeros meses con Argentum, muestra exclusivamente tus obligaciones fijas confirmadas: cuotas de tarjetas del ciclo actual y suscripciones vigentes.
+                    Es lo que te quedaría al terminar el ciclo, en un mes flojo y en uno bueno. Sale de lo que tenés libre hoy, lo que vas a cobrar antes del cierre y lo que gastaste en tus meses anteriores.
                   </p>
                 </div>
 
                 <div className={styles.modeCard}>
                   <div className={styles.modeHeader}>
                     <TrendingUp size={15} />
-                    <span>2. Proyección calibrada</span>
+                    <span>Las líneas de abajo</span>
                   </div>
                   <p className={styles.modeDesc}>
-                    A partir de 3 ciclos observados, el modelo estadístico proyecta además el ritmo de tus gastos variables diarios basándose en tus patrones históricos reales.
+                    Te dicen en cuántos de tus últimos meses no te alcanzó y, si cobrás antes del cierre, cuánto te queda libre hasta ese cobro.
                   </p>
                 </div>
               </div>
 
-              <div className={styles.sectionTitle} data-modal-section-title>Conceptos clave de la proyección</div>
-
-              <div className={styles.kpiList} data-modal-block>
-                <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Cierre esperado</span>
-                  <p className={styles.kpiText}>
-                    El valor estadístico más probable con el que cerrarás el ciclo sumando fijos y variables.
-                  </p>
-                </div>
-
-                <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Rango 80%</span>
-                  <p className={styles.kpiText}>
-                    Banda de seguridad estadística entre un escenario optimista (p10) y uno conservador (p90).
-                  </p>
-                </div>
-
-                <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Apertura</span>
-                  <p className={styles.kpiText}>
-                    Desglose por categoría para que puedas identificar rápidamente dónde se concentrarán tus mayores gastos.
-                  </p>
-                </div>
+              <div className={styles.activationNotice}>
+                <CheckCircle2 size={16} />
+                <span>Aparece cuando tenés al menos 3 meses con movimientos y la app ya sabe cuándo cobrás.</span>
               </div>
             </div>
           )}

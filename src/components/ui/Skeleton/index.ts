@@ -15,7 +15,6 @@ export {
   OnboardingSkeleton,
   BalanceCardSkeleton,
   DashboardListSkeleton,
-  ProyeccionCardSkeleton,
   ConvenienciaWizardSkeleton,
   ComerciosRecordadosSkeleton,
   PerfilSeguridadSkeleton,

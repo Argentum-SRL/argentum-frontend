@@ -767,53 +767,6 @@ export const DashboardListSkeleton = memo(function DashboardListSkeleton({
 DashboardListSkeleton.displayName = 'DashboardListSkeleton'
 
 /**
- * Template de Tarjeta de Proyección (ProyeccionCard)
- */
-export const ProyeccionCardSkeleton = memo(function ProyeccionCardSkeleton({
-  className = '',
-}: {
-  className?: string
-}) {
-  return (
-    <div
-      role="status"
-      aria-label="Cargando proyección..."
-      className={`${styles.proyeccionCardSkeleton} ${className}`.trim()}
-    >
-      <span className={styles.srOnly}>Cargando proyección...</span>
-      <div className={styles.proyeccionHeader}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-          <Skeleton variant="rounded" width={18} height={18} borderRadius={4} />
-          <Skeleton variant="text" width="45%" height={16} />
-          <Skeleton variant="rounded" width="25%" height={18} borderRadius={12} />
-        </div>
-        <Skeleton variant="rounded" width={24} height={24} borderRadius={6} />
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '6px 0' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Skeleton variant="text" width="30%" height={13} />
-          <Skeleton variant="text" width="20%" height={13} />
-        </div>
-        <Skeleton variant="rounded" width="100%" height={8} borderRadius={4} />
-      </div>
-
-      <div className={styles.proyeccionMetricsGrid}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <Skeleton variant="text" width="50%" height={12} />
-          <Skeleton variant="text" width="70%" height={20} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <Skeleton variant="text" width="50%" height={12} />
-          <Skeleton variant="text" width="70%" height={20} />
-        </div>
-      </div>
-    </div>
-  )
-})
-ProyeccionCardSkeleton.displayName = 'ProyeccionCardSkeleton'
-
-/**
  * Template de Wizard de Conveniencia (ToolsPage)
  */
 export const ConvenienciaWizardSkeleton = memo(function ConvenienciaWizardSkeleton({

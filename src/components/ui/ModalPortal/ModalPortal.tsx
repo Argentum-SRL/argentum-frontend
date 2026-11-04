@@ -6,7 +6,6 @@ import TransaccionModalEntrada from '@/components/transacciones/TransaccionModal
 import TarjetaModal from '@/components/tarjetas/TarjetaModal'
 import FilterBarMobileDrawer from '@/components/transacciones/FilterBarMobileDrawer'
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal'
-import ProyeccionModal from '@/components/dashboard/ProyeccionModal/ProyeccionModal'
 import BalanceCicloModal from '@/components/dashboard/BalanceCicloModal/BalanceCicloModal'
 import PresupuestoModal from '@/components/presupuestos/PresupuestoModal'
 import PresupuestoDetailModal from '@/components/presupuestos/PresupuestoDetailModal'
@@ -28,7 +27,6 @@ export function ModalPortal() {
   const transaccionData = typedModals.transaccion?.data
   const tarjetaData = typedModals.tarjeta?.data
   const filterDrawerData = typedModals.transaccionFilters?.data
-  const proyeccionData = typedModals.proyeccion?.data
   const presupuestoData = typedModals.presupuesto?.data
   const presupuestoDetailData = typedModals.presupuestoDetail?.data
   const goalData = typedModals.goal?.data
@@ -98,16 +96,6 @@ export function ModalPortal() {
             categorias={filterDrawerData.categorias}
             hasActiveFilters={filterDrawerData.hasActiveFilters}
             showMonedaFilter={filterDrawerData.showMonedaFilter}
-          />
-        </ModalErrorBoundary>
-      )}
-
-      {typedModals.proyeccion?.isOpen && proyeccionData?.proyeccion && (
-        <ModalErrorBoundary modalName="proyeccion" onClose={() => closeModal('proyeccion')}>
-          <ProyeccionModal
-            isOpen={true}
-            onClose={() => closeModal('proyeccion')}
-            proyeccion={proyeccionData.proyeccion}
           />
         </ModalErrorBoundary>
       )}

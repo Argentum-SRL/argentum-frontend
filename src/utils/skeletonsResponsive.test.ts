@@ -63,7 +63,6 @@ describe('Skeletons responsive y mirroring (fase_g3_skeletons_responsive)', () =
 
     expect(content).toContain('.balanceCardSkeleton')
     expect(content).toContain('.dashboardListSkeleton')
-    expect(content).toContain('.proyeccionCardSkeleton')
     expect(content).toContain('.wizardSkeletonWrapper')
     expect(content).toContain('.comerciosSkeletonWrapper')
     expect(content).toContain('.seguridadSkeletonWrapper')
@@ -76,18 +75,9 @@ describe('Skeletons responsive y mirroring (fase_g3_skeletons_responsive)', () =
     expect(content).toContain('export const Skeleton')
     expect(content).toContain('export const BalanceCardSkeleton')
     expect(content).toContain('export const DashboardListSkeleton')
-    expect(content).toContain('export const ProyeccionCardSkeleton')
     expect(content).toContain('export const ConvenienciaWizardSkeleton')
     expect(content).toContain('export const ComerciosRecordadosSkeleton')
     expect(content).toContain('export const PerfilSeguridadSkeleton')
-  })
-
-  it('ProyeccionCard.tsx no retorna null durante estado de carga (evita CLS)', () => {
-    const cardPath = path.resolve(rootDir, 'src/components/dashboard/ProyeccionCard/ProyeccionCard.tsx')
-    const content = fs.readFileSync(cardPath, 'utf-8')
-
-    expect(content).toContain('<ProyeccionCardSkeleton />')
-    expect(content).not.toMatch(/if\s*\(\s*loading\s*\)\s*return\s*null/)
   })
 
   it('ComerciosRecordados.tsx utiliza ComerciosRecordadosSkeleton en lugar de texto plano', () => {

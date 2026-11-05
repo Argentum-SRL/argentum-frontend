@@ -55,6 +55,7 @@ export interface ModalPayloadMap {
   }
   goal: {
     goal: Goal | null
+    sugerencia?: { nombre: string; monto_objetivo: number; moneda: 'ARS' | 'USD' } | null
     onSuccess: () => Promise<void> | void
   }
   goalContribution: {

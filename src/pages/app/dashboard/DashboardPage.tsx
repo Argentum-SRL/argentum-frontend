@@ -28,6 +28,7 @@ import { dashboardService } from '@/services/dashboard.service'
 import categoriaService from '@/services/categoria.service'
 import type { DashboardResumen, CategoriaGastoItem, Usuario, Billetera, SubcategoriaGasto, FinDeMesResponse, Frescura } from '@/types'
 import FinDeMesCard from '@/components/dashboard/FinDeMesCard/FinDeMesCard'
+import ConsejoCard from '@/components/dashboard/ConsejoCard/ConsejoCard'
 import { debeMostrarLineaSaldo, debeMostrarTarjetaFinDeMes } from '@/utils/finDeMes'
 import { PerfilFinancieroCard } from '@/components/perfil/PerfilFinancieroCard'
 import { BalanceCard } from '@/components/dashboard/BalanceCard'
@@ -1108,6 +1109,12 @@ export default function DashboardPage() {
           </div>
         </WidgetErrorBoundary>
       </div>
+
+      {!customRange && (
+        <WidgetErrorBoundary title="Un dato para vos">
+          <ConsejoCard />
+        </WidgetErrorBoundary>
+      )}
 
       {/* Perfil Financiero */}
       <WidgetErrorBoundary title="Perfil financiero">

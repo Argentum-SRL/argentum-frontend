@@ -24,6 +24,18 @@ export interface Usuario {
   fecha_nacimiento: string | null
   sexo: 'masculino' | 'femenino' | 'no_binario' | 'prefiero_no_decir' | null
   permiso_lectura_mensajes_en: string | null
+  prioridades_consejos?: number[]
+}
+
+export type RespuestaConsejo = 'sirvio' | 'no_sirve' | 'no_avisar'
+
+export interface Consejo {
+  id: string
+  tipo: string
+  texto: string
+  accion: 'crear_meta' | 'ver_movimientos' | 'cargar_ingreso' | null
+  accion_texto: string | null
+  accion_datos: Record<string, unknown> | null
 }
 
 // Historial de precios de una suscripción

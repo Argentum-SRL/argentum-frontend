@@ -21,6 +21,7 @@ interface GoalModalProps {
   open: boolean
   onClose: () => void
   goal?: Goal | null
+  sugerencia?: { nombre: string; monto_objetivo: number; moneda: 'ARS' | 'USD' } | null
   onSuccess: () => void
 }
 
@@ -39,7 +40,7 @@ interface FormState {
 }
 
 type FormAction =
-  | { type: 'RESET'; goal: Goal | null; defaultMoneda: 'ARS' | 'USD' }
+  | { type: 'RESET'; goal: Goal | null; defaultMoneda: 'ARS' | 'USD'; sugerencia?: { nombre: string; monto_objetivo: number; moneda: 'ARS' | 'USD' } | null }
   | { type: 'SET_STEP'; step: 1 | 2; direction: 'forward' | 'back' }
   | { type: 'SET_FIELD'; field: keyof FormState; value: FormState[keyof FormState] }
 
@@ -72,6 +73,14 @@ function formReducer(state: FormState, action: FormAction): FormState {
           estado: action.goal.estado
         }
       }
+      if (action.sugerencia) {
+        return {
+          ...initialState,
+          nombre: action.sugerencia.nombre,
+          monto_objetivo: action.sugerencia.monto_objetivo,
+          moneda: action.sugerencia.moneda,
+        }
+      }
       return {
         ...initialState,
         moneda: action.defaultMoneda,
@@ -86,7 +95,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
 }
 
 export default function GoalModal({
-  open, onClose, goal, onSuccess
+  open, onClose, goal, sugerencia, onSuccess
 }: GoalModalProps) {
   const { usuario } = useAuth()
   const isEdit = !!goal
@@ -106,12 +115,12 @@ export default function GoalModal({
     if (open) {
       const defaultMoneda = (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
       const timer = setTimeout(() => {
-        dispatch({ type: 'RESET', goal: goal || null, defaultMoneda })
+        dispatch({ type: 'RESET', goal: goal || null, defaultMoneda, sugerencia })
         setAnimClass('')
       }, 0)
       return () => clearTimeout(timer)
     }
-  }, [open, goal, usuario?.moneda_principal])
+  }, [open, goal, sugerencia, usuario?.moneda_principal])
 
   const goNext = () => {
     const trimmedNombre = nombre.trim()

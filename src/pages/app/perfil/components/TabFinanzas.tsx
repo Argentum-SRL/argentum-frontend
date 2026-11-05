@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Coins, Calendar, Receipt, Save, Check, ChevronDown } from '@/components/ui/icons'
+import { Coins, Calendar, Receipt, Save, Check, ChevronDown, Target } from '@/components/ui/icons'
+import { PRIORIDADES, alternarPrioridad, mismasPrioridades } from '@/utils/prioridades'
 import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { getCotizaciones } from '@/services/onboarding.service'
@@ -68,6 +69,10 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     direccion: initialCicloDir,
   })
 
+  // ── 3. Prioridades State ────────────────────────────────────────────────
+  const initialPrioridades = usuario?.prioridades_consejos || []
+  const [prioridades, setPrioridades] = useState<number[]>(initialPrioridades)
+
   // Estado unificado de guardado
   const [isSaving, setIsSaving] = useState(false)
 
@@ -96,6 +101,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           ? null
           : ((usuario?.ciclo_ajuste_direccion as 'anterior' | 'posterior' | null) ?? 'anterior'),
     })
+    setPrioridades(usuario?.prioridades_consejos || [])
   }
 
   // Fetch dollar quotes
@@ -142,7 +148,13 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     )
   }, [ciclo, usuario])
 
-  const isDirty = isMonedaDirty || isCicloDirty
+  // Detect dirty state for Prioridades
+  const isPrioridadesDirty = useMemo(() => {
+    const orig = usuario?.prioridades_consejos || []
+    return !mismasPrioridades(prioridades, orig)
+  }, [prioridades, usuario])
+
+  const isDirty = isMonedaDirty || isCicloDirty || isPrioridadesDirty
 
   // ── 3. Guardado Unificado (Cero duplicidad de botones) ─────────────────────
   const handleSaveAll = async (e?: React.FormEvent) => {
@@ -183,6 +195,10 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
           ciclo_ajuste_direccion: ciclo.tipo === 'regla' ? null : ciclo.direccion,
         })
         updatedUser = u2
+      }
+      if (isPrioridadesDirty) {
+        const u3 = await usuarioService.actualizarPrioridadesConsejos(prioridades)
+        updatedUser = u3
       }
       invalidateDashboardCache()
       if (updatedUser) {
@@ -309,6 +325,44 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
             </div>
           </section>
         </div>
+
+        {/* ── PRIORIDADES DE CONSEJOS (¿Qué es lo más importante para vos?) ── */}
+        <section className={`${perfilStyles.sectionCard} ${localStyles.comerciosSection}`}>
+          <div className={perfilStyles.sectionHeader}>
+            <div className={perfilStyles.sectionIconWrap} style={{ color: '#2563eb' }}>
+              <Target size={18} />
+            </div>
+            <div className={perfilStyles.sectionHeaderText}>
+              <h3>¿Qué es lo más importante para vos?</h3>
+            </div>
+          </div>
+
+          <div className={localStyles.formStack}>
+            <span className={localStyles.settingLabel}>Elegí hasta 3.</span>
+            <div className={localStyles.dolarGrid}>
+              {PRIORIDADES.map((p) => {
+                const isSelected = prioridades.includes(p.id)
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`${localStyles.dolarCard} ${isSelected ? localStyles.dolarCardActive : ''}`}
+                    onClick={() => setPrioridades((prev) => alternarPrioridad(prev, p.id))}
+                    aria-checked={isSelected}
+                    role="checkbox"
+                  >
+                    <div className={localStyles.dolarCardTop}>
+                      <span className={localStyles.dolarName}>{p.texto}</span>
+                      <div className={localStyles.radioIndicator}>
+                        {isSelected && <Check size={12} />}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </section>
 
         {/* ── BARRA UNIFICADA DE GUARDADO (Cero botones duplicados en pantalla) ── */}
         <div className={localStyles.unifiedActionBar}>

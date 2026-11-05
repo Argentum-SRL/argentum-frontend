@@ -140,6 +140,7 @@ export function ModalPortal() {
             open={true}
             onClose={() => closeModal('goal')}
             goal={goalData.goal}
+            sugerencia={goalData.sugerencia}
             onSuccess={goalData.onSuccess}
           />
         </ModalErrorBoundary>

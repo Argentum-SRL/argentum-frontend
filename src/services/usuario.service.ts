@@ -102,6 +102,11 @@ const usuarioService = {
     })
     return data
   },
+
+  actualizarPrioridadesConsejos: async (prioridades: number[]): Promise<Usuario> => {
+    const { data } = await api.put<Usuario>('/usuarios/me/prioridades-consejos', { prioridades })
+    return data
+  },
 }
 
 export default usuarioService

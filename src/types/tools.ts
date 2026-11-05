@@ -88,7 +88,7 @@ export interface CanAffordRequest {
 export interface CanAffordResult {
   modo: 'contado' | 'cuotas' | 'mensual';
   resultado: 'bien' | 'justo' | 'ahorros' | 'no_alcanza';
-  motivo?: 'datos_viejos' | 'sin_ingreso' | 'pocos_datos' | null;
+  motivo?: 'datos_viejos' | 'sin_ingreso' | 'aprendiendo' | 'pocos_datos' | null;
   titulo: string;
   linea_principal: string;
   lineas_plan?: string[];

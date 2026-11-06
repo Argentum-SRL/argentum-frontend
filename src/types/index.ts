@@ -906,6 +906,7 @@ export type TipoNotificacion =
   | 'GASTO_INUSUAL'
   | 'INACTIVIDAD'
   | 'FACTURA_VENCE'
+  | 'PROYECCION_NEGATIVA'
 
 export interface Notificacion {
   id: string

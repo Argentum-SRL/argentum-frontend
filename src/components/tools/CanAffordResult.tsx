@@ -33,6 +33,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
     linea_liberacion,
     linea_compensar,
     linea_frescura,
+    linea_espera,
   } = resultado;
 
   const clase = claseResultado(resKey);
@@ -103,7 +104,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
       )}
 
       {/* Líneas secundarias en gris chico */}
-      {(linea_liberacion || linea_compensar || linea_frescura) && (
+      {(linea_liberacion || linea_compensar || linea_frescura || linea_espera) && (
         <div className={styles.lineasSecundarias}>
           {linea_liberacion && (
             <p className={styles.lineaSecundaria}>
@@ -118,6 +119,11 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
           {linea_frescura && (
             <p className={styles.lineaSecundaria}>
               {linea_frescura}
+            </p>
+          )}
+          {linea_espera && (
+            <p className={styles.lineaSecundaria}>
+              {linea_espera}
             </p>
           )}
         </div>

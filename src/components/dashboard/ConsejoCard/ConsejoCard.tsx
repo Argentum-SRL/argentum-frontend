@@ -52,10 +52,22 @@ export const ConsejoCard: React.FC = () => {
     [consejo],
   )
 
+  const refrescarConsejo = useCallback(() => {
+    consejosService
+      .getActual()
+      .then((res) => {
+        setConsejo(res?.consejo ?? null)
+      })
+      .catch(() => {})
+  }, [])
+
   const handleAccion = useCallback(async () => {
     if (!consejo?.accion) return
 
-    if (consejo.accion === 'crear_meta') {
+    const accionStr = String(consejo.accion)
+    if (accionStr === 'aportar_meta' || accionStr === 'poner_fecha_meta') {
+      navigate('/app/metas')
+    } else if (consejo.accion === 'crear_meta') {
       const sugerencia = consejo.accion_datos
         ? {
             nombre: String(consejo.accion_datos.nombre || ''),
@@ -68,7 +80,7 @@ export const ConsejoCard: React.FC = () => {
         data: {
           goal: null,
           sugerencia,
-          onSuccess: () => {},
+          onSuccess: refrescarConsejo,
         },
       })
     } else if (consejo.accion === 'ver_presupuestos') {
@@ -85,7 +97,7 @@ export const ConsejoCard: React.FC = () => {
             monto: Number(accion_datos.monto || 0),
             moneda: (accion_datos.moneda as 'ARS' | 'USD') || 'ARS',
           },
-          onSuccess: () => {},
+          onSuccess: refrescarConsejo,
         },
       })
     } else if (consejo.accion === 'ver_movimientos') {
@@ -104,7 +116,7 @@ export const ConsejoCard: React.FC = () => {
             categorias,
             tarjetas,
             tipoInicial: 'ingreso',
-            onSuccess: () => {},
+            onSuccess: refrescarConsejo,
           },
         })
       } catch (err: unknown) {
@@ -113,7 +125,7 @@ export const ConsejoCard: React.FC = () => {
         })
       }
     }
-  }, [consejo, open, navigate])
+  }, [consejo, open, navigate, refrescarConsejo])
 
   if (!consejo) {
     return null

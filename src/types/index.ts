@@ -25,6 +25,7 @@ export interface Usuario {
   sexo: 'masculino' | 'femenino' | 'no_binario' | 'prefiero_no_decir' | null
   permiso_lectura_mensajes_en: string | null
   prioridades_consejos?: number[]
+  tiene_suscripciones?: boolean
 }
 
 export type RespuestaConsejo = 'sirvio' | 'no_sirve' | 'no_avisar'

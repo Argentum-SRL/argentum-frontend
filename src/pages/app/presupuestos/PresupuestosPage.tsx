@@ -12,7 +12,8 @@ import type {
   Presupuesto, 
   PeriodoPresupuesto, 
   Categoria,
-  Billetera
+  Billetera,
+  SugerenciaRubro
 } from '@/types'
 import { formatMonto } from '@/utils/format'
 import { sileo } from 'sileo'
@@ -24,6 +25,7 @@ import BudgetCard from './BudgetCard'
 import BudgetBarChart from './BudgetBarChart'
 import BudgetHistoryModal from './BudgetHistoryModal'
 import DescargarExcelModal from './DescargarExcelModal'
+import SugerenciaRubroCard from './SugerenciaRubroCard'
 import { EmptyState, PageSummaryBar, PresupuestosSkeleton } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 
@@ -46,13 +48,19 @@ export default function PresupuestosPage() {
   const [selectedPresupuesto, setSelectedPresupuesto] = useState<Presupuesto | null>(null)
   const [historial, setHistorial] = useState<PeriodoPresupuesto[]>([])
   const [loadingHistory, setLoadingHistory] = useState(false)
+  const [sugerencia, setSugerencia] = useState<SugerenciaRubro | null>(null)
 
   const fetchPresupuestos = useCallback(async (signal?: AbortSignal) => {
     setLoading(true)
     try {
-      const data = await presupuestoService.getPresupuestos(activeTab, signal)
+      const dataPromise = presupuestoService.getPresupuestos(activeTab, signal)
+      const sugPromise = activeTab === 'activo'
+        ? presupuestoService.getSugerenciaRubro(signal).catch(() => null)
+        : Promise.resolve(null)
+      const [data, sug] = await Promise.all([dataPromise, sugPromise])
       if (!signal?.aborted) {
         setPresupuestos(data)
+        setSugerencia(sug)
       }
     } catch (err) {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
@@ -65,6 +73,17 @@ export default function PresupuestosPage() {
       }
     }
   }, [activeTab])
+
+  const handleSubirLimite = async (p: Presupuesto) => {
+    if (!p.sugerencia_limite) return
+    try {
+      await presupuestoService.subirLimite(p.id, p.sugerencia_limite.monto)
+      sileo.success({ title: 'Listo, cambiamos el límite.' })
+      fetchPresupuestos()
+    } catch (err: unknown) {
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cambiar el límite. Probá de nuevo.') })
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -355,6 +374,7 @@ export default function PresupuestosPage() {
             <div className={styles.mobileChartContainer}>
               <BudgetBarChart
                 presupuestos={presupuestos}
+                onSubirLimite={handleSubirLimite}
                 onEdit={handleEdit}
                 onPause={handlePause}
                 onResume={handleResume}
@@ -370,6 +390,7 @@ export default function PresupuestosPage() {
                   key={p.id} 
                   presupuesto={p} 
                   onDetails={() => handleDetails(p)}
+                  onSubirLimite={() => handleSubirLimite(p)}
                   onEdit={() => handleEdit(p)}
                   onPause={() => handlePause(p)}
                   onResume={() => handleResume(p.id)}
@@ -382,12 +403,39 @@ export default function PresupuestosPage() {
         )}
       </div>
 
+      {activeTab === 'activo' && !loading && sugerencia && (
+        <SugerenciaRubroCard
+          sugerencia={sugerencia}
+          onArmar={() => {
+            open('presupuesto', {
+              data: {
+                presupuesto: null,
+                categorias,
+                sugerencia: {
+                  nombre: sugerencia.categoria,
+                  categoria_id: sugerencia.categoria_id,
+                  monto: sugerencia.monto,
+                  moneda: sugerencia.moneda,
+                },
+                onSuccess: fetchPresupuestos,
+              },
+            })
+          }}
+        />
+      )}
+
       <BudgetHistoryModal 
         open={showHistory}
         onClose={() => setShowHistory(false)}
         presupuesto={selectedPresupuesto}
         historial={historial}
         loading={loadingHistory}
+        onSubirLimite={() => {
+          setShowHistory(false)
+          if (selectedPresupuesto) {
+            handleSubirLimite(selectedPresupuesto)
+          }
+        }}
       />
 
       <DescargarExcelModal

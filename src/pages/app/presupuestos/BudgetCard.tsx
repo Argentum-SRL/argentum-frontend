@@ -2,7 +2,10 @@ import { useMemo } from 'react'
 import {
   Calendar,
   PieChart,
-  ArrowLeftRight
+  ArrowLeftRight,
+  TrendingUp,
+  Target,
+  ArrowRight
 } from '@/components/ui/icons'
 import type { Presupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
@@ -13,6 +16,7 @@ import styles from './BudgetCard.module.css'
 interface BudgetCardProps {
   presupuesto: Presupuesto
   onDetails: () => void
+  onSubirLimite?: () => void
   onEdit?: () => void
   onPause?: () => void
   onResume?: () => void
@@ -22,7 +26,8 @@ interface BudgetCardProps {
 
 export default function BudgetCard({
   presupuesto,
-  onDetails
+  onDetails,
+  onSubirLimite
 }: BudgetCardProps) {
   const p = presupuesto.periodo_actual
   const limite = Number(p?.monto_limite || presupuesto.monto || 1)
@@ -213,6 +218,39 @@ export default function BudgetCard({
           <div className={styles.conversionNotice}>
             <ArrowLeftRight size={11} />
             <span>Incluye {formatMonto(p.monto_convertido!, moneda)} convertidos de otra moneda</span>
+          </div>
+        )}
+
+        {presupuesto.ritmo_texto && (
+          <div className={styles.conversionNotice}>
+            <TrendingUp size={11} />
+            <span>{presupuesto.ritmo_texto}</span>
+          </div>
+        )}
+
+        {presupuesto.sugerencia_limite && (
+          <div
+            className={styles.sugerenciaBox}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <div className={styles.sugerenciaInfo}>
+              <Target size={11} className={styles.sugerenciaIcon} />
+              <span className={styles.sugerenciaTexto}>
+                {presupuesto.sugerencia_limite.texto}
+              </span>
+            </div>
+            <button
+              type="button"
+              className={styles.sugerenciaBtn}
+              onClick={(e) => {
+                e.stopPropagation()
+                onSubirLimite?.()
+              }}
+            >
+              <span>{presupuesto.sugerencia_limite.boton}</span>
+              <ArrowRight size={10} />
+            </button>
           </div>
         )}
       </div>

@@ -14,7 +14,9 @@ import {
   ChevronLeft,
   ChevronRight,
   RefreshCw,
+  TrendingUp,
 } from '@/components/ui/icons'
+import { Button } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
 import presupuestoService from '@/services/presupuesto.service'
 import transaccionService from '@/services/transaccion.service'
@@ -221,17 +223,17 @@ export default function PresupuestoDetailModal({
     }
   }, [open, presupuestoId])
 
-  // Cálculo de sugerencia de ajuste
-  const superado3Seguidos = useMemo(() => {
-    if (historial.length < 3) return false
-    return historial.slice(0, 3).every(h => h.superado)
-  }, [historial])
-
-  const gastoPromedio = useMemo(() => {
-    if (historial.length === 0) return 0
-    const sum = historial.slice(0, 3).reduce((acc, h) => acc + Number(h.monto_usado || 0), 0)
-    return sum / Math.min(historial.length, 3)
-  }, [historial])
+  const handleSubirLimite = async () => {
+    if (!presupuesto || !presupuesto.sugerencia_limite) return
+    try {
+      const updated = await presupuestoService.subirLimite(presupuesto.id, presupuesto.sugerencia_limite.monto)
+      setFreshPresupuesto(updated)
+      sileo.success({ title: 'Listo, cambiamos el límite.' })
+      onSuccess?.()
+    } catch (err: unknown) {
+      sileo.error({ title: getErrorMessage(err, 'No pudimos cambiar el límite. Probá de nuevo.') })
+    }
+  }
 
   // Estilo semántico para avatar y barra
   const progressFillColor = useMemo(() => {
@@ -544,6 +546,13 @@ export default function PresupuestoDetailModal({
                   </div>
                 )}
 
+                {presupuesto?.ritmo_texto && (
+                  <div className={styles.noticeBox}>
+                    <TrendingUp size={13} className={styles.noticeIcon} />
+                    <span>{presupuesto.ritmo_texto}</span>
+                  </div>
+                )}
+
                 {p && (p.monto_sin_cotizacion ?? 0) > 0 && (
                   <div className={styles.noticeBox}>
                     <AlertCircle size={13} className={styles.noticeIcon} />
@@ -763,15 +772,17 @@ export default function PresupuestoDetailModal({
                     </div>
                   ) : (
                     <div className={styles.historyList}>
-                      {superado3Seguidos && (
+                      {presupuesto?.sugerencia_limite && (
                         <div className={styles.suggestionBanner}>
                           <AlertCircle size={20} className={styles.suggestionIcon} />
                           <div>
                             <p className={styles.suggestionTitle}>Sugerencia de ajuste</p>
                             <p className={styles.suggestionDesc}>
-                              Superaste este presupuesto los últimos 3 periodos. Tu gasto promedio real es de{' '}
-                              <b>{formatMonto(gastoPromedio, moneda)}</b>. Considerá aumentar el límite para ajustarlo a tu realidad.
+                              {presupuesto.sugerencia_limite.texto}
                             </p>
+                            <Button variant="secondary" onClick={handleSubirLimite}>
+                              {presupuesto.sugerencia_limite.boton}
+                            </Button>
                           </div>
                         </div>
                       )}

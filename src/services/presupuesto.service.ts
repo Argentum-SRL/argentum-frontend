@@ -3,7 +3,8 @@ import type {
   Presupuesto, 
   PresupuestoCreate, 
   PresupuestoUpdate, 
-  PeriodoPresupuesto 
+  PeriodoPresupuesto,
+  SugerenciaRubro
 } from '@/types'
 import { createKeyedUserCache } from '@/utils/sessionCleanup'
 import { nombreArchivoExcel } from '@/utils/excelPresupuestos'
@@ -91,6 +92,15 @@ const presupuestoService = {
       new Date()
     )
     return { blob: response.data, nombreArchivo }
+  },
+
+  getSugerenciaRubro: async (signal?: AbortSignal): Promise<SugerenciaRubro | null> => {
+    const response = await api.get<{ sugerencia: SugerenciaRubro | null }>('/presupuestos/sugerencia-rubro', { signal })
+    return response.data.sugerencia
+  },
+
+  subirLimite: async (id: string, monto: number): Promise<Presupuesto> => {
+    return presupuestoService.updatePresupuesto(id, { monto })
   }
 }
 

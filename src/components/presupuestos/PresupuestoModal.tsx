@@ -14,7 +14,7 @@ import {
   Trash2,
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
-import type { Presupuesto, Categoria, Subcategoria } from '@/types'
+import type { Presupuesto, Categoria, Subcategoria, SugerenciaPresupuesto } from '@/types'
 import presupuestoService from '@/services/presupuesto.service'
 import categoriaService from '@/services/categoria.service'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
@@ -33,6 +33,7 @@ interface PresupuestoModalProps {
   presupuesto?: Presupuesto | null
   categorias: Categoria[]
   onSuccess: () => void
+  sugerencia?: SugerenciaPresupuesto | null
 }
 
 interface FormState {
@@ -49,7 +50,7 @@ interface FormState {
 }
 
 type FormAction =
-  | { type: 'RESET'; presupuesto: Presupuesto | null; defaultMoneda?: 'ARS' | 'USD' }
+  | { type: 'RESET'; presupuesto: Presupuesto | null; defaultMoneda?: 'ARS' | 'USD'; sugerencia?: SugerenciaPresupuesto | null }
   | { type: 'SET_STEP'; step: 1 | 2 | 3 }
   | { type: 'SET_FIELD'; field: keyof FormState; value: FormState[keyof FormState] }
 
@@ -83,6 +84,16 @@ function formReducer(state: FormState, action: FormAction): FormState {
           }))
         }
       }
+      if (action.sugerencia) {
+        const s = action.sugerencia
+        return {
+          ...initialState,
+          nombre: s.nombre,
+          monto: s.monto,
+          moneda: s.moneda,
+          selectedCategorias: [{ categoria_id: s.categoria_id, subcategoria_id: null }]
+        }
+      }
       return {
         ...initialState,
         moneda: action.defaultMoneda || 'ARS'
@@ -97,7 +108,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
 }
 
 export default function PresupuestoModal({
-  open, onClose, presupuesto, categorias, onSuccess
+  open, onClose, presupuesto, categorias, onSuccess, sugerencia
 }: PresupuestoModalProps) {
   const isEdit = !!presupuesto
   const { usuario } = useAuth()
@@ -142,14 +153,14 @@ export default function PresupuestoModal({
     if (open) {
       const defaultMoneda = (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
       const timer = setTimeout(() => {
-        dispatch({ type: 'RESET', presupuesto: presupuesto || null, defaultMoneda })
+        dispatch({ type: 'RESET', presupuesto: presupuesto || null, defaultMoneda, sugerencia })
         setExpandedCats(new Set())
         setAnimClass('')
         void loadData()
       }, 0)
       return () => clearTimeout(timer)
     }
-  }, [open, presupuesto, usuario?.moneda_principal, loadData])
+  }, [open, presupuesto, usuario?.moneda_principal, loadData, sugerencia])
 
   const filteredCategorias = useMemo(() => {
     if (!searchQuery.trim()) return egresoCategorias

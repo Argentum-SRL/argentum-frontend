@@ -332,6 +332,74 @@
   color: var(--text-2);
 }
 
+/* Ritmo row in mobile sheet */
+.ritmoRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  padding-top: 2px;
+}
+
+.ritmoIcon {
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+/* Sugerencia de Ajuste en sheet mobile */
+.sugerenciaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 6px;
+  margin-top: 2px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sugerenciaTexto {
+  font-size: 11px;
+  color: var(--text-2);
+  line-height: 1.35;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.sugerenciaBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--motion-fast) var(--ease-out),
+              background-color var(--motion-fast) var(--ease-out),
+              border-color var(--motion-fast) var(--ease-out);
+}
+
+.sugerenciaBtn:hover,
+.sugerenciaBtn:active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.sugerenciaBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 /* Actions List */
 .sheetActionsList {
   display: flex;
@@ -484,7 +552,8 @@
   .barArea,
 .solidFill,
 .sheetProgressFill,
-.sheetActionItem {
+.sheetActionItem,
+.sugerenciaBtn {
     transition: none;
     animation: none;
   }

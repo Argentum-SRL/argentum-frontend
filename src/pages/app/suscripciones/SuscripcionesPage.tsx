@@ -398,10 +398,12 @@ const SuscripcionesPage: React.FC = () => {
       <div className={styles.sections}>
         {sections.map(section => (
           <div key={section.title} className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={section.title === 'Activas' ? styles.sectionTitle : styles.sectionTitleAlt}>{section.title}</h2>
-              <span className={section.count > 0 ? styles.sectionCount : ''}>{section.count}</span>
-            </div>
+            {section.title !== 'Activas' && (
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>{section.title}</h2>
+                <span className={section.count > 0 ? styles.sectionCount : ''}>{section.count}</span>
+              </div>
+            )}
             <div className={styles.grid}>
               {section.items.map(s => (
                 <SuscripcionCard

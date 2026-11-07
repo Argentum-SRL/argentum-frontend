@@ -67,7 +67,7 @@
 .sectionTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #0D2045;
+  color: var(--text);
   margin: 0;
 }
 

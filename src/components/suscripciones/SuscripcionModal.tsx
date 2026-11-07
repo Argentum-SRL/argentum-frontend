@@ -484,15 +484,17 @@ const SuscripcionModal: React.FC<SuscripcionModalProps> = ({ open, onClose, susc
                               onClick={() => handleSelectServicio(s)}
                             >
                               <div className={styles.logoWrapper}>
-                                {s.icono && ICONOS_GENERICOS[s.icono] ? (
-                                  React.createElement(ICONOS_GENERICOS[s.icono], { size: 24 })
-                                ) : s.logoPath && !failedLogos[s.id] ? (
+                                {s.logoPath && !failedLogos[s.id] ? (
                                   <img
                                     src={s.logoPath}
                                     alt={s.nombre}
                                     className={styles.logo}
                                     onError={() => setFailedLogos(prev => ({ ...prev, [s.id]: true }))}
                                   />
+                                ) : s.icono && ICONOS_GENERICOS[s.icono] ? (
+                                  <div className={styles.logoFallback}>
+                                    {React.createElement(ICONOS_GENERICOS[s.icono], { size: 22 })}
+                                  </div>
                                 ) : (
                                   <div className={styles.logoFallback}>{s.nombre[0]}</div>
                                 )}

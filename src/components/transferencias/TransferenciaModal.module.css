@@ -137,6 +137,44 @@
 }
 
 /* ── Radio Pills / Solapas (Idéntico a TransaccionModal) ─────────────────── */
+.operacionSelector {
+  --selector-gap: 6px;
+}
+
+@media (max-width: 639px) {
+  .operacionSelector {
+    --selector-gap: 4px;
+  }
+
+  .operacionSelector button {
+    padding: 0 6px;
+    font-size: 12px;
+    gap: 4px;
+    letter-spacing: -0.2px;
+  }
+
+  .operacionSelector button:first-child {
+    flex: 1.25 1 0;
+  }
+
+  .operacionSelector button:not(:first-child) {
+    flex: 0.88 1 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalTransferencia {
+    --modal-pad-x: 16px;
+  }
+
+  .operacionSelector button {
+    padding: 0 4px;
+    font-size: 11.5px;
+    gap: 4px;
+    letter-spacing: -0.3px;
+  }
+}
+
 .radioGroup {
   display: flex;
   gap: 8px;

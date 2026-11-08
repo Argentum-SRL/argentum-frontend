@@ -27,7 +27,7 @@ function getBankVisuals(billetera?: Billetera, fallbackName = 'Cuenta') {
       nombre: `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`,
       bg: billetera.moneda === 'ARS' ? '#1A3D28' : '#0C3D48',
       logoUrl: '',
-      initials: 'EF',
+      initials: '$',
     }
   }
 

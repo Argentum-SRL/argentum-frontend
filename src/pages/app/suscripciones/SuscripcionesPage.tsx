@@ -328,7 +328,8 @@ const SuscripcionesPage: React.FC = () => {
           </div>
           <button className={styles.nuevaBtn} disabled style={{ opacity: 0.6, cursor: 'default' }}>
             <Plus size={16} strokeWidth={2.5} />
-            Agregar suscripción o débito
+            <span className={styles.btnTextMobile}>Nueva</span>
+            <span className={styles.btnTextDesktop}>Agregar suscripción o débito</span>
           </button>
         </header>
         <SuscripcionesSkeleton />
@@ -352,7 +353,8 @@ const SuscripcionesPage: React.FC = () => {
         </div>
         <button className={styles.nuevaBtn} onClick={handleCreate}>
           <Plus size={16} strokeWidth={2.5} />
-          Agregar suscripción o débito
+          <span className={styles.btnTextMobile}>Nueva</span>
+          <span className={styles.btnTextDesktop}>Agregar suscripción o débito</span>
         </button>
       </header>
 

@@ -124,7 +124,9 @@ export default function BudgetCard({
               <h3 className={styles.budgetTitle} title={presupuesto.nombre}>
                 {presupuesto.nombre}
               </h3>
-              <span className={styles.currencyTag}>{presupuesto.moneda === 'USD' ? 'Dólares' : 'Pesos'}</span>
+              {presupuesto.moneda === 'USD' && (
+                <span className={styles.currencyTag}>Dólares</span>
+              )}
               <span className={styles.periodTag}>{etiquetaPeriodoPresupuesto(presupuesto.periodo)}</span>
             </div>
             <div className={styles.metaRow}>

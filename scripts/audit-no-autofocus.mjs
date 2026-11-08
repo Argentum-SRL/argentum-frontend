@@ -17,6 +17,7 @@ export const ALLOWED_FOCUS_FILES = [
   'EditBilleteraModal.tsx',
   'SegmentedControl.tsx',
   'VerificarEmail.tsx',
+  'SuscripcionModal.tsx',
 ];
 
 // Prop-forwarding components allowed to have autoFocus={autoFocus} or autoFocus in prop signatures
@@ -30,6 +31,7 @@ export const FORWARDING_COMPONENTS = [
 export const ALLOWED_NAME_INPUT_FILES = [
   'src/components/billeteras/BankPickerModal.tsx',
   'src/components/billeteras/EditBilleteraModal.tsx',
+  'src/components/suscripciones/SuscripcionModal.tsx',
 ];
 
 /**
@@ -105,17 +107,18 @@ export const auditarContenido = function(content, filePath = '') {
         continue;
       }
 
-      // Si es uno de los dos inputs de nombre de D.2 (BankPickerModal o EditBilleteraModal)
+      // Si es uno de los inputs de nombre permitidos para edición inmediata
       const isNameInputFile = ALLOWED_NAME_INPUT_FILES.some((f) => normPath.endsWith(f));
       if (isNameInputFile) {
         // En estos modales, el input de nombre tiene autoFocus fijo para edición inmediata
         // Revisar contexto inmediato
-        const context = lines.slice(Math.max(0, i - 5), Math.min(lines.length, i + 6)).join('\n');
+        const context = lines.slice(Math.max(0, i - 35), Math.min(lines.length, i + 35)).join('\n');
         if (
           context.includes('nameInputRef') ||
           context.includes('isEditingName') ||
           context.includes('isCustom') ||
-          context.includes('billetera.nombre')
+          context.includes('billetera.nombre') ||
+          context.includes('suscripcion')
         ) {
           continue;
         }

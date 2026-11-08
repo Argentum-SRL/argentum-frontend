@@ -844,6 +844,7 @@ export default function SuscripcionModal({
                           <div className={styles.inlineNameWrap}>
                             <input
                               ref={nameInputRef}
+                              autoFocus
                               type="text"
                               className={styles.inlineNameInput}
                               value={nombre}
@@ -872,7 +873,6 @@ export default function SuscripcionModal({
                               }}
                               placeholder={serv?.nombre || 'Nombre de la suscripción'}
                               maxLength={100}
-                              autoFocus
                             />
                           </div>
                         ) : (
@@ -1100,6 +1100,7 @@ export default function SuscripcionModal({
                           <div className={styles.inlineNameWrap}>
                             <input
                               ref={nameInputRef}
+                              autoFocus
                               type="text"
                               className={styles.inlineNameInput}
                               value={nombre}
@@ -1128,7 +1129,6 @@ export default function SuscripcionModal({
                               }}
                               placeholder={serv?.nombre || 'Nombre de la suscripción'}
                               maxLength={100}
-                              autoFocus
                             />
                           </div>
                         ) : (

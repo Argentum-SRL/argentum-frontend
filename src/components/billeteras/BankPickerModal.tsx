@@ -61,45 +61,52 @@ interface BankPickerModalProps {
   monedaPrincipalUsuario: 'ARS' | 'USD'
 }
 
+// ── Categorías para filtro rápido (Chips) ────────────────────────────────────
+
+const CATEGORIAS_BANCOS: { id: BankDefinition['tipo']; label: string }[] = [
+  { id: 'banco_tradicional', label: 'Bancos tradicionales' },
+  { id: 'billetera_virtual', label: 'Billeteras virtuales' },
+  { id: 'banco_digital', label: 'Bancos digitales' },
+  { id: 'plataforma_inversion', label: 'Inversiones' },
+]
+
 // ── Logo en el picker ─────────────────────────────────────────────────────────
 
 function PickerLogo({
   bank,
-  size = 44,
+  size = 36,
 }: {
   bank: BankDefinition
-  size?: 44 | 36
+  size?: 40 | 36
 }) {
   const [hasError, setHasError] = useState(false)
   const url = getBankLogoUrl(bank.logoPath)
+  const isCompact = size === 36
+  const slotClass = isCompact ? styles.logoSlot36 : styles.logoSlot40
 
-  const sizeClass = size === 44 ? styles.size44 : styles.size36
-  const fontClass = size === 44 ? styles.initials44 : styles.initials36
-
-  if (!url || hasError) {
+  if (url && !hasError) {
     return (
-      <div 
-        className={`${styles.pickerLogoCircle} ${sizeClass}`} 
-        data-bank={bank.id}
-      >
-        <span className={`${styles.pickerLogoInitials} ${fontClass}`}>
-          {getInitials(bank.nombre)}
-        </span>
+      <div className={`${styles.bankIconSlot} ${slotClass}`}>
+        <img
+          src={url}
+          alt={bank.nombre}
+          className={styles.bankLogoImg}
+          onError={() => setHasError(true)}
+        />
       </div>
     )
   }
 
   return (
     <div 
-      className={`${styles.pickerLogoCircle} ${sizeClass}`} 
+      className={`${styles.bankIconSlot} ${slotClass}`} 
       data-bank={bank.id}
     >
-      <img
-        src={url}
-        alt={bank.nombre}
-        className={styles.pickerLogoImg}
-        onError={() => setHasError(true)}
-      />
+      <div className={styles.bankGenericBox}>
+        <span className={styles.bankInitialText}>
+          {getInitials(bank.nombre)}
+        </span>
+      </div>
     </div>
   )
 }
@@ -116,13 +123,12 @@ function BankPickerItem({
   return (
     <button
       type="button"
-      className={styles.pickerItem}
-      data-bank={bank.id}
+      className={styles.pickerCard}
       onClick={() => onSelect(bank)}
-      title={bank.nombre}
+      aria-label={`Seleccionar ${bank.nombre}`}
     >
-      <PickerLogo bank={bank} size={44} />
-      <span className={styles.pickerItemNombre}>{bank.nombre}</span>
+      <PickerLogo bank={bank} size={36} />
+      <span className={styles.pickerCardTitle}>{bank.nombre}</span>
     </button>
   )
 }
@@ -251,6 +257,7 @@ export default function BankPickerModal({
     isEditingName,
   } = state
 
+  const [categoriaFiltro, setCategoriaFiltro] = useState<BankDefinition['tipo'] | null>(null)
   const nameInputRef = useRef<HTMLInputElement>(null)
   const isCustom = bankSeleccionado?.id === 'custom'
 
@@ -262,6 +269,7 @@ export default function BankPickerModal({
       setEstimacion(null)
       setTipoPuntoPartida('hoy')
       setFechaSaldoManual(null)
+      setCategoriaFiltro(null)
     }
   }
 
@@ -320,14 +328,23 @@ export default function BankPickerModal({
     }
   }, [step, bankSeleccionado, entidadInfo, saldo])
 
-  // Filtrado de bancos
+  // Filtrado de bancos y secciones según búsqueda y categoría activa
   const bancosFiltrados = useMemo(() => {
-    if (!searchQuery.trim()) return BANKS
-    const q = searchQuery.toLowerCase()
-    return BANKS.filter((b) => b.nombre.toLowerCase().includes(q))
-  }, [searchQuery])
+    const q = searchQuery.trim().toLowerCase()
+    return BANKS.filter((b) => {
+      const matchesSearch = !q || b.nombre.toLowerCase().includes(q)
+      const matchesCat = !categoriaFiltro || b.tipo === categoriaFiltro
+      return matchesSearch && matchesCat
+    })
+  }, [searchQuery, categoriaFiltro])
 
   const sinResultados = bancosFiltrados.length === 0
+
+  const seccionesAMostrar = useMemo(() => {
+    if (searchQuery.trim()) return BANK_SECTIONS
+    if (!categoriaFiltro) return BANK_SECTIONS
+    return BANK_SECTIONS.filter((s) => s.tipo === categoriaFiltro)
+  }, [searchQuery, categoriaFiltro])
 
   // Billetera principal actual
   const billeteraPrincipalActual = billeterasActuales.find((b) => b.es_principal)
@@ -389,6 +406,7 @@ export default function BankPickerModal({
       showHeader={false}
       noPadding
       autoHeight
+      className={styles.modal}
       ariaLabel="Agregar billetera"
     >
       <div className={styles.modalRoot}>
@@ -416,10 +434,7 @@ export default function BankPickerModal({
             {/* Header del picker */}
             <div className={styles.pickerHeader}>
               <div className={styles.headerTopRow}>
-                <div>
-                  <h2 className={styles.pickerTitle}>¿Dónde tenés tu plata?</h2>
-                  <p className={styles.pickerSubtitle}>Elegí el banco o billetera para comenzar</p>
-                </div>
+                <h2 className={styles.pickerTitle}>¿Dónde tenés tu plata?</h2>
                 <button
                   type="button"
                   className={styles.closeBtn}
@@ -429,7 +444,8 @@ export default function BankPickerModal({
                   <X size={18} strokeWidth={1.75} />
                 </button>
               </div>
-              {/* Search */}
+
+              {/* Búsqueda */}
               <div className={styles.searchWrap}>
                 <Search size={15} className={styles.searchIcon} strokeWidth={1.75} />
                 <input
@@ -451,7 +467,39 @@ export default function BankPickerModal({
                   </button>
                 )}
               </div>
+
+              {/* Filtro rápido por categoría (Chips) */}
+              <div
+                className={styles.categoryChipsWrap}
+                role="tablist"
+                aria-label="Filtrar por categoría"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={categoriaFiltro === null}
+                  className={`${styles.categoryChip} ${categoriaFiltro === null ? styles.categoryChipActive : ''}`}
+                  onClick={() => setCategoriaFiltro(null)}
+                >
+                  Todos
+                </button>
+                {CATEGORIAS_BANCOS.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={categoriaFiltro === cat.id}
+                    className={`${styles.categoryChip} ${categoriaFiltro === cat.id ? styles.categoryChipActive : ''}`}
+                    onClick={() =>
+                      setCategoriaFiltro((prev) => (prev === cat.id ? null : cat.id))
+                    }
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
             </div>
+
             {sinResultados ? (
               <div className={styles.noResults}>
                 <p className={styles.noResultsText}>
@@ -470,7 +518,7 @@ export default function BankPickerModal({
               </div>
             ) : (
               <>
-                {BANK_SECTIONS.map((section) => {
+                {seccionesAMostrar.map((section) => {
                   const bancosDeSeccion = bancosFiltrados.filter(
                     (b) => b.tipo === section.tipo,
                   )

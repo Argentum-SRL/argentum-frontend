@@ -1,3 +1,8 @@
+/* ── Modal Container Width ───────────────────────────────────────────────── */
+.modal {
+  --modal-w: min(620px, calc(100vw - 32px));
+}
+
 /* ── Modal Root Wrapper ─────────────────────────────────────────────────── */
 .modalRoot {
   width: 100%;
@@ -131,24 +136,18 @@
 
 .headerTopRow {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
 .pickerTitle {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text);
   margin: 0;
   line-height: 1.2;
-}
-
-.pickerSubtitle {
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-2);
-  margin: 4px 0 0;
+  white-space: nowrap;
 }
 
 /* Search input */
@@ -168,7 +167,7 @@
 .searchInput {
   width: 100%;
   height: 40px;
-  padding: 0 36px 0 36px;
+  padding: 0 36px;
   border-radius: 12px;
   border: 1.5px solid var(--surface-alt);
   background: var(--page);
@@ -194,6 +193,59 @@
   padding: 2px;
 }
 
+/* ── Filtro rápido de categorías (Chips horizontales) ─────────────────────── */
+.categoryChipsWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.categoryChipsWrap::-webkit-scrollbar {
+  display: none;
+}
+
+.categoryChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.categoryChip:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.categoryChipActive {
+  background: var(--primary);
+  color: var(--primary-contrast, #ffffff);
+  border-color: var(--primary);
+  font-weight: 600;
+}
+
+.categoryChipActive:hover {
+  background: var(--primary);
+  color: var(--primary-contrast, #ffffff);
+  border-color: var(--primary);
+}
+
 /* Cuerpo scrolleable del picker */
 .pickerBody {
   flex: 1;
@@ -216,7 +268,7 @@
 
 /* Sección de bancos */
 .section {
-  margin-bottom: 20px;
+  margin-bottom: var(--modal-block-gap, 20px);
 }
 
 .sectionLabel {
@@ -228,116 +280,108 @@
   margin: 0 0 8px;
 }
 
-/* Grid de 4 columnas */
+/* Grid de 3 columnas (desktop) / 2 columnas (mobile) */
 .pickerGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--modal-option-gap, 8px);
 }
 
-/* Cada item del picker — background y borde se setean via inline style */
-.pickerItem {
+/* Cada item del picker */
+.pickerCard {
   position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 14px 8px 12px;
-  border-radius: 16px;
+  padding: 6px 10px;
+  min-height: 48px;
+  border-radius: var(--control-radius);
   cursor: pointer;
-  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-alt);
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
 }
 
-.pickerItem::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: var(--bank-color, transparent);
-  opacity: 0.1;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.pickerItem::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  border: 1.5px solid var(--bank-color, rgba(0, 0, 0, 0.05));
-  opacity: 0.3;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.pickerItem:hover {
+.pickerCard:hover {
+  border-color: var(--border);
+  background: var(--surface);
   box-shadow: var(--elevation-xs);
 }
 
+.pickerCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .pickerItem:hover {
-  transform: translateY(-1px);
+  .pickerCard:hover {
+    transform: translateY(-1px);
   }
 }
 
-.pickerItem:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: var(--elevation-none);
+.pickerCard:active {
+  transform: translateY(0) scale(0.99);
 }
 
-.pickerItemSelected,
-.pickerItem[data-selected="true"] {
-  transform: translateY(-2.5px) scale(1.025);
-  box-shadow: var(--elevation-selection-modal);
-  z-index: 8;
-}
-
-.pickerItemNombre {
-  font-size: 11px;
+.pickerCardTitle {
+  font-size: 13px;
   font-weight: 600;
   color: var(--text);
-  text-align: center;
-  line-height: 1.2;
-  word-break: break-word;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
-/* ── Picker Logo ──────────────────────────────────────────────────────────── */
-.pickerLogoCircle {
-  position: relative;
-  border-radius: 50%;
+/* ── Bank Logo & Slot ─────────────────────────────────────────────────────── */
+.bankIconSlot {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  overflow: hidden;
-  z-index: 1;
+  background: transparent;
+  border: none;
 }
 
-.pickerLogoCircle::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--bank-color, #8A95A8);
-  opacity: 0.14;
-  z-index: -1;
+.logoSlot40 {
+  width: 40px;
+  height: 40px;
 }
 
-.pickerLogoInitials {
-  font-weight: 800;
-  color: var(--bank-color, var(--text));
+.logoSlot36 {
+  width: 36px;
+  height: 36px;
 }
 
-.size44 { width: 44px; height: 44px; }
-.size36 { width: 36px; height: 36px; }
-
-.initials44 { font-size: 14px; }
-.initials36 { font-size: 11.5px; }
-
-.pickerLogoImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.bankLogoImg {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 8px;
   display: block;
+}
+
+.bankGenericBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bankInitialText {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bank-color, var(--primary));
+  line-height: 1;
 }
 
 /* Botón "Otra billetera" */
@@ -345,18 +389,19 @@
   width: 100%;
   padding: 12px;
   border-radius: 12px;
-  border: 1.5px dashed var(--surface-alt);
+  border: 1.5px dashed var(--border);
   background: transparent;
   color: var(--text-2);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
 }
 
 .otraBtn:hover {
-  border-color: var(--silver);
+  border-color: var(--primary);
   background: var(--surface-alt);
+  color: var(--text);
 }
 
 /* Sin resultados */
@@ -1185,9 +1230,58 @@
 }
 
 /* ── Mobile ─────────────────────────────────────────────────────────────────── */
-@media (max-width: 600px) {
+@media (max-width: 639px) {
   .pickerGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    --modal-pad-x: 12px;
+    --modal-block-gap: 16px;
+  }
+
+  .pickerTitle {
+    font-size: 15px;
+    letter-spacing: -0.2px;
+  }
+
+  .pickerGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .pickerCard {
+    padding: 6px 7px;
+    min-height: 42px;
+    gap: 6px;
+  }
+
+  .pickerCardTitle {
+    font-size: 11px;
+    letter-spacing: -0.1px;
+  }
+
+  .logoSlot36 {
+    width: 28px;
+    height: 28px;
+  }
+
+  .bankLogoImg {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .bankGenericBox {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .bankInitialText {
+    font-size: 11px;
   }
 }
 
@@ -1212,13 +1306,31 @@
   color: #F7A800;
 }
 
-[data-theme="dark"] .pickerItem {
+[data-theme="dark"] .pickerCard {
   background: var(--surface-alt);
   border-color: var(--border);
 }
 
-[data-theme="dark"] .pickerItem:hover {
+[data-theme="dark"] .pickerCard:hover {
   background: var(--surface);
+}
+
+[data-theme="dark"] .categoryChip {
+  background: var(--surface-alt);
+  border-color: var(--border-subtle);
+  color: var(--text-2);
+}
+
+[data-theme="dark"] .categoryChip:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .categoryChipActive {
+  background: var(--primary);
+  color: var(--primary-contrast, #ffffff);
+  border-color: var(--primary);
 }
 
 /* ── Bank Color Mappings ───────────────────────────────────────────────────── */
@@ -1283,7 +1395,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .slide, .dot, .closeBtn, .searchInput, .fieldInput, .colorSwatch, .principalRow,
-  .pickerItem, .otraBtn, .customBtn, .backBtn, .pencilIconWrapper, .inlineNameInput,
+  .pickerCard, .categoryChip, .bankLogoImg, .otraBtn, .customBtn, .backBtn, .pencilIconWrapper, .inlineNameInput,
   .bankPreviewNombreInput, .saldoWrap, .checkbox, .settingCard, .settingIconBox,
   .settingSub, .tnaInputBadge, .customSwitch, .customSwitchThumb, .cancelBtn, .crearBtn {
     transition: none;

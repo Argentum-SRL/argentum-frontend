@@ -462,14 +462,254 @@
   width: 100%;
 }
 
-/* ── 5. Reduced Motion ── */
+/* ── 5. Ciclo de Cobro Colapsable & Filas Simétricas ── */
+.cicloHeaderBtn {
+  width: 100%;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cicloHeaderBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  border-radius: var(--radius-control);
+}
+
+.cicloHeaderInner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.cicloHeaderText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.cicloTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cicloHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+@media (max-width: 639px) {
+  .cicloHeaderActions .comerciosBadge {
+    display: none;
+  }
+}
+
+.cicloSummaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-height: 52px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+@media (max-width: 639px) {
+  .cicloSummaryRow {
+    padding: var(--space-md) var(--space-md);
+  }
+}
+
+.cicloSummaryRow .settingLabel {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cicloSummaryRow:hover {
+    background: var(--surface-alt);
+    border-color: var(--primary);
+  }
+
+  .cicloSummaryRow:hover .cicloValuePill {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+.cicloSummaryRow:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.cicloValuePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-selector-pill);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: var(--elevation-xs);
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.cicloDateGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.cicloDateText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+@media (max-width: 639px) {
+  .cicloDateText {
+    font-size: 0.8125rem;
+  }
+}
+
+.dateMobile {
+  display: inline;
+}
+
+.dateDesktop {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .dateMobile {
+    display: none;
+  }
+
+  .dateDesktop {
+    display: inline;
+  }
+}
+
+.cicloAdjustBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-selector-pill);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 639px) {
+  .cicloAdjustBadge {
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+
+  .cicloAdjustText {
+    display: none;
+  }
+}
+
+.cicloExpandedContent {
+  width: 100%;
+  animation: cicloFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cicloFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── 6. Título de Prioridades (Garantizado en 1 solo renglón) ── */
+.prioridadesTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 639px) {
+  .prioridadesTitle {
+    font-size: 0.8125rem;
+    letter-spacing: -0.015em;
+  }
+}
+
+@media (max-width: 360px) {
+  .prioridadesTitle {
+    font-size: 0.75rem;
+  }
+}
+
+/* ── 7. Reduced Motion ── */
 @media (prefers-reduced-motion: reduce) {
   .saveButton,
   .dolarCard,
   .slider,
   .slider::before,
   .radioIndicator,
-  .chevronIcon {
+  .chevronIcon,
+  .cicloSummaryRow,
+  .cicloValuePill {
     transition: none !important;
+  }
+
+  .cicloExpandedContent {
+    animation: none !important;
   }
 }

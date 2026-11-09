@@ -19,6 +19,7 @@ const DashboardPage = lazy(() => import('@/pages/app/dashboard/DashboardPage'))
 const BilleterasPage = lazy(() => import('@/pages/app/billeteras/BilleterasPage'))
 const BilleteraDetallePage = lazy(() => import('@/pages/app/billeteras/BilleteraDetallePage'))
 const TransaccionesPage = lazy(() => import('@/pages/app/transacciones/TransaccionesPage'))
+const AnalisisPage = lazy(() => import('@/pages/app/analisis/AnalisisPage'))
 const PresupuestosPage = lazy(() => import('@/pages/app/presupuestos/PresupuestosPage'))
 const MetasPage = lazy(() => import('@/pages/app/metas/MetasPage'))
 const SuscripcionesPage = lazy(() => import('@/pages/app/suscripciones/SuscripcionesPage'))
@@ -89,6 +90,7 @@ const router = createBrowserRouter([
               { path: '/app/billeteras', element: <BilleterasPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/billeteras/:id', element: <BilleteraDetallePage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/transacciones', element: <TransaccionesPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/analisis', element: <AnalisisPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/presupuestos', element: <PresupuestosPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/metas', element: <MetasPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/metas/:id', element: <Navigate to="/app/metas" replace /> },

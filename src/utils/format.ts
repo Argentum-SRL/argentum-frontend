@@ -83,3 +83,11 @@ export function toISODateString(fecha: Date): string {
   return `${year}-${month}-${day}`
 }
 
+export function formatAxisCompact(val: number): string {
+  const num = Number.isFinite(val) ? val : 0
+  return new Intl.NumberFormat('es-AR', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(num)
+}
+

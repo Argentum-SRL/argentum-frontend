@@ -1,0 +1,481 @@
+.page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 8px 20px 12px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    height: calc(100dvh - 92px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.studioLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (min-width: 1024px) {
+  .studioLayout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+    height: 100%;
+  }
+}
+
+/* ── Columna Izquierda: Contenedor del Gráfico ── */
+.leftStage {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.stageTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--elevation-xs);
+  flex-shrink: 0;
+}
+
+.stageTitleBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stageMainTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.stagePeriodBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+}
+
+.inlineKpis {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.kpiPill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+}
+
+.kpiPillLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.kpiPillVal {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpiPillPositive {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--success);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpiPillNegative {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--error);
+  font-variant-numeric: tabular-nums;
+}
+
+.deltaGood {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.deltaBad {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--error);
+}
+
+.stageViewport {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* ── Columna Derecha: Panel de Control Compacto ── */
+.controlPanel {
+  --selector-pill-h: 30px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 12px 14px;
+  box-shadow: var(--elevation-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panelHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panelIconBox {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.reportsChipBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.reportsChipBtn:hover {
+  color: var(--text);
+  border-color: var(--text-3);
+}
+
+.reportsChipBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.reportsChipBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.panelSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sectionLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.tcInlineBadge {
+  font-size: 0.65rem;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.controlTrack {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 2px;
+}
+
+.controlTrackHalf {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 2px;
+}
+
+.viewGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3px;
+}
+
+.viewGridBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.viewGridBtn:hover:not(.viewGridBtnActive) {
+  color: var(--text);
+}
+
+.viewGridBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.viewGridBtnActive {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: var(--elevation-xs);
+}
+
+.twoColRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chartEditorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 2px;
+}
+
+.chartModeBtn,
+.chartEditorTriggerBtn {
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.chartModeBtn:hover:not(.chartModeBtnActive),
+.chartEditorTriggerBtn:hover:not(.chartModeBtnActive) {
+  color: var(--text);
+}
+
+.chartModeBtn:focus-visible,
+.chartEditorTriggerBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.chartModeBtnActive {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: var(--elevation-xs);
+}
+
+.resetSeriesLink {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.resetSeriesLink:hover {
+  text-decoration: underline;
+}
+
+.resetSeriesLink:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.selectsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.filterSelect {
+  height: 32px;
+  border-radius: 9px;
+  padding: 0 26px 0 9px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text);
+  background-color: var(--surface-alt);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  border: 1px solid var(--border);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.filterSelect:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .filterSelect {
+    font-size: 16px;
+    height: 40px;
+  }
+
+  .selectsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panelExportSection {
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.exportBtnsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.exportBtn {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.exportBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.exportBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.exportBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reportsChipBtn,
+  .viewGridBtn,
+  .chartModeBtn,
+  .chartEditorTriggerBtn,
+  .exportBtn {
+    transition: none;
+  }
+}

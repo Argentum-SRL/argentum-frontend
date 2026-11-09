@@ -1,7 +1,7 @@
 import { useId, useState, useEffect, useRef, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, Wallet, ArrowUpDown, PieChart, Target, RefreshCw, Repeat,
+  LayoutDashboard, Wallet, ArrowUpDown, Activity, PieChart, Target, RefreshCw, Repeat,
   Bell, Search, Sun, Moon, LogOut, ChevronDown, User,
   Calculator, Shield
 } from '@/components/ui/icons'
@@ -41,6 +41,7 @@ const NAV_MAIN = [
   { label: 'Dashboard',      path: '/app/dashboard',      Icon: LayoutDashboard },
   { label: 'Billeteras',     path: '/app/billeteras',     Icon: Wallet          },
   { label: 'Transacciones',  path: '/app/transacciones',  Icon: ArrowUpDown     },
+  { label: 'Análisis',       path: '/app/analisis',       Icon: Activity        },
 ]
 
 const NAV_FINANCIAL = [

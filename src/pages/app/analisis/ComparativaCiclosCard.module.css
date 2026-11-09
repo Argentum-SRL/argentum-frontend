@@ -1,0 +1,383 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--elevation-sm);
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconWrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-2);
+}
+
+.selectorBar {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  background: var(--surface-alt);
+  border-radius: 14px;
+}
+
+.selectBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.selectLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.selectInput {
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.selectInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.vsBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+}
+
+.summaryStrip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+}
+
+.summaryCaption {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.summaryVal {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryValMuted {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.deltaGood {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--success);
+  font-variant-numeric: tabular-nums;
+}
+
+.deltaBad {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--error);
+  font-variant-numeric: tabular-nums;
+}
+
+.highlightBoxGood,
+.highlightBoxBad {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.highlightBoxGood {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.highlightBoxBad {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error);
+}
+
+.deltaList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.deltaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface-alt);
+  border: 1px solid transparent;
+}
+
+.deltaCatInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.deltaCatTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.deltaCatName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dualBars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.barLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barTag {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.barTrack {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.barFillA {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.barFillB {
+  height: 100%;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.deltaRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.amountsPair {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.amountPrimary {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.amountSecondary {
+  font-size: 11px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.badgeGood,
+.badgeBad,
+.badgeNeutral {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+.badgeGood {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.badgeBad {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error);
+}
+
+.badgeNeutral {
+  background: var(--surface);
+  color: var(--text-2);
+}
+
+.chartWrap {
+  width: 100%;
+  min-height: 290px;
+}
+
+.tooltipCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: var(--elevation-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.tooltipTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.tooltipDivider {
+  height: 1px;
+  background: var(--border);
+}
+
+.emptyWrap {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-3);
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .selectInput {
+    font-size: 16px;
+  }
+
+  .deltaRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .deltaRight {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

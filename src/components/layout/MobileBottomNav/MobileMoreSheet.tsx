@@ -1,6 +1,7 @@
 import { useRef, useState, type FC, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+  Activity,
   Target,
   RefreshCw,
   Repeat,
@@ -179,6 +180,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
 
   // Financial and tool modules
   const mainItems: MenuItemConfig[] = [
+    { id: 'analisis', label: 'Análisis', Icon: Activity, path: '/app/analisis' },
     { id: 'metas', label: 'Metas', Icon: Target, path: '/app/metas' },
     { id: 'suscripciones', label: 'Suscripciones', Icon: RefreshCw, path: '/app/suscripciones' },
   ]

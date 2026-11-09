@@ -6,7 +6,8 @@ import {
   PlayCircle, 
   Trash2,
   X,
-  ChevronRight
+  ChevronRight,
+  TrendingUp
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Presupuesto } from '@/types'
@@ -16,6 +17,7 @@ import styles from './BudgetBarChart.module.css'
 
 interface BudgetBarChartProps {
   presupuestos: Presupuesto[]
+  onSubirLimite: (p: Presupuesto) => void
   onEdit: (p: Presupuesto) => void
   onPause: (p: Presupuesto) => void
   onResume: (id: string) => void
@@ -58,6 +60,7 @@ function formatCompact(monto: number, moneda: 'ARS' | 'USD'): string {
  */
 export default function BudgetBarChart({
   presupuestos,
+  onSubirLimite,
   onEdit,
   onPause,
   onResume,
@@ -255,6 +258,30 @@ export default function BudgetBarChart({
                   <span>{activePresupuesto.periodo_actual.porcentaje_usado.toFixed(1)}% utilizado</span>
                   <span>Vence el {formatFecha(activePresupuesto.periodo_actual.fecha_fin)}</span>
                 </div>
+                {activePresupuesto.ritmo_texto && (
+                  <div className={styles.ritmoRow}>
+                    <TrendingUp size={11} className={styles.ritmoIcon} />
+                    <span>{activePresupuesto.ritmo_texto}</span>
+                  </div>
+                )}
+                {activePresupuesto.sugerencia_limite && (
+                  <div className={styles.sugerenciaRow}>
+                    <p className={styles.sugerenciaTexto}>
+                      {activePresupuesto.sugerencia_limite.texto}
+                    </p>
+                    <button
+                      type="button"
+                      className={styles.sugerenciaBtn}
+                      onClick={() => {
+                        const p = activePresupuesto
+                        setActivePresupuesto(null)
+                        onSubirLimite(p)
+                      }}
+                    >
+                      {activePresupuesto.sugerencia_limite.boton}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 

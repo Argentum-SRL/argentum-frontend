@@ -1,11 +1,11 @@
-import { useMemo, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { 
   X, 
   History, 
   AlertCircle 
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
-import { EmptyState, Skeleton } from '@/components/ui'
+import { Button, EmptyState, Skeleton } from '@/components/ui'
 import type { Presupuesto, PeriodoPresupuesto } from '@/types'
 import { formatMonto, formatFecha } from '@/utils/format'
 import styles from './BudgetHistoryModal.module.css'
@@ -16,6 +16,7 @@ interface BudgetHistoryModalProps {
   presupuesto: Presupuesto | null
   historial: PeriodoPresupuesto[]
   loading: boolean
+  onSubirLimite?: () => void
 }
 
 export default function BudgetHistoryModal({ 
@@ -23,19 +24,9 @@ export default function BudgetHistoryModal({
   onClose, 
   presupuesto, 
   historial, 
-  loading 
+  loading,
+  onSubirLimite
 }: BudgetHistoryModalProps) {
-  
-  const superado3Seguidos = useMemo(() => {
-    if (historial.length < 3) return false
-    return historial.slice(0, 3).every(h => h.superado)
-  }, [historial])
-
-  const gastoPromedio = useMemo(() => {
-    if (historial.length === 0) return 0
-    const sum = historial.slice(0, 3).reduce((acc, h) => acc + Number(h.monto_usado || 0), 0)
-    return sum / Math.min(historial.length, 3)
-  }, [historial])
 
   return (
     <Modal 
@@ -54,16 +45,17 @@ export default function BudgetHistoryModal({
           </button>
         </div>
 
-        {superado3Seguidos && (
+        {presupuesto?.sugerencia_limite && (
           <div className={styles.suggestionBanner}>
             <AlertCircle size={24} className={styles.suggestionIcon} />
             <div>
               <p className={styles.suggestionTitle}>Sugerencia de ajuste</p>
               <p className={styles.suggestionDesc}>
-                Superaste este presupuesto los últimos 3 periodos. 
-                Tu gasto promedio real es de <b>{formatMonto(gastoPromedio, presupuesto?.moneda || 'ARS')}</b>.
-                Considerá aumentar el límite para reflejar tu realidad.
+                {presupuesto.sugerencia_limite.texto}
               </p>
+              <Button variant="secondary" onClick={onSubirLimite}>
+                {presupuesto.sugerencia_limite.boton}
+              </Button>
             </div>
           </div>
         )}

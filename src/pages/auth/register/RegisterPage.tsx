@@ -8,6 +8,7 @@ import DashboardMockup from '@/components/mock/DashboardMockup/DashboardMockup'
 import { Field, Button } from '@/components/ui'
 import { registerWithEmail, loginWithGoogle } from '@/services/auth.service'
 import { manejarRespuestaAuth } from '@/utils/authRedirect'
+import { emailParaVerificar } from '@/utils/registro'
 import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
@@ -246,19 +247,15 @@ export default function RegisterPage() {
     setLoading(true)
     setApiError(null)
     try {
-      const respuesta = await registerWithEmail({
+      await registerWithEmail({
         nombre,
         apellido,
         email,
         password,
         turnstile_token: turnstileToken,
       })
-      
-      if (respuesta.access_token) {
-        login(respuesta)
-      }
-      
-      manejarRespuestaAuth(respuesta, navigate)
+
+      navigate('/auth/verificar-email', { replace: true, state: { email: emailParaVerificar(email) } })
     } catch (err: unknown) {
       setApiError(getErrorMessage(err, "No pudimos crear tu cuenta. Intentá de nuevo en unos minutos."))
     } finally {

@@ -25,6 +25,7 @@ export interface Usuario {
   sexo: 'masculino' | 'femenino' | 'no_binario' | 'prefiero_no_decir' | null
   permiso_lectura_mensajes_en: string | null
   prioridades_consejos?: number[]
+  tiene_suscripciones?: boolean
 }
 
 export type RespuestaConsejo = 'sirvio' | 'no_sirve' | 'no_avisar'
@@ -33,7 +34,7 @@ export interface Consejo {
   id: string
   tipo: string
   texto: string
-  accion: 'crear_meta' | 'ver_movimientos' | 'cargar_ingreso' | null
+  accion: 'crear_meta' | 'ver_movimientos' | 'cargar_ingreso' | 'ver_presupuestos' | 'armar_presupuesto' | null
   accion_texto: string | null
   accion_datos: Record<string, unknown> | null
 }
@@ -823,6 +824,28 @@ export interface PeriodoPresupuesto {
   moneda_sin_cotizacion?: 'ARS' | 'USD' | null
 }
 
+export interface SugerenciaLimite {
+  texto: string
+  monto: number
+  boton: string
+}
+
+export interface SugerenciaRubro {
+  categoria_id: string
+  categoria: string
+  moneda: 'ARS' | 'USD'
+  monto: number
+  titulo: string
+  texto: string
+}
+
+export interface SugerenciaPresupuesto {
+  nombre: string
+  categoria_id: string
+  monto: number
+  moneda: 'ARS' | 'USD'
+}
+
 export interface Presupuesto {
   id: string
   usuario_id: string
@@ -836,6 +859,8 @@ export interface Presupuesto {
   categorias: PresupuestoCategoriaResponse[]
   periodo_actual: PeriodoPresupuesto | null
   proxima_renovacion: string | null
+  ritmo_texto?: string | null
+  sugerencia_limite?: SugerenciaLimite | null
 }
 
 export interface PresupuestoCategoriaInput {
@@ -882,6 +907,7 @@ export type TipoNotificacion =
   | 'GASTO_INUSUAL'
   | 'INACTIVIDAD'
   | 'FACTURA_VENCE'
+  | 'PROYECCION_NEGATIVA'
 
 export interface Notificacion {
   id: string

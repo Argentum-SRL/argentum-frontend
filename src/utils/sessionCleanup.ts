@@ -16,6 +16,7 @@ import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { invalidateBilleteras } from '@/services/billetera.service'
 import { invalidatePresupuestos } from '@/services/presupuesto.service'
 import { invalidateCategorias } from '@/services/categoria.service'
+import { invalidateSuscripcionesCache } from '@/services/suscripcion.service'
 
 // ── Interceptor para cancelación de peticiones HTTP en curso ──────────────
 
@@ -213,6 +214,16 @@ export function clearUserStorage(): void {
       // Ignorar restricciones de localStorage en entornos restringidos
     }
   }
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i)
+      if (k && (k.startsWith('argentum_has_suscripciones_') || k.startsWith('argentum_suscripciones_'))) {
+        localStorage.removeItem(k)
+      }
+    }
+  } catch {
+    // ignore
+  }
 }
 
 // ── Registro e invocación centralizada de limpiadores ─────────────────────
@@ -226,6 +237,7 @@ const CACHE_CLEANERS: Array<() => void> = [
   () => invalidateBilleteras(),     // Limpia billeterasCache
   () => invalidatePresupuestos(),   // Limpia presupuestosCache
   () => invalidateCategorias(),     // Limpia categoriesCache
+  () => invalidateSuscripcionesCache(), // Limpia suscripcionesCache
 ]
 
 /**

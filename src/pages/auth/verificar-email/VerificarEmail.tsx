@@ -195,8 +195,8 @@ export default function VerificarEmail() {
         </button>
 
         <p className={styles.subtitle}>
-          Enviamos un código de 6 dígitos a{' '}
-          <span className={styles.emailHighlight}>{email}</span>.{' '}
+          Te mandamos un mail a{' '}
+          <span className={styles.emailHighlight}>{email}</span> para seguir.{' '}
           <button
             type="button"
             onClick={() => {
@@ -209,7 +209,7 @@ export default function VerificarEmail() {
             Cambiar
           </button>
           <br />
-          Revisá también la carpeta de spam.
+          Si trae un código de 6 dígitos, escribilo acá. Revisá también la carpeta de spam.
         </p>
 
         <div className="mb-6">

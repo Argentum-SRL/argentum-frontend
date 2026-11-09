@@ -243,9 +243,9 @@ export const BANKS: BankDefinition[] = [
 ]
 
 export const BANK_SECTIONS: { titulo: string; tipo: BankDefinition['tipo'] }[] = [
+  { titulo: 'Bancos tradicionales', tipo: 'banco_tradicional' },
   { titulo: 'Billeteras virtuales', tipo: 'billetera_virtual' },
   { titulo: 'Bancos digitales',     tipo: 'banco_digital' },
-  { titulo: 'Bancos tradicionales', tipo: 'banco_tradicional' },
   { titulo: 'Plataformas de inversión', tipo: 'plataforma_inversion' },
 ]
 

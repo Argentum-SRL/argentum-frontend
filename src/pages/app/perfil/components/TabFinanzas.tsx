@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Coins, Calendar, Receipt, Save, Check, ChevronDown, Target } from '@/components/ui/icons'
+import { Coins, Calendar, Receipt, Save, Check, ChevronDown, Target, AlertCircle } from '@/components/ui/icons'
 import { PRIORIDADES, alternarPrioridad, mismasPrioridades } from '@/utils/prioridades'
 import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
-import { getCotizaciones } from '@/services/onboarding.service'
+import { getCotizaciones, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { invalidateDashboardCache } from '@/services/dashboard.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { CicloFinancieroSelector, type CicloValue } from '@/components/ciclo/CicloFinancieroSelector'
+import { REGLA_MAP } from '@/lib/utils/ciclo'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import ComerciosRecordados from './ComerciosRecordados'
 import { Skeleton, LunarLoader } from '@/components/ui'
@@ -69,6 +70,14 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     direccion: initialCicloDir,
   })
 
+  // Estado de colapso de ciclo (colapsado por defecto para igualar la altura con Moneda de cuenta)
+  const [cicloExpanded, setCicloExpanded] = useState(false)
+  const [cicloPreview, setCicloPreview] = useState<{
+    proxima_fecha_cobro: string
+    fue_ajustada: boolean
+  } | null>(null)
+  const [loadingCicloPreview, setLoadingCicloPreview] = useState(false)
+
   // ── 3. Prioridades State ────────────────────────────────────────────────
   const initialPrioridades = usuario?.prioridades_consejos || []
   const [prioridades, setPrioridades] = useState<number[]>(initialPrioridades)
@@ -117,6 +126,85 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
       })
     return () => controller.abort()
   }, [])
+
+  // Sincronizar preview del próximo cobro para mostrar en la vista colapsada
+  useEffect(() => {
+    const isValid =
+      ciclo.tipo === 'dia_fijo'
+        ? !isNaN(parseInt(ciclo.valor, 10)) && parseInt(ciclo.valor, 10) >= 1 && parseInt(ciclo.valor, 10) <= 31
+        : Boolean(ciclo.valor)
+
+    if (!isValid) return
+
+    const controller = new AbortController()
+    const timer = setTimeout(async () => {
+      setLoadingCicloPreview(true)
+      try {
+        const data = await getPreviewFechaCobro(
+          {
+            tipo: ciclo.tipo,
+            valor: ciclo.valor,
+            direccion: ciclo.tipo === 'regla' ? null : ciclo.direccion,
+          },
+          controller.signal
+        )
+        setCicloPreview(data)
+      } catch (err) {
+        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
+          return
+        }
+        setCicloPreview(null)
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingCicloPreview(false)
+        }
+      }
+    }, 200)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [ciclo.tipo, ciclo.valor, ciclo.direccion])
+
+  const cicloLabelText = useMemo(() => {
+    if (ciclo.tipo === 'regla') {
+      return REGLA_MAP[ciclo.valor] || '1° día hábil del mes'
+    }
+    return `Día ${ciclo.valor} del mes`
+  }, [ciclo.tipo, ciclo.valor])
+
+  const fechaCobro = cicloPreview?.proxima_fecha_cobro
+
+  const proximoCobroTextoCorto = useMemo(() => {
+    if (!fechaCobro) return 'Calculando...'
+    try {
+      const dt = new Date(fechaCobro + 'T12:00:00')
+      const formatted = dt.toLocaleDateString('es-AR', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+      })
+      return formatted.charAt(0).toUpperCase() + formatted.slice(1).replace(/\.$/, '')
+    } catch {
+      return fechaCobro
+    }
+  }, [fechaCobro])
+
+  const proximoCobroTexto = useMemo(() => {
+    if (!fechaCobro) return 'Calculando...'
+    try {
+      const dt = new Date(fechaCobro + 'T12:00:00')
+      const formatted = dt.toLocaleDateString('es-AR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      })
+      return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+    } catch {
+      return fechaCobro
+    }
+  }, [fechaCobro])
 
   // Detect dirty state for Moneda
   const isMonedaDirty = useMemo(() => {
@@ -305,23 +393,111 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
             </div>
           </section>
 
-          {/* Card 2: Ciclo de Ingresos y Cobro (Inmediatamente accesible en mobile) */}
+          {/* Card 2: Ciclo de Ingresos y Cobro (Colapsable estilo Comercios Recordados para igualar altura con Moneda) */}
           <section className={perfilStyles.sectionCard}>
-            <div className={perfilStyles.sectionHeader}>
-              <div className={perfilStyles.sectionIconWrap} style={{ color: '#10b981' }}>
-                <Calendar size={18} />
-              </div>
-              <div className={perfilStyles.sectionHeaderText}>
-                <h3>Ciclo de ingresos y cobro</h3>
+            <div
+              className={localStyles.cicloHeaderBtn}
+              onClick={() => setCicloExpanded((prev) => !prev)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setCicloExpanded((prev) => !prev)
+                }
+              }}
+              aria-expanded={cicloExpanded}
+              aria-label="Alternar visibilidad de ciclo de ingresos y cobro"
+            >
+              <div className={localStyles.cicloHeaderInner}>
+                <div className={perfilStyles.sectionIconWrap} style={{ color: '#10b981' }}>
+                  <Calendar size={18} />
+                </div>
+                <div className={localStyles.cicloHeaderText}>
+                  <h3 className={localStyles.cicloTitle}>Ciclo de ingresos y cobro</h3>
+                </div>
+                <div className={localStyles.cicloHeaderActions}>
+                  <span className={localStyles.comerciosBadge}>
+                    {cicloExpanded ? 'Ocultar' : 'Modificar'}
+                  </span>
+                  <div className={`${localStyles.chevronIcon} ${cicloExpanded ? localStyles.chevronExpanded : ''}`}>
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className={localStyles.formStack}>
-              <CicloFinancieroSelector
-                value={ciclo}
-                onChange={setCiclo}
-                disabled={isSaving}
-              />
+              {!cicloExpanded ? (
+                <>
+                  {/* Fila 1: Día o regla de cobro configurada */}
+                  <div
+                    className={localStyles.cicloSummaryRow}
+                    onClick={() => setCicloExpanded(true)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setCicloExpanded(true)
+                      }
+                    }}
+                    aria-label="Modificar día de cobro"
+                  >
+                    <span className={localStyles.settingLabel}>Día de cobro</span>
+                    <span className={localStyles.cicloValuePill}>
+                      {cicloLabelText}
+                    </span>
+                  </div>
+
+                  {/* Fila 2: Próximo reinicio de mes */}
+                  <div
+                    className={localStyles.cicloSummaryRow}
+                    onClick={() => setCicloExpanded(true)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setCicloExpanded(true)
+                      }
+                    }}
+                    aria-label="Ver detalles del próximo reinicio de mes"
+                  >
+                    <span className={localStyles.settingLabel}>Próximo reinicio</span>
+                    <div className={localStyles.cicloDateGroup}>
+                      <span className={localStyles.cicloDateText}>
+                        {loadingCicloPreview ? (
+                          'Calculando...'
+                        ) : (
+                          <>
+                            <span className={localStyles.dateMobile}>{proximoCobroTextoCorto}</span>
+                            <span className={localStyles.dateDesktop}>{proximoCobroTexto}</span>
+                          </>
+                        )}
+                      </span>
+                      {cicloPreview?.fue_ajustada && (
+                        <span
+                          className={localStyles.cicloAdjustBadge}
+                          title="Ajustado por feriado bancario"
+                          aria-label="Ajustado por feriado bancario"
+                        >
+                          <AlertCircle size={11} />
+                          <span className={localStyles.cicloAdjustText}>Ajustado</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className={localStyles.cicloExpandedContent}>
+                  <CicloFinancieroSelector
+                    value={ciclo}
+                    onChange={setCiclo}
+                    disabled={isSaving}
+                  />
+                </div>
+              )}
             </div>
           </section>
         </div>
@@ -333,7 +509,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
               <Target size={18} />
             </div>
             <div className={perfilStyles.sectionHeaderText}>
-              <h3>¿Qué es lo más importante para vos?</h3>
+              <h3 className={localStyles.prioridadesTitle}>¿Qué es lo más importante para vos?</h3>
             </div>
           </div>
 

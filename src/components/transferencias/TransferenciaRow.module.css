@@ -51,15 +51,16 @@
 }
 
 .avatarImg {
-  width: 14px;
-  height: 14px;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .avatarOrigen span,
 .avatarDestino span {
   color: white;
-  font-size: 8.5px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1;
 }

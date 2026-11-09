@@ -1,6 +1,7 @@
 import catalogoRaw from '@catalogo'
 
 import type { ElementType } from 'react'
+import { getSubcategoriaVisual } from '@/lib/utils/categoria.utils'
 import { Dumbbell, HeartPulse, Shield, Users, GraduationCap, Wifi, Smartphone } from '@/components/ui/icons'
 
 export const ICONOS_GENERICOS: Record<string, ElementType> = {
@@ -70,19 +71,29 @@ const rawList = Array.isArray(catalogoRaw)
   ? catalogoRaw
   : ((catalogoRaw as unknown as { servicios: RawServicioCatalogo[] }).servicios || [])
 
-export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = (rawList as RawServicioCatalogo[]).map(item => ({
-  ...item,
-  subcategoria: item.subcategoria ?? undefined,
-  logoPath: getLogo(item.logo),
-}))
+export const CATALOGO_SUSCRIPCIONES: ServicioCatalogo[] = (rawList as RawServicioCatalogo[]).map(item => {
+  let logoPath = getLogo(item.logo)
+  if (!logoPath && (item.generico || item.subcategoria)) {
+    const visual = getSubcategoriaVisual(item.subcategoria || item.nombre, item.categoria)
+    if (visual?.iconSrc) {
+      logoPath = visual.iconSrc
+    }
+  }
+  return {
+    ...item,
+    subcategoria: item.subcategoria ?? undefined,
+    logoPath,
+  }
+})
 
 export const CATEGORIAS_CATALOGO = [
-  { label: 'Streaming',      ids: ['netflix','hbomax','primevideo','paramount','appletv','crunchyroll','plutotv','peacock','youtubepremium','rakutenviki','twitch','kick'] },
-  { label: 'Música',         ids: ['spotify','applemusic','youtubemusic','tidal','deezer','amazonmusic'] },
-  { label: 'Productividad',  ids: ['icloud','googleone','microsoft365','adobe','chatgpt','claude','copilot','gemini','googleworkspace','github','linkedin','onedrive','canva','notion','evernote','dropbox','grammarly','capcut'] },
-  { label: 'Gaming',         ids: ['xbox','playstation','ubisoft','twitch','kick','discord'] },
-  { label: 'Delivery',       ids: ['rappi','pedidosya'] },
-  { label: 'Otros',          ids: ['duolingo','discord','meli'] },
+  { label: 'Streaming',                ids: ['netflix','hbomax','primevideo','paramount','appletv','crunchyroll','plutotv','peacock','youtubepremium','rakutenviki','twitch','kick'] },
+  { label: 'Música',                   ids: ['spotify','applemusic','youtubemusic','tidal','deezer','amazonmusic'] },
+  { label: 'Productividad',            ids: ['icloud','googleone','microsoft365','adobe','chatgpt','claude','copilot','gemini','googleworkspace','github','linkedin','onedrive','canva','notion','evernote','dropbox','grammarly','capcut'] },
+  { label: 'Gaming',                   ids: ['xbox','playstation','ubisoft','discord'] },
+  { label: 'Delivery',                 ids: ['rappi','pedidosya'] },
+  { label: 'Servicios y Gastos Fijos', ids: ['gimnasio','prepaga','celular','internet_cable','seguro','colegio','cursos'] },
+  { label: 'Otros',                    ids: ['duolingo','meli'] },
 ]
 
 function normalizeText(str: string): string {

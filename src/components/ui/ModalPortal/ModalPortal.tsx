@@ -117,6 +117,7 @@ export function ModalPortal() {
             presupuesto={presupuestoData.presupuesto}
             categorias={presupuestoData.categorias}
             onSuccess={presupuestoData.onSuccess}
+            sugerencia={presupuestoData.sugerencia}
           />
         </ModalErrorBoundary>
       )}

@@ -38,10 +38,17 @@
 }
 
 .subtitle {
+  display: none;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-2);
   margin: 0;
+}
+
+@media (min-width: 768px) {
+  .subtitle {
+    display: block;
+  }
 }
 
 .sections {
@@ -67,7 +74,7 @@
 .sectionTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #0D2045;
+  color: var(--text);
   margin: 0;
 }
 
@@ -759,6 +766,14 @@
   transition: opacity 120ms ease, transform 120ms ease;
 }
 
+.btnTextMobile {
+  display: inline;
+}
+
+.btnTextDesktop {
+  display: none;
+}
+
 .nuevaBtn:hover {
   opacity: 0.88;
 }
@@ -774,6 +789,14 @@
   .nuevaBtn {
     padding: 0 18px;
     height: 40px;
+  }
+
+  .btnTextMobile {
+    display: none;
+  }
+
+  .btnTextDesktop {
+    display: inline;
   }
 }
 

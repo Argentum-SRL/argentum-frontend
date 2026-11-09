@@ -14,6 +14,7 @@ import MobileBottomNav from '@/components/layout/MobileBottomNav/MobileBottomNav
 import MobileMoreSheet from '@/components/layout/MobileBottomNav/MobileMoreSheet'
 import { getFotoUrl } from '@/utils/fotoUrl'
 import usoService from '@/services/uso.service'
+import suscripcionService from '@/services/suscripcion.service'
 import styles from './AppLayout.module.css'
 
 // ── Icons ──────────────────────────────────────────────────────────────────
@@ -59,6 +60,12 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const { usuario, logout, is_admin } = useAuth()
+
+  useEffect(() => {
+    if (usuario?.id) {
+      void suscripcionService.getSuscripciones()
+    }
+  }, [usuario?.id])
   const { theme, toggleTheme } = useTheme()
   const { unreadCount } = useNotificaciones()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)

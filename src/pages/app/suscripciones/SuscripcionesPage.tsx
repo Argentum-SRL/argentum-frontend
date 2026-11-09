@@ -3,8 +3,9 @@ import { Plus } from '@/components/ui/icons'
 import { Button, PageSummaryBar, SuscripcionesSkeleton } from '@/components/ui'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
+import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/utils/errorMessages'
-import suscripcionService from '@/services/suscripcion.service'
+import suscripcionService, { getStoredHasSuscripciones, setStoredHasSuscripciones } from '@/services/suscripcion.service'
 import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import categoriaService from '@/services/categoria.service'
@@ -14,7 +15,7 @@ import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
 import { getSubcategoriaVisual } from '@/lib/utils/categoria.utils'
 import SuscripcionCard from '@/components/suscripciones/SuscripcionCard'
 import SuscripcionModal from '@/components/suscripciones/SuscripcionModal'
-import { setCachedSuscripciones } from '@/lib/utils/movimientoVisual.utils'
+import { setCachedSuscripciones, getCachedSuscripcionesSync } from '@/lib/utils/movimientoVisual.utils'
 import styles from './SuscripcionesPage.module.css'
 
 interface FloatingItemConfig {
@@ -70,6 +71,7 @@ const FLOATING_ITEMS: FloatingItemConfig[] = [
 
 
 const SuscripcionesPage: React.FC = () => {
+  const { usuario, updateUsuario } = useAuth()
   const [suscripciones, setSuscripciones] = useState<Suscripcion[]>([])
   const [totales, setTotales] = useState<TotalMensualSuscripciones | null>(null)
   const [billeteras, setBilleteras] = useState<Billetera[]>([])
@@ -81,6 +83,28 @@ const SuscripcionesPage: React.FC = () => {
   const [selectedSuscripcion, setSelectedSuscripcion] = useState<Suscripcion | null>(null)
   const [isExiting, setIsExiting] = useState(false)
   const { confirm } = useModal()
+
+  // Determinar si la cuenta tiene suscripciones conocidas:
+  // - Si suscripciones en estado ya tiene elementos cargados
+  // - Si hay suscripciones cacheadas en memoria sincrónica
+  // - Si hay valor persistido en localStorage para este usuario
+  // - Si usuario.tiene_suscripciones viene desde Auth
+  // En cuentas sin suscripciones, evalúa false para cargar directamente el menú vacío y NUNCA el skeleton.
+  const hasSubscriptions = useMemo(() => {
+    if (suscripciones.length > 0) return true
+    const syncCached = getCachedSuscripcionesSync()
+    if (syncCached !== null) {
+      return syncCached.length > 0
+    }
+    if (usuario?.id) {
+      const stored = getStoredHasSuscripciones(usuario.id)
+      if (stored !== null) return stored
+    }
+    if (usuario?.tiene_suscripciones !== undefined) {
+      return Boolean(usuario.tiene_suscripciones)
+    }
+    return false
+  }, [suscripciones.length, usuario?.id, usuario?.tiene_suscripciones])
   
   const internalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -92,14 +116,22 @@ const SuscripcionesPage: React.FC = () => {
   const loadData = useCallback(async (isFirstLoad = false, signal?: AbortSignal) => {
     try {
       const [data, t, bills, cards, cats, subs] = await Promise.all([
-        suscripcionService.getSuscripciones(undefined, signal),
-        suscripcionService.getTotalMensual(signal),
+        suscripcionService.getSuscripciones(undefined, signal, true),
+        suscripcionService.getTotalMensual(signal, true),
         billeteraService.list(signal),
         tarjetaService.getTarjetas(signal),
         categoriaService.getCategorias().catch(() => []),
         categoriaService.getAllSubcategorias(signal).catch(() => []),
       ])
       if (signal?.aborted) return
+
+      const nextHasSubs = data.length > 0
+      if (usuario?.id) {
+        setStoredHasSuscripciones(usuario.id, nextHasSubs)
+        if (usuario.tiene_suscripciones !== nextHasSubs) {
+          updateUsuario({ ...usuario, tiene_suscripciones: nextHasSubs })
+        }
+      }
 
       setCachedSuscripciones(data)
       setBilleteras(bills)
@@ -133,7 +165,7 @@ const SuscripcionesPage: React.FC = () => {
         setLoading(false)
       }
     }
-  }, [])
+  }, [usuario, updateUsuario])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -185,6 +217,14 @@ const SuscripcionesPage: React.FC = () => {
         try {
           await suscripcionService.deleteSuscripcion(s.id)
           sileo.success({ title: 'Suscripción eliminada' })
+          if (suscripciones.length <= 1) {
+            if (usuario?.id) {
+              setStoredHasSuscripciones(usuario.id, false)
+              if (usuario.tiene_suscripciones) {
+                updateUsuario({ ...usuario, tiene_suscripciones: false })
+              }
+            }
+          }
           loadData()
         } catch (error) {
           console.error(error)
@@ -205,27 +245,10 @@ const SuscripcionesPage: React.FC = () => {
     ].filter(s => s.count > 0)
   }, [suscripciones])
 
-  if (loading) {
-    return (
-      <div className={styles.root}>
-        <header className={styles.header}>
-          <div className={styles.titleGroup}>
-            <h1>Suscripciones</h1>
-            <p className={styles.subtitle}>
-              Controlá tus servicios, membresías y débitos automáticos recurrentes.
-            </p>
-          </div>
-          <button className={styles.nuevaBtn} disabled style={{ opacity: 0.6, cursor: 'default' }}>
-            <Plus size={16} strokeWidth={2.5} />
-            Agregar suscripción o débito
-          </button>
-        </header>
-        <SuscripcionesSkeleton />
-      </div>
-    )
-  }
+  // En cuentas que no tienen ninguna suscripción (o mientras se cargan), cargar directamente el menú de estado vacío (NUNCA el skeleton)
+  const showEmptyState = (!loading && suscripciones.length === 0) || isExiting || (loading && !hasSubscriptions)
 
-  if (suscripciones.length === 0 || isExiting) {
+  if (showEmptyState) {
     return (
       <div className={`${styles.root} ${styles.emptyRoot}`}>
         <div className={`${styles.emptyState} ${isExiting ? styles.emptyStateExiting : ''}`}>
@@ -292,6 +315,28 @@ const SuscripcionesPage: React.FC = () => {
     )
   }
 
+  // El skeleton tiene que aparecer cuando sí tenés al menos una suscripción y está cargando los datos
+  if (loading) {
+    return (
+      <div className={styles.root}>
+        <header className={styles.header}>
+          <div className={styles.titleGroup}>
+            <h1>Suscripciones</h1>
+            <p className={styles.subtitle}>
+              Controlá tus servicios, membresías y débitos automáticos recurrentes.
+            </p>
+          </div>
+          <button className={styles.nuevaBtn} disabled style={{ opacity: 0.6, cursor: 'default' }}>
+            <Plus size={16} strokeWidth={2.5} />
+            <span className={styles.btnTextMobile}>Nueva</span>
+            <span className={styles.btnTextDesktop}>Agregar suscripción o débito</span>
+          </button>
+        </header>
+        <SuscripcionesSkeleton />
+      </div>
+    )
+  }
+
   const totalMensualARS = totales?.total_ars || 0
   const totalMensualUSD = totales?.total_usd || 0
   const suscripcionesActivas = suscripciones.filter(s => s.estado === 'activa')
@@ -308,7 +353,8 @@ const SuscripcionesPage: React.FC = () => {
         </div>
         <button className={styles.nuevaBtn} onClick={handleCreate}>
           <Plus size={16} strokeWidth={2.5} />
-          Agregar suscripción o débito
+          <span className={styles.btnTextMobile}>Nueva</span>
+          <span className={styles.btnTextDesktop}>Agregar suscripción o débito</span>
         </button>
       </header>
 
@@ -354,10 +400,12 @@ const SuscripcionesPage: React.FC = () => {
       <div className={styles.sections}>
         {sections.map(section => (
           <div key={section.title} className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={section.title === 'Activas' ? styles.sectionTitle : styles.sectionTitleAlt}>{section.title}</h2>
-              <span className={section.count > 0 ? styles.sectionCount : ''}>{section.count}</span>
-            </div>
+            {section.title !== 'Activas' && (
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>{section.title}</h2>
+                <span className={section.count > 0 ? styles.sectionCount : ''}>{section.count}</span>
+              </div>
+            )}
             <div className={styles.grid}>
               {section.items.map(s => (
                 <SuscripcionCard

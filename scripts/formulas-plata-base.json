@@ -92,21 +92,21 @@
   },
   {
     "archivo": "src/components/suscripciones/SuscripcionModal.tsx",
-    "expresion": "state.monto * cotizValor",
+    "expresion": "monto * cotizValor",
     "cantidad": 1,
     "categoria": "pendiente",
     "motivo": "Conversión ARS/USD en formulario de suscripción (se migra en Bloque J)"
   },
   {
     "archivo": "src/components/suscripciones/SuscripcionModal.tsx",
-    "expresion": "state.monto / cotizValor",
+    "expresion": "monto / cotizValor",
     "cantidad": 1,
     "categoria": "pendiente",
     "motivo": "Conversión USD/ARS en formulario de suscripción (se migra en Bloque J)"
   },
   {
     "archivo": "src/components/suscripciones/SuscripcionModal.tsx",
-    "expresion": "state.monto / DIVISORES[state.frecuencia]",
+    "expresion": "monto / DIVISORES[frecuencia]",
     "cantidad": 1,
     "categoria": "pendiente",
     "motivo": "Normalización de monto mensual de suscripción (se migra en Bloque J)"

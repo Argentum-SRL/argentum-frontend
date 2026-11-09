@@ -431,23 +431,24 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   <SegmentedControl<'entre_cuentas' | 'compra' | 'venta'>
                     ariaLabel="Tipo de operación"
                     fullWidth
+                    className={styles.operacionSelector}
                     value={tipoOperacion === 'entre_cuentas' ? 'entre_cuentas' : fxDirection}
                     onChange={handleSelectOperacion}
                     options={[
                       {
                         value: 'entre_cuentas',
                         label: 'Entre cuentas',
-                        icon: <ArrowRightLeft size={15} strokeWidth={2} />,
+                        icon: <ArrowRightLeft size={14} strokeWidth={2} />,
                       },
                       {
                         value: 'compra',
                         label: 'Comprar',
-                        icon: <ArrowDownLeft size={15} strokeWidth={2.2} />,
+                        icon: <ArrowDownLeft size={14} strokeWidth={2.2} />,
                       },
                       {
                         value: 'venta',
                         label: 'Vender',
-                        icon: <ArrowUpRight size={15} strokeWidth={2.2} />,
+                        icon: <ArrowUpRight size={14} strokeWidth={2.2} />,
                       },
                     ]}
                   />

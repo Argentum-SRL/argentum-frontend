@@ -11,8 +11,7 @@ import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
 import { getErrorMessage } from '@/utils/errorMessages'
-import styles from '../FinDeMesCard/FinDeMesCard.module.css'
-import avisos from '../AvisosConfianza/AvisosConfianza.module.css'
+import styles from './ConsejoCard.module.css'
 
 export const ConsejoCard: React.FC = () => {
   const [consejo, setConsejo] = useState<Consejo | null>(null)
@@ -53,10 +52,22 @@ export const ConsejoCard: React.FC = () => {
     [consejo],
   )
 
+  const refrescarConsejo = useCallback(() => {
+    consejosService
+      .getActual()
+      .then((res) => {
+        setConsejo(res?.consejo ?? null)
+      })
+      .catch(() => {})
+  }, [])
+
   const handleAccion = useCallback(async () => {
     if (!consejo?.accion) return
 
-    if (consejo.accion === 'crear_meta') {
+    const accionStr = String(consejo.accion)
+    if (accionStr === 'aportar_meta' || accionStr === 'poner_fecha_meta') {
+      navigate('/app/metas')
+    } else if (consejo.accion === 'crear_meta') {
       const sugerencia = consejo.accion_datos
         ? {
             nombre: String(consejo.accion_datos.nombre || ''),
@@ -69,7 +80,24 @@ export const ConsejoCard: React.FC = () => {
         data: {
           goal: null,
           sugerencia,
-          onSuccess: () => {},
+          onSuccess: refrescarConsejo,
+        },
+      })
+    } else if (consejo.accion === 'ver_presupuestos') {
+      navigate('/app/presupuestos')
+    } else if (consejo.accion === 'armar_presupuesto') {
+      const accion_datos = (consejo.accion_datos || {}) as Record<string, unknown>
+      open('presupuesto', {
+        data: {
+          presupuesto: null,
+          categorias: [],
+          sugerencia: {
+            nombre: String(accion_datos.nombre || ''),
+            categoria_id: String(accion_datos.categoria_id || ''),
+            monto: Number(accion_datos.monto || 0),
+            moneda: (accion_datos.moneda as 'ARS' | 'USD') || 'ARS',
+          },
+          onSuccess: refrescarConsejo,
         },
       })
     } else if (consejo.accion === 'ver_movimientos') {
@@ -88,7 +116,7 @@ export const ConsejoCard: React.FC = () => {
             categorias,
             tarjetas,
             tipoInicial: 'ingreso',
-            onSuccess: () => {},
+            onSuccess: refrescarConsejo,
           },
         })
       } catch (err: unknown) {
@@ -97,7 +125,7 @@ export const ConsejoCard: React.FC = () => {
         })
       }
     }
-  }, [consejo, open, navigate])
+  }, [consejo, open, navigate, refrescarConsejo])
 
   if (!consejo) {
     return null
@@ -112,10 +140,10 @@ export const ConsejoCard: React.FC = () => {
           <Lightbulb size={18} className={styles.headerIcon} />
           <h2 className={styles.title}>Un dato para vos</h2>
         </div>
-        <div className={styles.titleGroup}>
+        <div className={styles.feedbackActions}>
           <button
             type="button"
-            className={avisos.closeBtn}
+            className={styles.feedbackBtn}
             onClick={() => void handleResponder('sirvio')}
             title="Me sirvió"
             aria-label="Me sirvió"
@@ -124,7 +152,7 @@ export const ConsejoCard: React.FC = () => {
           </button>
           <button
             type="button"
-            className={avisos.closeBtn}
+            className={styles.feedbackBtn}
             onClick={() => void handleResponder('no_sirve')}
             title="No me sirve"
             aria-label="No me sirve"
@@ -133,7 +161,7 @@ export const ConsejoCard: React.FC = () => {
           </button>
           <button
             type="button"
-            className={avisos.closeBtn}
+            className={styles.feedbackBtn}
             onClick={() => void handleResponder('no_avisar')}
             title="No me avises más de esto"
             aria-label="No me avises más de esto"
@@ -144,13 +172,15 @@ export const ConsejoCard: React.FC = () => {
       </header>
 
       <div className={styles.content}>
-        <p className={styles.subtitulo}>{consejo.texto}</p>
+        <p className={styles.texto}>{consejo.texto}</p>
         {consejo.accion && accionTexto && (
-          <div className={styles.titleGroup}>
-            <Button variant="secondary" onClick={() => void handleAccion()}>
-              {accionTexto}
-            </Button>
-          </div>
+          <Button
+            variant="secondary"
+            className={styles.actionBtn}
+            onClick={() => void handleAccion()}
+          >
+            {accionTexto}
+          </Button>
         )}
       </div>
     </article>

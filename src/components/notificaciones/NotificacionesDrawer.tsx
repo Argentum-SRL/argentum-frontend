@@ -104,6 +104,7 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
         return <PieChart size={18} />
       case 'SALDO_CERO':
       case 'GASTO_INUSUAL':
+      case 'PROYECCION_NEGATIVA':
         return <AlertTriangle size={18} />
       case 'SUSCRIPCION_HOY':
       case 'SUSCRIPCION_PROXIMA':

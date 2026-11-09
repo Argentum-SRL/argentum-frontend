@@ -97,6 +97,7 @@ export interface CanAffordResult {
   linea_liberacion?: string | null;
   linea_compensar?: string | null;
   linea_frescura?: string | null;
+  linea_espera?: string | null;
   libre: number;
   precio_total: number;
   fuente_inflacion?: string | null;

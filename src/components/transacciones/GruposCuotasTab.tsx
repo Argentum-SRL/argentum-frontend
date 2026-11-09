@@ -382,15 +382,18 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   }
 
   const handleCancelar = (grupo: GrupoCuotasResumen) => {
+    const esSingular = grupo.cantidad_pendientes === 1
     confirm({
-      title: '¿Cancelás las cuotas restantes?',
-      description: 'Las cuotas que faltan dejan de figurar en tus vencimientos futuros. Esta acción no mueve plata ni registra un pago.',
+      title: esSingular ? '¿Cancelás la cuota restante?' : '¿Cancelás las cuotas restantes?',
+      description: esSingular
+        ? 'La cuota que falta deja de figurar en tus vencimientos futuros. Esta acción no mueve plata ni registra un pago.'
+        : 'Las cuotas que faltan dejan de figurar en tus vencimientos futuros. Esta acción no mueve plata ni registra un pago.',
       variant: 'danger',
-      confirmLabel: 'Cancelar cuotas',
+      confirmLabel: esSingular ? 'Cancelar cuota' : 'Cancelar cuotas',
       onConfirm: async () => {
         try {
           await grupoCuotasService.cancelarGrupo(grupo.id)
-          sileo.success({ title: 'Compra en cuotas cancelada' })
+          sileo.success({ title: esSingular ? 'Cuota restante cancelada' : 'Compra en cuotas cancelada' })
           handleCloseDetail()
           fetchGrupos()
           onRefreshNeeded?.()
@@ -405,15 +408,22 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const handleAdelantar = (grupo: GrupoCuotasResumen) => {
     const ddmm = formatDiaMes(grupo.vencimiento_adelanto)
     const fechaTexto = ddmm ? ` que vence el ${ddmm}` : ''
-    const linea = `Todas las cuotas pendientes (${grupo.cantidad_pendientes}) pasan al próximo resumen de tu tarjeta${fechaTexto}. El banco te las cobrará juntas en ese resumen.`
+    const esSingular = grupo.cantidad_pendientes === 1
+    const linea = esSingular
+      ? `La cuota pendiente pasa al próximo resumen de tu tarjeta${fechaTexto}. El banco te la cobrará en ese resumen.`
+      : `Todas las cuotas pendientes (${grupo.cantidad_pendientes}) pasan al próximo resumen de tu tarjeta${fechaTexto}. El banco te las cobrará juntas en ese resumen.`
     confirm({
-      title: '¿Adelantar cuotas?',
+      title: esSingular ? '¿Adelantar cuota?' : '¿Adelantar cuotas?',
       description: linea,
-      confirmLabel: 'Adelantar cuotas',
+      confirmLabel: esSingular ? 'Adelantar cuota' : 'Adelantar cuotas',
       onConfirm: async () => {
         try {
           await grupoCuotasService.adelantarGrupo(grupo.id)
-          sileo.success({ title: `Listo, las cuotas que faltaban pasan al resumen que vence el ${ddmm}.` })
+          sileo.success({
+            title: esSingular
+              ? `Listo, la cuota que faltaba pasa al resumen que vence el ${ddmm}.`
+              : `Listo, las cuotas que faltaban pasan al resumen que vence el ${ddmm}.`
+          })
           handleCloseDetail()
           fetchGrupos()
           onRefreshNeeded?.()
@@ -488,9 +498,12 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     }
 
     if (editTarjetaTouched || editFechaTouched) {
+      const esSingular = editingGrupo?.cantidad_pendientes === 1
       confirm({
         title: '¿Confirmar cambios?',
-        description: 'Esto va a recalcular las cuotas pendientes con la tarjeta y fecha elegidas. Las cuotas ya pagadas no se modifican.',
+        description: esSingular
+          ? 'Esto va a recalcular la cuota pendiente con la tarjeta y fecha elegidas. Las cuotas ya pagadas no se modifican.'
+          : 'Esto va a recalcular las cuotas pendientes con la tarjeta y fecha elegidas. Las cuotas ya pagadas no se modifican.',
         variant: 'default',
         confirmLabel: 'Confirmar',
         cancelLabel: 'Cancelar',
@@ -503,9 +516,13 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   }
 
   const handleDeleteClick = (id: string) => {
+    const grupo = grupos.find(g => g.id === id) || selectedGrupo
+    const esSingular = grupo?.cantidad_pendientes === 1
     confirm({
       title: '¿Eliminás esta compra en cuotas?',
-      description: 'Se borran todas las cuotas pendientes. Las ya pagadas quedan en tu historial.',
+      description: esSingular
+        ? 'Se borrará la cuota pendiente. Las ya pagadas quedan en tu historial.'
+        : 'Se borran todas las cuotas pendientes. Las ya pagadas quedan en tu historial.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
       onConfirm: async () => {

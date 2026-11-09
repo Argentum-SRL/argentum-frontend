@@ -313,10 +313,10 @@ export default function GrupoCuotasDetalleModal({
                             type="button"
                             className={styles.detailCancelCuotasBtn}
                             onClick={() => handleCancelar(selectedGrupo)}
-                            title="Cancelar cuotas restantes"
+                            title={selectedGrupo.cantidad_pendientes === 1 ? 'Cancelar cuota restante' : 'Cancelar cuotas restantes'}
                           >
                             <XCircle size={15} />
-                            <span>Cancelar cuotas</span>
+                            <span>{selectedGrupo.cantidad_pendientes === 1 ? 'Cancelar cuota' : 'Cancelar cuotas'}</span>
                           </button>
                         )}
                       </div>
@@ -338,17 +338,17 @@ export default function GrupoCuotasDetalleModal({
                               type="button"
                               className={styles.detailAdelantarActionBtn}
                               onClick={() => handleAdelantar?.(selectedGrupo)}
-                              title="Adelantar cuotas al próximo resumen"
+                              title={selectedGrupo.cantidad_pendientes === 1 ? 'Adelantar cuota al próximo resumen' : 'Adelantar cuotas al próximo resumen'}
                             >
                               <Sparkles size={14} />
-                              <span>Adelantar cuotas</span>
+                              <span>{selectedGrupo.cantidad_pendientes === 1 ? 'Adelantar cuota' : 'Adelantar cuotas'}</span>
                             </button>
                           ) : (
                             <button
                               type="button"
                               className={styles.detailPrepayActionBtn}
                               onClick={handleGoPrepay}
-                              title="Prepagar cuotas pendientes"
+                              title={selectedGrupo.cantidad_pendientes === 1 ? 'Prepagar cuota pendiente' : 'Prepagar cuotas pendientes'}
                             >
                               <Sparkles size={14} />
                               <span>Prepagar</span>
@@ -423,7 +423,11 @@ export default function GrupoCuotasDetalleModal({
                               {formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)}
                             </div>
                             <p className={styles.prepayHeroNarrative}>
-                              Saldarás <strong>{selectedGrupo.cantidad_pendientes} {selectedGrupo.cantidad_pendientes === 1 ? 'cuota pendiente restante' : 'cuotas pendientes restantes'}</strong> de <strong>"{selectedGrupo.descripcion?.trim()}"</strong>.
+                              Saldarás {selectedGrupo.cantidad_pendientes === 1 ? (
+                                <>la <strong>cuota pendiente restante</strong></>
+                              ) : (
+                                <>las <strong>{selectedGrupo.cantidad_pendientes} cuotas pendientes restantes</strong></>
+                              )} de <strong>"{selectedGrupo.descripcion?.trim()}"</strong>.
                             </p>
                           </div>
                         </div>
@@ -469,7 +473,15 @@ export default function GrupoCuotasDetalleModal({
                         <div className={styles.prepayNoticeTip}>
                           <Lightbulb size={15} strokeWidth={2} className={styles.prepayNoticeIcon} aria-hidden="true" />
                           <span>
-                            Al confirmar el pago, las <strong>{selectedGrupo.cantidad_pendientes} cuotas pendientes</strong> se registrarán como pagadas inmediatamente y se debitarán de tu cuenta.
+                            {selectedGrupo.cantidad_pendientes === 1 ? (
+                              <>
+                                Al confirmar el pago, la <strong>cuota pendiente</strong> se registrará como pagada inmediatamente y se debitará de tu cuenta.
+                              </>
+                            ) : (
+                              <>
+                                Al confirmar el pago, las <strong>{selectedGrupo.cantidad_pendientes} cuotas pendientes</strong> se registrarán como pagadas inmediatamente y se debitarán de tu cuenta.
+                              </>
+                            )}
                           </span>
                         </div>
                       </div>

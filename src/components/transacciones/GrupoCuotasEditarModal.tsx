@@ -292,7 +292,17 @@ export default function GrupoCuotasEditarModal({
                       <div className={styles.editRecalcNotice}>
                         <Lightbulb size={15} strokeWidth={2} className={styles.prepayNoticeIcon} aria-hidden="true" />
                         <span>
-                          Al modificar el monto total o tarjeta, se recalcularán automáticamente las <strong>{editingGrupo.cantidad_pendientes} cuotas pendientes</strong>.
+                          {editingGrupo.cantidad_pendientes === 1 ? (
+                            <>
+                              Al modificar el monto total o la tarjeta, se recalculará automáticamente la{' '}
+                              <strong>cuota pendiente</strong>.
+                            </>
+                          ) : (
+                            <>
+                              Al modificar el monto total o la tarjeta, se recalcularán automáticamente las{' '}
+                              <strong>{editingGrupo.cantidad_pendientes} cuotas pendientes</strong>.
+                            </>
+                          )}
                         </span>
                       </div>
                       </div>

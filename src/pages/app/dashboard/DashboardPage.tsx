@@ -920,6 +920,7 @@ export default function DashboardPage() {
           ) : (
             data && (
               <BalanceCard
+                className={styles.balanceCardTopRow}
                 moneda={moneda}
                 onToggleMoneda={handleToggleMoneda}
                 tieneBilleterasUsd={tieneBilleterasUsd}

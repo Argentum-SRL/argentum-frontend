@@ -25,12 +25,14 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .barHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  gap: 8px;
 }
 
 .barTitleGroup {
@@ -63,6 +65,7 @@
   font-weight: 700;
   color: var(--text);
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .barAmountProyectado {

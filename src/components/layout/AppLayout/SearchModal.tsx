@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   Search, Moon, Sun, User, LogOut, Wallet, Target, 
   PieChart, RefreshCw, LayoutDashboard, ArrowUpDown, 
-  Plus, X, Calculator, Shield
+  Plus, X, Calculator, Shield, Activity, Repeat
 } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -143,8 +143,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     { id: 'nav-pres', title: 'Presupuestos', path: '/app/presupuestos', Icon: PieChart },
     { id: 'nav-meta', title: 'Metas de Ahorro', path: '/app/metas', Icon: Target },
     { id: 'nav-susc', title: 'Suscripciones', path: '/app/suscripciones', Icon: RefreshCw },
+    ...(is_admin ? [{ id: 'nav-tool', title: 'Herramientas', path: '/app/herramientas', Icon: Calculator }] : []),
+    { id: 'nav-anal', title: 'Análisis', path: '/app/analisis', Icon: Activity },
     ...(is_admin ? [
-      { id: 'nav-tool', title: 'Herramientas', path: '/app/herramientas', Icon: Calculator },
+      { id: 'nav-rep', title: 'Lo que se repite', path: '/app/lo-que-se-repite', Icon: Repeat },
       { id: 'nav-admin', title: 'Panel Admin', path: '/admin', Icon: Shield },
     ] : []),
     { id: 'nav-perf', title: 'Perfil', path: '/app/perfil', Icon: User }

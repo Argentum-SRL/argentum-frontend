@@ -180,16 +180,15 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
 
   // Financial and tool modules
   const mainItems: MenuItemConfig[] = [
-    { id: 'analisis', label: 'Análisis', Icon: Activity, path: '/app/analisis' },
     { id: 'metas', label: 'Metas', Icon: Target, path: '/app/metas' },
     { id: 'suscripciones', label: 'Suscripciones', Icon: RefreshCw, path: '/app/suscripciones' },
+    ...(isAdmin ? [{ id: 'herramientas', label: 'Herramientas', Icon: Calculator, path: '/app/herramientas' }] : []),
+    { id: 'analisis', label: 'Análisis', Icon: Activity, path: '/app/analisis' },
+    ...(isAdmin ? [
+      { id: 'lo-que-se-repite', label: 'Lo que se repite', Icon: Repeat, path: '/app/lo-que-se-repite' },
+      { id: 'admin', label: 'Módulo Admin', Icon: Shield, path: '/admin' },
+    ] : []),
   ]
-
-  if (isAdmin) {
-    mainItems.push({ id: 'lo-que-se-repite', label: 'Lo que se repite', Icon: Repeat, path: '/app/lo-que-se-repite' })
-    mainItems.push({ id: 'herramientas', label: 'Herramientas', Icon: Calculator, path: '/app/herramientas' })
-    mainItems.push({ id: 'admin', label: 'Módulo Admin', Icon: Shield, path: '/admin' })
-  }
 
   // Utility and account actions
   const utilityItems: MenuItemConfig[] = [

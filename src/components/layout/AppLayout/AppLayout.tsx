@@ -38,17 +38,13 @@ function MoonIcon({ size = 28, color = 'rgba(255,255,255,0.85)' }: { size?: numb
 
 // ── Nav config ─────────────────────────────────────────────────────────────
 
-const NAV_MAIN = [
+const NAV_BASE = [
   { label: 'Dashboard',      path: '/app/dashboard',      Icon: LayoutDashboard },
   { label: 'Billeteras',     path: '/app/billeteras',     Icon: Wallet          },
   { label: 'Transacciones',  path: '/app/transacciones',  Icon: ArrowUpDown     },
-  { label: 'Análisis',       path: '/app/analisis',       Icon: Activity        },
-]
-
-const NAV_FINANCIAL = [
-  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart  },
-  { label: 'Metas',          path: '/app/metas',           Icon: Target    },
-  { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: RefreshCw },
+  { label: 'Presupuestos',   path: '/app/presupuestos',   Icon: PieChart        },
+  { label: 'Metas',          path: '/app/metas',          Icon: Target          },
+  { label: 'Suscripciones',  path: '/app/suscripciones',  Icon: RefreshCw       },
 ]
 
 
@@ -127,12 +123,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
     setFotoError(false)
   }
 
-  const desktopNavItems = [...NAV_MAIN, ...NAV_FINANCIAL]
-  if (is_admin) {
-    desktopNavItems.push({ label: 'Lo que se repite', path: '/app/lo-que-se-repite', Icon: Repeat })
-    desktopNavItems.push({ label: 'Herramientas', path: '/app/herramientas', Icon: Calculator })
-    desktopNavItems.push({ label: 'Admin', path: '/admin', Icon: Shield })
-  }
+  const desktopNavItems = [
+    ...NAV_BASE,
+    ...(is_admin ? [{ label: 'Herramientas', path: '/app/herramientas', Icon: Calculator }] : []),
+    { label: 'Análisis', path: '/app/analisis', Icon: Activity },
+    ...(is_admin ? [
+      { label: 'Lo que se repite', path: '/app/lo-que-se-repite', Icon: Repeat },
+      { label: 'Admin', path: '/admin', Icon: Shield },
+    ] : []),
+  ]
 
   return (
     <div className={styles.root}>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo } from 'react'
 import { type Theme, ThemeContext } from './ThemeContext'
-import { updateSystemBars } from '@/utils/systemTheme'
+import { syncSystemBarsForTheme } from '@/utils/systemTheme'
 
 interface ThemeProviderProps {
   children: React.ReactNode
@@ -28,9 +28,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return getSystemTheme()
   })
 
-  const applyTheme = useCallback((newTheme: Theme) => {
-    const isDark = newTheme === 'dark'
-    const themeColor = isDark ? '#060B14' : '#FAF7F2'
+  useLayoutEffect(() => {
+    const isDark = theme === 'dark'
 
     if (isDark) {
       document.documentElement.setAttribute('data-theme', 'dark')
@@ -40,12 +39,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       document.documentElement.classList.remove('dark')
     }
 
-    updateSystemBars(themeColor, isDark)
-  }, [])
-
-  useEffect(() => {
-    applyTheme(theme)
-  }, [theme, applyTheme])
+    syncSystemBarsForTheme(isDark)
+  }, [theme])
 
   // Escuchar activamente el modo de color del sistema si el usuario no ha guardado una preferencia manual
   useEffect(() => {

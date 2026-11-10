@@ -1,6 +1,6 @@
-import React, { type ReactNode } from 'react'
+import React, { useLayoutEffect, type ReactNode } from 'react'
 import { useTheme } from '@/hooks/useTheme'
-import { updateSystemBars } from '@/utils/systemTheme'
+import { registerSystemBarSurface } from '@/utils/systemTheme'
 import { ArgentumCrescent } from './ArgentumCrescent'
 import { LunarLoading, type LunarLoadingProps } from './LunarLoading'
 import { ConstellationCanvas, type ConstellationCanvasProps } from './ConstellationCanvas'
@@ -256,18 +256,9 @@ export function AtmosphericBackground({
   role,
   ariaLive,
 }: AtmosphericBackgroundProps) {
-  const { theme } = useTheme()
-
-  React.useEffect(() => {
-    const isDark = theme === 'dark'
-    const targetBg = isDark ? '#020408' : '#FAF4EC'
-    updateSystemBars(targetBg, isDark)
-
-    return () => {
-      const defaultBg = isDark ? '#0E1117' : '#FAF7F2'
-      updateSystemBars(defaultBg, isDark)
-    }
-  }, [theme])
+  useLayoutEffect(() => {
+    return registerSystemBarSurface('atmospheric')
+  }, [])
 
   const containerClasses = [
     styles.container,

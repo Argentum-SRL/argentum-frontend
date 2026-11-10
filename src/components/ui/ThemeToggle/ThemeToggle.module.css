@@ -38,8 +38,8 @@
 
 .floating {
   position: fixed;
-  top: 18px;
-  right: 20px;
+  top: calc(env(safe-area-inset-top, 0px) + 18px);
+  right: calc(env(safe-area-inset-right, 0px) + 20px);
   z-index: 50;
 }
 

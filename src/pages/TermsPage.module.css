@@ -5,6 +5,7 @@
   background: var(--page);
   color: var(--text);
   font-family: 'Figtree', sans-serif;
+  transition: color 0.2s ease;
 }
 
 .header {
@@ -15,12 +16,13 @@
   border-bottom: 1px solid var(--border);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
 
 .headerContent {
   max-width: 800px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) max(24px, env(safe-area-inset-right, 0px)) 16px max(24px, env(safe-area-inset-left, 0px));
   display: flex;
   align-items: center;
   gap: 20px;
@@ -143,11 +145,12 @@
 
 .footer {
   text-align: center;
-  padding: 24px;
+  padding: 24px max(24px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
   border-top: none;
   background: var(--surface);
   font-size: 0.8125rem;
   color: var(--text-3);
+  transition: color 0.2s ease;
 }
 
 @media (max-width: 640px) {
@@ -167,9 +170,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-
+  .container,
+  .header,
+  .footer,
   .backBtn,
-.navLink {
+  .navLink {
     transition: none;
     animation: none;
   }

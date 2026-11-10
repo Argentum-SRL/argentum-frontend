@@ -33,6 +33,21 @@
   opacity: 0.85;
 }
 
+@media (max-width: 639px) {
+  .ambientGlow {
+    top: 10%;
+    right: -12%;
+    width: 68vw;
+    height: 68vw;
+    min-width: 240px;
+    min-height: 240px;
+    opacity: 0.4;
+  }
+  .ambientGlowHero {
+    opacity: 0.5;
+  }
+}
+
 /* ── Lienzo Vectorial de Precisión ───────────────────────────────────────── */
 .skySvg {
   position: absolute;

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { registerSystemBarSurface } from '@/utils/systemTheme'
 import {
   LunarLoading,
   AtmosphericBackground,
@@ -61,6 +62,10 @@ export default function AnimacionPreviewPage() {
     constellation: 'capricorn',
     phase: 'draw',
   })
+
+  useLayoutEffect(() => {
+    return registerSystemBarSurface('loading')
+  }, [])
 
   // Escuchar tecla Escape para alternar controles (modo inmersivo limpio)
   useEffect(() => {

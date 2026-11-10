@@ -17,16 +17,71 @@
 
   /* Modo Claro: Base marfil cálido (#FAF7F2) exactamente idéntica en bordes y barras */
   background-color: #FAF7F2;
-  background-image: radial-gradient(ellipse at 50% 46%, #FFFDF9 0%, #F8F3EA 38%, #FAF7F2 70%, #FAF7F2 100%);
+  background-image: radial-gradient(ellipse 90% 44% at 50% 48%, #FFFDF9 0%, #F8F3EA 42%, #FAF7F2 82%, #FAF7F2 100%);
   color: #14161D;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: color 0.4s ease;
 }
 
 :global([data-theme="dark"]) .container {
   /* Modo Oscuro: Base obsidiana lunar (#060B14) exactamente idéntica en bordes y barras */
   background-color: #060B14;
-  background-image: radial-gradient(ellipse at 50% 46%, #0C172B 0%, #080F1E 42%, #060B14 70%, #060B14 100%);
+  background-image: radial-gradient(ellipse 90% 44% at 50% 48%, #0C172B 0%, #080F1E 48%, #060B14 82%, #060B14 100%);
   color: #F8FAFC;
+}
+
+/* ── Velos de borde para integración continua con barras de sistema y safe areas ── */
+.topSafeBlend {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top, 0px) + 64px);
+  background: linear-gradient(
+    to bottom,
+    #FAF7F2 0%,
+    #FAF7F2 env(safe-area-inset-top, 0px),
+    rgba(250, 247, 242, 0.94) calc(env(safe-area-inset-top, 0px) + 14px),
+    rgba(250, 247, 242, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+:global([data-theme="dark"]) .topSafeBlend {
+  background: linear-gradient(
+    to bottom,
+    #060B14 0%,
+    #060B14 env(safe-area-inset-top, 0px),
+    rgba(6, 11, 20, 0.94) calc(env(safe-area-inset-top, 0px) + 14px),
+    rgba(6, 11, 20, 0) 100%
+  );
+}
+
+.bottomSafeBlend {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-bottom, 0px) + 56px);
+  background: linear-gradient(
+    to top,
+    #FAF7F2 0%,
+    #FAF7F2 env(safe-area-inset-bottom, 0px),
+    rgba(250, 247, 242, 0.92) calc(env(safe-area-inset-bottom, 0px) + 12px),
+    rgba(250, 247, 242, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+:global([data-theme="dark"]) .bottomSafeBlend {
+  background: linear-gradient(
+    to top,
+    #060B14 0%,
+    #060B14 env(safe-area-inset-bottom, 0px),
+    rgba(6, 11, 20, 0.92) calc(env(safe-area-inset-bottom, 0px) + 12px),
+    rgba(6, 11, 20, 0) 100%
+  );
 }
 
 @keyframes containerFadeIn {
@@ -45,6 +100,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  z-index: 5;
   max-width: 440px;
   width: 100%;
 }
@@ -157,6 +213,9 @@
   .container {
     animation: none !important;
   }
+  .container,
+  .topSafeBlend,
+  .bottomSafeBlend,
   .coronaHalo,
   .brandSignature,
   .tagline {

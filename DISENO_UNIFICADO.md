@@ -589,3 +589,126 @@ Para certificar cero regresiones visuales accidentales, los cambios de cascada y
 4. **Declaraciones `!important` en Administración:** 53 declaraciones conservadas en 6 módulos de `pages/admin/**` y `AdminPage.module.css`.
 5. **Desbordes Estáticos (B8):** Fondos ambientales decorativos de ancho amplio y contenedores de página con ancho natural gobernado por `AppLayout`.
 
+---
+
+## 16. Barras del Sistema Móvil, Safe Areas y PWA (Nov 2026)
+
+### 16.1 Arquitectura y Mecanismo Técnico
+Para que la barra de notificaciones superior (reloj, batería, notch/Dynamic Island) y la barra inferior/direcciones en iOS (Safari y PWA standalone) y Android (Chrome y PWA standalone) coincidan **exactamente al píxel y sin desfasaje temporal** con el fondo activo tanto en modo claro como en modo oscuro:
+
+1. **Pre-render sin flash (`index.html` + `public/manifest.json`):**
+   - `index.html` ejecuta un script inline sincrónico en `<head>` antes del primer pintado: resuelve el tema guardado (`localStorage`), asigna `data-theme="dark"` / `.dark` y fija la variable CSS `--system-bar-bg` al tono inicial del loader (`#FAF7F2` en claro, `#060B14` en oscuro).
+   - `<meta id="meta-apple-status-bar" name="apple-mobile-web-app-status-bar-style" content="default" />` **debe permanecer siempre en `'default'`** (prohibido `black-translucent`). Así iOS toma el color real de `<meta name="theme-color">` y ajusta automáticamente los íconos de estado (negros sobre claro, blancos sobre oscuro).
+   - `public/manifest.json` declara `"display": "standalone"`, `"background_color": "#FAF7F2"`, `"theme_color": "#FAF7F2"`.
+   - *(Nota técnica iOS PWA):* si una PWA instalada en pantalla de inicio fue agregada antes de una actualización de `theme-color`, iOS puede conservar en caché el primer lanzamiento hasta completar el ciclo o reinstalar el acceso directo en Home Screen.
+
+2. **Raíz del documento (`src/index.css`):**
+   - `html` y `body` aplican `background-color: var(--system-bar-bg, var(--page));`, con `transition: color 0.2s ease;` en `html` (sin animar `background-color`). WebKit/Safari y Chromium muestrean estos nodos detrás de los márgenes y rebotes de scroll.
+
+3. **Coordinación centralizada por pila LIFO (`src/utils/systemTheme.ts` + `src/context/ThemeProvider.tsx`):**
+   - `ThemeProvider` invoca `syncSystemBarsForTheme(isDark)` ante cualquier cambio de tema.
+   - Todo módulo que ocupa temporalmente el borde superior/inferior por encima del fondo `--page` llama a `registerSystemBarSurface(surface)` dentro de `useLayoutEffect` y retorna su función de limpieza (`useLayoutEffect(() => registerSystemBarSurface('...'), [])`).
+   - `registerSystemBarSurface` administra una **pila LIFO**: si un hijo (`LunarLoading`) monta antes que un padre (`ThemeProvider`) o se superponen capas (`AtmosphericBackground` encima de `TermsPage`), siempre prevalece la superficie visible en la cima de la pila sin colisiones ni sobreescrituras al desmontar fuera de orden.
+   - `updateSystemBars(color, isDark)` actualiza:
+     - `--system-bar-bg`, `html.style.backgroundColor` y `body.style.backgroundColor`.
+     - `root.style.colorScheme` y `<meta name="color-scheme">`.
+     - Reemplaza el nodo `<meta id="meta-theme-color" name="theme-color">` en `<head>` (eliminando `<meta name="theme-color" media="...">` heredados) únicamente cuando cambia el hex, ya que Safari/WebKit frecuentemente ignora mutaciones `setAttribute('content')` in-place tras la carga inicial.
+
+---
+
+### 16.2 Tabla Canónica de Superficies (`SYSTEM_BAR_COLORS`)
+Toda superficie de borde en la aplicación corresponde exclusivamente a una de las cuatro llaves definidas en [`SYSTEM_BAR_COLORS`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/utils/systemTheme.ts#L15-L20):
+
+| Superficie (`SystemBarSurface`) | Token CSS Vinculado (`src/index.css`) | Light Hex | Dark Hex | Dónde aplica |
+| :--- | :--- | :--- | :--- | :--- |
+| `'app'` (default fallback) | `--page` | `#F5F4F0` | `#0E1117` | Shell principal (`AppLayout.main`), pantallas `/app/*`, columna derecha/móvil de `AuthLayout` |
+| `'loading'` | `--lunar-bg` | `#FAF7F2` | `#060B14` | `LunarLoading` / `AtmosphericLoading` fullscreen (`fullScreen={true}`), `AnimacionPreviewPage` |
+| `'atmospheric'` | top/bottom de `AtmosphericBackground` + `--lunar-bg-deep` en oscuro | `#FAF4EC` | `#020408` | `AtmosphericBackground` montado en `OnboardingPage`, `CrearPasswordBloqueo`, `NotFoundPage`, `RootErrorBoundary`, `PageErrorBoundary`, preview `ambient` |
+| `'surface'` | `--surface` | `#FFFFFF` | `#161B24` | Pantallas independientes con cabecera `sticky`/`fixed` flush en `top: 0` usando `--surface` (ej. `TermsPage`) |
+
+---
+
+### 16.3 Reglas Críticas Anti-Desfasaje y Protección de Safe Areas
+1. **Regla anti-lag frente al wildcard `*` de `src/index.css`:**
+   - `src/index.css` define globalmente `*, *::before, *::after { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }`.
+   - Mientras tanto, `updateSystemBars()` cambia `html`, `body` y `<meta name="theme-color">` de forma **instantánea (0ms)** al alternar el tema.
+   - **OBLIGATORIO:** Todo contenedor raíz de página, overlay fullscreen, cabecera `sticky`/`fixed` en `top: 0` o bloque full-bleed con margen negativo que toque los bordes superior/inferior DEBE declarar un `transition:` explícito que excluya `background` y `background-color` (ejemplo: `transition: color 0.2s ease;` o `transition: border-color 0.2s ease, color 0.2s ease;`) e incluirse dentro de `@media (prefers-reduced-motion: reduce)` en el mismo archivo CSS (Regla **R30**).
+   - **Prohibido** usar `transition: background ...` o `transition: background-color ...` en `.container`, `.main`, `.root`, `.pageRoot`, `.header`, `.footer`, `.topSafeBlend`, `.bottomSafeBlend`, `.topVignette`, `.bottomVignette` ni `.emptyState` fullscreen.
+2. **Prohibido pisar `background-color` en gradientes de raíz:**
+   - En superficies fullscreen con `radial-gradient` (como `AtmosphericBackground`), usar `background-image: radial-gradient(...)` junto a `background-color: #FAF4EC;` / `#020408;` — nunca el shorthand `background: radial-gradient(...)` que resetea `background-color` a `transparent`.
+3. **Sellado sólido de Safe Areas (`env(safe-area-inset-*)`):**
+   - Todas las viñetas y velos perimetrales (`.topSafeBlend`, `.bottomSafeBlend`, `.topVignette`, `.bottomVignette`) extienden el color exacto **100% sólido** desde `0%` hasta `env(safe-area-inset-top, 0px)` / `env(safe-area-inset-bottom, 0px)` antes de difuminar hacia `transparent`. Esto impide que halos de luz (`.lightSourceGlow`), estrellas de `<ConstellationCanvas />` o scroll del contenido tiñan la zona del reloj/notch o barra inferior.
+4. **Prohibido montar superficies en ramas ocultas por CSS (`display: none`):**
+   - CSS `display: none` **no desmonta React ni evita `useLayoutEffect`**. Nunca renderizar `<AtmosphericBackground>` ni llamar `registerSystemBarSurface(...)` dentro de bloques ocultos solo por `@media` (como un panel solo desktop). En `AuthLayout`, el `.leftPanel` de escritorio usa `<ConstellationCanvas />` directo y **no** `<AtmosphericBackground>`, dejando que en móvil `< 768px` la superficie activa siga siendo `'app'` (`var(--page)`).
+5. **Contención de `!important` (Regla R10):**
+   - Si una superficie entra en `@media (prefers-reduced-motion: reduce)`, agrupar el selector dentro de una regla existente o declarar `transition: none;` sin sumar nuevos `!important` fuera del presupuesto auditado.
+
+---
+
+### 16.4 Inventario Verificado de Módulos (Cobertura 100%)
+
+| Módulo / Ruta | Superficie Activa | Mecanismo y CSS Verificado | Estado |
+| :--- | :--- | :--- | :--- |
+| **`index.html` + `public/manifest.json`** | Inicial `'loading'` -> resuelta por tema | Script pre-render sincrónico, `status-bar-style="default"`, `viewport-fit=cover`, manifest `standalone` `#FAF7F2` | Verificado |
+| **`src/index.css` + `ThemeProvider.tsx`** | Sincroniza tema global + fallback `'app'` | `html`/`body` leen `--system-bar-bg` sin animar `background-color`; `syncSystemBarsForTheme(isDark)` en `useLayoutEffect` | Verificado |
+| **`RootLayout` + `ProtectedRoute` (`<Suspense>` / guard)** | `'loading'` (`LunarLoading`) | `registerSystemBarSurface('loading')`, `.container` sin transición de fondo, `.topSafeBlend`/`.bottomSafeBlend` sólidos en `env(safe-area-inset-*)` | Verificado |
+| **`RootErrorBoundary` / `PageErrorBoundary`** | `'atmospheric'` | `<AtmosphericBackground role="alert">` fullscreen con `.topVignette`/`.bottomVignette` sólidos hasta `safe-area` | Verificado |
+| **`CrearPasswordBloqueo`** (`ProtectedRoute`) | `'atmospheric'` | `<AtmosphericBackground fullScreen>` + `<Modal>` encima (`overflow` sin cortar `safe-area`) | Verificado |
+| **`OnboardingPage`** (`/onboarding`) | `'atmospheric'` | `<AtmosphericBackground className={styles.page}>` en carga (`OnboardingSkeleton`) y pasos; `padding-top` con `env(safe-area-inset-top)` | Verificado |
+| **`AuthLayout` + todas las pantallas Auth** (`/login`, `/register`, `/login/telefono`, `/auth/verificar-email`, `/auth/verificar-telefono`, `/auth/recuperar-password`, `/reset-password`) | `'app'` (`--page`) | En móvil (`<768px`), `.mobile` cubre viewport sin `background` transition; `.leftPanel` desktop usa `<ConstellationCanvas />` (sin `<AtmosphericBackground>`) | Verificado |
+| **`NotFoundPage`** (`*` y `/app/*`) | `'atmospheric'` | `<AtmosphericBackground role="main">` empuja `'atmospheric'` en pila LIFO sobre `ThemeProvider` / `AppLayout` | Verificado |
+| **`TermsPage`** (`/terminos`) | `'surface'` (`--surface`) | `registerSystemBarSurface('surface')`; `.header` sticky en `top: 0` + `.container` + `.footer` sin transición de `background-color` y con `safe-area-inset-top/bottom` | Verificado |
+| **`AppLayout` + módulos `/app/*`** (`Dashboard`, `Billeteras`, `BilleteraDetalle`, `Transacciones`, `Analisis`, `Presupuestos`, `Metas`, `LoQueSeRepite`, `Perfil`, `Tools`, `AdminPage`, `DisenoPage`) | `'app'` (`--page`) | `.main` con `background: var(--page)` y `transition: color 0.2s ease`; `.content` en móvil compensa `env(safe-area-inset-top)` sin cabecera opaca fija arriba; `MobileBottomNav` flota con `safe-area-inset-bottom` | Verificado |
+| **`SuscripcionesPage` (`.emptyState` full-bleed)** | `'app'` (`--page`) | `.emptyRoot` sangra hasta `safe-area-inset-top` con `.emptyState { background: var(--page); }` y transición explícita sin `background-color` | Verificado |
+| **`AnimacionPreviewPage`** (`/animacion`, `/app/animacion`) | `'loading'` (o `'atmospheric'` en tab `ambient`) | `.pageRoot` con `#FAF7F2` / `#060B14` y `transition: color 0.2s ease` sin lag de fondo; tabs `hero`/`ambient` delegan en pila LIFO | Verificado |
+| **Modales, Sheets, Drawers y Toast** (`Modal`, `SearchModal`, `MobileMoreSheet`, `NotificacionesDrawer`, `ModalErrorBoundary`, `SileoToaster`) | Preserva superficie activa debajo del backdrop | Overlays usan backdrop translúcido con `z-index: var(--z-modal)` + `backdrop-filter`; bottom sheets compensan `env(safe-area-inset-bottom)`; `sileo.css` móvil posiciona bajo `safe-area-inset-top` | Verificado |
+
+---
+
+### 16.5 Guía Obligatoria para Módulos Nuevos (Playbook y Plantillas)
+
+Antes de crear cualquier página o vista nueva, elegir **exactamente uno** de estos 5 casos y aplicar su patrón completo:
+
+- **Caso A — Pantalla estándar dentro de `/app/*` (`AppLayout`):**
+  - Hereda automáticamente `'app'` (`var(--page)`).
+  - **No** llamar `registerSystemBarSurface`, **no** colocar `position: sticky/fixed; top: 0` sólido sobre la barra superior en móvil, y respetar el padding del contenedor `.content`.
+
+- **Caso B — Pantalla fullscreen inmersiva / Error / Auth / Onboarding:**
+  - Envolver la vista en `<AtmosphericBackground>` (o `<LunarLoading fullScreen>` si es estado de carga inicial). No duplicar `registerSystemBarSurface` en la página hija.
+  - Si se usa clase wrapper (`className={styles.pageRoot}`), NO asignar `background`/`background-color` propio encima ni agregar `transition: background-color`.
+
+- **Caso C — Página independiente con cabecera sticky/fixed en `top: 0` (tipo `TermsPage`):**
+  1. Si la cabecera en `top: 0` usa `--surface` (`#FFFFFF` / `#161B24`), registrar en TSX:
+     ```tsx
+     useLayoutEffect(() => {
+       return registerSystemBarSurface('surface')
+     }, [])
+     ```
+     Si usa un tono distinto permanente, primero agregar la nueva superficie en `SystemBarSurface` y `SYSTEM_BAR_COLORS` (`src/utils/systemTheme.ts`), reflejar su token en `src/index.css` y agregar el assertion en `src/utils/systemTheme.test.ts`.
+  2. Incluir `env(safe-area-inset-top, 0px)` en el `padding-top` de `.headerContent` y `env(safe-area-inset-bottom, 0px)` en `.footer`.
+  3. En CSS Module, anular el wildcard `*` en `.container` y `.header` (y `.footer` si usa `--surface`) y cubrir **R30**:
+     ```css
+     .container { transition: color 0.2s ease; }
+     .header { position: sticky; top: 0; background: var(--surface); transition: border-color 0.2s ease, color 0.2s ease; }
+     @media (prefers-reduced-motion: reduce) {
+       .container, .header { transition: none; animation: none; }
+     }
+     ```
+
+- **Caso D — Bloque interno con sangrado al borde superior en móvil (tipo `SuscripcionesPage` `.emptyRoot`):**
+  1. Mantener fondo idéntico a `--page` en el borde superior del bloque (o si es otra superficie completa, usar `registerSystemBarSurface`).
+  2. Nunca animar `background` ni `background-color` en la propiedad `transition` del contenedor sangrado y añadirlo a `@media (prefers-reduced-motion: reduce)`.
+
+- **Caso E — Modales, Bottom Sheets, Drawers o Paneles Ocultos Responsive:**
+  1. Modales y sheets centrados/anclados abajo usan el `<Modal variant="dialog" | "sheet">` canónico (no cambian `registerSystemBarSurface`, excepto un modal fullscreen opaco edge-to-edge).
+  2. Si un componente tiene dos layouts (`desktop` y `mobile`) alternados por CSS `display: none`, **nunca** montar `<AtmosphericBackground>` ni `registerSystemBarSurface` dentro del layout desktop oculto en móvil.
+
+#### Checklist Pre-Push para Cualquier Módulo Nuevo
+- [ ] Usa una de las 4 superficies de `SYSTEM_BAR_COLORS` (o amplía `SYSTEM_BAR_COLORS` + `systemTheme.test.ts` si realmente introduce superficie nueva).
+- [ ] Ningún contenedor raíz, sticky/fixed `top: 0`, vignette o full-bleed anima `background` ni `background-color` (y todos declaran `transition` sin fondo para neutralizar `*` de `src/index.css`).
+- [ ] Todo selector tocado tiene cobertura bajo `@media (prefers-reduced-motion: reduce)` (Regla R30) y cero `!important` nuevos (Regla R10).
+- [ ] Se respetan `env(safe-area-inset-top)` y `env(safe-area-inset-bottom)`.
+- [ ] Se agregaron las aserciones de la nueva ruta/CSS en `src/utils/systemTheme.test.ts`.
+- [ ] Verificación completa verde antes de commitear: `npm test`, `npm run lint` (`eslint` + `audit:rules`) y `npm run build`.
+
+

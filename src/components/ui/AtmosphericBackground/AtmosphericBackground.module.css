@@ -5,19 +5,19 @@
 .container {
   box-sizing: border-box;
   color: var(--text);
-  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+  transition: color 0.4s ease;
   position: relative;
   width: 100%;
 
   /* Modo Claro: Eclipse Lunar — Volumetría cálida de ámbar, cobre y pergamino mineral */
   background-color: #FAF4EC;
-  background: radial-gradient(circle at 82% 14%, #FFFDF8 0%, #FAF4EC 28%, #F3EBE0 62%, #ECE2D2 100%);
+  background-image: radial-gradient(circle at 82% 14%, #FFFDF8 0%, #FAF4EC 28%, #F3EBE0 62%, #ECE2D2 100%);
 }
 
 :global([data-theme="dark"]) .container {
   /* Modo Oscuro: Noche Lunar — Luz de plata fría sobre obsidiana e índigo de medianoche */
   background-color: #020408;
-  background: radial-gradient(circle at 82% 14%, #0E1B33 0%, #071021 32%, #040813 65%, #020408 100%);
+  background-image: radial-gradient(circle at 82% 14%, #0E1B33 0%, #071021 32%, #040813 65%, #020408 100%);
 }
 
 .fixed {
@@ -151,24 +151,25 @@
   top: 0;
   left: 0;
   right: 0;
-  height: calc(env(safe-area-inset-top, 44px) + 36px);
+  height: calc(env(safe-area-inset-top, 0px) + 64px);
   background: linear-gradient(
     to bottom,
-    rgba(255, 253, 248, 0.94) 0%,
-    rgba(255, 253, 248, 0.75) calc(env(safe-area-inset-top, 44px) + 6px),
-    transparent 100%
+    #FAF4EC 0%,
+    #FAF4EC env(safe-area-inset-top, 0px),
+    rgba(250, 244, 236, 0.94) calc(env(safe-area-inset-top, 0px) + 14px),
+    rgba(250, 244, 236, 0) 100%
   );
   pointer-events: none;
   z-index: 5;
-  transition: background 0.6s ease;
 }
 
 :global([data-theme="dark"]) .topVignette {
   background: linear-gradient(
     to bottom,
-    rgba(2, 4, 8, 0.96) 0%,
-    rgba(2, 4, 8, 0.80) calc(env(safe-area-inset-top, 44px) + 6px),
-    transparent 100%
+    #020408 0%,
+    #020408 env(safe-area-inset-top, 0px),
+    rgba(2, 4, 8, 0.94) calc(env(safe-area-inset-top, 0px) + 14px),
+    rgba(2, 4, 8, 0) 100%
   );
 }
 
@@ -177,24 +178,25 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: calc(env(safe-area-inset-bottom, 24px) + 36px);
+  height: calc(env(safe-area-inset-bottom, 0px) + 56px);
   background: linear-gradient(
     to top,
-    rgba(236, 226, 210, 0.94) 0%,
-    rgba(236, 226, 210, 0.75) calc(env(safe-area-inset-bottom, 24px) + 12px),
-    transparent 100%
+    #FAF4EC 0%,
+    #FAF4EC env(safe-area-inset-bottom, 0px),
+    rgba(250, 244, 236, 0.92) calc(env(safe-area-inset-bottom, 0px) + 12px),
+    rgba(250, 244, 236, 0) 100%
   );
   pointer-events: none;
   z-index: 5;
-  transition: background 0.6s ease;
 }
 
 :global([data-theme="dark"]) .bottomVignette {
   background: linear-gradient(
     to top,
-    rgba(2, 4, 8, 0.96) 0%,
-    rgba(2, 4, 8, 0.80) calc(env(safe-area-inset-bottom, 24px) + 12px),
-    transparent 100%
+    #020408 0%,
+    #020408 env(safe-area-inset-bottom, 0px),
+    rgba(2, 4, 8, 0.92) calc(env(safe-area-inset-bottom, 0px) + 12px),
+    rgba(2, 4, 8, 0) 100%
   );
 }
 

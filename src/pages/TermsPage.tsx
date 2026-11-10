@@ -1,11 +1,17 @@
+import { useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from '@/components/ui/icons'
 import { useAuth } from '@/hooks/useAuth'
+import { registerSystemBarSurface } from '@/utils/systemTheme'
 import styles from './TermsPage.module.css'
 
 export default function TermsPage() {
   const { isAuthenticated, isLoading } = useAuth()
   const navigate = useNavigate()
+
+  useLayoutEffect(() => {
+    return registerSystemBarSurface('surface')
+  }, [])
 
   const handleBack = () => {
     if (window.history.length > 1) {

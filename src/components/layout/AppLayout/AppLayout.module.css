@@ -583,6 +583,7 @@
   min-height: 100dvh;
   overflow-y: auto;
   background: var(--page);
+  transition: color 0.2s ease;
 }
 
 @media (min-width: 768px) {
@@ -737,6 +738,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .main,
   .profilePill,
   .topBarBtn,
   .dropdownItem,

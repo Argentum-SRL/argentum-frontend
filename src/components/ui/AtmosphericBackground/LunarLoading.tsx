@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useTheme } from '@/hooks/useTheme'
-import { updateSystemBars } from '@/utils/systemTheme'
+import { registerSystemBarSurface } from '@/utils/systemTheme'
 import { LunarPhase } from './LunarPhase'
 import { ArgentumCrescent } from './ArgentumCrescent'
 import { ConstellationCanvas } from './ConstellationCanvas'
@@ -94,17 +94,10 @@ export function LunarLoading({
   }, [])
 
   // Sincronizar barras del sistema (iOS Safari y Android Chrome) con el tono perimetral exacto del loader
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!fullScreen) return
-
-    const lunarBg = isDark ? '#060B14' : '#FAF7F2'
-    updateSystemBars(lunarBg, isDark)
-
-    return () => {
-      const defaultBg = isDark ? '#0E1117' : '#FAF7F2'
-      updateSystemBars(defaultBg, isDark)
-    }
-  }, [fullScreen, isDark])
+    return registerSystemBarSurface('loading')
+  }, [fullScreen])
 
   // Movimiento continuo de las fases a 6 segundos (sin interacción con mouse)
   useEffect(() => {
@@ -199,6 +192,13 @@ export function LunarLoading({
     >
       {/* Atmósfera Estelar: Sistema de Constelaciones de Alta Relojería */}
       <ConstellationCanvas intensity="hero" />
+
+      {fullScreen && (
+        <>
+          <div className={styles.topSafeBlend} aria-hidden="true" />
+          <div className={styles.bottomSafeBlend} aria-hidden="true" />
+        </>
+      )}
 
       <div className={styles.compositionStage}>
         {/* Marco de la Luna sin diagramas ni líneas planetarias */}

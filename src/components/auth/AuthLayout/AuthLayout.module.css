@@ -69,7 +69,7 @@
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: calc(env(safe-area-inset-top, 0px) + 48px) max(24px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 40px) max(24px, env(safe-area-inset-left, 0px));
+  padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px)) max(24px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 40px) max(24px, env(safe-area-inset-left, 0px));
 }
 
 /* ── Standalone (no left panel) ──────────────── */
@@ -82,6 +82,12 @@
   padding: calc(env(safe-area-inset-top, 0px) + 40px) max(20px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 48px) max(20px, env(safe-area-inset-left, 0px));
   box-sizing: border-box;
   position: relative;
+}
+
+@media (max-width: 767px) {
+  .standalone {
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
 }
 
 .standaloneCard {
@@ -183,6 +189,12 @@
   justify-content: center;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .themeToggle {
+    top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
 }
 
 .themeToggle:hover {

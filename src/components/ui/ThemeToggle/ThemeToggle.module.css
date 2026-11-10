@@ -43,6 +43,12 @@
   z-index: 50;
 }
 
+@media (max-width: 767px) {
+  .floating {
+    top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
+}
+
 .inline {
   position: relative;
 }

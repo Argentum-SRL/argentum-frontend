@@ -14,8 +14,6 @@
   z-index: 10;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
@@ -26,6 +24,12 @@
   display: flex;
   align-items: center;
   gap: 20px;
+}
+
+@media (max-width: 767px) {
+  .headerContent {
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
 }
 
 .backBtn {
@@ -100,6 +104,12 @@
 
 .section {
   scroll-margin-top: 80px;
+}
+
+@media (max-width: 767px) {
+  .section {
+    scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 124px);
+  }
 }
 
 .section h2 {

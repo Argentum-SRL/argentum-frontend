@@ -606,7 +606,7 @@
 
 @media (max-width: 767px) {
   .content {
-    padding: calc(16px + env(safe-area-inset-top, 0px)) max(var(--container-px-mobile), env(safe-area-inset-right, 0px)) 24px max(var(--container-px-mobile), env(safe-area-inset-left, 0px));
+    padding: calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px)) max(var(--container-px-mobile), env(safe-area-inset-right, 0px)) 24px max(var(--container-px-mobile), env(safe-area-inset-left, 0px));
   }
 }
 

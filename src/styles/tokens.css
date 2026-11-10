@@ -17,6 +17,7 @@
   --space-3xl: 32px; /* Espaciado amplio para separación entre módulos */
   --space-4xl: 40px; /* Espaciado extra amplio para márgenes estructurales */
   --space-5xl: 48px; /* Espaciado máximo para secciones de layout principal */
+  --mobile-top-clearance: 48px; /* Holgura superior en móvil debajo de env(safe-area-inset-top) para despejar la transición blur (~36px) de Dynamic Island en iOS 26 */
 
   /* ── Radios de Curvatura ── */
   --radius-modal: 20px; /* Radio de curvatura unificado para modales y bottom sheets */

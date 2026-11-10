@@ -26,7 +26,7 @@ export function SileoToaster() {
       offset={
         isDesktop
           ? { bottom: 32, right: 32 }
-          : { top: 'calc(16px + env(safe-area-inset-top, 0px))' }
+          : { top: 'calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))' }
       }
       options={{
         duration: 3500,

@@ -161,7 +161,7 @@
 @media (max-width: 767px) {
   .emptyRoot {
     /* r03-ok: sangrado a los bordes superior para overlay en movil */
-    margin-top: calc(-1 * (16px + env(safe-area-inset-top, 0px)));
+    margin-top: calc(-1 * (var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px)));
     /* r03-ok: sangrado a los bordes laterales para overlay en movil */
     margin-left: calc(-1 * var(--container-px-mobile, 20px));
     /* r03-ok: sangrado a los bordes laterales para overlay en movil */
@@ -573,7 +573,7 @@
     min-height: 100dvh;
     height: 100%;
     width: 100%;
-    padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(76px + env(safe-area-inset-bottom, 0px));
+    padding: calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px)) 16px calc(76px + env(safe-area-inset-bottom, 0px));
     display: flex;
     align-items: center;
     justify-content: center;

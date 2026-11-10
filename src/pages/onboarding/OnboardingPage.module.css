@@ -8,6 +8,12 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 767px) {
+  .page {
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
+}
+
 .inner {
   width: 100%;
   max-width: 480px;
@@ -29,6 +35,12 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding-right: 52px;
+  }
 }
 
 .headerMoon {

@@ -42,6 +42,12 @@
   transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
 }
 
+@media (max-width: 767px) {
+  .reopenControlsBtn {
+    top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
+}
+
 .reopenControlsBtn:hover {
   background: rgba(13, 32, 69, 0.98);
 }
@@ -353,6 +359,13 @@
   justify-content: center;
   padding: 80px 24px 140px;
   box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+  .modularShowcase {
+    padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px)) 16px calc(env(safe-area-inset-bottom, 0px) + 140px);
+    align-items: flex-start;
+  }
 }
 
 .modularCard {

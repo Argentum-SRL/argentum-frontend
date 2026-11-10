@@ -229,7 +229,7 @@ export function IconPlayground() {
 
   return (
     <div
-      className="w-full max-h-[85vh] overflow-y-auto px-6 py-8 bg-background text-foreground"
+      className="w-full max-h-[85vh] overflow-y-auto px-6 pb-8 pt-[calc(env(safe-area-inset-top,0px)+var(--mobile-top-clearance,48px))] md:pt-8 bg-background text-foreground"
       data-reduced-motion={forceReducedMotion ? 'true' : undefined}
     >
       {/* ── Coherence & Quality Assurance Banner ────────────────────────────── */}

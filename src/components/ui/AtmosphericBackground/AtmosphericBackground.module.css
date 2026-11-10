@@ -47,10 +47,10 @@
 
 @media (max-width: 767px) {
   .centered {
-    padding: 20px 16px;
+    padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px)) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 48px) max(16px, env(safe-area-inset-left, 0px));
   }
   .compensateBottomNav {
-    padding: 20px 16px calc(24px + 56px + env(safe-area-inset-bottom, 0px));
+    padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px)) max(16px, env(safe-area-inset-right, 0px)) calc(24px + 56px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   }
 }
 

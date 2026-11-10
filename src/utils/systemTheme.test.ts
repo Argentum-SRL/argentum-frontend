@@ -438,5 +438,65 @@ describe('systemTheme — sincronización de barras del sistema en móviles y PW
     expect(read('src/pages/onboarding/OnboardingPage.tsx')).toContain('<AtmosphericBackground')
     expect(read('src/components/auth/AuthLayout/AuthLayout.tsx')).toContain('<AtmosphericBackground')
   })
+
+  it('garantiza --mobile-top-clearance (48px) en todos los shells, pantallas y overlays para despejar el blur superior de iOS 26', () => {
+    const read = (relPath: string) => fs.readFileSync(path.resolve(process.cwd(), relPath), 'utf-8')
+
+    // 1. Token canónico único en tokens.css
+    const tokensCss = read('src/styles/tokens.css')
+    expect(tokensCss).toContain('--mobile-top-clearance: 48px;')
+
+    // 2. Shell /app/* y sangrado full-bleed acoplado de SuscripcionesPage
+    const appLayoutCss = read('src/components/layout/AppLayout/AppLayout.module.css')
+    expect(appLayoutCss).toContain('calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))')
+
+    const subsCss = read('src/pages/app/suscripciones/SuscripcionesPage.module.css')
+    expect(subsCss).toContain('margin-top: calc(-1 * (var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px)))')
+    expect(subsCss).toContain('padding: calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))')
+
+    // 3. Cero doble safe-area ni padding superior redundante dentro de AppLayout en móvil
+    const perfilCss = read('src/pages/app/perfil/PerfilPage.parte1.css')
+    expect(perfilCss).not.toContain('env(safe-area-inset-top')
+
+    const dashCss = read('src/pages/app/dashboard/DashboardPage.parte1.css')
+    expect(dashCss).toMatch(/@media\s*\(max-width:\s*767px\)\s*\{[^}]*\.header\s*\{[^}]*padding-top:\s*0;/s)
+
+    const repiteCss = read('src/pages/app/lo-que-se-repite/LoQueSeRepitePage.module.css')
+    expect(repiteCss).toMatch(/\.root\s*\{[^}]*padding:\s*0\s+0\s+40px;/s)
+
+    const analisisCss = read('src/pages/app/analisis/AnalisisPage.module.css')
+    expect(analisisCss).toMatch(/@media\s*\(max-width:\s*767px\)\s*\{\s*\.page\s*\{\s*padding-top:\s*0;\s*\}/s)
+
+    const disenoCss = read('src/pages/admin/diseno/DisenoPage.module.css')
+    expect(disenoCss).toMatch(/@media\s*\(max-width:\s*767px\)\s*\{\s*\.pageContainer\s*\{\s*padding:\s*0\s+0\s+40px;\s*\}/s)
+
+    // 4. TermsPage sin backdrop-filter en .header opaco sticky top: 0 y con clearance móvil
+    const termsCss = read('src/pages/TermsPage.module.css')
+    const termsHeaderMatch = termsCss.match(/\.header\s*\{([^}]*)\}/s)
+    expect(termsHeaderMatch?.[1]).toBeDefined()
+    expect(termsHeaderMatch?.[1]).not.toMatch(/backdrop-filter/i)
+    expect(termsCss).toContain('var(--mobile-top-clearance, 48px)')
+
+    // 5. Pantallas fullscreen/auth/onboarding/admin/overlays y toasts alineados al token móvil
+    const modulesWithClearance = [
+      'src/components/ui/ThemeToggle/ThemeToggle.module.css',
+      'src/components/auth/AuthLayout/AuthLayout.module.css',
+      'src/pages/onboarding/OnboardingPage.module.css',
+      'src/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css',
+      'src/pages/admin/AnimacionPreviewPage.module.css',
+      'src/pages/admin/components/IconPlayground.tsx',
+      'src/components/ui/AtmosphericBackground/AtmosphericBackground.module.css',
+      'src/components/ui/AtmosphericBackground/LunarLoading.module.css',
+      'src/components/ui/Modal/Modal.module.css',
+      'src/styles/sileo.css',
+      'src/components/ui/SileoToaster/SileoToaster.tsx',
+    ]
+
+    for (const modPath of modulesWithClearance) {
+      const content = read(modPath)
+      expect(content, `${modPath} debe usar --mobile-top-clearance`).toContain('--mobile-top-clearance')
+      expect(content, `${modPath} debe combinar con env(safe-area-inset-top`).toContain('env(safe-area-inset-top')
+    }
+  })
 })
 

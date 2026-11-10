@@ -29,6 +29,12 @@
   color: #F8FAFC;
 }
 
+@media (max-width: 767px) {
+  .container {
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
+}
+
 /* ── Velos de borde para integración continua con barras de sistema y safe areas ── */
 .topSafeBlend {
   position: absolute;

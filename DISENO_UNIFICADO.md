@@ -708,7 +708,45 @@ Antes de crear cualquier página o vista nueva, elegir **exactamente uno** de es
 - [ ] Ningún contenedor raíz, sticky/fixed `top: 0`, vignette o full-bleed anima `background` ni `background-color` (y todos declaran `transition` sin fondo para neutralizar `*` de `src/index.css`).
 - [ ] Todo selector tocado tiene cobertura bajo `@media (prefers-reduced-motion: reduce)` (Regla R30) y cero `!important` nuevos (Regla R10).
 - [ ] Se respetan `env(safe-area-inset-top)` y `env(safe-area-inset-bottom)`.
+- [ ] Todo contenido móvil de primer nivel respeta `calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))` (sin duplicar `safe-area-inset-top` dentro de `AppLayout` ni poner `backdrop-filter` en headers opacos sticky `top: 0`).
 - [ ] Se agregaron las aserciones de la nueva ruta/CSS en `src/utils/systemTheme.test.ts`.
 - [ ] Verificación completa verde antes de commitear: `npm test`, `npm run lint` (`eslint` + `audit:rules`) y `npm run build`.
+
+---
+
+### 16.6 Zona de Desenfoque / Transición Superior en iOS 26 (Dynamic Island / Pocket Blur)
+
+1. **Diagnóstico empírico verificado:**
+   - En iOS 26 (iPhone con Dynamic Island como iPhone 16 Pro, Safari y PWA `standalone` con `apple-mobile-web-app-status-bar-style="default"`), el sistema proyecta un degradado progresivo suave (*scroll pocket / progressive blur feather*) por debajo de la línea de `env(safe-area-inset-top)` para fundir la transición entre la barra de estado y el contenido desplazable.
+   - Mediante análisis píxel a píxel sobre capturas reales en iPhone 16 Pro (`DashboardPage`, `TransaccionesPage` y `PresupuestosPage`), el desvanecimiento alcanza exactamente **~36.0–36.4 CSS px** por debajo de `env(safe-area-inset-top, 0px)` (~95 CSS px desde el borde físico superior). El espaciado previo de `16px–24px` dejaba los encabezados y botones superiores dentro de ese tramo difuminado.
+   - Nota CSS: en la app web propia **no existe** ningún overlay CSS `blur()` superior; el único `backdrop-filter` estructural en cabecera era redundante en `TermsPage.module.css` (`.header` ya opaco con `var(--surface)` en `top: 0`), el cual se eliminó para no sumar doble desenfoque sobre iOS.
+
+2. **Token canónico único (`--mobile-top-clearance: 48px` en `src/styles/tokens.css`):**
+   - `36.4px` de alcance máximo de transición + `11.6px` de margen de seguridad (Display Zoom / Larger Text) = **`48px`** (`calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))`), alineado con `--space-5xl`.
+
+3. **Reglas obligatorias de holgura superior en toda la app:**
+   - **Propietario único de `env(safe-area-inset-top)`:** En todas las pantallas `/app/*` y `/admin/*`, el shell [`AppLayout.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/components/layout/AppLayout/AppLayout.module.css) (`.content` en `max-width: 767px`) aplica el padding superior único `calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))`.
+   - **Prohibido duplicar `env(safe-area-inset-top)` o sumar padding superior en hijos de `AppLayout`:** Ninguna página hija dentro de `AppLayout` puede agregar `env(safe-area-inset-top)` ni `padding-top > 0` en móvil (`<= 767px`). Todo contenido arranca exactamente en `48px + safe-area`. Excepción acoplada: bloques full-bleed con margen negativo superior (como [`SuscripcionesPage.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/pages/app/suscripciones/SuscripcionesPage.module.css) `.emptyRoot` y `.emptyState`) deben referenciar obligatoriamente `var(--mobile-top-clearance, 48px)` en ambos lados para mantener simetría exacta.
+   - **Cero `backdrop-filter` sobre cabeceras opacas sticky `top: 0`:** Toda barra opaca anclada en `top: 0` (`TermsPage`) omite `backdrop-filter` y respeta `padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))` en móvil (`<= 767px`), ajustando `scroll-margin-top` para anclas internas.
+   - **Tope vertical en Modales y Bottom Sheets (`Modal.module.css`):** Para evitar que hojas altas en teléfonos grandes alcancen la franja blur superior, `.sheet` y `@media (max-width: 767px) .container` imponen `max-height: min(var(--modal-max-h), calc(100dvh - env(safe-area-inset-top, 0px) - var(--mobile-top-clearance, 48px)))`.
+   - **Alineación unificada en pantallas standalone, controles flotantes y toasts:** Todo componente fuera de `AppLayout` o `position: fixed` en el borde superior en móvil usa `var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px)`.
+
+4. **Mapa completo de cobertura superior en móvil (`<= 767px`):**
+
+| Módulo / Elemento | Archivo CSS / TSX | Mecanismo aplicado |
+| :--- | :--- | :--- |
+| **Token global** | `src/styles/tokens.css` | `--mobile-top-clearance: 48px;` |
+| **Shell `/app/*` y `/admin/*`** (Dashboard, Billeteras, BilleteraDetalle, Transacciones, Analisis, Presupuestos, Metas, LoQueSeRepite, Perfil, Herramientas, Admin, Diseno + todos los Skeletons) | `src/components/layout/AppLayout/AppLayout.module.css` | `.content` móvil con `padding-top: calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))` |
+| **Normalización interna `/app/*`** | `PerfilPage.parte1.css`, `DashboardPage.parte1.css`, `LoQueSeRepitePage.module.css`, `AnalisisPage.module.css`, `DisenoPage.module.css` | Eliminado doble `env(safe-area-inset-top)` en Perfil; `padding-top: 0` móvil para alineación exacta en `48px` |
+| **Sangrado full-bleed Suscripciones** | `src/pages/app/suscripciones/SuscripcionesPage.module.css` | `.emptyRoot` (margen negativo) y `.emptyState` sincronizados con `var(--mobile-top-clearance, 48px)` |
+| **Términos y Condiciones (`/terminos`)** | `src/pages/TermsPage.module.css` | Removido `backdrop-filter` de `.header`; `.headerContent` móvil a `+ var(--mobile-top-clearance, 48px)` y `.section` `scroll-margin-top` compensado |
+| **Auth (`/login`, `/register`, `/login/telefono`, `/auth/*`, `/reset-password`)** | `src/components/auth/AuthLayout/AuthLayout.module.css` | `.mobileInner` y `.standalone` (móvil) a `+ var(--mobile-top-clearance, 48px)`; `.themeToggle` alineado |
+| **Botón flotante de tema** | `src/components/ui/ThemeToggle/ThemeToggle.module.css` | `.floating` móvil en `top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))` |
+| **Onboarding (`/onboarding`)** | `src/pages/onboarding/OnboardingPage.module.css` | `.page` móvil con `padding-top: + var(--mobile-top-clearance, 48px)` y `.header` `padding-right: 52px` para despejar `ThemeToggle` |
+| **Bloqueo crear contraseña** | `src/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css` | `.bgHeader` móvil (`<= 767px`) a `+ var(--mobile-top-clearance, 48px)` |
+| **Preview Admin (`/animacion`, `/app/animacion` e íconos)** | `AnimacionPreviewPage.module.css`, `IconPlayground.tsx` | `.reopenControlsBtn`, `.modularShowcase` e `IconPlayground` en móvil despejan `env(safe-area-inset-top) + var(--mobile-top-clearance, 48px)` |
+| **Pantallas de carga, Error 404 y ErrorBoundaries** | `LunarLoading.module.css`, `AtmosphericBackground.module.css` | Conservan velos opacos sobre el safe area e inyectan `padding-top: + var(--mobile-top-clearance, 48px)` en móvil |
+| **Modales y Bottom Sheets** | `src/components/ui/Modal/Modal.module.css` | `.sheet` y `.container` móvil limitados por `min(var(--modal-max-h), calc(100dvh - env(safe-area-inset-top, 0px) - var(--mobile-top-clearance, 48px)))` |
+| **Toasts móviles (`Sileo`)** | `SileoToaster.tsx`, `src/styles/sileo.css` | `[data-sileo-viewport]` y `offset.top` unificados en `calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))` |
 
 

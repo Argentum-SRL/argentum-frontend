@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Calendar, PieChart, CreditCard, Target, Settings } from '@/components/ui/icons'
+import { Bell, Calendar, PieChart, CreditCard, Target, Settings } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
+import { useSonidoAvisos } from '@/hooks/useSonidoAvisos'
 import styles from './NotificacionesConfigModal.module.css'
 
 interface NotificacionesConfigModalProps {
@@ -46,6 +47,7 @@ const defaultFormState = {
 
 const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ open, onClose }) => {
   const { config, updateConfig } = useNotificaciones()
+  const { activo: sonidoActivo, cambiarActivo: cambiarSonidoActivo } = useSonidoAvisos()
   const [prevOpenAndConfig, setPrevOpenAndConfig] = useState<{ open: boolean; config: typeof config }>({ open: false, config: null })
   const [form, setForm] = useState(defaultFormState)
   const [isSaving, setIsSaving] = useState(false)
@@ -139,6 +141,37 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
     <Modal isOpen={open} onClose={onClose} title="Preferencias de Notificaciones" size="lg">
       <form onSubmit={handleSave} className={styles.form} data-modal-frame>
         <div className={styles.topGrid} data-modal-stack>
+          {/* --- SONIDO --- */}
+          <section className={`${styles.section} ${styles.soundSection}`} data-modal-block>
+            <h3 className={styles.sectionTitle} data-modal-section-title>
+              <Bell size={16} /> Sonido
+            </h3>
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardMeta}>
+                  <p className={styles.cardTitle}>Sonido de los avisos</p>
+                  <p className={styles.cardDesc}>
+                    <span className={styles.descDesktop}>
+                      Suena una campanita cuando llega un aviso o cuando entrás con avisos sin leer.
+                    </span>
+                    <span className={styles.descMobile}>
+                      Suena con avisos nuevos o sin leer.
+                    </span>
+                  </p>
+                </div>
+                <label className={styles.channelLabel}>
+                  <input
+                    type="checkbox"
+                    checked={sonidoActivo}
+                    onChange={() => cambiarSonidoActivo(!sonidoActivo)}
+                    className={styles.channelCheckbox}
+                  />
+                  Activado
+                </label>
+              </div>
+            </div>
+          </section>
+
           {/* --- GENERAL DE CANALES --- */}
           <section className={styles.section} data-modal-block>
             <h3 className={styles.sectionTitle} data-modal-section-title>

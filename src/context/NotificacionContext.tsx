@@ -1,10 +1,36 @@
-import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react'
 import type { Notificacion, ConfiguracionNotificacion } from '@/types'
 import notificacionService from '@/services/notificacion.service'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import { NotificacionContext, type DataUpdateEvent } from './NotificacionContextBase'
 import { limpiarMensajeNotificacion } from '@/utils/notificacion.utils'
+import {
+  esRegresoLargo,
+  registrarIdsConocidos,
+  sonarAlEntrar,
+  sonarPendiente,
+  sonarPorAvisosNuevos,
+  type AlmacenSimple,
+  type DependenciasSonido,
+  type ResultadoSonido,
+  type SonidoPendiente,
+} from '@/utils/sonidoAvisos'
+import {
+  alDesbloquear,
+  instalarDesbloqueo,
+  reproducirAviso,
+} from '@/services/reproductorAvisos'
+
+// Obtiene localStorage de forma segura (null si no está disponible o bloqueado).
+function obtenerAlmacenSeguro(): AlmacenSimple | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return window.localStorage
+  } catch {
+    return null
+  }
+}
 
 
 export function NotificacionProvider({ children }: { children: ReactNode }) {
@@ -15,6 +41,51 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false)
   const { isAuthenticated } = useAuth()
 
+  const unreadCountRef = useRef(unreadCount)
+  const isAuthenticatedRef = useRef(isAuthenticated)
+  const pendienteRef = useRef<SonidoPendiente | null>(null)
+  const ocultoDesdeRef = useRef<number | null>(null)
+  const revisandoRef = useRef(false)
+  const sseConectadoAntesRef = useRef(false)
+
+  const dependenciasSonido = useMemo<DependenciasSonido>(
+    () => ({
+      almacen: obtenerAlmacenSeguro(),
+      ahora: Date.now,
+      reproducir: reproducirAviso,
+    }),
+    []
+  )
+
+  useEffect(() => {
+    unreadCountRef.current = unreadCount
+  }, [unreadCount])
+
+  useEffect(() => {
+    isAuthenticatedRef.current = isAuthenticated
+    if (!isAuthenticated) {
+      pendienteRef.current = null
+      ocultoDesdeRef.current = null
+      sseConectadoAntesRef.current = false
+    }
+  }, [isAuthenticated])
+
+  // Instala el desbloqueo de audio al montar (sin depender de la sesión, incluso en el login).
+  useEffect(() => {
+    const limpiarDesbloqueo = instalarDesbloqueo()
+    const limpiarAlDesbloquear = alDesbloquear(() => {
+      if (isAuthenticatedRef.current) {
+        void sonarPendiente(dependenciasSonido, pendienteRef.current, unreadCountRef.current)
+      }
+      pendienteRef.current = null
+    })
+
+    return () => {
+      limpiarAlDesbloquear()
+      limpiarDesbloqueo()
+    }
+  }, [dependenciasSonido])
+
   if (!isAuthenticated && (notificaciones.length > 0 || unreadCount !== 0 || config !== null || lastDataUpdate !== null)) {
     setNotificaciones([])
     setUnreadCount(0)
@@ -23,28 +94,34 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
   }
 
 
-  const fetchNotifications = useCallback(async (signal?: AbortSignal) => {
-    if (!isAuthenticated) return
+  const fetchNotifications = useCallback(async (signal?: AbortSignal): Promise<Notificacion[] | null> => {
+    if (!isAuthenticated) return null
     setIsLoading(true)
     try {
       const data = await notificacionService.list({ solo_no_leidas: false }, signal)
-      setNotificaciones(data.map((n) => ({ ...n, mensaje: limpiarMensajeNotificacion(n.mensaje) })))
+      const limpias = data.map((n) => ({ ...n, mensaje: limpiarMensajeNotificacion(n.mensaje) }))
+      setNotificaciones(limpias)
+      return limpias
     } catch (error) {
-      if (error && typeof error === 'object' && 'name' in error && (error.name === 'AbortError' || error.name === 'CanceledError')) return
+      if (error && typeof error === 'object' && 'name' in error && (error.name === 'AbortError' || error.name === 'CanceledError')) return null
       console.error('Error fetching notifications:', error)
+      return null
     } finally {
       setIsLoading(false)
     }
   }, [isAuthenticated])
 
-  const fetchUnreadCount = useCallback(async (signal?: AbortSignal) => {
-    if (!isAuthenticated) return
+  const fetchUnreadCount = useCallback(async (signal?: AbortSignal): Promise<number | null> => {
+    if (!isAuthenticated) return null
     try {
       const count = await notificacionService.getContador(signal)
+      unreadCountRef.current = count
       setUnreadCount(count)
+      return count
     } catch (error) {
-      if (error && typeof error === 'object' && 'name' in error && (error.name === 'AbortError' || error.name === 'CanceledError')) return
+      if (error && typeof error === 'object' && 'name' in error && (error.name === 'AbortError' || error.name === 'CanceledError')) return null
       console.error('Error fetching unread count:', error)
+      return null
     }
   }, [isAuthenticated])
 
@@ -133,6 +210,62 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // Evalúa avisos nuevos y agenda un sonido pendiente si quedó bloqueado por autoplay.
+  const reproducirSiSonNuevos = useCallback(
+    async (ids: string[]): Promise<ResultadoSonido> => {
+      const resultado = await sonarPorAvisosNuevos(dependenciasSonido, ids)
+      if (resultado === 'bloqueado') {
+        pendienteRef.current = { pedidoEn: dependenciasSonido.ahora(), tipo: 'nuevo' }
+      }
+      return resultado
+    },
+    [dependenciasSonido]
+  )
+
+  // Consulta la lista y el contador al volver a la pestaña o al reconectar el SSE.
+  const revisarNovedades = useCallback(async () => {
+    if (!isAuthenticated || revisandoRef.current) return
+    revisandoRef.current = true
+    try {
+      const anterior = ocultoDesdeRef.current
+      ocultoDesdeRef.current = null
+
+      const [lista, contador] = await Promise.all([
+        fetchNotifications(),
+        fetchUnreadCount(),
+      ])
+      if (!isAuthenticatedRef.current || lista === null || contador === null) {
+        return
+      }
+
+      const idsNoLeidos = lista.filter((n) => !n.leida).map((n) => n.id)
+      const resultadoNuevos = await reproducirSiSonNuevos(idsNoLeidos)
+
+      if (
+        resultadoNuevos === 'no' &&
+        esRegresoLargo(anterior, dependenciasSonido.ahora())
+      ) {
+        const resultadoEntrada = await sonarAlEntrar(dependenciasSonido, contador)
+        if (resultadoEntrada === 'bloqueado') {
+          pendienteRef.current = { pedidoEn: dependenciasSonido.ahora(), tipo: 'entrada' }
+        }
+      }
+
+      registrarIdsConocidos(
+        dependenciasSonido,
+        lista.map((n) => n.id)
+      )
+    } finally {
+      revisandoRef.current = false
+    }
+  }, [
+    isAuthenticated,
+    dependenciasSonido,
+    fetchNotifications,
+    fetchUnreadCount,
+    reproducirSiSonNuevos,
+  ])
+
   // Carga inicial al autenticar
   useEffect(() => {
     if (!isAuthenticated) {
@@ -140,18 +273,33 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     }
 
     const controller = new AbortController()
-    Promise.resolve().then(() => {
-      if (!controller.signal.aborted) {
-        fetchNotifications(controller.signal)
-        fetchUnreadCount(controller.signal)
-        fetchConfig(controller.signal)
+    Promise.resolve().then(async () => {
+      if (controller.signal.aborted) return
+      void fetchConfig(controller.signal)
+      const [lista, contador] = await Promise.all([
+        fetchNotifications(controller.signal),
+        fetchUnreadCount(controller.signal),
+      ])
+      if (controller.signal.aborted || !isAuthenticatedRef.current) return
+
+      if (lista !== null) {
+        registrarIdsConocidos(
+          dependenciasSonido,
+          lista.map((n) => n.id)
+        )
+      }
+      if (contador !== null) {
+        const resultado = await sonarAlEntrar(dependenciasSonido, contador)
+        if (!controller.signal.aborted && isAuthenticatedRef.current && resultado === 'bloqueado') {
+          pendienteRef.current = { pedidoEn: dependenciasSonido.ahora(), tipo: 'entrada' }
+        }
       }
     })
 
     return () => {
       controller.abort()
     }
-  }, [isAuthenticated, fetchNotifications, fetchUnreadCount, fetchConfig])
+  }, [isAuthenticated, dependenciasSonido, fetchNotifications, fetchUnreadCount, fetchConfig])
 
   // Conexión SSE
   useEffect(() => {
@@ -172,13 +320,26 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
         try {
           if (event.data === ': ping') return
           const data = JSON.parse(event.data)
-          if (data.event === 'connected') return
+          if (!data || typeof data !== 'object') return
+
+          if (data.event === 'connected') {
+            if (sseConectadoAntesRef.current) {
+              void revisarNovedades()
+            }
+            sseConectadoAntesRef.current = true
+            return
+          }
 
           if (data.event === 'data_update') {
             setLastDataUpdate({
               entidad: data.entidad,
               timestamp: Date.now()
             })
+            return
+          }
+
+          // Ignoramos sesiones revocadas o mensajes sin id ni tipo para no sumar filas, contadores, toasts ni sonido vacíos.
+          if (data.event === 'revoked' || !data.id || !data.tipo) {
             return
           }
 
@@ -195,6 +356,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
           })
 
           setUnreadCount((prev) => prev + 1)
+          unreadCountRef.current = unreadCountRef.current + 1
 
           // Decidir el tipo de toast
           if (
@@ -215,6 +377,9 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
           } else {
             sileo.success({ title: newNotif.mensaje })
           }
+
+          // Acompaña el aviso visual con el sonido corto si no se reprodujo ya en otra pestaña.
+          void reproducirSiSonNuevos([newNotif.id])
         } catch (err) {
           console.error('Error parsing SSE event:', err)
         }
@@ -232,6 +397,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     connectSSE()
 
     return () => {
+      sseConectadoAntesRef.current = false
       if (eventSource) {
         eventSource.close()
       }
@@ -239,7 +405,25 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
         clearTimeout(reconnectTimeout)
       }
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, revisarNovedades, reproducirSiSonNuevos])
+
+  // Detecta el paso a segundo plano y revisa avisos nuevos o regresos largos al volver a la pestaña/app.
+  useEffect(() => {
+    if (!isAuthenticated || typeof document === 'undefined') return
+
+    const alCambiarVisibilidad = () => {
+      if (document.visibilityState === 'hidden') {
+        ocultoDesdeRef.current = dependenciasSonido.ahora()
+      } else if (document.visibilityState === 'visible') {
+        void revisarNovedades()
+      }
+    }
+
+    document.addEventListener('visibilitychange', alCambiarVisibilidad)
+    return () => {
+      document.removeEventListener('visibilitychange', alCambiarVisibilidad)
+    }
+  }, [isAuthenticated, dependenciasSonido, revisarNovedades])
 
   const contextValue = useMemo(
     () => ({

@@ -12,8 +12,8 @@ export interface NotificacionContextValue {
   config: ConfiguracionNotificacion | null
   isLoading: boolean
   lastDataUpdate: DataUpdateEvent | null
-  fetchNotifications: (signal?: AbortSignal) => Promise<void>
-  fetchUnreadCount: (signal?: AbortSignal) => Promise<void>
+  fetchNotifications: (signal?: AbortSignal) => Promise<Notificacion[] | null>
+  fetchUnreadCount: (signal?: AbortSignal) => Promise<number | null>
   fetchConfig: (signal?: AbortSignal) => Promise<void>
   updateConfig: (payload: Partial<ConfiguracionNotificacion>) => Promise<void>
   marcarLeida: (id: string) => Promise<void>

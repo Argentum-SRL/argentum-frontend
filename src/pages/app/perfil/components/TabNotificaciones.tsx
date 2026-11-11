@@ -9,6 +9,7 @@ import {
   Plus,
 } from '@/components/ui/icons'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
+import { useSonidoAvisos } from '@/hooks/useSonidoAvisos'
 import type { ConfiguracionNotificacion } from '@/types'
 import { TimeInput, LunarLoader, PerfilNotificacionesSkeleton } from '@/components/ui'
 import { sileo } from 'sileo'
@@ -168,6 +169,7 @@ interface NotificacionesFormProps {
 const NotificacionesForm: React.FC<NotificacionesFormProps> = ({ initialConfig, onSave }) => {
   const [form, setForm] = useState<NotificationFormState>(() => buildInitialState(initialConfig))
   const [isSaving, setIsSaving] = useState(false)
+  const { activo: sonidoActivo, cambiarActivo: cambiarSonidoActivo } = useSonidoAvisos()
 
   const isDirty = useMemo(() => {
     const initial = buildInitialState(initialConfig)
@@ -234,6 +236,45 @@ const NotificacionesForm: React.FC<NotificacionesFormProps> = ({ initialConfig, 
             </p>
           </div>
         </div>
+
+        {/* ── Sonido en este dispositivo (Ancho Completo) ─────────────────── */}
+        <section className={perfilStyles.sectionCard}>
+          <div className={perfilStyles.sectionHeader}>
+            <div className={perfilStyles.sectionIconWrap} style={{ color: '#2563eb' }}>
+              <Bell size={18} />
+            </div>
+            <div className={perfilStyles.sectionHeaderText}>
+              <h3>Sonido</h3>
+            </div>
+          </div>
+
+          <div className={localStyles.cardStack}>
+            <div className={localStyles.settingRow}>
+              <div className={localStyles.settingRowHeader}>
+                <div className={localStyles.settingInfo}>
+                  <div className={localStyles.settingLabelGroup}>
+                    <span className={localStyles.settingLabel}>Sonido de los avisos</span>
+                  </div>
+                  <span className={localStyles.settingSubtitle}>
+                    <span className={localStyles.subtitleDesktop}>
+                      Suena una campanita cuando llega un aviso o cuando entrás con avisos sin leer.
+                    </span>
+                    <span className={localStyles.subtitleMobile}>
+                      Suena con avisos nuevos o sin leer.
+                    </span>
+                  </span>
+                </div>
+                <div className={localStyles.settingActions}>
+                  <Switch
+                    checked={sonidoActivo}
+                    onChange={() => cambiarSonidoActivo(!sonidoActivo)}
+                    ariaLabel="Sonido de los avisos"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ── Grid Principal Superior (2 Columnas Desktop, 1 Mobile) ───────── */}
         <div className={localStyles.mainGrid}>

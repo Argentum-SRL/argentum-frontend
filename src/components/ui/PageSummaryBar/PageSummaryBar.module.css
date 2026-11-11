@@ -86,20 +86,20 @@
     flex-direction: row;
     align-items: center;
     gap: 0;
-    padding: 0 24px; /* Tablet padding */
+    padding: 14px 24px; /* Tablet padding */
     min-height: 88px; /* Desktop min-height (≥768px) */
   }
 
   .leftSlot {
-    flex: 1.5;
+    flex: 1.5 1 auto;
     grid-column: unset; /* reset grid */
     border-bottom: none; /* reset mobile border */
-    padding: 0 28px 0 0;
+    padding: 0 24px 0 0;
   }
 
   .item {
-    flex: 1;
-    padding: 0 28px;
+    flex: 1 1 auto;
+    padding: 0 24px;
     border-right: none !important; /* reset mobile border */
     border-bottom: none !important; /* reset mobile border */
   }
@@ -124,16 +124,18 @@
 
   .value {
     font-size: 22px; /* Desktop font-size */
+    white-space: nowrap;
   }
 
   .valueHighlight {
     font-size: 26px; /* Desktop highlight size */
+    white-space: nowrap;
   }
 }
 
 @media (min-width: 1024px) {
   .container {
-    padding: 0 32px; /* Desktop padding */
+    padding: 14px 32px; /* Desktop padding */
   }
 }
 

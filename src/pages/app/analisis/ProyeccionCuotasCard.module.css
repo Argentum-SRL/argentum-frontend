@@ -101,8 +101,10 @@
 .legendRow {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .legendItem {
@@ -164,6 +166,14 @@
   font-weight: 600;
   color: var(--success);
   padding-top: 2px;
+}
+
+.bodyContentWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .plansList {
@@ -264,12 +274,13 @@
 }
 
 .emptyWrap {
+  flex: 1;
   min-height: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   color: var(--text-3);
 }
 

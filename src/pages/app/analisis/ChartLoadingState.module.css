@@ -1,0 +1,120 @@
+@keyframes chartBarPulse1 {
+  0%,
+  100% {
+    transform: scaleY(0.32);
+  }
+  50% {
+    transform: scaleY(0.96);
+  }
+}
+
+@keyframes chartBarPulse2 {
+  0%,
+  100% {
+    transform: scaleY(0.88);
+  }
+  50% {
+    transform: scaleY(0.28);
+  }
+}
+
+@keyframes chartBarPulse3 {
+  0%,
+  100% {
+    transform: scaleY(0.42);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes chartBarPulse4 {
+  0%,
+  100% {
+    transform: scaleY(0.76);
+  }
+  50% {
+    transform: scaleY(0.34);
+  }
+}
+
+@keyframes fadeInVeil {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.overlayRoot {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--surface) 65%, transparent);
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: fadeInVeil 120ms ease-out;
+}
+
+.standaloneRoot {
+  position: relative;
+  flex: 1;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.barsLoader {
+  width: 52px;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+}
+
+.barItem {
+  width: 6px;
+  height: 100%;
+  border-radius: 99px;
+  transform-origin: bottom center;
+}
+
+.bar1 {
+  background: #4CAF7D;
+  animation: chartBarPulse1 800ms ease-in-out infinite;
+}
+
+.bar2 {
+  background: #FF8A65;
+  animation: chartBarPulse2 800ms ease-in-out infinite;
+}
+
+.bar3 {
+  background: var(--primary);
+  animation: chartBarPulse3 800ms ease-in-out infinite;
+}
+
+.bar4 {
+  background: #2563eb;
+  animation: chartBarPulse4 800ms ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlayRoot,
+  .bar1,
+  .bar2,
+  .bar3,
+  .bar4 {
+    animation: none;
+  }
+}

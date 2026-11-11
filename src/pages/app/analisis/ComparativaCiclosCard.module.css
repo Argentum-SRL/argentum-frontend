@@ -177,6 +177,14 @@
   color: var(--error);
 }
 
+.bodyContentWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .deltaList {
   display: flex;
   flex-direction: column;
@@ -251,7 +259,7 @@
 .barFillA {
   height: 100%;
   border-radius: 999px;
-  background: var(--primary);
+  background: #FF8A65;
 }
 
 .barFillB {
@@ -351,12 +359,13 @@
 }
 
 .emptyWrap {
+  flex: 1;
   min-height: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   color: var(--text-3);
 }
 

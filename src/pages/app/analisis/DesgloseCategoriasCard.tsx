@@ -16,6 +16,7 @@ import analisisService, {
 } from '@/services/analisis.service'
 import { formatMonto, formatFecha } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
+import ChartLoadingState from './ChartLoadingState'
 import styles from './DesgloseCategoriasCard.module.css'
 
 const CHART_COLORS_LIGHT = [
@@ -49,6 +50,7 @@ interface DesgloseCategoriasCardProps {
   queryParams: AnalisisQueryParams
   vistaModoExterno?: 'barras' | 'dona' | 'ranking'
   onVistaModoChange?: (modo: 'barras' | 'dona' | 'ranking') => void
+  loading?: boolean
 }
 
 export default function DesgloseCategoriasCard({
@@ -58,6 +60,7 @@ export default function DesgloseCategoriasCard({
   queryParams,
   vistaModoExterno,
   onVistaModoChange,
+  loading = false,
 }: DesgloseCategoriasCardProps) {
   const { theme } = useTheme()
   const CHART_COLORS = theme === 'dark' ? CHART_COLORS_DARK : CHART_COLORS_LIGHT
@@ -91,6 +94,14 @@ export default function DesgloseCategoriasCard({
       categorias.find((c) => (c.categoria_id ?? 'sin-categoria') === selectedCatKey) ?? null
     )
   }, [categorias, selectedCatKey])
+
+  const animKey = useMemo(
+    () =>
+      `${queryParams.ciclos ?? 6}-${queryParams.moneda_modo ?? 'solo_ars'}-${
+        queryParams.billetera_id ?? 'all'
+      }-${queryParams.tarjeta_id ?? 'all'}-${vistaModo}-${gastoTotal}`,
+    [queryParams, vistaModo, gastoTotal]
+  )
 
   const fetchDrilldown = useCallback(
     async (catKey: string, subId: string | null, signal?: AbortSignal) => {
@@ -191,12 +202,26 @@ export default function DesgloseCategoriasCard({
         )}
       </header>
 
-      {categorias.length === 0 ? (
+      {categorias.length === 0 && loading ? (
+        <ChartLoadingState
+          label="Cargando categorías"
+          sublabel="Agrupando gastos del período..."
+        />
+      ) : categorias.length === 0 ? (
         <div className={styles.emptyWrap}>
           <PieChartIcon size={28} />
           <p className={styles.emptyText}>Sin gastos registrados en el período seleccionado.</p>
         </div>
-      ) : selectedCat ? (
+      ) : (
+        <div className={styles.bodyContentWrap}>
+          {loading && (
+            <ChartLoadingState
+              overlay
+              label="Actualizando categorías"
+              sublabel="Recalculando pesos del período..."
+            />
+          )}
+          {selectedCat ? (
         /* ── Nivel 2: Drill-down de Subcategorías + Movimientos ── */
         <div className={styles.drilldownLayout}>
           <div className={styles.subcatsSection}>
@@ -308,7 +333,7 @@ export default function DesgloseCategoriasCard({
         <div className={styles.donutLayout}>
           <div className={styles.donutChartBox}>
             <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
+              <PieChart key={animKey}>
                 <Pie
                   data={categorias}
                   dataKey="monto"
@@ -319,6 +344,8 @@ export default function DesgloseCategoriasCard({
                   outerRadius={96}
                   paddingAngle={2}
                   isAnimationActive={!prefersReducedMotion}
+                  animationDuration={480}
+                  animationEasing="ease-out"
                   onClick={(_, index) => {
                     const target = categorias[index]
                     if (target) handleSelectCategoria(target)
@@ -416,6 +443,7 @@ export default function DesgloseCategoriasCard({
               {vistaModo === 'barras' && (
                 <div className={styles.barTrack}>
                   <div
+                    key={`${animKey}-${cat.categoria_id ?? cat.categoria_nombre}`}
                     className={styles.barFill}
                     style={{
                       width: `${cat.ancho_barra_pct}%`,
@@ -426,6 +454,8 @@ export default function DesgloseCategoriasCard({
               )}
             </button>
           ))}
+        </div>
+          )}
         </div>
       )}
     </section>

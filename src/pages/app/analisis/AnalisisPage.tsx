@@ -9,6 +9,7 @@ import {
   Activity,
   Sparkles,
 } from '@/components/ui/icons'
+import { PageSummaryBar } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import analisisService, {
   type AnalisisResumenResponse,
@@ -87,8 +88,18 @@ export default function AnalisisPage() {
   const fetchResumen = useCallback(
     async (signal?: AbortSignal) => {
       setLoading(true)
+      const minLoaderDelay = new Promise<void>((resolve) => {
+        const t = setTimeout(resolve, 260)
+        signal?.addEventListener('abort', () => {
+          clearTimeout(t)
+          resolve()
+        })
+      })
       try {
-        const res = await analisisService.getResumen(queryParams, signal)
+        const [res] = await Promise.all([
+          analisisService.getResumen(queryParams, signal),
+          minLoaderDelay,
+        ])
         if (!signal?.aborted) {
           setData(res)
         }
@@ -168,70 +179,66 @@ export default function AnalisisPage() {
             IZQUIERDA: CONTENEDOR DE GRÁFICO (ENTRA 100% EN PANTALLA)
            ══════════════════════════════════════════════════════════════════ */}
         <main className={styles.leftStage} aria-label="Contenedor principal de gráficos">
-          {/* Cinta superior ultracompacta con título y KPIs en una sola línea */}
-          <header className={styles.stageTopBar}>
-            <div className={styles.stageTitleBlock}>
-              <h1 className={styles.stageMainTitle}>Análisis</h1>
-              <span className={styles.stagePeriodBadge}>
+          {/* ── Page Header (misma estética que Transacciones y Presupuestos) ── */}
+          <div className={styles.pageHeader}>
+            <div className={styles.titleGroup}>
+              <h1>Análisis</h1>
+              <p className={styles.subtitle}>
                 {data?.periodo_seleccionado.etiqueta ?? 'Cargando...'}
-              </span>
+                {' · '}
+                {loading && !data
+                  ? '—'
+                  : `${data?.kpis.cantidad_operaciones ?? 0} ${
+                      (data?.kpis.cantidad_operaciones ?? 0) === 1 ? 'movimiento' : 'movimientos'
+                    }`}
+              </p>
             </div>
+          </div>
 
-            <div className={styles.inlineKpis}>
-              <div className={styles.kpiPill}>
-                <span className={styles.kpiPillLabel}>Gastos</span>
-                <strong className={styles.kpiPillVal}>
-                  {loading && !data
+          {/* ── Hero Resumen (Card Marino unificado) ── */}
+          <PageSummaryBar
+            className={styles.summaryBar}
+            items={[
+              {
+                label: 'Balance del período',
+                value:
+                  loading && !data
                     ? '...'
-                    : formatMonto(data?.kpis.gastos_totales ?? 0, monedaVisual)}
-                </strong>
-                {data?.kpis.variacion_gasto_vs_anterior_pct !== null &&
-                  data?.kpis.variacion_gasto_vs_anterior_pct !== undefined && (
-                    <span
-                      className={
-                        data.kpis.variacion_gasto_vs_anterior_pct <= 0
-                          ? styles.deltaGood
-                          : styles.deltaBad
-                      }
-                    >
-                      {data.kpis.variacion_gasto_vs_anterior_pct > 0 ? '+' : ''}
-                      {data.kpis.variacion_gasto_vs_anterior_pct}%
-                    </span>
-                  )}
-              </div>
-
-              <div className={styles.kpiPill}>
-                <span className={styles.kpiPillLabel}>Ingresos</span>
-                <strong className={styles.kpiPillVal}>
-                  {loading && !data
+                    : `${(data?.kpis.balance_neto ?? 0) < 0 ? '-' : '+'}${formatMonto(
+                        Math.abs(data?.kpis.balance_neto ?? 0),
+                        monedaVisual
+                      )}`,
+                highlight: true,
+                valueColor: (data?.kpis.balance_neto ?? 0) < 0 ? '#FF8A65' : undefined,
+              },
+              {
+                label: 'Ingresos',
+                value:
+                  loading && !data
                     ? '...'
-                    : formatMonto(data?.kpis.ingresos_totales ?? 0, monedaVisual)}
-                </strong>
-              </div>
-
-              <div className={styles.kpiPill}>
-                <span className={styles.kpiPillLabel}>Balance</span>
-                <strong
-                  className={
-                    (data?.kpis.balance_neto ?? 0) >= 0
-                      ? styles.kpiPillPositive
-                      : styles.kpiPillNegative
-                  }
-                >
-                  {loading && !data
+                    : `+${formatMonto(data?.kpis.ingresos_totales ?? 0, monedaVisual)}`,
+                valueColor: '#4CAF7D',
+              },
+              {
+                label: 'Egresos',
+                value:
+                  loading && !data
                     ? '...'
-                    : formatMonto(data?.kpis.balance_neto ?? 0, monedaVisual)}
-                </strong>
-              </div>
-
-              <div className={styles.kpiPill}>
-                <span className={styles.kpiPillLabel}>Ahorro</span>
-                <strong className={styles.kpiPillVal}>
-                  {loading && !data ? '...' : `${data?.kpis.tasa_ahorro_pct ?? 0}%`}
-                </strong>
-              </div>
-            </div>
-          </header>
+                    : `-${formatMonto(data?.kpis.gastos_totales ?? 0, monedaVisual)}`,
+                valueColor: '#FF8A65',
+              },
+              {
+                label: 'Tasa de ahorro',
+                value: loading && !data ? '...' : `${data?.kpis.tasa_ahorro_pct ?? 0}%`,
+                valueColor:
+                  (data?.kpis.tasa_ahorro_pct ?? 0) >= 20
+                    ? '#4CAF7D'
+                    : (data?.kpis.tasa_ahorro_pct ?? 0) < 0
+                      ? '#FF8A65'
+                      : undefined,
+              },
+            ]}
+          />
 
           {/* Cuadro del Gráfico Protagonista */}
           <div className={styles.stageViewport}>
@@ -242,6 +249,9 @@ export default function AnalisisPage() {
                 promedioHistoricoGastos={data?.kpis.promedio_gasto_ciclo ?? 0}
                 modoGrafico={modoEvolucion}
                 seriesPersonalizadas={seriesPersonalizadas}
+                loading={loading}
+                onOpenEditorSeries={() => setIsEditorSeriesOpen(true)}
+                onResetSeries={() => setSeriesPersonalizadas([])}
               />
             )}
 
@@ -253,6 +263,7 @@ export default function AnalisisPage() {
                 queryParams={queryParams}
                 vistaModoExterno={modoCategorias}
                 onVistaModoChange={setModoCategorias}
+                loading={loading}
               />
             )}
 

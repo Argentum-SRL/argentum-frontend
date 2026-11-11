@@ -14,8 +14,14 @@
 
 .header {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.headerTopRow {
+  display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
@@ -38,11 +44,28 @@
   flex-shrink: 0;
 }
 
+.titleLine {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .title {
   font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   margin: 0;
+}
+
+.parentCategoryBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 
 .subtitle {
@@ -51,20 +74,145 @@
   margin: 2px 0 0;
 }
 
+.headerControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stackToggleGroup {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.stackToggleBtn {
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.stackToggleBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.stackToggleBtnActive {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.editSeriesQuickBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.editSeriesQuickBtn:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+}
+
+.editSeriesQuickBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.resetSeriesQuickBtn {
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.resetSeriesQuickBtn:hover {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
+.resetSeriesQuickBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 12px;
+  padding-top: 2px;
+  flex-shrink: 0;
 }
 
-.legendItem {
+.legendItemStatic {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-2);
+  padding: 2px 4px;
+}
+
+.legendChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: opacity 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.legendChip:hover {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.legendChip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.legendChipHovered {
+  border-color: var(--primary);
+  box-shadow: var(--elevation-xs);
+}
+
+.legendChipMuted {
+  opacity: 0.45;
+  text-decoration: line-through;
 }
 
 .legendDot {
@@ -82,18 +230,20 @@
 }
 
 .chartContainer {
+  position: relative;
   width: 100%;
   flex: 1;
   min-height: 280px;
 }
 
 .emptyWrap {
+  flex: 1;
   min-height: 240px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   color: var(--text-3);
   text-align: center;
 }
@@ -109,7 +259,7 @@
   border-radius: 14px;
   padding: 12px 14px;
   box-shadow: var(--elevation-md);
-  min-width: 190px;
+  min-width: 220px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -143,20 +293,72 @@
 }
 
 .tooltipLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--text-2);
+}
+
+.tooltipLabelStrong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tooltipColorDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+
+.tooltipRightGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .tooltipVal {
   font-weight: 600;
   color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltipValStrong {
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 
 .tooltipValPositive {
   font-weight: 700;
   color: var(--success);
+  font-variant-numeric: tabular-nums;
 }
 
 .tooltipValNegative {
+  font-weight: 700;
+  color: var(--error);
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltipShareBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--surface-alt);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.tooltipDeltaGood {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.tooltipDeltaBad {
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--error);
 }
@@ -176,3 +378,12 @@
   color: var(--primary);
 }
 
+@media (prefers-reduced-motion: reduce) {
+
+  .stackToggleBtn,
+  .editSeriesQuickBtn,
+  .resetSeriesQuickBtn,
+  .legendChip {
+    transition: none;
+  }
+}

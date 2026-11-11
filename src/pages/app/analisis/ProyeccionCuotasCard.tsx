@@ -16,6 +16,7 @@ import analisisService, {
 } from '@/services/analisis.service'
 import { formatMonto, formatAxisCompact } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
+import ChartLoadingState from './ChartLoadingState'
 import styles from './ProyeccionCuotasCard.module.css'
 
 interface ProyeccionCuotasCardProps {
@@ -41,7 +42,7 @@ export default function ProyeccionCuotasCard({
 }: ProyeccionCuotasCardProps) {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
-  const cuotasBarColor = isDark ? '#60A5FA' : '#0D2045'
+  const cuotasBarColor = '#FF8A65'
   const subsBarColor = isDark ? '#A78BFA' : '#7C3AED'
   const [horizonteInterno, setHorizonteInterno] = useState<'6' | '12'>('6')
   const [vistaInternaState, setVistaInternaState] = useState<'grafico' | 'planes'>('grafico')
@@ -75,16 +76,26 @@ export default function ProyeccionCuotasCard({
   const fetchProyeccion = useCallback(
     async (signal?: AbortSignal) => {
       setLoading(true)
+      const minLoaderDelay = new Promise<void>((resolve) => {
+        const t = setTimeout(resolve, 260)
+        signal?.addEventListener('abort', () => {
+          clearTimeout(t)
+          resolve()
+        })
+      })
       try {
-        const res = await analisisService.getProyeccionCompromisos(
-          {
-            moneda_modo: monedaModo,
-            meses: Number(horizonte),
-            billetera_id: billeteraId,
-            tarjeta_id: tarjetaId,
-          },
-          signal
-        )
+        const [res] = await Promise.all([
+          analisisService.getProyeccionCompromisos(
+            {
+              moneda_modo: monedaModo,
+              meses: Number(horizonte),
+              billetera_id: billeteraId,
+              tarjeta_id: tarjetaId,
+            },
+            signal
+          ),
+          minLoaderDelay,
+        ])
         if (!signal?.aborted) {
           setData(res)
         }
@@ -192,31 +203,31 @@ export default function ProyeccionCuotasCard({
         </div>
       )}
 
-      {loading && !data ? (
-        <div className={styles.emptyWrap}>
-          <p className={styles.emptyText}>Calculando proyección de compromisos...</p>
-        </div>
+      {!data && loading ? (
+        <ChartLoadingState
+          label="Calculando proyección"
+          sublabel="Proyectando cuotas y suscripciones..."
+        />
       ) : !data ? (
         <div className={styles.emptyWrap}>
           <CreditCard size={28} />
           <p className={styles.emptyText}>No pudimos proyectar compromisos en este momento.</p>
         </div>
-      ) : vistaInterna === 'grafico' ? (
+      ) : (
+        <div className={styles.bodyContentWrap}>
+          {loading && (
+            <ChartLoadingState
+              overlay
+              label="Actualizando proyección"
+              sublabel="Recalculando horizonte futuro..."
+            />
+          )}
+          {vistaInterna === 'grafico' ? (
         <>
-          <div className={styles.legendRow}>
-            <span className={styles.legendItem}>
-              <span className={styles.dot} style={{ background: cuotasBarColor }} />
-              Cuotas de compras
-            </span>
-            <span className={styles.legendItem}>
-              <span className={styles.dot} style={{ background: subsBarColor }} />
-              Suscripciones activas
-            </span>
-          </div>
-
           <div className={styles.chartWrap}>
             <ResponsiveContainer width="100%" height={215}>
               <BarChart
+                key={`${horizonte}-${monedaModo}-${billeteraId ?? 'all'}-${tarjetaId ?? 'all'}`}
                 data={data.serie_mensual}
                 margin={{ top: 10, right: 12, left: 0, bottom: 4 }}
               >
@@ -287,6 +298,17 @@ export default function ProyeccionCuotasCard({
               </BarChart>
             </ResponsiveContainer>
           </div>
+
+          <div className={styles.legendRow}>
+            <span className={styles.legendItem}>
+              <span className={styles.dot} style={{ background: cuotasBarColor }} />
+              Cuotas de compras
+            </span>
+            <span className={styles.legendItem}>
+              <span className={styles.dot} style={{ background: subsBarColor }} />
+              Suscripciones activas
+            </span>
+          </div>
         </>
       ) : data.planes_activos.length === 0 ? (
         <div className={styles.emptyWrap}>
@@ -326,6 +348,8 @@ export default function ProyeccionCuotasCard({
               </div>
             </div>
           ))}
+        </div>
+          )}
         </div>
       )}
     </section>

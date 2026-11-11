@@ -16,7 +16,7 @@ import analisisService, {
   type ComparativaCiclosResponse,
 } from '@/services/analisis.service'
 import { formatMonto, formatAxisCompact } from '@/utils/format'
-import { useTheme } from '@/hooks/useTheme'
+import ChartLoadingState from './ChartLoadingState'
 import styles from './ComparativaCiclosCard.module.css'
 
 interface ComparativaCiclosCardProps {
@@ -32,9 +32,7 @@ export default function ComparativaCiclosCard({
   vistaModoExterno,
   onVistaModoChange,
 }: ComparativaCiclosCardProps) {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
-  const primaryBarColor = isDark ? '#60A5FA' : '#0D2045'
+  const primaryBarColor = '#FF8A65'
   const [vistaModoInterno, setVistaModoInterno] = useState<'espejo' | 'grafico'>('espejo')
   const vistaModo = vistaModoExterno ?? vistaModoInterno
   const handleCambiarVista = (nuevo: 'espejo' | 'grafico') => {
@@ -62,15 +60,25 @@ export default function ComparativaCiclosCard({
   const fetchComparativa = useCallback(
     async (signal?: AbortSignal) => {
       setLoading(true)
+      const minLoaderDelay = new Promise<void>((resolve) => {
+        const t = setTimeout(resolve, 260)
+        signal?.addEventListener('abort', () => {
+          clearTimeout(t)
+          resolve()
+        })
+      })
       try {
-        const res = await analisisService.getComparativaCiclos(
-          {
-            ...queryParams,
-            ciclo_a: cicloAKey || undefined,
-            ciclo_b: cicloBKey || undefined,
-          },
-          signal
-        )
+        const [res] = await Promise.all([
+          analisisService.getComparativaCiclos(
+            {
+              ...queryParams,
+              ciclo_a: cicloAKey || undefined,
+              ciclo_b: cicloBKey || undefined,
+            },
+            signal
+          ),
+          minLoaderDelay,
+        ])
         if (!signal?.aborted) {
           setData(res)
           if (!cicloAKey && res.ciclo_a?.clave) setCicloAKey(res.ciclo_a.clave)
@@ -227,10 +235,11 @@ export default function ComparativaCiclosCard({
         </div>
       )}
 
-      {loading && !data ? (
-        <div className={styles.emptyWrap}>
-          <p className={styles.emptyText}>Comparando ciclos...</p>
-        </div>
+      {!data && loading ? (
+        <ChartLoadingState
+          label="Comparando ciclos"
+          sublabel="Calculando diferencias por categoría..."
+        />
       ) : !data || data.categorias.length === 0 ? (
         <div className={styles.emptyWrap}>
           <ArrowLeftRight size={28} />
@@ -238,10 +247,20 @@ export default function ComparativaCiclosCard({
             No hay gastos registrados en estos ciclos para comparar.
           </p>
         </div>
-      ) : vistaModo === 'grafico' ? (
+      ) : (
+        <div className={styles.bodyContentWrap}>
+          {loading && (
+            <ChartLoadingState
+              overlay
+              label="Comparando ciclos"
+              sublabel="Actualizando variaciones..."
+            />
+          )}
+          {vistaModo === 'grafico' ? (
         <div className={styles.chartWrap}>
           <ResponsiveContainer width="100%" height={290}>
             <BarChart
+              key={`${data.ciclo_a.clave}-${data.ciclo_b.clave}-${monedaVisual}`}
               data={data.categorias.slice(0, 8)}
               margin={{ top: 12, right: 12, left: 0, bottom: 8 }}
             >
@@ -368,6 +387,8 @@ export default function ComparativaCiclosCard({
               </div>
             </div>
           ))}
+        </div>
+          )}
         </div>
       )}
     </section>

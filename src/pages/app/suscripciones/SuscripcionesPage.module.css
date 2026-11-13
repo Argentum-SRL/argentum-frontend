@@ -2,6 +2,13 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .root {
+    gap: 24px;
+  }
 }
 
 .loading {
@@ -54,9 +61,15 @@
 .sections {
   display: flex;
   flex-direction: column;
-  gap: 48px;
-  margin-top: 24px;
+  gap: 24px;
+  margin-top: 0;
   animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+@media (min-width: 768px) {
+  .sections {
+    gap: 32px;
+  }
 }
 
 .section {

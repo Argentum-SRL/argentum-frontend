@@ -749,4 +749,56 @@ Antes de crear cualquier página o vista nueva, elegir **exactamente uno** de es
 | **Modales y Bottom Sheets** | `src/components/ui/Modal/Modal.module.css` | `.sheet` y `.container` móvil limitados por `min(var(--modal-max-h), calc(100dvh - env(safe-area-inset-top, 0px) - var(--mobile-top-clearance, 48px)))` |
 | **Toasts móviles (`Sileo`)** | `SileoToaster.tsx`, `src/styles/sileo.css` | `[data-sileo-viewport]` y `offset.top` unificados en `calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))` |
 
+---
+
+## 17. Norma Canónica de Márgenes, Contenedores y Ritmo Vertical de Módulos (Desktop y Mobile)
+
+### 17.1 Principio de Propietario Único del Shell (`AppLayout`)
+Para garantizar alineación matemática perfecta y ausencia de saltos o desalineaciones visuales al cambiar de pantalla:
+1. **El contenedor [`AppLayout.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/components/layout/AppLayout/AppLayout.module.css) es el ÚNICO dueño de los márgenes y rellenos perimetrales exteriores:**
+   - **Márgenes laterales (Eje X):**
+     - Mobile (`<= 767px`): `var(--container-px-mobile, 20px)`.
+     - Tablet (`768px - 1024px`): `var(--container-px-tablet, 32px)`.
+     - Desktop (`> 1024px`): `var(--container-px-desktop, 48px)`.
+     - *Prohibición:* Ninguna página o módulo hijo dentro de `/app/*` puede declarar `padding-inline` propio, `max-width` artificial centrado con `margin: 0 auto` (como el previo `1440px` de Análisis), ni márgenes que desplacen los bordes izquierdo o derecho respecto al resto de la aplicación.
+   - **Margen inferior y despeje de barra flotante (Eje Y Bottom en Móvil):**
+     - La barra de navegación móvil [`MobileBottomNav`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/components/layout/MobileBottomNav/MobileBottomNav.module.css) mide 56px de alto y flota a `calc(24px + env(safe-area-inset-bottom, 0px))`.
+     - `AppLayout.module.css` gestiona centralizadamente el despeje mediante `.main { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }` y `.content { padding-bottom: 24px; }`.
+     - *Prohibición:* Queda terminantemente prohibido que módulos o vistas hijas agreguen `padding-bottom` con `safe-area-inset-bottom` o reservas extras (como los previos `88px` de Dashboard, `96px` de BilleteraDetalle o `88px` de Tools). Esto duplicaba el despeje generando vacíos blancos antiestéticos al llegar al final del scroll.
+   - **Margen superior en escritorio (Eje Y Top en Desktop):**
+     - El encabezado desktop unificado es flotante (`56px` + `12px` top) y `AppLayout.module.css` aplica `padding-top: 68px` en `.main` y `padding: 40px ...` en `.content`.
+     - *Prohibición:* Las páginas hijas inician inmediatamente con su encabezado a `padding: 0`. Prohibido añadir `padding-top: 24px` propio en desktop (como el previo en `LoQueSeRepitePage`), que hacía descender el título respecto a las demás pantallas.
+
+### 17.2 Tokens Canónicos de Ritmo Vertical entre Bloques
+Los contenedores principales de página (`.page`, `.root`, `.container`) se estructuran como columnas flexibles con la escala canónica:
+- **En Celular (`max-width: 767px`):** `gap: var(--module-gap-mobile, 16px);` (o `20px` según densidad).
+- **En Computadora (`min-width: 768px`):** `gap: var(--module-gap-desktop, 24px);`.
+- **Prohibición de espaciadores artificiales:** Prohibido el uso de pseudoelementos `::after` con alturas fijas (`16px`, `32px`, `36px`) para forzar holgura al final de las páginas.
+
+### 17.3 Plantilla Base para la Raíz de Nuevos Módulos
+```css
+/* MiModuloPage.module.css */
+.page {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--module-gap-mobile, 16px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding-top: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .page {
+    gap: var(--module-gap-desktop, 24px);
+  }
+}
+```
+
+
 

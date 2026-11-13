@@ -1,27 +1,13 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding-bottom: 40px;
-}
-
-@media (max-width: 767px) {
-  .root {
-    gap: 16px;
-    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-  }
+  gap: 16px;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
   .root {
     gap: 24px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .root {
-    min-height: 100%;
-    padding-bottom: 0;
   }
 }
 

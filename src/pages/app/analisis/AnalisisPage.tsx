@@ -9,15 +9,14 @@ import {
   Activity,
   Sparkles,
 } from '@/components/ui/icons'
-import { PageSummaryBar } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import NumerosPrincipales from './NumerosPrincipales'
 import analisisService, {
   type AnalisisResumenResponse,
   type MonedaModoAnalisis,
   type AnalisisQueryParams,
   type SerieEvolucionPersonalizada,
 } from '@/services/analisis.service'
-import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { sileo } from 'sileo'
@@ -42,11 +41,11 @@ const VISTAS_PRINCIPALES: Array<{
   titulo: string
   icon: typeof TrendingUp
 }> = [
-  { id: 'evolucion', titulo: 'Evolución', icon: TrendingUp },
-  { id: 'categorias', titulo: 'Categorías', icon: PieChart },
-  { id: 'comparativa', titulo: 'Comparar', icon: ArrowLeftRight },
-  { id: 'proyeccion', titulo: 'Proyección', icon: Calendar },
-]
+    { id: 'evolucion', titulo: 'Evolución', icon: TrendingUp },
+    { id: 'categorias', titulo: 'Categorías', icon: PieChart },
+    { id: 'comparativa', titulo: 'Comparar', icon: ArrowLeftRight },
+    { id: 'proyeccion', titulo: 'Proyección', icon: Calendar },
+  ]
 
 export default function AnalisisPage() {
   const { lastDataUpdate } = useNotificaciones()
@@ -196,71 +195,12 @@ export default function AnalisisPage() {
           </div>
 
           {/* ── Hero Resumen (Card Marino unificado) ── */}
-          <PageSummaryBar
-            className={styles.summaryBar}
-            items={[
-              {
-                label: 'Te quedó',
-                value:
-                  loading && !data
-                    ? '...'
-                    : data?.kpis.balance_neto !== null && data?.kpis.balance_neto !== undefined
-                      ? `${(data.kpis.balance_neto) < 0 ? '-' : '+'}${formatMonto(
-                          Math.abs(data.kpis.balance_neto),
-                          monedaVisual
-                        )}`
-                      : '—',
-                highlight: true,
-                valueColor:
-                  data?.kpis.balance_neto !== null && (data?.kpis.balance_neto ?? 0) < 0
-                    ? '#FF8A65'
-                    : undefined,
-              },
-              {
-                label: 'Ingresos',
-                value:
-                  loading && !data
-                    ? '...'
-                    : data?.kpis.ingresos_totales !== null && data?.kpis.ingresos_totales !== undefined
-                      ? `+${formatMonto(data.kpis.ingresos_totales, monedaVisual)}`
-                      : '—',
-                valueColor: '#4CAF7D',
-              },
-              {
-                label: 'Egresos',
-                value:
-                  loading && !data
-                    ? '...'
-                    : `-${formatMonto(data?.kpis.gastos_totales ?? 0, monedaVisual)}`,
-                valueColor: '#FF8A65',
-              },
-              {
-                label: 'Te quedó (%)',
-                value:
-                  loading && !data
-                    ? '...'
-                    : data?.kpis.tasa_ahorro_pct !== null && data?.kpis.tasa_ahorro_pct !== undefined
-                      ? `${data.kpis.tasa_ahorro_pct}%`
-                      : '—',
-                valueColor:
-                  data?.kpis.tasa_ahorro_pct !== null && (data?.kpis.tasa_ahorro_pct ?? 0) >= 20
-                    ? '#4CAF7D'
-                    : data?.kpis.tasa_ahorro_pct !== null && (data?.kpis.tasa_ahorro_pct ?? 0) < 0
-                      ? '#FF8A65'
-                      : undefined,
-              },
-            ]}
+          <NumerosPrincipales
+            data={data}
+            loading={loading}
+            monedaVisual={monedaVisual}
+            hayFiltroCategoriaOTarjeta={Boolean(queryParams.categoria_id || queryParams.tarjeta_id)}
           />
-          {Boolean(queryParams.categoria_id || queryParams.tarjeta_id) && (
-            <p className={styles.subtitle} style={{ margin: '4px 0 0', textAlign: 'right' }}>
-              Con este filtro solo se ven gastos.
-            </p>
-          )}
-          {data?.kpis.variacion_texto && (
-            <p className={styles.subtitle} style={{ margin: '4px 0 0', textAlign: 'right' }}>
-              {data.kpis.variacion_texto}
-            </p>
-          )}
 
           {/* Cuadro del Gráfico Protagonista */}
           <div className={styles.stageViewport}>
@@ -268,7 +208,7 @@ export default function AnalisisPage() {
               <EvolucionCiclosCard
                 serie={data?.serie_ciclos ?? []}
                 monedaVisual={monedaVisual}
-                promedioHistoricoGastos={data?.kpis.promedio_gasto_ciclo ?? 0}
+                promedioHistoricoGastos={data?.kpis.promedio_gasto_ciclo ?? null}
                 modoGrafico={modoEvolucion}
                 seriesPersonalizadas={seriesPersonalizadas}
                 loading={loading}
@@ -457,12 +397,12 @@ export default function AnalisisPage() {
             <div className={styles.sectionLabelRow}>
               <span className={styles.sectionLabel}>Moneda</span>
               {esConsolidado && (
-                data?.movimientos_sin_cotizacion && data.movimientos_sin_cotizacion > 0 ? (
-                  <span className={styles.tcInlineBadge}>
-                    {data.movimientos_sin_cotizacion} movimientos en dólares no se pudieron pasar a pesos porque falta la cotización de esos días.
+                data?.aviso_cotizacion ? (
+                  <span className={styles.subtitle}>
+                    {data.aviso_cotizacion}
                   </span>
                 ) : data?.cotizacion_referencia?.texto ? (
-                  <span className={styles.tcInlineBadge}>
+                  <span className={styles.subtitle}>
                     {data.cotizacion_referencia.texto}
                   </span>
                 ) : null

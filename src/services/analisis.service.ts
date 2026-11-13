@@ -23,6 +23,7 @@ export interface AnalisisKpis {
   gastos_totales: number
   balance_neto: number | null
   tasa_ahorro_pct: number | null
+  tasa_ahorro_texto: string | null
   promedio_gasto_ciclo: number | null
   promedio_ingreso_ciclo: number | null
   variacion_gasto_vs_anterior_pct: number | null
@@ -104,6 +105,7 @@ export interface AnalisisResumenResponse {
   moneda_visual: 'ARS' | 'USD'
   cotizacion_referencia: AnalisisCotizacionRef
   movimientos_sin_cotizacion?: number
+  aviso_cotizacion: string | null
   periodo_seleccionado: AnalisisPeriodoInfo
   kpis: AnalisisKpis
   insights: AnalisisInsight[]

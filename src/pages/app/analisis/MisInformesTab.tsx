@@ -2,25 +2,20 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   FileSpreadsheet,
   Plus,
-  Trash2,
-  Edit3,
   Download,
   Sparkles,
-  Check,
   ArrowLeft,
   PieChart,
 } from '@/components/ui/icons'
-import SegmentedControl from '@/components/ui/SegmentedControl'
 import { Button } from '@/components/ui'
 import analisisService, {
   type AnalisisResumenResponse,
-  type BloqueInformeConfig,
-  type ConfiguracionInforme,
   type InformePersonalizadoItem,
-  type MonedaModoAnalisis,
-  type NaturalezaGastoFiltro,
-  type TipoBloqueInforme,
 } from '@/services/analisis.service'
+import {
+  PLANTILLAS_RAPIDAS,
+  type PlantillaRapidaItem,
+} from './plantillasInforme'
 import { formatMonto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
@@ -29,120 +24,15 @@ import DesgloseCategoriasCard from './DesgloseCategoriasCard'
 import ComparativaCiclosCard from './ComparativaCiclosCard'
 import ProyeccionCuotasCard from './ProyeccionCuotasCard'
 import { exportarAnalisisPdf } from './exportarAnalisisPdf'
+import InformeEditor from './InformeEditor'
+import InformeTarjeta, { PlantillaTarjeta } from './InformeTarjeta'
 import styles from './MisInformesTab.module.css'
-
-const CATALOGO_BLOQUES: Array<{
-  tipo: TipoBloqueInforme
-  titulo: string
-  descripcion: string
-}> = [
-  {
-    tipo: 'kpis',
-    titulo: 'Números principales',
-    descripcion: 'Lo que entró, lo que salió y lo que te quedó.',
-  },
-  {
-    tipo: 'evolucion_ciclos',
-    titulo: 'Evolución Ciclo a Ciclo',
-    descripcion: 'Lo que entró, lo que salió y lo que te quedó en cada ciclo.',
-  },
-  {
-    tipo: 'desglose_categorias',
-    titulo: 'Desglose por Categorías y Subcategorías',
-    descripcion: 'En qué se fue la plata, hasta cada movimiento.',
-  },
-  {
-    tipo: 'comparativa_ciclos',
-    titulo: 'Comparar dos ciclos',
-    descripcion: 'Qué cambió entre dos ciclos, rubro por rubro.',
-  },
-  {
-    tipo: 'proyeccion_cuotas',
-    titulo: 'Proyección de Tarjetas y Cuotas',
-    descripcion: 'Lo que ya tenés comprometido en cuotas y suscripciones, y cuándo se te libera.',
-  },
-]
-
-const PLANTILLAS_RAPIDAS: Array<{
-  id: string
-  nombre: string
-  descripcion: string
-  configuracion: ConfiguracionInforme
-}> = [
-  {
-    id: 'tpl-cierre-ciclo',
-    nombre: 'Resumen del ciclo',
-    descripcion:
-      'Resumen integral del último semestre con evolución, ranking de categorías y comparativa contra el ciclo anterior.',
-    configuracion: {
-      moneda_modo: 'solo_ars',
-      ciclos: 6,
-      naturaleza: 'todos',
-      bloques: [
-        { id: 'b-kpis', tipo: 'kpis', titulo: 'Números principales' },
-        { id: 'b-evol', tipo: 'evolucion_ciclos', titulo: 'Evolución por Ciclos' },
-        { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Desglose por Categorías' },
-        { id: 'b-comp', tipo: 'comparativa_ciclos', titulo: 'Comparar dos ciclos' },
-      ],
-    },
-  },
-  {
-    id: 'tpl-variables-hormiga',
-    nombre: 'Gastos del día a día',
-    descripcion:
-      'Filtra exclusivamente consumos del día a día de los últimos 3 ciclos para detectar cambios cotidianos.',
-    configuracion: {
-      moneda_modo: 'solo_ars',
-      ciclos: 3,
-      naturaleza: 'variables',
-      bloques: [
-        { id: 'b-kpis', tipo: 'kpis', titulo: 'Números del día a día' },
-        { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Rubros del día a día' },
-        { id: 'b-comp', tipo: 'comparativa_ciclos', titulo: 'Diferencias' },
-      ],
-    },
-  },
-  {
-    id: 'tpl-tarjetas-cuotas',
-    nombre: 'Compromisos de Tarjetas y Cuotas',
-    descripcion:
-      'Enfocado en compras financiadas y proyección futura de liberación de límite y flujo mensual.',
-    configuracion: {
-      moneda_modo: 'solo_ars',
-      ciclos: 6,
-      naturaleza: 'cuotas',
-      bloques: [
-        { id: 'b-kpis', tipo: 'kpis', titulo: 'Números principales' },
-        { id: 'b-proy', tipo: 'proyeccion_cuotas', titulo: 'Proyección de Cuotas y Suscripciones' },
-        { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Compras en cuotas por rubro' },
-      ],
-    },
-  },
-]
 
 export default function MisInformesTab() {
   const [informes, setInformes] = useState<InformePersonalizadoItem[]>([])
   const [loadingList, setLoadingList] = useState<boolean>(true)
-
-  // Vista activa: 'galeria' | 'constructor' | 'visor'
   const [modoVista, setModoVista] = useState<'galeria' | 'constructor' | 'visor'>('galeria')
   const [activeInforme, setActiveInforme] = useState<InformePersonalizadoItem | null>(null)
-
-  // Estado del formulario constructor
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [formNombre, setFormNombre] = useState<string>('Mi Informe Financiero')
-  const [formDesc, setFormDesc] = useState<string>('')
-  const [formMoneda, setFormMoneda] = useState<MonedaModoAnalisis>('solo_ars')
-  const [formCiclos, setFormCiclos] = useState<number>(6)
-  const [formNaturaleza, setFormNaturaleza] = useState<NaturalezaGastoFiltro>('todos')
-  const [formBloques, setFormBloques] = useState<TipoBloqueInforme[]>([
-    'kpis',
-    'evolucion_ciclos',
-    'desglose_categorias',
-  ])
-  const [saving, setSaving] = useState<boolean>(false)
-
-  // Datos cargados para el visor del informe activo
   const [visorData, setVisorData] = useState<AnalisisResumenResponse | null>(null)
   const [loadingVisor, setLoadingVisor] = useState<boolean>(false)
   const [exportingExcel, setExportingExcel] = useState<boolean>(false)
@@ -214,91 +104,13 @@ export default function MisInformesTab() {
   }, [modoVista, visorQueryParams])
 
   const handleIniciarNuevo = () => {
-    setEditingId(null)
-    setFormNombre('Informe Personalizado')
-    setFormDesc('Análisis a medida de mis ciclos y categorías')
-    setFormMoneda('solo_ars')
-    setFormCiclos(6)
-    setFormNaturaleza('todos')
-    setFormBloques(['kpis', 'evolucion_ciclos', 'desglose_categorias', 'comparativa_ciclos'])
+    setActiveInforme(null)
     setModoVista('constructor')
   }
 
   const handleEditarInforme = (inf: InformePersonalizadoItem) => {
-    setEditingId(inf.id)
-    setFormNombre(inf.nombre)
-    setFormDesc(inf.descripcion ?? '')
-    setFormMoneda(inf.configuracion.moneda_modo ?? 'solo_ars')
-    setFormCiclos(inf.configuracion.ciclos ?? 6)
-    setFormNaturaleza(inf.configuracion.naturaleza ?? 'todos')
-    setFormBloques(
-      inf.configuracion.bloques?.map((b) => b.tipo) ?? [
-        'kpis',
-        'evolucion_ciclos',
-        'desglose_categorias',
-      ]
-    )
+    setActiveInforme(inf)
     setModoVista('constructor')
-  }
-
-  const handleToggleBloque = (tipo: TipoBloqueInforme) => {
-    setFormBloques((prev) => {
-      if (prev.includes(tipo)) {
-        if (prev.length <= 1) return prev
-        return prev.filter((t) => t !== tipo)
-      }
-      return [...prev, tipo]
-    })
-  }
-
-  const handleGuardarInforme = async () => {
-    if (!formNombre.trim()) {
-      sileo.error({ title: 'Ingresá un nombre para el informe.' })
-      return
-    }
-    setSaving(true)
-    const bloquesConfig: BloqueInformeConfig[] = formBloques.map((t, idx) => {
-      const meta = CATALOGO_BLOQUES.find((c) => c.tipo === t)
-      return {
-        id: `bloque-${idx}-${t}`,
-        tipo: t,
-        titulo: meta?.titulo ?? t,
-      }
-    })
-    const configuracion: ConfiguracionInforme = {
-      moneda_modo: formMoneda,
-      ciclos: formCiclos,
-      naturaleza: formNaturaleza,
-      bloques: bloquesConfig,
-    }
-
-    try {
-      if (editingId) {
-        const actualizado = await analisisService.updateInforme(editingId, {
-          nombre: formNombre.trim(),
-          descripcion: formDesc.trim() || null,
-          configuracion,
-        })
-        setInformes((prev) => prev.map((item) => (item.id === editingId ? actualizado : item)))
-        setActiveInforme(actualizado)
-        sileo.success({ title: 'Informe actualizado.' })
-      } else {
-        const creado = await analisisService.createInforme({
-          nombre: formNombre.trim(),
-          descripcion: formDesc.trim() || null,
-          icono: 'pie-chart',
-          configuracion,
-        })
-        setInformes((prev) => [creado, ...prev])
-        setActiveInforme(creado)
-        sileo.success({ title: 'Informe guardado en tu cuenta.' })
-      }
-      setModoVista('visor')
-    } catch (err) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos guardar el informe.') })
-    } finally {
-      setSaving(false)
-    }
   }
 
   const handleEliminarInforme = async (id: string) => {
@@ -311,7 +123,7 @@ export default function MisInformesTab() {
     }
   }
 
-  const handleAbrirPlantilla = (tpl: (typeof PLANTILLAS_RAPIDAS)[number]) => {
+  const handleAbrirPlantilla = (tpl: PlantillaRapidaItem) => {
     const virtualInforme: InformePersonalizadoItem = {
       id: tpl.id,
       nombre: tpl.nombre,
@@ -326,7 +138,7 @@ export default function MisInformesTab() {
     setModoVista('visor')
   }
 
-  const handleGuardarCopiaPlantilla = async (tpl: (typeof PLANTILLAS_RAPIDAS)[number]) => {
+  const handleGuardarCopiaPlantilla = async (tpl: PlantillaRapidaItem) => {
     try {
       const creado = await analisisService.createInforme({
         nombre: tpl.nombre.trim(),
@@ -379,143 +191,23 @@ export default function MisInformesTab() {
 
   if (modoVista === 'constructor') {
     return (
-      <section className={styles.builderCard} aria-label="Constructor de informe personalizado">
-        <header className={styles.builderHeader}>
-          <button
-            type="button"
-            className={styles.backBtn}
-            onClick={() => setModoVista('galeria')}
-          >
-            <ArrowLeft size={16} />
-            <span>Volver a Mis Informes</span>
-          </button>
-
-          <h2 className={styles.builderTitle}>
-            {editingId ? 'Editar Informe Personalizado' : 'Crear Nuevo Informe por Bloques'}
-          </h2>
-        </header>
-
-        <div className={styles.formGrid}>
-          <div className={styles.fieldGroup}>
-            <label htmlFor="inf-nombre" className={styles.fieldLabel}>
-              Nombre del informe
-            </label>
-            <input
-              id="inf-nombre"
-              type="text"
-              className={styles.textInput}
-              value={formNombre}
-              onChange={(e) => setFormNombre(e.target.value)}
-              placeholder="Ej: Cierre mensual familiar"
-              maxLength={120}
-            />
-          </div>
-
-          <div className={styles.fieldGroup}>
-            <label htmlFor="inf-desc" className={styles.fieldLabel}>
-              Descripción (opcional)
-            </label>
-            <input
-              id="inf-desc"
-              type="text"
-              className={styles.textInput}
-              value={formDesc}
-              onChange={(e) => setFormDesc(e.target.value)}
-              placeholder="Ej: Seguimiento de gastos variables y tarjetas"
-              maxLength={300}
-            />
-          </div>
-        </div>
-
-        <div className={styles.configRow}>
-          <div className={styles.fieldGroup}>
-            <span className={styles.fieldLabel}>Moneda por defecto</span>
-            <SegmentedControl
-              options={[
-                { value: 'solo_ars', label: 'Pesos' },
-                { value: 'solo_usd', label: 'Dólares' },
-                { value: 'consolidado_ars', label: 'Todo pasado a pesos' },
-                { value: 'consolidado_usd', label: 'Todo pasado a dólares' },
-              ]}
-              value={formMoneda}
-              onChange={(v: string) => setFormMoneda(v as MonedaModoAnalisis)}
-              ariaLabel="Moneda del informe"
-              layout="wrap"
-            />
-          </div>
-
-          <div className={styles.fieldGroup}>
-            <span className={styles.fieldLabel}>Cuántos ciclos ver</span>
-            <SegmentedControl
-              options={[
-                { value: '1', label: 'Ciclo actual' },
-                { value: '3', label: '3 ciclos' },
-                { value: '6', label: '6 ciclos' },
-                { value: '12', label: '12 ciclos' },
-              ]}
-              value={String(formCiclos)}
-              onChange={(v: string) => setFormCiclos(Number(v))}
-              ariaLabel="Cuántos ciclos ver en el informe"
-              layout="inline"
-            />
-          </div>
-
-          <div className={styles.fieldGroup}>
-            <span className={styles.fieldLabel}>Tipo de gasto</span>
-            <SegmentedControl
-              options={[
-                { value: 'todos', label: 'Todos' },
-                { value: 'variables', label: 'Día a día' },
-                { value: 'fijos', label: 'Fijos y suscripciones' },
-                { value: 'cuotas', label: 'Cuotas' },
-              ]}
-              value={formNaturaleza}
-              onChange={(v: string) => setFormNaturaleza(v as NaturalezaGastoFiltro)}
-              ariaLabel="Tipo de gasto del informe"
-              layout="wrap"
-            />
-          </div>
-        </div>
-
-        <div className={styles.blocksPicker}>
-          <span className={styles.fieldLabel}>
-            Elegí qué bloques analíticos incluir en este informe ({formBloques.length}{' '}
-            seleccionados)
-          </span>
-
-          <div className={styles.blocksGrid}>
-            {CATALOGO_BLOQUES.map((b) => {
-              const active = formBloques.includes(b.tipo)
-              return (
-                <button
-                  key={b.tipo}
-                  type="button"
-                  className={`${styles.blockOption} ${active ? styles.blockOptionActive : ''}`}
-                  onClick={() => handleToggleBloque(b.tipo)}
-                >
-                  <div className={styles.blockCheck}>
-                    {active && <Check size={14} />}
-                  </div>
-                  <div className={styles.blockTexts}>
-                    <span className={styles.blockTitle}>{b.titulo}</span>
-                    <span className={styles.blockDesc}>{b.descripcion}</span>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        <footer className={styles.builderFooter}>
-          <Button variant="secondary" onClick={() => setModoVista('galeria')}>
-            Cancelar
-          </Button>
-          <Button onClick={() => void handleGuardarInforme()} disabled={saving}>
-            <Check size={16} />
-            <span>{saving ? 'Guardando...' : 'Guardar y Abrir Informe'}</span>
-          </Button>
-        </footer>
-      </section>
+      <InformeEditor
+        initialInforme={activeInforme}
+        onCancelar={() => setModoVista('galeria')}
+        onGuardarExito={(guardado) => {
+          setInformes((prev) => {
+            const idx = prev.findIndex((i) => i.id === guardado.id)
+            if (idx >= 0) {
+              const copy = [...prev]
+              copy[idx] = guardado
+              return copy
+            }
+            return [guardado, ...prev]
+          })
+          setActiveInforme(guardado)
+          setModoVista('visor')
+        }}
+      />
     )
   }
 
@@ -607,7 +299,7 @@ export default function MisInformesTab() {
               <EvolucionCiclosCard
                 serie={visorData.serie_ciclos}
                 monedaVisual={monedaVis}
-                promedioHistoricoGastos={visorData.kpis.promedio_gasto_ciclo ?? 0}
+                promedioHistoricoGastos={visorData.kpis.promedio_gasto_ciclo ?? null}
               />
             )}
 
@@ -681,59 +373,16 @@ export default function MisInformesTab() {
       ) : (
         <div className={styles.reportsGrid}>
           {informes.map((inf) => (
-            <article key={inf.id} className={styles.reportCard}>
-              <div className={styles.reportCardTop}>
-                <div className={styles.reportIconBox}>
-                  <FileSpreadsheet size={18} />
-                </div>
-                <div className={styles.reportCardActions}>
-                  <button
-                    type="button"
-                    className={styles.iconActionBtn}
-                    onClick={() => handleEditarInforme(inf)}
-                    aria-label="Editar informe"
-                    title="Editar bloques"
-                  >
-                    <Edit3 size={15} />
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.iconActionBtnDanger}
-                    onClick={() => void handleEliminarInforme(inf.id)}
-                    aria-label="Eliminar informe"
-                    title="Eliminar informe"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              </div>
-
-              <h3 className={styles.reportName}>{inf.nombre}</h3>
-              <p className={styles.reportDesc}>
-                {inf.descripcion || 'Informe personalizado por bloques'}
-              </p>
-
-              <div className={styles.badgesRow}>
-                <span className={styles.metaBadge}>
-                  {inf.configuracion.ciclos ?? 6} ciclos
-                </span>
-                <span className={styles.metaBadge}>
-                  {(inf.configuracion.moneda_modo ?? 'solo_ars').toUpperCase().replace('_', ' ')}
-                </span>
-                <span className={styles.metaBadge}>
-                  {inf.configuracion.bloques?.length ?? 0} bloques
-                </span>
-              </div>
-
-              <Button
-                onClick={() => {
-                  setActiveInforme(inf)
-                  setModoVista('visor')
-                }}
-              >
-                Abrir Informe
-              </Button>
-            </article>
+            <InformeTarjeta
+              key={inf.id}
+              informe={inf}
+              onEditar={handleEditarInforme}
+              onEliminar={(id) => void handleEliminarInforme(id)}
+              onAbrir={(inf) => {
+                setActiveInforme(inf)
+                setModoVista('visor')
+              }}
+            />
           ))}
         </div>
       )}
@@ -747,30 +396,15 @@ export default function MisInformesTab() {
 
         <div className={styles.reportsGrid}>
           {PLANTILLAS_RAPIDAS.map((tpl) => (
-            <article key={tpl.id} className={styles.templateCard}>
-              <h4 className={styles.reportName}>{tpl.nombre}</h4>
-              <p className={styles.reportDesc}>{tpl.descripcion}</p>
-
-              <div className={styles.badgesRow}>
-                <span className={styles.metaBadge}>{tpl.configuracion.ciclos} ciclos</span>
-                <span className={styles.metaBadge}>
-                  {tpl.configuracion.bloques.length} bloques incluidos
-                </span>
-              </div>
-
-              <div className={styles.templateBtns}>
-                <Button variant="secondary" onClick={() => handleAbrirPlantilla(tpl)}>
-                  Ver ahora
-                </Button>
-                <Button onClick={() => void handleGuardarCopiaPlantilla(tpl)}>
-                  Guardar en mi cuenta
-                </Button>
-              </div>
-            </article>
+            <PlantillaTarjeta
+              key={tpl.id}
+              plantilla={tpl}
+              onVerAhora={handleAbrirPlantilla}
+              onGuardarCopia={(t) => void handleGuardarCopiaPlantilla(t)}
+            />
           ))}
         </div>
       </div>
     </div>
   )
 }
-

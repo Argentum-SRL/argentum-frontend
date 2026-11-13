@@ -23,7 +23,7 @@ import styles from './EvolucionCiclosCard.module.css'
 interface EvolucionCiclosCardProps {
   serie: AnalisisCicloPunto[]
   monedaVisual: 'ARS' | 'USD'
-  promedioHistoricoGastos: number
+  promedioHistoricoGastos: number | null
   modoGrafico?: 'combinado' | 'barras' | 'lineas'
   seriesPersonalizadas?: SerieEvolucionPersonalizada[]
   loading?: boolean
@@ -179,7 +179,9 @@ export default function EvolucionCiclosCard({
               <p className={styles.subtitle}>
                 {esModoPersonalizado
                   ? `Promedio selección: ${formatMonto(avgCustomSeries, monedaVisual)}/ciclo · Tocá una serie para encenderla o apagarla`
-                  : `Ingresos vs. Gastos y línea de promedio histórico (${formatMonto(promedioHistoricoGastos, monedaVisual)})`}
+                  : promedioHistoricoGastos !== null
+                    ? `Ingresos vs. Gastos y línea de promedio histórico (${formatMonto(promedioHistoricoGastos, monedaVisual)})`
+                    : 'Ingresos vs. Gastos'}
               </p>
             </div>
           </div>
@@ -397,7 +399,7 @@ export default function EvolucionCiclosCard({
               />
 
               {/* Línea de referencia de promedio */}
-              {!esModoPersonalizado && promedioHistoricoGastos > 0 && (
+              {!esModoPersonalizado && promedioHistoricoGastos !== null && promedioHistoricoGastos > 0 && (
                 <ReferenceLine
                   y={promedioHistoricoGastos}
                   stroke={avgLineColor}

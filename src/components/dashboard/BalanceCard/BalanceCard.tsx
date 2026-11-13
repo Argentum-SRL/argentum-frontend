@@ -59,8 +59,8 @@ const formatCompromisoNombre = (item: CompromisoItem): string => {
       .replace(/^Parte en d[oó]lares de\s+/i, '')
       .replace(/\s+que se paga con pesos$/i, '')
       .trim()
-    if (!/\(usd\)$/i.test(name)) {
-      name = `${name} (USD)`
+    if (!/\((?:usd|d[oó]lares)\)$/i.test(name)) {
+      name = `${name} (Dólares)`
     }
     return name
   }

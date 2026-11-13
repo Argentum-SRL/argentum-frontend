@@ -44,6 +44,7 @@ export const ERROR_MAP: Record<string, string> = {
   "El nombre de la billetera no puede estar vacío.": "El nombre de la billetera no puede estar vacío.",
   "No podés cambiar la moneda de una billetera que ya tiene transacciones o transferencias asociadas.": "No podés cambiar la moneda de una billetera que ya tiene transacciones o transferencias asociadas.",
   "Las billeteras de efectivo (ARS/USD) no pueden eliminarse": "Las billeteras de efectivo no pueden eliminarse.",
+  "Las billeteras de efectivo no pueden eliminarse": "Las billeteras de efectivo no pueden eliminarse.",
   "No se puede eliminar la billetera porque tiene transacciones asociadas. Por favor, archivala para mantener el historial.": "No podés eliminar una billetera con transacciones asociadas. Te sugerimos archivarla.",
   "No se puede eliminar la billetera porque tiene transferencias internas asociadas. Por favor, archivala.": "No podés eliminar una billetera con transferencias asociadas. Te sugerimos archivarla.",
   "No se puede eliminar la billetera porque tiene suscripciones activas asociadas. Por favor, archivala o cancelá las suscripciones.": "No podés eliminar una billetera con suscripciones activas asociadas.",

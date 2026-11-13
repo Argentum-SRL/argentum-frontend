@@ -57,6 +57,9 @@ export const RULE_DEFS = {
   R31: 'regla :hover con transform/scale/translate fuera de @media (hover: hover) en el alcance decisión 3',
   R32: 'input, textarea o select real con tamaño de fuente resuelto < 16px en pantallas móviles (<= 768px)',
   R33: 'fila de botones del footer de modal con separación (gap) distinta de var(--modal-footer-btn-gap)',
+  R34: 'Elemento <select> nativo en páginas o componentes de la app (requiere SelectInput o componente unificado de dropdown)',
+  R35: 'Margen o padding perimetral redundante en raíces de módulos de páginas (pages/app/**) que duplique el shell AppLayout',
+  R36: 'Texto visible al usuario con códigos de moneda "ARS" o "USD" en lugar de "Pesos" o "Dólares" en la UI de la app (pages/app/** y components/**)',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
@@ -99,7 +102,7 @@ function auditCssFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
-    R32: 0, R33: 0,
+    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -507,6 +510,32 @@ function auditCssFile(filePath, relPath, content) {
     violations.R31 += checkHoverTransformOutsideMedia(cleanContent);
   }
 
+  // R35: Margen o padding perimetral redundante en raíces de módulos de páginas (pages/app/**)
+  const isAppModuleCss = (relPath.startsWith('pages/app/') || relPath.startsWith('pages\\app\\')) &&
+    /(?:Page|Card)\.(?:module|parte\d+)\.css$/i.test(relPath);
+
+  if (isAppModuleCss) {
+    const blocks = parseCssBlocks(cleanContent);
+    for (const b of blocks) {
+      const sel = b.selector.toLowerCase();
+      // Selectores de raíz de página o contenedores perimetrales
+      if (/^\.(?:page|root|container|sections)\b/.test(sel)) {
+        // 1. Prohibir max-width con centrado automático en raíz que rompa alineación
+        if (/max-width\s*:\s*\d+px/i.test(b.body) && /margin\s*:\s*0\s+auto/i.test(b.body)) {
+          violations.R35++;
+        }
+        // 2. Prohibir padding-bottom con safe-area-inset-bottom (duplica despeje AppLayout)
+        if (/padding-bottom\s*:[^;]*env\s*\(\s*safe-area-inset-bottom/i.test(b.body)) {
+          violations.R35++;
+        }
+        // 3. Prohibir padding-inline en raíz de página (duplica márgenes perimetrales del shell)
+        if (/padding-inline\s*:/i.test(b.body)) {
+          violations.R35++;
+        }
+      }
+    }
+  }
+
   return violations;
 }
 
@@ -554,7 +583,7 @@ function auditTsxFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
-    R32: 0, R33: 0,
+    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0,
   };
 
   const fileName = path.basename(filePath);
@@ -803,6 +832,55 @@ function auditTsxFile(filePath, relPath, content) {
       ts.forEachChild(n, ch => checkFooters(ch, curFooter));
     }
     checkFooters(sf, false);
+  }
+
+  // R34: Elemento <select> nativo en páginas o componentes de la app (pages/app/**)
+  const isAppPageTsx = relPath.startsWith('pages/app/') || relPath.startsWith('pages\\app\\');
+  if (isAppPageTsx) {
+    const lines = content.split('\n');
+    for (const l of lines) {
+      const trimmed = l.trim();
+      if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+      if (/<select\b/i.test(l)) {
+        violations.R34++;
+      }
+    }
+  }
+
+  // R36: Texto visible con 'ARS' o 'USD' en lugar de 'Pesos' o 'Dólares'
+  const isTargetR36 = relPath.startsWith('pages/app/') || relPath.startsWith('pages\\app\\') ||
+                      relPath.startsWith('components/') || relPath.startsWith('components\\');
+  if (isTargetR36 && !relPath.includes('.test.') && !relPath.includes('/admin/') && !relPath.includes('\\admin\\')) {
+    const lines = content.split('\n');
+    for (let idx = 0; idx < lines.length; idx++) {
+      const rawLine = lines[idx];
+      const trimmed = rawLine.trim();
+      if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+
+      // 1. Texto directo en JSX que contenga la palabra ARS o USD
+      if (/>[^<{}]*\b(?:ARS|USD)\b[^<{}]*</.test(trimmed)) {
+        violations.R36++;
+      }
+
+      // 2. Propiedades de texto visibles (label, title, placeholder, description, subtitle) con ARS o USD
+      if (/\b(?:label|title|description|placeholder|subtitle)\s*[:=]\s*['"`][^'"`]*\b(?:ARS|USD)\b[^'"`]*['"`]/.test(trimmed)) {
+        if (!trimmed.includes("'Pesos'") && !trimmed.includes('"Pesos"')) {
+          violations.R36++;
+        }
+      }
+
+      // 3. Template literals con (ARS) o (USD) literales
+      if (/`[^`]*\((?:ARS|USD)\)[^`]*`/.test(trimmed)) {
+        violations.R36++;
+      }
+
+      // 4. Interpolación directa del código de moneda cruda como label visible
+      if (/\b(?:label|title|description|placeholder|subtitle|name)\s*[:=]\s*`[^`]*\(\s*\$\{[^}]*\bmoneda\b[^}]*\}\s*\)[^`]*`/.test(trimmed)) {
+        if (!trimmed.includes('formatMoneda') && !trimmed.includes('formatMonto') && !trimmed.includes("'Pesos'")) {
+          violations.R36++;
+        }
+      }
+    }
   }
 
   return violations;

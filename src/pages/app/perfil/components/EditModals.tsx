@@ -5,7 +5,7 @@ import type { Usuario } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { Modal, DateInput, type SelectOption } from '@/components/ui'
+import { Modal, DateInput, SelectInput, type SelectOption } from '@/components/ui'
 import styles from '../PerfilPage.module.css'
 
 const OPCIONES_SEXO: SelectOption[] = [
@@ -203,18 +203,13 @@ const DatosPersonalesForm: React.FC<{
               <label htmlFor="modal-sexo" className={styles.fieldLabel}>
                 Sexo / Género
               </label>
-              <select
+              <SelectInput
                 id="modal-sexo"
-                className={`${styles.fieldInput} ${styles.selectInput}`}
                 value={formDatos.sexo}
-                onChange={(e) => setFormDatos({ ...formDatos, sexo: e.target.value })}
-              >
-                {OPCIONES_SEXO.map((op) => (
-                  <option key={op.value} value={op.value}>
-                    {op.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFormDatos({ ...formDatos, sexo: val })}
+                options={OPCIONES_SEXO}
+                placeholder="Seleccionar..."
+              />
             </div>
           </div>
         </div>

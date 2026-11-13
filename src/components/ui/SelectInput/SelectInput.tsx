@@ -20,6 +20,7 @@ interface SelectInputProps {
   disabled?: boolean
   className?: string
   id?: string
+  size?: 'default' | 'sm'
 }
 
 export const SelectInput: React.FC<SelectInputProps> = ({
@@ -32,6 +33,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
   disabled,
   className,
   id,
+  size = 'default',
 }) => {
   const [open, setOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -56,7 +58,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
       : Math.max(8, rect.top - panelHeight - 4)
 
     let left = rect.left
-    const panelWidth = rect.width
+    const panelWidth = Math.max(rect.width, 200)
     if (left + panelWidth > window.innerWidth - 8) {
       left = window.innerWidth - panelWidth - 8
     }
@@ -64,7 +66,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
 
     panelElRef.current.style.top = `${top}px`
     panelElRef.current.style.left = `${left}px`
-    panelElRef.current.style.width = `${rect.width}px`
+    panelElRef.current.style.width = `${panelWidth}px`
   }, [isMobile, options.length])
 
   const panelRef = useCallback((node: HTMLDivElement | null) => {
@@ -159,7 +161,11 @@ export const SelectInput: React.FC<SelectInputProps> = ({
 
   return (
     <div
-      className={[styles.wrapper, className].filter(Boolean).join(' ')}
+      className={[
+        styles.wrapper,
+        size === 'sm' ? styles.sm : '',
+        className,
+      ].filter(Boolean).join(' ')}
       ref={wrapperRef}
     >
       {label && (

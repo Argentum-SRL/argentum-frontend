@@ -4,6 +4,21 @@ import type { InformePersonalizadoItem } from '@/services/analisis.service'
 import type { PlantillaRapidaItem } from './plantillasInforme'
 import styles from './MisInformesTab.module.css'
 
+function formatModoMonedaBadge(modo?: string): string {
+  switch (modo) {
+    case 'solo_ars':
+      return 'Pesos'
+    case 'solo_usd':
+      return 'Dólares'
+    case 'consolidado_ars':
+      return 'Pasado a pesos'
+    case 'consolidado_usd':
+      return 'Pasado a dólares'
+    default:
+      return 'Pesos'
+  }
+}
+
 interface InformeTarjetaProps {
   informe: InformePersonalizadoItem
   onEditar: (inf: InformePersonalizadoItem) => void
@@ -55,7 +70,7 @@ export default function InformeTarjeta({
           {informe.configuracion.ciclos ?? 6} ciclos
         </span>
         <span className={styles.metaBadge}>
-          {(informe.configuracion.moneda_modo ?? 'solo_ars').toUpperCase().replace('_', ' ')}
+          {formatModoMonedaBadge(informe.configuracion.moneda_modo)}
         </span>
         <span className={styles.metaBadge}>
           {informe.configuracion.bloques?.length ?? 0} bloques

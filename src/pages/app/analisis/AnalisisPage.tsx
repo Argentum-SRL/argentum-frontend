@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import { SelectInput, type SelectOption } from '@/components/ui'
 import NumerosPrincipales from './NumerosPrincipales'
 import analisisService, {
   type AnalisisResumenResponse,
@@ -27,6 +28,7 @@ import ProyeccionCuotasCard from './ProyeccionCuotasCard'
 import MisInformesTab from './MisInformesTab'
 import EditorSeriesEvolucionModal from './EditorSeriesEvolucionModal'
 import { exportarAnalisisPdf } from './exportarAnalisisPdf'
+import { formatMoneda } from '@/utils/format'
 import styles from './AnalisisPage.module.css'
 
 type VistaActivaAnalisis =
@@ -144,6 +146,26 @@ export default function AnalisisPage() {
 
   const monedaVisual = data?.moneda_visual ?? (monedaModo.includes('usd') ? 'USD' : 'ARS')
   const esConsolidado = monedaModo === 'consolidado_ars' || monedaModo === 'consolidado_usd'
+
+  const billeteraOptions = useMemo<SelectOption[]>(() => {
+    const list: SelectOption[] = [{ value: 'todos', label: 'Todas las billeteras' }]
+    if (data?.filtros_disponibles.billeteras) {
+      for (const b of data.filtros_disponibles.billeteras) {
+        list.push({ value: b.id, label: `${b.nombre} (${formatMoneda(b.moneda)})` })
+      }
+    }
+    return list
+  }, [data])
+
+  const tarjetaOptions = useMemo<SelectOption[]>(() => {
+    const list: SelectOption[] = [{ value: 'todos', label: 'Todas las tarjetas' }]
+    if (data?.filtros_disponibles.tarjetas) {
+      for (const t of data.filtros_disponibles.tarjetas) {
+        list.push({ value: t.id, label: t.nombre })
+      }
+    }
+    return list
+  }, [data])
 
   const handleExportExcel = async () => {
     setExportingExcel(true)
@@ -493,41 +515,25 @@ export default function AnalisisPage() {
           {/* 6. Billetera y Tarjeta lado a lado */}
           <div className={styles.selectsGrid}>
             <div className={styles.panelSection}>
-              <label htmlFor="analisis-billetera" className={styles.sectionLabel}>
-                Billetera
-              </label>
-              <select
+              <SelectInput
                 id="analisis-billetera"
-                className={styles.filterSelect}
+                label="Billetera"
                 value={billeteraId}
-                onChange={(e) => setBilleteraId(e.target.value)}
-              >
-                <option value="todos">Todas</option>
-                {data?.filtros_disponibles.billeteras.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.nombre} ({b.moneda})
-                  </option>
-                ))}
-              </select>
+                onChange={setBilleteraId}
+                options={billeteraOptions}
+                size="sm"
+              />
             </div>
 
             <div className={styles.panelSection}>
-              <label htmlFor="analisis-tarjeta" className={styles.sectionLabel}>
-                Tarjeta
-              </label>
-              <select
+              <SelectInput
                 id="analisis-tarjeta"
-                className={styles.filterSelect}
+                label="Tarjeta"
                 value={tarjetaId}
-                onChange={(e) => setTarjetaId(e.target.value)}
-              >
-                <option value="todos">Todas</option>
-                {data?.filtros_disponibles.tarjetas.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.nombre}
-                  </option>
-                ))}
-              </select>
+                onChange={setTarjetaId}
+                options={tarjetaOptions}
+                size="sm"
+              />
             </div>
           </div>
 

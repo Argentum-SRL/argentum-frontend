@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   ResponsiveContainer,
   BarChart,
@@ -10,6 +10,7 @@ import {
 } from 'recharts'
 import { ArrowLeftRight, TrendingDown, TrendingUp } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import { SelectInput, type SelectOption } from '@/components/ui'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import analisisService, {
   type AnalisisQueryParams,
@@ -109,6 +110,18 @@ export default function ComparativaCiclosCard({
   const etiquetaA = data?.ciclo_a.etiqueta ?? 'Ciclo A'
   const etiquetaB = data?.ciclo_b.etiqueta ?? 'Ciclo B'
 
+  const cicloOptions = useMemo<SelectOption[]>(() => {
+    if (!data?.ciclos_disponibles) return []
+    return data.ciclos_disponibles.map((c) => ({
+      value: c.clave,
+      label: `${c.etiqueta} (${c.rango_texto})${
+        c.es_actual && c.dias_transcurridos != null && c.dias_totales != null
+          ? ` (en curso: ${c.dias_transcurridos}/${c.dias_totales} d)`
+          : ''
+      }`,
+    }))
+  }, [data])
+
   return (
     <section className={styles.card} aria-label="Comparar dos ciclos">
       <header className={styles.header}>
@@ -143,21 +156,14 @@ export default function ComparativaCiclosCard({
             <label htmlFor="comp-ciclo-a" className={styles.selectLabel}>
               Ciclo evaluado (A)
             </label>
-            <select
+            <SelectInput
               id="comp-ciclo-a"
-              className={styles.selectInput}
+              size="sm"
               value={cicloAKey || data.ciclo_a.clave}
-              onChange={(e) => setCicloAKey(e.target.value)}
-            >
-              {data.ciclos_disponibles.map((c) => (
-                <option key={c.clave} value={c.clave}>
-                  {c.etiqueta} ({c.rango_texto})
-                  {c.es_actual
-                    ? ` (en curso: ${c.dias_transcurridos ?? ''} de ${c.dias_totales ?? ''} días)`
-                    : ''}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setCicloAKey(val)}
+              options={cicloOptions}
+              placeholder="Seleccionar ciclo A..."
+            />
           </div>
 
           <span className={styles.vsBadge}>VS</span>
@@ -166,21 +172,14 @@ export default function ComparativaCiclosCard({
             <label htmlFor="comp-ciclo-b" className={styles.selectLabel}>
               Ciclo de referencia (B)
             </label>
-            <select
+            <SelectInput
               id="comp-ciclo-b"
-              className={styles.selectInput}
+              size="sm"
               value={cicloBKey || data.ciclo_b.clave}
-              onChange={(e) => setCicloBKey(e.target.value)}
-            >
-              {data.ciclos_disponibles.map((c) => (
-                <option key={c.clave} value={c.clave}>
-                  {c.etiqueta} ({c.rango_texto})
-                  {c.es_actual
-                    ? ` (en curso: ${c.dias_transcurridos ?? ''} de ${c.dias_totales ?? ''} días)`
-                    : ''}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setCicloBKey(val)}
+              options={cicloOptions}
+              placeholder="Seleccionar ciclo B..."
+            />
           </div>
         </div>
       )}

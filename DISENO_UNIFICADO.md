@@ -383,6 +383,9 @@ El componente `Modal` soporta la prop `variant?: 'dialog' | 'sheet'` (por defect
 13. ❌ Espaciados no canónicos en CSS de modales/hojas (R20): prohibido margin-top/bottom o gap fuera de 8px, 16px o 24px, o sin usar tokens `var(--modal-*)`.
 14. ❌ Contenedores con overflow que recorta sin padding suficiente para contener sombras o levantamientos (R21).
 15. ❌ Modales con elementos de formulario que no implementen `[data-modal-block]` (R22).
+16. ❌ Elementos `<select>` nativos de HTML en módulos de la app (`pages/app/**`) (R34 = 0). Todo dropdown o selector de opciones debe utilizar `SelectInput` (`@/components/ui/SelectInput`) o superficies de selección unificadas.
+17. ❌ Márgenes perimetrales redundantes en raíces de páginas/módulos (`pages/app/**`) (R35 = 0): prohibido declarar `padding-inline` propio, `max-width` artificial centrado con `margin: 0 auto`, o `padding-bottom` que duplique el despeje de la barra de navegación móvil gestionado por `AppLayout`.
+18. ❌ Textos o etiquetas visibles al usuario con siglas "ARS" o "USD" (R36 = 0). La interfaz debe presentar exclusivamente "Pesos" (en vez de "ARS") y "Dólares" (en vez de "USD"), formateando billeteras con `formatMoneda(moneda)` y montos con `formatMonto(monto, moneda)`.
 
 ---
 
@@ -799,6 +802,40 @@ Los contenedores principales de página (`.page`, `.root`, `.container`) se estr
   }
 }
 ```
+
+---
+
+## 18. Norma Canónica de Listas Desplegables (Dropdowns) y Selectores Unificados
+
+### 18.1 Reemplazo Absoluto de `<select>` Nativo (`SelectInput`)
+Para mantener coherencia estética, consistencia de interacciones y accesibilidad táctil óptima en todos los tamaños de pantalla:
+1. **Componente Canónico:** Toda lista desplegable de selección simple en módulos de la app (`pages/app/**`) debe implementarse exclusivamente con `SelectInput` (`import { SelectInput, type SelectOption } from '@/components/ui'`).
+2. **Prohibición de `<select>` nativo:** Queda terminantemente prohibido utilizar el elemento HTML nativo `<select>` en módulos de la aplicación. Esta restricción está custodiada por la regla de auditoría **R34** con línea base 0. Un `<select>` nativo romperá `npm run audit:rules` y abortará automáticamente `git push`.
+
+### 18.2 Comportamiento Responsive Adaptativo
+`SelectInput` adapta su renderizado automáticamente según el ancho del viewport:
+- **En Computadora / Desktop (`min-width: 768px`):**
+  - Se abre como panel flotante elevado portalizado en el `document.body` (`z-index: var(--z-modal)`).
+  - Posicionamiento dinámico con detección de límites de ventana para prevenir desbordes laterales.
+  - Altura máxima acotada (`max-height: 280px`) con scroll vertical nativo suave para listas extensas.
+  - Soporte de tamaño compacto (`size="sm"`) con altura de 36px y tipografía de 13px para filtros, encabezados y barras de control secundarias (como en Análisis y comparativas).
+- **En Celular / Mobile (`max-width: 767px`):**
+  - Se transforma automáticamente en Bottom Sheet modal canónico (`Modal variant="sheet"`).
+  - Áreas táctiles cómodas de al menos 44px de altura por ítem (`padding: 13px 14px`), eliminando dificultades de selección en pantallas pequeñas.
+  - Título contextual claro, backdrop difuminado y cierre intuitivo por pulsación externa o botón de cierre.
+
+---
+
+## 19. Norma Canónica de Nomenclatura de Monedas: "Pesos" y "Dólares" (Sin "ARS" ni "USD" en la UI)
+
+### 19.1 Principio de Experiencia Humana y Sin Tecnicismos
+Para evitar frialdad bancaria y siglas técnicas innecesarias en la interfaz:
+1. **Regla de Oro:** En ningún texto, etiqueta, menú desplegable, botón, badge, pill, tooltip o mensaje visible para el usuario final deben aparecer las siglas técnicas de código ISO "ARS" ni "USD".
+2. **Nombres Canónicos:**
+   - Para moneda local se utiliza siempre la palabra **"Pesos"** (o "pesos").
+   - Para moneda extranjera se utiliza siempre la palabra **"Dólares"** (o "dólares").
+3. **Preservación del Modelo Interno (Sin Roturas):** Los modelos de datos, columnas de base de datos, enums de TypeScript/Python (`'ARS' | 'USD'`), parámetros de consulta y endpoints de API continúan utilizando los identificadores estándar `'ARS'` y `'USD'`. La transformación a "Pesos" y "Dólares" se realiza en la capa de presentación mediante el helper centralizado [`formatMoneda(moneda)`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/utils/format.ts).
+4. **Candado Pre-Push (R36):** La regla automática **R36** en `scripts/audit-design-rules.mjs` verifica que ningún archivo de vista o componente renderice directamente las palabras "ARS" o "USD" en la UI visible. Si se detecta alguna ocurrencia, el hook pre-push aborta el `git push` de manera inmediata.
 
 
 

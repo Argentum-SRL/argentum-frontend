@@ -21,8 +21,8 @@ interface TabFinanzasProps {
 }
 
 const MONEDA_PRINCIPAL_OPTIONS = [
-  { value: 'ARS', label: 'Pesos ($)' },
-  { value: 'USD', label: 'Dólares (US$)' },
+  { value: 'ARS', label: 'Pesos' },
+  { value: 'USD', label: 'Dólares' },
 ]
 
 const OPCIONES_TIPO_DOLAR: { value: 'oficial' | 'mep' | 'blue' | 'tarjeta'; label: string; desc: string }[] = [

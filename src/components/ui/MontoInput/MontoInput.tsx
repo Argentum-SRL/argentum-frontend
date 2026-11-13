@@ -241,8 +241,8 @@ const MontoInput = memo(({
               disabled={disabled || !onMonedaChange}
               aria-label={
                 onMonedaChange
-                  ? `Moneda actual: ${moneda === 'ARS' ? 'Pesos argentinos (ARS)' : 'Dólares estadounidenses (USD)'}. Click para cambiar.`
-                  : `Moneda: ${moneda === 'ARS' ? 'Pesos argentinos (ARS)' : 'Dólares estadounidenses (USD)'}`
+                  ? `Moneda actual: ${moneda === 'ARS' ? 'Pesos' : 'Dólares'}. Click para cambiar.`
+                  : `Moneda: ${moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
               }
               title={onMonedaChange ? 'Cambiar moneda' : undefined}
             >

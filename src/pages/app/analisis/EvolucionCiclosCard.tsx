@@ -353,7 +353,9 @@ export default function EvolucionCiclosCard({
                           <div className={styles.tooltipRow}>
                             <span className={styles.tooltipLabel}>Ingresos</span>
                             <span className={styles.tooltipValPositive}>
-                              {formatMonto(row.ingresos, monedaVisual)}
+                              {row.ingresos !== null && row.ingresos !== undefined
+                                ? formatMonto(row.ingresos, monedaVisual)
+                                : '—'}
                             </span>
                           </div>
                           <div className={styles.tooltipRow}>
@@ -364,20 +366,28 @@ export default function EvolucionCiclosCard({
                           </div>
                           <div className={styles.tooltipDivider} />
                           <div className={styles.tooltipRow}>
-                            <span className={styles.tooltipLabel}>Balance neto</span>
+                            <span className={styles.tooltipLabel}>Te quedó</span>
                             <span
                               className={
-                                row.balance >= 0
-                                  ? styles.tooltipValPositive
-                                  : styles.tooltipValNegative
+                                row.balance === null || row.balance === undefined
+                                  ? undefined
+                                  : row.balance >= 0
+                                    ? styles.tooltipValPositive
+                                    : styles.tooltipValNegative
                               }
                             >
-                              {formatMonto(row.balance, monedaVisual)}
+                              {row.balance !== null && row.balance !== undefined
+                                ? formatMonto(row.balance, monedaVisual)
+                                : '—'}
                             </span>
                           </div>
                           <div className={styles.tooltipRow}>
-                            <span className={styles.tooltipLabel}>Tasa de ahorro</span>
-                            <span className={styles.tooltipBadge}>{row.tasa_ahorro_pct}%</span>
+                            <span className={styles.tooltipLabel}>Te quedó (%)</span>
+                            <span className={styles.tooltipBadge}>
+                              {row.tasa_ahorro_pct !== null && row.tasa_ahorro_pct !== undefined
+                                ? `${row.tasa_ahorro_pct}%`
+                                : '—'}
+                            </span>
                           </div>
                         </>
                       )}

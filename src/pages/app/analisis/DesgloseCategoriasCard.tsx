@@ -222,7 +222,7 @@ export default function DesgloseCategoriasCard({
             />
           )}
           {selectedCat ? (
-        /* ── Nivel 2: Drill-down de Subcategorías + Movimientos ── */
+        /* ── Nivel 2: Detalle de Subcategorías + Movimientos ── */
         <div className={styles.drilldownLayout}>
           <div className={styles.subcatsSection}>
             <div className={styles.sectionHeaderRow}>

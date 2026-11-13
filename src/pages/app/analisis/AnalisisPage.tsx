@@ -44,7 +44,7 @@ const VISTAS_PRINCIPALES: Array<{
 }> = [
   { id: 'evolucion', titulo: 'Evolución', icon: TrendingUp },
   { id: 'categorias', titulo: 'Categorías', icon: PieChart },
-  { id: 'comparativa', titulo: 'Comparador', icon: ArrowLeftRight },
+  { id: 'comparativa', titulo: 'Comparar', icon: ArrowLeftRight },
   { id: 'proyeccion', titulo: 'Proyección', icon: Calendar },
 ]
 
@@ -53,10 +53,10 @@ export default function AnalisisPage() {
 
   const [vistaActiva, setVistaActiva] = useState<VistaActivaAnalisis>('evolucion')
 
-  // Sub-modos controlados desde el Panel de Control derecho
+  // Sub-modos controlados desde los Filtros
   const [modoEvolucion, setModoEvolucion] = useState<'combinado' | 'barras' | 'lineas'>('combinado')
   const [modoCategorias, setModoCategorias] = useState<'barras' | 'dona' | 'ranking'>('barras')
-  const [modoComparativa, setModoComparativa] = useState<'espejo' | 'grafico'>('espejo')
+  const [modoComparativa, setModoComparativa] = useState<'diferencias' | 'grafico'>('diferencias')
   const [horizonteProyeccion, setHorizonteProyeccion] = useState<'6' | '12'>('6')
   const [vistaProyeccion, setVistaProyeccion] = useState<'grafico' | 'planes'>('grafico')
 
@@ -168,7 +168,7 @@ export default function AnalisisPage() {
 
   const handleExportPdf = () => {
     if (!data) return
-    exportarAnalisisPdf(data, 'Argentum — Informe de Análisis Financiero')
+    exportarAnalisisPdf(data, 'Argentum — Tu análisis')
     sileo.success({ title: 'Informe PDF descargado.' })
   }
 
@@ -200,23 +200,30 @@ export default function AnalisisPage() {
             className={styles.summaryBar}
             items={[
               {
-                label: 'Balance del período',
+                label: 'Te quedó',
                 value:
                   loading && !data
                     ? '...'
-                    : `${(data?.kpis.balance_neto ?? 0) < 0 ? '-' : '+'}${formatMonto(
-                        Math.abs(data?.kpis.balance_neto ?? 0),
-                        monedaVisual
-                      )}`,
+                    : data?.kpis.balance_neto !== null && data?.kpis.balance_neto !== undefined
+                      ? `${(data.kpis.balance_neto) < 0 ? '-' : '+'}${formatMonto(
+                          Math.abs(data.kpis.balance_neto),
+                          monedaVisual
+                        )}`
+                      : '—',
                 highlight: true,
-                valueColor: (data?.kpis.balance_neto ?? 0) < 0 ? '#FF8A65' : undefined,
+                valueColor:
+                  data?.kpis.balance_neto !== null && (data?.kpis.balance_neto ?? 0) < 0
+                    ? '#FF8A65'
+                    : undefined,
               },
               {
                 label: 'Ingresos',
                 value:
                   loading && !data
                     ? '...'
-                    : `+${formatMonto(data?.kpis.ingresos_totales ?? 0, monedaVisual)}`,
+                    : data?.kpis.ingresos_totales !== null && data?.kpis.ingresos_totales !== undefined
+                      ? `+${formatMonto(data.kpis.ingresos_totales, monedaVisual)}`
+                      : '—',
                 valueColor: '#4CAF7D',
               },
               {
@@ -228,17 +235,32 @@ export default function AnalisisPage() {
                 valueColor: '#FF8A65',
               },
               {
-                label: 'Tasa de ahorro',
-                value: loading && !data ? '...' : `${data?.kpis.tasa_ahorro_pct ?? 0}%`,
+                label: 'Te quedó (%)',
+                value:
+                  loading && !data
+                    ? '...'
+                    : data?.kpis.tasa_ahorro_pct !== null && data?.kpis.tasa_ahorro_pct !== undefined
+                      ? `${data.kpis.tasa_ahorro_pct}%`
+                      : '—',
                 valueColor:
-                  (data?.kpis.tasa_ahorro_pct ?? 0) >= 20
+                  data?.kpis.tasa_ahorro_pct !== null && (data?.kpis.tasa_ahorro_pct ?? 0) >= 20
                     ? '#4CAF7D'
-                    : (data?.kpis.tasa_ahorro_pct ?? 0) < 0
+                    : data?.kpis.tasa_ahorro_pct !== null && (data?.kpis.tasa_ahorro_pct ?? 0) < 0
                       ? '#FF8A65'
                       : undefined,
               },
             ]}
           />
+          {Boolean(queryParams.categoria_id || queryParams.tarjeta_id) && (
+            <p className={styles.subtitle} style={{ margin: '4px 0 0', textAlign: 'right' }}>
+              Con este filtro solo se ven gastos.
+            </p>
+          )}
+          {data?.kpis.variacion_texto && (
+            <p className={styles.subtitle} style={{ margin: '4px 0 0', textAlign: 'right' }}>
+              {data.kpis.variacion_texto}
+            </p>
+          )}
 
           {/* Cuadro del Gráfico Protagonista */}
           <div className={styles.stageViewport}>
@@ -294,15 +316,15 @@ export default function AnalisisPage() {
         </main>
 
         {/* ══════════════════════════════════════════════════════════════════
-            DERECHA: PANEL DE CONTROL COMPACTO (SIN SCROLL)
+            DERECHA: FILTROS COMPACTOS (SIN SCROLL)
            ══════════════════════════════════════════════════════════════════ */}
-        <aside className={styles.controlPanel} aria-label="Panel de control de análisis">
+        <aside className={styles.controlPanel} aria-label="Filtros de análisis">
           <div className={styles.panelHeader}>
             <div className={styles.panelHeaderLeft}>
               <div className={styles.panelIconBox}>
                 <Activity size={15} />
               </div>
-              <h2 className={styles.panelTitle}>Panel de Control</h2>
+              <h2 className={styles.panelTitle}>Filtros</h2>
             </div>
 
             <button
@@ -386,7 +408,7 @@ export default function AnalisisPage() {
               <div className={styles.controlTrack}>
                 <SegmentedControl
                   options={[
-                    { value: 'espejo', label: 'Tabla Deltas' },
+                    { value: 'diferencias', label: 'Diferencias' },
                     { value: 'grafico', label: 'Barras' },
                   ]}
                   value={modoComparativa}
@@ -400,7 +422,7 @@ export default function AnalisisPage() {
 
           {vistaActiva === 'proyeccion' && (
             <div className={styles.panelSection}>
-              <span className={styles.sectionLabel}>Horizonte y vista</span>
+              <span className={styles.sectionLabel}>Cuántos ciclos y cómo verlo</span>
               <div className={styles.twoColRow}>
                 <div className={styles.controlTrackHalf}>
                   <SegmentedControl
@@ -417,7 +439,7 @@ export default function AnalisisPage() {
                 <div className={styles.controlTrackHalf}>
                   <SegmentedControl
                     options={[
-                      { value: 'grafico', label: 'Curva' },
+                      { value: 'grafico', label: 'Por ciclo' },
                       { value: 'planes', label: 'Planes' },
                     ]}
                     value={vistaProyeccion}
@@ -434,20 +456,25 @@ export default function AnalisisPage() {
           <div className={styles.panelSection}>
             <div className={styles.sectionLabelRow}>
               <span className={styles.sectionLabel}>Moneda</span>
-              {esConsolidado && data?.cotizacion_referencia && (
-                <span className={styles.tcInlineBadge}>
-                  TC {data.cotizacion_referencia.nombre}:{' '}
-                  <strong>{formatMonto(data.cotizacion_referencia.valor, 'ARS')}</strong>
-                </span>
+              {esConsolidado && (
+                data?.movimientos_sin_cotizacion && data.movimientos_sin_cotizacion > 0 ? (
+                  <span className={styles.tcInlineBadge}>
+                    {data.movimientos_sin_cotizacion} movimientos en dólares no se pudieron pasar a pesos porque falta la cotización de esos días.
+                  </span>
+                ) : data?.cotizacion_referencia?.texto ? (
+                  <span className={styles.tcInlineBadge}>
+                    {data.cotizacion_referencia.texto}
+                  </span>
+                ) : null
               )}
             </div>
             <div className={styles.controlTrack}>
               <SegmentedControl
                 options={[
-                  { value: 'solo_ars', label: 'ARS' },
-                  { value: 'solo_usd', label: 'USD' },
-                  { value: 'consolidado_ars', label: 'Todo $' },
-                  { value: 'consolidado_usd', label: 'Todo US$' },
+                  { value: 'solo_ars', label: 'Pesos' },
+                  { value: 'solo_usd', label: 'Dólares' },
+                  { value: 'consolidado_ars', label: 'Todo pasado a pesos' },
+                  { value: 'consolidado_usd', label: 'Todo pasado a dólares' },
                 ]}
                 value={monedaModo}
                 onChange={(v: string) => setMonedaModo(v as MonedaModoAnalisis)}
@@ -457,9 +484,9 @@ export default function AnalisisPage() {
             </div>
           </div>
 
-          {/* 4. Ventana de Ciclos (1 sola línea) */}
+          {/* 4. Cuántos ciclos ver (1 sola línea) */}
           <div className={styles.panelSection}>
-            <span className={styles.sectionLabel}>Período (ciclos)</span>
+            <span className={styles.sectionLabel}>Cuántos ciclos ver</span>
             <div className={styles.controlTrack}>
               <SegmentedControl
                 options={[
@@ -470,7 +497,7 @@ export default function AnalisisPage() {
                 ]}
                 value={String(ciclosCount)}
                 onChange={(v: string) => setCiclosCount(Number(v))}
-                ariaLabel="Ventana de ciclos"
+                ariaLabel="Cuántos ciclos ver"
                 fullWidth
               />
             </div>

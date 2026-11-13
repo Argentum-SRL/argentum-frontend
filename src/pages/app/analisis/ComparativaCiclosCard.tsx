@@ -22,8 +22,8 @@ import styles from './ComparativaCiclosCard.module.css'
 interface ComparativaCiclosCardProps {
   queryParams: AnalisisQueryParams
   monedaVisual: 'ARS' | 'USD'
-  vistaModoExterno?: 'espejo' | 'grafico'
-  onVistaModoChange?: (modo: 'espejo' | 'grafico') => void
+  vistaModoExterno?: 'diferencias' | 'grafico'
+  onVistaModoChange?: (modo: 'diferencias' | 'grafico') => void
 }
 
 export default function ComparativaCiclosCard({
@@ -33,9 +33,9 @@ export default function ComparativaCiclosCard({
   onVistaModoChange,
 }: ComparativaCiclosCardProps) {
   const primaryBarColor = '#FF8A65'
-  const [vistaModoInterno, setVistaModoInterno] = useState<'espejo' | 'grafico'>('espejo')
+  const [vistaModoInterno, setVistaModoInterno] = useState<'diferencias' | 'grafico'>('diferencias')
   const vistaModo = vistaModoExterno ?? vistaModoInterno
-  const handleCambiarVista = (nuevo: 'espejo' | 'grafico') => {
+  const handleCambiarVista = (nuevo: 'diferencias' | 'grafico') => {
     setVistaModoInterno(nuevo)
     onVistaModoChange?.(nuevo)
   }
@@ -110,24 +110,24 @@ export default function ComparativaCiclosCard({
   const etiquetaB = data?.ciclo_b.etiqueta ?? 'Ciclo B'
 
   return (
-    <section className={styles.card} aria-label="Comparador ciclo a ciclo">
+    <section className={styles.card} aria-label="Comparar dos ciclos">
       <header className={styles.header}>
         <div className={styles.titleGroup}>
           <div className={styles.iconWrap}>
             <ArrowLeftRight size={18} />
           </div>
           <div>
-            <h2 className={styles.title}>Comparador Ciclo a Ciclo</h2>
+            <h2 className={styles.title}>Comparar dos ciclos</h2>
             <p className={styles.subtitle}>
-              Mano a mano entre dos ciclos para detectar ahorros o desvíos por categoría
+              Qué cambió entre dos ciclos, rubro por rubro.
             </p>
           </div>
         </div>
 
         <SegmentedControl
           options={[
-            { value: 'espejo', label: 'Tabla de Deltas' },
-            { value: 'grafico', label: 'Barras Agrupadas' },
+            { value: 'diferencias', label: 'Diferencias' },
+            { value: 'grafico', label: 'Barras' },
           ]}
           value={vistaModo}
           onChange={(v: string) => handleCambiarVista(v as typeof vistaModo)}
@@ -151,7 +151,10 @@ export default function ComparativaCiclosCard({
             >
               {data.ciclos_disponibles.map((c) => (
                 <option key={c.clave} value={c.clave}>
-                  {c.etiqueta} ({c.rango_texto}){c.es_actual ? ' · Actual' : ''}
+                  {c.etiqueta} ({c.rango_texto})
+                  {c.es_actual
+                    ? ` (en curso: ${c.dias_transcurridos ?? ''} de ${c.dias_totales ?? ''} días)`
+                    : ''}
                 </option>
               ))}
             </select>
@@ -171,7 +174,10 @@ export default function ComparativaCiclosCard({
             >
               {data.ciclos_disponibles.map((c) => (
                 <option key={c.clave} value={c.clave}>
-                  {c.etiqueta} ({c.rango_texto}){c.es_actual ? ' · Actual' : ''}
+                  {c.etiqueta} ({c.rango_texto})
+                  {c.es_actual
+                    ? ` (en curso: ${c.dias_transcurridos ?? ''} de ${c.dias_totales ?? ''} días)`
+                    : ''}
                 </option>
               ))}
             </select>
@@ -197,7 +203,7 @@ export default function ComparativaCiclosCard({
           </div>
 
           <div className={styles.summaryItem}>
-            <span className={styles.summaryCaption}>Variación Neta</span>
+            <span className={styles.summaryCaption}>Diferencia</span>
             <span
               className={
                 data.resumen.diferencia_gasto_monto <= 0

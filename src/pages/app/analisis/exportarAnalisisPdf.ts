@@ -5,7 +5,7 @@ import { formatMonto } from '@/utils/format'
 
 export function exportarAnalisisPdf(
   data: AnalisisResumenResponse,
-  tituloInforme = 'Argentum — Informe de Análisis Financiero'
+  tituloInforme = 'Argentum — Tu análisis'
 ): void {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const moneda = data.moneda_visual
@@ -27,11 +27,11 @@ export function exportarAnalisisPdf(
     21
   )
 
-  // Bloque 1: Indicadores Clave (KPIs)
+  // Bloque 1: Números principales
   doc.setTextColor(15, 23, 42)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(11)
-  doc.text('1. Indicadores Clave del Período', 14, 38)
+  doc.text('1. Números principales del período', 14, 38)
 
   autoTable(doc, {
     startY: 42,
@@ -40,21 +40,31 @@ export function exportarAnalisisPdf(
       [
         'Gastos del período',
         formatMonto(data.kpis.gastos_totales, moneda),
-        `Promedio por ciclo: ${formatMonto(data.kpis.promedio_gasto_ciclo, moneda)}`,
+        data.kpis.promedio_gasto_ciclo !== null && data.kpis.promedio_gasto_ciclo !== undefined
+          ? `Promedio por ciclo: ${formatMonto(data.kpis.promedio_gasto_ciclo, moneda)}`
+          : '—',
       ],
       [
         'Ingresos del período',
-        formatMonto(data.kpis.ingresos_totales, moneda),
-        `Promedio por ciclo: ${formatMonto(data.kpis.promedio_ingreso_ciclo, moneda)}`,
+        data.kpis.ingresos_totales !== null && data.kpis.ingresos_totales !== undefined
+          ? formatMonto(data.kpis.ingresos_totales, moneda)
+          : '—',
+        data.kpis.promedio_ingreso_ciclo !== null && data.kpis.promedio_ingreso_ciclo !== undefined
+          ? `Promedio por ciclo: ${formatMonto(data.kpis.promedio_ingreso_ciclo, moneda)}`
+          : '—',
       ],
       [
-        'Balance neto',
-        formatMonto(data.kpis.balance_neto, moneda),
+        'Te quedó',
+        data.kpis.balance_neto !== null && data.kpis.balance_neto !== undefined
+          ? formatMonto(data.kpis.balance_neto, moneda)
+          : '—',
         `${data.kpis.cantidad_operaciones} movimientos de gasto evaluados`,
       ],
       [
-        'Tasa de ahorro',
-        `${data.kpis.tasa_ahorro_pct}%`,
+        'Te quedó (%)',
+        data.kpis.tasa_ahorro_pct !== null && data.kpis.tasa_ahorro_pct !== undefined
+          ? `${data.kpis.tasa_ahorro_pct}%`
+          : '—',
         'Porcentaje retenido sobre ingresos del período',
       ],
     ],
@@ -72,14 +82,14 @@ export function exportarAnalisisPdf(
 
   autoTable(doc, {
     startY: finalY1 + 14,
-    head: [['Ciclo', 'Rango', 'Ingresos', 'Gastos', 'Balance', 'Ahorro %']],
+    head: [['Ciclo', 'Rango', 'Ingresos', 'Gastos', 'Te quedó', 'Te quedó (%)']],
     body: data.serie_ciclos.map((c) => [
       c.etiqueta,
       c.rango_texto,
-      formatMonto(c.ingresos, moneda),
+      c.ingresos !== null && c.ingresos !== undefined ? formatMonto(c.ingresos, moneda) : '—',
       formatMonto(c.gastos, moneda),
-      formatMonto(c.balance, moneda),
-      `${c.tasa_ahorro_pct}%`,
+      c.balance !== null && c.balance !== undefined ? formatMonto(c.balance, moneda) : '—',
+      c.tasa_ahorro_pct !== null && c.tasa_ahorro_pct !== undefined ? `${c.tasa_ahorro_pct}%` : '—',
     ]),
     theme: 'striped',
     headStyles: { fillColor: [13, 32, 69], textColor: 255, fontSize: 8.5 },

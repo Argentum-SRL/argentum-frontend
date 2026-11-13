@@ -38,28 +38,28 @@ const CATALOGO_BLOQUES: Array<{
 }> = [
   {
     tipo: 'kpis',
-    titulo: 'Indicadores Clave (KPIs)',
-    descripcion: 'Tarjetas con Gastos, Ingresos, Balance Neto y Tasa de Ahorro del período.',
+    titulo: 'Números principales',
+    descripcion: 'Lo que entró, lo que salió y lo que te quedó.',
   },
   {
     tipo: 'evolucion_ciclos',
     titulo: 'Evolución Ciclo a Ciclo',
-    descripcion: 'Gráfico combinado de ingresos, gastos, balance y línea de promedio histórico.',
+    descripcion: 'Lo que entró, lo que salió y lo que te quedó en cada ciclo.',
   },
   {
     tipo: 'desglose_categorias',
     titulo: 'Desglose por Categorías y Subcategorías',
-    descripcion: 'Distribución porcentual con drill-down hasta los movimientos individuales.',
+    descripcion: 'En qué se fue la plata, hasta cada movimiento.',
   },
   {
     tipo: 'comparativa_ciclos',
-    titulo: 'Comparador Mano a Mano de Ciclos',
-    descripcion: 'Tabla de variaciones y espejo entre dos ciclos para detectar ahorros o desvíos.',
+    titulo: 'Comparar dos ciclos',
+    descripcion: 'Qué cambió entre dos ciclos, rubro por rubro.',
   },
   {
     tipo: 'proyeccion_cuotas',
     titulo: 'Proyección de Tarjetas y Cuotas',
-    descripcion: 'Curva futura de cuotas pendientes, suscripciones y mes de mayor alivio.',
+    descripcion: 'Lo que ya tenés comprometido en cuotas y suscripciones, y cuándo se te libera.',
   },
 ]
 
@@ -71,7 +71,7 @@ const PLANTILLAS_RAPIDAS: Array<{
 }> = [
   {
     id: 'tpl-cierre-ciclo',
-    nombre: 'Cierre Ejecutivo de Ciclo',
+    nombre: 'Resumen del ciclo',
     descripcion:
       'Resumen integral del último semestre con evolución, ranking de categorías y comparativa contra el ciclo anterior.',
     configuracion: {
@@ -79,32 +79,32 @@ const PLANTILLAS_RAPIDAS: Array<{
       ciclos: 6,
       naturaleza: 'todos',
       bloques: [
-        { id: 'b-kpis', tipo: 'kpis', titulo: 'Indicadores Clave' },
+        { id: 'b-kpis', tipo: 'kpis', titulo: 'Números principales' },
         { id: 'b-evol', tipo: 'evolucion_ciclos', titulo: 'Evolución por Ciclos' },
         { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Desglose por Categorías' },
-        { id: 'b-comp', tipo: 'comparativa_ciclos', titulo: 'Comparador Ciclo a Ciclo' },
+        { id: 'b-comp', tipo: 'comparativa_ciclos', titulo: 'Comparar dos ciclos' },
       ],
     },
   },
   {
     id: 'tpl-variables-hormiga',
-    nombre: 'Auditoría de Gastos Variables',
+    nombre: 'Gastos del día a día',
     descripcion:
-      'Filtra exclusivamente consumos variables de los últimos 3 ciclos para detectar desvíos cotidianos.',
+      'Filtra exclusivamente consumos del día a día de los últimos 3 ciclos para detectar cambios cotidianos.',
     configuracion: {
       moneda_modo: 'solo_ars',
       ciclos: 3,
       naturaleza: 'variables',
       bloques: [
-        { id: 'b-kpis', tipo: 'kpis', titulo: 'KPIs de Gastos Variables' },
-        { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Categorías Variables' },
-        { id: 'b-comp', tipo: 'comparativa_ciclos', titulo: 'Variación vs. Ciclo Anterior' },
+        { id: 'b-kpis', tipo: 'kpis', titulo: 'Números del día a día' },
+        { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Rubros del día a día' },
+        { id: 'b-comp', tipo: 'comparativa_ciclos', titulo: 'Diferencias' },
       ],
     },
   },
   {
     id: 'tpl-tarjetas-cuotas',
-    nombre: ' Compromisos de Tarjetas y Cuotas',
+    nombre: 'Compromisos de Tarjetas y Cuotas',
     descripcion:
       'Enfocado en compras financiadas y proyección futura de liberación de límite y flujo mensual.',
     configuracion: {
@@ -112,9 +112,9 @@ const PLANTILLAS_RAPIDAS: Array<{
       ciclos: 6,
       naturaleza: 'cuotas',
       bloques: [
-        { id: 'b-kpis', tipo: 'kpis', titulo: 'Resumen de Cuotas' },
+        { id: 'b-kpis', tipo: 'kpis', titulo: 'Números principales' },
         { id: 'b-proy', tipo: 'proyeccion_cuotas', titulo: 'Proyección de Cuotas y Suscripciones' },
-        { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Rubros Financiados' },
+        { id: 'b-cats', tipo: 'desglose_categorias', titulo: 'Compras en cuotas por rubro' },
       ],
     },
   },
@@ -432,10 +432,10 @@ export default function MisInformesTab() {
             <span className={styles.fieldLabel}>Moneda por defecto</span>
             <SegmentedControl
               options={[
-                { value: 'solo_ars', label: 'Solo ARS' },
-                { value: 'solo_usd', label: 'Solo USD' },
-                { value: 'consolidado_ars', label: 'Todo en ARS' },
-                { value: 'consolidado_usd', label: 'Todo en USD' },
+                { value: 'solo_ars', label: 'Pesos' },
+                { value: 'solo_usd', label: 'Dólares' },
+                { value: 'consolidado_ars', label: 'Todo pasado a pesos' },
+                { value: 'consolidado_usd', label: 'Todo pasado a dólares' },
               ]}
               value={formMoneda}
               onChange={(v: string) => setFormMoneda(v as MonedaModoAnalisis)}
@@ -445,7 +445,7 @@ export default function MisInformesTab() {
           </div>
 
           <div className={styles.fieldGroup}>
-            <span className={styles.fieldLabel}>Ventana de ciclos</span>
+            <span className={styles.fieldLabel}>Cuántos ciclos ver</span>
             <SegmentedControl
               options={[
                 { value: '1', label: 'Ciclo actual' },
@@ -455,23 +455,23 @@ export default function MisInformesTab() {
               ]}
               value={String(formCiclos)}
               onChange={(v: string) => setFormCiclos(Number(v))}
-              ariaLabel="Ventana de ciclos del informe"
+              ariaLabel="Cuántos ciclos ver en el informe"
               layout="inline"
             />
           </div>
 
           <div className={styles.fieldGroup}>
-            <span className={styles.fieldLabel}>Naturaleza de gastos</span>
+            <span className={styles.fieldLabel}>Tipo de gasto</span>
             <SegmentedControl
               options={[
                 { value: 'todos', label: 'Todos' },
-                { value: 'variables', label: 'Variables' },
-                { value: 'fijos', label: 'Fijos y Suscr.' },
+                { value: 'variables', label: 'Día a día' },
+                { value: 'fijos', label: 'Fijos y suscripciones' },
                 { value: 'cuotas', label: 'Cuotas' },
               ]}
               value={formNaturaleza}
               onChange={(v: string) => setFormNaturaleza(v as NaturalezaGastoFiltro)}
-              ariaLabel="Naturaleza de gasto del informe"
+              ariaLabel="Tipo de gasto del informe"
               layout="wrap"
             />
           </div>
@@ -579,18 +579,26 @@ export default function MisInformesTab() {
                 <div className={styles.kpiMiniCard}>
                   <span className={styles.kpiMiniLabel}>Ingresos del período</span>
                   <strong className={styles.kpiMiniVal}>
-                    {formatMonto(visorData.kpis.ingresos_totales, monedaVis)}
+                    {visorData.kpis.ingresos_totales !== null && visorData.kpis.ingresos_totales !== undefined
+                      ? formatMonto(visorData.kpis.ingresos_totales, monedaVis)
+                      : '—'}
                   </strong>
                 </div>
                 <div className={styles.kpiMiniCard}>
-                  <span className={styles.kpiMiniLabel}>Balance neto</span>
+                  <span className={styles.kpiMiniLabel}>Te quedó</span>
                   <strong className={styles.kpiMiniVal}>
-                    {formatMonto(visorData.kpis.balance_neto, monedaVis)}
+                    {visorData.kpis.balance_neto !== null && visorData.kpis.balance_neto !== undefined
+                      ? formatMonto(visorData.kpis.balance_neto, monedaVis)
+                      : '—'}
                   </strong>
                 </div>
                 <div className={styles.kpiMiniCard}>
-                  <span className={styles.kpiMiniLabel}>Tasa de ahorro</span>
-                  <strong className={styles.kpiMiniVal}>{visorData.kpis.tasa_ahorro_pct}%</strong>
+                  <span className={styles.kpiMiniLabel}>Te quedó (%)</span>
+                  <strong className={styles.kpiMiniVal}>
+                    {visorData.kpis.tasa_ahorro_pct !== null && visorData.kpis.tasa_ahorro_pct !== undefined
+                      ? `${visorData.kpis.tasa_ahorro_pct}%`
+                      : '—'}
+                  </strong>
                 </div>
               </section>
             )}
@@ -599,7 +607,7 @@ export default function MisInformesTab() {
               <EvolucionCiclosCard
                 serie={visorData.serie_ciclos}
                 monedaVisual={monedaVis}
-                promedioHistoricoGastos={visorData.kpis.promedio_gasto_ciclo}
+                promedioHistoricoGastos={visorData.kpis.promedio_gasto_ciclo ?? 0}
               />
             )}
 

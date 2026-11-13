@@ -133,7 +133,7 @@ export default function ProyeccionCuotasCard({
           <div>
             <h2 className={styles.title}>Proyección de Cuotas y Suscripciones</h2>
             <p className={styles.subtitle}>
-              Evolución de tu compromiso mensual futuro y liberación de flujo de caja
+              Lo que ya tenés comprometido en cuotas y suscripciones, y cuándo se te libera.
             </p>
           </div>
         </div>
@@ -152,7 +152,7 @@ export default function ProyeccionCuotasCard({
 
           <SegmentedControl
             options={[
-              { value: 'grafico', label: 'Curva Mensual' },
+              { value: 'grafico', label: 'Por ciclo' },
               { value: 'planes', label: 'Planes Activos' },
             ]}
             value={vistaInterna}
@@ -163,7 +163,7 @@ export default function ProyeccionCuotasCard({
         </div>
       </header>
 
-      {/* Mini KPIs de compromiso futuro */}
+      {/* Mini números de compromiso futuro */}
       {data && (
         <div className={styles.metricsStrip}>
           <div className={styles.metricItem}>
@@ -255,7 +255,7 @@ export default function ProyeccionCuotasCard({
                     const p = payload[0].payload
                     return (
                       <div className={styles.tooltipCard}>
-                        <p className={styles.tooltipTitle}>{p.mes_nombre}</p>
+                        <p className={styles.tooltipTitle}>{p.rango_texto || p.mes_nombre}</p>
                         <div className={styles.tooltipRow}>
                           <span>Cuotas ({p.cantidad_cuotas}):</span>
                           <strong>{formatMonto(p.monto_cuotas, monedaVisual)}</strong>

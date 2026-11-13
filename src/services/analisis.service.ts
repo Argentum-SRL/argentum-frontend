@@ -4,10 +4,11 @@ export type MonedaModoAnalisis = 'solo_ars' | 'solo_usd' | 'consolidado_ars' | '
 export type NaturalezaGastoFiltro = 'todos' | 'variables' | 'fijos' | 'cuotas'
 
 export interface AnalisisCotizacionRef {
-  tipo: string
-  nombre: string
-  valor: number
-  fecha_actualizacion: string | null
+  texto?: string
+  tipo?: string
+  nombre?: string
+  valor?: number
+  fecha_actualizacion?: string | null
 }
 
 export interface AnalisisPeriodoInfo {
@@ -18,14 +19,15 @@ export interface AnalisisPeriodoInfo {
 }
 
 export interface AnalisisKpis {
-  ingresos_totales: number
+  ingresos_totales: number | null
   gastos_totales: number
-  balance_neto: number
-  tasa_ahorro_pct: number
-  promedio_gasto_ciclo: number
-  promedio_ingreso_ciclo: number
+  balance_neto: number | null
+  tasa_ahorro_pct: number | null
+  promedio_gasto_ciclo: number | null
+  promedio_ingreso_ciclo: number | null
   variacion_gasto_vs_anterior_pct: number | null
   variacion_ingreso_vs_anterior_pct: number | null
+  variacion_texto: string | null
   cantidad_operaciones: number
 }
 
@@ -43,11 +45,13 @@ export interface AnalisisCicloPunto {
   fecha_inicio: string
   fecha_fin: string
   es_actual: boolean
-  ingresos: number
+  dias_transcurridos: number
+  dias_totales: number
+  ingresos: number | null
   gastos: number
-  balance: number
-  tasa_ahorro_pct: number
-  promedio_historico_gastos: number
+  balance: number | null
+  tasa_ahorro_pct: number | null
+  promedio_historico_gastos: number | null
   por_categoria?: Record<string, number>
   por_subcategoria?: Record<string, number>
 }
@@ -99,6 +103,7 @@ export interface AnalisisResumenResponse {
   moneda_modo: MonedaModoAnalisis
   moneda_visual: 'ARS' | 'USD'
   cotizacion_referencia: AnalisisCotizacionRef
+  movimientos_sin_cotizacion?: number
   periodo_seleccionado: AnalisisPeriodoInfo
   kpis: AnalisisKpis
   insights: AnalisisInsight[]
@@ -137,6 +142,8 @@ export interface ComparativaCicloMeta {
   etiqueta: string
   rango_texto: string
   es_actual?: boolean
+  dias_transcurridos?: number
+  dias_totales?: number
 }
 
 export interface ComparativaCategoriaItem {
@@ -184,7 +191,8 @@ export interface ComparativaCiclosResponse {
 export interface ProyeccionMesPunto {
   clave: string
   etiqueta: string
-  mes_nombre: string
+  rango_texto: string
+  mes_nombre?: string
   monto_cuotas: number
   monto_suscripciones: number
   monto_total: number
@@ -216,7 +224,8 @@ export interface ProyeccionCompromisosResponse {
     cantidad_planes_activos: number
     mes_mayor_alivio: {
       etiqueta: string
-      mes_nombre: string
+      rango_texto?: string
+      mes_nombre?: string
       monto_liberado: number
       planes_finalizados: number
     } | null

@@ -28,6 +28,9 @@ interface ComparativaCiclosCardProps {
   vistaModoExterno?: 'diferencias' | 'grafico'
   onVistaModoChange?: (modo: 'diferencias' | 'grafico') => void
   collapsible?: boolean
+  cicloA?: string
+  cicloB?: string
+  onCiclosChange?: (cicloA: string, cicloB: string) => void
 }
 
 export default function ComparativaCiclosCard({
@@ -36,6 +39,9 @@ export default function ComparativaCiclosCard({
   vistaModoExterno,
   onVistaModoChange,
   collapsible = false,
+  cicloA,
+  cicloB,
+  onCiclosChange,
 }: ComparativaCiclosCardProps) {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
@@ -46,8 +52,8 @@ export default function ComparativaCiclosCard({
     setVistaModoInterno(nuevo)
     onVistaModoChange?.(nuevo)
   }
-  const [cicloAKey, setCicloAKey] = useState<string>('')
-  const [cicloBKey, setCicloBKey] = useState<string>('')
+  const [cicloAKey, setCicloAKey] = useState<string>(() => cicloA ?? '')
+  const [cicloBKey, setCicloBKey] = useState<string>(() => cicloB ?? '')
   const [mostrarTodas, setMostrarTodas] = useState<boolean>(false)
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
   const [data, setData] = useState<ComparativaCiclosResponse | null>(null)
@@ -99,8 +105,11 @@ export default function ComparativaCiclosCard({
         ])
         if (!signal?.aborted) {
           setData(res)
+          const finalA = cicloAKey || res.ciclo_a?.clave || ''
+          const finalB = cicloBKey || res.ciclo_b?.clave || ''
           if (!cicloAKey && res.ciclo_a?.clave) setCicloAKey(res.ciclo_a.clave)
           if (!cicloBKey && res.ciclo_b?.clave) setCicloBKey(res.ciclo_b.clave)
+          onCiclosChange?.(finalA, finalB)
         }
       } catch {
         // Silencioso en cancelación o error de red puntual
@@ -110,7 +119,7 @@ export default function ComparativaCiclosCard({
         }
       }
     },
-    [queryParams, cicloAKey, cicloBKey]
+    [queryParams, cicloAKey, cicloBKey, onCiclosChange]
   )
 
   useEffect(() => {
@@ -197,7 +206,10 @@ export default function ComparativaCiclosCard({
               id="comp-ciclo-a"
               size="sm"
               value={cicloAKey || data.ciclo_a.clave}
-              onChange={(val) => setCicloAKey(val)}
+              onChange={(val) => {
+                setCicloAKey(val)
+                onCiclosChange?.(val, cicloBKey || data.ciclo_b.clave)
+              }}
               options={cicloOptions}
               placeholder="Ciclo A..."
             />
@@ -214,7 +226,10 @@ export default function ComparativaCiclosCard({
               id="comp-ciclo-b"
               size="sm"
               value={cicloBKey || data.ciclo_b.clave}
-              onChange={(val) => setCicloBKey(val)}
+              onChange={(val) => {
+                setCicloBKey(val)
+                onCiclosChange?.(cicloAKey || data.ciclo_a.clave, val)
+              }}
               options={cicloOptions}
               placeholder="Ciclo B..."
             />

@@ -4,26 +4,33 @@ import ModalFooter from '@/components/ui/Modal/ModalFooter'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import Button from '@/components/ui/Button/Button'
 import { sileo } from 'sileo'
-import analisisService, {
-  type AnalisisQueryParams,
-  type AnalisisResumenResponse,
-} from '@/services/analisis.service'
-import { exportarAnalisisPdf } from './exportarAnalisisPdf'
+import analisisService from '@/services/analisis.service'
 import { getErrorMessage } from '@/utils/errorMessages'
+import {
+  nombreArchivoDescarga,
+  resumenPedido,
+  type PedidoDescarga,
+} from './descargaAnalisis'
+import { exportarInformePdf } from './exportarInformePdf'
 import styles from './DescargarAnalisisModal.module.css'
 
 interface DescargarAnalisisModalProps {
   isOpen: boolean
   onClose: () => void
-  queryParams: AnalisisQueryParams
-  data: AnalisisResumenResponse | null
+  pedido: PedidoDescarga | null
+  nombres?: {
+    billeteras?: Record<string, string>
+    tarjetas?: Record<string, string>
+    billeteraNombre?: string
+    tarjetaNombre?: string
+  }
 }
 
 export default function DescargarAnalisisModal({
   isOpen,
   onClose,
-  queryParams,
-  data,
+  pedido,
+  nombres,
 }: DescargarAnalisisModalProps) {
   const [formato, setFormato] = useState<'excel' | 'pdf'>('excel')
   const [descargando, setDescargando] = useState(false)
@@ -38,33 +45,32 @@ export default function DescargarAnalisisModal({
   }
 
   const handleDescargar = async () => {
-    if (formato === 'excel') {
-      setDescargando(true)
-      try {
-        const blob = await analisisService.exportarExcel(queryParams)
+    if (!pedido) return
+    setDescargando(true)
+
+    try {
+      if (formato === 'excel') {
+        const blob = await analisisService.exportarExcel(pedido)
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `Analisis_Argentum_${new Date().toISOString().slice(0, 10)}.xlsx`
+        a.download = nombreArchivoDescarga(pedido.titulo, 'xlsx')
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
-        sileo.success({ title: 'Libro Excel (.xlsx) descargado.' })
-        onClose()
-      } catch (err: unknown) {
-        sileo.error({
-          title: getErrorMessage(err, 'No pudimos exportar el Excel.'),
-        })
-      } finally {
-        setDescargando(false)
-      }
-    } else {
-      if (data) {
-        exportarAnalisisPdf(data, 'Argentum — Tu análisis')
-        sileo.success({ title: 'Informe PDF descargado.' })
+        sileo.success({ title: 'Excel descargado.' })
+      } else {
+        await exportarInformePdf(pedido, nombres)
+        sileo.success({ title: 'PDF descargado.' })
       }
       onClose()
+    } catch (err: unknown) {
+      sileo.error({
+        title: getErrorMessage(err, 'No pudimos descargar el archivo.'),
+      })
+    } finally {
+      setDescargando(false)
     }
   }
 
@@ -73,6 +79,8 @@ export default function DescargarAnalisisModal({
       onClose()
     }
   }
+
+  const lineaResumen = pedido ? resumenPedido(pedido, nombres) : ''
 
   return (
     <Modal
@@ -99,7 +107,7 @@ export default function DescargarAnalisisModal({
               variant="primary"
               fullWidth
               onClick={() => void handleDescargar()}
-              disabled={descargando || (formato === 'pdf' && !data)}
+              disabled={descargando || !pedido}
             >
               {descargando ? 'Descargando…' : 'Descargar'}
             </Button>
@@ -109,7 +117,7 @@ export default function DescargarAnalisisModal({
     >
       <div className={styles.container} data-modal-block>
         <p className={styles.texto}>
-          Elegí el formato para descargar el análisis con los filtros seleccionados.
+          {lineaResumen}
         </p>
 
         <div className={styles.selectorWrapper}>

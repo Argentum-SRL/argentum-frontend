@@ -85,4 +85,29 @@ describe('TF2: Límites de tamaño en Análisis', () => {
     const lines = countLines('EvolucionCiclosCard.tsx')
     expect(lines).toBeLessThanOrEqual(720)
   })
+
+  it('descargaAnalisis.ts tiene como máximo 220 líneas', () => {
+    const lines = countLines('descargaAnalisis.ts')
+    expect(lines).toBeLessThanOrEqual(220)
+  })
+
+  it('exportarInformePdf.ts tiene como máximo 350 líneas', () => {
+    const lines = countLines('exportarInformePdf.ts')
+    expect(lines).toBeLessThanOrEqual(350)
+  })
+
+  it('contenidoPdf.ts tiene como máximo 350 líneas', () => {
+    const lines = countLines('contenidoPdf.ts')
+    expect(lines).toBeLessThanOrEqual(350)
+  })
+
+  it('opcionesTablaPdf.ts tiene como máximo 150 líneas', () => {
+    const lines = countLines('opcionesTablaPdf.ts')
+    expect(lines).toBeLessThanOrEqual(150)
+  })
+
+  it('estilosArchivo.ts tiene como máximo 80 líneas', () => {
+    const lines = countLines('estilosArchivo.ts')
+    expect(lines).toBeLessThanOrEqual(80)
+  })
 })

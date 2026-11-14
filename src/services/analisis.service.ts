@@ -44,6 +44,7 @@ export interface AnalisisInsight {
 export interface AnalisisCicloPunto {
   clave: string
   etiqueta: string
+  nombre_corto?: string
   rango_texto: string
   fecha_inicio: string
   fecha_fin: string
@@ -114,6 +115,16 @@ export interface AnalisisResumenResponse {
   insights: AnalisisInsight[]
   serie_ciclos: AnalisisCicloPunto[]
   desglose_categorias: AnalisisCategoriaItem[]
+  totales_terminados?: {
+    ingresos: number | null
+    gastos: number
+    balance: number | null
+    tasa_ahorro_pct: number | null
+  }
+  total_desglose?: {
+    monto: number
+    cantidad_movimientos: number
+  }
   filtros_disponibles: AnalisisFiltrosDisponibles
 }
 
@@ -141,10 +152,20 @@ export interface AnalisisQueryParams {
   naturaleza?: NaturalezaGastoFiltro
 }
 
+export interface ExportarExcelParams extends AnalisisQueryParams {
+  titulo?: string
+  bloques?: string
+  titulos?: string
+  ciclo_a?: string
+  ciclo_b?: string
+  meses?: number
+}
+
 // ── Fase 3: Comparativa entre Ciclos y Proyección de Compromisos ─────────────
 export interface ComparativaCicloMeta {
   clave: string
   etiqueta: string
+  nombre_corto?: string
   rango_texto: string
   es_actual?: boolean
   dias_transcurridos?: number
@@ -191,11 +212,18 @@ export interface ComparativaCiclosResponse {
     } | null
   }
   categorias: ComparativaCategoriaItem[]
+  totales?: {
+    monto_a: number
+    monto_b: number
+    diferencia_monto: number
+    diferencia_pct: number | null
+  }
 }
 
 export interface ProyeccionMesPunto {
   clave: string
   etiqueta: string
+  nombre_corto?: string
   rango_texto: string
   mes_nombre?: string
   monto_cuotas: number
@@ -216,6 +244,7 @@ export interface ProyeccionPlanActivo {
   saldo_pendiente: number
   ultimo_vencimiento: string
   ultimo_mes_etiqueta: string
+  ultimo_mes_nombre_corto?: string
   progreso_pct: number
 }
 
@@ -237,6 +266,13 @@ export interface ProyeccionCompromisosResponse {
   }
   serie_mensual: ProyeccionMesPunto[]
   planes_activos: ProyeccionPlanActivo[]
+  totales_serie?: {
+    monto_cuotas: number
+    monto_suscripciones: number
+    monto_total: number
+    planes_que_finalizan: number
+    monto_que_se_libera: number
+  }
 }
 
 // ── Fase 4: Mis Informes Personalizados ──────────────────────────────────────
@@ -356,7 +392,32 @@ const analisisService = {
     await api.delete(`/analisis/informes/${id}`)
   },
 
-  async exportarExcel(params: AnalisisQueryParams & { titulo?: string }): Promise<Blob> {
+  async exportarExcel(
+    pedidoOrParams: unknown
+  ): Promise<Blob> {
+    const raw = (pedidoOrParams || {}) as Record<string, unknown>
+    let params: Record<string, unknown>
+    if (raw.bloques && Array.isArray(raw.bloques)) {
+      const bloquesArray = raw.bloques as Array<string | { tipo: string; titulo?: string }>
+      const bloquesStr = bloquesArray
+        .map((b) => (typeof b === 'string' ? b : b.tipo))
+        .join(',')
+      const titulosStr = bloquesArray
+        .map((b) => (typeof b === 'object' && b.titulo ? b.titulo : ''))
+        .join('|')
+      const pObj =
+        raw.params && typeof raw.params === 'object'
+          ? (raw.params as Record<string, unknown>)
+          : {}
+      params = {
+        ...pObj,
+        titulo: raw.titulo,
+        bloques: bloquesStr,
+        ...(titulosStr.replace(/\|/g, '') ? { titulos: titulosStr } : {}),
+      }
+    } else {
+      params = { ...raw }
+    }
     const res = await api.get<Blob>('/analisis/exportar-excel', {
       params,
       responseType: 'blob',

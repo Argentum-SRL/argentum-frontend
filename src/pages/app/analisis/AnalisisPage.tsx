@@ -18,6 +18,7 @@ import analisisService, {
 } from '@/services/analisis.service'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import type { VistaActivaAnalisis } from './filtrosAnalisis'
+import { armarPedidoDescarga, type PedidoDescarga } from './descargaAnalisis'
 import styles from './AnalisisPage.module.css'
 
 const OPCIONES_TABS_MOBILE: SegmentedControlOption<'analisis' | 'informes'>[] = [
@@ -43,7 +44,12 @@ export default function AnalisisPage() {
   const [seriesPersonalizadas, setSeriesPersonalizadas] = useState<SerieEvolucionPersonalizada[]>([])
   const [modoCategorias, setModoCategorias] = useState<'barras' | 'dona' | 'ranking'>('barras')
   const [modoComparativa, setModoComparativa] = useState<'diferencias' | 'grafico'>('diferencias')
+  const [cicloA, setCicloA] = useState<string | undefined>(undefined)
+  const [cicloB, setCicloB] = useState<string | undefined>(undefined)
   const [horizonteProyeccion, setHorizonteProyeccion] = useState<'6' | '12'>('6')
+
+  // Estado informe activo (desde MisInformesTab)
+  const [pedidoInforme, setPedidoInforme] = useState<PedidoDescarga | null>(null)
 
   // Modales
   const [descargarModalOpen, setDescargarModalOpen] = useState(false)
@@ -125,14 +131,47 @@ export default function AnalisisPage() {
   }, [lastDataUpdate, fetchResumen])
 
   const monedaVisual = data?.moneda_visual ?? (monedaModo.includes('usd') ? 'USD' : 'ARS')
-  const billeteras = data?.filtros_disponibles.billeteras ?? []
-  const tarjetas = data?.filtros_disponibles.tarjetas ?? []
+  const billeteras = useMemo(() => data?.filtros_disponibles.billeteras ?? [], [data?.filtros_disponibles.billeteras])
+  const tarjetas = useMemo(() => data?.filtros_disponibles.tarjetas ?? [], [data?.filtros_disponibles.tarjetas])
 
   const esInformes = vistaActiva === 'informes'
   const subtituloDesktop = `${data?.periodo_seleccionado.etiqueta ?? 'Cargando...'} · ${data?.kpis.cantidad_operaciones ?? 0} movimientos`
   const rangoMobile = data?.periodo_seleccionado.etiqueta.match(/\(([^)]+)\)/)?.[1]
   const subtituloMobile = `${rangoMobile ?? data?.periodo_seleccionado.etiqueta ?? 'Cargando...'} · ${data?.kpis.cantidad_operaciones ?? 0} movimientos`
   const mostrarSidebar = sidebarOpen && !esInformes
+
+  const nombresParaDescarga = useMemo(() => {
+    const bMap: Record<string, string> = {}
+    billeteras.forEach((b) => {
+      bMap[b.id] = b.nombre
+    })
+    const tMap: Record<string, string> = {}
+    tarjetas.forEach((t) => {
+      tMap[t.id] = t.nombre
+    })
+    return {
+      billeteras: bMap,
+      tarjetas: tMap,
+      billeteraNombre: billeteraId !== 'todos' ? bMap[billeteraId] : undefined,
+      tarjetaNombre: tarjetaId !== 'todos' ? tMap[tarjetaId] : undefined,
+    }
+  }, [billeteras, tarjetas, billeteraId, tarjetaId])
+
+  const pedidoDescarga = useMemo<PedidoDescarga | null>(() => {
+    if (vistaActiva === 'informes') {
+      return pedidoInforme
+    }
+    return armarPedidoDescarga({
+      tabActiva: vistaActiva,
+      filtros: {
+        ...queryParams,
+        ciclo_a: cicloA,
+        ciclo_b: cicloB,
+        meses: horizonteProyeccion === '12' ? 12 : 6,
+      },
+      datosResumen: data ?? undefined,
+    })
+  }, [vistaActiva, pedidoInforme, queryParams, cicloA, cicloB, horizonteProyeccion, data])
 
   return (
     <div className={styles.page}>
@@ -186,16 +225,18 @@ export default function AnalisisPage() {
             <span className={styles.btnText}>Mis informes</span>
           </button>
 
-          <button
-            type="button"
-            className={styles.btnGhost}
-            onClick={() => setDescargarModalOpen(true)}
-            aria-label="Descargar"
-            title="Descargar análisis"
-          >
-            <Download size={16} className={styles.btnIcon} />
-            <span className={styles.btnText}>Descargar</span>
-          </button>
+          {pedidoDescarga !== null && (
+            <button
+              type="button"
+              className={styles.btnGhost}
+              onClick={() => setDescargarModalOpen(true)}
+              aria-label="Descargar"
+              title="Descargar análisis"
+            >
+              <Download size={16} className={styles.btnIcon} />
+              <span className={styles.btnText}>Descargar</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -229,28 +270,32 @@ export default function AnalisisPage() {
           )}
 
           {/* Barra de Controles Mobile (Filtros + Descargar, como en Transacciones) */}
-          {vistaActiva !== 'informes' && (
+          {(vistaActiva !== 'informes' || pedidoDescarga !== null) && (
             <div className={styles.mobileControlsBar}>
               <div className={styles.mobileLeftActions}>
+                {vistaActiva !== 'informes' && (
+                  <button
+                    type="button"
+                    className={styles.mobileFilterBtn}
+                    onClick={() => setSidebarOpen(true)}
+                    aria-label="Abrir filtros"
+                  >
+                    <SlidersHorizontal size={15} />
+                    <span>Filtros</span>
+                  </button>
+                )}
+              </div>
+              {pedidoDescarga !== null && (
                 <button
                   type="button"
-                  className={styles.mobileFilterBtn}
-                  onClick={() => setSidebarOpen(true)}
-                  aria-label="Abrir filtros"
+                  className={styles.mobileActionBtn}
+                  onClick={() => setDescargarModalOpen(true)}
+                  aria-label="Descargar análisis"
+                  title="Descargar"
                 >
-                  <SlidersHorizontal size={15} />
-                  <span>Filtros</span>
+                  <Download size={16} />
                 </button>
-              </div>
-              <button
-                type="button"
-                className={styles.mobileActionBtn}
-                onClick={() => setDescargarModalOpen(true)}
-                aria-label="Descargar análisis"
-                title="Descargar"
-              >
-                <Download size={16} />
-              </button>
+              )}
             </div>
           )}
 
@@ -291,6 +336,12 @@ export default function AnalisisPage() {
                 monedaVisual={monedaVisual}
                 vistaModoExterno={modoComparativa}
                 onVistaModoChange={setModoComparativa}
+                cicloA={cicloA}
+                cicloB={cicloB}
+                onCiclosChange={(a, b) => {
+                  setCicloA(a)
+                  setCicloB(b)
+                }}
                 collapsible={false}
               />
             )}
@@ -307,7 +358,9 @@ export default function AnalisisPage() {
               />
             )}
 
-            {vistaActiva === 'informes' && <MisInformesTab />}
+            {vistaActiva === 'informes' && (
+              <MisInformesTab onPedidoInformeChange={setPedidoInforme} />
+            )}
           </div>
         </main>
 
@@ -341,8 +394,8 @@ export default function AnalisisPage() {
       <DescargarAnalisisModal
         isOpen={descargarModalOpen}
         onClose={() => setDescargarModalOpen(false)}
-        queryParams={queryParams}
-        data={data}
+        pedido={pedidoDescarga}
+        nombres={nombresParaDescarga}
       />
 
       <EditorSeriesEvolucionModal

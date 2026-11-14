@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
-  FileSpreadsheet,
   Plus,
-  Download,
   Sparkles,
   ArrowLeft,
 } from '@/components/ui/icons'
@@ -22,12 +20,16 @@ import EvolucionCiclosCard from './EvolucionCiclosCard'
 import DesgloseCategoriasCard from './DesgloseCategoriasCard'
 import ComparativaCiclosCard from './ComparativaCiclosCard'
 import ProyeccionCuotasCard from './ProyeccionCuotasCard'
-import { exportarAnalisisPdf } from './exportarAnalisisPdf'
 import InformeEditor from './InformeEditor'
 import InformeTarjeta, { PlantillaTarjeta } from './InformeTarjeta'
+import { armarPedidoDescarga, type PedidoDescarga } from './descargaAnalisis'
 import styles from './MisInformesTab.module.css'
 
-export default function MisInformesTab() {
+interface MisInformesTabProps {
+  onPedidoInformeChange?: (pedido: PedidoDescarga | null) => void
+}
+
+export default function MisInformesTab({ onPedidoInformeChange }: MisInformesTabProps = {}) {
   const [informes, setInformes] = useState<InformePersonalizadoItem[]>([])
   const [mostrarTodosInformes, setMostrarTodosInformes] = useState<boolean>(false)
   const [loadingList, setLoadingList] = useState<boolean>(true)
@@ -35,7 +37,9 @@ export default function MisInformesTab() {
   const [activeInforme, setActiveInforme] = useState<InformePersonalizadoItem | null>(null)
   const [visorData, setVisorData] = useState<AnalisisResumenResponse | null>(null)
   const [loadingVisor, setLoadingVisor] = useState<boolean>(false)
-  const [exportingExcel, setExportingExcel] = useState<boolean>(false)
+  const [visorCicloA, setVisorCicloA] = useState<string | undefined>(undefined)
+  const [visorCicloB, setVisorCicloB] = useState<string | undefined>(undefined)
+  const [visorMeses, setVisorMeses] = useState<number>(6)
 
   const fetchInformes = useCallback(async (signal?: AbortSignal) => {
     setLoadingList(true)
@@ -155,39 +159,44 @@ export default function MisInformesTab() {
     }
   }
 
-  const handleDescargarExcel = async () => {
-    if (!visorQueryParams || !activeInforme) return
-    setExportingExcel(true)
-    try {
-      const blob = await analisisService.exportarExcel({
-        ...visorQueryParams,
-        titulo: activeInforme.nombre,
-      })
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      const slug = activeInforme.nombre
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_|_$/g, '')
-      a.download = `${slug || 'informe_argentum'}.xlsx`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      window.URL.revokeObjectURL(url)
-      sileo.success({ title: 'Excel descargado.' })
-    } catch (err) {
-      sileo.error({ title: getErrorMessage(err, 'Error al exportar a Excel.') })
-    } finally {
-      setExportingExcel(false)
+  useEffect(() => {
+    if (modoVista !== 'visor' || !activeInforme || !visorQueryParams) {
+      onPedidoInformeChange?.(null)
+      return
     }
-  }
+    const pedido = armarPedidoDescarga({
+      tabActiva: 'mis_informes',
+      tituloInforme: activeInforme.nombre,
+      bloquesInforme: activeInforme.configuracion.bloques,
+      filtros: {
+        moneda_modo: visorQueryParams.moneda_modo,
+        ciclos: visorQueryParams.ciclos,
+        naturaleza: visorQueryParams.naturaleza,
+        billetera_id: visorQueryParams.billetera_id,
+        tarjeta_id: visorQueryParams.tarjeta_id,
+        ciclo_a: visorCicloA,
+        ciclo_b: visorCicloB,
+        meses: visorMeses,
+      },
+      datosVisor: visorData ?? undefined,
+    })
+    onPedidoInformeChange?.(pedido)
+  }, [
+    modoVista,
+    activeInforme,
+    visorQueryParams,
+    visorCicloA,
+    visorCicloB,
+    visorMeses,
+    visorData,
+    onPedidoInformeChange,
+  ])
 
-  const handleDescargarPdf = () => {
-    if (!visorData || !activeInforme) return
-    exportarAnalisisPdf(visorData, activeInforme.nombre)
-    sileo.success({ title: 'PDF generado.' })
-  }
+  useEffect(() => {
+    return () => {
+      onPedidoInformeChange?.(null)
+    }
+  }, [onPedidoInformeChange])
 
   if (modoVista === 'constructor') {
     return (
@@ -236,30 +245,6 @@ export default function MisInformesTab() {
               )}
             </div>
           </div>
-
-          <div className={styles.exportActions}>
-            <button
-              type="button"
-              className={styles.actionGhostBtn}
-              onClick={() => void handleDescargarExcel()}
-              disabled={exportingExcel || loadingVisor}
-              title="Exportar a Excel (.xlsx)"
-            >
-              <FileSpreadsheet size={15} />
-              <span>{exportingExcel ? 'Generando...' : 'Excel'}</span>
-            </button>
-
-            <button
-              type="button"
-              className={styles.actionGhostBtn}
-              onClick={handleDescargarPdf}
-              disabled={!visorData || loadingVisor}
-              title="Exportar a PDF"
-            >
-              <Download size={15} />
-              <span>PDF</span>
-            </button>
-          </div>
         </header>
 
         {loadingVisor && !visorData ? (
@@ -293,6 +278,12 @@ export default function MisInformesTab() {
               <ComparativaCiclosCard
                 queryParams={visorQueryParams}
                 monedaVisual={monedaVis}
+                cicloA={visorCicloA}
+                cicloB={visorCicloB}
+                onCiclosChange={(a, b) => {
+                  setVisorCicloA(a)
+                  setVisorCicloB(b)
+                }}
                 collapsible
               />
             )}
@@ -303,6 +294,8 @@ export default function MisInformesTab() {
                 monedaVisual={monedaVis}
                 billeteraId={visorQueryParams.billetera_id}
                 tarjetaId={visorQueryParams.tarjeta_id}
+                horizonteExterno={String(visorMeses) as '6' | '12'}
+                onHorizonteChange={(h) => setVisorMeses(h === '12' ? 12 : 6)}
                 collapsible
               />
             )}

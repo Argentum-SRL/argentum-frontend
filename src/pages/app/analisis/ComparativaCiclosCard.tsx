@@ -3,6 +3,7 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -17,6 +18,7 @@ import analisisService, {
   type ComparativaCiclosResponse,
 } from '@/services/analisis.service'
 import { formatMonto, formatMontoCorto, formatPorcentaje } from '@/utils/format'
+import { useTheme } from '@/hooks/useTheme'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './ComparativaCiclosCard.module.css'
 
@@ -35,7 +37,9 @@ export default function ComparativaCiclosCard({
   onVistaModoChange,
   collapsible = false,
 }: ComparativaCiclosCardProps) {
-  const primaryBarColor = '#FF8A65'
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [vistaModoInterno, setVistaModoInterno] = useState<'diferencias' | 'grafico'>('diferencias')
   const vistaModo = vistaModoExterno ?? vistaModoInterno
   const handleCambiarVista = (nuevo: 'diferencias' | 'grafico') => {
@@ -300,78 +304,146 @@ export default function ComparativaCiclosCard({
             />
           )}
           {vistaModo === 'grafico' ? (
-        <div className={styles.chartWrap}>
-          <ResponsiveContainer width="100%" height={290}>
-            <BarChart
-              key={`${data.ciclo_a.clave}-${data.ciclo_b.clave}-${monedaVisual}`}
-              data={data.categorias.slice(0, 8)}
-              margin={{ top: 12, right: 12, left: 0, bottom: 8 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="var(--border)"
-              />
-              <XAxis
-                dataKey="categoria_nombre"
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: 'var(--text-2)', fontSize: 11 }}
-              />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: 'var(--text-2)', fontSize: 12 }}
-                tickFormatter={(val: number) => formatMontoCorto(val, monedaVisual)}
-                width={64}
-              />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload || payload.length === 0) return null
-                  const row = payload[0].payload
-                  return (
-                    <div className={styles.tooltipCard}>
-                      <p className={styles.tooltipTitle}>{row.categoria_nombre}</p>
-                      <div className={styles.tooltipRow}>
-                        <span>{etiquetaA}:</span>
-                        <strong>{formatMonto(row.monto_a, monedaVisual)}</strong>
-                      </div>
-                      <div className={styles.tooltipRow}>
-                        <span>{etiquetaB}:</span>
-                        <strong>{formatMonto(row.monto_b, monedaVisual)}</strong>
-                      </div>
-                      <div className={styles.tooltipDivider} />
-                      <div className={styles.tooltipRow}>
-                        <span>Diferencia:</span>
-                        <strong>
-                          {row.diferencia_monto > 0 ? '+' : ''}
-                          {formatMonto(row.diferencia_monto, monedaVisual)}
-                        </strong>
-                      </div>
-                    </div>
-                  )
-                }}
-              />
-              <Bar
-                dataKey="monto_a"
-                name={etiquetaA}
-                fill={primaryBarColor}
-                radius={[6, 6, 0, 0]}
-                maxBarSize={28}
-                isAnimationActive={!prefersReducedMotion}
-              />
-              <Bar
-                dataKey="monto_b"
-                name={etiquetaB}
-                fill="#94A3B8"
-                radius={[6, 6, 0, 0]}
-                maxBarSize={28}
-                isAnimationActive={!prefersReducedMotion}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
+            <div className={styles.chartWrap}>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart
+                  key={`${data.ciclo_a.clave}-${data.ciclo_b.clave}-${monedaVisual}`}
+                  data={data.categorias.slice(0, 8)}
+                  margin={{ top: 12, right: 12, left: 0, bottom: 8 }}
+                  onMouseMove={(state) => {
+                    if (state && typeof state.activeTooltipIndex === 'number') {
+                      setActiveIndex(state.activeTooltipIndex)
+                    }
+                  }}
+                  onMouseLeave={() => setActiveIndex(null)}
+                >
+                  <defs>
+                    <linearGradient id="compCicloAGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#FFA07A" />
+                      <stop offset="100%" stopColor="#FF6E40" />
+                    </linearGradient>
+                    <linearGradient id="compCicloBGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={isDark ? '#94A3B8' : '#CBD5E1'} />
+                      <stop offset="100%" stopColor={isDark ? '#64748B' : '#94A3B8'} />
+                    </linearGradient>
+                    <filter id="compBarADepth" x="-30%" y="-20%" width="160%" height="150%">
+                      <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor={isDark ? '#000000' : '#0F172A'} floodOpacity={isDark ? '0.65' : '0.25'} />
+                      <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#FF6E40" floodOpacity={isDark ? '0.4' : '0.2'} />
+                    </filter>
+                    <filter id="compBarBDepth" x="-30%" y="-20%" width="160%" height="150%">
+                      <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor={isDark ? '#000000' : '#0F172A'} floodOpacity={isDark ? '0.65' : '0.25'} />
+                      <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#64748B" floodOpacity={isDark ? '0.4' : '0.2'} />
+                    </filter>
+                  </defs>
+
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis
+                    dataKey="categoria_nombre"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: 'var(--text-2)', fontSize: 11 }}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: 'var(--text-2)', fontSize: 12 }}
+                    tickFormatter={(val: number) => formatMontoCorto(val, monedaVisual)}
+                    width={64}
+                  />
+                  <Tooltip
+                    cursor={false}
+                    content={({ active, payload }) => {
+                      if (!active || !payload || payload.length === 0) return null
+                      const row = payload[0].payload
+                      return (
+                        <div className={styles.tooltipCard}>
+                          <p className={styles.tooltipTitle}>{row.categoria_nombre}</p>
+                          <div className={styles.tooltipRow}>
+                            <span>{etiquetaA}:</span>
+                            <strong>{formatMonto(row.monto_a, monedaVisual)}</strong>
+                          </div>
+                          <div className={styles.tooltipRow}>
+                            <span>{etiquetaB}:</span>
+                            <strong>{formatMonto(row.monto_b, monedaVisual)}</strong>
+                          </div>
+                          <div className={styles.tooltipDivider} />
+                          <div className={styles.tooltipRow}>
+                            <span>Diferencia:</span>
+                            <strong style={{ color: row.diferencia_monto <= 0 ? 'var(--success)' : 'var(--error)' }}>
+                              {row.diferencia_monto > 0 ? '+' : ''}
+                              {formatMonto(row.diferencia_monto, monedaVisual)}
+                              {row.diferencia_pct !== null && ` (${formatPorcentaje(row.diferencia_pct, { signo: true })})`}
+                            </strong>
+                          </div>
+                        </div>
+                      )
+                    }}
+                  />
+                  <Bar
+                    dataKey="monto_a"
+                    name={etiquetaA}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={28}
+                    isAnimationActive={!prefersReducedMotion}
+                  >
+                    {data.categorias.slice(0, 8).map((_, idx) => {
+                      const isHovered = activeIndex === idx
+                      const isAnyHovered = activeIndex !== null
+                      return (
+                        <Cell
+                          key={`bar-a-${idx}`}
+                          fill="url(#compCicloAGrad)"
+                          style={{
+                            opacity: isAnyHovered ? (isHovered ? 1 : 0.38) : 1,
+                            filter: isHovered ? 'url(#compBarADepth)' : undefined,
+                            transform: isHovered ? 'translateY(-2px)' : 'none',
+                            transformOrigin: 'bottom',
+                            transition: prefersReducedMotion ? 'none' : 'opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease',
+                          }}
+                        />
+                      )
+                    })}
+                  </Bar>
+                  <Bar
+                    dataKey="monto_b"
+                    name={etiquetaB}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={28}
+                    isAnimationActive={!prefersReducedMotion}
+                  >
+                    {data.categorias.slice(0, 8).map((_, idx) => {
+                      const isHovered = activeIndex === idx
+                      const isAnyHovered = activeIndex !== null
+                      return (
+                        <Cell
+                          key={`bar-b-${idx}`}
+                          fill="url(#compCicloBGrad)"
+                          style={{
+                            opacity: isAnyHovered ? (isHovered ? 1 : 0.38) : 1,
+                            filter: isHovered ? 'url(#compBarBDepth)' : undefined,
+                            transform: isHovered ? 'translateY(-2px)' : 'none',
+                            transformOrigin: 'bottom',
+                            transition: prefersReducedMotion ? 'none' : 'opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease',
+                          }}
+                        />
+                      )
+                    })}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+
+              <div className={styles.legendRow}>
+                <span className={styles.legendItem}>
+                  <span className={styles.dot} style={{ background: '#FF6E40' }} />
+                  {etiquetaA}
+                </span>
+                <span className={styles.legendItem}>
+                  <span className={styles.dot} style={{ background: isDark ? '#94A3B8' : '#64748B' }} />
+                  {etiquetaB}
+                </span>
+              </div>
+            </div>
+          ) : (
         <div className={styles.deltaList}>
           {(mostrarTodas ? data.categorias : data.categorias.slice(0, 8)).map((item) => (
             <div key={item.categoria_id ?? item.categoria_nombre} className={styles.deltaRow}>

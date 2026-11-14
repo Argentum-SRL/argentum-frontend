@@ -473,8 +473,8 @@ export default function TransaccionesPage() {
     const raw = totalesMonedaActiva.linea_metas
     if (!raw) return null
 
-    const matchAporte = raw.match(/apartaste\s+([^\s]+(?:\s+[\d.,]+)?)/i)
-    const matchRetiro = raw.match(/sacaste\s+([^\s]+(?:\s+[\d.,]+)?)/i)
+    const matchAporte = raw.match(/apartaste\s+([^\s]+(?:\s+[\d\.,]+)?)/i)
+    const matchRetiro = raw.match(/sacaste\s+([^\s]+(?:\s+[\d\.,]+)?)/i)
 
     if (matchAporte) {
       const monto = matchAporte[1].trim()

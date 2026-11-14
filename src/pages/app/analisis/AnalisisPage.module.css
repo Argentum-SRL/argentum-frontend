@@ -208,16 +208,12 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  margin-top: 0;
 }
 
-@media (min-width: 768px) {
-  .desktopSummaryBar {
-    display: block;
-  }
-}
-
-/* ── Mobile Resumen Card (< 768px) ── */
-.mobileSummaryCard {
+/* ── Mobile Resumen (< 768px): 2 filas limpias, números 100% completos ── */
+/* ── Mobile Split Strip (Unified Metric Surface) ── */
+.mobileSplitStrip {
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -225,109 +221,183 @@
   border-radius: 16px;
   padding: 12px 14px;
   box-shadow: var(--elevation-xs);
+  margin-bottom: 4px;
+  gap: 8px;
   width: 100%;
   box-sizing: border-box;
-  gap: 8px;
 }
 
-@media (min-width: 768px) {
-  .mobileSummaryCard {
-    display: none;
-  }
-}
-
-.mobileHeroMetric {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.mobileHeroLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.mobileMetricLabel {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-3);
-  line-height: 1.2;
-}
-
-.mobileHeroValue {
-  font-size: 18px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.mobilePillBadge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-2);
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  padding: 3px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-.mobileMetricDivider {
-  height: 1px;
-  background: var(--border);
-  width: 100%;
-}
-
-.mobileSubMetricsGrid {
+.mobileSplitGrid {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
 
-.mobileSubItem {
+.mobileMetasRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mobileMetasIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+  display: block;
+}
+
+.splitItem {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   flex: 1;
   min-width: 0;
   gap: 2px;
+  text-align: center;
 }
 
-.mobileSubDivider {
-  width: 1px;
-  height: 26px;
-  background: var(--border);
-  margin: 0 8px;
-  flex-shrink: 0;
+.splitLabel {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
 }
 
-.mobileSubValue {
-  font-size: 12px;
+.splitValue {
+  font-size: 12.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
 }
 
+.splitDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
 .colorGreen {
-  color: #4CAF7D;
+  color: var(--success, #1a7a4a);
 }
 
 .colorRed {
-  color: #FF8A65;
+  color: var(--error, #c0392b);
+}
+
+:global([data-theme="dark"]) .colorGreen {
+  color: #4caf7d;
+}
+
+:global([data-theme="dark"]) .colorRed {
+  color: #ff8a65;
+}
+
+/* ── Balance Hero Slot (Desktop PageSummaryBar) ── */
+.balanceCicloSlot {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.balanceMainGroup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.balanceCicloLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+.balanceCicloValue {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.08;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.metasNotice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 280px;
+  margin-left: auto;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.metasNoticeIcon {
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  display: block;
+}
+
+.metasNoticeText {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.25;
+  text-align: left;
+  letter-spacing: -0.01em;
+}
+
+.metasNoticeHighlight {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.balanceNegative {
+  color: #ff8a65;
+}
+
+.balancePositive {
+  color: rgba(255, 255, 255, 1);
+}
+
+@media (min-width: 768px) {
+  .balanceCicloValue {
+    font-size: clamp(22px, 2.2vw, 28px);
+  }
+
+  .mobileSplitStrip {
+    display: none;
+  }
+
+  .desktopSummaryBar {
+    display: flex;
+  }
 }
 
 .fraseResumen {

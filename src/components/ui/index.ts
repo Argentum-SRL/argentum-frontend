@@ -10,6 +10,7 @@ import { DateInput } from './DateInput/DateInput.tsx'
 import { TimeInput } from './TimeInput/TimeInput.tsx'
 import { SelectInput } from './SelectInput'
 import type { SelectOption } from './SelectInput'
+import { CollapseToggle, type CollapseToggleProps } from './CollapseToggle'
 import { PhoneCountrySelect } from './PhoneCountrySelect'
 import type { Country } from './PhoneCountrySelect'
 import SegmentedControl from './SegmentedControl'
@@ -32,6 +33,8 @@ export {
   TimeInput,
   SelectInput, 
   type SelectOption, 
+  CollapseToggle,
+  type CollapseToggleProps,
   PhoneCountrySelect, 
   type Country,
   SegmentedControl,

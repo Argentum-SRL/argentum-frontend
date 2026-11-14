@@ -9,7 +9,7 @@
     "R07": 0,
     "R08": 0,
     "R09": 0,
-    "R10": 462,
+    "R10": 457,
     "R11": 0,
     "R12": 13,
     "R13": 0,
@@ -36,7 +36,8 @@
     "R34": 0,
     "R35": 0,
     "R36": 0,
-    "R37": 0
+    "R37": 0,
+    "R38": 0
   },
   "files": {
     "components/auth/AuthLayout/AuthLayout.module.css": {
@@ -76,7 +77,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css": {
       "R01": 0,
@@ -115,7 +117,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/billeteras/BankPickerModal.module.css": {
       "R01": 0,
@@ -154,7 +157,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/billeteras/BilleteraCard.module.css": {
       "R01": 0,
@@ -193,7 +197,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/billeteras/EditBilleteraModal.module.css": {
       "R01": 0,
@@ -232,7 +237,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/dashboard/BalanceCard/BalanceCard.module.css": {
       "R01": 0,
@@ -271,7 +277,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/dashboard/ConsejoCard/ConsejoCard.module.css": {
       "R01": 0,
@@ -310,7 +317,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/facturas/FacturaPanel.module.css": {
       "R01": 0,
@@ -349,7 +357,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/layout/AppLayout/AppLayout.module.css": {
       "R01": 0,
@@ -388,7 +397,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/layout/MobileBottomNav/MobileMoreSheet.module.css": {
       "R01": 0,
@@ -427,7 +437,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/notificaciones/NotificacionesDrawer.module.css": {
       "R01": 0,
@@ -466,7 +477,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/perfil/FotoCropModal.module.css": {
       "R01": 0,
@@ -505,7 +517,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/perfil/PerfilFinancieroCard.module.css": {
       "R01": 0,
@@ -544,7 +557,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/presupuestos/PresupuestoModal.module.css": {
       "R01": 0,
@@ -583,7 +597,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/suscripciones/SuscripcionCard.module.css": {
       "R01": 0,
@@ -622,7 +637,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tarjetas/PagarResumenModal.module.css": {
       "R01": 0,
@@ -661,7 +677,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tarjetas/TarjetaCard.module.css": {
       "R01": 0,
@@ -700,7 +717,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tarjetas/TarjetaModal.module.css": {
       "R01": 0,
@@ -739,7 +757,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tools/importacion/ImportacionResumenSection.module.css": {
       "R01": 0,
@@ -778,7 +797,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tools/importacion/ModalesImportacion.module.css": {
       "R01": 0,
@@ -817,7 +837,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tools/ToolsComponents.parte1.css": {
       "R01": 0,
@@ -856,7 +877,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tools/ToolsComponents.parte2.css": {
       "R01": 0,
@@ -895,7 +917,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tools/ToolsComponents.parte3.css": {
       "R01": 0,
@@ -934,7 +957,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tools/ToolsComponents.parte4.css": {
       "R01": 0,
@@ -973,7 +997,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/tools/ToolsComponents.parte5.css": {
       "R01": 0,
@@ -1012,7 +1037,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/DebitoEnDolares.module.css": {
       "R01": 0,
@@ -1051,7 +1077,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/FilterBar.parte1.css": {
       "R01": 0,
@@ -1090,7 +1117,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/FilterBar.parte2.css": {
       "R01": 0,
@@ -1129,7 +1157,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/GruposCuotasTab.parte1.css": {
       "R01": 0,
@@ -1168,7 +1197,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/GruposCuotasTab.parte3.css": {
       "R01": 0,
@@ -1207,7 +1237,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/MovimientoRow.module.css": {
       "R01": 0,
@@ -1246,7 +1277,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/TransaccionModal.parte1.css": {
       "R01": 0,
@@ -1285,7 +1317,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/TransaccionModal.parte2.css": {
       "R01": 0,
@@ -1324,7 +1357,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/TransaccionModal.parte3.css": {
       "R01": 0,
@@ -1363,7 +1397,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transacciones/TransaccionRow.module.css": {
       "R01": 0,
@@ -1402,7 +1437,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transferencias/TransferenciaRow.module.css": {
       "R01": 0,
@@ -1441,7 +1477,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/transferencias/TransferenciasFilterBar.module.css": {
       "R01": 0,
@@ -1480,7 +1517,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/AtmosphericBackground/AtmosphericBackground.module.css": {
       "R01": 0,
@@ -1519,7 +1557,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/AtmosphericBackground/LunarLoading.module.css": {
       "R01": 0,
@@ -1558,7 +1597,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/Button/Button.module.css": {
       "R01": 0,
@@ -1597,7 +1637,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/CategoriaSelector/CategoriaSelector.module.css": {
       "R01": 0,
@@ -1636,7 +1677,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/ColorPicker/ColorPicker.module.css": {
       "R01": 0,
@@ -1675,7 +1717,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/ConfirmModal/ConfirmModal.module.css": {
       "R01": 0,
@@ -1714,7 +1757,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/DateInput/DateInput.module.css": {
       "R01": 0,
@@ -1753,7 +1797,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/Field/Field.module.css": {
       "R01": 0,
@@ -1792,7 +1837,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/GoogleLoginButton/GoogleLoginButton.module.css": {
       "R01": 0,
@@ -1831,7 +1877,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/LunarLoader/LunarLoader.module.css": {
       "R01": 0,
@@ -1870,7 +1917,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/MontoInput/MontoInput.module.css": {
       "R01": 0,
@@ -1909,46 +1957,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
-    },
-    "components/ui/PageSummaryBar/PageSummaryBar.module.css": {
-      "R01": 0,
-      "R02": 0,
-      "R03": 0,
-      "R04": 0,
-      "R05": 0,
-      "R06": 0,
-      "R07": 0,
-      "R08": 0,
-      "R09": 0,
-      "R10": 5,
-      "R11": 0,
-      "R12": 0,
-      "R13": 0,
-      "R14": 0,
-      "R15": 0,
-      "R16": 0,
-      "R17": 0,
-      "R18": 0,
-      "R19": 0,
-      "R20": 0,
-      "R21": 0,
-      "R22": 0,
-      "R23": 0,
-      "R24": 0,
-      "R25": 0,
-      "R26": 0,
-      "R27": 0,
-      "R28": 0,
-      "R29": 0,
-      "R30": 0,
-      "R31": 0,
-      "R32": 0,
-      "R33": 0,
-      "R34": 0,
-      "R35": 0,
-      "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/SelectableSurface/SelectableSurface.module.css": {
       "R01": 0,
@@ -1987,7 +1997,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/SelectInput/SelectInput.module.css": {
       "R01": 0,
@@ -2026,7 +2037,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "components/ui/TimeInput/TimeInput.module.css": {
       "R01": 0,
@@ -2065,7 +2077,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "index.css": {
       "R01": 0,
@@ -2104,7 +2117,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/admin/AnimacionPreviewPage.module.css": {
       "R01": 0,
@@ -2143,7 +2157,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/admin/diseno/components/DisenoCatalogView.module.css": {
       "R01": 0,
@@ -2182,7 +2197,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/admin/diseno/components/DisenoCategoryNav.module.css": {
       "R01": 0,
@@ -2221,7 +2237,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/admin/diseno/components/DisenoSpecificationView.module.css": {
       "R01": 0,
@@ -2260,7 +2277,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/admin/diseno/components/InteractiveDemos.module.css": {
       "R01": 0,
@@ -2299,7 +2317,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/AdminPage.module.css": {
       "R01": 0,
@@ -2338,7 +2357,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/billeteras/BilleteraDetallePage.module.css": {
       "R01": 0,
@@ -2377,7 +2397,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/billeteras/BilleterasPage.module.css": {
       "R01": 0,
@@ -2416,7 +2437,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/dashboard/DashboardPage.parte1.css": {
       "R01": 0,
@@ -2455,7 +2477,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/dashboard/DashboardPage.parte2.css": {
       "R01": 0,
@@ -2494,7 +2517,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/dashboard/DashboardPage.parte3.css": {
       "R01": 0,
@@ -2533,7 +2557,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/metas/GoalsBarChart.module.css": {
       "R01": 0,
@@ -2572,7 +2597,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/metas/MetasPage.module.css": {
       "R01": 0,
@@ -2611,7 +2637,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/perfil/components/ComerciosRecordados.module.css": {
       "R01": 0,
@@ -2650,7 +2677,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/perfil/components/EliminarCuentaModal.module.css": {
       "R01": 0,
@@ -2689,7 +2717,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/perfil/components/TabFinanzas.module.css": {
       "R01": 0,
@@ -2728,7 +2757,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/perfil/components/TabSeguridad.module.css": {
       "R01": 0,
@@ -2767,7 +2797,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/perfil/PerfilPage.parte2.css": {
       "R01": 0,
@@ -2806,7 +2837,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/perfil/PerfilPage.parte3.css": {
       "R01": 0,
@@ -2845,7 +2877,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/presupuestos/BudgetBarChart.module.css": {
       "R01": 0,
@@ -2884,7 +2917,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/presupuestos/PresupuestosPage.module.css": {
       "R01": 0,
@@ -2923,7 +2957,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/presupuestos/SugerenciaRubroCard.module.css": {
       "R01": 0,
@@ -2962,7 +2997,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/suscripciones/SuscripcionesPage.module.css": {
       "R01": 0,
@@ -3001,7 +3037,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/tools/ToolsPage.module.css": {
       "R01": 0,
@@ -3040,7 +3077,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/app/transacciones/TransaccionesPage.module.css": {
       "R01": 0,
@@ -3079,7 +3117,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "pages/TermsPage.module.css": {
       "R01": 0,
@@ -3118,7 +3157,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     },
     "styles/sileo.css": {
       "R01": 0,
@@ -3157,7 +3197,8 @@
       "R34": 0,
       "R35": 0,
       "R36": 0,
-      "R37": 0
+      "R37": 0,
+      "R38": 0
     }
   }
 }

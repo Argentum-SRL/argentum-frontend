@@ -137,6 +137,52 @@
   line-height: 1.3;
 }
 
+.sidebarSeriesBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  margin-top: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.sidebarSeriesBtn:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--text-3);
+}
+
+.sidebarResetSeriesBtn {
+  margin-top: 4px;
+  background: transparent;
+  color: var(--text-2);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  width: 100%;
+  padding: 4px;
+  transition: color 140ms ease;
+}
+
+.sidebarResetSeriesBtn:hover {
+  color: var(--text);
+}
+
 .desktopClearBtn {
   margin-top: 4px;
   background: var(--surface-alt);

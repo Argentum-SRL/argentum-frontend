@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   TrendingUp, SlidersHorizontal, PieChart, ArrowLeftRight,
-  Calendar, X,
+  Calendar, X, Sparkles,
 } from '@/components/ui/icons'
 import { SelectInput, type SelectOption } from '@/components/ui'
 import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'
@@ -27,6 +27,11 @@ export interface FiltrosAnalisisProps {
   textoCotizacionRef?: string | null
   isOpen: boolean
   onClose: () => void
+  modoEvolucion?: 'combinado' | 'barras' | 'lineas'
+  onModoEvolucionChange?: (m: 'combinado' | 'barras' | 'lineas') => void
+  onOpenEditorSeries?: () => void
+  esModoPersonalizado?: boolean
+  onResetSeries?: () => void
 }
 
 const OPCIONES_PERIODO: SegmentedControlOption<string>[] = [
@@ -56,6 +61,8 @@ export default function FiltrosAnalisis({
   tarjetaId, onTarjetaIdChange, billeteras, tarjetas,
   avisoCotizacion, textoCotizacionRef,
   isOpen, onClose,
+  modoEvolucion, onModoEvolucionChange,
+  onOpenEditorSeries, esModoPersonalizado = false, onResetSeries,
 }: FiltrosAnalisisProps) {
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== 'undefined' && window.innerWidth <= 767
@@ -113,6 +120,42 @@ export default function FiltrosAnalisis({
           })}
         </div>
       </div>
+
+      {vista === 'evolucion' && onModoEvolucionChange && (
+        <div className={styles.sideBlock}>
+          <span className={styles.sideBlockTitle}>Tipo de visualización</span>
+          <SegmentedControl<'combinado' | 'barras' | 'lineas'>
+            options={[
+              { value: 'combinado', label: 'Combinado' },
+              { value: 'barras', label: 'Barras' },
+              { value: 'lineas', label: 'Líneas' },
+            ]}
+            value={modoEvolucion ?? 'combinado'}
+            onChange={onModoEvolucionChange}
+            ariaLabel="Tipo de gráfico de evolución"
+            fullWidth
+          />
+          {onOpenEditorSeries && (
+            <button
+              type="button"
+              className={styles.sidebarSeriesBtn}
+              onClick={onOpenEditorSeries}
+            >
+              <Sparkles size={14} />
+              <span>{esModoPersonalizado ? 'Editar series' : 'Elegir categorías'}</span>
+            </button>
+          )}
+          {esModoPersonalizado && onResetSeries && (
+            <button
+              type="button"
+              className={styles.sidebarResetSeriesBtn}
+              onClick={onResetSeries}
+            >
+              Ver general
+            </button>
+          )}
+        </div>
+      )}
 
       {visibles.includes('periodo') && (
         <div className={styles.sideBlock}>

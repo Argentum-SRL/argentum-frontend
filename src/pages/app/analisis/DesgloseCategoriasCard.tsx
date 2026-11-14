@@ -6,6 +6,7 @@ import {
   ChevronRight,
 } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import { CollapseToggle } from '@/components/ui'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { MovimientoAvatar } from '@/components/ui/MovimientoAvatar'
@@ -15,33 +16,9 @@ import analisisService, {
   type AnalisisQueryParams,
 } from '@/services/analisis.service'
 import { formatMonto, formatFecha, formatPorcentaje } from '@/utils/format'
-import { useTheme } from '@/hooks/useTheme'
+import { getCategoriaColor, getSubcategoriaColor } from '@/lib/utils/categoriaColores'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './DesgloseCategoriasCard.module.css'
-
-const CHART_COLORS_LIGHT = [
-  '#0D2045',
-  '#2563EB',
-  '#059669',
-  '#D97706',
-  '#7C3AED',
-  '#DB2777',
-  '#0284C7',
-  '#EA580C',
-  '#64748B',
-]
-
-const CHART_COLORS_DARK = [
-  '#60A5FA',
-  '#38BDF8',
-  '#34D399',
-  '#FBBF24',
-  '#A78BFA',
-  '#F472B6',
-  '#2DD4BF',
-  '#FB923C',
-  '#94A3B8',
-]
 
 interface DesgloseCategoriasCardProps {
   categorias: AnalisisCategoriaItem[]
@@ -51,6 +28,7 @@ interface DesgloseCategoriasCardProps {
   vistaModoExterno?: 'barras' | 'dona' | 'ranking'
   onVistaModoChange?: (modo: 'barras' | 'dona' | 'ranking') => void
   loading?: boolean
+  collapsible?: boolean
 }
 
 export default function DesgloseCategoriasCard({
@@ -61,9 +39,8 @@ export default function DesgloseCategoriasCard({
   vistaModoExterno,
   onVistaModoChange,
   loading = false,
+  collapsible = false,
 }: DesgloseCategoriasCardProps) {
-  const { theme } = useTheme()
-  const CHART_COLORS = theme === 'dark' ? CHART_COLORS_DARK : CHART_COLORS_LIGHT
   const [vistaModoInterno, setVistaModoInterno] = useState<'barras' | 'dona' | 'ranking'>('barras')
   const vistaModo = vistaModoExterno ?? vistaModoInterno
   const handleCambiarVista = (nuevo: 'barras' | 'dona' | 'ranking') => {
@@ -73,6 +50,7 @@ export default function DesgloseCategoriasCard({
   const [selectedCatKey, setSelectedCatKey] = useState<string | null>(null)
   const [selectedSubId, setSelectedSubId] = useState<string | null>(null)
   const [mostrarTodas, setMostrarTodas] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true)
   const [movimientos, setMovimientos] = useState<AnalisisMovimientoDrilldown[]>([])
   const [loadingMovs, setLoadingMovs] = useState(false)
 
@@ -188,33 +166,44 @@ export default function DesgloseCategoriasCard({
           </div>
         </div>
 
-        {!selectedCat && (
-          <SegmentedControl
-            options={[
-              { value: 'barras', label: 'Barras' },
-              { value: 'dona', label: 'Dona' },
-              { value: 'ranking', label: 'Ranking' },
-            ]}
-            value={vistaModo}
-            onChange={(v: string) => handleCambiarVista(v as typeof vistaModo)}
-            ariaLabel="Modo de visualización de categorías"
-            layout="inline"
-          />
-        )}
+        <div className={styles.headerRightActions}>
+          {!selectedCat && isExpanded && (
+            <SegmentedControl
+              options={[
+                { value: 'barras', label: 'Barras' },
+                { value: 'dona', label: 'Dona' },
+                { value: 'ranking', label: 'Ranking' },
+              ]}
+              value={vistaModo}
+              onChange={(v: string) => handleCambiarVista(v as typeof vistaModo)}
+              ariaLabel="Modo de visualización de categorías"
+              layout="inline"
+            />
+          )}
+
+          {collapsible && (
+            <CollapseToggle
+              expanded={isExpanded}
+              onToggle={() => setIsExpanded((prev) => !prev)}
+              ariaLabel={isExpanded ? 'Ocultar desglose de categorías' : 'Mostrar desglose de categorías'}
+            />
+          )}
+        </div>
       </header>
 
-      {categorias.length === 0 && loading ? (
-        <ChartLoadingState
-          label="Cargando categorías"
-          sublabel="Agrupando gastos del período..."
-        />
-      ) : categorias.length === 0 ? (
-        <div className={styles.emptyWrap}>
-          <PieChartIcon size={28} />
-          <p className={styles.emptyText}>Sin gastos registrados en el período seleccionado.</p>
-        </div>
-      ) : (
-        <div className={styles.bodyContentWrap}>
+      {isExpanded &&
+        (categorias.length === 0 && loading ? (
+          <ChartLoadingState
+            label="Cargando categorías"
+            sublabel="Agrupando gastos del período..."
+          />
+        ) : categorias.length === 0 ? (
+          <div className={styles.emptyWrap}>
+            <PieChartIcon size={28} />
+            <p className={styles.emptyText}>Sin gastos registrados en el período seleccionado.</p>
+          </div>
+        ) : (
+          <div className={styles.bodyContentWrap}>
           {loading && (
             <ChartLoadingState
               overlay
@@ -240,8 +229,13 @@ export default function DesgloseCategoriasCard({
             </div>
 
             <div className={styles.subcatList}>
-              {selectedCat.subcategorias.map((sub) => {
+              {selectedCat.subcategorias.map((sub, idx) => {
                 const isSelected = selectedSubId === sub.subcategoria_id
+                const subColor = getSubcategoriaColor(
+                  sub,
+                  selectedCat.categoria_nombre,
+                  idx
+                )
                 return (
                   <button
                     key={sub.subcategoria_id}
@@ -260,7 +254,13 @@ export default function DesgloseCategoriasCard({
                         size={28}
                       />
                       <div className={styles.subcatMeta}>
-                        <span className={styles.subcatName}>{sub.subcategoria_nombre}</span>
+                        <div className={styles.subcatTitleRow}>
+                          <span
+                            className={styles.subcatDot}
+                            style={{ backgroundColor: subColor }}
+                          />
+                          <span className={styles.subcatName}>{sub.subcategoria_nombre}</span>
+                        </div>
                         <span className={styles.subcatCount}>
                           {sub.cantidad_movimientos}{' '}
                           {sub.cantidad_movimientos === 1 ? 'movimiento' : 'movimientos'}
@@ -280,7 +280,10 @@ export default function DesgloseCategoriasCard({
                     <div className={styles.barTrack}>
                       <div
                         className={styles.barFill}
-                        style={{ width: `${sub.ancho_barra_pct}` + '%' }}
+                        style={{
+                          width: `${sub.ancho_barra_pct}` + '%',
+                          backgroundColor: subColor,
+                        }}
                       />
                     </div>
                   </button>
@@ -357,7 +360,7 @@ export default function DesgloseCategoriasCard({
                   {categorias.map((entry, idx) => (
                     <Cell
                       key={entry.categoria_id ?? entry.categoria_nombre}
-                      fill={CHART_COLORS[idx % CHART_COLORS.length]}
+                      fill={getCategoriaColor(entry, idx)}
                       style={{ cursor: 'pointer' }}
                     />
                   ))}
@@ -396,7 +399,7 @@ export default function DesgloseCategoriasCard({
               >
                 <span
                   className={styles.colorSwatch}
-                  style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
+                  style={{ backgroundColor: getCategoriaColor(cat, idx) }}
                 />
                 <span className={styles.donutLegendName}>{cat.categoria_nombre}</span>
                 <span className={styles.donutLegendPct}>
@@ -463,7 +466,7 @@ export default function DesgloseCategoriasCard({
                     className={styles.barFill}
                     style={{
                       width: `${cat.ancho_barra_pct}` + '%',
-                      backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
+                      backgroundColor: getCategoriaColor(cat, idx),
                     }}
                   />
                 </div>
@@ -482,7 +485,7 @@ export default function DesgloseCategoriasCard({
         </div>
           )}
         </div>
-      )}
+      ))}
     </section>
   )
 }

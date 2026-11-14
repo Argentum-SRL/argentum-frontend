@@ -267,6 +267,8 @@ export default function AnalisisPage() {
                 loading={loading}
                 onOpenEditorSeries={() => setEditorSeriesOpen(true)}
                 onResetSeries={() => setSeriesPersonalizadas([])}
+                ocultarControlesHeader={mostrarSidebar}
+                collapsible={false}
               />
             )}
 
@@ -279,6 +281,7 @@ export default function AnalisisPage() {
                 vistaModoExterno={modoCategorias}
                 onVistaModoChange={setModoCategorias}
                 loading={loading}
+                collapsible={false}
               />
             )}
 
@@ -288,6 +291,7 @@ export default function AnalisisPage() {
                 monedaVisual={monedaVisual}
                 vistaModoExterno={modoComparativa}
                 onVistaModoChange={setModoComparativa}
+                collapsible={false}
               />
             )}
 
@@ -299,6 +303,7 @@ export default function AnalisisPage() {
                 tarjetaId={queryParams.tarjeta_id}
                 horizonteExterno={horizonteProyeccion}
                 onHorizonteChange={setHorizonteProyeccion}
+                collapsible={false}
               />
             )}
 
@@ -324,6 +329,11 @@ export default function AnalisisPage() {
           textoCotizacionRef={data?.cotizacion_referencia?.texto}
           isOpen={mostrarSidebar}
           onClose={() => setSidebarOpen(false)}
+          modoEvolucion={modoEvolucion}
+          onModoEvolucionChange={setModoEvolucion}
+          onOpenEditorSeries={() => setEditorSeriesOpen(true)}
+          esModoPersonalizado={seriesPersonalizadas.length > 0}
+          onResetSeries={() => setSeriesPersonalizadas([])}
         />
       </div>
 

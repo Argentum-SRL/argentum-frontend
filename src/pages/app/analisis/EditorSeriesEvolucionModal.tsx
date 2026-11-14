@@ -10,6 +10,7 @@ import type {
   SerieEvolucionPersonalizada,
 } from '@/services/analisis.service'
 import { formatMonto } from '@/utils/format'
+import { getCategoriaColor, getSubcategoriaColor } from '@/lib/utils/categoriaColores'
 import styles from './EditorSeriesEvolucionModal.module.css'
 
 const PALETA_SERIES_EVOLUCION = [
@@ -69,12 +70,16 @@ export default function EditorSeriesEvolucionModal({
     if (exists) {
       onChangeSeries(seriesActivas.filter((s) => s.key !== key))
     } else {
+      const preferredColor = getCategoriaColor(cat)
+      const color = seriesActivas.some((s) => s.color === preferredColor)
+        ? nextColorFor(seriesActivas)
+        : preferredColor
       const nueva: SerieEvolucionPersonalizada = {
         key,
         tipo: 'categoria',
         id: catId,
         nombre: cat.categoria_nombre,
-        color: nextColorFor(seriesActivas),
+        color,
       }
       onChangeSeries([...seriesActivas, nueva])
     }
@@ -89,13 +94,17 @@ export default function EditorSeriesEvolucionModal({
     if (exists) {
       onChangeSeries(seriesActivas.filter((s) => s.key !== key))
     } else {
+      const preferredColor = getSubcategoriaColor(sub, cat.categoria_nombre)
+      const color = seriesActivas.some((s) => s.color === preferredColor)
+        ? nextColorFor(seriesActivas)
+        : preferredColor
       const nueva: SerieEvolucionPersonalizada = {
         key,
         tipo: 'subcategoria',
         id: subIdCompuesto,
         nombre: sub.subcategoria_nombre,
         categoriaPadreNombre: cat.categoria_nombre,
-        color: nextColorFor(seriesActivas),
+        color,
       }
       onChangeSeries([...seriesActivas, nueva])
     }
@@ -107,18 +116,23 @@ export default function EditorSeriesEvolucionModal({
     const baseSinCat = seriesActivas.filter((s) => s.key !== `cat:${catId}`)
     const nuevas = [...baseSinCat]
 
-    for (const sub of cat.subcategorias) {
+    for (let idx = 0; idx < cat.subcategorias.length; idx++) {
+      const sub = cat.subcategorias[idx]
       const subIdCompuesto =
         sub.subcategoria_id === 'general' ? `${catId}:general` : sub.subcategoria_id
       const key = `sub:${subIdCompuesto}`
       if (!nuevas.some((s) => s.key === key)) {
+        const preferredColor = getSubcategoriaColor(sub, cat.categoria_nombre, idx)
+        const color = nuevas.some((s) => s.color === preferredColor)
+          ? nextColorFor(nuevas)
+          : preferredColor
         nuevas.push({
           key,
           tipo: 'subcategoria',
           id: subIdCompuesto,
           nombre: sub.subcategoria_nombre,
           categoriaPadreNombre: cat.categoria_nombre,
-          color: nextColorFor(nuevas),
+          color,
         })
       }
     }

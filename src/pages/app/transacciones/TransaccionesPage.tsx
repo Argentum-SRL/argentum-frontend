@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard } from '@/components/ui/icons'
+import { Plus, ArrowLeftRight, Download, AlertCircle, ArrowRight, CreditCard, Target } from '@/components/ui/icons'
 import { LunarLoader, TransactionsListSkeleton, Skeleton } from '@/components/ui'
 import styles from './TransaccionesPage.module.css'
 import transaccionService from '@/services/transaccion.service'
@@ -27,6 +27,20 @@ import { EmptyState, PageSummaryBar } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 
 const PAGE_SIZE = 50
+
+function renderMetasTexto(texto: string, monto: string | null) {
+  if (!monto || !texto.includes(monto)) {
+    return texto
+  }
+  const parts = texto.split(monto)
+  return (
+    <>
+      {parts[0]}
+      <strong className={styles.metasNoticeHighlight}>{monto}</strong>
+      {parts.slice(1).join(monto)}
+    </>
+  )
+}
 
 export default function TransaccionesPage() {
   const { usuario } = useAuth()
@@ -455,6 +469,42 @@ export default function TransaccionesPage() {
     gastos: totalGastos
   }), [balance, totalIngresos, totalGastos])
 
+  const metasInfo = useMemo(() => {
+    const raw = totalesMonedaActiva.linea_metas
+    if (!raw) return null
+
+    const matchAporte = raw.match(/apartaste\s+([^\s]+(?:\s+[\d.,]+)?)/i)
+    const matchRetiro = raw.match(/sacaste\s+([^\s]+(?:\s+[\d.,]+)?)/i)
+
+    if (matchAporte) {
+      const monto = matchAporte[1].trim()
+      return {
+        textoDesktop: raw,
+        textoMobile: `Apartaste ${monto} para tus metas`,
+        monto,
+        tooltip: raw,
+      }
+    }
+
+    if (matchRetiro) {
+      const monto = matchRetiro[1].trim()
+      return {
+        textoDesktop: raw,
+        textoMobile: `Sacaste ${monto} de tus metas`,
+        monto,
+        tooltip: raw,
+      }
+    }
+
+    const sinPunto = raw.replace(/\.$/, '')
+    return {
+      textoDesktop: raw,
+      textoMobile: sinPunto,
+      monto: null,
+      tooltip: raw,
+    }
+  }, [totalesMonedaActiva.linea_metas])
+
   const handleExportar = useCallback(async () => {
     try {
       // Pedir al servidor todos los ítems del filtro (limit 5000) y usar totales del servidor
@@ -546,47 +596,59 @@ export default function TransaccionesPage() {
 
       {activeTab === 'historial' ? (
         <>
-          {/* ── Mobile Split Strip Resumen (1 sola fila limpia y compacta) ── */}
+          {/* ── Mobile Split Strip Resumen (Columnas simétricas + Fila de Metas inferior) ── */}
           <div className={styles.mobileSplitStrip}>
-            <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Balance</span>
-              <span className={`${styles.splitValue} ${resumen.balance < 0 ? styles.colorRed : styles.colorGreen}`}>
-                {resumen.balance < 0 ? '-' : '+'}{formatCurrency(Math.abs(resumen.balance))}
-              </span>
-              {totalesMonedaActiva.linea_metas && (
-                <p className={styles.lineaSaldo}>{totalesMonedaActiva.linea_metas}</p>
-              )}
+            <div className={styles.mobileSplitGrid}>
+              <div className={styles.splitItem}>
+                <span className={styles.splitLabel}>Balance</span>
+                <span className={`${styles.splitValue} ${resumen.balance < 0 ? styles.colorRed : styles.colorGreen}`}>
+                  {resumen.balance < 0 ? '-' : '+'}{formatCurrency(Math.abs(resumen.balance))}
+                </span>
+              </div>
+              <div className={styles.splitDivider} />
+              <div className={styles.splitItem}>
+                <span className={styles.splitLabel}>Ingresos</span>
+                <span className={`${styles.splitValue} ${styles.colorGreen}`}>
+                  +{formatCurrency(resumen.ingresos)}
+                </span>
+              </div>
+              <div className={styles.splitDivider} />
+              <div className={styles.splitItem}>
+                <span className={styles.splitLabel}>Egresos</span>
+                <span className={`${styles.splitValue} ${styles.colorRed}`}>
+                  -{formatCurrency(Math.abs(resumen.gastos))}
+                </span>
+              </div>
             </div>
-            <div className={styles.splitDivider} />
-            <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Ingresos</span>
-              <span className={`${styles.splitValue} ${styles.colorGreen}`}>
-                +{formatCurrency(resumen.ingresos)}
-              </span>
-            </div>
-            <div className={styles.splitDivider} />
-            <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Egresos</span>
-              <span className={`${styles.splitValue} ${styles.colorRed}`}>
-                -{formatCurrency(Math.abs(resumen.gastos))}
-              </span>
-            </div>
+            {metasInfo && (
+              <div className={styles.mobileMetasRow} title={metasInfo.tooltip}>
+                <Target size={12} className={styles.mobileMetasIcon} />
+                <span>{metasInfo.textoMobile}</span>
+              </div>
+            )}
           </div>
 
-          {/* ── Hero Resumen (Desktop) ────────────────────────────────────────── */}
+          {/* ── Hero Resumen (Desktop: Balance + Aviso de metas contra el divisor) ── */}
           <PageSummaryBar
             className={styles.desktopSummaryBar}
             leftSlot={
               <div className={styles.balanceCicloSlot}>
-                <span className={styles.balanceCicloLabel}>Balance del ciclo</span>
-                <span
-                  className={`${styles.balanceCicloValue} ${resumen.balance < 0 ? styles.balanceNegative : styles.balancePositive}`}
-                >
-                  {resumen.balance < 0 ? '-' : '+'}
-                  {formatCurrency(Math.abs(resumen.balance))}
-                </span>
-                {totalesMonedaActiva.linea_metas && (
-                  <p className={styles.lineaSaldo}>{totalesMonedaActiva.linea_metas}</p>
+                <div className={styles.balanceMainGroup}>
+                  <span className={styles.balanceCicloLabel}>Balance del ciclo</span>
+                  <span
+                    className={`${styles.balanceCicloValue} ${resumen.balance < 0 ? styles.balanceNegative : styles.balancePositive}`}
+                  >
+                    {resumen.balance < 0 ? '-' : '+'}
+                    {formatCurrency(Math.abs(resumen.balance))}
+                  </span>
+                </div>
+                {metasInfo && (
+                  <div className={styles.metasNotice} title={metasInfo.tooltip}>
+                    <Target size={13} className={styles.metasNoticeIcon} aria-hidden="true" />
+                    <p className={styles.metasNoticeText}>
+                      {renderMetasTexto(metasInfo.textoDesktop, metasInfo.monto)}
+                    </p>
+                  </div>
                 )}
               </div>
             }

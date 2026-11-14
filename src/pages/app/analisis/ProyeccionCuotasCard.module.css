@@ -134,6 +134,8 @@
   flex-direction: column;
   gap: 6px;
   min-width: 190px;
+  backdrop-filter: blur(12px);
+  pointer-events: none;
 }
 
 .tooltipTitle {

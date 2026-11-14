@@ -61,6 +61,7 @@ export const RULE_DEFS = {
   R35: 'Margen o padding perimetral redundante en raíces de módulos de páginas (pages/app/**) que duplique el shell AppLayout',
   R36: 'Texto visible al usuario con códigos de moneda "ARS" o "USD" en lugar de "Pesos" o "Dólares" en la UI de la app (pages/app/** y components/**)',
   R37: 'Botón de cerrar o descartar con forma no circular (debe tener border-radius: 50% o 9999px)',
+  R38: 'Botón o disparador de colapso ad-hoc (requiere componente unificado CollapseToggle)',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
@@ -103,7 +104,7 @@ function auditCssFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
-    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0, R37: 0,
+    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0, R37: 0, R38: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -562,6 +563,19 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
+  // R38: Prohibido declarar botones o selectores ad-hoc de colapso/expandir (debe usarse el componente CollapseToggle)
+  const isTargetR38Css = (relPath.startsWith('pages/app/') || relPath.startsWith('pages\\app\\') ||
+                          relPath.startsWith('components/') || relPath.startsWith('components\\')) &&
+                         !relPath.includes('CollapseToggle');
+  if (isTargetR38Css) {
+    const blocks = parseCssBlocks(cleanContent);
+    for (const b of blocks) {
+      if (/\b(?:toggleCollapseBtn|collapseBtn|toggleChevron|cicloHeaderActions)\b/i.test(b.selector)) {
+        violations.R38++;
+      }
+    }
+  }
+
   return violations;
 }
 
@@ -609,7 +623,7 @@ function auditTsxFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
-    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0, R37: 0,
+    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0, R37: 0, R38: 0,
   };
 
   const fileName = path.basename(filePath);
@@ -905,6 +919,20 @@ function auditTsxFile(filePath, relPath, content) {
         if (!trimmed.includes('formatMoneda') && !trimmed.includes('formatMonto') && !trimmed.includes("'Pesos'")) {
           violations.R36++;
         }
+      }
+    }
+  }
+
+  // R38: Prohibido armar botones de colapso ad-hoc en TSX (debe usarse CollapseToggle)
+  const isTargetR38Tsx = (relPath.startsWith('pages/app/') || relPath.startsWith('pages\\app\\')) &&
+                         !relPath.includes('.test.') && !relPath.includes('CollapseToggle');
+  if (isTargetR38Tsx) {
+    const lines = content.split('\n');
+    for (const l of lines) {
+      const trimmed = l.trim();
+      if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+      if (/\b(?:toggleCollapseBtn|cicloHeaderActions)\b/i.test(l)) {
+        violations.R38++;
       }
     }
   }

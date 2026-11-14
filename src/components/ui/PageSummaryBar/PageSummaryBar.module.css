@@ -124,15 +124,15 @@
   }
 }
 
-/* Contenedores amplios (>= 680px): Fila horizontal fluida con divisores verticales */
-@container (min-width: 680px) {
+/* Contenedores amplios (>= 768px): Fila horizontal fluida con divisores verticales */
+@media (min-width: 768px) {
   .container {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 0;
-    padding: 14px clamp(16px, 2.5cqi, 32px);
-    min-height: 84px;
+    padding: 12px clamp(16px, 2.5cqi, 28px);
+    min-height: 72px;
   }
 
   .leftSlot {
@@ -140,6 +140,9 @@
     grid-column: unset;
     border-bottom: none;
     padding: 0 24px 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .item {
@@ -147,6 +150,7 @@
     padding: 0 clamp(8px, 1.8cqi, 24px);
     border-right: none;
     border-bottom: none;
+    justify-content: center;
   }
 
   /* Divisor vertical entre ítems horizontales */

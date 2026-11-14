@@ -855,5 +855,21 @@ Para garantizar consistencia visual absoluta en todas las ventanas, modales, pan
    - **Transición suave:** `transition: background-color 120ms ease, color 120ms ease;` con cobertura `prefers-reduced-motion: reduce`.
 4. **Candado Pre-Push (R37):** La regla automática **R37** en `scripts/audit-design-rules.mjs` verifica que ningún archivo CSS de vistas (`pages/app/**`) o componentes (`components/**`) declare botones de cierre con `border-radius` no circular. Cualquier transgresión aborta inmediatamente el `git push`.
 
+---
+
+## 21. Botón de Colapso Unificado (`CollapseToggle`)
+
+### 21.1 Principio de Acción Colapsable y Microinteracción
+Para todas las tarjetas, secciones o bloques de informe que admitan plegado o despliegue en cabeceras:
+1. **Componente Canónico Universal:** Se utiliza exclusivamente `CollapseToggle` (`import { CollapseToggle } from '@/components/ui'`). Prohibido terminantemente duplicar código de toggles colapsables con cajas/botones duros ad-hoc (`toggleCollapseBtn`, etc.).
+2. **Diseño Visual e Integración:**
+   - **Contenedor:** Fondo transparente, sin bordes toscos, alineación inline-flex con `gap: var(--space-xs, 4px)`.
+   - **Pill Badge:** Píldora de estado (`comerciosBadge`, `height: 20px`, `border-radius: 9999px`, fondo `rgba(var(--primary-rgb), 0.1)`, texto `var(--primary)` o `#93c5fd` en dark mode) con texto dinámico `"Ocultar"` (cuando está expandido) y `"Modificar"` (cuando está colapsado).
+   - **Chevron Dinámico:** Ícono `ChevronDown` (18px, color `var(--text-3)`) con rotación fluida de 180° (`transform: rotate(180deg)`) con curva `cubic-bezier(0.16, 1, 0.3, 1)`.
+   - **Mobile-First:** En pantallas angostas (`<= 639px`), la píldora se oculta automáticamente para priorizar el espacio de los títulos, conservando el chevron táctil.
+   - **Polimorfismo:** Admite `as="button"` (por defecto, accesible e interactivo) o `as="div"` (para cabeceras donde el bloque padre ya es un botón).
+3. **Candado Pre-Push (R38):** La regla automática **R38** en `scripts/audit-design-rules.mjs` previene la declaración de botones de colapso o clases ad-hoc (`toggleCollapseBtn`, etc.) en vistas o componentes, obligando al uso de `CollapseToggle`.
+
+
 
 

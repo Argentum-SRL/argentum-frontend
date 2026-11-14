@@ -1,4 +1,5 @@
 import { PageSummaryBar } from '@/components/ui'
+import { TrendingUp } from '@/components/ui/icons'
 import type { SummaryBarItem } from '@/components/ui/PageSummaryBar/PageSummaryBar'
 import type { AnalisisResumenResponse } from '@/services/analisis.service'
 import { formatMonto, formatPorcentaje } from '@/utils/format'
@@ -36,6 +37,22 @@ function formatMontoKpi(
     return `${signo}${texto}`
   }
   return texto
+}
+
+function renderSubValue(texto: string) {
+  const match = texto.match(/(-?\d+(?:[.,]\d+)?%)/)
+  if (!match) {
+    return texto
+  }
+  const pct = match[1]
+  const parts = texto.split(pct)
+  return (
+    <>
+      {parts[0]}
+      <strong className={styles.metasNoticeHighlight}>{pct}</strong>
+      {parts.slice(1).join(pct)}
+    </>
+  )
 }
 
 function formatearFraseMobile(frase: string): string {
@@ -90,96 +107,111 @@ export default function NumerosPrincipales({
   const egresosMonto = formatMontoKpi(kpis.gastos_totales, monedaVisual, tieneCentavos, '-')
   const esBalanceNegativo = (kpis.balance_neto ?? 0) < 0
 
-  let items: SummaryBarItem[]
-  if (soloEgresos) {
-    items = [
-      {
-        label: 'Egresos',
-        value: egresosMonto,
-        valueColor: '#FF8A65',
-      },
-    ]
-  } else {
-    items = [
-      {
-        label: 'Te quedó',
-        value: balanceMonto,
-        subValue,
-        highlight: true,
-        valueColor: esBalanceNegativo ? '#FF8A65' : undefined,
-      },
-      {
-        label: 'Ingresos',
-        value: ingresosMonto,
-        valueColor: '#4CAF7D',
-      },
-      {
-        label: 'Egresos',
-        value: egresosMonto,
-        valueColor: '#FF8A65',
-      },
-    ]
-  }
+  const itemsSoloEgresos: SummaryBarItem[] = [
+    {
+      label: 'Egresos',
+      value: egresosMonto,
+      valueColor: '#FF8A65',
+    },
+  ]
+
+  const itemsResumen: SummaryBarItem[] = [
+    {
+      label: 'Ingresos',
+      value: ingresosMonto,
+      valueColor: '#4CAF7D',
+    },
+    {
+      label: 'Egresos',
+      value: egresosMonto,
+      valueColor: '#FF8A65',
+    },
+  ]
 
   return (
     <div className={styles.summarySection}>
-      {/* Desktop Summary Bar (>= 768px) */}
-      <div className={styles.desktopSummaryBar}>
-        <PageSummaryBar items={items} />
-      </div>
-
-      {/* Mobile Card Resumen (< 768px) */}
+      {/* ── Mobile Split Strip Resumen (Columnas simétricas + Fila de tasa inferior) ── */}
       {soloEgresos ? (
-        <div className={styles.mobileSummaryCard}>
-          <div className={styles.mobileHeroMetric}>
-            <div className={styles.mobileHeroLeft}>
-              <span className={styles.mobileMetricLabel}>Egresos</span>
-              <span className={`${styles.mobileHeroValue} ${styles.colorRed}`}>
+        <div className={styles.mobileSplitStrip}>
+          <div className={styles.mobileSplitGrid}>
+            <div className={styles.splitItem}>
+              <span className={styles.splitLabel}>Egresos</span>
+              <span className={`${styles.splitValue} ${styles.colorRed}`}>
                 {egresosMonto}
               </span>
             </div>
           </div>
         </div>
       ) : (
-        <div className={styles.mobileSummaryCard}>
-          {/* Fila Principal: Te quedó + % de ahorro */}
-          <div className={styles.mobileHeroMetric}>
-            <div className={styles.mobileHeroLeft}>
-              <span className={styles.mobileMetricLabel}>Te quedó</span>
+        <div className={styles.mobileSplitStrip}>
+          <div className={styles.mobileSplitGrid}>
+            <div className={styles.splitItem}>
+              <span className={styles.splitLabel}>Te quedó</span>
               <span
-                className={`${styles.mobileHeroValue} ${
+                className={`${styles.splitValue} ${
                   esBalanceNegativo ? styles.colorRed : styles.colorGreen
                 }`}
               >
                 {balanceMonto}
               </span>
             </div>
-            {subValue && (
-              <span className={styles.mobilePillBadge}>{subValue}</span>
-            )}
-          </div>
-
-          <div className={styles.mobileMetricDivider} />
-
-          {/* Fila Secundaria: Ingresos y Egresos (2 columnas con espacio amplio) */}
-          <div className={styles.mobileSubMetricsGrid}>
-            <div className={styles.mobileSubItem}>
-              <span className={styles.mobileMetricLabel}>Ingresos</span>
-              <span className={`${styles.mobileSubValue} ${styles.colorGreen}`}>
+            <div className={styles.splitDivider} />
+            <div className={styles.splitItem}>
+              <span className={styles.splitLabel}>Ingresos</span>
+              <span className={`${styles.splitValue} ${styles.colorGreen}`}>
                 {ingresosMonto}
               </span>
             </div>
-
-            <div className={styles.mobileSubDivider} />
-
-            <div className={styles.mobileSubItem}>
-              <span className={styles.mobileMetricLabel}>Egresos</span>
-              <span className={`${styles.mobileSubValue} ${styles.colorRed}`}>
+            <div className={styles.splitDivider} />
+            <div className={styles.splitItem}>
+              <span className={styles.splitLabel}>Egresos</span>
+              <span className={`${styles.splitValue} ${styles.colorRed}`}>
                 {egresosMonto}
               </span>
             </div>
           </div>
+          {subValue && (
+            <div className={styles.mobileMetasRow} title={subValue}>
+              <TrendingUp size={12} className={styles.mobileMetasIcon} />
+              <span>{subValue}</span>
+            </div>
+          )}
         </div>
+      )}
+
+      {/* ── Hero Resumen (Desktop: Balance + Aviso contra el divisor) ── */}
+      {soloEgresos ? (
+        <PageSummaryBar
+          className={styles.desktopSummaryBar}
+          items={itemsSoloEgresos}
+        />
+      ) : (
+        <PageSummaryBar
+          className={styles.desktopSummaryBar}
+          leftSlot={
+            <div className={styles.balanceCicloSlot}>
+              <div className={styles.balanceMainGroup}>
+                <span className={styles.balanceCicloLabel}>Te quedó</span>
+                <span
+                  className={`${styles.balanceCicloValue} ${
+                    esBalanceNegativo ? styles.balanceNegative : styles.balancePositive
+                  }`}
+                >
+                  {balanceMonto}
+                </span>
+              </div>
+              {subValue && (
+                <div className={styles.metasNotice} title={subValue}>
+                  <TrendingUp size={13} className={styles.metasNoticeIcon} aria-hidden="true" />
+                  <p className={styles.metasNoticeText}>
+                    {renderSubValue(subValue)}
+                  </p>
+                </div>
+              )}
+            </div>
+          }
+          items={itemsResumen}
+        />
       )}
 
       {kpis.frase_resumen && (

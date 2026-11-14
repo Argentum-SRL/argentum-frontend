@@ -7,6 +7,7 @@ import {
   ArrowLeft,
 } from '@/components/ui/icons'
 import { Button } from '@/components/ui'
+import ViewerKpisBlock from './ViewerKpisBlock'
 import analisisService, {
   type AnalisisResumenResponse,
   type InformePersonalizadoItem,
@@ -15,7 +16,6 @@ import {
   PLANTILLAS_RAPIDAS,
   type PlantillaRapidaItem,
 } from './plantillasInforme'
-import { formatMonto, formatPorcentaje } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
 import EvolucionCiclosCard from './EvolucionCiclosCard'
@@ -221,13 +221,15 @@ export default function MisInformesTab() {
           <div className={styles.viewerTitleGroup}>
             <button
               type="button"
-              className={styles.backBtn}
+              className={styles.viewerBackBtn}
               onClick={() => setModoVista('galeria')}
+              aria-label="Volver a Mis Informes"
+              title="Volver a Mis Informes"
             >
               <ArrowLeft size={16} />
               <span>Mis Informes</span>
             </button>
-            <div>
+            <div className={styles.viewerTitleText}>
               <h2 className={styles.viewerTitle}>{activeInforme.nombre}</h2>
               {activeInforme.descripcion && (
                 <p className={styles.viewerSub}>{activeInforme.descripcion}</p>
@@ -236,23 +238,27 @@ export default function MisInformesTab() {
           </div>
 
           <div className={styles.exportActions}>
-            <Button
-              variant="secondary"
+            <button
+              type="button"
+              className={styles.actionGhostBtn}
               onClick={() => void handleDescargarExcel()}
               disabled={exportingExcel || loadingVisor}
+              title="Exportar a Excel (.xlsx)"
             >
               <FileSpreadsheet size={15} />
-              <span>{exportingExcel ? 'Generando...' : 'Exportar Excel (.xlsx)'}</span>
-            </Button>
+              <span>{exportingExcel ? 'Generando...' : 'Excel'}</span>
+            </button>
 
-            <Button
-              variant="secondary"
+            <button
+              type="button"
+              className={styles.actionGhostBtn}
               onClick={handleDescargarPdf}
               disabled={!visorData || loadingVisor}
+              title="Exportar a PDF"
             >
               <Download size={15} />
-              <span>Exportar PDF</span>
-            </Button>
+              <span>PDF</span>
+            </button>
           </div>
         </header>
 
@@ -261,38 +267,7 @@ export default function MisInformesTab() {
         ) : (
           <div className={styles.viewerBlocks}>
             {tiposActivos.includes('kpis') && visorData && (
-              <section className={styles.kpiMiniGrid}>
-                <div className={styles.kpiMiniCard}>
-                  <span className={styles.kpiMiniLabel}>Gastos del período</span>
-                  <strong className={styles.kpiMiniVal}>
-                    {formatMonto(visorData.kpis.gastos_totales, monedaVis)}
-                  </strong>
-                </div>
-                <div className={styles.kpiMiniCard}>
-                  <span className={styles.kpiMiniLabel}>Ingresos del período</span>
-                  <strong className={styles.kpiMiniVal}>
-                    {visorData.kpis.ingresos_totales !== null && visorData.kpis.ingresos_totales !== undefined
-                      ? formatMonto(visorData.kpis.ingresos_totales, monedaVis)
-                      : '—'}
-                  </strong>
-                </div>
-                <div className={styles.kpiMiniCard}>
-                  <span className={styles.kpiMiniLabel}>Te quedó</span>
-                  <strong className={styles.kpiMiniVal}>
-                    {visorData.kpis.balance_neto !== null && visorData.kpis.balance_neto !== undefined
-                      ? formatMonto(visorData.kpis.balance_neto, monedaVis)
-                      : '—'}
-                  </strong>
-                </div>
-                <div className={styles.kpiMiniCard}>
-                  <span className={styles.kpiMiniLabel}>Te quedó (%)</span>
-                  <strong className={styles.kpiMiniVal}>
-                    {visorData.kpis.tasa_ahorro_pct !== null && visorData.kpis.tasa_ahorro_pct !== undefined
-                      ? formatPorcentaje(visorData.kpis.tasa_ahorro_pct)
-                      : '—'}
-                  </strong>
-                </div>
-              </section>
+              <ViewerKpisBlock visorData={visorData} monedaVis={monedaVis} />
             )}
 
             {tiposActivos.includes('evolucion_ciclos') && visorData && (
@@ -300,6 +275,7 @@ export default function MisInformesTab() {
                 serie={visorData.serie_ciclos}
                 monedaVisual={monedaVis}
                 promedioHistoricoGastos={visorData.kpis.promedio_gasto_ciclo ?? null}
+                collapsible
               />
             )}
 
@@ -309,6 +285,7 @@ export default function MisInformesTab() {
                 monedaVisual={monedaVis}
                 gastoTotal={visorData.kpis.gastos_totales}
                 queryParams={visorQueryParams}
+                collapsible
               />
             )}
 
@@ -316,6 +293,7 @@ export default function MisInformesTab() {
               <ComparativaCiclosCard
                 queryParams={visorQueryParams}
                 monedaVisual={monedaVis}
+                collapsible
               />
             )}
 
@@ -325,6 +303,7 @@ export default function MisInformesTab() {
                 monedaVisual={monedaVis}
                 billeteraId={visorQueryParams.billetera_id}
                 tarjetaId={visorQueryParams.tarjeta_id}
+                collapsible
               />
             )}
           </div>

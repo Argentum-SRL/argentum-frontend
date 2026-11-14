@@ -10,7 +10,7 @@ import {
 } from 'recharts'
 import { ArrowLeftRight, TrendingDown, TrendingUp } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
-import { SelectInput, type SelectOption } from '@/components/ui'
+import { SelectInput, CollapseToggle, type SelectOption } from '@/components/ui'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import analisisService, {
   type AnalisisQueryParams,
@@ -25,6 +25,7 @@ interface ComparativaCiclosCardProps {
   monedaVisual: 'ARS' | 'USD'
   vistaModoExterno?: 'diferencias' | 'grafico'
   onVistaModoChange?: (modo: 'diferencias' | 'grafico') => void
+  collapsible?: boolean
 }
 
 export default function ComparativaCiclosCard({
@@ -32,6 +33,7 @@ export default function ComparativaCiclosCard({
   monedaVisual,
   vistaModoExterno,
   onVistaModoChange,
+  collapsible = false,
 }: ComparativaCiclosCardProps) {
   const primaryBarColor = '#FF8A65'
   const [vistaModoInterno, setVistaModoInterno] = useState<'diferencias' | 'grafico'>('diferencias')
@@ -43,6 +45,7 @@ export default function ComparativaCiclosCard({
   const [cicloAKey, setCicloAKey] = useState<string>('')
   const [cicloBKey, setCicloBKey] = useState<string>('')
   const [mostrarTodas, setMostrarTodas] = useState<boolean>(false)
+  const [isExpanded, setIsExpanded] = useState<boolean>(true)
   const [data, setData] = useState<ComparativaCiclosResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -138,20 +141,32 @@ export default function ComparativaCiclosCard({
           </div>
         </div>
 
-        <SegmentedControl
-          options={[
-            { value: 'diferencias', label: 'Diferencias' },
-            { value: 'grafico', label: 'Barras' },
-          ]}
-          value={vistaModo}
-          onChange={(v: string) => handleCambiarVista(v as typeof vistaModo)}
-          ariaLabel="Modo de vista comparativa"
-          layout="inline"
-        />
+        <div className={styles.headerRightActions}>
+          <SegmentedControl
+            options={[
+              { value: 'diferencias', label: 'Diferencias' },
+              { value: 'grafico', label: 'Barras' },
+            ]}
+            value={vistaModo}
+            onChange={(v: string) => handleCambiarVista(v as typeof vistaModo)}
+            ariaLabel="Modo de vista comparativa"
+            layout="inline"
+          />
+
+          {collapsible && (
+            <CollapseToggle
+              expanded={isExpanded}
+              onToggle={() => setIsExpanded((prev) => !prev)}
+              ariaLabel={isExpanded ? 'Ocultar comparación de ciclos' : 'Mostrar comparación de ciclos'}
+            />
+          )}
+        </div>
       </header>
 
-      {/* Selectores de Ciclo A vs Ciclo B */}
-      {data && data.ciclos_disponibles.length > 0 && (
+      {isExpanded && (
+        <>
+          {/* Selectores de Ciclo A vs Ciclo B */}
+          {data && data.ciclos_disponibles.length > 0 && (
         <div className={styles.selectorBar}>
           <div className={styles.selectBox}>
             <label htmlFor="comp-ciclo-a" className={styles.selectLabel}>
@@ -403,6 +418,8 @@ export default function ComparativaCiclosCard({
         </div>
           )}
         </div>
+      )}
+        </>
       )}
     </section>
   )

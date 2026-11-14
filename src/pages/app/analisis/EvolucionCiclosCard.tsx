@@ -5,10 +5,8 @@ import {
 } from 'recharts'
 import { TrendingUp, Activity, Sparkles } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
-import type {
-  AnalisisCicloPunto,
-  SerieEvolucionPersonalizada,
-} from '@/services/analisis.service'
+import { CollapseToggle } from '@/components/ui'
+import type { AnalisisCicloPunto, SerieEvolucionPersonalizada } from '@/services/analisis.service'
 import { formatMonto, formatPorcentaje, formatMontoCorto } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
 import ChartLoadingState from './ChartLoadingState'
@@ -30,6 +28,7 @@ interface EvolucionCiclosCardProps {
   onOpenEditorSeries?: () => void
   onResetSeries?: () => void
   ocultarControlesHeader?: boolean
+  collapsible?: boolean
 }
 
 /**
@@ -56,12 +55,14 @@ export default function EvolucionCiclosCard({
   onOpenEditorSeries,
   onResetSeries,
   ocultarControlesHeader = false,
+  collapsible = false,
 }: EvolucionCiclosCardProps) {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const esModoPersonalizado = seriesPersonalizadas.length > 0
 
   const [hiddenKeys, setHiddenKeys] = useState<string[]>([])
+  const [isExpanded, setIsExpanded] = useState(true)
   const [modoBarrasCustom, setModoBarrasCustom] = useState<'separadas' | 'apiladas'>('separadas')
 
   const visibleSeries = useMemo(() => {
@@ -94,13 +95,7 @@ export default function EvolucionCiclosCard({
     if (!esModoPersonalizado) {
       return serie.map((p): EvolucionChartItem => {
         if (p.sin_datos) {
-          return {
-            ...p,
-            ingresos: null,
-            gastos: 0,
-            balance: null,
-            __sum_serie: null,
-          }
+          return { ...p, ingresos: null, gastos: 0, balance: null, __sum_serie: null }
         }
         return { ...p, __sum_serie: 0 }
       })
@@ -236,62 +231,58 @@ export default function EvolucionCiclosCard({
             </div>
           </div>
 
-          {!ocultarControlesHeader && (
+          {(!ocultarControlesHeader || collapsible) && (
             <div className={styles.headerControls}>
-              {!esModoPersonalizado && onModoGraficoChange && (
-                <SegmentedControl<'combinado' | 'barras' | 'lineas'>
-                  options={[
-                    { value: 'combinado', label: 'Combinado' },
-                    { value: 'barras', label: 'Barras' },
-                    { value: 'lineas', label: 'Líneas' },
-                  ]}
-                  value={modoGrafico}
-                  onChange={onModoGraficoChange}
-                  ariaLabel="Tipo de gráfico de evolución"
+              {!ocultarControlesHeader && (
+                <>
+                  {!esModoPersonalizado && onModoGraficoChange && (
+                    <SegmentedControl<'combinado' | 'barras' | 'lineas'>
+                      options={[{ value: 'combinado', label: 'Combinado' }, { value: 'barras', label: 'Barras' }, { value: 'lineas', label: 'Líneas' }]}
+                      value={modoGrafico}
+                      onChange={onModoGraficoChange}
+                      ariaLabel="Tipo de gráfico de evolución"
+                    />
+                  )}
+
+                  {esModoPersonalizado && modoGrafico !== 'lineas' && seriesPersonalizadas.length > 1 && (
+                    <SegmentedControl<'separadas' | 'apiladas'>
+                      options={[{ value: 'separadas', label: 'Separadas' }, { value: 'apiladas', label: 'Apiladas' }]}
+                      value={modoBarrasCustom}
+                      onChange={setModoBarrasCustom}
+                      ariaLabel="Disposición de barras"
+                    />
+                  )}
+
+                  {onOpenEditorSeries && (
+                    <button type="button" className={styles.editSeriesQuickBtn} onClick={onOpenEditorSeries}>
+                      <Sparkles size={14} />
+                      <span>{esModoPersonalizado ? 'Editar series' : 'Elegir categorías'}</span>
+                    </button>
+                  )}
+
+                  {esModoPersonalizado && onResetSeries && (
+                    <button type="button" className={styles.resetSeriesQuickBtn} onClick={() => { setHiddenKeys([]); onResetSeries() }}>
+                      Ver general
+                    </button>
+                  )}
+                </>
+              )}
+
+              {collapsible && (
+                <CollapseToggle
+                  expanded={isExpanded}
+                  onToggle={() => setIsExpanded((prev) => !prev)}
+                  ariaLabel={isExpanded ? 'Ocultar evolución por ciclos' : 'Mostrar evolución por ciclos'}
                 />
-              )}
-
-              {esModoPersonalizado && modoGrafico !== 'lineas' && seriesPersonalizadas.length > 1 && (
-                <SegmentedControl<'separadas' | 'apiladas'>
-                  options={[
-                    { value: 'separadas', label: 'Separadas' },
-                    { value: 'apiladas', label: 'Apiladas' },
-                  ]}
-                  value={modoBarrasCustom}
-                  onChange={setModoBarrasCustom}
-                  ariaLabel="Disposición de barras"
-                />
-              )}
-
-              {onOpenEditorSeries && (
-                <button
-                  type="button"
-                  className={styles.editSeriesQuickBtn}
-                  onClick={onOpenEditorSeries}
-                >
-                  <Sparkles size={14} />
-                  <span>{esModoPersonalizado ? 'Editar series' : 'Elegir categorías'}</span>
-                </button>
-              )}
-
-              {esModoPersonalizado && onResetSeries && (
-                <button
-                  type="button"
-                  className={styles.resetSeriesQuickBtn}
-                  onClick={() => {
-                    setHiddenKeys([])
-                    onResetSeries()
-                  }}
-                >
-                  Ver general
-                </button>
               )}
             </div>
           )}
         </div>
       </header>
 
-      {serie.length === 0 && loading ? (
+      {isExpanded && (
+        <>
+          {serie.length === 0 && loading ? (
         <ChartLoadingState
           label="Cargando evolución"
           sublabel="Procesando ciclos y movimientos..."
@@ -711,6 +702,8 @@ export default function EvolucionCiclosCard({
           </>
         )}
       </div>
+        </>
+      )}
     </section>
   )
 }

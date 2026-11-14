@@ -11,7 +11,7 @@ import { CicloFinancieroSelector, type CicloValue } from '@/components/ciclo/Cic
 import { REGLA_MAP } from '@/lib/utils/ciclo'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import ComerciosRecordados from './ComerciosRecordados'
-import { Skeleton, LunarLoader } from '@/components/ui'
+import { Skeleton, LunarLoader, CollapseToggle } from '@/components/ui'
 import perfilStyles from '../PerfilPage.module.css'
 import localStyles from './TabFinanzas.module.css'
 
@@ -416,14 +416,10 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
                 <div className={localStyles.cicloHeaderText}>
                   <h3 className={localStyles.cicloTitle}>Ciclo de ingresos y cobro</h3>
                 </div>
-                <div className={localStyles.cicloHeaderActions}>
-                  <span className={localStyles.comerciosBadge}>
-                    {cicloExpanded ? 'Ocultar' : 'Modificar'}
-                  </span>
-                  <div className={`${localStyles.chevronIcon} ${cicloExpanded ? localStyles.chevronExpanded : ''}`}>
-                    <ChevronDown size={18} />
-                  </div>
-                </div>
+                <CollapseToggle
+                  expanded={cicloExpanded}
+                  as="div"
+                />
               </div>
             </div>
 

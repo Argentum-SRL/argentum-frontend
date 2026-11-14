@@ -505,19 +505,6 @@
   text-overflow: ellipsis;
 }
 
-.cicloHeaderActions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  flex-shrink: 0;
-}
-
-@media (max-width: 639px) {
-  .cicloHeaderActions .comerciosBadge {
-    display: none;
-  }
-}
-
 .cicloSummaryRow {
   display: flex;
   align-items: center;

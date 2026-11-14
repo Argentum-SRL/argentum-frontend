@@ -1,46 +1,48 @@
 import { useState, useEffect, useMemo } from 'react'
 import {
-  ResponsiveContainer,
-  ComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ReferenceLine,
+  ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis,
+  CartesianGrid, Tooltip, ReferenceLine, Cell,
 } from 'recharts'
 import { TrendingUp, Activity, Sparkles } from '@/components/ui/icons'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import type {
   AnalisisCicloPunto,
   SerieEvolucionPersonalizada,
 } from '@/services/analisis.service'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatPorcentaje, formatMontoCorto } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './EvolucionCiclosCard.module.css'
+
+interface EvolucionChartItem extends AnalisisCicloPunto {
+  __sum_serie: number | null
+  [key: string]: unknown
+}
 
 interface EvolucionCiclosCardProps {
   serie: AnalisisCicloPunto[]
   monedaVisual: 'ARS' | 'USD'
   promedioHistoricoGastos: number | null
   modoGrafico?: 'combinado' | 'barras' | 'lineas'
+  onModoGraficoChange?: (m: 'combinado' | 'barras' | 'lineas') => void
   seriesPersonalizadas?: SerieEvolucionPersonalizada[]
   loading?: boolean
   onOpenEditorSeries?: () => void
   onResetSeries?: () => void
+  ocultarControlesHeader?: boolean
 }
 
-function abbreviateAxisValue(val: number, moneda: 'ARS' | 'USD'): string {
-  const prefix = moneda === 'USD' ? 'US$' : '$'
-  const absVal = Math.abs(val)
-  if (absVal >= 1_000_000) {
-    return `${prefix}${(val / 1_000_000).toFixed(1)}M`
-  }
-  if (absVal >= 1_000) {
-    return `${prefix}${(val / 1_000).toFixed(0)}k`
-  }
-  return `${prefix}${val.toFixed(0)}`
+/**
+ * C-4: Eje Y: si hay valores negativos, el piso es el valor más bajo redondeado hacia
+ * abajo a una marca redonda que no pase de 1,5 veces ese valor.
+ */
+function calcularPisoNegativo(minVal: number): number {
+  if (minVal >= 0) return 0
+  const abs = Math.abs(minVal)
+  const step = Math.pow(10, Math.floor(Math.log10(abs)))
+  const subStep = abs / (step / 2) <= 10 ? step / 2 : step
+  const rounded = Math.ceil(abs / subStep) * subStep
+  return rounded <= 1.5 * abs ? -rounded : -abs
 }
 
 export default function EvolucionCiclosCard({
@@ -48,26 +50,25 @@ export default function EvolucionCiclosCard({
   monedaVisual,
   promedioHistoricoGastos,
   modoGrafico = 'combinado',
+  onModoGraficoChange,
   seriesPersonalizadas = [],
   loading = false,
   onOpenEditorSeries,
   onResetSeries,
+  ocultarControlesHeader = false,
 }: EvolucionCiclosCardProps) {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const esModoPersonalizado = seriesPersonalizadas.length > 0
 
-  // Estado interactivo de la leyenda y modo de agrupación de barras
   const [hiddenKeys, setHiddenKeys] = useState<string[]>([])
   const [modoBarrasCustom, setModoBarrasCustom] = useState<'separadas' | 'apiladas'>('separadas')
 
-  // Serie visible filtrada por los chips activos en la leyenda
   const visibleSeries = useMemo(() => {
     const filtered = seriesPersonalizadas.filter((s) => !hiddenKeys.includes(s.key))
     return filtered.length > 0 ? filtered : seriesPersonalizadas
   }, [seriesPersonalizadas, hiddenKeys])
 
-  // Detectar si todas las subcategorías comparten una misma categoría padre (ej. "Vivienda")
   const sharedParentName = useMemo(() => {
     if (seriesPersonalizadas.length < 2) return null
     const firstParent = seriesPersonalizadas[0]?.categoriaPadreNombre
@@ -81,7 +82,6 @@ export default function EvolucionCiclosCard({
       if (prev.includes(key)) {
         return prev.filter((k) => k !== key)
       }
-      // Impedir ocultar la última serie visible
       if (seriesPersonalizadas.length - prev.length <= 1) {
         return prev
       }
@@ -89,9 +89,38 @@ export default function EvolucionCiclosCard({
     })
   }
 
-  const chartData = useMemo(() => {
-    if (!esModoPersonalizado) return serie.map((p) => ({ ...p, __sum_serie: 0 }))
-    return serie.map((punto, idx) => {
+  // C-5: Puntos sin datos tienen valores null para no unir líneas ni dibujar barras
+  const chartData = useMemo<EvolucionChartItem[]>(() => {
+    if (!esModoPersonalizado) {
+      return serie.map((p): EvolucionChartItem => {
+        if (p.sin_datos) {
+          return {
+            ...p,
+            ingresos: null,
+            gastos: 0,
+            balance: null,
+            __sum_serie: null,
+          }
+        }
+        return { ...p, __sum_serie: 0 }
+      })
+    }
+    return serie.map((punto, idx): EvolucionChartItem => {
+      if (punto.sin_datos) {
+        const extraNull: Record<string, number | null> = {}
+        for (const s of seriesPersonalizadas) {
+          extraNull[s.key] = null
+          extraNull[`__prev_${s.key}`] = 0
+        }
+        return {
+          ...punto,
+          ...extraNull,
+          __sum_serie: null,
+          ingresos: null,
+          gastos: 0,
+          balance: null,
+        }
+      }
       const prevPunto = idx > 0 ? serie[idx - 1] : null
       const extra: Record<string, number> = {}
       let sumVisible = 0
@@ -119,16 +148,37 @@ export default function EvolucionCiclosCard({
     })
   }, [serie, esModoPersonalizado, seriesPersonalizadas, hiddenKeys])
 
-  // Promedio por ciclo de la selección personalizada activa
+  // C-5: El promedio de las series elegidas usa solo ciclos terminados con datos
   const avgCustomSeries = useMemo(() => {
     if (!esModoPersonalizado || chartData.length === 0) return 0
+    const terminadosConDatos = chartData.filter((row) => !row.sin_datos && !row.es_actual)
+    if (terminadosConDatos.length === 0) return 0
     let acc = 0
-    for (const row of chartData) {
-      const val = Number(row.__sum_serie ?? 0)
-      acc += val
+    for (const row of terminadosConDatos) {
+      acc += Number(row.__sum_serie ?? 0)
     }
-    return acc / chartData.length
+    return acc / terminadosConDatos.length
   }, [esModoPersonalizado, chartData])
+
+  // C-4: Dominio Y con piso redondeado para valores negativos
+  const { minY } = useMemo(() => {
+    let min = 0
+    for (const row of chartData) {
+      if (row.sin_datos) continue
+      if (esModoPersonalizado) {
+        const sum = Number(row.__sum_serie ?? 0)
+        if (sum < min) min = sum
+        for (const s of visibleSeries) {
+          const v = Number(row[s.key] ?? 0)
+          if (v < min) min = v
+        }
+      } else {
+        const bal = Number(row.balance ?? 0)
+        if (bal < min) min = bal
+      }
+    }
+    return { minY: min < 0 ? calcularPisoNegativo(min) : 0 }
+  }, [chartData, esModoPersonalizado, visibleSeries])
 
   const chartAnimationKey = useMemo(() => {
     const firstKey = serie[0]?.clave ?? 'empty'
@@ -178,62 +228,66 @@ export default function EvolucionCiclosCard({
               </div>
               <p className={styles.subtitle}>
                 {esModoPersonalizado
-                  ? `Promedio selección: ${formatMonto(avgCustomSeries, monedaVisual)}/ciclo · Tocá una serie para encenderla o apagarla`
+                  ? `Promedio selección: ${formatMonto(avgCustomSeries, monedaVisual)}/ciclo`
                   : promedioHistoricoGastos !== null
-                    ? `Ingresos vs. Gastos y línea de promedio histórico (${formatMonto(promedioHistoricoGastos, monedaVisual)})`
-                    : 'Ingresos vs. Gastos'}
+                    ? `Promedio de gastos: ${formatMonto(promedioHistoricoGastos, monedaVisual)}`
+                    : null}
               </p>
             </div>
           </div>
 
-          <div className={styles.headerControls}>
-            {esModoPersonalizado && modoGrafico !== 'lineas' && seriesPersonalizadas.length > 1 && (
-              <div className={styles.stackToggleGroup} role="group" aria-label="Disposición de barras">
+          {!ocultarControlesHeader && (
+            <div className={styles.headerControls}>
+              {!esModoPersonalizado && onModoGraficoChange && (
+                <SegmentedControl<'combinado' | 'barras' | 'lineas'>
+                  options={[
+                    { value: 'combinado', label: 'Combinado' },
+                    { value: 'barras', label: 'Barras' },
+                    { value: 'lineas', label: 'Líneas' },
+                  ]}
+                  value={modoGrafico}
+                  onChange={onModoGraficoChange}
+                  ariaLabel="Tipo de gráfico de evolución"
+                />
+              )}
+
+              {esModoPersonalizado && modoGrafico !== 'lineas' && seriesPersonalizadas.length > 1 && (
+                <SegmentedControl<'separadas' | 'apiladas'>
+                  options={[
+                    { value: 'separadas', label: 'Separadas' },
+                    { value: 'apiladas', label: 'Apiladas' },
+                  ]}
+                  value={modoBarrasCustom}
+                  onChange={setModoBarrasCustom}
+                  ariaLabel="Disposición de barras"
+                />
+              )}
+
+              {onOpenEditorSeries && (
                 <button
                   type="button"
-                  className={`${styles.stackToggleBtn} ${
-                    modoBarrasCustom === 'separadas' ? styles.stackToggleBtnActive : ''
-                  }`}
-                  onClick={() => setModoBarrasCustom('separadas')}
+                  className={styles.editSeriesQuickBtn}
+                  onClick={onOpenEditorSeries}
                 >
-                  Separadas
+                  <Sparkles size={14} />
+                  <span>{esModoPersonalizado ? 'Editar series' : 'Elegir categorías'}</span>
                 </button>
+              )}
+
+              {esModoPersonalizado && onResetSeries && (
                 <button
                   type="button"
-                  className={`${styles.stackToggleBtn} ${
-                    modoBarrasCustom === 'apiladas' ? styles.stackToggleBtnActive : ''
-                  }`}
-                  onClick={() => setModoBarrasCustom('apiladas')}
+                  className={styles.resetSeriesQuickBtn}
+                  onClick={() => {
+                    setHiddenKeys([])
+                    onResetSeries()
+                  }}
                 >
-                  Apiladas
+                  Ver general
                 </button>
-              </div>
-            )}
-
-            {onOpenEditorSeries && (
-              <button
-                type="button"
-                className={styles.editSeriesQuickBtn}
-                onClick={onOpenEditorSeries}
-              >
-                <Sparkles size={13} />
-                <span>{esModoPersonalizado ? 'Editar series' : 'Elegir categorías'}</span>
-              </button>
-            )}
-
-            {esModoPersonalizado && onResetSeries && (
-              <button
-                type="button"
-                className={styles.resetSeriesQuickBtn}
-                onClick={() => {
-                  setHiddenKeys([])
-                  onResetSeries()
-                }}
-              >
-                Ver general
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -260,23 +314,42 @@ export default function EvolucionCiclosCard({
             <ComposedChart
               key={chartAnimationKey}
               data={chartData}
-              margin={{ top: 12, right: 16, left: 4, bottom: 8 }}
+              margin={{ top: 8, right: 8, left: -4, bottom: 4 }}
               barGap={modoBarrasCustom === 'apiladas' ? 0 : 4}
-              barCategoryGap="22%"
+              barCategoryGap="20%"
             >
               <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
               <XAxis
                 dataKey="etiqueta"
-                tick={{ fill: axisColor, fontSize: 12, fontWeight: 600 }}
+                height={38}
                 axisLine={{ stroke: gridStroke }}
                 tickLine={false}
+                tick={({ x, y, payload }: { x?: string | number; y?: string | number; payload?: { value?: string | number } }) => {
+                  const pto = chartData.find(
+                    (p) => p.etiqueta === payload?.value || p.clave === payload?.value
+                  )
+                  return (
+                    <g transform={`translate(${x ?? 0},${y ?? 0})`}>
+                      <text x={0} y={0} dy={14} textAnchor="middle" fill={axisColor} fontSize={11} fontWeight={600}>
+                        {pto?.etiqueta ?? (payload?.value ? String(payload.value) : '')}
+                      </text>
+                      {(pto?.sin_datos || pto?.es_actual) && (
+                        <text x={0} y={0} dy={26} textAnchor="middle" fill="var(--text-3)" fontSize={11}>
+                          {pto?.sin_datos ? 'Sin datos' : 'En curso'}
+                        </text>
+                      )}
+                    </g>
+                  )
+                }}
               />
               <YAxis
-                tickFormatter={(val: number) => abbreviateAxisValue(val, monedaVisual)}
+                domain={[minY, 'auto']}
+                tickCount={5}
+                tickFormatter={(val: number) => formatMontoCorto(val, monedaVisual)}
                 tick={{ fill: axisColor, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
-                width={64}
+                width={56}
               />
               <Tooltip
                 cursor={{
@@ -286,6 +359,19 @@ export default function EvolucionCiclosCard({
                 content={({ active, payload }) => {
                   if (!active || !payload || payload.length === 0) return null
                   const row = payload[0].payload as AnalisisCicloPunto & Record<string, number>
+
+                  if (row.sin_datos) {
+                    return (
+                      <div className={styles.tooltipCard}>
+                        <div className={styles.tooltipHeader}>
+                          <span className={styles.tooltipTitle}>{row.etiqueta}</span>
+                          <span className={styles.tooltipRange}>{row.rango_texto}</span>
+                        </div>
+                        <p className={styles.tooltipSinDatos}>No hay movimientos en este ciclo.</p>
+                      </div>
+                    )
+                  }
+
                   const cycleSum = Number(row.__sum_serie ?? 0)
 
                   return (
@@ -324,7 +410,9 @@ export default function EvolucionCiclosCard({
                                     {formatMonto(currVal, monedaVisual)}
                                   </span>
                                   {currVal > 0 && visibleSeries.length > 1 && (
-                                    <span className={styles.tooltipShareBadge}>{sharePct}%</span>
+                                    <span className={styles.tooltipShareBadge}>
+                                      {formatPorcentaje(sharePct)}
+                                    </span>
                                   )}
                                   {deltaPct !== null && deltaPct !== 0 && (
                                     <span
@@ -334,8 +422,7 @@ export default function EvolucionCiclosCard({
                                           : styles.tooltipDeltaBad
                                       }
                                     >
-                                      {deltaPct > 0 ? '+' : ''}
-                                      {deltaPct}%
+                                      {formatPorcentaje(deltaPct, { signo: true })}
                                     </span>
                                   )}
                                 </div>
@@ -387,7 +474,7 @@ export default function EvolucionCiclosCard({
                             <span className={styles.tooltipLabel}>Te quedó (%)</span>
                             <span className={styles.tooltipBadge}>
                               {row.tasa_ahorro_pct !== null && row.tasa_ahorro_pct !== undefined
-                                ? `${row.tasa_ahorro_pct}%`
+                                ? formatPorcentaje(row.tasa_ahorro_pct)
                                 : '—'}
                             </span>
                           </div>
@@ -398,23 +485,11 @@ export default function EvolucionCiclosCard({
                 }}
               />
 
-              {/* Línea de referencia de promedio */}
               {!esModoPersonalizado && promedioHistoricoGastos !== null && promedioHistoricoGastos > 0 && (
-                <ReferenceLine
-                  y={promedioHistoricoGastos}
-                  stroke={avgLineColor}
-                  strokeDasharray="5 5"
-                  strokeWidth={1.5}
-                />
+                <ReferenceLine y={promedioHistoricoGastos} stroke={avgLineColor} strokeDasharray="5 5" strokeWidth={1.5} />
               )}
-
               {esModoPersonalizado && avgCustomSeries > 0 && (
-                <ReferenceLine
-                  y={avgCustomSeries}
-                  stroke={avgLineColor}
-                  strokeDasharray="5 5"
-                  strokeWidth={1.5}
-                />
+                <ReferenceLine y={avgCustomSeries} stroke={avgLineColor} strokeDasharray="5 5" strokeWidth={1.5} />
               )}
 
               {esModoPersonalizado ? (
@@ -427,6 +502,7 @@ export default function EvolucionCiclosCard({
                       name={s.nombre}
                       stroke={s.color}
                       strokeWidth={2.5}
+                      connectNulls={false}
                       dot={{ r: 4, fill: s.color, strokeWidth: 0 }}
                       activeDot={{ r: 6 }}
                       isAnimationActive={!prefersReducedMotion}
@@ -459,7 +535,15 @@ export default function EvolucionCiclosCard({
                           isAnimationActive={!prefersReducedMotion}
                           animationDuration={500}
                           animationEasing="ease-out"
-                        />
+                        >
+                          {chartData.map((entry, index) => (
+                            <Cell
+                              key={`cell-custom-${s.key}-${index}`}
+                              fill={s.color}
+                              opacity={entry.es_actual ? 0.55 : 1}
+                            />
+                          ))}
+                        </Bar>
                       )
                     })}
 
@@ -472,6 +556,7 @@ export default function EvolucionCiclosCard({
                           name="Suma selección"
                           stroke={balanceLineColor}
                           strokeWidth={2.2}
+                          connectNulls={false}
                           dot={{ r: 3.5, fill: balanceLineColor, strokeWidth: 0 }}
                           activeDot={{ r: 5.5 }}
                           isAnimationActive={!prefersReducedMotion}
@@ -492,7 +577,15 @@ export default function EvolucionCiclosCard({
                     isAnimationActive={!prefersReducedMotion}
                     animationDuration={500}
                     animationEasing="ease-out"
-                  />
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-ing-${index}`}
+                        fill={incomeColor}
+                        opacity={entry.es_actual ? 0.55 : 1}
+                      />
+                    ))}
+                  </Bar>
                   <Bar
                     dataKey="gastos"
                     name="Gastos"
@@ -502,7 +595,15 @@ export default function EvolucionCiclosCard({
                     isAnimationActive={!prefersReducedMotion}
                     animationDuration={500}
                     animationEasing="ease-out"
-                  />
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-gas-${index}`}
+                        fill={expenseColor}
+                        opacity={entry.es_actual ? 0.55 : 1}
+                      />
+                    ))}
+                  </Bar>
                 </>
               ) : (
                 <>
@@ -512,6 +613,7 @@ export default function EvolucionCiclosCard({
                     name="Ingresos"
                     stroke={incomeColor}
                     strokeWidth={2.4}
+                    connectNulls={false}
                     dot={{ r: 4, fill: incomeColor, strokeWidth: 0 }}
                     isAnimationActive={!prefersReducedMotion}
                     animationDuration={500}
@@ -523,6 +625,7 @@ export default function EvolucionCiclosCard({
                     name="Gastos"
                     stroke={expenseColor}
                     strokeWidth={2.4}
+                    connectNulls={false}
                     dot={{ r: 4, fill: expenseColor, strokeWidth: 0 }}
                     isAnimationActive={!prefersReducedMotion}
                     animationDuration={500}
@@ -537,6 +640,7 @@ export default function EvolucionCiclosCard({
                   name="Balance"
                   stroke={balanceLineColor}
                   strokeWidth={2.4}
+                  connectNulls={false}
                   dot={{ r: 4, fill: balanceLineColor, strokeWidth: 0 }}
                   activeDot={{ r: 6 }}
                   isAnimationActive={!prefersReducedMotion}
@@ -569,53 +673,41 @@ export default function EvolucionCiclosCard({
                   onClick={() => toggleSerieVisibility(s.key)}
                   title={
                     isHidden
-                      ? `Mostrar ${shortLabel} en el gráfico`
-                      : `Ocultar ${shortLabel} para reescalar el eje`
+                      ? `Mostrar serie ${shortLabel}`
+                      : `Ocultar serie ${shortLabel}`
                   }
                 >
                   <span
                     className={styles.legendDot}
-                    style={{ backgroundColor: isHidden ? 'var(--text-3)' : s.color }}
+                    style={{ backgroundColor: s.color }}
                   />
                   <span>{shortLabel}</span>
                 </button>
               )
             })}
-
-            {modoGrafico === 'combinado' &&
-              modoBarrasCustom === 'separadas' &&
-              visibleSeries.length > 1 && (
-                <span className={styles.legendItemStatic}>
-                  <span className={styles.legendDot} style={{ backgroundColor: balanceLineColor }} />
-                  Suma selección
-                </span>
-              )}
-
-            {avgCustomSeries > 0 && (
-              <span className={styles.legendItemStatic}>
-                <span className={styles.legendDash} style={{ borderColor: avgLineColor }} />
-                Promedio
-              </span>
-            )}
           </>
         ) : (
           <>
-            <span className={styles.legendItemStatic}>
+            <div className={styles.legendItemStatic}>
               <span className={styles.legendDot} style={{ backgroundColor: incomeColor }} />
-              Ingresos
-            </span>
-            <span className={styles.legendItemStatic}>
+              <span>Ingresos</span>
+            </div>
+            <div className={styles.legendItemStatic}>
               <span className={styles.legendDot} style={{ backgroundColor: expenseColor }} />
-              Gastos
-            </span>
-            <span className={styles.legendItemStatic}>
-              <span className={styles.legendDot} style={{ backgroundColor: balanceLineColor }} />
-              Balance
-            </span>
-            <span className={styles.legendItemStatic}>
-              <span className={styles.legendDash} style={{ borderColor: avgLineColor }} />
-              Promedio gastos
-            </span>
+              <span>Gastos</span>
+            </div>
+            {modoGrafico !== 'barras' && (
+              <div className={styles.legendItemStatic}>
+                <span className={styles.legendDot} style={{ backgroundColor: balanceLineColor }} />
+                <span>Te quedó</span>
+              </div>
+            )}
+            {promedioHistoricoGastos !== null && promedioHistoricoGastos > 0 && (
+              <div className={styles.legendItemStatic}>
+                <span className={styles.legendDash} style={{ color: avgLineColor }} />
+                <span>Promedio gastos</span>
+              </div>
+            )}
           </>
         )}
       </div>

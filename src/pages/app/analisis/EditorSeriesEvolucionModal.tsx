@@ -50,6 +50,7 @@ export default function EditorSeriesEvolucionModal({
     return initial
   })
   const [isDraggingOver, setIsDraggingOver] = useState(false)
+  const esTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
 
   const toggleExpandCat = (catKey: string) => {
     setExpandedCatIds((prev) => ({ ...prev, [catKey]: !prev[catKey] }))
@@ -209,7 +210,7 @@ export default function EditorSeriesEvolucionModal({
       <div className={styles.editorWrap} data-modal-block>
         <div className={styles.introBanner}>
           <span>
-            Arrastrá o tocá <strong>categorías enteras</strong> (ej. Hogar) o{' '}
+            {esTouch ? 'Tocá ' : 'Arrastrá o tocá '}<strong>categorías enteras</strong> (ej. Hogar) o{' '}
             <strong>subcategorías individuales</strong> (ej. cada servicio) para compararlas en
             barras separadas ciclo a ciclo.
           </span>
@@ -227,7 +228,7 @@ export default function EditorSeriesEvolucionModal({
         <div className={styles.columnsGrid}>
           {/* Columna izquierda: Catálogo de Categorías y Subcategorías */}
           <div className={styles.catalogColumn}>
-            <h3 className={styles.columnHeading}>1. Categorías y subcategorías (arrastrá o tocá)</h3>
+            <h3 className={styles.columnHeading}>1. Elegí categorías o subcategorías</h3>
             <div className={styles.catalogScroll}>
               {categorias.map((cat) => {
                 const catKey = cat.categoria_id ?? 'sin-categoria'
@@ -254,7 +255,7 @@ export default function EditorSeriesEvolucionModal({
                           <span className={styles.catNameText}>{cat.categoria_nombre}</span>
                           <span className={styles.catAmountText}>
                             {formatMonto(cat.monto, monedaVisual)} · {cat.subcategorias.length}{' '}
-                            {cat.subcategorias.length === 1 ? 'subcat.' : 'subcats.'}
+                            {cat.subcategorias.length === 1 ? 'subcategoría' : 'subcategorías'}
                           </span>
                         </div>
                       </button>
@@ -332,7 +333,7 @@ export default function EditorSeriesEvolucionModal({
           {/* Columna derecha: Zona de Drop / Series activas en el gráfico */}
           <div className={styles.dropColumn}>
             <h3 className={styles.columnHeading}>
-              2. Barras activas por período ({seriesActivas.length || 'Modo Ingresos vs. Gastos'})
+              2. Lo que se ve en el gráfico
             </h3>
             <div
               className={`${styles.dropZoneBox} ${isDraggingOver ? styles.dropZoneBoxActive : ''}`}
@@ -350,8 +351,9 @@ export default function EditorSeriesEvolucionModal({
                     Vista por defecto: Ingresos vs. Gastos
                   </p>
                   <p className={styles.emptyDropHint}>
-                    Arrastrá cualquier categoría o subcategoría hasta este recuadro para ver su
-                    evolución ciclo a ciclo en barras separadas.
+                    {esTouch
+                      ? 'Tocá cualquier categoría o subcategoría para ver su evolución ciclo a ciclo en barras separadas.'
+                      : 'Arrastrá cualquier categoría o subcategoría hasta este recuadro para ver su evolución ciclo a ciclo en barras separadas.'}
                   </p>
                 </div>
               ) : (

@@ -7,8 +7,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height: 100%;
-  min-height: 0;
   box-sizing: border-box;
 }
 
@@ -98,8 +96,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
 }
 
 /* ── Lista de Categorías (Barras / Ranking) ── */
@@ -107,29 +103,28 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
+  width: 100%;
 }
 
 .catRow {
   width: 100%;
-  background: var(--surface-alt);
+  background: transparent;
+  min-height: 56px;
   border: 1px solid transparent;
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 8px;
   cursor: pointer;
   text-align: left;
-  transition: border-color var(--motion-fast) var(--ease-out), background var(--motion-fast) var(--ease-out);
+  box-sizing: border-box;
+  transition: background-color var(--motion-fast) var(--ease-out);
 }
 
 .catRow:hover {
-  border-color: var(--border);
-  background: var(--surface);
+  background: var(--surface-alt);
 }
 
 .catRow:focus-visible {
@@ -367,10 +362,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
+  width: 100%;
 }
 
 .subcatsSection,
@@ -387,7 +379,7 @@
   gap: 8px;
 }
 
-.sectionLabel {
+.subcatsHeading {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -468,7 +460,7 @@
 }
 
 .subcatCount {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-3);
 }
 
@@ -510,9 +502,38 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 320px;
-  overflow-y: auto;
-  padding-right: 4px;
+  width: 100%;
+}
+
+.verMasBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  margin-top: 8px;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn:hover {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
+@media (max-width: 767px) {
+  .verMasBtn {
+    min-height: 44px;
+    height: 44px;
+  }
 }
 
 .movRow {

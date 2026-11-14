@@ -30,6 +30,8 @@ export interface AnalisisKpis {
   variacion_ingreso_vs_anterior_pct: number | null
   variacion_texto: string | null
   cantidad_operaciones: number
+  alcance: 'terminados' | 'en_curso'
+  frase_resumen: string | null
 }
 
 export interface AnalisisInsight {
@@ -53,6 +55,7 @@ export interface AnalisisCicloPunto {
   balance: number | null
   tasa_ahorro_pct: number | null
   promedio_historico_gastos: number | null
+  sin_datos: boolean
   por_categoria?: Record<string, number>
   por_subcategoria?: Record<string, number>
 }

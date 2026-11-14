@@ -16,7 +16,7 @@ import analisisService, {
   type AnalisisQueryParams,
   type ComparativaCiclosResponse,
 } from '@/services/analisis.service'
-import { formatMonto, formatAxisCompact } from '@/utils/format'
+import { formatMonto, formatMontoCorto, formatPorcentaje } from '@/utils/format'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './ComparativaCiclosCard.module.css'
 
@@ -42,6 +42,7 @@ export default function ComparativaCiclosCard({
   }
   const [cicloAKey, setCicloAKey] = useState<string>('')
   const [cicloBKey, setCicloBKey] = useState<string>('')
+  const [mostrarTodas, setMostrarTodas] = useState<boolean>(false)
   const [data, setData] = useState<ComparativaCiclosResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -116,7 +117,7 @@ export default function ComparativaCiclosCard({
       value: c.clave,
       label: `${c.etiqueta} (${c.rango_texto})${
         c.es_actual && c.dias_transcurridos != null && c.dias_totales != null
-          ? ` (en curso: ${c.dias_transcurridos}/${c.dias_totales} d)`
+          ? ` (en curso, día ${c.dias_transcurridos} de ${c.dias_totales})`
           : ''
       }`,
     }))
@@ -212,9 +213,9 @@ export default function ComparativaCiclosCard({
             >
               {data.resumen.diferencia_gasto_monto > 0 ? '+' : ''}
               {formatMonto(data.resumen.diferencia_gasto_monto, monedaVisual)}
-              {data.resumen.diferencia_gasto_pct !== null
-                ? ` (${data.resumen.diferencia_gasto_pct > 0 ? '+' : ''}${data.resumen.diferencia_gasto_pct}%)`
-                : ''}
+              {data.resumen.diferencia_gasto_pct !== null && (
+                ` (${formatPorcentaje(data.resumen.diferencia_gasto_pct, { signo: true })})`
+              )}
             </span>
           </div>
 
@@ -222,8 +223,7 @@ export default function ComparativaCiclosCard({
             <div className={styles.highlightBoxGood}>
               <TrendingDown size={14} />
               <span>
-                Mayor baja en <strong>{data.resumen.mayor_ahorro.categoria_nombre}</strong> (
-                -{formatMonto(data.resumen.mayor_ahorro.diferencia_monto, monedaVisual)})
+                Mayor baja en <strong>{data.resumen.mayor_ahorro.categoria_nombre}</strong> (-{formatMonto(data.resumen.mayor_ahorro.diferencia_monto, monedaVisual)})
               </span>
             </div>
           )}
@@ -232,8 +232,7 @@ export default function ComparativaCiclosCard({
             <div className={styles.highlightBoxBad}>
               <TrendingUp size={14} />
               <span>
-                Mayor suba en <strong>{data.resumen.mayor_aumento.categoria_nombre}</strong> (
-                +{formatMonto(data.resumen.mayor_aumento.diferencia_monto, monedaVisual)})
+                Mayor suba en <strong>{data.resumen.mayor_aumento.categoria_nombre}</strong> (+{formatMonto(data.resumen.mayor_aumento.diferencia_monto, monedaVisual)})
               </span>
             </div>
           )}
@@ -283,9 +282,9 @@ export default function ComparativaCiclosCard({
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tick={{ fill: 'var(--text-2)', fontSize: 11 }}
-                tickFormatter={(val: number) => formatAxisCompact(val)}
-                width={56}
+                tick={{ fill: 'var(--text-2)', fontSize: 12 }}
+                tickFormatter={(val: number) => formatMontoCorto(val, monedaVisual)}
+                width={64}
               />
               <Tooltip
                 content={({ active, payload }) => {
@@ -335,7 +334,7 @@ export default function ComparativaCiclosCard({
         </div>
       ) : (
         <div className={styles.deltaList}>
-          {data.categorias.map((item) => (
+          {(mostrarTodas ? data.categorias : data.categorias.slice(0, 8)).map((item) => (
             <div key={item.categoria_id ?? item.categoria_nombre} className={styles.deltaRow}>
               <div className={styles.deltaCatInfo}>
                 <CategoriaIcon nombre={item.categoria_nombre} size={28} />
@@ -347,7 +346,7 @@ export default function ComparativaCiclosCard({
                       <div className={styles.barTrack}>
                         <div
                           className={styles.barFillA}
-                          style={{ width: `${item.ancho_a_pct}%` }}
+                          style={{ width: `${item.ancho_a_pct}` + '%' }}
                         />
                       </div>
                     </div>
@@ -356,7 +355,7 @@ export default function ComparativaCiclosCard({
                       <div className={styles.barTrack}>
                         <div
                           className={styles.barFillB}
-                          style={{ width: `${item.ancho_b_pct}%` }}
+                          style={{ width: `${item.ancho_b_pct}` + '%' }}
                         />
                       </div>
                     </div>
@@ -385,13 +384,22 @@ export default function ComparativaCiclosCard({
                 >
                   {item.diferencia_monto > 0 ? '+' : ''}
                   {formatMonto(item.diferencia_monto, monedaVisual)}
-                  {item.diferencia_pct !== null
-                    ? ` (${item.diferencia_pct > 0 ? '+' : ''}${item.diferencia_pct}%)`
-                    : ''}
+                  {item.diferencia_pct !== null && (
+                    ` (${formatPorcentaje(item.diferencia_pct, { signo: true })})`
+                  )}
                 </span>
               </div>
             </div>
           ))}
+          {data.categorias.length > 8 && (
+            <button
+              type="button"
+              className={styles.verMasBtn}
+              onClick={() => setMostrarTodas(!mostrarTodas)}
+            >
+              {mostrarTodas ? 'Ver menos' : `Ver todas (${data.categorias.length})`}
+            </button>
+          )}
         </div>
           )}
         </div>

@@ -7,8 +7,6 @@
   border: 1px solid var(--border);
   border-radius: 20px;
   box-shadow: var(--elevation-sm);
-  height: 100%;
-  min-height: 0;
   box-sizing: border-box;
 }
 
@@ -76,7 +74,7 @@
 }
 
 .metricLabel {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-2);
 }
 
@@ -124,8 +122,6 @@
 
 .chartWrap {
   width: 100%;
-  height: 215px;
-  flex-shrink: 0;
 }
 
 .tooltipCard {
@@ -162,7 +158,7 @@
 }
 
 .tooltipRelief {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--success);
   padding-top: 2px;
@@ -172,18 +168,14 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  width: 100%;
 }
 
 .plansList {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
+  width: 100%;
 }
 
 .planRow {
@@ -234,7 +226,7 @@
 }
 
 .planSub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-2);
 }
 
@@ -268,13 +260,12 @@
 }
 
 .planInstallment {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
 
 .emptyWrap {
-  flex: 1;
   min-height: 220px;
   display: flex;
   flex-direction: column;
@@ -289,7 +280,41 @@
   font-size: 13px;
 }
 
-@media (max-width: 768px) {
+.verMasBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  margin-top: 8px;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn:hover {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
+@media (max-width: 767px) {
+  .chartWrap {
+    height: 260px;
+    min-height: 260px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .planRow {
     flex-direction: column;
     align-items: stretch;
@@ -299,5 +324,23 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .verMasBtn {
+    min-height: 44px;
+    height: 44px;
+  }
+}
+
+@media (min-width: 768px) {
+  .chartWrap {
+    height: clamp(280px, 42dvh, 460px);
+    min-height: 280px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verMasBtn {
+    transition: none;
   }
 }

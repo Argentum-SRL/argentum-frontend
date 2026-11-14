@@ -2,20 +2,18 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 16px 20px;
+  padding: 14px 18px;
   box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  height: 100%;
-  min-height: 0;
+  gap: 8px;
   box-sizing: border-box;
 }
 
 .header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .headerTopRow {
@@ -23,19 +21,19 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .titleGroup {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .iconWrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   background: var(--surface-alt);
   color: var(--primary);
   display: flex;
@@ -48,7 +46,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .title {
@@ -59,7 +57,7 @@
 }
 
 .parentCategoryBadge {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--primary);
   background: var(--surface-alt);
@@ -71,7 +69,7 @@
 .subtitle {
   font-size: 0.8125rem;
   color: var(--text-2);
-  margin: 2px 0 0;
+  margin: 0;
 }
 
 .headerControls {
@@ -81,50 +79,21 @@
   gap: 8px;
 }
 
-.stackToggleGroup {
-  display: inline-flex;
-  align-items: center;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 2px;
-  gap: 2px;
-}
-
-.stackToggleBtn {
-  border: none;
-  background: transparent;
-  color: var(--text-2);
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 140ms ease, color 140ms ease;
-}
-
-.stackToggleBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.stackToggleBtnActive {
-  background: var(--primary);
-  color: #ffffff;
-}
-
 .editSeriesQuickBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 0 14px;
+  min-height: 36px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
-  font-size: 0.75rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
+  box-sizing: border-box;
   transition: background-color 140ms ease, border-color 140ms ease;
 }
 
@@ -139,12 +108,16 @@
 }
 
 .resetSeriesQuickBtn {
-  padding: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  min-height: 36px;
   border-radius: 10px;
   border: none;
   background: transparent;
   color: var(--text-2);
-  font-size: 0.72rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition: color 140ms ease, background-color 140ms ease;
@@ -165,8 +138,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding-top: 2px;
+  gap: 8px;
+  padding-top: 0;
   flex-shrink: 0;
 }
 
@@ -232,12 +205,9 @@
 .chartContainer {
   position: relative;
   width: 100%;
-  flex: 1;
-  min-height: 280px;
 }
 
 .emptyWrap {
-  flex: 1;
   min-height: 240px;
   display: flex;
   flex-direction: column;
@@ -282,6 +252,12 @@
 .tooltipRange {
   font-size: 0.75rem;
   color: var(--text-3);
+}
+
+.tooltipSinDatos {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  margin: 4px 0 0;
 }
 
 .tooltipRow {
@@ -343,7 +319,7 @@
 }
 
 .tooltipShareBadge {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-2);
   background: var(--surface-alt);
@@ -352,13 +328,13 @@
 }
 
 .tooltipDeltaGood {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--success);
 }
 
 .tooltipDeltaBad {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--error);
 }
@@ -378,9 +354,83 @@
   color: var(--primary);
 }
 
+@media (max-width: 767px) {
+  .card {
+    border-radius: 16px;
+    padding: 12px 12px;
+    gap: 6px;
+  }
+
+  .header {
+    gap: 2px;
+  }
+
+  .headerTopRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .titleGroup {
+    gap: 6px;
+  }
+
+  .iconWrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .iconWrap svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .title {
+    font-size: 0.9375rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    margin: 0;
+  }
+
+  .chartContainer {
+    height: 240px;
+    min-height: 240px;
+  }
+
+  .headerControls {
+    display: none;
+  }
+
+  .legend {
+    gap: 6px;
+    padding-top: 0;
+  }
+
+  .legendItemStatic {
+    font-size: 0.6875rem;
+    padding: 0 2px;
+    gap: 4px;
+  }
+
+  .legendChip {
+    padding: 2px 8px;
+    font-size: 0.6875rem;
+    gap: 4px;
+  }
+}
+
+@media (min-width: 768px) {
+  .chartContainer {
+    height: clamp(280px, 42dvh, 460px);
+    min-height: 280px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
 
-  .stackToggleBtn,
   .editSeriesQuickBtn,
   .resetSeriesQuickBtn,
   .legendChip {

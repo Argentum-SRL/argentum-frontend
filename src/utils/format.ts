@@ -91,3 +91,58 @@ export function formatAxisCompact(val: number): string {
   }).format(num)
 }
 
+export function formatPorcentaje(valor: number, opciones?: { signo?: boolean }): string {
+  const num = Number.isFinite(valor) ? valor : 0
+  const absFormatted = new Intl.NumberFormat('es-AR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(Math.abs(num))
+
+  if (absFormatted === '0') {
+    return '0%'
+  }
+  if (num > 0) {
+    const prefix = opciones?.signo ? '+' : ''
+    return `${prefix}${absFormatted}%`
+  }
+  return `-${absFormatted}%`
+}
+
+export function formatMontoCorto(valor: number, moneda: 'ARS' | 'USD' = 'ARS'): string {
+  const num = typeof valor === 'number' ? valor : parseFloat(String(valor))
+  const safeNum = isNaN(num) || num === null || num === undefined ? 0 : num
+  const absVal = Math.abs(safeNum)
+  const isNegative = safeNum < 0
+
+  let numFormatted: string
+  let sufijo = ''
+
+  if (absVal >= 1_000_000) {
+    const valM = absVal / 1_000_000
+    numFormatted = new Intl.NumberFormat('es-AR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    }).format(valM)
+    sufijo = ' M'
+  } else if (absVal >= 1_000) {
+    const valK = absVal / 1_000
+    numFormatted = new Intl.NumberFormat('es-AR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    }).format(valK)
+    sufijo = ' mil'
+  } else {
+    numFormatted = new Intl.NumberFormat('es-AR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    }).format(absVal)
+  }
+
+  const baseSymbol = String(moneda).toUpperCase() === 'USD' ? 'US$' : '$'
+  // El espacio entre el símbolo y el número es el mismo que usa formatMonto (\u00a0 de Intl es-AR)
+  const prefix = isNegative ? `-${baseSymbol}\u00a0` : `${baseSymbol}\u00a0`
+
+  return `${prefix}${numFormatted}${sufijo}`
+}
+
+

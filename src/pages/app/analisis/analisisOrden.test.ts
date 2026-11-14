@@ -66,8 +66,23 @@ describe('TF2: Límites de tamaño en Análisis', () => {
     expect(lines).toBeLessThanOrEqual(400)
   })
 
-  it('AnalisisPage.tsx tiene como máximo 600 líneas', () => {
+  it('AnalisisPage.tsx tiene como máximo 480 líneas', () => {
     const lines = countLines('AnalisisPage.tsx')
-    expect(lines).toBeLessThanOrEqual(600)
+    expect(lines).toBeLessThanOrEqual(480)
+  })
+
+  it('FiltrosAnalisis.tsx tiene como máximo 320 líneas', () => {
+    const lines = countLines('FiltrosAnalisis.tsx')
+    expect(lines).toBeLessThanOrEqual(320)
+  })
+
+  it('DescargarAnalisisModal.tsx tiene como máximo 200 líneas', () => {
+    const lines = countLines('DescargarAnalisisModal.tsx')
+    expect(lines).toBeLessThanOrEqual(200)
+  })
+
+  it('EvolucionCiclosCard.tsx tiene como máximo 720 líneas', () => {
+    const lines = countLines('EvolucionCiclosCard.tsx')
+    expect(lines).toBeLessThanOrEqual(720)
   })
 })

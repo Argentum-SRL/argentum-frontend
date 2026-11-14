@@ -1,79 +1,59 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import {
-  TrendingUp,
-  FileSpreadsheet,
-  Download,
-  PieChart,
-  ArrowLeftRight,
-  Calendar,
-  Activity,
-  Sparkles,
-} from '@/components/ui/icons'
-import SegmentedControl from '@/components/ui/SegmentedControl'
-import { SelectInput, type SelectOption } from '@/components/ui'
+import { Download, SlidersHorizontal, FileSpreadsheet } from '@/components/ui/icons'
+import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'
 import NumerosPrincipales from './NumerosPrincipales'
-import analisisService, {
-  type AnalisisResumenResponse,
-  type MonedaModoAnalisis,
-  type AnalisisQueryParams,
-  type SerieEvolucionPersonalizada,
-} from '@/services/analisis.service'
-import { getErrorMessage } from '@/utils/errorMessages'
-import { useNotificaciones } from '@/hooks/useNotificaciones'
-import { sileo } from 'sileo'
+import FiltrosAnalisis from './FiltrosAnalisis.tsx'
+import DescargarAnalisisModal from './DescargarAnalisisModal'
 import EvolucionCiclosCard from './EvolucionCiclosCard'
 import DesgloseCategoriasCard from './DesgloseCategoriasCard'
 import ComparativaCiclosCard from './ComparativaCiclosCard'
 import ProyeccionCuotasCard from './ProyeccionCuotasCard'
 import MisInformesTab from './MisInformesTab'
 import EditorSeriesEvolucionModal from './EditorSeriesEvolucionModal'
-import { exportarAnalisisPdf } from './exportarAnalisisPdf'
-import { formatMoneda } from '@/utils/format'
+import analisisService, {
+  type AnalisisResumenResponse,
+  type MonedaModoAnalisis,
+  type AnalisisQueryParams,
+  type SerieEvolucionPersonalizada,
+} from '@/services/analisis.service'
+import { useNotificaciones } from '@/hooks/useNotificaciones'
+import type { VistaActivaAnalisis } from './filtrosAnalisis'
 import styles from './AnalisisPage.module.css'
 
-type VistaActivaAnalisis =
-  | 'evolucion'
-  | 'categorias'
-  | 'comparativa'
-  | 'proyeccion'
-  | 'informes'
-
-const VISTAS_PRINCIPALES: Array<{
-  id: VistaActivaAnalisis
-  titulo: string
-  icon: typeof TrendingUp
-}> = [
-    { id: 'evolucion', titulo: 'Evolución', icon: TrendingUp },
-    { id: 'categorias', titulo: 'Categorías', icon: PieChart },
-    { id: 'comparativa', titulo: 'Comparar', icon: ArrowLeftRight },
-    { id: 'proyeccion', titulo: 'Proyección', icon: Calendar },
-  ]
+const OPCIONES_TABS_MOBILE: SegmentedControlOption<'analisis' | 'informes'>[] = [
+  { value: 'analisis', label: 'Análisis' },
+  { value: 'informes', label: 'Informes' },
+]
 
 export default function AnalisisPage() {
-  const { lastDataUpdate } = useNotificaciones()
-
   const [vistaActiva, setVistaActiva] = useState<VistaActivaAnalisis>('evolucion')
-
-  // Sub-modos controlados desde los Filtros
-  const [modoEvolucion, setModoEvolucion] = useState<'combinado' | 'barras' | 'lineas'>('combinado')
-  const [modoCategorias, setModoCategorias] = useState<'barras' | 'dona' | 'ranking'>('barras')
-  const [modoComparativa, setModoComparativa] = useState<'diferencias' | 'grafico'>('diferencias')
-  const [horizonteProyeccion, setHorizonteProyeccion] = useState<'6' | '12'>('6')
-  const [vistaProyeccion, setVistaProyeccion] = useState<'grafico' | 'planes'>('grafico')
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.innerWidth >= 768
+  )
 
   // Filtros de datos
   const [monedaModo, setMonedaModo] = useState<MonedaModoAnalisis>('solo_ars')
   const [ciclosCount, setCiclosCount] = useState<number>(6)
   const [billeteraId, setBilleteraId] = useState<string>('todos')
   const [tarjetaId, setTarjetaId] = useState<string>('todos')
+  const [categoriaId] = useState<string | undefined>(undefined)
 
-  // Series personalizadas para el Gráfico de Evolución
+  // Estado de vistas y tarjetas
+  const [modoEvolucion, setModoEvolucion] = useState<'combinado' | 'barras' | 'lineas'>('combinado')
   const [seriesPersonalizadas, setSeriesPersonalizadas] = useState<SerieEvolucionPersonalizada[]>([])
-  const [isEditorSeriesOpen, setIsEditorSeriesOpen] = useState<boolean>(false)
+  const [modoCategorias, setModoCategorias] = useState<'barras' | 'dona' | 'ranking'>('barras')
+  const [modoComparativa, setModoComparativa] = useState<'diferencias' | 'grafico'>('diferencias')
+  const [horizonteProyeccion, setHorizonteProyeccion] = useState<'6' | '12'>('6')
 
+  // Modales
+  const [descargarModalOpen, setDescargarModalOpen] = useState(false)
+  const [editorSeriesOpen, setEditorSeriesOpen] = useState(false)
+
+  // Datos
   const [data, setData] = useState<AnalisisResumenResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  const [exportingExcel, setExportingExcel] = useState<boolean>(false)
+
+  const { lastDataUpdate } = useNotificaciones()
 
   const queryParams = useMemo<AnalisisQueryParams>(
     () => ({
@@ -82,8 +62,9 @@ export default function AnalisisPage() {
       naturaleza: 'todos',
       billetera_id: billeteraId !== 'todos' ? billeteraId : undefined,
       tarjeta_id: tarjetaId !== 'todos' ? tarjetaId : undefined,
+      categoria_id: categoriaId,
     }),
-    [monedaModo, ciclosCount, billeteraId, tarjetaId]
+    [monedaModo, ciclosCount, billeteraId, tarjetaId, categoriaId]
   )
 
   const fetchResumen = useCallback(
@@ -96,6 +77,7 @@ export default function AnalisisPage() {
           resolve()
         })
       })
+
       try {
         const [res] = await Promise.all([
           analisisService.getResumen(queryParams, signal),
@@ -104,13 +86,8 @@ export default function AnalisisPage() {
         if (!signal?.aborted) {
           setData(res)
         }
-      } catch (err) {
-        if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
-          return
-        }
-        sileo.error({
-          title: getErrorMessage(err, 'No pudimos cargar los datos de análisis.'),
-        })
+      } catch {
+        // Silencioso en cancelación
       } finally {
         if (!signal?.aborted) {
           setLoading(false)
@@ -132,109 +109,163 @@ export default function AnalisisPage() {
   }, [fetchResumen])
 
   useEffect(() => {
-    if (lastDataUpdate?.entidad === 'transacciones' || lastDataUpdate?.entidad === 'billeteras') {
+    if (
+      lastDataUpdate?.entidad === 'transacciones' ||
+      lastDataUpdate?.entidad === 'billeteras'
+    ) {
       const controller = new AbortController()
       const timer = setTimeout(() => {
         void fetchResumen(controller.signal)
-      }, 0)
+      }, 300)
       return () => {
         clearTimeout(timer)
         controller.abort()
       }
     }
-  }, [lastDataUpdate?.timestamp, lastDataUpdate?.entidad, fetchResumen])
+  }, [lastDataUpdate, fetchResumen])
 
   const monedaVisual = data?.moneda_visual ?? (monedaModo.includes('usd') ? 'USD' : 'ARS')
-  const esConsolidado = monedaModo === 'consolidado_ars' || monedaModo === 'consolidado_usd'
+  const billeteras = data?.filtros_disponibles.billeteras ?? []
+  const tarjetas = data?.filtros_disponibles.tarjetas ?? []
 
-  const billeteraOptions = useMemo<SelectOption[]>(() => {
-    const list: SelectOption[] = [{ value: 'todos', label: 'Todas las billeteras' }]
-    if (data?.filtros_disponibles.billeteras) {
-      for (const b of data.filtros_disponibles.billeteras) {
-        list.push({ value: b.id, label: `${b.nombre} (${formatMoneda(b.moneda)})` })
-      }
-    }
-    return list
-  }, [data])
-
-  const tarjetaOptions = useMemo<SelectOption[]>(() => {
-    const list: SelectOption[] = [{ value: 'todos', label: 'Todas las tarjetas' }]
-    if (data?.filtros_disponibles.tarjetas) {
-      for (const t of data.filtros_disponibles.tarjetas) {
-        list.push({ value: t.id, label: t.nombre })
-      }
-    }
-    return list
-  }, [data])
-
-  const handleExportExcel = async () => {
-    setExportingExcel(true)
-    try {
-      const blob = await analisisService.exportarExcel(queryParams)
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `argentum_analisis_${ciclosCount}ciclos_${monedaVisual.toLowerCase()}.xlsx`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      window.URL.revokeObjectURL(url)
-      sileo.success({ title: 'Libro Excel (.xlsx) descargado.' })
-    } catch (err) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos exportar el Excel.') })
-    } finally {
-      setExportingExcel(false)
-    }
-  }
-
-  const handleExportPdf = () => {
-    if (!data) return
-    exportarAnalisisPdf(data, 'Argentum — Tu análisis')
-    sileo.success({ title: 'Informe PDF descargado.' })
-  }
+  const esInformes = vistaActiva === 'informes'
+  const subtituloDesktop = `${data?.periodo_seleccionado.etiqueta ?? 'Cargando...'} · ${data?.kpis.cantidad_operaciones ?? 0} movimientos`
+  const rangoMobile = data?.periodo_seleccionado.etiqueta.match(/\(([^)]+)\)/)?.[1]
+  const subtituloMobile = `${rangoMobile ?? data?.periodo_seleccionado.etiqueta ?? 'Cargando...'} · ${data?.kpis.cantidad_operaciones ?? 0} movimientos`
+  const mostrarSidebar = sidebarOpen && !esInformes
 
   return (
     <div className={styles.page}>
-      <div className={styles.studioLayout}>
-        {/* ══════════════════════════════════════════════════════════════════
-            IZQUIERDA: CONTENEDOR DE GRÁFICO (ENTRA 100% EN PANTALLA)
-           ══════════════════════════════════════════════════════════════════ */}
-        <main className={styles.leftStage} aria-label="Contenedor principal de gráficos">
-          {/* ── Page Header (misma estética que Transacciones y Presupuestos) ── */}
-          <div className={styles.pageHeader}>
-            <div className={styles.titleGroup}>
-              <h1>Análisis</h1>
-              <p className={styles.subtitle}>
-                {data?.periodo_seleccionado.etiqueta ?? 'Cargando...'}
-                {' · '}
-                {loading && !data
-                  ? '—'
-                  : `${data?.kpis.cantidad_operaciones ?? 0} ${
-                      (data?.kpis.cantidad_operaciones ?? 0) === 1 ? 'movimiento' : 'movimientos'
-                    }`}
-              </p>
-            </div>
-          </div>
+      {/* 1. Encabezado */}
+      <header className={styles.pageHeader}>
+        <div className={styles.titleGroup}>
+          <h1>{esInformes ? 'Mis Informes Personalizados' : 'Análisis'}</h1>
+          <p className={styles.subtitle}>
+            <span className={styles.subtitleDesktop}>
+              {esInformes
+                ? 'Reportes a medida exportables a Excel o PDF'
+                : subtituloDesktop}
+            </span>
+            <span className={styles.subtitleMobile}>
+              {esInformes
+                ? 'Reportes a medida en Excel o PDF'
+                : subtituloMobile}
+            </span>
+          </p>
+        </div>
 
-          {/* ── Hero Resumen (Card Marino unificado) ── */}
-          <NumerosPrincipales
-            data={data}
-            loading={loading}
-            monedaVisual={monedaVisual}
-            hayFiltroCategoriaOTarjeta={Boolean(queryParams.categoria_id || queryParams.tarjeta_id)}
+        <div className={styles.headerActions}>
+          <button
+            type="button"
+            className={`${styles.btnGhost} ${mostrarSidebar ? styles.btnGhostActive : ''}`}
+            onClick={() => {
+              if (vistaActiva === 'informes') {
+                setVistaActiva('evolucion')
+                setSidebarOpen(true)
+              } else {
+                setSidebarOpen((prev) => !prev)
+              }
+            }}
+            aria-label={mostrarSidebar ? 'Ocultar filtros' : 'Filtros'}
+            title={mostrarSidebar ? 'Ocultar filtros' : 'Filtros'}
+          >
+            <SlidersHorizontal size={16} className={styles.btnIcon} />
+            <span className={styles.btnText}>
+              {mostrarSidebar ? 'Ocultar filtros' : 'Filtros'}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.btnGhost} ${vistaActiva === 'informes' ? styles.btnGhostActive : ''}`}
+            onClick={() => setVistaActiva((prev) => (prev === 'informes' ? 'evolucion' : 'informes'))}
+            aria-label="Mis informes"
+            title="Mis informes"
+          >
+            <FileSpreadsheet size={16} className={styles.btnIcon} />
+            <span className={styles.btnText}>Mis informes</span>
+          </button>
+
+          <button
+            type="button"
+            className={styles.btnGhost}
+            onClick={() => setDescargarModalOpen(true)}
+            aria-label="Descargar"
+            title="Descargar análisis"
+          >
+            <Download size={16} className={styles.btnIcon} />
+            <span className={styles.btnText}>Descargar</span>
+          </button>
+        </div>
+      </header>
+
+      {/* 2. Grilla con Escenario y Panel Lateral Colapsable */}
+      <div
+        className={`${styles.layoutGrid} ${
+          mostrarSidebar ? styles.layoutGridWithSidebar : styles.layoutGridFull
+        }`}
+      >
+        <main className={styles.stageColumn}>
+          {/* Selector de pestañas oficial solo para mobile (idéntico a Transacciones) */}
+          <SegmentedControl<'analisis' | 'informes'>
+            options={OPCIONES_TABS_MOBILE}
+            value={vistaActiva === 'informes' ? 'informes' : 'analisis'}
+            onChange={(val) => setVistaActiva(val === 'informes' ? 'informes' : 'evolucion')}
+            fullWidth
+            ariaLabel="Secciones de análisis"
+            className={styles.tabsMobileOnly}
           />
 
-          {/* Cuadro del Gráfico Protagonista */}
-          <div className={styles.stageViewport}>
+          {/* Números de arriba (solo en Evolución y Categorías cuando no está en informes) */}
+          {vistaActiva !== 'informes' && (vistaActiva === 'evolucion' || vistaActiva === 'categorias') && (
+            <NumerosPrincipales
+              data={data}
+              loading={loading}
+              monedaVisual={monedaVisual}
+              hayFiltroCategoriaOTarjeta={Boolean(
+                categoriaId || (tarjetaId && tarjetaId !== 'todos')
+              )}
+            />
+          )}
+
+          {/* Barra de Controles Mobile (Filtros + Descargar, como en Transacciones) */}
+          {vistaActiva !== 'informes' && (
+            <div className={styles.mobileControlsBar}>
+              <div className={styles.mobileLeftActions}>
+                <button
+                  type="button"
+                  className={styles.mobileFilterBtn}
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="Abrir filtros"
+                >
+                  <SlidersHorizontal size={15} />
+                  <span>Filtros</span>
+                </button>
+              </div>
+              <button
+                type="button"
+                className={styles.mobileActionBtn}
+                onClick={() => setDescargarModalOpen(true)}
+                aria-label="Descargar análisis"
+                title="Descargar"
+              >
+                <Download size={16} />
+              </button>
+            </div>
+          )}
+
+          {/* Tarjeta de visualización activa */}
+          <div className={styles.cardSection}>
             {vistaActiva === 'evolucion' && (
               <EvolucionCiclosCard
                 serie={data?.serie_ciclos ?? []}
                 monedaVisual={monedaVisual}
                 promedioHistoricoGastos={data?.kpis.promedio_gasto_ciclo ?? null}
                 modoGrafico={modoEvolucion}
+                onModoGraficoChange={setModoEvolucion}
                 seriesPersonalizadas={seriesPersonalizadas}
                 loading={loading}
-                onOpenEditorSeries={() => setIsEditorSeriesOpen(true)}
+                onOpenEditorSeries={() => setEditorSeriesOpen(true)}
                 onResetSeries={() => setSeriesPersonalizadas([])}
               />
             )}
@@ -268,8 +299,6 @@ export default function AnalisisPage() {
                 tarjetaId={queryParams.tarjeta_id}
                 horizonteExterno={horizonteProyeccion}
                 onHorizonteChange={setHorizonteProyeccion}
-                vistaInternaExterna={vistaProyeccion}
-                onVistaInternaChange={setVistaProyeccion}
               />
             )}
 
@@ -277,304 +306,42 @@ export default function AnalisisPage() {
           </div>
         </main>
 
-        {/* ══════════════════════════════════════════════════════════════════
-            DERECHA: FILTROS COMPACTOS (SIN SCROLL)
-           ══════════════════════════════════════════════════════════════════ */}
-        <aside className={styles.controlPanel} aria-label="Filtros de análisis">
-          <div className={styles.panelHeader}>
-            <div className={styles.panelHeaderLeft}>
-              <div className={styles.panelIconBox}>
-                <Activity size={15} />
-              </div>
-              <h2 className={styles.panelTitle}>Filtros</h2>
-            </div>
-
-            <button
-              type="button"
-              className={`${styles.reportsChipBtn} ${
-                vistaActiva === 'informes' ? styles.reportsChipBtnActive : ''
-              }`}
-              onClick={() => setVistaActiva('informes')}
-            >
-              <FileSpreadsheet size={13} />
-              <span>Mis Informes</span>
-            </button>
-          </div>
-
-          {/* 1. Selector de Gráfico en Grilla 2x2 */}
-          <div className={styles.panelSection}>
-            <span className={styles.sectionLabel}>Gráfico en pantalla</span>
-            <div className={styles.viewGrid}>
-              {VISTAS_PRINCIPALES.map((v) => {
-                const IconComp = v.icon
-                const isSelected = vistaActiva === v.id
-                return (
-                  <button
-                    key={v.id}
-                    type="button"
-                    className={`${styles.viewGridBtn} ${
-                      isSelected ? styles.viewGridBtnActive : ''
-                    }`}
-                    onClick={() => setVistaActiva(v.id)}
-                  >
-                    <IconComp size={15} />
-                    <span>{v.titulo}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* 2. Formato contextual del gráfico activo */}
-          {vistaActiva === 'evolucion' && (
-            <div className={styles.panelSection}>
-              <span className={styles.sectionLabel}>Formato de gráfico</span>
-              <div className={styles.controlTrack}>
-                <SegmentedControl
-                  options={[
-                    { value: 'combinado', label: 'Combinado' },
-                    { value: 'barras', label: 'Barras' },
-                    { value: 'lineas', label: 'Líneas' },
-                  ]}
-                  value={modoEvolucion}
-                  onChange={(v: string) => setModoEvolucion(v as typeof modoEvolucion)}
-                  ariaLabel="Formato de evolución"
-                  fullWidth
-                />
-              </div>
-            </div>
-          )}
-
-          {vistaActiva === 'categorias' && (
-            <div className={styles.panelSection}>
-              <span className={styles.sectionLabel}>Formato de gráfico</span>
-              <div className={styles.controlTrack}>
-                <SegmentedControl
-                  options={[
-                    { value: 'barras', label: 'Barras' },
-                    { value: 'dona', label: 'Dona' },
-                    { value: 'ranking', label: 'Ranking' },
-                  ]}
-                  value={modoCategorias}
-                  onChange={(v: string) => setModoCategorias(v as typeof modoCategorias)}
-                  ariaLabel="Formato de categorías"
-                  fullWidth
-                />
-              </div>
-            </div>
-          )}
-
-          {vistaActiva === 'comparativa' && (
-            <div className={styles.panelSection}>
-              <span className={styles.sectionLabel}>Formato de comparativa</span>
-              <div className={styles.controlTrack}>
-                <SegmentedControl
-                  options={[
-                    { value: 'diferencias', label: 'Diferencias' },
-                    { value: 'grafico', label: 'Barras' },
-                  ]}
-                  value={modoComparativa}
-                  onChange={(v: string) => setModoComparativa(v as typeof modoComparativa)}
-                  ariaLabel="Formato de comparativa"
-                  fullWidth
-                />
-              </div>
-            </div>
-          )}
-
-          {vistaActiva === 'proyeccion' && (
-            <div className={styles.panelSection}>
-              <span className={styles.sectionLabel}>Cuántos ciclos y cómo verlo</span>
-              <div className={styles.twoColRow}>
-                <div className={styles.controlTrackHalf}>
-                  <SegmentedControl
-                    options={[
-                      { value: '6', label: '6M' },
-                      { value: '12', label: '12M' },
-                    ]}
-                    value={horizonteProyeccion}
-                    onChange={(v: string) => setHorizonteProyeccion(v as '6' | '12')}
-                    ariaLabel="Horizonte"
-                    fullWidth
-                  />
-                </div>
-                <div className={styles.controlTrackHalf}>
-                  <SegmentedControl
-                    options={[
-                      { value: 'grafico', label: 'Por ciclo' },
-                      { value: 'planes', label: 'Planes' },
-                    ]}
-                    value={vistaProyeccion}
-                    onChange={(v: string) => setVistaProyeccion(v as 'grafico' | 'planes')}
-                    ariaLabel="Vista"
-                    fullWidth
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 3. Moneda (1 sola línea) */}
-          <div className={styles.panelSection}>
-            <div className={styles.sectionLabelRow}>
-              <span className={styles.sectionLabel}>Moneda</span>
-              {esConsolidado && (
-                data?.aviso_cotizacion ? (
-                  <span className={styles.subtitle}>
-                    {data.aviso_cotizacion}
-                  </span>
-                ) : data?.cotizacion_referencia?.texto ? (
-                  <span className={styles.subtitle}>
-                    {data.cotizacion_referencia.texto}
-                  </span>
-                ) : null
-              )}
-            </div>
-            <div className={styles.controlTrack}>
-              <SegmentedControl
-                options={[
-                  { value: 'solo_ars', label: 'Pesos' },
-                  { value: 'solo_usd', label: 'Dólares' },
-                  { value: 'consolidado_ars', label: 'Todo pasado a pesos' },
-                  { value: 'consolidado_usd', label: 'Todo pasado a dólares' },
-                ]}
-                value={monedaModo}
-                onChange={(v: string) => setMonedaModo(v as MonedaModoAnalisis)}
-                ariaLabel="Modo de moneda"
-                fullWidth
-              />
-            </div>
-          </div>
-
-          {/* 4. Cuántos ciclos ver (1 sola línea) */}
-          <div className={styles.panelSection}>
-            <span className={styles.sectionLabel}>Cuántos ciclos ver</span>
-            <div className={styles.controlTrack}>
-              <SegmentedControl
-                options={[
-                  { value: '1', label: 'Actual' },
-                  { value: '3', label: '3C' },
-                  { value: '6', label: '6C' },
-                  { value: '12', label: '12C' },
-                ]}
-                value={String(ciclosCount)}
-                onChange={(v: string) => setCiclosCount(Number(v))}
-                ariaLabel="Cuántos ciclos ver"
-                fullWidth
-              />
-            </div>
-          </div>
-
-          {/* 5. Qué ver en el gráfico (reemplaza Tipo de gasto) */}
-          <div className={styles.panelSection}>
-            <div className={styles.sectionLabelRow}>
-              <span className={styles.sectionLabel}>Qué ver en el gráfico</span>
-              {seriesPersonalizadas.length > 0 && (
-                <button
-                  type="button"
-                  className={styles.resetSeriesLink}
-                  onClick={() => setSeriesPersonalizadas([])}
-                >
-                  Restablecer
-                </button>
-              )}
-            </div>
-            <div className={styles.chartEditorRow}>
-              <button
-                type="button"
-                className={`${styles.chartModeBtn} ${
-                  seriesPersonalizadas.length === 0 ? styles.chartModeBtnActive : ''
-                }`}
-                onClick={() => {
-                  setSeriesPersonalizadas([])
-                  if (vistaActiva !== 'evolucion') setVistaActiva('evolucion')
-                }}
-              >
-                Ingresos y Egresos
-              </button>
-              <button
-                type="button"
-                className={`${styles.chartEditorTriggerBtn} ${
-                  seriesPersonalizadas.length > 0 ? styles.chartModeBtnActive : ''
-                }`}
-                onClick={() => {
-                  if (vistaActiva !== 'evolucion') setVistaActiva('evolucion')
-                  setIsEditorSeriesOpen(true)
-                }}
-              >
-                <Sparkles size={13} />
-                <span>
-                  {seriesPersonalizadas.length > 0
-                    ? `Categorías (${seriesPersonalizadas.length})`
-                    : 'Elegir Categorías'}
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* 6. Billetera y Tarjeta lado a lado */}
-          <div className={styles.selectsGrid}>
-            <div className={styles.panelSection}>
-              <SelectInput
-                id="analisis-billetera"
-                label="Billetera"
-                value={billeteraId}
-                onChange={setBilleteraId}
-                options={billeteraOptions}
-                size="sm"
-              />
-            </div>
-
-            <div className={styles.panelSection}>
-              <SelectInput
-                id="analisis-tarjeta"
-                label="Tarjeta"
-                value={tarjetaId}
-                onChange={setTarjetaId}
-                options={tarjetaOptions}
-                size="sm"
-              />
-            </div>
-          </div>
-
-          {/* 7. Exportación */}
-          <div className={styles.panelExportSection}>
-            <div className={styles.exportBtnsGrid}>
-              <button
-                type="button"
-                className={styles.exportBtn}
-                onClick={() => void handleExportExcel()}
-                disabled={exportingExcel || loading}
-              >
-                <FileSpreadsheet size={14} />
-                <span>{exportingExcel ? 'Exportando...' : 'Excel (.xlsx)'}</span>
-              </button>
-              <button
-                type="button"
-                className={styles.exportBtn}
-                onClick={handleExportPdf}
-                disabled={!data || loading}
-              >
-                <Download size={14} />
-                <span>Informe PDF</span>
-              </button>
-            </div>
-          </div>
-        </aside>
+        {/* 3. Panel Lateral de Filtros */}
+        <FiltrosAnalisis
+          vista={vistaActiva}
+          onVistaChange={setVistaActiva}
+          ciclos={ciclosCount}
+          onCiclosChange={setCiclosCount}
+          monedaModo={monedaModo}
+          onMonedaModoChange={setMonedaModo}
+          billeteraId={billeteraId}
+          onBilleteraIdChange={setBilleteraId}
+          tarjetaId={tarjetaId}
+          onTarjetaIdChange={setTarjetaId}
+          billeteras={billeteras}
+          tarjetas={tarjetas}
+          avisoCotizacion={data?.aviso_cotizacion}
+          textoCotizacionRef={data?.cotizacion_referencia?.texto}
+          isOpen={mostrarSidebar}
+          onClose={() => setSidebarOpen(false)}
+        />
       </div>
 
+      {/* Modales */}
+      <DescargarAnalisisModal
+        isOpen={descargarModalOpen}
+        onClose={() => setDescargarModalOpen(false)}
+        queryParams={queryParams}
+        data={data}
+      />
+
       <EditorSeriesEvolucionModal
-        isOpen={isEditorSeriesOpen}
-        onClose={() => setIsEditorSeriesOpen(false)}
+        isOpen={editorSeriesOpen}
+        onClose={() => setEditorSeriesOpen(false)}
         categorias={data?.desglose_categorias ?? []}
         monedaVisual={monedaVisual}
         seriesActivas={seriesPersonalizadas}
-        onChangeSeries={(nuevasSeries: SerieEvolucionPersonalizada[]) => {
-          setSeriesPersonalizadas(nuevasSeries)
-          if (vistaActiva !== 'evolucion') {
-            setVistaActiva('evolucion')
-          }
-        }}
+        onChangeSeries={setSeriesPersonalizadas}
       />
     </div>
   )

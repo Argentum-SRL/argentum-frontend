@@ -34,7 +34,7 @@ export default function EmptyState({
     <div className={containerClass}>
       {Icon && (
         <div className={styles.iconWrapper}>
-          <Icon size={variant === 'card' ? 64 : 40} className={styles.icon} />
+          <Icon size={variant === 'card' ? 26 : 20} className={styles.icon} />
         </div>
       )}
       <h3 className={styles.title}>{title}</h3>

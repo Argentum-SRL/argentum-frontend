@@ -60,6 +60,7 @@ export const RULE_DEFS = {
   R34: 'Elemento <select> nativo en páginas o componentes de la app (requiere SelectInput o componente unificado de dropdown)',
   R35: 'Margen o padding perimetral redundante en raíces de módulos de páginas (pages/app/**) que duplique el shell AppLayout',
   R36: 'Texto visible al usuario con códigos de moneda "ARS" o "USD" en lugar de "Pesos" o "Dólares" en la UI de la app (pages/app/** y components/**)',
+  R37: 'Botón de cerrar o descartar con forma no circular (debe tener border-radius: 50% o 9999px)',
 };
 
 // Eliminar comentarios de CSS para análisis limpio
@@ -102,7 +103,7 @@ function auditCssFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
-    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0,
+    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0, R37: 0,
   };
 
   const isSegmentedControl = relPath.endsWith('SegmentedControl.module.css');
@@ -536,6 +537,31 @@ function auditCssFile(filePath, relPath, content) {
     }
   }
 
+  // R37: Botones de cerrar / descartar en paneles, modales, sheets o drawers deben ser circulares (border-radius: 50% o 9999px)
+  const isTargetR37 = relPath.startsWith('pages/app/') || relPath.startsWith('pages\\app\\') ||
+                      relPath.startsWith('components/') || relPath.startsWith('components\\');
+  if (isTargetR37) {
+    const blocks = parseCssBlocks(cleanContent);
+    for (const b of blocks) {
+      const sel = b.selector;
+      if (/\b(?:sideMenuCloseBtn|closeBtn|closeButton|sheetCloseBtn|modalCloseBtn)\b/i.test(sel)) {
+        if (!sel.includes(':hover') && !sel.includes(':active') && !sel.includes(':focus') && !sel.includes(':disabled')) {
+          const isTextButton = /padding\s*:\s*[^;]*\d+(?:\.\d+)?(?:rem|px)\s+\d+(?:\.\d+)?(?:rem|px)/i.test(b.body);
+          if (!isTextButton) {
+            const brMatch = b.body.match(/border-radius\s*:\s*([^;]+);/i);
+            if (brMatch) {
+              const val = brMatch[1].trim();
+              const isCircular = /^(?:50%|9999px|999px|var\(--radius-full\))$/i.test(val);
+              if (!isCircular) {
+                violations.R37++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   return violations;
 }
 
@@ -583,7 +609,7 @@ function auditTsxFile(filePath, relPath, content) {
     R15: 0, R16: 0, R17: 0, R18: 0, R19: 0,
     R20: 0, R21: 0, R22: 0, R23: 0, R24: 0, R25: 0,
     R26: 0, R27: 0, R28: 0, R29: 0, R30: 0, R31: 0,
-    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0,
+    R32: 0, R33: 0, R34: 0, R35: 0, R36: 0, R37: 0,
   };
 
   const fileName = path.basename(filePath);

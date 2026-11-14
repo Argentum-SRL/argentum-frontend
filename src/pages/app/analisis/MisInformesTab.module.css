@@ -2,16 +2,14 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
+  width: 100%;
+  padding-bottom: 48px;
 }
 
 .sectionTopBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -45,24 +43,35 @@
   border: 1px solid var(--border);
   border-radius: 20px;
   box-shadow: var(--elevation-xs);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.reportCardTop {
+.reportCard:hover,
+.templateCard:hover {
+  border-color: var(--text-3);
+  box-shadow: var(--elevation-sm);
+}
+
+.reportCardTop,
+.templateCardTop {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-.reportIconBox {
+.reportIconBox,
+.templateIconBox {
   width: 36px;
   height: 36px;
   border-radius: 10px;
   background: var(--surface-alt);
+  border: 1px solid var(--border);
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .reportCardActions {
@@ -75,7 +84,7 @@
 .iconActionBtnDanger {
   width: 32px;
   height: 32px;
-  border-radius: 10px;
+  border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface-alt);
   color: var(--text-2);
@@ -83,6 +92,17 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.iconActionBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.iconActionBtnDanger:hover {
+  background: var(--border);
+  color: var(--error);
 }
 
 .iconActionBtn:focus-visible,
@@ -118,7 +138,7 @@
 }
 
 .metaBadge {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 999px;
@@ -130,7 +150,53 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  margin-top: auto;
+  width: 100%;
+}
+
+.templateBtnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 140ms ease;
+}
+
+.templateBtnSecondary:hover {
+  background: var(--border);
+}
+
+.templateBtnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  flex: 1;
+  transition: opacity 140ms ease;
+}
+
+.templateBtnPrimary:hover {
+  opacity: 0.92;
 }
 
 .templatesSection {
@@ -153,23 +219,34 @@
   color: var(--text);
 }
 
-.emptySavedCard {
+/* ── Hero Callout (Estado vacío inicial) ── */
+.heroCalloutCard {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
-  padding: 24px;
+  padding: 18px 22px;
   background: var(--surface);
-  border: 1px dashed var(--border);
+  border: 1px solid var(--border);
   border-radius: 20px;
+  box-shadow: var(--elevation-xs);
+  box-sizing: border-box;
 }
 
-.emptyIconCircle {
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
+.heroCalloutLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.heroCalloutIconBox {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   background: var(--surface-alt);
+  border: 1px solid var(--border);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -177,22 +254,75 @@
   flex-shrink: 0;
 }
 
-.emptySavedTexts {
-  flex: 1;
-  min-width: 220px;
+.heroCalloutTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
-.emptySavedTitle {
+.heroCalloutTitle {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text);
+  line-height: 1.25;
 }
 
-.emptySavedDesc {
-  margin: 4px 0 0;
-  font-size: 0.8125rem;
+.heroCalloutDesc {
+  margin: 0;
+  font-size: 13px;
   color: var(--text-2);
+  line-height: 1.4;
+}
+
+.heroCalloutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 18px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: opacity 140ms ease;
+}
+
+.heroCalloutBtn:hover {
+  opacity: 0.92;
+}
+
+@media (max-width: 640px) {
+  .heroCalloutCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .heroCalloutLeft {
+    align-items: flex-start;
+  }
+
+  .heroCalloutBtn {
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .templateBtnSecondary,
+  .templateBtnPrimary {
+    min-height: 44px;
+    height: 44px;
+  }
 }
 
 /* ── Constructor de Informes ── */
@@ -451,6 +581,30 @@
   border: 1px solid var(--border);
 }
 
+.verMasBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  margin-top: 8px;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn:hover {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
 @media (max-width: 1024px) {
   .reportsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -461,7 +615,8 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
+
   .reportsGrid,
   .formGrid,
   .blocksGrid,
@@ -471,5 +626,16 @@
 
   .textInput {
     font-size: 16px;
+  }
+
+  .verMasBtn {
+    min-height: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verMasBtn {
+    transition: none;
   }
 }

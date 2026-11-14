@@ -1,4 +1,4 @@
-import { Edit3, FileSpreadsheet, Trash2 } from '@/components/ui/icons'
+import { Edit3, FileSpreadsheet, Trash2, Eye, Copy, Sparkles, TrendingUp, Calendar } from '@/components/ui/icons'
 import { Button } from '@/components/ui'
 import type { InformePersonalizadoItem } from '@/services/analisis.service'
 import type { PlantillaRapidaItem } from './plantillasInforme'
@@ -16,6 +16,19 @@ function formatModoMonedaBadge(modo?: string): string {
       return 'Pasado a dólares'
     default:
       return 'Pesos'
+  }
+}
+
+function getTemplateIcon(id: string) {
+  switch (id) {
+    case 'tpl-cierre-ciclo':
+      return <Sparkles size={18} />
+    case 'tpl-variables-hormiga':
+      return <TrendingUp size={18} />
+    case 'tpl-tarjetas-cuotas':
+      return <Calendar size={18} />
+    default:
+      return <Sparkles size={18} />
   }
 }
 
@@ -97,23 +110,38 @@ export function PlantillaTarjeta({
 }: PlantillaTarjetaProps) {
   return (
     <article className={styles.templateCard}>
+      <div className={styles.templateCardTop}>
+        <div className={styles.templateIconBox}>
+          {getTemplateIcon(plantilla.id)}
+        </div>
+        <div className={styles.badgesRow}>
+          <span className={styles.metaBadge}>{plantilla.configuracion.ciclos} ciclos</span>
+          <span className={styles.metaBadge}>
+            {plantilla.configuracion.bloques.length} bloques
+          </span>
+        </div>
+      </div>
+
       <h4 className={styles.reportName}>{plantilla.nombre}</h4>
       <p className={styles.reportDesc}>{plantilla.descripcion}</p>
 
-      <div className={styles.badgesRow}>
-        <span className={styles.metaBadge}>{plantilla.configuracion.ciclos} ciclos</span>
-        <span className={styles.metaBadge}>
-          {plantilla.configuracion.bloques.length} bloques incluidos
-        </span>
-      </div>
-
       <div className={styles.templateBtns}>
-        <Button variant="secondary" onClick={() => onVerAhora(plantilla)}>
-          Ver ahora
-        </Button>
-        <Button onClick={() => onGuardarCopia(plantilla)}>
-          Guardar en mi cuenta
-        </Button>
+        <button
+          type="button"
+          className={styles.templateBtnSecondary}
+          onClick={() => onVerAhora(plantilla)}
+        >
+          <Eye size={14} />
+          <span>Ver</span>
+        </button>
+        <button
+          type="button"
+          className={styles.templateBtnPrimary}
+          onClick={() => onGuardarCopia(plantilla)}
+        >
+          <Copy size={14} />
+          <span>Guardar plantilla</span>
+        </button>
       </div>
     </article>
   )

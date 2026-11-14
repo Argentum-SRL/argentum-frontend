@@ -5,55 +5,64 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Card Variant ────────────────────────────────────────────────────────── */
 .card {
-  padding: 48px 16px;
+  padding: 32px 18px;
   background: var(--surface);
-  border-radius:20px;
-  border: 1px dashed var(--border);
-  gap: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--elevation-xs);
+  gap: 12px;
 }
 
 @media (min-width: 768px) {
   .card {
-    padding: 80px 24px;
+    padding: 44px 32px;
+    gap: 16px;
   }
 }
 
 .card .iconWrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  flex-shrink: 0;
 }
 
 .card .icon {
-  color: var(--text-3);
-  opacity: 0.8;
+  color: var(--primary);
 }
 
 .card .title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text);
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 @media (min-width: 768px) {
   .card .title {
-    font-size: 20px;
+    font-size: 17.5px;
   }
 }
 
 .card .description {
-  font-size: 13px;
-  max-width: 340px;
+  font-size: 13.5px;
+  max-width: 380px;
   color: var(--text-2);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 @media (min-width: 768px) {
@@ -64,24 +73,29 @@
 
 /* ── Compact Variant ─────────────────────────────────────────────────────── */
 .compact {
-  padding: 24px 16px;
+  padding: 20px 14px;
   background: transparent;
   gap: 8px;
 }
 
 .compact .iconWrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .compact .icon {
-  color: var(--text-3);
-  opacity: 0.6;
+  color: var(--primary);
 }
 
 .compact .title {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--text);
   margin: 0;
@@ -90,7 +104,7 @@
 
 .compact .description {
   font-size: 13px;
-  max-width: 280px;
+  max-width: 300px;
   color: var(--text-2);
   margin: 0;
   line-height: 1.4;
@@ -101,45 +115,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   margin-top: 4px;
+  flex-wrap: wrap;
 }
 
 .btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 0 16px;
-  height: var(--control-h-sm);
-  border-radius: var(--control-radius);
-  font-size: 13px;
+  padding: 0 18px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   border: none;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
-}
-
-.btn:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
-.btn:active {
-  transform: translateY(0);
+  font-family: inherit;
+  transition: opacity 140ms ease, background-color 140ms ease;
 }
 
 .btnPrimary {
   background: var(--primary);
-  color: white;
+  color: #ffffff;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .btnPrimary:hover {
-    opacity: 0.92;
-    transform: translateY(-1px);
-  }
+.btnPrimary:hover {
+  opacity: 0.92;
 }
 
 .btnSecondary {
@@ -148,10 +152,25 @@
   border: 1px solid var(--border);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .btnSecondary:hover {
-    background: var(--border);
-    transform: translateY(-1px);
+.btnSecondary:hover {
+  background: var(--border);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
   }
 }
 
@@ -159,15 +178,4 @@
   .btn {
     transition: none;
   }
-}
-
-/* Dark theme overrides for standard button colors if needed */
-[data-theme="dark"] .btnPrimary {
-  background: var(--primary);
-  color: #fff;
-}
-
-[data-theme="dark"] .btnSecondary {
-  background: var(--surface-alt);
-  color: var(--text);
 }

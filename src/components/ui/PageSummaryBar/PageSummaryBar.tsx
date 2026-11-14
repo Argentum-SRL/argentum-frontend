@@ -25,15 +25,22 @@ const getColorClass = (color?: string) => {
 };
 
 export default function PageSummaryBar({ items, leftSlot, className = '' }: PageSummaryBarProps) {
+  const hasHighlight = items.some((i) => i.highlight);
   return (
-    <div className={`${styles.container} ${leftSlot ? styles.hasLeftSlot : ''} ${className}`}>
+    <div
+      className={`${styles.container} ${leftSlot ? styles.hasLeftSlot : ''} ${
+        hasHighlight ? styles.hasHighlight : ''
+      } ${className}`}
+    >
       {leftSlot && <div className={styles.leftSlot}>{leftSlot}</div>}
       {items.map((item, index) => {
         const colorClass = getColorClass(item.valueColor);
         return (
           <div
             key={index}
-            className={`${styles.item} ${index === 0 ? styles.itemFirst : ''}`}
+            className={`${styles.item} ${index === 0 ? styles.itemFirst : ''} ${
+              item.highlight ? styles.itemHighlight : ''
+            }`}
           >
             <span className={styles.label}>{item.label}</span>
             <span

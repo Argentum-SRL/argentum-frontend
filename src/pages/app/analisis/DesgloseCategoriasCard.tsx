@@ -14,7 +14,7 @@ import analisisService, {
   type AnalisisMovimientoDrilldown,
   type AnalisisQueryParams,
 } from '@/services/analisis.service'
-import { formatMonto, formatFecha } from '@/utils/format'
+import { formatMonto, formatFecha, formatPorcentaje } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './DesgloseCategoriasCard.module.css'
@@ -72,6 +72,7 @@ export default function DesgloseCategoriasCard({
   }
   const [selectedCatKey, setSelectedCatKey] = useState<string | null>(null)
   const [selectedSubId, setSelectedSubId] = useState<string | null>(null)
+  const [mostrarTodas, setMostrarTodas] = useState(false)
   const [movimientos, setMovimientos] = useState<AnalisisMovimientoDrilldown[]>([])
   const [loadingMovs, setLoadingMovs] = useState(false)
 
@@ -181,7 +182,7 @@ export default function DesgloseCategoriasCard({
             </h2>
             <p className={styles.subtitle}>
               {selectedCat
-                ? `${formatMonto(selectedCat.monto, monedaVisual)} (${selectedCat.porcentaje_del_total}% del total) · Tocá una subcategoría para filtrar movimientos`
+                ? `${formatMonto(selectedCat.monto, monedaVisual)} (${formatPorcentaje(selectedCat.porcentaje_del_total)} del total) · Tocá una subcategoría para filtrar movimientos`
                 : 'Tocá cualquier categoría para explorar sus subcategorías y movimientos'}
             </p>
           </div>
@@ -226,7 +227,7 @@ export default function DesgloseCategoriasCard({
         <div className={styles.drilldownLayout}>
           <div className={styles.subcatsSection}>
             <div className={styles.sectionHeaderRow}>
-              <span className={styles.sectionLabel}>Subcategorías</span>
+              <span className={styles.subcatsHeading}>Subcategorías</span>
               {selectedSubId && (
                 <button
                   type="button"
@@ -271,13 +272,15 @@ export default function DesgloseCategoriasCard({
                       <span className={styles.subcatAmount}>
                         {formatMonto(sub.monto, monedaVisual)}
                       </span>
-                      <span className={styles.subcatPct}>{sub.porcentaje_categoria}%</span>
+                      <span className={styles.subcatPct}>
+                        {formatPorcentaje(sub.porcentaje_categoria)}
+                      </span>
                     </div>
 
                     <div className={styles.barTrack}>
                       <div
                         className={styles.barFill}
-                        style={{ width: `${sub.ancho_barra_pct}%` }}
+                        style={{ width: `${sub.ancho_barra_pct}` + '%' }}
                       />
                     </div>
                   </button>
@@ -288,7 +291,7 @@ export default function DesgloseCategoriasCard({
 
           <div className={styles.movsSection}>
             <div className={styles.sectionHeaderRow}>
-              <span className={styles.sectionLabel}>Movimientos que componen este gasto</span>
+              <span className={styles.subcatsHeading}>Movimientos que componen este gasto</span>
               <span className={styles.movsCountBadge}>{movimientos.length}</span>
             </div>
 
@@ -367,7 +370,7 @@ export default function DesgloseCategoriasCard({
                       <div className={styles.donutTooltip}>
                         <span className={styles.donutTooltipTitle}>{item.categoria_nombre}</span>
                         <span className={styles.donutTooltipVal}>
-                          {formatMonto(item.monto, monedaVisual)} ({item.porcentaje_del_total}%)
+                          {formatMonto(item.monto, monedaVisual)} ({formatPorcentaje(item.porcentaje_del_total)})
                         </span>
                       </div>
                     )
@@ -384,7 +387,7 @@ export default function DesgloseCategoriasCard({
           </div>
 
           <div className={styles.donutLegendList}>
-            {categorias.map((cat, idx) => (
+            {(mostrarTodas ? categorias : categorias.slice(0, 8)).map((cat, idx) => (
               <button
                 key={cat.categoria_id ?? cat.categoria_nombre}
                 type="button"
@@ -396,19 +399,30 @@ export default function DesgloseCategoriasCard({
                   style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
                 />
                 <span className={styles.donutLegendName}>{cat.categoria_nombre}</span>
-                <span className={styles.donutLegendPct}>{cat.porcentaje_del_total}%</span>
+                <span className={styles.donutLegendPct}>
+                  {formatPorcentaje(cat.porcentaje_del_total)}
+                </span>
                 <span className={styles.donutLegendVal}>
                   {formatMonto(cat.monto, monedaVisual)}
                 </span>
                 <ChevronRight size={14} className={styles.chevronIcon} />
               </button>
             ))}
+            {categorias.length > 8 && (
+              <button
+                type="button"
+                className={styles.verMasBtn}
+                onClick={() => setMostrarTodas(!mostrarTodas)}
+              >
+                {mostrarTodas ? 'Ver menos' : `Ver todas (${categorias.length})`}
+              </button>
+            )}
           </div>
         </div>
       ) : (
         /* ── Nivel 1 (Modo Barras Horizontales / Ranking) ── */
         <div className={styles.catList}>
-          {categorias.map((cat, idx) => (
+          {(mostrarTodas ? categorias : categorias.slice(0, 8)).map((cat, idx) => (
             <button
               key={cat.categoria_id ?? cat.categoria_nombre}
               type="button"
@@ -435,7 +449,9 @@ export default function DesgloseCategoriasCard({
                   <span className={styles.catAmount}>
                     {formatMonto(cat.monto, monedaVisual)}
                   </span>
-                  <span className={styles.catPctBadge}>{cat.porcentaje_del_total}%</span>
+                  <span className={styles.catPctBadge}>
+                    {formatPorcentaje(cat.porcentaje_del_total)}
+                  </span>
                   <ChevronRight size={15} className={styles.chevronIcon} />
                 </div>
               </div>
@@ -446,7 +462,7 @@ export default function DesgloseCategoriasCard({
                     key={`${animKey}-${cat.categoria_id ?? cat.categoria_nombre}`}
                     className={styles.barFill}
                     style={{
-                      width: `${cat.ancho_barra_pct}%`,
+                      width: `${cat.ancho_barra_pct}` + '%',
                       backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
                     }}
                   />
@@ -454,6 +470,15 @@ export default function DesgloseCategoriasCard({
               )}
             </button>
           ))}
+          {categorias.length > 8 && (
+            <button
+              type="button"
+              className={styles.verMasBtn}
+              onClick={() => setMostrarTodas(!mostrarTodas)}
+            >
+              {mostrarTodas ? 'Ver menos' : `Ver todas (${categorias.length})`}
+            </button>
+          )}
         </div>
           )}
         </div>

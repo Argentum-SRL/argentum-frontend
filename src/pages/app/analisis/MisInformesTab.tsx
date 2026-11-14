@@ -5,7 +5,6 @@ import {
   Download,
   Sparkles,
   ArrowLeft,
-  PieChart,
 } from '@/components/ui/icons'
 import { Button } from '@/components/ui'
 import analisisService, {
@@ -16,7 +15,7 @@ import {
   PLANTILLAS_RAPIDAS,
   type PlantillaRapidaItem,
 } from './plantillasInforme'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatPorcentaje } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
 import EvolucionCiclosCard from './EvolucionCiclosCard'
@@ -30,6 +29,7 @@ import styles from './MisInformesTab.module.css'
 
 export default function MisInformesTab() {
   const [informes, setInformes] = useState<InformePersonalizadoItem[]>([])
+  const [mostrarTodosInformes, setMostrarTodosInformes] = useState<boolean>(false)
   const [loadingList, setLoadingList] = useState<boolean>(true)
   const [modoVista, setModoVista] = useState<'galeria' | 'constructor' | 'visor'>('galeria')
   const [activeInforme, setActiveInforme] = useState<InformePersonalizadoItem | null>(null)
@@ -288,7 +288,7 @@ export default function MisInformesTab() {
                   <span className={styles.kpiMiniLabel}>Te quedó (%)</span>
                   <strong className={styles.kpiMiniVal}>
                     {visorData.kpis.tasa_ahorro_pct !== null && visorData.kpis.tasa_ahorro_pct !== undefined
-                      ? `${visorData.kpis.tasa_ahorro_pct}%`
+                      ? formatPorcentaje(visorData.kpis.tasa_ahorro_pct)
                       : '—'}
                   </strong>
                 </div>
@@ -335,56 +335,63 @@ export default function MisInformesTab() {
 
   return (
     <div className={styles.galleryContainer}>
-      {/* Cabecera de Mis Informes */}
-      <div className={styles.sectionTopBar}>
-        <div>
-          <h2 className={styles.sectionHeading}>Mis Informes Personalizados</h2>
-          <p className={styles.sectionSub}>
-            Armá reportes a medida combinando bloques y exportalos a Excel o PDF cuando quieras
-          </p>
+      {/* Acción Nuevo Informe cuando hay informes guardados */}
+      {informes.length > 0 && (
+        <div className={styles.sectionTopBar}>
+          <Button onClick={handleIniciarNuevo}>
+            <Plus size={16} />
+            <span>Nuevo Informe</span>
+          </Button>
         </div>
-
-        <Button onClick={handleIniciarNuevo}>
-          <Plus size={16} />
-          <span>Nuevo Informe</span>
-        </Button>
-      </div>
+      )}
 
       {/* Lista de informes guardados por el usuario */}
       {loadingList ? (
         <div className={styles.loadingCard}>Cargando tus informes...</div>
       ) : informes.length === 0 ? (
-        <div className={styles.emptySavedCard}>
-          <div className={styles.emptyIconCircle}>
-            <PieChart size={24} />
+        <div className={styles.heroCalloutCard}>
+          <div className={styles.heroCalloutLeft}>
+            <div className={styles.heroCalloutIconBox}>
+              <Sparkles size={20} />
+            </div>
+            <div className={styles.heroCalloutTexts}>
+              <h3 className={styles.heroCalloutTitle}>Creá tu primer informe</h3>
+              <p className={styles.heroCalloutDesc}>
+                Combiná bloques a medida o empezá guardando cualquiera de las plantillas de abajo.
+              </p>
+            </div>
           </div>
-          <div className={styles.emptySavedTexts}>
-            <h3 className={styles.emptySavedTitle}>Todavía no guardaste informes propios</h3>
-            <p className={styles.emptySavedDesc}>
-              Podés crear uno desde cero eligiendo tus bloques o guardar cualquiera de las
-              plantillas recomendadas de abajo en un clic.
-            </p>
-          </div>
-          <Button onClick={handleIniciarNuevo}>
-            <Plus size={16} />
-            <span>Crear mi primer informe</span>
-          </Button>
+          <button
+            type="button"
+            className={styles.heroCalloutBtn}
+            onClick={handleIniciarNuevo}
+          >
+            <Plus size={15} />
+            <span>Crear desde cero</span>
+          </button>
         </div>
       ) : (
-        <div className={styles.reportsGrid}>
-          {informes.map((inf) => (
-            <InformeTarjeta
-              key={inf.id}
-              informe={inf}
-              onEditar={handleEditarInforme}
-              onEliminar={(id) => void handleEliminarInforme(id)}
-              onAbrir={(inf) => {
-                setActiveInforme(inf)
-                setModoVista('visor')
-              }}
-            />
-          ))}
-        </div>
+        <>
+          <div className={styles.reportsGrid}>
+            {(mostrarTodosInformes ? informes : informes.slice(0, 8)).map((inf) => (
+              <InformeTarjeta
+                key={inf.id}
+                informe={inf}
+                onEditar={handleEditarInforme}
+                onEliminar={(id) => void handleEliminarInforme(id)}
+                onAbrir={(inf) => {
+                  setActiveInforme(inf)
+                  setModoVista('visor')
+                }}
+              />
+            ))}
+          </div>
+          {informes.length > 8 && (
+            <button type="button" className={styles.verMasBtn} onClick={() => setMostrarTodosInformes(!mostrarTodosInformes)}>
+              {mostrarTodosInformes ? 'Ver menos' : `Ver todas (${informes.length})`}
+            </button>
+          )}
+        </>
       )}
 
       {/* Plantillas Rápidas en 1 clic */}

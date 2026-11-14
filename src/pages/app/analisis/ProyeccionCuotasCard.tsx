@@ -14,7 +14,7 @@ import analisisService, {
   type MonedaModoAnalisis,
   type ProyeccionCompromisosResponse,
 } from '@/services/analisis.service'
-import { formatMonto, formatAxisCompact } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './ProyeccionCuotasCard.module.css'
@@ -46,6 +46,7 @@ export default function ProyeccionCuotasCard({
   const subsBarColor = isDark ? '#A78BFA' : '#7C3AED'
   const [horizonteInterno, setHorizonteInterno] = useState<'6' | '12'>('6')
   const [vistaInternaState, setVistaInternaState] = useState<'grafico' | 'planes'>('grafico')
+  const [mostrarTodosPlanes, setMostrarTodosPlanes] = useState<boolean>(false)
   const horizonte = horizonteExterno ?? horizonteInterno
   const vistaInterna = vistaInternaExterna ?? vistaInternaState
 
@@ -245,9 +246,9 @@ export default function ProyeccionCuotasCard({
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: 'var(--text-2)', fontSize: 11 }}
-                  tickFormatter={(val: number) => formatAxisCompact(val)}
-                  width={56}
+                  tick={{ fill: 'var(--text-2)', fontSize: 12 }}
+                  tickFormatter={(val: number) => formatMontoCorto(val, monedaVisual)}
+                  width={64}
                 />
                 <Tooltip
                   content={({ active, payload }) => {
@@ -317,7 +318,7 @@ export default function ProyeccionCuotasCard({
         </div>
       ) : (
         <div className={styles.plansList}>
-          {data.planes_activos.map((plan) => (
+          {(mostrarTodosPlanes ? data.planes_activos : data.planes_activos.slice(0, 8)).map((plan) => (
             <div key={plan.id} className={styles.planRow}>
               <div className={styles.planLeft}>
                 <div className={styles.planIconBox}>
@@ -332,7 +333,7 @@ export default function ProyeccionCuotasCard({
                   <div className={styles.progressTrack}>
                     <div
                       className={styles.progressFill}
-                      style={{ width: `${plan.progreso_pct}%` }}
+                      style={{ width: `${plan.progreso_pct}` + '%' }}
                     />
                   </div>
                 </div>
@@ -348,6 +349,15 @@ export default function ProyeccionCuotasCard({
               </div>
             </div>
           ))}
+          {data.planes_activos.length > 8 && (
+            <button
+              type="button"
+              className={styles.verMasBtn}
+              onClick={() => setMostrarTodosPlanes(!mostrarTodosPlanes)}
+            >
+              {mostrarTodosPlanes ? 'Ver menos' : `Ver todas (${data.planes_activos.length})`}
+            </button>
+          )}
         </div>
           )}
         </div>

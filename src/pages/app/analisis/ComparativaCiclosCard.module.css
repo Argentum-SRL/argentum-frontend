@@ -7,8 +7,6 @@
   border: 1px solid var(--border);
   border-radius: 20px;
   box-shadow: var(--elevation-sm);
-  height: 100%;
-  min-height: 0;
   box-sizing: border-box;
 }
 
@@ -70,7 +68,7 @@
 }
 
 .selectLabel {
-  font-size: 0.7rem;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -83,7 +81,7 @@
   justify-content: center;
   height: 36px;
   padding: 0 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--text-3);
   letter-spacing: 0.06em;
@@ -108,7 +106,7 @@
 }
 
 .summaryCaption {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-2);
 }
 
@@ -164,18 +162,14 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  width: 100%;
 }
 
 .deltaList {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
+  width: 100%;
 }
 
 .deltaRow {
@@ -224,7 +218,7 @@
 }
 
 .barTag {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
   width: 44px;
@@ -273,7 +267,7 @@
 }
 
 .amountSecondary {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
@@ -281,7 +275,7 @@
 .badgeGood,
 .badgeBad,
 .badgeNeutral {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
@@ -305,7 +299,6 @@
 
 .chartWrap {
   width: 100%;
-  min-height: 290px;
 }
 
 .tooltipCard {
@@ -342,7 +335,6 @@
 }
 
 .emptyWrap {
-  flex: 1;
   min-height: 220px;
   display: flex;
   flex-direction: column;
@@ -350,38 +342,64 @@
   justify-content: center;
   gap: 12px;
   color: var(--text-3);
+  text-align: center;
 }
 
 .emptyText {
+  font-size: 0.875rem;
   margin: 0;
-  font-size: 13px;
 }
 
-@media (max-width: 768px) {
-  .selectorBar {
+.verMasBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  margin-top: 8px;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn:hover {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
+@media (max-width: 767px) {
+  .chartWrap {
+    height: 260px;
+    min-height: 260px;
+  }
+
+  .header {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
   }
 
-  .selectBox {
-    min-width: 100%;
+  .verMasBtn {
+    min-height: 44px;
+    height: 44px;
   }
+}
 
-  .vsBadge {
-    align-self: center;
-    height: 20px;
-    padding: 0;
+@media (min-width: 768px) {
+  .chartWrap {
+    height: clamp(280px, 42dvh, 460px);
+    min-height: 280px;
   }
+}
 
-  .deltaRow {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .deltaRight {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+@media (prefers-reduced-motion: reduce) {
+  .verMasBtn {
+    transition: none;
   }
 }

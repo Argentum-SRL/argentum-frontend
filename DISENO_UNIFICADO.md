@@ -837,5 +837,23 @@ Para evitar frialdad bancaria y siglas técnicas innecesarias en la interfaz:
 3. **Preservación del Modelo Interno (Sin Roturas):** Los modelos de datos, columnas de base de datos, enums de TypeScript/Python (`'ARS' | 'USD'`), parámetros de consulta y endpoints de API continúan utilizando los identificadores estándar `'ARS'` y `'USD'`. La transformación a "Pesos" y "Dólares" se realiza en la capa de presentación mediante el helper centralizado [`formatMoneda(moneda)`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/utils/format.ts).
 4. **Candado Pre-Push (R36):** La regla automática **R36** en `scripts/audit-design-rules.mjs` verifica que ningún archivo de vista o componente renderice directamente las palabras "ARS" o "USD" en la UI visible. Si se detecta alguna ocurrencia, el hook pre-push aborta el `git push` de manera inmediata.
 
+---
+
+## 20. Norma Canónica de Botones de Cierre y Descarte Circulares (`border-radius: 50%`)
+
+### 20.1 Principio de Forma y Microinteracción Unificada
+Para garantizar consistencia visual absoluta en todas las ventanas, modales, paneles laterales y hojas deslizantes (sheets):
+1. **Forma Circular Universal:** Todo botón de cierre de panel, modal, drawer o sheet con ícono de cruz `X` (clases `*closeBtn*`, `*closeButton*`, `*sideMenuCloseBtn*`, `*sheetCloseBtn*`, `*modalCloseBtn*`, etc.) debe tener obligatoriamente forma perfectamente circular mediante `border-radius: 50%` (o `9999px`). Queda terminantemente prohibido el uso de recuadros cuadrados o rectangulares con bordes semi-redondeados (ej. `border-radius: 8px` o `10px`).
+2. **Dimensiones y Espaciado Canónicos:**
+   - Diámetro canónico: `width: 32px; height: 32px;` (o `28px` a `32px` según densidad visual).
+   - Centrado estricto: `display: inline-flex; align-items: center; justify-content: center;` con `flex-shrink: 0;`.
+   - Borde: `border: none;`.
+3. **Tokens de Color y Estados de Interacción:**
+   - **Reposo:** `background: var(--surface-alt); color: var(--text-2);`.
+   - **Hover / Active:** `background: var(--border); color: var(--text);`.
+   - **Focus visible:** `outline: 2px solid var(--focus-ring, var(--primary)); outline-offset: 2px;`.
+   - **Transición suave:** `transition: background-color 120ms ease, color 120ms ease;` con cobertura `prefers-reduced-motion: reduce`.
+4. **Candado Pre-Push (R37):** La regla automática **R37** en `scripts/audit-design-rules.mjs` verifica que ningún archivo CSS de vistas (`pages/app/**`) o componentes (`components/**`) declare botones de cierre con `border-radius` no circular. Cualquier transgresión aborta inmediatamente el `git push`.
+
 
 

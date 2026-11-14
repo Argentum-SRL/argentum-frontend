@@ -1,9 +1,13 @@
+/* ==========================================================================
+   AnalisisPage.module.css — Estructura y encabezado de la página de Análisis
+   Distribución con escenario principal a la izquierda y panel lateral colapsable.
+   ========================================================================== */
+
 .page {
   width: 100%;
-  min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--module-gap-mobile, 16px);
   box-sizing: border-box;
 }
 
@@ -15,50 +19,17 @@
 
 @media (min-width: 768px) {
   .page {
-    gap: 24px;
+    gap: var(--module-gap-desktop, 24px);
   }
 }
 
-@media (min-width: 1024px) {
-  .page {
-    height: 100%;
-    overflow: hidden;
-  }
-}
-
-.studioLayout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  flex: 1;
-  min-height: 0;
-}
-
-@media (min-width: 1024px) {
-  .studioLayout {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 20px;
-    height: 100%;
-  }
-}
-
-/* ── Columna Izquierda: Contenedor del Gráfico ── */
-.leftStage {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-}
-
-/* ── Page Header (misma línea visual que Transacciones y Presupuestos) ── */
+/* ── Encabezado ── */
 .pageHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  flex-shrink: 0;
+  width: 100%;
 }
 
 .titleGroup {
@@ -74,6 +45,9 @@
   margin: 0;
   line-height: 1.1;
   letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (min-width: 768px) {
@@ -87,316 +61,374 @@
   font-weight: 500;
   color: var(--text-2);
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ── Card Marino de Resumen ── */
-.summaryBar {
-  margin-top: 0 !important;
-  flex-shrink: 0;
+.subtitleDesktop {
+  display: none;
 }
 
-.stageViewport {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+.subtitleMobile {
+  display: inline;
 }
 
-/* ── Columna Derecha: Panel de Control Compacto ── */
-.controlPanel {
-  --selector-pill-h: 30px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 12px 14px;
-  box-shadow: var(--elevation-sm);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 6px;
-  height: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
+@media (min-width: 768px) {
+  .subtitleDesktop {
+    display: inline;
+  }
+
+  .subtitleMobile {
+    display: none;
+  }
 }
 
-.panelHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-}
-
-.panelHeaderLeft {
+.headerActions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.panelIconBox {
-  width: 26px;
-  height: 26px;
+@media (max-width: 767px) {
+  .headerActions {
+    display: none;
+  }
+}
+
+.btnGhost {
+  background: transparent;
+  color: var(--text-2);
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
   border-radius: 8px;
-  background: var(--surface-alt);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.panelTitle {
-  margin: 0;
-  font-size: 0.875rem;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
-
-.reportsChipBtn {
+  transition: background-color 150ms ease, color 150ms ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.btnGhost:hover {
   background: var(--surface-alt);
-  color: var(--text-2);
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
-}
-
-.reportsChipBtn:hover {
   color: var(--text);
-  border-color: var(--text-3);
 }
 
-.reportsChipBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.btnGhostActive {
+  background: var(--surface-alt);
+  color: var(--primary);
 }
 
-.reportsChipBtnActive {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #ffffff;
+.btnIcon {
+  flex-shrink: 0;
 }
 
-.panelSection {
+@media (max-width: 767px) {
+  .btnGhost {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .btnText {
+    display: none;
+  }
+}
+
+/* ── Grilla con Escenario y Panel Lateral ── */
+.layoutGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--module-gap-mobile, 16px);
+  width: 100%;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .layoutGrid {
+    gap: var(--module-gap-desktop, 24px);
+  }
+
+  .layoutGridWithSidebar {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+
+  .layoutGridFull {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Selector de pestañas oficial solo para mobile (idéntico a Transacciones) ── */
+.tabsMobileOnly {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .tabsMobileOnly {
+    display: none;
+  }
+}
+
+.stageColumn {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--module-gap-mobile, 16px);
+  min-width: 0;
+  width: 100%;
 }
 
-.sectionLabelRow {
+@media (min-width: 768px) {
+  .stageColumn {
+    gap: var(--module-gap-desktop, 24px);
+  }
+}
+
+/* ── Resumen y Frase ── */
+.summarySection {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.desktopSummaryBar {
+  display: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .desktopSummaryBar {
+    display: block;
+  }
+}
+
+/* ── Mobile Resumen Card (< 768px) ── */
+.mobileSummaryCard {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: var(--elevation-xs);
+  width: 100%;
+  box-sizing: border-box;
   gap: 8px;
 }
 
-.sectionLabel {
-  font-size: 0.65rem;
+@media (min-width: 768px) {
+  .mobileSummaryCard {
+    display: none;
+  }
+}
+
+.mobileHeroMetric {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mobileHeroLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileMetricLabel {
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-3);
+  line-height: 1.2;
 }
 
-.controlTrack {
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 2px;
+.mobileHeroValue {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.controlTrackHalf {
-  flex: 1;
-  min-width: 0;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 2px;
-}
-
-.viewGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 3px;
-}
-
-.viewGridBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px 8px;
-  border-radius: 9px;
-  border: 1px solid transparent;
-  background: transparent;
+.mobilePillBadge {
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-2);
-  font-size: 0.76rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
-.viewGridBtn:hover:not(.viewGridBtnActive) {
-  color: var(--text);
+.mobileMetricDivider {
+  height: 1px;
+  background: var(--border);
+  width: 100%;
 }
 
-.viewGridBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.viewGridBtnActive {
-  background: var(--primary);
-  color: #ffffff;
-  box-shadow: var(--elevation-xs);
-}
-
-.twoColRow {
+.mobileSubMetricsGrid {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  width: 100%;
 }
 
-.chartEditorRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 2px;
+.mobileSubItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
 }
 
-.chartModeBtn,
-.chartEditorTriggerBtn {
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 8px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-2);
-  font-size: 0.72rem;
+.mobileSubDivider {
+  width: 1px;
+  height: 26px;
+  background: var(--border);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+.mobileSubValue {
+  font-size: 12px;
   font-weight: 700;
-  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
   white-space: nowrap;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.chartModeBtn:hover:not(.chartModeBtnActive),
-.chartEditorTriggerBtn:hover:not(.chartModeBtnActive) {
-  color: var(--text);
+.colorGreen {
+  color: #4CAF7D;
 }
 
-.chartModeBtn:focus-visible,
-.chartEditorTriggerBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.colorRed {
+  color: #FF8A65;
 }
 
-.chartModeBtnActive {
-  background: var(--primary);
-  color: #ffffff;
-  box-shadow: var(--elevation-xs);
+.fraseResumen {
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.4;
+  text-align: left;
 }
 
-.resetSeriesLink {
-  border: none;
-  background: transparent;
-  color: var(--primary);
-  font-size: 0.65rem;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
+.fraseDesktop {
+  display: none;
 }
 
-.resetSeriesLink:hover {
-  text-decoration: underline;
+.fraseMobile {
+  display: block;
 }
 
-.resetSeriesLink:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
+@media (min-width: 768px) {
+  .fraseDesktop {
+    display: block;
+  }
 
-.selectsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-@media (max-width: 768px) {
-  .selectsGrid {
-    grid-template-columns: 1fr;
+  .fraseMobile {
+    display: none;
   }
 }
 
-.panelExportSection {
-  padding-top: 6px;
-  border-top: 1px solid var(--border);
+/* ── Mobile Controls Bar (Filtros + Descargar, como en Transacciones) ── */
+.mobileControlsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  box-sizing: border-box;
 }
 
-.exportBtnsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+@media (min-width: 768px) {
+  .mobileControlsBar {
+    display: none;
+  }
+}
+
+.mobileLeftActions {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.exportBtn {
-  height: 32px;
+.mobileFilterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 12px;
+  color: var(--primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--elevation-xs);
+  user-select: none;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.mobileFilterBtn:active {
+  transform: scale(0.97);
+}
+
+.mobileActionBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 0 10px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
-  color: var(--text);
-  font-size: 0.76rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease;
-}
-
-.exportBtn:hover:not(:disabled) {
-  border-color: var(--primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  cursor: pointer;
+  box-shadow: var(--elevation-xs);
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
-.exportBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.mobileActionBtn:active {
+  transform: scale(0.95);
 }
 
-.exportBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* ── Sección de Tarjeta Activa ── */
+.cardSection {
+  width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reportsChipBtn,
-  .viewGridBtn,
-  .chartModeBtn,
-  .chartEditorTriggerBtn,
-  .exportBtn {
+  .btnGhost,
+  .mobileFilterBtn,
+  .mobileActionBtn {
     transition: none;
   }
 }

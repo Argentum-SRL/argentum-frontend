@@ -11,7 +11,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 12px 14px;
+  padding: 10px;
   box-shadow: var(--elevation-xs);
   margin-bottom: 4px;
   gap: 8px;
@@ -69,12 +69,12 @@
 }
 
 .splitValue {
-  font-size: 12.5px;
+  font-size: clamp(10px, 3vw, 12px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   max-width: 100%;
 }
 

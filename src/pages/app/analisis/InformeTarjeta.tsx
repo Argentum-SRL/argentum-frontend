@@ -1,8 +1,15 @@
-import { Edit3, FileSpreadsheet, Trash2, Eye, Copy, Sparkles, TrendingUp, Calendar } from '@/components/ui/icons'
-import { Button } from '@/components/ui'
+import { Edit3, FileSpreadsheet, Trash2, Eye, Copy, Sparkles, TrendingUp, Calendar, ArrowRight } from '@/components/ui/icons'
 import type { InformePersonalizadoItem } from '@/services/analisis.service'
 import type { PlantillaRapidaItem } from './plantillasInforme'
 import styles from './MisInformesTab.module.css'
+
+const MAPA_BLOQUES_NOMBRES: Record<string, string> = {
+  kpis: 'Balance',
+  evolucion_ciclos: 'Evolución',
+  desglose_categorias: 'Categorías',
+  comparativa_ciclos: 'Comparativa',
+  proyeccion_cuotas: 'Cuotas',
+}
 
 function formatModoMonedaBadge(modo?: string): string {
   switch (modo) {
@@ -45,54 +52,110 @@ export default function InformeTarjeta({
   onEliminar,
   onAbrir,
 }: InformeTarjetaProps) {
+  const bloques = informe.configuracion.bloques ?? []
+
   return (
-    <article className={styles.reportCard}>
-      <div className={styles.reportCardTop}>
-        <div className={styles.reportIconBox}>
-          <FileSpreadsheet size={18} />
+    <article
+      className={styles.reportCard}
+      onClick={() => onAbrir(informe)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onAbrir(informe)
+        }
+      }}
+      aria-label={`Abrir informe ${informe.nombre}`}
+    >
+      <div className={styles.reportCardHeader}>
+        <div className={styles.reportHeaderLeft}>
+          <div className={styles.reportIconBox}>
+            <FileSpreadsheet size={18} />
+          </div>
+          <div className={styles.reportTitleBlock}>
+            <h3 className={styles.reportName}>{informe.nombre}</h3>
+            <p className={styles.reportDesc}>
+              {informe.descripcion || 'Informe personalizado por bloques'}
+            </p>
+          </div>
         </div>
-        <div className={styles.reportCardActions}>
+
+        <div className={styles.reportCardActions} onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
             className={styles.iconActionBtn}
-            onClick={() => onEditar(informe)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onEditar(informe)
+            }}
             aria-label="Editar informe"
-            title="Editar bloques"
+            title="Editar informe"
           >
-            <Edit3 size={15} />
+            <Edit3 size={14} />
           </button>
           <button
             type="button"
             className={styles.iconActionBtnDanger}
-            onClick={() => onEliminar(informe.id)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onEliminar(informe.id)
+            }}
             aria-label="Eliminar informe"
             title="Eliminar informe"
           >
-            <Trash2 size={15} />
+            <Trash2 size={14} />
           </button>
         </div>
       </div>
 
-      <h3 className={styles.reportName}>{informe.nombre}</h3>
-      <p className={styles.reportDesc}>
-        {informe.descripcion || 'Informe personalizado por bloques'}
-      </p>
+      <div className={styles.reportCardMeta}>
+        <div className={styles.badgesRow}>
+          <span className={styles.metaBadge}>
+            {informe.configuracion.ciclos ?? 6} ciclos
+          </span>
+          <span className={styles.metaBadge}>
+            {formatModoMonedaBadge(informe.configuracion.moneda_modo)}
+          </span>
+          {informe.configuracion.naturaleza && informe.configuracion.naturaleza !== 'todos' && (
+            <span className={styles.metaBadge}>
+              {informe.configuracion.naturaleza === 'variables'
+                ? 'Día a día'
+                : informe.configuracion.naturaleza === 'fijos'
+                  ? 'Fijos'
+                  : 'Cuotas'}
+            </span>
+          )}
+          <span className={styles.metaBadgeMuted}>
+            {bloques.length} {bloques.length === 1 ? 'bloque' : 'bloques'}
+          </span>
+        </div>
 
-      <div className={styles.badgesRow}>
-        <span className={styles.metaBadge}>
-          {informe.configuracion.ciclos ?? 6} ciclos
-        </span>
-        <span className={styles.metaBadge}>
-          {formatModoMonedaBadge(informe.configuracion.moneda_modo)}
-        </span>
-        <span className={styles.metaBadge}>
-          {informe.configuracion.bloques?.length ?? 0} bloques
-        </span>
+        {bloques.length > 0 && (
+          <div className={styles.blockChipsPreview}>
+            <span className={styles.blockChipsLabel}>Módulos:</span>
+            {bloques.map((b) => (
+              <span key={b.tipo} className={styles.blockMiniChip}>
+                {MAPA_BLOQUES_NOMBRES[b.tipo] ?? b.titulo}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
-      <Button onClick={() => onAbrir(informe)}>
-        Abrir Informe
-      </Button>
+      <div className={styles.reportCardFooter}>
+        <button
+          type="button"
+          className={styles.openReportBtn}
+          onClick={(e) => {
+            e.stopPropagation()
+            onAbrir(informe)
+          }}
+        >
+          <span>Abrir informe</span>
+          <ArrowRight size={14} />
+        </button>
+      </div>
     </article>
   )
 }
@@ -108,28 +171,62 @@ export function PlantillaTarjeta({
   onVerAhora,
   onGuardarCopia,
 }: PlantillaTarjetaProps) {
+  const bloques = plantilla.configuracion.bloques ?? []
+
   return (
-    <article className={styles.templateCard}>
-      <div className={styles.templateCardTop}>
-        <div className={styles.templateIconBox}>
-          {getTemplateIcon(plantilla.id)}
-        </div>
-        <div className={styles.badgesRow}>
-          <span className={styles.metaBadge}>{plantilla.configuracion.ciclos} ciclos</span>
-          <span className={styles.metaBadge}>
-            {plantilla.configuracion.bloques.length} bloques
-          </span>
+    <article
+      className={styles.templateCard}
+      onClick={() => onVerAhora(plantilla)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onVerAhora(plantilla)
+        }
+      }}
+      aria-label={`Ver plantilla ${plantilla.nombre}`}
+    >
+      <div className={styles.reportCardHeader}>
+        <div className={styles.reportHeaderLeft}>
+          <div className={styles.templateIconBox}>
+            {getTemplateIcon(plantilla.id)}
+          </div>
+          <div className={styles.reportTitleBlock}>
+            <h4 className={styles.reportName}>{plantilla.nombre}</h4>
+            <p className={styles.reportDesc}>{plantilla.descripcion}</p>
+          </div>
         </div>
       </div>
 
-      <h4 className={styles.reportName}>{plantilla.nombre}</h4>
-      <p className={styles.reportDesc}>{plantilla.descripcion}</p>
+      <div className={styles.reportCardMeta}>
+        <div className={styles.badgesRow}>
+          <span className={styles.metaBadge}>{plantilla.configuracion.ciclos} ciclos</span>
+          <span className={styles.metaBadgeMuted}>
+            {bloques.length} {bloques.length === 1 ? 'bloque' : 'bloques'}
+          </span>
+        </div>
 
-      <div className={styles.templateBtns}>
+        {bloques.length > 0 && (
+          <div className={styles.blockChipsPreview}>
+            <span className={styles.blockChipsLabel}>Módulos:</span>
+            {bloques.map((b) => (
+              <span key={b.tipo} className={styles.blockMiniChip}>
+                {MAPA_BLOQUES_NOMBRES[b.tipo] ?? b.titulo}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className={styles.templateBtns} onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           className={styles.templateBtnSecondary}
-          onClick={() => onVerAhora(plantilla)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onVerAhora(plantilla)
+          }}
         >
           <Eye size={14} />
           <span>Ver</span>
@@ -137,7 +234,10 @@ export function PlantillaTarjeta({
         <button
           type="button"
           className={styles.templateBtnPrimary}
-          onClick={() => onGuardarCopia(plantilla)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onGuardarCopia(plantilla)
+          }}
         >
           <Copy size={14} />
           <span>Guardar plantilla</span>

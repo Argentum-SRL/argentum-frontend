@@ -38,26 +38,43 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 20px;
+  padding: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 16px;
   box-shadow: var(--elevation-xs);
+  cursor: pointer;
   transition: border-color 150ms ease, box-shadow 150ms ease;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .reportCard:hover,
 .templateCard:hover {
-  border-color: var(--text-3);
+  border-color: var(--primary);
   box-shadow: var(--elevation-sm);
 }
 
-.reportCardTop,
-.templateCardTop {
+.reportCard:focus-visible,
+.templateCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.reportCardHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
+  width: 100%;
+}
+
+.reportHeaderLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 
 .reportIconBox,
@@ -74,16 +91,48 @@
   flex-shrink: 0;
 }
 
+.reportTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.reportName {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reportDesc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .reportCardActions {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .iconActionBtn,
 .iconActionBtnDanger {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface-alt);
@@ -93,11 +142,16 @@
   justify-content: center;
   cursor: pointer;
   transition: background-color 140ms ease, color 140ms ease;
+  padding: 0;
 }
 
 .iconActionBtn:hover {
   background: var(--border);
   color: var(--text);
+}
+
+.iconActionBtnDanger {
+  color: var(--error);
 }
 
 .iconActionBtnDanger:hover {
@@ -111,23 +165,11 @@
   outline-offset: 2px;
 }
 
-.iconActionBtnDanger {
-  color: var(--error);
-}
-
-.reportName {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.reportDesc {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--text-2);
-  line-height: 1.45;
-  flex: 1;
+.reportCardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
 .badgesRow {
@@ -138,12 +180,87 @@
 }
 
 .metaBadge {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 999px;
+  padding: 2px 8px;
+  border-radius: 9999px;
   background: var(--surface-alt);
   color: var(--text-2);
+  line-height: 1.3;
+}
+
+.metaBadgeMuted {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  line-height: 1.3;
+}
+
+.blockChipsPreview {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.blockChipsLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+  margin-right: 2px;
+}
+
+.blockMiniChip {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  line-height: 1.25;
+}
+
+.reportCardFooter {
+  display: flex;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.openReportBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 140ms ease;
+  box-sizing: border-box;
+}
+
+.openReportBtn:hover {
+  opacity: 0.92;
+}
+
+.openReportBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .templateBtns {
@@ -984,6 +1101,27 @@
 @media (max-width: 767px) {
   .reportsGrid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .reportCard,
+  .templateCard {
+    padding: 14px 14px;
+    gap: 8px;
+    border-radius: 16px;
+  }
+
+  .reportHeaderLeft {
+    gap: 8px;
+  }
+
+  .reportName {
+    font-size: 14.5px;
+  }
+
+  .openReportBtn {
+    height: 36px;
+    font-size: 13px;
   }
 
   .textInput {
@@ -993,6 +1131,54 @@
   .verMasBtn {
     min-height: 44px;
     height: 44px;
+  }
+
+  .viewerHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .viewerTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .viewerBackBtn {
+    min-height: 32px;
+    height: 32px;
+    padding: 0 8px;
+    font-size: 12px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .viewerTitle {
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .exportActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .actionGhostBtn {
+    min-height: 32px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .viewerBlocks {
+    gap: 16px;
   }
 }
 

@@ -48,6 +48,15 @@ export default function ComparativaCiclosCard({
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
   const [data, setData] = useState<ComparativaCiclosResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
+  const [isMobile, setIsMobile] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.innerWidth <= 767
+  )
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -118,13 +127,15 @@ export default function ComparativaCiclosCard({
     if (!data?.ciclos_disponibles) return []
     return data.ciclos_disponibles.map((c) => ({
       value: c.clave,
-      label: `${c.etiqueta} (${c.rango_texto})${
-        c.es_actual && c.dias_transcurridos != null && c.dias_totales != null
-          ? ` (en curso, día ${c.dias_transcurridos} de ${c.dias_totales})`
-          : ''
-      }`,
+      label: isMobile
+        ? `${c.etiqueta}${c.es_actual ? ' (actual)' : ''}`
+        : `${c.etiqueta} (${c.rango_texto})${
+            c.es_actual && c.dias_transcurridos != null && c.dias_totales != null
+              ? ` (en curso, día ${c.dias_transcurridos} de ${c.dias_totales})`
+              : ''
+          }`,
     }))
-  }, [data])
+  }, [data, isMobile])
 
   return (
     <section className={styles.card} aria-label="Comparar dos ciclos">
@@ -136,7 +147,12 @@ export default function ComparativaCiclosCard({
           <div>
             <h2 className={styles.title}>Comparar dos ciclos</h2>
             <p className={styles.subtitle}>
-              Qué cambió entre dos ciclos, rubro por rubro.
+              <span className={styles.subtitleDesktop}>
+                Qué cambió entre dos ciclos, rubro por rubro.
+              </span>
+              <span className={styles.subtitleMobile}>
+                Qué cambió rubro por rubro
+              </span>
             </p>
           </div>
         </div>
@@ -170,7 +186,8 @@ export default function ComparativaCiclosCard({
         <div className={styles.selectorBar}>
           <div className={styles.selectBox}>
             <label htmlFor="comp-ciclo-a" className={styles.selectLabel}>
-              Ciclo evaluado (A)
+              <span className={styles.labelDesktop}>Ciclo evaluado (A)</span>
+              <span className={styles.labelMobile}>Ciclo (A)</span>
             </label>
             <SelectInput
               id="comp-ciclo-a"
@@ -178,15 +195,16 @@ export default function ComparativaCiclosCard({
               value={cicloAKey || data.ciclo_a.clave}
               onChange={(val) => setCicloAKey(val)}
               options={cicloOptions}
-              placeholder="Seleccionar ciclo A..."
+              placeholder="Ciclo A..."
             />
           </div>
 
-          <span className={styles.vsBadge}>VS</span>
+          <span className={styles.vsBadge} aria-hidden="true">VS</span>
 
           <div className={styles.selectBox}>
             <label htmlFor="comp-ciclo-b" className={styles.selectLabel}>
-              Ciclo de referencia (B)
+              <span className={styles.labelDesktop}>Ciclo de referencia (B)</span>
+              <span className={styles.labelMobile}>Ciclo (B)</span>
             </label>
             <SelectInput
               id="comp-ciclo-b"
@@ -194,7 +212,7 @@ export default function ComparativaCiclosCard({
               value={cicloBKey || data.ciclo_b.clave}
               onChange={(val) => setCicloBKey(val)}
               options={cicloOptions}
-              placeholder="Seleccionar ciclo B..."
+              placeholder="Ciclo B..."
             />
           </div>
         </div>
@@ -203,52 +221,58 @@ export default function ComparativaCiclosCard({
       {/* Resumen global del duelo */}
       {data && (
         <div className={styles.summaryStrip}>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryCaption}>Gastos en {etiquetaA}</span>
-            <span className={styles.summaryVal}>
-              {formatMonto(data.resumen.gasto_a, monedaVisual)}
-            </span>
-          </div>
-
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryCaption}>Gastos en {etiquetaB}</span>
-            <span className={styles.summaryValMuted}>
-              {formatMonto(data.resumen.gasto_b, monedaVisual)}
-            </span>
-          </div>
-
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryCaption}>Diferencia</span>
-            <span
-              className={
-                data.resumen.diferencia_gasto_monto <= 0
-                  ? styles.deltaGood
-                  : styles.deltaBad
-              }
-            >
-              {data.resumen.diferencia_gasto_monto > 0 ? '+' : ''}
-              {formatMonto(data.resumen.diferencia_gasto_monto, monedaVisual)}
-              {data.resumen.diferencia_gasto_pct !== null && (
-                ` (${formatPorcentaje(data.resumen.diferencia_gasto_pct, { signo: true })})`
-              )}
-            </span>
-          </div>
-
-          {data.resumen.mayor_ahorro && (
-            <div className={styles.highlightBoxGood}>
-              <TrendingDown size={14} />
-              <span>
-                Mayor baja en <strong>{data.resumen.mayor_ahorro.categoria_nombre}</strong> (-{formatMonto(data.resumen.mayor_ahorro.diferencia_monto, monedaVisual)})
+          <div className={styles.summaryKpis}>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryCaption}>Gastos en {etiquetaA}</span>
+              <span className={styles.summaryVal}>
+                {formatMonto(data.resumen.gasto_a, monedaVisual)}
               </span>
             </div>
-          )}
 
-          {data.resumen.mayor_aumento && (
-            <div className={styles.highlightBoxBad}>
-              <TrendingUp size={14} />
-              <span>
-                Mayor suba en <strong>{data.resumen.mayor_aumento.categoria_nombre}</strong> (+{formatMonto(data.resumen.mayor_aumento.diferencia_monto, monedaVisual)})
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryCaption}>Gastos en {etiquetaB}</span>
+              <span className={styles.summaryValMuted}>
+                {formatMonto(data.resumen.gasto_b, monedaVisual)}
               </span>
+            </div>
+
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryCaption}>Diferencia</span>
+              <span
+                className={
+                  data.resumen.diferencia_gasto_monto <= 0
+                    ? styles.deltaGood
+                    : styles.deltaBad
+                }
+              >
+                {data.resumen.diferencia_gasto_monto > 0 ? '+' : ''}
+                {formatMonto(data.resumen.diferencia_gasto_monto, monedaVisual)}
+                {data.resumen.diferencia_gasto_pct !== null && (
+                  ` (${formatPorcentaje(data.resumen.diferencia_gasto_pct, { signo: true })})`
+                )}
+              </span>
+            </div>
+          </div>
+
+          {(data.resumen.mayor_ahorro || data.resumen.mayor_aumento) && (
+            <div className={styles.summaryHighlights}>
+              {data.resumen.mayor_ahorro && (
+                <div className={styles.highlightBoxGood}>
+                  <TrendingDown size={14} />
+                  <span>
+                    Mayor baja en <strong>{data.resumen.mayor_ahorro.categoria_nombre}</strong> (-{formatMonto(data.resumen.mayor_ahorro.diferencia_monto, monedaVisual)})
+                  </span>
+                </div>
+              )}
+
+              {data.resumen.mayor_aumento && (
+                <div className={styles.highlightBoxBad}>
+                  <TrendingUp size={14} />
+                  <span>
+                    Mayor suba en <strong>{data.resumen.mayor_aumento.categoria_nombre}</strong> (+{formatMonto(data.resumen.mayor_aumento.diferencia_monto, monedaVisual)})
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>

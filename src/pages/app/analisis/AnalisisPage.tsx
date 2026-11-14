@@ -146,11 +146,11 @@ export default function AnalisisPage() {
                 ? 'Reportes a medida exportables a Excel o PDF'
                 : subtituloDesktop}
             </span>
-            <span className={styles.subtitleMobile}>
-              {esInformes
-                ? 'Reportes a medida en Excel o PDF'
-                : subtituloMobile}
-            </span>
+            {!esInformes && (
+              <span className={styles.subtitleMobile}>
+                {subtituloMobile}
+              </span>
+            )}
           </p>
         </div>
 

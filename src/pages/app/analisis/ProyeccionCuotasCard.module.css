@@ -1,8 +1,8 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: 8px;
+  padding: 14px 18px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -47,6 +47,17 @@
   margin: 2px 0 0;
   font-size: 0.8125rem;
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitleDesktop {
+  display: inline;
+}
+
+.subtitleMobile {
+  display: none;
 }
 
 .controlsRow {
@@ -307,6 +318,41 @@
 }
 
 @media (max-width: 767px) {
+  .card {
+    border-radius: 16px;
+    padding: 12px 12px;
+    gap: 6px;
+  }
+
+  .titleGroup {
+    gap: 6px;
+  }
+
+  .iconWrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .title {
+    font-size: 0.9375rem;
+  }
+
+  .subtitle {
+    font-size: clamp(9.5px, 2.7vw, 11px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .subtitleDesktop {
+    display: none;
+  }
+
+  .subtitleMobile {
+    display: inline;
+  }
+
   .chartWrap {
     height: 260px;
     min-height: 260px;

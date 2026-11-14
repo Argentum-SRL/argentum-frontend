@@ -140,7 +140,12 @@ export default function ProyeccionCuotasCard({
           <div>
             <h2 className={styles.title}>Proyección de Cuotas y Suscripciones</h2>
             <p className={styles.subtitle}>
-              Lo que ya tenés comprometido en cuotas y suscripciones, y cuándo se te libera.
+              <span className={styles.subtitleDesktop}>
+                Lo que ya tenés comprometido en cuotas y suscripciones, y cuándo se te libera.
+              </span>
+              <span className={styles.subtitleMobile}>
+                Compromisos futuros y cuándo se liberan
+              </span>
             </p>
           </div>
         </div>

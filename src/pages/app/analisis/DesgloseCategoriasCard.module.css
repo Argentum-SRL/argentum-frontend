@@ -2,11 +2,11 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 16px 20px;
+  padding: 14px 18px;
   box-shadow: var(--elevation-sm);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   box-sizing: border-box;
 }
 
@@ -79,6 +79,17 @@
   font-size: 0.8125rem;
   color: var(--text-2);
   margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitleDesktop {
+  display: inline;
+}
+
+.subtitleMobile {
+  display: none;
 }
 
 .emptyWrap {
@@ -141,6 +152,13 @@
 
 .catTopRow {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.catHeaderLine {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -150,8 +168,9 @@
 .catIdentity {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
+  flex: 1;
 }
 
 .rankBadge {
@@ -165,12 +184,6 @@
   flex-shrink: 0;
 }
 
-.catTextGroup {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
 .catName {
   font-size: 0.875rem;
   font-weight: 700;
@@ -180,12 +193,7 @@
   text-overflow: ellipsis;
 }
 
-.catSubInfo {
-  font-size: 0.75rem;
-  color: var(--text-3);
-}
-
-.catNumbers {
+.catAmountsWrap {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -196,6 +204,27 @@
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.catMetaLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding-left: 34px;
+  box-sizing: border-box;
+}
+
+.catSubInfo {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .catPctBadge {
@@ -205,6 +234,7 @@
   background: var(--surface);
   border-radius: 999px;
   padding: 2px 8px;
+  flex-shrink: 0;
 }
 
 .chevronIcon {
@@ -390,8 +420,12 @@
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .clearSubBtn {
@@ -550,6 +584,51 @@
 }
 
 @media (max-width: 767px) {
+  .card {
+    border-radius: 16px;
+    padding: 12px 12px;
+    gap: 6px;
+  }
+
+  .header {
+    gap: 4px;
+  }
+
+  .titleGroup {
+    gap: 6px;
+  }
+
+  .iconWrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .title {
+    font-size: 0.9375rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .subtitleDesktop {
+    display: none;
+  }
+
+  .subtitleMobile {
+    display: inline;
+  }
+
+  .subcatsHeading {
+    font-size: clamp(9.5px, 2.6vw, 11px);
+    letter-spacing: 0.015em;
+    white-space: nowrap;
+  }
+
   .verMasBtn {
     min-height: 44px;
     height: 44px;

@@ -70,6 +70,9 @@
   font-size: 0.8125rem;
   color: var(--text-2);
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .headerControls {
@@ -393,6 +396,9 @@
   .subtitle {
     font-size: 0.75rem;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .chartContainer {

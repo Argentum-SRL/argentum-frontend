@@ -1,8 +1,8 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: 8px;
+  padding: 14px 18px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -54,6 +54,17 @@
   margin: 2px 0 0;
   font-size: 0.8125rem;
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitleDesktop {
+  display: inline;
+}
+
+.subtitleMobile {
+  display: none;
 }
 
 .selectorBar {
@@ -75,11 +86,22 @@
 }
 
 .selectLabel {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.labelDesktop {
+  display: inline;
+}
+
+.labelMobile {
+  display: none;
 }
 
 .vsBadge {
@@ -92,17 +114,24 @@
   font-weight: 800;
   color: var(--text-3);
   letter-spacing: 0.06em;
+  flex-shrink: 0;
 }
 
 .summaryStrip {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
-  flex-wrap: wrap;
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--surface);
+}
+
+.summaryKpis {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .summaryItem {
@@ -145,6 +174,15 @@
   font-variant-numeric: tabular-nums;
 }
 
+.summaryHighlights {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
 .highlightBoxGood,
 .highlightBoxBad {
   display: inline-flex;
@@ -183,8 +221,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 16px;
+  padding: 10px 14px;
   border-radius: 14px;
   background: var(--surface-alt);
   border: 1px solid transparent;
@@ -208,24 +246,29 @@
 
 .deltaCatName {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dualBars {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 100%;
 }
 
 .barLine {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 }
 
 .barTag {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-3);
   width: 44px;
@@ -269,14 +312,17 @@
 .amountPrimary {
   font-size: 13px;
   font-weight: 700;
-  color: var(--text);
+  color: #FF8A65;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .amountSecondary {
   font-size: 12px;
+  font-weight: 600;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .badgeGood,
@@ -287,6 +333,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .badgeGood {
@@ -382,6 +429,42 @@
 }
 
 @media (max-width: 767px) {
+  .card {
+    border-radius: 16px;
+    padding: 12px 12px;
+    gap: 6px;
+  }
+
+  .titleGroup {
+    gap: 6px;
+  }
+
+  .iconWrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .title {
+    font-size: 0.9375rem;
+  }
+
+  .subtitle {
+    font-size: clamp(9.5px, 2.7vw, 11px);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .subtitleDesktop {
+    display: none;
+  }
+
+  .subtitleMobile {
+    display: inline;
+  }
+
   .chartWrap {
     height: 260px;
     min-height: 260px;
@@ -390,6 +473,134 @@
   .header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .selectorBar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 8px 8px;
+    border-radius: 12px;
+  }
+
+  .selectBox {
+    width: 100%;
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .selectLabel {
+    font-size: 10px;
+    letter-spacing: 0.02em;
+  }
+
+  .labelDesktop {
+    display: none;
+  }
+
+  .labelMobile {
+    display: inline;
+  }
+
+  .vsBadge {
+    height: 36px;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+    background: transparent;
+    border: none;
+  }
+
+  .summaryStrip {
+    padding: 10px 10px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .summaryKpis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .summaryItem {
+    min-width: 0;
+  }
+
+  .summaryItem:nth-child(3) {
+    grid-column: span 2;
+    border-top: 1px dashed var(--border);
+    padding-top: 6px;
+    margin-top: 2px;
+  }
+
+  .summaryCaption {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .summaryVal,
+  .summaryValMuted {
+    font-size: 13.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .deltaGood,
+  .deltaBad {
+    font-size: 13px;
+  }
+
+  .summaryHighlights {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .highlightBoxGood,
+  .highlightBoxBad {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 11px;
+    padding: 6px 8px;
+    border-radius: 8px;
+  }
+
+  .deltaRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 10px;
+    border-radius: 12px;
+  }
+
+  .deltaCatInfo {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .deltaCatTexts {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .deltaRight {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-left: 36px;
+    box-sizing: border-box;
   }
 
   .verMasBtn {

@@ -158,11 +158,16 @@ export default function DesgloseCategoriasCard({
             <h2 className={styles.title}>
               {selectedCat ? selectedCat.categoria_nombre : 'Desglose por Categorías'}
             </h2>
-            <p className={styles.subtitle}>
-              {selectedCat
-                ? `${formatMonto(selectedCat.monto, monedaVisual)} (${formatPorcentaje(selectedCat.porcentaje_del_total)} del total) · Tocá una subcategoría para filtrar movimientos`
-                : 'Tocá cualquier categoría para explorar sus subcategorías y movimientos'}
-            </p>
+            {selectedCat && (
+              <p className={styles.subtitle}>
+                <span className={styles.subtitleDesktop}>
+                  {formatMonto(selectedCat.monto, monedaVisual)} ({formatPorcentaje(selectedCat.porcentaje_del_total)} del total)
+                </span>
+                <span className={styles.subtitleMobile}>
+                  {formatMonto(selectedCat.monto, monedaVisual)} · {formatPorcentaje(selectedCat.porcentaje_del_total)}
+                </span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -433,29 +438,32 @@ export default function DesgloseCategoriasCard({
               onClick={() => handleSelectCategoria(cat)}
             >
               <div className={styles.catTopRow}>
-                <div className={styles.catIdentity}>
-                  {vistaModo === 'ranking' && (
-                    <span className={styles.rankBadge}>#{idx + 1}</span>
-                  )}
-                  <CategoriaIcon nombre={cat.categoria_nombre} size={30} />
-                  <div className={styles.catTextGroup}>
+                <div className={styles.catHeaderLine}>
+                  <div className={styles.catIdentity}>
+                    {vistaModo === 'ranking' && (
+                      <span className={styles.rankBadge}>#{idx + 1}</span>
+                    )}
+                    <CategoriaIcon nombre={cat.categoria_nombre} size={26} />
                     <span className={styles.catName}>{cat.categoria_nombre}</span>
-                    <span className={styles.catSubInfo}>
-                      {cat.subcategorias.length}{' '}
-                      {cat.subcategorias.length === 1 ? 'subcategoría' : 'subcategorías'} ·{' '}
-                      {cat.cantidad_movimientos} mov.
+                  </div>
+
+                  <div className={styles.catAmountsWrap}>
+                    <span className={styles.catAmount}>
+                      {formatMonto(cat.monto, monedaVisual)}
                     </span>
+                    <ChevronRight size={15} className={styles.chevronIcon} />
                   </div>
                 </div>
 
-                <div className={styles.catNumbers}>
-                  <span className={styles.catAmount}>
-                    {formatMonto(cat.monto, monedaVisual)}
+                <div className={styles.catMetaLine}>
+                  <span className={styles.catSubInfo}>
+                    {cat.subcategorias.length}{' '}
+                    {cat.subcategorias.length === 1 ? 'subcategoría' : 'subcategorías'} ·{' '}
+                    {cat.cantidad_movimientos} mov.
                   </span>
                   <span className={styles.catPctBadge}>
                     {formatPorcentaje(cat.porcentaje_del_total)}
                   </span>
-                  <ChevronRight size={15} className={styles.chevronIcon} />
                 </div>
               </div>
 

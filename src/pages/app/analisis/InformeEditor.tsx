@@ -1,14 +1,12 @@
-import { useState } from 'react'
-import { ArrowLeft, Check } from '@/components/ui/icons'
-import { Button } from '@/components/ui'
-import SegmentedControl from '@/components/ui/SegmentedControl'
+import { useState, useEffect } from 'react'
+import {
+  ArrowLeft, Check, LayoutDashboard, TrendingUp, ChartPie, Transfer, CreditCard, type LucideIcon,
+} from '@/components/ui/icons'
+import { Button, SelectInput } from '@/components/ui'
+import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'
 import analisisService, {
-  type BloqueInformeConfig,
-  type ConfiguracionInforme,
-  type InformePersonalizadoItem,
-  type MonedaModoAnalisis,
-  type NaturalezaGastoFiltro,
-  type TipoBloqueInforme,
+  type BloqueInformeConfig, type ConfiguracionInforme, type InformePersonalizadoItem,
+  type MonedaModoAnalisis, type NaturalezaGastoFiltro, type TipoBloqueInforme,
 } from '@/services/analisis.service'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { sileo } from 'sileo'
@@ -20,34 +18,43 @@ export interface BloqueCatalogoItem {
   tipo: TipoBloqueInforme
   titulo: string
   descripcion: string
+  icon: LucideIcon
 }
 
 const CATALOGO_BLOQUES: BloqueCatalogoItem[] = [
-  {
-    tipo: 'kpis',
-    titulo: 'Números principales',
-    descripcion: 'Lo que entró, lo que salió y lo que te quedó.',
-  },
-  {
-    tipo: 'evolucion_ciclos',
-    titulo: 'Evolución Ciclo a Ciclo',
-    descripcion: 'Lo que entró, lo que salió y lo que te quedó en cada ciclo.',
-  },
-  {
-    tipo: 'desglose_categorias',
-    titulo: 'Desglose por Categorías y Subcategorías',
-    descripcion: 'En qué se fue la plata, hasta cada movimiento.',
-  },
-  {
-    tipo: 'comparativa_ciclos',
-    titulo: 'Comparar dos ciclos',
-    descripcion: 'Qué cambió entre dos ciclos, rubro por rubro.',
-  },
-  {
-    tipo: 'proyeccion_cuotas',
-    titulo: 'Proyección de Tarjetas y Cuotas',
-    descripcion: 'Lo que ya tenés comprometido en cuotas y suscripciones, y cuándo se te libera.',
-  },
+  { tipo: 'kpis', titulo: 'Números principales', descripcion: 'Balance, ingresos y egresos consolidados', icon: LayoutDashboard },
+  { tipo: 'evolucion_ciclos', titulo: 'Evolución Ciclo a Ciclo', descripcion: 'Histórico ciclo a ciclo comparativo', icon: TrendingUp },
+  { tipo: 'desglose_categorias', titulo: 'Desglose por Categorías', descripcion: 'Distribución por rubros y categorías', icon: ChartPie },
+  { tipo: 'comparativa_ciclos', titulo: 'Comparar dos ciclos', descripcion: 'Variaciones rubro por rubro', icon: Transfer },
+  { tipo: 'proyeccion_cuotas', titulo: 'Proyección de Tarjetas y Cuotas', descripcion: 'Compromisos futuros y vencimientos', icon: CreditCard },
+]
+
+const OPCIONES_MONEDA: Array<{ value: MonedaModoAnalisis; label: string }> = [
+  { value: 'solo_ars', label: 'Pesos' },
+  { value: 'solo_usd', label: 'Dólares' },
+  { value: 'consolidado_ars', label: 'Todo en pesos' },
+  { value: 'consolidado_usd', label: 'Todo en dólares' },
+]
+
+const OPCIONES_CICLOS_DESKTOP: SegmentedControlOption<string>[] = [
+  { value: '1', label: 'Ciclo actual' },
+  { value: '3', label: '3 ciclos' },
+  { value: '6', label: '6 ciclos' },
+  { value: '12', label: '12 ciclos' },
+]
+
+const OPCIONES_CICLOS_MOBILE: SegmentedControlOption<string>[] = [
+  { value: '1', label: 'Actual' },
+  { value: '3', label: '3C' },
+  { value: '6', label: '6C' },
+  { value: '12', label: '12C' },
+]
+
+const OPCIONES_NATURALEZA: Array<{ value: NaturalezaGastoFiltro; label: string }> = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'variables', label: 'Día a día' },
+  { value: 'fijos', label: 'Fijos' },
+  { value: 'cuotas', label: 'Cuotas' },
 ]
 
 interface InformeEditorProps {
@@ -64,33 +71,32 @@ export default function InformeEditor({
   const editingId = initialInforme?.id ?? null
   const cfg = initialInforme?.configuracion
 
-  const [formNombre, setFormNombre] = useState<string>(
-    initialInforme?.nombre ?? 'Informe Personalizado'
-  )
-  const [formDesc, setFormDesc] = useState<string>(
-    initialInforme?.descripcion ?? (editingId ? '' : 'Análisis a medida de mis ciclos y categorías')
-  )
-  const [formMoneda, setFormMoneda] = useState<MonedaModoAnalisis>(
-    cfg?.moneda_modo ?? 'solo_ars'
-  )
+  const [formNombre, setFormNombre] = useState<string>(initialInforme?.nombre ?? 'Informe Personalizado')
+  const [formDesc, setFormDesc] = useState<string>(initialInforme?.descripcion ?? '')
+  const [formMoneda, setFormMoneda] = useState<MonedaModoAnalisis>(cfg?.moneda_modo ?? 'solo_ars')
   const [formCiclos, setFormCiclos] = useState<number>(cfg?.ciclos ?? 6)
-  const [formNaturaleza, setFormNaturaleza] = useState<NaturalezaGastoFiltro>(
-    cfg?.naturaleza ?? 'todos'
-  )
+  const [formNaturaleza, setFormNaturaleza] = useState<NaturalezaGastoFiltro>(cfg?.naturaleza ?? 'todos')
   const [formBloques, setFormBloques] = useState<TipoBloqueInforme[]>(
-    cfg?.bloques?.map((b) => b.tipo) ?? [
-      'kpis',
-      'evolucion_ciclos',
-      'desglose_categorias',
-      'comparativa_ciclos',
-    ]
+    cfg?.bloques?.map((b) => b.tipo) ?? ['kpis', 'evolucion_ciclos', 'desglose_categorias', 'comparativa_ciclos']
   )
   const [saving, setSaving] = useState<boolean>(false)
+  const [isMobile, setIsMobile] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.innerWidth <= 767
+  )
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleToggleBloque = (tipo: TipoBloqueInforme) => {
     setFormBloques((prev) => {
       if (prev.includes(tipo)) {
-        if (prev.length <= 1) return prev
+        if (prev.length <= 1) {
+          sileo.info({ title: 'El informe debe incluir al menos 1 bloque.' })
+          return prev
+        }
         return prev.filter((t) => t !== tipo)
       }
       return [...prev, tipo]
@@ -102,14 +108,14 @@ export default function InformeEditor({
       sileo.error({ title: 'Ingresá un nombre para el informe.' })
       return
     }
+    if (formBloques.length === 0) {
+      sileo.error({ title: 'Seleccioná al menos un bloque para el informe.' })
+      return
+    }
     setSaving(true)
     const bloquesConfig: BloqueInformeConfig[] = formBloques.map((t, idx) => {
       const meta = CATALOGO_BLOQUES.find((c) => c.tipo === t)
-      return {
-        id: `bloque-${idx}-${t}`,
-        tipo: t,
-        titulo: meta?.titulo ?? t,
-      }
+      return { id: `bloque-${idx}-${t}`, tipo: t, titulo: meta?.titulo ?? t }
     })
     const configuracion: ConfiguracionInforme = {
       moneda_modo: formMoneda,
@@ -147,140 +153,195 @@ export default function InformeEditor({
   return (
     <section className={styles.builderCard} aria-label="Constructor de informe personalizado">
       <header className={styles.builderHeader}>
-        <button
-          type="button"
-          className={styles.backBtn}
-          onClick={onCancelar}
-        >
-          <ArrowLeft size={16} />
-          <span>Volver a Mis Informes</span>
-        </button>
+        <div className={styles.builderHeaderLeft}>
+          <button type="button" className={styles.backBtn} onClick={onCancelar} aria-label="Volver a Mis Informes">
+            <ArrowLeft size={15} />
+            <span>{isMobile ? 'Volver' : 'Volver a Mis Informes'}</span>
+          </button>
+          <div className={styles.titleWithBadge}>
+            <h2 className={styles.builderTitle}>
+              {editingId ? 'Editar Informe' : 'Crear Informe'}
+            </h2>
+            {!isMobile && (
+              <span className={styles.statusBadge}>
+                {formBloques.length} {formBloques.length === 1 ? 'bloque' : 'bloques'}
+              </span>
+            )}
+          </div>
+        </div>
 
-        <h2 className={styles.builderTitle}>
-          {editingId ? 'Editar Informe Personalizado' : 'Crear Nuevo Informe por Bloques'}
-        </h2>
+        <div className={styles.builderHeaderActions}>
+          {!isMobile && (
+            <Button variant="secondary" className={styles.headerBtnSecondary} onClick={onCancelar} disabled={saving}>
+              Cancelar
+            </Button>
+          )}
+          <Button className={styles.headerBtnPrimary} onClick={() => void handleGuardarInforme()} disabled={saving} loading={saving}>
+            <Check size={15} />
+            <span>{isMobile ? 'Guardar' : 'Guardar y Abrir'}</span>
+          </Button>
+        </div>
       </header>
 
-      <div className={styles.formGrid}>
-        <div className={styles.fieldGroup}>
-          <label htmlFor="inf-nombre" className={styles.fieldLabel}>
-            Nombre del informe
-          </label>
-          <input
-            id="inf-nombre"
-            type="text"
-            className={styles.textInput}
-            value={formNombre}
-            onChange={(e) => setFormNombre(e.target.value)}
-            placeholder="Ej: Cierre mensual familiar"
-            maxLength={120}
-          />
+      <div className={styles.builderLayout}>
+        <div className={styles.builderParamsCol}>
+          <div className={styles.sectionPanel}>
+            <h3 className={styles.sectionHeaderTitle}>Detalles del informe</h3>
+            <div className={styles.compactInputsRow}>
+              <div className={styles.fieldGroup}>
+                <label htmlFor="inf-nombre" className={styles.fieldLabel}>Nombre</label>
+                <input
+                  id="inf-nombre"
+                  type="text"
+                  className={styles.textInput}
+                  value={formNombre}
+                  onChange={(e) => setFormNombre(e.target.value)}
+                  placeholder="Ej: Cierre mensual familiar"
+                  maxLength={120}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label htmlFor="inf-desc" className={styles.fieldLabel}>
+                  Descripción <span className={styles.labelSub}>(opcional)</span>
+                </label>
+                <input
+                  id="inf-desc"
+                  type="text"
+                  className={styles.textInput}
+                  value={formDesc}
+                  onChange={(e) => setFormDesc(e.target.value)}
+                  placeholder="Ej: Seguimiento de gastos y tarjetas"
+                  maxLength={300}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.sectionPanel}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionHeaderTexts}>
+                <h3 className={styles.sectionHeaderTitle}>Filtros iniciales</h3>
+                <span className={styles.sectionHint}>Se aplican al abrir este informe</span>
+              </div>
+            </div>
+
+            <div className={styles.filterControlsList}>
+              {isMobile ? (
+                <>
+                  <div className={styles.mobileFilterRow}>
+                    <SelectInput
+                      id="inf-moneda-select"
+                      label="Moneda"
+                      size="sm"
+                      value={formMoneda}
+                      onChange={(v) => setFormMoneda(v as MonedaModoAnalisis)}
+                      options={OPCIONES_MONEDA}
+                    />
+
+                    <SelectInput
+                      id="inf-naturaleza-select"
+                      label="Tipo de gasto"
+                      size="sm"
+                      value={formNaturaleza}
+                      onChange={(v) => setFormNaturaleza(v as NaturalezaGastoFiltro)}
+                      options={OPCIONES_NATURALEZA}
+                    />
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <span className={styles.fieldLabel}>Período a mostrar</span>
+                    <SegmentedControl
+                      options={OPCIONES_CICLOS_MOBILE}
+                      value={String(formCiclos)}
+                      onChange={(v: string) => setFormCiclos(Number(v))}
+                      ariaLabel="Período a mostrar"
+                      fullWidth
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className={styles.fieldGroup}>
+                    <span className={styles.fieldLabel}>Moneda por defecto</span>
+                    <SegmentedControl
+                      options={OPCIONES_MONEDA}
+                      value={formMoneda}
+                      onChange={(v: string) => setFormMoneda(v as MonedaModoAnalisis)}
+                      ariaLabel="Moneda del informe"
+                      fullWidth
+                    />
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <span className={styles.fieldLabel}>Período a mostrar</span>
+                    <SegmentedControl
+                      options={OPCIONES_CICLOS_DESKTOP}
+                      value={String(formCiclos)}
+                      onChange={(v: string) => setFormCiclos(Number(v))}
+                      ariaLabel="Cuántos ciclos ver en el informe"
+                      fullWidth
+                    />
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <span className={styles.fieldLabel}>Tipo de gasto</span>
+                    <SegmentedControl
+                      options={OPCIONES_NATURALEZA}
+                      value={formNaturaleza}
+                      onChange={(v: string) => setFormNaturaleza(v as NaturalezaGastoFiltro)}
+                      ariaLabel="Tipo de gasto del informe"
+                      fullWidth
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className={styles.fieldGroup}>
-          <label htmlFor="inf-desc" className={styles.fieldLabel}>
-            Descripción (opcional)
-          </label>
-          <input
-            id="inf-desc"
-            type="text"
-            className={styles.textInput}
-            value={formDesc}
-            onChange={(e) => setFormDesc(e.target.value)}
-            placeholder="Ej: Seguimiento de gastos variables y tarjetas"
-            maxLength={300}
-          />
+        <div className={styles.builderBlocksCol}>
+          <div className={styles.sectionPanel}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionHeaderTexts}>
+                <h3 className={styles.sectionHeaderTitle}>Módulos incluidos</h3>
+                <span className={styles.sectionHint}>Elegí qué bloques querés que aparezcan en tu informe</span>
+              </div>
+              <span className={styles.blocksCounterBadge}>
+                {formBloques.length} de {CATALOGO_BLOQUES.length}
+              </span>
+            </div>
+
+            <div className={styles.blocksList}>
+              {CATALOGO_BLOQUES.map((b) => {
+                const active = formBloques.includes(b.tipo)
+                const Icon = b.icon
+                return (
+                  <button
+                    key={b.tipo}
+                    type="button"
+                    role="checkbox"
+                    aria-checked={active}
+                    className={`${styles.blockRow} ${active ? styles.blockRowActive : ''}`}
+                    onClick={() => handleToggleBloque(b.tipo)}
+                  >
+                    <div className={`${styles.blockIconWrap} ${active ? styles.blockIconActive : ''}`}>
+                      <Icon size={16} />
+                    </div>
+                    <div className={styles.blockTexts}>
+                      <span className={styles.blockTitle}>{b.titulo}</span>
+                      <span className={styles.blockDesc}>{b.descripcion}</span>
+                    </div>
+                    <div className={`${styles.blockCheckCircle} ${active ? styles.blockCheckActive : ''}`}>
+                      {active && <Check size={12} strokeWidth={2.5} />}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className={styles.configRow}>
-        <div className={styles.fieldGroup}>
-          <span className={styles.fieldLabel}>Moneda por defecto</span>
-          <SegmentedControl
-            options={[
-              { value: 'solo_ars', label: 'Pesos' },
-              { value: 'solo_usd', label: 'Dólares' },
-              { value: 'consolidado_ars', label: 'Todo pasado a pesos' },
-              { value: 'consolidado_usd', label: 'Todo pasado a dólares' },
-            ]}
-            value={formMoneda}
-            onChange={(v: string) => setFormMoneda(v as MonedaModoAnalisis)}
-            ariaLabel="Moneda del informe"
-            layout="wrap"
-          />
-        </div>
-
-        <div className={styles.fieldGroup}>
-          <span className={styles.fieldLabel}>Cuántos ciclos ver</span>
-          <SegmentedControl
-            options={[
-              { value: '1', label: 'Ciclo actual' },
-              { value: '3', label: '3 ciclos' },
-              { value: '6', label: '6 ciclos' },
-              { value: '12', label: '12 ciclos' },
-            ]}
-            value={String(formCiclos)}
-            onChange={(v: string) => setFormCiclos(Number(v))}
-            ariaLabel="Cuántos ciclos ver en el informe"
-            layout="inline"
-          />
-        </div>
-
-        <div className={styles.fieldGroup}>
-          <span className={styles.fieldLabel}>Tipo de gasto</span>
-          <SegmentedControl
-            options={[
-              { value: 'todos', label: 'Todos' },
-              { value: 'variables', label: 'Día a día' },
-              { value: 'fijos', label: 'Fijos y suscripciones' },
-              { value: 'cuotas', label: 'Cuotas' },
-            ]}
-            value={formNaturaleza}
-            onChange={(v: string) => setFormNaturaleza(v as NaturalezaGastoFiltro)}
-            ariaLabel="Tipo de gasto del informe"
-            layout="wrap"
-          />
-        </div>
-      </div>
-
-      <div className={styles.blocksPicker}>
-        <span className={styles.fieldLabel}>
-          Elegí qué bloques analíticos incluir en este informe ({formBloques.length}{' '}
-          seleccionados)
-        </span>
-
-        <div className={styles.blocksGrid}>
-          {CATALOGO_BLOQUES.map((b) => {
-            const active = formBloques.includes(b.tipo)
-            return (
-              <button
-                key={b.tipo}
-                type="button"
-                className={`${styles.blockOption} ${active ? styles.blockOptionActive : ''}`}
-                onClick={() => handleToggleBloque(b.tipo)}
-              >
-                <div className={styles.blockCheck}>
-                  {active && <Check size={14} />}
-                </div>
-                <div className={styles.blockTexts}>
-                  <span className={styles.blockTitle}>{b.titulo}</span>
-                  <span className={styles.blockDesc}>{b.descripcion}</span>
-                </div>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      <footer className={styles.builderFooter}>
-        <Button variant="secondary" onClick={onCancelar}>
-          Cancelar
-        </Button>
-        <Button onClick={() => void handleGuardarInforme()} disabled={saving}>
-          <Check size={16} />
-          <span>{saving ? 'Guardando...' : 'Guardar y Abrir Informe'}</span>
-        </Button>
-      </footer>
     </section>
   )
 }

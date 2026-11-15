@@ -4,6 +4,7 @@ import type {
   ProyeccionCompromisosResponse,
 } from '@/services/analisis.service'
 import { formatFecha } from '@/utils/format'
+import { armarKpisVista } from './kpisVista'
 import {
   obtenerTipoBloque,
   obtenerTituloBloque,
@@ -105,6 +106,7 @@ export function armarContenidoPdf(
 ): SeccionPdf[] {
   const secciones: SeccionPdf[] = []
   const moneda = resolverMonedaPedido(pedido)
+  const { soloGastos } = armarKpisVista(datos.resumen?.kpis, datos.resumen?.moneda_modo)
 
   for (const b of pedido.bloques) {
     const tipo = obtenerTipoBloque(b)
@@ -114,13 +116,44 @@ export function armarContenidoPdf(
 
     if (tipo === 'kpis') {
       const k = datos.resumen?.kpis
-      const filas: CeldaPdf[][] = [
-        ['Ingresos', { valor: k?.ingresos_totales, moneda, tipo: 'monto' }],
-        ['Egresos', { valor: k?.gastos_totales, moneda, tipo: 'monto' }],
-        ['Te quedó', { valor: k?.balance_neto, moneda, tipo: 'resultado' }],
-        ['% de lo que entró', { valor: k?.tasa_ahorro_pct, tipo: 'porcentaje' }],
-        ['Promedio de gastos por ciclo', { valor: k?.promedio_gasto_ciclo, moneda, tipo: 'monto' }],
-      ]
+      let filas: CeldaPdf[][]
+
+      if (soloGastos) {
+        if (k?.gasto_total_referencia !== null && k?.gasto_total_referencia !== undefined) {
+          filas = [
+            ['Egresos', { valor: k?.gastos_totales, moneda, tipo: 'monto' }],
+            ['Todo lo que gastaste', { valor: k?.gasto_total_referencia, moneda, tipo: 'monto' }],
+            [
+              '% de todo lo que gastaste',
+              { valor: k?.peso_sobre_gasto_total_pct, tipo: 'porcentaje' },
+            ],
+            [
+              'Promedio de gastos por ciclo',
+              { valor: k?.promedio_gasto_ciclo, moneda, tipo: 'monto' },
+            ],
+          ]
+        } else {
+          filas = [
+            ['Egresos', { valor: k?.gastos_totales, moneda, tipo: 'monto' }],
+            [
+              'Promedio de gastos por ciclo',
+              { valor: k?.promedio_gasto_ciclo, moneda, tipo: 'monto' },
+            ],
+          ]
+        }
+      } else {
+        filas = [
+          ['Ingresos', { valor: k?.ingresos_totales, moneda, tipo: 'monto' }],
+          ['Egresos', { valor: k?.gastos_totales, moneda, tipo: 'monto' }],
+          ['Te quedó', { valor: k?.balance_neto, moneda, tipo: 'resultado' }],
+          ['% de lo que entró', { valor: k?.tasa_ahorro_pct, tipo: 'porcentaje' }],
+          [
+            'Promedio de gastos por ciclo',
+            { valor: k?.promedio_gasto_ciclo, moneda, tipo: 'monto' },
+          ],
+        ]
+      }
+
       secciones.push({
         titulo: titCustom || 'Números principales',
         nota: k?.frase_resumen || (datos.resumen as { frase_resumen?: string } | undefined)?.frase_resumen || undefined,
@@ -132,38 +165,83 @@ export function armarContenidoPdf(
       })
     } else if (tipo === 'evolucion_ciclos') {
       const serie = datos.resumen?.serie_ciclos || []
-      const filas: CeldaPdf[][] = serie.map((c) => [
-        c.nombre_corto || c.etiqueta,
-        formatFecha(c.fecha_inicio),
-        formatFecha(c.fecha_fin),
-        { valor: c.ingresos, moneda, tipo: 'monto' },
-        { valor: c.gastos, moneda, tipo: 'monto' },
-        { valor: c.balance, moneda, tipo: 'resultado' },
-        { valor: c.tasa_ahorro_pct, tipo: 'porcentaje' },
-        c.sin_datos ? 'Sin datos' : c.es_actual ? 'En curso' : 'Terminado',
-      ])
-
       const totTerm = datos.resumen?.totales_terminados
-      const total: CeldaPdf[] | undefined = totTerm
-        ? [
-            'Total ciclos terminados', '', '',
-            { valor: totTerm.ingresos, moneda, tipo: 'monto' },
-            { valor: totTerm.gastos, moneda, tipo: 'monto' },
-            { valor: totTerm.balance, moneda, tipo: 'resultado' },
-            { valor: totTerm.tasa_ahorro_pct, tipo: 'porcentaje' },
-            '',
-          ]
-        : undefined
 
-      secciones.push({
-        titulo: titCustom || 'Evolución',
-        tablas: [{
-          encabezados: ['Ciclo', 'Desde', 'Hasta', 'Ingresos', 'Gastos', 'Te quedó', '% de lo que entró', 'Estado'],
-          alineaciones: ['left', 'center', 'center', 'right', 'right', 'right', 'right', 'center'],
-          filas,
-          total,
-        }],
-      })
+      if (soloGastos) {
+        const filas: CeldaPdf[][] = serie.map((c) => [
+          c.nombre_corto || c.etiqueta,
+          formatFecha(c.fecha_inicio),
+          formatFecha(c.fecha_fin),
+          { valor: c.gastos, moneda, tipo: 'monto' },
+          c.sin_datos ? 'Sin datos' : c.es_actual ? 'En curso' : 'Terminado',
+        ])
+        const total: CeldaPdf[] | undefined = totTerm
+          ? [
+              'Total ciclos terminados', '', '',
+              { valor: totTerm.gastos, moneda, tipo: 'monto' },
+              '',
+            ]
+          : undefined
+
+        secciones.push({
+          titulo: titCustom || 'Evolución',
+          tablas: [{
+            encabezados: ['Ciclo', 'Desde', 'Hasta', 'Gastos', 'Estado'],
+            alineaciones: ['left', 'center', 'center', 'right', 'center'],
+            filas,
+            total,
+          }],
+        })
+      } else {
+        const filas: CeldaPdf[][] = serie.map((c) => [
+          c.nombre_corto || c.etiqueta,
+          formatFecha(c.fecha_inicio),
+          formatFecha(c.fecha_fin),
+          { valor: c.ingresos, moneda, tipo: 'monto' },
+          { valor: c.gastos, moneda, tipo: 'monto' },
+          { valor: c.balance, moneda, tipo: 'resultado' },
+          { valor: c.tasa_ahorro_pct, tipo: 'porcentaje' },
+          c.sin_datos ? 'Sin datos' : c.es_actual ? 'En curso' : 'Terminado',
+        ])
+        const total: CeldaPdf[] | undefined = totTerm
+          ? [
+              'Total ciclos terminados', '', '',
+              { valor: totTerm.ingresos, moneda, tipo: 'monto' },
+              { valor: totTerm.gastos, moneda, tipo: 'monto' },
+              { valor: totTerm.balance, moneda, tipo: 'resultado' },
+              { valor: totTerm.tasa_ahorro_pct, tipo: 'porcentaje' },
+              '',
+            ]
+          : undefined
+
+        secciones.push({
+          titulo: titCustom || 'Evolución',
+          tablas: [{
+            encabezados: [
+              'Ciclo',
+              'Desde',
+              'Hasta',
+              'Ingresos',
+              'Gastos',
+              'Te quedó',
+              '% de lo que entró',
+              'Estado',
+            ],
+            alineaciones: [
+              'left',
+              'center',
+              'center',
+              'right',
+              'right',
+              'right',
+              'right',
+              'center',
+            ],
+            filas,
+            total,
+          }],
+        })
+      }
     } else if (tipo === 'desglose_categorias') {
       const cats = datos.resumen?.desglose_categorias || []
       const filas: CeldaPdf[][] = []

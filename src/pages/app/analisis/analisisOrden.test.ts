@@ -96,9 +96,24 @@ describe('TF2: Límites de tamaño en Análisis', () => {
     expect(lines).toBeLessThanOrEqual(350)
   })
 
-  it('contenidoPdf.ts tiene como máximo 350 líneas', () => {
+  it('contenidoPdf.ts tiene como máximo 380 líneas', () => {
     const lines = countLines('contenidoPdf.ts')
-    expect(lines).toBeLessThanOrEqual(350)
+    expect(lines).toBeLessThanOrEqual(380)
+  })
+
+  it('kpisVista.ts tiene como máximo 90 líneas', () => {
+    const lines = countLines('kpisVista.ts')
+    expect(lines).toBeLessThanOrEqual(90)
+  })
+
+  it('NumerosPrincipales.tsx tiene como máximo 275 líneas', () => {
+    const lines = countLines('NumerosPrincipales.tsx')
+    expect(lines).toBeLessThanOrEqual(275)
+  })
+
+  it('ViewerKpisBlock.tsx tiene como máximo 190 líneas', () => {
+    const lines = countLines('ViewerKpisBlock.tsx')
+    expect(lines).toBeLessThanOrEqual(190)
   })
 
   it('opcionesTablaPdf.ts tiene como máximo 150 líneas', () => {

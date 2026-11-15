@@ -4,12 +4,12 @@ import type { SummaryBarItem } from '@/components/ui/PageSummaryBar/PageSummaryB
 import type { AnalisisResumenResponse } from '@/services/analisis.service'
 import { formatMonto, formatPorcentaje } from '@/utils/format'
 import styles from './AnalisisPage.module.css'
+import { armarKpisVista } from './kpisVista'
 
 interface NumerosPrincipalesProps {
   data: AnalisisResumenResponse | null
   loading: boolean
   monedaVisual: 'ARS' | 'USD'
-  hayFiltroCategoriaOTarjeta?: boolean
 }
 
 function formatMontoKpi(
@@ -18,7 +18,9 @@ function formatMontoKpi(
   forzarCentavos: boolean,
   signo?: '+' | '-'
 ): string {
-  if (monto === null || monto === undefined) return '—'
+  if (monto === null || monto === undefined) {
+    return '—'
+  }
   const absVal = Math.abs(monto)
   let texto: string
   if (forzarCentavos) {
@@ -69,7 +71,6 @@ export default function NumerosPrincipales({
   data,
   loading,
   monedaVisual,
-  hayFiltroCategoriaOTarjeta,
 }: NumerosPrincipalesProps) {
   if (loading && !data) {
     return null
@@ -80,8 +81,7 @@ export default function NumerosPrincipales({
   }
 
   const { kpis } = data
-  const soloEgresos =
-    Boolean(hayFiltroCategoriaOTarjeta) || kpis.ingresos_totales === null
+  const { soloGastos, textoPeso } = armarKpisVista(kpis, data.moneda_modo)
 
   // B-2 ítem 4: Si alguno de los montos tiene centavos, los tres se muestran con centavos (",00")
   const tieneCentavos = [
@@ -107,13 +107,19 @@ export default function NumerosPrincipales({
   const egresosMonto = formatMontoKpi(kpis.gastos_totales, monedaVisual, tieneCentavos, '-')
   const esBalanceNegativo = (kpis.balance_neto ?? 0) < 0
 
-  const itemsSoloEgresos: SummaryBarItem[] = [
-    {
-      label: 'Egresos',
-      value: egresosMonto,
-      valueColor: '#FF8A65',
-    },
-  ]
+  const promedioMonto =
+    kpis.promedio_gasto_ciclo !== null && kpis.promedio_gasto_ciclo !== undefined
+      ? formatMonto(kpis.promedio_gasto_ciclo, monedaVisual)
+      : null
+
+  const itemsSoloGastos: SummaryBarItem[] = promedioMonto
+    ? [
+        {
+          label: 'Promedio por ciclo',
+          value: promedioMonto,
+        },
+      ]
+    : []
 
   const itemsResumen: SummaryBarItem[] = [
     {
@@ -131,7 +137,7 @@ export default function NumerosPrincipales({
   return (
     <div className={styles.summarySection}>
       {/* ── Mobile Split Strip Resumen (Columnas simétricas + Fila de tasa inferior) ── */}
-      {soloEgresos ? (
+      {soloGastos ? (
         <div className={styles.mobileSplitStrip}>
           <div className={styles.mobileSplitGrid}>
             <div className={styles.splitItem}>
@@ -140,7 +146,22 @@ export default function NumerosPrincipales({
                 {egresosMonto}
               </span>
             </div>
+            {promedioMonto && (
+              <>
+                <div className={styles.splitDivider} />
+                <div className={styles.splitItem}>
+                  <span className={styles.splitLabel}>Promedio por ciclo</span>
+                  <span className={styles.splitValue}>{promedioMonto}</span>
+                </div>
+              </>
+            )}
           </div>
+          {textoPeso && (
+            <div className={styles.mobileMetasRow} title={textoPeso}>
+              <TrendingUp size={12} className={styles.mobileMetasIcon} />
+              <span>{textoPeso}</span>
+            </div>
+          )}
         </div>
       ) : (
         <div className={styles.mobileSplitStrip}>
@@ -180,10 +201,28 @@ export default function NumerosPrincipales({
       )}
 
       {/* ── Hero Resumen (Desktop: Balance + Aviso contra el divisor) ── */}
-      {soloEgresos ? (
+      {soloGastos ? (
         <PageSummaryBar
           className={styles.desktopSummaryBar}
-          items={itemsSoloEgresos}
+          leftSlot={
+            <div className={styles.balanceCicloSlot}>
+              <div className={styles.balanceMainGroup}>
+                <span className={styles.balanceCicloLabel}>Egresos</span>
+                <span className={`${styles.balanceCicloValue} ${styles.balanceNegative}`}>
+                  {egresosMonto}
+                </span>
+              </div>
+              {textoPeso && (
+                <div className={styles.metasNotice} title={textoPeso}>
+                  <TrendingUp size={13} className={styles.metasNoticeIcon} aria-hidden="true" />
+                  <p className={styles.metasNoticeText}>
+                    {renderSubValue(textoPeso)}
+                  </p>
+                </div>
+              )}
+            </div>
+          }
+          items={itemsSoloGastos}
         />
       ) : (
         <PageSummaryBar

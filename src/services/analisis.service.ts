@@ -32,6 +32,9 @@ export interface AnalisisKpis {
   cantidad_operaciones: number
   alcance: 'terminados' | 'en_curso'
   frase_resumen: string | null
+  solo_gastos?: boolean
+  gasto_total_referencia?: number | null
+  peso_sobre_gasto_total_pct?: number | null
 }
 
 export interface AnalisisInsight {

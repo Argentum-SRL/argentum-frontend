@@ -263,9 +263,6 @@ export default function AnalisisPage() {
               data={data}
               loading={loading}
               monedaVisual={monedaVisual}
-              hayFiltroCategoriaOTarjeta={Boolean(
-                categoriaId || (tarjetaId && tarjetaId !== 'todos')
-              )}
             />
           )}
 

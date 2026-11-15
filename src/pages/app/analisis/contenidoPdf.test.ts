@@ -11,6 +11,7 @@ import {
 } from './contenidoPdf'
 import { HEX_COLORES, hexToRgb, RGB_COLORES } from './estilosArchivo'
 import type { PedidoDescarga } from './descargaAnalisis'
+import type { AnalisisResumenResponse } from '@/services/analisis.service'
 
 describe('TF7: Estructura y fidelidad de armarContenidoPdf', () => {
   const datosEjemplo: DatosInformePdf = {
@@ -560,5 +561,131 @@ describe('TF8: Controles estáticos de exportarInformePdf, contenidoPdf y opcion
       const sinHeadStyles = code.replace(/headStyles:\s*\{[\s\S]*?\}/g, '')
       expect(sinHeadStyles).not.toContain('RGB_COLORES.BLANCO')
     }
+  })
+})
+
+describe('TF15: Modo solo_gastos en PDF', () => {
+  const baseResumen: AnalisisResumenResponse = {
+    moneda_modo: 'solo_ars',
+    moneda_visual: 'ARS',
+    kpis: {
+      solo_gastos: true,
+      gastos_totales: 80000,
+      gasto_total_referencia: 650000,
+      peso_sobre_gasto_total_pct: 12.3,
+      promedio_gasto_ciclo: 70000,
+      ingresos_totales: null,
+      balance_neto: null,
+      tasa_ahorro_pct: null,
+    },
+    serie_ciclos: [
+      {
+        nombre_corto: 'Oct 2026',
+        etiqueta: 'Octubre 2026',
+        fecha_inicio: '2026-10-01',
+        fecha_fin: '2026-10-31',
+        gastos: 80000,
+        es_actual: false,
+        sin_datos: false,
+      },
+    ],
+    totales_terminados: {
+      gastos: 80000,
+    },
+  } as unknown as AnalisisResumenResponse
+
+  it('con solo_gastos true y referencia 650000, kpis trae exactamente 4 filas', () => {
+    const pedido: PedidoDescarga = {
+      tipo: 'tab',
+      titulo: 'Test',
+      bloques: ['kpis'],
+      params: { moneda_modo: 'solo_ars' },
+    }
+    const sec = armarContenidoPdf(pedido, { resumen: baseResumen })
+    expect(sec).toHaveLength(1)
+    const filas = sec[0].tablas[0].filas
+    const conceptos = filas.map((r) => r[0])
+    expect(conceptos).toEqual([
+      'Egresos',
+      'Todo lo que gastaste',
+      '% de todo lo que gastaste',
+      'Promedio de gastos por ciclo',
+    ])
+  })
+
+  it('con referencia null, kpis trae solo Egresos y Promedio de gastos por ciclo', () => {
+    const pedido: PedidoDescarga = {
+      tipo: 'tab',
+      titulo: 'Test',
+      bloques: ['kpis'],
+      params: { moneda_modo: 'solo_ars' },
+    }
+    const resumenSinRef = {
+      ...baseResumen,
+      kpis: {
+        ...baseResumen.kpis,
+        gasto_total_referencia: null,
+        peso_sobre_gasto_total_pct: null,
+      },
+    }
+    const sec = armarContenidoPdf(pedido, { resumen: resumenSinRef })
+    expect(sec).toHaveLength(1)
+    const filas = sec[0].tablas[0].filas
+    const conceptos = filas.map((r) => r[0])
+    expect(conceptos).toEqual(['Egresos', 'Promedio de gastos por ciclo'])
+  })
+
+  it('el bloque evolucion_ciclos trae encabezados y alineaciones de solo gastos', () => {
+    const pedido: PedidoDescarga = {
+      tipo: 'tab',
+      titulo: 'Test',
+      bloques: ['evolucion_ciclos'],
+      params: { moneda_modo: 'solo_ars' },
+    }
+    const sec = armarContenidoPdf(pedido, { resumen: baseResumen })
+    expect(sec).toHaveLength(1)
+    const tabla = sec[0].tablas[0]
+    expect(tabla.encabezados).toEqual(['Ciclo', 'Desde', 'Hasta', 'Gastos', 'Estado'])
+    expect(tabla.alineaciones).toEqual(['left', 'center', 'center', 'right', 'center'])
+    expect(tabla.alineaciones).toHaveLength(tabla.encabezados.length)
+  })
+
+  it('con solo_gastos false todo es igual que hoy', () => {
+    const pedido: PedidoDescarga = {
+      tipo: 'tab',
+      titulo: 'Test',
+      bloques: ['kpis', 'evolucion_ciclos'],
+      params: { moneda_modo: 'solo_ars' },
+    }
+    const resumenNormal = {
+      ...baseResumen,
+      kpis: {
+        ...baseResumen.kpis,
+        solo_gastos: false,
+        ingresos_totales: 1000000,
+        balance_neto: 920000,
+        tasa_ahorro_pct: 92.0,
+      },
+    }
+    const sec = armarContenidoPdf(pedido, { resumen: resumenNormal })
+    expect(sec).toHaveLength(2)
+    const conceptosKpi = sec[0].tablas[0].filas.map((r) => r[0])
+    expect(conceptosKpi).toEqual([
+      'Ingresos',
+      'Egresos',
+      'Te quedó',
+      '% de lo que entró',
+      'Promedio de gastos por ciclo',
+    ])
+    expect(sec[1].tablas[0].encabezados).toEqual([
+      'Ciclo',
+      'Desde',
+      'Hasta',
+      'Ingresos',
+      'Gastos',
+      'Te quedó',
+      '% de lo que entró',
+      'Estado',
+    ])
   })
 })

@@ -302,12 +302,6 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
         sileo.error({ title: 'Seleccioná la cuenta de origen' })
         return
       }
-      if (isOverdraft) {
-        sileo.error({
-          title: `Saldo insuficiente en ${billeteraOrigen?.nombre}. Disponible: ${formatMonto(saldoOrigenActual, effectiveMoneda)}`,
-        })
-        return
-      }
 
       setAnimClass(styles.slideForward)
       setStep(2)

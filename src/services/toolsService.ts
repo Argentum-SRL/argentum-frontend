@@ -10,6 +10,12 @@ interface StandardResponse<T> {
   };
 }
 
+let usaDolaresContexto = false;
+
+export function getUsaDolaresContexto(): boolean {
+  return usaDolaresContexto;
+}
+
 export const toolsService = {
   getInflacionEsperada: async (): Promise<InflacionEsperadaData | null> => {
     const response = await api.get<StandardResponse<InflacionEsperadaData | null>>('/api/v1/tools/inflacion-esperada');
@@ -28,7 +34,9 @@ export const toolsService = {
 
   getFinancialContext: async (): Promise<FinancialContext> => {
     const response = await api.get<StandardResponse<FinancialContext>>('/api/v1/tools/financial-context');
-    return response.data.data;
+    const data = response.data.data;
+    usaDolaresContexto = Boolean(data?.usa_dolares);
+    return data;
   },
   
   calculateCanAfford: async (data: CanAffordRequest): Promise<CanAffordResult> => {

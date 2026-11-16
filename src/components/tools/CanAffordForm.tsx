@@ -3,7 +3,14 @@ import { Calendar, Coins } from '@/components/ui/icons';
 import { Button, MontoInput } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
-import { OPCIONES_MODO_PAGO, etiquetaMonto } from '@/utils/permitirse';
+import { useAuth } from '@/hooks/useAuth';
+import { getUsaDolaresContexto } from '@/services/toolsService';
+import {
+  OPCIONES_MODO_PAGO,
+  etiquetaMonto,
+  mostrarSelectorMoneda,
+  descripcionImporteMoneda,
+} from '@/utils/permitirse';
 import styles from './ToolsComponents.module.css';
 
 const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
@@ -19,16 +26,23 @@ const MODO_OPTIONS = OPCIONES_MODO_PAGO.map((modo) => ({
   icon: MODO_CONFIG[modo].icon,
 }));
 
+const MONEDA_OPTIONS: { value: 'ARS' | 'USD'; label: string }[] = [
+  { value: 'ARS', label: 'Pesos' },
+  { value: 'USD', label: 'Dólares' },
+];
+
 interface CanAffordFormProps {
   formData: {
     precio_total: number | null;
     modo: 'contado' | 'cuotas';
     cantidad_cuotas: number | null;
+    moneda?: 'ARS' | 'USD';
   };
   setFormData: React.Dispatch<React.SetStateAction<{
     precio_total: number | null;
     modo: 'contado' | 'cuotas';
     cantidad_cuotas: number | null;
+    moneda?: 'ARS' | 'USD';
   }>>;
   calculando: boolean;
   calcular: () => void;
@@ -48,6 +62,14 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   tna,
   setTna,
 }) => {
+  const { usuario } = useAuth();
+  const monedaDefault: 'ARS' | 'USD' = usuario?.moneda_principal === 'USD' ? 'USD' : 'ARS';
+  const monedaActual: 'ARS' | 'USD' = formData.moneda ?? monedaDefault;
+  const verSelectorMoneda = mostrarSelectorMoneda(
+    getUsaDolaresContexto(),
+    usuario?.moneda_principal,
+  );
+
   const handleChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -92,8 +114,25 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
               onChange={(val) => handleChange('precio_total', val)}
               allowDecimals
             />
-            <span className={styles.inputDesc}>El importe en pesos a evaluar</span>
+            <span className={styles.inputDesc}>
+              {descripcionImporteMoneda(monedaActual)}
+            </span>
           </div>
+
+          {/* Selector Pesos | Dólares si usa dólares o tiene moneda principal en dólares */}
+          {verSelectorMoneda && (
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Moneda</label>
+              <SegmentedControl<'ARS' | 'USD'>
+                className={styles.modoPagoSelector}
+                options={MONEDA_OPTIONS}
+                value={monedaActual}
+                onChange={(v) => handleChange('moneda', v)}
+                ariaLabel="Moneda"
+                fullWidth
+              />
+            </div>
+          )}
 
           {/* Modo pago */}
           <div className={styles.formGroup}>

@@ -1268,3 +1268,21 @@ declare module './movimiento' {
     proximos_total?: number
   }
 }
+
+export * from './tools'
+
+declare module './tools' {
+  interface FinancialContext {
+    usa_dolares?: boolean
+  }
+  interface CanAffordRequest {
+    moneda?: 'ARS' | 'USD'
+  }
+  interface CanAffordResult {
+    linea_cotizacion?: string | null
+    linea_cuentas?: string | null
+    linea_reintegro?: string | null
+    linea_juntar?: string | null
+    moneda?: 'ARS' | 'USD'
+  }
+}

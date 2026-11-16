@@ -2,7 +2,12 @@ import React from 'react';
 import { TrendingUp, Banknote, Target, RotateCcw } from '@/components/ui/icons';
 import { Button } from '@/components/ui';
 import type { CanAffordResult as ICanAffordResult } from '@/types/tools';
-import { claseResultado, filasAhorros, type FilaAhorro } from '@/utils/permitirse';
+import {
+  claseResultado,
+  filasAhorros,
+  lineasSecundariasPermitirse,
+  type FilaAhorro,
+} from '@/utils/permitirse';
 import { formatMonto } from '@/utils/format';
 import styles from './ToolsComponents.module.css';
 
@@ -28,16 +33,15 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
     titulo,
     linea_principal,
     lineas_plan,
+    linea_cotizacion,
+    linea_cuentas,
     linea_ahorros,
     ahorros,
-    linea_liberacion,
-    linea_compensar,
-    linea_frescura,
-    linea_espera,
   } = resultado;
 
   const clase = claseResultado(resKey);
   const filas = filasAhorros(ahorros);
+  const lineasSecundarias = lineasSecundariasPermitirse(resultado);
 
   const tituloColorClass = (() => {
     switch (clase) {
@@ -59,12 +63,7 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
         {titulo}
       </h2>
 
-      {/* Línea principal */}
-      <p className={styles.lineaPrincipal}>
-        {linea_principal}
-      </p>
-
-      {/* Bloque del plan (lineas_plan) si hay */}
+      {/* Bloque del plan (lineas_plan) si hay cuotas */}
       {lineas_plan && lineas_plan.length > 0 && (
         <div className={styles.bloquePlan}>
           {lineas_plan.map((linea, idx) => (
@@ -75,8 +74,27 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
         </div>
       )}
 
+      {/* Cotización si evaluó en dólares */}
+      {linea_cotizacion && (
+        <p className={styles.lineaSecundaria}>
+          {linea_cotizacion}
+        </p>
+      )}
+
+      {/* Línea principal */}
+      <p className={styles.lineaPrincipal}>
+        {linea_principal}
+      </p>
+
+      {/* Desglose de cuentas cuando hay más de una o falta contexto */}
+      {linea_cuentas && (
+        <p className={styles.lineaSecundaria}>
+          {linea_cuentas}
+        </p>
+      )}
+
       {/* Bloque de ahorros si hay */}
-      {filas.length > 0 && (
+      {(filas.length > 0 || linea_ahorros) && (
         <div className={styles.bloqueAhorros}>
           {filas.map((f: FilaAhorro) => (
             <div key={f.tipo} className={styles.filaAhorro}>
@@ -103,29 +121,14 @@ export const CanAffordResult: React.FC<CanAffordResultProps> = ({
         </div>
       )}
 
-      {/* Líneas secundarias en gris chico */}
-      {(linea_liberacion || linea_compensar || linea_frescura || linea_espera) && (
+      {/* Líneas secundarias en gris chico (liberación/compensar, reintegro, juntar, frescura, espera) */}
+      {lineasSecundarias.length > 0 && (
         <div className={styles.lineasSecundarias}>
-          {linea_liberacion && (
-            <p className={styles.lineaSecundaria}>
-              {linea_liberacion}
+          {lineasSecundarias.map((linea, idx) => (
+            <p key={idx} className={styles.lineaSecundaria}>
+              {linea}
             </p>
-          )}
-          {linea_compensar && (
-            <p className={styles.lineaSecundaria}>
-              {linea_compensar}
-            </p>
-          )}
-          {linea_frescura && (
-            <p className={styles.lineaSecundaria}>
-              {linea_frescura}
-            </p>
-          )}
-          {linea_espera && (
-            <p className={styles.lineaSecundaria}>
-              {linea_espera}
-            </p>
-          )}
+          ))}
         </div>
       )}
 

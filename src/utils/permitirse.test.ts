@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { claseResultado, filasAhorros, etiquetaMonto, mostrarLinkGastoFijo, OPCIONES_MODO_PAGO } from './permitirse';
+import {
+  claseResultado,
+  filasAhorros,
+  etiquetaMonto,
+  mostrarLinkGastoFijo,
+  OPCIONES_MODO_PAGO,
+  mostrarSelectorMoneda,
+  descripcionImporteMoneda,
+  lineasSecundariasPermitirse,
+  lineasOrdenadasPermitirse,
+} from './permitirse';
 import { formatMonto } from '@/utils/format';
 
 describe('permitirse utils', () => {
@@ -58,5 +68,54 @@ describe('permitirse utils', () => {
   it('OPCIONES_MODO_PAGO contiene contado y cuotas y no incluye mensual', () => {
     expect(OPCIONES_MODO_PAGO).toEqual(['contado', 'cuotas']);
     expect(OPCIONES_MODO_PAGO).not.toContain('mensual');
+  });
+
+  it('mostrarSelectorMoneda muestra selector solo si usa_dolares o moneda_principal es USD', () => {
+    expect(mostrarSelectorMoneda(false, 'ARS')).toBe(false);
+    expect(mostrarSelectorMoneda(undefined, 'ARS')).toBe(false);
+    expect(mostrarSelectorMoneda(true, 'ARS')).toBe(true);
+    expect(mostrarSelectorMoneda(false, 'USD')).toBe(true);
+    expect(mostrarSelectorMoneda(true, 'USD')).toBe(true);
+  });
+
+  it('descripcionImporteMoneda diferencia Pesos y Dólares sin siglas en UI', () => {
+    expect(descripcionImporteMoneda('ARS')).toBe('El importe en pesos a evaluar');
+    expect(descripcionImporteMoneda('USD')).toBe('El importe en dólares a evaluar');
+  });
+
+  it('lineasSecundariasPermitirse y lineasOrdenadasPermitirse respetan orden D-T1.7', () => {
+    const res = {
+      titulo: 'Te entra, pero vas a tocar tus ahorros',
+      lineas_plan: ['3 cuotas de $120.000'],
+      linea_cotizacion: 'Cotización actual: $1.450 por dólar.',
+      linea_principal: 'Te queda un margen libre.',
+      linea_cuentas: 'En tu caja en pesos tenés $200.000.',
+      linea_ahorros: 'Te faltan $100.000 de tus ahorros.',
+      linea_liberacion: 'En mayo se liberan cuotas.',
+      linea_reintegro: 'El descuento ya quedó considerado.',
+      linea_juntar: 'Tendrías que juntar $50.000.',
+      linea_frescura: 'Falta registrar tu último sueldo.',
+      linea_espera: 'Si esperás al mes que viene te alcanza sin tocar ahorros.',
+    };
+    expect(lineasSecundariasPermitirse(res)).toEqual([
+      res.linea_liberacion,
+      res.linea_reintegro,
+      res.linea_juntar,
+      res.linea_frescura,
+      res.linea_espera,
+    ]);
+    expect(lineasOrdenadasPermitirse(res)).toEqual([
+      res.titulo,
+      res.lineas_plan[0],
+      res.linea_cotizacion,
+      res.linea_principal,
+      res.linea_cuentas,
+      res.linea_ahorros,
+      res.linea_liberacion,
+      res.linea_reintegro,
+      res.linea_juntar,
+      res.linea_frescura,
+      res.linea_espera,
+    ]);
   });
 });

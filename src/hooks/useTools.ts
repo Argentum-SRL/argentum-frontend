@@ -2,10 +2,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import toolsService from '@/services/toolsService';
 import type { InflacionEsperadaData, ConvenienciaResult, FinancialContext, CanAffordResult } from '@/types/tools';
 import { useSimularCuotas } from '@/hooks/useSimularCuotas';
+import { useAuth } from '@/hooks/useAuth';
 import { sileo } from 'sileo';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 
 export const useTools = () => {
+  const { usuario } = useAuth();
+  const monedaDefault: 'ARS' | 'USD' = usuario?.moneda_principal === 'USD' ? 'USD' : 'ARS';
   // Tab switching: 'conveniencia' is the Cuotas vs Contado tab, 'can-afford' is the "¿Me lo puedo permitir?" tab, 'importar-resumen' is the Importación de resúmenes tab
   const [activeTab, setActiveTab] = useState<'conveniencia' | 'can-afford' | 'importar-resumen'>('conveniencia');
   
@@ -177,6 +180,7 @@ export const useTools = () => {
     precio_total: number | null;
     modo: 'contado' | 'cuotas';
     cantidad_cuotas: number | null;
+    moneda?: 'ARS' | 'USD';
   }>({
     precio_total: null,
     modo: 'contado',
@@ -249,12 +253,14 @@ export const useTools = () => {
 
     setCanAffordCalculando(true);
     try {
+      const monedaElegida = canAffordForm.moneda ?? monedaDefault;
       const res = await toolsService.calculateCanAfford({
         precio_total: precio,
         modo: canAffordForm.modo,
         cantidad_cuotas: canAffordForm.modo === 'cuotas' ? (canAffordForm.cantidad_cuotas || 2) : 1,
         tiene_interes: canAffordForm.modo === 'cuotas' ? tieneInteres : false,
         tna: canAffordForm.modo === 'cuotas' && tieneInteres && tna ? parseFloat(tna) : undefined,
+        moneda: monedaElegida,
       });
       cerrarGastoFijo();
       setCanAffordResult(res);

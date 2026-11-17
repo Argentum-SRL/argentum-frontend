@@ -1,0 +1,988 @@
+TABLA DE CARTELITOS DE LA WEB — texto viejo => texto nuevo (fase_notif_web1, decisiones 1A y 2A del 16/11/2026)
+Formato: un bloque por texto viejo; VIEJO, NUEVO y DÓNDE (archivo:línea del front en 91cdad7). {x} es un dato. " / " separa variantes (singular / plural, o las dos ramas de un ? :).
+Lo que va entre paréntesis después del texto nuevo es una indicación, no parte del texto.
+Si el mismo texto viejo aparece en un lugar que no está en DÓNDE, va el mismo texto nuevo.
+
+VIEJO: "{b.nombre}" archivada
+NUEVO: Billetera {b.nombre} archivada.
+DÓNDE: pages/app/billeteras/BilleterasPage.tsx:216
+
+VIEJO: "{b.nombre}" reactivada
+NUEVO: Billetera {b.nombre} reactivada.
+DÓNDE: pages/app/billeteras/BilleterasPage.tsx:229
+
+VIEJO: "{b.nombre}" se eliminó.
+NUEVO: Billetera {b.nombre} eliminada.
+DÓNDE: pages/app/billeteras/BilleterasPage.tsx:248
+
+VIEJO: "{payload.nombre}" creada exitosamente
+NUEVO: Billetera {payload.nombre} creada.
+DÓNDE: pages/app/billeteras/BilleterasPage.tsx:289
+
+VIEJO: Pago registrado. {formatMonto(res.monto_diferencia, payload.moneda || 'ARS')} quedaron como {tipoLabel}.
+NUEVO: Pago del resumen guardado: {formatMonto(...)} quedaron como {tipoLabel en minúscula}.
+DÓNDE: components/tarjetas/TarjetaSummary.tsx:341
+
+VIEJO: Análisis realizado con éxito
+NUEVO: Cálculo listo.
+DÓNDE: hooks/useTools.ts:267, hooks/useTools.ts:312
+
+VIEJO: Cálculo realizado con éxito
+NUEVO: Cálculo listo.
+DÓNDE: hooks/useTools.ts:141
+
+VIEJO: Aporte registrado con éxito
+NUEVO: Aporte guardado.
+DÓNDE: components/goals/GoalContributionModal.tsx:242
+
+VIEJO: Retiro registrado con éxito
+NUEVO: Retiro guardado.
+DÓNDE: components/goals/GoalContributionModal.tsx:242
+
+VIEJO: Billetera actualizada exitosamente
+NUEVO: Billetera actualizada.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:373, pages/app/billeteras/BilleterasPage.tsx:260
+
+VIEJO: Billetera no encontrada
+NUEVO: No se encontró esa billetera. Volvé a Billeteras.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:156
+
+VIEJO: Ciclo iniciado
+NUEVO: Nuevo ciclo del presupuesto iniciado.  (y se saca la description)
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:318
+
+VIEJO: Se inició el nuevo ciclo de este presupuesto correctamente.
+NUEVO: (se saca: era la description del cartelito de arriba)
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:318
+
+VIEJO: Comercio eliminado de la memoria
+NUEVO: Comercio eliminado.
+DÓNDE: pages/app/perfil/components/ComerciosRecordados.tsx:45
+
+VIEJO: Completá los campos obligatorios
+NUEVO: Completá los datos que faltan.
+DÓNDE: components/suscripciones/SuscripcionModal.tsx:583
+
+VIEJO: Completá los datos requeridos
+NUEVO: Completá los datos que faltan.
+DÓNDE: components/transacciones/TransaccionModal.tsx:555
+
+VIEJO: Compra en cuotas actualizada
+NUEVO: Compra en cuotas actualizada.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:488
+
+VIEJO: Compra en cuotas cancelada
+NUEVO: Compra en cuotas cancelada.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:396
+
+VIEJO: Compra en cuotas eliminada
+NUEVO: Compra en cuotas eliminada.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:531
+
+VIEJO: Compra en cuotas registrada
+NUEVO: Compra en cuotas guardada.
+DÓNDE: components/transacciones/TransaccionModal.tsx:662
+
+VIEJO: Configuración financiera guardada
+NUEVO: Configuración financiera guardada.
+DÓNDE: pages/app/perfil/components/TabFinanzas.tsx:295
+
+VIEJO: Contraseña actualizada con éxito
+NUEVO: Contraseña actualizada.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:110
+
+VIEJO: Control eliminado
+NUEVO: Control eliminado.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:354
+
+VIEJO: Control guardado.
+NUEVO: Control guardado.
+DÓNDE: components/billeteras/ActualizarSaldoModal.tsx:121
+
+VIEJO: Saldo actualizado.
+NUEVO: Saldo actualizado.
+DÓNDE: components/billeteras/ActualizarSaldoModal.tsx:121
+
+VIEJO: Correo actualizado. Se envió un código de verificación.
+NUEVO: Email actualizado. Revisá tu casilla para confirmarlo.  (sin res.confirmacion)
+DÓNDE: pages/app/perfil/components/EditModals.tsx:285
+
+VIEJO: Cuota eliminada correctamente
+NUEVO: Cuota eliminada.
+DÓNDE: components/transacciones/useEliminarTransaccion.ts:34
+
+VIEJO: La cuota se eliminó correctamente.
+NUEVO: Cuota eliminada.
+DÓNDE: pages/app/transacciones/TransaccionesPage.tsx:385
+
+VIEJO: Cuota restante cancelada
+NUEVO: Cuota restante cancelada.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:396
+
+VIEJO: Datos personales actualizados correctamente
+NUEVO: Datos personales actualizados.
+DÓNDE: pages/app/perfil/components/EditModals.tsx:103
+
+VIEJO: Debe ingresar una TNA de inversión válida entre 0.1% y 3000%
+NUEVO: Ingresá una tasa de la inversión de entre 0,1% y 3.000% por año.
+DÓNDE: hooks/useTools.ts:124
+
+VIEJO: Debe ingresar una TNA válida entre 0.1% y 3000%
+NUEVO: Ingresá una tasa de entre 0,1% y 3.000% por año.
+DÓNDE: hooks/useTools.ts:117, hooks/useTools.ts:249
+
+VIEJO: Debés seleccionar una cotización de referencia para el dólar.
+NUEVO: Elegí qué dólar usar de referencia.
+DÓNDE: pages/app/perfil/components/TabFinanzas.tsx:253
+
+VIEJO: El día de corte debe ser un número entero entre 1 y 31.
+NUEVO: El día de corte tiene que ser del 1 al 31.
+DÓNDE: pages/app/perfil/components/TabFinanzas.tsx:260
+
+VIEJO: El email ingresado no coincide con el email de confirmación.
+NUEVO: Los dos emails tienen que ser iguales.
+DÓNDE: pages/AdminPage.tsx:303
+
+VIEJO: El informe debe incluir al menos 1 bloque.
+NUEVO: Agregá al menos un bloque al informe.
+DÓNDE: pages/app/analisis/InformeEditor.tsx:97
+
+VIEJO: El límite de crédito debe ser mayor a cero si se indica
+NUEVO: El límite tiene que ser mayor a 0 o quedar vacío.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:437
+
+VIEJO: El monto debe ser mayor a cero
+NUEVO: Ingresá un monto mayor a 0.
+DÓNDE: components/transacciones/TransaccionModal.tsx:485, components/transacciones/TransaccionModal.tsx:538
+
+VIEJO: El precio de contado debe ser mayor a 0
+NUEVO: Ingresá un precio de contado mayor a 0.
+DÓNDE: hooks/useTools.ts:91
+
+VIEJO: El precio de contado excede el límite permitido
+NUEVO: El precio de contado es demasiado alto. Revisá el número.
+DÓNDE: hooks/useTools.ts:95
+
+VIEJO: El precio de la compra debe ser mayor a 0
+NUEVO: Ingresá un precio mayor a 0.
+DÓNDE: hooks/useTools.ts:235, hooks/useTools.ts:295
+
+VIEJO: El precio de la compra excede el límite permitido
+NUEVO: El precio es demasiado alto. Revisá el número.
+DÓNDE: hooks/useTools.ts:239, hooks/useTools.ts:299
+
+VIEJO: El precio en cuotas excede el límite permitido
+NUEVO: El precio en cuotas es demasiado alto. Revisá el número.
+DÓNDE: hooks/useTools.ts:103
+
+VIEJO: El precio total en cuotas debe ser mayor a 0
+NUEVO: Ingresá un precio en cuotas mayor a 0.
+DÓNDE: hooks/useTools.ts:99
+
+VIEJO: El reintegro no puede ser mayor al total de la compra
+NUEVO: El reintegro no puede ser más que la compra.
+DÓNDE: components/transacciones/TransaccionModal.tsx:510, components/transacciones/TransaccionModal.tsx:567
+
+VIEJO: El vencimiento tiene que ser posterior al cierre y dentro del mes siguiente.
+NUEVO: El vencimiento tiene que ser después del cierre y dentro del mes siguiente.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:429
+
+VIEJO: El último cierre debe ser anterior al próximo cierre.
+NUEVO: El último cierre tiene que ser antes del próximo.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:433
+
+VIEJO: Enlace de WhatsApp copiado al portapapeles
+NUEVO: Enlace copiado.
+DÓNDE: components/whatsapp/VinculacionWhatsAppCard.tsx:175
+
+VIEJO: Error al aplicar la categoría a los anteriores
+NUEVO: No se pudo cambiar la categoría de los anteriores. Probá de nuevo.
+DÓNDE: components/transacciones/MemoriaComercioDialog.tsx:101
+
+VIEJO: Error al archivar
+NUEVO: No se pudo archivar la tarjeta. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:435
+
+VIEJO: Error al cambiar el estado
+NUEVO: No se pudo cambiar el estado de la meta. Probá de nuevo.
+DÓNDE: components/goals/GoalDetailModal.tsx:143, pages/app/metas/MetasPage.tsx:147
+
+VIEJO: Error al cargar billeteras
+NUEVO: No se pudieron cargar las billeteras. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:401, pages/app/billeteras/BilleteraDetallePage.tsx:417
+
+VIEJO: Error al cargar datos
+NUEVO: No se pudieron cargar los datos. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:205
+
+VIEJO: Error al ejecutar la tarea
+NUEVO: No se pudo correr la tarea. Probá de nuevo.
+DÓNDE: pages/admin/components/SchedulerPanel.tsx:89
+
+VIEJO: Error al eliminar la meta
+NUEVO: No se pudo eliminar la meta. Probá de nuevo.
+DÓNDE: pages/app/metas/MetasPage.tsx:178
+
+VIEJO: Error al enviar el código de verificación.
+NUEVO: No se pudo mandar el código. Probá de nuevo.
+DÓNDE: pages/app/perfil/PerfilPage.tsx:93
+
+VIEJO: Error al guardar configuración
+NUEVO: No se pudo guardar la preferencia. Probá de nuevo.
+DÓNDE: context/NotificacionContext.tsx:146
+
+VIEJO: Error al guardar la memoria por comercio
+NUEVO: No se pudo recordar el comercio. Probá de nuevo.
+DÓNDE: components/transacciones/MemoriaComercioDialog.tsx:73
+
+VIEJO: Error al guardar la transacción
+NUEVO: No se pudo guardar la transacción. Probá de nuevo.
+DÓNDE: components/transacciones/TransaccionModal.tsx:696
+
+VIEJO: Error al guardar tarjeta
+NUEVO: No se pudo guardar la tarjeta. Probá de nuevo.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: Error al inicializar los datos de importación.
+NUEVO: No se pudo abrir la importación. Probá de nuevo.
+DÓNDE: components/tools/importacion/ImportacionResumenSection.tsx:89
+
+VIEJO: Error al procesar la transferencia.
+NUEVO: No se pudo guardar la transferencia. Probá de nuevo.
+DÓNDE: components/transferencias/TransferenciaModal.tsx:380
+
+VIEJO: Error al subir la foto
+NUEVO: No se pudo subir la foto. Probá de nuevo.
+DÓNDE: components/perfil/FotoCropModal.tsx:155
+
+VIEJO: Estado del scheduler actualizado
+NUEVO: Estado del scheduler actualizado.
+DÓNDE: pages/admin/components/SchedulerPanel.tsx:42
+
+VIEJO: Excel descargado.
+NUEVO: Excel descargado.
+DÓNDE: pages/app/analisis/DescargarAnalisisModal.tsx:62
+
+VIEJO: PDF descargado.
+NUEVO: PDF descargado.
+DÓNDE: pages/app/analisis/DescargarAnalisisModal.tsx:65
+
+VIEJO: Listo, se descargó tu Excel.
+NUEVO: Excel descargado.
+DÓNDE: pages/app/presupuestos/DescargarExcelModal.tsx:42
+
+VIEJO: Foto de perfil actualizada
+NUEVO: Foto de perfil actualizada.
+DÓNDE: components/perfil/FotoCropModal.tsx:151
+
+VIEJO: Foto de perfil eliminada
+NUEVO: Foto de perfil eliminada.
+DÓNDE: pages/app/perfil/components/ProfileHero.tsx:61
+
+VIEJO: Importación confirmada con éxito.
+NUEVO: Importación guardada.
+DÓNDE: components/tools/importacion/ImportacionResumenSection.tsx:257
+
+VIEJO: Informe actualizado.
+NUEVO: Informe actualizado.
+DÓNDE: pages/app/analisis/InformeEditor.tsx:134
+
+VIEJO: Informe eliminado.
+NUEVO: Informe eliminado.
+DÓNDE: pages/app/analisis/MisInformesTab.tsx:124
+
+VIEJO: Informe guardado en tu cuenta.
+NUEVO: Informe guardado.
+DÓNDE: pages/app/analisis/InformeEditor.tsx:143
+
+VIEJO: Ingresá el monto o porcentaje del reintegro
+NUEVO: Ingresá el monto o el porcentaje del reintegro.
+DÓNDE: components/transacciones/TransaccionModal.tsx:506, components/transacciones/TransaccionModal.tsx:563
+
+VIEJO: Ingresá el monto que te cobró el banco en pesos
+NUEVO: Ingresá el monto que te cobró el banco en pesos.
+DÓNDE: components/transacciones/TransaccionModal.tsx:543
+
+VIEJO: Ingresá la fecha de próximo cierre (DD/MM)
+NUEVO: Ingresá la fecha del próximo cierre (por ejemplo, 22/10).
+DÓNDE: components/tarjetas/TarjetaModal.tsx:401
+
+VIEJO: Ingresá la fecha de próximo vencimiento (DD/MM)
+NUEVO: Ingresá la fecha del próximo vencimiento (por ejemplo, 4/11).
+DÓNDE: components/tarjetas/TarjetaModal.tsx:405
+
+VIEJO: Ingresá los 4 últimos dígitos de la tarjeta
+NUEVO: Ingresá los 4 últimos números de la tarjeta.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:386
+
+VIEJO: Ingresá un monto total válido
+NUEVO: Ingresá un monto total mayor a 0.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:290, components/transacciones/GruposCuotasTab.tsx:461
+
+VIEJO: Ingresá un monto válido mayor a 0
+NUEVO: Ingresá un monto mayor a 0.
+DÓNDE: components/transferencias/TransferenciaModal.tsx:298
+
+VIEJO: Ingresá un nombre para el informe.
+NUEVO: Ingresá un nombre para el informe.
+DÓNDE: pages/app/analisis/InformeEditor.tsx:108
+
+VIEJO: Ingresá una cotización válida
+NUEVO: Ingresá una cotización mayor a 0.
+DÓNDE: components/transferencias/TransferenciaModal.tsx:321
+
+VIEJO: Ingresá una fecha válida para el próximo cierre (ej: 22/10)
+NUEVO: Revisá la fecha del próximo cierre (por ejemplo, 22/10).
+DÓNDE: components/tarjetas/TarjetaModal.tsx:410
+
+VIEJO: Ingresá una fecha válida para el próximo vencimiento (ej: 04/11)
+NUEVO: Revisá la fecha del próximo vencimiento (por ejemplo, 4/11).
+DÓNDE: components/tarjetas/TarjetaModal.tsx:415
+
+VIEJO: Ingresá una fecha válida para el último cierre (ej: 24/09)
+NUEVO: Revisá la fecha del último cierre (por ejemplo, 24/9).
+DÓNDE: components/tarjetas/TarjetaModal.tsx:422
+
+VIEJO: La cantidad de cuotas debe estar entre 1 y 120
+NUEVO: Las cuotas tienen que ser entre 1 y 120.
+DÓNDE: hooks/useTools.ts:107
+
+VIEJO: La cantidad de cuotas debe estar entre 2 y 120
+NUEVO: Las cuotas tienen que ser entre 2 y 120.
+DÓNDE: hooks/useTools.ts:243
+
+VIEJO: La cantidad de cuotas debe ser un número entero entre 1 y 120
+NUEVO: Las cuotas tienen que ser entre 1 y 120.
+DÓNDE: components/transacciones/TransaccionModal.tsx:494, components/transacciones/TransaccionModal.tsx:584
+
+VIEJO: La cuota inicial debe estar entre 1 y la cantidad total
+NUEVO: La cuota inicial tiene que ser entre 1 y el total de cuotas.
+DÓNDE: components/transacciones/TransaccionModal.tsx:588
+
+VIEJO: La foto supera el límite de 5MB
+NUEVO: La foto es muy pesada (máximo 5 MB). Elegí una más liviana.
+DÓNDE: components/perfil/FotoCropModal.tsx:75
+
+VIEJO: La inflación mensual debe estar entre 0% y 100%
+NUEVO: La inflación por mes tiene que ser entre 0% y 100%.
+DÓNDE: hooks/useTools.ts:111
+
+VIEJO: La tasa de interés (TNA) debe estar entre 0% y 3000%.
+NUEVO: La tasa tiene que ser entre 0% y 3.000% por año.
+DÓNDE: components/transacciones/TransaccionModal.tsx:592
+
+VIEJO: La transacción se eliminó.
+NUEVO: Transacción eliminada.
+DÓNDE: pages/app/transacciones/TransaccionesPage.tsx:404
+
+VIEJO: Listo
+NUEVO: Reintegro guardado.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:361
+
+VIEJO: Listo, cambiamos el límite.
+NUEVO: Límite actualizado.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:231, pages/app/presupuestos/PresupuestosPage.tsx:81
+
+VIEJO: Listo, fecha del saldo cambiada.
+NUEVO: Fecha del saldo actualizada.
+DÓNDE: components/billeteras/CambiarFechaSaldoModal.tsx:133
+
+VIEJO: Listo, la anoté como gasto.
+NUEVO: Factura guardada como gasto.
+DÓNDE: components/facturas/FacturaPanel.tsx:179
+
+VIEJO: Listo, la cuota que faltaba pasa al resumen que vence el {ddmm}.
+NUEVO: La cuota que faltaba pasa al resumen que vence el {ddmm}.  (ddmm como d/mm: 4/12)
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:422
+
+VIEJO: Listo, las cuotas que faltaban pasan al resumen que vence el {ddmm}.
+NUEVO: Las cuotas que faltaban pasan al resumen que vence el {ddmm}.  (ddmm como d/mm)
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:422
+
+VIEJO: Listo, la saqué de tus próximos pagos.
+NUEVO: Factura sacada de tus próximos pagos.
+DÓNDE: components/facturas/FacturaPanel.tsx:199
+
+VIEJO: Listo, lo voy a recordar.
+NUEVO: Categoría guardada para este comercio.
+DÓNDE: components/transacciones/MemoriaComercioDialog.tsx:64, components/transacciones/MemoriaComercioDialog.tsx:82
+
+VIEJO: Listo, vuelve a estar pendiente.
+NUEVO: Factura pendiente otra vez.
+DÓNDE: components/facturas/FacturaPanel.tsx:219
+
+VIEJO: Listo: {res.actualizadas} movimiento(s) actualizado(s).
+NUEVO: 1 transacción actualizada. / {n} transacciones actualizadas.
+DÓNDE: components/transacciones/MemoriaComercioDialog.tsx:94
+
+VIEJO: Meta actualizada
+NUEVO: Meta actualizada.
+DÓNDE: components/goals/GoalModal.tsx:191
+
+VIEJO: Meta creada
+NUEVO: Meta creada.
+DÓNDE: components/goals/GoalModal.tsx:194
+
+VIEJO: Meta eliminada
+NUEVO: Meta eliminada.
+DÓNDE: components/goals/GoalDetailModal.tsx:195, pages/app/metas/MetasPage.tsx:175
+
+VIEJO: Meta {nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}
+NUEVO: Meta pausada. / Meta reanudada.
+DÓNDE: components/goals/GoalDetailModal.tsx:139, pages/app/metas/MetasPage.tsx:144
+
+VIEJO: Monitor de WhatsApp actualizado
+NUEVO: Monitor de WhatsApp actualizado.
+DÓNDE: pages/admin/components/MonitorWppPanel.tsx:76
+
+VIEJO: Movimiento actualizado
+NUEVO: Transacción actualizada.
+DÓNDE: components/transacciones/QueEsEstaPlataModal.tsx:93
+
+VIEJO: Movimiento eliminado
+NUEVO: Transacción eliminada.
+DÓNDE: components/transacciones/QueEsEstaPlataModal.tsx:73
+
+VIEJO: Movimiento eliminado
+NUEVO: Movimiento eliminado.
+DÓNDE: components/goals/GoalDetailModal.tsx:159
+
+VIEJO: No pudimos abrir el formulario. Probá de nuevo.
+NUEVO: No se pudo abrir el formulario. Probá de nuevo.
+DÓNDE: components/dashboard/AvisosConfianza/AvisosConfianza.tsx:46, components/dashboard/ConsejoCard/ConsejoCard.tsx:123
+
+VIEJO: No pudimos actualizar el saldo.
+NUEVO: No se pudo actualizar el saldo. Probá de nuevo.
+DÓNDE: components/billeteras/ActualizarSaldoModal.tsx:127
+
+VIEJO: No pudimos actualizar la billetera.
+NUEVO: No se pudo actualizar la billetera. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:375
+
+VIEJO: No pudimos actualizar la tasa.
+NUEVO: No se pudo actualizar la tasa. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:297
+
+VIEJO: No pudimos adelantar las cuotas. Intentá de nuevo.
+NUEVO: No se pudieron adelantar las cuotas. Probá de nuevo.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:432
+
+VIEJO: No pudimos armar el Excel. Probá de nuevo en unos minutos.
+NUEVO: No se pudo armar el Excel. Probá de nuevo en unos minutos.
+DÓNDE: pages/app/presupuestos/DescargarExcelModal.tsx:47
+
+VIEJO: No pudimos armar el PDF. Intentá de nuevo.
+NUEVO: No se pudo armar el PDF. Probá de nuevo.
+DÓNDE: pages/app/transacciones/TransaccionesPage.tsx:534
+
+VIEJO: No pudimos borrar el comercio recordado.
+NUEVO: No se pudo eliminar el comercio. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/ComerciosRecordados.tsx:47
+
+VIEJO: No pudimos cambiar el límite. Probá de nuevo.
+NUEVO: No se pudo cambiar el límite. Probá de nuevo.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:234, pages/app/presupuestos/PresupuestosPage.tsx:84
+
+VIEJO: No pudimos cargar el detalle de subcategorías.
+NUEVO: No se pudo cargar el detalle de subcategorías. Probá de nuevo.
+DÓNDE: pages/app/dashboard/DashboardPage.tsx:772
+
+VIEJO: No pudimos cargar el historial. Intentá de nuevo.
+NUEVO: No se pudo cargar el historial. Probá de nuevo.
+DÓNDE: pages/app/presupuestos/PresupuestosPage.tsx:239
+
+VIEJO: No pudimos cargar la información. Intentá de nuevo.
+NUEVO: No se pudieron cargar los datos. Probá de nuevo.
+DÓNDE: pages/app/dashboard/DashboardPage.tsx:666, pages/app/dashboard/DashboardPage.tsx:711
+
+VIEJO: No pudimos cargar las metas. Intentá de nuevo.
+NUEVO: No se pudieron cargar las metas. Probá de nuevo.
+DÓNDE: pages/app/metas/MetasPage.tsx:39
+
+VIEJO: No pudimos cargar las suscripciones. Intentá de nuevo.
+NUEVO: No se pudieron cargar las suscripciones. Probá de nuevo.
+DÓNDE: pages/app/suscripciones/SuscripcionesPage.tsx:162
+
+VIEJO: No pudimos cargar las transferencias. Intentá de nuevo.
+NUEVO: No se pudieron cargar las transferencias. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleterasPage.tsx:99
+
+VIEJO: No pudimos cargar los comercios recordados.
+NUEVO: No se pudieron cargar los comercios recordados. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/ComerciosRecordados.tsx:24
+
+VIEJO: No pudimos cargar los datos. Intentá de nuevo.
+NUEVO: No se pudieron cargar los datos. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleterasPage.tsx:83
+
+VIEJO: No pudimos cargar los grupos de cuotas. Intentá de nuevo.
+NUEVO: No se pudieron cargar las compras en cuotas. Probá de nuevo.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:140
+
+VIEJO: No pudimos cargar los movimientos. Intentá de nuevo.
+NUEVO: No se pudieron cargar las transacciones. Probá de nuevo.
+DÓNDE: pages/app/transacciones/TransaccionesPage.tsx:144
+
+VIEJO: No pudimos cargar los presupuestos. Intentá de nuevo.
+NUEVO: No se pudieron cargar los presupuestos. Probá de nuevo.
+DÓNDE: pages/app/presupuestos/PresupuestosPage.tsx:69
+
+VIEJO: No pudimos cargar más movimientos.
+NUEVO: No se pudieron cargar más transacciones. Probá de nuevo.
+DÓNDE: pages/app/transacciones/TransaccionesPage.tsx:172
+
+VIEJO: No pudimos cargar más movimientos. Intentá de nuevo.
+NUEVO: No se pudieron cargar más transacciones. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:315
+
+VIEJO: No pudimos cargar tu contexto financiero real.
+NUEVO: No se pudieron cargar tus datos. Probá de nuevo.
+DÓNDE: hooks/useTools.ts:217
+
+VIEJO: No pudimos cerrar las sesiones.
+NUEVO: No se pudieron cerrar las sesiones. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:197
+
+VIEJO: No pudimos completar la acción. Intentá de nuevo.
+NUEVO: (uno por lugar) No se pudo {lo que hace el botón que tocó la persona}. Probá de nuevo.
+DÓNDE: components/tarjetas/TarjetaSummary.tsx:354, components/transacciones/GruposCuotasTab.tsx:402, components/transacciones/GruposCuotasTab.tsx:494, components/transacciones/GruposCuotasTab.tsx:537, pages/AdminPage.tsx:325, pages/app/billeteras/BilleterasPage.tsx:134, pages/app/billeteras/BilleterasPage.tsx:218, pages/app/billeteras/BilleterasPage.tsx:231, pages/app/billeteras/BilleterasPage.tsx:250, pages/app/billeteras/BilleterasPage.tsx:262, pages/app/billeteras/BilleterasPage.tsx:291, pages/app/presupuestos/PresupuestosPage.tsx:181, pages/app/presupuestos/PresupuestosPage.tsx:199, pages/app/suscripciones/SuscripcionesPage.tsx:206, pages/app/suscripciones/SuscripcionesPage.tsx:231
+
+VIEJO: No pudimos descargar el archivo.
+NUEVO: No se pudo descargar el archivo. Probá de nuevo.
+DÓNDE: pages/app/analisis/DescargarAnalisisModal.tsx:69
+
+VIEJO: No pudimos desvincular tu cuenta de WhatsApp.
+NUEVO: No se pudo desvincular tu WhatsApp. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:153
+
+VIEJO: No pudimos eliminar el control.
+NUEVO: No se pudo eliminar el control. Probá de nuevo.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:357
+
+VIEJO: No pudimos eliminar el movimiento.
+NUEVO: No se pudo eliminar el movimiento. Probá de nuevo.
+DÓNDE: components/goals/GoalDetailModal.tsx:163
+
+VIEJO: No pudimos eliminar el presupuesto. Intentá de nuevo.
+NUEVO: No se pudo eliminar el presupuesto. Probá de nuevo.
+DÓNDE: pages/app/presupuestos/PresupuestosPage.tsx:227
+
+VIEJO: No pudimos eliminar la cuota. Intentá de nuevo.
+NUEVO: No se pudo eliminar la cuota. Probá de nuevo.
+DÓNDE: pages/app/transacciones/TransaccionesPage.tsx:389
+
+VIEJO: No pudimos eliminar la foto de perfil.
+NUEVO: No se pudo eliminar la foto de perfil. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/ProfileHero.tsx:63
+
+VIEJO: No pudimos eliminar la meta.
+NUEVO: No se pudo eliminar la meta. Probá de nuevo.
+DÓNDE: components/goals/GoalDetailModal.tsx:199
+
+VIEJO: No pudimos eliminar la transacción. Intentá de nuevo.
+NUEVO: No se pudo eliminar la transacción. Probá de nuevo.
+DÓNDE: pages/app/transacciones/TransaccionesPage.tsx:408
+
+VIEJO: No pudimos generar el archivo. Probá de nuevo en unos minutos.
+NUEVO: No se pudo armar el archivo. Probá de nuevo en unos minutos.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:219
+
+VIEJO: No pudimos guardar el informe.
+NUEVO: No se pudo guardar el informe. Probá de nuevo.
+DÓNDE: pages/app/analisis/InformeEditor.tsx:147
+
+VIEJO: No pudimos guardar el reintegro.
+NUEVO: No se pudo guardar el reintegro. Probá de nuevo.
+DÓNDE: components/transacciones/GrupoCuotasDetalleModal.tsx:534
+
+VIEJO: No pudimos guardar la suscripción. Intentá de nuevo.
+NUEVO: No se pudo guardar la suscripción. Probá de nuevo.
+DÓNDE: components/suscripciones/SuscripcionModal.tsx:620
+
+VIEJO: No pudimos guardar los cambios. Probá de nuevo.
+NUEVO: No se pudieron guardar los cambios. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/TabNotificaciones.tsx:216
+
+VIEJO: No pudimos guardar tu respuesta.
+NUEVO: No se pudo guardar tu respuesta. Probá de nuevo.
+DÓNDE: components/dashboard/ConsejoCard/ConsejoCard.tsx:49
+
+VIEJO: No pudimos guardar el cambio. Probá de nuevo.
+NUEVO: No se pudo guardar el cambio. Probá de nuevo.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: No pudimos registrar el rendimiento. Intentá de nuevo.
+NUEVO: No se pudo guardar el rendimiento. Probá de nuevo.
+DÓNDE: components/billeteras/RegistrarRendimientoModal.tsx:71
+
+VIEJO: No pudimos restaurar el presupuesto.
+NUEVO: No se pudo restaurar el presupuesto. Probá de nuevo.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:345, components/presupuestos/PresupuestoModal.tsx:388, pages/app/presupuestos/PresupuestosPage.tsx:220
+
+VIEJO: No pudimos saldar las cuotas. Intentá de nuevo.
+NUEVO: No se pudieron saldar las cuotas. Probá de nuevo.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:450
+
+VIEJO: No pudimos saltear la pregunta.
+NUEVO: No se pudo saltear la pregunta. Probá de nuevo.
+DÓNDE: components/dashboard/AvisosConfianza/AvisosConfianza.tsx:85
+
+VIEJO: No pudimos verificar el saldo. Intentá de nuevo.
+NUEVO: No se pudo revisar el saldo. Probá de nuevo.
+DÓNDE: components/billeteras/ActualizarSaldoModal.tsx:93
+
+VIEJO: No se pudieron guardar las preferencias.
+NUEVO: No se pudieron guardar las preferencias. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:177
+
+VIEJO: No se pudo actualizar el motivo del ingreso
+NUEVO: No se pudo cambiar el motivo del ingreso. Probá de nuevo.
+DÓNDE: components/transacciones/TransaccionModal.tsx:659, components/transacciones/TransaccionModal.tsx:682
+
+VIEJO: No se pudo actualizar el movimiento.
+NUEVO: No se pudo actualizar la transacción. Probá de nuevo.
+DÓNDE: components/transacciones/QueEsEstaPlataModal.tsx:98
+
+VIEJO: No se pudo actualizar el permiso de lectura de mensajes.
+NUEVO: No se pudo cambiar el permiso de lectura de mensajes. Probá de nuevo.
+DÓNDE: components/onboarding/StepWhatsApp.tsx:34
+
+VIEJO: No se pudo cambiar el estado del presupuesto
+NUEVO: No se pudo cambiar el estado del presupuesto. Probá de nuevo.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:294
+
+VIEJO: No se pudo cargar el estado del scheduler
+NUEVO: No se pudo cargar el estado del scheduler. Probá de nuevo.
+DÓNDE: pages/admin/components/SchedulerPanel.tsx:46, pages/admin/components/SchedulerPanel.tsx:64
+
+VIEJO: No se pudo cargar el monitor de WhatsApp
+NUEVO: No se pudo cargar el monitor de WhatsApp. Probá de nuevo.
+DÓNDE: pages/admin/components/MonitorWppPanel.tsx:80, pages/admin/components/MonitorWppPanel.tsx:100
+
+VIEJO: No se pudo copiar el enlace
+NUEVO: No se pudo copiar el enlace. Copialo a mano.
+DÓNDE: components/whatsapp/VinculacionWhatsAppCard.tsx:178
+
+VIEJO: No se pudo eliminar el informe.
+NUEVO: No se pudo eliminar el informe. Probá de nuevo.
+DÓNDE: pages/app/analisis/MisInformesTab.tsx:126
+
+VIEJO: No se pudo eliminar el movimiento.
+NUEVO: No se pudo eliminar la transacción. Probá de nuevo.
+DÓNDE: components/transacciones/QueEsEstaPlataModal.tsx:78
+
+VIEJO: No se pudo eliminar el presupuesto
+NUEVO: No se pudo eliminar el presupuesto. Probá de nuevo.
+DÓNDE: components/presupuestos/PresupuestoModal.tsx:396
+
+VIEJO: No se pudo eliminar el presupuesto.
+NUEVO: No se pudo eliminar el presupuesto. Probá de nuevo.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:352
+
+VIEJO: No se pudo eliminar la cuota
+NUEVO: No se pudo eliminar la cuota. Probá de nuevo.
+DÓNDE: components/transacciones/useEliminarTransaccion.ts:39
+
+VIEJO: No se pudo eliminar la transacción
+NUEVO: No se pudo eliminar la transacción. Probá de nuevo.
+DÓNDE: components/transacciones/useEliminarTransaccion.ts:59
+
+VIEJO: No se pudo guardar el reintegro
+NUEVO: No se pudo guardar el reintegro. Probá de nuevo.
+DÓNDE: components/transacciones/TransaccionModal.tsx:651, components/transacciones/TransaccionModal.tsx:674
+
+VIEJO: No se pudo guardar la configuración financiera.
+NUEVO: No se pudo guardar la configuración financiera. Probá de nuevo.
+DÓNDE: pages/app/perfil/components/TabFinanzas.tsx:297
+
+VIEJO: No se pudo guardar la plantilla.
+NUEVO: No se pudo guardar la plantilla. Probá de nuevo.
+DÓNDE: pages/app/analisis/MisInformesTab.tsx:158
+
+VIEJO: No se pudo iniciar el nuevo ciclo.
+NUEVO: No se pudo iniciar el nuevo ciclo. Probá de nuevo.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:321
+
+VIEJO: No se puede eliminar esta notificación
+NUEVO: Esta notificación no se puede eliminar.
+DÓNDE: context/NotificacionContext.tsx:198
+
+VIEJO: No se puede eliminar una tarjeta con transacciones
+NUEVO: No se puede eliminar una tarjeta con transacciones. Archivala.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:454
+
+VIEJO: No seleccionaste ninguna transacción para importar. Marcá al menos una para continuar o cancelá la operación.
+NUEVO: Marcá al menos una transacción para importar.
+DÓNDE: components/tools/importacion/ImportacionResumenSection.tsx:239
+
+VIEJO: Notificación silenciada por {horas} horas
+NUEVO: Notificación silenciada por 1 hora. / Notificación silenciada por {horas} horas.
+DÓNDE: context/NotificacionContext.tsx:182
+
+VIEJO: Pago de resumen registrado con éxito
+NUEVO: Pago del resumen guardado.
+DÓNDE: components/tarjetas/TarjetaSummary.tsx:345
+
+VIEJO: Plantilla guardada en Mis Informes.
+NUEVO: Plantilla guardada en Mis Informes.
+DÓNDE: pages/app/analisis/MisInformesTab.tsx:156
+
+VIEJO: Por favor, seleccioná una tarjeta y una billetera.
+NUEVO: Elegí una tarjeta y una billetera.
+DÓNDE: components/tools/importacion/ImportacionResumenSection.tsx:134
+
+VIEJO: Preferencia de notificaciones guardada
+NUEVO: Preferencia de notificaciones guardada.
+DÓNDE: context/NotificacionContext.tsx:143
+
+VIEJO: Tus preferencias de notificaciones fueron guardadas.
+NUEVO: Preferencias de notificaciones guardadas.
+DÓNDE: pages/app/perfil/components/TabNotificaciones.tsx:213
+
+VIEJO: Preferencias de seguridad guardadas
+NUEVO: Preferencias de seguridad guardadas.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:175
+
+VIEJO: Presupuesto actualizado
+NUEVO: Presupuesto actualizado.
+DÓNDE: components/presupuestos/PresupuestoModal.tsx:450
+
+VIEJO: Presupuesto creado
+NUEVO: Presupuesto creado.
+DÓNDE: components/presupuestos/PresupuestoModal.tsx:453
+
+VIEJO: Presupuesto eliminado
+NUEVO: Presupuesto eliminado.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:335, components/presupuestos/PresupuestoModal.tsx:378, pages/app/presupuestos/PresupuestosPage.tsx:210
+
+VIEJO: Presupuesto pausado
+NUEVO: Presupuesto pausado.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:286, pages/app/presupuestos/PresupuestosPage.tsx:178
+
+VIEJO: Presupuesto reanudado
+NUEVO: Presupuesto reanudado.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:289, pages/app/presupuestos/PresupuestosPage.tsx:196
+
+VIEJO: Presupuesto restaurado
+NUEVO: Presupuesto restaurado.
+DÓNDE: components/presupuestos/PresupuestoDetailModal.tsx:342, components/presupuestos/PresupuestoModal.tsx:385, pages/app/presupuestos/PresupuestosPage.tsx:217
+
+VIEJO: Rendimiento registrado exitosamente
+NUEVO: Rendimiento guardado.
+DÓNDE: components/billeteras/RegistrarRendimientoModal.tsx:67
+
+VIEJO: Resumen procesado con éxito.
+NUEVO: Resumen leído. Revisá las transacciones antes de importarlas.
+DÓNDE: components/tools/importacion/ImportacionResumenSection.tsx:116
+
+VIEJO: Se va a correr en unos segundos.
+NUEVO: Se va a correr en unos segundos.  (sin res.mensaje)
+DÓNDE: pages/admin/components/SchedulerPanel.tsx:81
+
+VIEJO: Seleccioná al menos un bloque para el informe.
+NUEVO: Elegí al menos un bloque para el informe.
+DÓNDE: pages/app/analisis/InformeEditor.tsx:112
+
+VIEJO: Seleccioná la cuenta bancaria asociada
+NUEVO: Elegí la cuenta bancaria asociada.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:390
+
+VIEJO: Seleccioná la cuenta de destino
+NUEVO: Elegí la cuenta de destino.
+DÓNDE: components/transferencias/TransferenciaModal.tsx:310
+
+VIEJO: Seleccioná la cuenta de origen
+NUEVO: Elegí la cuenta de origen.
+DÓNDE: components/transferencias/TransferenciaModal.tsx:302
+
+VIEJO: Seleccioná la red emisora de la tarjeta
+NUEVO: Elegí la red de la tarjeta.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:394
+
+VIEJO: Seleccioná un día hábil válido.
+NUEVO: Elegí un día hábil.
+DÓNDE: pages/app/perfil/components/TabFinanzas.tsx:264
+
+VIEJO: Seleccioná una billetera
+NUEVO: Elegí una billetera.
+DÓNDE: components/transacciones/TransaccionModal.tsx:489, components/transacciones/TransaccionModal.tsx:598
+
+VIEJO: Seleccioná una categoría
+NUEVO: Elegí una categoría.
+DÓNDE: components/transacciones/TransaccionModal.tsx:499, components/transacciones/TransaccionModal.tsx:548
+
+VIEJO: Seleccioná una categoría primero
+NUEVO: Elegí primero una categoría.
+DÓNDE: components/transacciones/TransaccionModal.tsx:202
+
+VIEJO: Seleccioná una tarjeta
+NUEVO: Elegí una tarjeta.
+DÓNDE: components/transacciones/TransaccionModal.tsx:489
+
+VIEJO: Seleccioná una tarjeta de crédito
+NUEVO: Elegí una tarjeta de crédito.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:294, components/transacciones/TransaccionModal.tsx:575
+
+VIEJO: Si tu correo está registrado, te enviamos un nuevo código.
+NUEVO: Si tu email tiene cuenta, te va a llegar un código nuevo.
+DÓNDE: pages/auth/verificar-email/VerificarEmail.tsx:75
+
+VIEJO: Suscripción actualizada
+NUEVO: Suscripción actualizada.
+DÓNDE: components/suscripciones/SuscripcionModal.tsx:610
+
+VIEJO: Suscripción creada
+NUEVO: Suscripción creada.
+DÓNDE: components/suscripciones/SuscripcionModal.tsx:613
+
+VIEJO: Suscripción eliminada
+NUEVO: Suscripción eliminada.
+DÓNDE: pages/app/suscripciones/SuscripcionesPage.tsx:219
+
+VIEJO: Suscripción pausada
+NUEVO: Suscripción pausada.
+DÓNDE: pages/app/suscripciones/SuscripcionesPage.tsx:198
+
+VIEJO: Suscripción reactivada
+NUEVO: Suscripción reactivada.
+DÓNDE: pages/app/suscripciones/SuscripcionesPage.tsx:201
+
+VIEJO: Tarjeta actualizada
+NUEVO: Tarjeta actualizada.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:497
+
+VIEJO: Tarjeta actualizada. Se recalcularon las fechas de {res.cuotas_recalculadas} {res.cuotas_recalculadas === 1 ? 'cuota futura' : 'cuotas futuras'}.
+NUEVO: Tarjeta actualizada: cambió la fecha de 1 cuota que falta. / Tarjeta actualizada: cambiaron las fechas de {n} cuotas que faltan.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:493
+
+VIEJO: Tarjeta archivada
+NUEVO: Tarjeta archivada.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:430
+
+VIEJO: Tarjeta eliminada
+NUEVO: Tarjeta eliminada.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:450
+
+VIEJO: Tarjeta guardada
+NUEVO: Tarjeta guardada.
+DÓNDE: components/tarjetas/TarjetaModal.tsx:501
+
+VIEJO: Tasa actualizada a la automática
+NUEVO: Tasa automática activada.
+DÓNDE: pages/app/billeteras/BilleteraDetallePage.tsx:294
+
+VIEJO: Te enviamos un código de verificación a tu correo.
+NUEVO: Te va a llegar un código a tu email.
+DÓNDE: pages/app/perfil/PerfilPage.tsx:90
+
+VIEJO: Te mandamos un código nuevo.
+NUEVO: Te va a llegar un código nuevo.
+DÓNDE: pages/auth/verificar-email/VerificarEmail.tsx:118
+
+VIEJO: Tiene que ser hoy o una fecha futura.
+NUEVO: La fecha tiene que ser hoy o más adelante.
+DÓNDE: components/suscripciones/SuscripcionModal.tsx:590
+
+VIEJO: Todas las notificaciones marcadas como leídas
+NUEVO: Todas las notificaciones marcadas como leídas.
+DÓNDE: context/NotificacionContext.tsx:207
+
+VIEJO: Transacción actualizada
+NUEVO: Transacción actualizada.
+DÓNDE: components/transacciones/TransaccionModal.tsx:689
+
+VIEJO: Transacción confirmada
+NUEVO: Transacción confirmada.
+DÓNDE: components/transacciones/TransaccionModal.tsx:687
+
+VIEJO: Transacción creada
+NUEVO: Transacción creada.
+DÓNDE: components/transacciones/TransaccionModal.tsx:662
+
+VIEJO: Transacción eliminada correctamente
+NUEVO: Transacción eliminada.
+DÓNDE: components/transacciones/useEliminarTransaccion.ts:54
+
+VIEJO: Transferencia eliminada
+NUEVO: Transferencia eliminada.
+DÓNDE: pages/app/billeteras/BilleterasPage.tsx:129
+
+VIEJO: Tu cuenta de WhatsApp fue desvinculada exitosamente.
+NUEVO: WhatsApp desvinculado.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:151
+
+VIEJO: ¡Tu cuenta de WhatsApp fue vinculada exitosamente!
+NUEVO: WhatsApp vinculado.
+DÓNDE: components/whatsapp/VinculacionWhatsAppCard.tsx:125
+
+VIEJO: Tu cuenta ha sido eliminada exitosamente.
+NUEVO: Tu cuenta de Argentum se eliminó.
+DÓNDE: pages/app/perfil/components/EliminarCuentaModal.tsx:42
+
+VIEJO: Tus datos se descargaron correctamente.
+NUEVO: Datos descargados.
+DÓNDE: pages/app/perfil/components/TabSeguridad.tsx:217
+
+VIEJO: Vas a ver cada cuota en Transacciones el día de pago de la tarjeta. La compra completa queda en la pestaña Cuotas.
+NUEVO: Vas a ver cada cuota en Transacciones cuando vence la tarjeta.
+DÓNDE: services/transaccion.service.ts:68
+
+VIEJO: ¡Contraseña configurada con éxito!
+NUEVO: Contraseña creada.
+DÓNDE: components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.tsx:52
+
+VIEJO: ¡Listo! Las cuotas restantes se saldaron con éxito.
+NUEVO: Cuotas que faltaban saldadas.
+DÓNDE: components/transacciones/GruposCuotasTab.tsx:444
+
+VIEJO: ¡Listo! Tu contraseña se actualizó. Ya podés iniciar sesión con la nueva.
+NUEVO: Contraseña actualizada. Ya podés entrar con la nueva.
+DÓNDE: pages/auth/reset-password/ResetPasswordPage.tsx:79
+
+VIEJO: ¡Tu email quedó verificado! Ya podés entrar a Argentum.
+NUEVO: Email verificado. Ya podés entrar.
+DÓNDE: pages/auth/verificar-email/VerificarEmail.tsx:95
+
+VIEJO: Compra de dólares registrada
+NUEVO: Compra de dólares guardada.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: Venta de dólares registrada
+NUEVO: Venta de dólares guardada.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: Extracción de efectivo registrada
+NUEVO: Extracción guardada.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: Depósito registrado con éxito
+NUEVO: Depósito guardado.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: Transferencia realizada con éxito
+NUEVO: Transferencia guardada.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: Listo, no lo vamos a mostrar más.
+NUEVO: No se va a mostrar más.
+DÓNDE: (sale de una variable o constante; buscalo en src)
+
+VIEJO: Lo pasaste a {sección}.
+NUEVO: Lo pasaste a {sección}.  (queda igual: cumple las reglas)
+DÓNDE: pages/app/lo-que-se-repite/textos.ts::armarAvisoMovido
+
+CARTELITOS QUE HOY MUESTRAN UNA VARIABLE (deben quedar resueltos a textos de esta tabla, a getErrorMessage(error, '<texto>') o a parsearAviso(...).titulo):
+- {msg}  en components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.tsx:57, components/onboarding/StepCicloFinanciero.tsx:64, components/onboarding/StepDatosPersonales.tsx:85, components/onboarding/StepMoneda.tsx:90, components/whatsapp/VinculacionWhatsAppCard.tsx:89, pages/app/perfil/components/EditModals.tsx:108, pages/app/perfil/components/EditModals.tsx:293, pages/app/perfil/components/TabSeguridad.tsx:118, pages/auth/reset-password/ResetPasswordPage.tsx:96, pages/auth/verificar-email/VerificarEmail.tsx:79, pages/auth/verificar-email/VerificarEmail.tsx:106, pages/auth/verificar-email/VerificarEmail.tsx:124
+- {error.response?.data?.detail}  en components/perfil/FotoCropModal.tsx:155, pages/app/billeteras/BilleteraDetallePage.tsx:435, pages/app/billeteras/BilleteraDetallePage.tsx:454
+- {errorMsg}  en components/tarjetas/TarjetaModal.tsx:517
+- {detail}  en components/tools/importacion/ImportacionResumenSection.tsx:124, components/tools/importacion/ImportacionResumenSection.tsx:179, components/tools/importacion/ImportacionResumenSection.tsx:264, hooks/useTools.ts:147, hooks/useTools.ts:272, hooks/useTools.ts:317
+- {val.mensaje}  en components/transacciones/TransaccionModal.tsx:555
+- {successToastTitle}  en components/transferencias/TransferenciaModal.tsx:373
+- {newNotif.mensaje}  en context/NotificacionContext.tsx:366, context/NotificacionContext.tsx:371, context/NotificacionContext.tsx:376, context/NotificacionContext.tsx:378
+- {res.mensaje}  en pages/admin/components/SchedulerPanel.tsx:81
+- {mensaje}  en pages/admin/components/SchedulerPanel.tsx:89
+- {TEXTOS.AVISOS.ERROR_DEFAULT}  en pages/app/lo-que-se-repite/LoQueSeRepitePage.tsx:115, pages/app/lo-que-se-repite/LoQueSeRepitePage.tsx:155, pages/app/lo-que-se-repite/LoQueSeRepitePage.tsx:179, pages/app/lo-que-se-repite/LoQueSeRepitePage.tsx:202
+- {TEXTOS.AVISOS.DESCARTADO}  en pages/app/lo-que-se-repite/LoQueSeRepitePage.tsx:143
+- {armarAvisoMovido(caja_destino)}  en pages/app/lo-que-se-repite/LoQueSeRepitePage.tsx:174
+- {res.confirmacion}  en pages/app/perfil/components/EditModals.tsx:285
+- {detalle}  en pages/app/presupuestos/DescargarExcelModal.tsx:47

@@ -239,3 +239,6 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
 
 25. **Norma Canónica de Botones de Colapso (`CollapseToggle`):** Todo botón o disparador para colapsar, plegar o expandir tarjetas, secciones o bloques en cabeceras debe utilizar obligatoriamente `CollapseToggle` (`import { CollapseToggle } from '@/components/ui'`). Prohibido terminantemente armar botones de colapso ad-hoc con bordes/cajas duras o clases duplicadas (`toggleCollapseBtn`, `cicloHeaderActions`, etc.). El diseño canónico hereda la apariencia limpia de `cicloHeaderActions`: fondo transparente, badge pill circular (`comerciosBadge`, `height: 20px`, `border-radius: 9999px`, fondo primario traslúcido) con texto dinámico ("Ocultar" / "Modificar"), chevron que rota 180° (`chevronIcon` / `chevronExpanded`), y en mobile (`<= 639px`) oculta la píldora dejando solo el chevron táctil. Admite `as="div"` si la cabecera completa ya es interactiva. Custodiado por la regla de auditoría **R38** en `scripts/audit-design-rules.mjs` con bloqueo en git push. Ver detalle en `DISENO_UNIFICADO.md` §21.
 
+Textos de la web (cartelitos y campanita): siguen REGLAS_TEXTOS_WEB.md. Un texto nuevo se
+escribe primero en ese archivo. Lo controlan app/core/reglas_texto_web.py y
+tests/test_reglas_texto_web*.py en backend, y reglasTextoWeb.ts y textosCartelitos.test.ts.

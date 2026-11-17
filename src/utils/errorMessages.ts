@@ -18,7 +18,7 @@ export const ERROR_MAP: Record<string, string> = {
 
   // HTTP genéricos — fallback por código de status
   "Internal Server Error":
-    "Algo salió mal de nuestro lado. Probá de nuevo en unos minutos.",
+    "Algo salió mal. Probá de nuevo en unos minutos.",
   "Not Found": "No se encontró lo que buscabas.",
   "Unauthorized": "Necesitás iniciar sesión para continuar.",
   "Forbidden": "No tenés permiso para hacer eso.",

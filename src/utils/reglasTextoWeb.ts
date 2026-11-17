@@ -8,6 +8,9 @@ export const MAXIMO_RENGLONES_WEB = 7
 const A = '(?<![\\p{L}\\p{N}_])'
 const Z = '(?![\\p{L}\\p{N}_])'
 
+// Emails de contacto permitidos: se excluyen solo al buscar links (W11_LINK).
+const MAIL = /[\p{L}\p{N}_.+-]+@[\p{L}\p{N}_-]+(?:\.[\p{L}\p{N}_-]+)+/gu
+
 // [expresión, nombre, distingue mayúsculas]
 const PALABRAS_WEB: Array<[string, string, boolean]> = [
   ['con [eé]xito', 'con éxito', false],
@@ -34,7 +37,8 @@ const PALABRAS_WEB: Array<[string, string, boolean]> = [
   ],
   [
     '(?:pudimos|enviamos|mandamos|cambiamos|anotamos|encontramos|contactanos|registramos' +
-      '|vamos a|anoté|saqué|guardé|borré|eliminé|voy a)',
+      '|vamos a|anoté|saqué|guardé|borré|eliminé|voy a' +
+      '|nuestr[oa]s?|nosotros)',
     'primera persona',
     false,
   ],
@@ -98,7 +102,8 @@ export function problemasTextoWeb(texto: string): string[] {
   if (/(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]|\u{FE0F})/u.test(texto)) {
     res.push('W10_EMOJI')
   }
-  if (new RegExp('https?://|www\\.|\\.com' + Z, 'iu').test(texto)) {
+  const textoSinMails = texto.replace(MAIL, ' ')
+  if (new RegExp('https?://|www\\.|\\.com' + Z, 'iu').test(textoSinMails)) {
     res.push('W11_LINK')
   }
   if (lineas.length > MAXIMO_RENGLONES_WEB) res.push('W12_RENGLONES')

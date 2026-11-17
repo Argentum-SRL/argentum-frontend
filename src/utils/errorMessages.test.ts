@@ -85,4 +85,34 @@ describe("getErrorMessage y ERROR_MAP (DE.3 y DE.4.4)", () => {
       ).toBeGreaterThan(0);
     }
   });
+
+  it("deja pasar ACCOUNT_SUSPENDED con mail de contacto", () => {
+    const textoCuentaSuspendida =
+      "Tu cuenta está suspendida. Si creés que es un error, " +
+      "escribí a srlargentum@gmail.com.";
+    const err = {
+      response: {
+        status: 403,
+        data: {
+          success: false,
+          error: {
+            code: "ACCOUNT_SUSPENDED",
+            message: textoCuentaSuspendida,
+          },
+        },
+      },
+    };
+    expect(getErrorMessage(err, "X.")).toBe(textoCuentaSuspendida);
+  });
+
+  it("devuelve el texto sin primera persona ante status 500 sin data", () => {
+    const err = {
+      response: {
+        status: 500,
+      },
+    };
+    expect(getErrorMessage(err, "X.")).toBe(
+      "Algo salió mal. Probá de nuevo en unos minutos."
+    );
+  });
 });

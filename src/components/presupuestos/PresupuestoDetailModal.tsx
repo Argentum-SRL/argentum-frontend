@@ -228,10 +228,12 @@ export default function PresupuestoDetailModal({
     try {
       const updated = await presupuestoService.subirLimite(presupuesto.id, presupuesto.sugerencia_limite.monto)
       setFreshPresupuesto(updated)
-      sileo.success({ title: 'Listo, cambiamos el límite.' })
+      sileo.success({ title: 'Límite actualizado.' })
       onSuccess?.()
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cambiar el límite. Probá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo cambiar el límite. Probá de nuevo.'),
+      })
     }
   }
 
@@ -283,15 +285,20 @@ export default function PresupuestoDetailModal({
     try {
       if (isActivo) {
         await presupuestoService.pausarPresupuesto(presupuesto.id)
-        sileo.success({ title: 'Presupuesto pausado' })
+        sileo.success({ title: 'Presupuesto pausado.' })
       } else {
         await presupuestoService.reanudarPresupuesto(presupuesto.id)
-        sileo.success({ title: 'Presupuesto reanudado' })
+        sileo.success({ title: 'Presupuesto reanudado.' })
       }
       void refreshPresupuesto()
       onSuccess?.()
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo cambiar el estado del presupuesto') })
+            sileo.error({
+        title: getErrorMessage(
+          err,
+          'No se pudo cambiar el estado del presupuesto. Probá de nuevo.'
+        ),
+      })
     }
   }
 
@@ -315,10 +322,12 @@ export default function PresupuestoDetailModal({
     try {
       const updated = await presupuestoService.renovarPresupuesto(presupuesto.id)
       setFreshPresupuesto(updated)
-      sileo.success({ title: 'Ciclo iniciado', description: 'Se inició el nuevo ciclo de este presupuesto correctamente.' })
+      sileo.success({ title: 'Nuevo ciclo del presupuesto iniciado.' })
       onSuccess?.()
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo iniciar el nuevo ciclo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo iniciar el nuevo ciclo. Probá de nuevo.'),
+      })
     } finally {
       setIsRenewing(false)
     }
@@ -333,23 +342,27 @@ export default function PresupuestoDetailModal({
       onClose()
       onSuccess?.()
       sileo.action({
-        title: 'Presupuesto eliminado',
+        title: 'Presupuesto eliminado.',
         button: {
           title: 'Deshacer',
           onClick: async () => {
             try {
               await presupuestoService.restaurarPresupuesto(id, estadoAnterior)
-              sileo.success({ title: 'Presupuesto restaurado' })
+              sileo.success({ title: 'Presupuesto restaurado.' })
               onSuccess?.()
             } catch (err: unknown) {
-              sileo.error({ title: getErrorMessage(err, 'No pudimos restaurar el presupuesto.') })
+                            sileo.error({
+                title: getErrorMessage(err, 'No se pudo restaurar el presupuesto. Probá de nuevo.'),
+              })
             }
           }
         },
         duration: 8000
       })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo eliminar el presupuesto.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
+      })
     }
   }
 

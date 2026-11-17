@@ -59,7 +59,10 @@ export default function StepCicloFinanciero({ datosIniciales, onNext }: Props) {
       invalidateDashboardCache()
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No pudimos guardar tus preferencias. Intentá de nuevo.')
+            const msg = getErrorMessage(
+        err,
+        'No se pudieron guardar tus preferencias. Probá de nuevo.'
+      )
       setError(msg)
       sileo.error({ title: msg })
     } finally {

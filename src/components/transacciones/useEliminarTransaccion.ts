@@ -31,12 +31,14 @@ export function useEliminarTransaccion({
         onConfirm: async () => {
           try {
             await transaccionService.deleteCuotaIndividual(transaccion.id)
-            sileo.success({ title: 'Cuota eliminada correctamente' })
+            sileo.success({ title: 'Cuota eliminada.' })
             onSuccess()
             onClose()
           } catch (e) {
             console.error(e)
-            sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar la cuota') })
+                        sileo.error({
+              title: getErrorMessage(e, 'No se pudo eliminar la cuota. Probá de nuevo.'),
+            })
           }
         },
       })
@@ -51,12 +53,14 @@ export function useEliminarTransaccion({
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(transaccion.id)
-          sileo.success({ title: 'Transacción eliminada correctamente' })
+          sileo.success({ title: 'Transacción eliminada.' })
           onSuccess()
           onClose()
         } catch (e) {
           console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar la transacción') })
+                    sileo.error({
+            title: getErrorMessage(e, 'No se pudo eliminar la transacción. Probá de nuevo.'),
+          })
         }
       },
     })

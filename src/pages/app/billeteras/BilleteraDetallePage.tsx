@@ -153,7 +153,7 @@ const BilleteraDetallePage: React.FC = () => {
           return
         }
         console.error(error)
-        sileo.error({ title: 'Billetera no encontrada' })
+        sileo.error({ title: 'No se encontró esa billetera. Volvé a Billeteras.' })
         navigate('/app/billeteras')
       } finally {
         if (!controller.signal.aborted) {
@@ -202,7 +202,7 @@ const BilleteraDetallePage: React.FC = () => {
           return
         }
         console.error(error)
-        sileo.error({ title: 'Error al cargar datos' })
+        sileo.error({ title: 'No se pudieron cargar los datos. Probá de nuevo.' })
       } finally {
         if (!controller.signal.aborted) {
           setLoadingData(false)
@@ -291,10 +291,10 @@ const BilleteraDetallePage: React.FC = () => {
     if (!billetera) return
     try {
       await billeteraService.update(billetera.id, { tna: null })
-      sileo.success({ title: 'Tasa actualizada a la automática' })
+      sileo.success({ title: 'Tasa automática activada.' })
       await refreshData()
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos actualizar la tasa.') })
+      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar la tasa. Probá de nuevo.') })
     }
   }, [billetera, refreshData])
 
@@ -312,7 +312,7 @@ const BilleteraDetallePage: React.FC = () => {
       setHasMoreMovimientos(res.hay_mas)
     } catch (err: unknown) {
       console.error(err)
-      sileo.error({ title: 'No pudimos cargar más movimientos. Intentá de nuevo.' })
+      sileo.error({ title: 'No se pudieron cargar más transacciones. Probá de nuevo.' })
     } finally {
       setLoadingMoreMovimientos(false)
     }
@@ -351,10 +351,12 @@ const BilleteraDetallePage: React.FC = () => {
       onConfirm: async () => {
         try {
           await billeteraService.eliminarAjuste(billetera.id, ajuste.id)
-          sileo.success({ title: 'Control eliminado' })
+          sileo.success({ title: 'Control eliminado.' })
           await refreshData()
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar el control.') })
+                    sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar el control. Probá de nuevo.'),
+          })
         }
       },
     })
@@ -370,9 +372,11 @@ const BilleteraDetallePage: React.FC = () => {
           try {
             await billeteraService.update(billeteraId, payload)
             await refreshData()
-            sileo.success({ title: 'Billetera actualizada exitosamente' })
+            sileo.success({ title: 'Billetera actualizada.' })
           } catch (err: unknown) {
-            sileo.error({ title: getErrorMessage(err, 'No pudimos actualizar la billetera.') })
+                        sileo.error({
+              title: getErrorMessage(err, 'No se pudo actualizar la billetera. Probá de nuevo.'),
+            })
           }
         },
       },
@@ -398,7 +402,7 @@ const BilleteraDetallePage: React.FC = () => {
       })
     } catch (error: unknown) {
       console.error(error)
-      sileo.error({ title: 'Error al cargar billeteras' })
+      sileo.error({ title: 'No se pudieron cargar las billeteras. Probá de nuevo.' })
     }
   }
 
@@ -414,7 +418,7 @@ const BilleteraDetallePage: React.FC = () => {
       })
     } catch (error: unknown) {
       console.error(error)
-      sileo.error({ title: 'Error al cargar billeteras' })
+      sileo.error({ title: 'No se pudieron cargar las billeteras. Probá de nuevo.' })
     }
   }
 
@@ -427,12 +431,13 @@ const BilleteraDetallePage: React.FC = () => {
       onConfirm: async () => {
         try {
           await tarjetaService.archivarTarjeta(tarjeta.id)
-          sileo.success({ title: 'Tarjeta archivada' })
+          sileo.success({ title: 'Tarjeta archivada.' })
           const data = await tarjetaService.getTarjetasPorBilletera(id!)
           setTarjetas(data)
         } catch (err: unknown) {
-          const error = err as { response?: { data?: { detail?: string } } }
-          sileo.error({ title: error.response?.data?.detail || 'Error al archivar' })
+          sileo.error({
+            title: getErrorMessage(err, 'No se pudo archivar la tarjeta. Probá de nuevo.'),
+          })
         }
       }
     })
@@ -447,11 +452,15 @@ const BilleteraDetallePage: React.FC = () => {
       onConfirm: async () => {
         try {
           await tarjetaService.deleteTarjeta(tarjeta.id)
-          sileo.success({ title: 'Tarjeta eliminada' })
+          sileo.success({ title: 'Tarjeta eliminada.' })
           setTarjetas(tarjetas.filter(t => t.id !== tarjeta.id))
         } catch (err: unknown) {
-          const error = err as { response?: { data?: { detail?: string } } }
-          sileo.error({ title: error.response?.data?.detail || 'No se puede eliminar una tarjeta con transacciones' })
+          sileo.error({
+            title: getErrorMessage(
+              err,
+              'No se puede eliminar una tarjeta con transacciones. Archivala.'
+            ),
+          })
         }
       }
     })

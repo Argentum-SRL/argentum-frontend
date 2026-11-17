@@ -39,7 +39,7 @@ export const EliminarCuentaModal: React.FC<EliminarCuentaModalProps> = ({
     setErrorMsg(null)
     try {
       await usuarioService.eliminarCuenta(payload)
-      sileo.success({ title: 'Tu cuenta ha sido eliminada exitosamente.' })
+      sileo.success({ title: 'Tu cuenta de Argentum se eliminó.' })
       onClose()
       await logout()
     } catch (err) {

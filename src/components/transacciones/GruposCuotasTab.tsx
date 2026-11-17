@@ -137,7 +137,9 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       setGrupos(data)
     } catch (e) {
       console.error(e)
-      sileo.error({ title: getErrorMessage(e, 'No pudimos cargar los grupos de cuotas. Intentá de nuevo.') })
+              sileo.error({
+          title: getErrorMessage(e, 'No se pudieron cargar las compras en cuotas. Probá de nuevo.'),
+        })
     } finally {
       setLoading(false)
     }
@@ -287,11 +289,11 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   const goEditStep2 = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     if (editMonto === null || editMonto <= 0) {
-      sileo.error({ title: 'Ingresá un monto total válido' })
+      sileo.error({ title: 'Ingresá un monto total mayor a 0.' })
       return
     }
     if (!editTarjetaId && tarjetas.length > 0) {
-      sileo.error({ title: 'Seleccioná una tarjeta de crédito' })
+      sileo.error({ title: 'Elegí una tarjeta de crédito.' })
       return
     }
     setEditSlideDirection('forward')
@@ -358,7 +360,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   }
 
   const handleReintegroGuardado = async () => {
-    sileo.success({ title: 'Listo' })
+    sileo.success({ title: 'Reintegro guardado.' })
     try {
       const data = await grupoCuotasService.getGruposCuotas()
       setGrupos(data)
@@ -393,13 +395,22 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       onConfirm: async () => {
         try {
           await grupoCuotasService.cancelarGrupo(grupo.id)
-          sileo.success({ title: esSingular ? 'Cuota restante cancelada' : 'Compra en cuotas cancelada' })
+                    sileo.success({
+            title: esSingular
+              ? 'Cuota restante cancelada.'
+              : 'Compra en cuotas cancelada.',
+          })
           handleCloseDetail()
           fetchGrupos()
           onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(
+              e,
+              'No se pudo cancelar la compra en cuotas. Probá de nuevo.'
+            ),
+          })
         }
       }
     })
@@ -419,17 +430,20 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       onConfirm: async () => {
         try {
           await grupoCuotasService.adelantarGrupo(grupo.id)
+          const ddmmToast = ddmm.replace(/^0/, '')
           sileo.success({
             title: esSingular
-              ? `Listo, la cuota que faltaba pasa al resumen que vence el ${ddmm}.`
-              : `Listo, las cuotas que faltaban pasan al resumen que vence el ${ddmm}.`
+              ? `La cuota que faltaba pasa al resumen que vence el ${ddmmToast}.`
+              : `Las cuotas que faltaban pasan al resumen que vence el ${ddmmToast}.`,
           })
           handleCloseDetail()
           fetchGrupos()
           onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No pudimos adelantar las cuotas. Intentá de nuevo.') })
+                    sileo.error({
+            title: getErrorMessage(e, 'No se pudieron adelantar las cuotas. Probá de nuevo.'),
+          })
         }
       }
     })
@@ -441,13 +455,15 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     try {
       await grupoCuotasService.prepagarGrupo(grupoId, billeteraSeleccionada, claveOperacionRef.current)
       claveOperacionRef.current = nuevaClaveOperacion()
-      sileo.success({ title: '¡Listo! Las cuotas restantes se saldaron con éxito.' })
+      sileo.success({ title: 'Cuotas que faltaban saldadas.' })
       handleCloseDetail()
       fetchGrupos()
       onRefreshNeeded?.()
     } catch (e) {
       console.error(e)
-      sileo.error({ title: getErrorMessage(e, 'No pudimos saldar las cuotas. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(e, 'No se pudieron saldar las cuotas. Probá de nuevo.'),
+      })
     } finally {
       setSaving(false)
     }
@@ -458,7 +474,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     if (!editingGrupo) return
 
     if (editMonto === null || editMonto <= 0) {
-      sileo.error({ title: 'Ingresá un monto total válido' })
+      sileo.error({ title: 'Ingresá un monto total mayor a 0.' })
       return
     }
 
@@ -485,13 +501,18 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
         }
 
         await grupoCuotasService.updateGrupoCuotas(editingGrupo.id, payload)
-        sileo.success({ title: 'Compra en cuotas actualizada' })
+        sileo.success({ title: 'Compra en cuotas actualizada.' })
         setEditingGrupo(null)
         fetchGrupos()
         onRefreshNeeded?.()
       } catch (e: unknown) {
         console.error(e)
-        sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
+        sileo.error({
+          title: getErrorMessage(
+            e,
+            'No se pudo actualizar la compra en cuotas. Probá de nuevo.'
+          ),
+        })
       } finally {
         setSaving(false)
       }
@@ -528,13 +549,18 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
       onConfirm: async () => {
         try {
           await grupoCuotasService.deleteGrupoCuotas(id)
-          sileo.success({ title: 'Compra en cuotas eliminada' })
+          sileo.success({ title: 'Compra en cuotas eliminada.' })
           setSelectedGrupo(null)
           fetchGrupos()
           onRefreshNeeded?.()
         } catch (e) {
           console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(
+              e,
+              'No se pudo eliminar la compra en cuotas. Probá de nuevo.'
+            ),
+          })
         }
       }
     })

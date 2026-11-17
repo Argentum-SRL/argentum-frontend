@@ -67,7 +67,7 @@ export default function DescargarAnalisisModal({
       onClose()
     } catch (err: unknown) {
       sileo.error({
-        title: getErrorMessage(err, 'No pudimos descargar el archivo.'),
+        title: getErrorMessage(err, 'No se pudo descargar el archivo. Probá de nuevo.'),
       })
     } finally {
       setDescargando(false)

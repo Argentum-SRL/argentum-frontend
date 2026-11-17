@@ -72,9 +72,9 @@ export default function VerificarEmail() {
       setModoIngresoEmail(false)
       setCountdown(60)
       setCodigo('')
-      sileo.success({ title: 'Si tu correo está registrado, te enviamos un nuevo código.' })
+      sileo.success({ title: 'Si tu email tiene cuenta, te va a llegar un código nuevo.' })
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No pudimos enviar el código. Intentá de nuevo.')
+      const msg = getErrorMessage(err, 'No se pudo mandar el código. Probá de nuevo.')
       setApiError(msg)
       sileo.error({ title: msg })
     } finally {
@@ -92,7 +92,7 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       const respuesta = await verificarCodigoEmail(email.trim(), codigo)
-      sileo.success({ title: '¡Tu email quedó verificado! Ya podés entrar a Argentum.' })
+      sileo.success({ title: 'Email verificado. Ya podés entrar.' })
       
       // Solo hacemos login si la respuesta ya trae tokens.
       if (respuesta.access_token) {
@@ -101,7 +101,10 @@ export default function VerificarEmail() {
       
       manejarRespuestaAuth(respuesta, navigate)
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, "No pudimos verificar tu email. El enlace puede haber expirado — pedí uno nuevo.")
+            const msg = getErrorMessage(
+        err,
+        'No se pudo confirmar tu email. Pedí un código nuevo y probá.'
+      )
       setApiError(msg)
       sileo.error({ title: msg })
     } finally {
@@ -115,11 +118,11 @@ export default function VerificarEmail() {
     setApiError(null)
     try {
       await enviarCodigoEmail(email.trim())
-      sileo.success({ title: 'Te mandamos un código nuevo.' })
+      sileo.success({ title: 'Te va a llegar un código nuevo.' })
       setCountdown(60)
       setCodigo('')
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No pudimos reenviar el código.')
+      const msg = getErrorMessage(err, 'No se pudo mandar otro código. Probá de nuevo.')
       setApiError(msg)
       sileo.error({ title: msg })
     } finally {

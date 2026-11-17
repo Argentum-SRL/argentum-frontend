@@ -46,7 +46,7 @@ export const ConsejoCard: React.FC = () => {
         await consejosService.responder(consejo.id, respuesta)
         setConsejo(null)
       } catch {
-        sileo.error({ title: 'No pudimos guardar tu respuesta.' })
+        sileo.error({ title: 'No se pudo guardar tu respuesta. Probá de nuevo.' })
       }
     },
     [consejo],
@@ -121,7 +121,7 @@ export const ConsejoCard: React.FC = () => {
         })
       } catch (err: unknown) {
         sileo.error({
-          title: getErrorMessage(err, 'No pudimos abrir el formulario. Probá de nuevo.'),
+          title: getErrorMessage(err, 'No se pudo abrir el formulario. Probá de nuevo.'),
         })
       }
     }

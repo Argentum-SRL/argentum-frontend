@@ -94,7 +94,7 @@ export default function InformeEditor({
     setFormBloques((prev) => {
       if (prev.includes(tipo)) {
         if (prev.length <= 1) {
-          sileo.info({ title: 'El informe debe incluir al menos 1 bloque.' })
+          sileo.info({ title: 'Agregá al menos un bloque al informe.' })
           return prev
         }
         return prev.filter((t) => t !== tipo)
@@ -109,7 +109,7 @@ export default function InformeEditor({
       return
     }
     if (formBloques.length === 0) {
-      sileo.error({ title: 'Seleccioná al menos un bloque para el informe.' })
+      sileo.error({ title: 'Elegí al menos un bloque para el informe.' })
       return
     }
     setSaving(true)
@@ -140,11 +140,11 @@ export default function InformeEditor({
           icono: 'pie-chart',
           configuracion,
         })
-        sileo.success({ title: 'Informe guardado en tu cuenta.' })
+        sileo.success({ title: 'Informe guardado.' })
         onGuardarExito(creado)
       }
     } catch (err) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos guardar el informe.') })
+      sileo.error({ title: getErrorMessage(err, 'No se pudo guardar el informe. Probá de nuevo.') })
     } finally {
       setSaving(false)
     }

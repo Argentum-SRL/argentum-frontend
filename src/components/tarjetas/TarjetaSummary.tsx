@@ -333,16 +333,18 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       claveOperacionRef.current = nuevaClaveOperacion()
       // Aviso de éxito según respuesta del servidor
       if (res?.monto_diferencia && Number(res.monto_diferencia) > 0) {
-        const tipoLabel = payload.diferencia_tipo === 'cargos_banco' 
-          ? 'Cargos del banco' 
-          : payload.diferencia_tipo === 'intereses' 
-          ? 'Intereses' 
-          : 'Compras no cargadas'
+        const tipoLabel =
+          payload.diferencia_tipo === 'cargos_banco'
+            ? 'cargos del banco'
+            : payload.diferencia_tipo === 'intereses'
+              ? 'intereses'
+              : 'compras no cargadas'
+        const difFmt = formatMonto(res.monto_diferencia, payload.moneda || 'ARS')
         sileo.success({
-          title: `Pago registrado. ${formatMonto(res.monto_diferencia, payload.moneda || 'ARS')} quedaron como ${tipoLabel}.`
+          title: `Pago del resumen guardado: ${difFmt} quedaron como ${tipoLabel}.`,
         })
       } else {
-        sileo.success({ title: 'Pago de resumen registrado con éxito' })
+        sileo.success({ title: 'Pago del resumen guardado.' })
       }
       setIsPagarModalOpen(false)
       setDismissedNotifId(tarjeta.resumen_impago?.notificacion_id || null)
@@ -351,7 +353,9 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
       return res
     } catch (err: unknown) {
       console.error(err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo guardar el pago del resumen. Probá de nuevo.'),
+      })
     } finally {
       setIsPaying(false)
     }

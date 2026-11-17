@@ -76,7 +76,7 @@ export default function ResetPasswordPage() {
 
     try {
       await confirmarResetPassword(token, nuevaPassword)
-      sileo.success({ title: '¡Listo! Tu contraseña se actualizó. Ya podés iniciar sesión con la nueva.' })
+      sileo.success({ title: 'Contraseña actualizada. Ya podés entrar con la nueva.' })
       setStatus('confirmado')
       setTimeout(() => {
         navigate('/login', {
@@ -91,7 +91,10 @@ export default function ResetPasswordPage() {
       if (code === 'TOKEN_INVALIDO') {
         setStatus('invalido')
       } else {
-        const msg = getErrorMessage(err, "No pudimos cambiar tu contraseña. El enlace puede haber expirado — pedí uno nuevo.")
+                const msg = getErrorMessage(
+          err,
+          'No se pudo cambiar tu contraseña. Pedí un enlace nuevo y probá.'
+        )
         setApiError(msg)
         sileo.error({ title: msg })
       }

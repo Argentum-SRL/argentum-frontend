@@ -23,7 +23,7 @@ import type { Notificacion, TipoNotificacion } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
 import { EmptyState } from '@/components/ui'
 import { formatHora } from '@/utils/format'
-import { limpiarMensajeNotificacion } from '@/utils/notificacion.utils'
+import { parsearAviso } from '@/utils/avisoNotificacion'
 import NotificacionesConfigModal from './NotificacionesConfigModal'
 import styles from './NotificacionesDrawer.module.css'
 
@@ -223,7 +223,9 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                   <div key={groupName} className={styles.group}>
                     <h4 className={styles.groupTitle}>{groupName}</h4>
                     <div className={styles.list}>
-                      {items.map((n) => (
+                      {items.map((n) => {
+                        const aviso = parsearAviso(n.mensaje)
+                        return (
                         <div
                           key={n.id}
                           className={`${styles.card} ${!n.leida ? styles.cardUnread : ''} ${
@@ -235,7 +237,20 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                         >
                           <div className={styles.iconWrapper}>{getIcon(n.tipo)}</div>
                           <div className={styles.cardBody}>
-                            <p className={styles.message}>{limpiarMensajeNotificacion(n.mensaje)}</p>
+                            <p className={styles.messageTitle}>{aviso.titulo}</p>
+                            {aviso.bloques.map((b, idx) =>
+                              b.tipo === 'lista' ? (
+                                <ul key={idx} className={styles.messageList}>
+                                  {b.items?.map((item, itemIdx) => (
+                                    <li key={itemIdx}>{item}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p key={idx} className={styles.messageText}>
+                                  {b.texto}
+                                </p>
+                              )
+                            )}
                             <div className={styles.metaRow}>
                               <span className={styles.time}>{formatTime(n.created_at)}</span>
                             </div>
@@ -401,7 +416,8 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                             )}
                           </div>
                         </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 ))

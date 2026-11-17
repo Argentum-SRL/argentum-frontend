@@ -210,10 +210,10 @@ const NotificacionesForm: React.FC<NotificacionesFormProps> = ({ initialConfig, 
     setIsSaving(true)
     try {
       await onSave(form)
-      sileo.success({ title: 'Tus preferencias de notificaciones fueron guardadas.' })
+      sileo.success({ title: 'Preferencias de notificaciones guardadas.' })
     } catch (err: unknown) {
       console.error(err)
-      sileo.error({ title: 'No pudimos guardar los cambios. Probá de nuevo.' })
+      sileo.error({ title: 'No se pudieron guardar los cambios. Probá de nuevo.' })
     } finally {
       setIsSaving(false)
     }

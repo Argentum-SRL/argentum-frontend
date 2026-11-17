@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { RefreshCw, Play, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react'
 import { sileo } from 'sileo'
+import { getErrorMessage } from '@/utils/errorMessages'
 import adminService, { type JobSchedulerItem } from '../../../services/adminService'
 import styles from './SchedulerPanel.module.css'
 
@@ -39,11 +40,11 @@ export const SchedulerPanel: React.FC = () => {
       setSchedulerActivo(data.scheduler_activo)
       setJobs(data.jobs)
       if (mostrarFeedback) {
-        sileo.success({ title: 'Estado del scheduler actualizado' })
+        sileo.success({ title: 'Estado del scheduler actualizado.' })
       }
     } catch (err: unknown) {
       console.error('Error al cargar scheduler:', err)
-      sileo.error({ title: 'No se pudo cargar el estado del scheduler' })
+      sileo.error({ title: 'No se pudo cargar el estado del scheduler. Probá de nuevo.' })
     } finally {
       setLoading(false)
     }
@@ -61,7 +62,7 @@ export const SchedulerPanel: React.FC = () => {
       .catch((err: unknown) => {
         if (!activo) return
         console.error('Error al cargar scheduler:', err)
-        sileo.error({ title: 'No se pudo cargar el estado del scheduler' })
+        sileo.error({ title: 'No se pudo cargar el estado del scheduler. Probá de nuevo.' })
       })
       .finally(() => {
         if (activo) {
@@ -77,16 +78,17 @@ export const SchedulerPanel: React.FC = () => {
   const handleCorrerJob = async (jobId: string) => {
     try {
       setCorriendoJobId(jobId)
-      const res = await adminService.correrJob(jobId)
-      sileo.success({ title: res.mensaje || 'Se va a correr en unos segundos.' })
+      await adminService.correrJob(jobId)
+      sileo.success({ title: 'Se va a correr en unos segundos.' })
       // Recargar después de una pequeña pausa
       setTimeout(() => {
         cargarScheduler()
       }, 1500)
     } catch (err: unknown) {
       console.error(`Error al ejecutar job ${jobId}:`, err)
-      const mensaje = err && typeof err === 'object' && 'response' in err && (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
-      sileo.error({ title: typeof mensaje === 'string' ? mensaje : 'Error al ejecutar la tarea' })
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo correr la tarea. Probá de nuevo.'),
+      })
     } finally {
       setCorriendoJobId(null)
     }

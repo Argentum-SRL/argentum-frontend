@@ -66,7 +66,9 @@ export default function PresupuestosPage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar los presupuestos. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar los presupuestos. Probá de nuevo.'),
+      })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
@@ -78,10 +80,12 @@ export default function PresupuestosPage() {
     if (!p.sugerencia_limite) return
     try {
       await presupuestoService.subirLimite(p.id, p.sugerencia_limite.monto)
-      sileo.success({ title: 'Listo, cambiamos el límite.' })
+      sileo.success({ title: 'Límite actualizado.' })
       fetchPresupuestos()
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cambiar el límite. Probá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo cambiar el límite. Probá de nuevo.'),
+      })
     }
   }
 
@@ -175,10 +179,12 @@ export default function PresupuestosPage() {
       onConfirm: async () => {
         try {
           await presupuestoService.pausarPresupuesto(p.id)
-          sileo.success({ title: 'Presupuesto pausado' })
+          sileo.success({ title: 'Presupuesto pausado.' })
           fetchPresupuestos()
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(err, 'No se pudo pausar el presupuesto. Probá de nuevo.'),
+          })
         }
       }
     })
@@ -193,10 +199,12 @@ export default function PresupuestosPage() {
       onConfirm: async () => {
         try {
           await presupuestoService.reanudarPresupuesto(id)
-          sileo.success({ title: 'Presupuesto reanudado' })
+          sileo.success({ title: 'Presupuesto reanudado.' })
           fetchPresupuestos()
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(err, 'No se pudo reactivar el presupuesto. Probá de nuevo.'),
+          })
         }
       }
     })
@@ -208,23 +216,27 @@ export default function PresupuestosPage() {
       await presupuestoService.eliminarPresupuesto(p.id)
       fetchPresupuestos()
       sileo.action({
-        title: 'Presupuesto eliminado',
+        title: 'Presupuesto eliminado.',
         button: {
           title: 'Deshacer',
           onClick: async () => {
             try {
               await presupuestoService.restaurarPresupuesto(p.id, estadoAnterior)
-              sileo.success({ title: 'Presupuesto restaurado' })
+              sileo.success({ title: 'Presupuesto restaurado.' })
               fetchPresupuestos()
             } catch (err: unknown) {
-              sileo.error({ title: getErrorMessage(err, 'No pudimos restaurar el presupuesto.') })
+                            sileo.error({
+                title: getErrorMessage(err, 'No se pudo restaurar el presupuesto. Probá de nuevo.'),
+              })
             }
           }
         },
         duration: 8000
       })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar el presupuesto. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
+      })
     }
   }
 
@@ -236,7 +248,9 @@ export default function PresupuestosPage() {
       const data = await presupuestoService.getHistorial(p.id)
       setHistorial(data)
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar el historial. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo cargar el historial. Probá de nuevo.'),
+      })
     } finally {
       setLoadingHistory(false)
     }

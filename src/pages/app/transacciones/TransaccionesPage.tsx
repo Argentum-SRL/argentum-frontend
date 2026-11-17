@@ -141,7 +141,9 @@ export default function TransaccionesPage() {
         return
       }
       console.error(err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar los movimientos. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar las transacciones. Probá de nuevo.'),
+      })
     }
   }, [filters])
 
@@ -169,7 +171,9 @@ export default function TransaccionesPage() {
         return
       }
       console.error(err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar más movimientos.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar más transacciones. Probá de nuevo.'),
+      })
     } finally {
       setLoadingMore(false)
     }
@@ -382,11 +386,13 @@ export default function TransaccionesPage() {
         onConfirm: async () => {
           try {
             await transaccionService.deleteCuotaIndividual(rawId)
-            sileo.success({ title: 'La cuota se eliminó correctamente.' })
+            sileo.success({ title: 'Cuota eliminada.' })
             refresh()
           } catch (e) {
             console.error(e)
-            sileo.error({ title: getErrorMessage(e, 'No pudimos eliminar la cuota. Intentá de nuevo.') })
+                        sileo.error({
+              title: getErrorMessage(e, 'No se pudo eliminar la cuota. Probá de nuevo.'),
+            })
           }
         },
       })
@@ -401,11 +407,13 @@ export default function TransaccionesPage() {
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(rawId)
-          sileo.success({ title: 'La transacción se eliminó.' })
+          sileo.success({ title: 'Transacción eliminada.' })
           refresh()
         } catch (e) {
           console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No pudimos eliminar la transacción. Intentá de nuevo.') })
+                    sileo.error({
+            title: getErrorMessage(e, 'No se pudo eliminar la transacción. Probá de nuevo.'),
+          })
         }
       },
     })
@@ -531,7 +539,7 @@ export default function TransaccionesPage() {
       })
     } catch (e) {
       console.error(e)
-      sileo.error({ title: 'No pudimos armar el PDF. Intentá de nuevo.' })
+      sileo.error({ title: 'No se pudo armar el PDF. Probá de nuevo.' })
     }
   }, [filters, mainCurrency, resumen, usuario])
 

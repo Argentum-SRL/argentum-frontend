@@ -80,7 +80,10 @@ export default function StepDatosPersonales({ datosIniciales, onNext }: Props) {
       })
       onNext(res.siguiente_paso)
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, "No pudimos guardar tus datos. Intentá de nuevo.")
+            const msg = getErrorMessage(
+        err,
+        'No se pudieron guardar tus datos. Probá de nuevo.'
+      )
       setError(msg)
       sileo.error({ title: msg })
     } finally {

@@ -21,7 +21,12 @@ export const ComerciosRecordados: React.FC = () => {
       .then(setComercios)
       .catch((err: unknown) => {
         if (!controller.signal.aborted) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos cargar los comercios recordados.') })
+                sileo.error({
+        title: getErrorMessage(
+          err,
+          'No se pudieron cargar los comercios recordados. Probá de nuevo.'
+        ),
+      })
         }
       })
       .finally(() => {
@@ -42,9 +47,11 @@ export const ComerciosRecordados: React.FC = () => {
         try {
           await memoriaComercioService.eliminar(id)
           setComercios((prev) => prev.filter((c) => c.id !== id))
-          sileo.success({ title: 'Comercio eliminado de la memoria' })
+          sileo.success({ title: 'Comercio eliminado.' })
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos borrar el comercio recordado.') })
+                    sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar el comercio. Probá de nuevo.'),
+          })
         }
       },
     })

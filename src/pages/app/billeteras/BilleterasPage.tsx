@@ -80,7 +80,9 @@ export default function BilleterasPage() {
         return
       }
       console.error('Error fetching billeteras data:', err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar los datos. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar los datos. Probá de nuevo.'),
+      })
     } finally {
       if (!signal?.aborted) {
         setIsLoading(false)
@@ -96,7 +98,9 @@ export default function BilleterasPage() {
       setTransferencias(data)
     } catch (err) {
       console.error('Error fetching transferencias:', err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar las transferencias. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar las transferencias. Probá de nuevo.'),
+      })
     } finally {
       if (!signal?.aborted) {
         setLoadingTransferencias(false)
@@ -126,12 +130,14 @@ export default function BilleterasPage() {
       onConfirm: async () => {
         try {
           await transferenciaService.deleteTransferencia(id)
-          sileo.success({ title: 'Transferencia eliminada' })
+          sileo.success({ title: 'Transferencia eliminada.' })
           void fetchTransferenciasData()
           void fetchPageData()
         } catch (e) {
           console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(e, 'No se pudo eliminar la transferencia. Probá de nuevo.'),
+          })
         }
       },
     })
@@ -213,9 +219,11 @@ export default function BilleterasPage() {
         try {
           await billeteraService.archivar(id)
           await fetchPageData()
-          sileo.success({ title: `"${b.nombre}" archivada` })
+          sileo.success({ title: `Billetera ${b.nombre} archivada.` })
         } catch (error: unknown) {
-          sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(error, 'No se pudo archivar la billetera. Probá de nuevo.'),
+          })
         }
       }
     })
@@ -226,9 +234,11 @@ export default function BilleterasPage() {
     try {
       await billeteraService.desarchivar(id)
       await fetchPageData()
-      if (b) sileo.success({ title: `"${b.nombre}" reactivada` })
+      if (b) sileo.success({ title: `Billetera ${b.nombre} reactivada.` })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo reactivar la billetera. Probá de nuevo.'),
+      })
     }
   }, [billeteras, fetchPageData])
 
@@ -245,9 +255,11 @@ export default function BilleterasPage() {
         try {
           await billeteraService.delete(id)
           await fetchPageData()
-          sileo.success({ title: `"${b.nombre}" se eliminó.` })
+          sileo.success({ title: `Billetera ${b.nombre} eliminada.` })
         } catch (error: unknown) {
-          sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(error, 'No se pudo eliminar la billetera. Probá de nuevo.'),
+          })
         }
       },
     })
@@ -257,9 +269,11 @@ export default function BilleterasPage() {
     try {
       await billeteraService.update(id, payload)
       await fetchPageData()
-      sileo.success({ title: 'Billetera actualizada exitosamente' })
+      sileo.success({ title: 'Billetera actualizada.' })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo actualizar la billetera. Probá de nuevo.'),
+      })
     }
   }, [fetchPageData])
 
@@ -286,9 +300,11 @@ export default function BilleterasPage() {
         fecha_saldo: payload.fecha_saldo,
       })
       await fetchPageData()
-      sileo.success({ title: `"${payload.nombre}" creada exitosamente` })
+      sileo.success({ title: `Billetera ${payload.nombre} creada.` })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No pudimos completar la acción. Intentá de nuevo.') })
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo crear la billetera. Probá de nuevo.'),
+      })
     }
   }, [fetchPageData])
 

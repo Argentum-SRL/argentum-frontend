@@ -70,12 +70,14 @@ export function QueEsEstaPlataModal({
       onConfirm: async () => {
         try {
           await transaccionService.deleteTransaccion(transaccion.id)
-          sileo.success({ title: 'Movimiento eliminado' })
+          sileo.success({ title: 'Transacción eliminada.' })
           onSuccess?.(null)
           onClose()
         } catch (e) {
           console.error(e)
-          sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar el movimiento.') })
+                    sileo.error({
+            title: getErrorMessage(e, 'No se pudo eliminar la transacción. Probá de nuevo.'),
+          })
         }
       },
     })
@@ -90,12 +92,14 @@ export function QueEsEstaPlataModal({
         { opcion },
         clave
       )
-      sileo.success({ title: 'Movimiento actualizado' })
+      sileo.success({ title: 'Transacción actualizada.' })
       onSuccess?.(updated)
       onClose()
     } catch (e) {
       console.error(e)
-      sileo.error({ title: getErrorMessage(e, 'No se pudo actualizar el movimiento.') })
+            sileo.error({
+        title: getErrorMessage(e, 'No se pudo actualizar la transacción. Probá de nuevo.'),
+      })
     } finally {
       setSaving(false)
     }

@@ -3,6 +3,7 @@ import { AlertTriangle, ShieldAlert } from '@/components/ui/icons'
 import { LunarLoader, ImportacionResumenSkeleton, TableSkeleton } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
+import { getErrorMessage } from '@/utils/errorMessages'
 import tarjetaService from '@/services/tarjeta.service'
 import billeteraService from '@/services/billetera.service'
 import importacionService from '@/services/importacionService'
@@ -86,7 +87,7 @@ export const ImportacionResumenSection: React.FC = () => {
         }
       } catch (err) {
         console.error('Error al cargar datos de tarjetas/billeteras/categorías:', err)
-        sileo.error({ title: 'Error al inicializar los datos de importación.' })
+        sileo.error({ title: 'No se pudo abrir la importación. Probá de nuevo.' })
       } finally {
         setLoadingData(false)
       }
@@ -113,15 +114,18 @@ export const ImportacionResumenSection: React.FC = () => {
     try {
       const response = await importacionService.procesarResumen(selectedFile)
       setImportacionResult(response)
-      sileo.success({ title: 'Resumen procesado con éxito.' })
+            sileo.success({
+        title: 'Resumen leído. Revisá las transacciones antes de importarlas.',
+      })
       setStep(2)
     } catch (err: unknown) {
       console.error('Error al procesar resumen:', err)
-      const error = err as { response?: { data?: { detail?: { error?: { message?: string } } | string } } }
-      const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
-        ? error.response.data.detail.error.message
-        : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'No se pudo procesar el resumen. Verificá el archivo e intentá de nuevo.')
-      sileo.error({ title: detail })
+      sileo.error({
+        title: getErrorMessage(
+          err,
+          'No se pudo leer el resumen. Revisá el archivo y probá de nuevo.'
+        ),
+      })
     } finally {
       clearTimeout(textTimer)
       setIsProcessing(false)
@@ -131,7 +135,7 @@ export const ImportacionResumenSection: React.FC = () => {
   // Continuar desde el paso 2 y resolver los modales que hagan falta
   const handleContinuarFlujo = async () => {
     if (!selectedTarjetaId || !selectedBilleteraId) {
-      sileo.error({ title: 'Por favor, seleccioná una tarjeta y una billetera.' })
+      sileo.error({ title: 'Elegí una tarjeta y una billetera.' })
       return
     }
 
@@ -172,11 +176,12 @@ export const ImportacionResumenSection: React.FC = () => {
       }
     } catch (err: unknown) {
       console.error('Error al obtener la vista previa del resumen:', err)
-      const error = err as { response?: { data?: { detail?: { error?: { message?: string } } | string } } }
-      const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
-        ? error.response.data.detail.error.message
-        : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'Error al cargar la vista previa del resumen.')
-      sileo.error({ title: detail })
+      sileo.error({
+        title: getErrorMessage(
+          err,
+          'No se pudo abrir la vista previa del resumen. Probá de nuevo.'
+        ),
+      })
     } finally {
       setLoadingPreview(false)
     }
@@ -236,7 +241,7 @@ export const ImportacionResumenSection: React.FC = () => {
 
     const totalAImportar = transaccionesFinales.filter(t => t.incluir).length
     if (totalAImportar === 0) {
-      sileo.info({ title: 'No seleccionaste ninguna transacción para importar. Marcá al menos una para continuar o cancelá la operación.' })
+      sileo.info({ title: 'Marcá al menos una transacción para importar.' })
       return
     }
 
@@ -254,14 +259,15 @@ export const ImportacionResumenSection: React.FC = () => {
         payload
       )
       setResultadoConfirmacion(res)
-      sileo.success({ title: 'Importación confirmada con éxito.' })
+      sileo.success({ title: 'Importación guardada.' })
     } catch (err: unknown) {
       console.error('Error al confirmar importación:', err)
-      const error = err as { response?: { data?: { detail?: { error?: { message?: string } } | string } } }
-      const detail = typeof error.response?.data?.detail === 'object' && error.response?.data?.detail?.error?.message
-        ? error.response.data.detail.error.message
-        : (typeof error.response?.data?.detail === 'string' ? error.response.data.detail : 'Error al confirmar la importación del resumen.')
-      sileo.error({ title: detail })
+      sileo.error({
+        title: getErrorMessage(
+          err,
+          'No se pudo guardar la importación. Probá de nuevo.'
+        ),
+      })
     } finally {
       setIsConfirming(false)
     }

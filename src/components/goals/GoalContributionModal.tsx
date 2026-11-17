@@ -239,7 +239,9 @@ export default function GoalContributionModal({
         cotizacion_usada: needsExchangeRate ? cotizacion_usada : null
       }, claveOperacionRef.current)
       claveOperacionRef.current = nuevaClaveOperacion()
-      sileo.success({ title: tipo === 'aporte' ? 'Aporte registrado con éxito' : 'Retiro registrado con éxito' })
+            sileo.success({
+        title: tipo === 'aporte' ? 'Aporte guardado.' : 'Retiro guardado.',
+      })
       onSuccess()
       onClose()
     } catch (err: unknown) {

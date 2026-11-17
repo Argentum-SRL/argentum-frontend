@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
 import { sileo } from 'sileo'
+import { getErrorMessage } from '@/utils/errorMessages'
 import { useModal } from '@/hooks/useModal'
 import { useAuth } from '@/hooks/useAuth'
 import tarjetaService from '@/services/tarjeta.service'
@@ -383,58 +384,60 @@ export const TarjetaModal: React.FC = () => {
   const goNext = () => {
     if (step === 1) {
       if (!state.ultimos4 || state.ultimos4.length !== 4) {
-        sileo.error({ title: 'Ingresá los 4 últimos dígitos de la tarjeta' })
+        sileo.error({ title: 'Ingresá los 4 últimos números de la tarjeta.' })
         return
       }
       if (!state.billeteraId) {
-        sileo.error({ title: 'Seleccioná la cuenta bancaria asociada' })
+        sileo.error({ title: 'Elegí la cuenta bancaria asociada.' })
         return
       }
       if (!state.red) {
-        sileo.error({ title: 'Seleccioná la red emisora de la tarjeta' })
+        sileo.error({ title: 'Elegí la red de la tarjeta.' })
         return
       }
       setAnimClass(styles.slideForward)
       setStep(2)
     } else if (step === 2) {
       if (!state.proximoCierre) {
-        sileo.error({ title: 'Ingresá la fecha de próximo cierre (DD/MM)' })
+        sileo.error({ title: 'Ingresá la fecha del próximo cierre (por ejemplo, 22/10).' })
         return
       }
       if (!state.proximoVencimiento) {
-        sileo.error({ title: 'Ingresá la fecha de próximo vencimiento (DD/MM)' })
+        sileo.error({ title: 'Ingresá la fecha del próximo vencimiento (por ejemplo, 4/11).' })
         return
       }
       const isoCierre = inferFechaIso(state.proximoCierre, 'cierre')
       if (!isoCierre) {
-        sileo.error({ title: 'Ingresá una fecha válida para el próximo cierre (ej: 22/10)' })
+        sileo.error({ title: 'Revisá la fecha del próximo cierre (por ejemplo, 22/10).' })
         return
       }
       const isoVencimiento = inferFechaIso(state.proximoVencimiento, 'vencimiento', isoCierre)
       if (!isoVencimiento) {
-        sileo.error({ title: 'Ingresá una fecha válida para el próximo vencimiento (ej: 04/11)' })
+        sileo.error({ title: 'Revisá la fecha del próximo vencimiento (por ejemplo, 4/11).' })
         return
       }
       let isoUltimoCierre: string | null = null
       if (state.ultimoCierre && state.ultimoCierre.trim()) {
         isoUltimoCierre = inferFechaIso(state.ultimoCierre, 'ultimo_cierre', isoCierre)
         if (!isoUltimoCierre) {
-          sileo.error({ title: 'Ingresá una fecha válida para el último cierre (ej: 24/09)' })
+          sileo.error({ title: 'Revisá la fecha del último cierre (por ejemplo, 24/9).' })
           return
         }
       }
       const diffMs = new Date(isoVencimiento).getTime() - new Date(isoCierre).getTime()
       const diffDias = Math.round(diffMs / (1000 * 60 * 60 * 24))
       if (isoVencimiento <= isoCierre || diffDias > 31) {
-        sileo.error({ title: 'El vencimiento tiene que ser posterior al cierre y dentro del mes siguiente.' })
+                sileo.error({
+          title: 'El vencimiento tiene que ser después del cierre y dentro del mes siguiente.',
+        })
         return
       }
       if (isoUltimoCierre && isoUltimoCierre >= isoCierre) {
-        sileo.error({ title: 'El último cierre debe ser anterior al próximo cierre.' })
+        sileo.error({ title: 'El último cierre tiene que ser antes del próximo.' })
         return
       }
       if (state.limiteCredito !== null && state.limiteCredito !== undefined && state.limiteCredito <= 0) {
-        sileo.error({ title: 'El límite de crédito debe ser mayor a cero si se indica' })
+        sileo.error({ title: 'El límite tiene que ser mayor a 0 o quedar vacío.' })
         return
       }
       setAnimClass(styles.slideForward)
@@ -490,31 +493,28 @@ export const TarjetaModal: React.FC = () => {
       if (data.tarjeta) {
         const res = await tarjetaService.updateTarjeta(data.tarjeta.id, payload)
         if (res?.cuotas_recalculadas && res.cuotas_recalculadas > 0) {
+          const nCuotas = res.cuotas_recalculadas
           sileo.success({
-            title: `Tarjeta actualizada. Se recalcularon las fechas de ${res.cuotas_recalculadas} ${res.cuotas_recalculadas === 1 ? 'cuota futura' : 'cuotas futuras'}.`,
+            title:
+              nCuotas === 1
+                ? 'Tarjeta actualizada: cambió la fecha de 1 cuota que falta.'
+                : `Tarjeta actualizada: cambiaron las fechas de ${nCuotas} cuotas que faltan.`,
           })
         } else {
-          sileo.success({ title: 'Tarjeta actualizada' })
+          sileo.success({ title: 'Tarjeta actualizada.' })
         }
       } else {
         await tarjetaService.createTarjeta(payload)
-        sileo.success({ title: 'Tarjeta guardada' })
+        sileo.success({ title: 'Tarjeta guardada.' })
       }
 
       data.onSuccess()
       close('tarjeta')
     } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { detail?: string } | string } }
-      const errorData = axiosError.response?.data
-      console.error('Error al guardar tarjeta:', errorData)
-
-      let errorMsg = 'Error al guardar tarjeta'
-      if (typeof errorData === 'string') {
-        errorMsg = errorData
-      } else if (errorData && typeof errorData === 'object' && 'detail' in errorData && typeof errorData.detail === 'string') {
-        errorMsg = errorData.detail
-      }
-      sileo.error({ title: errorMsg })
+      console.error('Error al guardar tarjeta:', err)
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo guardar la tarjeta. Probá de nuevo.'),
+      })
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'loading', value: false })
     }

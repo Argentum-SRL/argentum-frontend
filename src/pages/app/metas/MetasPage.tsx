@@ -36,7 +36,9 @@ export default function MetasPage() {
       if (err instanceof Error && (err.name === 'AbortError' || err.name === 'CanceledError')) {
         return
       }
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar las metas. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar las metas. Probá de nuevo.'),
+      })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
@@ -141,10 +143,17 @@ export default function MetasPage() {
     const nuevoEstado = g.estado === EstadoMeta.ACTIVA ? EstadoMeta.PAUSADA : EstadoMeta.ACTIVA
     try {
       await goalsService.updateGoal(g.id, { estado: nuevoEstado })
-      sileo.success({ title: `Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}` })
+            sileo.success({
+        title:
+          nuevoEstado === EstadoMeta.PAUSADA
+            ? 'Meta pausada.'
+            : 'Meta reanudada.',
+      })
       void fetchAll()
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'Error al cambiar el estado') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo cambiar el estado de la meta. Probá de nuevo.'),
+      })
     }
   }, [fetchAll])
 
@@ -172,10 +181,12 @@ export default function MetasPage() {
       onConfirm: async () => {
         try {
           await goalsService.deleteGoal(g.id)
-          sileo.success({ title: 'Meta eliminada' })
+          sileo.success({ title: 'Meta eliminada.' })
           void fetchAll()
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'Error al eliminar la meta') })
+                    sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar la meta. Probá de nuevo.'),
+          })
         }
       }
     })

@@ -159,7 +159,9 @@ const SuscripcionesPage: React.FC = () => {
         return
       }
       console.error(error)
-      sileo.error({ title: getErrorMessage(error, 'No pudimos cargar las suscripciones. Intentá de nuevo.') })
+            sileo.error({
+        title: getErrorMessage(error, 'No se pudieron cargar las suscripciones. Probá de nuevo.'),
+      })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
@@ -195,15 +197,20 @@ const SuscripcionesPage: React.FC = () => {
     try {
       if (s.estado === 'activa') {
         await suscripcionService.pausarSuscripcion(s.id)
-        sileo.success({ title: 'Suscripción pausada' })
+        sileo.success({ title: 'Suscripción pausada.' })
       } else {
         await suscripcionService.reactivarSuscripcion(s.id)
-        sileo.success({ title: 'Suscripción reactivada' })
+        sileo.success({ title: 'Suscripción reactivada.' })
       }
       loadData()
     } catch (error: unknown) {
       console.error(error)
-      sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
+      sileo.error({
+        title: getErrorMessage(
+          error,
+          'No se pudo cambiar el estado de la suscripción. Probá de nuevo.'
+        ),
+      })
     }
   }
 
@@ -216,7 +223,7 @@ const SuscripcionesPage: React.FC = () => {
       onConfirm: async () => {
         try {
           await suscripcionService.deleteSuscripcion(s.id)
-          sileo.success({ title: 'Suscripción eliminada' })
+          sileo.success({ title: 'Suscripción eliminada.' })
           if (suscripciones.length <= 1) {
             if (usuario?.id) {
               setStoredHasSuscripciones(usuario.id, false)
@@ -228,7 +235,9 @@ const SuscripcionesPage: React.FC = () => {
           loadData()
         } catch (error) {
           console.error(error)
-          sileo.error({ title: getErrorMessage(error, 'No pudimos completar la acción. Intentá de nuevo.') })
+          sileo.error({
+            title: getErrorMessage(error, 'No se pudo eliminar la suscripción. Probá de nuevo.'),
+          })
         }
       }
     })

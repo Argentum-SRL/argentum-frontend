@@ -87,10 +87,10 @@ export default function PerfilPage() {
     if (!usuario?.email) return
     try {
       await authService.enviarCodigoEmail(usuario.email)
-      sileo.success({ title: 'Te enviamos un código de verificación a tu correo.' })
+      sileo.success({ title: 'Te va a llegar un código a tu email.' })
       navigate('/auth/verificar-email', { state: { email: usuario.email, from: '/app/perfil' } })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'Error al enviar el código de verificación.') })
+      sileo.error({ title: getErrorMessage(err, 'No se pudo mandar el código. Probá de nuevo.') })
     }
   }
 

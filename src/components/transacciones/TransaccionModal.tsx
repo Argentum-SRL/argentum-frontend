@@ -199,7 +199,7 @@ export default function TransaccionModal({
   const handleToggleReintegroFromStep3 = () => {
     if (!reintegroHook.tieneReintegro) {
       if (!categoriaId) {
-        sileo.error({ title: 'Seleccioná una categoría primero' })
+        sileo.error({ title: 'Elegí primero una categoría.' })
         return
       }
       reintegroHook.setTieneReintegro(true)
@@ -482,32 +482,37 @@ export default function TransaccionModal({
   const goNext = () => {
     if (step === 1) {
       if (!monto || Number(monto) <= 0 || !Number.isFinite(Number(monto))) {
-        sileo.error({ title: 'El monto debe ser mayor a cero' })
+        sileo.error({ title: 'Ingresá un monto mayor a 0.' })
         return
       }
       if (metodoPago === 'credito' ? !tarjetaId : !billeteraId) {
-        sileo.error({ title: metodoPago === 'credito' ? 'Seleccioná una tarjeta' : 'Seleccioná una billetera' })
+                sileo.error({
+          title:
+            metodoPago === 'credito'
+              ? 'Elegí una tarjeta.'
+              : 'Elegí una billetera.',
+        })
         return
       }
     } else if (step === 2) {
       if (!Number.isInteger(cantidadCuotas) || cantidadCuotas < 1 || cantidadCuotas > 120) {
-        sileo.error({ title: 'La cantidad de cuotas debe ser un número entero entre 1 y 120' })
+        sileo.error({ title: 'Las cuotas tienen que ser entre 1 y 120.' })
         return
       }
     } else if (step === 3) {
       if (!categoriaId) {
-        sileo.error({ title: 'Seleccioná una categoría' })
+        sileo.error({ title: 'Elegí una categoría.' })
         return
       }
     } else if (step === 4) {
       if (reintegroHook.tieneReintegro) {
         const montoReintegro = reintegroHook.montoFinal
         if (!montoReintegro || montoReintegro <= 0) {
-          sileo.error({ title: 'Ingresá el monto o porcentaje del reintegro' })
+          sileo.error({ title: 'Ingresá el monto o el porcentaje del reintegro.' })
           return
         }
         if (monto && montoReintegro > Number(monto)) {
-          sileo.error({ title: 'El reintegro no puede ser mayor al total de la compra' })
+          sileo.error({ title: 'El reintegro no puede ser más que la compra.' })
           return
         }
       }
@@ -535,24 +540,24 @@ export default function TransaccionModal({
 
     // Validaciones estrictas
     if (!monto || Number(monto) <= 0 || !Number.isFinite(Number(monto))) {
-      sileo.error({ title: 'El monto debe ser mayor a cero' })
+      sileo.error({ title: 'Ingresá un monto mayor a 0.' })
       return
     }
 
     if (esDebitoUsdEnPesos && (!montoPesosDebito || montoPesosDebito <= 0)) {
-      sileo.error({ title: 'Ingresá el monto que te cobró el banco en pesos' })
+      sileo.error({ title: 'Ingresá el monto que te cobró el banco en pesos.' })
       return
     }
 
     if (!categoriaId) {
-      sileo.error({ title: 'Seleccioná una categoría' })
+      sileo.error({ title: 'Elegí una categoría.' })
       return
     }
 
     if (tipo === 'ingreso' && mostrarQueEsEstaPlata) {
       const val = queEsPlataHook.validar()
       if (!val.valido) {
-        sileo.error({ title: val.mensaje || 'Completá los datos requeridos' })
+        sileo.error({ title: val.mensaje || 'Completá los datos que faltan.' })
         return
       }
     }
@@ -560,11 +565,11 @@ export default function TransaccionModal({
     if (tipo === 'egreso' && !isCuotaHija && reintegroHook.tieneReintegro) {
       const montoReintegro = reintegroHook.montoFinal
       if (!montoReintegro || montoReintegro <= 0) {
-        sileo.error({ title: 'Ingresá el monto o porcentaje del reintegro' })
+        sileo.error({ title: 'Ingresá el monto o el porcentaje del reintegro.' })
         return
       }
       if (monto && montoReintegro > Number(monto)) {
-        sileo.error({ title: 'El reintegro no puede ser mayor al total de la compra' })
+        sileo.error({ title: 'El reintegro no puede ser más que la compra.' })
         return
       }
     }
@@ -572,7 +577,7 @@ export default function TransaccionModal({
     let resolvedBilleteraId = billeteraId
     if (metodoPago === 'credito') {
       if (!tarjetaId) {
-        sileo.error({ title: 'Seleccioná una tarjeta de crédito' })
+        sileo.error({ title: 'Elegí una tarjeta de crédito.' })
         return
       }
       const tarjetaSel = tarjetas.find(t => t.id === tarjetaId)
@@ -581,21 +586,23 @@ export default function TransaccionModal({
       }
       if (!isEdit) {
         if (!Number.isInteger(cantidadCuotas) || cantidadCuotas < 1 || cantidadCuotas > 120) {
-          sileo.error({ title: 'La cantidad de cuotas debe ser un número entero entre 1 y 120' })
+          sileo.error({ title: 'Las cuotas tienen que ser entre 1 y 120.' })
           return
         }
         if (!Number.isInteger(cuotaInicial) || cuotaInicial < 1 || cuotaInicial > cantidadCuotas) {
-          sileo.error({ title: 'La cuota inicial debe estar entre 1 y la cantidad total' })
+          sileo.error({
+            title: 'La cuota inicial tiene que ser entre 1 y el total de cuotas.',
+          })
           return
         }
         if (!Number.isFinite(tasaInteres) || tasaInteres < 0 || tasaInteres > 3000) {
-          sileo.error({ title: 'La tasa de interés (TNA) debe estar entre 0% y 3000%.' })
+          sileo.error({ title: 'La tasa tiene que ser entre 0% y 3.000% por año.' })
           return
         }
       }
     } else {
       if (!resolvedBilleteraId) {
-        sileo.error({ title: 'Seleccioná una billetera' })
+        sileo.error({ title: 'Elegí una billetera.' })
         return
       }
     }
@@ -648,7 +655,9 @@ export default function TransaccionModal({
             await reintegroHook.guardarReintegro(savedTx.id)
           } catch (err) {
             console.error(err)
-            sileo.error({ title: getErrorMessage(err, 'No se pudo guardar el reintegro') })
+            sileo.error({
+              title: getErrorMessage(err, 'No se pudo guardar el reintegro. Probá de nuevo.'),
+            })
           }
         }
         if (savedTx && tipo === 'ingreso' && mostrarQueEsEstaPlata) {
@@ -656,11 +665,16 @@ export default function TransaccionModal({
             await queEsPlataHook.responderQueEs(savedTx.id, claveQueEsRef.current)
           } catch (err) {
             console.error(err)
-            sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el motivo del ingreso') })
+            sileo.error({
+              title: getErrorMessage(
+                err,
+                'No se pudo cambiar el motivo del ingreso. Probá de nuevo.'
+              ),
+            })
           }
         }
         sileo.success({
-          title: metodoPago === 'credito' ? 'Compra en cuotas registrada' : 'Transacción creada'
+          title: metodoPago === 'credito' ? 'Compra en cuotas guardada.' : 'Transacción creada.',
         })
         onSuccess(savedTx)
         onClose()
@@ -671,7 +685,9 @@ export default function TransaccionModal({
             await reintegroHook.guardarReintegro(transaccion.id)
           } catch (err) {
             console.error(err)
-            sileo.error({ title: getErrorMessage(err, 'No se pudo guardar el reintegro') })
+            sileo.error({
+              title: getErrorMessage(err, 'No se pudo guardar el reintegro. Probá de nuevo.'),
+            })
           }
         }
         if (savedTx && tipo === 'ingreso' && mostrarQueEsEstaPlata) {
@@ -679,21 +695,28 @@ export default function TransaccionModal({
             await queEsPlataHook.responderQueEs(transaccion.id, claveQueEsRef.current)
           } catch (err) {
             console.error(err)
-            sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el motivo del ingreso') })
+            sileo.error({
+              title: getErrorMessage(
+                err,
+                'No se pudo cambiar el motivo del ingreso. Probá de nuevo.'
+              ),
+            })
           }
         }
         if (isPendienteIA) {
           await transaccionService.confirmarIA(transaccion.id)
-          sileo.success({ title: 'Transacción confirmada' })
+          sileo.success({ title: 'Transacción confirmada.' })
         } else {
-          sileo.success({ title: 'Transacción actualizada' })
+          sileo.success({ title: 'Transacción actualizada.' })
         }
         onSuccess(savedTx)
         await evaluarMemoriaPostGuardado(transaccion)
       }
     } catch (e) {
       console.error(e)
-      sileo.error({ title: getErrorMessage(e, 'Error al guardar la transacción') })
+            sileo.error({
+        title: getErrorMessage(e, 'No se pudo guardar la transacción. Probá de nuevo.'),
+      })
     } finally {
       submittingRef.current = false
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })

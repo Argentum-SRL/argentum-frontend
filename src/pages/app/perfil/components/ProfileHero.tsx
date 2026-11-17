@@ -58,9 +58,11 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
         try {
           await usuarioService.eliminarFoto()
           if (usuario) updateUsuario({ ...usuario, foto_url: null })
-          sileo.success({ title: 'Foto de perfil eliminada' })
+          sileo.success({ title: 'Foto de perfil eliminada.' })
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar la foto de perfil.') })
+                    sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar la foto de perfil. Probá de nuevo.'),
+          })
         }
       },
     })

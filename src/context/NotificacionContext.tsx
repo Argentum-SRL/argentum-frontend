@@ -4,7 +4,7 @@ import notificacionService from '@/services/notificacion.service'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import { NotificacionContext, type DataUpdateEvent } from './NotificacionContextBase'
-import { limpiarMensajeNotificacion } from '@/utils/notificacion.utils'
+import { parsearAviso } from '@/utils/avisoNotificacion'
 import {
   esRegresoLargo,
   registrarIdsConocidos,
@@ -99,9 +99,8 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     try {
       const data = await notificacionService.list({ solo_no_leidas: false }, signal)
-      const limpias = data.map((n) => ({ ...n, mensaje: limpiarMensajeNotificacion(n.mensaje) }))
-      setNotificaciones(limpias)
-      return limpias
+      setNotificaciones(data)
+      return data
     } catch (error) {
       if (error && typeof error === 'object' && 'name' in error && (error.name === 'AbortError' || error.name === 'CanceledError')) return null
       console.error('Error fetching notifications:', error)
@@ -140,10 +139,10 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
     try {
       const updated = await notificacionService.updateConfig(payload)
       setConfig(updated)
-      sileo.success({ title: 'Preferencia de notificaciones guardada' })
+      sileo.success({ title: 'Preferencia de notificaciones guardada.' })
     } catch (error) {
       console.error('Error updating notifications config:', error)
-      sileo.error({ title: 'Error al guardar configuración' })
+      sileo.error({ title: 'No se pudo guardar la preferencia. Probá de nuevo.' })
     }
   }, [])
 
@@ -179,7 +178,11 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       if (notif && !notif.leida) {
         setUnreadCount((prev) => Math.max(0, prev - 1))
       }
-      sileo.success({ title: `Notificación silenciada por ${horas} horas` })
+            const msgSilencio =
+        horas === 1
+          ? 'Notificación silenciada por 1 hora.'
+          : `Notificación silenciada por ${horas} horas.`
+      sileo.success({ title: msgSilencio })
     } catch (error) {
       console.error('Error silencing notification:', error)
     }
@@ -195,7 +198,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Error deleting notification:', error)
-      sileo.error({ title: 'No se puede eliminar esta notificación' })
+      sileo.error({ title: 'Esta notificación no se puede eliminar.' })
     }
   }, [notificaciones])
 
@@ -204,7 +207,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
       await notificacionService.marcarTodasLeidas()
       setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
       setUnreadCount(0)
-      sileo.success({ title: 'Todas las notificaciones marcadas como leídas' })
+      sileo.success({ title: 'Todas las notificaciones marcadas como leídas.' })
     } catch (error) {
       console.error('Error marking all as read:', error)
     }
@@ -343,11 +346,7 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
             return
           }
 
-          const rawNotif = data as Notificacion
-          const newNotif: Notificacion = {
-            ...rawNotif,
-            mensaje: limpiarMensajeNotificacion(rawNotif.mensaje),
-          }
+          const newNotif = data as Notificacion
 
           setNotificaciones((prev) => {
             // Evitar duplicados
@@ -363,19 +362,19 @@ export function NotificacionProvider({ children }: { children: ReactNode }) {
             newNotif.nivel === 'CRITICA' || 
             ['PRESUPUESTO_AGOTADO', 'SALDO_CERO', 'GASTO_INUSUAL'].includes(newNotif.tipo)
           ) {
-            sileo.error({ title: newNotif.mensaje })
+            sileo.error({ title: parsearAviso(newNotif.mensaje).titulo })
           } else if (
             newNotif.nivel === 'FINANCIERA_IMPORTANTE' ||
             ['PRESUPUESTO_LIMITE', 'CUOTA_VENCE', 'SUSCRIPCION_HOY', 'PROYECCION_NEGATIVA'].includes(newNotif.tipo)
           ) {
-            sileo.warning({ title: newNotif.mensaje })
+            sileo.warning({ title: parsearAviso(newNotif.mensaje).titulo })
           } else if (
             newNotif.nivel === 'FINANCIERA_INFORMATIVA' ||
             ['RESUMEN_SEMANAL', 'RESUMEN_CICLO'].includes(newNotif.tipo)
           ) {
-            sileo.info({ title: newNotif.mensaje })
+            sileo.info({ title: parsearAviso(newNotif.mensaje).titulo })
           } else {
-            sileo.success({ title: newNotif.mensaje })
+            sileo.success({ title: parsearAviso(newNotif.mensaje).titulo })
           }
 
           // Acompaña el aviso visual con el sonido corto si no se reprodujo ya en otra pestaña.

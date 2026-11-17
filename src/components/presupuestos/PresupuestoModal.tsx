@@ -376,16 +376,18 @@ export default function PresupuestoModal({
       onSuccess()
       onClose()
       sileo.action({
-        title: 'Presupuesto eliminado',
+        title: 'Presupuesto eliminado.',
         button: {
           title: 'Deshacer',
           onClick: async () => {
             try {
               await presupuestoService.restaurarPresupuesto(id, estadoAnterior)
-              sileo.success({ title: 'Presupuesto restaurado' })
+              sileo.success({ title: 'Presupuesto restaurado.' })
               onSuccess()
             } catch (e) {
-              sileo.error({ title: getErrorMessage(e, 'No pudimos restaurar el presupuesto.') })
+                            sileo.error({
+                title: getErrorMessage(e, 'No se pudo restaurar el presupuesto. Probá de nuevo.'),
+              })
             }
           }
         },
@@ -393,7 +395,9 @@ export default function PresupuestoModal({
       })
     } catch (e) {
       console.error(e)
-      sileo.error({ title: getErrorMessage(e, 'No se pudo eliminar el presupuesto') })
+            sileo.error({
+        title: getErrorMessage(e, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
+      })
     }
   }
 
@@ -447,10 +451,10 @@ export default function PresupuestoModal({
 
       if (isEdit) {
         await presupuestoService.updatePresupuesto(presupuesto!.id, payload)
-        sileo.success({ title: 'Presupuesto actualizado' })
+        sileo.success({ title: 'Presupuesto actualizado.' })
       } else {
         await presupuestoService.createPresupuesto(payload)
-        sileo.success({ title: 'Presupuesto creado' })
+        sileo.success({ title: 'Presupuesto creado.' })
       }
       onSuccess()
       onClose()

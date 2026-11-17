@@ -64,12 +64,12 @@ export default function RegistrarRendimientoModal({
         monto,
       }, claveOperacionRef.current)
       claveOperacionRef.current = nuevaClaveOperacion()
-      sileo.success({ title: 'Rendimiento registrado exitosamente' })
+      sileo.success({ title: 'Rendimiento guardado.' })
       onSuccess(updated)
       onClose()
     } catch (err: unknown) {
       sileo.error({
-        title: getErrorMessage(err, 'No pudimos registrar el rendimiento. Intentá de nuevo.'),
+        title: getErrorMessage(err, 'No se pudo guardar el rendimiento. Probá de nuevo.'),
       })
     } finally {
       setIsSubmitting(false)

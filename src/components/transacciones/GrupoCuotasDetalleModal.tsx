@@ -531,7 +531,12 @@ export default function GrupoCuotasDetalleModal({
                         handleReintegroGuardado()
                       } catch (err) {
                         console.error(err)
-                        sileo.error({ title: getErrorMessage(err, 'No pudimos guardar el reintegro.') })
+                        sileo.error({
+                          title: getErrorMessage(
+                            err,
+                            'No se pudo guardar el reintegro. Probá de nuevo.'
+                          ),
+                        })
                       } finally {
                         setSavingReintegro(false)
                       }

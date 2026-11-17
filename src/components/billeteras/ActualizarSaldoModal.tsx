@@ -91,7 +91,7 @@ export default function ActualizarSaldoModal({
       setStep(2)
     } catch (err: unknown) {
       sileo.error({
-        title: getErrorMessage(err, 'No pudimos verificar el saldo. Intentá de nuevo.'),
+        title: getErrorMessage(err, 'No se pudo revisar el saldo. Probá de nuevo.'),
       })
     } finally {
       setIsLoadingPreview(false)
@@ -125,7 +125,7 @@ export default function ActualizarSaldoModal({
       onClose()
     } catch (err: unknown) {
       sileo.error({
-        title: getErrorMessage(err, 'No pudimos actualizar el saldo.'),
+        title: getErrorMessage(err, 'No se pudo actualizar el saldo. Probá de nuevo.'),
       })
     } finally {
       setIsSubmitting(false)

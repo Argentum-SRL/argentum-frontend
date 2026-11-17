@@ -100,10 +100,13 @@ const DatosPersonalesForm: React.FC<{
         sexo: formDatos.sexo || null,
       })
       updateUsuario(updated)
-      sileo.success({ title: 'Datos personales actualizados correctamente' })
+      sileo.success({ title: 'Datos personales actualizados.' })
       onClose()
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No se pudieron actualizar los datos personales.')
+            const msg = getErrorMessage(
+        err,
+        'No se pudieron actualizar los datos personales. Probá de nuevo.'
+      )
       setErrorMsg(msg)
       sileo.error({ title: msg })
     } finally {
@@ -282,13 +285,16 @@ const EmailForm: React.FC<{
       if (usuario) {
         updateUsuario({ ...usuario, email: emailLimpio, email_verificado: false })
       }
-      sileo.success({ title: res.confirmacion || 'Correo actualizado. Se envió un código de verificación.' })
+      sileo.success({ title: 'Email actualizado. Revisá tu casilla para confirmarlo.' })
       onClose()
       if (res.requiere_verificacion_email) {
         navigate('/auth/verificar-email', { state: { email: emailLimpio } })
       }
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No se pudo actualizar el correo. Verificá los datos.')
+            const msg = getErrorMessage(
+        err,
+        'No se pudo actualizar el email. Revisá los datos y probá de nuevo.'
+      )
       setErrorMsg(msg)
       sileo.error({ title: msg })
     } finally {

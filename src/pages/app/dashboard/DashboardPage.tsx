@@ -663,7 +663,9 @@ export default function DashboardPage() {
       }
       console.error('Error loading dashboard:', err)
       setError(true)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.') })
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar los datos. Probá de nuevo.'),
+      })
     } finally {
       if (!signal?.aborted) {
         setLoading(false)
@@ -708,7 +710,9 @@ export default function DashboardPage() {
         return
       }
       console.error('Error loading fin de mes:', err)
-      sileo.error({ title: getErrorMessage(err, 'No pudimos cargar la información. Intentá de nuevo.') })
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudieron cargar los datos. Probá de nuevo.'),
+      })
     }
   }, [])
 
@@ -769,7 +773,7 @@ export default function DashboardPage() {
           return
         }
         console.error('Error fetching subcategories:', err)
-        sileo.error({ title: 'No pudimos cargar el detalle de subcategorías.' })
+        sileo.error({ title: 'No se pudo cargar el detalle de subcategorías. Probá de nuevo.' })
       } finally {
         setLoadingSubcategorias(false)
       }

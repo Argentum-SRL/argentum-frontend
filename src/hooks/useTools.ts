@@ -4,6 +4,7 @@ import type { InflacionEsperadaData, ConvenienciaResult, FinancialContext, CanAf
 import { useSimularCuotas } from '@/hooks/useSimularCuotas';
 import { useAuth } from '@/hooks/useAuth';
 import { sileo } from 'sileo';
+import { getErrorMessage } from '@/utils/errorMessages';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 
 export const useTools = () => {
@@ -88,40 +89,42 @@ export const useTools = () => {
     const tnaVal = formData.tna;
     
     if (contado === null || isNaN(contado) || contado <= 0) {
-      sileo.error({ title: 'El precio de contado debe ser mayor a 0' });
+      sileo.error({ title: 'Ingresá un precio de contado mayor a 0.' });
       return false;
     }
     if (contado > MAX_MONTO_INTEGRIDAD) {
-      sileo.error({ title: 'El precio de contado excede el límite permitido' });
+      sileo.error({ title: 'El precio de contado es demasiado alto. Revisá el número.' });
       return false;
     }
     if (!tiene_interes && (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0)) {
-      sileo.error({ title: 'El precio total en cuotas debe ser mayor a 0' });
+      sileo.error({ title: 'Ingresá un precio en cuotas mayor a 0.' });
       return false;
     }
     if (!tiene_interes && cuotasTotal !== null && cuotasTotal > MAX_MONTO_INTEGRIDAD) {
-      sileo.error({ title: 'El precio en cuotas excede el límite permitido' });
+      sileo.error({ title: 'El precio en cuotas es demasiado alto. Revisá el número.' });
       return false;
     }
     if (cuotas === null || isNaN(cuotas) || cuotas < 1 || cuotas > 120) {
-      sileo.error({ title: 'La cantidad de cuotas debe estar entre 1 y 120' });
+      sileo.error({ title: 'Las cuotas tienen que ser entre 1 y 120.' });
       return false;
     }
     if (isNaN(inflacion) || inflacion < 0 || inflacion > 100) {
-      sileo.error({ title: 'La inflación mensual debe estar entre 0% y 100%' });
+      sileo.error({ title: 'La inflación por mes tiene que ser entre 0% y 100%.' });
       return false;
     }
     if (tiene_interes) {
       const parsedTna = parseFloat(tnaVal);
       if (isNaN(parsedTna) || parsedTna < 0.1 || parsedTna > 3000) {
-        sileo.error({ title: 'Debe ingresar una TNA válida entre 0.1% y 3000%' });
+        sileo.error({ title: 'Ingresá una tasa de entre 0,1% y 3.000% por año.' });
         return false;
       }
     }
     if (formData.hasCapitalToInvest) {
       const parsedInvTna = parseFloat(formData.investmentTna);
       if (isNaN(parsedInvTna) || parsedInvTna < 0.1 || parsedInvTna > 3000) {
-        sileo.error({ title: 'Debe ingresar una TNA de inversión válida entre 0.1% y 3000%' });
+                sileo.error({
+          title: 'Ingresá una tasa de la inversión de entre 0,1% y 3.000% por año.',
+        });
         return false;
       }
     }
@@ -138,13 +141,13 @@ export const useTools = () => {
         tna_billetera_inversion: formData.hasCapitalToInvest ? parseFloat(formData.investmentTna) : undefined
       });
       setResultado(res);
-      sileo.success({ title: 'Cálculo realizado con éxito' });
+      sileo.success({ title: 'Cálculo listo.' });
       return true;
     } catch (err: unknown) {
       console.error(err);
-      const error = err as import('axios').AxiosError<{ error?: { message?: string } }>;
-      const detail = error.response?.data?.error?.message || 'No pudimos calcular. Verificá los datos ingresados.';
-      sileo.error({ title: detail });
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo calcular. Revisá los datos y probá de nuevo.'),
+      });
       return false;
     } finally {
       setCalculando(false);
@@ -214,7 +217,7 @@ export const useTools = () => {
     } catch (err) {
       console.error('Error al cargar contexto financiero:', err);
       setFinancialContextError(true);
-      sileo.error({ title: 'No pudimos cargar tu contexto financiero real.' });
+      sileo.error({ title: 'No se pudieron cargar tus datos. Probá de nuevo.' });
     } finally {
       setFinancialContextLoading(false);
     }
@@ -232,21 +235,21 @@ export const useTools = () => {
   const canAffordCalcular = async () => {
     const precio = canAffordForm.precio_total;
     if (precio === null || isNaN(precio) || precio <= 0) {
-      sileo.error({ title: 'El precio de la compra debe ser mayor a 0' });
+      sileo.error({ title: 'Ingresá un precio mayor a 0.' });
       return;
     }
     if (precio > MAX_MONTO_INTEGRIDAD) {
-      sileo.error({ title: 'El precio de la compra excede el límite permitido' });
+      sileo.error({ title: 'El precio es demasiado alto. Revisá el número.' });
       return;
     }
     if (canAffordForm.modo === 'cuotas' && (canAffordForm.cantidad_cuotas === null || isNaN(canAffordForm.cantidad_cuotas) || canAffordForm.cantidad_cuotas < 2 || canAffordForm.cantidad_cuotas > 120)) {
-      sileo.error({ title: 'La cantidad de cuotas debe estar entre 2 y 120' });
+      sileo.error({ title: 'Las cuotas tienen que ser entre 2 y 120.' });
       return;
     }
     if (canAffordForm.modo === 'cuotas' && tieneInteres) {
       const parsedTna = parseFloat(tna);
       if (isNaN(parsedTna) || parsedTna < 0.1 || parsedTna > 3000) {
-        sileo.error({ title: 'Debe ingresar una TNA válida entre 0.1% y 3000%' });
+        sileo.error({ title: 'Ingresá una tasa de entre 0,1% y 3.000% por año.' });
         return;
       }
     }
@@ -264,12 +267,12 @@ export const useTools = () => {
       });
       cerrarGastoFijo();
       setCanAffordResult(res);
-      sileo.success({ title: 'Análisis realizado con éxito' });
+      sileo.success({ title: 'Cálculo listo.' });
     } catch (err: unknown) {
       console.error(err);
-      const error = err as import('axios').AxiosError<{ error?: { message?: string } }>;
-      const detail = error.response?.data?.error?.message || 'No pudimos realizar el análisis de compra.';
-      sileo.error({ title: detail });
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo hacer el cálculo. Probá de nuevo.'),
+      });
     } finally {
       setCanAffordCalculando(false);
     }
@@ -292,11 +295,11 @@ export const useTools = () => {
   const gastoFijoCalcular = async () => {
     const monto = gastoFijoMonto;
     if (monto === null || isNaN(monto) || monto <= 0) {
-      sileo.error({ title: 'El precio de la compra debe ser mayor a 0' });
+      sileo.error({ title: 'Ingresá un precio mayor a 0.' });
       return;
     }
     if (monto > MAX_MONTO_INTEGRIDAD) {
-      sileo.error({ title: 'El precio de la compra excede el límite permitido' });
+      sileo.error({ title: 'El precio es demasiado alto. Revisá el número.' });
       return;
     }
 
@@ -309,12 +312,12 @@ export const useTools = () => {
         tiene_interes: false,
       });
       setGastoFijoResult(res);
-      sileo.success({ title: 'Análisis realizado con éxito' });
+      sileo.success({ title: 'Cálculo listo.' });
     } catch (err: unknown) {
       console.error(err);
-      const error = err as import('axios').AxiosError<{ error?: { message?: string } }>;
-      const detail = error.response?.data?.error?.message || 'No pudimos realizar el análisis de compra.';
-      sileo.error({ title: detail });
+      sileo.error({
+        title: getErrorMessage(err, 'No se pudo hacer el cálculo. Probá de nuevo.'),
+      });
     } finally {
       setGastoFijoCalculando(false);
     }

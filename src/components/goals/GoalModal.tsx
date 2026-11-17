@@ -188,10 +188,10 @@ export default function GoalModal({
 
       if (isEdit) {
         await goalsService.updateGoal(goal!.id, payload)
-        sileo.success({ title: 'Meta actualizada' })
+        sileo.success({ title: 'Meta actualizada.' })
       } else {
         await goalsService.createGoal(payload)
-        sileo.success({ title: 'Meta creada' })
+        sileo.success({ title: 'Meta creada.' })
       }
       onSuccess()
       onClose()

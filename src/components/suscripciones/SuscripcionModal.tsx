@@ -580,14 +580,14 @@ export default function SuscripcionModal({
       if (!nombre.trim()) {
         dispatch({ type: 'SET_FIELD', field: 'isEditingName', value: true })
       } else if (!monto) {
-        sileo.error({ title: 'Completá los campos obligatorios' })
+        sileo.error({ title: 'Completá los datos que faltan.' })
       }
       return
     }
 
     const hoyLocal = getHoyLocal()
     if (proximo_cobro < hoyLocal) {
-      sileo.error({ title: 'Tiene que ser hoy o una fecha futura.' })
+      sileo.error({ title: 'La fecha tiene que ser hoy o más adelante.' })
       return
     }
 
@@ -607,10 +607,10 @@ export default function SuscripcionModal({
 
       if (isEdit && suscripcion) {
         await suscripcionService.updateSuscripcion(suscripcion.id, payload)
-        sileo.success({ title: 'Suscripción actualizada' })
+        sileo.success({ title: 'Suscripción actualizada.' })
       } else {
         await suscripcionService.createSuscripcion(payload as SuscripcionCreate)
-        sileo.success({ title: 'Suscripción creada' })
+        sileo.success({ title: 'Suscripción creada.' })
       }
 
       void suscripcionService.getSuscripciones().then(setCachedSuscripciones)
@@ -618,7 +618,7 @@ export default function SuscripcionModal({
       onClose()
     } catch (error: unknown) {
       sileo.error({
-        title: getErrorMessage(error, 'No pudimos guardar la suscripción. Intentá de nuevo.'),
+        title: getErrorMessage(error, 'No se pudo guardar la suscripción. Probá de nuevo.'),
       })
     } finally {
       dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: false })

@@ -83,7 +83,7 @@ export default function VinculacionWhatsAppCard({
     } catch (err: unknown) {
       const msg = getErrorMessage(
         err,
-        'No pudimos generar el código de vinculación. Intentá de nuevo.'
+        'No se pudo generar el código para vincular. Probá de nuevo.'
       )
       setApiError(msg)
       sileo.error({ title: msg })
@@ -122,7 +122,7 @@ export default function VinculacionWhatsAppCard({
 
       if (me?.telefono_verificado && (esPrimeraVinculacion || telefonoCambio)) {
         setVinculado(true)
-        sileo.success({ title: '¡Tu cuenta de WhatsApp fue vinculada exitosamente!' })
+        sileo.success({ title: 'WhatsApp vinculado.' })
 
         setTimeout(async () => {
           updateUsuario(me)
@@ -172,10 +172,10 @@ export default function VinculacionWhatsAppCard({
     try {
       await navigator.clipboard.writeText(codigoData.link_whatsapp)
       setCopied(true)
-      sileo.success({ title: 'Enlace de WhatsApp copiado al portapapeles' })
+      sileo.success({ title: 'Enlace copiado.' })
       setTimeout(() => setCopied(false), 2500)
     } catch {
-      sileo.error({ title: 'No se pudo copiar el enlace' })
+      sileo.error({ title: 'No se pudo copiar el enlace. Copialo a mano.' })
     }
   }
 

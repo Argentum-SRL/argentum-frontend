@@ -266,15 +266,17 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   // Mensaje de éxito del toast
   const successToastTitle = useMemo(() => {
     if (tipoOperacion === 'fx') {
-      return fxDirection === 'compra' ? 'Compra de dólares registrada' : 'Venta de dólares registrada'
+      return fxDirection === 'compra'
+        ? 'Compra de dólares guardada.'
+        : 'Venta de dólares guardada.'
     }
     if (tipoMovimientoDetectado === 'extraccion') {
-      return 'Extracción de efectivo registrada'
+      return 'Extracción guardada.'
     }
     if (tipoMovimientoDetectado === 'deposito') {
-      return 'Depósito registrado con éxito'
+      return 'Depósito guardado.'
     }
-    return 'Transferencia realizada con éxito'
+    return 'Transferencia guardada.'
   }, [tipoOperacion, fxDirection, tipoMovimientoDetectado])
 
   // Placeholder de nota según movimiento detectado
@@ -295,11 +297,11 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
   const goNext = () => {
     if (step === 1) {
       if (!monto || monto <= 0) {
-        sileo.error({ title: 'Ingresá un monto válido mayor a 0' })
+        sileo.error({ title: 'Ingresá un monto mayor a 0.' })
         return
       }
       if (!billeteraOrigenId) {
-        sileo.error({ title: 'Seleccioná la cuenta de origen' })
+        sileo.error({ title: 'Elegí la cuenta de origen.' })
         return
       }
 
@@ -307,7 +309,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       setStep(2)
     } else if (step === 2) {
       if (!billeteraDestinoId) {
-        sileo.error({ title: 'Seleccioná la cuenta de destino' })
+        sileo.error({ title: 'Elegí la cuenta de destino.' })
         return
       }
       setAnimClass(styles.slideForward)
@@ -318,7 +320,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       }
     } else if (step === 3) {
       if (!cotizacionActivaValor || cotizacionActivaValor <= 0) {
-        sileo.error({ title: 'Ingresá una cotización válida' })
+        sileo.error({ title: 'Ingresá una cotización mayor a 0.' })
         return
       }
       setAnimClass(styles.slideForward)
@@ -377,7 +379,9 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
       onClose()
     } catch (err: unknown) {
       console.error(err)
-      sileo.error({ title: getErrorMessage(err, 'Error al procesar la transferencia.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo guardar la transferencia. Probá de nuevo.'),
+      })
     } finally {
       setIsSubmitting(false)
     }

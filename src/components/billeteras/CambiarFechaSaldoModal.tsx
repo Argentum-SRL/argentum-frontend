@@ -130,7 +130,7 @@ export default function CambiarFechaSaldoModal({
     setApiError(null)
     try {
       await billeteraService.cambiarFechaSaldo(billetera.id, fechaNueva)
-      sileo.success({ title: 'Listo, fecha del saldo cambiada.' })
+      sileo.success({ title: 'Fecha del saldo actualizada.' })
       onActualizado()
       onClose()
     } catch (err: unknown) {

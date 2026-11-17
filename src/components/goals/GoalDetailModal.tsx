@@ -136,11 +136,18 @@ export default function GoalDetailModal({
     const nuevoEstado = goal.estado === EstadoMeta.ACTIVA ? EstadoMeta.PAUSADA : EstadoMeta.ACTIVA
     try {
       await goalsService.updateGoal(goal.id, { estado: nuevoEstado })
-      sileo.success({ title: `Meta ${nuevoEstado === EstadoMeta.PAUSADA ? 'pausada' : 'reanudada'}` })
+            sileo.success({
+        title:
+          nuevoEstado === EstadoMeta.PAUSADA
+            ? 'Meta pausada.'
+            : 'Meta reanudada.',
+      })
       void refreshGoal()
       onSuccess?.()
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'Error al cambiar el estado') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo cambiar el estado de la meta. Probá de nuevo.'),
+      })
     }
   }
 
@@ -156,11 +163,13 @@ export default function GoalDetailModal({
       onConfirm: async () => {
         try {
           await goalsService.deleteMovement(goal.id, movementId)
-          sileo.success({ title: 'Movimiento eliminado' })
+          sileo.success({ title: 'Movimiento eliminado.' })
           void refreshGoal()
           onSuccess?.()
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar el movimiento.') })
+                    sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar el movimiento. Probá de nuevo.'),
+          })
         }
       }
     })
@@ -192,11 +201,13 @@ export default function GoalDetailModal({
       onConfirm: async () => {
         try {
           await goalsService.deleteGoal(goal.id)
-          sileo.success({ title: 'Meta eliminada' })
+          sileo.success({ title: 'Meta eliminada.' })
           onClose()
           onSuccess?.()
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos eliminar la meta.') })
+                    sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar la meta. Probá de nuevo.'),
+          })
         }
       }
     })

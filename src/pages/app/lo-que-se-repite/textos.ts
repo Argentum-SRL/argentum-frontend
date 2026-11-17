@@ -43,8 +43,8 @@ export const TEXTOS = {
 
   // Avisos
   AVISOS: {
-    DESCARTADO: 'Listo, no lo vamos a mostrar más.',
-    ERROR_DEFAULT: 'No pudimos guardar el cambio. Probá de nuevo.',
+    DESCARTADO: 'No se va a mostrar más.',
+    ERROR_DEFAULT: 'No se pudo guardar el cambio. Probá de nuevo.',
     PREFIX_MOVIDO: 'Lo pasaste a ',
   },
 

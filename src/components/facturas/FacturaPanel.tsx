@@ -176,7 +176,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
       }, claveOperacionRef.current)
 
       claveOperacionRef.current = nuevaClaveOperacion()
-      sileo.success({ title: 'Listo, la anoté como gasto.' })
+      sileo.success({ title: 'Factura guardada como gasto.' })
       onClose()
       onSuccess()
     } catch (err: unknown) {
@@ -196,7 +196,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
 
     try {
       await facturaService.descartar(factura.id)
-      sileo.success({ title: 'Listo, la saqué de tus próximos pagos.' })
+      sileo.success({ title: 'Factura sacada de tus próximos pagos.' })
       onClose()
       onSuccess()
     } catch (err: unknown) {
@@ -216,7 +216,7 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
 
     try {
       await facturaService.desmarcar(factura.id)
-      sileo.success({ title: 'Listo, vuelve a estar pendiente.' })
+      sileo.success({ title: 'Factura pendiente otra vez.' })
       onClose()
       onSuccess()
     } catch (err: unknown) {

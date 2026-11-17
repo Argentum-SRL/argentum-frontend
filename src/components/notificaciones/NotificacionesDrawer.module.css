@@ -253,7 +253,10 @@
   justify-content: space-between;
 }
 
-.message {
+.message,
+.messageTitle,
+.messageText,
+.messageList {
   font-size: 14px;
   line-height: 1.4;
   color: var(--text);
@@ -262,8 +265,23 @@
   padding-right: 110px;
 }
 
-.cardUnread .message {
+.messageTitle {
+  font-weight: 600;
+}
+
+.messageList {
+  list-style: disc;
+  padding-left: 18px;
+}
+
+.cardUnread .message,
+.cardUnread .messageText,
+.cardUnread .messageList {
   font-weight: 500;
+}
+
+.cardUnread .messageTitle {
+  font-weight: 600;
 }
 
 .metaRow {
@@ -561,7 +579,10 @@
     border-radius: 8px;
   }
 
-  .message {
+  .message,
+  .messageTitle,
+  .messageText,
+  .messageList {
     font-size: 13.5px;
     line-height: 1.35;
     padding-right: 30px;

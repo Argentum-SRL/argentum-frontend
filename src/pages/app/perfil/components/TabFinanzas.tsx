@@ -250,18 +250,18 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
     if (!isDirty || isSaving) return
 
     if ((monedaPrincipal === 'USD' || monedaSecundariaActiva) && !tipoDolar) {
-      sileo.error({ title: 'Debés seleccionar una cotización de referencia para el dólar.' })
+      sileo.error({ title: 'Elegí qué dólar usar de referencia.' })
       return
     }
 
     if (ciclo.tipo === 'dia_fijo') {
       const diaNum = parseInt(ciclo.valor, 10)
       if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
-        sileo.error({ title: 'El día de corte debe ser un número entero entre 1 y 31.' })
+        sileo.error({ title: 'El día de corte tiene que ser del 1 al 31.' })
         return
       }
     } else if (ciclo.tipo === 'regla' && !ciclo.valor) {
-      sileo.error({ title: 'Seleccioná un día hábil válido.' })
+      sileo.error({ title: 'Elegí un día hábil.' })
       return
     }
 
@@ -292,9 +292,14 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
       if (updatedUser) {
         updateUsuario(updatedUser)
       }
-      sileo.success({ title: 'Configuración financiera guardada' })
+      sileo.success({ title: 'Configuración financiera guardada.' })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo guardar la configuración financiera.') })
+            sileo.error({
+        title: getErrorMessage(
+          err,
+          'No se pudo guardar la configuración financiera. Probá de nuevo.'
+        ),
+      })
     } finally {
       setIsSaving(false)
     }

@@ -73,11 +73,11 @@ export const MonitorWppPanel: React.FC = () => {
       setResumen(resumenData)
       setConversacionesData(convsData)
       if (mostrarFeedback) {
-        sileo.success({ title: 'Monitor de WhatsApp actualizado' })
+        sileo.success({ title: 'Monitor de WhatsApp actualizado.' })
       }
     } catch (err: unknown) {
       console.error('Error al cargar monitor wpp:', err)
-      sileo.error({ title: 'No se pudo cargar el monitor de WhatsApp' })
+      sileo.error({ title: 'No se pudo cargar el monitor de WhatsApp. Probá de nuevo.' })
     } finally {
       setLoading(false)
     }
@@ -97,7 +97,7 @@ export const MonitorWppPanel: React.FC = () => {
       .catch((err: unknown) => {
         if (!activo) return
         console.error('Error al cargar monitor wpp:', err)
-        sileo.error({ title: 'No se pudo cargar el monitor de WhatsApp' })
+        sileo.error({ title: 'No se pudo cargar el monitor de WhatsApp. Probá de nuevo.' })
       })
       .finally(() => {
         if (activo) {

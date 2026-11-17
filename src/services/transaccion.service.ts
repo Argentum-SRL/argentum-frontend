@@ -66,7 +66,7 @@ const transaccionService = {
     if (cuotas && Number(cuotas) > 1) {
       setTimeout(() => {
         sileo.info({
-          title: 'Vas a ver cada cuota en Transacciones el día de pago de la tarjeta. La compra completa queda en la pestaña Cuotas.',
+          title: 'Vas a ver cada cuota en Transacciones cuando vence la tarjeta.',
           duration: 6000,
         })
       }, 700)

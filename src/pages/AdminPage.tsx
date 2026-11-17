@@ -300,7 +300,7 @@ export default function AdminPage() {
         case 'eliminar': {
           const targetEmail = (confirmAction.expectedEmail || '').trim().toLowerCase()
           if (!emailConfirmInput.trim() || emailConfirmInput.trim().toLowerCase() !== targetEmail) {
-            sileo.error({ title: 'El email ingresado no coincide con el email de confirmación.' })
+            sileo.error({ title: 'Los dos emails tienen que ser iguales.' })
             setActionLoading(false)
             return
           }
@@ -322,7 +322,9 @@ export default function AdminPage() {
       fetchUsuarios()
       fetchStats()
     } catch (err) {
-      sileo.error({ title: getErrorMessage(err, "No pudimos completar la acción. Intentá de nuevo.") })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo guardar el cambio. Probá de nuevo.'),
+      })
     } finally {
       setActionLoading(false)
     }

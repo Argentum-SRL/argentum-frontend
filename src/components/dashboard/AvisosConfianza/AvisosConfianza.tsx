@@ -44,7 +44,7 @@ export default function AvisosConfianza({ frescura, onActualizado }: AvisosConfi
       })
     } catch (err: unknown) {
       sileo.error({
-        title: getErrorMessage(err, 'No pudimos abrir el formulario. Probá de nuevo.'),
+        title: getErrorMessage(err, 'No se pudo abrir el formulario. Probá de nuevo.'),
       })
     } finally {
       setCargandoForm(false)
@@ -83,7 +83,7 @@ export default function AvisosConfianza({ frescura, onActualizado }: AvisosConfi
       setOculta(true)
     } catch (err: unknown) {
       sileo.error({
-        title: getErrorMessage(err, 'No pudimos saltear la pregunta.'),
+        title: getErrorMessage(err, 'No se pudo saltear la pregunta. Probá de nuevo.'),
       })
     }
   }, [billeteraPregunta])

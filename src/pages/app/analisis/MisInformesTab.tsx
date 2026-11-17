@@ -123,7 +123,9 @@ export default function MisInformesTab({ onPedidoInformeChange }: MisInformesTab
       setInformes((prev) => prev.filter((i) => i.id !== id))
       sileo.success({ title: 'Informe eliminado.' })
     } catch (err) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo eliminar el informe.') })
+                sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar el informe. Probá de nuevo.'),
+          })
     }
   }
 
@@ -155,7 +157,9 @@ export default function MisInformesTab({ onPedidoInformeChange }: MisInformesTab
       setModoVista('visor')
       sileo.success({ title: 'Plantilla guardada en Mis Informes.' })
     } catch (err) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudo guardar la plantilla.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudo guardar la plantilla. Probá de nuevo.'),
+      })
     }
   }
 

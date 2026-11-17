@@ -83,8 +83,8 @@ export default function StepMoneda({ datosIniciales, onNext }: Props) {
       await finalizar(paso)
     } catch (err: unknown) {
       const defaultMsg = guardadoExitoso
-        ? "No pudimos completar la configuración de tu cuenta. Por favor intentá de nuevo."
-        : "No pudimos guardar tu moneda. Intentá de nuevo."
+        ? 'No se pudo terminar de configurar tu cuenta. Probá de nuevo.'
+        : 'No se pudo guardar tu moneda. Probá de nuevo.'
       const msg = getErrorMessage(err, defaultMsg)
       setError(msg)
       sileo.error({ title: msg })

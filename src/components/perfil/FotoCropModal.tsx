@@ -4,6 +4,7 @@ import Modal from '@/components/ui/Modal/Modal'
 import usuarioService from '@/services/usuario.service'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
+import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './FotoCropModal.module.css'
 
 interface FotoCropModalProps {
@@ -72,7 +73,9 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
     if (!file) return
 
     if (file.size > 5 * 1024 * 1024) {
-      sileo.error({ title: 'La foto supera el límite de 5MB' })
+            sileo.error({
+        title: 'La foto es muy pesada (máximo 5 MB). Elegí una más liviana.',
+      })
       return
     }
 
@@ -148,11 +151,12 @@ export default function FotoCropModal({ open, onClose, onSuccess }: FotoCropModa
           updateUsuario({ ...usuario, foto_url: res.foto_url })
         }
         onSuccess(res.foto_url)
-        sileo.success({ title: 'Foto de perfil actualizada' })
+        sileo.success({ title: 'Foto de perfil actualizada.' })
         handleClose()
       } catch (err: unknown) {
-        const error = err as { response?: { data?: { detail?: string } } }
-        sileo.error({ title: error.response?.data?.detail || 'Error al subir la foto' })
+        sileo.error({
+          title: getErrorMessage(err, 'No se pudo subir la foto. Probá de nuevo.'),
+        })
       } finally {
         setIsSaving(false)
       }

@@ -4,6 +4,7 @@ import ModalFooter from '@/components/ui/Modal/ModalFooter'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import Button from '@/components/ui/Button/Button'
 import { sileo } from 'sileo'
+import { getErrorMessage } from '@/utils/errorMessages'
 import presupuestoService from '@/services/presupuesto.service'
 import { leerDetalleError } from '@/utils/excelPresupuestos'
 import styles from './DescargarExcelModal.module.css'
@@ -39,13 +40,16 @@ export default function DescargarExcelModal({ isOpen, onClose }: DescargarExcelM
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      sileo.success({ title: 'Listo, se descargó tu Excel.' })
+      sileo.success({ title: 'Excel descargado.' })
       onClose()
     } catch (err: unknown) {
       const errObj = err as { response?: { data?: unknown } }
       const detalle = await leerDetalleError(errObj?.response?.data)
       sileo.error({
-        title: detalle || 'No pudimos armar el Excel. Probá de nuevo en unos minutos.',
+        title: getErrorMessage(
+          detalle ? { response: { data: { detail: detalle } } } : err,
+          'No se pudo armar el Excel. Probá de nuevo en unos minutos.'
+        ),
       })
     } finally {
       setDescargando(false)

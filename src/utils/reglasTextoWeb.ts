@@ -95,7 +95,7 @@ export function problemasTextoWeb(texto: string): string[] {
   ) {
     res.push('W9_FECHA')
   }
-  if (/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u.test(texto)) {
+  if (/(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]|\u{FE0F})/u.test(texto)) {
     res.push('W10_EMOJI')
   }
   if (new RegExp('https?://|www\\.|\\.com' + Z, 'iu').test(texto)) {

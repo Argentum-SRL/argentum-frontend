@@ -61,7 +61,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
       })
 
       if (res.cantidad_anteriores === 0) {
-        sileo.success({ title: 'Listo, lo voy a recordar.' })
+        sileo.success({ title: 'Categoría guardada para este comercio.' })
         onClose()
       } else {
         setMemoriaId(res.memoria_id)
@@ -70,7 +70,9 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
       }
     } catch (error) {
       console.error(error)
-      sileo.error({ title: getErrorMessage(error, 'Error al guardar la memoria por comercio') })
+            sileo.error({
+        title: getErrorMessage(error, 'No se pudo recordar el comercio. Probá de nuevo.'),
+      })
       onClose()
     } finally {
       setIsLoading(false)
@@ -79,7 +81,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
 
   const handleDejarlosComoEstan = () => {
     if (isLoading) return
-    sileo.success({ title: 'Listo, lo voy a recordar.' })
+    sileo.success({ title: 'Categoría guardada para este comercio.' })
     onClose()
   }
 
@@ -91,14 +93,23 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
         memoria_id: memoriaId,
         transaccion_ids: anteriores.map((a) => a.id),
       })
+      const nAct = res.actualizadas
       sileo.success({
-        title: `Listo: ${res.actualizadas} movimiento(s) actualizado(s).`,
+        title:
+          nAct === 1
+            ? '1 transacción actualizada.'
+            : `${nAct} transacciones actualizadas.`,
       })
       onSuccess?.()
       onClose()
     } catch (error) {
       console.error(error)
-      sileo.error({ title: getErrorMessage(error, 'Error al aplicar la categoría a los anteriores') })
+            sileo.error({
+        title: getErrorMessage(
+          error,
+          'No se pudo cambiar la categoría de los anteriores. Probá de nuevo.'
+        ),
+      })
       onClose()
     } finally {
       setIsLoading(false)

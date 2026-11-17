@@ -107,13 +107,16 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
         password_nueva: passwordNueva,
         password_nueva_confirmacion: passwordConfirm,
       })
-      sileo.success({ title: 'Contraseña actualizada con éxito' })
+      sileo.success({ title: 'Contraseña actualizada.' })
       handleCancelPassword()
       if (usuario) {
         updateUsuario({ ...usuario, password_configurada: true })
       }
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No se pudo actualizar la contraseña. Verificá que la contraseña actual sea correcta.')
+            const msg = getErrorMessage(
+        err,
+        'No se pudo cambiar la contraseña. Revisá la contraseña actual.'
+      )
       setPwError(msg)
       sileo.error({ title: msg })
     } finally {
@@ -148,9 +151,11 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
         try {
           const usuarioActualizado = await usuarioService.desvincularTelefono()
           updateUsuario(usuarioActualizado)
-          sileo.success({ title: 'Tu cuenta de WhatsApp fue desvinculada exitosamente.' })
+          sileo.success({ title: 'WhatsApp desvinculado.' })
         } catch (err: unknown) {
-          sileo.error({ title: getErrorMessage(err, 'No pudimos desvincular tu cuenta de WhatsApp.') })
+                    sileo.error({
+            title: getErrorMessage(err, 'No se pudo desvincular tu WhatsApp. Probá de nuevo.'),
+          })
         } finally {
           setIsDesvinculando(false)
         }
@@ -172,9 +177,11 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
         const usuarioActualizado = await usuarioService.actualizarPermisoMensajes(permisoMensajes)
         updateUsuario(usuarioActualizado)
       }
-      sileo.success({ title: 'Preferencias de seguridad guardadas' })
+      sileo.success({ title: 'Preferencias de seguridad guardadas.' })
     } catch (err: unknown) {
-      sileo.error({ title: getErrorMessage(err, 'No se pudieron guardar las preferencias.') })
+            sileo.error({
+        title: getErrorMessage(err, 'No se pudieron guardar las preferencias. Probá de nuevo.'),
+      })
     } finally {
       setIsSavingSecurity(false)
     }
@@ -195,7 +202,7 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
           await logout()
         } catch (err: unknown) {
           sileo.error({
-            title: getErrorMessage(err, 'No pudimos cerrar las sesiones.'),
+            title: getErrorMessage(err, 'No se pudieron cerrar las sesiones. Probá de nuevo.'),
           })
         }
       },
@@ -214,10 +221,10 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      sileo.success({ title: 'Tus datos se descargaron correctamente.' })
+      sileo.success({ title: 'Datos descargados.' })
     } catch (err: unknown) {
       sileo.error({
-        title: getErrorMessage(err, 'No pudimos generar el archivo. Probá de nuevo en unos minutos.'),
+        title: getErrorMessage(err, 'No se pudo armar el archivo. Probá de nuevo en unos minutos.'),
       })
     } finally {
       setIsDownloading(false)

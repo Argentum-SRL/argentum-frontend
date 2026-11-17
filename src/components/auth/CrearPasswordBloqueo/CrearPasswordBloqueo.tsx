@@ -49,10 +49,13 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
         password_nueva: password,
         password_nueva_confirmacion: passwordConfirm,
       })
-      sileo.success({ title: '¡Contraseña configurada con éxito!' })
+      sileo.success({ title: 'Contraseña creada.' })
       updateUsuario({ ...usuario, password_configurada: true })
     } catch (err: unknown) {
-      const msg = getErrorMessage(err, 'No se pudo configurar la contraseña. Verificá los datos e intentá de nuevo.')
+            const msg = getErrorMessage(
+        err,
+        'No se pudo guardar la contraseña. Revisá los datos y probá de nuevo.'
+      )
       setErrorMsg(msg)
       sileo.error({ title: msg })
     } finally {

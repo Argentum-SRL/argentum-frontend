@@ -31,7 +31,12 @@ export default function StepWhatsApp({ onNext }: Props) {
       }
     } catch (err: unknown) {
       setPermiso(!nuevoValor)
-      sileo.error({ title: getErrorMessage(err, 'No se pudo actualizar el permiso de lectura de mensajes.') })
+            sileo.error({
+        title: getErrorMessage(
+          err,
+          'No se pudo cambiar el permiso de lectura de mensajes. Probá de nuevo.'
+        ),
+      })
     } finally {
       setLoadingPermiso(false)
     }

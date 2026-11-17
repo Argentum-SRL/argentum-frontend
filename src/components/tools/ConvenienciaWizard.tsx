@@ -3,32 +3,29 @@ import type { InflacionEsperadaData, ConvenienciaResult as IConvenienciaResult }
 import type { PlanCuotas } from '@/types';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { totalDesdeCuota, cuotaDesdeTotal } from '@/utils/ayudasEscritura';
+import { resolverValorCuotaFormulario, resolverTotalCuotasFormulario } from './conveniencia';
 import ConvenienciaForm from './ConvenienciaForm';
 import ConvenienciaSidebar from './ConvenienciaSidebar';
 
 const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
 
+export interface ConvenienciaFormState {
+  precio_contado: number | null;
+  precio_total_cuotas: number | null;
+  valor_cuota: number | null;
+  sin_interes: boolean;
+  cantidad_cuotas: number | null;
+  inflacion_mensual: string;
+  usar_inflacion_propia: boolean;
+  tiene_interes: boolean;
+  tna: string;
+  hasCapitalToInvest: boolean;
+  investmentTna: string;
+}
+
 export interface ConvenienciaWizardProps {
-  formData: {
-    precio_contado: number | null;
-    precio_total_cuotas: number | null;
-    cantidad_cuotas: number | null;
-    inflacion_mensual: string;
-    tiene_interes: boolean;
-    tna: string;
-    hasCapitalToInvest: boolean;
-    investmentTna: string;
-  };
-  setFormData: React.Dispatch<React.SetStateAction<{
-    precio_contado: number | null;
-    precio_total_cuotas: number | null;
-    cantidad_cuotas: number | null;
-    inflacion_mensual: string;
-    tiene_interes: boolean;
-    tna: string;
-    hasCapitalToInvest: boolean;
-    investmentTna: string;
-  }>>;
+  formData: ConvenienciaFormState;
+  setFormData: React.Dispatch<React.SetStateAction<ConvenienciaFormState>>;
   resultado: IConvenienciaResult | null;
   calculando: boolean;
   calcular: () => Promise<boolean>;
@@ -60,9 +57,10 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   );
   const [showDetailedReport, setShowDetailedReport] = useState<boolean>(false);
 
-  // Modo de ingreso para cuotas fijas: 'cuota' | 'total'
-  const [fixedMode, setFixedMode] = useState<'cuota' | 'total'>('total');
+  // Modo de ingreso para cuotas fijas: por defecto 'cuota' (lo que muestra el comercio)
+  const [fixedMode, setFixedMode] = useState<'cuota' | 'total'>('cuota');
   const [cuotaInputValue, setCuotaInputValue] = useState<number | null>(() => {
+    if (formData.valor_cuota != null) return formData.valor_cuota;
     if (formData.precio_total_cuotas && formData.cantidad_cuotas) {
       return cuotaDesdeTotal(formData.precio_total_cuotas, formData.cantidad_cuotas);
     }
@@ -75,14 +73,17 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
     setFormData({
       precio_contado: null,
       precio_total_cuotas: null,
+      valor_cuota: null,
+      sin_interes: false,
       cantidad_cuotas: 12,
       inflacion_mensual: ipcData?.valor_mensual ? ipcData.valor_mensual.toString() : '',
+      usar_inflacion_propia: false,
       tiene_interes: false,
       tna: '',
       hasCapitalToInvest: false,
       investmentTna: '',
     });
-    setFixedMode('total');
+    setFixedMode('cuota');
     setCuotaInputValue(null);
     setShowDetailedReport(false);
     setCurrentStep(1);
@@ -97,8 +98,48 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
     setFormData(prev => {
       const next = { ...prev, [field]: value };
       if (field === 'tiene_interes') {
-        if (value === true) next.precio_total_cuotas = null;
-        else next.tna = '';
+        if (value === true) {
+          next.precio_total_cuotas = null;
+          next.valor_cuota = null;
+          next.sin_interes = false;
+        } else {
+          next.tna = '';
+        }
+      }
+      if (field === 'sin_interes') {
+        if (value === true) {
+          next.tiene_interes = false;
+          next.tna = '';
+          const calc = resolverValorCuotaFormulario({
+            precioContado: next.precio_contado,
+            cantidadCuotas: next.cantidad_cuotas,
+            sinInteres: true,
+            seLaTasa: false,
+            cuotaManual: null,
+            cuotaSimuladaBackend: null,
+          });
+          next.valor_cuota = calc;
+          next.precio_total_cuotas = next.precio_contado;
+          setCuotaInputValue(calc);
+        } else {
+          next.valor_cuota = null;
+          next.precio_total_cuotas = null;
+          setCuotaInputValue(null);
+        }
+      }
+      if (field === 'precio_contado' && prev.sin_interes) {
+        const contadoVal = typeof value === 'number' ? value : null;
+        const calc = resolverValorCuotaFormulario({
+          precioContado: contadoVal,
+          cantidadCuotas: next.cantidad_cuotas,
+          sinInteres: true,
+          seLaTasa: false,
+          cuotaManual: null,
+          cuotaSimuladaBackend: null,
+        });
+        next.valor_cuota = calc;
+        next.precio_total_cuotas = contadoVal;
+        setCuotaInputValue(calc);
       }
       if (field === 'hasCapitalToInvest' && value === false) {
         next.investmentTna = '';
@@ -135,31 +176,54 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
 
   const handleCuotaValChange = (val: number | null) => {
     setCuotaInputValue(val);
-    if (val !== null && val > 0 && formData.cantidad_cuotas) {
-      handleChange('precio_total_cuotas', totalDesdeCuota(val, formData.cantidad_cuotas));
-    } else {
-      handleChange('precio_total_cuotas', null);
-    }
+    if (resultado) resetCalculadora();
+    setFormData(prev => ({
+      ...prev,
+      sin_interes: false,
+      valor_cuota: val,
+      precio_total_cuotas:
+        val !== null && val > 0 && prev.cantidad_cuotas
+          ? totalDesdeCuota(val, prev.cantidad_cuotas)
+          : null,
+    }));
   };
 
   const handleTotalValChange = (val: number | null) => {
-    handleChange('precio_total_cuotas', val);
-    if (val !== null && val > 0 && formData.cantidad_cuotas) {
-      setCuotaInputValue(cuotaDesdeTotal(val, formData.cantidad_cuotas));
-    } else {
-      setCuotaInputValue(null);
-    }
+    if (resultado) resetCalculadora();
+    const calc =
+      val !== null && val > 0 && formData.cantidad_cuotas
+        ? cuotaDesdeTotal(val, formData.cantidad_cuotas)
+        : null;
+    setCuotaInputValue(calc);
+    setFormData(prev => ({
+      ...prev,
+      sin_interes: false,
+      valor_cuota: calc,
+      precio_total_cuotas: val,
+    }));
   };
 
   const handleCuotasCountChange = (n: number | null) => {
-    handleChange('cantidad_cuotas', n);
-    if (n && n > 0) {
-      if (fixedMode === 'cuota' && cuotaInputValue) {
-        handleChange('precio_total_cuotas', totalDesdeCuota(cuotaInputValue, n));
-      } else if (fixedMode === 'total' && formData.precio_total_cuotas) {
-        setCuotaInputValue(cuotaDesdeTotal(formData.precio_total_cuotas, n));
+    if (resultado) resetCalculadora();
+    setFormData(prev => {
+      const next = { ...prev, cantidad_cuotas: n };
+      if (n && n > 0) {
+        if (prev.sin_interes && prev.precio_contado) {
+          const calc = cuotaDesdeTotal(prev.precio_contado, n);
+          next.valor_cuota = calc;
+          next.precio_total_cuotas = prev.precio_contado;
+          setCuotaInputValue(calc);
+        } else if (fixedMode === 'cuota' && cuotaInputValue) {
+          next.valor_cuota = cuotaInputValue;
+          next.precio_total_cuotas = totalDesdeCuota(cuotaInputValue, n);
+        } else if (fixedMode === 'total' && prev.precio_total_cuotas) {
+          const calc = cuotaDesdeTotal(prev.precio_total_cuotas, n);
+          next.valor_cuota = calc;
+          setCuotaInputValue(calc);
+        }
       }
-    }
+      return next;
+    });
   };
 
   // ── Validaciones por Paso ────────────────────────────────────────────────
@@ -177,10 +241,15 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
 
   const hasFinancingCondition =
     (!formData.tiene_interes && (
-      formData.precio_total_cuotas !== null &&
-      !isNaN(formData.precio_total_cuotas) &&
-      formData.precio_total_cuotas > 0 &&
-      formData.precio_total_cuotas <= MAX_MONTO_INTEGRIDAD
+      formData.sin_interes ||
+      (formData.valor_cuota !== null &&
+        !isNaN(formData.valor_cuota) &&
+        formData.valor_cuota > 0 &&
+        (formData.precio_total_cuotas ?? 0) <= MAX_MONTO_INTEGRIDAD) ||
+      (formData.precio_total_cuotas !== null &&
+        !isNaN(formData.precio_total_cuotas) &&
+        formData.precio_total_cuotas > 0 &&
+        formData.precio_total_cuotas <= MAX_MONTO_INTEGRIDAD)
     )) ||
     (formData.tiene_interes && (
       Boolean(formData.tna) &&
@@ -191,11 +260,13 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
 
   const canGoToStep3 = canGoToStep2 && hasCuotas && hasFinancingCondition;
 
+  const usarInflacionPropia = formData.usar_inflacion_propia || ipcError;
   const hasInflation =
-    Boolean(formData.inflacion_mensual) &&
-    !isNaN(parseFloat(formData.inflacion_mensual)) &&
-    parseFloat(formData.inflacion_mensual) >= 0 &&
-    parseFloat(formData.inflacion_mensual) <= 100;
+    !usarInflacionPropia ||
+    (Boolean(formData.inflacion_mensual) &&
+      !isNaN(parseFloat(formData.inflacion_mensual)) &&
+      parseFloat(formData.inflacion_mensual) >= 0 &&
+      parseFloat(formData.inflacion_mensual) <= 100);
 
   const hasInvestmentCondition =
     !formData.hasCapitalToInvest ||
@@ -215,13 +286,26 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
     }
   };
 
-  const cuotaEstimada = cuotaCalculada;
+  const cuotaEstimada = resolverValorCuotaFormulario({
+    precioContado: formData.precio_contado,
+    cantidadCuotas: formData.cantidad_cuotas,
+    sinInteres: formData.sin_interes,
+    seLaTasa: formData.tiene_interes,
+    cuotaManual: formData.valor_cuota,
+    cuotaSimuladaBackend: cuotaCalculada,
+  });
 
   const totalFinanciadoDisplay = (() => {
-    if (!formData.tiene_interes) {
-      return formData.precio_total_cuotas;
+    if (formData.tiene_interes) {
+      return planCuotas ? planCuotas.total_financiado : null;
     }
-    return planCuotas ? planCuotas.total_financiado : null;
+    if (formData.sin_interes) {
+      return formData.precio_contado;
+    }
+    return (
+      formData.precio_total_cuotas ??
+      resolverTotalCuotasFormulario(cuotaEstimada, formData.cantidad_cuotas)
+    );
   })();
 
   const recargoNominal = (() => {

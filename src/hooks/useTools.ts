@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { sileo } from 'sileo';
 import { getErrorMessage } from '@/utils/errorMessages';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
+import { totalDesdeCuota } from '@/utils/ayudasEscritura';
 
 export const useTools = () => {
   const { usuario } = useAuth();
@@ -21,8 +22,11 @@ export const useTools = () => {
   const [formData, setFormData] = useState<{
     precio_contado: number | null;
     precio_total_cuotas: number | null;
+    valor_cuota: number | null;
+    sin_interes: boolean;
     cantidad_cuotas: number | null;
     inflacion_mensual: string;
+    usar_inflacion_propia: boolean;
     tiene_interes: boolean;
     tna: string;
     hasCapitalToInvest: boolean;
@@ -30,8 +34,11 @@ export const useTools = () => {
   }>({
     precio_contado: null,
     precio_total_cuotas: null,
+    valor_cuota: null,
+    sin_interes: false,
     cantidad_cuotas: 12,
     inflacion_mensual: '',
+    usar_inflacion_propia: false,
     tiene_interes: false,
     tna: '',
     hasCapitalToInvest: false,
@@ -83,7 +90,10 @@ export const useTools = () => {
   const calcular = async () => {
     const contado = formData.precio_contado;
     const cuotasTotal = formData.precio_total_cuotas;
+    const valorCuota = formData.valor_cuota;
+    const sinInteres = formData.sin_interes;
     const inflacion = parseFloat(formData.inflacion_mensual);
+    const usarInflacionPropia = formData.usar_inflacion_propia || ipcError;
     const cuotas = formData.cantidad_cuotas;
     const tiene_interes = formData.tiene_interes;
     const tnaVal = formData.tna;
@@ -96,19 +106,24 @@ export const useTools = () => {
       sileo.error({ title: 'El precio de contado es demasiado alto. Revisá el número.' });
       return false;
     }
-    if (!tiene_interes && (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0)) {
-      sileo.error({ title: 'Ingresá un precio en cuotas mayor a 0.' });
+    if (cuotas === null || isNaN(cuotas) || cuotas < 1 || cuotas > 120) {
+      sileo.error({ title: 'Las cuotas tienen que ser entre 1 y 120.' });
+      return false;
+    }
+    if (
+      !tiene_interes &&
+      !sinInteres &&
+      (valorCuota === null || isNaN(valorCuota) || valorCuota <= 0) &&
+      (cuotasTotal === null || isNaN(cuotasTotal) || cuotasTotal <= 0)
+    ) {
+      sileo.error({ title: 'Ingresá el valor de cada cuota mayor a 0.' });
       return false;
     }
     if (!tiene_interes && cuotasTotal !== null && cuotasTotal > MAX_MONTO_INTEGRIDAD) {
       sileo.error({ title: 'El precio en cuotas es demasiado alto. Revisá el número.' });
       return false;
     }
-    if (cuotas === null || isNaN(cuotas) || cuotas < 1 || cuotas > 120) {
-      sileo.error({ title: 'Las cuotas tienen que ser entre 1 y 120.' });
-      return false;
-    }
-    if (isNaN(inflacion) || inflacion < 0 || inflacion > 100) {
+    if (usarInflacionPropia && (isNaN(inflacion) || inflacion < 0 || inflacion > 100)) {
       sileo.error({ title: 'La inflación por mes tiene que ser entre 0% y 100%.' });
       return false;
     }
@@ -133,9 +148,14 @@ export const useTools = () => {
     try {
       const res = await toolsService.calcularConveniencia({
         precio_contado: contado,
-        precio_total_cuotas: (tiene_interes || cuotasTotal === null) ? undefined : cuotasTotal,
+        precio_total_cuotas:
+          tiene_interes || sinInteres || valorCuota !== null || cuotasTotal === null
+            ? undefined
+            : cuotasTotal,
+        valor_cuota: !tiene_interes && !sinInteres && valorCuota !== null ? valorCuota : undefined,
+        sin_interes: !tiene_interes && sinInteres ? true : undefined,
         cantidad_cuotas: cuotas,
-        inflacion_mensual: inflacion,
+        inflacion_mensual: usarInflacionPropia ? inflacion : undefined,
         tiene_interes,
         tna: tiene_interes ? parseFloat(tnaVal) : undefined,
         tna_billetera_inversion: formData.hasCapitalToInvest ? parseFloat(formData.investmentTna) : undefined
@@ -160,7 +180,13 @@ export const useTools = () => {
 
   // Simulación unificada para Calculadora Cuotas vs Contado (Decisión 3.f)
   const parsedTnaConveniencia = formData.tiene_interes ? parseFloat(formData.tna) : null;
-  const montoTotalConveniencia = formData.tiene_interes ? formData.precio_contado : formData.precio_total_cuotas;
+  const totalPorCuota =
+    formData.valor_cuota !== null && formData.cantidad_cuotas
+      ? totalDesdeCuota(formData.valor_cuota, formData.cantidad_cuotas)
+      : null;
+  const montoTotalConveniencia = formData.tiene_interes
+    ? formData.precio_contado
+    : (formData.precio_total_cuotas ?? totalPorCuota);
   const cantidadesConveniencia = useMemo(() => (formData.cantidad_cuotas ? [formData.cantidad_cuotas] : []), [formData.cantidad_cuotas]);
 
   const { simulacion: simulacionConveniencia } = useSimularCuotas({

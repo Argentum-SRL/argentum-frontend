@@ -2,19 +2,11 @@ import React from 'react';
 import { ArgentumCrescent } from '@/components/ui';
 import { formatMonto } from '@/utils/format';
 import type { ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
+import type { ConvenienciaFormState } from './ConvenienciaWizard';
 
 export interface ConvenienciaSidebarProps {
   currentStep: 1 | 2 | 3;
-  formData: {
-    precio_contado: number | null;
-    precio_total_cuotas: number | null;
-    cantidad_cuotas: number | null;
-    inflacion_mensual: string;
-    tiene_interes: boolean;
-    tna: string;
-    hasCapitalToInvest: boolean;
-    investmentTna: string;
-  };
+  formData: ConvenienciaFormState;
   totalFinanciadoDisplay: number | null;
   cuotaEstimada: number | null;
   contadoBarPct: number;
@@ -116,7 +108,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                  Costo real descontado (VPN)
+                  En plata de hoy
                 </span>
                 <span className="text-xs font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                   {formatMonto(resultado.costo_real_cuotas, 'ARS')}
@@ -146,8 +138,8 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
             {/* Comparativa visual de costo real */}
             <div className="flex flex-col gap-1.5 pt-1">
               <div className="flex justify-between text-[11px] font-medium text-slate-500">
-                <span>Comparativa a valor de hoy</span>
-                <span className="font-semibold text-slate-400">VPN</span>
+                <span>Comparativa en plata de hoy</span>
+                <span className="font-semibold text-slate-400">Hoy</span>
               </div>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
@@ -321,7 +313,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold text-slate-700 dark:text-slate-300">3.</span>
-                    <span><strong>Descuento por IPC:</strong> cuánto se licúan las cuotas a valor real.</span>
+                    <span><strong>Inflación por mes:</strong> cuánto valen esas cuotas en plata de hoy.</span>
                   </li>
                 </ul>
               </div>
@@ -334,7 +326,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 shrink-0">
         <span className="text-[10.5px] text-slate-400 leading-normal block">
           {resultado
-            ? 'Cifras ajustadas por el IPC oficial proyectado a valor de hoy.'
+            ? 'Cifras ajustadas por la inflación elegida a plata de hoy.'
             : 'El balance se actualiza en tiempo real conforme completás los campos.'}
         </span>
       </div>

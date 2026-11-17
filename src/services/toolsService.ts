@@ -27,7 +27,9 @@ export const toolsService = {
     return response.data.data;
   },
   
-  calcularConveniencia: async (data: ConvenienciaRequest): Promise<ConvenienciaResult> => {
+  calcularConveniencia: async (
+    data: Omit<ConvenienciaRequest, 'inflacion_mensual'> & { inflacion_mensual?: number }
+  ): Promise<ConvenienciaResult> => {
     const response = await api.post<StandardResponse<ConvenienciaResult>>('/api/v1/tools/installment-convenience', data);
     return response.data.data;
   },

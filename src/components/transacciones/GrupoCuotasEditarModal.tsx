@@ -2,7 +2,11 @@
  * Modal de edición en dos pasos para compras en cuotas.
  */
 import { esPunteroFino } from '@/utils/foco'
-import type { RefObject } from 'react'
+import { useState, type RefObject } from 'react'
+import { sileo } from 'sileo'
+import { getErrorMessage } from '@/utils/errorMessages'
+import grupoCuotasService from '@/services/grupoCuotas.service'
+import PrecioContadoCampo from './PrecioContadoCampo'
 import {
   CreditCard,
   ChevronLeft,
@@ -76,6 +80,44 @@ export default function GrupoCuotasEditarModal({
   handleSave,
   tarjetasCarouselRef,
 }: GrupoCuotasEditarModalProps) {
+  const [precioContadoOverride, setPrecioContadoOverride] = useState<{
+    grupoId: string
+    valor: number | null
+  } | null>(null)
+  const [savingPrecioContado, setSavingPrecioContado] = useState(false)
+
+  const editPrecioContado =
+    editingGrupo && precioContadoOverride?.grupoId === editingGrupo.id
+      ? precioContadoOverride.valor
+      : (editingGrupo?.precio_contado ?? null)
+
+  const handleSubmitPaso2 = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingGrupo) return
+    if (editPrecioContado !== null && editPrecioContado <= 0) {
+      sileo.error({ title: 'El precio de contado tiene que ser mayor a 0.' })
+      return
+    }
+    const anterior = editingGrupo.precio_contado ?? null
+    const nuevo = editPrecioContado ?? null
+    if (nuevo !== anterior) {
+      setSavingPrecioContado(true)
+      try {
+        await grupoCuotasService.updateGrupoCuotas(editingGrupo.id, {
+          precio_contado: nuevo,
+        })
+      } catch (err) {
+        sileo.error({
+          title: getErrorMessage(err, 'No se pudo guardar el precio de contado. Probá de nuevo.'),
+        })
+        setSavingPrecioContado(false)
+        return
+      }
+      setSavingPrecioContado(false)
+    }
+    await handleSave(e)
+  }
+
   return (
     <>
       {/* ── MODAL DE EDICIÓN (2 PASOS - ESTILO TRANSACCIONMODAL) ────────── */}
@@ -214,7 +256,7 @@ export default function GrupoCuotasEditarModal({
                 }`}
                 data-modal-frame
               >
-                <form className={styles.formContainer} onSubmit={handleSave}>
+                <form className={styles.formContainer} onSubmit={handleSubmitPaso2}>
                   <div
                     className={`${styles.formBody} ${styles.formBodyWithHeader}`}
                   >
@@ -288,6 +330,17 @@ export default function GrupoCuotasEditarModal({
                         onSelectSubcategoria={(id) => setEditSubcategoriaId(id)}
                       />
 
+                      <PrecioContadoCampo
+                        id="edit-cuota-precio-contado"
+                        value={editPrecioContado}
+                        onChange={(v) =>
+                          setPrecioContadoOverride({ grupoId: editingGrupo.id, valor: v })
+                        }
+                        moneda={(editingGrupo.moneda as 'ARS' | 'USD') || 'ARS'}
+                        labelClassName={styles.fieldLabel}
+                        wrapperClassName={styles.formField}
+                      />
+
                       {/* Recalculation Notice */}
                       <div className={styles.editRecalcNotice}>
                         <Lightbulb size={15} strokeWidth={2} className={styles.prepayNoticeIcon} aria-hidden="true" />
@@ -314,16 +367,16 @@ export default function GrupoCuotasEditarModal({
                       type="button"
                       className={styles.cancelBtn}
                       onClick={goEditStep1}
-                      disabled={saving}
+                      disabled={saving || savingPrecioContado}
                     >
                       Atrás
                     </button>
                     <button
                       type="submit"
                       className={styles.submitBtn}
-                      disabled={saving}
+                      disabled={saving || savingPrecioContado}
                     >
-                      {saving ? 'Guardando...' : 'Guardar cambios'}
+                      {saving || savingPrecioContado ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                   </div>
                 </form>

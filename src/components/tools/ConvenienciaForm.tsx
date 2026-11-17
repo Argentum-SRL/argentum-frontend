@@ -15,6 +15,8 @@ import SegmentedControl from '@/components/ui/SegmentedControl';
 import type { InflacionEsperadaData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { formatMonto } from '@/utils/format';
+import { TEXTO_AYUDA_INFLACION_ESPERADA } from './conveniencia';
+import type { ConvenienciaFormState } from './ConvenienciaWizard';
 import DetalleCuotasChart from './DetalleCuotasChart';
 import ExplicacionCalculo from './ExplicacionCalculo';
 import styles from './ConvenienciaForm.module.css';
@@ -27,16 +29,7 @@ export interface ConvenienciaFormProps {
   canGoToStep2: boolean;
   canGoToStep3: boolean;
   canCalculate: boolean;
-  formData: {
-    precio_contado: number | null;
-    precio_total_cuotas: number | null;
-    cantidad_cuotas: number | null;
-    inflacion_mensual: string;
-    tiene_interes: boolean;
-    tna: string;
-    hasCapitalToInvest: boolean;
-    investmentTna: string;
-  };
+  formData: ConvenienciaFormState;
   handleChange: (field: string, value: string | number | boolean | null) => void;
   ipcData: InflacionEsperadaData | null;
   ipcLoading: boolean;
@@ -93,47 +86,39 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
 }) => {
   const [step3View, setStep3View] = useState<'resultado' | 'grafico'>('resultado');
   const [slideDirection, setSlideDirection] = useState<'forward' | 'backward'>('forward');
+  const [showInflacionHelp, setShowInflacionHelp] = useState(false);
 
   const isContadoExceeded =
     formData.precio_contado !== null && formData.precio_contado > MAX_MONTO_INTEGRIDAD;
   const isCuotasExceeded =
     formData.precio_total_cuotas !== null && formData.precio_total_cuotas > MAX_MONTO_INTEGRIDAD;
 
-  // ── Configuración del Veredicto Oficial ─────────────────────────────────────
+  // ── Configuración del Veredicto Oficial (D-T2.3) ────────────────────────────
   const isCuotas = resultado?.resultado === 'conviene_cuotas';
   const isContado = resultado?.resultado === 'conviene_contado';
 
   const verdictConfig = resultado
     ? isCuotas
       ? {
-          badge: 'CONVIENE FINANCIAR EN CUOTAS',
-          title: `Ahorrás ${formatMonto(resultado.ahorro_real, 'ARS')} a valor de hoy`,
-          sub:
-            resultado.remanente_vpn != null && resultado.remanente_vpn > 0
-              ? `Los rendimientos pagan el recargo y te sobran ${formatMonto(resultado.remanente_vpn, 'ARS')} en términos reales.`
-              : 'El recargo comercial es menor a la pérdida de poder adquisitivo proyectada por la inflación.',
+          title: resultado.titulo || 'Te conviene en cuotas.',
+          line2: resultado.linea_2 || '',
+          line3: resultado.linea_3 || '',
           icon: CheckCircle,
-          badgeColor:
-            'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60',
           amountColor: 'text-emerald-600 dark:text-emerald-400',
         }
       : isContado
       ? {
-          badge: 'CONVIENE PAGAR DE CONTADO',
-          title: `Ahorrás ${formatMonto(resultado.ahorro_real, 'ARS')} pagando hoy`,
-          sub: 'El recargo comercial nominal supera la erosión proyectada por la inflación durante el plazo.',
+          title: resultado.titulo || 'Te conviene de contado.',
+          line2: resultado.linea_2 || '',
+          line3: resultado.linea_3 || '',
           icon: Lightbulb,
-          badgeColor:
-            'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60',
           amountColor: 'text-amber-600 dark:text-amber-400',
         }
       : {
-          badge: 'DA PRÁCTICAMENTE LO MISMO',
-          title: `Diferencia marginal de ${resultado.porcentaje_ahorro.toFixed(1)}%`,
-          sub: 'La diferencia entre ambas opciones es insignificante. Podés elegir según tu disponibilidad de efectivo.',
+          title: resultado.titulo || 'Da casi lo mismo.',
+          line2: resultado.linea_2 || '',
+          line3: resultado.linea_3 || '',
           icon: HelpCircle,
-          badgeColor:
-            'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
           amountColor: 'text-slate-700 dark:text-slate-300',
         }
     : null;
@@ -426,128 +411,123 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
               </div>
             </div>
 
-            {/* B & C. Grilla de 2 columnas amplia: Modalidad e Importe informado */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-slate-100 dark:border-slate-800/80">
-              {/* Selector de Modalidad */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  ¿Tiene recargo o interés?
-                </label>
-                <SegmentedControl<'fijas' | 'tna'>
-                  options={[
-                    { value: 'fijas', label: 'Cuotas fijas' },
-                    { value: 'tna', label: 'Con interés (TNA)' },
-                  ]}
-                  value={formData.tiene_interes ? 'tna' : 'fijas'}
-                  onChange={(val) => handleChange('tiene_interes', val === 'tna')}
-                  fullWidth
-                  ariaLabel="Modalidad de financiación"
-                />
-              </div>
-
-              {/* Selector de Forma de Ingreso (solo si cuotas fijas) */}
+            {/* B. Valor de cada cuota + "Sin interés" + "Sé la tasa" (D-T2.6) */}
+            <div className="flex flex-col gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
               {!formData.tiene_interes ? (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    ¿Qué valor te informaron?
-                  </label>
-                  <SegmentedControl<'total' | 'cuota'>
-                    options={[
-                      { value: 'total', label: 'Total financiado' },
-                      { value: 'cuota', label: 'Valor por cuota' },
-                    ]}
-                    value={fixedMode}
-                    onChange={(val) => setFixedMode(val)}
-                    fullWidth
-                    ariaLabel="¿Qué valor te informaron?"
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label
+                      htmlFor={fixedMode === 'total' ? 'conv_total_cuotas' : 'conv_valor_cuota'}
+                      className="text-xs font-bold text-slate-700 dark:text-slate-300"
+                    >
+                      {fixedMode === 'total' ? 'Total en cuotas' : 'Valor de cada cuota'}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleChange('sin_interes', !formData.sin_interes)}
+                        aria-pressed={formData.sin_interes}
+                        className={`h-8 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          formData.sin_interes
+                            ? 'bg-[#0D2045] dark:bg-[#4878B8] text-white border-transparent shadow-xs'
+                            : 'bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                        }`}
+                      >
+                        Sin interés
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFixedMode(fixedMode === 'cuota' ? 'total' : 'cuota')}
+                        className="text-[11px] font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer"
+                      >
+                        {fixedMode === 'cuota' ? 'Prefiero poner el total' : 'Prefiero poner cada cuota'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <MontoInput
+                    id={fixedMode === 'total' ? 'conv_total_cuotas' : 'conv_valor_cuota'}
+                    className="w-full text-base sm:text-lg"
+                    variant="outlined"
+                    placeholder="0"
+                    value={fixedMode === 'total' ? formData.precio_total_cuotas : cuotaInputValue}
+                    onChange={fixedMode === 'total' ? handleTotalValChange : handleCuotaValChange}
+                    allowDecimals
                   />
+                  {isCuotasExceeded && (
+                    <span className="text-xs text-red-500 font-medium">
+                      El precio en cuotas excede el límite permitido.
+                    </span>
+                  )}
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {formData.sin_interes && cuotaEstimada !== null && formData.cantidad_cuotas
+                      ? `${formData.cantidad_cuotas} cuotas sin interés de ${formatMonto(cuotaEstimada, 'ARS')} cada una.`
+                      : fixedMode === 'total'
+                      ? formData.cantidad_cuotas && formData.precio_total_cuotas
+                        ? `Equivale a ${formData.cantidad_cuotas} cuotas de ~${formatMonto(cuotaEstimada || 0, 'ARS')} cada una.`
+                        : 'Importe final sumando todas las cuotas.'
+                      : formData.cantidad_cuotas && cuotaInputValue
+                      ? `${formData.cantidad_cuotas} cuotas de ${formatMonto(cuotaInputValue, 'ARS')} son ${formatMonto(totalFinanciadoDisplay || 0, 'ARS')}.`
+                      : 'Es lo que te muestra el comercio por mes.'}
+                  </span>
                 </div>
               ) : (
-                <div className="flex flex-col gap-1.5 justify-end">
-                  <span className="text-[11.5px] text-slate-400 leading-tight">
-                    El cálculo estimará la amortización francesa según la TNA informada por el banco o comercio.
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    className="text-xs font-bold text-slate-700 dark:text-slate-300"
+                    htmlFor="conv_tna"
+                  >
+                    Tasa anual (si la sabés)
+                  </label>
+                  <div className="flex items-stretch h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+                    <input
+                      id="conv_tna"
+                      type="number"
+                      step="any"
+                      min="0.1"
+                      max="3000"
+                      placeholder="Ej: 120"
+                      value={formData.tna}
+                      onChange={(e) => handleChange('tna', e.target.value)}
+                      className="flex-1 px-3.5 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
+                      inputMode="decimal"
+                    />
+                    <span className="flex items-center px-3.5 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
+                      % por año
+                    </span>
+                  </div>
+                  {formData.tna !== '' &&
+                    (isNaN(parseFloat(formData.tna)) ||
+                      parseFloat(formData.tna) < 0.1 ||
+                      parseFloat(formData.tna) > 3000) && (
+                      <span className="text-xs text-red-500 font-medium">
+                        Ingresá una tasa de entre 0,1% y 3.000% por año.
+                      </span>
+                    )}
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {cuotaEstimada !== null && formData.cantidad_cuotas
+                      ? `Quedan ${formData.cantidad_cuotas} cuotas de ~${formatMonto(
+                          cuotaEstimada,
+                          'ARS'
+                        )}${totalFinanciadoDisplay !== null ? ` (Total: ${formatMonto(totalFinanciadoDisplay, 'ARS')})` : ''}`
+                      : 'Calcula el valor aproximado de cada cuota.'}
                   </span>
                 </div>
               )}
-            </div>
 
-            {/* D. Input Unificado (Monto o TNA) con Microcopy Dinámico */}
-            {!formData.tiene_interes ? (
-              <div className="flex flex-col gap-1.5 pt-1">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  {fixedMode === 'total' ? 'Total financiado sumando todas las cuotas' : 'Valor de cada cuota mensual'}
-                </label>
-                <MontoInput
-                  id={fixedMode === 'total' ? 'conv_total_cuotas' : 'conv_valor_cuota'}
-                  className="w-full text-base sm:text-lg"
-                  variant="outlined"
-                  placeholder="0"
-                  value={fixedMode === 'total' ? formData.precio_total_cuotas : cuotaInputValue}
-                  onChange={fixedMode === 'total' ? handleTotalValChange : handleCuotaValChange}
-                  allowDecimals
-                />
-                {isCuotasExceeded && (
-                  <span className="text-xs text-red-500 font-medium">
-                    El precio en cuotas excede el límite permitido.
-                  </span>
-                )}
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  {fixedMode === 'total'
-                    ? formData.cantidad_cuotas && formData.precio_total_cuotas
-                      ? `Equivale a ${formData.cantidad_cuotas} cuotas de ~${formatMonto(
-                          cuotaEstimada || 0,
-                          'ARS'
-                        )} cada una.`
-                      : 'Importe final que pagarías sumando todos los pagos.'
-                    : formData.cantidad_cuotas && cuotaInputValue
-                    ? `${formData.cantidad_cuotas} cuotas × ${formatMonto(
-                        cuotaInputValue,
-                        'ARS'
-                      )} = Total financiado ${formatMonto(totalFinanciadoDisplay || 0, 'ARS')}.`
-                    : 'Importe de cada pago mensual individual.'}
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-1.5 pt-1">
-                <label
-                  className="text-xs font-bold text-slate-700 dark:text-slate-300"
-                  htmlFor="conv_tna"
+              {/* Opción "Sé la tasa" */}
+              <div className="flex items-center justify-between pt-1">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={formData.tiene_interes}
+                  onClick={() => handleChange('tiene_interes', !formData.tiene_interes)}
+                  className="inline-flex items-center gap-2 text-xs font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer"
                 >
-                  Tasa Nominal Anual (TNA) de la compra
-                </label>
-                <div className="flex items-stretch h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
-                  <input
-                    id="conv_tna"
-                    type="number"
-                    step="any"
-                    min="0.1"
-                    max="3000"
-                    placeholder="Ej: 120"
-                    value={formData.tna}
-                    onChange={(e) => handleChange('tna', e.target.value)}
-                    className="flex-1 px-3.5 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
-                    inputMode="decimal"
-                  />
-                  <span className="flex items-center px-3.5 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
-                    % anual
-                  </span>
-                </div>
-                {formData.tna !== '' &&
-                  (isNaN(parseFloat(formData.tna)) ||
-                    parseFloat(formData.tna) < 0.1 ||
-                    parseFloat(formData.tna) > 3000) && (
-                    <span className="text-xs text-red-500 font-medium">TNA debe estar entre 0.1% y 3000%</span>
-                  )}
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  {cuotaEstimada !== null && formData.cantidad_cuotas
-                    ? `Pagarás ${formData.cantidad_cuotas} cuotas de ~${formatMonto(
-                        cuotaEstimada,
-                        'ARS'
-                      )}${totalFinanciadoDisplay !== null ? ` (Total: ${formatMonto(totalFinanciadoDisplay, 'ARS')})` : ''}`
-                    : 'Figura en el resumen bancario o en la letra chica del comercio.'}
-                </span>
+                  <span>{formData.tiene_interes ? 'Volver al valor de cada cuota' : 'Sé la tasa'}</span>
+                </button>
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -598,63 +578,87 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
 
                 {/* Grilla de Supuestos Económicos */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                  {/* Supuesto 1: Inflación mensual */}
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                      <label
-                        className="text-xs font-bold text-slate-700 dark:text-slate-300"
-                        htmlFor="conv_inflacion"
+                  {/* Supuesto 1: Inflación esperada vs propia (D-T2.6) */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        Inflación
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowInflacionHelp(v => !v)}
+                        aria-label="De dónde sale la inflación que se espera"
+                        title={TEXTO_AYUDA_INFLACION_ESPERADA}
+                        className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-slate-300 dark:border-slate-600 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                       >
-                        Inflación mensual esperada
-                      </label>
-                      {ipcLoading ? (
-                        <span className="text-[10px] text-slate-400">Cargando…</span>
-                      ) : isIpcOfficialUsed ? (
-                        <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 px-2 py-0.5 rounded">
-                          IPC · {ipcData?.valor_mensual}%
-                        </span>
-                      ) : ipcError ? (
-                        <span className="text-[10px] text-slate-400">Sin datos</span>
-                      ) : (
-                        <span className="text-[10px] text-slate-400">Manual</span>
-                      )}
+                        ?
+                      </button>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 flex items-stretch h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
-                        <input
-                          id="conv_inflacion"
-                          type="number"
-                          step="any"
-                          min="0"
-                          max="100"
-                          placeholder="Ej: 1.66"
-                          value={formData.inflacion_mensual}
-                          onChange={(e) => handleChange('inflacion_mensual', e.target.value)}
-                          className="flex-1 px-3 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
-                          inputMode="decimal"
-                        />
-                        <span className="flex items-center px-2.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
-                          %/mes
-                        </span>
+                    <SegmentedControl<'esperada' | 'propia'>
+                      options={[
+                        { value: 'esperada', label: 'La que se espera para los próximos meses' },
+                        { value: 'propia', label: 'Escribir una propia' },
+                      ]}
+                      value={formData.usar_inflacion_propia || ipcError ? 'propia' : 'esperada'}
+                      onChange={(val) => {
+                        handleChange('usar_inflacion_propia', val === 'propia');
+                        if (val === 'esperada' && ipcData?.valor_mensual != null) {
+                          handleChange('inflacion_mensual', ipcData.valor_mensual.toString());
+                        }
+                      }}
+                      layout="stacked"
+                      fullWidth
+                      ariaLabel="Inflación para el cálculo"
+                    />
+
+                    {showInflacionHelp && (
+                      <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 m-0">
+                        {TEXTO_AYUDA_INFLACION_ESPERADA}
+                      </p>
+                    )}
+
+                    {(formData.usar_inflacion_propia || ipcError) ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 flex items-stretch h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+                          <input
+                            id="conv_inflacion"
+                            type="number"
+                            step="any"
+                            min="0"
+                            max="100"
+                            placeholder="Ej: 2"
+                            value={formData.inflacion_mensual}
+                            onChange={(e) => handleChange('inflacion_mensual', e.target.value)}
+                            className="flex-1 px-3 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
+                            inputMode="decimal"
+                          />
+                          <span className="flex items-center px-2.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
+                            % por mes
+                          </span>
+                        </div>
+
+                        {!isIpcOfficialUsed && ipcData?.valor_mensual != null && (
+                          <button
+                            type="button"
+                            className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-primary text-xs font-bold hover:bg-white dark:hover:bg-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                            onClick={syncIpc}
+                            title="Volver a la inflación que se espera"
+                          >
+                            <RefreshCcw size={12} className={isRotating ? 'animate-spin' : ''} />
+                            <span>{ipcData.valor_mensual}%</span>
+                          </button>
+                        )}
                       </div>
-
-                      {!isIpcOfficialUsed && ipcData?.valor_mensual != null && (
-                        <button
-                          type="button"
-                          className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-primary text-xs font-bold hover:bg-white dark:hover:bg-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                          onClick={syncIpc}
-                          title={ipcData?.fuente_texto ? `Restablecer valor oficial (${ipcData.fuente_texto})` : "Restablecer valor oficial"}
-                        >
-                          <RefreshCcw size={12} className={isRotating ? 'animate-spin' : ''} />
-                          <span>{ipcData.valor_mensual}%</span>
-                        </button>
-                      )}
-                    </div>
-
-                    <span className="text-[11.5px] text-slate-400">
-                      Tasa mensual para descontar las cuotas futuras a hoy.
-                    </span>
+                    ) : (
+                      <span className="text-[11.5px] text-slate-500 dark:text-slate-400">
+                        {ipcLoading
+                          ? 'Cargando proyección mensual…'
+                          : ipcData?.meses?.length
+                          ? `Usamos la proyección mes a mes (${ipcData.valor_mensual}% el primer mes).`
+                          : 'Usamos la proyección mensual automática.'}
+                      </span>
+                    )}
                   </div>
 
                   {/* Supuesto 2: Rendimiento alternativo del dinero */}
@@ -700,11 +704,11 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                             inputMode="decimal"
                           />
                           <span className="flex items-center px-2.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
-                            % TNA
+                            % por año
                           </span>
                         </div>
                         <span className="text-[11.5px] text-slate-400">
-                          Rendimiento de billetera remunerada o fondo (FCI).
+                          Rendimiento de billetera remunerada o fondo.
                         </span>
                       </div>
                     ) : (
@@ -726,26 +730,28 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 {step3View === 'resultado' ? (
                   /* ── VISTA A: RESULTADO DEL ANÁLISIS ── */
                   <div className="flex flex-col gap-4">
-                    {/* Veredicto Hero Card (Sobrio, editorial, sin bloques agresivos) */}
+                    {/* Veredicto Hero Card (3 líneas D-T2.3) */}
                     {verdictConfig && (
                       <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/90 dark:border-slate-700/80 flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md border ${verdictConfig.badgeColor}`}
-                          >
-                            {verdictConfig.badge}
-                          </span>
-                          <div className="p-1 rounded-full text-slate-500 dark:text-slate-400">
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className={`text-xl sm:text-2xl font-black tracking-tight ${verdictConfig.amountColor}`}>
+                            {verdictConfig.title}
+                          </h3>
+                          <div className="p-1 rounded-full text-slate-500 dark:text-slate-400 shrink-0">
                             {React.createElement(verdictConfig.icon, { size: 22 })}
                           </div>
                         </div>
 
-                        <h3 className={`text-xl sm:text-2xl font-black tracking-tight ${verdictConfig.amountColor}`}>
-                          {verdictConfig.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                          {verdictConfig.sub}
-                        </p>
+                        {verdictConfig.line2 && (
+                          <p className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
+                            {verdictConfig.line2}
+                          </p>
+                        )}
+                        {verdictConfig.line3 && (
+                          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            {verdictConfig.line3}
+                          </p>
+                        )}
                       </div>
                     )}
 
@@ -753,22 +759,22 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Precio Contado
+                          Precio de contado
                         </span>
                         <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
                           {formatMonto(resultado.precio_contado, 'ARS')}
                         </span>
-                        <span className="text-[10.5px] text-slate-400">Desembolso único hoy</span>
+                        <span className="text-[10.5px] text-slate-400">Un pago hoy</span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Costo Real en Cuotas
+                          En plata de hoy
                         </span>
                         <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
                           {formatMonto(resultado.costo_real_cuotas, 'ARS')}
                         </span>
-                        <span className="text-[10.5px] text-slate-400">Valor presente VPN</span>
+                        <span className="text-[10.5px] text-slate-400">Con la inflación elegida</span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">

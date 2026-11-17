@@ -1027,6 +1027,8 @@ export interface GrupoCuotasResumen {
   subcategoria_id?: string | null
   suscripcion_id?: string | null
   reintegro?: ReintegroInfo | null
+  precio_contado?: number | null
+  detalle_precio_contado?: string | null
 }
 
 export interface GrupoCuotasUpdate {
@@ -1037,6 +1039,7 @@ export interface GrupoCuotasUpdate {
   tarjeta_id?: string | null
   billetera_id?: string | null
   fecha_referencia?: string | null
+  precio_contado?: number | null
 }
 
 export interface PlanCuotas {

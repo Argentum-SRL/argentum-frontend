@@ -211,6 +211,11 @@ export default function GrupoCuotasDetalleModal({
                               </span>
                             </div>
                           </div>
+                          {selectedGrupo.detalle_precio_contado && (
+                            <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-1.5 mb-0">
+                              {selectedGrupo.detalle_precio_contado}
+                            </p>
+                          )}
                         </div>
 
                         {/* 2. Progress & Financial Breakdown */}

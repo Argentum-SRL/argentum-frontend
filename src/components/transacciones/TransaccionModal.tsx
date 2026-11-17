@@ -34,6 +34,7 @@ import memoriaStyles from './MemoriaComercioDialog.module.css'
 import { useResumenDeCompra, formatDDMM } from '@/hooks/useResumenDeCompra'
 import DebitoEnDolares from './DebitoEnDolares'
 import CalculoCuotasResumen from './CalculoCuotasResumen'
+import PrecioContadoCampo from './PrecioContadoCampo'
 import AvisoSaldoAnterior from './AvisoSaldoAnterior'
 import { ReintegroSwitchCard } from './ReintegroBloque'
 import ReintegroPaso from './ReintegroPaso'
@@ -62,8 +63,13 @@ export interface TransaccionModalProps {
 
 
 export default function TransaccionModal({
-  open, onClose, transaccion, billeteraInicialId, tipoInicial, billeteras, categorias, tarjetas, onSuccess,
+  open, onClose: onCloseProp, transaccion, billeteraInicialId, tipoInicial, billeteras, categorias, tarjetas, onSuccess,
 }: TransaccionModalProps) {
+  const [precioContado, setPrecioContado] = useState<number | null>(null)
+  const onClose = useCallback(() => {
+    setPrecioContado(null)
+    onCloseProp()
+  }, [onCloseProp])
   const isEdit = !!transaccion
   const isCuotaHija = isEdit && !!transaccion?.es_cuota_hija
   const [state, dispatch] = useReducer(formReducer, initialState)
@@ -642,6 +648,7 @@ export default function TransaccionModal({
                 tiene_interes: tasaInteres > 0,
                 tasa_interes: tasaInteres,
                 monto_total: Number(monto),
+                precio_contado: precioContado && precioContado > 0 ? precioContado : null,
                 proximo_resumen: proximoResumen
               }
               : undefined,
@@ -1030,6 +1037,7 @@ export default function TransaccionModal({
                       }
                     }}
                   />
+                  <PrecioContadoCampo value={precioContado} onChange={setPrecioContado} moneda={moneda} />
                 </div>
 
                 <div className={styles.formFooter}>

@@ -3,7 +3,9 @@ import {
   resolverValorCuotaFormulario,
   resolverTotalCuotasFormulario,
   TEXTO_AYUDA_INFLACION_ESPERADA,
+  TEXTO_AYUDA_CUOTAS_CONTADO,
 } from './conveniencia'
+import { TEXTO_AYUDA_PERMITIRSE } from './permitirseAyuda'
 import { problemasTextoWeb } from '@/utils/reglasTextoWeb'
 
 describe('resolverValorCuotaFormulario', () => {
@@ -115,6 +117,59 @@ describe('Textos nuevos web de T2 cumplen reglasTextoWeb', () => {
   it('ningún texto nuevo de T2 tiene problemas en problemasTextoWeb', () => {
     for (const texto of TEXTOS_WEB_T2) {
       expect(problemasTextoWeb(texto), `Texto inválido: ${texto}`).toEqual([])
+    }
+  })
+})
+
+describe('Textos de pantalla T3 sin tecnicismos ni primera persona', () => {
+  const PROHIBIDAS_PANTALLA = [
+    'anoté',
+    'guardé',
+    'voy',
+    'pudimos',
+    'enviamos',
+    'mandamos',
+    'vamos',
+    'nuestro',
+    'nuestra',
+    'nuestros',
+    'nuestras',
+    'nosotros',
+    'comparo',
+    'digo',
+    'REM',
+    'TNA',
+    'CFT',
+    'ARS',
+    'USD',
+    'líquido',
+  ]
+
+  it('TEXTO_AYUDA_PERMITIRSE y TEXTO_AYUDA_CUOTAS_CONTADO coinciden exactamente con D-T3.4', () => {
+    expect(TEXTO_AYUDA_PERMITIRSE).toBe(
+      'Te dice si una compra te entra, mirando la plata que tenés hoy, lo que cobrás y gastás cada mes y lo que ya tenés comprometido. Si te entra usando plata de tus cuentas o tus ahorros, también te lo aclara. No es un consejo de inversión.'
+    )
+    expect(TEXTO_AYUDA_CUOTAS_CONTADO).toBe(
+      'Compara lo que pagás en cuotas con el precio de contado, teniendo en cuenta la inflación que se espera para los próximos meses. Si las cuotas pierden valor más rápido de lo que te cobran de más, te conviene en cuotas.'
+    )
+  })
+
+  it('ni ayudas ni rótulos de pantalla contienen palabras prohibidas como palabra entera', () => {
+    const textosPantalla = [
+      TEXTO_AYUDA_PERMITIRSE,
+      TEXTO_AYUDA_CUOTAS_CONTADO,
+      TEXTO_AYUDA_INFLACION_ESPERADA,
+      'Plata disponible',
+      'Precio',
+      'Herramientas',
+    ]
+
+    for (const texto of textosPantalla) {
+      for (const palabra of PROHIBIDAS_PANTALLA) {
+        const escaped = palabra.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const rx = new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}($|[^\\p{L}\\p{N}_])`, 'iu')
+        expect(rx.test(texto), `Palabra prohibida "${palabra}" en "${texto}"`).toBe(false)
+      }
     }
   })
 })

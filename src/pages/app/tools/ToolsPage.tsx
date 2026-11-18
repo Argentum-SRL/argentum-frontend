@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Scale, HelpCircle, FileSpreadsheet, Repeat } from '@/components/ui/icons';
+import { HelpCircle, Repeat } from '@/components/ui/icons';
 import useTools from '@/hooks/useTools';
 import ConvenienciaWizard from '@/components/tools/ConvenienciaWizard';
 import FinancialContextBanner from '@/components/tools/FinancialContextBanner';
@@ -16,41 +16,13 @@ import { useAuth } from '@/hooks/useAuth';
 import ImportacionResumenSection from '@/components/tools/importacion/ImportacionResumenSection';
 import { formatMonto } from '@/utils/format';
 import { mostrarLinkGastoFijo } from '@/utils/permitirse';
-
-type TabId = 'conveniencia' | 'can-afford' | 'importar-resumen';
-
-interface TabItem {
-  id: TabId;
-  title: string;
-  icon: typeof Scale;
-  adminOnly?: boolean;
-}
-
-const TOOL_TABS: TabItem[] = [
-  {
-    id: 'conveniencia',
-    title: 'Cuotas vs Contado',
-    icon: Scale,
-  },
-  {
-    id: 'can-afford',
-    title: '¿Me lo puedo permitir?',
-    icon: HelpCircle,
-  },
-  {
-    id: 'importar-resumen',
-    title: 'Importar Resumen',
-    icon: FileSpreadsheet,
-    adminOnly: true,
-  },
-];
+import { TOOL_TABS, pestanaInicial, type TabId } from './toolsTabs';
 
 export default function ToolsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const rawTab = searchParams.get('tab') as TabId | null;
-  const initialTab: TabId = (rawTab === 'can-afford' || rawTab === 'importar-resumen' || rawTab === 'conveniencia')
-    ? rawTab
-    : 'conveniencia';
+  const { is_admin } = useAuth();
+  const rawTab = searchParams.get('tab');
+  const initialTab: TabId = pestanaInicial(rawTab, is_admin);
 
   const {
     activeTab,
@@ -92,10 +64,8 @@ export default function ToolsPage() {
     gastoFijoCalcular,
   } = useTools();
 
-  const { is_admin } = useAuth();
-
   // Sync tab with URL if needed
-  const currentTab = rawTab || activeTab || initialTab;
+  const currentTab: TabId = rawTab ? initialTab : pestanaInicial(activeTab, is_admin);
 
   const handleSelectTab = (tabId: TabId) => {
     setActiveTab(tabId);
@@ -135,7 +105,7 @@ export default function ToolsPage() {
       {/* ── Page Header (Title on left, Tool Switcher on right) ─────────────── */}
       <div className={pageStyles.header}>
         <div className={pageStyles.titleGroup}>
-          <h1>Herramientas Financieras</h1>
+          <h1>Herramientas</h1>
           <p className={pageStyles.subtitle}>
             Simuladores inteligentes y calculadoras para optimizar tus decisiones de compra
           </p>
@@ -241,7 +211,7 @@ export default function ToolsPage() {
                           value: formatMonto(gastoFijoMonto || 0, 'ARS'),
                         },
                         {
-                          label: 'Saldo líquido',
+                          label: 'Plata disponible',
                           value: formatMonto(financialContext?.saldo_disponible || 0, 'ARS'),
                         },
                       ]}
@@ -265,13 +235,13 @@ export default function ToolsPage() {
                 title="¿Me lo puedo permitir?"
                 icon={HelpCircle}
                 items={[
-                  { label: 'Precio compra', value: formatMonto(canAffordForm.precio_total || 0, 'ARS') },
+                  { label: 'Precio', value: formatMonto(canAffordForm.precio_total || 0, 'ARS') },
                   {
                     label: 'Modalidad',
                     value: canAffordForm.modo === 'contado' ? 'Contado' : `${canAffordForm.cantidad_cuotas} cuotas`
                   },
                   {
-                    label: 'Saldo líquido',
+                    label: 'Plata disponible',
                     value: formatMonto(financialContext?.saldo_disponible || 0, 'ARS')
                   }
                 ]}
@@ -289,7 +259,7 @@ export default function ToolsPage() {
       )}
 
       {/* ── Tab: Importar resumen (Admin) ────────────────────────────────── */}
-      {currentTab === 'importar-resumen' && <ImportacionResumenSection />}
+      {is_admin && currentTab === 'importar-resumen' && <ImportacionResumenSection />}
     </div>
   );
 }

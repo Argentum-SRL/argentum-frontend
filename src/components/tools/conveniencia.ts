@@ -47,6 +47,9 @@ export function resolverTotalCuotasFormulario(
 export const TEXTO_AYUDA_INFLACION_ESPERADA =
   'Sale de lo que responden cada mes los analistas que consulta el Banco Central.'
 
+export const TEXTO_AYUDA_CUOTAS_CONTADO =
+  'Compara lo que pagás en cuotas con el precio de contado, teniendo en cuenta la inflación que se espera para los próximos meses. Si las cuotas pierden valor más rápido de lo que te cobran de más, te conviene en cuotas.'
+
 declare module '@/types/tools' {
   interface ConvenienciaRequest {
     valor_cuota?: number

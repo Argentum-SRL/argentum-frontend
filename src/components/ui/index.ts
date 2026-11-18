@@ -11,6 +11,7 @@ import { TimeInput } from './TimeInput/TimeInput.tsx'
 import { SelectInput } from './SelectInput'
 import type { SelectOption } from './SelectInput'
 import { CollapseToggle, type CollapseToggleProps } from './CollapseToggle'
+import { AyudaBoton, type AyudaBotonProps } from './AyudaBoton/AyudaBoton.tsx'
 import { PhoneCountrySelect } from './PhoneCountrySelect'
 import type { Country } from './PhoneCountrySelect'
 import SegmentedControl from './SegmentedControl'
@@ -35,6 +36,8 @@ export {
   type SelectOption, 
   CollapseToggle,
   type CollapseToggleProps,
+  AyudaBoton,
+  type AyudaBotonProps,
   PhoneCountrySelect, 
   type Country,
   SegmentedControl,

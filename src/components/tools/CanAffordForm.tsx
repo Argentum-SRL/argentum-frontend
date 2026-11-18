@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, Coins } from '@/components/ui/icons';
-import { Button, MontoInput } from '@/components/ui';
+import { Button, MontoInput, AyudaBoton } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,8 @@ import {
   mostrarSelectorMoneda,
   descripcionImporteMoneda,
 } from '@/utils/permitirse';
+import { TEXTO_AYUDA_PERMITIRSE } from './permitirseAyuda';
+import canAffordStyles from './CanAffordForm.module.css';
 import styles from './ToolsComponents.module.css';
 
 const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
@@ -91,7 +93,13 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <h2 className={styles.cardTitle}>¿Qué estás pensando comprar?</h2>
+        <div className={canAffordStyles.cardTitleRow}>
+          <h2 className={styles.cardTitle}>¿Qué estás pensando comprar?</h2>
+          <AyudaBoton
+            titulo="¿Me lo puedo permitir?"
+            texto={TEXTO_AYUDA_PERMITIRSE}
+          />
+        </div>
         <p className={styles.cardSubtitle}>
           Analizá si podés permitirte esta compra
         </p>

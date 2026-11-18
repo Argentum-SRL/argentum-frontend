@@ -182,7 +182,7 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   const mainItems: MenuItemConfig[] = [
     { id: 'metas', label: 'Metas', Icon: Target, path: '/app/metas' },
     { id: 'suscripciones', label: 'Suscripciones', Icon: RefreshCw, path: '/app/suscripciones' },
-    ...(isAdmin ? [{ id: 'herramientas', label: 'Herramientas', Icon: Calculator, path: '/app/herramientas' }] : []),
+    { id: 'herramientas', label: 'Herramientas', Icon: Calculator, path: '/app/herramientas' },
     { id: 'analisis', label: 'Análisis', Icon: Activity, path: '/app/analisis' },
     ...(isAdmin ? [
       { id: 'lo-que-se-repite', label: 'Lo que se repite', Icon: Repeat, path: '/app/lo-que-se-repite' },

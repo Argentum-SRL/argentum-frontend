@@ -143,7 +143,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     { id: 'nav-pres', title: 'Presupuestos', path: '/app/presupuestos', Icon: PieChart },
     { id: 'nav-meta', title: 'Metas de Ahorro', path: '/app/metas', Icon: Target },
     { id: 'nav-susc', title: 'Suscripciones', path: '/app/suscripciones', Icon: RefreshCw },
-    ...(is_admin ? [{ id: 'nav-tool', title: 'Herramientas', path: '/app/herramientas', Icon: Calculator }] : []),
+    { id: 'nav-tool', title: 'Herramientas', path: '/app/herramientas', Icon: Calculator },
     { id: 'nav-anal', title: 'Análisis', path: '/app/analisis', Icon: Activity },
     ...(is_admin ? [
       { id: 'nav-rep', title: 'Lo que se repite', path: '/app/lo-que-se-repite', Icon: Repeat },

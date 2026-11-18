@@ -125,7 +125,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const desktopNavItems = [
     ...NAV_BASE,
-    ...(is_admin ? [{ label: 'Herramientas', path: '/app/herramientas', Icon: Calculator }] : []),
+    { label: 'Herramientas', path: '/app/herramientas', Icon: Calculator },
     { label: 'Análisis', path: '/app/analisis', Icon: Activity },
     ...(is_admin ? [
       { label: 'Lo que se repite', path: '/app/lo-que-se-repite', Icon: Repeat },

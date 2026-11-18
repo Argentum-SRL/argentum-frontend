@@ -10,12 +10,15 @@ import {
   HelpCircle,
   Edit3,
 } from '@/components/ui/icons';
-import { MontoInput } from '@/components/ui';
+import { MontoInput, AyudaBoton } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import type { InflacionEsperadaData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { formatMonto } from '@/utils/format';
-import { TEXTO_AYUDA_INFLACION_ESPERADA } from './conveniencia';
+import {
+  TEXTO_AYUDA_CUOTAS_CONTADO,
+  TEXTO_AYUDA_INFLACION_ESPERADA,
+} from './conveniencia';
 import type { ConvenienciaFormState } from './ConvenienciaWizard';
 import DetalleCuotasChart from './DetalleCuotasChart';
 import ExplicacionCalculo from './ExplicacionCalculo';
@@ -86,7 +89,6 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
 }) => {
   const [step3View, setStep3View] = useState<'resultado' | 'grafico'>('resultado');
   const [slideDirection, setSlideDirection] = useState<'forward' | 'backward'>('forward');
-  const [showInflacionHelp, setShowInflacionHelp] = useState(false);
 
   const isContadoExceeded =
     formData.precio_contado !== null && formData.precio_contado > MAX_MONTO_INTEGRIDAD;
@@ -280,9 +282,15 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Referencia base
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-                ¿Cuánto cuesta de contado?
-              </h2>
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+                  ¿Cuánto cuesta de contado?
+                </h2>
+                <AyudaBoton
+                  titulo="Cuotas vs contado"
+                  texto={TEXTO_AYUDA_CUOTAS_CONTADO}
+                />
+              </div>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-normal">
                 Empecemos por el importe que pagarías hoy en un único pago. Lo utilizaremos como base para contrastar cualquier alternativa financiada.
               </p>
@@ -584,15 +592,10 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                         Inflación
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => setShowInflacionHelp(v => !v)}
-                        aria-label="De dónde sale la inflación que se espera"
-                        title={TEXTO_AYUDA_INFLACION_ESPERADA}
-                        className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-slate-300 dark:border-slate-600 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                      >
-                        ?
-                      </button>
+                      <AyudaBoton
+                        titulo="La inflación que se espera"
+                        texto={TEXTO_AYUDA_INFLACION_ESPERADA}
+                      />
                     </div>
 
                     <SegmentedControl<'esperada' | 'propia'>
@@ -611,12 +614,6 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       fullWidth
                       ariaLabel="Inflación para el cálculo"
                     />
-
-                    {showInflacionHelp && (
-                      <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 m-0">
-                        {TEXTO_AYUDA_INFLACION_ESPERADA}
-                      </p>
-                    )}
 
                     {(formData.usar_inflacion_propia || ipcError) ? (
                       <div className="flex items-center gap-2">

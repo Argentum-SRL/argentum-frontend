@@ -581,50 +581,75 @@
   pointer-events: none;
 }
 
-.footerSecondaryGroup {
+.bodyActionsBlock {
   display: flex;
-  align-items: center;
-  gap: var(--modal-footer-btn-gap);
+  flex-direction: column;
+  gap: var(--modal-option-gap);
+  width: 100%;
 }
 
-.footerIconBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--page);
+.bodyActionBtn {
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 4px;
+  border: none;
+  border-radius: var(--control-radius);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.bodyActionBtn:hover {
+  background: var(--surface-alt);
+}
+
+.bodyDeleteBtn {
+  color: var(--error);
+}
+
+.bodyDeleteBtn:hover {
+  background: var(--error-bg);
+}
+
+.secondaryBtn {
+  flex: 1;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
+  background: transparent;
   border: 1px solid var(--border);
   color: var(--text-2);
-  display: flex;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   cursor: pointer;
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
-  padding: 0;
 }
 
-.footerIconBtn:hover {
+.secondaryBtn:hover {
   background: var(--surface-alt);
   color: var(--text);
   border-color: var(--text-3);
 }
 
-.footerIconBtn:active {
-  transform: scale(0.94);
-}
-
-.dangerIconBtn:hover {
-  background: var(--error-bg);
-  color: var(--error);
-  border-color: rgba(192, 57, 43, 0.25);
-}
-
 .primaryBtn {
-  flex: 1;
-  height: 38px;
-  border-radius: 11px;
+  flex: 2;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   background: var(--primary);
   color: #ffffff;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   border: none;
   display: inline-flex;
@@ -659,7 +684,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .footerIconBtn,
+  .bodyActionBtn,
+  .secondaryBtn,
   .primaryBtn {
     transition: none;
     transform: none;

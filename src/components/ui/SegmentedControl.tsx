@@ -121,6 +121,7 @@ export default function SegmentedControl<T extends string = string>({
       className={[
         styles.track,
         fullWidth ? styles.fullWidth : '',
+        layout === 'wrap' ? styles.trackWrap : '',
         className,
       ].filter(Boolean).join(' ')}
     >

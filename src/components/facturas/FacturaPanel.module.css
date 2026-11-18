@@ -61,42 +61,38 @@
   color: var(--text-secondary);
 }
 
-.actionsRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 8px;
-}
-
 .btnBorrar {
-  color: var(--error) !important;
-}
-
-.btnBorrar:hover {
-  background: var(--error-bg) !important;
-}
-
-.confirmBox {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px;
-  border-radius: 10px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-}
-
-.confirmText {
-  font-size: 0.875rem;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.confirmButtons {
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 4px;
+  border: none;
+  border-radius: var(--control-radius);
+  background: transparent;
+  color: var(--error);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.btnBorrar:hover:not(:disabled) {
+  background: var(--error-bg);
+}
+
+.btnBorrar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnBorrar {
+    transition: none;
+  }
 }
 
 .autoPagadaBox {

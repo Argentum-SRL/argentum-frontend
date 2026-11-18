@@ -232,8 +232,32 @@ Para evitar CSS duplicado o ad-hoc en cada modal, el espaciado se gobierna centr
 - `[data-modal-field]`: Contenedor de control + su etiqueta/ayuda/error con gap `--modal-label-gap` (8px). El texto de ayuda vive DENTRO del campo, debajo del control, sin márgenes propios inline.
 - `[data-modal-options]`: Contenedor de lista de ítems de una misma pregunta (toggles, tarjetas de opción, radios, chips) con gap `--modal-option-gap` (8px).
 - `[data-modal-section-title]`: Subtítulo o encabezado de bloque; aplica `margin-bottom: var(--modal-section-title-gap)` (10px).
-- `[data-modal-delete]`: Identifica la acción destructiva de eliminar la entidad del modal; se ubica exclusivamente al final del contenido (último bloque), nunca en el header ni en el footer.
+- `[data-modal-delete]`: Identifica la acción destructiva de eliminar la entidad del modal (regla **F2**); se ubica exclusivamente como último elemento del contenido (último bloque), nunca en el encabezado ni en el pie.
 - **Prohibición de estilos inline en modales (R27):** Queda terminantemente prohibido usar estilos inline con `margin` o `padding` vertical para forzar separaciones dentro de modales; el ritmo visual se gobierna exclusivamente por los tokens y atributos del sistema.
+
+### Reglas Canónicas de Acciones, Pie y Encabezado de Modales y Hojas (F1–F4)
+
+Aplica a **todos** los modales y hojas (`sheets`/`drawers`) del frontend (incluido `pages/admin`):
+
+- **F1 (Pie de modal):** El pie lleva como mucho **dos** botones: el secundario (`flex: 1`) y el principal (`flex: 2`), usando los tokens del pie (`--control-h`, `--control-radius`, `--modal-footer-gap`, `--modal-footer-btn-gap`, `--modal-footer-pad-bottom`). Si hay un solo botón en el pie, ocupa todo el ancho (`flex: 1`). Prohibido incluir íconos sueltos de acción en el pie.
+- **F2 (Acción destructiva "Eliminar"):** Eliminar va siempre como último elemento del contenido (último bloque, con `data-modal-delete`), nunca en el encabezado ni en el pie: botón de texto con ícono `Trash2` y el texto `"Eliminar <entidad>"` (ej. `"Eliminar presupuesto"`, `"Eliminar meta"`, `"Eliminar movimiento"`, `"Eliminar compra"`, `"Eliminar transacción"`, `"Eliminar esta cuota"`, `"Eliminar factura"`), en color de error (`var(--error)`), ancho completo, alineado a la izquierda, sin fondo en reposo y altura `--control-h`. Siempre solicita confirmación mediante el diálogo correspondiente (`confirm` de `useModal` o confirmación propia del módulo).
+- **F3 (Acciones terciarias):** Toda otra acción que no es ni la principal ni la secundaria (ej. `"Pausar presupuesto"` / `"Reanudar presupuesto"`, `"Pausar meta"` / `"Reanudar meta"`, `"Cancelar cuota"` / `"Cancelar cuotas"`) se ubica en ese mismo último bloque del contenido, arriba de Eliminar, con el mismo formato de botón de texto full-width alineado a la izquierda en color de texto normal (`var(--text)`).
+- **F4 (Encabezado):** El encabezado lleva únicamente el título (junto a datos informativos si corresponden, como contadores de no leídas), la navegación entre pasos o vistas (`backBtn` / `nextSlideBtn`) y el botón de cerrar (`X`). Ninguna acción destructiva o de configuración se coloca en el encabezado.
+
+#### Casos fijos
+- `PresupuestoDetailModal`: pie con un solo botón principal `"Editar presupuesto"` a lo ancho; último bloque del contenido con `"Pausar presupuesto"` / `"Reanudar presupuesto"` y `"Eliminar presupuesto"`.
+- `GoalDetailModal`: pie con `"Editar"` (secundario, `flex: 1`) y `"Aportar dinero"` / `"Gestionar fondos"` (principal, `flex: 2`); último bloque del contenido con `"Pausar meta"` / `"Reanudar meta"` (cuando no está cumplida) y `"Eliminar meta"`.
+- `PresupuestoModal` (en edición): `"Eliminar presupuesto"` al final del contenido del Paso 1 (fuera del encabezado).
+- `QueEsEstaPlataModal`: `"Eliminar movimiento"` al final del contenido (fuera del título); pie `Cancelar` + `Guardar`.
+- `GrupoCuotasDetalleModal` (detalle de compra): pie `"Editar"` (secundario) + acción de pago (`"Adelantar cuota"` / `"Adelantar cuotas"` / `"Prepagar"`) como principal, o solo `"Editar"` a lo ancho si no hay cuotas pendientes; último bloque del contenido con `"Cancelar cuota"` / `"Cancelar cuotas"` arriba de `"Eliminar compra"`.
+- `ActualizarSaldoModal` (Paso 2 con diferencia): pie con `"Ajustar el saldo"` y `"Cargar lo que falta"` / `"Cargar un ingreso"` manteniendo su jerarquía; flecha `"Volver"` en el encabezado y nota explicativa del ajuste al final del contenido.
+- `TransaccionModal` (en edición): `"Eliminar transacción"` / `"Eliminar esta cuota"` al final del contenido de Paso 1 y Paso 3; pie del Paso 1 siempre `Cancelar` + `Continuar`.
+- `NotificacionesDrawer`: `"Configurar avisos"` en el renglón de acciones sobre la lista (junto a `"Marcar todas como leídas"`), fuera del encabezado.
+- `FacturaPanel`: acción principal en el pie con `ModalFooter` (`"Ya la pagué"` o `"No la pagué"`); `"Eliminar factura"` al final del contenido con `confirm` de `useModal`.
+
+#### Excepciones a F1–F4
+- Modales cuya única función es confirmar un borrado o baja definitiva (`ConfirmModal`, `EliminarCuentaModal`, `IdentidadModal` en modo eliminar): su botón destructivo de confirmación permanece en el pie.
+- Selectores de fecha y hora (`DateInput` y `TimeInput`, incluida su presentación en hoja de celular): quedan exceptuados de **F1** por tratarse de selectores de valor y no de modales de acción.
 
 ### Estructura Canónica del Modal
 
@@ -247,15 +271,15 @@ Para evitar CSS duplicado o ad-hoc en cada modal, el espaciado se gobierna centr
    - `--modal-header-gap`: `20px` de separación hacia el contenido.
    - `--modal-radius`: `var(--radius-modal)` (`20px`).
    - `--modal-max-h`: `90dvh` (solo unidades dvh en modales y hojas).
-   - Altura fluida por contenido scrolleable interno con footer fijo.
-3. **Acciones Destructivas:**
-   - Botón marcado con `[data-modal-delete]` al final del último bloque de contenido con confirmación, **nunca** compartiendo el footer.
+   - Altura fluida por contenido scrolleable interno con footer fijo; en todo modal con pie fijo, el `padding-bottom` del cuerpo con scroll (en escritorio y en móvil) debe ser `var(--modal-footer-gap)` (`24px`) para que el último bloque se vea completo por encima del pie al llegar al final del scroll (**D-C2.4**).
+3. **Acciones Destructivas y Terciarias:**
+   - Botón de texto `[data-modal-delete]` al final del último bloque de contenido con confirmación (regla **F2**), y acciones terciarias arriba de este en el mismo bloque (regla **F3**), nunca compartiendo el pie ni el encabezado (salvo las excepciones listadas arriba).
 4. **Footer:**
-   - Implementado mediante `ModalFooter` (`secondary?: ReactNode`, `primary: ReactNode`).
+   - Implementado mediante `ModalFooter` (`secondary?: ReactNode`, `primary: ReactNode`) o la estructura equivalente con sus tokens.
+   - Como máximo dos botones: secundario (`flex: 1`) y principal (`flex: 2`), o botón único a lo ancho (`flex: 1`) (regla **F1**). Sin íconos sueltos en el pie.
    - Separación hacia el contenido: `var(--modal-footer-gap)` (`24px`).
    - Gap entre botones: `var(--modal-footer-btn-gap)` (`12px`).
    - Sin borde divisor superior (`border-top: none`).
-   - Cancelar: `flex: 1`, Confirmar / Principal: `flex: 2`. Sin acción secundaria: el principal ocupa todo el ancho.
 5. **Apilamiento y Cierre de Modales Múltiples:**
    - Soporte para modales y hojas anidadas (por ejemplo selectores de fecha o país abiertos desde un modal):
    - Contador de bloqueo de scroll a nivel de módulo en `Modal.tsx` (`activeModalsCount`) que restaura el scroll del body solo al desmontar el último modal abierto.

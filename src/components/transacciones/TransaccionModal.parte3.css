@@ -281,7 +281,7 @@
   flex-shrink: 0;
 }
 
-.cancelBtn, .btnDelete {
+.cancelBtn {
   flex: 1;
   height: 42px;
   border-radius: 12px;
@@ -299,13 +299,33 @@
   color: var(--text);
 }
 
-.btnDelete {
-  border-color: rgba(220, 38, 38, 0.3);
-  color: #DC2626;
+.bodyDeleteBlock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.btnDelete:hover {
-  background: rgba(220, 38, 38, 0.1);
+.bodyDeleteBtn {
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 4px;
+  border: none;
+  border-radius: var(--control-radius);
+  background: transparent;
+  color: var(--error);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.bodyDeleteBtn:hover {
+  background: var(--error-bg);
 }
 
 .submitBtn {
@@ -422,7 +442,7 @@
   .formFooter {
     padding: 8px var(--modal-pad-x) 10px; /* Separación lateral oficial */
   }
-  .cancelBtn, .btnDelete, .submitBtn {
+  .cancelBtn, .submitBtn {
     height: 40px;
     font-size: 13px;
   }
@@ -436,7 +456,7 @@
 .advancedDrawer,
 .advInput,
 .cancelBtn,
-.btnDelete,
+.bodyDeleteBtn,
 .submitBtn,
 .emptyWalletBox {
     transition: none;

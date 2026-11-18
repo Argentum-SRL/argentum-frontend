@@ -27,7 +27,7 @@
 }
 
 .formBody {
-  padding: 16px var(--modal-pad-x); /* Separación lateral oficial */
+  padding: 16px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -59,7 +59,7 @@
 }
 
 .formBody {
-  padding: 16px var(--modal-pad-x); /* Separación lateral oficial */
+  padding: 16px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
   display: flex;
   flex-direction: column;
   gap: var(--modal-field-gap); /* Separación estándar entre campos */

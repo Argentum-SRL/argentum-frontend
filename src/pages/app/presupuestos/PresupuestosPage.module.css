@@ -1,13 +1,13 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--module-gap-mobile);
   min-height: 100%;
 }
 
 @media (min-width: 768px) {
   .page {
-    gap: 24px;
+    gap: var(--module-gap-desktop);
   }
 }
 
@@ -54,7 +54,7 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .excelBtn {
@@ -138,7 +138,75 @@
   .btnSuffix { display: inline; }
 }
 
-/* ── Hero Resumen (Marine) ────────────────────────────────────────────────── */
+/* ── Hero Resumen (Desktop PageSummaryBar, igual a Transacciones) ────────── */
+.resumenSlot {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--space-lg);
+  box-sizing: border-box;
+}
+
+.resumenMainGroup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.resumenHeroLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+}
+
+.resumenHeroValue {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.08;
+  color: rgba(255, 255, 255, 1);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.resumenNotice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-icon);
+  max-width: 260px;
+  margin-left: auto;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.resumenNoticeIcon {
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  display: block;
+}
+
+.resumenNoticeText {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.25;
+  text-align: left;
+  letter-spacing: -0.01em;
+}
+
+.resumenNoticeHighlight {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+}
 
 /* ── Controls Row & Tabs ─────────────────────────────────────────────────── */
 .controlsRow {
@@ -148,14 +216,7 @@
   width: 100%;
 }
 
-
-/* ── Grid & Responsive Containers ────────────────────────────────────────── */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
+/* ── Responsive Containers ───────────────────────────────────────────────── */
 .mobileChartContainer {
   display: block;
 }
@@ -164,14 +225,13 @@
   display: none;
 }
 
+.desktopSummaryBar {
+  display: none !important;
+}
+
 @media (min-width: 768px) {
   .controlsRow {
     justify-content: flex-start;
-  }
-
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 20px;
   }
 
   .mobileChartContainer {
@@ -181,157 +241,26 @@
   .desktopGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 20px;
-  }
-}
-
-/* ── Estados Vacíos y Loading ────────────────────────────────────────────── */
-.emptyState {
-  padding: 60px 20px;
-  text-align: center;
-  color: var(--text-2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  background: var(--surface);
-  border-radius: 20px;
-  border: 1px dashed var(--border);
-}
-
-.emptyIcon { color: var(--border); }
-.emptyTitle { font-size: 18px; font-weight: 700; color: var(--text); margin: 0; }
-.emptyDesc { font-size: 14px; max-width: 320px; margin: 0; }
-
-.skeleton {
-  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--surface) 50%, var(--surface-alt) 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.skeletonCard {
-  height: 240px;
-  border-radius: 20px;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  .skeletonCard {
-    height: 280px;
-  }
-}
-
-/* ── History Drawer Content ──────────────────────────────────────────────── */
-.historyContent {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.suggestionBanner {
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  gap: 12px;
-  color: var(--text-2);
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.suggestionTitle { font-weight: 800; font-size: 14px; margin: 0 0 4px; }
-.suggestionDesc { font-size: 13px; line-height: 1.4; margin: 0; }
-
-.historyList { display: flex; flex-direction: column; gap: 16px; }
-
-.historyItem {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.historyHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.historyDates { font-size: 13px; font-weight: 700; color: var(--text); }
-.historyStatus { font-size: 11px; font-weight: 800; text-transform: uppercase; }
-
-.progressContainer {
-  height: 6px;
-  background: var(--surface-alt);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progressBar {
-  height: 100%;
-  transition: width 0.6s ease;
-}
-
-.historyMeta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-2);
-}
-
-.historyPercent { font-weight: 700; color: var(--text); }
-
-.errorText { color: var(--error); }
-.successText { color: var(--success); }
-
-.loadingHistory, .emptyHistory {
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--text-2);
-}
-
-.page::after {
-  content: '';
-  display: none;
-}
-
-.summaryBar {
-  display: none !important;
-  margin-top: 0 !important;
-}
-
-@media (min-width: 768px) {
-  .page::after {
-    display: block;
-    height: 32px;
-    flex-shrink: 0;
-    width: 100%;
+    gap: var(--space-xl);
   }
 
-  .summaryBar {
+  .desktopSummaryBar {
     display: flex !important;
   }
+
+  .resumenHeroValue {
+    font-size: 28px;
+  }
+}
+
+/* Contrato validado por skeletonsResponsive.test.ts */
+.suggestionBanner {
+  box-sizing: border-box;
 }
 
 @media (prefers-reduced-motion: reduce) {
-
-  .nuevaBtn,
-.skeleton,
-.progressBar {
+  .excelBtn,
+  .nuevaBtn {
     transition: none;
-    animation: none;
   }
 }

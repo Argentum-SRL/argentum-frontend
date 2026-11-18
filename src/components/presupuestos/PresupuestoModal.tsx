@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useReducer, useState, useCallback } from 'react'
+import { useMemo, useEffect, useReducer, useState, useCallback, useRef } from 'react'
 import { esPunteroFino } from '@/utils/foco'
 import {
   Target,
@@ -24,8 +24,11 @@ import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
+import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
+import AlertasPorcentajeCampo from './AlertasPorcentajeCampo'
+import { validarAlertasFormulario } from './alertasPresupuesto'
 
 interface PresupuestoModalProps {
   open: boolean
@@ -44,6 +47,7 @@ interface FormState {
   periodo: 'semanal' | 'quincenal' | 'mensual'
   renovacion: 'automatica' | 'manual'
   selectedCategorias: { categoria_id: string | null; subcategoria_id: string | null }[]
+  alertasPorcentajes: Array<number | null>
   searchQuery: string
   localError: string | null
   isSubmitting: boolean
@@ -62,6 +66,7 @@ const initialState: FormState = {
   periodo: 'mensual',
   renovacion: 'automatica',
   selectedCategorias: [],
+  alertasPorcentajes: [80, 100],
   searchQuery: '',
   localError: null,
   isSubmitting: false,
@@ -81,7 +86,10 @@ function formReducer(state: FormState, action: FormAction): FormState {
           selectedCategorias: action.presupuesto.categorias.map(c => ({
             categoria_id: c.categoria_id || null,
             subcategoria_id: c.subcategoria_id || null
-          }))
+          })),
+          alertasPorcentajes: action.presupuesto.alertas_porcentajes?.length
+            ? [...action.presupuesto.alertas_porcentajes].sort((a, b) => a - b)
+            : [80, 100],
         }
       }
       if (action.sugerencia) {
@@ -112,20 +120,29 @@ export default function PresupuestoModal({
 }: PresupuestoModalProps) {
   const isEdit = !!presupuesto
   const { usuario } = useAuth()
+  const { confirm } = useModal()
   const [state, dispatch] = useReducer(formReducer, initialState)
   const [fallbackCategorias, setFallbackCategorias] = useState<Categoria[]>([])
   const [allSubcategorias, setAllSubcategorias] = useState<Subcategoria[]>([])
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set())
   const [animClass, setAnimClass] = useState('')
+  const [alertasExpanded, setAlertasExpanded] = useState(false)
+  const [alertasSubmitAttempted, setAlertasSubmitAttempted] = useState(false)
+  const alertasTocadasRef = useRef(false)
 
   const {
-    step, nombre, monto, moneda, periodo, renovacion, selectedCategorias, searchQuery, localError, isSubmitting
+    step, nombre, monto, moneda, periodo, renovacion, selectedCategorias, alertasPorcentajes, searchQuery, localError, isSubmitting
   } = state
 
   const setField = useCallback(<K extends keyof FormState>(field: K, value: FormState[K]) => {
     dispatch({ type: 'SET_FIELD', field, value } as FormAction)
     if (localError) dispatch({ type: 'SET_FIELD', field: 'localError', value: null } as FormAction)
   }, [localError])
+
+  const handleAlertasChange = useCallback((nuevas: Array<number | null>) => {
+    alertasTocadasRef.current = true
+    setField('alertasPorcentajes', nuevas)
+  }, [setField])
 
   const effectiveCategorias = categorias.length > 0 ? categorias : fallbackCategorias
 
@@ -151,16 +168,42 @@ export default function PresupuestoModal({
 
   useEffect(() => {
     if (open) {
+      alertasTocadasRef.current = false
       const defaultMoneda = (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
       const timer = setTimeout(() => {
         dispatch({ type: 'RESET', presupuesto: presupuesto || null, defaultMoneda, sugerencia })
         setExpandedCats(new Set())
         setAnimClass('')
+        setAlertasExpanded(false)
+        setAlertasSubmitAttempted(false)
         void loadData()
       }, 0)
       return () => clearTimeout(timer)
     }
   }, [open, presupuesto, usuario?.moneda_principal, loadData, sugerencia])
+
+  useEffect(() => {
+    if (!open || presupuesto) return
+    const controller = new AbortController()
+
+    const cargarAlertasPorDefecto = async () => {
+      try {
+        const lista = await presupuestoService.getAlertasPorDefecto(controller.signal)
+        if (!controller.signal.aborted && !alertasTocadasRef.current && lista.length > 0) {
+          dispatch({
+            type: 'SET_FIELD',
+            field: 'alertasPorcentajes',
+            value: [...lista].sort((a, b) => a - b),
+          })
+        }
+      } catch {
+        // Conserva el valor inicial si falla la carga de preferencias
+      }
+    }
+
+    void cargarAlertasPorDefecto()
+    return () => controller.abort()
+  }, [open, presupuesto])
 
   const filteredCategorias = useMemo(() => {
     if (!searchQuery.trim()) return egresoCategorias
@@ -367,38 +410,28 @@ export default function PresupuestoModal({
     setExpandedCats(next)
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!presupuesto) return
-    const id = presupuesto.id
-    const estadoAnterior = presupuesto.estado
-    try {
-      await presupuestoService.eliminarPresupuesto(id)
-      onSuccess()
-      onClose()
-      sileo.action({
-        title: 'Presupuesto eliminado.',
-        button: {
-          title: 'Deshacer',
-          onClick: async () => {
-            try {
-              await presupuestoService.restaurarPresupuesto(id, estadoAnterior)
-              sileo.success({ title: 'Presupuesto restaurado.' })
-              onSuccess()
-            } catch (e) {
-                            sileo.error({
-                title: getErrorMessage(e, 'No se pudo restaurar el presupuesto. Probá de nuevo.'),
-              })
-            }
-          }
-        },
-        duration: 8000
-      })
-    } catch (e) {
-      console.error(e)
-            sileo.error({
-        title: getErrorMessage(e, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
-      })
-    }
+    confirm({
+      title: '¿Eliminás este presupuesto?',
+      description: 'Se borra con su historial de ciclos. Tus gastos no cambian.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar presupuesto',
+      cancelLabel: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          await presupuestoService.eliminarPresupuesto(presupuesto.id)
+          onSuccess()
+          onClose()
+          sileo.success({ title: 'Presupuesto eliminado.' })
+        } catch (e) {
+          console.error(e)
+          sileo.error({
+            title: getErrorMessage(e, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
+          })
+        }
+      },
+    })
   }
 
   const handleSubmit = async () => {
@@ -428,6 +461,13 @@ export default function PresupuestoModal({
       dispatch({ type: 'SET_FIELD', field: 'localError', value: 'Seleccioná al menos una categoría' })
       return
     }
+    const errorAlertas = validarAlertasFormulario(alertasPorcentajes)
+    if (errorAlertas) {
+      setAlertasExpanded(true)
+      setAlertasSubmitAttempted(true)
+      dispatch({ type: 'SET_FIELD', field: 'localError', value: errorAlertas })
+      return
+    }
 
     dispatch({ type: 'SET_FIELD', field: 'isSubmitting', value: true })
     try {
@@ -440,13 +480,18 @@ export default function PresupuestoModal({
         return true
       })
 
+      const alertasOrdenadas = alertasPorcentajes
+        .filter((v): v is number => v !== null)
+        .sort((a, b) => a - b)
+
       const payload = {
         nombre: trimmed,
         monto,
         moneda,
         periodo,
         renovacion,
-        categorias: dedupedCategorias
+        categorias: dedupedCategorias,
+        alertas_porcentajes: alertasOrdenadas,
       }
 
       if (isEdit) {
@@ -507,18 +552,6 @@ export default function PresupuestoModal({
                   <h2 className={styles.headerTitle}>{isEdit ? 'Editar presupuesto' : 'Nuevo presupuesto'}</h2>
                 </div>
                 <div className={styles.headerRightActions}>
-                  {isEdit && (
-                    <button
-                      type="button"
-                      className={styles.deleteHeaderBtn}
-                      onClick={handleDelete}
-                      title="Eliminar presupuesto"
-                      aria-label="Eliminar presupuesto"
-                      data-modal-delete
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
                   <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
                     <X size={18} strokeWidth={1.75} />
                   </button>
@@ -557,9 +590,30 @@ export default function PresupuestoModal({
                     max={999999999999.99}
                     label="Monto límite"
                   />
-                  <p className={styles.fieldHint}>Este será el límite máximo de gasto para el periodo seleccionado.</p>
+                  <p className={styles.fieldHint}>
+                    <span className={styles.hintDesktop}>
+                      Este será el límite máximo de gasto para el periodo seleccionado.
+                    </span>
+                    <span className={styles.hintMobile}>
+                      Límite máximo de gasto del período.
+                    </span>
+                  </p>
                 </div>
                 </div>
+
+                {isEdit && (
+                  <div className={styles.bodyActionsBlock} data-modal-block>
+                    <button
+                      type="button"
+                      className={styles.bodyDeleteBtn}
+                      onClick={handleDelete}
+                      data-modal-delete
+                    >
+                      <Trash2 size={15} />
+                      <span>Eliminar presupuesto</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className={styles.formFooter}>
@@ -606,62 +660,64 @@ export default function PresupuestoModal({
                   </div>
                 )}
 
-                {/* Buscador Superior */}
-                <div className={styles.catSearchContainer}>
-                  <Search size={16} className={styles.searchIcon} strokeWidth={2} />
-                  <input
-                    type="text"
-                    className={styles.catSearchInput}
-                    placeholder="Buscar categorías o subcategorías..."
-                    value={searchQuery}
-                    onChange={e => setField('searchQuery', e.target.value)}
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      className={styles.clearSearchBtn}
-                      onClick={() => setField('searchQuery', '')}
-                      title="Limpiar búsqueda"
-                      aria-label="Limpiar búsqueda"
-                    >
-                      <X size={13} />
-                    </button>
-                  )}
-                </div>
+                {/* Buscador Superior + Atajos Rápidos */}
+                <div data-modal-block>
+                  <div className={styles.catSearchContainer}>
+                    <Search size={16} className={styles.searchIcon} strokeWidth={2} />
+                    <input
+                      type="text"
+                      className={styles.catSearchInput}
+                      placeholder="Buscar categorías o subcategorías..."
+                      value={searchQuery}
+                      onChange={e => setField('searchQuery', e.target.value)}
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        className={styles.clearSearchBtn}
+                        onClick={() => setField('searchQuery', '')}
+                        title="Limpiar búsqueda"
+                        aria-label="Limpiar búsqueda"
+                      >
+                        <X size={13} />
+                      </button>
+                    )}
+                  </div>
 
-                {/* Atajos Rápidos de Selección en 1 toque (Presets) */}
-                <div className={styles.presetsBar} role="toolbar" aria-label="Atajos de categorías">
-                  <button
-                    type="button"
-                    className={`${styles.presetPill} ${isPresetActive('todas') ? styles.presetPillActive : ''}`}
-                    onClick={() => applyPreset('todas')}
-                  >
-                    <span>{isPresetActive('todas') ? '✓ Todas' : 'Todas'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.presetPill} ${isPresetActive('esenciales') ? styles.presetPillActive : ''}`}
-                    onClick={() => applyPreset('esenciales')}
-                  >
-                    <span>Fijos & Esenciales</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.presetPill} ${isPresetActive('ocio') ? styles.presetPillActive : ''}`}
-                    onClick={() => applyPreset('ocio')}
-                  >
-                    <span>Variables & Ocio</span>
-                  </button>
-                  {selectedCategorias.length > 0 && (
+                  {/* Atajos Rápidos de Selección en 1 toque (Presets) */}
+                  <div className={styles.presetsBar} role="toolbar" aria-label="Atajos de categorías">
                     <button
                       type="button"
-                      className={`${styles.presetPill} ${styles.presetPillClear}`}
-                      onClick={() => applyPreset('limpiar')}
-                      title="Desmarcar todas"
+                      className={`${styles.presetPill} ${isPresetActive('todas') ? styles.presetPillActive : ''}`}
+                      onClick={() => applyPreset('todas')}
                     >
-                      <span>Limpiar</span>
+                      <span>{isPresetActive('todas') ? '✓ Todas' : 'Todas'}</span>
                     </button>
-                  )}
+                    <button
+                      type="button"
+                      className={`${styles.presetPill} ${isPresetActive('esenciales') ? styles.presetPillActive : ''}`}
+                      onClick={() => applyPreset('esenciales')}
+                    >
+                      <span>Fijos & Esenciales</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.presetPill} ${isPresetActive('ocio') ? styles.presetPillActive : ''}`}
+                      onClick={() => applyPreset('ocio')}
+                    >
+                      <span>Variables & Ocio</span>
+                    </button>
+                    {selectedCategorias.length > 0 && (
+                      <button
+                        type="button"
+                        className={`${styles.presetPill} ${styles.presetPillClear}`}
+                        onClick={() => applyPreset('limpiar')}
+                        title="Desmarcar todas"
+                      >
+                        <span>Limpiar</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Lista Espaciosa de Categorías */}
@@ -862,12 +918,19 @@ export default function PresupuestoModal({
 
                 <div className={styles.formField} data-modal-field>
                   <label className={styles.fieldLabel}>Renovación</label>
-                  <div className={styles.renewalOptions} role="radiogroup" aria-label="Tipo de renovación">
-                    <div
+                  <div className={styles.renewalOptions} role="radiogroup" aria-label="Tipo de renovación" data-modal-options>
+                    <button
+                      type="button"
                       role="radio"
                       aria-checked={renovacion === 'automatica'}
                       className={`${styles.renewalCard} ${renovacion === 'automatica' ? styles.renewalCardActive : ''}`}
                       onClick={() => setField('renovacion', 'automatica')}
+                      onKeyDown={(e) => {
+                        if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                          e.preventDefault()
+                          setField('renovacion', 'manual')
+                        }
+                      }}
                     >
                       <div className={styles.renewalLeft}>
                         <div className={styles.renewalIconWrap}>
@@ -875,19 +938,26 @@ export default function PresupuestoModal({
                         </div>
                         <div className={styles.renewalInfo}>
                           <span className={styles.renewalTitle}>Automática</span>
-                          <p className={styles.renewalDesc}>Se reinicia solo al finalizar el periodo</p>
+                          <span className={styles.renewalDesc}>Se reinicia solo cada periodo</span>
                         </div>
                       </div>
                       <div className={`${styles.radioCircle} ${renovacion === 'automatica' ? styles.radioCircleActive : ''}`} aria-hidden="true">
                         {renovacion === 'automatica' && <div className={styles.radioDot} />}
                       </div>
-                    </div>
+                    </button>
 
-                    <div
+                    <button
+                      type="button"
                       role="radio"
                       aria-checked={renovacion === 'manual'}
                       className={`${styles.renewalCard} ${renovacion === 'manual' ? styles.renewalCardActive : ''}`}
                       onClick={() => setField('renovacion', 'manual')}
+                      onKeyDown={(e) => {
+                        if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                          e.preventDefault()
+                          setField('renovacion', 'automatica')
+                        }
+                      }}
                     >
                       <div className={styles.renewalLeft}>
                         <div className={styles.renewalIconWrap}>
@@ -895,16 +965,24 @@ export default function PresupuestoModal({
                         </div>
                         <div className={styles.renewalInfo}>
                           <span className={styles.renewalTitle}>Manual</span>
-                          <p className={styles.renewalDesc}>Finaliza o se renueva cuando vos decidas</p>
+                          <span className={styles.renewalDesc}>Cerrás o renovás cuando decidas</span>
                         </div>
                       </div>
                       <div className={`${styles.radioCircle} ${renovacion === 'manual' ? styles.radioCircleActive : ''}`} aria-hidden="true">
                         {renovacion === 'manual' && <div className={styles.radioDot} />}
                       </div>
-                    </div>
+                    </button>
                   </div>
                 </div>
                 </div>
+
+                <AlertasPorcentajeCampo
+                  alertas={alertasPorcentajes}
+                  onChange={handleAlertasChange}
+                  expanded={alertasExpanded}
+                  onToggleExpanded={() => setAlertasExpanded((prev) => !prev)}
+                  mostrarErrores={alertasSubmitAttempted}
+                />
               </div>
 
               <div className={styles.formFooter}>

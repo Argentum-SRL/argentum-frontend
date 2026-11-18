@@ -1,13 +1,25 @@
 .modalContent {
   display: flex;
   flex-direction: column;
-  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
+  flex: 1;
+  min-height: 0;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: var(--modal-pad-x) var(--modal-pad-x) 0;
+  flex-shrink: 0;
+}
+
+.historyBody {
+  display: flex;
+  flex-direction: column;
+  padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .skeletonItem {
@@ -27,18 +39,19 @@
 }
 
 .headerTitle {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--text);
   margin: 0;
+  line-height: 1.2;
 }
 
 .closeBtn {
   background: var(--surface-alt);
   border: none;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,12 +67,19 @@
 
 .suggestionBanner {
   display: flex;
-  gap: 16px;
+  gap: var(--space-lg);
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: 20px;
-  padding: 20px;
+  padding: var(--space-xl);
   color: var(--text-2);
+}
+
+.suggestionContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
 }
 
 .suggestionIcon {
@@ -70,7 +90,7 @@
 .suggestionTitle {
   font-size: 15px;
   font-weight: 800;
-  margin: 0 0 4px 0;
+  margin: 0;
 }
 
 .suggestionDesc {
@@ -84,14 +104,14 @@
 .historyList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--modal-field-gap);
 }
 
 .historyItem {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 20px;
+  padding: var(--space-lg);
   transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
 }
 
@@ -111,7 +131,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--modal-field-gap);
 }
 
 .dates {
@@ -141,7 +161,7 @@
 
 /* Progress Section */
 .progressSection {
-  margin-bottom: 12px;
+  margin-bottom: var(--modal-label-gap);
 }
 
 .progressBarContainer {
@@ -149,7 +169,7 @@
   background: var(--surface-alt);
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: var(--modal-option-gap);
 }
 
 .progressBar {
@@ -186,28 +206,6 @@
   font-size: 20px;
   font-weight: 900;
   color: var(--text);
-}
-
-/* Empty/Loading States */
-.loadingState, .emptyState {
-  padding: 48px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: var(--text-3);
-  gap: 16px;
-}
-
-.emptyIcon {
-  opacity: 0.2;
-}
-
-.emptyTitle {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

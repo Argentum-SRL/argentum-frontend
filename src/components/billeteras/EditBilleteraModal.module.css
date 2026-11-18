@@ -173,7 +173,7 @@
 
 /* ── Form Fields ───────────────────────────────────────────────────────────── */
 .formFields {
-  padding: 8px var(--modal-pad-x) 12px; /* Separación lateral oficial */
+  padding: 8px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
   display: flex;
   flex-direction: column;
   box-sizing: border-box;

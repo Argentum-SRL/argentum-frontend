@@ -51,7 +51,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
+  padding: var(--modal-pad-x) var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
   border-bottom: none;
   flex-shrink: 0;
 }
@@ -63,10 +63,11 @@
 }
 
 .headerTitle {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text);
   margin: 0;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
@@ -120,8 +121,8 @@
 .identityCard {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
   background: var(--page);
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
@@ -239,7 +240,7 @@
 .categorySection {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--modal-label-gap);
 }
 
 .sectionMiniLabel {
@@ -253,7 +254,7 @@
 .categoryChipsList {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--modal-option-gap);
 }
 
 .catChip {
@@ -274,10 +275,10 @@
   background: var(--page);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  padding: 14px 16px;
+  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--modal-option-gap);
 }
 
 .heroAmounts {
@@ -290,7 +291,7 @@
 .amountBlock {
   display: flex;
   flex-direction: column;
-  gap: 0px;
+  gap: var(--space-2xs);
 }
 
 .limitBlock {
@@ -328,7 +329,6 @@
   border-radius: 999px;
   overflow: hidden;
   position: relative;
-  margin-top: 1px;
 }
 
 .progressFill {
@@ -406,15 +406,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: 14px;
   background: var(--page);
   border: 1px solid var(--border-subtle);
   cursor: pointer;
   width: 100%;
   text-align: left;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-top: 2px;
 }
 
 .movimientosNavCard:hover {
@@ -436,7 +435,7 @@
 .movimientosNavLeft {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-md);
 }
 
 .movimientosNavIconBox {
@@ -454,7 +453,7 @@
 .movimientosNavInfo {
   display: flex;
   flex-direction: column;
-  gap: 0px;
+  gap: var(--space-2xs);
 }
 
 .movimientosNavTitle {
@@ -485,43 +484,18 @@
   }
 }
 
-.volverBtn {
-  width: 100%;
-  height: 38px;
-  border-radius: 10px;
-  background: var(--surface-alt);
-  color: var(--text);
-  border: 1px solid var(--border-subtle);
-  font-size: 13px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-}
-
-.volverBtn:hover {
-  background: var(--border);
-}
-
-.volverBtn:active {
-  transform: scale(0.99);
-}
-
 /* ── Content Section: Transacciones & Historial ────────────────────────────── */
 .contentSection {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--modal-field-gap);
 }
 
 .txList,
 .historyList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--modal-option-gap);
 }
 
 .txItem {
@@ -617,11 +591,18 @@
   color: #F5A623;
 }
 
+.suggestionContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
 .suggestionTitle {
   font-weight: 700;
   font-size: 12.5px;
   color: var(--text);
-  margin: 0 0 2px;
+  margin: 0;
 }
 
 .suggestionDesc {
@@ -702,18 +683,7 @@
   font-feature-settings: "tnum";
 }
 
-/* ── Empty States & Loading ────────────────────────────────────────────────── */
-.loadingBox {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 30px 16px;
-  color: var(--text-3);
-  font-size: 12px;
-}
-
+/* ── Empty States ──────────────────────────────────────────────────────────── */
 .emptyStateWrap {
   padding: 24px 16px;
 }
@@ -730,46 +700,52 @@
   flex-shrink: 0;
 }
 
-.footerSecondaryGroup {
+.bodyActionsBlock {
   display: flex;
-  align-items: center;
-  gap: var(--modal-footer-btn-gap);
+  flex-direction: column;
+  gap: var(--modal-option-gap);
+  width: 100%;
 }
 
-.footerIconBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
-}
-
-.footerIconBtn:hover {
-  background: var(--surface-alt);
+.bodyActionBtn {
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 4px;
+  border: none;
+  border-radius: var(--control-radius);
+  background: transparent;
   color: var(--text);
-  border-color: var(--text-3);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 
-.dangerIconBtn:hover {
-  background: var(--error-bg);
+.bodyActionBtn:hover {
+  background: var(--surface-alt);
+}
+
+.bodyDeleteBtn {
   color: var(--error);
-  border-color: var(--error);
+}
+
+.bodyDeleteBtn:hover {
+  background: var(--error-bg);
 }
 
 .primaryBtn {
   flex: 1;
-  height: 36px;
-  border-radius: 10px;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   background: var(--primary);
   color: #ffffff;
   border: none;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -792,12 +768,12 @@
 
 .volverBtn {
   width: 100%;
-  height: 38px;
-  border-radius: 10px;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   background: var(--surface-alt);
   color: var(--text);
   border: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -821,12 +797,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--modal-field-gap);
   padding: 14px 18px;
   background: var(--surface-alt);
   border: 1px solid var(--border);
   border-radius: 14px;
-  margin-bottom: 20px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -852,8 +827,7 @@
   line-height: 1.35;
 }
 
-.renewActionBtn,
-.emptyRenewBtn {
+.renewActionBtn {
   height: 34px;
   padding: 0 14px;
   border-radius: 9px;
@@ -871,25 +845,21 @@
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.renewActionBtn:hover,
-.emptyRenewBtn:hover {
+.renewActionBtn:hover {
   opacity: 0.9;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .renewActionBtn:hover,
-.emptyRenewBtn:hover {
+  .renewActionBtn:hover {
   transform: translateY(-1px);
   }
 }
 
-.renewActionBtn:active,
-.emptyRenewBtn:active {
+.renewActionBtn:active {
   transform: scale(0.98);
 }
 
-.renewActionBtn:disabled,
-.emptyRenewBtn:disabled {
+.renewActionBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
@@ -923,11 +893,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .footerIconBtn,
+  .bodyActionBtn,
   .primaryBtn,
   .volverBtn,
-  .renewActionBtn,
-  .emptyRenewBtn {
+  .renewActionBtn {
     transition: none;
     transform: none;
   }

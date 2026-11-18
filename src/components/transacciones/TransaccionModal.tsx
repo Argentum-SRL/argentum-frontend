@@ -779,18 +779,6 @@ export default function TransaccionModal({
                     </div>
                   </div>
                   <div className={styles.headerRightActions}>
-                    {isEdit && (
-                      <button
-                        type="button"
-                        className={styles.deleteHeaderBtn}
-                        onClick={handleDeleteTransaction}
-                        title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
-                        aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
-                        data-modal-delete
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
                     <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
                       <X size={18} strokeWidth={1.75} />
                     </button>
@@ -959,17 +947,25 @@ export default function TransaccionModal({
                       )}
                     </div>
                   </div>
+
+                  {isEdit && (
+                    <div className={styles.bodyDeleteBlock} data-modal-block>
+                      <button
+                        type="button"
+                        className={styles.bodyDeleteBtn}
+                        onClick={handleDeleteTransaction}
+                        data-modal-delete
+                      >
+                        <Trash2 size={15} />
+                        <span>{isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className={styles.formFooter}>
-                {isEdit ? (
-                  <button type="button" className={styles.btnDelete} onClick={handleDeleteTransaction} data-modal-delete>
-                    {isCuotaHija ? 'Eliminar cuota' : 'Eliminar'}
-                  </button>
-                ) : (
-                  <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
-                )}
+                <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
                 <button type="submit" className={styles.submitBtn}>Continuar</button>
               </div>
             </form>
@@ -1083,18 +1079,6 @@ export default function TransaccionModal({
                     </div>
                   </div>
                   <div className={styles.headerRightActions}>
-                    {isEdit && (
-                      <button
-                        type="button"
-                        className={styles.deleteHeaderBtn}
-                        onClick={handleDeleteTransaction}
-                        title={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
-                        aria-label={isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}
-                        data-modal-delete
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
                     <button type="button" className={styles.closeBtn} onClick={onClose} title="Cerrar" aria-label="Cerrar">
                       <X size={18} strokeWidth={1.75} />
                     </button>
@@ -1163,6 +1147,20 @@ export default function TransaccionModal({
                       tieneReintegro={reintegroHook.tieneReintegro}
                       onToggle={handleToggleReintegroFromStep3}
                     />
+                  )}
+
+                  {isEdit && (
+                    <div className={styles.bodyDeleteBlock} data-modal-block>
+                      <button
+                        type="button"
+                        className={styles.bodyDeleteBtn}
+                        onClick={handleDeleteTransaction}
+                        data-modal-delete
+                      >
+                        <Trash2 size={15} />
+                        <span>{isCuotaHija ? 'Eliminar esta cuota' : 'Eliminar transacción'}</span>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

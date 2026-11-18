@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { esPunteroFino } from '@/utils/foco'
-import { X, Wallet, Check, AlertTriangle, CheckCircle2, ArrowLeft } from '@/components/ui/icons'
+import { X, Wallet, Check, AlertTriangle, CheckCircle2, ArrowLeft, ChevronLeft } from '@/components/ui/icons'
 import { LunarLoader } from '@/components/ui'
 import type { Billetera, ControlSaldoPreview } from '@/types'
 import Modal from '@/components/ui/Modal/Modal'
@@ -152,16 +152,30 @@ export default function ActualizarSaldoModal({
       <div className={styles.modalContainer} data-modal-frame>
         {/* Header */}
         <div className={styles.modalHeader}>
-          <div className={styles.headerLeft}>
-            <h2 className={styles.headerTitle}>Actualizar saldo</h2>
-            <div className={styles.headerSubtitleRow}>
-              <span className={styles.billeteraBadge}>
-                <Wallet size={12} />
-                <span>{nombreBilletera}</span>
-              </span>
-              <span className={styles.monedaBadge}>
-                {billetera.moneda === 'USD' ? 'Dólares' : 'Pesos'}
-              </span>
+          <div className={styles.headerLeftRow}>
+            {step === 2 && preview && preview.diferencia !== 0 && (
+              <button
+                type="button"
+                className={styles.backBtn}
+                onClick={() => setStep(1)}
+                disabled={isSubmitting}
+                title="Volver"
+                aria-label="Volver"
+              >
+                <ChevronLeft size={18} strokeWidth={2} />
+              </button>
+            )}
+            <div className={styles.headerLeft}>
+              <h2 className={styles.headerTitle}>Actualizar saldo</h2>
+              <div className={styles.headerSubtitleRow}>
+                <span className={styles.billeteraBadge}>
+                  <Wallet size={12} />
+                  <span>{nombreBilletera}</span>
+                </span>
+                <span className={styles.monedaBadge}>
+                  {billetera.moneda === 'USD' ? 'Dólares' : 'Pesos'}
+                </span>
+              </div>
             </div>
           </div>
           <button
@@ -315,6 +329,9 @@ export default function ActualizarSaldoModal({
                       )}
                     </div>
                   )}
+                  <p className={styles.footerHelpText}>
+                    El ajuste corrige el saldo, pero no cuenta como gasto ni como ingreso.
+                  </p>
                 </>
               )}
             </div>
@@ -437,17 +454,6 @@ export default function ActualizarSaldoModal({
                       </>
                     )}
                   </div>
-                  <p className={styles.footerHelpText}>
-                    El ajuste corrige el saldo, pero no cuenta como gasto ni como ingreso.
-                  </p>
-                  <button
-                    type="button"
-                    className={styles.volverLinkBtn}
-                    onClick={() => setStep(1)}
-                  >
-                    <ArrowLeft size={14} />
-                    <span>Volver</span>
-                  </button>
                 </>
               )}
             </div>

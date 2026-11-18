@@ -204,7 +204,7 @@ export default function BudgetBarChart({
         ariaLabel={activePresupuesto ? `Opciones de ${activePresupuesto.nombre}` : 'Opciones'}
       >
         {activePresupuesto && (
-          <div className={styles.sheetContent}>
+          <div className={styles.sheetContent} data-modal-frame>
             {/* Sheet Header */}
             <div className={styles.sheetHeader}>
               <div className={styles.sheetTitleGroup}>
@@ -229,6 +229,7 @@ export default function BudgetBarChart({
               </button>
             </div>
 
+            <div className={styles.sheetBody} data-modal-stack>
             {/* Quick Summary Card */}
             {activePresupuesto.periodo_actual && (
               <div className={styles.sheetSummaryCard}>
@@ -286,7 +287,7 @@ export default function BudgetBarChart({
             )}
 
             {/* Action Items List */}
-            <div className={styles.sheetActionsList}>
+            <div className={styles.sheetActionsList} data-modal-options>
               <button 
                 className={styles.sheetActionItem}
                 onClick={() => {
@@ -378,6 +379,7 @@ export default function BudgetBarChart({
                 </div>
                 <ChevronRight size={16} className={styles.sheetChevron} />
               </button>
+            </div>
             </div>
           </div>
         )}

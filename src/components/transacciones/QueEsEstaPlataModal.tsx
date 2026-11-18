@@ -113,21 +113,7 @@ export function QueEsEstaPlataModal({
     <Modal
       isOpen={open}
       onClose={onClose}
-      title={
-        <div className={styles.modalHeaderTitle}>
-          <span>¿Qué es esta plata?</span>
-          <button
-            type="button"
-            onClick={handleDelete}
-            title="Eliminar movimiento"
-            aria-label="Eliminar movimiento"
-            data-modal-delete
-            className={styles.deleteBtn}
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
-      }
+      title="¿Qué es esta plata?"
       footer={
         <ModalFooter
           secondary={
@@ -161,6 +147,16 @@ export function QueEsEstaPlataModal({
             ]}
           />
         </div>
+
+        <button
+          type="button"
+          onClick={handleDelete}
+          data-modal-delete
+          className={styles.deleteBodyBtn}
+        >
+          <Trash2 size={15} />
+          <span>Eliminar movimiento</span>
+        </button>
       </div>
     </Modal>
   )

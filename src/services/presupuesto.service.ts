@@ -71,12 +71,6 @@ const presupuestoService = {
     invalidatePresupuestos()
   },
 
-  restaurarPresupuesto: async (id: string, estado: 'activo' | 'pausado'): Promise<Presupuesto> => {
-    const response = await api.post<Presupuesto>(`/presupuestos/${id}/restaurar`, { estado })
-    invalidatePresupuestos()
-    return response.data
-  },
-
   getHistorial: async (id: string, signal?: AbortSignal): Promise<PeriodoPresupuesto[]> => {
     const response = await api.get<PeriodoPresupuesto[]>(`/presupuestos/${id}/historial`, { signal })
     return response.data
@@ -97,6 +91,14 @@ const presupuestoService = {
   getSugerenciaRubro: async (signal?: AbortSignal): Promise<SugerenciaRubro | null> => {
     const response = await api.get<{ sugerencia: SugerenciaRubro | null }>('/presupuestos/sugerencia-rubro', { signal })
     return response.data.sugerencia
+  },
+
+  getAlertasPorDefecto: async (signal?: AbortSignal): Promise<number[]> => {
+    const response = await api.get<{ alertas_porcentajes: number[] }>(
+      '/presupuestos/alertas-por-defecto',
+      { signal }
+    )
+    return response.data.alertas_porcentajes
   },
 
   subirLimite: async (id: string, monto: number): Promise<Presupuesto> => {

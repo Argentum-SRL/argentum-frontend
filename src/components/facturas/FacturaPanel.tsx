@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Modal, Button, DateInput, SelectInput, FacturaPanelSkeleton } from '@/components/ui'
-import { AlertCircle } from '@/components/ui/icons'
+import ModalFooter from '@/components/ui/Modal/ModalFooter'
+import { AlertCircle, Trash2 } from '@/components/ui/icons'
+import { useModal } from '@/hooks/useModal'
 import type { Factura, Billetera } from '@/types'
 import facturaService from '@/services/factura.service'
 import transaccionService from '@/services/transaccion.service'
@@ -54,12 +56,12 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
   billeteras,
   onSuccess,
 }) => {
+  const { confirm } = useModal()
   const [loading, setLoading] = useState(false)
   const [factura, setFactura] = useState<Factura | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [userSelectedBilleteraId, setUserSelectedBilleteraId] = useState<string>('')
   const [fechaPago, setFechaPago] = useState<string>(getTodayArgentina)
-  const [confirmandoBorrado, setConfirmandoBorrado] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const claveOperacionRef = useRef<string>('')
 
@@ -81,7 +83,6 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
     const cargar = async () => {
       setLoading(true)
       setError(null)
-      setConfirmandoBorrado(false)
       setSubmitting(false)
       try {
         const facturas = await facturaService.listar(controller.signal)
@@ -228,6 +229,18 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
     }
   }, [factura, onClose, onSuccess])
 
+  const handleConfirmDelete = useCallback(() => {
+    if (!factura) return
+    confirm({
+      title: '¿Eliminás esta factura?',
+      description: 'Sale de tus próximos pagos.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar factura',
+      cancelLabel: 'Cancelar',
+      onConfirm: handleDescartar,
+    })
+  }, [factura, confirm, handleDescartar])
+
   const categoriaSubcategoria = useMemo(() => {
     if (!factura?.categoria_nombre) return null
     if (factura.subcategoria_nombre) {
@@ -238,12 +251,44 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
 
   const tituloModal = factura ? `Factura de ${factura.descripcion}` : 'Factura'
 
+  const footerContent = !loading && factura ? (
+    factura.pagada_automaticamente ? (
+      <ModalFooter
+        primary={
+          <Button
+            variant="secondary"
+            onClick={handleDesmarcar}
+            loading={submitting}
+            fullWidth
+          >
+            No la pagué
+          </Button>
+        }
+      />
+    ) : (
+      <ModalFooter
+        primary={
+          <Button
+            variant="primary"
+            onClick={handlePagar}
+            loading={submitting}
+            disabled={billeterasValidas.length === 0}
+            fullWidth
+          >
+            Ya la pagué
+          </Button>
+        }
+      />
+    )
+  ) : undefined
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={tituloModal}
       size="sm"
+      footer={footerContent}
     >
       <div className={styles.container} data-modal-stack>
         {loading && <FacturaPanelSkeleton />}
@@ -277,14 +322,6 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
                 <p className={styles.autoPagadaText}>
                   La marqué pagada sola porque cargaste un gasto por el mismo importe.
                 </p>
-                <Button
-                  variant="secondary"
-                  onClick={handleDesmarcar}
-                  loading={submitting}
-                  fullWidth
-                >
-                  No la pagué
-                </Button>
               </div>
             ) : (
               <div className={styles.formSection} data-modal-block>
@@ -314,50 +351,16 @@ export const FacturaPanel: React.FC<FacturaPanelProps> = ({
                   />
                 </div>
 
-                {confirmandoBorrado ? (
-                  <div className={styles.confirmBox}>
-                    <p className={styles.confirmText}>
-                      ¿Seguro? Deja de aparecer en tus próximos pagos.
-                    </p>
-                    <div className={styles.confirmButtons}>
-                      <Button
-                        variant="danger"
-                        onClick={handleDescartar}
-                        loading={submitting}
-                        data-modal-delete
-                      >
-                        Sí, borrar
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => setConfirmandoBorrado(false)}
-                        disabled={submitting}
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className={styles.actionsRow}>
-                    <Button
-                      variant="primary"
-                      onClick={handlePagar}
-                      loading={submitting}
-                      disabled={billeterasValidas.length === 0}
-                    >
-                      Ya la pagué
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() => setConfirmandoBorrado(true)}
-                      disabled={submitting}
-                      className={styles.btnBorrar}
-                      data-modal-delete
-                    >
-                      Borrar
-                    </Button>
-                  </div>
-                )}
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={submitting}
+                  className={styles.btnBorrar}
+                  data-modal-delete
+                >
+                  <Trash2 size={15} />
+                  <span>Eliminar factura</span>
+                </button>
               </div>
             )}
           </>

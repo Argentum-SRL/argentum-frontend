@@ -246,7 +246,7 @@
     padding: 14px var(--modal-pad-x) 4px; /* Separación lateral oficial */
   }
   .formBody {
-    padding: 10px var(--modal-pad-x) 14px; /* Separación lateral oficial */
+    padding: 10px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
   }
   .formFooter {
     padding: 8px var(--modal-pad-x) 14px; /* Separación lateral oficial */

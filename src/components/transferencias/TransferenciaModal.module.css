@@ -354,7 +354,7 @@
   }
 
   .formBody {
-    padding: 4px var(--modal-pad-x) 10px; /* Separación lateral oficial */
+    padding: 4px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
     gap: var(--modal-field-gap); /* Separación estándar entre campos */
   }
 

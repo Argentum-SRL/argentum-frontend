@@ -82,18 +82,20 @@
   text-overflow: ellipsis;
 }
 
-/* Divisores en modo grilla compacto (< 680px) */
-.container:not(.hasLeftSlot) .item:nth-child(odd) {
-  border-right: 1px solid var(--border-color);
-}
+/* Divisores en modo grilla compacto (< 768px) */
+@media (max-width: 767px) {
+  .container:not(.hasLeftSlot) .item:nth-child(odd) {
+    border-right: 1px solid var(--border-color);
+  }
 
-.container:not(.hasLeftSlot) .item:nth-child(1):nth-last-child(n+3),
-.container:not(.hasLeftSlot) .item:nth-child(2):nth-last-child(n+2) {
-  border-bottom: 1px solid var(--border-color);
-}
+  .container:not(.hasLeftSlot) .item:nth-child(1):nth-last-child(n+3),
+  .container:not(.hasLeftSlot) .item:nth-child(2):nth-last-child(n+2) {
+    border-bottom: 1px solid var(--border-color);
+  }
 
-.container.hasLeftSlot .item:nth-child(even) {
-  border-right: 1px solid var(--border-color);
+  .container.hasLeftSlot .item:nth-child(even) {
+    border-right: 1px solid var(--border-color);
+  }
 }
 
 /* C-1: Si hay ítem destacado (como "Te quedó" en Análisis), en contenedores < 680px

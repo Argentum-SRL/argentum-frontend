@@ -2,12 +2,11 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-modal, 18px);
-  padding: var(--space-md, 14px) var(--space-lg, 18px);
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-md, 16px);
-  margin-top: var(--space-lg, 16px);
+  gap: var(--space-md);
   box-shadow: var(--elevation-sm);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }

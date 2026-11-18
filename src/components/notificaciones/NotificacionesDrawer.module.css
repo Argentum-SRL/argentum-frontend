@@ -45,7 +45,7 @@
   gap: 8px;
 }
 
-.closeBtn, .configBtn {
+.closeBtn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -60,7 +60,7 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
-.closeBtn:hover, .configBtn:hover {
+.closeBtn:hover {
   background: var(--border);
   color: var(--text);
 }
@@ -69,6 +69,7 @@
 .actionsSubheader {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 8px 20px;
   border-bottom: 1px solid var(--surface-alt);
@@ -99,6 +100,15 @@
 .actionTextBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.configTextBtn {
+  margin-left: auto;
+  color: var(--text-2);
+}
+
+.configTextBtn:hover:not(:disabled) {
+  color: var(--text);
 }
 
 /* ── Cuerpo y Área de Scroll ─────────────────────────────────────────────── */
@@ -557,7 +567,7 @@
   }
 
   .formBody {
-    padding: 10px var(--modal-pad-x) 16px; /* Separación lateral oficial */
+    padding: 10px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
   }
 
   .scrollArea {
@@ -599,7 +609,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .closeBtn,
-.configBtn,
 .actionTextBtn,
 .card,
 .desktopActions,

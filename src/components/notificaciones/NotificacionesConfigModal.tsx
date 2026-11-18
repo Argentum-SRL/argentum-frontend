@@ -263,8 +263,8 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
             <div className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.cardMeta}>
-                  <p className={styles.cardTitle}>Alerta de límite</p>
-                  <p className={styles.cardDesc}>Avisar cuando estés cerca de agotar un presupuesto.</p>
+                  <p className={styles.cardTitle}>Avisos para presupuestos nuevos</p>
+                  <p className={styles.cardDesc}>Cada presupuesto se puede cambiar al crearlo o editarlo.</p>
                 </div>
                 <label className={styles.switch}>
                   <input
@@ -279,7 +279,7 @@ const NotificacionesConfigModal: React.FC<NotificacionesConfigModalProps> = ({ o
               {form.presupuesto_umbral_1_activo && (
                 <div className={styles.cardControls}>
                   <div className={styles.inputGroup}>
-                    <label htmlFor="presupuesto_umbral_1">Porcentaje límite:</label>
+                    <label htmlFor="presupuesto_umbral_1">Al llegar al</label>
                     <input
                       type="number"
                       id="presupuesto_umbral_1"

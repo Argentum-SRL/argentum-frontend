@@ -453,44 +453,41 @@ export default function GoalDetailModal({
             )}
           </div>
 
+          <div className={styles.bodyActionsBlock} data-modal-options>
+            {!isCompleted && (
+              <button
+                type="button"
+                className={styles.bodyActionBtn}
+                onClick={handleToggleStatus}
+              >
+                {isPaused ? <Play size={15} /> : <Pause size={15} />}
+                <span>{isPaused ? 'Reanudar meta' : 'Pausar meta'}</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              className={`${styles.bodyActionBtn} ${styles.bodyDeleteBtn}`}
+              onClick={handleDeleteGoal}
+              data-modal-delete
+            >
+              <Trash2 size={15} />
+              <span>Eliminar meta</span>
+            </button>
+          </div>
+
         </div>
 
         {/* ── Modal Footer (Actions) ──────────────────────────────────── */}
         <div className={styles.footer}>
-          <div className={styles.footerSecondaryGroup}>
-            {!isCompleted && (
-              <button 
-                type="button"
-                className={styles.footerIconBtn} 
-                onClick={handleToggleStatus}
-                title={isPaused ? 'Reanudar meta' : 'Pausar meta'}
-                aria-label={isPaused ? 'Reanudar meta' : 'Pausar meta'}
-              >
-                {isPaused ? <Play size={15} /> : <Pause size={15} />}
-              </button>
-            )}
-
-            <button 
-              type="button"
-              className={styles.footerIconBtn} 
-              onClick={handleEdit}
-              title="Editar meta"
-              aria-label="Editar meta"
-            >
-              <Pencil size={15} />
-            </button>
-
-            <button 
-              type="button"
-              className={`${styles.footerIconBtn} ${styles.dangerIconBtn}`} 
-              onClick={handleDeleteGoal}
-              title="Eliminar meta"
-              aria-label="Eliminar meta"
-              data-modal-delete
-            >
-              <Trash2 size={15} />
-            </button>
-          </div>
+          <button
+            type="button"
+            className={styles.secondaryBtn}
+            onClick={handleEdit}
+          >
+            <Pencil size={14} />
+            <span>Editar</span>
+          </button>
 
           <button 
             type="button"

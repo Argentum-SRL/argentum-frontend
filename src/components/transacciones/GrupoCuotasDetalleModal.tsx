@@ -129,16 +129,6 @@ export default function GrupoCuotasDetalleModal({
                       <div className={styles.headerRightActions}>
                         <button
                           type="button"
-                          className={styles.deleteHeaderBtn}
-                          onClick={() => handleDeleteClick(selectedGrupo.id)}
-                          title="Eliminar compra"
-                          aria-label="Eliminar compra"
-                          data-modal-delete
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                        <button
-                          type="button"
                           className={styles.closeBtn}
                           onClick={handleCloseDetail}
                           title="Cerrar"
@@ -307,60 +297,72 @@ export default function GrupoCuotasDetalleModal({
                           />
                         )}
 
+                        <div className={styles.detailBodyActions} data-modal-options>
+                          {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
+                            <button
+                              type="button"
+                              className={styles.detailBodyActionBtn}
+                              onClick={() => handleCancelar(selectedGrupo)}
+                              title={selectedGrupo.cantidad_pendientes === 1 ? 'Cancelar cuota restante' : 'Cancelar cuotas restantes'}
+                            >
+                              <XCircle size={15} />
+                              <span>{selectedGrupo.cantidad_pendientes === 1 ? 'Cancelar cuota' : 'Cancelar cuotas'}</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            className={`${styles.detailBodyActionBtn} ${styles.detailBodyDeleteBtn}`}
+                            onClick={() => handleDeleteClick(selectedGrupo.id)}
+                            data-modal-delete
+                          >
+                            <Trash2 size={15} />
+                            <span>Eliminar compra</span>
+                          </button>
+                        </div>
+
                       </div>
                     </div>
 
                     {/* Footer Actions */}
                     <div className={styles.detailFormFooter}>
-                      <div className={styles.detailFooterLeftGroup}>
-                        {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
+                      <button
+                        type="button"
+                        className={`${styles.detailEditActionBtn} ${
+                          selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado'
+                            ? ''
+                            : styles.detailEditFullWidth
+                        }`}
+                        onClick={() => handleEditClick(selectedGrupo)}
+                        title="Editar compra"
+                      >
+                        <Edit2 size={14} />
+                        <span>Editar</span>
+                      </button>
+
+                      {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
+                        tieneTarjeta ? (
                           <button
                             type="button"
-                            className={styles.detailCancelCuotasBtn}
-                            onClick={() => handleCancelar(selectedGrupo)}
-                            title={selectedGrupo.cantidad_pendientes === 1 ? 'Cancelar cuota restante' : 'Cancelar cuotas restantes'}
+                            className={styles.detailAdelantarActionBtn}
+                            onClick={() => handleAdelantar?.(selectedGrupo)}
+                            title={selectedGrupo.cantidad_pendientes === 1 ? 'Adelantar cuota al próximo resumen' : 'Adelantar cuotas al próximo resumen'}
                           >
-                            <XCircle size={15} />
-                            <span>{selectedGrupo.cantidad_pendientes === 1 ? 'Cancelar cuota' : 'Cancelar cuotas'}</span>
+                            <Sparkles size={14} />
+                            <span>{selectedGrupo.cantidad_pendientes === 1 ? 'Adelantar cuota' : 'Adelantar cuotas'}</span>
                           </button>
-                        )}
-                      </div>
-
-                      <div className={styles.detailFooterRightGroup}>
-                        <button
-                          type="button"
-                          className={styles.detailEditActionBtn}
-                          onClick={() => handleEditClick(selectedGrupo)}
-                          title="Editar compra"
-                        >
-                          <Edit2 size={14} />
-                          <span>Editar</span>
-                        </button>
-
-                        {selectedGrupo.cantidad_pendientes > 0 && selectedGrupo.estado !== 'cancelado' && (
-                          tieneTarjeta ? (
-                            <button
-                              type="button"
-                              className={styles.detailAdelantarActionBtn}
-                              onClick={() => handleAdelantar?.(selectedGrupo)}
-                              title={selectedGrupo.cantidad_pendientes === 1 ? 'Adelantar cuota al próximo resumen' : 'Adelantar cuotas al próximo resumen'}
-                            >
-                              <Sparkles size={14} />
-                              <span>{selectedGrupo.cantidad_pendientes === 1 ? 'Adelantar cuota' : 'Adelantar cuotas'}</span>
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              className={styles.detailPrepayActionBtn}
-                              onClick={handleGoPrepay}
-                              title={selectedGrupo.cantidad_pendientes === 1 ? 'Prepagar cuota pendiente' : 'Prepagar cuotas pendientes'}
-                            >
-                              <Sparkles size={14} />
-                              <span>Prepagar</span>
-                            </button>
-                          )
-                        )}
-                      </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className={styles.detailPrepayActionBtn}
+                            onClick={handleGoPrepay}
+                            title={selectedGrupo.cantidad_pendientes === 1 ? 'Prepagar cuota pendiente' : 'Prepagar cuotas pendientes'}
+                          >
+                            <Sparkles size={14} />
+                            <span>Prepagar</span>
+                          </button>
+                        )
+                      )}
                     </div>
                   </div>
                 </div>

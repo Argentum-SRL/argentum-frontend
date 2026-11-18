@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Plus, 
   PieChart,
-  Download
+  Download,
+  Target,
 } from '@/components/ui/icons'
 import styles from './PresupuestosPage.module.css'
 import presupuestoService from '@/services/presupuesto.service'
@@ -28,6 +29,7 @@ import DescargarExcelModal from './DescargarExcelModal'
 import SugerenciaRubroCard from './SugerenciaRubroCard'
 import { EmptyState, PageSummaryBar, PresupuestosSkeleton } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import { enRiesgo as contarEnRiesgo } from './resumenPresupuestos'
 
 export default function PresupuestosPage() {
   const { usuario } = useAuth()
@@ -210,34 +212,25 @@ export default function PresupuestosPage() {
     })
   }
 
-  const handleDelete = async (p: Presupuesto) => {
-    const estadoAnterior = p.estado
-    try {
-      await presupuestoService.eliminarPresupuesto(p.id)
-      fetchPresupuestos()
-      sileo.action({
-        title: 'Presupuesto eliminado.',
-        button: {
-          title: 'Deshacer',
-          onClick: async () => {
-            try {
-              await presupuestoService.restaurarPresupuesto(p.id, estadoAnterior)
-              sileo.success({ title: 'Presupuesto restaurado.' })
-              fetchPresupuestos()
-            } catch (err: unknown) {
-                            sileo.error({
-                title: getErrorMessage(err, 'No se pudo restaurar el presupuesto. Probá de nuevo.'),
-              })
-            }
-          }
-        },
-        duration: 8000
-      })
-    } catch (err: unknown) {
-            sileo.error({
-        title: getErrorMessage(err, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
-      })
-    }
+  const handleDelete = (p: Presupuesto) => {
+    confirm({
+      title: '¿Eliminás este presupuesto?',
+      description: 'Se borra con su historial de ciclos. Tus gastos no cambian.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar presupuesto',
+      cancelLabel: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          await presupuestoService.eliminarPresupuesto(p.id)
+          sileo.success({ title: 'Presupuesto eliminado.' })
+          fetchPresupuestos()
+        } catch (err: unknown) {
+          sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
+          })
+        }
+      }
+    })
   }
 
   const handleViewHistory = async (p: Presupuesto) => {
@@ -256,25 +249,29 @@ export default function PresupuestosPage() {
     }
   }
 
-  const totals = useMemo(() => {
-    const activeOnes = presupuestos.filter(p => p.estado === 'activo' && p.periodo_actual)
+  const resumen = useMemo(() => {
+    const activos = presupuestos.filter(p => p.estado === 'activo' && p.periodo_actual)
     const primaryCurrency = (usuario?.moneda_principal as 'ARS' | 'USD') || 'ARS'
-    
-    const totalARS = activeOnes.filter(p => p.moneda === 'ARS').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_usado || 0), 0)
-    const limiteARS = activeOnes.filter(p => p.moneda === 'ARS').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_limite || 0), 0)
-    const totalUSD = activeOnes.filter(p => p.moneda === 'USD').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_usado || 0), 0)
-    const limiteUSD = activeOnes.filter(p => p.moneda === 'USD').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_limite || 0), 0)
 
-    const hasUSD = activeOnes.some(p => p.moneda === 'USD')
-    const hasARS = activeOnes.some(p => p.moneda === 'ARS')
+    const totalARS = activos.filter(p => p.moneda === 'ARS').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_usado || 0), 0)
+    const limiteARS = activos.filter(p => p.moneda === 'ARS').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_limite || 0), 0)
+    const totalUSD = activos.filter(p => p.moneda === 'USD').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_usado || 0), 0)
+    const limiteUSD = activos.filter(p => p.moneda === 'USD').reduce((acc, p) => acc + Number(p.periodo_actual?.monto_limite || 0), 0)
+
+    const hasUSD = activos.some(p => p.moneda === 'USD')
+    const hasARS = activos.some(p => p.moneda === 'ARS')
 
     let gastadoLabel: string
+    let limiteLabel: string | null = null
     if (hasARS && hasUSD) {
       gastadoLabel = `${formatMonto(totalARS, 'ARS')} + ${formatMonto(totalUSD, 'USD')}`
+      limiteLabel = `${formatMonto(limiteARS, 'ARS')} + ${formatMonto(limiteUSD, 'USD')}`
     } else if (hasUSD) {
       gastadoLabel = formatMonto(totalUSD, 'USD')
+      limiteLabel = formatMonto(limiteUSD, 'USD')
     } else if (hasARS) {
       gastadoLabel = formatMonto(totalARS, 'ARS')
+      limiteLabel = formatMonto(limiteARS, 'ARS')
     } else {
       gastadoLabel = formatMonto(0, primaryCurrency)
     }
@@ -282,22 +279,16 @@ export default function PresupuestosPage() {
     const totalGastadoNum = primaryCurrency === 'USD' ? totalUSD : totalARS
     const totalLimiteNum = primaryCurrency === 'USD' ? limiteUSD : limiteARS
     const porcentajeGlobal = totalLimiteNum > 0 ? (totalGastadoNum / totalLimiteNum) * 100 : 0
-    const superados = activeOnes.filter(p => (p.periodo_actual?.porcentaje_usado || 0) >= 100).length
-    
+    const enRiesgo = contarEnRiesgo(activos)
+
     return {
+      activosCount: activos.length,
       gastadoLabel,
+      limiteLabel,
       porcentajeGlobal,
-      superados
+      enRiesgo,
     }
   }, [presupuestos, usuario?.moneda_principal])
-
-  const activeOnes = presupuestos.filter(p => p.estado === 'activo' && p.periodo_actual)
-  const presupuestosEnRiesgo = activeOnes.filter(p => {
-    const limite = Number(p.periodo_actual?.monto_limite || 0)
-    if (limite <= 0) return false
-    const gastado = Number(p.periodo_actual?.monto_usado || 0)
-    return (gastado / limite) >= 0.8
-  }).length
 
   return (
     <div className={styles.page}>
@@ -328,26 +319,39 @@ export default function PresupuestosPage() {
         </div>
       </div>
 
-      {/* ── Hero Resumen ────────────────────────────────────────────────────── */}
-      {activeTab === 'activo' && (
+      {/* ── Hero Resumen (Desktop, igual a Transacciones) ──────────────────── */}
+      {activeTab === 'activo' && !loading && resumen.activosCount > 0 && (
         <PageSummaryBar
-          className={styles.summaryBar}
+          className={styles.desktopSummaryBar}
+          leftSlot={
+            <div className={styles.resumenSlot}>
+              <div className={styles.resumenMainGroup}>
+                <span className={styles.resumenHeroLabel}>Gastado este ciclo</span>
+                <span className={styles.resumenHeroValue}>{resumen.gastadoLabel}</span>
+              </div>
+              {resumen.limiteLabel && (
+                <div className={styles.resumenNotice}>
+                  <Target size={13} className={styles.resumenNoticeIcon} aria-hidden="true" />
+                  <p className={styles.resumenNoticeText}>
+                    Límite total asignado{' '}
+                    <strong className={styles.resumenNoticeHighlight}>{resumen.limiteLabel}</strong>
+                  </p>
+                </div>
+              )}
+            </div>
+          }
           items={[
             {
-              label: "Gastado este ciclo",
-              value: totals.gastadoLabel,
-            },
-            {
               label: "Del límite total",
-              value: `${totals.porcentajeGlobal.toFixed(1)}%`,
-              valueColor: totals.porcentajeGlobal >= 80 ? '#FF8A65'
-                        : totals.porcentajeGlobal >= 60 ? '#F5A623'
+              value: `${resumen.porcentajeGlobal.toFixed(1)}%`,
+              valueColor: resumen.porcentajeGlobal >= 80 ? '#FF8A65'
+                        : resumen.porcentajeGlobal >= 60 ? '#F5A623'
                         : '#4CAF7D',
             },
             {
               label: "En riesgo",
-              value: `${presupuestosEnRiesgo} ${presupuestosEnRiesgo === 1 ? 'presupuesto' : 'presupuestos'}`,
-              valueColor: presupuestosEnRiesgo > 0 ? '#FF8A65' : '#4CAF7D',
+              value: `${resumen.enRiesgo} ${resumen.enRiesgo === 1 ? 'presupuesto' : 'presupuestos'}`,
+              valueColor: resumen.enRiesgo > 0 ? '#FF8A65' : '#4CAF7D',
             },
           ]}
         />

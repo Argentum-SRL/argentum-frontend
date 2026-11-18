@@ -15,6 +15,7 @@ import {
   ChevronRight,
   RefreshCw,
   TrendingUp,
+  Bell,
 } from '@/components/ui/icons'
 import { Button } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
@@ -30,6 +31,7 @@ import { EmptyState, Skeleton } from '@/components/ui'
 import { etiquetaPeriodoPresupuesto } from '@/lib/utils/presupuesto.utils'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
+import { textoAvisos } from './alertasPresupuesto'
 import styles from './PresupuestoDetailModal.module.css'
 
 interface PresupuestoDetailModalProps {
@@ -49,7 +51,7 @@ export default function PresupuestoDetailModal({
   billeteras = [],
   onSuccess
 }: PresupuestoDetailModalProps) {
-  const { open: openModal } = useModal()
+  const { open: openModal, confirm } = useModal()
   const [freshPresupuesto, setFreshPresupuesto] = useState<Presupuesto | null>(null)
   const [step, setStep] = useState<1 | 2>(1)
   const [animClass, setAnimClass] = useState('')
@@ -333,37 +335,27 @@ export default function PresupuestoDetailModal({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!presupuesto) return
-    const id = presupuesto.id
-    const estadoAnterior = presupuesto.estado
-    try {
-      await presupuestoService.eliminarPresupuesto(id)
-      onClose()
-      onSuccess?.()
-      sileo.action({
-        title: 'Presupuesto eliminado.',
-        button: {
-          title: 'Deshacer',
-          onClick: async () => {
-            try {
-              await presupuestoService.restaurarPresupuesto(id, estadoAnterior)
-              sileo.success({ title: 'Presupuesto restaurado.' })
-              onSuccess?.()
-            } catch (err: unknown) {
-                            sileo.error({
-                title: getErrorMessage(err, 'No se pudo restaurar el presupuesto. Probá de nuevo.'),
-              })
-            }
-          }
-        },
-        duration: 8000
-      })
-    } catch (err: unknown) {
-            sileo.error({
-        title: getErrorMessage(err, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
-      })
-    }
+    confirm({
+      title: '¿Eliminás este presupuesto?',
+      description: 'Se borra con su historial de ciclos. Tus gastos no cambian.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar presupuesto',
+      cancelLabel: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          await presupuestoService.eliminarPresupuesto(presupuesto.id)
+          onClose()
+          onSuccess?.()
+          sileo.success({ title: 'Presupuesto eliminado.' })
+        } catch (err: unknown) {
+          sileo.error({
+            title: getErrorMessage(err, 'No se pudo eliminar el presupuesto. Probá de nuevo.'),
+          })
+        }
+      },
+    })
   }
 
   if (!presupuesto) return null
@@ -414,74 +406,76 @@ export default function PresupuestoDetailModal({
 
             {/* Modal Body (Scrollable Content) */}
             <div className={styles.body} data-modal-stack>
-              {/* Tarjeta de Identidad */}
-              <div className={styles.identityCard}>
-                <div className={styles.budgetAvatar} style={avatarStyle}>
-                  {primaryCat ? (
-                    <SubcategoriaIcon 
-                      nombre={primaryCat.es_subcategoria ? primaryCat.nombre : null} 
-                      parentCategory={primaryCat.es_subcategoria ? null : primaryCat.nombre} 
-                      size={20} 
-                    />
-                  ) : (
-                    <PieChart size={20} strokeWidth={2.2} />
-                  )}
-                </div>
-
-                <div className={styles.identityInfo}>
-                  <div className={styles.titleRow}>
-                    <h3 className={styles.budgetName} title={presupuesto.nombre}>
-                      {presupuesto.nombre}
-                    </h3>
+              <div data-modal-block>
+                {/* Tarjeta de Identidad */}
+                <div className={styles.identityCard}>
+                  <div className={styles.budgetAvatar} style={avatarStyle}>
+                    {primaryCat ? (
+                      <SubcategoriaIcon 
+                        nombre={primaryCat.es_subcategoria ? primaryCat.nombre : null} 
+                        parentCategory={primaryCat.es_subcategoria ? null : primaryCat.nombre} 
+                        size={20} 
+                      />
+                    ) : (
+                      <PieChart size={20} strokeWidth={2.2} />
+                    )}
                   </div>
 
-                  <div className={styles.metaRow}>
-                    <span className={styles.currencyPill}>{presupuesto.moneda === 'USD' ? 'Dólares' : 'Pesos'}</span>
-                    <span className={styles.periodPill}>{etiquetaPeriodoPresupuesto(presupuesto.periodo)}</span>
+                  <div className={styles.identityInfo}>
+                    <div className={styles.titleRow}>
+                      <h3 className={styles.budgetName} title={presupuesto.nombre}>
+                        {presupuesto.nombre}
+                      </h3>
+                    </div>
 
-                    {isPaused && (
-                      <span className={styles.statusPillPaused}>
-                        <Pause size={10} strokeWidth={2.5} />
-                        Pausado
-                      </span>
-                    )}
-                    {isSuperado && (
-                      <span className={styles.statusPillSuperado}>
-                        Superado
-                      </span>
-                    )}
-                    {isAlerta && (
-                      <span className={styles.statusPillAlerta}>
-                        En alerta
-                      </span>
-                    )}
+                    <div className={styles.metaRow}>
+                      <span className={styles.currencyPill}>{presupuesto.moneda === 'USD' ? 'Dólares' : 'Pesos'}</span>
+                      <span className={styles.periodPill}>{etiquetaPeriodoPresupuesto(presupuesto.periodo)}</span>
 
-                    <span className={styles.dateMeta}>
-                      <Calendar size={12} className={styles.dateIcon} />
-                      <span>{p ? `Vence el ${formatFecha(p.fecha_fin)}` : 'Sin periodo'}</span>
-                    </span>
+                      {isPaused && (
+                        <span className={styles.statusPillPaused}>
+                          <Pause size={10} strokeWidth={2.5} />
+                          Pausado
+                        </span>
+                      )}
+                      {isSuperado && (
+                        <span className={styles.statusPillSuperado}>
+                          Superado
+                        </span>
+                      )}
+                      {isAlerta && (
+                        <span className={styles.statusPillAlerta}>
+                          En alerta
+                        </span>
+                      )}
+
+                      <span className={styles.dateMeta}>
+                        <Calendar size={12} className={styles.dateIcon} />
+                        <span>{p ? `Vence el ${formatFecha(p.fecha_fin)}` : 'Sin periodo'}</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Categorías Asociadas */}
+                {presupuesto.categorias && presupuesto.categorias.length > 0 && (
+                  <div className={styles.categorySection} data-modal-field>
+                    <span className={styles.sectionMiniLabel}>Categorías controladas</span>
+                    <div className={styles.categoryChipsList}>
+                      {presupuesto.categorias.map((c, i) => (
+                        <span key={i} className={styles.catChip} title={c.nombre}>
+                          <SubcategoriaIcon 
+                            nombre={c.es_subcategoria ? c.nombre : null} 
+                            parentCategory={c.es_subcategoria ? null : c.nombre} 
+                            size={13} 
+                          />
+                          <span>{c.nombre}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Categorías Asociadas */}
-              {presupuesto.categorias && presupuesto.categorias.length > 0 && (
-                <div className={styles.categorySection}>
-                  <span className={styles.sectionMiniLabel}>Categorías controladas</span>
-                  <div className={styles.categoryChipsList}>
-                    {presupuesto.categorias.map((c, i) => (
-                      <span key={i} className={styles.catChip} title={c.nombre}>
-                        <SubcategoriaIcon 
-                          nombre={c.es_subcategoria ? c.nombre : null} 
-                          parentCategory={c.es_subcategoria ? null : c.nombre} 
-                          size={13} 
-                        />
-                        <span>{c.nombre}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Banner de aviso cuando no hay ciclo activo */}
               {!p && !isPaused && presupuesto.estado === 'activo' && (
@@ -572,6 +566,13 @@ export default function PresupuestoDetailModal({
                     <span>Quedaron gastos sin cotización para esas fechas</span>
                   </div>
                 )}
+
+                {presupuesto.alertas_porcentajes && presupuesto.alertas_porcentajes.length > 0 && (
+                  <div className={styles.noticeBox}>
+                    <Bell size={13} className={styles.noticeIcon} />
+                    <span>{textoAvisos(presupuesto.alertas_porcentajes)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Tarjeta de acceso a gastos e historial */}
@@ -594,34 +595,32 @@ export default function PresupuestoDetailModal({
                 </div>
                 <ChevronRight size={18} className={styles.movimientosNavArrow} strokeWidth={2} />
               </button>
+
+              <div className={styles.bodyActionsBlock} data-modal-options>
+                <button
+                  type="button"
+                  className={styles.bodyActionBtn}
+                  onClick={handleToggleStatus}
+                >
+                  {isPaused ? <Play size={15} /> : <Pause size={15} />}
+                  <span>{isPaused ? 'Reanudar presupuesto' : 'Pausar presupuesto'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`${styles.bodyActionBtn} ${styles.bodyDeleteBtn}`}
+                  onClick={handleDelete}
+                  data-modal-delete
+                >
+                  <Trash2 size={15} />
+                  <span>Eliminar presupuesto</span>
+                </button>
+              </div>
             </div>
 
             {/* Modal Footer Step 1 */}
             <div className={styles.footer}>
-              <div className={styles.footerSecondaryGroup}>
-                <button 
-                  type="button"
-                  className={styles.footerIconBtn} 
-                  onClick={handleToggleStatus}
-                  title={isPaused ? 'Reactivar presupuesto' : 'Pausar presupuesto'}
-                  aria-label={isPaused ? 'Reactivar presupuesto' : 'Pausar presupuesto'}
-                >
-                  {isPaused ? <Play size={15} /> : <Pause size={15} />}
-                </button>
-
-                <button 
-                  type="button"
-                  className={`${styles.footerIconBtn} ${styles.dangerIconBtn}`} 
-                  onClick={handleDelete}
-                  title="Eliminar presupuesto"
-                  aria-label="Eliminar presupuesto"
-                  data-modal-delete
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-
-              <button 
+              <button
                 type="button"
                 className={styles.primaryBtn}
                 onClick={handleEdit}
@@ -788,7 +787,7 @@ export default function PresupuestoDetailModal({
                       {presupuesto?.sugerencia_limite && (
                         <div className={styles.suggestionBanner}>
                           <AlertCircle size={20} className={styles.suggestionIcon} />
-                          <div>
+                          <div className={styles.suggestionContent}>
                             <p className={styles.suggestionTitle}>Sugerencia de ajuste</p>
                             <p className={styles.suggestionDesc}>
                               {presupuesto.sugerencia_limite.texto}

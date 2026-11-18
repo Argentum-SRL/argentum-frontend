@@ -103,29 +103,33 @@
   flex-shrink: 0;
 }
 
-.modalHeaderTitle {
+.deleteBodyBtn {
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 4px;
+  border: none;
+  border-radius: var(--control-radius);
+  background: transparent;
+  color: var(--error);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.deleteBtn {
-  background: none;
-  border: none;
-  color: var(--text-3, #9ca3af);
+  justify-content: flex-start;
+  gap: 8px;
   cursor: pointer;
-  padding: 6px;
-  border-radius: var(--radius-sm, 6px);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 
-.deleteBtn:hover {
-  color: var(--danger, #ef4444);
-  background: rgba(239, 68, 68, 0.1);
+.deleteBodyBtn:hover {
+  background: var(--error-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deleteBodyBtn {
+    transition: none;
+  }
 }
 
 .modalBody {

@@ -857,6 +857,7 @@ export interface Presupuesto {
   estado: 'activo' | 'pausado'
   fecha_creacion: string
   categorias: PresupuestoCategoriaResponse[]
+  alertas_porcentajes: number[]
   periodo_actual: PeriodoPresupuesto | null
   proxima_renovacion: string | null
   ritmo_texto?: string | null
@@ -875,6 +876,7 @@ export interface PresupuestoCreate {
   periodo: 'semanal' | 'quincenal' | 'mensual'
   renovacion: 'automatica' | 'manual'
   categorias: PresupuestoCategoriaInput[]
+  alertas_porcentajes?: number[]
 }
 
 export interface PresupuestoUpdate {
@@ -884,6 +886,7 @@ export interface PresupuestoUpdate {
   periodo?: 'semanal' | 'quincenal' | 'mensual'
   renovacion?: 'automatica' | 'manual'
   categorias?: PresupuestoCategoriaInput[]
+  alertas_porcentajes?: number[]
 }
 
 export * from './goals'

@@ -325,36 +325,36 @@ const NotificacionesForm: React.FC<NotificacionesFormProps> = ({ initialConfig, 
                 )}
               </div>
 
-              {/* Row 2: Límites de Presupuesto */}
+              {/* Row 2: Avisos para presupuestos nuevos */}
               <div className={localStyles.settingRow}>
                 <div className={localStyles.settingRowHeader}>
                   <div className={localStyles.settingInfo}>
                     <div className={localStyles.settingLabelGroup}>
-                      <span className={localStyles.settingLabel}>Límites de presupuesto</span>
+                      <span className={localStyles.settingLabel}>Avisos para presupuestos nuevos</span>
                     </div>
                     <span className={localStyles.settingSubtitle}>
-                      Aviso preventivo al acercarte al tope de una categoría.
+                      Cada presupuesto se puede cambiar al crearlo o editarlo.
                     </span>
                   </div>
                   <div className={localStyles.settingActions}>
                     <Switch
                       checked={form.presupuesto_umbral_1_activo}
                       onChange={() => handleToggle('presupuesto_umbral_1_activo')}
-                      ariaLabel="Activar alerta preventiva de presupuesto"
+                      ariaLabel="Activar avisos para presupuestos nuevos"
                     />
                   </div>
                 </div>
 
                 {form.presupuesto_umbral_1_activo && (
                   <div className={localStyles.subPanel}>
-                    <span className={localStyles.subLabel}>Umbral</span>
+                    <span className={localStyles.subLabel}>Al llegar al</span>
                     <Stepper
                       value={form.presupuesto_umbral_1}
                       onChange={(val) => handleNumber('presupuesto_umbral_1', val, 50, 95)}
                       min={50}
                       max={95}
                       step={5}
-                      formatLabel={(val) => `${val}% consumido`}
+                      formatLabel={(val) => `${val}%`}
                       ariaLabel="Porcentaje de umbral de presupuesto"
                     />
                   </div>

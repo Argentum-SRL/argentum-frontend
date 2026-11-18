@@ -45,22 +45,21 @@ export default function BudgetHistoryModal({
           </button>
         </div>
 
-        {presupuesto?.sugerencia_limite && (
-          <div className={styles.suggestionBanner}>
-            <AlertCircle size={24} className={styles.suggestionIcon} />
-            <div>
-              <p className={styles.suggestionTitle}>Sugerencia de ajuste</p>
-              <p className={styles.suggestionDesc}>
-                {presupuesto.sugerencia_limite.texto}
-              </p>
-              <Button variant="secondary" onClick={onSubirLimite}>
-                {presupuesto.sugerencia_limite.boton}
-              </Button>
-            </div>
-          </div>
-        )}
-
         <div className={styles.historyBody} data-modal-stack>
+          {presupuesto?.sugerencia_limite && (
+            <div className={styles.suggestionBanner}>
+              <AlertCircle size={24} className={styles.suggestionIcon} />
+              <div className={styles.suggestionContent}>
+                <p className={styles.suggestionTitle}>Sugerencia de ajuste</p>
+                <p className={styles.suggestionDesc}>
+                  {presupuesto.sugerencia_limite.texto}
+                </p>
+                <Button variant="secondary" onClick={onSubirLimite}>
+                  {presupuesto.sugerencia_limite.boton}
+                </Button>
+              </div>
+            </div>
+          )}
           {loading ? (
             <div className={styles.historyList}>
               {[1, 2, 3].map(i => (

@@ -206,7 +206,7 @@
   }
 
   .modalBody {
-    padding: 14px var(--modal-pad-x);
+    padding: 14px var(--modal-pad-x) var(--modal-footer-gap);
     gap: 20px;
   }
 

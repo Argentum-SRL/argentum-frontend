@@ -167,15 +167,6 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
             <div className={styles.headerActions}>
               <button
                 type="button"
-                className={styles.configBtn}
-                onClick={() => setIsConfigOpen(true)}
-                title="Configuración de notificaciones"
-                aria-label="Configurar preferencias de notificación"
-              >
-                <Settings size={18} />
-              </button>
-              <button
-                type="button"
                 className={styles.closeBtn}
                 onClick={onClose}
                 title="Cerrar"
@@ -186,9 +177,9 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
             </div>
           </div>
 
-          {/* Subcabecera para acciones masivas */}
-          {notificaciones.length > 0 && unreadCount > 0 && (
-            <div className={styles.actionsSubheader}>
+          {/* Subcabecera para acciones */}
+          <div className={styles.actionsSubheader}>
+            {notificaciones.length > 0 && unreadCount > 0 && (
               <button
                 type="button"
                 className={styles.actionTextBtn}
@@ -199,8 +190,16 @@ const NotificacionesDrawer: React.FC<NotificacionesDrawerProps> = ({ open, onClo
                 <Check size={14} />
                 Marcar todas como leídas
               </button>
-            </div>
-          )}
+            )}
+            <button
+              type="button"
+              className={`${styles.actionTextBtn} ${styles.configTextBtn}`}
+              onClick={() => setIsConfigOpen(true)}
+            >
+              <Settings size={14} />
+              <span>Configurar avisos</span>
+            </button>
+          </div>
 
           {/* Cuerpo del modal / Lista scrollable */}
           <div className={styles.formBody} data-modal-stack>

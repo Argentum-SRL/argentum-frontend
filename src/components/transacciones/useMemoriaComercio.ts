@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Categoria, Transaccion } from '@/types'
 import memoriaComercioService from '@/services/memoriaComercio.service'
 import categoriaService from '@/services/categoria.service'
+import { debeSugerirPorDescripcion } from './sugerenciaDescripcion'
 
 export interface MemoriaDialogData {
   clave: string
@@ -38,9 +39,15 @@ export function useMemoriaComercio({
 }: UseMemoriaComercioParams) {
   const [prevOpen, setPrevOpen] = useState(open)
   const [sugerenciaClave, setSugerenciaClave] = useState<string | null>(null)
+  const [origenSugerencia, setOrigenSugerencia] = useState<'memoria' | 'ia' | null>(null)
   const [showMemoriaDialog, setShowMemoriaDialog] = useState(false)
   const [memoriaDialogData, setMemoriaDialogData] = useState<MemoriaDialogData | null>(null)
   const [categoriaManual, setCategoriaManual] = useState(false)
+  const onAutoSelectRef = useRef(onAutoSelectCategoria)
+
+  useEffect(() => {
+    onAutoSelectRef.current = onAutoSelectCategoria
+  }, [onAutoSelectCategoria])
 
   // Resetear estado al abrir/cerrar el modal (patrón React recomendado para derivar de props)
   if (open !== prevOpen) {
@@ -48,44 +55,72 @@ export function useMemoriaComercio({
     if (open) {
       setCategoriaManual(false)
       setSugerenciaClave(null)
+      setOrigenSugerencia(null)
       setShowMemoriaDialog(false)
       setMemoriaDialogData(null)
     }
   }
 
-  // Memoria por comercio: sugerencia automática al tipear descripción (debounce 400ms)
+  // Memoria por comercio y fallback al clasificador IA según descripción (debounce 400ms)
   useEffect(() => {
     if (!open || isEdit) return
     const desc = descripcion.trim()
     if (!desc || (tipo !== 'egreso' && tipo !== 'ingreso')) {
       const resetTimer = setTimeout(() => {
         setSugerenciaClave(null)
+        setOrigenSugerencia(null)
       }, 0)
       return () => clearTimeout(resetTimer)
     }
 
+    const controller = new AbortController()
     const timer = setTimeout(async () => {
       try {
         const res = await memoriaComercioService.getSugerencia(desc, tipo)
+        if (controller.signal.aborted) return
+
         if (res.memoria_id && !categoriaManual) {
           if (res.categoria_id) {
-            onAutoSelectCategoria?.(res.categoria_id, res.subcategoria_id || '')
+            onAutoSelectRef.current?.(res.categoria_id, res.subcategoria_id || '')
             setSugerenciaClave(res.clave)
+            setOrigenSugerencia('memoria')
+            return
           }
+        }
+
+        setSugerenciaClave(null)
+        if (!debeSugerirPorDescripcion({ open, isEdit, categoriaManual, descripcion, tipo })) {
+          setOrigenSugerencia(null)
+          return
+        }
+
+        const sugeridos = await categoriaService.sugerir(desc, tipo, controller.signal)
+        if (controller.signal.aborted) return
+
+        if (sugeridos.length > 0 && !categoriaManual) {
+          const primero = sugeridos[0]
+          onAutoSelectRef.current?.(primero.categoria_id, primero.subcategoria_id || '')
+          setOrigenSugerencia('ia')
         } else {
-          setSugerenciaClave(null)
+          setOrigenSugerencia(null)
         }
       } catch (e) {
-        console.error('Error al obtener sugerencia de comercio:', e)
+        if (!controller.signal.aborted) {
+          console.error('Error al obtener sugerencia de comercio:', e)
+        }
       }
     }, 400)
 
-    return () => clearTimeout(timer)
-  }, [descripcion, tipo, open, isEdit, onAutoSelectCategoria, categoriaManual])
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [descripcion, tipo, open, isEdit, categoriaManual])
 
   const marcarCategoriaManual = useCallback(() => {
     setCategoriaManual(true)
     setSugerenciaClave(null)
+    setOrigenSugerencia(null)
   }, [])
 
   const evaluarMemoriaPostGuardado = useCallback(
@@ -149,6 +184,7 @@ export function useMemoriaComercio({
 
   return {
     sugerenciaClave,
+    origenSugerencia,
     marcarCategoriaManual,
     evaluarMemoriaPostGuardado,
     showMemoriaDialog,

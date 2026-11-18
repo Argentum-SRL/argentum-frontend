@@ -4,6 +4,7 @@ import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { Skeleton } from '../Skeleton'
 import categoriaService from '@/services/categoria.service'
+import CategoriaBuscador from './CategoriaBuscador'
 import styles from './CategoriaSelector.module.css'
 
 const normText = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
@@ -76,30 +77,38 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
     return (
       <div className={styles.container}>
         <label className={styles.fieldLabel}>Categoría</label>
-        <div className={styles.catGrid}>
-          {displayCategorias.map(cat => {
-            const isActive = categoriaId === cat.id
-            return (
-              <button
-                type="button"
-                key={cat.id}
-                data-active={isActive}
-                className={`${styles.catBtn} ${isActive ? styles.catBtnActive : ''}`}
-                title={`Categoría ${cat.nombre}`}
-                aria-label={`Seleccionar categoría ${cat.nombre}`}
-                onClick={() => {
-                  onSelectCategoria(cat.id)
-                  onSelectSubcategoria('')
-                }}
-              >
-                <div className={styles.catIconWrapper}>
-                  <CategoriaIcon nombre={cat.nombre} size={36} />
-                </div>
-                <span className={styles.catName}>{cat.nombre}</span>
-              </button>
-            )
-          })}
-        </div>
+        <CategoriaBuscador
+          tipo={tipo}
+          onSelectResultado={(res) => {
+            onSelectCategoria(res.categoria_id)
+            onSelectSubcategoria(res.subcategoria_id ?? '')
+          }}
+        >
+          <div className={styles.catGrid}>
+            {displayCategorias.map(cat => {
+              const isActive = categoriaId === cat.id
+              return (
+                <button
+                  type="button"
+                  key={cat.id}
+                  data-active={isActive}
+                  className={`${styles.catBtn} ${isActive ? styles.catBtnActive : ''}`}
+                  title={`Categoría ${cat.nombre}`}
+                  aria-label={`Seleccionar categoría ${cat.nombre}`}
+                  onClick={() => {
+                    onSelectCategoria(cat.id)
+                    onSelectSubcategoria('')
+                  }}
+                >
+                  <div className={styles.catIconWrapper}>
+                    <CategoriaIcon nombre={cat.nombre} size={36} />
+                  </div>
+                  <span className={styles.catName}>{cat.nombre}</span>
+                </button>
+              )
+            })}
+          </div>
+        </CategoriaBuscador>
       </div>
     )
   }

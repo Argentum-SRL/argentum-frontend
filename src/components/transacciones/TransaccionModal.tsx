@@ -30,7 +30,7 @@ import { RED_LABEL } from '@/lib/utils/tarjeta.utils'
 import { sortBilleteras, getBankById, findBankByNombre } from '@/lib/utils/billeteras.utils'
 import { useMemoriaComercio } from './useMemoriaComercio'
 import MemoriaComercioDialog from './MemoriaComercioDialog'
-import memoriaStyles from './MemoriaComercioDialog.module.css'
+import SugerenciaCategoriaTexto from './SugerenciaCategoriaTexto'
 import { useResumenDeCompra, formatDDMM } from '@/hooks/useResumenDeCompra'
 import DebitoEnDolares from './DebitoEnDolares'
 import CalculoCuotasResumen from './CalculoCuotasResumen'
@@ -89,6 +89,7 @@ export default function TransaccionModal({
 
   const {
     sugerenciaClave,
+    origenSugerencia,
     marcarCategoriaManual,
     evaluarMemoriaPostGuardado,
     showMemoriaDialog,
@@ -1126,10 +1127,8 @@ export default function TransaccionModal({
                       dispatch({ type: 'SET_FIELD', field: 'subcategoriaId', value: id })
                     }}
                   />
-                  {!isEdit && sugerenciaClave && descripcion.trim() && (
-                    <p className={memoriaStyles.sugerenciaText}>
-                      Categoría que usaste antes para &quot;{sugerenciaClave}&quot;.
-                    </p>
+                  {!isEdit && descripcion.trim() && (
+                    <SugerenciaCategoriaTexto origen={origenSugerencia} clave={sugerenciaClave} />
                   )}
 
                   {/* ¿Qué es esta plata? para ingresos */}

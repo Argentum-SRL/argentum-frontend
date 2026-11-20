@@ -1,0 +1,43 @@
+.introText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.googleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.googleHint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.googleDisabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.errorText {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--error);
+  line-height: 1.4;
+}

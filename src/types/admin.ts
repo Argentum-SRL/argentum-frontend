@@ -1,3 +1,29 @@
+export type EstadoCuentaAdmin = 'activa' | 'suspendida' | 'sin_verificar'
+
+export type EstadoVisibleAdmin =
+  | 'activo'
+  | 'nuevo'
+  | 'poco_uso'
+  | 'en_desuso'
+  | 'sin_empezar'
+  | 'suspendida'
+  | 'sin_verificar'
+
+export type CanalUsoAdmin = 'web' | 'whatsapp' | null
+
+export type OrdenUsuariosAdmin = 'ultimo_uso' | 'movimientos' | 'costo_mes' | 'registro'
+
+export interface CostoUsuarioMes {
+  ia_usd: number
+  ia_ars: number | null
+  whatsapp_cobrados: number
+  whatsapp_ars: number
+  total_ars: number
+  dolar_oficial: number | null
+  dolar_fecha: string | null
+  sin_dolar: boolean
+}
+
 export interface UsuarioAdminResumen {
   id: string
   nombre: string | null
@@ -12,10 +38,31 @@ export interface UsuarioAdminResumen {
   created_at: string
   ultima_actividad: string | null
   foto_url: string | null
+  estado_cuenta: EstadoCuentaAdmin
+  estado_visible: EstadoVisibleAdmin
+  movimientos_mes: number
+  ultimo_uso: string | null
+  ultimo_uso_canal: CanalUsoAdmin
+  costo_mes_ars: number
 }
 
 export interface UsuarioAdmin extends UsuarioAdminResumen {
   paso_onboarding_actual: string | null
+  ultimo_uso_web: string | null
+  ultimo_uso_whatsapp: string | null
+  tiene_contrasena: boolean
+  costo_mes: CostoUsuarioMes | null
+}
+
+export interface ConteosEstadoAdmin {
+  todos: number
+  activo: number
+  nuevo: number
+  poco_uso: number
+  en_desuso: number
+  sin_empezar: number
+  suspendida: number
+  sin_verificar: number
 }
 
 export interface PaginatedUsuarios {
@@ -23,6 +70,7 @@ export interface PaginatedUsuarios {
   page: number
   limit: number
   pages: number
+  conteos_estado?: ConteosEstadoAdmin
   usuarios: UsuarioAdminResumen[]
 }
 
@@ -30,9 +78,8 @@ export interface FiltrosAdmin {
   page?: number
   limit?: number
   search?: string
-  estado?: 'activo' | 'inactivo' | 'bloqueado' | ''
-  onboarding?: 'completo' | 'incompleto' | ''
-  wpp?: 'vinculado' | 'no_vinculado' | ''
+  estado?: EstadoVisibleAdmin | ''
+  orden?: OrdenUsuariosAdmin
 }
 
 export interface AdminStats {
@@ -43,8 +90,48 @@ export interface AdminStats {
   nuevos_hoy: number
   nuevos_7_dias: number
   activos_7_dias: number
+  usaron_7_dias: number
+  en_desuso: number
+  activos_pct: number
+  costo_mes_ars: number
+  costo_mes_sin_dolar: boolean
+  costo_mes_fuente: 'openai' | 'estimado'
   admins_total: number
   por_proveedor: Record<string, number>
+}
+
+export interface ReauthPayload {
+  password_actual?: string
+  google_credential?: string
+}
+
+export type AccionAdminClave =
+  | 'suspender'
+  | 'reactivar'
+  | 'mail_contrasena'
+  | 'cerrar_sesiones'
+  | 'desconectar_whatsapp'
+  | 'hacer_admin'
+  | 'quitar_admin'
+  | 'eliminar_cuenta'
+  | 'correr_tarea'
+  | 'verificacion_fallida'
+
+export interface AccionAdminItem {
+  fecha: string
+  admin: string
+  accion: AccionAdminClave
+  accion_texto: string
+  usuario: string | null
+  detalle: string | null
+}
+
+export interface PaginatedRegistroAdmin {
+  total: number
+  page: number
+  limit: number
+  pages: number
+  items: AccionAdminItem[]
 }
 
 export interface CalidadResumen {
@@ -69,12 +156,24 @@ export interface CostoPorUsuario {
   total_usd: number | string
 }
 
+export interface CostoUsuarioMesItem {
+  usuario_id: string
+  nombre: string
+  total_ars: number
+  ia_usd: number
+  whatsapp_cobrados: number
+}
+
 export interface CostoResumen {
   total_usd: number | string
   por_funcion: Record<string, number | string>
   por_dia: CostoPorDia[]
   por_usuario: CostoPorUsuario[]
+  por_usuario_mes?: CostoUsuarioMesItem[]
   sin_usuario_usd: number | string
+  openai_usd?: number | string | null
+  openai_estado?: 'ok' | 'sin_conexion' | 'error' | null
+  openai_hasta?: string | null
 }
 
 export interface TopesHoyResumen {
@@ -91,6 +190,9 @@ export interface SaludResumen {
   mensajes_con_tiempo: number
   avisos_whatsapp_enviados: number
   avisos_whatsapp_sin_enviar: number
+  wpp_fallados?: number
+  wpp_interrumpidos?: number
+  wpp_vencidos?: number
 }
 
 export interface SalientesMes {

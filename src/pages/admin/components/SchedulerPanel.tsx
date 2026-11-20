@@ -1,284 +1,215 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { RefreshCw, Play, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { sileo } from 'sileo'
+import { AlertTriangle, Clock } from '@/components/ui/icons'
+import { AdminTareasSkeleton, Button, EmptyState } from '@/components/ui'
+import adminService, { type JobSchedulerItem } from '@/services/adminService'
 import { getErrorMessage } from '@/utils/errorMessages'
-import adminService, { type JobSchedulerItem } from '../../../services/adminService'
+import { ordenarTareas, tiempoHasta, tiempoRelativo } from '@/utils/admin'
 import styles from './SchedulerPanel.module.css'
 
-/** Formatea una fecha ISO a la zona horaria de Argentina (dd/MM/yyyy HH:mm:ss) */
-function formatearFechaArgentina(isoDate: string | null | undefined): string {
-  if (!isoDate) return '—'
-  try {
-    const d = new Date(isoDate)
-    if (isNaN(d.getTime())) return '—'
-    return new Intl.DateTimeFormat('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }).format(d)
-  } catch {
-    return '—'
+interface SchedulerPanelProps {
+  refreshKey: number
+}
+
+function dotClaseEstado(estado: JobSchedulerItem['estado']): string {
+  switch (estado) {
+    case 'Al día':
+      return styles.dotBien
+    case 'Atrasado':
+      return styles.dotAviso
+    case 'Falló':
+      return styles.dotMal
+    case 'Sin datos':
+    default:
+      return styles.dotGris
   }
 }
 
-export const SchedulerPanel: React.FC = () => {
+export const SchedulerPanel: React.FC<SchedulerPanelProps> = ({ refreshKey }) => {
   const [jobs, setJobs] = useState<JobSchedulerItem[]>([])
-  const [schedulerActivo, setSchedulerActivo] = useState<boolean>(true)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [schedulerActivo, setSchedulerActivo] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [corriendoJobId, setCorriendoJobId] = useState<string | null>(null)
   const [detallesAbiertos, setDetallesAbiertos] = useState<Record<string, boolean>>({})
-
-  const cargarScheduler = useCallback(async (mostrarFeedback = false) => {
-    try {
-      setLoading(true)
-      const data = await adminService.getScheduler()
-      setSchedulerActivo(data.scheduler_activo)
-      setJobs(data.jobs)
-      if (mostrarFeedback) {
-        sileo.success({ title: 'Estado del scheduler actualizado.' })
-      }
-    } catch (err: unknown) {
-      console.error('Error al cargar scheduler:', err)
-      sileo.error({ title: 'No se pudo cargar el estado del scheduler. Probá de nuevo.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const [reloadSeq, setReloadSeq] = useState(0)
 
   useEffect(() => {
-    let activo = true
+    const controller = new AbortController()
     adminService
-      .getScheduler()
+      .getScheduler(controller.signal)
       .then((data) => {
-        if (!activo) return
+        if (controller.signal.aborted) return
+        setError(null)
         setSchedulerActivo(data.scheduler_activo)
-        setJobs(data.jobs)
+        setJobs(ordenarTareas(data.jobs))
       })
       .catch((err: unknown) => {
-        if (!activo) return
-        console.error('Error al cargar scheduler:', err)
-        sileo.error({ title: 'No se pudo cargar el estado del scheduler. Probá de nuevo.' })
+        if (controller.signal.aborted) return
+        const msg = getErrorMessage(err, 'No se pudieron cargar los datos. Probá de nuevo.')
+        setError(msg)
+        sileo.error({ title: msg })
       })
       .finally(() => {
-        if (activo) {
+        if (!controller.signal.aborted) {
           setLoading(false)
         }
       })
+    return () => controller.abort()
+  }, [refreshKey, reloadSeq])
 
-    return () => {
-      activo = false
-    }
-  }, [])
+  const handleReintentar = () => {
+    setLoading(true)
+    setError(null)
+    setReloadSeq((n) => n + 1)
+  }
 
   const handleCorrerJob = async (jobId: string) => {
     try {
       setCorriendoJobId(jobId)
       await adminService.correrJob(jobId)
-      sileo.success({ title: 'Se va a correr en unos segundos.' })
-      // Recargar después de una pequeña pausa
-      setTimeout(() => {
-        cargarScheduler()
-      }, 1500)
+      sileo.success({ title: 'La tarea va a correr en unos segundos.' })
+      setLoading(true)
+      setReloadSeq((n) => n + 1)
     } catch (err: unknown) {
-      console.error(`Error al ejecutar job ${jobId}:`, err)
-      sileo.error({
-        title: getErrorMessage(err, 'No se pudo correr la tarea. Probá de nuevo.'),
-      })
+      sileo.error({ title: getErrorMessage(err, 'No se pudo correr la tarea. Probá de nuevo.') })
     } finally {
       setCorriendoJobId(null)
     }
   }
 
   const toggleDetalle = (jobId: string) => {
-    setDetallesAbiertos((prev) => ({
-      ...prev,
-      [jobId]: !prev[jobId],
-    }))
+    setDetallesAbiertos((prev) => ({ ...prev, [jobId]: !prev[jobId] }))
   }
 
-  const renderResultadoChip = (job: JobSchedulerItem) => {
-    const ult = job.ultima_corrida
-    if (!ult) return <span className={styles.vacioText}>—</span>
-
-    if (ult.resultado === 'ok') {
-      return (
-        <span className={`${styles.chipResultado} ${styles.chipBien}`}>
-          <CheckCircle2 size={12} />
-          Bien
-        </span>
-      )
-    }
-
-    if (ult.resultado === 'error') {
-      const estaAbierto = detallesAbiertos[job.job_id]
-      return (
-        <button
-          type="button"
-          onClick={() => toggleDetalle(job.job_id)}
-          className={`${styles.chipResultado} ${styles.chipFallo}`}
-          title="Tocar para ver detalle del error"
-        >
-          <XCircle size={12} />
-          Falló
-          <span style={{ fontSize: '10px', opacity: 0.8 }}>
-            {estaAbierto ? '▲' : '▼'}
-          </span>
-        </button>
-      )
-    }
-
-    return (
-      <span className={`${styles.chipResultado} ${styles.chipOmitida}`}>
-        <Clock size={12} />
-        Omitida
-      </span>
-    )
-  }
-
-  const renderEstadoChip = (estado: JobSchedulerItem['estado']) => {
-    switch (estado) {
-      case 'Al día':
-        return (
-          <span className={`${styles.chipEstado} ${styles.chipEstadoAlDia}`}>
-            ● Al día
-          </span>
-        )
-      case 'Atrasado':
-        return (
-          <span className={`${styles.chipEstado} ${styles.chipEstadoAtrasado}`}>
-            ▲ Atrasado
-          </span>
-        )
-      case 'Falló':
-        return (
-          <span className={`${styles.chipEstado} ${styles.chipEstadoFallo}`}>
-            ✕ Falló
-          </span>
-        )
-      case 'Sin datos':
-      default:
-        return (
-          <span className={`${styles.chipEstado} ${styles.chipEstadoSinDatos}`}>
-            ○ Sin datos
-          </span>
-        )
-    }
-  }
+  const ahora = new Date()
+  const conProblemas = jobs.filter((j) => j.estado === 'Falló' || j.estado === 'Atrasado').length
 
   return (
-    <div className={styles.container}>
-      {/* Aviso si el scheduler está apagado */}
-      {!schedulerActivo && (
-        <div className={styles.warningBanner}>
-          <AlertTriangle size={18} className={styles.warningIcon} />
+    <section className={styles.sectionCard} aria-label="Tareas automáticas">
+      <div className={styles.sectionHeader}>
+        <div className={styles.sectionIconWrap}>
+          <Clock size={18} />
+        </div>
+        <div className={styles.sectionHeaderText}>
+          <h3>Tareas automáticas</h3>
+          <p>
+            {jobs.length} tareas · {conProblemas} con problemas
+          </p>
+        </div>
+      </div>
+
+      {!loading && !schedulerActivo && (
+        <div className={styles.avisoApagado} role="status">
+          <AlertTriangle size={16} aria-hidden="true" />
           <span>Las tareas automáticas están apagadas en este servidor.</span>
         </div>
       )}
 
-      {/* Cabecera del Panel */}
-      <div className={styles.headerRow}>
-        <div className={styles.headerTitleGroup}>
-          <h2 className={styles.title}>Tareas Automáticas</h2>
-          <p className={styles.subtitle}>
-            Monitoreo y ejecución de trabajos programados (APScheduler). Total: {jobs.length} tareas.
-          </p>
-        </div>
-        <button
-          type="button"
-          className={styles.refreshBtn}
-          onClick={() => cargarScheduler(true)}
-          disabled={loading}
-          title="Recargar listado de tareas"
-        >
-          <RefreshCw size={15} className={loading ? styles.spin : ''} />
-          <span>Actualizar</span>
-        </button>
-      </div>
-
-      {loading && jobs.length === 0 ? (
-        <div className={styles.loadingContainer}>
-          <RefreshCw size={24} className={styles.spin} />
-          <span>Cargando catálogo de tareas automáticas...</span>
-        </div>
+      {loading ? (
+        <AdminTareasSkeleton />
+      ) : error ? (
+        <EmptyState
+          variant="compact"
+          icon={Clock}
+          title={error}
+          actionLabel="Reintentar"
+          onActionClick={handleReintentar}
+        />
+      ) : jobs.length === 0 ? (
+        <EmptyState
+          variant="compact"
+          icon={Clock}
+          title="No hay tareas registradas."
+        />
       ) : (
         <>
-          {/* Vista Escritorio: Tabla */}
-          <div className={styles.desktopWrapper}>
+          <div className={styles.desktopTableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th className={styles.th}>Tarea</th>
-                  <th className={styles.th}>Última corrida</th>
-                  <th className={styles.th}>Próxima corrida</th>
+                  <th className={styles.th}>Última vez</th>
+                  <th className={styles.th}>Próxima</th>
                   <th className={styles.th}>Estado</th>
-                  <th className={styles.th} style={{ textAlign: 'right' }}>Acción</th>
+                  <th className={`${styles.th} ${styles.thRight}`} />
                 </tr>
               </thead>
               <tbody>
                 {jobs.map((job) => {
-                  const tieneDetalleError = job.ultima_corrida?.resultado === 'error' && detallesAbiertos[job.job_id]
+                  const abierto = Boolean(detallesAbiertos[job.job_id])
+                  const falloUltima = job.ultima_corrida?.resultado === 'error'
                   return (
                     <React.Fragment key={job.job_id}>
-                      <tr className={styles.tr}>
+                      <tr className={styles.tableRow}>
                         <td className={styles.td}>
-                          <div className={styles.taskInfo}>
-                            <span className={styles.taskName}>{job.nombre}</span>
-                            <span className={styles.taskDesc}>{job.que_hace}</span>
+                          <div className={styles.jobTitle}>{job.nombre}</div>
+                          <div className={styles.jobDesc}>{job.que_hace}</div>
+                        </td>
+                        <td className={styles.td}>
+                          <div className={styles.ultimaTime}>
+                            {tiempoRelativo(job.ultima_corrida?.inicio ?? null, ahora)}
                           </div>
+                          {job.ultima_corrida?.resultado === 'ok' && (
+                            <div className={styles.ultimaSub}>
+                              Bien · {job.ultima_corrida.duracion_ms} ms
+                            </div>
+                          )}
+                          {job.ultima_corrida?.resultado === 'omitido' && (
+                            <div className={styles.ultimaSub}>Omitido</div>
+                          )}
+                          {falloUltima && (
+                            <div className={styles.falloInline}>
+                              <span className={styles.falloTexto}>Falló</span>
+                              <button
+                                type="button"
+                                className={styles.motivoBtn}
+                                aria-expanded={abierto}
+                                onClick={() => toggleDetalle(job.job_id)}
+                              >
+                                {abierto ? 'Ocultar motivo' : 'Ver motivo'}
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                        <td className={`${styles.td} ${styles.numCell}`}>
+                          {tiempoHasta(job.proxima_corrida ?? null, ahora)}
                         </td>
                         <td className={styles.td}>
-                          <div className={styles.corridaStack}>
-                            <span className={styles.fechaText}>
-                              {formatearFechaArgentina(job.ultima_corrida?.inicio)}
-                            </span>
-                            {renderResultadoChip(job)}
-                            {job.ultima_corrida && (
-                              <span className={styles.duracionText}>
-                                {job.ultima_corrida.duracion_ms} ms
-                              </span>
-                            )}
+                          <div className={styles.estadoInline}>
+                            <span
+                              className={`${styles.statusDot} ${dotClaseEstado(job.estado)}`}
+                              aria-hidden="true"
+                            />
+                            <span>{job.estado}</span>
                           </div>
+                          {job.errores_24h > 0 && (
+                            <div className={styles.erroresSub}>
+                              {job.errores_24h === 1
+                                ? '1 error en 24 h'
+                                : `${job.errores_24h} errores en 24 h`}
+                            </div>
+                          )}
                         </td>
-                        <td className={styles.td}>
-                          <span className={styles.fechaText}>
-                            {formatearFechaArgentina(job.proxima_corrida)}
-                          </span>
-                        </td>
-                        <td className={styles.td}>
-                          {renderEstadoChip(job.estado)}
-                        </td>
-                        <td className={styles.td} style={{ textAlign: 'right' }}>
+                        <td className={`${styles.td} ${styles.tdRight}`}>
                           {job.puede_correr_ahora && (
-                            <button
+                            <Button
                               type="button"
-                              className={styles.runBtn}
-                              disabled={corriendoJobId === job.job_id || !schedulerActivo}
-                              onClick={() => handleCorrerJob(job.job_id)}
-                              title={
-                                !schedulerActivo
-                                  ? 'El scheduler está apagado'
-                                  : 'Ejecutar tarea en segundo plano inmediatamente'
-                              }
+                              variant="secondary"
+                              loading={corriendoJobId === job.job_id}
+                              disabled={!schedulerActivo || Boolean(corriendoJobId)}
+                              onClick={() => void handleCorrerJob(job.job_id)}
                             >
-                              <Play size={12} fill="currentColor" />
-                              <span>{corriendoJobId === job.job_id ? 'Corriendo...' : 'Correr ahora'}</span>
-                            </button>
+                              Correr ahora
+                            </Button>
                           )}
                         </td>
                       </tr>
-
-                      {/* Fila desplegable con detalle de error */}
-                      {tieneDetalleError && (
-                        <tr className={styles.errorDetailRow}>
-                          <td colSpan={5}>
-                            <div className={styles.errorDetailBox}>
-                              <span className={styles.errorDetailLabel}>Detalle del fallo:</span>
-                              {job.ultima_corrida?.detalle || 'Sin mensaje de error especificado'}
+                      {falloUltima && abierto && (
+                        <tr className={styles.detalleRow}>
+                          <td colSpan={5} className={styles.detalleCell}>
+                            <div className={styles.detalleBox}>
+                              {job.ultima_corrida?.detalle || 'Sin detalle registrado.'}
                             </div>
                           </td>
                         </tr>
@@ -290,56 +221,85 @@ export const SchedulerPanel: React.FC = () => {
             </table>
           </div>
 
-          {/* Vista Móvil: Tarjetas */}
-          <div className={styles.mobileCards}>
+          <div className={styles.mobileList}>
             {jobs.map((job) => {
-              const tieneDetalleError = job.ultima_corrida?.resultado === 'error' && detallesAbiertos[job.job_id]
+              const abierto = Boolean(detallesAbiertos[job.job_id])
+              const falloUltima = job.ultima_corrida?.resultado === 'error'
               return (
-                <div key={job.job_id} className={styles.card}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <h3 className={styles.cardTitle}>{job.nombre}</h3>
-                      <p className={styles.cardDesc}>{job.que_hace}</p>
+                <div key={job.job_id} className={styles.mobileCard}>
+                  <div className={styles.mobileTop}>
+                    <div className={styles.mobileTitleCol}>
+                      <div className={styles.jobTitle}>{job.nombre}</div>
+                      <div className={styles.jobDesc}>{job.que_hace}</div>
                     </div>
-                    {renderEstadoChip(job.estado)}
+                    <span className={styles.estadoInline}>
+                      <span
+                        className={`${styles.statusDot} ${dotClaseEstado(job.estado)}`}
+                        aria-hidden="true"
+                      />
+                      <span>{job.estado}</span>
+                    </span>
                   </div>
 
-                  <div className={styles.cardBody}>
-                    <div className={styles.cardRow}>
-                      <span className={styles.cardRowLabel}>Última corrida:</span>
-                      <div className={styles.cardRowVal}>
-                        <span>{formatearFechaArgentina(job.ultima_corrida?.inicio)}</span>
-                        {renderResultadoChip(job)}
+                  <div className={styles.mobileRows}>
+                    <div className={styles.mobileRow}>
+                      <span className={styles.mobileLabel}>Última vez</span>
+                      <div className={styles.mobileValCol}>
+                        <span>{tiempoRelativo(job.ultima_corrida?.inicio ?? null, ahora)}</span>
+                        {job.ultima_corrida?.resultado === 'ok' && (
+                          <span className={styles.ultimaSub}>
+                            Bien · {job.ultima_corrida.duracion_ms} ms
+                          </span>
+                        )}
+                        {falloUltima && (
+                          <div className={styles.falloInline}>
+                            <span className={styles.falloTexto}>Falló</span>
+                            <button
+                              type="button"
+                              className={styles.motivoBtn}
+                              aria-expanded={abierto}
+                              onClick={() => toggleDetalle(job.job_id)}
+                            >
+                              {abierto ? 'Ocultar motivo' : 'Ver motivo'}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {tieneDetalleError && (
-                      <div className={styles.errorDetailBox} style={{ margin: '4px 0' }}>
-                        <span className={styles.errorDetailLabel}>Error:</span>
-                        {job.ultima_corrida?.detalle || 'Sin mensaje de error'}
+                    {falloUltima && abierto && (
+                      <div className={styles.detalleBox}>
+                        {job.ultima_corrida?.detalle || 'Sin detalle registrado.'}
                       </div>
                     )}
 
-                    <div className={styles.cardRow}>
-                      <span className={styles.cardRowLabel}>Próxima corrida:</span>
-                      <span className={styles.cardRowVal}>
-                        {formatearFechaArgentina(job.proxima_corrida)}
+                    <div className={styles.mobileRow}>
+                      <span className={styles.mobileLabel}>Próxima</span>
+                      <span className={styles.numCell}>
+                        {tiempoHasta(job.proxima_corrida ?? null, ahora)}
                       </span>
                     </div>
+
+                    {job.errores_24h > 0 && (
+                      <div className={styles.erroresSub}>
+                        {job.errores_24h === 1
+                          ? '1 error en 24 h'
+                          : `${job.errores_24h} errores en 24 h`}
+                      </div>
+                    )}
                   </div>
 
                   {job.puede_correr_ahora && (
-                    <div className={styles.cardFooter}>
-                      <button
-                        type="button"
-                        className={styles.runBtn}
-                        disabled={corriendoJobId === job.job_id || !schedulerActivo}
-                        onClick={() => handleCorrerJob(job.job_id)}
-                      >
-                        <Play size={12} fill="currentColor" />
-                        <span>{corriendoJobId === job.job_id ? 'Corriendo...' : 'Correr ahora'}</span>
-                      </button>
-                    </div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      fullWidth
+                      loading={corriendoJobId === job.job_id}
+                      disabled={!schedulerActivo || Boolean(corriendoJobId)}
+                      onClick={() => void handleCorrerJob(job.job_id)}
+                    >
+                      Correr ahora
+                    </Button>
                   )}
                 </div>
               )
@@ -347,7 +307,7 @@ export const SchedulerPanel: React.FC = () => {
           </div>
         </>
       )}
-    </div>
+    </section>
   )
 }
 

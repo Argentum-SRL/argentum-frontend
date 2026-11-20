@@ -98,4 +98,12 @@ export {
   PerfilNotificacionesSkeleton,
   type SkeletonProps,
 } from './Skeleton'
+export {
+  AdminSummaryBarSkeleton,
+  AdminUsuariosListaSkeleton,
+  AdminUsuarioDetalleSkeleton,
+  AdminMonitorSkeleton,
+  AdminTareasSkeleton,
+  AdminRegistroSkeleton,
+} from './Skeleton/SkeletonAdmin'
 

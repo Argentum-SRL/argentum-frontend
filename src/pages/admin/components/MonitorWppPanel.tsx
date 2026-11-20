@@ -1,547 +1,639 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { RefreshCw, MessageSquare, AlertTriangle, DollarSign, Activity, Send } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { sileo } from 'sileo'
-import adminService from '../../../services/adminService'
+import { Send } from 'lucide-react'
+import { Activity, AlertTriangle, DollarSign, MessageSquare, Users } from '@/components/ui/icons'
+import {
+  AdminMonitorSkeleton,
+  Button,
+  DateInput,
+  EmptyState,
+  PageSummaryBar,
+  SegmentedControl,
+  type SegmentedControlOption,
+} from '@/components/ui'
+import adminService from '@/services/adminService'
+import { getErrorMessage } from '@/utils/errorMessages'
+import { formatMonto } from '@/utils/format'
+import {
+  formatearCantidad,
+  formatearDiaMes,
+  porcentajeBarra,
+} from '@/utils/admin'
 import type {
   MonitorWppResumen,
   PaginatedConversacionesMonitor,
-  ConversacionMonitorItem,
-} from '../../../types/admin'
+} from '@/types/admin'
+import ConversacionesCard from '../whatsapp/ConversacionesCard'
 import styles from './MonitorWppPanel.module.css'
 
-/** Formatea un monto a 'USD 0,000' (3 decimales, coma decimal) */
-function formatMontoUsd(monto: number | string | undefined | null): string {
-  const num = Number(monto) || 0
-  const fijado = num.toFixed(3)
-  return `USD ${fijado.replace('.', ',')}`
+interface MonitorWppPanelProps {
+  refreshKey: number
+  onSelectUsuario: (usuarioId: string) => void
 }
 
-/** Formatea una fecha ISO a la zona horaria de Argentina */
-function formatearFechaArgentina(isoDate: string | null | undefined): string {
-  if (!isoDate) return '—'
-  try {
-    const d = new Date(isoDate)
-    if (isNaN(d.getTime())) return '—'
-    return new Intl.DateTimeFormat('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }).format(d)
-  } catch {
-    return '—'
+type PeriodoMonitor = '1' | '7' | '30' | 'rango'
+
+type ConsultaPeriodo =
+  | { dias: number; desde?: undefined; hasta?: undefined }
+  | { dias?: undefined; desde: string; hasta: string }
+
+const OPCIONES_PERIODO: SegmentedControlOption<PeriodoMonitor>[] = [
+  { value: '1', label: 'Hoy' },
+  { value: '7', label: '7\u00a0días' },
+  { value: '30', label: '30\u00a0días' },
+  { value: 'rango', label: 'Elegir\u00a0fechas' },
+]
+
+const NOMBRES_FUNCIONES: Array<{ key: string; label: string }> = [
+  { key: 'texto_whatsapp', label: 'Mensajes de texto' },
+  { key: 'audio_whatsapp', label: 'Audios' },
+  { key: 'imagen_whatsapp', label: 'Fotos' },
+  { key: 'pdf_whatsapp', label: 'PDF por WhatsApp' },
+  { key: 'importacion_pdf', label: 'Importación de resúmenes' },
+]
+
+function hoyArgentinaIso(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Argentina/Buenos_Aires',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date())
+}
+
+function diasEntreIso(desde: string, hasta: string): number {
+  const [y1, m1, d1] = desde.split('-').map(Number)
+  const [y2, m2, d2] = hasta.split('-').map(Number)
+  const t1 = Date.UTC(y1, m1 - 1, d1)
+  const t2 = Date.UTC(y2, m2 - 1, d2)
+  return Math.round((t2 - t1) / 86_400_000)
+}
+
+function validarRangoFechas(desde: string, hasta: string, hoyIso: string): string | null {
+  if (!desde || !hasta) {
+    return 'Elegí las dos fechas.'
+  }
+  if (desde > hasta) {
+    return 'La fecha de inicio tiene que ser anterior a la de fin.'
+  }
+  if (hasta > hoyIso) {
+    return 'La fecha de fin no puede ser posterior a hoy.'
+  }
+  if (diasEntreIso(desde, hasta) > 89) {
+    return 'Elegí un rango de hasta 90 días.'
+  }
+  return null
+}
+
+function nivelHoyVisual(nivel: string): { texto: string; tono: 'bien' | 'aviso' | 'mal' } {
+  switch (nivel) {
+    case 'aviso':
+      return { texto: 'Cerca del tope', tono: 'aviso' }
+    case 'sin_archivos':
+      return { texto: 'Sin fotos ni PDF por hoy', tono: 'aviso' }
+    case 'sin_ia':
+      return { texto: 'Sin IA por hoy', tono: 'mal' }
+    case 'normal':
+    default:
+      return { texto: 'Todo normal', tono: 'bien' }
   }
 }
 
-const NOMBRES_FUNCIONES: Record<string, string> = {
-  texto_whatsapp: 'Mensajes de texto',
-  audio_whatsapp: 'Audios',
-  imagen_whatsapp: 'Fotos',
-  pdf_whatsapp: 'PDF por WhatsApp',
-  importacion_pdf: 'Importación de resúmenes',
+function claseDot(tono: 'bien' | 'aviso' | 'mal'): string {
+  if (tono === 'bien') return styles.dotBien
+  if (tono === 'mal') return styles.dotMal
+  return styles.dotAviso
 }
 
-const NOMBRES_CATEGORIAS: Record<string, string> = {
-  entendido_primera: 'Entendido a la primera',
-  no_entendido: 'No entendido',
-  error_ia: 'Error de la IA',
-  deshecho_o_corregido: 'Deshecho o corregido',
-  correccion: 'Corrección',
-  tope: 'Tope alcanzado',
-}
+export const MonitorWppPanel: React.FC<MonitorWppPanelProps> = ({
+  refreshKey,
+  onSelectUsuario,
+}) => {
+  const hoyIso = hoyArgentinaIso()
+  const [periodo, setPeriodo] = useState<PeriodoMonitor>('1')
+  const [desdeInput, setDesdeInput] = useState(hoyIso)
+  const [hastaInput, setHastaInput] = useState(hoyIso)
+  const [rangoError, setRangoError] = useState<string | null>(null)
+  const [consulta, setConsulta] = useState<ConsultaPeriodo>({ dias: 1 })
 
-export const MonitorWppPanel: React.FC = () => {
-  const [dias, setDias] = useState<1 | 7 | 30>(1)
+  const [categoria, setCategoria] = useState('')
+  const [pagina, setPagina] = useState(1)
+  const [reloadSeq, setReloadSeq] = useState(0)
+
   const [resumen, setResumen] = useState<MonitorWppResumen | null>(null)
-  const [conversacionesData, setConversacionesData] = useState<PaginatedConversacionesMonitor | null>(null)
-  const [categoriaFiltro, setCategoriaFiltro] = useState<string>('')
-  const [pagina, setPagina] = useState<number>(1)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [loadingTable, setLoadingTable] = useState<boolean>(false)
-
-  const cargarDatos = useCallback(async (diasVal: 1 | 7 | 30, catVal: string, pagVal: number, mostrarFeedback = false) => {
-    try {
-      setLoading(true)
-      const [resumenData, convsData] = await Promise.all([
-        adminService.getMonitorWppResumen(diasVal),
-        adminService.getMonitorWppConversaciones(diasVal, catVal, pagVal),
-      ])
-      setResumen(resumenData)
-      setConversacionesData(convsData)
-      if (mostrarFeedback) {
-        sileo.success({ title: 'Monitor de WhatsApp actualizado.' })
-      }
-    } catch (err: unknown) {
-      console.error('Error al cargar monitor wpp:', err)
-      sileo.error({ title: 'No se pudo cargar el monitor de WhatsApp. Probá de nuevo.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const [convs, setConvs] = useState<PaginatedConversacionesMonitor | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [loadingConvs, setLoadingConvs] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    let activo = true
+    const controller = new AbortController()
     Promise.all([
-      adminService.getMonitorWppResumen(dias),
-      adminService.getMonitorWppConversaciones(dias, categoriaFiltro, pagina),
+      adminService.getMonitorWppResumen(consulta, controller.signal),
+      adminService.getMonitorWppConversaciones(consulta, categoria, pagina, controller.signal),
     ])
       .then(([resumenData, convsData]) => {
-        if (!activo) return
+        if (controller.signal.aborted) return
+        setError(null)
+        setRangoError(null)
         setResumen(resumenData)
-        setConversacionesData(convsData)
+        setConvs(convsData)
       })
       .catch((err: unknown) => {
-        if (!activo) return
-        console.error('Error al cargar monitor wpp:', err)
-        sileo.error({ title: 'No se pudo cargar el monitor de WhatsApp. Probá de nuevo.' })
+        if (controller.signal.aborted) return
+        const msg = getErrorMessage(err, 'No se pudieron cargar los datos. Probá de nuevo.')
+        if (consulta.desde) {
+          setRangoError(msg)
+        }
+        setError(msg)
+        sileo.error({ title: msg })
       })
       .finally(() => {
-        if (activo) {
+        if (!controller.signal.aborted) {
           setLoading(false)
-          setLoadingTable(false)
+          setLoadingConvs(false)
         }
       })
+    return () => controller.abort()
+  }, [consulta, categoria, pagina, refreshKey, reloadSeq])
 
-    return () => {
-      activo = false
+  const handleCambioPeriodo = (val: PeriodoMonitor) => {
+    setPeriodo(val)
+    setRangoError(null)
+    if (val !== 'rango') {
+      setLoading(true)
+      setError(null)
+      setPagina(1)
+      setConsulta({ dias: Number(val) })
     }
-  }, [dias, categoriaFiltro, pagina])
+  }
 
-  const handleCambioDias = (nuevosDias: 1 | 7 | 30) => {
+  const handleVerRango = () => {
+    const errValidacion = validarRangoFechas(desdeInput, hastaInput, hoyArgentinaIso())
+    if (errValidacion) {
+      setRangoError(errValidacion)
+      return
+    }
+    setRangoError(null)
+    setError(null)
     setLoading(true)
-    setDias(nuevosDias)
+    setPagina(1)
+    setConsulta({ desde: desdeInput, hasta: hastaInput })
+  }
+
+  const handleCambioCategoria = (val: string) => {
+    setLoadingConvs(true)
+    setCategoria(val)
     setPagina(1)
   }
 
-  const handleCambioCategoria = (nuevaCat: string) => {
-    setLoadingTable(true)
-    setCategoriaFiltro(nuevaCat)
-    setPagina(1)
+  const handleCambioPagina = (nextPage: number) => {
+    setLoadingConvs(true)
+    setPagina(nextPage)
   }
 
-  const handleCambioPagina = (nuevaPagina: number) => {
-    setLoadingTable(true)
-    setPagina(nuevaPagina)
+  const handleReintentar = () => {
+    setLoading(true)
+    setError(null)
+    setReloadSeq((n) => n + 1)
   }
 
-  // Textos y etiquetas de Topes de Hoy
-  const estadoNivelMap: Record<string, { label: string; className: string }> = {
-    normal: { label: 'Normal', className: styles.badgeNormal },
-    aviso: { label: 'Aviso enviado', className: styles.badgeAviso },
-    sin_archivos: { label: 'Fotos y PDF en pausa', className: styles.badgePausa },
-    sin_ia: { label: 'IA en pausa', className: styles.badgePausa },
-  }
-
-  const nivelActual = resumen?.topes_hoy.nivel || 'normal'
-  const estadoBadge = estadoNivelMap[nivelActual] || { label: nivelActual, className: styles.badgeNormal }
-
-  // Formato de entendidos primera
-  const pctEntendidoFmt = resumen
-    ? `${resumen.calidad.porcentaje_entendidos_primera.toFixed(1).replace('.', ',')} %`
-    : '0,0 %'
-  const baseEntendidos = resumen ? (resumen.calidad.total - resumen.calidad.correcciones) : 0
-  const textoEntendidosPrimera = `Entendidos a la primera: ${pctEntendidoFmt} (${resumen?.calidad.entendidos_primera ?? 0} de ${baseEntendidos})`
-
-  // Salud - Tiempo de respuesta
-  let textoSaludTiempo = 'Todavía no hay datos de tiempo de respuesta'
-  if (
-    resumen?.salud.mensajes_con_tiempo &&
-    resumen.salud.tiempo_respuesta_mediana_ms !== null &&
-    resumen.salud.tiempo_respuesta_p90_ms !== null
-  ) {
-    const medS = (resumen.salud.tiempo_respuesta_mediana_ms / 1000).toFixed(1).replace('.', ',')
-    const p90S = (resumen.salud.tiempo_respuesta_p90_ms / 1000).toFixed(1).replace('.', ',')
-    textoSaludTiempo = `La mitad de las respuestas tarda menos de ${medS} s y 9 de cada 10, menos de ${p90S} s`
-  }
-
-  const totalPaginas = conversacionesData ? Math.max(1, Math.ceil(conversacionesData.total / 50)) : 1
-
-  return (
-    <div className={styles.container}>
-      {/* Header & Controls */}
-      <div className={styles.headerRow}>
-        <div className={styles.headerTitleGroup}>
-          <h2 className={styles.title}>Monitor de WhatsApp y Costos de IA</h2>
-          <p className={styles.subtitle}>
-            Monitoreo en tiempo real de entendimiento del bot, consumo de OpenAI, topes diarios y latencia.
-          </p>
-        </div>
-
-        <div className={styles.controlsGroup}>
-          {/* Selector Hoy | 7 días | 30 días */}
-          <div className={styles.selectorDias}>
-            <button
-              type="button"
-              className={`${styles.diaBtn} ${dias === 1 ? styles.diaBtnActive : ''}`}
-              onClick={() => handleCambioDias(1)}
-            >
-              Hoy
-            </button>
-            <button
-              type="button"
-              className={`${styles.diaBtn} ${dias === 7 ? styles.diaBtnActive : ''}`}
-              onClick={() => handleCambioDias(7)}
-            >
-              7 días
-            </button>
-            <button
-              type="button"
-              className={`${styles.diaBtn} ${dias === 30 ? styles.diaBtnActive : ''}`}
-              onClick={() => handleCambioDias(30)}
-            >
-              30 días
-            </button>
-          </div>
-
-          <button
-            type="button"
-            className={styles.refreshBtn}
-            onClick={() => cargarDatos(dias, categoriaFiltro, pagina, true)}
-            disabled={loading}
-          >
-            <RefreshCw size={14} className={loading ? styles.spin : ''} />
-            <span>Actualizar</span>
-          </button>
-        </div>
+  const cabeceraPeriodo = (
+    <>
+      <div className={styles.topRow}>
+        <h2 className={styles.panelTitle}>WhatsApp e IA</h2>
+        <SegmentedControl
+          options={OPCIONES_PERIODO}
+          value={periodo}
+          onChange={handleCambioPeriodo}
+          layout="inline"
+          ariaLabel="Período del monitor"
+        />
       </div>
 
-      {/* Cuatro Tarjetas */}
-      <div className={styles.cardsGrid}>
-        {/* Tarjeta 1: Cómo entiende el bot */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Cómo entiende el bot</h3>
-            <MessageSquare size={16} className="text-primary" />
+      {periodo === 'rango' && (
+        <div className={styles.rangoBlock}>
+          <div className={styles.rangoRow}>
+            <div className={styles.rangoInputWrap}>
+              <DateInput
+                label="Desde"
+                value={desdeInput}
+                onChange={setDesdeInput}
+                max={hoyIso}
+              />
+            </div>
+            <div className={styles.rangoInputWrap}>
+              <DateInput
+                label="Hasta"
+                value={hastaInput}
+                onChange={setHastaInput}
+                max={hoyIso}
+              />
+            </div>
+            <Button type="button" variant="secondary" onClick={handleVerRango}>
+              Ver
+            </Button>
           </div>
-          <div className={styles.cardBody}>
-            <div className={styles.metricRow}>
-              <span className={styles.metricHighlight}>{textoEntendidosPrimera}</span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>No entendidos:</span>
-              <span className={styles.metricValue}>{resumen?.calidad.no_entendidos ?? 0}</span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Deshechos o corregidos después:</span>
-              <span className={styles.metricValue}>{resumen?.calidad.deshechos_o_corregidos ?? 0}</span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Errores de la IA:</span>
-              <span className={styles.metricValue}>{resumen?.calidad.errores_ia ?? 0}</span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Topes alcanzados:</span>
-              <span className={styles.metricValue}>{resumen?.calidad.topes ?? 0}</span>
-            </div>
-          </div>
+          {rangoError && (
+            <p className={styles.rangoError} role="alert">
+              {rangoError}
+            </p>
+          )}
         </div>
+      )}
+    </>
+  )
 
-        {/* Tarjeta 2: Costo de la IA */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Costo de la IA</h3>
-            <DollarSign size={16} className="text-primary" />
-          </div>
-          <div className={styles.cardBody}>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Total acumulado:</span>
-              <span className={styles.metricHighlight}>{formatMontoUsd(resumen?.costo.total_usd)}</span>
+  if (loading && !resumen) {
+    return (
+      <div className={styles.panelStack}>
+        {cabeceraPeriodo}
+        <AdminMonitorSkeleton />
+      </div>
+    )
+  }
+
+  if (error && !resumen) {
+    return (
+      <div className={styles.panelStack}>
+        {cabeceraPeriodo}
+        <div className={styles.sectionCard}>
+          <EmptyState
+            variant="compact"
+            icon={MessageSquare}
+            title={error}
+            actionLabel="Reintentar"
+            onActionClick={handleReintentar}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  const calidad = resumen?.calidad
+  const costo = resumen?.costo
+  const topesHoy = resumen?.topes_hoy
+  const salud = resumen?.salud
+  const salientes = resumen?.whatsapp_salientes
+
+  const pctEntendido = (calidad?.porcentaje_entendidos_primera ?? 0).toFixed(1).replace('.', ',')
+  const totalUsdNum = Number(costo?.total_usd) || 0
+  const openaiEstado = costo?.openai_estado ?? 'sin_conexion'
+  const openaiOk =
+    openaiEstado === 'ok' && costo?.openai_usd !== null && costo?.openai_usd !== undefined
+  const openaiUsdNum = openaiOk ? Number(costo?.openai_usd) || 0 : 0
+
+  const medianaMs = salud?.tiempo_respuesta_mediana_ms
+  const segundosMediana =
+    medianaMs !== null && medianaMs !== undefined
+      ? (medianaMs / 1000).toFixed(1).replace('.', ',')
+      : null
+
+  const summaryItems = [
+    {
+      label: 'Entendió a la primera',
+      value: `${pctEntendido}%`,
+      subValue: `${calidad?.entendidos_primera ?? 0} de ${calidad?.total ?? 0} mensajes`,
+    },
+    {
+      label: 'Costo de la IA',
+      value: openaiOk ? formatMonto(openaiUsdNum, 'USD') : formatMonto(totalUsdNum, 'USD'),
+      subValue: openaiOk
+        ? `según OpenAI · estimado ${formatMonto(totalUsdNum, 'USD')}`
+        : 'estimado por Argentum',
+    },
+    {
+      label: 'Mensajes recibidos',
+      value: String(calidad?.total ?? 0),
+      subValue: 'en el período',
+    },
+    {
+      label: 'Tiempo de respuesta',
+      value: segundosMediana ? `${segundosMediana} s` : '—',
+      subValue: 'la mitad tarda menos',
+    },
+  ]
+
+  const funcionesVisibles = NOMBRES_FUNCIONES.filter(
+    ({ key }) => Number(costo?.por_funcion?.[key] ?? 0) > 0
+  )
+  const sinUsuarioUsd = Number(costo?.sin_usuario_usd ?? 0)
+
+  let pieCostoOpenAi: string
+  if (openaiOk) {
+    pieCostoOpenAi = costo?.openai_hasta
+      ? `Según OpenAI, en este período: ${formatMonto(openaiUsdNum, 'USD')} (datos hasta el ${formatearDiaMes(costo.openai_hasta)}).`
+      : `Según OpenAI, en este período: ${formatMonto(openaiUsdNum, 'USD')}.`
+  } else if (openaiEstado === 'error') {
+    pieCostoOpenAi = 'No se pudo consultar OpenAI. Probá de nuevo más tarde.'
+  } else {
+    pieCostoOpenAi = 'Sin conexión con OpenAI: estos números son estimados.'
+  }
+
+  const wppFallados = salud?.wpp_fallados ?? 0
+  const wppInterrumpidos = salud?.wpp_interrumpidos ?? 0
+  const wppVencidos = salud?.wpp_vencidos ?? 0
+  const avisosSinEnviar = salud?.avisos_whatsapp_sin_enviar ?? 0
+  const sinProblemas =
+    wppFallados === 0 &&
+    wppInterrumpidos === 0 &&
+    wppVencidos === 0 &&
+    avisosSinEnviar === 0
+
+  const gastoHoyNum = Number(topesHoy?.gasto_hoy_usd) || 0
+  const presupuestoNum = Number(topesHoy?.presupuesto_usd) || 0
+  const pctHoyBarra = porcentajeBarra(gastoHoyNum, presupuestoNum)
+  const nivelHoy = nivelHoyVisual(topesHoy?.nivel ?? 'normal')
+
+  const cupoUsado = salientes?.mes.cupo_usado ?? 0
+  const cupoGratis = salientes?.mes.cupo_gratis ?? 0
+  const pctCupoBarra = porcentajeBarra(cupoUsado, cupoGratis)
+  const ultimos7Dias = (salientes?.por_dia ?? []).slice(-7)
+  const maxDiaSalientes = Math.max(1, ...ultimos7Dias.map((d) => d.total))
+  const topUsuariosMes = costo?.por_usuario_mes ?? []
+
+  return (
+    <div className={styles.panelStack}>
+      {cabeceraPeriodo}
+
+      <PageSummaryBar items={summaryItems} />
+
+      <div className={styles.columnas}>
+        <div className={styles.columna}>
+          <section className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionIconWrap}>
+                <MessageSquare size={18} />
+              </div>
+              <div className={styles.sectionHeaderText}>
+                <h3>Calidad</h3>
+              </div>
             </div>
 
-            {/* Desglose por función */}
-            <div className={styles.subList}>
-              {Object.entries(NOMBRES_FUNCIONES).map(([clave, nombre]) => {
-                const monto = resumen?.costo.por_funcion[clave] ?? 0
-                return (
-                  <div key={clave} className={styles.subItem}>
-                    <span>{nombre}:</span>
-                    <span className="font-semibold">{formatMontoUsd(monto)}</span>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Sin usuario si aplica */}
-            {resumen && Number(resumen.costo.sin_usuario_usd) > 0 && (
+            <div className={styles.metricRows}>
               <div className={styles.metricRow}>
-                <span className={styles.metricLabel}>Sin usuario:</span>
-                <span className={styles.metricValue}>{formatMontoUsd(resumen.costo.sin_usuario_usd)}</span>
+                <span className={styles.metricLabel}>No entendió</span>
+                <span className={styles.metricVal}>{calidad?.no_entendidos ?? 0}</span>
               </div>
-            )}
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Se deshizo o corrigió</span>
+                <span className={styles.metricVal}>{calidad?.deshechos_o_corregidos ?? 0}</span>
+              </div>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Errores de la IA</span>
+                <span className={styles.metricVal}>{calidad?.errores_ia ?? 0}</span>
+              </div>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Topes alcanzados</span>
+                <span className={styles.metricVal}>{calidad?.topes ?? 0}</span>
+              </div>
+            </div>
+          </section>
 
-            {/* Top 10 usuarios */}
-            {resumen && resumen.costo.por_usuario.length > 0 && (
-              <div className="flex flex-col gap-1 mt-2">
-                <span className="text-xs font-semibold text-[var(--text-2)]">Top usuarios de mayor costo:</span>
-                <div className={styles.subList}>
-                  {resumen.costo.por_usuario.map((u, i) => (
-                    <div key={u.usuario_id || i} className={styles.subItem}>
-                      <span className="truncate max-w-[170px]" title={u.email || u.usuario_id}>
-                        {u.email || u.usuario_id.slice(0, 8)}:
-                      </span>
-                      <span className="font-semibold">{formatMontoUsd(u.total_usd)}</span>
+          <section className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionIconWrap}>
+                <Activity size={18} />
+              </div>
+              <div className={styles.sectionHeaderText}>
+                <h3>Hoy</h3>
+              </div>
+            </div>
+
+            <div className={styles.progressSection}>
+              <span className={styles.progressTitle}>
+                {formatMonto(gastoHoyNum, 'USD')} de {formatMonto(presupuestoNum, 'USD')}
+              </span>
+              <div className={styles.barTrack}>
+                <div
+                  className={`${styles.barFill} ${
+                    nivelHoy.tono === 'mal'
+                      ? styles.barMal
+                      : nivelHoy.tono === 'aviso'
+                      ? styles.barAviso
+                      : styles.barPrimary
+                  }`}
+                  style={{ width: `${pctHoyBarra}%` }}
+                />
+              </div>
+              <span className={styles.estadoInline}>
+                <span
+                  className={`${styles.statusDot} ${claseDot(nivelHoy.tono)}`}
+                  aria-hidden="true"
+                />
+                <span>{nivelHoy.texto}</span>
+              </span>
+            </div>
+
+            <div className={styles.metricRows}>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Personas en el tope de mensajes</span>
+                <span className={styles.metricVal}>{topesHoy?.usuarios_tope_mensajes ?? 0}</span>
+              </div>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>En el tope de fotos y archivos</span>
+                <span className={styles.metricVal}>{topesHoy?.usuarios_tope_archivos ?? 0}</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div className={styles.columna}>
+          <section className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionIconWrap}>
+                <DollarSign size={18} />
+              </div>
+              <div className={styles.sectionHeaderText}>
+                <h3>Costo por función</h3>
+              </div>
+            </div>
+
+            {funcionesVisibles.length === 0 && sinUsuarioUsd <= 0 ? (
+              <p className={styles.emptySimple}>Sin consumo registrado en el período.</p>
+            ) : (
+              <div className={styles.metricRows}>
+                {funcionesVisibles.map(({ key, label }) => {
+                  const val = Number(costo?.por_funcion?.[key] ?? 0)
+                  return (
+                    <div key={key} className={styles.metricRow}>
+                      <span className={styles.metricLabel}>{label}</span>
+                      <span className={styles.metricVal}>{formatMonto(val, 'USD')}</span>
                     </div>
-                  ))}
-                </div>
+                  )
+                })}
+                {sinUsuarioUsd > 0 && (
+                  <div className={styles.metricRow}>
+                    <span className={styles.metricLabel}>Sin usuario</span>
+                    <span className={styles.metricVal}>{formatMonto(sinUsuarioUsd, 'USD')}</span>
+                  </div>
+                )}
               </div>
             )}
 
-            <span className={styles.leyendaFija}>Estimado por Argentum, no es la factura de OpenAI.</span>
-          </div>
-        </div>
+            <p className={styles.cardFootnote}>{pieCostoOpenAi}</p>
+          </section>
 
-        {/* Tarjeta 3: Topes de hoy */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Topes de hoy</h3>
-            <AlertTriangle size={16} className="text-primary" />
-          </div>
-          <div className={styles.cardBody}>
-            <div className={styles.metricRow}>
-              <span className={styles.metricHighlight}>
-                {`Gasto de hoy: ${formatMontoUsd(resumen?.topes_hoy.gasto_hoy_usd)} de ${formatMontoUsd(resumen?.topes_hoy.presupuesto_usd)}`}
-              </span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Estado de cuota global:</span>
-              <span className={`${styles.badge} ${estadoBadge.className}`}>{estadoBadge.label}</span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Personas en el tope de mensajes:</span>
-              <span className={styles.metricValue}>{resumen?.topes_hoy.usuarios_tope_mensajes ?? 0}</span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Personas en el tope de fotos y archivos:</span>
-              <span className={styles.metricValue}>{resumen?.topes_hoy.usuarios_tope_archivos ?? 0}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tarjeta 4: Salud */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Salud</h3>
-            <Activity size={16} className="text-primary" />
-          </div>
-          <div className={styles.cardBody}>
-            <div className={styles.metricRow}>
-              <span className={styles.metricValue}>{textoSaludTiempo}</span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Avisos por WhatsApp:</span>
-              <span className={styles.metricValue}>
-                {`${resumen?.salud.avisos_whatsapp_enviados ?? 0} enviados, ${resumen?.salud.avisos_whatsapp_sin_enviar ?? 0} sin enviar`}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tarjeta 5: Mensajes del bot */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>Mensajes del bot</h3>
-            <Send size={16} className="text-primary" />
-          </div>
-          <div className={styles.cardBody}>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Enviados este mes:</span>
-              <span className={styles.metricValue}>
-                {(resumen?.whatsapp_salientes?.mes.enviados ?? 0).toLocaleString('es-AR')}
-              </span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Cupo gratis de Meta:</span>
-              <span className={styles.metricValue}>
-                {`${(resumen?.whatsapp_salientes?.mes.cupo_usado ?? 0).toLocaleString('es-AR')} de ${(resumen?.whatsapp_salientes?.mes.cupo_gratis ?? 1000).toLocaleString('es-AR')} usados`}
-              </span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Cobrados por Meta este mes:</span>
-              <span className={styles.metricValue}>
-                {(resumen?.whatsapp_salientes?.mes.cobrados_meta ?? 0).toLocaleString('es-AR')}
-              </span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Sin dato de Meta todavía:</span>
-              <span className={styles.metricValue}>
-                {(resumen?.whatsapp_salientes?.mes.sin_dato_meta ?? 0).toLocaleString('es-AR')}
-              </span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Sin enviar este mes:</span>
-              <span className={styles.metricValue}>
-                {(resumen?.whatsapp_salientes?.mes.no_enviados ?? 0).toLocaleString('es-AR')}
-              </span>
-            </div>
-            <div className={styles.metricRow}>
-              <span className={styles.metricLabel}>Mensajes con más de una respuesta:</span>
-              <span className={styles.metricValue}>
-                {(resumen?.whatsapp_salientes?.entrantes_con_mas_de_una_respuesta ?? 0).toLocaleString('es-AR')}
-              </span>
+          <section className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionIconWrap}>
+                <Send size={18} />
+              </div>
+              <div className={styles.sectionHeaderText}>
+                <h3>Mensajes de Meta este mes</h3>
+              </div>
             </div>
 
-            {resumen?.whatsapp_salientes?.por_dia && resumen.whatsapp_salientes.por_dia.length > 0 && (
-              <div className={styles.subList}>
-                {resumen.whatsapp_salientes.por_dia.map((d) => (
-                  <div key={d.fecha} className={styles.subItem}>
-                    <span>
-                      {`${d.fecha}: ${d.total.toLocaleString('es-AR')} (respuestas ${d.respuestas.toLocaleString('es-AR')}, plantillas ${d.plantillas.toLocaleString('es-AR')}, otros ${d.otros.toLocaleString('es-AR')})`}
-                    </span>
+            <div className={styles.bigNumberBlock}>
+              <span className={styles.bigNumber}>
+                {formatearCantidad(salientes?.mes.enviados ?? 0)}
+              </span>
+              <span className={styles.bigCaption}>enviados</span>
+            </div>
+
+            <div className={styles.progressSection}>
+              <span className={styles.progressCaption}>
+                {formatearCantidad(cupoUsado)} de {formatearCantidad(cupoGratis)} gratis
+              </span>
+              <div className={styles.barTrack}>
+                <div
+                  className={`${styles.barFill} ${styles.barPrimary}`}
+                  style={{ width: `${pctCupoBarra}%` }}
+                />
+              </div>
+            </div>
+
+            <div className={styles.metricRows}>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Cobrados por Meta</span>
+                <span className={styles.metricVal}>{salientes?.mes.cobrados_meta ?? 0}</span>
+              </div>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Sin dato de Meta todavía</span>
+                <span className={styles.metricVal}>{salientes?.mes.sin_dato_meta ?? 0}</span>
+              </div>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Sin enviar</span>
+                <span className={styles.metricVal}>{salientes?.mes.no_enviados ?? 0}</span>
+              </div>
+              <div className={styles.metricRow}>
+                <span className={styles.metricLabel}>Con más de una respuesta</span>
+                <span className={styles.metricVal}>
+                  {salientes?.entrantes_con_mas_de_una_respuesta ?? 0}
+                </span>
+              </div>
+            </div>
+
+            {ultimos7Dias.length > 0 && (
+              <div className={styles.dailyBars}>
+                <span className={styles.subTitle}>Últimos 7 días</span>
+                {ultimos7Dias.map((d) => (
+                  <div key={d.fecha} className={styles.dailyBarRow}>
+                    <span className={styles.dailyFecha}>{formatearDiaMes(d.fecha)}</span>
+                    <div className={styles.barTrack}>
+                      <div
+                        className={`${styles.barFill} ${styles.barPrimary}`}
+                        style={{ width: `${porcentajeBarra(d.total, maxDiaSalientes)}%` }}
+                      />
+                    </div>
+                    <span className={styles.dailyCount}>{d.total}</span>
                   </div>
                 ))}
               </div>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Tabla de Conversaciones */}
-      <div className={styles.tableSection}>
-        <div className={styles.tableSectionHeader}>
-          <div className="flex flex-col gap-1">
-            <h3 className={styles.title}>Registro de Conversaciones</h3>
-            <span className={styles.subtitle}>
-              Listado detallado de mensajes entrantes y respuestas del asistente.
-            </span>
-          </div>
-
-          {/* Filtro por Categoría */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="filtro-categoria" className="text-xs font-semibold text-[var(--text-2)]">
-              Categoría:
-            </label>
-            <select
-              id="filtro-categoria"
-              className={styles.filterSelect}
-              value={categoriaFiltro}
-              onChange={(e) => handleCambioCategoria(e.target.value)}
-            >
-              <option value="">Todas</option>
-              <option value="entendido_primera">Entendidos a la primera</option>
-              <option value="no_entendido">No entendidos</option>
-              <option value="error_ia">Errores de la IA</option>
-              <option value="deshecho_o_corregido">Deshechos o corregidos</option>
-              <option value="correccion">Correcciones</option>
-              <option value="tope">Topes</option>
-            </select>
-          </div>
+          </section>
         </div>
 
-        <div className={styles.tableWrapper}>
-          {loadingTable ? (
-            <div className={styles.emptyMsg}>Cargando conversaciones...</div>
-          ) : !conversacionesData || conversacionesData.items.length === 0 ? (
-            <div className={styles.emptyMsg}>No hay conversaciones registradas en esta ventana.</div>
-          ) : (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>Fecha</th>
-                  <th className={styles.th}>Usuario</th>
-                  <th className={styles.th}>Tipo</th>
-                  <th className={styles.th}>Intent</th>
-                  <th className={styles.th}>Categoría</th>
-                  <th className={styles.th}>Tiempo</th>
-                  <th className={styles.th}>Error IA</th>
-                  <th className={styles.th}>Mensaje Usuario</th>
-                  <th className={styles.th}>Respuesta Bot</th>
-                </tr>
-              </thead>
-              <tbody>
-                {conversacionesData.items.map((c: ConversacionMonitorItem, idx: number) => {
-                  const nombreCat = NOMBRES_CATEGORIAS[c.categoria] || c.categoria
+        <div className={`${styles.columna} ${styles.columnaTercera}`}>
+          <section className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionIconWrap}>
+                <AlertTriangle size={18} />
+              </div>
+              <div className={styles.sectionHeaderText}>
+                <h3>Problemas</h3>
+              </div>
+            </div>
+
+            {sinProblemas ? (
+              <span className={styles.estadoInline}>
+                <span className={`${styles.statusDot} ${styles.dotBien}`} aria-hidden="true" />
+                <span>Sin problemas en el período.</span>
+              </span>
+            ) : (
+              <div className={styles.metricRows}>
+                <div className={styles.metricRow}>
+                  <span className={styles.metricLabel}>Mensajes que fallaron</span>
+                  <span className={styles.metricVal}>{wppFallados}</span>
+                </div>
+                <div className={styles.metricRow}>
+                  <span className={styles.metricLabel}>Cortados por un reinicio</span>
+                  <span className={styles.metricVal}>{wppInterrumpidos}</span>
+                </div>
+                <div className={styles.metricRow}>
+                  <span className={styles.metricLabel}>Sin respuesta después de 1 hora</span>
+                  <span className={styles.metricVal}>{wppVencidos}</span>
+                </div>
+                <div className={styles.metricRow}>
+                  <span className={styles.metricLabel}>Avisos sin enviar</span>
+                  <span className={styles.metricVal}>{avisosSinEnviar}</span>
+                </div>
+              </div>
+            )}
+          </section>
+
+          <section className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionIconWrap}>
+                <Users size={18} />
+              </div>
+              <div className={styles.sectionHeaderText}>
+                <h3>Los que más cuestan este mes</h3>
+              </div>
+            </div>
+
+            {topUsuariosMes.length === 0 ? (
+              <p className={styles.emptySimple}>Todavía no hay costos este mes.</p>
+            ) : (
+              <div className={styles.topUsersList}>
+                {topUsuariosMes.map((u) => {
+                  const msgTxt =
+                    u.whatsapp_cobrados === 1
+                      ? '1 mensaje cobrado'
+                      : `${u.whatsapp_cobrados} mensajes cobrados`
                   return (
-                    <tr key={`${c.usuario_id}_${c.fecha}_${idx}`} className={styles.row}>
-                      <td className={styles.td}>{formatearFechaArgentina(c.fecha)}</td>
-                      <td className={styles.td}>
-                        <div className="flex flex-col">
-                          <span className="font-semibold">{c.email || '—'}</span>
-                          <span className="text-[11px] text-[var(--text-2)]">{c.usuario_id.slice(0, 8)}</span>
-                        </div>
-                      </td>
-                      <td className={styles.td}>
-                        <span className="capitalize">{c.tipo_mensaje}</span>
-                      </td>
-                      <td className={styles.td}>
-                        <code className="text-xs bg-[var(--surface-alt)] px-1.5 py-0.5 rounded">
-                          {c.intent || '—'}
-                        </code>
-                      </td>
-                      <td className={styles.td}>
-                        <span className="text-xs font-semibold">{nombreCat}</span>
-                      </td>
-                      <td className={styles.td}>
-                        {c.tiempo_respuesta_ms !== null ? `${c.tiempo_respuesta_ms} ms` : '—'}
-                      </td>
-                      <td className={styles.td}>
-                        {c.error_ia ? (
-                          <span className="text-red-500 font-bold">Sí</span>
-                        ) : (
-                          <span className="text-[var(--text-2)]">No</span>
-                        )}
-                      </td>
-                      <td className={styles.td}>
-                        {!c.texto_visible ? (
-                          <span className={styles.textoOculto}>Texto oculto: no dio permiso</span>
-                        ) : (
-                          <div className={styles.msgBox}>
-                            <span className={styles.msgContent}>{c.mensaje_usuario || '—'}</span>
-                            {c.transcripcion && (
-                              <span className="text-[11px] text-[var(--text-2)]">
-                                <strong>Audio:</strong> {c.transcripcion}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                      <td className={styles.td}>
-                        {!c.texto_visible ? (
-                          <span className={styles.textoOculto}>Texto oculto: no dio permiso</span>
-                        ) : (
-                          <div className={styles.msgBox}>
-                            <span className={styles.msgContent}>{c.mensaje_bot || '—'}</span>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
+                    <button
+                      key={u.usuario_id}
+                      type="button"
+                      className={styles.topUserRow}
+                      onClick={() => onSelectUsuario(u.usuario_id)}
+                    >
+                      <div className={styles.topUserLeft}>
+                        <span className={styles.topUserName}>{u.nombre}</span>
+                        <span className={styles.topUserSub}>
+                          IA {formatMonto(u.ia_usd, 'USD')} · {msgTxt}
+                        </span>
+                      </div>
+                      <span className={styles.topUserTotal}>{formatMonto(u.total_ars, 'ARS')}</span>
+                    </button>
                   )
                 })}
-              </tbody>
-            </table>
-          )}
+              </div>
+            )}
+          </section>
         </div>
-
-        {/* Paginación */}
-        {conversacionesData && conversacionesData.total > 0 && (
-          <div className={styles.pagination}>
-            <span>
-              Página {pagina} de {totalPaginas} ({conversacionesData.total} conversaciones)
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className={styles.pageBtn}
-                onClick={() => handleCambioPagina(pagina - 1)}
-                disabled={pagina <= 1 || loadingTable}
-              >
-                Anterior
-              </button>
-              <button
-                type="button"
-                className={styles.pageBtn}
-                onClick={() => handleCambioPagina(pagina + 1)}
-                disabled={pagina >= totalPaginas || loadingTable}
-              >
-                Siguiente
-              </button>
-            </div>
-          </div>
-        )}
       </div>
+
+      <ConversacionesCard
+        convs={convs}
+        categoria={categoria}
+        pagina={pagina}
+        loadingConvs={loadingConvs}
+        onCambioCategoria={handleCambioCategoria}
+        onCambioPagina={handleCambioPagina}
+      />
     </div>
   )
 }
+
+export default MonitorWppPanel

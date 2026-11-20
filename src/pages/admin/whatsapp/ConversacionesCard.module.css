@@ -1,0 +1,253 @@
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sectionCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  box-shadow: var(--elevation-sm);
+}
+
+.convHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sectionIconWrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .sectionIconWrap {
+  color: #60a5fa;
+}
+
+.sectionHeaderText h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.convToolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.convFilterWrap {
+  width: 240px;
+  max-width: 100%;
+}
+
+.emptySimple {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.desktopTableWrap {
+  display: none;
+}
+
+.mobileList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 1024px) {
+  .desktopTableWrap {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .mobileList {
+    display: none;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.thRight {
+  text-align: right;
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--border);
+}
+
+.td {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text);
+  vertical-align: top;
+}
+
+.tdRight {
+  text-align: right;
+}
+
+.numCell {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.estadoInline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotBien {
+  background: var(--success);
+}
+
+.dotAviso {
+  background: var(--warning);
+}
+
+.dotMal {
+  background: var(--error);
+}
+
+.msgText {
+  display: block;
+  max-width: 240px;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.hiddenMsg {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-3);
+}
+
+.mobileConvItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.mobileConvTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mobileConvWho {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobileConvWhen {
+  font-size: 12px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.mobileConvMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.mobileConvMsg {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.mobileBotMsg {
+  margin-top: 4px;
+  color: var(--text-2);
+}
+
+.paginationFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.rangeText {
+  font-size: 13px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.paginationBtns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

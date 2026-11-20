@@ -496,7 +496,7 @@ Toda verificación o certificación responsive debe comprobar el correcto render
 | Suscripciones | Pendiente | Fases Futuras |
 | Dashboard | Pendiente | Fases Futuras |
 | Perfil | Pendiente | Fases Futuras |
-| Herramientas / Admin | Pendiente | Fases Futuras |
+| Herramientas / Admin | Completado | Rediseñado en fase_j3b_panel_admin |
 
 ---
 
@@ -613,7 +613,7 @@ Para certificar cero regresiones visuales accidentales, los cambios de cascada y
 1. **BalanceCard y SegmentedControl:** Conservan transiciones y selectores internos sin alterar.
 2. **Selectores Heredados (R12):** 17 definiciones de selectores de tabs/pills/toggles propios listadas para eventual migración tras validación en capturas reales.
 3. **Controles Propios de Administración:** La administración conserva sus dimensiones internas funcionales (altos, radios y paddings propios) sin unificación forzada a escala de app.
-4. **Declaraciones `!important` en Administración:** 53 declaraciones conservadas en 6 módulos de `pages/admin/**` y `AdminPage.module.css`.
+4. **Declaraciones `!important` en Administración:** 0 declaraciones restantes tras el rediseño de `fase_j3b_panel_admin`.
 5. **Desbordes Estáticos (B8):** Fondos ambientales decorativos de ancho amplio y contenedores de página con ancho natural gobernado por `AppLayout`.
 
 ---
@@ -893,6 +893,16 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
    - **Mobile-First:** En pantallas angostas (`<= 639px`), la píldora se oculta automáticamente para priorizar el espacio de los títulos, conservando el chevron táctil.
    - **Polimorfismo:** Admite `as="button"` (por defecto, accesible e interactivo) o `as="div"` (para cabeceras donde el bloque padre ya es un botón).
 3. **Candado Pre-Push (R38):** La regla automática **R38** en `scripts/audit-design-rules.mjs` previene la declaración de botones de colapso o clases ad-hoc (`toggleCollapseBtn`, etc.) en vistas o componentes, obligando al uso de `CollapseToggle`.
+
+---
+
+## 22. Admin (fase_j3b_panel_admin y fase_j3b2_panel_admin)
+- Celular (`<= 767px`): muestra solo Usuarios (lista y detalle); `PageSummaryBar`, pestañas, Diseño, WhatsApp e IA, Tareas y Registro solo desde `768px`.
+- Estética alineada con Perfil > Seguridad (`.sectionCard` y `.securityRow`) y `PageSummaryBar`; raíz `.page` según §17 sin `!important` ni siglas `ARS`/`USD` visibles.
+- Estados de uso con punto de 8 px + texto (`estadoVisual`) y `AvatarUsuario` como único `<img>` del admin (`referrerPolicy="no-referrer"` + iniciales).
+- `SegmentedControl` corta etiquetas de varias palabras entre palabras: usar espacio duro `\u00a0` y sin `fullWidth` hasta arreglar el componente; filtros en lista con container query (`@container`).
+- WhatsApp e IA en grilla de 2/3 columnas con alto propio (`align-items: start`) y tarjeta Conversaciones plegable con `ui/CollapseToggle`.
+- `IdentidadModal` con botones `fullWidth` y foco en email al eliminar; cargas con `SkeletonAdmin` y helpers en `src/utils/admin.ts`.
 
 
 

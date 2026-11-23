@@ -96,10 +96,20 @@ export function mostrarSelectorMoneda(
   return Boolean(usaDolares) || String(monedaPrincipal ?? '').toUpperCase() === 'USD';
 }
 
+export function monedaCompraPermitirse(
+  monedaForm?: 'ARS' | 'USD' | null,
+  monedaPrincipal?: string | null,
+): 'ARS' | 'USD' {
+  if (monedaForm === 'USD' || monedaForm === 'ARS') {
+    return monedaForm;
+  }
+  return String(monedaPrincipal ?? '').toUpperCase() === 'USD' ? 'USD' : 'ARS';
+}
+
 export function descripcionImporteMoneda(moneda: 'ARS' | 'USD'): string {
   return moneda === 'USD'
-    ? 'El importe en dólares a evaluar'
-    : 'El importe en pesos a evaluar';
+    ? 'Lo que sale, en dólares'
+    : 'Lo que sale, en pesos';
 }
 
 export function lineasSecundariasPermitirse(

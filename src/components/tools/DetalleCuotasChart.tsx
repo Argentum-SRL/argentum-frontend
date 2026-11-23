@@ -14,7 +14,7 @@ import styles from './ToolsComponents.module.css';
 
 interface TooltipPayloadItem {
   value: number;
-  payload: { mes: string; 'Cuota Nominal': number; 'Valor Real': number };
+  payload: { mes: string; 'Cuota que pagás': number; 'Valor Real': number };
 }
 
 interface CustomTooltipProps {
@@ -43,7 +43,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, formatVa
       <p className={styles.tooltipLabel}>{payload[0].payload.mes}</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, fontSize: 12 }}>
-          <span style={{ color: 'var(--text-3)' }}>Cuota nominal:</span>
+          <span style={{ color: 'var(--text-3)' }}>Cuota que pagás:</span>
           <strong style={{ color: 'var(--text)' }}>{formatValue(nominal)}</strong>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, fontSize: 12 }}>
@@ -87,7 +87,7 @@ export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
 
   const chartData = detallePorMes.map((item) => ({
     mes: `Mes ${item.mes}`,
-    'Cuota Nominal': item.cuota_nominal,
+    'Cuota que pagás': item.cuota_nominal,
     'Valor Real': item.cuota_valor_presente,
   }));
 
@@ -105,7 +105,7 @@ export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
     <div className={styles.chartContainer}>
       <h3 className={styles.chartTitle}>¿Cómo pierde valor cada cuota con el tiempo?</h3>
       <p className={styles.chartSubtitle}>
-        Comparación entre el valor nominal de la cuota y su valor real ajustado por inflación.
+        Cuánto pagás cada mes vs. cuánto vale en plata de hoy.
       </p>
 
       <div className={styles.chartWrapper}>
@@ -130,7 +130,7 @@ export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
               cursor={{ fill: 'var(--surface-alt)', opacity: 0.6 }}
             />
             <Legend iconSize={9} iconType="circle" wrapperStyle={{ fontSize: 11, paddingTop: 10, color: 'var(--text-2)' }} />
-            <Bar dataKey="Cuota Nominal" fill={nominalBarColor} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="Cuota que pagás" fill={nominalBarColor} radius={[4, 4, 0, 0]} />
             <Bar dataKey="Valor Real" fill={realBarColor} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>

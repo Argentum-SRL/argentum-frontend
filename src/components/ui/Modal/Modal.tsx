@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from '@/components/ui/icons'
 import styles from './Modal.module.css'
 
@@ -85,7 +86,7 @@ const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null
 
-  return (
+  const modalNode = (
     <div 
       className={`${styles.overlay} ${variant === 'sheet' ? styles.sheetOverlay : ''}`} 
       onClick={closeOnOverlayClick ? onClose : undefined}
@@ -151,6 +152,10 @@ const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   )
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalNode, document.body)
+    : modalNode
 }
 
 export default Modal

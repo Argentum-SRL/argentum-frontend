@@ -1,12 +1,14 @@
 import React from 'react';
 import { ArgentumCrescent } from '@/components/ui';
-import { formatMonto } from '@/utils/format';
+import { formatMonto, formatPorcentaje } from '@/utils/format';
 import type { ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import type { ConvenienciaFormState } from './ConvenienciaWizard';
+import { textoContadoResultado, esCuotaEstimadaFormulario } from './conveniencia';
 
 export interface ConvenienciaSidebarProps {
   currentStep: 1 | 2 | 3;
   formData: ConvenienciaFormState;
+  fixedMode?: 'total' | 'cuota';
   totalFinanciadoDisplay: number | null;
   cuotaEstimada: number | null;
   contadoBarPct: number;
@@ -21,6 +23,7 @@ export interface ConvenienciaSidebarProps {
 export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
   currentStep,
   formData,
+  fixedMode = 'cuota',
   totalFinanciadoDisplay,
   cuotaEstimada,
   contadoBarPct,
@@ -38,6 +41,14 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
     : (formData.moneda_cuotas === 'USD' ? 'USD' : 'ARS');
   const monedaResultado: 'ARS' | 'USD' =
     resultado?.moneda === 'USD' ? 'USD' : monedaCuotas;
+  const esCuotaEstimada = esCuotaEstimadaFormulario({
+    tiene_interes: formData.tiene_interes,
+    sin_interes: formData.sin_interes,
+    fixedMode,
+  });
+  const contadoDisplay = resultado
+    ? textoContadoResultado(resultado, monedaContado, monedaResultado)
+    : null;
 
   // Barras para el resultado: Contado vs Costo Real VPN
   const { contadoVpnBarPct, cuotasVpnBarPct } = (() => {
@@ -59,13 +70,13 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
           <div className="flex items-center gap-2">
             <ArgentumCrescent size={16} className="text-[#0D2045] dark:text-[#A8B4C5]" />
             <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Balance Financiero
+              Resumen
             </span>
           </div>
 
           {resultado ? (
             <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-2 py-0.5 rounded-full">
-              RESUMEN EJECUTIVO
+              RESULTADO
             </span>
           ) : currentStep === 1 ? (
             <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-full">
@@ -92,9 +103,11 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   Contado
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
-                  {formatMonto(resultado.precio_contado, monedaContado)}
+                  {contadoDisplay ? contadoDisplay.monto : formatMonto(resultado.precio_contado, monedaContado)}
                 </span>
-                <span className="text-[10.5px] text-slate-400">Desembolso hoy</span>
+                <span className="text-[10.5px] text-slate-400">
+                  {contadoDisplay ? contadoDisplay.subtitulo : 'Un pago hoy'}
+                </span>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
@@ -105,7 +118,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   {formatMonto(resultado.precio_total_cuotas_con_interes ?? totalFinanciadoDisplay ?? 0, monedaResultado)}
                 </span>
                 <span className="text-[10.5px] text-slate-400">
-                  {formData.cantidad_cuotas} pagos nominales
+                  {formData.cantidad_cuotas} cuotas
                 </span>
               </div>
             </div>
@@ -123,7 +136,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
 
               <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  {isCuotas ? 'Ahorro neto real' : isContado ? 'Sobrecosto neto' : 'Diferencia'}
+                  {isCuotas ? 'Te ahorrás' : isContado ? 'Pagás de más' : 'Diferencia'}
                 </span>
                 <span
                   className={`text-xs font-black tabular-nums ${
@@ -134,9 +147,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                       : 'text-slate-700 dark:text-slate-300'
                   }`}
                 >
-                  {isCuotas
-                    ? `+${formatMonto(resultado.ahorro_real, monedaResultado)}`
-                    : `-${formatMonto(resultado.ahorro_real, monedaResultado)}`}
+                  {formatMonto(Math.abs(resultado.ahorro_real), monedaResultado)}
                 </span>
               </div>
             </div>
@@ -144,7 +155,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
             {/* Comparativa visual de costo real */}
             <div className="flex flex-col gap-1.5 pt-1">
               <div className="flex justify-between text-[11px] font-medium text-slate-500">
-                <span>Comparativa en plata de hoy</span>
+                <span>En plata de hoy</span>
                 <span className="font-semibold text-slate-400">Hoy</span>
               </div>
               <div className="flex flex-col gap-2">
@@ -195,7 +206,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                     : '—'}
                 </span>
                 <span className="text-[10.5px] text-slate-400">
-                  {hasContado ? 'Referencia fijada' : 'Ingresá el precio'}
+                  {hasContado ? 'Precio de contado' : 'Ingresá el precio'}
                 </span>
               </div>
 
@@ -215,7 +226,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                 </span>
                 <span className="text-[10.5px] text-slate-400 truncate">
                   {cuotaEstimada !== null && formData.cantidad_cuotas
-                    ? `${formData.cantidad_cuotas}x de ~${formatMonto(cuotaEstimada, monedaCuotas)}`
+                    ? `${formData.cantidad_cuotas}x de ${esCuotaEstimada ? '~' : ''}${formatMonto(cuotaEstimada, monedaCuotas)}`
                     : 'Paso 2'}
                 </span>
               </div>
@@ -224,13 +235,13 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
             {/* Si ambos están completos (en paso 2 o 3 pre-cálculo) */}
             {hasContado && hasFinancingCondition && recargoNominal ? (
               <div className="flex flex-col gap-3 animate-fadeIn">
-                {/* Fila de Diferencia Nominal Bruta */}
+                {/* Fila de Diferencia Sin Inflación */}
                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60">
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                      Diferencia nominal
+                      Diferencia sin inflación
                     </span>
-                    <span className="text-[10.5px] text-slate-400">Recargo sin inflación</span>
+                    <span className="text-[10.5px] text-slate-400">Entre contado y cuotas</span>
                   </div>
                   <span
                     className={`text-xs font-extrabold tracking-tight tabular-nums ${
@@ -242,17 +253,17 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                     }`}
                   >
                     {recargoNominal.diff > 0
-                      ? `+${formatMonto(recargoNominal.diff, monedaCuotas)} (+${recargoNominal.pct.toFixed(1)}%)`
+                      ? `+${formatMonto(recargoNominal.diff, monedaCuotas)} (${formatPorcentaje(Math.abs(recargoNominal.pct), { signo: true })})`
                       : recargoNominal.diff < 0
-                      ? `-${formatMonto(Math.abs(recargoNominal.diff), monedaCuotas)} (${recargoNominal.pct.toFixed(1)}%)`
-                      : '$0 (Mismo importe)'}
+                      ? `-${formatMonto(Math.abs(recargoNominal.diff), monedaCuotas)} (-${formatPorcentaje(Math.abs(recargoNominal.pct))})`
+                      : `${formatMonto(0, monedaCuotas)} (Mismo precio)`}
                   </span>
                 </div>
 
                 {/* Barras comparativas proporcionales */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between text-[11px] font-medium text-slate-500">
-                    <span>Comparativa nominal</span>
+                    <span>Comparación sin inflación</span>
                     <span>{formData.cantidad_cuotas} pagos</span>
                   </div>
 
@@ -283,11 +294,11 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   </div>
                 </div>
 
-                {/* Nota orientativa sujeta a los supuestos del Paso 3 */}
+                {/* Nota aproximada para el Paso 3 */}
                 <div className="rounded-xl p-3 border bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/70 flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      Orientativo · Sujeto a supuestos
+                      Aproximado
                     </span>
                     <span className="text-[10px] font-semibold text-slate-400">
                       Paso 2 de 3
@@ -295,10 +306,10 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   </div>
                   <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-normal">
                     {recargoNominal.diff > 0
-                      ? `La financiación presenta un recargo comercial del +${recargoNominal.pct.toFixed(1)}% antes de inflación. En el Paso 3 se contrastará si la inflación proyectada licúa este costo frente al pago al contado.`
+                      ? `Las cuotas suman ${formatPorcentaje(Math.abs(recargoNominal.pct))} más que de contado. En el paso 3 vemos si la inflación lo compensa.`
                       : recargoNominal.diff < 0
-                      ? `La opción financiada tiene un descuento nominal del ${recargoNominal.pct.toFixed(1)}%. En el Paso 3 se evaluará el ahorro neto real a valor presente.`
-                      : `Sin recargo comercial nominal. En el Paso 3 se calculará el beneficio financiero de diferir pagos bajo la inflación esperada.`}
+                      ? `Las cuotas suman ${formatPorcentaje(Math.abs(recargoNominal.pct))} menos que de contado. En el paso 3 lo pasamos a plata de hoy.`
+                      : `Las cuotas suman lo mismo que de contado. En el paso 3 vemos cuánto te ahorrás con la inflación.`}
                   </p>
                 </div>
               </div>
@@ -306,20 +317,20 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
               /* Composición Útil para Paso 1 o Paso 2 incompleto (Evita vacíos y repetición de guiones) */
               <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/30 border border-slate-200/80 dark:border-slate-700/60 flex flex-col gap-2.5">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Criterio de evaluación financiera
+                  Cómo lo calculo
                 </span>
                 <ul className="flex flex-col gap-2 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed list-none p-0 m-0">
                   <li className="flex items-start gap-2">
                     <span className="font-bold text-slate-700 dark:text-slate-300">1.</span>
-                    <span><strong>Referencia base:</strong> el desembolso total al pagar hoy en un pago.</span>
+                    <span><strong>Contado:</strong> lo que pagás hoy en un solo pago.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold text-slate-700 dark:text-slate-300">2.</span>
-                    <span><strong>Oferta financiada:</strong> plazo de pagos y recargo comercial nominal.</span>
+                    <span><strong>Cuotas:</strong> cuántas son y cuánto suman.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold text-slate-700 dark:text-slate-300">3.</span>
-                    <span><strong>Inflación por mes:</strong> cuánto valen esas cuotas en plata de hoy.</span>
+                    <span><strong>Inflación:</strong> cuánto valen esas cuotas en plata de hoy.</span>
                   </li>
                 </ul>
               </div>
@@ -332,8 +343,8 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 shrink-0">
         <span className="text-[10.5px] text-slate-400 leading-normal block">
           {resultado
-            ? 'Cifras ajustadas por la inflación elegida a plata de hoy.'
-            : 'El balance se actualiza en tiempo real conforme completás los campos.'}
+            ? (monedaResultado === 'USD' ? 'Montos en dólares, sin inflación.' : 'Montos en plata de hoy.')
+            : 'Se actualiza mientras completás los datos.'}
         </span>
       </div>
     </aside>

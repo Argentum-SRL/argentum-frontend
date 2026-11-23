@@ -341,7 +341,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   );
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-1 sm:py-2 flex flex-col gap-4">
+    <div className="w-full max-w-[1440px] mx-auto px-0 sm:px-6 lg:px-8 py-1 sm:py-2 flex flex-col gap-4">
       {/* ─────────────────────────────────────────────────────────────
           EXPERIENCIA GUIADA HORIZONTAL DE 2 COLUMNAS (65% / 35%)
          ───────────────────────────────────────────────────────────── */}
@@ -386,6 +386,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
           <ConvenienciaSidebar
             currentStep={currentStep}
             formData={formData}
+            fixedMode={fixedMode}
             totalFinanciadoDisplay={totalFinanciadoDisplay}
             cuotaEstimada={cuotaEstimada}
             contadoBarPct={contadoBarPct}

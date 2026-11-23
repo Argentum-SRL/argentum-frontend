@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import toolsService from '@/services/toolsService';
 import type { InflacionEsperadaData, ConvenienciaResult, FinancialContext, CanAffordResult } from '@/types/tools';
 import { useSimularCuotas } from '@/hooks/useSimularCuotas';
@@ -9,11 +9,13 @@ import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { totalDesdeCuota } from '@/utils/ayudasEscritura';
 import { armarPedidoConveniencia } from '@/components/tools/conveniencia';
 
-export const useTools = () => {
+export const useTools = (
+  initialTab: 'conveniencia' | 'can-afford' | 'importar-resumen' = 'conveniencia'
+) => {
   const { usuario } = useAuth();
   const monedaDefault: 'ARS' | 'USD' = usuario?.moneda_principal === 'USD' ? 'USD' : 'ARS';
-  // Tab switching: 'conveniencia' is the Cuotas vs Contado tab, 'can-afford' is the "¿Me lo puedo permitir?" tab, 'importar-resumen' is the Importación de resúmenes tab
-  const [activeTab, setActiveTab] = useState<'conveniencia' | 'can-afford' | 'importar-resumen'>('conveniencia');
+  // Pestaña activa: inicia según la URL para cargar el contexto financiero si abre directo en can-afford
+  const [activeTab, setActiveTab] = useState<'conveniencia' | 'can-afford' | 'importar-resumen'>(initialTab);
   
   // ── Tab 1: Cuotas vs Contado ─────────────────────────────────────────────
   const [ipcData, setIpcData] = useState<InflacionEsperadaData | null>(null);
@@ -238,7 +240,10 @@ export const useTools = () => {
     }
   };
 
+  const financialContextPedidoRef = useRef(false);
+
   const loadFinancialContext = useCallback(async () => {
+    financialContextPedidoRef.current = true;
     setFinancialContextLoading(true);
     setFinancialContextError(false);
     try {
@@ -254,9 +259,17 @@ export const useTools = () => {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'can-afford' && !financialContext && !financialContextLoading && !financialContextError) {
+    if (
+      activeTab === 'can-afford' &&
+      !financialContext &&
+      !financialContextLoading &&
+      !financialContextError &&
+      !financialContextPedidoRef.current
+    ) {
       const timer = setTimeout(() => {
-        void loadFinancialContext();
+        if (!financialContextPedidoRef.current) {
+          void loadFinancialContext();
+        }
       }, 0);
       return () => clearTimeout(timer);
     }

@@ -49,7 +49,7 @@ export const GastoFijoForm: React.FC<GastoFijoFormProps> = ({
           allowDecimals
         />
         <span className={styles.inputDesc}>
-          El importe en pesos que pagarías cada mes
+          Lo que pagarías cada mes, en pesos
         </span>
       </div>
 

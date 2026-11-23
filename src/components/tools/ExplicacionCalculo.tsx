@@ -26,7 +26,7 @@ export const ExplicacionCalculo: React.FC = () => {
           </p>
           
           <p>
-            Para cada cuota, calculamos su <strong>"valor real a hoy"</strong> (o valor presente) usando la fórmula:
+            Para cada cuota, calculamos su <strong>"valor real a hoy"</strong> usando la fórmula:
           </p>
           
           <div className={styles.formulaBlock}>
@@ -35,7 +35,7 @@ export const ExplicacionCalculo: React.FC = () => {
           
           <p>
             Luego sumamos todos esos valores reales de cada mes y los comparamos con el precio de contado. 
-            Si la suma de las cuotas traídas a valor presente es menor que el precio de contado, entonces 
+            Si la suma de las cuotas traídas a plata de hoy es menor que el precio de contado, entonces 
             <strong> te conviene pagar en cuotas</strong> porque terminarás entregando menos valor real de dinero.
           </p>
 

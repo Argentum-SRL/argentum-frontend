@@ -14,10 +14,12 @@ import { MontoInput, AyudaBoton } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import type { InflacionEsperadaData, ConvenienciaResult as IConvenienciaResult } from '@/types/tools';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
-import { formatMonto } from '@/utils/format';
+import { formatMonto, formatPorcentaje } from '@/utils/format';
 import {
   TEXTO_AYUDA_CUOTAS_CONTADO,
   TEXTO_AYUDA_INFLACION_ESPERADA,
+  textoContadoResultado,
+  esCuotaEstimadaFormulario,
 } from './conveniencia';
 import type { ConvenienciaFormState } from './ConvenienciaWizard';
 import DetalleCuotasChart from './DetalleCuotasChart';
@@ -106,6 +108,14 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
     : (formData.moneda_cuotas === 'USD' ? 'USD' : 'ARS');
   const monedaResultado: 'ARS' | 'USD' =
     resultado?.moneda === 'USD' ? 'USD' : monedaCuotasEfectiva;
+  const esCuotaEstimada = esCuotaEstimadaFormulario({
+    tiene_interes: formData.tiene_interes,
+    sin_interes: formData.sin_interes,
+    fixedMode,
+  });
+  const contadoDisplay = resultado
+    ? textoContadoResultado(resultado, monedaContadoActual, monedaResultado)
+    : null;
 
   // ── Configuración del Veredicto Oficial (D-T2.3) ────────────────────────────
   const isCuotas = resultado?.resultado === 'conviene_cuotas';
@@ -138,20 +148,20 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
     : null;
 
   return (
-    <div className="w-full h-full flex flex-col justify-between rounded-2xl bg-white dark:bg-[#161B24] border border-slate-200/90 dark:border-slate-800 shadow-sm dark:shadow-none p-5 sm:p-6 lg:p-7 transition-all lg:overflow-hidden">
+    <div className="w-full h-full flex flex-col justify-between rounded-2xl bg-white dark:bg-[#161B24] border border-slate-200/90 dark:border-slate-800 shadow-sm dark:shadow-none p-4 sm:p-6 lg:p-7 transition-all lg:overflow-hidden">
       {/* ── Stepper Superior de Navegación ── */}
       <div className="pb-4 border-b border-slate-100 dark:border-slate-800/80 shrink-0">
-        <nav aria-label="Progreso de la simulación" className="w-full">
-          <ol className="flex items-center w-full justify-between gap-2 sm:gap-4">
+        <nav aria-label="Progreso de la simulación" className="w-full min-w-0">
+          <ol className={`flex items-center w-full justify-between min-w-0 ${styles.stepperList}`}>
             {/* Paso 1: Contado */}
-            <li className="flex-1 flex items-center">
+            <li className="flex-1 flex items-center min-w-0">
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
-                className="flex items-center gap-2 sm:gap-2.5 group cursor-pointer text-left outline-none"
+                className={`flex items-center group cursor-pointer text-left outline-none min-w-0 ${styles.stepperBtn}`}
               >
                 <span
-                  className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  className={`${styles.stepperCircle} rounded-full flex items-center justify-center font-bold transition-all shrink-0 ${
                     currentStep === 1
                       ? 'bg-[#0D2045] dark:bg-[#4878B8] text-white shadow-xs'
                       : currentStep > 1
@@ -161,12 +171,12 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 >
                   {currentStep > 1 ? '✓' : '1'}
                 </span>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none">
+                <div className="flex flex-col min-w-0">
+                  <span className={`${styles.stepperKicker} text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
                     Paso 1
                   </span>
                   <span
-                    className={`text-xs font-bold transition-colors mt-0.5 ${
+                    className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${
                       currentStep === 1
                         ? 'text-slate-900 dark:text-slate-100'
                         : currentStep > 1
@@ -179,7 +189,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 </div>
               </button>
               <div
-                className={`flex-1 h-0.5 mx-2.5 rounded-full transition-colors ${
+                className={`${styles.stepperLine} flex-1 h-0.5 rounded-full transition-colors ${
                   currentStep >= 2
                     ? 'bg-emerald-400 dark:bg-emerald-600'
                     : 'bg-slate-200 dark:bg-slate-800'
@@ -188,17 +198,17 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
             </li>
 
             {/* Paso 2: Financiación */}
-            <li className="flex-1 flex items-center">
+            <li className="flex-1 flex items-center min-w-0">
               <button
                 type="button"
                 disabled={!canGoToStep2}
                 onClick={() => canGoToStep2 && setCurrentStep(2)}
-                className={`flex items-center gap-2 sm:gap-2.5 group text-left outline-none ${
+                className={`flex items-center group text-left outline-none min-w-0 ${styles.stepperBtn} ${
                   canGoToStep2 ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
                 }`}
               >
                 <span
-                  className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  className={`${styles.stepperCircle} rounded-full flex items-center justify-center font-bold transition-all shrink-0 ${
                     currentStep === 2
                       ? 'bg-[#0D2045] dark:bg-[#4878B8] text-white shadow-xs'
                       : currentStep > 2
@@ -208,12 +218,12 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 >
                   {currentStep > 2 ? '✓' : '2'}
                 </span>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none">
+                <div className="flex flex-col min-w-0">
+                  <span className={`${styles.stepperKicker} text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
                     Paso 2
                   </span>
                   <span
-                    className={`text-xs font-bold transition-colors mt-0.5 ${
+                    className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${
                       currentStep === 2
                         ? 'text-slate-900 dark:text-slate-100'
                         : currentStep > 2
@@ -226,7 +236,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 </div>
               </button>
               <div
-                className={`flex-1 h-0.5 mx-2.5 rounded-full transition-colors ${
+                className={`${styles.stepperLine} flex-1 h-0.5 rounded-full transition-colors ${
                   currentStep >= 3
                     ? 'bg-emerald-400 dark:bg-emerald-600'
                     : 'bg-slate-200 dark:bg-slate-800'
@@ -235,17 +245,17 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
             </li>
 
             {/* Paso 3: Análisis */}
-            <li className="flex items-center">
+            <li className="flex items-center min-w-0 shrink-0">
               <button
                 type="button"
                 disabled={!canGoToStep3}
                 onClick={() => canGoToStep3 && setCurrentStep(3)}
-                className={`flex items-center gap-2 sm:gap-2.5 group text-left outline-none ${
+                className={`flex items-center group text-left outline-none min-w-0 ${styles.stepperBtn} ${
                   canGoToStep3 ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
                 }`}
               >
                 <span
-                  className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  className={`${styles.stepperCircle} rounded-full flex items-center justify-center font-bold transition-all shrink-0 ${
                     currentStep === 3 && resultado
                       ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800'
                       : currentStep === 3
@@ -255,12 +265,12 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 >
                   {currentStep === 3 && resultado ? '✓' : '3'}
                 </span>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none">
+                <div className="flex flex-col min-w-0">
+                  <span className={`${styles.stepperKicker} text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
                     Paso 3
                   </span>
                   <span
-                    className={`text-xs font-bold transition-colors mt-0.5 ${
+                    className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${
                       currentStep === 3
                         ? 'text-slate-900 dark:text-slate-100'
                         : 'text-slate-400 dark:text-slate-500'
@@ -292,10 +302,10 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
           >
             <div className="flex flex-col gap-1 text-center sm:text-left">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Referencia base
+                Contado
               </span>
               <div className="flex items-center justify-center sm:justify-start gap-2">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+                <h2 className="text-[clamp(16px,4.5vw,24px)] sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight whitespace-nowrap">
                   ¿Cuánto cuesta de contado?
                 </h2>
                 <AyudaBoton
@@ -304,7 +314,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 />
               </div>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-normal">
-                Empecemos por el importe que pagarías hoy en un único pago. Lo utilizaremos como base para contrastar cualquier alternativa financiada.
+                Poné lo que pagarías hoy en un solo pago.
               </p>
             </div>
 
@@ -340,7 +350,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 </span>
               )}
               <span className="text-xs text-slate-400">
-                Importe en un único pago en efectivo o transferencia inmediata.
+                En efectivo o transferencia, en un solo pago.
               </span>
             </div>
           </div>
@@ -362,13 +372,13 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
             {/* Header del Paso 2 */}
             <div className="flex flex-col gap-0.5 text-center sm:text-left">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Condiciones comerciales
+                Cuotas
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                 ¿Cómo te ofrecen financiarlo?
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-normal">
-                Indicá las cuotas y los importes informados por el comercio para calcular el recargo comercial.
+                Poné las cuotas que te ofrece el comercio.
               </p>
             </div>
 
@@ -501,7 +511,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       : fixedMode === 'total'
                       ? formData.cantidad_cuotas && formData.precio_total_cuotas
                         ? `Equivale a ${formData.cantidad_cuotas} cuotas de ~${formatMonto(cuotaEstimada || 0, monedaCuotasEfectiva)} cada una.`
-                        : 'Importe final sumando todas las cuotas.'
+                        : 'Total sumando todas las cuotas.'
                       : formData.cantidad_cuotas && cuotaInputValue
                       ? `${formData.cantidad_cuotas} cuotas de ${formatMonto(cuotaInputValue, monedaCuotasEfectiva)} son ${formatMonto(totalFinanciadoDisplay || 0, monedaCuotasEfectiva)}.`
                       : 'Es lo que te muestra el comercio por mes.'}
@@ -585,13 +595,13 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
               <>
                 <div className="flex flex-col gap-0.5 text-center sm:text-left">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                    Parámetros finales
+                    Inflación
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                     Comparemos las alternativas
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-normal">
-                    Revisá los supuestos económicos antes de analizar qué opción te conviene.
+                    Revisá los datos antes de ver qué te conviene.
                   </p>
                 </div>
 
@@ -603,7 +613,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                     </span>
                     <span className="text-slate-300 dark:text-slate-700">·</span>
                     <span>
-                      {formData.cantidad_cuotas}x de ~<strong>{formatMonto(cuotaEstimada || 0, monedaCuotasEfectiva)}</strong>
+                      {formData.cantidad_cuotas}x de {esCuotaEstimada ? '~' : ''}<strong>{formatMonto(cuotaEstimada || 0, monedaCuotasEfectiva)}</strong>
                     </span>
                     <span className="text-slate-300 dark:text-slate-700">·</span>
                     <span>
@@ -680,7 +690,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                             title="Volver a la inflación que se espera"
                           >
                             <RefreshCcw size={12} className={isRotating ? 'animate-spin' : ''} />
-                            <span>{ipcData.valor_mensual}%</span>
+                            <span>{formatPorcentaje(ipcData.valor_mensual)}</span>
                           </button>
                         )}
                       </div>
@@ -689,7 +699,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                         {ipcLoading
                           ? 'Cargando proyección mensual…'
                           : ipcData?.meses?.length
-                          ? `Usamos la proyección mes a mes (${ipcData.valor_mensual}% el primer mes).`
+                          ? `Usamos la proyección mes a mes (${formatPorcentaje(ipcData.valor_mensual)} el primer mes).`
                           : 'Usamos la proyección mensual automática.'}
                       </span>
                     )}
@@ -747,7 +757,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       </div>
                     ) : (
                       <span className="text-[11.5px] text-slate-400 leading-relaxed pt-1">
-                        Permite simular el saldo si conservás el dinero invertido mes a mes.
+                        Si dejás la plata invertida mientras pagás las cuotas.
                       </span>
                     )}
                   </div>
@@ -811,9 +821,11 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                           Precio de contado
                         </span>
                         <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
-                          {formatMonto(resultado.precio_contado, monedaContadoActual)}
+                          {contadoDisplay ? contadoDisplay.monto : formatMonto(resultado.precio_contado, monedaContadoActual)}
                         </span>
-                        <span className="text-[10.5px] text-slate-400">Un pago hoy</span>
+                        <span className="text-[10.5px] text-slate-400">
+                          {contadoDisplay ? contadoDisplay.subtitulo : 'Un pago hoy'}
+                        </span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
@@ -830,7 +842,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
 
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          {isCuotas ? 'Ahorro Real Neto' : isContado ? 'Sobrecosto Real' : 'Diferencia'}
+                          {isCuotas ? 'Te ahorrás' : isContado ? 'Pagás de más' : 'Diferencia'}
                         </span>
                         <span
                           className={`text-base sm:text-lg font-black mt-0.5 tabular-nums ${
@@ -841,10 +853,14 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                               : 'text-slate-700 dark:text-slate-300'
                           }`}
                         >
-                          {formatMonto(resultado.ahorro_real, monedaResultado)}
+                          {formatMonto(Math.abs(resultado.ahorro_real), monedaResultado)}
                         </span>
                         <span className="text-[10.5px] text-slate-400">
-                          {resultado.porcentaje_ahorro.toFixed(1)}% de variación
+                          {isCuotas
+                            ? `${formatPorcentaje(Math.abs(resultado.porcentaje_ahorro))} menos que de contado`
+                            : isContado
+                            ? `${formatPorcentaje(Math.abs(resultado.porcentaje_ahorro))} más que de contado`
+                            : `${formatPorcentaje(Math.abs(resultado.porcentaje_ahorro))} de diferencia`}
                         </span>
                       </div>
                     </div>

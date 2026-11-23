@@ -1,5 +1,6 @@
 import { cuotaDesdeTotal, totalDesdeCuota } from '@/utils/ayudasEscritura'
-import type { ConvenienciaRequest } from '@/types/tools'
+import { formatMonto } from '@/utils/format'
+import type { ConvenienciaRequest, ConvenienciaResult } from '@/types/tools'
 
 export interface DatosValorCuotaForm {
   precioContado: number | null
@@ -114,6 +115,53 @@ export function armarPedidoConveniencia(formData: DatosPedidoConveniencia): Conv
   }
 
   return pedido;
+}
+
+/**
+ * Devuelve el monto y subtítulo de la tarjeta de contado en el resultado.
+ * Cuando la moneda del contado difiere de la del resultado, muestra contado_usado
+ * en la moneda del resultado y abajo el monto original al dólar oficial.
+ */
+export function textoContadoResultado(
+  resultado: Pick<ConvenienciaResult, 'precio_contado' | 'contado_usado' | 'cotizacion'>,
+  monedaContado: 'ARS' | 'USD',
+  monedaResultado: 'ARS' | 'USD',
+): { monto: string; subtitulo: string } {
+  if (monedaContado !== monedaResultado) {
+    const montoConvertido = resultado.contado_usado ?? resultado.precio_contado
+    const montoOrigTxt = formatMonto(resultado.precio_contado, monedaContado)
+    const cot = resultado.cotizacion
+    if (cot !== null && cot !== undefined && Number.isFinite(cot)) {
+      const cotFmt = new Intl.NumberFormat('es-AR', {
+        minimumFractionDigits: Number.isInteger(cot) ? 0 : 2,
+        maximumFractionDigits: 2,
+      }).format(cot)
+      return {
+        monto: formatMonto(montoConvertido, monedaResultado),
+        subtitulo: `${montoOrigTxt} al dólar oficial ($${cotFmt})`,
+      }
+    }
+    return {
+      monto: formatMonto(montoConvertido, monedaResultado),
+      subtitulo: montoOrigTxt,
+    }
+  }
+  return {
+    monto: formatMonto(resultado.precio_contado, monedaContado),
+    subtitulo: 'Un pago hoy',
+  }
+}
+
+/**
+ * Indica si el valor de cada cuota mostrado es estimado (lleva "~")
+ * o si lo escribió la persona / es división sin interés.
+ */
+export function esCuotaEstimadaFormulario(datos: {
+  tiene_interes: boolean
+  sin_interes: boolean
+  fixedMode: 'total' | 'cuota'
+}): boolean {
+  return Boolean(datos.tiene_interes || (!datos.sin_interes && datos.fixedMode === 'total'))
 }
 
 declare module '@/types/tools' {

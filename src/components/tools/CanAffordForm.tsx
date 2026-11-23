@@ -217,7 +217,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
               {/* TNA */}
               {tieneInteres && (
                 <div className={`${styles.formGroup} ${styles.animateFadeIn}`}>
-                  <label className={styles.label} htmlFor="ca_tna">TNA (Tasa Nominal Anual)</label>
+                  <label className={styles.label} htmlFor="ca_tna">Tasa anual</label>
                   <div className={styles.tnaWrapper}>
                     <input
                       id="ca_tna"
@@ -234,7 +234,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
                     <span className={styles.tnaUnit}>%</span>
                   </div>
                   {tna !== '' && (isNaN(parseFloat(tna)) || parseFloat(tna) < 0.1 || parseFloat(tna) > 3000) && (
-                    <span className={styles.errorText}>TNA debe estar entre 0.1% y 3000%</span>
+                    <span className={styles.errorText}>La tasa tiene que estar entre 0,1% y 3.000%</span>
                   )}
                   <span className={styles.inputDesc}>Figura en la web del comercio. Ej: 120% anual.</span>
                 </div>

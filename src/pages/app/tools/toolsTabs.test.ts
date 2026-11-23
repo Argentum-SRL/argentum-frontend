@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { TOOL_TABS, pestanaInicial } from './toolsTabs';
 
@@ -18,5 +20,29 @@ describe('toolsTabs / pestanaInicial', () => {
       'can-afford',
       'importar-resumen',
     ]);
+  });
+
+  it('ToolsPage reutiliza SegmentedControl con la cápsula visual del navbar principal', () => {
+    const pageTsx = fs.readFileSync(path.resolve(__dirname, 'ToolsPage.tsx'), 'utf-8');
+    const pageCss = fs.readFileSync(path.resolve(__dirname, 'ToolsPage.module.css'), 'utf-8');
+    const appCss = fs.readFileSync(
+      path.resolve(__dirname, '../../../components/layout/AppLayout/AppLayout.module.css'),
+      'utf-8'
+    );
+
+    expect(pageTsx).toContain('SegmentedControl');
+    expect(pageTsx).toContain('navCapsule');
+    expect(pageTsx).toContain('controlsRowRef');
+    expect(appCss).toContain('border-radius: 26px');
+    expect(pageCss).toContain('border-radius: 26px');
+    expect(pageCss).toContain('#0b1729');
+    expect(pageCss).toContain('var(--elevation-md)');
+    expect(pageCss).toContain('backdrop-filter: blur(16px)');
+    expect(pageCss).toContain('border-radius: 18px');
+    expect(pageCss).toContain('overflow-x: auto');
+    expect(pageCss).toContain('max-width: none');
+    expect(pageCss).toContain('width: max-content');
+    expect(pageCss).toContain('white-space: nowrap');
+    expect(pageCss).toContain('prefers-reduced-motion: reduce');
   });
 });

@@ -49,3 +49,76 @@
     opacity: 1;
   }
 }
+
+/* ── Stepper Responsive (sin recortes en 320px / 375px; escritorio intacto) ── */
+.stepperList {
+  gap: 8px;
+}
+
+.stepperBtn {
+  gap: 8px;
+}
+
+.stepperCircle {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+
+.stepperKicker {
+  display: block;
+}
+
+.stepperLabel {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.stepperLine {
+  margin: 0 10px;
+}
+
+@media (min-width: 640px) {
+  .stepperList {
+    gap: 16px;
+  }
+
+  .stepperBtn {
+    gap: 12px;
+  }
+
+  .stepperCircle {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 479px) {
+  .stepperList {
+    gap: 2px;
+  }
+
+  .stepperBtn {
+    gap: 4px;
+  }
+
+  .stepperCircle {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+
+  .stepperKicker {
+    display: none;
+  }
+
+  .stepperLabel {
+    font-size: 11px;
+    margin-top: 0;
+  }
+
+  .stepperLine {
+    margin: 0 3px;
+    min-width: 4px;
+  }
+}

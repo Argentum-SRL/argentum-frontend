@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { HelpCircle, Repeat } from '@/components/ui/icons';
 import useTools from '@/hooks/useTools';
@@ -15,12 +15,12 @@ import toolsStyles from '@/components/tools/ToolsComponents.module.css';
 import { useAuth } from '@/hooks/useAuth';
 import ImportacionResumenSection from '@/components/tools/importacion/ImportacionResumenSection';
 import { formatMonto } from '@/utils/format';
-import { mostrarLinkGastoFijo } from '@/utils/permitirse';
+import { mostrarLinkGastoFijo, monedaCompraPermitirse } from '@/utils/permitirse';
 import { TOOL_TABS, pestanaInicial, type TabId } from './toolsTabs';
 
 export default function ToolsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { is_admin } = useAuth();
+  const { is_admin, usuario } = useAuth();
   const rawTab = searchParams.get('tab');
   const initialTab: TabId = pestanaInicial(rawTab, is_admin);
 
@@ -62,10 +62,16 @@ export default function ToolsPage() {
     abrirGastoFijo,
     volverGastoFijo,
     gastoFijoCalcular,
-  } = useTools();
+  } = useTools(initialTab);
 
   // Sync tab with URL if needed
   const currentTab: TabId = rawTab ? initialTab : pestanaInicial(activeTab, is_admin);
+
+  useEffect(() => {
+    if (currentTab !== activeTab) {
+      setActiveTab(currentTab);
+    }
+  }, [currentTab, activeTab, setActiveTab]);
 
   const handleSelectTab = (tabId: TabId) => {
     setActiveTab(tabId);
@@ -80,8 +86,10 @@ export default function ToolsPage() {
     }, { replace: true });
   };
 
-    // ── Mobile Carousel Auto-scroll ──────────────────────────────────────────
-  const controlsRowRef = useRef<HTMLDivElement>(null);
+  const visibleTabs = TOOL_TABS.filter(t => !t.adminOnly || is_admin);
+
+  // Mobile horizontal carousel auto-scroll (mismo patrón que Perfil)
+  const controlsRowRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const container = controlsRowRef.current;
@@ -97,29 +105,31 @@ export default function ToolsPage() {
     }
   }, [currentTab]);
 
-  const visibleTabs = TOOL_TABS.filter(t => !t.adminOnly || is_admin);
-
   return (
     <div className={pageStyles.page}>
 
-      {/* ── Page Header (Title on left, Tool Switcher on right) ─────────────── */}
+      {/* ── Page Header (Title on left, Navbar-style Pill Switcher on right) ─── */}
       <div className={pageStyles.header}>
         <div className={pageStyles.titleGroup}>
           <h1>Herramientas</h1>
           <p className={pageStyles.subtitle}>
-            Simuladores inteligentes y calculadoras para optimizar tus decisiones de compra
+            Para decidir antes de comprar.
           </p>
         </div>
 
-        <div ref={controlsRowRef} className={pageStyles.controlsRow}>
+        <nav
+          ref={controlsRowRef}
+          aria-label="Navegación de herramientas"
+          className={pageStyles.controlsRow}
+        >
           <SegmentedControl
-            className={pageStyles.navTrack}
+            className={pageStyles.navCapsule}
             options={visibleTabs.map((tab) => {
               const Icon = tab.icon;
               return {
                 value: tab.id,
                 label: tab.title,
-                icon: <Icon size={16} strokeWidth={2.2} />,
+                icon: <Icon size={18} strokeWidth={1.75} aria-hidden="true" />,
               };
             })}
             value={currentTab}
@@ -127,7 +137,7 @@ export default function ToolsPage() {
             ariaLabel="Herramientas disponibles"
             layout="inline"
           />
-        </div>
+        </nav>
       </div>
 
       {/* ── Tab: Cuotas vs Contado (Financial Wizard Shell) ─────────────── */}
@@ -235,7 +245,13 @@ export default function ToolsPage() {
                 title="¿Me lo puedo permitir?"
                 icon={HelpCircle}
                 items={[
-                  { label: 'Precio', value: formatMonto(canAffordForm.precio_total || 0, 'ARS') },
+                  {
+                    label: 'Precio',
+                    value: formatMonto(
+                      canAffordForm.precio_total || 0,
+                      monedaCompraPermitirse(canAffordForm.moneda, usuario?.moneda_principal),
+                    ),
+                  },
                   {
                     label: 'Modalidad',
                     value: canAffordForm.modo === 'contado' ? 'Contado' : `${canAffordForm.cantidad_cuotas} cuotas`

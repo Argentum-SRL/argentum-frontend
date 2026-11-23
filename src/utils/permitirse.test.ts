@@ -79,8 +79,8 @@ describe('permitirse utils', () => {
   });
 
   it('descripcionImporteMoneda diferencia Pesos y Dólares sin siglas en UI', () => {
-    expect(descripcionImporteMoneda('ARS')).toBe('El importe en pesos a evaluar');
-    expect(descripcionImporteMoneda('USD')).toBe('El importe en dólares a evaluar');
+    expect(descripcionImporteMoneda('ARS')).toBe('Lo que sale, en pesos');
+    expect(descripcionImporteMoneda('USD')).toBe('Lo que sale, en dólares');
   });
 
   it('lineasSecundariasPermitirse y lineasOrdenadasPermitirse respetan orden D-T1.7', () => {

@@ -4,7 +4,7 @@
   flex-direction: column;
   gap: 16px;
   min-height: 100%;
-  animation: pageFadeIn 0.35s ease both;
+  animation: pageFadeIn 0.35s ease backwards;
   width: 100%;
 }
 
@@ -15,8 +15,15 @@
 }
 
 @keyframes pageFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Header (Title left, Segmented Switcher right) ───────────────────────── */
@@ -25,19 +32,6 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
-}
-
-@media (min-width: 900px) {
-  .header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-  }
-
-  .controlsRow {
-    width: auto;
-  }
 }
 
 .titleGroup {
@@ -99,32 +93,25 @@
 /* Skeletons unificados en ConvenienciaWizardSkeleton */
 
 @media (prefers-reduced-motion: reduce) {
+
   .page,
-.skeleton {
+  .skeleton {
     transition: none;
     animation: none;
   }
 }
 
-/* ── Segmented Navigation Tabs (Carrusel en Móvil y Tablet) ── */
+/* ── Pill Navigation Container (Alineado al navbar principal + carrusel mobile como Perfil) ── */
 .controlsRow {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
   width: 100%;
+  min-width: 0;
   flex-shrink: 0;
   box-sizing: border-box;
-}
-
-.navTrack {
-  flex-wrap: nowrap;
-  width: max-content;
-  max-width: none;
-}
-
-.navTrack [role="radio"] {
-  flex-shrink: 0;
-  white-space: nowrap;
+  overflow: visible;
 }
 
 @supports (scrollbar-width: none) {
@@ -137,6 +124,96 @@
   display: none;
 }
 
+.controlsRow .navCapsule {
+  --tnp-bg: var(--surface);
+  --tnp-border: rgba(0, 0, 0, 0.10);
+  --tnp-text: color-mix(in srgb, var(--primary) 68%, transparent);
+  --tnp-text-hover: var(--primary);
+  --tnp-hover-bg: rgba(0, 0, 0, 0.05);
+  --tnp-active-bg: color-mix(in srgb, var(--primary) 12%, transparent);
+  --tnp-active-text: var(--primary);
+
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  width: max-content;
+  max-width: none;
+  background: var(--tnp-bg);
+  background-clip: padding-box;
+  border-radius: 26px;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--tnp-border);
+  box-shadow: var(--elevation-md);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-sizing: border-box;
+}
+
+:global([data-theme="dark"]) .controlsRow .navCapsule,
+:global(.dark) .controlsRow .navCapsule {
+  --tnp-bg: #0b1729;
+  --tnp-border: rgba(255, 255, 255, 0.08);
+  --tnp-text: rgba(255, 255, 255, 0.62);
+  --tnp-text-hover: rgba(255, 255, 255, 0.90);
+  --tnp-hover-bg: rgba(255, 255, 255, 0.07);
+  --tnp-active-bg: rgba(255, 255, 255, 0.14);
+  --tnp-active-text: #ffffff;
+}
+
+.controlsRow .navCapsule [role="radio"] {
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--tnp-text);
+  padding: 0 14px;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.controlsRow .navCapsule [role="radio"]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+:global([data-theme="dark"]) .controlsRow .navCapsule [role="radio"]:focus-visible,
+:global(.dark) .controlsRow .navCapsule [role="radio"]:focus-visible {
+  outline-color: var(--primary-light);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .controlsRow .navCapsule [role="radio"][aria-checked="false"]:hover {
+    background: var(--tnp-hover-bg);
+    color: var(--tnp-text-hover);
+  }
+}
+
+.controlsRow .navCapsule [role="radio"][aria-checked="true"] {
+  background: var(--tnp-active-bg);
+  color: var(--tnp-active-text);
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.controlsRow .navCapsule [role="radio"]:active {
+  background: var(--tnp-active-bg);
+}
+
+@media (pointer: coarse) {
+  .controlsRow .navCapsule [role="radio"] {
+    min-height: 40px;
+  }
+}
+
 @media (max-width: 768px) {
   .controlsRow {
     justify-content: flex-start;
@@ -146,16 +223,37 @@
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     gap: 8px;
-    padding: 2px 0 6px 0;
+    padding: 8px 4px 16px 4px;
     width: 100%;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
 
-  .controlsRow .navTrack {
+  .controlsRow .navCapsule {
     flex-wrap: nowrap;
     max-width: none;
     width: max-content;
     flex-shrink: 0;
+  }
+}
+
+@media (min-width: 900px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .controlsRow {
+    width: auto;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .controlsRow .navCapsule [role="radio"] {
+    transition: none;
   }
 }

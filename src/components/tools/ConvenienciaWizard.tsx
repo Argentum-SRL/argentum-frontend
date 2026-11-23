@@ -21,6 +21,8 @@ export interface ConvenienciaFormState {
   tna: string;
   hasCapitalToInvest: boolean;
   investmentTna: string;
+  moneda_contado: 'ARS' | 'USD';
+  moneda_cuotas: 'ARS' | 'USD';
 }
 
 export interface ConvenienciaWizardProps {
@@ -82,6 +84,8 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
       tna: '',
       hasCapitalToInvest: false,
       investmentTna: '',
+      moneda_contado: 'ARS',
+      moneda_cuotas: 'ARS',
     });
     setFixedMode('cuota');
     setCuotaInputValue(null);
@@ -261,7 +265,11 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
   const canGoToStep3 = canGoToStep2 && hasCuotas && hasFinancingCondition;
 
   const usarInflacionPropia = formData.usar_inflacion_propia || ipcError;
+  const cuotasEnDolares =
+    (formData.sin_interes ? formData.moneda_contado : formData.moneda_cuotas) === 'USD';
+
   const hasInflation =
+    cuotasEnDolares ||
     !usarInflacionPropia ||
     (Boolean(formData.inflacion_mensual) &&
       !isNaN(parseFloat(formData.inflacion_mensual)) &&
@@ -269,6 +277,7 @@ export const ConvenienciaWizard: React.FC<ConvenienciaWizardProps> = ({
       parseFloat(formData.inflacion_mensual) <= 100);
 
   const hasInvestmentCondition =
+    cuotasEnDolares ||
     !formData.hasCapitalToInvest ||
     (Boolean(formData.investmentTna) &&
       !isNaN(parseFloat(formData.investmentTna)) &&

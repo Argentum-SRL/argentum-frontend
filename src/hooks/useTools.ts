@@ -7,6 +7,7 @@ import { sileo } from 'sileo';
 import { getErrorMessage } from '@/utils/errorMessages';
 import { MAX_MONTO_INTEGRIDAD } from '@/lib/constants/limits';
 import { totalDesdeCuota } from '@/utils/ayudasEscritura';
+import { armarPedidoConveniencia } from '@/components/tools/conveniencia';
 
 export const useTools = () => {
   const { usuario } = useAuth();
@@ -31,6 +32,8 @@ export const useTools = () => {
     tna: string;
     hasCapitalToInvest: boolean;
     investmentTna: string;
+    moneda_contado: 'ARS' | 'USD';
+    moneda_cuotas: 'ARS' | 'USD';
   }>({
     precio_contado: null,
     precio_total_cuotas: null,
@@ -43,6 +46,8 @@ export const useTools = () => {
     tna: '',
     hasCapitalToInvest: false,
     investmentTna: '',
+    moneda_contado: 'ARS',
+    moneda_cuotas: 'ARS',
   });
   
   const [resultado, setResultado] = useState<ConvenienciaResult | null>(null);
@@ -97,6 +102,10 @@ export const useTools = () => {
     const cuotas = formData.cantidad_cuotas;
     const tiene_interes = formData.tiene_interes;
     const tnaVal = formData.tna;
+    const monedaCuotasEfectiva: 'ARS' | 'USD' = sinInteres
+      ? formData.moneda_contado
+      : formData.moneda_cuotas;
+    const cuotasEnDolares = monedaCuotasEfectiva === 'USD';
     
     if (contado === null || isNaN(contado) || contado <= 0) {
       sileo.error({ title: 'Ingresá un precio de contado mayor a 0.' });
@@ -123,7 +132,11 @@ export const useTools = () => {
       sileo.error({ title: 'El precio en cuotas es demasiado alto. Revisá el número.' });
       return false;
     }
-    if (usarInflacionPropia && (isNaN(inflacion) || inflacion < 0 || inflacion > 100)) {
+    if (
+      !cuotasEnDolares &&
+      usarInflacionPropia &&
+      (isNaN(inflacion) || inflacion < 0 || inflacion > 100)
+    ) {
       sileo.error({ title: 'La inflación por mes tiene que ser entre 0% y 100%.' });
       return false;
     }
@@ -134,10 +147,10 @@ export const useTools = () => {
         return false;
       }
     }
-    if (formData.hasCapitalToInvest) {
+    if (!cuotasEnDolares && formData.hasCapitalToInvest) {
       const parsedInvTna = parseFloat(formData.investmentTna);
       if (isNaN(parsedInvTna) || parsedInvTna < 0.1 || parsedInvTna > 3000) {
-                sileo.error({
+        sileo.error({
           title: 'Ingresá una tasa de la inversión de entre 0,1% y 3.000% por año.',
         });
         return false;
@@ -146,20 +159,11 @@ export const useTools = () => {
     
     setCalculando(true);
     try {
-      const res = await toolsService.calcularConveniencia({
-        precio_contado: contado,
-        precio_total_cuotas:
-          tiene_interes || sinInteres || valorCuota !== null || cuotasTotal === null
-            ? undefined
-            : cuotasTotal,
-        valor_cuota: !tiene_interes && !sinInteres && valorCuota !== null ? valorCuota : undefined,
-        sin_interes: !tiene_interes && sinInteres ? true : undefined,
-        cantidad_cuotas: cuotas,
-        inflacion_mensual: usarInflacionPropia ? inflacion : undefined,
-        tiene_interes,
-        tna: tiene_interes ? parseFloat(tnaVal) : undefined,
-        tna_billetera_inversion: formData.hasCapitalToInvest ? parseFloat(formData.investmentTna) : undefined
+      const pedido = armarPedidoConveniencia({
+        ...formData,
+        ipcError,
       });
+      const res = await toolsService.calcularConveniencia(pedido);
       setResultado(res);
       sileo.success({ title: 'Cálculo listo.' });
       return true;

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   resolverValorCuotaFormulario,
   resolverTotalCuotasFormulario,
+  armarPedidoConveniencia,
   TEXTO_AYUDA_INFLACION_ESPERADA,
   TEXTO_AYUDA_CUOTAS_CONTADO,
 } from './conveniencia'
@@ -171,5 +172,58 @@ describe('Textos de pantalla T3 sin tecnicismos ni primera persona', () => {
         expect(rx.test(texto), `Palabra prohibida "${palabra}" en "${texto}"`).toBe(false)
       }
     }
+  })
+})
+
+describe('armarPedidoConveniencia (D-V1.7)', () => {
+  const baseForm = {
+    precio_contado: 1000,
+    precio_total_cuotas: null,
+    valor_cuota: 130000,
+    sin_interes: false,
+    cantidad_cuotas: 12,
+    inflacion_mensual: '3',
+    usar_inflacion_propia: true,
+    tiene_interes: false,
+    tna: '',
+    hasCapitalToInvest: true,
+    investmentTna: '40',
+    moneda_contado: 'USD' as const,
+    moneda_cuotas: 'ARS' as const,
+  }
+
+  it('envía moneda_contado USD y moneda_cuotas ARS con contado en dólares y cuotas en pesos', () => {
+    const req = armarPedidoConveniencia(baseForm)
+    expect(req.moneda_contado).toBe('USD')
+    expect(req.moneda_cuotas).toBe('ARS')
+    expect(req.inflacion_mensual).toBe(3)
+    expect(req.tna_billetera_inversion).toBe(40)
+  })
+
+  it('con "Sin interés" fuerza moneda_cuotas igual a moneda_contado', () => {
+    const req = armarPedidoConveniencia({
+      ...baseForm,
+      valor_cuota: null,
+      sin_interes: true,
+      moneda_contado: 'USD',
+      moneda_cuotas: 'ARS',
+    })
+    expect(req.moneda_contado).toBe('USD')
+    expect(req.moneda_cuotas).toBe('USD')
+    expect(req.inflacion_mensual).toBeUndefined()
+    expect(req.tna_billetera_inversion).toBeUndefined()
+  })
+
+  it('con cuotas en dólares omite inflacion_mensual y tna_billetera_inversion', () => {
+    const req = armarPedidoConveniencia({
+      ...baseForm,
+      moneda_contado: 'ARS',
+      moneda_cuotas: 'USD',
+      valor_cuota: 100,
+    })
+    expect(req.moneda_contado).toBe('ARS')
+    expect(req.moneda_cuotas).toBe('USD')
+    expect(req.inflacion_mensual).toBeUndefined()
+    expect(req.tna_billetera_inversion).toBeUndefined()
   })
 })

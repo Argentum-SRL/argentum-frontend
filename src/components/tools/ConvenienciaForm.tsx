@@ -26,6 +26,11 @@ import styles from './ConvenienciaForm.module.css';
 
 const QUICK_CUOTAS = [3, 6, 12, 18, 24, 36];
 
+const MONEDA_OPTIONS: { value: 'ARS' | 'USD'; label: string }[] = [
+  { value: 'ARS', label: 'Pesos' },
+  { value: 'USD', label: 'Dólares' },
+];
+
 export interface ConvenienciaFormProps {
   currentStep: 1 | 2 | 3;
   setCurrentStep: (step: 1 | 2 | 3) => void;
@@ -94,6 +99,13 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
     formData.precio_contado !== null && formData.precio_contado > MAX_MONTO_INTEGRIDAD;
   const isCuotasExceeded =
     formData.precio_total_cuotas !== null && formData.precio_total_cuotas > MAX_MONTO_INTEGRIDAD;
+
+  const monedaContadoActual: 'ARS' | 'USD' = formData.moneda_contado === 'USD' ? 'USD' : 'ARS';
+  const monedaCuotasEfectiva: 'ARS' | 'USD' = formData.sin_interes
+    ? monedaContadoActual
+    : (formData.moneda_cuotas === 'USD' ? 'USD' : 'ARS');
+  const monedaResultado: 'ARS' | 'USD' =
+    resultado?.moneda === 'USD' ? 'USD' : monedaCuotasEfectiva;
 
   // ── Configuración del Veredicto Oficial (D-T2.3) ────────────────────────────
   const isCuotas = resultado?.resultado === 'conviene_cuotas';
@@ -297,12 +309,20 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
             </div>
 
             <div className="flex flex-col gap-2 pt-1">
-              <label
-                htmlFor="conv_precio_contado"
-                className="text-xs font-bold text-slate-700 dark:text-slate-300"
-              >
-                Precio de contado
-              </label>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label
+                  htmlFor="conv_precio_contado"
+                  className="text-xs font-bold text-slate-700 dark:text-slate-300"
+                >
+                  Precio de contado
+                </label>
+                <SegmentedControl<'ARS' | 'USD'>
+                  options={MONEDA_OPTIONS}
+                  value={monedaContadoActual}
+                  onChange={(v) => handleChange('moneda_contado', v)}
+                  ariaLabel="Moneda del precio de contado"
+                />
+              </div>
               <MontoInput
                 id="conv_precio_contado"
                 className="w-full"
@@ -430,7 +450,15 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                     >
                       {fixedMode === 'total' ? 'Total en cuotas' : 'Valor de cada cuota'}
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {!formData.sin_interes && (
+                        <SegmentedControl<'ARS' | 'USD'>
+                          options={MONEDA_OPTIONS}
+                          value={monedaCuotasEfectiva}
+                          onChange={(v) => handleChange('moneda_cuotas', v)}
+                          ariaLabel="Moneda de las cuotas"
+                        />
+                      )}
                       <button
                         type="button"
                         onClick={() => handleChange('sin_interes', !formData.sin_interes)}
@@ -469,24 +497,32 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   )}
                   <span className="text-xs text-slate-500 dark:text-slate-400">
                     {formData.sin_interes && cuotaEstimada !== null && formData.cantidad_cuotas
-                      ? `${formData.cantidad_cuotas} cuotas sin interés de ${formatMonto(cuotaEstimada, 'ARS')} cada una.`
+                      ? `${formData.cantidad_cuotas} cuotas sin interés de ${formatMonto(cuotaEstimada, monedaCuotasEfectiva)} cada una.`
                       : fixedMode === 'total'
                       ? formData.cantidad_cuotas && formData.precio_total_cuotas
-                        ? `Equivale a ${formData.cantidad_cuotas} cuotas de ~${formatMonto(cuotaEstimada || 0, 'ARS')} cada una.`
+                        ? `Equivale a ${formData.cantidad_cuotas} cuotas de ~${formatMonto(cuotaEstimada || 0, monedaCuotasEfectiva)} cada una.`
                         : 'Importe final sumando todas las cuotas.'
                       : formData.cantidad_cuotas && cuotaInputValue
-                      ? `${formData.cantidad_cuotas} cuotas de ${formatMonto(cuotaInputValue, 'ARS')} son ${formatMonto(totalFinanciadoDisplay || 0, 'ARS')}.`
+                      ? `${formData.cantidad_cuotas} cuotas de ${formatMonto(cuotaInputValue, monedaCuotasEfectiva)} son ${formatMonto(totalFinanciadoDisplay || 0, monedaCuotasEfectiva)}.`
                       : 'Es lo que te muestra el comercio por mes.'}
                   </span>
                 </div>
               ) : (
                 <div className="flex flex-col gap-1.5">
-                  <label
-                    className="text-xs font-bold text-slate-700 dark:text-slate-300"
-                    htmlFor="conv_tna"
-                  >
-                    Tasa anual (si la sabés)
-                  </label>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label
+                      className="text-xs font-bold text-slate-700 dark:text-slate-300"
+                      htmlFor="conv_tna"
+                    >
+                      Tasa anual (si la sabés)
+                    </label>
+                    <SegmentedControl<'ARS' | 'USD'>
+                      options={MONEDA_OPTIONS}
+                      value={monedaCuotasEfectiva}
+                      onChange={(v) => handleChange('moneda_cuotas', v)}
+                      ariaLabel="Moneda de las cuotas"
+                    />
+                  </div>
                   <div className="flex items-stretch h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
                     <input
                       id="conv_tna"
@@ -516,8 +552,8 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                     {cuotaEstimada !== null && formData.cantidad_cuotas
                       ? `Quedan ${formData.cantidad_cuotas} cuotas de ~${formatMonto(
                           cuotaEstimada,
-                          'ARS'
-                        )}${totalFinanciadoDisplay !== null ? ` (Total: ${formatMonto(totalFinanciadoDisplay, 'ARS')})` : ''}`
+                          monedaCuotasEfectiva
+                        )}${totalFinanciadoDisplay !== null ? ` (Total: ${formatMonto(totalFinanciadoDisplay, monedaCuotasEfectiva)})` : ''}`
                       : 'Calcula el valor aproximado de cada cuota.'}
                   </span>
                 </div>
@@ -563,15 +599,15 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-800 dark:text-slate-200">
                     <span>
-                      Contado: <strong>{formatMonto(formData.precio_contado || 0, 'ARS')}</strong>
+                      Contado: <strong>{formatMonto(formData.precio_contado || 0, monedaContadoActual)}</strong>
                     </span>
                     <span className="text-slate-300 dark:text-slate-700">·</span>
                     <span>
-                      {formData.cantidad_cuotas}x de ~<strong>{formatMonto(cuotaEstimada || 0, 'ARS')}</strong>
+                      {formData.cantidad_cuotas}x de ~<strong>{formatMonto(cuotaEstimada || 0, monedaCuotasEfectiva)}</strong>
                     </span>
                     <span className="text-slate-300 dark:text-slate-700">·</span>
                     <span>
-                      Total: <strong>{formatMonto(totalFinanciadoDisplay || 0, 'ARS')}</strong>
+                      Total: <strong>{formatMonto(totalFinanciadoDisplay || 0, monedaCuotasEfectiva)}</strong>
                     </span>
                   </div>
                   <button
@@ -584,7 +620,8 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   </button>
                 </div>
 
-                {/* Grilla de Supuestos Económicos */}
+                {/* Grilla de Supuestos Económicos (oculta con cuotas en dólares, D-V1.7) */}
+                {monedaCuotasEfectiva !== 'USD' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   {/* Supuesto 1: Inflación esperada vs propia (D-T2.6) */}
                   <div className="flex flex-col gap-2">
@@ -715,6 +752,11 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                     )}
                   </div>
                 </div>
+                ) : (
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 text-xs text-slate-600 dark:text-slate-300">
+                    En dólares no hay inflación que achique las cuotas.
+                  </div>
+                )}
               </>
             ) : (
               /* Si el cálculo ya fue realizado: ALTERNANCIA ENTRE RESULTADO Y GRÁFICO (MISMO ESPACIO) */
@@ -749,6 +791,16 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                             {verdictConfig.line3}
                           </p>
                         )}
+                        {resultado?.linea_billetera && (
+                          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            {resultado.linea_billetera}
+                          </p>
+                        )}
+                        {resultado?.linea_cotizacion && (
+                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                            {resultado.linea_cotizacion}
+                          </p>
+                        )}
                       </div>
                     )}
 
@@ -759,7 +811,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                           Precio de contado
                         </span>
                         <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
-                          {formatMonto(resultado.precio_contado, 'ARS')}
+                          {formatMonto(resultado.precio_contado, monedaContadoActual)}
                         </span>
                         <span className="text-[10.5px] text-slate-400">Un pago hoy</span>
                       </div>
@@ -769,9 +821,11 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                           En plata de hoy
                         </span>
                         <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
-                          {formatMonto(resultado.costo_real_cuotas, 'ARS')}
+                          {formatMonto(resultado.costo_real_cuotas, monedaResultado)}
                         </span>
-                        <span className="text-[10.5px] text-slate-400">Con la inflación elegida</span>
+                        <span className="text-[10.5px] text-slate-400">
+                          {monedaResultado === 'USD' ? 'En dólares' : 'Con la inflación elegida'}
+                        </span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
@@ -787,7 +841,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                               : 'text-slate-700 dark:text-slate-300'
                           }`}
                         >
-                          {formatMonto(resultado.ahorro_real, 'ARS')}
+                          {formatMonto(resultado.ahorro_real, monedaResultado)}
                         </span>
                         <span className="text-[10.5px] text-slate-400">
                           {resultado.porcentaje_ahorro.toFixed(1)}% de variación

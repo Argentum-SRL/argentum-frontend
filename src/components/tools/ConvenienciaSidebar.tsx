@@ -32,11 +32,17 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
   const hasContado = formData.precio_contado !== null && formData.precio_contado > 0;
   const isCuotas = resultado?.resultado === 'conviene_cuotas';
   const isContado = resultado?.resultado === 'conviene_contado';
+  const monedaContado: 'ARS' | 'USD' = formData.moneda_contado === 'USD' ? 'USD' : 'ARS';
+  const monedaCuotas: 'ARS' | 'USD' = formData.sin_interes
+    ? monedaContado
+    : (formData.moneda_cuotas === 'USD' ? 'USD' : 'ARS');
+  const monedaResultado: 'ARS' | 'USD' =
+    resultado?.moneda === 'USD' ? 'USD' : monedaCuotas;
 
   // Barras para el resultado: Contado vs Costo Real VPN
   const { contadoVpnBarPct, cuotasVpnBarPct } = (() => {
     if (!resultado) return { contadoVpnBarPct: 0, cuotasVpnBarPct: 0 };
-    const pContado = resultado.precio_contado;
+    const pContado = resultado.contado_usado ?? resultado.precio_contado;
     const pVpn = resultado.costo_real_cuotas;
     const max = Math.max(pContado, pVpn, 1);
     return {
@@ -86,7 +92,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   Contado
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
-                  {formatMonto(resultado.precio_contado, 'ARS')}
+                  {formatMonto(resultado.precio_contado, monedaContado)}
                 </span>
                 <span className="text-[10.5px] text-slate-400">Desembolso hoy</span>
               </div>
@@ -96,7 +102,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   Total Cuotas
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
-                  {formatMonto(resultado.precio_total_cuotas_con_interes ?? totalFinanciadoDisplay ?? 0, 'ARS')}
+                  {formatMonto(resultado.precio_total_cuotas_con_interes ?? totalFinanciadoDisplay ?? 0, monedaResultado)}
                 </span>
                 <span className="text-[10.5px] text-slate-400">
                   {formData.cantidad_cuotas} pagos nominales
@@ -111,7 +117,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   En plata de hoy
                 </span>
                 <span className="text-xs font-bold text-slate-900 dark:text-slate-100 tabular-nums">
-                  {formatMonto(resultado.costo_real_cuotas, 'ARS')}
+                  {formatMonto(resultado.costo_real_cuotas, monedaResultado)}
                 </span>
               </div>
 
@@ -129,8 +135,8 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   }`}
                 >
                   {isCuotas
-                    ? `+${formatMonto(resultado.ahorro_real, 'ARS')}`
-                    : `-${formatMonto(resultado.ahorro_real, 'ARS')}`}
+                    ? `+${formatMonto(resultado.ahorro_real, monedaResultado)}`
+                    : `-${formatMonto(resultado.ahorro_real, monedaResultado)}`}
                 </span>
               </div>
             </div>
@@ -185,7 +191,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
                   {formData.precio_contado !== null && hasContado
-                    ? formatMonto(formData.precio_contado, 'ARS')
+                    ? formatMonto(formData.precio_contado, monedaContado)
                     : '—'}
                 </span>
                 <span className="text-[10.5px] text-slate-400">
@@ -205,11 +211,11 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   Financiación
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
-                  {totalFinanciadoDisplay != null ? formatMonto(totalFinanciadoDisplay, 'ARS') : '—'}
+                  {totalFinanciadoDisplay != null ? formatMonto(totalFinanciadoDisplay, monedaCuotas) : '—'}
                 </span>
                 <span className="text-[10.5px] text-slate-400 truncate">
                   {cuotaEstimada !== null && formData.cantidad_cuotas
-                    ? `${formData.cantidad_cuotas}x de ~${formatMonto(cuotaEstimada, 'ARS')}`
+                    ? `${formData.cantidad_cuotas}x de ~${formatMonto(cuotaEstimada, monedaCuotas)}`
                     : 'Paso 2'}
                 </span>
               </div>
@@ -236,9 +242,9 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                     }`}
                   >
                     {recargoNominal.diff > 0
-                      ? `+${formatMonto(recargoNominal.diff, 'ARS')} (+${recargoNominal.pct.toFixed(1)}%)`
+                      ? `+${formatMonto(recargoNominal.diff, monedaCuotas)} (+${recargoNominal.pct.toFixed(1)}%)`
                       : recargoNominal.diff < 0
-                      ? `-${formatMonto(Math.abs(recargoNominal.diff), 'ARS')} (${recargoNominal.pct.toFixed(1)}%)`
+                      ? `-${formatMonto(Math.abs(recargoNominal.diff), monedaCuotas)} (${recargoNominal.pct.toFixed(1)}%)`
                       : '$0 (Mismo importe)'}
                   </span>
                 </div>

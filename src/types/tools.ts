@@ -30,16 +30,23 @@ export interface ConvenienciaResult {
   tna_billetera_inversion_usada?: number | null;
   saldo_final_inversion?: number | null;
   remanente_vpn?: number | null;
+  moneda?: 'ARS' | 'USD';
+  contado_usado?: number;
+  cotizacion?: number | null;
+  linea_cotizacion?: string | null;
+  linea_billetera?: string | null;
 }
 
 export interface ConvenienciaRequest {
   precio_contado: number;
   precio_total_cuotas?: number;
   cantidad_cuotas: number;
-  inflacion_mensual: number;
+  inflacion_mensual?: number;
   tiene_interes?: boolean;
   tna?: number;
   tna_billetera_inversion?: number | null;
+  moneda_contado?: 'ARS' | 'USD';
+  moneda_cuotas?: 'ARS' | 'USD';
 }
 
 export interface CurrencyFinancialData {

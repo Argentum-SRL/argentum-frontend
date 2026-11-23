@@ -71,7 +71,6 @@ const router = createBrowserRouter([
               { path: '/diseno', element: <DisenoPage />, errorElement: <PageErrorBoundary /> },
               { path: '/admin/diseno', element: <DisenoPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/diseno', element: <DisenoPage />, errorElement: <PageErrorBoundary /> },
-              { path: '/app/herramientas', element: <ToolsPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/lo-que-se-repite', element: <LoQueSeRepitePage />, errorElement: <PageErrorBoundary /> },
             ],
           },
@@ -95,6 +94,7 @@ const router = createBrowserRouter([
               { path: '/app/metas', element: <MetasPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/metas/:id', element: <Navigate to="/app/metas" replace /> },
               { path: '/app/suscripciones', element: <SuscripcionesPage />, errorElement: <PageErrorBoundary /> },
+              { path: '/app/herramientas', element: <ToolsPage />, errorElement: <PageErrorBoundary /> },
               { path: '/app/perfil', element: <PerfilPage />, errorElement: <PageErrorBoundary /> },
               // Rutas legacy — redirigen a la página unificada de perfil
               { path: '/app/configuracion', element: <Navigate to="/app/perfil" replace /> },

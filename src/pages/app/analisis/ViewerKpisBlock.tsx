@@ -21,7 +21,7 @@ function renderSubValue(texto: string) {
   return (
     <>
       {parts[0]}
-      <strong className={styles.metasNoticeHighlight}>{pct}</strong>
+      <strong>{pct}</strong>
       {parts.slice(1).join(pct)}
     </>
   )
@@ -52,120 +52,91 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
       ? `+${formatMonto(kpis.ingresos_totales, monedaVis)}`
       : '—'
 
-  const heroLabel = soloGastos ? 'Gastos' : 'Te quedó'
-  const heroValor = soloGastos ? gastosTexto : balanceTexto
-  const heroColor = soloGastos
-    ? styles.balanceNegative
-    : esBalanceNegativo
-      ? styles.balanceNegative
-      : styles.balancePositive
-
   const avisoTexto = soloGastos ? textoPeso : tasaAhorroTexto
 
-  const items: SummaryBarItem[] = soloGastos
-    ? promedioMonto
+  const itemsSoloGastos: SummaryBarItem[] = [
+    {
+      label: 'Gastos',
+      value: gastosTexto,
+      highlight: true,
+      tone: 'negative',
+      notice: avisoTexto
+        ? {
+            icon: <TrendingUp size={13} />,
+            tooltip: avisoTexto,
+            text: renderSubValue(avisoTexto),
+          }
+        : undefined,
+    },
+    ...(promedioMonto
       ? [
           {
             label: 'Promedio por ciclo',
             value: promedioMonto,
-          },
+          } satisfies SummaryBarItem,
         ]
-      : []
-    : [
-        {
-          label: 'Ingresos',
-          value: ingresosTexto,
-          valueColor: '#4CAF7D',
-        },
-        {
-          label: 'Gastos',
-          value: gastosTexto,
-          valueColor: '#FF8A65',
-        },
-      ]
+      : []),
+  ]
+
+  const itemsResumenDesktop: SummaryBarItem[] = [
+    {
+      label: 'Te quedó',
+      value: balanceTexto,
+      highlight: true,
+      tone: esBalanceNegativo ? 'negative' : 'default',
+      notice: avisoTexto
+        ? {
+            icon: <TrendingUp size={13} />,
+            tooltip: avisoTexto,
+            text: renderSubValue(avisoTexto),
+          }
+        : undefined,
+    },
+    {
+      label: 'Ingresos',
+      value: ingresosTexto,
+      tone: 'positive',
+    },
+    {
+      label: 'Gastos',
+      value: gastosTexto,
+      tone: 'negative',
+    },
+  ]
+
+  const itemsResumenMobile: SummaryBarItem[] = [
+    {
+      label: 'Te quedó',
+      value: balanceTexto,
+      tone: esBalanceNegativo ? 'negative' : 'positive',
+    },
+    {
+      label: 'Ingresos',
+      value: ingresosTexto,
+      tone: 'positive',
+    },
+    {
+      label: 'Gastos',
+      value: gastosTexto,
+      tone: 'negative',
+    },
+  ]
 
   return (
     <div className={styles.summaryWrap}>
-      {/* ── Mobile Split Strip Resumen ── */}
-      <div className={styles.mobileSplitStrip}>
-        <div className={styles.mobileSplitGrid}>
-          {soloGastos ? (
-            <>
-              <div className={styles.splitItem}>
-                <span className={styles.splitLabel}>Gastos</span>
-                <span className={`${styles.splitValue} ${styles.colorRed}`}>
-                  {gastosTexto}
-                </span>
-              </div>
-              {promedioMonto && (
-                <>
-                  <div className={styles.splitDivider} />
-                  <div className={styles.splitItem}>
-                    <span className={styles.splitLabel}>Promedio por ciclo</span>
-                    <span className={styles.splitValue}>{promedioMonto}</span>
-                  </div>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <div className={styles.splitItem}>
-                <span className={styles.splitLabel}>Te quedó</span>
-                <span
-                  className={`${styles.splitValue} ${
-                    esBalanceNegativo ? styles.colorRed : styles.colorGreen
-                  }`}
-                >
-                  {balanceTexto}
-                </span>
-              </div>
-              <div className={styles.splitDivider} />
-              <div className={styles.splitItem}>
-                <span className={styles.splitLabel}>Ingresos</span>
-                <span className={`${styles.splitValue} ${styles.colorGreen}`}>
-                  {ingresosTexto}
-                </span>
-              </div>
-              <div className={styles.splitDivider} />
-              <div className={styles.splitItem}>
-                <span className={styles.splitLabel}>Gastos</span>
-                <span className={`${styles.splitValue} ${styles.colorRed}`}>
-                  {gastosTexto}
-                </span>
-              </div>
-            </>
-          )}
-        </div>
-        {avisoTexto && (
-          <div className={styles.mobileMetasRow} title={avisoTexto}>
-            <TrendingUp size={12} className={styles.mobileMetasIcon} />
-            <span>{avisoTexto}</span>
-          </div>
-        )}
-      </div>
-
-      {/* ── Desktop Resumen ── */}
       <PageSummaryBar
-        className={styles.desktopSummaryBar}
-        leftSlot={
-          <div className={styles.balanceCicloSlot}>
-            <div className={styles.balanceMainGroup}>
-              <span className={styles.balanceCicloLabel}>{heroLabel}</span>
-              <span className={`${styles.balanceCicloValue} ${heroColor}`}>
-                {heroValor}
-              </span>
-            </div>
-            {avisoTexto && (
-              <div className={styles.metasNotice} title={avisoTexto}>
-                <TrendingUp size={13} className={styles.metasNoticeIcon} aria-hidden="true" />
-                <p className={styles.metasNoticeText}>
-                  {renderSubValue(avisoTexto)}
-                </p>
-              </div>
-            )}
-          </div>
+        mobileVariant="strip"
+        items={soloGastos ? itemsSoloGastos : itemsResumenDesktop}
+        mobileItems={soloGastos ? itemsSoloGastos : itemsResumenMobile}
+        mobileNotice={
+          avisoTexto
+            ? {
+                icon: <TrendingUp size={12} />,
+                tooltip: avisoTexto,
+                text: avisoTexto,
+              }
+            : undefined
         }
-        items={items}
       />
     </div>
   )

@@ -11,7 +11,7 @@ export const AdminSummaryBarSkeleton = memo(function AdminSummaryBarSkeleton() {
       className={styles.summaryBar}
     >
       <span className={baseStyles.srOnly}>Cargando resumen de administración...</span>
-      {Array.from({ length: 4 }).map((_, i) => (
+      {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className={styles.summaryItem}>
           <Skeleton variant="text" width="48%" height={11} />
           <Skeleton variant="text" width="60%" height={20} />

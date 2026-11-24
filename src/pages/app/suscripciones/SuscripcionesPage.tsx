@@ -389,11 +389,12 @@ const SuscripcionesPage: React.FC = () => {
 
       {/* ── Barra de resumen (Desktop) ────────────────────────────────────── */}
       <PageSummaryBar
-        className={styles.desktopSummaryBar}
+        mobileVariant="none"
         items={[
           {
             label: "Total mensual en Pesos",
             value: formatCurrency(totalMensualARS),
+            highlight: true,
           },
           {
             label: "Total mensual en Dólares",

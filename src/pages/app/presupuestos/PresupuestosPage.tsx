@@ -319,39 +319,41 @@ export default function PresupuestosPage() {
         </div>
       </div>
 
-      {/* ── Hero Resumen (Desktop, igual a Transacciones) ──────────────────── */}
+      {/* ── Hero Resumen (Desktop) ─────────────────────────────────────────── */}
       {activeTab === 'activo' && !loading && resumen.activosCount > 0 && (
         <PageSummaryBar
-          className={styles.desktopSummaryBar}
-          leftSlot={
-            <div className={styles.resumenSlot}>
-              <div className={styles.resumenMainGroup}>
-                <span className={styles.resumenHeroLabel}>Gastado este ciclo</span>
-                <span className={styles.resumenHeroValue}>{resumen.gastadoLabel}</span>
-              </div>
-              {resumen.limiteLabel && (
-                <div className={styles.resumenNotice}>
-                  <Target size={13} className={styles.resumenNoticeIcon} aria-hidden="true" />
-                  <p className={styles.resumenNoticeText}>
-                    Límite total asignado{' '}
-                    <strong className={styles.resumenNoticeHighlight}>{resumen.limiteLabel}</strong>
-                  </p>
-                </div>
-              )}
-            </div>
-          }
+          mobileVariant="none"
           items={[
             {
-              label: "Del límite total",
-              value: `${resumen.porcentajeGlobal.toFixed(1)}%`,
-              valueColor: resumen.porcentajeGlobal >= 80 ? '#FF8A65'
-                        : resumen.porcentajeGlobal >= 60 ? '#F5A623'
-                        : '#4CAF7D',
+              label: 'Gastado este ciclo',
+              value: resumen.gastadoLabel,
+              highlight: true,
+              notice: resumen.limiteLabel
+                ? {
+                    icon: <Target size={13} />,
+                    tooltip: `Límite total asignado ${resumen.limiteLabel}`,
+                    text: (
+                      <>
+                        Límite total asignado <strong>{resumen.limiteLabel}</strong>
+                      </>
+                    ),
+                  }
+                : undefined,
             },
             {
-              label: "En riesgo",
+              label: 'Del límite total',
+              value: `${resumen.porcentajeGlobal.toFixed(1)}%`,
+              tone:
+                resumen.porcentajeGlobal >= 80
+                  ? 'negative'
+                  : resumen.porcentajeGlobal >= 60
+                    ? 'warning'
+                    : 'positive',
+            },
+            {
+              label: 'En riesgo',
               value: `${resumen.enRiesgo} ${resumen.enRiesgo === 1 ? 'presupuesto' : 'presupuestos'}`,
-              valueColor: resumen.enRiesgo > 0 ? '#FF8A65' : '#4CAF7D',
+              tone: resumen.enRiesgo > 0 ? 'negative' : 'positive',
             },
           ]}
         />

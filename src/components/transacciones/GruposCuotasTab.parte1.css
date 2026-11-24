@@ -9,61 +9,6 @@
   width: 100%;
 }
 
-/* ── 1. Resumen Superior (Desktop Only) ─────────────────────────────── */
-.metricsBar {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 12px 18px;
-  box-shadow: var(--elevation-xs);
-}
-
-@media (min-width: 768px) {
-  .metricsBar {
-    display: flex;
-  }
-}
-
-.metricItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-  gap: 2px;
-  text-align: center;
-}
-
-.metricLabel {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-3);
-}
-
-.metricValue {
-  font-size: 14.5px;
-  font-weight: 800;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.metricRed {
-  color: var(--error, #E11D48);
-}
-
-.metricDivider {
-  width: 1px;
-  height: 24px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
 /* ── 2. Controles de Filtro y Búsqueda ──────────────────────────────── */
 .controlsRow {
   display: flex;

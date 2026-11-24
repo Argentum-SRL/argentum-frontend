@@ -746,18 +746,9 @@
   color: var(--text-2);
 }
 
-.desktopSummaryBar {
-  display: none !important;
-  margin-top: 16px !important;
-}
-
 @media (min-width: 768px) {
   .mobileSummaryCard {
     display: none;
-  }
-
-  .desktopSummaryBar {
-    display: flex !important;
   }
 }
 

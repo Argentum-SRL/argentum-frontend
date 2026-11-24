@@ -1,58 +1,146 @@
 import React from 'react';
 import styles from './PageSummaryBar.module.css';
 
+export type SummaryBarTone = 'default' | 'positive' | 'warning' | 'negative';
+
+export interface SummaryBarNotice {
+  icon?: React.ReactNode;
+  text: React.ReactNode;
+  tooltip?: string;
+}
+
 export interface SummaryBarItem {
   label: string;
   value: string;
   subValue?: string;
   highlight?: boolean;
-  valueColor?: string;
+  tone?: SummaryBarTone;
+  notice?: SummaryBarNotice;
 }
 
 export interface PageSummaryBarProps {
   items: SummaryBarItem[];
-  leftSlot?: React.ReactNode;
+  mobileVariant?: 'grid' | 'none' | 'strip';
+  mobileItems?: SummaryBarItem[];
+  mobileNotice?: SummaryBarNotice;
   className?: string;
 }
 
-const getColorClass = (color?: string) => {
-  if (!color) return '';
-  const lowerColor = color.toLowerCase();
-  if (lowerColor === '#4caf7d') return styles.colorGreen;
-  if (lowerColor === '#f5a623') return styles.colorOrange;
-  if (lowerColor === '#ff8a65') return styles.colorRed;
+const getDesktopToneClass = (tone: SummaryBarTone) => {
+  if (tone === 'positive') return styles.colorGreen;
+  if (tone === 'warning') return styles.colorOrange;
+  if (tone === 'negative') return styles.colorRed;
   return '';
 };
 
-export default function PageSummaryBar({ items, leftSlot, className = '' }: PageSummaryBarProps) {
-  const hasHighlight = items.some((i) => i.highlight);
+const getStripToneClass = (tone: SummaryBarTone) => {
+  if (tone === 'positive') return styles.stripColorGreen;
+  if (tone === 'warning') return styles.stripColorOrange;
+  if (tone === 'negative') return styles.stripColorRed;
+  return '';
+};
+
+export default function PageSummaryBar({
+  items,
+  mobileVariant = 'grid',
+  mobileItems,
+  mobileNotice,
+  className = '',
+}: PageSummaryBarProps) {
+  const hideOnMobile = mobileVariant === 'none' || mobileVariant === 'strip';
+  const stripItems = mobileItems ?? items;
+  const stripNotice = mobileNotice ?? items.find((i) => i.notice)?.notice;
+
   return (
-    <div
-      className={`${styles.container} ${leftSlot ? styles.hasLeftSlot : ''} ${
-        hasHighlight ? styles.hasHighlight : ''
-      } ${className}`}
-    >
-      {leftSlot && <div className={styles.leftSlot}>{leftSlot}</div>}
-      {items.map((item, index) => {
-        const colorClass = getColorClass(item.valueColor);
-        return (
-          <div
-            key={index}
-            className={`${styles.item} ${index === 0 ? styles.itemFirst : ''} ${
-              item.highlight ? styles.itemHighlight : ''
-            }`}
-          >
-            <span className={styles.label}>{item.label}</span>
-            <span
-              className={`${styles.value} ${item.highlight ? styles.valueHighlight : ''} ${colorClass}`}
-            >
-              {item.value}
-            </span>
-            {item.subValue && <span className={styles.subValue}>{item.subValue}</span>}
+    <>
+      {mobileVariant === 'strip' && (
+        <div className={`${styles.mobileStrip} ${className}`.trim()}>
+          <div className={styles.mobileStripGrid}>
+            {stripItems.map((item, index) => {
+              const toneClass = getStripToneClass(item.tone ?? 'default');
+              return (
+                <React.Fragment key={index}>
+                  {index > 0 && <div className={styles.stripDivider} />}
+                  <div className={styles.stripItem}>
+                    <span className={styles.stripLabel}>{item.label}</span>
+                    <span className={`${styles.stripValue} ${toneClass}`.trim()}>
+                      {item.value}
+                    </span>
+                  </div>
+                </React.Fragment>
+              );
+            })}
           </div>
-        );
-      })}
-    </div>
+          {stripNotice && (
+            <div className={styles.mobileStripNotice} title={stripNotice.tooltip}>
+              {stripNotice.icon && (
+                <span className={styles.mobileStripNoticeIcon} aria-hidden="true">
+                  {stripNotice.icon}
+                </span>
+              )}
+              <span className={styles.mobileStripNoticeText}>{stripNotice.text}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div
+        className={`${styles.container} ${
+          hideOnMobile ? styles.hideMobile : ''
+        } ${className}`.trim()}
+      >
+        {items.map((item, index) => {
+          const colorClass = getDesktopToneClass(item.tone ?? 'default');
+          const hasNotice = Boolean(item.notice);
+
+          return (
+            <div
+              key={index}
+              className={`${styles.item} ${index === 0 ? styles.itemFirst : ''} ${
+                item.highlight ? styles.itemHighlight : ''
+              } ${hasNotice ? styles.itemWithNotice : ''}`.trim()}
+            >
+              {hasNotice ? (
+                <>
+                  <div className={styles.itemMain}>
+                    <span className={styles.label}>{item.label}</span>
+                    <span
+                      className={`${styles.value} ${
+                        item.highlight ? styles.valueHighlight : ''
+                      } ${colorClass}`.trim()}
+                    >
+                      {item.value}
+                    </span>
+                    {item.subValue && <span className={styles.subValue}>{item.subValue}</span>}
+                  </div>
+                  {item.notice && (
+                    <div className={styles.notice} title={item.notice.tooltip}>
+                      {item.notice.icon && (
+                        <span className={styles.noticeIcon} aria-hidden="true">
+                          {item.notice.icon}
+                        </span>
+                      )}
+                      <p className={styles.noticeText}>{item.notice.text}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span className={styles.label}>{item.label}</span>
+                  <span
+                    className={`${styles.value} ${
+                      item.highlight ? styles.valueHighlight : ''
+                    } ${colorClass}`.trim()}
+                  >
+                    {item.value}
+                  </span>
+                  {item.subValue && <span className={styles.subValue}>{item.subValue}</span>}
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
-

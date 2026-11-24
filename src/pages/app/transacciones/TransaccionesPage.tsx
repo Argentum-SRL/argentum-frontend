@@ -36,7 +36,7 @@ function renderMetasTexto(texto: string, monto: string | null) {
   return (
     <>
       {parts[0]}
-      <strong className={styles.metasNoticeHighlight}>{monto}</strong>
+      <strong>{monto}</strong>
       {parts.slice(1).join(monto)}
     </>
   )
@@ -604,74 +604,60 @@ export default function TransaccionesPage() {
 
       {activeTab === 'historial' ? (
         <>
-          {/* ── Mobile Split Strip Resumen (Columnas simétricas + Fila de Metas inferior) ── */}
-          <div className={styles.mobileSplitStrip}>
-            <div className={styles.mobileSplitGrid}>
-              <div className={styles.splitItem}>
-                <span className={styles.splitLabel}>Balance</span>
-                <span className={`${styles.splitValue} ${resumen.balance < 0 ? styles.colorRed : styles.colorGreen}`}>
-                  {resumen.balance < 0 ? '-' : '+'}{formatCurrency(Math.abs(resumen.balance))}
-                </span>
-              </div>
-              <div className={styles.splitDivider} />
-              <div className={styles.splitItem}>
-                <span className={styles.splitLabel}>Ingresos</span>
-                <span className={`${styles.splitValue} ${styles.colorGreen}`}>
-                  +{formatCurrency(resumen.ingresos)}
-                </span>
-              </div>
-              <div className={styles.splitDivider} />
-              <div className={styles.splitItem}>
-                <span className={styles.splitLabel}>Egresos</span>
-                <span className={`${styles.splitValue} ${styles.colorRed}`}>
-                  -{formatCurrency(Math.abs(resumen.gastos))}
-                </span>
-              </div>
-            </div>
-            {metasInfo && (
-              <div className={styles.mobileMetasRow} title={metasInfo.tooltip}>
-                <Target size={12} className={styles.mobileMetasIcon} />
-                <span>{metasInfo.textoMobile}</span>
-              </div>
-            )}
-          </div>
-
-          {/* ── Hero Resumen (Desktop: Balance + Aviso de metas contra el divisor) ── */}
+          {/* ── Resumen Unificado (Mobile Strip + Desktop Summary Bar) ── */}
           <PageSummaryBar
-            className={styles.desktopSummaryBar}
-            leftSlot={
-              <div className={styles.balanceCicloSlot}>
-                <div className={styles.balanceMainGroup}>
-                  <span className={styles.balanceCicloLabel}>Balance del ciclo</span>
-                  <span
-                    className={`${styles.balanceCicloValue} ${resumen.balance < 0 ? styles.balanceNegative : styles.balancePositive}`}
-                  >
-                    {resumen.balance < 0 ? '-' : '+'}
-                    {formatCurrency(Math.abs(resumen.balance))}
-                  </span>
-                </div>
-                {metasInfo && (
-                  <div className={styles.metasNotice} title={metasInfo.tooltip}>
-                    <Target size={13} className={styles.metasNoticeIcon} aria-hidden="true" />
-                    <p className={styles.metasNoticeText}>
-                      {renderMetasTexto(metasInfo.textoDesktop, metasInfo.monto)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            }
+            mobileVariant="strip"
             items={[
               {
-                label: "Ingresos",
-                value: `+${formatCurrency(resumen.ingresos)}`,
-                valueColor: '#4CAF7D',
+                label: 'Balance del ciclo',
+                value: `${resumen.balance < 0 ? '-' : '+'}${formatCurrency(Math.abs(resumen.balance))}`,
+                highlight: true,
+                tone: resumen.balance < 0 ? 'negative' : 'default',
+                notice: metasInfo
+                  ? {
+                      icon: <Target size={13} />,
+                      tooltip: metasInfo.tooltip,
+                      text: renderMetasTexto(metasInfo.textoDesktop, metasInfo.monto),
+                    }
+                  : undefined,
               },
               {
-                label: "Egresos",
+                label: 'Ingresos',
+                value: `+${formatCurrency(resumen.ingresos)}`,
+                tone: 'positive',
+              },
+              {
+                label: 'Egresos',
                 value: `-${formatCurrency(Math.abs(resumen.gastos))}`,
-                valueColor: '#FF8A65',
+                tone: 'negative',
               },
             ]}
+            mobileItems={[
+              {
+                label: 'Balance',
+                value: `${resumen.balance < 0 ? '-' : '+'}${formatCurrency(Math.abs(resumen.balance))}`,
+                tone: resumen.balance < 0 ? 'negative' : 'positive',
+              },
+              {
+                label: 'Ingresos',
+                value: `+${formatCurrency(resumen.ingresos)}`,
+                tone: 'positive',
+              },
+              {
+                label: 'Egresos',
+                value: `-${formatCurrency(Math.abs(resumen.gastos))}`,
+                tone: 'negative',
+              },
+            ]}
+            mobileNotice={
+              metasInfo
+                ? {
+                    icon: <Target size={12} />,
+                    tooltip: metasInfo.tooltip,
+                    text: metasInfo.textoMobile,
+                  }
+                : undefined
+            }
           />
 
           {/* ── Filter Bar ───────────────────────────────────────────────────── */}

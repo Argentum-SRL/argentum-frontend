@@ -210,36 +210,38 @@ export default function MetasPage() {
       </div>
 
       {/* ── Barra de resumen (Desktop) ────────────────────────────────────── */}
-      <PageSummaryBar
-        className={styles.desktopSummaryBar}
-        items={[
-          {
-            label: totals.totalObjetivoUSD > 0 ? "Ahorro acumulado en Pesos" : "Ahorro acumulado",
-            value: formatMonto(totals.totalAhorradoARS, 'ARS'),
-            highlight: true,
-          },
-          ...(totals.totalObjetivoUSD > 0 || totals.totalAhorradoUSD > 0 ? [
+      {!loading && goals.length > 0 && (
+        <PageSummaryBar
+          mobileVariant="none"
+          items={[
             {
-              label: "Ahorro acumulado en Dólares",
-              value: formatMonto(totals.totalAhorradoUSD, 'USD'),
+              label: totals.totalObjetivoUSD > 0 ? "Ahorro acumulado en Pesos" : "Ahorro acumulado",
+              value: formatMonto(totals.totalAhorradoARS, 'ARS'),
               highlight: true,
             },
+            ...(totals.totalObjetivoUSD > 0 || totals.totalAhorradoUSD > 0 ? [
+              {
+                label: "Ahorro acumulado en Dólares",
+                value: formatMonto(totals.totalAhorradoUSD, 'USD'),
+                highlight: true,
+              },
+              {
+                label: "Objetivo global en Dólares",
+                value: formatMonto(totals.totalObjetivoUSD, 'USD'),
+              }
+            ] : [
+              {
+                label: "Objetivo global",
+                value: formatMonto(totals.totalObjetivoARS, 'ARS'),
+              }
+            ]),
             {
-              label: "Objetivo global en Dólares",
-              value: formatMonto(totals.totalObjetivoUSD, 'USD'),
-            }
-          ] : [
-            {
-              label: "Objetivo global",
-              value: formatMonto(totals.totalObjetivoARS, 'ARS'),
-            }
-          ]),
-          {
-            label: "Completadas",
-            value: `${totals.completadas} meta${totals.completadas !== 1 ? 's' : ''}`,
-          },
-        ]}
-      />
+              label: "Completadas",
+              value: `${totals.completadas} meta${totals.completadas !== 1 ? 's' : ''}`,
+            },
+          ]}
+        />
+      )}
 
       {/* ── Controls Row (Tabs) ──────────────────────────────── */}
       <div className={styles.controlsRow}>

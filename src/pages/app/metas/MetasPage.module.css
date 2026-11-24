@@ -200,17 +200,6 @@
   }
 }
 
-.desktopSummaryBar {
-  display: none !important;
-  margin-top: 0 !important;
-}
-
-@media (min-width: 768px) {
-  .desktopSummaryBar {
-    display: flex !important;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
 
   .nuevaBtn,

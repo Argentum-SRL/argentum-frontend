@@ -19,7 +19,7 @@ import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { EmptyState, GruposCuotasSkeleton } from '@/components/ui'
+import { EmptyState, GruposCuotasSkeleton, PageSummaryBar } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import GrupoCuotasAvatar from './GrupoCuotasAvatar'
 import GrupoCuotasDetalleModal from './GrupoCuotasDetalleModal'
@@ -661,28 +661,33 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
   return (
     <div className={styles.container}>
       {/* ── 1. Resumen Superior (Desktop Only) ─────────────────────────── */}
-      <div className={styles.metricsBar}>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>Compras activas</span>
-          <span className={styles.metricValue}>{metricas.cuotasActivas}</span>
-        </div>
-        <div className={styles.metricDivider} />
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>Compromiso / mes</span>
-          <span className={styles.metricValue}>
-            {formatMonto(Math.round(metricas.cuotaMensualARS), 'ARS')}
-            {metricas.cuotaMensualUSD > 0 && ` + ${formatMonto(Math.round(metricas.cuotaMensualUSD), 'USD')}`}
-          </span>
-        </div>
-        <div className={styles.metricDivider} />
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>Total pendiente</span>
-          <span className={`${styles.metricValue} ${styles.metricRed}`}>
-            {formatMonto(Math.round(metricas.deudaPendienteARS), 'ARS')}
-            {metricas.deudaPendienteUSD > 0 && ` + ${formatMonto(Math.round(metricas.deudaPendienteUSD), 'USD')}`}
-          </span>
-        </div>
-      </div>
+      <PageSummaryBar
+        mobileVariant="none"
+        items={[
+          {
+            label: 'Compras activas',
+            value: String(metricas.cuotasActivas),
+          },
+          {
+            label: 'Compromiso / mes',
+            value: `${formatMonto(Math.round(metricas.cuotaMensualARS), 'ARS')}${
+              metricas.cuotaMensualUSD > 0
+                ? ` + ${formatMonto(Math.round(metricas.cuotaMensualUSD), 'USD')}`
+                : ''
+            }`,
+          },
+          {
+            label: 'Total pendiente',
+            value: `${formatMonto(Math.round(metricas.deudaPendienteARS), 'ARS')}${
+              metricas.deudaPendienteUSD > 0
+                ? ` + ${formatMonto(Math.round(metricas.deudaPendienteUSD), 'USD')}`
+                : ''
+            }`,
+            highlight: true,
+            tone: 'negative',
+          },
+        ]}
+      />
 
       {/* ── 2. Controles de Búsqueda y Filtro de Estado ────────────────── */}
       <div className={styles.controlsRow}>

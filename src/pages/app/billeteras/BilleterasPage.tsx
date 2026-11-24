@@ -409,20 +409,20 @@ export default function BilleterasPage() {
           {/* ── Barra de resumen (Desktop) ───────────────────────────────────────── */}
           {!isLoading && billeterasActivas.length > 0 && (
             <PageSummaryBar
-              className={styles.desktopSummaryBar}
+              mobileVariant="none"
               items={[
-                {
-                  label: "Billeteras activas",
-                  value: String(billeterasActivas.length),
-                  highlight: true,
-                },
                 {
                   label: "Total en Pesos",
                   value: formatCurrency(totalARS),
+                  highlight: true,
                 },
                 {
                   label: "Total en Dólares",
                   value: formatMonto(totalUSD, 'USD'),
+                },
+                {
+                  label: "Billeteras activas",
+                  value: String(billeterasActivas.length),
                 },
               ]}
             />

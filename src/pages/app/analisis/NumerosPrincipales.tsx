@@ -51,7 +51,7 @@ function renderSubValue(texto: string) {
   return (
     <>
       {parts[0]}
-      <strong className={styles.metasNoticeHighlight}>{pct}</strong>
+      <strong>{pct}</strong>
       {parts.slice(1).join(pct)}
     </>
   )
@@ -112,146 +112,90 @@ export default function NumerosPrincipales({
       ? formatMonto(kpis.promedio_gasto_ciclo, monedaVisual)
       : null
 
-  const itemsSoloGastos: SummaryBarItem[] = promedioMonto
-    ? [
-        {
-          label: 'Promedio por ciclo',
-          value: promedioMonto,
-        },
-      ]
-    : []
+  const itemsSoloGastos: SummaryBarItem[] = [
+    {
+      label: 'Egresos',
+      value: egresosMonto,
+      highlight: true,
+      tone: 'negative',
+      notice: textoPeso
+        ? {
+            icon: <TrendingUp size={13} />,
+            tooltip: textoPeso,
+            text: renderSubValue(textoPeso),
+          }
+        : undefined,
+    },
+    ...(promedioMonto
+      ? [
+          {
+            label: 'Promedio por ciclo',
+            value: promedioMonto,
+          } satisfies SummaryBarItem,
+        ]
+      : []),
+  ]
 
-  const itemsResumen: SummaryBarItem[] = [
+  const itemsResumenDesktop: SummaryBarItem[] = [
+    {
+      label: 'Te quedó',
+      value: balanceMonto,
+      highlight: true,
+      tone: esBalanceNegativo ? 'negative' : 'default',
+      notice: subValue
+        ? {
+            icon: <TrendingUp size={13} />,
+            tooltip: subValue,
+            text: renderSubValue(subValue),
+          }
+        : undefined,
+    },
     {
       label: 'Ingresos',
       value: ingresosMonto,
-      valueColor: '#4CAF7D',
+      tone: 'positive',
     },
     {
       label: 'Egresos',
       value: egresosMonto,
-      valueColor: '#FF8A65',
+      tone: 'negative',
+    },
+  ]
+
+  const itemsResumenMobile: SummaryBarItem[] = [
+    {
+      label: 'Te quedó',
+      value: balanceMonto,
+      tone: esBalanceNegativo ? 'negative' : 'positive',
+    },
+    {
+      label: 'Ingresos',
+      value: ingresosMonto,
+      tone: 'positive',
+    },
+    {
+      label: 'Egresos',
+      value: egresosMonto,
+      tone: 'negative',
     },
   ]
 
   return (
     <div className={styles.summarySection}>
-      {/* ── Mobile Split Strip Resumen (Columnas simétricas + Fila de tasa inferior) ── */}
-      {soloGastos ? (
-        <div className={styles.mobileSplitStrip}>
-          <div className={styles.mobileSplitGrid}>
-            <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Egresos</span>
-              <span className={`${styles.splitValue} ${styles.colorRed}`}>
-                {egresosMonto}
-              </span>
-            </div>
-            {promedioMonto && (
-              <>
-                <div className={styles.splitDivider} />
-                <div className={styles.splitItem}>
-                  <span className={styles.splitLabel}>Promedio por ciclo</span>
-                  <span className={styles.splitValue}>{promedioMonto}</span>
-                </div>
-              </>
-            )}
-          </div>
-          {textoPeso && (
-            <div className={styles.mobileMetasRow} title={textoPeso}>
-              <TrendingUp size={12} className={styles.mobileMetasIcon} />
-              <span>{textoPeso}</span>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className={styles.mobileSplitStrip}>
-          <div className={styles.mobileSplitGrid}>
-            <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Te quedó</span>
-              <span
-                className={`${styles.splitValue} ${
-                  esBalanceNegativo ? styles.colorRed : styles.colorGreen
-                }`}
-              >
-                {balanceMonto}
-              </span>
-            </div>
-            <div className={styles.splitDivider} />
-            <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Ingresos</span>
-              <span className={`${styles.splitValue} ${styles.colorGreen}`}>
-                {ingresosMonto}
-              </span>
-            </div>
-            <div className={styles.splitDivider} />
-            <div className={styles.splitItem}>
-              <span className={styles.splitLabel}>Egresos</span>
-              <span className={`${styles.splitValue} ${styles.colorRed}`}>
-                {egresosMonto}
-              </span>
-            </div>
-          </div>
-          {subValue && (
-            <div className={styles.mobileMetasRow} title={subValue}>
-              <TrendingUp size={12} className={styles.mobileMetasIcon} />
-              <span>{subValue}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Hero Resumen (Desktop: Balance + Aviso contra el divisor) ── */}
-      {soloGastos ? (
-        <PageSummaryBar
-          className={styles.desktopSummaryBar}
-          leftSlot={
-            <div className={styles.balanceCicloSlot}>
-              <div className={styles.balanceMainGroup}>
-                <span className={styles.balanceCicloLabel}>Egresos</span>
-                <span className={`${styles.balanceCicloValue} ${styles.balanceNegative}`}>
-                  {egresosMonto}
-                </span>
-              </div>
-              {textoPeso && (
-                <div className={styles.metasNotice} title={textoPeso}>
-                  <TrendingUp size={13} className={styles.metasNoticeIcon} aria-hidden="true" />
-                  <p className={styles.metasNoticeText}>
-                    {renderSubValue(textoPeso)}
-                  </p>
-                </div>
-              )}
-            </div>
-          }
-          items={itemsSoloGastos}
-        />
-      ) : (
-        <PageSummaryBar
-          className={styles.desktopSummaryBar}
-          leftSlot={
-            <div className={styles.balanceCicloSlot}>
-              <div className={styles.balanceMainGroup}>
-                <span className={styles.balanceCicloLabel}>Te quedó</span>
-                <span
-                  className={`${styles.balanceCicloValue} ${
-                    esBalanceNegativo ? styles.balanceNegative : styles.balancePositive
-                  }`}
-                >
-                  {balanceMonto}
-                </span>
-              </div>
-              {subValue && (
-                <div className={styles.metasNotice} title={subValue}>
-                  <TrendingUp size={13} className={styles.metasNoticeIcon} aria-hidden="true" />
-                  <p className={styles.metasNoticeText}>
-                    {renderSubValue(subValue)}
-                  </p>
-                </div>
-              )}
-            </div>
-          }
-          items={itemsResumen}
-        />
-      )}
+      <PageSummaryBar
+        mobileVariant="strip"
+        items={soloGastos ? itemsSoloGastos : itemsResumenDesktop}
+        mobileItems={soloGastos ? itemsSoloGastos : itemsResumenMobile}
+        mobileNotice={
+          soloGastos
+            ? textoPeso
+              ? { icon: <TrendingUp size={12} />, tooltip: textoPeso, text: textoPeso }
+              : undefined
+            : subValue
+              ? { icon: <TrendingUp size={12} />, tooltip: subValue, text: subValue }
+              : undefined
+        }
+      />
 
       {kpis.frase_resumen && (
         <p className={styles.fraseResumen}>

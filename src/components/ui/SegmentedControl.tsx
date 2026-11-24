@@ -21,7 +21,7 @@ export interface SegmentedControlProps<T extends string = string> {
   className?: string
   ariaLabel?: string
   fullWidth?: boolean
-  /* wrap ya no hace falta: la cápsula siempre pasa a otra fila si no entra */
+  /* inline: columnas iguales en una línea en desktop (>= 768px) y pasa a la fila siguiente en celular (<= 767px); wrap: multilínea siempre; stacked: píldora vertical */
   layout?: 'inline' | 'stacked' | 'wrap'
   size?: SegmentedControlSize
 }

@@ -3,8 +3,10 @@
    Diseño sin pista contenedora (sin card ni fondo detrás de los botones):
    - Columnas del mismo ancho medidas por la etiqueta más larga (grid con
      grid-auto-flow: column y grid-auto-columns: 1fr), gap var(--selector-gap).
-   - Una línea en desktop (>= 768px con white-space: nowrap); hasta 767px y en
-     fullWidth (minmax(0, 1fr)) el texto puede partirse sin ellipsis.
+   - En desktop (>= 768px) una línea (white-space: nowrap) con columnas iguales.
+   - En celular (<= 767px) un grupo inline (sin fullWidth, wrap ni stacked) usa
+     display: flex con flex-wrap: wrap y cada botón flex: 1 1 auto / min-width:
+     min(max-content, 100%) para pasar a la fila siguiente cuando no entra.
    - Tres tamaños (sm 36px/12px, md 40px/16px, lg 44px/16px), letra 13px y
      mínimo 44px en táctil (pointer: coarse).
    - Píldora inactiva: transparente, sin borde, color var(--text-2), 13px, peso 600,
@@ -118,6 +120,20 @@
   opacity: 0.8;
   white-space: normal;
   text-align: center;
+}
+
+/* Hasta 767px un grupo inline pasa botones a la fila siguiente cuando no entra;
+   se envuelve en :where() para no subir especificidad sobre modificadores locales como .navTrack */
+@media (max-width: 767px) {
+  .track:where(:not(.fullWidth):not(.trackWrap):not(:has(.pillStacked))) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  :where(.track:not(.fullWidth):not(.trackWrap):not(:has(.pillStacked))) > .pill:where(:not(.pillStacked)) {
+    flex: 1 1 auto;
+    min-width: min(max-content, 100%);
+  }
 }
 
 @media (min-width: 768px) {

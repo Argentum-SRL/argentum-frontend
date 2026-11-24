@@ -81,14 +81,7 @@
 }
 
 @media (max-width: 479px) {
-  .modoPagoSelector {
-    flex-wrap: nowrap;
-    gap: 6px;
-  }
-
   .modoPagoSelector [role="radio"] {
-    flex: 1 1 0;
-    min-width: 0;
     padding: 0 8px;
     font-size: 12px;
   }

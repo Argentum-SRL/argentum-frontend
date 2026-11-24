@@ -144,6 +144,7 @@
 @media (max-width: 639px) {
   .operacionSelector {
     --selector-gap: 4px;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.88fr) minmax(0, 0.88fr);
   }
 
   .operacionSelector button {
@@ -151,14 +152,6 @@
     font-size: 12px;
     gap: 4px;
     letter-spacing: -0.2px;
-  }
-
-  .operacionSelector button:first-child {
-    flex: 1.25 1 0;
-  }
-
-  .operacionSelector button:not(:first-child) {
-    flex: 0.88 1 0;
   }
 }
 

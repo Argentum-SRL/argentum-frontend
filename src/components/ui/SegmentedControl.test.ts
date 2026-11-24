@@ -37,4 +37,27 @@ describe('FS1: Verificación estática de SegmentedControl y sus tamaños', () =
     expect(tamanos).toEqual(['sm', 'md', 'lg'])
     expect(sizePropCheck).toBe('sm')
   })
+
+  it('SegmentedControl.module.css contiene un bloque @media (max-width: 767px) con flex-wrap: wrap para el track inline', () => {
+    const css = fs.readFileSync(path.join(UI_DIR, 'SegmentedControl.module.css'), 'utf-8')
+    const startIdx = css.search(/@media\s*\(max-width:\s*767px\)\s*\{/)
+    expect(startIdx).toBeGreaterThan(-1)
+    const openBrace = css.indexOf('{', startIdx)
+    let depth = 0
+    let endIdx = -1
+    for (let i = openBrace; i < css.length; i++) {
+      if (css[i] === '{') depth++
+      else if (css[i] === '}') {
+        depth--
+        if (depth === 0) { endIdx = i; break }
+      }
+    }
+    expect(endIdx).toBeGreaterThan(openBrace)
+    const mediaBlock = css.slice(openBrace + 1, endIdx)
+    expect(mediaBlock).toContain('.track')
+    expect(mediaBlock).toContain('display: flex')
+    expect(mediaBlock).toContain('flex-wrap: wrap')
+    expect(mediaBlock).toContain('flex: 1 1 auto')
+    expect(mediaBlock).toContain('min-width: min(max-content, 100%)')
+  })
 })

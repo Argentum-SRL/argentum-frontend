@@ -165,7 +165,7 @@ export default function ProyeccionCuotasCard({
           <SegmentedControl
             options={[
               { value: 'grafico', label: 'Por ciclo' },
-              { value: 'planes', label: 'Planes Activos' },
+              { value: 'planes', label: 'Planes activos' },
             ]}
             value={vistaInterna}
             onChange={(v: string) => handleCambiarVistaInterna(v as 'grafico' | 'planes')}

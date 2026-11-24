@@ -84,7 +84,9 @@
 
   /* ── Medidas del Selector Cápsula ── */
   --selector-gap: var(--space-icon); /* Separación horizontal entre botones de selección (6px) */
+  --selector-pill-h-sm: 36px; /* Altura mínima de la píldora compacta para barras de tarjeta (44px en táctil) */
   --selector-pill-h: 40px; /* Altura mínima de la píldora para diseño horizontal o inline (44px en táctil) */
+  --selector-pill-h-lg: 44px; /* Altura mínima de la píldora grande para modales y formularios */
   --selector-pill-h-stacked: 48px; /* Altura mínima de la píldora para diseño vertical o apilado */
 
   /* ── Colores del Selector Cápsula ── */
@@ -103,6 +105,7 @@
 
 @media (pointer: coarse) {
   :root {
+    --selector-pill-h-sm: 44px; /* Altura táctil mejorada para WCAG 2.5.5 */
     --selector-pill-h: 44px; /* Altura táctil mejorada para WCAG 2.5.5 */
   }
 }

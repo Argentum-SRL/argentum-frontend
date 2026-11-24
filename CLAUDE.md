@@ -242,10 +242,12 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
 ### Admin (fase_j3b_panel_admin y fase_j3b2_panel_admin)
 - Celular (`<= 767px`): solo Usuarios (lista y detalle); `PageSummaryBar`, pestañas, Diseño y resto de secciones solo desde `768px`.
 - Estados de uso con punto de 8 px + texto (`estadoVisual`), movimientos del mes y `AvatarUsuario` único `<img>` del admin (`referrerPolicy="no-referrer"` + iniciales).
-- `SegmentedControl` corta etiquetas de varias palabras entre palabras: usar `\u00a0` y sin `fullWidth` hasta arreglar el componente; filtros con container query (`@container`).
+- `SegmentedControl` ya no corta etiquetas en desktop (`>= 768px` en una línea con columnas iguales vía `grid-auto-columns: 1fr`); filtros con container query (`@container`).
 - Lista-detalle (`UsuariosPanel`) en 2 columnas (`>= 1024px`) con detalle sticky; WhatsApp e IA en grilla de alto propio (`align-items: start`) y Conversaciones con `ui/CollapseToggle`.
 - `IdentidadModal` con botones `fullWidth` y foco en email al eliminar; `SkeletonAdmin` y helpers puros en `src/utils/admin.ts`.
 
 Textos de la web (cartelitos y campanita): siguen REGLAS_TEXTOS_WEB.md. Un texto nuevo se
 escribe primero en ese archivo. Lo controlan app/core/reglas_texto_web.py y
 tests/test_reglas_texto_web*.py en backend, y reglasTextoWeb.ts y textosCartelitos.test.ts.
+
+26. **Tamaños y una línea de `SegmentedControl` (fase_fs1_selector_tamanos, 24/11/2026):** Columnas del mismo ancho medidas por la etiqueta más larga (`grid-auto-flow: column; grid-auto-columns: 1fr`, sin `flex: 1 1 0` en `.pill`). En desktop (`>= 768px`) usa `white-space: nowrap` (sin partir etiquetas); hasta `767px` y en `fullWidth` (`minmax(0, 1fr)`) puede partirse con `white-space: normal` sin ellipsis. Prop `size?: 'sm' | 'md' | 'lg'` (default `'md'`): `sm` 36px/12px pad H (`--selector-pill-h-sm`), `md` 40px/16px pad H (`--selector-pill-h`), `lg` 44px/16px pad H (`--selector-pill-h-lg`), letra 13px en los tres; bajo `@media (pointer: coarse)` todos miden mínimo 44px (`layout="stacked"` conserva 48px en `md`/`lg` y baja a 44px en `sm`). Asignación de tamaños a pantallas queda sin asignar todavía (muestra en Admin > Diseño > Pestañas y Selectores).

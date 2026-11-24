@@ -12,6 +12,8 @@ export interface SegmentedControlOption<T extends string = string> {
   disabled?: boolean
 }
 
+export type SegmentedControlSize = 'sm' | 'md' | 'lg'
+
 export interface SegmentedControlProps<T extends string = string> {
   options: SegmentedControlOption<T>[]
   value: T
@@ -21,6 +23,7 @@ export interface SegmentedControlProps<T extends string = string> {
   fullWidth?: boolean
   /* wrap ya no hace falta: la cápsula siempre pasa a otra fila si no entra */
   layout?: 'inline' | 'stacked' | 'wrap'
+  size?: SegmentedControlSize
 }
 
 /**
@@ -36,6 +39,7 @@ export default function SegmentedControl<T extends string = string>({
   ariaLabel = 'Opciones de selección',
   fullWidth = false,
   layout = 'inline',
+  size = 'md',
 }: SegmentedControlProps<T>) {
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
 
@@ -146,6 +150,8 @@ export default function SegmentedControl<T extends string = string>({
             disabled={isDisabled}
             className={[
               styles.pill,
+              size === 'sm' ? styles.pillSm : '',
+              size === 'lg' ? styles.pillLg : '',
               layout === 'stacked' ? styles.pillStacked : '',
               isActive ? styles.pillActive : '',
               isDisabled ? styles.pillDisabled : '',

@@ -27,6 +27,7 @@ import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import TransaccionRow from '@/components/transacciones/TransaccionRow'
 import EmptyState from '@/components/ui/EmptyState/EmptyState'
 import type { Billetera, Transaccion } from '@/types'
+import DemoTamanosSelector from './DemoTamanosSelector'
 import styles from './InteractiveDemos.module.css'
 
 export interface DemoProps {
@@ -79,8 +80,9 @@ export function DemoSegmentedControls({ selectedId, onSelect }: DemoProps = {}) 
   const [variantD, setVariantD] = useState<'mes' | 'año' | 'historico'>('mes')
 
   return (
-    <div className={styles.demoGrid}>
-      {/* Opción 1: Cápsula Gris (Transacciones) */}
+    <>
+      <div className={styles.demoGrid}>
+        {/* Opción 1: Cápsula Gris (Transacciones) */}
       <div className={styles.variantCard}>
         <div className={styles.cardHeader}>
           <h4 className={styles.cardTitle}>Opción 1: Selector en Cápsula (Transacciones)</h4>
@@ -218,7 +220,9 @@ export function DemoSegmentedControls({ selectedId, onSelect }: DemoProps = {}) 
           </div>
         )}
       </div>
-    </div>
+      </div>
+      <DemoTamanosSelector />
+    </>
   )
 }
 

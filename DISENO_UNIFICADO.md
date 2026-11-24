@@ -108,13 +108,26 @@ ui/SegmentedControl ES la cápsula de la "Opción 1" de la página admin Diseño
 ### Tokens y Medidas del Selector
 - `--radius-selector-pill`: `10px` (radio del botón de selección).
 - `--selector-gap`: `var(--space-icon)` (`6px`).
-- `--selector-pill-h`: `40px` (y `44px` en pantallas táctiles con `@media (pointer: coarse)`).
-- `--selector-pill-h-stacked`: `56px` (modo vertical o apilado con ícono superior).
+- `--selector-pill-h-sm`: `36px` (compacto para barras de cards; sube a `44px` en `@media (pointer: coarse)`).
+- `--selector-pill-h`: `40px` (tamaño por defecto `md`; sube a `44px` en `@media (pointer: coarse)`).
+- `--selector-pill-h-lg`: `44px` (grande para modales, formularios y vistas móviles).
+- `--selector-pill-h-stacked`: `48px` (modo vertical o apilado con ícono superior; en `size="sm"` baja a `44px`).
 - `--selector-pill-bg-active`: `var(--primary)`.
 - `--selector-pill-text-active`: `#FFFFFF`.
 
-**Geometría Táctil y Accesibilidad:**  
-Píldora de 40px en entornos de escritorio y 44px en entornos táctiles (`@media (pointer: coarse)`), satisfaciendo plenamente el objetivo táctil de 44px exigido por WCAG 2.5.5 (Target Size Enhanced).
+**Reglas de Columnas, Una Línea y Tres Tamaños (FS1):**
+1. **Columnas del mismo ancho y una línea en desktop:** El track usa CSS Grid (`grid-auto-flow: column; grid-auto-columns: 1fr`), sin `flex: 1 1 0` en `.pill`, midiendo todas las columnas por la etiqueta más larga del grupo. Desde `768px` las etiquetas van en un único renglón (`white-space: nowrap`); hasta `767px` pueden partirse (`white-space: normal`).
+2. **Desborde de grupo en desktop:** Si la cápsula inline no entra en el ancho disponible en desktop, no parte las etiquetas: el contenedor padre con `flex-wrap: wrap` pasa el grupo entero a la fila inferior.
+3. **Comportamiento de `fullWidth`, `wrap` y `stacked`:** Con `fullWidth`, el grupo ocupa el 100% y reparte columnas con `grid-auto-columns: minmax(0, 1fr)`, permitiendo partir texto (`white-space: normal`) si una etiqueta no entra en su columna, nunca con puntos suspensivos (`ellipsis`) ni `overflow: hidden`. `layout="wrap"` y `layout="stacked"` conservan su comportamiento, respetando los tres tamaños (`stacked` mantiene `48px` mínimo en `md` y `lg`, y `44px` en `sm`).
+4. **Táctil (`@media (pointer: coarse)`):** Los tres tamaños miden mínimo `44px` de alto (`sm` y `md` suben a `44px`; `lg` ya es `44px`), satisfaciendo WCAG 2.5.5.
+
+| Tamaño (`size`) | Alto (desktop / táctil) | Relleno horizontal | Para qué entorno sería | Estado |
+| :--- | :--- | :--- | :--- | :--- |
+| `sm` | `36px` / `44px` | `12px` | Barras internas de cards (ej. Análisis) | Sin asignar todavía |
+| `md` (default) | `40px` / `44px` | `16px` | Encabezados de página y tamaño actual | Sin asignar todavía |
+| `lg` | `44px` / `44px` | `16px` | Modales, formularios y vistas móviles | Sin asignar todavía |
+
+*(Nota: radio `10px`, tamaño de letra `13px`, colores, sombra `--elevation-pill` y separación `--selector-gap` son iguales en los tres tamaños.)*
 
 ### Propiedad opcional `description`
 El tipo `SegmentedControlOption` admite la prop opcional `description?: string`:
@@ -900,7 +913,7 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
 - Celular (`<= 767px`): muestra solo Usuarios (lista y detalle); `PageSummaryBar`, pestañas, Diseño, WhatsApp e IA, Tareas y Registro solo desde `768px`.
 - Estética alineada con Perfil > Seguridad (`.sectionCard` y `.securityRow`) y `PageSummaryBar`; raíz `.page` según §17 sin `!important` ni siglas `ARS`/`USD` visibles.
 - Estados de uso con punto de 8 px + texto (`estadoVisual`) y `AvatarUsuario` como único `<img>` del admin (`referrerPolicy="no-referrer"` + iniciales).
-- `SegmentedControl` corta etiquetas de varias palabras entre palabras: usar espacio duro `\u00a0` y sin `fullWidth` hasta arreglar el componente; filtros en lista con container query (`@container`).
+- `SegmentedControl` mantiene sus etiquetas en una sola línea en desktop (`>= 768px` con `white-space: nowrap` y columnas iguales vía `grid-auto-columns: 1fr`); filtros en lista con container query (`@container`).
 - WhatsApp e IA en grilla de 2/3 columnas con alto propio (`align-items: start`) y tarjeta Conversaciones plegable con `ui/CollapseToggle`.
 - `IdentidadModal` con botones `fullWidth` y foco en email al eliminar; cargas con `SkeletonAdmin` y helpers en `src/utils/admin.ts`.
 

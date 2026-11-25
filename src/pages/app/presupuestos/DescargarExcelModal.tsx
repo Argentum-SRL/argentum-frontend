@@ -114,6 +114,7 @@ export default function DescargarExcelModal({ isOpen, onClose }: DescargarExcelM
             }}
             ariaLabel="Alcance del Excel de presupuestos"
             fullWidth
+            size="lg"
           />
         </div>
       </div>

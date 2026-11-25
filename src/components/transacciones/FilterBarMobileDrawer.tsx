@@ -278,6 +278,7 @@ export default function FilterBarMobileDrawer({
             value={localFilters.tipo ?? 'todos'}
             onChange={(v) => handleTipoChange(v === 'todos' ? undefined : v)}
             fullWidth
+            size="lg"
             ariaLabel="Tipo de movimiento"
           />
         </div>
@@ -295,6 +296,7 @@ export default function FilterBarMobileDrawer({
               value={(localFilters.moneda === 'ARS' || localFilters.moneda === 'USD') ? localFilters.moneda : 'todas'}
               onChange={(v) => setLocalFilters((prev) => ({ ...prev, moneda: v === 'todas' ? undefined : v }))}
               fullWidth
+              size="lg"
               ariaLabel="Moneda"
             />
           </div>
@@ -536,6 +538,7 @@ export default function FilterBarMobileDrawer({
               if (v) handleApplyPreset(v)
             }}
             fullWidth
+            size="lg"
             ariaLabel="Atajos de período"
           />
 

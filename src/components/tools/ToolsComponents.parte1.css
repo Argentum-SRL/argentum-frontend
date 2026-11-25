@@ -82,7 +82,7 @@
 
 @media (max-width: 479px) {
   .modoPagoSelector [role="radio"] {
-    padding: 0 8px;
+    padding-inline: 8px;
     font-size: 12px;
   }
 }

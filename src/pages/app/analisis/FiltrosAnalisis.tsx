@@ -134,6 +134,7 @@ export default function FiltrosAnalisis({
             onChange={onModoEvolucionChange}
             ariaLabel="Tipo de gráfico de evolución"
             fullWidth
+            size="sm"
           />
           {onOpenEditorSeries && (
             <button
@@ -166,6 +167,7 @@ export default function FiltrosAnalisis({
             onChange={(val) => onCiclosChange(Number(val))}
             ariaLabel="Cantidad de ciclos"
             fullWidth
+            size="sm"
           />
         </div>
       )}

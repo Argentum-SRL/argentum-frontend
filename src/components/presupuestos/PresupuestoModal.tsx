@@ -913,6 +913,7 @@ export default function PresupuestoModal({
                     onChange={(v) => setField('periodo', v)}
                     ariaLabel="Periodo de tiempo"
                     fullWidth
+                    size="lg"
                   />
                 </div>
 

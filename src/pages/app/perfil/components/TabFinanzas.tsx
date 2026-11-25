@@ -332,6 +332,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
                     onChange={(val) => setMonedaPrincipal(val as 'ARS' | 'USD')}
                     ariaLabel="Moneda Principal"
                     fullWidth
+                    size="lg"
                   />
                 </div>
               </div>

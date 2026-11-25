@@ -294,6 +294,7 @@ export default function AnimacionPreviewPage() {
               onChange={(val: string) => setViewMode(val as typeof viewMode)}
               ariaLabel="Modos de animación"
               layout="inline"
+              size="md"
             />
 
             {/* Alternar Tema Light / Dark */}

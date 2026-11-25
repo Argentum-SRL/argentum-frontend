@@ -7,14 +7,17 @@
    - En celular (<= 767px) un grupo inline (sin fullWidth, wrap ni stacked) usa
      display: flex con flex-wrap: wrap y cada botón flex: 1 1 auto / min-width:
      min(max-content, 100%) para pasar a la fila siguiente cuando no entra.
-   - Tres tamaños (sm 36px/12px, md 40px/16px, lg 44px/16px), letra 13px y
-     mínimo 44px en táctil (pointer: coarse).
+   - Alturas visuales iguales en mouse y táctil: sm 28px (pad 3px 10px), md 32px
+     (pad 4px 12px), lg 36px (pad 5px 14px), stacked 44px; letra 13px, radio 8px.
+   - Zona de toque de 44px por fuera mediante .pill::before con inset negativo
+     (sin cambiar la altura visual bajo pointer: coarse ni invadir botones vecinos).
    - Píldora inactiva: transparente, sin borde, color var(--text-2), 13px, peso 600,
-     min-height var(--selector-pill-h), radio var(--radius-selector-pill).
+     min-height var(--pill-h), radio var(--radius-selector-pill).
    - Píldora activa: background var(--selector-pill-bg-active), color var(--selector-pill-text-active),
      peso 700 y box-shadow var(--elevation-pill).
    - Badge opcional para contadores (.badge) con contraste adaptativo al estado activo.
    - Hover solo cambia el color del texto a var(--text) (sin fondo de hover).
+   - Permitido en este archivo: inset negativos en .pill::before para zona de toque.
    - Prohibido en este archivo: transform, directivas important, márgenes negativos,
      z-index y sombras que no sean var(--elevation-pill).
    ========================================================================== */
@@ -32,7 +35,9 @@
 }
 
 .pill {
-  min-height: var(--selector-pill-h);
+  position: relative;
+  --pill-h: var(--selector-pill-h);
+  min-height: var(--pill-h);
   border: 0;
   border-radius: var(--radius-selector-pill);
   background: transparent;
@@ -48,7 +53,7 @@
   gap: var(--space-sm);
   cursor: pointer;
   box-sizing: border-box;
-  padding: 6px var(--space-lg);
+  padding: 4px 12px;
   margin: 0;
   white-space: normal;
   text-align: center;
@@ -58,23 +63,27 @@
   transition: color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
 }
 
+.pill::before {
+  content: "";
+  position: absolute;
+  inset-block: min(0px, calc((var(--pill-h) - var(--selector-touch)) / 2));
+  inset-inline: -3px;
+}
+
 .pillSm {
-  min-height: var(--selector-pill-h-sm);
-  padding: 6px var(--space-md);
+  --pill-h: var(--selector-pill-h-sm);
+  padding: 3px 10px;
 }
 
 .pillLg {
-  min-height: var(--selector-pill-h-lg);
+  --pill-h: var(--selector-pill-h-lg);
+  padding: 5px 14px;
 }
 
 .pillStacked {
-  min-height: var(--selector-pill-h-stacked);
+  --pill-h: var(--selector-pill-h-stacked);
   flex-direction: column;
   gap: var(--space-xs);
-}
-
-.pillSm.pillStacked {
-  min-height: 44px;
 }
 
 .fullWidth {
@@ -85,7 +94,7 @@
 .fullWidth .pill {
   min-width: 0;
   max-width: none;
-  padding: 6px var(--space-sm);
+  padding-inline: var(--space-sm);
 }
 
 .trackWrap {
@@ -96,7 +105,7 @@
 .trackWrap .pill {
   flex: 1 1 auto;
   min-width: min(max-content, 100%);
-  padding: 6px var(--space-md);
+  padding-inline: var(--space-md);
 }
 
 .text {
@@ -147,12 +156,6 @@
   .fullWidth .label,
   .fullWidth .description {
     white-space: normal;
-  }
-}
-
-@media (pointer: coarse) {
-  .pillSm {
-    min-height: 44px;
   }
 }
 

@@ -429,6 +429,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                   <SegmentedControl<'entre_cuentas' | 'compra' | 'venta'>
                     ariaLabel="Tipo de operación"
                     fullWidth
+                    size="lg"
                     className={styles.operacionSelector}
                     value={tipoOperacion === 'entre_cuentas' ? 'entre_cuentas' : fxDirection}
                     onChange={handleSelectOperacion}
@@ -624,6 +625,7 @@ export const TransferenciaModal: React.FC<TransferenciaModalProps> = ({
                       ariaLabel="Tipo de cambio de referencia"
                       fullWidth
                       layout="stacked"
+                      size="lg"
                       value={tipoCotizacion}
                       onChange={(val) => {
                         setTipoCotizacion(val)

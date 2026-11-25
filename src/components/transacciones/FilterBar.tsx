@@ -592,6 +592,7 @@ export default function FilterBar({
             value={filters.tipo ?? 'todos'}
             onChange={(v) => handleTipoChange(v === 'todos' ? undefined : v)}
             ariaLabel="Filtrar por tipo"
+            size="sm"
           />
 
           {/* Billetera Popover */}

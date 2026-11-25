@@ -257,6 +257,7 @@ export default function InformeEditor({
                       onChange={(v: string) => setFormCiclos(Number(v))}
                       ariaLabel="Período a mostrar"
                       fullWidth
+                      size="lg"
                     />
                   </div>
                 </>
@@ -270,6 +271,7 @@ export default function InformeEditor({
                       onChange={(v: string) => setFormMoneda(v as MonedaModoAnalisis)}
                       ariaLabel="Moneda del informe"
                       fullWidth
+                      size="lg"
                     />
                   </div>
 
@@ -281,6 +283,7 @@ export default function InformeEditor({
                       onChange={(v: string) => setFormCiclos(Number(v))}
                       ariaLabel="Cuántos ciclos ver en el informe"
                       fullWidth
+                      size="lg"
                     />
                   </div>
 
@@ -292,6 +295,7 @@ export default function InformeEditor({
                       onChange={(v: string) => setFormNaturaleza(v as NaturalezaGastoFiltro)}
                       ariaLabel="Tipo de gasto del informe"
                       fullWidth
+                      size="lg"
                     />
                   </div>
                 </>

@@ -106,28 +106,29 @@ Diseño final sin pista contenedora (sin card ni fondo detrás de los botones): 
 ui/SegmentedControl ES la cápsula de la "Opción 1" de la página admin Diseño (sin pista, sin card, sin fondo detrás), con el botón elegido en `var(--primary)` y texto blanco por decisión de Sebastián del 17/10; la "Opción 4" tiene pista o card y NO es la oficial.
 
 ### Tokens y Medidas del Selector
-- `--radius-selector-pill`: `10px` (radio del botón de selección).
+- `--radius-selector-pill`: `8px` (radio del botón de selección).
 - `--selector-gap`: `var(--space-icon)` (`6px`).
-- `--selector-pill-h-sm`: `36px` (compacto para barras de cards; sube a `44px` en `@media (pointer: coarse)`).
-- `--selector-pill-h`: `40px` (tamaño por defecto `md`; sube a `44px` en `@media (pointer: coarse)`).
-- `--selector-pill-h-lg`: `44px` (grande para modales, formularios y vistas móviles).
-- `--selector-pill-h-stacked`: `48px` (modo vertical o apilado con ícono superior; en `size="sm"` baja a `44px`).
+- `--selector-pill-h-sm`: `28px` (compacto para barras de tarjeta y filtros).
+- `--selector-pill-h`: `32px` (tamaño por defecto `md`, pestañas/navegación de página e inline).
+- `--selector-pill-h-lg`: `36px` (grande para modales, drawers y formularios).
+- `--selector-pill-h-stacked`: `44px` (modo vertical o apilado con descripción o ícono superior).
+- `--selector-touch`: `44px` (zona de toque mínima extendida por fuera con `.pill::before`).
 - `--selector-pill-bg-active`: `var(--primary)`.
 - `--selector-pill-text-active`: `#FFFFFF`.
 
 **Reglas de Columnas, Una Línea y Tres Tamaños (FS1):**
 1. **Columnas del mismo ancho y una línea en desktop:** En desktop (`>= 768px`), un grupo inline va en columnas iguales en una sola línea (`grid-auto-flow: column; grid-auto-columns: 1fr`, `white-space: nowrap`, sin `flex: 1 1 0`); en celular (`<= 767px`), un grupo inline que no entra pasa a la fila siguiente (`display: flex; flex-wrap: wrap`, `flex: 1 1 auto`, `min-width: min(max-content, 100%)`), partiendo la etiqueta solo si un botón solo no entra en el contenedor.
 2. **Desborde de grupo en desktop:** Si la cápsula inline no entra en el ancho disponible en desktop, no parte las etiquetas: el contenedor padre con `flex-wrap: wrap` pasa el grupo entero a la fila inferior.
-3. **Comportamiento de `fullWidth`, `wrap` y `stacked`:** Con `fullWidth`, el grupo ocupa el 100% y reparte columnas con `grid-auto-columns: minmax(0, 1fr)`, permitiendo partir texto (`white-space: normal`) si una etiqueta no entra en su columna, nunca con puntos suspensivos (`ellipsis`) ni `overflow: hidden`. `layout="wrap"` y `layout="stacked"` conservan su comportamiento, respetando los tres tamaños (`stacked` mantiene `48px` mínimo en `md` y `lg`, y `44px` en `sm`).
-4. **Táctil (`@media (pointer: coarse)`):** Los tres tamaños miden mínimo `44px` de alto (`sm` y `md` suben a `44px`; `lg` ya es `44px`), satisfaciendo WCAG 2.5.5.
+3. **Comportamiento de `fullWidth`, `wrap` y `stacked`:** Con `fullWidth`, el grupo ocupa el 100% y reparte columnas con `grid-auto-columns: minmax(0, 1fr)`, permitiendo partir texto (`white-space: normal`) si una etiqueta no entra en su columna, nunca con puntos suspensivos (`ellipsis`) ni `overflow: hidden`. `fullWidth` y `wrap` solo fijan relleno horizontal (`padding-inline`) para que el relleno vertical dependa siempre del tamaño. `layout="stacked"` conserva `44px` de alto.
+4. **Zona de toque separada del tamaño visual (FS1C):** La altura visual no cambia con `pointer: coarse`; cada `.pill` usa `position: relative` y extiende su zona de toque a `44px` por fuera mediante `.pill::before` (`--selector-touch: 44px`). El contenedor decide el tamaño (`sm` barra de tarjeta/filtro, `md` navegación de página, `lg` modal/drawer/formulario).
 
-| Tamaño (`size`) | Alto (desktop / táctil) | Relleno horizontal | Para qué entorno sería | Estado |
+| Tamaño (`size`) | Alto visual | Relleno | Zona de toque | Contenedor asignado |
 | :--- | :--- | :--- | :--- | :--- |
-| `sm` | `36px` / `44px` | `12px` | Barras internas de cards (ej. Análisis) | Sin asignar todavía |
-| `md` (default) | `40px` / `44px` | `16px` | Encabezados de página y tamaño actual | Sin asignar todavía |
-| `lg` | `44px` / `44px` | `16px` | Modales, formularios y vistas móviles | Sin asignar todavía |
+| `sm` | `28px` | `3px 10px` | `44px` | Barras de tarjeta y barras de filtro |
+| `md` (default) | `32px` | `4px 12px` | `44px` | Pestañas/navegación de página y paneles admin |
+| `lg` | `36px` | `5px 14px` | `44px` | Modales, drawers y formularios (`stacked`: `44px`) |
 
-*(Nota: radio `10px`, tamaño de letra `13px`, colores, sombra `--elevation-pill` y separación `--selector-gap` son iguales en los tres tamaños.)*
+*(Nota: radio `8px`, tamaño de letra `13px`, colores, sombra `--elevation-pill` y separación `--selector-gap` son iguales en los tres tamaños.)*
 
 ### Propiedad opcional `description`
 El tipo `SegmentedControlOption` admite la prop opcional `description?: string`:

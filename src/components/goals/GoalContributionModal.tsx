@@ -315,6 +315,7 @@ export default function GoalContributionModal({
                   value={tipo}
                   onChange={value => dispatch({ type: 'SET_FIELD', field: 'tipo', value })}
                   fullWidth
+                  size="lg"
                   ariaLabel="Tipo de operación"
                 />
 

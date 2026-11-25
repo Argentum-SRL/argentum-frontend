@@ -957,6 +957,7 @@ export default function SuscripcionModal({
                           dispatch({ type: 'SET_FIELD', field: 'metodoCobro', value })
                         }
                         fullWidth
+                        size="lg"
                         ariaLabel="Método de cobro"
                       />
                     </div>
@@ -1185,6 +1186,7 @@ export default function SuscripcionModal({
                         }
                         fullWidth
                         layout="wrap"
+                        size="lg"
                         ariaLabel="Frecuencia de cobro"
                       />
                       {costoMensual && frecuencia !== 'mensual' && (

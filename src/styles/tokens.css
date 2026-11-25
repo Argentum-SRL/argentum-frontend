@@ -24,7 +24,7 @@
   /* ── Radios de Curvatura ── */
   --radius-modal: 20px; /* Radio de curvatura unificado para modales y bottom sheets */
   --radius-control: 12px; /* Radio de curvatura estándar para controles interactivos y botones */
-  --radius-selector-pill: 10px; /* Radio concéntrico de la píldora activa del selector cápsula */
+  --radius-selector-pill: 8px; /* Radio concéntrico de la píldora activa del selector cápsula */
 
   /* ── Capas de Apilamiento (Z-Index) ── */
   --z-base: 0; /* Capa base para flujo normal del documento */
@@ -84,10 +84,11 @@
 
   /* ── Medidas del Selector Cápsula ── */
   --selector-gap: var(--space-icon); /* Separación horizontal entre botones de selección (6px) */
-  --selector-pill-h-sm: 36px; /* Altura mínima de la píldora compacta para barras de tarjeta (44px en táctil) */
-  --selector-pill-h: 40px; /* Altura mínima de la píldora para diseño horizontal o inline (44px en táctil) */
-  --selector-pill-h-lg: 44px; /* Altura mínima de la píldora grande para modales y formularios */
-  --selector-pill-h-stacked: 48px; /* Altura mínima de la píldora para diseño vertical o apilado */
+  --selector-pill-h-sm: 28px; /* Altura visual de la píldora compacta para barras de tarjeta y filtros */
+  --selector-pill-h: 32px; /* Altura visual de la píldora mediana para pestañas de página e inline */
+  --selector-pill-h-lg: 36px; /* Altura visual de la píldora grande para modales, drawers y formularios */
+  --selector-pill-h-stacked: 44px; /* Altura visual de la píldora apilada con descripción o ícono superior */
+  --selector-touch: 44px; /* Altura mínima de la zona de toque extendida por ::before */
 
   /* ── Colores del Selector Cápsula ── */
   --selector-pill-bg-active: var(--primary); /* Fondo del botón de selección activo */
@@ -101,13 +102,6 @@
   --modal-w-lg: calc(800px * var(--screen-scale)); /* Ancho de modal grande adaptativo */
   --modal-w-xl: calc(1000px * var(--screen-scale)); /* Ancho de modal extra grande adaptativo */
   --content-max-w: calc(1600px * var(--screen-scale)); /* Ancho máximo de contenido principal adaptativo */
-}
-
-@media (pointer: coarse) {
-  :root {
-    --selector-pill-h-sm: 44px; /* Altura táctil mejorada para WCAG 2.5.5 */
-    --selector-pill-h: 44px; /* Altura táctil mejorada para WCAG 2.5.5 */
-  }
 }
 
 /* Escala adaptativa para monitores grandes */

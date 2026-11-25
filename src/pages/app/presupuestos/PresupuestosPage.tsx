@@ -369,6 +369,7 @@ export default function PresupuestosPage() {
           value={activeTab}
           onChange={setActiveTab}
           ariaLabel="Estado de los presupuestos"
+          size="md"
         />
       </div>
 

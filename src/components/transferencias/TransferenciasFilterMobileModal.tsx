@@ -94,6 +94,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
             value={localPeriodoPreset}
             onChange={setLocalPeriodoPreset}
             fullWidth
+            size="lg"
             ariaLabel="Período"
           />
         </div>
@@ -110,6 +111,7 @@ export const TransferenciasFilterMobileModal: React.FC<TransferenciasFilterMobil
             value={localTipo}
             onChange={setLocalTipo}
             fullWidth
+            size="lg"
             ariaLabel="Tipo de operación"
           />
         </div>

@@ -160,6 +160,7 @@ export default function ProyeccionCuotasCard({
             onChange={(v: string) => handleCambiarHorizonte(v as '6' | '12')}
             ariaLabel="Horizonte de proyección"
             layout="inline"
+            size="sm"
           />
 
           <SegmentedControl
@@ -171,6 +172,7 @@ export default function ProyeccionCuotasCard({
             onChange={(v: string) => handleCambiarVistaInterna(v as 'grafico' | 'planes')}
             ariaLabel="Modo de vista de proyección"
             layout="inline"
+            size="sm"
           />
 
           {collapsible && (

@@ -241,6 +241,7 @@ export default function EvolucionCiclosCard({
                       value={modoGrafico}
                       onChange={onModoGraficoChange}
                       ariaLabel="Tipo de gráfico de evolución"
+                      size="sm"
                     />
                   )}
 
@@ -250,6 +251,7 @@ export default function EvolucionCiclosCard({
                       value={modoBarrasCustom}
                       onChange={setModoBarrasCustom}
                       ariaLabel="Disposición de barras"
+                      size="sm"
                     />
                   )}
 

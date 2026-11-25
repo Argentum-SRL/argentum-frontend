@@ -599,6 +599,7 @@ export default function TransaccionesPage() {
         onChange={setActiveTab}
         fullWidth
         ariaLabel="Secciones de transacciones"
+        size="md"
         className={styles.tabsMobileOnly}
       />
 

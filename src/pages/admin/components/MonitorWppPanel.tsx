@@ -207,6 +207,7 @@ export const MonitorWppPanel: React.FC<MonitorWppPanelProps> = ({
           value={periodo}
           onChange={handleCambioPeriodo}
           layout="inline"
+          size="md"
           ariaLabel="Período del monitor"
         />
       </div>

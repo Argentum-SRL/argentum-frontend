@@ -160,6 +160,7 @@ export const TransferenciasFilterBar: React.FC<TransferenciasFilterBarProps> = (
             value={tipoOperacion}
             onChange={onTipoOperacionChange}
             ariaLabel="Filtrar por tipo de operación"
+            size="sm"
           />
 
           {/* Período Dropdown Pill (matching Transacciones) */}

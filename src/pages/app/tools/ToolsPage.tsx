@@ -136,6 +136,7 @@ export default function ToolsPage() {
             onChange={(val) => handleSelectTab(val as TabId)}
             ariaLabel="Herramientas disponibles"
             layout="inline"
+            size="md"
           />
         </nav>
       </div>

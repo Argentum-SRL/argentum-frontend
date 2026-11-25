@@ -331,6 +331,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   value={monedaContadoActual}
                   onChange={(v) => handleChange('moneda_contado', v)}
                   ariaLabel="Moneda del precio de contado"
+                  size="lg"
                 />
               </div>
               <MontoInput
@@ -467,6 +468,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                           value={monedaCuotasEfectiva}
                           onChange={(v) => handleChange('moneda_cuotas', v)}
                           ariaLabel="Moneda de las cuotas"
+                          size="lg"
                         />
                       )}
                       <button
@@ -531,6 +533,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       value={monedaCuotasEfectiva}
                       onChange={(v) => handleChange('moneda_cuotas', v)}
                       ariaLabel="Moneda de las cuotas"
+                      size="lg"
                     />
                   </div>
                   <div className="flex items-stretch h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
@@ -659,6 +662,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       }}
                       layout="stacked"
                       fullWidth
+                      size="lg"
                       ariaLabel="Inflación para el cálculo"
                     />
 

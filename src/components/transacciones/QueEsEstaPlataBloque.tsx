@@ -40,6 +40,7 @@ export function QueEsEstaPlataBloque({ hook, moneda, categorias }: QueEsEstaPlat
         <SegmentedControl<'me_pagaron' | 'parte_de_gasto' | 'paso_por_mi_cuenta'>
           layout="stacked"
           fullWidth
+          size="lg"
           ariaLabel="¿Qué es esta plata?"
           value={opcion}
           onChange={setOpcion}

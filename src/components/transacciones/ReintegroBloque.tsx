@@ -150,6 +150,7 @@ export function ReintegroBloque({ reintegro, isEdit, onToggleOff }: ReintegroBlo
                 <SegmentedControl<'monto' | 'porcentaje' | 'todo'>
                   ariaLabel="¿Cuánto te devuelven?"
                   fullWidth
+                  size="lg"
                   value={modoMonto}
                   onChange={setModoMonto}
                   options={[
@@ -209,6 +210,7 @@ export function ReintegroBloque({ reintegro, isEdit, onToggleOff }: ReintegroBlo
                 <SegmentedControl<'si' | 'no'>
                   ariaLabel="¿Ya te lo devolvieron?"
                   fullWidth
+                  size="lg"
                   value={yaRecibido ? 'si' : 'no'}
                   onChange={(val) => setYaRecibido(val === 'si')}
                   options={[

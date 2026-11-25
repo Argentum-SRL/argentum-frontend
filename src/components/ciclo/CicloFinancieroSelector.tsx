@@ -453,6 +453,7 @@ export const CicloFinancieroSelector: React.FC<Props> = ({
           onChange={(val) => handleModeChange(val as 'dia_fijo' | 'regla')}
           ariaLabel="Modalidad de ciclo de cobro"
           fullWidth
+          size="md"
         />
       </div>
 
@@ -629,6 +630,7 @@ export const CicloFinancieroSelector: React.FC<Props> = ({
                   onChange={(v) => handleContingencyChange(v as 'anterior' | 'posterior' | 'mismo')}
                   ariaLabel="Ajuste por feriado"
                   fullWidth
+                  size="md"
                 />
               </div>
             </div>

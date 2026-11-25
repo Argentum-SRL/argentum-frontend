@@ -138,6 +138,7 @@ export function QueEsEstaPlataModal({
           <SegmentedControl<'me_pagaron' | 'paso_por_mi_cuenta'>
             layout="stacked"
             fullWidth
+            size="lg"
             ariaLabel="¿Qué es esta plata?"
             value={opcion}
             onChange={setOpcion}

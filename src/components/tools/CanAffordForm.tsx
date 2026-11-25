@@ -138,6 +138,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
                 onChange={(v) => handleChange('moneda', v)}
                 ariaLabel="Moneda"
                 fullWidth
+                size="lg"
               />
             </div>
           )}
@@ -152,6 +153,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
               onChange={(v) => handleChange('modo', v)}
               ariaLabel="¿Cómo lo vas a pagar?"
               fullWidth
+              size="lg"
             />
           </div>
         </div>
@@ -211,6 +213,7 @@ export const CanAffordForm: React.FC<CanAffordFormProps> = ({
                   onChange={(v) => setTieneInteres(v === 'con')}
                   ariaLabel="¿Las cuotas tienen interés?"
                   fullWidth
+                  size="lg"
                 />
               </div>
 

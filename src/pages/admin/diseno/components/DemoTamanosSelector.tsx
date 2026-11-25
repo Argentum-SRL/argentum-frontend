@@ -44,9 +44,9 @@ export default function DemoTamanosSelector() {
       <div className={styles.sectionHeader}>
         <h3 className={styles.sectionTitle}>Tamaños según el entorno (para aprobar)</h3>
         <p className={styles.sectionSubtitle}>
-          Muestra con el componente real ui/SegmentedControl (letra 13px, radio 10px, gap 6px).
-          En pantallas táctiles (pointer: coarse), sm y md suben a 44px de alto mínimo; el marco
-          celular usa lg (44px) para representar la altura táctil.
+          Muestra con el componente real ui/SegmentedControl (letra 13px, radio 8px, gap 6px).
+          La altura visual no cambia en táctil; todos extienden su zona de toque a 44px por
+          fuera mediante ::before.
         </p>
       </div>
 
@@ -55,7 +55,7 @@ export default function DemoTamanosSelector() {
         <div className={styles.demoBlock}>
           <div className={styles.blockHeader}>
             <h4 className={styles.blockTitle}>a. Las tres alturas en fila</h4>
-            <span className={styles.blockScreenTag}>Comparación directa: sm 36px · md 40px · lg 44px</span>
+            <span className={styles.blockScreenTag}>Comparación directa: sm 28px · md 32px · lg 36px</span>
           </div>
           <div className={styles.canvas}>
             <div className={styles.heightsRow}>
@@ -70,7 +70,7 @@ export default function DemoTamanosSelector() {
                   onChange={setValA1}
                   ariaLabel="Tamaño sm"
                 />
-                <span className={styles.measurePill}>sm · 36px alto · 12px pad H · 13px</span>
+                <span className={styles.measurePill}>sm · 28px alto · 3px 10px pad · 13px</span>
               </div>
 
               <div className={styles.heightItem}>
@@ -84,7 +84,7 @@ export default function DemoTamanosSelector() {
                   onChange={setValA2}
                   ariaLabel="Tamaño md"
                 />
-                <span className={styles.measurePill}>md · 40px alto · 16px pad H · 13px</span>
+                <span className={styles.measurePill}>md · 32px alto · 4px 12px pad · 13px</span>
               </div>
 
               <div className={styles.heightItem}>
@@ -98,7 +98,7 @@ export default function DemoTamanosSelector() {
                   onChange={setValA3}
                   ariaLabel="Tamaño lg"
                 />
-                <span className={styles.measurePill}>lg · 44px alto · 16px pad H · 13px</span>
+                <span className={styles.measurePill}>lg · 36px alto · 5px 14px pad · 13px</span>
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function DemoTamanosSelector() {
                 />
               </div>
               <div className={styles.cardMockBody}>
-                Área de gráfico o tabla dentro de la card · cápsula sm: 36px alto, 12px relleno horizontal, 13px letra
+                Área de gráfico o tabla dentro de la card · cápsula sm: 28px alto, 3px 10px relleno, 13px letra
               </div>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function DemoTamanosSelector() {
               />
             </div>
             <p className={styles.measureNote}>
-              Medida cápsula md: 40px alto mínimo · 16px relleno horizontal · 13px letra · columnas iguales
+              Medida cápsula md: 32px alto visual · 4px 12px relleno · 13px letra · columnas iguales
             </p>
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function DemoTamanosSelector() {
                 </div>
 
                 <div className={styles.fieldGroup}>
-                  <span className={styles.fieldLabel}>Tipo (SegmentedControl lg fullWidth: 44px alto)</span>
+                  <span className={styles.fieldLabel}>Tipo (SegmentedControl lg fullWidth: 36px alto visual)</span>
                   <SegmentedControl
                     size="lg"
                     fullWidth
@@ -201,7 +201,7 @@ export default function DemoTamanosSelector() {
 
                 <div className={styles.compareBar}>
                   <span className={styles.fieldLabel}>
-                    Comparación de alturas lado a lado: Input (44px) vs cápsula md (40px) vs cápsula lg (44px)
+                    Comparación de alturas lado a lado: Input (44px) vs cápsula md (32px) vs cápsula lg (36px)
                   </span>
                   <div className={styles.compareRow}>
                     <div className={styles.compareCol}>
@@ -220,7 +220,7 @@ export default function DemoTamanosSelector() {
                         onChange={setValDCmpMd}
                         ariaLabel="Comparación md"
                       />
-                      <span className={styles.measureNote}>md: 40px alto</span>
+                      <span className={styles.measureNote}>md: 32px alto</span>
                     </div>
                     <div className={styles.compareCol}>
                       <SegmentedControl
@@ -234,7 +234,7 @@ export default function DemoTamanosSelector() {
                         onChange={setValDCmpLg}
                         ariaLabel="Comparación lg"
                       />
-                      <span className={styles.measureNote}>lg: 44px alto</span>
+                      <span className={styles.measureNote}>lg: 36px alto</span>
                     </div>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export default function DemoTamanosSelector() {
             <div className={styles.phoneFrame}>
               <div className={styles.phoneHeader}>
                 <span>Marco fijo 375px</span>
-                <span className={styles.measurePill}>lg · 44px mín. · minmax(0, 1fr)</span>
+                <span className={styles.measurePill}>lg · 36px visual (toque 44px) · minmax(0, 1fr)</span>
               </div>
 
               <div className={styles.fieldGroup}>
@@ -320,7 +320,7 @@ export default function DemoTamanosSelector() {
           <div className={styles.canvas}>
             <div className={styles.desktopCompareStack}>
               <div className={styles.desktopRow}>
-                <span className={styles.measurePill}>sm · 36px × 12px pad</span>
+                <span className={styles.measurePill}>sm · 28px × 3px 10px pad</span>
                 <SegmentedControl
                   size="sm"
                   options={[
@@ -344,7 +344,7 @@ export default function DemoTamanosSelector() {
               </div>
 
               <div className={styles.desktopRow}>
-                <span className={styles.measurePill}>md · 40px × 16px pad</span>
+                <span className={styles.measurePill}>md · 32px × 4px 12px pad</span>
                 <SegmentedControl
                   size="md"
                   options={[
@@ -368,7 +368,7 @@ export default function DemoTamanosSelector() {
               </div>
 
               <div className={styles.desktopRow}>
-                <span className={styles.measurePill}>lg · 44px × 16px pad</span>
+                <span className={styles.measurePill}>lg · 36px × 5px 14px pad</span>
                 <SegmentedControl
                   size="lg"
                   options={[

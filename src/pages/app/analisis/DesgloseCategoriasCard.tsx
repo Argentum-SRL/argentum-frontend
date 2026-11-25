@@ -183,6 +183,7 @@ export default function DesgloseCategoriasCard({
               onChange={(v: string) => handleCambiarVista(v as typeof vistaModo)}
               ariaLabel="Modo de visualización de categorías"
               layout="inline"
+              size="sm"
             />
           )}
 

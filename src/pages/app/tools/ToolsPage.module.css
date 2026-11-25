@@ -165,12 +165,10 @@
 .controlsRow .navCapsule [role="radio"] {
   flex: 0 0 auto;
   min-width: 0;
-  min-height: 36px;
-  height: 36px;
   border-radius: 18px;
   background: transparent;
   color: var(--tnp-text);
-  padding: 0 14px;
+  padding-inline: 14px;
   gap: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -206,12 +204,6 @@
 
 .controlsRow .navCapsule [role="radio"]:active {
   background: var(--tnp-active-bg);
-}
-
-@media (pointer: coarse) {
-  .controlsRow .navCapsule [role="radio"] {
-    min-height: 40px;
-  }
 }
 
 @media (max-width: 768px) {

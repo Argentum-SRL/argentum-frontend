@@ -664,6 +664,7 @@ const BilleteraDetallePage: React.FC = () => {
           onChange={setActiveTab}
           fullWidth
           ariaLabel="Secciones de la billetera"
+          size="md"
           className={styles.tabsMobileOnly}
         />
       )}

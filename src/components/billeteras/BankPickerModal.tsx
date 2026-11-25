@@ -686,6 +686,7 @@ export default function BankPickerModal({
                           <SegmentedControl<'hoy' | 'ciclo'>
                             ariaLabel="Punto de partida del saldo"
                             fullWidth
+                            size="lg"
                             value={tipoPuntoPartida}
                             onChange={(val) => setTipoPuntoPartida(val)}
                             options={[

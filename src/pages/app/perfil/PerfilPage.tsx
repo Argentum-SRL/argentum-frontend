@@ -125,6 +125,7 @@ export default function PerfilPage() {
           onChange={(val) => handleTabChange(val as TabType)}
           ariaLabel="Secciones de perfil"
           layout="inline"
+          size="md"
         />
       </div>
 

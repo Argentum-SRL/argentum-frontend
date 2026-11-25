@@ -385,6 +385,7 @@ export default function BilleterasPage() {
         onChange={setActiveTab}
         fullWidth
         ariaLabel="Secciones de billeteras"
+        size="md"
         className={styles.tabsMobileOnly}
       />
 

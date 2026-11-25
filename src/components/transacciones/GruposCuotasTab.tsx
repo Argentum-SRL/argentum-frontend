@@ -703,6 +703,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
               value={statusFilter}
               onChange={setStatusFilter}
               fullWidth
+              size="sm"
               ariaLabel="Filtrar cuotas por estado"
             />
           </div>
@@ -748,6 +749,7 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
             ]}
             value={statusFilter}
             onChange={setStatusFilter}
+            size="sm"
             ariaLabel="Filtrar cuotas por estado"
           />
 

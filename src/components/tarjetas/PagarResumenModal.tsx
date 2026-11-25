@@ -354,6 +354,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   value={modoUSD}
                   onChange={handleModoUSDChange}
                   fullWidth
+                  size="lg"
                   ariaLabel="Modo de pago en dólares"
                 />
 
@@ -466,6 +467,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   value={tipoPago}
                   onChange={handleSelectTipo}
                   fullWidth
+                  size="lg"
                   ariaLabel="Tipo de pago"
                 />
 

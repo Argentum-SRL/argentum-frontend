@@ -254,6 +254,7 @@ export default function AnalisisPage() {
             onChange={(val) => setVistaActiva(val === 'informes' ? 'informes' : 'evolucion')}
             fullWidth
             ariaLabel="Secciones de análisis"
+            size="md"
             className={styles.tabsMobileOnly}
           />
 

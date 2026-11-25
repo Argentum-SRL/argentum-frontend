@@ -254,6 +254,7 @@ export default function MetasPage() {
           value={activeTab}
           onChange={setActiveTab}
           ariaLabel="Estado de las metas"
+          size="md"
         />
       </div>
 

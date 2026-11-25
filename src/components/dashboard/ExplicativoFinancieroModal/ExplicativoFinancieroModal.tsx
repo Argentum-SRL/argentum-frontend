@@ -51,6 +51,7 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
             value={activeTab}
             onChange={setActiveTab}
             fullWidth
+            size="lg"
             ariaLabel="Secciones del explicativo financiero"
           />
         </div>

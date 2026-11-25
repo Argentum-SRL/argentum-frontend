@@ -799,6 +799,7 @@ export default function TransaccionModal({
                     <SegmentedControl<'egreso' | 'ingreso'>
                       ariaLabel="Tipo de transacción"
                       fullWidth
+                      size="lg"
                       value={tipo}
                       onChange={handleSelectTipo}
                       options={[
@@ -837,6 +838,7 @@ export default function TransaccionModal({
                         <SegmentedControl<'debito' | 'transferencia' | 'credito' | 'efectivo'>
                           layout="stacked"
                           fullWidth
+                          size="lg"
                           ariaLabel="Método de pago"
                           options={availableMethods.map(({ key, icon, label }) => ({
                             value: key,

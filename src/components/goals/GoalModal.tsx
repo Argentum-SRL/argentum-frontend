@@ -365,6 +365,7 @@ export default function GoalModal({
                       value={estado}
                       onChange={s => setField('estado', s)}
                       fullWidth
+                      size="lg"
                       ariaLabel="Estado de la meta"
                     />
                     {estado === EstadoMeta.COMPLETADA && (

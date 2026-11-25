@@ -134,6 +134,7 @@ export default function DescargarAnalisisModal({
             }}
             ariaLabel="Formato de descarga del análisis"
             fullWidth
+            size="lg"
           />
         </div>
       </div>

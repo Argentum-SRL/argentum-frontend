@@ -200,6 +200,7 @@ export const AdminPage: React.FC = () => {
               value={activeTab}
               onChange={handleTabChange}
               layout="inline"
+              size="md"
               ariaLabel="Secciones de administración"
             />
           </div>

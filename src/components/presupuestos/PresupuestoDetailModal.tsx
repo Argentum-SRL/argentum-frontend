@@ -681,6 +681,7 @@ export default function PresupuestoDetailModal({
                 value={activeTab}
                 onChange={setActiveTab}
                 fullWidth
+                size="lg"
                 ariaLabel="Vista de gastos e historial"
               />
 

@@ -180,6 +180,7 @@ export default function ComparativaCiclosCard({
             onChange={(v: string) => handleCambiarVista(v as typeof vistaModo)}
             ariaLabel="Modo de vista comparativa"
             layout="inline"
+            size="sm"
           />
 
           {collapsible && (

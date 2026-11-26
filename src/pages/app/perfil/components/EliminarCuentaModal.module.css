@@ -11,18 +11,6 @@
   color: var(--error);
 }
 
-@media (max-width: 479px) {
-  .iconWrap {
-    width: 52px !important;
-    height: 52px !important;
-    margin: 0 auto 12px !important;
-  }
-  .iconAlert {
-    width: 24px !important;
-    height: 24px !important;
-  }
-}
-
 .title {
   font-weight: 800;
   text-align: center;
@@ -31,30 +19,12 @@
   width: 100%;
 }
 
-/* En Desktop (>= 640px): se muestra elegante en una sola línea */
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .title {
-    white-space: nowrap !important;
+    white-space: nowrap !important; /* nowrap-ok: título de modal 580px en >=768px */
     font-size: 1.22rem !important;
     letter-spacing: -0.015em;
     margin-bottom: 10px;
-  }
-}
-
-/* En Móvil (< 640px): tamaño de título real, claro y visible con salto balanceado */
-@media (max-width: 639px) {
-  .title {
-    white-space: normal !important;
-    font-size: 1.15rem !important;
-    letter-spacing: -0.015em;
-    text-wrap: balance;
-    margin-bottom: 8px;
-  }
-}
-
-@media (max-width: 360px) {
-  .title {
-    font-size: 1.05rem !important;
   }
 }
 
@@ -75,32 +45,9 @@
   display: none;
 }
 
-@media (max-width: 639px) {
-  .description {
-    margin-bottom: 16px;
-  }
-  .descDesktop {
-    display: none;
-  }
-  .descMobile {
-    display: block;
-    font-size: 0.85rem;
-    line-height: 1.45;
-  }
-  .descMobile strong {
-    color: var(--error);
-  }
-}
-
 .inputWrap {
   width: 100%;
   margin-bottom: 16px;
-}
-
-@media (max-width: 479px) {
-  .inputWrap {
-    margin-bottom: 14px;
-  }
 }
 
 .passwordInput {
@@ -115,19 +62,6 @@
   color: var(--text);
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-@media (max-width: 479px) {
-  .passwordInput {
-    padding: 11px 14px;
-    font-size: var(--control-font-mobile);
-  }
-}
-
-@media (max-width: 767.98px) {
-  .passwordInput {
-    font-size: var(--control-font-mobile);
-  }
 }
 
 .passwordInput:focus {
@@ -153,13 +87,6 @@
   width: 100%;
   margin-bottom: 16px;
   gap: 12px;
-}
-
-@media (max-width: 479px) {
-  .googleWrap {
-    margin-bottom: 14px;
-    gap: 8px;
-  }
 }
 
 .googleInstruction {
@@ -193,29 +120,78 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 479px) {
+.actions {
+  width: 100%;
+}
+
+.cancelBtn::before,
+.confirmBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+@media (max-width: 767.98px) {
+  .iconWrap {
+    width: 52px !important;
+    height: 52px !important;
+    margin: 0 auto 12px !important;
+  }
+  .iconAlert {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .title {
+    white-space: normal !important;
+    font-size: clamp(16.64px, calc(15.3829px + 0.3929vw), 18.4px) !important;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin-bottom: 8px;
+  }
+  .description {
+    margin-bottom: 16px;
+  }
+  .descDesktop {
+    display: none;
+  }
+  .descMobile {
+    display: block;
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+  .descMobile strong {
+    color: var(--error);
+  }
+  .inputWrap {
+    margin-bottom: 14px;
+  }
+  .passwordInput {
+    padding: 11px 14px;
+    font-size: var(--control-font-mobile);
+  }
+  .googleWrap {
+    margin-bottom: 14px;
+    gap: 8px;
+  }
   .errorAlert {
     padding: 8px 12px;
     font-size: 0.8125rem;
     margin-bottom: 14px;
   }
-}
-
-.actions {
-  width: 100%;
-}
-
-@media (max-width: 479px) {
   .cancelBtn {
-    max-width: 100px !important;
-    padding: 0 10px !important;
+    padding: 0 14px !important;
     font-size: 13px !important;
   }
-
+  .cancelBtn::before,
+  .confirmBtn::before {
+    inset: -4px 0;
+  }
   .confirmBtn {
-    font-size: 12px !important;
-    padding: 0 8px !important;
-    white-space: nowrap !important;
+    font-size: 12.5px !important;
+    padding: 0 16px !important;
+    white-space: normal !important;
+    text-wrap: balance;
+    line-height: 1.2;
   }
 }
 

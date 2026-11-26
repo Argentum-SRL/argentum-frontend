@@ -135,6 +135,7 @@
 }
 
 .deleteBtn {
+  position: relative;
   width: 34px;
   height: 34px;
   border-radius: var(--radius-selector-pill);
@@ -149,6 +150,12 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.deleteBtn::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
 }
 
 .deleteBtn:focus-visible {

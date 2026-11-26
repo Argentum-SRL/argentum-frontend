@@ -5,8 +5,8 @@ import path from 'node:path'
 const ROOT_DIR = path.resolve(__dirname, '../..')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
-// Cortes legados congelados al cierre de F3 (baja de 150 a 111 tras limpiar analisis, transacciones y transferencias): solo puede bajar.
-const TOPE_LEGADO = 111
+// Cortes legados congelados al cierre de F4 (baja de 111 a 56 tras limpiar perfil y tarjetas): solo puede bajar.
+const TOPE_LEGADO = 56
 
 const LEGADO: Record<string, Record<string, number>> = {
   'src/components/auth/AuthLayout/AuthLayout.module.css': {
@@ -58,18 +58,6 @@ const LEGADO: Record<string, Record<string, number>> = {
     'max 480': 1,
     'max 639': 1,
   },
-  'src/components/tarjetas/PagarResumenModal.module.css': {
-    'max 640': 1,
-  },
-  'src/components/tarjetas/PresionFuturaCard.module.css': {
-    'max 480': 1,
-  },
-  'src/components/tarjetas/TarjetaModal.module.css': {
-    'max 380': 1,
-  },
-  'src/components/tarjetas/TarjetaSummary.module.css': {
-    'max 480': 2,
-  },
   'src/components/whatsapp/VinculacionWhatsAppCard.module.css': {
     'min 640': 1,
   },
@@ -107,34 +95,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   'src/pages/app/dashboard/DashboardPage.parte3.css': {
     'max 500': 1,
     'max 640': 1,
-  },
-  'src/pages/app/perfil/PerfilPage.parte1.css': {
-    'max 639': 6,
-    'min 640': 2,
-  },
-  'src/pages/app/perfil/PerfilPage.parte2.css': {
-    'max 639': 5,
-  },
-  'src/pages/app/perfil/PerfilPage.parte3.css': {
-    'max 479': 1,
-    'max 639': 5,
-  },
-  'src/pages/app/perfil/components/EliminarCuentaModal.module.css': {
-    'max 360': 1,
-    'max 479': 6,
-    'max 639': 2,
-    'min 640': 1,
-  },
-  'src/pages/app/perfil/components/TabFinanzas.module.css': {
-    'max 360': 1,
-    'max 639': 7,
-    'min 640': 2,
-  },
-  'src/pages/app/perfil/components/TabNotificaciones.module.css': {
-    'max 639': 4,
-  },
-  'src/pages/app/perfil/components/TabSeguridad.module.css': {
-    'max 639': 7,
   },
   'src/pages/app/presupuestos/PresupuestosPage.module.css': {
     'max 640': 1,

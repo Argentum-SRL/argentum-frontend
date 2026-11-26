@@ -6,8 +6,9 @@ import notificacionService from '@/services/notificacion.service'
 import { nuevaClaveOperacion } from '@/services/api'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { EmptyState, TarjetaSummarySkeleton } from '@/components/ui'
+import { MontoFit } from '@/components/ui/MontoFit/MontoFit'
 import PagarResumenModal from './PagarResumenModal'
 import DebitoAutomaticoBadge from '@/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
@@ -477,7 +478,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                       </span>
                     </div>
                     <div className={styles.itemRight}>
-                      <span className={styles.itemMonto}>{formatMonto(item.monto_restante, item.moneda)}</span>
+                      <MontoFit
+                        className={styles.itemMonto}
+                        completo={formatMonto(item.monto_restante, item.moneda)}
+                        corto={formatMontoCorto(item.monto_restante, item.moneda)}
+                      />
                     </div>
                   </div>
                 ))
@@ -510,7 +515,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                       </span>
                     </div>
                     <div className={styles.itemRight}>
-                      <span className={styles.itemMonto}>{formatMonto(cuota.monto, cuota.moneda)}</span>
+                      <MontoFit
+                        className={styles.itemMonto}
+                        completo={formatMonto(cuota.monto, cuota.moneda)}
+                        corto={formatMontoCorto(cuota.monto, cuota.moneda)}
+                      />
                     </div>
                   </div>
                 ))
@@ -542,7 +551,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                         <span className={styles.monedaBadge}>Pesos</span>
                         <span className={styles.heroTotalLabel}>Total a pagar</span>
                       </div>
-                      <span className={styles.heroTotalValue}>{formatMonto(currentTicket.totalAPagarARS || 0, 'ARS')}</span>
+                      <MontoFit
+                        className={styles.heroTotalValue}
+                        completo={formatMonto(currentTicket.totalAPagarARS || 0, 'ARS')}
+                        corto={formatMontoCorto(currentTicket.totalAPagarARS || 0, 'ARS')}
+                      />
                     </div>
 
                     {/* Solo mostrar desglose si hay deuda anterior o saldo financiado */}
@@ -587,7 +600,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                         <span className={styles.monedaBadge}>Dólares</span>
                         <span className={styles.heroTotalLabel}>Total a pagar</span>
                       </div>
-                      <span className={styles.heroTotalValue}>{formatMonto(currentTicket.totalAPagarUSD || 0, 'USD')}</span>
+                      <MontoFit
+                        className={styles.heroTotalValue}
+                        completo={formatMonto(currentTicket.totalAPagarUSD || 0, 'USD')}
+                        corto={formatMontoCorto(currentTicket.totalAPagarUSD || 0, 'USD')}
+                      />
                     </div>
 
                     {/* Solo mostrar desglose si hay deuda anterior o saldo financiado */}
@@ -674,9 +691,11 @@ const TarjetaSummary: React.FC<TarjetaSummaryProps> = ({
                 {/* Total principal unificado */}
                 <div className={styles.heroTotalRow}>
                   <span className={styles.heroTotalLabel}>Total a pagar</span>
-                  <span className={styles.heroTotalValue}>
-                    {formatMonto(displayTotal, ticketMoneda)}
-                  </span>
+                  <MontoFit
+                    className={styles.heroTotalValue}
+                    completo={formatMonto(displayTotal, ticketMoneda)}
+                    corto={formatMontoCorto(displayTotal, ticketMoneda)}
+                  />
                 </div>
 
                 {ticketMoneda === 'USD' && currentTicket.totalEstimadoARSUSD !== undefined && currentTicket.totalEstimadoARSUSD !== null && (

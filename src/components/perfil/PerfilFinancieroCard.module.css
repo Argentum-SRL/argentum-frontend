@@ -77,6 +77,7 @@
 }
 
 .pfInfoBtn {
+  position: relative;
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-3);
@@ -90,6 +91,13 @@
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
+/* Borde 1px deja padding-box 24x24; inset -10px logra 44x44 sin invadir .pfRefreshBtn */
+.pfInfoBtn::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
 .pfInfoBtn:hover {
   background: var(--surface-alt);
   color: var(--primary);
@@ -97,6 +105,7 @@
 }
 
 .pfRefreshBtn {
+  position: relative;
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-2);
@@ -109,6 +118,12 @@
   padding: 4px 10px;
   border-radius: 8px;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.pfRefreshBtn::before {
+  content: '';
+  position: absolute;
+  inset: -10px 0;
 }
 
 .pfRefreshBtn:hover:not(:disabled) {
@@ -138,7 +153,7 @@
 /* ── KPI Strip (Propuesta PF-1) ───────────────────────────────────────── */
 .pfMetricsStrip {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0;
   border-top: 1px solid var(--border);
   padding-top: 12px;
@@ -150,6 +165,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
   border-right: 1px solid var(--border);
   cursor: default;
   outline: none;
@@ -190,9 +206,10 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-3);
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -227,7 +244,7 @@
 }
 
 .pfKpiStatusBadge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   border-radius: 4px;
   padding: 1px 6px;
@@ -325,7 +342,7 @@
 /* ── Responsive Queries ─────────────────────────────────────────────────── */
 @media (min-width: 768px) and (max-width: 1023.98px) {
   .pfMetricsStrip {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px 0;
   }
   .pfKpiCell {
@@ -346,7 +363,7 @@
 
 @media (max-width: 767.98px) {
   .pfMetricsStrip {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px 0;
   }
   .pfKpiCell {

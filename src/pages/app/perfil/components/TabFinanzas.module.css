@@ -7,12 +7,6 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767.98px) {
-  .tabContainer {
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 20px));
-  }
-}
-
 /* ── 1. Layouts Principales ── */
 .tabForm {
   display: flex;
@@ -63,7 +57,7 @@
   width: 100%;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .monedaBlock {
     flex-direction: row;
     align-items: center;
@@ -75,6 +69,14 @@
   .monedaControlWrap {
     width: auto;
     flex-shrink: 0;
+  }
+
+  .dateMobile {
+    display: none;
+  }
+
+  .dateDesktop {
+    display: inline;
   }
 }
 
@@ -119,6 +121,12 @@
   width: 48px;
   height: 28px;
   flex-shrink: 0;
+}
+
+.switch::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }
 
 .switch input {
@@ -289,28 +297,13 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 639px) {
-  .unifiedActionBar {
-    padding: var(--space-sm) var(--space-md);
-    gap: var(--space-sm);
-  }
-}
-
 .dirtyStatusText {
   display: inline-flex;
   align-items: center;
   gap: var(--space-icon);
   font-size: 0.8125rem;
   color: var(--text-2);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-@media (max-width: 639px) {
-  .dirtyStatusText {
-    font-size: 0.75rem;
-    gap: var(--space-xs);
-  }
+  min-width: 0;
 }
 
 .dirtyDotAmber {
@@ -321,6 +314,7 @@
 }
 
 .saveButton {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -335,20 +329,17 @@
   font-weight: 600;
   cursor: pointer;
   outline: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton guardar configuracion */
   flex-shrink: 0;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-@media (max-width: 639px) {
-  .saveButton {
-    height: 36px;
-    padding: 0 var(--space-md);
-    gap: var(--space-icon);
-    font-size: 0.8125rem;
-  }
+.saveButton::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
 }
 
 .saveButton:focus-visible {
@@ -400,6 +391,7 @@
 }
 
 .comerciosHeader {
+  position: relative;
   width: 100%;
   cursor: pointer;
   user-select: none;
@@ -409,6 +401,12 @@
   text-align: left;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.comerciosHeader::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .comerciosHeader:focus-visible {
@@ -435,7 +433,7 @@
   height: 20px;
   border-radius: var(--radius-selector-pill);
   box-sizing: border-box;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: badge contador corto */
 }
 
 :global([data-theme="dark"]) .comerciosBadge {
@@ -464,6 +462,7 @@
 
 /* ── 5. Ciclo de Cobro Colapsable & Filas Simétricas ── */
 .cicloHeaderBtn {
+  position: relative;
   width: 100%;
   cursor: pointer;
   user-select: none;
@@ -473,6 +472,12 @@
   text-align: left;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.cicloHeaderBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .cicloHeaderBtn:focus-visible {
@@ -509,6 +514,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-lg);
   background: var(--surface-2);
@@ -521,17 +527,6 @@
   overflow: hidden;
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-@media (max-width: 639px) {
-  .cicloSummaryRow {
-    padding: var(--space-md) var(--space-md);
-  }
-}
-
-.cicloSummaryRow .settingLabel {
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -556,18 +551,18 @@
   align-items: center;
   justify-content: center;
   min-height: 32px;
-  padding: 0 var(--space-md);
+  padding: 4px var(--space-md);
   border-radius: var(--radius-selector-pill);
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   font-size: 0.8125rem;
   font-weight: 600;
-  white-space: nowrap;
+  text-align: center;
   box-shadow: var(--elevation-xs);
   transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
   box-sizing: border-box;
-  flex-shrink: 0;
+  max-width: 100%;
 }
 
 .cicloDateGroup {
@@ -577,21 +572,14 @@
   flex-shrink: 0;
   min-width: 0;
   justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .cicloDateText {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
-  white-space: nowrap;
   text-align: right;
-  flex-shrink: 0;
-}
-
-@media (max-width: 639px) {
-  .cicloDateText {
-    font-size: 0.8125rem;
-  }
 }
 
 .dateMobile {
@@ -600,16 +588,6 @@
 
 .dateDesktop {
   display: none;
-}
-
-@media (min-width: 640px) {
-  .dateMobile {
-    display: none;
-  }
-
-  .dateDesktop {
-    display: inline;
-  }
 }
 
 .cicloAdjustBadge {
@@ -626,22 +604,9 @@
   font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: badge estado ajuste feriado */
   flex-shrink: 0;
   box-sizing: border-box;
-}
-
-@media (max-width: 639px) {
-  .cicloAdjustBadge {
-    padding: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-  }
-
-  .cicloAdjustText {
-    display: none;
-  }
 }
 
 .cicloExpandedContent {
@@ -658,7 +623,7 @@
   }
 }
 
-/* ── 6. Título de Prioridades (Garantizado en 1 solo renglón) ── */
+/* ── 6. Título de Prioridades (1 renglón en >=768px, hasta 2 renglones en celular) ── */
 .prioridadesTitle {
   font-size: 0.9375rem;
   font-weight: 700;
@@ -670,16 +635,58 @@
   text-overflow: ellipsis;
 }
 
-@media (max-width: 639px) {
-  .prioridadesTitle {
-    font-size: 0.8125rem;
-    letter-spacing: -0.015em;
+@media (max-width: 767.98px) {
+  .tabContainer {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 20px));
   }
-}
 
-@media (max-width: 360px) {
+  .cicloTitle,
   .prioridadesTitle {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .unifiedActionBar {
+    flex-wrap: wrap;
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .dirtyStatusText {
     font-size: 0.75rem;
+    gap: var(--space-xs);
+  }
+
+  .saveButton {
+    height: 36px;
+    padding: 0 var(--space-md);
+    gap: var(--space-icon);
+    font-size: 0.8125rem;
+    white-space: normal;
+    text-wrap: balance;
+  }
+
+  .cicloSummaryRow {
+    padding: var(--space-md) var(--space-md);
+  }
+
+  .cicloDateText {
+    font-size: 0.8125rem;
+  }
+
+  .cicloAdjustBadge {
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+
+  .cicloAdjustText {
+    display: none;
   }
 }
 

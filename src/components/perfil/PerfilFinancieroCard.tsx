@@ -9,7 +9,8 @@ import { getPerfilFinanciero, recalcularPerfilFinanciero } from '@/services/perf
 import { triggerBienvenidaFinancieraOnce } from '@/utils/bienvenidaFinancieraManager'
 import { useModal } from '@/hooks/useModal'
 import type { PerfilFinancieroConInterpretaciones } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
+import { MontoFit } from '@/components/ui/MontoFit/MontoFit'
 import styles from './PerfilFinancieroCard.module.css'
 
 const formatRelativeTime = (dateStr: string | null) => {
@@ -223,7 +224,9 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ data
     {
       id: 'ingreso_tipico',
       title: 'Ingreso Habitual',
-      valueElement: ingresoTipicoAnim !== null ? formatMonto(ingresoTipicoAnim, 'ARS') : 'Cargá tus cobros para ver esto',
+      valueElement: ingresoTipicoAnim !== null
+        ? <MontoFit completo={formatMonto(ingresoTipicoAnim, 'ARS')} corto={formatMontoCorto(ingresoTipicoAnim, 'ARS')} />
+        : 'Cargá tus cobros para ver esto',
       displayValue: ingresoTipicoRaw !== null ? formatMonto(ingresoTipicoRaw, 'ARS') : 'Cargá tus cobros para ver esto',
       statusClass: styles.statusNeutral,
       statusText: ingresoTipicoRaw !== null ? 'Habitual' : 'Sin datos',
@@ -279,7 +282,7 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ data
             aria-label={`${kpi.title}: ${kpi.displayValue}. ${kpi.tooltip}`}
           >
             <div className={styles.pfKpiLabelRow}>
-              <span className={styles.pfKpiLabel}>
+              <span className={styles.pfKpiLabel} title={kpi.title}>
                 {kpi.title}
               </span>
               <HelpCircle size={12} className={styles.pfInfoIcon} aria-hidden="true" />

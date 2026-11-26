@@ -50,6 +50,7 @@
 }
 
 .impagoBtnPrimary {
+  position: relative;
   background: var(--primary);
   color: #fff;
   border: none;
@@ -59,6 +60,14 @@
   padding: 6px 12px;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, filter 0.15s ease;
+}
+
+.impagoBtnPrimary::before,
+.impagoBtnSecondary::before,
+.impagoBtnGhost::before {
+  content: '';
+  position: absolute;
+  inset: -9px -4px;
 }
 
 .impagoBtnPrimary:hover {
@@ -72,6 +81,7 @@
 }
 
 .impagoBtnSecondary {
+  position: relative;
   background: var(--surface-alt);
   color: var(--text);
   border: 1px solid var(--border);
@@ -90,6 +100,7 @@
 }
 
 .impagoBtnGhost {
+  position: relative;
   background: transparent;
   color: var(--text-3);
   border: none;
@@ -117,6 +128,7 @@
 }
 
 .navBtn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -130,6 +142,12 @@
   transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   flex-shrink: 0;
   box-shadow: var(--elevation-xs);
+}
+
+.navBtn::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
 }
 
 .navBtn:hover:not(:disabled) {
@@ -159,7 +177,8 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  min-width: 150px;
+  flex: 1;
+  min-width: 0;
 }
 
 .monthTitle {
@@ -189,7 +208,7 @@
 }
 
 .textoFechas {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--text-3);
   text-align: center;
   line-height: 1.25;
@@ -211,14 +230,6 @@
   transition: transform 0.25s ease, opacity 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
   box-sizing: border-box;
   width: 100%;
-}
-
-@media (max-width: 480px) {
-  .summaryCard {
-    padding: 14px 14px;
-    border-radius: 14px;
-    gap: 12px;
-  }
 }
 
 /* ── Lista de Ítems / Consumos ── */
@@ -246,7 +257,7 @@
 }
 
 .itemsCountBadge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 10px;
@@ -316,7 +327,7 @@
 }
 
 .badgeFinanciado {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -330,14 +341,17 @@
 .itemRight {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
+  max-width: 50%;
+  min-width: 0;
 }
 
 .itemMonto {
   font-size: 13.5px;
   font-weight: 700;
   color: var(--text);
-  white-space: nowrap;
+  text-align: right;
 }
 
 /* ── Footer y Liquidación ── */
@@ -380,6 +394,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 8px;
   padding: 0;
 }
 
@@ -389,6 +404,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-2);
+  flex-shrink: 0;
 }
 
 .heroTotalValue {
@@ -396,12 +412,9 @@
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.02em;
-}
-
-@media (max-width: 480px) {
-  .heroTotalValue {
-    font-size: 16px;
-  }
+  flex: 1;
+  min-width: 0;
+  text-align: right;
 }
 
 /* Pago Mínimo Compacto */
@@ -411,6 +424,7 @@
   align-items: center;
   padding: 0;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .minimoLabel {
@@ -423,7 +437,7 @@
 }
 
 .minimoTag {
-  font-size: 8.5px;
+  font-size: 11px;
   padding: 1px 4px;
   background: rgba(0, 0, 0, 0.06);
   color: var(--text-3);
@@ -474,7 +488,7 @@
 }
 
 .monedaBadge {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -504,19 +518,20 @@
 .monedaEstimacionRow {
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 4px;
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .monedaEstimacionVal {
   font-weight: 700;
   color: var(--text-2);
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .monedaEstimacionTag {
   color: var(--text-3);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* Fila de Vencimiento */
@@ -524,6 +539,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   padding: 8px 12px;
   border-radius: 10px;
   background: var(--surface-alt);
@@ -572,7 +589,7 @@
 }
 
 .urgentBadge {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 800;
   padding: 1px 5px;
   border-radius: 4px;
@@ -590,6 +607,7 @@
 }
 
 .payBtn {
+  position: relative;
   background: var(--primary, #0D2045);
   color: white;
   border: none;
@@ -607,6 +625,13 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   box-shadow: var(--elevation-sm);
+}
+
+.payBtn::before,
+.payBtnSecondary::before {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
 .payBtn:hover:not(:disabled) {
@@ -633,6 +658,7 @@
 }
 
 .payBtnSecondary {
+  position: relative;
   flex: 1;
   background: #059669;
   color: #ffffff;
@@ -703,6 +729,7 @@
 
 /* Botón Expandir / Contraer */
 .expandBtn {
+  position: relative;
   background: transparent;
   border: none;
   color: var(--primary);
@@ -713,13 +740,20 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 0 0;
+  padding: 10px 0 4px;
   width: 100%;
   border-top: 1px solid var(--surface-alt);
   margin-top: 2px;
   transition: color 0.15s ease;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Con -3px inferior en .payBtn y gap 8px + margin-top 2px, -7px superior evita superposición */
+.expandBtn::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .expandBtn:hover {
@@ -761,6 +795,7 @@
 }
 
 .retryBtn {
+  position: relative;
   background: var(--surface-alt);
   color: var(--text);
   border: 1px solid var(--border);
@@ -769,6 +804,24 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.retryBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px 0;
+}
+
+@media (max-width: 767.98px) {
+  .summaryCard {
+    padding: clamp(14px, calc(12.5714px + 0.4464vw), 16px) clamp(14px, calc(11.1429px + 0.8929vw), 18px);
+    border-radius: 14px;
+    gap: 12px;
+  }
+
+  .heroTotalValue {
+    font-size: clamp(16px, calc(15.2857px + 0.2232vw), 17px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

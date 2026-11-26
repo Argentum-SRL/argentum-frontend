@@ -265,7 +265,7 @@ export const RealCardPreview: React.FC<RealCardPreviewProps> = ({
           ) : (
             <span 
               style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: '800',
                 color: textColor
               }}

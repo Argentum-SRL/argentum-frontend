@@ -115,8 +115,8 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
       2. *Alertas de Verificación Discretas (`.heroAlertsInline`):* Si existen verificaciones pendientes (`Email pendiente`, `WhatsApp pendiente`), se muestran como micro-tags compactos de 18px de altura con tipografía secundaria (10px, peso 500, ícono 10px y fondo translúcido sutil) ubicados directamente junto al nombre en `.heroTopRow`, eliminando bloques gigantes o renglones dedicados que compitan con la identidad. Si están verificados, no se muestra ningún chip.
       3. *Resumen Financiero Integrado y Sin Cajas (`.heroGlanceZone`):* Eliminación total de contenedores, tarjetas, bordes y fondos anidados. Se integra como una línea de estado limpia y tipográfica (`display: inline-flex; align-items: center; gap: 4px`) dentro de `.heroDetails`: ícono SVG de moneda (`Coins` 12px) + valor (`Pesos`, con pill `MEP` si aplica) + separador de punto (`•`) + ícono SVG de calendario (`Calendar` 12px) + ciclo (`Día 30 del mes`).
     - **Ultra-compactación Móvil y Layout de Fila Única (iPhone SE 375x667):**
-      - En dispositivos móviles (< 640px), la tarjeta no se divide en dos filas ni contiene barras flotantes inferiores: el avatar se ubica a la izquierda y a su derecha se apilan en solo dos líneas compactas: 1. Nombre + micro-tag de alerta, 2. Meta-línea de moneda y ciclo.
-      - *Botón de Edición Móvil:* En dispositivos móviles (< 640px), el botón de edición de datos personales oculta el texto "Editar perfil" y muestra únicamente el ícono del lápiz (`Pencil` 13px) en un botón compacto (`.editProfileHeroBtn`), optimizando el espacio horizontal al lado del nombre de usuario y badges.
+      - En dispositivos móviles (< 768px), la tarjeta no se divide en dos filas ni contiene barras flotantes inferiores: el avatar se ubica a la izquierda y a su derecha se apilan en solo dos líneas compactas: 1. Nombre + micro-tag de alerta, 2. Meta-línea de moneda y ciclo.
+      - *Botón de Edición Móvil:* En dispositivos móviles (< 768px), el botón de edición de datos personales oculta el texto "Editar perfil" y muestra únicamente el ícono del lápiz (`Pencil` 13px) en un botón compacto (`.editProfileHeroBtn`), optimizando el espacio horizontal al lado del nombre de usuario y badges.
       - Altura total reducida a ~72px (ahorro de más de 60px respecto a layouts previos), 100% de visibilidad above the fold, cero scroll horizontal y cero contenedores anidados.
     - **Cero símbolos de moneda redundantes:** Eliminación universal de "($)" y "(US$)" en todo el módulo de perfil, reservándolos exclusivamente dentro de los botones del selector de moneda de `TabFinanzas`.
     - **Tokens y Accesibilidad:** Uso exclusivo de tokens `--surface`, `--surface-alt`, `--border`, `--radius-modal`, `--elevation-sm`, `--space-*`, foco visible en avatar interactivo y botones, hover de escala confinado a puntero fino, y cobertura total bajo `@media (prefers-reduced-motion: reduce)`.
@@ -160,12 +160,12 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
          - *Solución:* Usar siempre porcentajes deliberados (`width: 40%`, `60%`, `80%`, `100%`), `min-width: 0`, y clases flex con `flex-wrap: wrap` y `word-break: normal; overflow-wrap: break-word; hyphens: none;`.
 
     - **Reglas Responsivas Multi-Pantalla (320px a 1920px+):**
-      - *Mobile Estricto (320px - 639px, ej. iPhone SE 375x667):*
+      - *Mobile Estricto (320px - 767,98px, ej. iPhone SE 375x667):*
         - Grillas se colapsan a 1 sola columna (`grid-template-columns: 1fr`).
         - En filas con botones o controles interactivos, usar envoltura flexible (`display: flex; flex-wrap: wrap; gap: var(--space-sm)`). El grupo de texto toma `flex: 1 1 180px` y los botones fluyen debajo fluidamente sin estrangular las etiquetas.
         - Altura táctil mínima de 44px en controles interactivos (R32: fuentes de input >= 16px para evitar auto-zoom iOS).
         - Cero scroll horizontal permitido (`max-width: 100%`).
-      - *Tablet (640px - 1023px):*
+      - *Tablet (768px - 1023,98px):*
         - Transición fluida a 1 o 2 columnas según la densidad.
         - Separaciones intermedias (`gap: var(--space-md)`).
       - *Desktop (1024px - 1920px+):*

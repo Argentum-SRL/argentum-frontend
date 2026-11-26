@@ -76,7 +76,7 @@
 }
 
 .mesesTag {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -103,11 +103,13 @@
   align-items: flex-end;
   text-align: right;
   flex-shrink: 0;
+  min-width: 0;
+  max-width: 100%;
   gap: 0px;
 }
 
 .totalLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-3);
   text-transform: uppercase;
@@ -296,9 +298,9 @@
   100% { opacity: 0.5; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 767.98px) {
   .card {
-    padding: 14px 14px;
+    padding: clamp(14px, calc(12.5714px + 0.4464vw), 16px) clamp(14px, calc(11.1429px + 0.8929vw), 18px);
   }
   .cardHeader {
     flex-direction: column;
@@ -308,12 +310,13 @@
   .headerRight {
     align-items: flex-start;
     text-align: left;
+    width: 100%;
   }
   .monthLabelCol {
-    width: 50px;
+    width: clamp(50px, calc(42.8571px + 2.2321vw), 60px);
   }
   .monthTotalCol {
-    width: 75px;
+    width: clamp(75px, calc(67.8571px + 2.2321vw), 85px);
   }
 }
 

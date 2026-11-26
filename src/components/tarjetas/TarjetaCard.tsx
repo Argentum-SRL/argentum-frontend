@@ -109,7 +109,7 @@ const TarjetaCard: React.FC<TarjetaCardProps> = ({ tarjeta, billetera, onEdit, o
             {/* Panel de firma y código de seguridad */}
             <div className={styles.signatureStripRow}>
               <div className={styles.signatureStrip}>
-                <span className={styles.signatureText}>{titular.toUpperCase()}</span>
+                <span className={styles.signatureText} title={titular.toUpperCase()}>{titular.toUpperCase()}</span>
               </div>
               <div className={styles.cvvBox}>
                 <span className={styles.cvvLabel}>CVV</span>

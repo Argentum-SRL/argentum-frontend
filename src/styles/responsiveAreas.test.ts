@@ -14,6 +14,9 @@ const AREAS = [
   'src/components/transacciones',
   'src/pages/app/transacciones',
   'src/components/transferencias',
+  'src/pages/app/perfil',
+  'src/components/perfil',
+  'src/components/tarjetas',
 ]
 
 const CORTES_OFICIALES_ANCHO = new Set([
@@ -25,6 +28,36 @@ const CORTES_OFICIALES_ANCHO = new Set([
 
 // Excepciones de letra < 11px documentadas con motivo (vacío en F2).
 const EXCEPCIONES_LETRA: Record<string, string> = {}
+
+// Excepciones de toque F2/F3 (fuera de permitidas.txt en F4B; no editar F2/F3 desde F4B).
+const EXCEPCIONES_TOQUE_F2_F3: Record<string, string> = {
+  'src/components/tools/ToolsComponents.parte3.css::.fwDot::before': 'F2 fuera de permitidas en F4B (30x30 border 1.5px inset -7px = 41px)',
+  'src/components/tools/ToolsComponents.parte3.css::.fwChip::before': 'F2 fuera de permitidas en F4B (H=40px border 1.5px inset -2px = 41px)',
+  'src/components/tools/importacion/ModalesImportacion.module.css::.cancelImportBtn::before': 'F2 fuera de permitidas en F4B (H=38px border 1px inset -3px = 42px)',
+  'src/components/tools/importacion/ModalesImportacion.module.css::.radioPill::before': 'F2 fuera de permitidas en F4B (H=38px border 1px inset -3px = 42px)',
+  'src/pages/app/analisis/AnalisisPage.module.css::.mobileFilterBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
+  'src/pages/app/analisis/AnalisisPage.module.css::.mobileActionBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
+  'src/pages/app/analisis/DesgloseCategoriasCard.module.css::.backBtn::before': 'F3 fuera de permitidas en F4B (38x38 border 1px inset -3px = 42px)',
+  'src/pages/app/analisis/EditorSeriesEvolucionModal.module.css::.addWholeCatBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
+  'src/pages/app/analisis/EditorSeriesEvolucionModal.module.css::.splitSubsBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
+  'src/pages/app/analisis/EditorSeriesEvolucionModal.module.css::.removeChipBtn::before': 'F3 fuera de permitidas en F4B (26x26 border 1px inset -9px = 42px)',
+  'src/pages/app/analisis/EvolucionCiclosCard.module.css::.editSeriesQuickBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
+  'src/pages/app/analisis/FiltrosAnalisis.module.css::.viewTileBtn::before': 'F3 fuera de permitidas en F4B (H=38px border 1px inset -3px = 42px)',
+  'src/pages/app/analisis/MisInformesTab.module.css::.iconActionBtn::before': 'F3 fuera de permitidas en F4B (30x30 border 1px inset -7px -3px = 34x42)',
+  'src/pages/app/analisis/MisInformesTab.module.css::.iconActionBtnDanger::before': 'F3 fuera de permitidas en F4B (30x30 border 1px inset -7px -3px = 34x42)',
+  'src/pages/app/analisis/MisInformesTab.module.css::.templateBtnSecondary::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
+  'src/pages/app/analisis/MisInformesTab.module.css::.backBtn::before': 'F3 fuera de permitidas en F4B (@media móvil H=32px border 1px inset -6px = 42px)',
+  'src/pages/app/analisis/MisInformesTab.module.css::.viewerBackBtn::before': 'F3 fuera de permitidas en F4B (@media móvil H=32px border 1px inset -6px = 42px)',
+  'src/components/transacciones/FilterBar.parte1.css::.mobileFilterBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
+  'src/components/transacciones/FilterBar.parte1.css::.mobileSearchTriggerBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
+  'src/components/transacciones/GruposCuotasTab.parte1.css::.mobileSearchTriggerBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
+  'src/components/transacciones/TransaccionModal.parte1.css::.deleteHeaderBtn::before': 'F3 fuera de permitidas en F4B (32x32 inset -6px -4px = 40x44)',
+  'src/components/transacciones/TransaccionModal.parte1.css::.backBtn::before': 'F3 fuera de permitidas en F4B (32x32 inset -6px -4px = 40x44)',
+  'src/components/transacciones/TransaccionModal.parte1.css::.closeBtn::before': 'F3 fuera de permitidas en F4B (32x32 inset -4px = 40x40)',
+  'src/components/transacciones/TransaccionModal.parte3.css::.stepperBtn::before': 'F3 fuera de permitidas en F4B (32x32 border 1px inset -6px = 42px)',
+  'src/components/transferencias/TransferenciasFilterBar.module.css::.mobileFilterBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
+  'src/components/transferencias/TransferenciasFilterBar.module.css::.mobileSearchTriggerBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
+}
 
 function walkFiles(dir: string, exts: string[], acc: string[] = []): string[] {
   if (!fs.existsSync(dir)) return acc
@@ -46,9 +79,10 @@ interface CssBlock {
   rawBody: string
   cleanBody: string
   startLine: number
+  media: string
 }
 
-function extractCssBlocks(css: string, baseLine = 1): CssBlock[] {
+function extractCssBlocks(css: string, baseLine = 1, media = 'base'): CssBlock[] {
   const blocks: CssBlock[] = []
   let i = 0
   const n = css.length
@@ -78,18 +112,64 @@ function extractCssBlocks(css: string, baseLine = 1): CssBlock[] {
     const rawBody = css.slice(open + 1, j - 1)
     const bodyStartLine = lineAt(open + 1)
     if (selector.startsWith('@media') || selector.startsWith('@supports') || selector.startsWith('@container')) {
-      blocks.push(...extractCssBlocks(rawBody, bodyStartLine))
+      const childMedia = media === 'base' ? selector : `${media} | ${selector}`
+      blocks.push(...extractCssBlocks(rawBody, bodyStartLine, childMedia))
     } else if (!selector.startsWith('@keyframes') && !selector.startsWith('@font-face')) {
       blocks.push({
         selector,
         rawBody,
         cleanBody: stripCssComments(rawBody),
         startLine: lineAt(i),
+        media,
       })
     }
     i = j
   }
   return blocks
+}
+
+function parsePxProp(body: string, propName: string): number | null {
+  const re = new RegExp(`(?:^|[;\\s])${propName}\\s*:\\s*([^;!}]+)`, 'gi')
+  let last: number | null = null
+  for (const m of body.matchAll(re)) {
+    const val = m[1].trim()
+    const px = val.match(/^(-?[\d.]+)px$/i)
+    last = px ? parseFloat(px[1]) : (/^0$/.test(val) ? 0 : null)
+  }
+  return last
+}
+
+function parseBorderPx(body: string): { h: number; v: number } {
+  let b = 0
+  for (const m of body.matchAll(/(?:^|[;\s])border\s*:\s*([^;!}]+)/gi)) {
+    const val = m[1].trim()
+    if (/^(none|0)$/i.test(val)) b = 0
+    else {
+      const px = val.match(/(?:^|\s)([\d.]+)px(?:\s|$)/i)
+      if (px) b = parseFloat(px[1])
+    }
+  }
+  for (const m of body.matchAll(/(?:^|[;\s])border-width\s*:\s*([^;!}]+)/gi)) {
+    const px = m[1].trim().match(/^([\d.]+)px$/i)
+    if (px) b = parseFloat(px[1])
+  }
+  return { h: b * 2, v: b * 2 }
+}
+
+function parseInsetSides(val: string): { top: number; right: number; bottom: number; left: number } | null {
+  const parts = val.trim().split(/\s+/).map((p) => {
+    const m = p.match(/^(-?[\d.]+)px$/i)
+    if (m) return parseFloat(m[1])
+    if (/^0$/.test(p)) return 0
+    return null
+  })
+  if (parts.some((p) => p === null)) return null
+  const nums = parts as number[]
+  if (nums.length === 1) return { top: nums[0], right: nums[0], bottom: nums[0], left: nums[0] }
+  if (nums.length === 2) return { top: nums[0], right: nums[1], bottom: nums[0], left: nums[1] }
+  if (nums.length === 3) return { top: nums[0], right: nums[1], bottom: nums[2], left: nums[1] }
+  if (nums.length === 4) return { top: nums[0], right: nums[1], bottom: nums[2], left: nums[3] }
+  return null
 }
 
 function loadTokens(): Map<string, string> {
@@ -254,6 +334,124 @@ describe('Reglas responsive por área (AREAS)', () => {
       const clean = stripCssComments(fs.readFileSync(abs, 'utf-8'))
       if (/\b100vw\b/i.test(clean)) {
         hallados.push(rel)
+      }
+    }
+    expect(hallados).toEqual([])
+  })
+
+  it('R5: áreas de toque con ::before/::after alcanzan >= 44px considerando borde', () => {
+    const insuficientes: string[] = []
+
+    for (const abs of cssFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      const blocks = extractCssBlocks(fs.readFileSync(abs, 'utf-8'))
+
+      const baseBySel = new Map<string, CssBlock[]>()
+      const touchBySelMedia = new Map<string, CssBlock>()
+      const mediaList = new Set<string>(['base'])
+
+      for (const blk of blocks) {
+        mediaList.add(blk.media)
+        for (const rawSel of blk.selector.split(',')) {
+          const sel = rawSel.trim()
+          if (sel.includes('::before') || sel.includes('::after')) {
+            const insM = blk.cleanBody.match(/inset\s*:\s*([^;!}]+)/i)
+            if (insM && /-\d/.test(insM[1])) {
+              touchBySelMedia.set(`${sel}@@${blk.media}`, { ...blk, selector: sel })
+            }
+          } else {
+            const list = baseBySel.get(sel) ?? []
+            list.push(blk)
+            baseBySel.set(sel, list)
+          }
+        }
+      }
+
+      const checked = new Set<string>()
+      for (const [key, tBlk] of touchBySelMedia.entries()) {
+        const sepIdx = key.lastIndexOf('@@')
+        const sel = key.slice(0, sepIdx)
+        const baseSel = sel.replace(/::(?:before|after).*$/, '').trim()
+        const baseBlocks = baseBySel.get(baseSel) ?? []
+        const evalMedias = tBlk.media === 'base' ? Array.from(mediaList) : [tBlk.media]
+
+        for (const m of evalMedias) {
+          const overrideKey = `${sel}@@${m}`
+          if (m !== tBlk.media && touchBySelMedia.has(overrideKey)) continue
+          let combinedBody = ''
+          for (const bb of baseBlocks) {
+            if (bb.media === 'base') combinedBody += `${bb.cleanBody}\n`
+          }
+          if (m !== 'base') {
+            let hasInMedia = false
+            for (const bb of baseBlocks) {
+              if (bb.media === m) {
+                combinedBody += `${bb.cleanBody}\n`
+                hasInMedia = true
+              }
+            }
+            if (!hasInMedia && tBlk.media === 'base') continue
+          }
+
+          const insM = tBlk.cleanBody.match(/inset\s*:\s*([^;!}]+)/i)
+          if (!insM) continue
+          const ins = parseInsetSides(insM[1])
+          if (!ins) continue
+
+          const w = parsePxProp(combinedBody, 'width')
+          const h = parsePxProp(combinedBody, 'height')
+          const bw = parseBorderPx(combinedBody)
+          const hasToqueOk = /toque-ok\s*:/.test(tBlk.rawBody)
+          const exKey = `${rel}::${sel}`
+          if (exKey in EXCEPCIONES_TOQUE_F2_F3) continue
+
+          const effW = w !== null ? w - bw.h + -ins.left + -ins.right : null
+          const effH = h !== null ? h - bw.v + -ins.top + -ins.bottom : null
+          const badW = effW !== null && effW < 44 && !hasToqueOk
+          const badH = effH !== null && effH < 44
+          if (badW || badH) {
+            const dup = `${rel}:${tBlk.startLine}:${sel}:${m}`
+            if (!checked.has(dup)) {
+              checked.add(dup)
+              insuficientes.push(
+                `${rel}:${tBlk.startLine} [${sel}] (${m}) -> W=${effW ?? '?'} H=${effH ?? '?'}`
+              )
+            }
+          }
+        }
+      }
+    }
+
+    expect(insuficientes).toEqual([])
+  })
+
+  it('R6: en celular (max-width: 767.98px), ninguna cabecera de modal/sección borra padding horizontal', () => {
+    const hallados: string[] = []
+    for (const abs of cssFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      const blocks = extractCssBlocks(fs.readFileSync(abs, 'utf-8'))
+      for (const blk of blocks) {
+        if (!/max-width\s*:\s*767\.98px/i.test(blk.media)) continue
+        const esHeader = blk.selector
+          .split(',')
+          .some((s) => /\.(formHeader|modalHeader|header)\b/.test(s.trim()))
+        if (!esHeader) continue
+
+        for (const m of blk.cleanBody.matchAll(/(?:^|[;\s])(padding|padding-left|padding-right|padding-inline)\s*:\s*([^;!}]+)/gi)) {
+          const prop = m[1].toLowerCase()
+          const val = m[2].trim()
+          let zeroH = false
+          if (prop === 'padding-left' || prop === 'padding-right' || prop === 'padding-inline') {
+            if (/^0(?:px|rem|em)?$/i.test(val)) zeroH = true
+          } else {
+            const parts = val.split(/\s+/)
+            if ((parts.length === 2 || parts.length === 3) && /^0(?:px|rem|em)?$/i.test(parts[1])) zeroH = true
+            if (parts.length === 4 && (/^0(?:px|rem|em)?$/i.test(parts[1]) || /^0(?:px|rem|em)?$/i.test(parts[3]))) zeroH = true
+          }
+          if (zeroH) {
+            hallados.push(`${rel}:${blk.startLine} [${blk.selector}] -> ${prop}: ${val}`)
+          }
+        }
       }
     }
     expect(hallados).toEqual([])

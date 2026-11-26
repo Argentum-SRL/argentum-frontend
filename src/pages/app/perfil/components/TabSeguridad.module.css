@@ -7,12 +7,6 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767.98px) {
-  .tabContainer {
-    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
-  }
-}
-
 .tabForm {
   display: flex;
   flex-direction: column;
@@ -118,71 +112,6 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 639px) {
-  .securityRow:not(.securityRowToggle) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-md);
-    padding: var(--space-md);
-  }
-
-  .securityRowHeader {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-md);
-    width: 100%;
-  }
-
-  .rowInfo {
-    width: 100%;
-  }
-
-  .rowLabel {
-    font-size: 0.875rem;
-  }
-
-  .rowLabelGroup {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-sm);
-    width: 100%;
-  }
-
-  .securityRow:not(.securityRowToggle) .rowActions,
-  .securityRowHeader .rowActions {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    margin-top: 2px;
-  }
-
-  .securityRow:not(.securityRowToggle) .rowActions button,
-  .securityRow:not(.securityRowToggle) .rowActions a,
-  .securityRowHeader .rowActions button {
-    width: 100%;
-    flex: 1;
-    justify-content: center;
-    height: 38px;
-  }
-
-  .securityRowToggle {
-    padding: var(--space-md);
-    gap: var(--space-md);
-  }
-
-  .securityRowToggle .rowInfo {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .securityRowToggle .rowActions {
-    flex-shrink: 0;
-    width: auto;
-  }
-}
-
 /* ── 3. Badges de Estado (Micro-tags canónicos) ───────────────────────────── */
 .badgeVerified {
   display: inline-flex;
@@ -196,7 +125,7 @@
   color: #10b981;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.2);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: badge corto verificado */
   line-height: 1;
 }
 
@@ -218,7 +147,7 @@
   color: #f59e0b;
   background: rgba(245, 158, 11, 0.1);
   border: 1px solid rgba(245, 158, 11, 0.2);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: badge corto pendiente */
   line-height: 1;
 }
 
@@ -240,12 +169,13 @@
   color: var(--text-2);
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: badge corto estado neutral */
   line-height: 1;
 }
 
 /* ── 4. Botones de Acción Canónicos ───────────────────────────────────────── */
 .btnSecondary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -260,8 +190,14 @@
   font-weight: 600;
   cursor: pointer;
   outline: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton secundario corto */
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btnSecondary::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .btnSecondary:hover {
@@ -281,6 +217,7 @@
 }
 
 .btnPrimary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -295,8 +232,14 @@
   font-weight: 600;
   cursor: pointer;
   outline: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton primario corto */
   transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.btnPrimary::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .btnPrimary:hover:not(:disabled) {
@@ -314,6 +257,7 @@
 }
 
 .btnDanger {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -328,8 +272,14 @@
   font-weight: 600;
   cursor: pointer;
   outline: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton peligro corto */
   transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btnDanger::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .btnDanger:hover:not(:disabled) {
@@ -345,16 +295,6 @@
 .btnDanger:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-@media (max-width: 639px) {
-  .btnSecondary,
-  .btnPrimary,
-  .btnDanger {
-    height: 38px;
-    padding: 0 14px;
-    font-size: 0.8125rem;
-  }
 }
 
 /* ── 5. Formulario Expandible de Contraseña ──────────────────────────────── */
@@ -434,13 +374,6 @@
   box-shadow: var(--focus-ring);
 }
 
-@media (max-width: 767.98px) {
-  .fieldInput {
-    font-size: 16px;
-    height: 44px;
-  }
-}
-
 .eyeToggleBtn {
   position: absolute;
   right: 6px;
@@ -456,6 +389,12 @@
   border-radius: 6px;
   padding: 0;
   transition: color 0.12s ease;
+}
+
+.eyeToggleBtn::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
 }
 
 .eyeToggleBtn:hover {
@@ -494,12 +433,6 @@
   width: 100%;
 }
 
-@media (max-width: 639px) {
-  .reqGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .reqItem {
   display: flex;
   align-items: center;
@@ -535,17 +468,6 @@
   margin-top: var(--space-xs);
 }
 
-@media (max-width: 639px) {
-  .formActions {
-    flex-direction: column-reverse;
-    width: 100%;
-  }
-
-  .formActions button {
-    width: 100%;
-  }
-}
-
 .alertError {
   display: flex;
   align-items: center;
@@ -566,6 +488,12 @@
   width: 48px;
   height: 28px;
   flex-shrink: 0;
+}
+
+.switch::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }
 
 .switch input {
@@ -673,28 +601,13 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 639px) {
-  .unifiedActionBar {
-    padding: var(--space-sm) var(--space-md);
-    gap: var(--space-sm);
-  }
-}
-
 .dirtyStatusText {
   display: inline-flex;
   align-items: center;
   gap: var(--space-icon);
   font-size: 0.8125rem;
   color: var(--text-2);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-@media (max-width: 639px) {
-  .dirtyStatusText {
-    font-size: 0.75rem;
-    gap: var(--space-xs);
-  }
+  min-width: 0;
 }
 
 .dirtyDotAmber {
@@ -705,6 +618,7 @@
 }
 
 .saveButton {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -719,20 +633,17 @@
   font-weight: 600;
   cursor: pointer;
   outline: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton guardar configuracion */
   flex-shrink: 0;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-@media (max-width: 639px) {
-  .saveButton {
-    height: 36px;
-    padding: 0 var(--space-md);
-    gap: var(--space-icon);
-    font-size: 0.8125rem;
-  }
+.saveButton::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
 }
 
 .saveButton:focus-visible {
@@ -761,6 +672,129 @@
   background: var(--surface);
   color: var(--text-2);
   border-color: var(--border);
+}
+
+@media (max-width: 767.98px) {
+  .tabContainer {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
+  }
+
+  .securityRow:not(.securityRowToggle) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .securityRowHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+    width: 100%;
+  }
+
+  .rowInfo {
+    width: 100%;
+  }
+
+  .rowLabel {
+    font-size: 0.875rem;
+  }
+
+  .rowLabelGroup {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    width: 100%;
+  }
+
+  .securityRow:not(.securityRowToggle) .rowActions,
+  .securityRowHeader .rowActions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: 2px;
+  }
+
+  .securityRow:not(.securityRowToggle) .rowActions button,
+  .securityRow:not(.securityRowToggle) .rowActions a,
+  .securityRowHeader .rowActions button {
+    width: 100%;
+    flex: 1;
+    justify-content: center;
+    height: 38px;
+  }
+
+  .securityRowToggle {
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+
+  .securityRowToggle .rowInfo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .securityRowToggle .rowActions {
+    flex-shrink: 0;
+    width: auto;
+  }
+
+  .btnSecondary,
+  .btnPrimary,
+  .btnDanger {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 0.8125rem;
+    white-space: normal;
+    text-wrap: balance;
+  }
+
+  .btnSecondary::before,
+  .btnPrimary::before,
+  .btnDanger::before {
+    inset: -4px 0;
+  }
+
+  .fieldInput {
+    font-size: 16px;
+    height: 44px;
+  }
+
+  .reqGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+
+  .unifiedActionBar {
+    flex-wrap: wrap;
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .dirtyStatusText {
+    font-size: 0.75rem;
+    gap: var(--space-xs);
+  }
+
+  .saveButton {
+    height: 36px;
+    padding: 0 var(--space-md);
+    gap: var(--space-icon);
+    font-size: 0.8125rem;
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 
 /* ── 10. Prefers Reduced Motion ──────────────────────────────────────────── */

@@ -2,7 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react'
 import type { PresionFuturaData } from '@/types'
 import tarjetaService from '@/services/tarjeta.service'
 import { CreditCard, Calendar } from '@/components/ui/icons'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
+import { MontoFit } from '@/components/ui/MontoFit/MontoFit'
 import styles from './PresionFuturaCard.module.css'
 
 interface Props {
@@ -143,6 +144,9 @@ export const PresionFuturaCard: React.FC<Props> = ({
     if (mesesConCuotas.length === 0) return null
 
     const maxMonto = Math.max(...mesesConCuotas.map(m => m.total[key] || 0), 1)
+    const totalRedondeado = Math.round(totalComprometido)
+
+    const subtitleText = `${tarjetaNombre ? `${tarjetaNombre} · ` : ''}Compromiso de pago en ${moneda === 'ARS' ? 'pesos' : 'dólares'}`
 
     return (
       <div className={styles.card}>
@@ -156,16 +160,18 @@ export const PresionFuturaCard: React.FC<Props> = ({
               </h3>
               <span className={styles.mesesTag}>Próximos {meses} meses</span>
             </div>
-            <p className={styles.cardSubtitle}>
-              {tarjetaNombre ? `${tarjetaNombre} · ` : ''}Compromiso de pago en {moneda === 'ARS' ? 'pesos' : 'dólares'}
+            <p className={styles.cardSubtitle} title={subtitleText}>
+              {subtitleText}
             </p>
           </div>
 
           <div className={styles.headerRight}>
             <span className={styles.totalLabel}>Total comprometido</span>
-            <span className={styles.totalValue}>
-              {formatMonto(Math.round(totalComprometido), moneda)}
-            </span>
+            <MontoFit
+              className={styles.totalValue}
+              completo={formatMonto(totalRedondeado, moneda)}
+              corto={formatMontoCorto(totalRedondeado, moneda)}
+            />
           </div>
         </div>
 
@@ -173,6 +179,7 @@ export const PresionFuturaCard: React.FC<Props> = ({
         <div className={styles.monthsList}>
           {mesesConCuotas.map(mes => {
             const mesTotal = mes.total[key] || 0
+            const mesRedondeado = Math.round(mesTotal)
             const porcentaje = maxMonto > 0 ? (mesTotal / maxMonto) * 100 : 0
 
             return (
@@ -186,9 +193,11 @@ export const PresionFuturaCard: React.FC<Props> = ({
                 </div>
 
                 <div className={styles.monthTotalCol}>
-                  <span className={styles.monthTotal}>
-                    {formatMonto(Math.round(mesTotal), moneda)}
-                  </span>
+                  <MontoFit
+                    className={styles.monthTotal}
+                    completo={formatMonto(mesRedondeado, moneda)}
+                    corto={formatMontoCorto(mesRedondeado, moneda)}
+                  />
                 </div>
               </div>
             )

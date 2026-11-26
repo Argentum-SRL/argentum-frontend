@@ -7,12 +7,6 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767.98px) {
-  .tabContainer {
-    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
-  }
-}
-
 .tabForm {
   display: flex;
   flex-direction: column;
@@ -220,6 +214,7 @@
 }
 
 .stepperBtn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -232,6 +227,12 @@
   cursor: pointer;
   outline: none;
   transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.stepperBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
 }
 
 .stepperBtn:hover:not(:disabled) {
@@ -254,7 +255,7 @@
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: valor numerico corto de dias */
   min-width: 80px;
   text-align: center;
 }
@@ -266,6 +267,12 @@
   width: 48px;
   height: 28px;
   flex-shrink: 0;
+}
+
+.switch::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }
 
 .switch input {
@@ -368,28 +375,13 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 639px) {
-  .unifiedActionBar {
-    padding: var(--space-sm) var(--space-md);
-    gap: var(--space-sm);
-  }
-}
-
 .dirtyStatusText {
   display: inline-flex;
   align-items: center;
   gap: var(--space-icon);
   font-size: 0.8125rem;
   color: var(--text-2);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-@media (max-width: 639px) {
-  .dirtyStatusText {
-    font-size: 0.75rem;
-    gap: var(--space-xs);
-  }
+  min-width: 0;
 }
 
 .dirtyDotAmber {
@@ -400,6 +392,7 @@
 }
 
 .saveButton {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -414,20 +407,17 @@
   font-weight: 600;
   cursor: pointer;
   outline: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton guardar preferencias */
   flex-shrink: 0;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-@media (max-width: 639px) {
-  .saveButton {
-    height: 36px;
-    padding: 0 var(--space-md);
-    gap: var(--space-icon);
-    font-size: 0.8125rem;
-  }
+.saveButton::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
 }
 
 .saveButton:focus-visible {
@@ -458,8 +448,32 @@
   border-color: var(--border);
 }
 
-/* ── 8. Adaptación Móvil Responsiva (iPhone SE 375x667) ──────────────────── */
-@media (max-width: 639px) {
+/* ── 8. Adaptación Móvil Responsiva (<= 767.98px) ────────────────────────── */
+@media (max-width: 767.98px) {
+  .tabContainer {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
+  }
+
+  .unifiedActionBar {
+    flex-wrap: wrap;
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .dirtyStatusText {
+    font-size: 0.75rem;
+    gap: var(--space-xs);
+  }
+
+  .saveButton {
+    height: 36px;
+    padding: 0 var(--space-md);
+    gap: var(--space-icon);
+    font-size: 0.8125rem;
+    white-space: normal;
+    text-wrap: balance;
+  }
+
   .noticeCard {
     padding: 10px 14px;
     gap: var(--space-sm);
@@ -514,7 +528,6 @@
 
   .subLabel {
     font-size: 0.75rem;
-    white-space: nowrap;
   }
 
   .stepper {

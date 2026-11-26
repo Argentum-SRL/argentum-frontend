@@ -417,7 +417,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
                   <Calendar size={18} />
                 </div>
                 <div className={localStyles.cicloHeaderText}>
-                  <h3 className={localStyles.cicloTitle}>Ciclo de ingresos y cobro</h3>
+                  <h3 className={localStyles.cicloTitle} title="Ciclo de ingresos y cobro">Ciclo de ingresos y cobro</h3>
                 </div>
                 <CollapseToggle
                   expanded={cicloExpanded}
@@ -508,7 +508,7 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
               <Target size={18} />
             </div>
             <div className={perfilStyles.sectionHeaderText}>
-              <h3 className={localStyles.prioridadesTitle}>¿Qué es lo más importante para vos?</h3>
+              <h3 className={localStyles.prioridadesTitle} title="¿Qué es lo más importante para vos?">¿Qué es lo más importante para vos?</h3>
             </div>
           </div>
 

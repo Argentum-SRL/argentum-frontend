@@ -3,15 +3,15 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
-  height: 18px;
+  height: 20px;
   padding: 0 6px;
   border-radius: var(--radius-selector-pill);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   color: #f59e0b;
   background: rgba(245, 158, 11, 0.08);
   border: 1px solid rgba(245, 158, 11, 0.2);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: badge corto de verificacion */
   line-height: 1;
 }
 
@@ -52,16 +52,8 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 639px) {
-  .contactItemBox:not(.contactItemBoxToggle) > .contactItemAction {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-}
-
 .editContactBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -75,7 +67,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton corto de contacto */
+}
+
+.editContactBtn::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .editContactBtn:hover {
@@ -85,6 +83,7 @@
 }
 
 .unlinkContactBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -98,7 +97,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton corto desvincular */
+}
+
+.unlinkContactBtn::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .unlinkContactBtn:hover:not(:disabled) {
@@ -115,19 +120,20 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 18px;
+  height: 20px;
   padding: 0 6px;
   border-radius: var(--radius-selector-pill);
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text-2);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: tag corto bloqueado */
   line-height: 1;
 }
 
 .verifyDirectBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -141,21 +147,17 @@
   border: none;
   cursor: pointer;
   transition: opacity 0.15s ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: boton corto verificar */
+}
+
+.verifyDirectBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
 }
 
 .verifyDirectBtn:hover {
   opacity: 0.9;
-}
-
-@media (max-width: 639px) {
-  .editContactBtn,
-  .unlinkContactBtn,
-  .verifyDirectBtn {
-    height: 36px;
-    padding: 0 12px;
-    font-size: 13px;
-  }
 }
 
 /* ── 5. Finanzas & Moneda Tab ────────────────────────────────────── */
@@ -214,6 +216,12 @@
   cursor: pointer;
 }
 
+.switch::before {
+  content: '';
+  position: absolute;
+  inset: -9px 0;
+}
+
 .switch input {
   opacity: 0;
   width: 0;
@@ -268,13 +276,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   width: 100%;
-}
-
-@media (max-width: 639px) {
-  .dolarOptionsGrid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
 }
 
 .dolarOptionCard {
@@ -345,7 +346,7 @@
 }
 
 .rateLabel {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-3);
@@ -398,22 +399,13 @@
   width: 100%;
 }
 
-@media (max-width: 639px) {
-  .cardFooterActions {
-    justify-content: stretch;
-  }
-  .cardFooterActions button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
 .saveBtnPrimary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  height: 42px;
+  height: 44px;
   padding: 0 20px;
   border-radius: 12px;
   background: var(--primary);
@@ -565,6 +557,12 @@
   border-radius: 6px;
 }
 
+.pwEyeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
 .pwEyeBtn:hover {
   color: var(--text);
 }
@@ -606,13 +604,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   width: 100%;
-}
-
-@media (max-width: 639px) {
-  .pwChecklistGrid {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
 }
 
 .reqItem {
@@ -694,5 +685,37 @@
 .reqItem {
     transition: none;
     animation: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .contactItemBox:not(.contactItemBoxToggle) > .contactItemAction {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .editContactBtn,
+  .unlinkContactBtn,
+  .verifyDirectBtn {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+    white-space: normal;
+  }
+  .dolarOptionsGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .cardFooterActions {
+    justify-content: stretch;
+  }
+  .cardFooterActions button {
+    width: 100%;
+    justify-content: center;
+  }
+  .pwChecklistGrid {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 }

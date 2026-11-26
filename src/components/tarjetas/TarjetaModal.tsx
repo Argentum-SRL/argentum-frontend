@@ -17,8 +17,9 @@ import type { Billetera, TarjetaCredito, TarjetaCreditoCreate } from '@/types'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import SelectableSurface from '@/components/ui/SelectableSurface'
 import RealCardPreview from './RealCardPreview'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
+import { MontoFit } from '@/components/ui/MontoFit/MontoFit'
 import styles from './TarjetaModal.module.css'
 
 // Logos de redes
@@ -586,7 +587,7 @@ export const TarjetaModal: React.FC = () => {
                               <span style={{ fontSize: '11px', fontWeight: 800 }}>{label}</span>
                             )}
                           </div>
-                          <span className={styles.redTileLabel}>{label}</span>
+                          <span className={styles.redTileLabel} title={label}>{label}</span>
                         </button>
                       )
                     })}
@@ -927,9 +928,15 @@ export const TarjetaModal: React.FC = () => {
 
                   <div className={styles.summaryRow}>
                     <span className={styles.summaryLbl}>Límite disponible</span>
-                    <span className={styles.summaryVal}>
-                      {state.limiteCredito ? formatMonto(state.limiteCredito, state.moneda) : 'Sin límite fijado'}
-                    </span>
+                    {state.limiteCredito ? (
+                      <MontoFit
+                        className={styles.summaryVal}
+                        completo={formatMonto(state.limiteCredito, state.moneda)}
+                        corto={formatMontoCorto(state.limiteCredito, state.moneda)}
+                      />
+                    ) : (
+                      <span className={styles.summaryVal}>Sin límite fijado</span>
+                    )}
                   </div>
                 </div>
               </div>

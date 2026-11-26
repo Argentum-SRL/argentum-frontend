@@ -36,6 +36,7 @@
 }
 
 .backBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -48,6 +49,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background 120ms ease, color 120ms ease;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .backBtn:hover:not(:disabled) {
@@ -94,6 +101,8 @@
   font-size: 11px;
   font-weight: 700;
   border: 1px solid var(--border);
+  max-width: 100%;
+  min-width: 0;
 }
 
 .monedaBadge {
@@ -103,7 +112,7 @@
   border-radius: 6px;
   background: color-mix(in srgb, var(--primary) 10%, transparent);
   color: var(--primary);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -209,7 +218,7 @@
 }
 
 .montoHeroLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--text-3);
   text-transform: uppercase;
@@ -223,6 +232,8 @@
   letter-spacing: -0.03em;
   line-height: 1.15;
   font-family: 'Figtree', sans-serif;
+  min-width: 0;
+  width: 100%;
 }
 
 /* ── Monto Custom Section (MontoInput + Chips) ────────────────────────────── */
@@ -243,6 +254,7 @@
 }
 
 .quickChip {
+  position: relative;
   padding: 6px 12px;
   border-radius: 10px;
   background: var(--surface);
@@ -253,6 +265,13 @@
   cursor: pointer;
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
   box-shadow: var(--elevation-none);
+}
+
+/* Gap 6px en .quickChipsRow limita expansión horizontal a -3px sin superposición */
+.quickChip::before {
+  content: '';
+  position: absolute;
+  inset: -9px -3px;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -287,7 +306,7 @@
 }
 
 .breakdownTitle {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -298,6 +317,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   font-size: 12.5px;
   color: var(--text-2);
   font-weight: 500;
@@ -323,6 +344,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 8px;
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
@@ -333,6 +355,9 @@
   font-size: 16px;
   font-weight: 800;
   color: var(--text);
+  flex: 1;
+  min-width: 0;
+  text-align: right;
 }
 
 /* ── Pesificación Card ───────────────────────────────────────────────────── */
@@ -365,6 +390,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   font-size: 12.5px;
   color: var(--text-2);
 }
@@ -415,16 +442,11 @@
   box-shadow: var(--elevation-none);
 }
 
-@media (max-width: 767.98px) {
-  .inlineInput {
-    font-size: var(--control-font-mobile);
-  }
-}
-
 .pesificacionTotalRow {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 8px;
 }
 
 .pesificacionTotalLabel {
@@ -439,6 +461,9 @@
   font-size: 17px;
   font-weight: 800;
   color: var(--primary);
+  flex: 1;
+  min-width: 0;
+  text-align: right;
 }
 
 .cotizacionAlert {
@@ -480,6 +505,7 @@
 }
 
 .pesificarSwitchBtn {
+  position: relative;
   align-self: flex-start;
   padding: 6px 12px;
   background: var(--primary);
@@ -489,6 +515,12 @@
   font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.pesificarSwitchBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px 0;
 }
 
 /* ── Pago Mínimo Box ─────────────────────────────────────────────────────── */
@@ -505,6 +537,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text-2);
@@ -517,7 +551,7 @@
 }
 
 .minimoBadge {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   background: rgba(0, 0, 0, 0.06);
@@ -584,7 +618,7 @@
   flex: 1;
   height: 46px;
   padding-inline: 16px;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón corto de pie de modal (Cancelar/Volver); requerido por Modal.test.ts */
   border-radius: 12px;
   border: 1.5px solid var(--border);
   background: transparent;
@@ -609,7 +643,7 @@
   flex: 2;
   height: 46px;
   padding-inline: 16px;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón principal de pie de modal (Confirmar/Continuar); requerido por Modal.test.ts */
   border-radius: 12px;
   border: none;
   background: var(--primary, #0D2045);
@@ -648,7 +682,11 @@
 }
 
 /* ── Responsive Mobile ───────────────────────────────────────────────────── */
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
+  .inlineInput {
+    font-size: var(--control-font-mobile);
+  }
+
   .modalHeader {
     padding: 14px var(--modal-pad-x) 12px; /* Separación lateral oficial */
   }

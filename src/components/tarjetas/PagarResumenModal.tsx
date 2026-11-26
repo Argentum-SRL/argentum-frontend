@@ -6,7 +6,8 @@ import Modal from '@/components/ui/Modal/Modal'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import CategoriaSelector from '@/components/ui/CategoriaSelector/CategoriaSelector'
 import categoriaService from '@/services/categoria.service'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
+import { MontoFit } from '@/components/ui/MontoFit/MontoFit'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { mitadRedondeada, excedente } from '@/utils/ayudasEscritura'
 import { useSimularPesificacion } from '@/hooks/useSimularPesificacion'
@@ -476,7 +477,10 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                   <div className={styles.montoHeroCard}>
                     <span className={styles.montoHeroLabel}>Total a liquidar</span>
                     <div className={styles.montoHeroAmountDisplay}>
-                      {formatMonto(totalAPagar, monedaAPagar)}
+                      <MontoFit
+                        completo={formatMonto(totalAPagar, monedaAPagar)}
+                        corto={formatMontoCorto(totalAPagar, monedaAPagar)}
+                      />
                     </div>
                   </div>
                 ) : (
@@ -646,7 +650,11 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
                   <div className={styles.breakdownTotalRow}>
                     <span>Total del resumen</span>
-                    <span className={styles.breakdownTotalVal}>{formatMonto(totalAPagar, monedaAPagar)}</span>
+                    <MontoFit
+                      className={styles.breakdownTotalVal}
+                      completo={formatMonto(totalAPagar, monedaAPagar)}
+                      corto={formatMontoCorto(totalAPagar, monedaAPagar)}
+                    />
                   </div>
                 </div>
               )}
@@ -726,15 +734,19 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
 
                   <div className={styles.pesificacionTotalRow}>
                     <span className={styles.pesificacionTotalLabel}>Total final a debitar</span>
-                    <span className={styles.pesificacionTotalVal}>
-                      {cargandoPesificacion
-                        ? 'Calculando…'
-                        : errorPesificacion
-                          ? 'No se pudo calcular'
-                          : pesificacionSim?.total_estimado_ars != null
-                            ? formatMonto(pesificacionSim.total_estimado_ars, 'ARS')
-                            : 'Calculando…'}
-                    </span>
+                    {cargandoPesificacion ? (
+                      <span className={styles.pesificacionTotalVal}>Calculando…</span>
+                    ) : errorPesificacion ? (
+                      <span className={styles.pesificacionTotalVal}>No se pudo calcular</span>
+                    ) : pesificacionSim?.total_estimado_ars != null ? (
+                      <MontoFit
+                        className={styles.pesificacionTotalVal}
+                        completo={formatMonto(pesificacionSim.total_estimado_ars, 'ARS')}
+                        corto={formatMontoCorto(pesificacionSim.total_estimado_ars, 'ARS')}
+                      />
+                    ) : (
+                      <span className={styles.pesificacionTotalVal}>Calculando…</span>
+                    )}
                   </div>
                 </div>
               )}

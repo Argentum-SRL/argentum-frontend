@@ -10,9 +10,9 @@
 }
 
 .currentSessionTag {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: 4px;
   background: rgba(16, 185, 129, 0.12);
   color: #10b981;
@@ -24,6 +24,7 @@
 }
 
 .revokeSingleBtn {
+  position: relative;
   padding: 5px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -33,6 +34,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.revokeSingleBtn::before {
+  content: '';
+  position: absolute;
+  inset: -10px 0;
 }
 
 .revokeSingleBtn:hover {
@@ -46,6 +53,7 @@
 }
 
 .revokeAllBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -58,6 +66,12 @@
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.revokeAllBtn::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .revokeAllBtn:hover {
@@ -83,14 +97,6 @@
   border: 1px solid var(--border);
   box-sizing: border-box;
   width: 100%;
-}
-
-@media (max-width: 639px) {
-  .timeSectionBody {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
 }
 
 .timeSectionInfo {
@@ -120,23 +126,6 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 639px) {
-  .timeControlsRow {
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .timeControlsRow .timeInputBox {
-    flex: 1;
-    min-width: 130px;
-  }
-  .timeControlsRow button {
-    flex: 1;
-    min-width: 130px;
-    justify-content: center;
-  }
-}
-
 .timeInputBox {
   display: flex;
   align-items: center;
@@ -149,17 +138,10 @@
   width: 100%;
 }
 
-@media (max-width: 1023.98px) {
+@media (min-width: 768px) and (max-width: 1023.98px) {
   .notifCardsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
-  }
-}
-
-@media (max-width: 639px) {
-  .notifCardsGrid {
-    grid-template-columns: 1fr;
-    gap: 8px;
   }
 }
 
@@ -226,14 +208,6 @@
   width: 100%;
 }
 
-@media (max-width: 479px) {
-  .notifCardBody {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-}
-
 .inlineNumberControl {
   display: flex;
   align-items: center;
@@ -270,6 +244,7 @@
 }
 
 .channelPill {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -283,6 +258,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.channelPill::before {
+  content: '';
+  position: absolute;
+  inset: -10px -2px; /* toque-ok: horizontal limitado a -2px por gap de 4px en .channelsGroup */
 }
 
 .channelPill:hover {
@@ -308,16 +289,6 @@
   justify-content: flex-end;
   padding-top: 10px;
   width: 100%;
-}
-
-@media (max-width: 639px) {
-  .notifFooterBar {
-    justify-content: stretch;
-  }
-  .notifFooterBar button {
-    width: 100%;
-    justify-content: center;
-  }
 }
 
 /* ── 9. Edit Modals (Datos, Email, Teléfono) ──────────────────────── */
@@ -535,7 +506,7 @@
 }
 
 .fieldLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -591,16 +562,6 @@
   color: var(--text);
 }
 
-@media (max-width: 767.98px) {
-  .fieldInput,
-  .selectInput {
-    font-size: var(--control-font-mobile);
-  }
-  .smallNumberInput {
-    font-size: 16px;
-  }
-}
-
 .formRowDual {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -608,7 +569,49 @@
   width: 100%;
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767.98px) {
+  .timeSectionBody {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .timeControlsRow {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .timeControlsRow .timeInputBox {
+    flex: 1;
+    min-width: 130px;
+  }
+  .timeControlsRow button {
+    flex: 1;
+    min-width: 130px;
+    justify-content: center;
+  }
+  .notifCardsGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .notifCardBody {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .notifFooterBar {
+    justify-content: stretch;
+  }
+  .notifFooterBar button {
+    width: 100%;
+    justify-content: center;
+  }
+  .fieldInput,
+  .selectInput {
+    font-size: var(--control-font-mobile);
+  }
+  .smallNumberInput {
+    font-size: 16px;
+  }
   .formRowDual {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -688,6 +691,12 @@
   transition: color 120ms ease;
 }
 
+.modalPwEyeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
 .modalPwEyeBtn:hover {
   color: var(--text);
 }
@@ -712,7 +721,8 @@
 .cancelBtn,
 .modalCancelBtn {
   flex: 1;
-  height: 42px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: var(--control-radius);
   border: 1.5px solid var(--surface-alt);
   background: transparent;
@@ -741,7 +751,8 @@
 .submitBtn,
 .modalSubmitBtn {
   flex: 2;
-  height: 42px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: var(--control-radius);
   border: none;
   background: var(--primary);

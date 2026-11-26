@@ -163,7 +163,10 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
 
           <div className={styles.heroDetails}>
             <div className={styles.heroTopRow}>
-              <h2 className={styles.heroName}>
+              <h2
+                className={styles.heroName}
+                title={usuario?.nombre ? `${usuario.nombre} ${usuario.apellido || ''}`.trim() : 'Tu Cuenta'}
+              >
                 {usuario?.nombre ? `${usuario.nombre} ${usuario.apellido || ''}`.trim() : 'Tu Cuenta'}
               </h2>
 

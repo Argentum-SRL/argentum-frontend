@@ -78,6 +78,7 @@
 }
 
 .backBtn, .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -92,10 +93,7 @@
   transition: background 120ms ease;
 }
 
-.closeBtn {
-  position: relative;
-}
-
+.backBtn::before,
 .closeBtn::before {
   content: '';
   position: absolute;
@@ -159,7 +157,7 @@
 /* ── Redes Grid & Apple-Style Interactive Brand Tiles ───────────────────────── */
 .redGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(72px, 100%), 1fr));
   gap: 8px;
   width: 100%;
   padding: 8px 2px 14px;
@@ -257,13 +255,16 @@
 }
 
 .redTileLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text-3);
   text-align: center;
   line-height: 1;
   transition: color 200ms ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -285,7 +286,7 @@
   width: 100%;
   box-sizing: border-box;
   flex-wrap: nowrap !important;
-  white-space: nowrap !important;
+  white-space: nowrap !important; /* nowrap-ok: prefijo e input de 4 dígitos en una fila */
   overflow: hidden;
   transition: border-color 150ms ease, background 150ms ease;
 }
@@ -303,7 +304,7 @@
   color: var(--text-3);
   font-family: 'Courier New', monospace;
   user-select: none;
-  white-space: nowrap !important;
+  white-space: nowrap !important; /* nowrap-ok: máscara fija de tarjeta */
   flex-shrink: 0;
 }
 
@@ -319,7 +320,7 @@
   color: var(--text);
   font-family: 'Courier New', monospace;
   padding: 0;
-  white-space: nowrap !important;
+  white-space: nowrap !important; /* nowrap-ok: input numérico de 4 dígitos */
 }
 
 .cardDigitsInput:focus-visible {
@@ -360,13 +361,13 @@
 }
 
 .cycleColLabel {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--text-3);
   text-align: center;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta corta de columna de ciclo */
 }
 
 .cycleValueRow {
@@ -434,17 +435,10 @@
 
 .fechasResumenGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr));
   gap: 8px;
   width: 100%;
   margin-top: 2px;
-}
-
-@media (max-width: 380px) {
-  .fechasResumenGrid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
 }
 
 .fechaCol {
@@ -599,6 +593,7 @@
 }
 
 .colorArrowLarge {
+  position: relative;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -611,6 +606,12 @@
   cursor: pointer;
   transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
   flex-shrink: 0;
+}
+
+.colorArrowLarge::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .colorArrowLarge:hover {
@@ -654,7 +655,7 @@
 }
 
 .walletNamePreview {
-  font-size: clamp(10.5px, 3.6cqi, 13px);
+  font-size: clamp(11px, 3.8cqi, 13px);
   font-weight: 800;
   letter-spacing: 0.05em;
   line-height: 1.2;
@@ -701,7 +702,7 @@
   font-weight: 700;
   letter-spacing: clamp(0.08em, 0.12cqi, 0.14em);
   margin-bottom: clamp(2px, 1cqi, 4px);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: número XXXX XXXX XXXX 1234 de maqueta de tarjeta */
   font-variant-numeric: tabular-nums;
   transition: color 200ms ease;
   z-index: 2;
@@ -726,16 +727,16 @@
 }
 
 .cardInfoLabel {
-  font-size: clamp(7px, 2.2cqi, 8.5px);
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .cardInfoValue {
-  font-size: clamp(9px, 2.8cqi, 11px);
+  font-size: clamp(11px, 3.2cqi, 12px);
   font-weight: 700;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: fecha dd/mm corta en maqueta de tarjeta */
 }
 
 .networkLogoWrap {
@@ -762,6 +763,8 @@
 }
 
 .colorSwatchBtn {
+  position: relative;
+  min-width: 44px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -822,7 +825,7 @@
   font-weight: 600;
   color: var(--text-3);
   transition: color 200ms ease, font-weight 200ms ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta corta de color (Banco/Gold/Platinum/Black/Zafiro) */
 }
 
 .colorSwatchBtn[data-active="true"] .colorSwatchLabel {
@@ -858,6 +861,8 @@
   font-weight: 700;
   color: var(--text);
   text-align: right;
+  flex: 1;
+  min-width: 0;
 }
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */
@@ -872,6 +877,7 @@
 .cancelBtn {
   flex: 1;
   height: 44px;
+  padding-inline: 16px;
   border-radius: 12px;
   border: 1.5px solid var(--surface-alt);
   background: transparent;
@@ -891,6 +897,7 @@
 .submitBtn {
   flex: 2;
   height: 44px;
+  padding-inline: 16px;
   border-radius: 12px;
   border: none;
   background: var(--primary);
@@ -913,10 +920,8 @@
 
 /* ── Responsive Mobile (<768px) ──────────────────────────────────────────── */
 @media (max-width: 767.98px) {
-  
-
   .formHeader {
-    padding: 2px 0 6px;
+    padding: 2px var(--modal-pad-x) 6px;
   }
 
   .formBody {
@@ -944,11 +949,6 @@
     max-width: 36px;
   }
 
-  .redTileLabel {
-    font-size: 9.5px;
-  }
-
-
   .formFooter {
     padding: 10px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación lateral oficial */
     gap: var(--modal-footer-btn-gap); /* Separación oficial entre botones del pie */
@@ -962,10 +962,6 @@
   .submitBtn {
     height: 46px;
     font-size: 14.5px;
-  }
-
-  .fieldLabel {
-    font-size: 10.5px;
   }
 
   .cardDigitsHero {
@@ -986,9 +982,7 @@
   .realCard {
     max-width: 340px;
   }
-}
 
-@media (max-width: 767.98px) {
   .dateInput {
     font-size: var(--control-font-mobile);
   }

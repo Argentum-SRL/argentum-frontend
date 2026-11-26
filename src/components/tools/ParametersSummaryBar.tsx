@@ -50,7 +50,7 @@ export const ParametersSummaryBar: React.FC<ParametersSummaryBarProps> = ({
           <div className={styles.summaryBarIconBox}>
             <Icon size={16} strokeWidth={2.2} />
           </div>
-          <span className={styles.summaryBarTitle}>{title}</span>
+          <span className={styles.summaryBarTitle} title={title}>{title}</span>
         </div>
 
         <div className={styles.summaryPills}>

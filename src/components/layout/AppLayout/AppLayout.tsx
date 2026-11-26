@@ -222,8 +222,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 }
               </div>
               <div className={styles.topBarUserInfo}>
-                <span className={styles.topBarUserName}>{usuario?.nombre}</span>
-                {usuario?.email && <span className={styles.topBarUserEmail}>{usuario.email}</span>}
+                <span className={styles.topBarUserName} title={usuario?.nombre ?? undefined}>{usuario?.nombre}</span>
+                {usuario?.email && <span className={styles.topBarUserEmail} title={usuario.email}>{usuario.email}</span>}
               </div>
               <ChevronDown
                 size={16}

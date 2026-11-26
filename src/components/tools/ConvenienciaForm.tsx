@@ -172,18 +172,11 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   {currentStep > 1 ? '✓' : '1'}
                 </span>
                 <div className="flex flex-col min-w-0">
-                  <span className={`${styles.stepperKicker} text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
+                  <span className={`${styles.stepperKicker} text-[11px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
                     Paso 1
                   </span>
-                  <span
-                    className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${
-                      currentStep === 1
-                        ? 'text-slate-900 dark:text-slate-100'
-                        : currentStep > 1
-                        ? 'text-slate-600 dark:text-slate-300'
-                        : 'text-slate-400 dark:text-slate-500'
-                    }`}
-                  >
+                  {/* nowrap-ok: etiqueta fija corta de paso en stepper */}
+                  <span className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${currentStep === 1 ? 'text-slate-900 dark:text-slate-100' : currentStep > 1 ? 'text-slate-600 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>
                     Contado
                   </span>
                 </div>
@@ -219,18 +212,11 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   {currentStep > 2 ? '✓' : '2'}
                 </span>
                 <div className="flex flex-col min-w-0">
-                  <span className={`${styles.stepperKicker} text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
+                  <span className={`${styles.stepperKicker} text-[11px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
                     Paso 2
                   </span>
-                  <span
-                    className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${
-                      currentStep === 2
-                        ? 'text-slate-900 dark:text-slate-100'
-                        : currentStep > 2
-                        ? 'text-slate-600 dark:text-slate-300'
-                        : 'text-slate-400 dark:text-slate-500'
-                    }`}
-                  >
+                  {/* nowrap-ok: etiqueta fija corta de paso en stepper */}
+                  <span className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${currentStep === 2 ? 'text-slate-900 dark:text-slate-100' : currentStep > 2 ? 'text-slate-600 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>
                     Financiación
                   </span>
                 </div>
@@ -266,16 +252,11 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   {currentStep === 3 && resultado ? '✓' : '3'}
                 </span>
                 <div className="flex flex-col min-w-0">
-                  <span className={`${styles.stepperKicker} text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
+                  <span className={`${styles.stepperKicker} text-[11px] font-bold uppercase tracking-wider text-slate-400 leading-none`}>
                     Paso 3
                   </span>
-                  <span
-                    className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${
-                      currentStep === 3
-                        ? 'text-slate-900 dark:text-slate-100'
-                        : 'text-slate-400 dark:text-slate-500'
-                    }`}
-                  >
+                  {/* nowrap-ok: etiqueta fija corta de paso en stepper */}
+                  <span className={`${styles.stepperLabel} font-bold transition-colors whitespace-nowrap ${currentStep === 3 ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'}`}>
                     Análisis
                   </span>
                 </div>
@@ -305,7 +286,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 Contado
               </span>
               <div className="flex items-center justify-center sm:justify-start gap-2">
-                <h2 className="text-[clamp(16px,4.5vw,24px)] sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight whitespace-nowrap">
+                <h2 className="text-[clamp(16px,4.5vw,24px)] sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                   ¿Cuánto cuesta de contado?
                 </h2>
                 <AyudaBoton
@@ -400,7 +381,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   <button
                     key={n}
                     type="button"
-                    className={`h-9 px-3.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+                    className={`relative before:absolute before:content-[''] before:-inset-y-[4px] before:-inset-x-[2px] h-9 px-3.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       formData.cantidad_cuotas === n && !isCustomCuotas
                         ? 'bg-[#0D2045] dark:bg-[#4878B8] text-white border-transparent shadow-xs'
                         : 'bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -418,7 +399,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 {!isCustomCuotas ? (
                   <button
                     type="button"
-                    className="h-9 px-3 text-xs font-bold rounded-xl border bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer"
+                    className="relative before:absolute before:content-[''] before:-inset-y-[4px] before:-inset-x-[2px] h-9 px-3 text-xs font-bold rounded-xl border bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer"
                     onClick={() => {
                       setIsCustomCuotas(true);
                       handleCuotasCountChange(9);
@@ -475,7 +456,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                         type="button"
                         onClick={() => handleChange('sin_interes', !formData.sin_interes)}
                         aria-pressed={formData.sin_interes}
-                        className={`h-8 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        className={`relative before:absolute before:content-[''] before:-inset-y-[6px] before:-inset-x-[4px] h-8 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                           formData.sin_interes
                             ? 'bg-[#0D2045] dark:bg-[#4878B8] text-white border-transparent shadow-xs'
                             : 'bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -486,7 +467,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       <button
                         type="button"
                         onClick={() => setFixedMode(fixedMode === 'cuota' ? 'total' : 'cuota')}
-                        className="text-[11px] font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer"
+                        className="relative before:absolute before:content-[''] before:-inset-y-[8px] before:-inset-x-[4px] text-[11px] font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer"
                       >
                         {fixedMode === 'cuota' ? 'Prefiero poner el total' : 'Prefiero poner cada cuota'}
                       </button>
@@ -546,7 +527,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       placeholder="Ej: 120"
                       value={formData.tna}
                       onChange={(e) => handleChange('tna', e.target.value)}
-                      className="flex-1 px-3.5 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
+                      className="flex-1 min-w-0 px-3.5 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
                       inputMode="decimal"
                     />
                     <span className="flex items-center px-3.5 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
@@ -579,7 +560,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   role="switch"
                   aria-checked={formData.tiene_interes}
                   onClick={() => handleChange('tiene_interes', !formData.tiene_interes)}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer"
+                  className="relative before:absolute before:content-[''] before:-inset-y-[13px] before:-inset-x-[6px] inline-flex items-center gap-2 text-xs font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer"
                 >
                   <span>{formData.tiene_interes ? 'Volver al valor de cada cuota' : 'Sé la tasa'}</span>
                 </button>
@@ -610,7 +591,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
 
                 {/* Resumen Compacto de la Compra Previo al Análisis */}
                 <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between gap-3">
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-800 dark:text-slate-200">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-800 dark:text-slate-200 min-w-0 flex-1">
                     <span>
                       Contado: <strong>{formatMonto(formData.precio_contado || 0, monedaContadoActual)}</strong>
                     </span>
@@ -626,7 +607,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   <button
                     type="button"
                     onClick={() => setCurrentStep(2)}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer shrink-0"
+                    className="relative before:absolute before:content-[''] before:-inset-y-[13px] before:-inset-x-[8px] inline-flex items-center gap-1 text-xs font-bold text-primary dark:text-[#4878B8] hover:underline cursor-pointer shrink-0"
                   >
                     <Edit3 size={13} />
                     <span>Modificar</span>
@@ -668,7 +649,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
 
                     {(formData.usar_inflacion_propia || ipcError) ? (
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 flex items-stretch h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+                        <div className="flex-1 min-w-0 flex items-stretch h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
                           <input
                             id="conv_inflacion"
                             type="number"
@@ -678,7 +659,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                             placeholder="Ej: 2"
                             value={formData.inflacion_mensual}
                             onChange={(e) => handleChange('inflacion_mensual', e.target.value)}
-                            className="flex-1 px-3 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
+                            className="flex-1 min-w-0 px-3 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
                             inputMode="decimal"
                           />
                           <span className="flex items-center px-2.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
@@ -689,7 +670,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                         {!isIpcOfficialUsed && ipcData?.valor_mensual != null && (
                           <button
                             type="button"
-                            className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-primary text-xs font-bold hover:bg-white dark:hover:bg-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                            className="relative before:absolute before:content-[''] before:-inset-[2px] h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-primary text-xs font-bold hover:bg-white dark:hover:bg-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                             onClick={syncIpc}
                             title="Volver a la inflación que se espera"
                           >
@@ -715,12 +696,12 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
                         Invertir el dinero hoy
                       </label>
-                      {/* Toggle Switch */}
+                      {/* Toggle Switch (gap 6px abajo limita N vertical a 6px sin superposición sobre input) */}
                       <button
                         type="button"
                         role="switch"
                         aria-checked={formData.hasCapitalToInvest}
-                        className={`w-10 h-5 rounded-full border transition-all p-0.5 inline-flex items-center cursor-pointer shrink-0 outline-none ${
+                        className={`relative before:absolute before:content-[''] before:-inset-y-[6px] before:-inset-x-[2px] w-10 h-5 rounded-full border transition-all p-0.5 inline-flex items-center cursor-pointer shrink-0 outline-none ${
                           formData.hasCapitalToInvest
                             ? 'bg-primary border-primary'
                             : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600'
@@ -748,7 +729,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                             placeholder="Ej: 38"
                             value={formData.investmentTna}
                             onChange={(e) => handleChange('investmentTna', e.target.value)}
-                            className="flex-1 px-3 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
+                            className="flex-1 min-w-0 px-3 text-sm font-semibold bg-transparent text-slate-900 dark:text-slate-100 outline-none"
                             inputMode="decimal"
                           />
                           <span className="flex items-center px-2.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-700/50 border-l border-slate-200 dark:border-slate-700">
@@ -821,31 +802,31 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                     {/* 3 Tarjetas Métricas Esenciales */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           Precio de contado
                         </span>
                         <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
                           {contadoDisplay ? contadoDisplay.monto : formatMonto(resultado.precio_contado, monedaContadoActual)}
                         </span>
-                        <span className="text-[10.5px] text-slate-400">
+                        <span className="text-[11px] text-slate-400">
                           {contadoDisplay ? contadoDisplay.subtitulo : 'Un pago hoy'}
                         </span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           En plata de hoy
                         </span>
                         <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
                           {formatMonto(resultado.costo_real_cuotas, monedaResultado)}
                         </span>
-                        <span className="text-[10.5px] text-slate-400">
+                        <span className="text-[11px] text-slate-400">
                           {monedaResultado === 'USD' ? 'En dólares' : 'Con la inflación elegida'}
                         </span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           {isCuotas ? 'Te ahorrás' : isContado ? 'Pagás de más' : 'Diferencia'}
                         </span>
                         <span
@@ -859,7 +840,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                         >
                           {formatMonto(Math.abs(resultado.ahorro_real), monedaResultado)}
                         </span>
-                        <span className="text-[10.5px] text-slate-400">
+                        <span className="text-[11px] text-slate-400">
                           {isCuotas
                             ? `${formatPorcentaje(Math.abs(resultado.porcentaje_ahorro))} menos que de contado`
                             : isContado
@@ -877,7 +858,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                           setSlideDirection('forward');
                           setStep3View('grafico');
                         }}
-                        className="w-full py-3 px-4 rounded-xl flex items-center justify-between text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100/90 dark:bg-slate-800/80 hover:bg-slate-200/90 dark:hover:bg-slate-700/80 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#0D2045] dark:focus-visible:ring-[#4878B8]"
+                        className="relative before:absolute before:content-[''] before:-inset-y-[2px] before:inset-x-0 w-full py-3 px-4 rounded-xl flex items-center justify-between text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100/90 dark:bg-slate-800/80 hover:bg-slate-200/90 dark:hover:bg-slate-700/80 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#0D2045] dark:focus-visible:ring-[#4878B8]"
                       >
                         <span>Ver evolución de las cuotas</span>
                         <ArrowRight size={16} className="text-slate-500 dark:text-slate-400" />
@@ -888,14 +869,14 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                   /* ── VISTA B: GRÁFICO DE EVOLUCIÓN DEDICADO Y DESGLOSE TÉCNICO ── */
                   <div className="flex flex-col gap-3.5">
                     {/* Encabezado de la Vista B con control de regreso */}
-                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                    <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-slate-800 shrink-0">
                       <button
                         type="button"
                         onClick={() => {
                           setSlideDirection('backward');
                           setStep3View('resultado');
                         }}
-                        className="inline-flex items-center gap-1.5 py-1 px-2.5 -ml-2.5 rounded-lg text-xs font-bold text-primary dark:text-[#4878B8] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        className="relative before:absolute before:content-[''] before:-inset-y-[9px] before:-inset-x-[4px] inline-flex items-center gap-1.5 py-1 px-2.5 -ml-2.5 rounded-lg text-xs font-bold text-primary dark:text-[#4878B8] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       >
                         <ArrowLeft size={14} />
                         <span>Volver al resultado</span>
@@ -926,14 +907,14 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
       </div>
 
       {/* ── BARRA INFERIOR DE ACCIONES STABLE (Anclada al pie) ── */}
-      <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3 shrink-0">
+      <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 sm:gap-3 shrink-0">
         {/* Lado izquierdo: Botón Volver */}
         <div>
           {currentStep === 2 && (
             <button
               type="button"
               onClick={() => setCurrentStep(1)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none"
+              className="relative before:absolute before:content-[''] before:-inset-y-[5px] before:-inset-x-[2px] inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none"
             >
               <ArrowLeft size={14} />
               <span>Volver a contado</span>
@@ -944,7 +925,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
             <button
               type="button"
               onClick={() => setCurrentStep(2)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none"
+              className="relative before:absolute before:content-[''] before:-inset-y-[5px] before:-inset-x-[2px] inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none"
             >
               <ArrowLeft size={14} />
               <span>Volver a financiación</span>
@@ -958,7 +939,7 @@ export const ConvenienciaForm: React.FC<ConvenienciaFormProps> = ({
                 setStep3View('resultado');
                 setCurrentStep(2);
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none"
+              className="relative before:absolute before:content-[''] before:-inset-y-[5px] before:-inset-x-[2px] inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer outline-none"
             >
               <ArrowLeft size={14} />
               <span>Modificar condiciones</span>

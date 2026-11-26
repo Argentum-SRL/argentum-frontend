@@ -75,19 +75,19 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
           </div>
 
           {resultado ? (
-            <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-2 py-0.5 rounded-full">
               RESULTADO
             </span>
           ) : currentStep === 1 ? (
-            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-full">
               PASO 1 DE 3
             </span>
           ) : currentStep === 2 ? (
-            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-full">
               PASO 2 DE 3
             </span>
           ) : (
-            <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 px-2.5 py-0.5 rounded-full">
               PASO 3 DE 3
             </span>
           )}
@@ -99,25 +99,25 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
             {/* Cifras Fundamentales */}
             <div className="grid grid-cols-2 gap-2.5">
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Contado
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
                   {contadoDisplay ? contadoDisplay.monto : formatMonto(resultado.precio_contado, monedaContado)}
                 </span>
-                <span className="text-[10.5px] text-slate-400">
+                <span className="text-[11px] text-slate-400">
                   {contadoDisplay ? contadoDisplay.subtitulo : 'Un pago hoy'}
                 </span>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex flex-col">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Total Cuotas
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
                   {formatMonto(resultado.precio_total_cuotas_con_interes ?? totalFinanciadoDisplay ?? 0, monedaResultado)}
                 </span>
-                <span className="text-[10.5px] text-slate-400">
+                <span className="text-[11px] text-slate-400">
                   {formData.cantidad_cuotas} cuotas
                 </span>
               </div>
@@ -160,7 +160,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
               </div>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10.5px] font-semibold text-slate-400 w-14 shrink-0">Contado</span>
+                  <span className="text-[11px] font-semibold text-slate-400 w-14 shrink-0">Contado</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                     <div
                       className="h-full bg-slate-700 dark:bg-slate-300 rounded-full transition-all duration-300"
@@ -169,7 +169,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10.5px] font-semibold text-slate-400 w-14 shrink-0">Cuotas</span>
+                  <span className="text-[11px] font-semibold text-slate-400 w-14 shrink-0">Cuotas</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${
@@ -197,7 +197,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                     : 'bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-700/40'
                 }`}
               >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Contado
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
@@ -205,7 +205,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                     ? formatMonto(formData.precio_contado, monedaContado)
                     : '—'}
                 </span>
-                <span className="text-[10.5px] text-slate-400">
+                <span className="text-[11px] text-slate-400">
                   {hasContado ? 'Precio de contado' : 'Ingresá el precio'}
                 </span>
               </div>
@@ -218,13 +218,13 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                     : 'bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-700/40'
                 }`}
               >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Financiación
                 </span>
                 <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5 tabular-nums">
                   {totalFinanciadoDisplay != null ? formatMonto(totalFinanciadoDisplay, monedaCuotas) : '—'}
                 </span>
-                <span className="text-[10.5px] text-slate-400 truncate">
+                <span className="text-[11px] text-slate-400">
                   {cuotaEstimada !== null && formData.cantidad_cuotas
                     ? `${formData.cantidad_cuotas}x de ${esCuotaEstimada ? '~' : ''}${formatMonto(cuotaEstimada, monedaCuotas)}`
                     : 'Paso 2'}
@@ -236,12 +236,12 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
             {hasContado && hasFinancingCondition && recargoNominal ? (
               <div className="flex flex-col gap-3 animate-fadeIn">
                 {/* Fila de Diferencia Sin Inflación */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60">
-                  <div className="flex flex-col">
+                <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60">
+                  <div className="flex flex-col min-w-0">
                     <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                       Diferencia sin inflación
                     </span>
-                    <span className="text-[10.5px] text-slate-400">Entre contado y cuotas</span>
+                    <span className="text-[11px] text-slate-400">Entre contado y cuotas</span>
                   </div>
                   <span
                     className={`text-xs font-extrabold tracking-tight tabular-nums ${
@@ -269,7 +269,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
 
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10.5px] font-semibold text-slate-400 w-14 shrink-0">Contado</span>
+                      <span className="text-[11px] font-semibold text-slate-400 w-14 shrink-0">Contado</span>
                       <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
                           className="h-full bg-slate-700 dark:bg-slate-300 rounded-full transition-all duration-300"
@@ -279,7 +279,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="text-[10.5px] font-semibold text-slate-400 w-14 shrink-0">Cuotas</span>
+                      <span className="text-[11px] font-semibold text-slate-400 w-14 shrink-0">Cuotas</span>
                       <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
@@ -297,10 +297,10 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
                 {/* Nota aproximada para el Paso 3 */}
                 <div className="rounded-xl p-3 border bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/70 flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                       Aproximado
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-400">
+                    <span className="text-[11px] font-semibold text-slate-400">
                       Paso 2 de 3
                     </span>
                   </div>
@@ -341,7 +341,7 @@ export const ConvenienciaSidebar: React.FC<ConvenienciaSidebarProps> = ({
 
       {/* ── PARTE INFERIOR: Pie del Sidebar (Alineado con el pie de la columna izquierda) ── */}
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 shrink-0">
-        <span className="text-[10.5px] text-slate-400 leading-normal block">
+        <span className="text-[11px] text-slate-400 leading-normal block">
           {resultado
             ? (monedaResultado === 'USD' ? 'Montos en dólares, sin inflación.' : 'Montos en plata de hoy.')
             : 'Se actualiza mientras completás los datos.'}

@@ -54,11 +54,8 @@ const CERRAR: CerrarSpec[] = [
     excepcion: 'botón con texto "Cerrar" (~40px de alto); ya cumple >= 44px con ::before { inset: -2px 0 }',
   },
   { css: 'components/ui/Modal/Modal.module.css', selector: '.closeButton' },
-  {
-    css: 'pages/admin/AnimacionPreviewPage.module.css',
-    selector: '.closeBtn',
-    excepcion: 'separación 8px con .minimizeBtn en .dockActions < 2*10=20px; N máximo sin superposición = 4',
-  },
+  { css: 'pages/admin/AnimacionPreviewPage.module.css', selector: '.closeBtn', excepcion: 'separación 8px con .minimizeBtn en .dockActions < 2*10=20px; N máximo sin superposición = 4' },
+  { css: 'pages/admin/diseno/components/InteractiveDemos.module.css', selector: '.modalFrameClose', excepcion: 'maqueta sin onClick' },
   { css: 'pages/admin/usuarios/UsuariosPanel.module.css', selector: '.closeBtn' },
   { css: 'pages/app/analisis/FiltrosAnalisis.module.css', selector: '.sideMenuCloseBtn' },
   {
@@ -69,6 +66,7 @@ const CERRAR: CerrarSpec[] = [
   { css: 'pages/app/metas/GoalsBarChart.module.css', selector: '.sheetCloseBtn' },
   { css: 'pages/app/perfil/PerfilPage.parte3.css', selector: '.modalCloseBtn' },
   { css: 'pages/app/perfil/PerfilPage.parte3.css', selector: '.closeBtn' },
+  { css: 'pages/app/presupuestos/BudgetBarChart.module.css', selector: '.sheetCloseBtn' },
   { css: 'pages/app/presupuestos/BudgetHistoryModal.module.css', selector: '.closeBtn' },
 ]
 
@@ -276,7 +274,7 @@ describe('Reglas responsive de componentes compartidos src/components/ui (F1)', 
     expect(mobileBlock).toMatch(/\.btn\s*\{[^}]*white-space\s*:\s*normal/)
   })
 
-  it('U7: todo botón de cerrar en CERRAR tiene ::before/::after con inset >= 6px (o excepción documentada) y no hay .closeBtn/.closeButton fuera de CERRAR', () => {
+  it('U7: todo botón de cerrar en CERRAR tiene ::before/::after con inset >= 6px (o excepción documentada) y no hay selectores con "close"/"cerrar" fuera de CERRAR', () => {
     const fallos: string[] = []
     const cerrarKeys = new Set(CERRAR.map((item) => `${item.css}::${item.selector}`))
 
@@ -290,6 +288,13 @@ describe('Reglas responsive de componentes compartidos src/components/ui (F1)', 
       const splitSel = (s: string) => s.split(',').map((p) => p.trim())
 
       const baseBlocks = blocks.filter((b) => splitSel(b.selector).includes(item.selector))
+      if (item.excepcion === 'maqueta sin onClick' || item.excepcion?.startsWith('pendiente fase ')) {
+        if (baseBlocks.length === 0) {
+          fallos.push(`${item.css} [${item.selector}]: no se encontró el selector en CSS`)
+        }
+        continue
+      }
+
       const hasNonStaticPos = baseBlocks.some((b) =>
         /position\s*:\s*(relative|absolute|fixed|sticky)\b/i.test(b.cleanBody)
       )
@@ -342,8 +347,7 @@ describe('Reglas responsive de componentes compartidos src/components/ui (F1)', 
       for (const blk of blocks) {
         for (const part of blk.selector.split(',').map((s) => s.trim())) {
           if (/::?(hover|active|focus|disabled|before|after)/i.test(part)) continue
-          const m = part.match(/(\.closeBtn|\.closeButton)(?=$|[\s>+~,.[])/)
-          if (m) {
+          for (const m of part.matchAll(/(\.[A-Za-z0-9_-]*(?:close|cerrar)[A-Za-z0-9_-]*)(?=$|[\s>+~,.[])/gi)) {
             const key = `${rel}::${m[1]}`
             if (!cerrarKeys.has(key)) {
               fallos.push(`Fuera de CERRAR: ${key} (selector "${part}")`)

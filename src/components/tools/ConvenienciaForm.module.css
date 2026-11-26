@@ -52,16 +52,23 @@
 
 /* ── Stepper Responsive (sin recortes en 320px / 375px; escritorio intacto) ── */
 .stepperList {
-  gap: 8px;
+  gap: 16px;
 }
 
 .stepperBtn {
-  gap: 8px;
+  position: relative;
+  gap: 12px;
+}
+
+.stepperBtn::before {
+  content: '';
+  position: absolute;
+  inset: -12px 0;
 }
 
 .stepperCircle {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   font-size: 12px;
 }
 
@@ -78,22 +85,7 @@
   margin: 0 10px;
 }
 
-@media (min-width: 640px) {
-  .stepperList {
-    gap: 16px;
-  }
-
-  .stepperBtn {
-    gap: 12px;
-  }
-
-  .stepperCircle {
-    width: 28px;
-    height: 28px;
-  }
-}
-
-@media (max-width: 479px) {
+@media (max-width: 767.98px) {
   .stepperList {
     gap: 2px;
   }

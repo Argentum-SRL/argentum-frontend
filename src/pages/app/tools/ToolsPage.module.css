@@ -229,7 +229,7 @@
   }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   .header {
     flex-direction: row;
     align-items: center;

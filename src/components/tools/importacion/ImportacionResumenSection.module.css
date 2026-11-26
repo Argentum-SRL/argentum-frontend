@@ -54,6 +54,7 @@
 .formHeader {
   display: flex;
   align-items: center;
+  gap: 8px;
   padding: 16px 24px 8px;
   position: relative;
 }
@@ -65,9 +66,12 @@
   margin: 0;
   letter-spacing: -0.2px;
   flex-grow: 1;
+  min-width: 0;
 }
 
 .backBtn {
+  position: relative;
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -80,6 +84,12 @@
   cursor: pointer;
   margin-right: 12px;
   transition: background 120ms ease, color 120ms ease;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .backBtn:hover {
@@ -107,6 +117,7 @@
 
 /* ── Buttons ── */
 .cancelBtn {
+  position: relative;
   padding: 10px 18px;
   border-radius: 12px;
   border: none;
@@ -118,12 +129,19 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
+.cancelBtn::before {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}
+
 .cancelBtn:hover {
   background: var(--surface-alt);
   color: var(--text);
 }
 
 .submitBtn {
+  position: relative;
   padding: 10px 20px;
   border-radius: 12px;
   border: none;
@@ -136,6 +154,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.submitBtn::before {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
 }
 
 .submitBtn:hover:not(:disabled) {
@@ -254,6 +278,8 @@
 }
 
 .removeFileBtn {
+  position: relative;
+  flex-shrink: 0;
   background: transparent;
   border: none;
   color: var(--text-3);
@@ -265,6 +291,12 @@
   align-items: center;
   justify-content: center;
   transition: background 120ms ease, color 120ms ease;
+}
+
+.removeFileBtn::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
 }
 
 .removeFileBtn:hover {
@@ -384,16 +416,17 @@
 .adminBadge {
   background: rgba(var(--primary-rgb), 0.1);
   color: var(--primary);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   padding: 3px 6px;
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  flex-shrink: 0;
 }
 
 /* Responsive adjustment (avoid horizontal scroll) */
-@media (max-width: 375px) {
+@media (max-width: 767.98px) {
   .formBody {
     padding: 12px 16px 20px;
   }
@@ -435,8 +468,10 @@
 
 .stateDetailItem {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   font-size: 13px;
   border-bottom: 1px dashed var(--border);
   padding-bottom: 8px;
@@ -450,6 +485,7 @@
 .stateDetailItem span {
   color: var(--text-3);
   font-weight: 500;
+  min-width: 0;
 }
 
 .stateDetailItem strong {
@@ -457,6 +493,7 @@
   font-weight: 600;
   text-align: right;
   max-width: 60%;
+  min-width: 0;
 }
 
 .fullWidthBtnGroup {
@@ -510,6 +547,7 @@
 
 .actionGroup {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   justify-content: flex-end;
   width: 100%;

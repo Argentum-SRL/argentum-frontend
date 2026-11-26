@@ -123,7 +123,7 @@ export const DetalleCuotasChart: React.FC<DetalleCuotasChartProps> = ({
               tickLine={false}
               axisLine={false}
               tickFormatter={(v) => `$${v.toLocaleString('es-AR')}`}
-              tick={{ fontSize: 10, fill: 'var(--text-3)' }}
+              tick={{ fontSize: 11, fill: 'var(--text-3)' }}
             />
             <Tooltip
               content={<CustomTooltip formatValue={formatValue} resultado={resultado} />}

@@ -455,6 +455,8 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 
 ## 12. Sistema Responsive
 
+> Guía operativa completa (qué se toca cuando se pide un cambio "para mobile", "para tablet" o "para escritorio", valores fluidos, checklist): `RESPONSIVE.md`. Si algo de esta sección la contradice, manda `RESPONSIVE.md`.
+
 ### Puntos de Corte Oficiales (FS2B)
 La arquitectura responsive de Argentum usa tres rangos oficiales, idénticos en CSS y JS, escritos con sintaxis clásica `min-width` / `max-width` (compatible con navegadores viejos; **PROHIBIDA** la sintaxis de rango tipo `width < 768px` o `768px <= width`) y sin solapamientos en 768px ni 1024px (nada de `max-width: 768px` junto a `min-width: 768px` ni `max-width: 1024px` junto a `min-width: 1024px`):
 
@@ -933,6 +935,7 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
 - **Piso de letra 11px:** todo texto legible tiene un mínimo de `11px`; única excepción documentada: la letra de respaldo dentro de un ícono o avatar de `<= 20px` (no es texto de lectura).
 - **Zona táctil mínima 44px:** todo elemento interactivo alcanza al menos `44 × 44px` de área táctil usando `::before` o `::after` con `inset` negativo sin cambiar el tamaño visible. Vale para todo botón de cerrar del front; lo controla U7 de uiResponsive.test.ts.
 - **`white-space: nowrap` protegido:** solo se permite en un bloque con `text-overflow: ellipsis` y atributo `title` con el texto completo, en `MontoFit`, o con comentario `/* nowrap-ok: <motivo> */` en la misma línea.
+- **Control por área:** Las reglas responsive por área las controla src/styles/responsiveAreas.test.ts; cada fase agrega su carpeta a AREAS.
 
 
 

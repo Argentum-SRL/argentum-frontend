@@ -5,8 +5,8 @@ import path from 'node:path'
 const ROOT_DIR = path.resolve(__dirname, '../..')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
-// Cortes legados congelados al cierre de F1 (baja de 202 a 181 tras limpiar ui/): solo puede bajar.
-const TOPE_LEGADO = 181
+// Cortes legados congelados al cierre de F2 (baja de 181 a 150 tras limpiar layout/, tools/ y pages/app/tools/): solo puede bajar.
+const TOPE_LEGADO = 150
 
 const LEGADO: Record<string, Record<string, number>> = {
   'src/components/auth/AuthLayout/AuthLayout.module.css': {
@@ -46,9 +46,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   'src/components/goals/GoalModal.module.css': {
     'max 480': 3,
   },
-  'src/components/layout/AppLayout/AppLayout.module.css': {
-    'max 1279': 1,
-  },
   'src/components/notificaciones/NotificacionesConfigModal.module.css': {
     'max 639': 1,
     'min 640': 1,
@@ -72,39 +69,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   },
   'src/components/tarjetas/TarjetaSummary.module.css': {
     'max 480': 2,
-  },
-  'src/components/tools/ConvenienciaForm.module.css': {
-    'max 479': 1,
-    'min 640': 1,
-  },
-  'src/components/tools/ToolsComponents.module.css': {
-    'max 479': 1,
-    'min 640': 1,
-  },
-  'src/components/tools/ToolsComponents.parte1.css': {
-    'max 479': 1,
-    'min 640': 10,
-    'min 880': 1,
-  },
-  'src/components/tools/ToolsComponents.parte2.css': {
-    'max 479': 1,
-    'min 480': 1,
-    'min 640': 2,
-  },
-  'src/components/tools/ToolsComponents.parte3.css': {
-    'max 640': 1,
-    'min 640': 2,
-  },
-  'src/components/tools/ToolsComponents.parte4.css': {
-    'max 480': 1,
-    'max 600': 1,
-    'max 920': 2,
-  },
-  'src/components/tools/ToolsComponents.parte5.css': {
-    'max 920': 1,
-  },
-  'src/components/tools/importacion/ImportacionResumenSection.module.css': {
-    'max 375': 1,
   },
   'src/components/transacciones/DayGroup.module.css': {
     'max 640': 1,
@@ -230,9 +194,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   },
   'src/pages/app/suscripciones/SuscripcionesPage.module.css': {
     'max 360': 1,
-  },
-  'src/pages/app/tools/ToolsPage.module.css': {
-    'min 900': 1,
   },
   'src/pages/auth/recuperar-password/RecuperarPassword.module.css': {
     'min 640': 1,

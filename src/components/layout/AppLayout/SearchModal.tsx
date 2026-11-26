@@ -458,7 +458,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                               <n.Icon size={18} />
                             </div>
                             <div className={styles.cardBody}>
-                              <span className={styles.cardTitle}>{n.title}</span>
+                              <span className={styles.cardTitle} title={n.title}>{n.title}</span>
                             </div>
                           </div>
                         )
@@ -486,8 +486,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                               <a.Icon size={18} />
                             </div>
                             <div className={styles.cardBody}>
-                              <span className={styles.cardTitle}>{a.title}</span>
-                              <span className={styles.cardSubtitle}>{a.subtitle}</span>
+                              <span className={styles.cardTitle} title={a.title}>{a.title}</span>
+                              <span className={styles.cardSubtitle} title={a.subtitle}>{a.subtitle}</span>
                             </div>
                           </div>
                         )
@@ -518,9 +518,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                               <item.Icon size={18} />
                             </div>
                             <div className={styles.cardBody}>
-                              <span className={styles.cardTitle}>{item.title}</span>
-                              <span className={styles.cardExtra}>{item.extraNode ?? item.extra}</span>
-                              <span className={styles.cardSubtitle}>{item.subtitle}</span>
+                              <span className={styles.cardTitle} title={item.title}>{item.title}</span>
+                              <span className={styles.cardExtra} title={item.extra}>{item.extraNode ?? item.extra}</span>
+                              <span className={styles.cardSubtitle} title={item.subtitle}>{item.subtitle}</span>
                             </div>
                           </div>
                         )
@@ -551,9 +551,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                               <item.Icon size={18} />
                             </div>
                             <div className={styles.cardBody}>
-                              <span className={styles.cardTitle}>{item.title}</span>
-                              {item.extra && <span className={styles.cardExtra}>{item.extra} usado</span>}
-                              <span className={styles.cardSubtitle}>{item.subtitleNode ?? item.subtitle}</span>
+                              <span className={styles.cardTitle} title={item.title}>{item.title}</span>
+                              {item.extra && <span className={styles.cardExtra} title={`${item.extra} usado`}>{item.extra} usado</span>}
+                              <span className={styles.cardSubtitle} title={item.subtitle}>{item.subtitleNode ?? item.subtitle}</span>
                             </div>
                           </div>
                         )
@@ -584,9 +584,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                               <item.Icon size={18} />
                             </div>
                             <div className={styles.cardBody}>
-                              <span className={styles.cardTitle}>{item.title}</span>
-                              <span className={styles.cardExtra}>{item.extra} completado</span>
-                              <span className={styles.cardSubtitle}>{item.subtitleNode ?? item.subtitle}</span>
+                              <span className={styles.cardTitle} title={item.title}>{item.title}</span>
+                              <span className={styles.cardExtra} title={`${item.extra} completado`}>{item.extra} completado</span>
+                              <span className={styles.cardSubtitle} title={item.subtitle}>{item.subtitleNode ?? item.subtitle}</span>
                             </div>
                           </div>
                         )
@@ -627,10 +627,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                               />
                             </div>
                             <div className={styles.cardBody}>
-                              <span className={styles.cardTitle}>{item.title}</span>
-                              <span className={styles.cardExtra}>{item.extraNode ?? item.extra}</span>
-                              <span className={styles.cardSubtitle}>{item.subtitle}</span>
-                              {item.extraSub && <span className={styles.cardExtraSub}>{item.extraSub}</span>}
+                              <span className={styles.cardTitle} title={item.title}>{item.title}</span>
+                              <span className={styles.cardExtra} title={item.extra}>{item.extraNode ?? item.extra}</span>
+                              <span className={styles.cardSubtitle} title={item.subtitle}>{item.subtitle}</span>
+                              {item.extraSub && <span className={styles.cardExtraSub} title={item.extraSub}>{item.extraSub}</span>}
                             </div>
                           </div>
                         )

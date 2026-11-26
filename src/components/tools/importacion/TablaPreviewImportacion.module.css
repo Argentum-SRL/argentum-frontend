@@ -104,7 +104,7 @@
 .tdFecha {
   color: var(--text-2);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: columna fecha YYYY-MM-DD en tabla desktop con overflow-x auto */
 }
 
 .tdDesc {
@@ -121,7 +121,7 @@
 
 .titularLabel {
   display: inline-block;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   background: var(--surface-alt);
@@ -139,13 +139,13 @@
 
 /* Badges */
 .tagBadge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 99px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta corta de estado dentro de .tagsContainer con flex-wrap */
 }
 
 .tagNueva {
@@ -174,7 +174,7 @@
 }
 
 .tdCuota {
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: columna cuota N/M en tabla desktop con overflow-x auto */
 }
 
 .cuotaBadge {
@@ -240,8 +240,10 @@
 
 .cardHeader {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
 }
@@ -253,12 +255,19 @@
 }
 
 .cardCheckLabel {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.cardCheckLabel::before {
+  content: '';
+  position: absolute;
+  inset: -13px -8px;
 }
 
 .cardCheckText {
@@ -318,6 +327,7 @@
 
 .selectCatMobile {
   flex-grow: 1;
+  min-width: 0;
 }
 
 .cardMonto {

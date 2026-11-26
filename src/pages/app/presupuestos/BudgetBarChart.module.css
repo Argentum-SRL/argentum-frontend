@@ -283,6 +283,7 @@
 }
 
 .sheetCloseBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius:50%;
@@ -293,6 +294,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.sheetCloseBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 /* Quick Summary Card Inside Sheet */

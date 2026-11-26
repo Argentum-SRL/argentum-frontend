@@ -32,11 +32,11 @@
   left: 0;
   right: 0;
   height: 56px;
-  padding: 0 max(24px, env(safe-area-inset-right, 0px)) 0 max(24px, env(safe-area-inset-left, 0px));
+  padding: 0 max(clamp(20px, calc(4px + 1.5625vw), 24px), env(safe-area-inset-right, 0px)) 0 max(clamp(20px, calc(4px + 1.5625vw), 24px), env(safe-area-inset-left, 0px));
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 16px;
+  gap: clamp(12px, calc(-4px + 1.5625vw), 16px);
   z-index: 40;
   pointer-events: none;
   box-sizing: border-box;
@@ -53,18 +53,26 @@
   align-items: center;
   justify-self: start;
   pointer-events: auto;
+  min-width: 0;
 }
 
 .standaloneLogo {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
   color: var(--primary);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: marca fija "Argentum" en cabecera desktop */
   -webkit-user-select: none;
   user-select: none;
   flex-shrink: 0;
+}
+
+.standaloneLogo::before {
+  content: '';
+  position: absolute;
+  inset: -10px -4px;
 }
 
 :global([data-theme="dark"]) .standaloneLogo,
@@ -76,7 +84,7 @@
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: marca fija "Argentum" en cabecera desktop */
   line-height: 1;
   display: inline-block;
 }
@@ -113,8 +121,10 @@
   align-items: center;
   justify-content: flex-end;
   justify-self: end;
-  gap: 12px;
+  gap: clamp(8px, calc(-8px + 1.5625vw), 12px);
   pointer-events: auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .actionPill {
@@ -140,9 +150,12 @@
 .profileWrapper {
   position: relative;
   flex-shrink: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .profilePill {
+  position: relative;
   display: flex;
   align-items: center;
   background: var(--sb-bg);
@@ -156,6 +169,8 @@
   transition: transform 150ms, box-shadow 150ms;
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .profilePill:focus-visible {
@@ -210,6 +225,13 @@
   position: relative;
 }
 
+/* Área táctil extendida; gap lateral 4px en .actionPill limita N horizontal a 2px sin superposición */
+.topBarBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px -2px;
+}
+
 .topBarBtn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
@@ -235,6 +257,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .topBarUserName {
@@ -242,6 +266,10 @@
   font-weight: 600;
   color: var(--sb-text);
   line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topBarUserEmail {
@@ -250,6 +278,10 @@
   color: var(--sb-text);
   opacity: 0.7;
   line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topBarAvatar {
@@ -273,37 +305,6 @@
 }
 
 /* ── Media Queries Responsive Overrides (Cascade After Base) ─────────────── */
-
-/* Intermediate screens / Laptops / Tablets in landscape (1024px to 1279px) */
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .desktopHeader {
-    padding: 0 20px;
-    gap: 12px;
-  }
-
-  .headerRight {
-    gap: 8px;
-  }
-
-  .logoTitle {
-    display: none;
-  }
-
-  .standaloneLogo {
-    gap: 0;
-  }
-
-  .topBarUserEmail {
-    display: none !important;
-  }
-
-  .topBarUserName {
-    max-width: 110px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
 
 /* Tablet portrait & narrow landscape (iPad Air 820px, Surface 912px, Fold 882px, etc.) */
 @media (min-width: 768px) and (max-width: 1023.98px) {
@@ -339,6 +340,12 @@
     gap: 0 !important;
   }
 
+  .profilePill::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+  }
+
   .actionPill {
     padding: 3px !important;
     gap: 2px !important;
@@ -347,6 +354,11 @@
   .topBarBtn {
     width: 34px !important;
     height: 34px !important;
+  }
+
+  /* Gap 2px en .actionPill limita N horizontal a 1px sin superposición */
+  .topBarBtn::before {
+    inset: -5px -1px;
   }
 
   .topNavPill {
@@ -359,6 +371,11 @@
     height: 34px !important;
     max-width: 34px !important;
     padding: 0 8px !important;
+  }
+
+  /* Gap 2px en .topNavPill limita N horizontal a 1px sin superposición */
+  .navItem::before {
+    inset: -5px -1px;
   }
 }
 
@@ -383,6 +400,12 @@
     padding: 2px !important;
   }
 
+  .profilePill::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+
   .topBarAvatar {
     width: 30px !important;
     height: 30px !important;
@@ -394,6 +417,11 @@
     width: 30px !important;
     max-width: 30px !important;
     border-radius: 8px !important;
+  }
+
+  .navItem::before,
+  .topBarBtn::before {
+    inset: -7px -1px;
   }
 
   .main {
@@ -426,6 +454,7 @@
 }
 
 .dropdownItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -439,6 +468,13 @@
   border-radius: 10px;
   cursor: pointer;
   transition: background 150ms;
+}
+
+/* Gap 2px en .profileDropdown limita N vertical a 1px sin superposición */
+.dropdownItem::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0;
 }
 
 .dropdownItem:focus-visible {
@@ -459,6 +495,7 @@
 }
 .dropdownItem span {
   flex: 1;
+  min-width: 0;
   text-align: left;
 }
 
@@ -467,6 +504,7 @@
 /* ── Desktop Top Nav Items ───────────────────────────────────────────────── */
 
 .navItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -482,8 +520,15 @@
     color 150ms ease,
     max-width 250ms cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: ítem colapsable a ícono en barra desktop */
   max-width: 36px; /* Solo muestra icono inicialmente */
+}
+
+/* Gap 4px en .topNavPill limita N horizontal a 2px sin superposición */
+.navItem::before {
+  content: '';
+  position: absolute;
+  inset: -4px -2px;
 }
 
 .navItem:focus-visible {
@@ -561,7 +606,7 @@
   opacity: 0;
   transform: translateX(-4px);
   transition: opacity 200ms ease, transform 200ms ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta oculta dentro de .navItem hasta hover */
 }
 
 .navItemActive .navIcon::after {
@@ -648,7 +693,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: marca fija "Argentum" en cabecera móvil oculta */
   -webkit-user-select: none;
   user-select: none;
   flex-shrink: 0;
@@ -659,7 +704,7 @@
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.3px;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: texto fijo "Argentum" en cabecera móvil oculta */
   line-height: 1;
 }
 
@@ -687,6 +732,12 @@
   justify-content: center;
   transition: background 0.15s;
   position: relative;
+}
+
+.mobileIconBtn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
 }
 
 .mobileIconBtn:focus-visible {

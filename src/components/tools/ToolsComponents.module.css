@@ -7,17 +7,11 @@
 
 /* ── ¿Me lo puedo permitir? Nuevo diseño F-B ── */
 .tituloResultado {
-  font-size: 26px;
+  font-size: clamp(26px, calc(20.7059px + 1.4706vw), 32px);
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
-}
-
-@media (min-width: 640px) {
-  .tituloResultado {
-    font-size: 32px;
-  }
 }
 
 .tituloBien {
@@ -77,18 +71,21 @@
 
 .filaAhorro {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
 }
 
 .filaAhorroInfo {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
+  min-width: 0;
 }
 
 .filaAhorroDetalle {
@@ -140,7 +137,7 @@
   max-width: 100%;
 }
 
-@media (max-width: 479px) {
+@media (max-width: 767.98px) {
   .btnLinkGastoFijo {
     font-size: 12px;
     padding: 0 4px;

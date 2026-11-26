@@ -119,7 +119,7 @@ export const UploadPdfResumen: React.FC<UploadPdfResumenProps> = ({
         <div className={styles.fileSelectedCard}>
           <FileText size={28} className={styles.fileIcon} />
           <div className={styles.fileDetails}>
-            <span className={styles.fileName}>{selectedFile.name}</span>
+            <span className={styles.fileName} title={selectedFile.name}>{selectedFile.name}</span>
             <span className={styles.fileSize}>{formatFileSize(selectedFile.size)}</span>
           </div>
           <button

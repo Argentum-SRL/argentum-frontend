@@ -51,7 +51,6 @@
   color: var(--text-2);
   background: var(--surface-alt);
   border-left: 1.5px solid var(--border);
-  white-space: nowrap;
   flex-shrink: 0;
 }
 
@@ -62,6 +61,7 @@
   background: var(--surface-alt);
   border: none;
   border-left: 1.5px solid var(--border);
+  min-height: 44px;
   padding: 0 14px;
   font-size: 12px;
   font-weight: 700;
@@ -69,7 +69,6 @@
   cursor: pointer;
   transition: background 0.15s ease;
   font-family: inherit;
-  white-space: nowrap;
   flex-shrink: 0;
 }
 
@@ -198,7 +197,7 @@
   border-radius:16px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 767.98px) {
   .fwCompareRow { grid-template-columns: 1fr; gap: 12px; }
   .fwCompareVsLabel { display: none; }
   .fwCompareDiff { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 12px; }
@@ -207,7 +206,7 @@
 .fwCompareCol { display: flex; flex-direction: column; gap: 2px; }
 
 .fwCompareColLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -239,7 +238,7 @@
 }
 
 .fwCompareDiffLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -251,7 +250,7 @@
 
 /* Metrics */
 .fwMetricsRow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 480px) { .fwMetricsRow { grid-template-columns: 1fr; } }
+@media (max-width: 767.98px) { .fwMetricsRow { grid-template-columns: 1fr; } }
 
 .fwMetric {
   background: var(--surface-alt);
@@ -264,7 +263,7 @@
 }
 
 .fwMetricLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -362,6 +361,7 @@
 }
 
 .wbStepItem {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -376,6 +376,12 @@
   border-radius:999px;
   transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   outline: none;
+}
+
+.wbStepItem::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }
 
 .wbStepItem:focus-visible {
@@ -554,7 +560,7 @@
   min-height: 560px;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 1023.98px) {
   .wbGrid {
     grid-template-columns: 1fr;
   }
@@ -572,7 +578,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 1023.98px) {
   .wbLeftPanel {
     border-right: none;
     border-bottom: 1.5px solid var(--border);
@@ -597,7 +603,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -612,6 +618,7 @@
 }
 
 .wbEditBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -625,6 +632,12 @@
   cursor: pointer;
   font-family: inherit;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.wbEditBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px -4px;
 }
 
 .wbEditBtn:hover {
@@ -660,6 +673,7 @@
 }
 
 .wbInlineSaveBtn {
+  position: relative;
   align-self: flex-end;
   padding: 6px 14px;
   font-size: 12px;
@@ -671,6 +685,12 @@
   cursor: pointer;
   font-family: inherit;
   transition: opacity 0.15s ease;
+}
+
+.wbInlineSaveBtn::before {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
 }
 
 .wbInlineSaveBtn:hover {

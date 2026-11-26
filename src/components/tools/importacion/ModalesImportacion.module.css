@@ -144,6 +144,7 @@
 
 /* Cancelar importación completa */
 .cancelImportBtn {
+  position: relative;
   width: 100%;
   height: 38px;
   border-radius: 10px;
@@ -159,6 +160,12 @@
   justify-content: center;
   gap: 6px;
   margin-top: 4px;
+}
+
+.cancelImportBtn::before {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
 .cancelImportBtn:hover {
@@ -223,6 +230,7 @@
 }
 
 .selectAllBtn {
+  position: relative;
   background: none;
   border: none;
   color: var(--primary);
@@ -233,6 +241,12 @@
   padding: 2px 6px;
   border-radius: 6px;
   transition: background 120ms ease;
+}
+
+.selectAllBtn::before {
+  content: '';
+  position: absolute;
+  inset: -10px -4px;
 }
 
 .selectAllBtn:hover {
@@ -286,6 +300,7 @@
 }
 
 .radioPill {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
@@ -300,6 +315,12 @@
   color: var(--text-2);
   cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.radioPill::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
 }
 
 .pillActiveEgreso {

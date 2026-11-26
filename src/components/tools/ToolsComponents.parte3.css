@@ -25,7 +25,7 @@
   gap: 8px 16px;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .distLegend {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -68,7 +68,7 @@
 }
 
 .distLegendPct {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-3);
 }
 
@@ -98,7 +98,7 @@
   height: 210px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .chartWrapper {
     height: 180px;
   }
@@ -198,7 +198,7 @@
 }
 
 .badge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   background: rgba(168, 144, 90, 0.1);
@@ -353,7 +353,7 @@
   position: relative;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .fwShell {
     padding: 56px 64px 56px;
   }
@@ -369,6 +369,7 @@
 }
 
 .fwDot {
+  position: relative;
   width: 30px;
   height: 30px;
   border-radius:50%;
@@ -386,6 +387,12 @@
   flex-shrink: 0;
   outline: none;
   line-height: 1;
+}
+
+.fwDot::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
 }
 
 .fwDot:focus-visible {
@@ -429,7 +436,6 @@
   font-weight: 700;
   color: var(--text);
   margin-left: 7px;
-  white-space: nowrap;
 }
 
 /* ── Stage wrapper + animations ──────────────────────────────────────── */
@@ -534,6 +540,7 @@
 }
 
 .fwRecapChip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -544,9 +551,14 @@
   cursor: pointer;
   font-family: inherit;
   transition: border-color 0.15s ease, background 0.15s ease;
-  white-space: nowrap;
   flex-shrink: 0;
   margin-top: 6px;
+}
+
+.fwRecapChip::before {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
 }
 
 .fwRecapChip:hover {
@@ -643,6 +655,7 @@
 }
 
 .fwChip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -658,6 +671,12 @@
   user-select: none;
   min-height: 40px;
   font-family: inherit;
+}
+
+.fwChip::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
 }
 
 .fwChip:hover {

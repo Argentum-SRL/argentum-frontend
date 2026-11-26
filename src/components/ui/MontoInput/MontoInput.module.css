@@ -49,6 +49,7 @@
 
 /* ── Chip de moneda ── */
 .monedaToggleChip {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -60,6 +61,12 @@
   transition: background-color var(--motion-fast) var(--ease-out);
   flex-shrink: 0;
   cursor: pointer;
+}
+
+.monedaToggleChip::before {
+  content: '';
+  position: absolute;
+  inset: -11px 0;
 }
 
 .monedaToggleChip:disabled {
@@ -158,15 +165,15 @@
 .montoHeroCompact .monedaToggleChip {
   padding: 4px 6px;
   border-radius: 6px;
-  gap: 2px;
+  gap: 4px;
 }
 
 .montoHeroCompact .monedaChipCode {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .montoHeroCompact .monedaChipLabel {
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .montoHeroCompact .montoDivider {

@@ -4,7 +4,7 @@
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: contenedor de MontoFit que alterna monto completo o corto */
   overflow: hidden;
   text-align: inherit;
 }
@@ -19,7 +19,7 @@
   left: 0;
   visibility: hidden;
   pointer-events: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: medidor oculto de ancho real para MontoFit */
   font: inherit;
   letter-spacing: inherit;
 }

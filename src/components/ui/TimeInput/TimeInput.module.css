@@ -34,7 +34,7 @@
   transition: border-color var(--motion-fast) var(--ease-out),
               background-color var(--motion-fast) var(--ease-out),
               box-shadow var(--motion-fast) var(--ease-out);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: horario fijo HH:MM */
   box-sizing: border-box;
 }
 
@@ -203,6 +203,7 @@
 }
 
 .nowBtn {
+  position: relative;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-2);
@@ -214,12 +215,19 @@
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 
+.nowBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px -4px;
+}
+
 .nowBtn:hover {
   background: var(--surface-alt);
   color: var(--text);
 }
 
 .doneBtn {
+  position: relative;
   font-size: 12px;
   font-weight: 700;
   color: #ffffff;
@@ -229,6 +237,12 @@
   padding: 6px 16px;
   border-radius: 8px;
   transition: opacity var(--motion-fast) var(--ease-out);
+}
+
+.doneBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px -4px;
 }
 
 .doneBtn:hover {

@@ -53,7 +53,7 @@
 }
 
 .confirmModal {
-  --modal-w: min(450px, calc(100vw - 32px));
+  --modal-w: 450px;
 }
 
 .description {
@@ -61,7 +61,7 @@
   text-align: center;
   font-size: 0.9375rem;
   line-height: 1.5;
-  white-space: nowrap;
+  white-space: normal;
   margin-bottom: 24px;
 }
 
@@ -107,6 +107,7 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--modal-footer-btn-gap);
   align-items: center;
   width: 100%;
@@ -120,7 +121,8 @@
 }
 
 .cancelBtn {
-  flex: 1;
+  position: relative;
+  flex: 1 1 90px;
   max-width: 130px;
   height: var(--control-h);
   border-radius: var(--control-radius);
@@ -136,7 +138,7 @@
   padding: 0 16px;
   box-sizing: border-box;
   transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: un renglón en escritorio; en celular pasa a normal */
 }
 
 .cancelBtn:hover:not(:disabled) {
@@ -164,7 +166,8 @@
 }
 
 .confirmBtn {
-  flex: 2;
+  position: relative;
+  flex: 2 1 140px;
   height: var(--control-h);
   border-radius: var(--control-radius);
   border: none;
@@ -178,7 +181,7 @@
   padding: 0 16px;
   box-sizing: border-box;
   transition: opacity 120ms ease, transform 120ms ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: un renglón en escritorio; en celular pasa a normal */
 }
 
 .confirmBtn:hover:not(:disabled) {
@@ -244,7 +247,7 @@
 }
 
 /* ── Responsive Behavior ─────────────────────────────────────────────────── */
-@media (max-width: 480px), (max-height: 720px) {
+@media (max-width: 767.98px) {
   .iconWrap {
     width: 52px;
     height: 52px;
@@ -260,7 +263,58 @@
   .description {
     font-size: 0.875rem;
     line-height: 1.45;
+    margin-bottom: 16px;
+  }
+
+  .actions {
+    gap: var(--modal-footer-btn-gap);
+  }
+
+  .cancelBtn {
+    height: auto;
+    min-height: 40px;
+    font-size: 13px;
+    max-width: 105px;
+    padding: 6px 12px;
+    line-height: 1.2;
     white-space: normal;
+    text-wrap: balance;
+  }
+
+  .confirmBtn {
+    height: auto;
+    min-height: 40px;
+    font-size: 12.5px;
+    padding: 6px 12px;
+    line-height: 1.2;
+    white-space: normal;
+    text-wrap: balance;
+  }
+
+  .cancelBtn::before,
+  .confirmBtn::before {
+    content: '';
+    position: absolute;
+    inset: -2px 0;
+  }
+}
+
+@media (max-height: 720px) {
+  .iconWrap {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 12px;
+  }
+
+  .title {
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+
+  .description {
+    font-size: 0.875rem;
+    line-height: 1.45;
     margin-bottom: 16px;
   }
 
@@ -279,22 +333,6 @@
     height: 40px;
     font-size: 12.5px;
     padding: 0 12px;
-  }
-}
-
-@media (max-width: 340px) {
-  .actions {
-    flex-direction: column-reverse;
-    gap: var(--modal-footer-btn-gap);
-  }
-
-  .cancelBtn,
-  .confirmBtn {
-    width: 100%;
-    max-width: none;
-    flex: none;
-    height: var(--control-h);
-    font-size: 13px;
   }
 }
 

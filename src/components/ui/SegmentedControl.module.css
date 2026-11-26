@@ -149,7 +149,7 @@
   .pill,
   .label,
   .description {
-    white-space: nowrap;
+    white-space: nowrap; /* nowrap-ok: una línea en desktop (>= 768px) en SegmentedControl */
   }
 
   .fullWidth .pill,

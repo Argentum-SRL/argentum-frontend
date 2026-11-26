@@ -930,6 +930,9 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
 - **Botones del pie de modal:** Los botones del pie de un modal no llevan montos en la etiqueta y llevan padding horizontal de 16px.
 - **Un solo margen debajo del último botón:** en mobile debajo del último botón debe haber UN solo margen, igual a `--modal-footer-pad-bottom`; el `.content` del `Modal` con padding normal ya aporta ese margen cuando es el último hijo, así que un pie propio adentro del contenido lleva padding inferior `0` en mobile, y un modal `noPadding` aporta el margen en su propio pie. Todo modal o bottom sheet nuevo se mide en 360, 375, 393, 412 y 440px con 0 y 34px de área segura antes de darlo por bueno.
 - **Pie pegajoso en modales:** Un pie `position: sticky` adentro de un contenedor con scroll se ancla descontando el padding del contenedor; en mobile su `bottom` y su `margin-bottom` valen `calc(-1 * var(--modal-footer-pad-bottom))` para quedar a un solo margen del borde.
+- **Piso de letra 11px:** todo texto legible tiene un mínimo de `11px`; única excepción documentada: la letra de respaldo dentro de un ícono o avatar de `<= 20px` (no es texto de lectura).
+- **Zona táctil mínima 44px:** todo elemento interactivo alcanza al menos `44 × 44px` de área táctil usando `::before` o `::after` con `inset` negativo sin cambiar el tamaño visible.
+- **`white-space: nowrap` protegido:** solo se permite en un bloque con `text-overflow: ellipsis` y atributo `title` con el texto completo, en `MontoFit`, o con comentario `/* nowrap-ok: <motivo> */` en la misma línea.
 
 
 

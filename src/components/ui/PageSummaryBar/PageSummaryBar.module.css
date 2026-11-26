@@ -67,7 +67,7 @@
   color: var(--text-value);
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: aloja MontoFit sin partir ni cortar montos */
   overflow: hidden;
   max-width: 100%;
 }
@@ -76,7 +76,7 @@
   font-size: clamp(19px, 3.2cqi, 25px);
   font-weight: 800;
   line-height: 1.1;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: aloja MontoFit sin partir ni cortar montos */
   overflow: hidden;
   max-width: 100%;
 }
@@ -289,14 +289,18 @@
 }
 
 .stripLabel {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-3);
-  white-space: nowrap;
+  line-height: 1.15;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 100%;
 }
 
@@ -305,7 +309,7 @@
   font-weight: 700;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: aloja MontoFit sin partir ni cortar montos */
   overflow: hidden;
   width: 100%;
   max-width: 100%;

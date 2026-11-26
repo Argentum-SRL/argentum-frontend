@@ -39,6 +39,7 @@
 }
 
 .retryBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
@@ -52,6 +53,12 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.retryBtn::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }
 
 .retryBtn:focus-visible {

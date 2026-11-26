@@ -118,7 +118,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
           onClick={() => handleSelect(opt.value)}
         >
           {opt.icon && <span className={styles.optionIcon}>{opt.icon}</span>}
-          <span className={styles.optionLabel}>{opt.label}</span>
+          <span className={styles.optionLabel} title={opt.label}>{opt.label}</span>
           {opt.value === value && (
             <span className={styles.optionCheck}>
               <Check size={14} />
@@ -171,6 +171,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
           type="button"
           disabled={disabled}
           onClick={() => !disabled && setOpen(prev => !prev)}
+          title={displayValue || undefined}
           className={[
             styles.trigger,
             error ? styles.triggerError : '',
@@ -178,7 +179,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
             !displayValue ? styles.triggerPlaceholder : '',
           ].filter(Boolean).join(' ')}
         >
-          {displayValue || placeholder}
+          <span className={styles.triggerText}>{displayValue || placeholder}</span>
         </button>
         <span className={[
           styles.chevron,

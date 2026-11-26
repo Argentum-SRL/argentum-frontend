@@ -141,6 +141,7 @@
 }
 
 .closeButton {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -155,6 +156,12 @@
   transition: background 120ms ease, color 120ms ease;
   font-size: 20px;
   line-height: 1;
+}
+
+.closeButton::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .closeButton:focus-visible {

@@ -5,8 +5,8 @@ import path from 'node:path'
 const ROOT_DIR = path.resolve(__dirname, '../..')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
-// Cortes legados congelados al cierre de FS2B: solo puede bajar.
-const TOPE_LEGADO = 202
+// Cortes legados congelados al cierre de F1 (baja de 202 a 181 tras limpiar ui/): solo puede bajar.
+const TOPE_LEGADO = 181
 
 const LEGADO: Record<string, Record<string, number>> = {
   'src/components/auth/AuthLayout/AuthLayout.module.css': {
@@ -149,34 +149,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   },
   'src/components/transferencias/TransferenciasFilterBar.module.css': {
     'min 1100': 3,
-  },
-  'src/components/ui/AtmosphericBackground/ConstellationCanvas.module.css': {
-    'max 639': 1,
-  },
-  'src/components/ui/AtmosphericBackground/LunarLoading.module.css': {
-    'max 640': 2,
-  },
-  'src/components/ui/CategoriaSelector/CategoriaSelector.module.css': {
-    'max 480': 11,
-  },
-  'src/components/ui/CollapseToggle/CollapseToggle.module.css': {
-    'max 639': 1,
-  },
-  'src/components/ui/ConfirmModal/ConfirmModal.module.css': {
-    'max 340': 1,
-    'max 480': 1,
-  },
-  'src/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge.module.css': {
-    'max 640': 1,
-  },
-  'src/components/ui/EmptyState/EmptyState.module.css': {
-    'max 480': 1,
-  },
-  'src/components/ui/Skeleton/Skeleton.module.css': {
-    'max 639': 1,
-  },
-  'src/components/ui/Skeleton/SkeletonAdmin.module.css': {
-    'max 639': 1,
   },
   'src/components/whatsapp/VinculacionWhatsAppCard.module.css': {
     'min 640': 1,

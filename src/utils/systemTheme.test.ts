@@ -235,7 +235,7 @@ describe('systemTheme — sincronización de barras del sistema en móviles y PW
     expect(atmosCss).toContain('#FAF4EC 0%')
     expect(atmosCss).toContain('#020408 0%')
 
-    expect(constellationCss).toContain('@media (max-width: 639px)')
+    expect(constellationCss).toContain('@media (max-width: 767.98px)')
   })
 
   it('reemplaza el nodo meta theme-color en head al cambiar el color para forzar repintado WebKit/iOS sin duplicar llamadas idénticas', () => {

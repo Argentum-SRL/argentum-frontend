@@ -103,7 +103,7 @@ export const CategoriaSelector: React.FC<CategoriaSelectorProps> = ({
                   <div className={styles.catIconWrapper}>
                     <CategoriaIcon nombre={cat.nombre} size={36} />
                   </div>
-                  <span className={styles.catName}>{cat.nombre}</span>
+                  <span className={styles.catName} title={cat.nombre}>{cat.nombre}</span>
                 </button>
               )
             })}

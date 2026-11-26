@@ -74,7 +74,7 @@ export const PhoneCountrySelect: React.FC<PhoneCountrySelectProps> = ({
         >
           <span className={styles.optionFlag}>{c.bandera}</span>
           <span className={styles.optionCode}>{c.codigo}</span>
-          {c.nombre && <span className={styles.optionName}>{c.nombre}</span>}
+          {c.nombre && <span className={styles.optionName} title={c.nombre}>{c.nombre}</span>}
           {c.codigo === value && <Check size={13} className={styles.optionCheck} />}
         </button>
       ))}

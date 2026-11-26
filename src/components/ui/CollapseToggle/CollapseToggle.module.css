@@ -1,4 +1,5 @@
 .cicloHeaderActions {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -12,6 +13,12 @@
   cursor: pointer;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.cicloHeaderActions::before {
+  content: '';
+  position: absolute;
+  inset: -13px;
 }
 
 .cicloHeaderActions:focus-visible {
@@ -33,7 +40,7 @@
   height: 20px;
   border-radius: var(--radius-selector-pill);
   box-sizing: border-box;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: texto fijo corto de acción o contador */
 }
 
 :global([data-theme="dark"]) .comerciosBadge {
@@ -54,7 +61,7 @@
   transform: rotate(180deg);
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767.98px) {
   .cicloHeaderActions .comerciosBadge {
     display: none;
   }

@@ -36,11 +36,13 @@
 }
 
 .retryBtn, .homeBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.4rem;
+  min-height: var(--control-h);
   border-radius: var(--control-radius);
   font-size: 0.9375rem;
   font-weight: 600;

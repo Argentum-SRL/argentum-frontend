@@ -19,7 +19,11 @@
 }
 
 .trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
+  min-width: 0;
   height: var(--control-h);
   padding: 0 36px 0 var(--control-pad-x);
   background: var(--surface);
@@ -32,13 +36,19 @@
   outline: none;
   cursor: pointer;
   text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   box-sizing: border-box;
   transition: border-color var(--motion-fast) var(--ease-out),
               box-shadow var(--motion-fast) var(--ease-out),
               background-color var(--motion-fast) var(--ease-out);
+}
+
+.triggerText {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 767.98px) {
@@ -111,6 +121,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
 }
 
 .sm .trigger {
@@ -118,6 +129,12 @@
   padding: 0 30px 0 10px;
   font-size: 13px;
   border-radius: 10px;
+}
+
+.sm .trigger::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .sm .chevron {
@@ -199,6 +216,7 @@
 
 .optionLabel {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -214,6 +232,12 @@
 
 :global([data-theme="dark"]) .optionCheck {
   color: #60a5fa;
+}
+
+@media (max-width: 767.98px) {
+  .option {
+    min-height: var(--control-h);
+  }
 }
 
 .mobileBottomSheet .option {

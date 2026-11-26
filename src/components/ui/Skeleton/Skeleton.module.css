@@ -70,7 +70,7 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   clip-path: inset(50%);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: patrón estándar de lector de pantalla */
   border-width: 0;
   box-sizing: border-box;
 }
@@ -890,7 +890,7 @@
   box-shadow: var(--elevation-sm);
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767.98px) {
   .seguridadCardSkeleton {
     padding: 16px;
     border-radius: 16px;

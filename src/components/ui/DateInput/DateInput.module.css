@@ -20,6 +20,7 @@
 
 .input {
   width: 100%;
+  min-width: 0;
   height: var(--control-h);
   padding: 0 42px 0 var(--control-pad-x);
   background: var(--surface);
@@ -123,6 +124,12 @@
   padding: 0;
 }
 
+.calendarBtn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+}
+
 .calendarBtn:hover:not(:disabled) {
   background: var(--surface-alt);
   color: var(--primary);
@@ -144,7 +151,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-2);
   background: var(--surface);
@@ -156,7 +163,7 @@
   z-index: var(--z-dropdown);
   animation: fadeInHint 150ms cubic-bezier(0.16, 1, 0.3, 1);
   letter-spacing: 0.04em;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: texto fijo corto DD/MM/AAAA */
 }
 
 [data-theme="dark"] .formatHintBadge {
@@ -188,6 +195,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
 }
 
 /* ─── COMPACT VARIANT ─────────────────────────────── */
@@ -201,6 +209,7 @@
 }
 
 .compactRow {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -214,6 +223,12 @@
   user-select: none;
   outline: none;
   gap: 8px;
+}
+
+.compactRow::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .compactRow:hover:not(.compactDisabled) {
@@ -235,7 +250,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--text-2);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta fija corta en fila compacta */
 }
 
 .compactValueGroup {
@@ -410,6 +425,7 @@
 }
 
 .clearBtn {
+  position: relative;
   background: none;
   border: 1px solid rgba(239, 68, 68, 0.25);
   cursor: pointer;
@@ -420,6 +436,12 @@
   padding: 5px 12px;
   border-radius: 8px;
   transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
+}
+
+.clearBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px -4px;
 }
 
 .clearBtn:focus-visible {
@@ -438,6 +460,7 @@
 }
 
 .todayBtn {
+  position: relative;
   background: var(--surface-alt);
   border: 1px solid var(--border);
   cursor: pointer;
@@ -448,6 +471,12 @@
   padding: 5px 12px;
   border-radius: 8px;
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+}
+
+.todayBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px -4px;
 }
 
 .todayBtn:focus-visible {
@@ -472,6 +501,7 @@
 }
 
 .confirmBtn {
+  position: relative;
   background: var(--primary);
   border: 1px solid transparent;
   cursor: pointer;
@@ -482,6 +512,12 @@
   padding: 5px 14px;
   border-radius: 8px;
   transition: filter var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+}
+
+.confirmBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px -4px;
 }
 
 .confirmBtn:focus-visible {

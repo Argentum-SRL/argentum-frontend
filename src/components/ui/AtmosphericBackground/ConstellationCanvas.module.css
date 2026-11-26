@@ -33,7 +33,7 @@
   opacity: 0.85;
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767.98px) {
   .ambientGlow {
     top: 10%;
     right: -12%;

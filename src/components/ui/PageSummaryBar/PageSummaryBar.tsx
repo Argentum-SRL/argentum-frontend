@@ -66,7 +66,7 @@ export default function PageSummaryBar({
                 <React.Fragment key={index}>
                   {index > 0 && <div className={styles.stripDivider} />}
                   <div className={styles.stripItem}>
-                    <span className={styles.stripLabel}>{item.label}</span>
+                    <span className={styles.stripLabel} title={item.label}>{item.label}</span>
                     <span className={`${styles.stripValue} ${toneClass}`.trim()}>
                       {renderValue(item)}
                     </span>
@@ -107,7 +107,7 @@ export default function PageSummaryBar({
               {hasNotice ? (
                 <>
                   <div className={styles.itemMain}>
-                    <span className={styles.label}>{item.label}</span>
+                    <span className={styles.label} title={item.label}>{item.label}</span>
                     <span
                       className={`${styles.value} ${
                         item.highlight ? styles.valueHighlight : ''
@@ -115,7 +115,7 @@ export default function PageSummaryBar({
                     >
                       {renderValue(item)}
                     </span>
-                    {item.subValue && <span className={styles.subValue}>{item.subValue}</span>}
+                    {item.subValue && <span className={styles.subValue} title={item.subValue}>{item.subValue}</span>}
                   </div>
                   {item.notice && (
                     <div className={styles.notice} title={item.notice.tooltip}>
@@ -130,7 +130,7 @@ export default function PageSummaryBar({
                 </>
               ) : (
                 <>
-                  <span className={styles.label}>{item.label}</span>
+                  <span className={styles.label} title={item.label}>{item.label}</span>
                   <span
                     className={`${styles.value} ${
                       item.highlight ? styles.valueHighlight : ''
@@ -138,7 +138,7 @@ export default function PageSummaryBar({
                   >
                     {renderValue(item)}
                   </span>
-                  {item.subValue && <span className={styles.subValue}>{item.subValue}</span>}
+                  {item.subValue && <span className={styles.subValue} title={item.subValue}>{item.subValue}</span>}
                 </>
               )}
             </div>

@@ -94,6 +94,16 @@
   flex-shrink: 0;
 }
 
+.closeBtn {
+  position: relative;
+}
+
+.closeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
 .nextSlideBtn:hover,
 .backBtn:hover,
 .closeBtn:hover {

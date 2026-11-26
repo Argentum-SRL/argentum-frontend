@@ -462,6 +462,7 @@
 }
 
 .whatsappBannerCloseBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -474,6 +475,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.whatsappBannerCloseBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .whatsappBannerCloseBtn:hover {
@@ -540,6 +547,10 @@
   .whatsappBannerCloseBtn {
     width: 26px;
     height: 26px;
+  }
+
+  .whatsappBannerCloseBtn::before {
+    inset: -4px;
   }
 }
 

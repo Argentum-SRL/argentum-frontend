@@ -484,6 +484,7 @@
 
 /* Boton de cierre circular (DISENO_UNIFICADO §20) */
 .closeBtn {
+  position: relative;
   display: none;
   align-items: center;
   justify-content: center;
@@ -498,6 +499,12 @@
   transition:
     background-color var(--motion-fast) var(--ease-out),
     color var(--motion-fast) var(--ease-out);
+}
+
+.closeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .closeBtn:focus-visible {

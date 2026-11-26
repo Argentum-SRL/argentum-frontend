@@ -81,6 +81,7 @@
 }
 
 .closeBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -93,6 +94,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.closeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .closeBtn:hover {
@@ -134,6 +141,10 @@
   .closeBtn {
     width: 26px;
     height: 26px;
+  }
+
+  .closeBtn::before {
+    inset: -4px;
   }
 }
 

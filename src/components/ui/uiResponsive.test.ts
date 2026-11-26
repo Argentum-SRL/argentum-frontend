@@ -3,6 +3,74 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const UI_DIR = path.resolve(__dirname)
+const SRC_DIR = path.resolve(UI_DIR, '..', '..')
+
+interface CerrarSpec {
+  css: string
+  selector: string
+  excepcion?: string
+}
+
+const CERRAR: CerrarSpec[] = [
+  { css: 'components/billeteras/ActualizarSaldoModal.module.css', selector: '.closeBtn' },
+  { css: 'components/billeteras/BankPickerModal.parte1.css', selector: '.closeBtn' },
+  { css: 'components/billeteras/CambiarFechaSaldoModal.module.css', selector: '.closeBtn' },
+  { css: 'components/billeteras/EditBilleteraModal.module.css', selector: '.closeBtn' },
+  {
+    css: 'components/dashboard/AvisosConfianza/AvisosConfianza.module.css',
+    selector: '.closeBtn',
+    excepcion: '28x28 desktop (gap 12px con .mainAction < 2*8=16 -> inset -6px); 26x26 <=640px (gap 8px < 2*9=18 -> inset -4px)',
+  },
+  { css: 'components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal.module.css', selector: '.closeButton' },
+  { css: 'components/goals/GoalContributionModal.module.css', selector: '.closeBtn' },
+  { css: 'components/goals/GoalDetailModal.module.css', selector: '.closeBtn' },
+  { css: 'components/goals/GoalModal.module.css', selector: '.closeBtn' },
+  { css: 'components/layout/AppLayout/SearchModal.module.css', selector: '.closeBtn' },
+  { css: 'components/notificaciones/NotificacionesDrawer.module.css', selector: '.closeBtn' },
+  { css: 'components/perfil/FotoCropModal.module.css', selector: '.closeBtn' },
+  {
+    css: 'components/presupuestos/PresupuestoDetailModal.module.css',
+    selector: '.closeBtn',
+    excepcion: 'separación 8px con .nextSlideBtn en .headerRightActions < 2*6=12px; N máximo sin superposición = 4',
+  },
+  { css: 'components/presupuestos/PresupuestoModal.module.css', selector: '.closeBtn' },
+  { css: 'components/suscripciones/SuscripcionModal.module.css', selector: '.closeBtn' },
+  { css: 'components/tarjetas/PagarResumenModal.module.css', selector: '.closeBtn' },
+  { css: 'components/tarjetas/TarjetaModal.module.css', selector: '.closeBtn' },
+  { css: 'components/transacciones/FilterBar.parte1.css', selector: '.mobileExpandedSearchClose' },
+  { css: 'components/transacciones/GruposCuotasTab.parte1.css', selector: '.mobileExpandedSearchClose' },
+  { css: 'components/transacciones/GruposCuotasTab.parte3.css', selector: '.closeBtn' },
+  { css: 'components/transacciones/MemoriaComercioDialog.module.css', selector: '.closeBtn' },
+  {
+    css: 'components/transacciones/TransaccionModal.parte1.css',
+    selector: '.closeBtn',
+    excepcion: 'separación 8px con .deleteHeaderBtn en ReintegroPaso.tsx .headerRightActions < 2*6=12px; N máximo sin superposición = 4',
+  },
+  { css: 'components/transferencias/TransferenciaModal.module.css', selector: '.closeBtn' },
+  { css: 'components/transferencias/TransferenciasFilterBar.module.css', selector: '.mobileExpandedSearchClose' },
+  {
+    css: 'components/ui/ErrorBoundary/ModalErrorBoundary.module.css',
+    selector: '.closeBtn',
+    excepcion: 'botón con texto "Cerrar" (~40px de alto); ya cumple >= 44px con ::before { inset: -2px 0 }',
+  },
+  { css: 'components/ui/Modal/Modal.module.css', selector: '.closeButton' },
+  {
+    css: 'pages/admin/AnimacionPreviewPage.module.css',
+    selector: '.closeBtn',
+    excepcion: 'separación 8px con .minimizeBtn en .dockActions < 2*10=20px; N máximo sin superposición = 4',
+  },
+  { css: 'pages/admin/usuarios/UsuariosPanel.module.css', selector: '.closeBtn' },
+  { css: 'pages/app/analisis/FiltrosAnalisis.module.css', selector: '.sideMenuCloseBtn' },
+  {
+    css: 'pages/app/dashboard/DashboardPage.parte3.css',
+    selector: '.whatsappBannerCloseBtn',
+    excepcion: '28x28 desktop (gap 12px con .whatsappBannerActionsDesktop < 2*8=16 -> inset -6px); 26x26 <=640px (gap 8px < 2*9=18 -> inset -4px)',
+  },
+  { css: 'pages/app/metas/GoalsBarChart.module.css', selector: '.sheetCloseBtn' },
+  { css: 'pages/app/perfil/PerfilPage.parte3.css', selector: '.modalCloseBtn' },
+  { css: 'pages/app/perfil/PerfilPage.parte3.css', selector: '.closeBtn' },
+  { css: 'pages/app/presupuestos/BudgetHistoryModal.module.css', selector: '.closeBtn' },
+]
 
 const CORTES_OFICIALES_ANCHO = new Set([
   'max 767.98',
@@ -36,7 +104,7 @@ interface CssBlock {
   startLine: number
 }
 
-function extractCssBlocks(css: string, baseLine = 1): CssBlock[] {
+function extractCssBlocks(css: string, baseLine = 1, skipReducedMotion = false): CssBlock[] {
   const blocks: CssBlock[] = []
   let i = 0
   const n = css.length
@@ -66,7 +134,9 @@ function extractCssBlocks(css: string, baseLine = 1): CssBlock[] {
     const rawBody = css.slice(open + 1, j - 1)
     const bodyStartLine = lineAt(open + 1)
     if (selector.startsWith('@media') || selector.startsWith('@supports')) {
-      blocks.push(...extractCssBlocks(rawBody, bodyStartLine))
+      if (!(skipReducedMotion && /prefers-reduced-motion/i.test(selector))) {
+        blocks.push(...extractCssBlocks(rawBody, bodyStartLine, skipReducedMotion))
+      }
     } else if (!selector.startsWith('@keyframes') && !selector.startsWith('@font-face')) {
       blocks.push({
         selector,
@@ -204,5 +274,94 @@ describe('Reglas responsive de componentes compartidos src/components/ui (F1)', 
     const mobileBlock = extractMediaBlock(buttonCss, /@media\s*\(\s*max-width\s*:\s*767\.98px\s*\)\s*\{/)
     expect(mobileBlock).not.toBe('')
     expect(mobileBlock).toMatch(/\.btn\s*\{[^}]*white-space\s*:\s*normal/)
+  })
+
+  it('U7: todo botón de cerrar en CERRAR tiene ::before/::after con inset >= 6px (o excepción documentada) y no hay .closeBtn/.closeButton fuera de CERRAR', () => {
+    const fallos: string[] = []
+    const cerrarKeys = new Set(CERRAR.map((item) => `${item.css}::${item.selector}`))
+
+    for (const item of CERRAR) {
+      const abs = path.join(SRC_DIR, item.css)
+      if (!fs.existsSync(abs)) {
+        fallos.push(`Falta archivo: ${item.css}`)
+        continue
+      }
+      const blocks = extractCssBlocks(fs.readFileSync(abs, 'utf-8'), 1, true)
+      const splitSel = (s: string) => s.split(',').map((p) => p.trim())
+
+      const baseBlocks = blocks.filter((b) => splitSel(b.selector).includes(item.selector))
+      const hasNonStaticPos = baseBlocks.some((b) =>
+        /position\s*:\s*(relative|absolute|fixed|sticky)\b/i.test(b.cleanBody)
+      )
+      if (!hasNonStaticPos) {
+        fallos.push(`${item.css} [${item.selector}]: falta position no-static`)
+      }
+
+      const pseudoBlocks = blocks.filter((b) =>
+        splitSel(b.selector).some(
+          (p) => p === `${item.selector}::before` || p === `${item.selector}::after`
+        )
+      )
+      if (pseudoBlocks.length === 0) {
+        fallos.push(`${item.css} [${item.selector}]: falta ::before o ::after`)
+        continue
+      }
+
+      const hasContentAbs = pseudoBlocks.some(
+        (b) => /content\s*:\s*['"]['"]/i.test(b.cleanBody) && /position\s*:\s*absolute\b/i.test(b.cleanBody)
+      )
+      if (!hasContentAbs) {
+        fallos.push(`${item.css} [${item.selector}]: el pseudo-elemento debe definir content: '' y position: absolute`)
+      }
+
+      const insetMatch = pseudoBlocks
+        .map((b) => b.cleanBody.match(/inset\s*:\s*([^;!}]+)/i))
+        .find((m) => m !== null)
+      if (!insetMatch) {
+        fallos.push(`${item.css} [${item.selector}]: falta inset negativo en pseudo-elemento`)
+        continue
+      }
+
+      const insetVal = insetMatch[1].trim()
+      if (!item.excepcion) {
+        const singleNeg = insetVal.match(/^-(\d+)px$/i)
+        if (!singleNeg || parseInt(singleNeg[1], 10) < 6) {
+          fallos.push(`${item.css} [${item.selector}]: inset=${insetVal} (se esperaba -Npx con N >= 6)`)
+        }
+      } else {
+        if (!/-\d+px/i.test(insetVal)) {
+          fallos.push(`${item.css} [${item.selector}]: excepción sin inset negativo válido (${insetVal})`)
+        }
+      }
+    }
+
+    const todosCssSrc = walkCssFiles(SRC_DIR)
+    for (const abs of todosCssSrc) {
+      const rel = path.relative(SRC_DIR, abs).replace(/\\/g, '/')
+      const blocks = extractCssBlocks(fs.readFileSync(abs, 'utf-8'), 1, true)
+      for (const blk of blocks) {
+        for (const part of blk.selector.split(',').map((s) => s.trim())) {
+          if (/::?(hover|active|focus|disabled|before|after)/i.test(part)) continue
+          const m = part.match(/(\.closeBtn|\.closeButton)(?=$|[\s>+~,.[])/)
+          if (m) {
+            const key = `${rel}::${m[1]}`
+            if (!cerrarKeys.has(key)) {
+              fallos.push(`Fuera de CERRAR: ${key} (selector "${part}")`)
+            }
+          }
+        }
+      }
+    }
+
+    expect(fallos).toEqual([])
+  })
+
+  it('U8: CategoriaSelector.module.css .catGrid define grid-auto-rows: 1fr', () => {
+    const catCss = stripCssComments(
+      fs.readFileSync(path.join(UI_DIR, 'CategoriaSelector/CategoriaSelector.module.css'), 'utf-8')
+    )
+    const gridMatch = catCss.match(/\.catGrid\s*\{([^}]*)\}/)
+    expect(gridMatch).not.toBeNull()
+    expect(gridMatch![1]).toMatch(/grid-auto-rows\s*:\s*1fr\b/)
   })
 })

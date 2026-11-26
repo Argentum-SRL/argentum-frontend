@@ -370,6 +370,7 @@
 }
 
 .modalCloseBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -381,6 +382,12 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.modalCloseBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .modalCloseBtn:hover {
@@ -450,6 +457,7 @@
 }
 
 .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -462,6 +470,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background 120ms ease, color 120ms ease;
+}
+
+.closeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .closeBtn:hover {

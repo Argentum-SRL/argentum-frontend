@@ -79,6 +79,7 @@
 }
 
 .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -91,6 +92,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.closeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .closeBtn:focus-visible {

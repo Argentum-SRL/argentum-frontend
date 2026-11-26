@@ -47,6 +47,7 @@
 }
 
 .closeBtn {
+  position: relative;
   background: var(--surface-alt);
   border: none;
   border-radius: 50%;
@@ -58,6 +59,12 @@
   cursor: pointer;
   color: var(--text-3);
   transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+.closeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .closeBtn:hover {

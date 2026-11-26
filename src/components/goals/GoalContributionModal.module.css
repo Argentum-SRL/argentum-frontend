@@ -104,6 +104,16 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
+.closeBtn {
+  position: relative;
+}
+
+.closeBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
 .backBtn:hover, .closeBtn:hover {
   background: var(--border);
   color: var(--text);

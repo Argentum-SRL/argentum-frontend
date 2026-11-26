@@ -18,6 +18,7 @@
 .catGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: clamp(4px, 0.95vw, 6px);
   width: 100%;
   padding: clamp(1px, 0.27vw, 2px) 0 2px;

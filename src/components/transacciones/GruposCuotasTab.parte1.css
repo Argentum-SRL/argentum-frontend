@@ -131,6 +131,12 @@
   cursor: pointer;
 }
 
+.mobileExpandedSearchClose::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
+}
+
 /* Desktop Controls */
 .desktopControlsContainer {
   display: none;

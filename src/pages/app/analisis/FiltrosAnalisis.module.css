@@ -47,6 +47,7 @@
 }
 
 .sideMenuCloseBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -59,6 +60,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background-color 120ms ease, color 120ms ease;
+}
+
+.sideMenuCloseBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .sideMenuCloseBtn:hover {

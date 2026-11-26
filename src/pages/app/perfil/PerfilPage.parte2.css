@@ -529,7 +529,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .cleanInput {
     font-size: 16px;
     height: 44px;

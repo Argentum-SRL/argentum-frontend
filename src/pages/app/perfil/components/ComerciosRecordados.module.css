@@ -39,7 +39,7 @@
   transition: border-color 0.15s ease;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .searchInput {
     font-size: 16px;
   }

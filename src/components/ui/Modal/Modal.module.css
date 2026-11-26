@@ -73,7 +73,7 @@
   padding-bottom: var(--modal-footer-pad-bottom);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .overlay {
     align-items: flex-end;
     padding: 0;
@@ -102,7 +102,7 @@
   box-shadow: var(--elevation-lg);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   :global([data-theme="dark"]) .container,
   :global(.dark) .container {
     border-left: none;

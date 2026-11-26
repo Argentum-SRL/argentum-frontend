@@ -364,14 +364,14 @@
   margin-bottom: 2px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .selectField {
     font-size: var(--control-font-mobile);
   }
 }
 
 /* En mobile, Modal .content ya aporta --modal-footer-pad-bottom; evitamos doble margen */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .formFooter {
     padding-bottom: 0;
   }

@@ -19,7 +19,7 @@ const GAPS_PERMITIDOS = new Set([0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48]);
 
 // Escala permitida para R15 (@media min/max-width/height en px)
 const BREAKPOINTS_PERMITIDOS = new Set([
-  360, 479, 480, 639, 640, 719, 720, 767, 768, 1023, 1024, 1279, 1280, 1439, 1440, 1919, 1920, 2559, 2560,
+  360, 479, 480, 639, 640, 719, 720, 767, 767.98, 768, 1023, 1023.98, 1024, 1279, 1280, 1439, 1440, 1919, 1920, 2559, 2560,
 ]);
 
 // Nombres y descripciones de reglas fijas
@@ -313,10 +313,10 @@ function auditCssFile(filePath, relPath, content) {
   let mMatch;
   while ((mMatch = mediaCondRegex.exec(cleanContent)) !== null) {
     const cond = mMatch[1];
-    const pxRegex = /(?:min|max)-(?:width|height)\s*:\s*(\d+)px/gi;
+    const pxRegex = /(?:min|max)-(?:width|height)\s*:\s*(\d+(?:\.\d+)?)px/gi;
     let pMatch;
     while ((pMatch = pxRegex.exec(cond)) !== null) {
-      const val = parseInt(pMatch[1], 10);
+      const val = parseFloat(pMatch[1]);
       if (!BREAKPOINTS_PERMITIDOS.has(val)) {
         violations.R15++;
       }
@@ -785,7 +785,7 @@ function auditTsxFile(filePath, relPath, content) {
                     const b = rm[1];
                     const fm = b.match(/font-size\s*:\s*([0-9.]+)px/i);
                     if (fm && parseFloat(fm[1]) < 16) {
-                      if (!cssContent.includes('--control-font-mobile') && !/max-width\s*:\s*(?:768|767)px/.test(cssContent)) {
+                      if (!cssContent.includes('--control-font-mobile') && !/max-width\s*:\s*(?:768|767\.98|767)px/.test(cssContent)) {
                         violations.R32++;
                       }
                     }

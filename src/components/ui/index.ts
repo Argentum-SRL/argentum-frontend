@@ -16,6 +16,7 @@ import { PhoneCountrySelect } from './PhoneCountrySelect'
 import type { Country } from './PhoneCountrySelect'
 import SegmentedControl from './SegmentedControl'
 import type { SegmentedControlOption, SegmentedControlProps } from './SegmentedControl'
+import MontoFit, { type MontoFitProps } from './MontoFit/MontoFit.tsx'
 
 export { 
   Button, 
@@ -42,7 +43,9 @@ export {
   type Country,
   SegmentedControl,
   type SegmentedControlOption,
-  type SegmentedControlProps
+  type SegmentedControlProps,
+  MontoFit,
+  type MontoFitProps
 }
 
 export { ColorPicker } from './ColorPicker'

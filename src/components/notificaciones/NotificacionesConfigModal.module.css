@@ -287,7 +287,7 @@
 }
 
 /* En mobile, .content:last-child ya aporta --modal-footer-pad-bottom y position: sticky descuenta el padding del contenedor con scroll; por eso bottom y margin-bottom valen calc(-1 * var(--modal-footer-pad-bottom)) para dejar un solo margen */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .footer {
     /* r03-ok: anula el padding inferior de .content en mobile para dejar un solo margen */
     margin-bottom: calc(-1 * var(--modal-footer-pad-bottom));
@@ -335,7 +335,7 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .numberInput,
   .timeInput,
   .selectInput {

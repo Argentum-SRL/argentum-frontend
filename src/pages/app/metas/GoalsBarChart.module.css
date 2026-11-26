@@ -45,6 +45,7 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding: 0 28px;
+  scroll-padding-left: 28px;
   padding: 24px 28px 16px 28px;
   -ms-overflow-style: none;
 }
@@ -61,8 +62,8 @@
 
 /* Individual Column Wrapper */
 .columnWrapper {
-  flex: 0 0 86px;
-  min-width: 82px;
+  flex: 0 0 var(--columna-ancho, 86px);
+  min-width: 0;
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
@@ -80,7 +81,7 @@
 
 /* Main Bar Column Area */
 .barArea {
-  width: 82px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -179,6 +180,9 @@
 }
 
 .spentAmount {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
   font-size: 16px;
   font-weight: 800;
   color: #1E293B;
@@ -230,12 +234,18 @@
 .budgetName {
   font-size: 12px;
   font-weight: 700;
+  line-height: 15px;
+  min-height: 30px;
   color: var(--text);
   text-align: center;
   width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
   margin-top: 10px;
 }
 
@@ -461,15 +471,11 @@
     gap: 24px;
     padding: 32px 36px 24px 36px;
     scroll-padding: 0 36px;
-  }
-
-  .columnWrapper {
-    flex: 0 0 110px;
-    min-width: 104px;
+    scroll-padding-left: 36px;
   }
 
   .barArea {
-    width: 104px;
+    width: 100%;
     border-radius:36px;
   }
 
@@ -504,10 +510,12 @@
 
   .budgetName {
     font-size: 13px;
+    line-height: 16px;
+    min-height: 32px;
     margin-top: 12px;
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .sheetContent {
     padding-bottom: var(--modal-footer-pad-bottom);
   }

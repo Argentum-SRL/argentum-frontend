@@ -11,8 +11,9 @@ import {
   type SegmentedControlOption,
 } from '@/components/ui'
 import adminService from '@/services/adminService'
+import { useViewport } from '@/hooks/useViewport'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import type { AdminStats } from '@/types/admin'
 import UsuariosPanel from './admin/usuarios/UsuariosPanel'
 import MonitorWppPanel from './admin/components/MonitorWppPanel'
@@ -40,9 +41,7 @@ function normalizarTab(raw: string | null): AdminTab {
 
 export const AdminPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [esCelular, setEsCelular] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
-  )
+  const { esCelular } = useViewport()
   const rawTab = normalizarTab(searchParams.get('tab'))
   const activeTab: AdminTab = esCelular ? 'usuarios' : rawTab
   const selectedUserId = activeTab === 'usuarios' ? searchParams.get('usuario') : null
@@ -51,14 +50,6 @@ export const AdminPage: React.FC = () => {
   const [loadingStats, setLoadingStats] = useState(true)
   const [reloading, setReloading] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 767px)')
-    const sync = () => setEsCelular(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
 
   const cargarStats = useCallback(() => {
     adminService
@@ -149,6 +140,7 @@ export const AdminPage: React.FC = () => {
         {
           label: 'Costo del mes',
           value: formatMonto(stats.costo_mes_ars, 'ARS'),
+          valorCorto: formatMontoCorto(stats.costo_mes_ars, 'ARS'),
           subValue: stats.costo_mes_sin_dolar
             ? 'falta el dólar'
             : stats.costo_mes_fuente === 'openai'

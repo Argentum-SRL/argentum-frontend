@@ -325,7 +325,7 @@
   top: calc(100% + 6px);
   left: 0;
   z-index: 40;
-  min-width: 200px;
+  min-width: min(200px, 100%);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;

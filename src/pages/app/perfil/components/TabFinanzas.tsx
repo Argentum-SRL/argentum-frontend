@@ -5,6 +5,7 @@ import type { Usuario, CotizacionesDolarResponse } from '@/types'
 import usuarioService from '@/services/usuario.service'
 import { getCotizaciones, getPreviewFechaCobro } from '@/services/onboarding.service'
 import { invalidateDashboardCache } from '@/services/dashboard.service'
+import { useViewport } from '@/hooks/useViewport'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { CicloFinancieroSelector, type CicloValue } from '@/components/ciclo/CicloFinancieroSelector'
@@ -86,12 +87,8 @@ export const TabFinanzas: React.FC<TabFinanzasProps> = ({ usuario, updateUsuario
   const [isSaving, setIsSaving] = useState(false)
 
   // En móvil (< 1024px), colapsar comercios por defecto para no abrumar la pantalla
-  const [comerciosExpanded, setComerciosExpanded] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 1024
-    }
-    return false
-  })
+  const { esEscritorio } = useViewport()
+  const [comerciosExpanded, setComerciosExpanded] = useState(() => esEscritorio)
 
   // Sync state if usuario prop changes
   const [prevUsuario, setPrevUsuario] = useState(usuario)

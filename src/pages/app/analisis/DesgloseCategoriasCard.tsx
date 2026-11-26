@@ -6,7 +6,7 @@ import {
   ChevronRight,
 } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
-import { CollapseToggle } from '@/components/ui'
+import { CollapseToggle, MontoFit } from '@/components/ui'
 import { CategoriaIcon } from '@/components/ui/CategoriaIcon'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import { MovimientoAvatar } from '@/components/ui/MovimientoAvatar'
@@ -15,7 +15,7 @@ import analisisService, {
   type AnalisisMovimientoDrilldown,
   type AnalisisQueryParams,
 } from '@/services/analisis.service'
-import { formatMonto, formatFecha, formatPorcentaje } from '@/utils/format'
+import { formatMonto, formatMontoCorto, formatFecha, formatPorcentaje } from '@/utils/format'
 import { getCategoriaColor, getSubcategoriaColor } from '@/lib/utils/categoriaColores'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './DesgloseCategoriasCard.module.css'
@@ -161,10 +161,16 @@ export default function DesgloseCategoriasCard({
             {selectedCat && (
               <p className={styles.subtitle}>
                 <span className={styles.subtitleDesktop}>
-                  {formatMonto(selectedCat.monto, monedaVisual)} ({formatPorcentaje(selectedCat.porcentaje_del_total)} del total)
+                  <MontoFit
+                    completo={`${formatMonto(selectedCat.monto, monedaVisual)} (${formatPorcentaje(selectedCat.porcentaje_del_total)} del total)`}
+                    corto={`${formatMontoCorto(selectedCat.monto, monedaVisual)} (${formatPorcentaje(selectedCat.porcentaje_del_total)} del total)`}
+                  />
                 </span>
                 <span className={styles.subtitleMobile}>
-                  {formatMonto(selectedCat.monto, monedaVisual)} · {formatPorcentaje(selectedCat.porcentaje_del_total)}
+                  <MontoFit
+                    completo={`${formatMonto(selectedCat.monto, monedaVisual)} · ${formatPorcentaje(selectedCat.porcentaje_del_total)}`}
+                    corto={`${formatMontoCorto(selectedCat.monto, monedaVisual)} · ${formatPorcentaje(selectedCat.porcentaje_del_total)}`}
+                  />
                 </span>
               </p>
             )}

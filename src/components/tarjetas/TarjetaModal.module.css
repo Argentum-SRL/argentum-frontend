@@ -902,7 +902,7 @@
 }
 
 /* ── Responsive Mobile (<768px) ──────────────────────────────────────────── */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   
 
   .formHeader {
@@ -978,7 +978,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .dateInput {
     font-size: var(--control-font-mobile);
   }

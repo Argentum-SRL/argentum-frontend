@@ -1,6 +1,6 @@
 import { PageSummaryBar } from '@/components/ui'
 import { TrendingUp } from '@/components/ui/icons'
-import { formatMonto, formatPorcentaje } from '@/utils/format'
+import { formatMonto, formatMontoCorto, formatPorcentaje } from '@/utils/format'
 import type { AnalisisResumenResponse } from '@/services/analisis.service'
 import type { SummaryBarItem } from '@/components/ui/PageSummaryBar/PageSummaryBar'
 import styles from './ViewerKpisBlock.module.css'
@@ -32,15 +32,21 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
   const { soloGastos, textoPeso } = armarKpisVista(kpis, visorData.moneda_modo)
 
   const gastosTexto = `-${formatMonto(kpis.gastos_totales, monedaVis)}`
+  const gastosCorto = `-${formatMontoCorto(Math.abs(kpis.gastos_totales), monedaVis)}`
   const balanceNeto = kpis.balance_neto ?? 0
   const esBalanceNegativo = balanceNeto < 0
   const balanceSigno = esBalanceNegativo ? '-' : '+'
   const balanceTexto = `${balanceSigno}${formatMonto(Math.abs(balanceNeto), monedaVis)}`
+  const balanceCorto = `${balanceSigno}${formatMontoCorto(Math.abs(balanceNeto), monedaVis)}`
 
   const promedioMonto =
     kpis.promedio_gasto_ciclo !== null && kpis.promedio_gasto_ciclo !== undefined
       ? formatMonto(kpis.promedio_gasto_ciclo, monedaVis)
       : null
+  const promedioMontoCorto =
+    kpis.promedio_gasto_ciclo !== null && kpis.promedio_gasto_ciclo !== undefined
+      ? formatMontoCorto(Math.abs(kpis.promedio_gasto_ciclo), monedaVis)
+      : undefined
 
   const tasaAhorroTexto =
     kpis.tasa_ahorro_pct !== null && kpis.tasa_ahorro_pct !== undefined
@@ -51,6 +57,10 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
     kpis.ingresos_totales !== null && kpis.ingresos_totales !== undefined
       ? `+${formatMonto(kpis.ingresos_totales, monedaVis)}`
       : '—'
+  const ingresosCorto =
+    kpis.ingresos_totales !== null && kpis.ingresos_totales !== undefined
+      ? `+${formatMontoCorto(Math.abs(kpis.ingresos_totales), monedaVis)}`
+      : undefined
 
   const avisoTexto = soloGastos ? textoPeso : tasaAhorroTexto
 
@@ -58,6 +68,7 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
     {
       label: 'Gastos',
       value: gastosTexto,
+      valorCorto: gastosCorto,
       highlight: true,
       tone: 'negative',
       notice: avisoTexto
@@ -73,6 +84,7 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
           {
             label: 'Promedio por ciclo',
             value: promedioMonto,
+            valorCorto: promedioMontoCorto,
           } satisfies SummaryBarItem,
         ]
       : []),
@@ -82,6 +94,7 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
     {
       label: 'Te quedó',
       value: balanceTexto,
+      valorCorto: balanceCorto,
       highlight: true,
       tone: esBalanceNegativo ? 'negative' : 'default',
       notice: avisoTexto
@@ -95,11 +108,13 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
     {
       label: 'Ingresos',
       value: ingresosTexto,
+      valorCorto: ingresosCorto,
       tone: 'positive',
     },
     {
       label: 'Gastos',
       value: gastosTexto,
+      valorCorto: gastosCorto,
       tone: 'negative',
     },
   ]
@@ -108,22 +123,26 @@ export default function ViewerKpisBlock({ visorData, monedaVis }: ViewerKpisBloc
     {
       label: 'Te quedó',
       value: balanceTexto,
+      valorCorto: balanceCorto,
       tone: esBalanceNegativo ? 'negative' : 'positive',
     },
     {
       label: 'Ingresos',
       value: ingresosTexto,
+      valorCorto: ingresosCorto,
       tone: 'positive',
     },
     {
       label: 'Gastos',
       value: gastosTexto,
+      valorCorto: gastosCorto,
       tone: 'negative',
     },
   ]
 
   return (
     <div className={styles.summaryWrap}>
+      {/* PageSummaryBar usa MontoFit para estos montos */}
       <PageSummaryBar
         mobileVariant="strip"
         items={soloGastos ? itemsSoloGastos : itemsResumenDesktop}

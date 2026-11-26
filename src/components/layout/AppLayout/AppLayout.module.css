@@ -42,7 +42,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .desktopHeader {
     display: none;
   }
@@ -306,7 +306,7 @@
 }
 
 /* Tablet portrait & narrow landscape (iPad Air 820px, Surface 912px, Fold 882px, etc.) */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1023.98px) {
   .desktopHeader {
     padding: 0 16px;
     gap: 12px;
@@ -604,7 +604,7 @@
   padding: 40px var(--container-px-desktop, 48px);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .content {
     padding: calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px)) max(var(--container-px-mobile), env(safe-area-inset-right, 0px)) 24px max(var(--container-px-mobile), env(safe-area-inset-left, 0px));
   }
@@ -620,7 +620,7 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023.98px) {
   .content {
     padding: 32px var(--container-px-tablet);
   }
@@ -730,7 +730,7 @@
 
 /* ── Mobile offsets ──────────────────────────────────────────────────────── */
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .main {
     padding-top: 0;
     padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));

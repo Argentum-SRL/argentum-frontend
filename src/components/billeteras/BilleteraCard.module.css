@@ -20,7 +20,7 @@
 }
 
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .wc {
     height: 210px; /* Tamaño fijo tipo tarjeta solo en mobile */
     box-shadow: var(--elevation-sm);
@@ -99,7 +99,7 @@
   flex-direction: column;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .wcInner {
     height: 100%;
     justify-content: space-between;
@@ -126,7 +126,7 @@
      en columna dentro del flex. El kebab queda auto-push a la derecha. */
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .wcTop {
     margin-bottom: 0;
   }
@@ -389,18 +389,14 @@
   letter-spacing: -0.8px;
   line-height: 1.1;
   margin: 0;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
   .wcBalAmt {
     font-size: 32px;
     letter-spacing: -1px;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
   }
 }
 
@@ -434,7 +430,7 @@
   max-width: 90%;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .wcAdd {
     display: none; /* Oculto en mobile, el botón está en el header */
   }

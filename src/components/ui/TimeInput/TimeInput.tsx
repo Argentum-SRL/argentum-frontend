@@ -4,6 +4,7 @@ import { Clock } from '@/components/ui/icons'
 import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
 import '@ncdai/react-wheel-picker/style.css'
 import Modal from '@/components/ui/Modal/Modal'
+import { useViewport } from '@/hooks/useViewport'
 import styles from './TimeInput.module.css'
 
 const WHEEL_DRAG_SENSITIVITY = 6
@@ -49,7 +50,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   }, [value])
 
   const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 1024)
+  const { esCelular: isMobile } = useViewport()
   const [selectedHour, setSelectedHour] = useState<number>(horaNum)
   const [selectedMinute, setSelectedMinute] = useState<number>(minutoNum)
   const [prevValue, setPrevValue] = useState(value)
@@ -63,13 +64,6 @@ export const TimeInput: React.FC<TimeInputProps> = ({
     setSelectedHour(horaNum)
     setSelectedMinute(minutoNum)
   }
-
-  // Detectar resize mobile vs desktop
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 1024)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   // Posicionamiento dinámico del popover en desktop
   const updatePosition = useCallback(() => {

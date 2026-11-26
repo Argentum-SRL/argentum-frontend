@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { Calendar, Landmark, Clock, Check, AlertCircle, ChevronDown } from '@/components/ui/icons'
 import { LunarLoader, Modal } from '@/components/ui'
+import { useViewport } from '@/hooks/useViewport'
 import { getPreviewFechaCobro } from '@/services/onboarding.service'
 import { REGLAS_CICLO } from '@/lib/utils/ciclo'
 import SegmentedControl from '@/components/ui/SegmentedControl'
@@ -343,14 +344,7 @@ export const CicloFinancieroSelector: React.FC<Props> = ({
   const otherRowRef = useRef<HTMLButtonElement | null>(null)
   const panelElRef = useRef<HTMLDivElement | null>(null)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 767)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
+  const { esCelular: isMobile } = useViewport()
 
   useEffect(() => {
     if (isOtherSelected) {

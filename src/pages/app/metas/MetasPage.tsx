@@ -9,7 +9,7 @@ import billeteraService from '@/services/billetera.service'
 import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
 import type { Billetera } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
 import { getErrorMessage } from '@/utils/errorMessages'
@@ -217,22 +217,26 @@ export default function MetasPage() {
             {
               label: totals.totalObjetivoUSD > 0 ? "Ahorro acumulado en Pesos" : "Ahorro acumulado",
               value: formatMonto(totals.totalAhorradoARS, 'ARS'),
+              valorCorto: formatMontoCorto(totals.totalAhorradoARS, 'ARS'),
               highlight: true,
             },
             ...(totals.totalObjetivoUSD > 0 || totals.totalAhorradoUSD > 0 ? [
               {
                 label: "Ahorro acumulado en Dólares",
                 value: formatMonto(totals.totalAhorradoUSD, 'USD'),
+                valorCorto: formatMontoCorto(totals.totalAhorradoUSD, 'USD'),
                 highlight: true,
               },
               {
                 label: "Objetivo global en Dólares",
                 value: formatMonto(totals.totalObjetivoUSD, 'USD'),
+                valorCorto: formatMontoCorto(totals.totalObjetivoUSD, 'USD'),
               }
             ] : [
               {
                 label: "Objetivo global",
                 value: formatMonto(totals.totalObjetivoARS, 'ARS'),
+                valorCorto: formatMontoCorto(totals.totalObjetivoARS, 'ARS'),
               }
             ]),
             {

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import {
   TrendingUp, SlidersHorizontal, PieChart, ArrowLeftRight,
   Calendar, X, Sparkles,
@@ -6,6 +5,7 @@ import {
 import { SelectInput, type SelectOption } from '@/components/ui'
 import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'
 import Modal from '@/components/ui/Modal/Modal'
+import { useViewport } from '@/hooks/useViewport'
 import type { MonedaModoAnalisis } from '@/services/analisis.service'
 import { filtrosVisibles, etiquetaBilletera, type VistaActivaAnalisis } from './filtrosAnalisis'
 import styles from './FiltrosAnalisis.module.css'
@@ -64,15 +64,7 @@ export default function FiltrosAnalisis({
   modoEvolucion, onModoEvolucionChange,
   onOpenEditorSeries, esModoPersonalizado = false, onResetSeries,
 }: FiltrosAnalisisProps) {
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth <= 767
-  )
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 767)
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
+  const { esCelular: isMobile } = useViewport()
 
   const visibles = filtrosVisibles(vista)
   const billeteraOptions: SelectOption[] = [

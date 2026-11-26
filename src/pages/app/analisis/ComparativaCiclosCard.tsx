@@ -19,6 +19,8 @@ import analisisService, {
 } from '@/services/analisis.service'
 import { formatMonto, formatMontoCorto, formatPorcentaje } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
+import { useViewport } from '@/hooks/useViewport'
+import { MontoFit } from '@/components/ui'
 import ChartLoadingState from './ChartLoadingState'
 import styles from './ComparativaCiclosCard.module.css'
 
@@ -58,15 +60,7 @@ export default function ComparativaCiclosCard({
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
   const [data, setData] = useState<ComparativaCiclosResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  const [isMobile, setIsMobile] = useState<boolean>(
-    () => typeof window !== 'undefined' && window.innerWidth <= 767
-  )
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 767)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const { esCelular: isMobile } = useViewport()
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -245,14 +239,20 @@ export default function ComparativaCiclosCard({
             <div className={styles.summaryItem}>
               <span className={styles.summaryCaption}>Gastos en {etiquetaA}</span>
               <span className={styles.summaryVal}>
-                {formatMonto(data.resumen.gasto_a, monedaVisual)}
+                <MontoFit
+                  completo={formatMonto(data.resumen.gasto_a, monedaVisual)}
+                  corto={formatMontoCorto(data.resumen.gasto_a, monedaVisual)}
+                />
               </span>
             </div>
 
             <div className={styles.summaryItem}>
               <span className={styles.summaryCaption}>Gastos en {etiquetaB}</span>
               <span className={styles.summaryValMuted}>
-                {formatMonto(data.resumen.gasto_b, monedaVisual)}
+                <MontoFit
+                  completo={formatMonto(data.resumen.gasto_b, monedaVisual)}
+                  corto={formatMontoCorto(data.resumen.gasto_b, monedaVisual)}
+                />
               </span>
             </div>
 

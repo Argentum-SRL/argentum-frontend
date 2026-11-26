@@ -17,6 +17,7 @@ import analisisService, {
   type SerieEvolucionPersonalizada,
 } from '@/services/analisis.service'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
+import { useViewport } from '@/hooks/useViewport'
 import type { VistaActivaAnalisis } from './filtrosAnalisis'
 import { armarPedidoDescarga, type PedidoDescarga } from './descargaAnalisis'
 import styles from './AnalisisPage.module.css'
@@ -27,10 +28,9 @@ const OPCIONES_TABS_MOBILE: SegmentedControlOption<'analisis' | 'informes'>[] = 
 ]
 
 export default function AnalisisPage() {
+  const { esCelular } = useViewport()
   const [vistaActiva, setVistaActiva] = useState<VistaActivaAnalisis>('evolucion')
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(
-    () => typeof window !== 'undefined' && window.innerWidth >= 768
-  )
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => !esCelular)
 
   // Filtros de datos
   const [monedaModo, setMonedaModo] = useState<MonedaModoAnalisis>('solo_ars')

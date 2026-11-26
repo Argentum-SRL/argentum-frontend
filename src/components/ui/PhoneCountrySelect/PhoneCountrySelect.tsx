@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { ChevronDown, Check } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
+import { useViewport } from '@/hooks/useViewport'
 import styles from './PhoneCountrySelect.module.css'
 
 export interface Country {
@@ -23,16 +24,9 @@ export const PhoneCountrySelect: React.FC<PhoneCountrySelectProps> = ({
   disabled,
 }) => {
   const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const { esCelular: isMobile } = useViewport()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const panelElRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 767)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
 
   const panelRef = useCallback((node: HTMLDivElement | null) => {
     panelElRef.current = node

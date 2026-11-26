@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from
 import { createPortal } from 'react-dom'
 import { Check } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
+import { useViewport } from '@/hooks/useViewport'
 import styles from './ColorPicker.module.css'
 
 const PRESET_COLORS = [
@@ -27,7 +28,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   id,
 }) => {
   const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const { esCelular: isMobile } = useViewport()
   const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({})
   const [prevValue, setPrevValue] = useState(value)
   const [hexInput, setHexInput] = useState(value)
@@ -38,14 +39,6 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     setPrevValue(value)
     setHexInput(value)
   }
-
-  // Detect mobile screen size
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 767)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
 
   // Lock body scroll on mobile bottom sheet open
   useEffect(() => {

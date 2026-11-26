@@ -133,7 +133,7 @@
 
 /* Hasta 767px un grupo inline pasa botones a la fila siguiente cuando no entra;
    se envuelve en :where() para no subir especificidad sobre modificadores locales como .navTrack */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .track:where(:not(.fullWidth):not(.trackWrap):not(:has(.pillStacked))) {
     display: flex;
     flex-wrap: wrap;

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
 import { Toaster } from 'sileo'
 import { useTheme } from '@/hooks/useTheme'
+import { useViewport } from '@/hooks/useViewport'
 
 /**
  * Componente Toaster de Sileo adaptado al ecosistema de Argentum.
@@ -8,16 +8,8 @@ import { useTheme } from '@/hooks/useTheme'
  */
 export function SileoToaster() {
   const { theme } = useTheme()
-  const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
-  )
-
-  useEffect(() => {
-    const mql = window.matchMedia('(min-width: 768px)')
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
-    mql.addEventListener('change', handler)
-    return () => mql.removeEventListener('change', handler)
-  }, [])
+  const { esCelular } = useViewport()
+  const isDesktop = !esCelular
 
   return (
     <Toaster

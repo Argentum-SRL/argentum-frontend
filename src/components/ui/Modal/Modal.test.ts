@@ -168,7 +168,7 @@ describe('FS1E: exclusión de noPadding en mobile y botones Confirmar sin monto'
   function extractMobileMediaBlocks(css: string): Array<{ selector: string; body: string }> {
     const clean = css.replace(/\/\*[\s\S]*?\*\//g, '');
     const out: Array<{ selector: string; body: string }> = [];
-    const mediaRe = /@media\s*\([^)]*max-width\s*:\s*767px[^)]*\)\s*\{/g;
+    const mediaRe = /@media\s*\([^)]*max-width\s*:\s*767\.98px[^)]*\)\s*\{/g;
     let m: RegExpExecArray | null;
     while ((m = mediaRe.exec(clean)) !== null) {
       let depth = 1;
@@ -259,7 +259,7 @@ describe('FS1F: margen inferior único en modales restantes y etiqueta Otro mont
   function extractMobileMediaBlocks(css: string): Array<{ selector: string; body: string }> {
     const clean = css.replace(/\/\*[\s\S]*?\*\//g, '');
     const out: Array<{ selector: string; body: string }> = [];
-    const mediaRe = /@media\s*\([^)]*max-width\s*:\s*767px[^)]*\)\s*\{/g;
+    const mediaRe = /@media\s*\([^)]*max-width\s*:\s*767\.98px[^)]*\)\s*\{/g;
     let m: RegExpExecArray | null;
     while ((m = mediaRe.exec(clean)) !== null) {
       let depth = 1;
@@ -311,7 +311,7 @@ describe('FS1F: margen inferior único en modales restantes y etiqueta Otro mont
     return bottom;
   }
 
-  it('T1: ModalesImportacion.module.css define padding-bottom: 0 en .formFooter dentro de @media (max-width: 767px)', () => {
+  it('T1: ModalesImportacion.module.css define padding-bottom: 0 en .formFooter dentro de @media (max-width: 767.98px)', () => {
     const mobileBlocks = extractMobileMediaBlocks(importCss);
     const footerBlock = mobileBlocks.find((b) => /\.formFooter\b/.test(b.selector));
     expect(footerBlock).toBeDefined();
@@ -424,7 +424,7 @@ describe('FS1G: pie pegajoso (position: sticky) en modal de notificaciones y mod
   function extractMobileMediaBlocks(css: string): Array<{ selector: string; body: string }> {
     const clean = css.replace(/\/\*[\s\S]*?\*\//g, '');
     const out: Array<{ selector: string; body: string }> = [];
-    const mediaRe = /@media\s*\([^)]*max-width\s*:\s*767px[^)]*\)\s*\{/g;
+    const mediaRe = /@media\s*\([^)]*max-width\s*:\s*767\.98px[^)]*\)\s*\{/g;
     let m: RegExpExecArray | null;
     while ((m = mediaRe.exec(clean)) !== null) {
       let depth = 1;

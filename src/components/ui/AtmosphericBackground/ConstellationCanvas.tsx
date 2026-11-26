@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useId } from 'react'
 import { useTheme } from '@/hooks/useTheme'
+import { useViewport } from '@/hooks/useViewport'
 import {
   CONSTELLATIONS,
   CONSTELLATION_TIMINGS,
@@ -54,24 +55,17 @@ export function ConstellationCanvas({
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches
   })
 
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.innerWidth <= 640
-  })
+  const { esCelular: isMobile } = useViewport()
 
-  // Escuchar preferencia de accesibilidad y tamaño de pantalla
+  // Escuchar preferencia de accesibilidad
   useEffect(() => {
     if (typeof window === 'undefined') return
     const mqMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const handleMotion = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
     mqMotion.addEventListener('change', handleMotion)
 
-    const handleResize = () => setIsMobile(window.innerWidth <= 640)
-    window.addEventListener('resize', handleResize)
-
     return () => {
       mqMotion.removeEventListener('change', handleMotion)
-      window.removeEventListener('resize', handleResize)
     }
   }, [])
 

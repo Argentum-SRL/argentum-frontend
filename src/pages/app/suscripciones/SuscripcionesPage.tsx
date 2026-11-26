@@ -10,7 +10,7 @@ import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import categoriaService from '@/services/categoria.service'
 import type { Suscripcion, TotalMensualSuscripciones, Billetera, TarjetaCredito, Categoria, Subcategoria } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { CATALOGO_SUSCRIPCIONES } from '@/lib/constants/suscripciones'
 import { getSubcategoriaVisual } from '@/lib/utils/categoria.utils'
 import SuscripcionCard from '@/components/suscripciones/SuscripcionCard'
@@ -394,11 +394,13 @@ const SuscripcionesPage: React.FC = () => {
           {
             label: "Total mensual en Pesos",
             value: formatCurrency(totalMensualARS),
+            valorCorto: formatMontoCorto(totalMensualARS, 'ARS'),
             highlight: true,
           },
           {
             label: "Total mensual en Dólares",
             value: formatMonto(totalMensualUSD, 'USD'),
+            valorCorto: formatMontoCorto(totalMensualUSD, 'USD'),
           },
           {
             label: "Activas",

@@ -29,7 +29,7 @@
   color: #F8FAFC;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .container {
     padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
   }

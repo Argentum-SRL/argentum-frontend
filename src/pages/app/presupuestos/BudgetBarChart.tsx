@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, type CSSProperties } from 'react'
 import { 
   History, 
   Edit, 
@@ -9,9 +9,12 @@ import {
   ChevronRight,
   TrendingUp
 } from '@/components/ui/icons'
+import { MontoFit } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Presupuesto } from '@/types'
-import { formatMonto, formatFecha } from '@/utils/format'
+import { formatMonto, formatMontoCorto, formatFecha } from '@/utils/format'
+import { useViewport } from '@/hooks/useViewport'
+import { useColumnasConAsomo } from '@/hooks/useColumnasConAsomo'
 import { SubcategoriaIcon } from '@/components/ui/SubcategoriaIcon'
 import styles from './BudgetBarChart.module.css'
 
@@ -39,22 +42,6 @@ const PASTEL_PALETTE = [
 ]
 
 /**
- * Compact number formatting matching reference (e.g. 766k, 1.2M, $450)
- */
-function formatCompact(monto: number, moneda: 'ARS' | 'USD'): string {
-  const prefix = moneda === 'USD' ? 'US$' : '$'
-  if (monto >= 1_000_000) {
-    const val = monto / 1_000_000
-    return `${prefix}${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)}M`
-  }
-  if (monto >= 1_000) {
-    const val = monto / 1_000
-    return `${prefix}${Math.round(val)}k`
-  }
-  return `${prefix}${Math.round(monto)}`
-}
-
-/**
  * BudgetBarChart - Exact replica of the reference TikTok comparative bar chart.
  * Tap on any column opens an action sheet modal with all options.
  */
@@ -69,8 +56,16 @@ export default function BudgetBarChart({
 }: BudgetBarChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [activePresupuesto, setActivePresupuesto] = useState<Presupuesto | null>(null)
+  const { esCelular } = useViewport()
 
   const validPresupuestos = presupuestos.filter(p => p.periodo_actual !== null)
+  const { ancho: columnaAncho } = useColumnasConAsomo(
+    containerRef,
+    validPresupuestos.length,
+    esCelular
+      ? { base: 86, minimo: 86, gap: 16, padIzq: 28, padDer: 28 }
+      : { base: 110, minimo: 86, gap: 24, padIzq: 36, padDer: 36 }
+  )
 
   if (validPresupuestos.length === 0) {
     return (
@@ -103,7 +98,11 @@ export default function BudgetBarChart({
         </span>
       </div>
 
-      <div className={styles.scrollContainer} ref={containerRef}>
+      <div
+        className={styles.scrollContainer}
+        ref={containerRef}
+        style={{ '--columna-ancho': `${columnaAncho}px` } as CSSProperties}
+      >
         {validPresupuestos.map((p, idx) => {
           const periodo = p.periodo_actual!
           const limite = Number(periodo.monto_limite || p.monto || 0)
@@ -177,7 +176,10 @@ export default function BudgetBarChart({
                     />
                   </div>
                   <span className={styles.spentAmount}>
-                    {formatCompact(gastado, p.moneda)}
+                    <MontoFit
+                      completo={formatMonto(gastado, p.moneda)}
+                      corto={formatMontoCorto(gastado, p.moneda)}
+                    />
                   </span>
                   <span className={styles.percentText}>
                     {porcentaje.toFixed(0)}%{isCappedOverflow ? ' ▲' : ''}

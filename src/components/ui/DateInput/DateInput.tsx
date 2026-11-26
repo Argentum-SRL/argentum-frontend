@@ -6,6 +6,7 @@ import { Calendar, AlertCircle, Keyboard } from '@/components/ui/icons'
 import { WheelPicker, WheelPickerWrapper, type WheelPickerOption } from '@ncdai/react-wheel-picker'
 import '@ncdai/react-wheel-picker/style.css'
 import Modal from '@/components/ui/Modal/Modal'
+import { useViewport } from '@/hooks/useViewport'
 import styles from './DateInput.module.css'
 
 // Formato interno (lo que se almacena y comunica al padre)
@@ -80,17 +81,10 @@ export const DateInput: React.FC<DateInputProps> = ({
   }, [value])
 
   const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 1024)
+  const { esCelular: isMobile } = useViewport()
   const [isFocused, setIsFocused] = useState(false)
   const [inputText, setInputText] = useState(parsedValueDate ? format(parsedValueDate, DISPLAY_FORMAT) : '')
   const [prevValue, setPrevValue] = useState(value)
-
-  // Detectar mobile en resize continuo
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 1024)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   // Rango de años calculado según min/max o default -100 / +10
   const currentYearNow = useMemo(() => new Date().getFullYear(), [])
@@ -172,12 +166,11 @@ export const DateInput: React.FC<DateInputProps> = ({
     popoverRef.current.style.visibility = 'visible'
   }, [isMobile])
 
-  // Recalcular posición y responsive breakpoints en resize / scroll mientras esté abierto
+  // Recalcular posición en resize / scroll mientras esté abierto
   useLayoutEffect(() => {
     if (!open) return
 
     const handleWindowChange = () => {
-      setIsMobile(window.innerWidth <= 1024)
       calcPosition()
     }
 

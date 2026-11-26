@@ -158,9 +158,9 @@ describe('FS1 / FS1B / FS1C: Verificación estática de SegmentedControl y sus t
     expect(sizePropCheck).toBe('sm')
   })
 
-  it('SegmentedControl.module.css contiene un bloque @media (max-width: 767px) con flex-wrap: wrap para el track inline', () => {
+  it('SegmentedControl.module.css contiene un bloque @media (max-width: 767.98px) con flex-wrap: wrap para el track inline', () => {
     const css = fs.readFileSync(path.join(UI_DIR, 'SegmentedControl.module.css'), 'utf-8')
-    const blocks = extractMediaBlocks(css, /@media\s*\(max-width:\s*767px\)\s*\{/)
+    const blocks = extractMediaBlocks(css, /@media\s*\(max-width:\s*767\.98px\)\s*\{/)
     expect(blocks.length).toBeGreaterThan(0)
     const mediaBlock = blocks[0]
     expect(mediaBlock).toContain('.track')

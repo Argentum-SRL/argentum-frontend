@@ -86,7 +86,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .cardsGridOverlap > * {
     /* r03-ok: solapamiento intencional del esqueleto de tarjetas apiladas */
     margin-bottom: -100px;
@@ -403,7 +403,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .summaryBarSkeleton {
     grid-template-columns: 1fr;
     height: auto;

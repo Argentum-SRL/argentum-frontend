@@ -8,7 +8,7 @@ import { useModal } from '@/hooks/useModal'
 import { useNotificaciones } from '@/hooks/useNotificaciones'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { calcularTotales, sortBilleteras } from '@/lib/utils/billeteras.utils'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import BilleteraCard, { NuevaBilleteraCard } from '@/components/billeteras/BilleteraCard'
 import type { CreatePayload } from '@/components/billeteras/BankPickerModal'
 import type { EditPayload } from '@/components/billeteras/EditBilleteraModal'
@@ -415,11 +415,13 @@ export default function BilleterasPage() {
                 {
                   label: "Total en Pesos",
                   value: formatCurrency(totalARS),
+                  valorCorto: formatMontoCorto(totalARS, 'ARS'),
                   highlight: true,
                 },
                 {
                   label: "Total en Dólares",
                   value: formatMonto(totalUSD, 'USD'),
+                  valorCorto: formatMontoCorto(totalUSD, 'USD'),
                 },
                 {
                   label: "Billeteras activas",

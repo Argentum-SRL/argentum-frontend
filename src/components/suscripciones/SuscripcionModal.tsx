@@ -7,7 +7,8 @@ import type { ServicioCatalogo } from '@/lib/constants/suscripciones'
 import Modal from '@/components/ui/Modal/Modal'
 import { sileo } from 'sileo'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { DateInput } from '@/components/ui'
+import { DateInput, MontoFit } from '@/components/ui'
+import { formatMontoCorto } from '@/utils/format'
 import MontoInput from '@/components/ui/MontoInput/MontoInput'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import SelectableSurface from '@/components/ui/SelectableSurface'
@@ -411,11 +412,17 @@ export default function SuscripcionModal({
 
     if (moneda === 'USD' && medioMoneda === 'ARS') {
       const totalArs = monto * cotizValor
-      return `≈ $ ${totalArs.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pesos (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
+      return {
+        completo: `≈ $ ${totalArs.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pesos (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`,
+        corto: formatMontoCorto(totalArs, 'ARS'),
+      }
     }
     if (moneda === 'ARS' && medioMoneda === 'USD') {
       const totalUsd = monto / cotizValor
-      return `≈ US$ ${totalUsd.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} dólares (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`
+      return {
+        completo: `≈ US$ ${totalUsd.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} dólares (cotiz. ${cotizValor.toLocaleString('es-AR', { minimumFractionDigits: 2 })})`,
+        corto: formatMontoCorto(totalUsd, 'USD'),
+      }
     }
     return null
   }, [monto, moneda, selectedMedio, cotizacion])
@@ -929,7 +936,12 @@ export default function SuscripcionModal({
                       {equivalenteEstimado && (
                         <div className={styles.equivalenteEstimado}>
                           <span className={styles.equivalenteLabel}>Equivalente estimado:</span>
-                          <span className={styles.equivalenteMonto}>{equivalenteEstimado}</span>
+                          <span className={styles.equivalenteMonto}>
+                            <MontoFit
+                              completo={equivalenteEstimado.completo}
+                              corto={equivalenteEstimado.corto}
+                            />
+                          </span>
                         </div>
                       )}
                     </div>

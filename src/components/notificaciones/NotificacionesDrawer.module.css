@@ -557,7 +557,7 @@
 }
 
 /* ── Responsive Mobile Optimization ──────────────────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .formHeader {
     padding: 12px var(--modal-pad-x) 10px; /* Separación lateral oficial */
   }

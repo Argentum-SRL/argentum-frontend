@@ -1,0 +1,467 @@
+import { describe, it, expect } from 'vitest'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const ROOT_DIR = path.resolve(__dirname, '../..')
+const SRC_DIR = path.join(ROOT_DIR, 'src')
+
+// Cortes legados congelados al cierre de FS2B: solo puede bajar.
+const TOPE_LEGADO = 202
+
+const LEGADO: Record<string, Record<string, number>> = {
+  'src/components/auth/AuthLayout/AuthLayout.module.css': {
+    'max 480': 1,
+    'min 1200': 1,
+  },
+  'src/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css': {
+    'max 540': 1,
+    'max 640': 1,
+  },
+  'src/components/billeteras/ActualizarSaldoModal.module.css': {
+    'max 640': 1,
+  },
+  'src/components/billeteras/BankPickerModal.parte2.css': {
+    'max 480': 1,
+    'max 639': 1,
+  },
+  'src/components/billeteras/CambiarFechaSaldoModal.module.css': {
+    'max 640': 1,
+  },
+  'src/components/ciclo/CicloFinancieroSelector.module.css': {
+    'max 639': 2,
+    'min 640': 1,
+  },
+  'src/components/dashboard/AvisosConfianza/AvisosConfianza.module.css': {
+    'max 640': 1,
+  },
+  'src/components/dashboard/ConsejoCard/ConsejoCard.module.css': {
+    'max 640': 1,
+  },
+  'src/components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal.module.css': {
+    'max 640': 1,
+  },
+  'src/components/goals/GoalContributionModal.module.css': {
+    'max 480': 2,
+  },
+  'src/components/goals/GoalModal.module.css': {
+    'max 480': 3,
+  },
+  'src/components/layout/AppLayout/AppLayout.module.css': {
+    'max 1279': 1,
+  },
+  'src/components/notificaciones/NotificacionesConfigModal.module.css': {
+    'max 639': 1,
+    'min 640': 1,
+  },
+  'src/components/presupuestos/PresupuestoModal.module.css': {
+    'max 480': 1,
+    'max 639': 1,
+  },
+  'src/components/suscripciones/SuscripcionModal.module.css': {
+    'max 480': 1,
+    'max 639': 1,
+  },
+  'src/components/tarjetas/PagarResumenModal.module.css': {
+    'max 640': 1,
+  },
+  'src/components/tarjetas/PresionFuturaCard.module.css': {
+    'max 480': 1,
+  },
+  'src/components/tarjetas/TarjetaModal.module.css': {
+    'max 380': 1,
+  },
+  'src/components/tarjetas/TarjetaSummary.module.css': {
+    'max 480': 2,
+  },
+  'src/components/tools/ConvenienciaForm.module.css': {
+    'max 479': 1,
+    'min 640': 1,
+  },
+  'src/components/tools/ToolsComponents.module.css': {
+    'max 479': 1,
+    'min 640': 1,
+  },
+  'src/components/tools/ToolsComponents.parte1.css': {
+    'max 479': 1,
+    'min 640': 10,
+    'min 880': 1,
+  },
+  'src/components/tools/ToolsComponents.parte2.css': {
+    'max 479': 1,
+    'min 480': 1,
+    'min 640': 2,
+  },
+  'src/components/tools/ToolsComponents.parte3.css': {
+    'max 640': 1,
+    'min 640': 2,
+  },
+  'src/components/tools/ToolsComponents.parte4.css': {
+    'max 480': 1,
+    'max 600': 1,
+    'max 920': 2,
+  },
+  'src/components/tools/ToolsComponents.parte5.css': {
+    'max 920': 1,
+  },
+  'src/components/tools/importacion/ImportacionResumenSection.module.css': {
+    'max 375': 1,
+  },
+  'src/components/transacciones/DayGroup.module.css': {
+    'max 640': 1,
+  },
+  'src/components/transacciones/FilterBar.parte1.css': {
+    'min 1100': 8,
+    'min 1360': 1,
+  },
+  'src/components/transacciones/GruposCuotasTab.parte1.css': {
+    'max 640': 6,
+  },
+  'src/components/transacciones/GruposCuotasTab.parte2.css': {
+    'max 480': 3,
+    'max 640': 1,
+  },
+  'src/components/transacciones/GruposCuotasTab.parte3.css': {
+    'max 420': 1,
+    'max 480': 1,
+  },
+  'src/components/transacciones/MemoriaComercioDialog.module.css': {
+    'max 480': 1,
+  },
+  'src/components/transacciones/TransaccionModal.parte1.css': {
+    'max 480': 1,
+  },
+  'src/components/transacciones/TransaccionModal.parte2.css': {
+    'max 480': 1,
+  },
+  'src/components/transacciones/TransaccionModal.parte3.css': {
+    'max 420': 1,
+    'max 480': 3,
+  },
+  'src/components/transacciones/TransaccionRow.module.css': {
+    'max 640': 1,
+  },
+  'src/components/transferencias/TransferenciaModal.module.css': {
+    'max 480': 2,
+    'max 639': 1,
+  },
+  'src/components/transferencias/TransferenciaRow.module.css': {
+    'max 640': 1,
+  },
+  'src/components/transferencias/TransferenciasFilterBar.module.css': {
+    'min 1100': 3,
+  },
+  'src/components/ui/AtmosphericBackground/ConstellationCanvas.module.css': {
+    'max 639': 1,
+  },
+  'src/components/ui/AtmosphericBackground/LunarLoading.module.css': {
+    'max 640': 2,
+  },
+  'src/components/ui/CategoriaSelector/CategoriaSelector.module.css': {
+    'max 480': 11,
+  },
+  'src/components/ui/CollapseToggle/CollapseToggle.module.css': {
+    'max 639': 1,
+  },
+  'src/components/ui/ConfirmModal/ConfirmModal.module.css': {
+    'max 340': 1,
+    'max 480': 1,
+  },
+  'src/components/ui/DebitoAutomaticoBadge/DebitoAutomaticoBadge.module.css': {
+    'max 640': 1,
+  },
+  'src/components/ui/EmptyState/EmptyState.module.css': {
+    'max 480': 1,
+  },
+  'src/components/ui/Skeleton/Skeleton.module.css': {
+    'max 639': 1,
+  },
+  'src/components/ui/Skeleton/SkeletonAdmin.module.css': {
+    'max 639': 1,
+  },
+  'src/components/whatsapp/VinculacionWhatsAppCard.module.css': {
+    'min 640': 1,
+  },
+  'src/pages/TermsPage.module.css': {
+    'max 640': 1,
+  },
+  'src/pages/admin/AnimacionPreviewPage.module.css': {
+    'max 640': 1,
+  },
+  'src/pages/admin/components/MonitorWppPanel.module.css': {
+    'max 639': 1,
+    'min 1280': 1,
+  },
+  'src/pages/admin/components/SchedulerPanel.module.css': {
+    'max 639': 1,
+  },
+  'src/pages/admin/diseno/components/DisenoSpecificationView.module.css': {
+    'max 900': 1,
+  },
+  'src/pages/admin/diseno/components/InteractiveDemos.module.css': {
+    'max 640': 1,
+  },
+  'src/pages/admin/registro/RegistroPanel.module.css': {
+    'max 639': 1,
+  },
+  'src/pages/admin/usuarios/UsuariosPanel.module.css': {
+    'max 639': 2,
+  },
+  'src/pages/app/analisis/DesgloseCategoriasCard.module.css': {
+    'min 640': 1,
+  },
+  'src/pages/app/analisis/MisInformesTab.module.css': {
+    'max 640': 1,
+  },
+  'src/pages/app/billeteras/BilleteraDetallePage.module.css': {
+    'max 360': 1,
+    'max 480': 1,
+    'max 600': 1,
+    'min 640': 9,
+  },
+  'src/pages/app/dashboard/DashboardPage.parte3.css': {
+    'max 500': 1,
+    'max 640': 1,
+  },
+  'src/pages/app/perfil/PerfilPage.parte1.css': {
+    'max 639': 6,
+    'min 640': 2,
+  },
+  'src/pages/app/perfil/PerfilPage.parte2.css': {
+    'max 639': 5,
+  },
+  'src/pages/app/perfil/PerfilPage.parte3.css': {
+    'max 479': 1,
+    'max 639': 5,
+  },
+  'src/pages/app/perfil/components/EliminarCuentaModal.module.css': {
+    'max 360': 1,
+    'max 479': 6,
+    'max 639': 2,
+    'min 640': 1,
+  },
+  'src/pages/app/perfil/components/TabFinanzas.module.css': {
+    'max 360': 1,
+    'max 639': 7,
+    'min 640': 2,
+  },
+  'src/pages/app/perfil/components/TabNotificaciones.module.css': {
+    'max 639': 4,
+  },
+  'src/pages/app/perfil/components/TabSeguridad.module.css': {
+    'max 639': 7,
+  },
+  'src/pages/app/presupuestos/PresupuestosPage.module.css': {
+    'max 640': 1,
+  },
+  'src/pages/app/presupuestos/SugerenciaRubroCard.module.css': {
+    'max 640': 1,
+  },
+  'src/pages/app/suscripciones/SuscripcionesPage.module.css': {
+    'max 360': 1,
+  },
+  'src/pages/app/tools/ToolsPage.module.css': {
+    'min 900': 1,
+  },
+  'src/pages/auth/recuperar-password/RecuperarPassword.module.css': {
+    'min 640': 1,
+  },
+  'src/pages/onboarding/OnboardingPage.module.css': {
+    'min 480': 1,
+  },
+  'src/styles/tokens.css': {
+    'max 480': 1,
+  },
+}
+
+const OFICIALES = new Set([
+  'max 767.98',
+  'min 768',
+  'max 1023.98',
+  'min 1024',
+])
+
+const TOKENS_EXTRA = new Set([
+  'min 1440',
+  'min 1920',
+  'min 2560',
+])
+
+function walkFiles(dir: string, exts: string[], acc: string[] = []): string[] {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '.git') continue
+    const full = path.join(dir, entry.name)
+    if (entry.isDirectory()) walkFiles(full, exts, acc)
+    else if (exts.some((ext) => entry.name.endsWith(ext))) acc.push(full)
+  }
+  return acc
+}
+
+function stripCssComments(css: string): string {
+  return css.replace(/\/\*[\s\S]*?\*\//g, ' ')
+}
+
+function extractMediaConditions(css: string): string[] {
+  const clean = stripCssComments(css)
+  const out: string[] = []
+  const re = /@media\s*([^{]+)\{/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(clean)) !== null) {
+    out.push(m[1])
+  }
+  return out
+}
+
+function extractMediaBlock(css: string, headerRe: RegExp): string {
+  const clean = stripCssComments(css)
+  const m = headerRe.exec(clean)
+  if (!m) return ''
+  let depth = 1
+  let i = m.index + m[0].length
+  while (i < clean.length && depth > 0) {
+    if (clean[i] === '{') depth++
+    else if (clean[i] === '}') depth--
+    i++
+  }
+  return clean.slice(m.index + m[0].length, i - 1)
+}
+
+describe('Trinquete de puntos de corte y defectos (FS2B)', () => {
+  const cssFiles = walkFiles(SRC_DIR, ['.css']).sort()
+
+  it('T-A1: ninguna @media de ancho usa sintaxis de rango', () => {
+    for (const abs of cssFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      const conds = extractMediaConditions(fs.readFileSync(abs, 'utf-8'))
+      for (const c of conds) {
+        expect(c, `${rel} tiene sintaxis de rango: ${c}`).not.toMatch(/\bwidth\s*[<>]/)
+      }
+    }
+  })
+
+  it('T-A2: ningún max-width 767, 768, 1023 ni 1024 en @media', () => {
+    for (const abs of cssFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      const conds = extractMediaConditions(fs.readFileSync(abs, 'utf-8'))
+      for (const c of conds) {
+        expect(c, `${rel} tiene corte viejo en @media: ${c}`).not.toMatch(
+          /max-width\s*:\s*(?:767|768|1023|1024)px\b/
+        )
+      }
+    }
+  })
+
+  it('T-A3: ningún archivo tiene a la vez max-width y min-width para 768 o 1024', () => {
+    for (const abs of cssFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      const conds = extractMediaConditions(fs.readFileSync(abs, 'utf-8'))
+      const maxVals = new Set<string>()
+      const minVals = new Set<string>()
+      for (const c of conds) {
+        for (const m of c.matchAll(/(min|max)-width\s*:\s*([\d.]+)px/gi)) {
+          if (m[1].toLowerCase() === 'max') maxVals.add(m[2])
+          else minVals.add(m[2])
+        }
+      }
+      for (const n of ['768', '1024']) {
+        expect(maxVals.has(n) && minVals.has(n), `${rel} solapa N=${n}`).toBe(false)
+      }
+    }
+  })
+
+  it('T-A4: todo corte fuera de los oficiales coincide exactamente con LEGADO', () => {
+    const actual: Record<string, Record<string, number>> = {}
+    for (const abs of cssFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      const conds = extractMediaConditions(fs.readFileSync(abs, 'utf-8'))
+      const counts: Record<string, number> = {}
+      for (const c of conds) {
+        for (const m of c.matchAll(/\(\s*(min|max)-width\s*:\s*([\d.]+)px\s*\)/gi)) {
+          const key = `${m[1].toLowerCase()} ${m[2]}`
+          if (OFICIALES.has(key)) continue
+          if (rel === 'src/styles/tokens.css' && TOKENS_EXTRA.has(key)) continue
+          counts[key] = (counts[key] || 0) + 1
+        }
+      }
+      if (Object.keys(counts).length > 0) {
+        const sorted: Record<string, number> = {}
+        for (const k of Object.keys(counts).sort()) sorted[k] = counts[k]
+        actual[rel] = sorted
+      }
+    }
+    expect(actual).toEqual(LEGADO)
+  })
+
+  it('T-A5: el total de cortes legados es <= TOPE_LEGADO', () => {
+    let total = 0
+    for (const counts of Object.values(LEGADO)) {
+      for (const v of Object.values(counts)) total += v
+    }
+    expect(total).toBeLessThanOrEqual(TOPE_LEGADO)
+  })
+
+  it('T-A6: en TS/TSX fuera de useViewport.ts no hay innerWidth comparativo ni matchMedia de ancho', () => {
+    const tsFiles = walkFiles(SRC_DIR, ['.ts', '.tsx'])
+      .filter((f) => !f.endsWith('.test.ts') && !f.endsWith('.test.tsx'))
+      .sort()
+    const innerWidthRe = /innerWidth\s*(<=|>=|<|>)/
+    const matchMediaWidthRe = /matchMedia\(\s*['"`]\s*\(\s*(min|max)-width/g
+
+    for (const abs of tsFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      if (rel === 'src/hooks/useViewport.ts') continue
+      const content = fs.readFileSync(abs, 'utf-8')
+      expect(content, `${rel} usa innerWidth para decidir`).not.toMatch(innerWidthRe)
+      const mmMatches = [...content.matchAll(matchMediaWidthRe)]
+      if (rel === 'src/pages/admin/usuarios/UsuariosLista.tsx') {
+        expect(mmMatches).toHaveLength(1)
+        expect(content).toContain("'(max-width: 479px)'")
+      } else {
+        expect(mmMatches, `${rel} usa matchMedia de ancho fuera de useViewport`).toHaveLength(0)
+      }
+    }
+  })
+
+  it('P1: PerfilFinancieroCard.module.css alinea las columnas en tablet y celular sin 640 ni 1023', () => {
+    const css = fs.readFileSync(
+      path.join(SRC_DIR, 'components/perfil/PerfilFinancieroCard.module.css'),
+      'utf-8'
+    )
+    expect(css).not.toMatch(/max-width\s*:\s*640px/)
+    expect(css).not.toMatch(/max-width\s*:\s*1023px/)
+
+    const tabletBlock = extractMediaBlock(
+      css,
+      /@media\s*\(\s*min-width\s*:\s*768px\s*\)\s*and\s*\(\s*max-width\s*:\s*1023\.98px\s*\)\s*\{/
+    )
+    expect(tabletBlock).toMatch(/\.pfKpiCell:nth-child\(3n\+1\)\s*\{[^}]*padding-left\s*:\s*0/)
+
+    const mobileBlock = extractMediaBlock(css, /@media\s*\(\s*max-width\s*:\s*767\.98px\s*\)\s*\{/)
+    expect(mobileBlock).toMatch(/\.pfKpiCell:nth-child\(2n\+1\)\s*\{[^}]*padding-left\s*:\s*0/)
+  })
+
+  it('P2: UsuariosPanel.module.css tiene overflow-x: auto en .desktopTableWrap', () => {
+    const css = fs.readFileSync(
+      path.join(SRC_DIR, 'pages/admin/usuarios/UsuariosPanel.module.css'),
+      'utf-8'
+    )
+    const wrapBlock = css.match(/\.desktopTableWrap\s*\{([^}]*)\}/)?.[1] ?? ''
+    expect(wrapBlock).toMatch(/overflow-x\s*:\s*auto/)
+  })
+
+  it('P3: FiltrosAnalisis, FotoCropModal, DateInput y TimeInput usan min() en sus anchos de E', () => {
+    const filtrosCss = fs.readFileSync(path.join(SRC_DIR, 'pages/app/analisis/FiltrosAnalisis.module.css'), 'utf-8')
+    const fotoCss = fs.readFileSync(path.join(SRC_DIR, 'components/perfil/FotoCropModal.module.css'), 'utf-8')
+    const dateCss = fs.readFileSync(path.join(SRC_DIR, 'components/ui/DateInput/DateInput.module.css'), 'utf-8')
+    const timeCss = fs.readFileSync(path.join(SRC_DIR, 'components/ui/TimeInput/TimeInput.module.css'), 'utf-8')
+
+    expect(filtrosCss.match(/\.sideMenuCard\s*\{[^}]*\}/)?.[0] ?? '').not.toMatch(/\bwidth\s*:\s*\d{3}px/)
+    for (const sel of ['.cropArea', '.cropCanvas', '.zoomRow']) {
+      const blk = fotoCss.match(new RegExp(`\\${sel}[^{]*\\{[^}]*\\}`))?.[0] ?? ''
+      expect(blk, `FotoCropModal ${sel}`).not.toMatch(/\bwidth\s*:\s*\d{3}px/)
+    }
+    const datePopover = dateCss.match(/\.popover\s*\{[^}]*\}/)?.[0] ?? ''
+    expect(datePopover).not.toMatch(/(?:min-)?width\s*:\s*\d{3}px/)
+    const timePopover = timeCss.match(/\.popover\s*\{[^}]*\}/)?.[0] ?? ''
+    expect(timePopover).not.toMatch(/\bwidth\s*:\s*\d{3}px/)
+  })
+})

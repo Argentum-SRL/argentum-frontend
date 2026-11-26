@@ -29,6 +29,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.titleGroup > div {
+  min-width: 0;
+  flex: 1;
 }
 
 .iconWrap {
@@ -79,13 +86,11 @@
   font-size: 0.8125rem;
   color: var(--text-2);
   margin: 2px 0 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .subtitleDesktop {
-  display: inline;
+  display: block;
 }
 
 .subtitleMobile {
@@ -583,7 +588,7 @@
   background: var(--surface-alt);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .card {
     border-radius: 16px;
     padding: 12px 12px;
@@ -610,9 +615,7 @@
 
   .subtitle {
     font-size: 0.75rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0;
   }
 
   .subtitleDesktop {
@@ -620,7 +623,7 @@
   }
 
   .subtitleMobile {
-    display: inline;
+    display: block;
   }
 
   .subcatsHeading {

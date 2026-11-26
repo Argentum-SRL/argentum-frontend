@@ -66,7 +66,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .selectInput {
     font-size: var(--control-font-mobile);
   }
@@ -217,7 +217,7 @@
   color: var(--text-3);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .selectorsRow,
   .comparisonGrid {
     grid-template-columns: 1fr;

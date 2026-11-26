@@ -459,16 +459,16 @@ describe('systemTheme — sincronización de barras del sistema en móviles y PW
     expect(perfilCss).not.toContain('env(safe-area-inset-top')
 
     const dashCss = read('src/pages/app/dashboard/DashboardPage.parte1.css')
-    expect(dashCss).toMatch(/@media\s*\(max-width:\s*767px\)\s*\{[^}]*\.header\s*\{[^}]*padding-top:\s*0;/s)
+    expect(dashCss).toMatch(/@media\s*\(max-width:\s*767\.98px\)\s*\{[^}]*\.header\s*\{[^}]*padding-top:\s*0;/s)
 
     const repiteCss = read('src/pages/app/lo-que-se-repite/LoQueSeRepitePage.module.css')
     expect(repiteCss).toMatch(/\.root\s*\{[^}]*padding:\s*0\s+0\s+40px;/s)
 
     const analisisCss = read('src/pages/app/analisis/AnalisisPage.module.css')
-    expect(analisisCss).toMatch(/@media\s*\(max-width:\s*767px\)\s*\{\s*\.page\s*\{\s*padding-top:\s*0;\s*\}/s)
+    expect(analisisCss).toMatch(/@media\s*\(max-width:\s*767\.98px\)\s*\{\s*\.page\s*\{\s*padding-top:\s*0;\s*\}/s)
 
     const disenoCss = read('src/pages/admin/diseno/DisenoPage.module.css')
-    expect(disenoCss).toMatch(/@media\s*\(max-width:\s*767px\)\s*\{\s*\.pageContainer\s*\{\s*padding:\s*0\s+0\s+40px;\s*\}/s)
+    expect(disenoCss).toMatch(/@media\s*\(max-width:\s*767\.98px\)\s*\{\s*\.pageContainer\s*\{\s*padding:\s*0\s+0\s+40px;\s*\}/s)
 
     // 4. TermsPage sin backdrop-filter en .header opaco sticky top: 0 y con clearance móvil
     const termsCss = read('src/pages/TermsPage.module.css')

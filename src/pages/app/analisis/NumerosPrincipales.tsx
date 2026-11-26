@@ -2,7 +2,7 @@ import { PageSummaryBar } from '@/components/ui'
 import { TrendingUp } from '@/components/ui/icons'
 import type { SummaryBarItem } from '@/components/ui/PageSummaryBar/PageSummaryBar'
 import type { AnalisisResumenResponse } from '@/services/analisis.service'
-import { formatMonto, formatPorcentaje } from '@/utils/format'
+import { formatMonto, formatMontoCorto, formatPorcentaje } from '@/utils/format'
 import styles from './AnalisisPage.module.css'
 import { armarKpisVista } from './kpisVista'
 
@@ -39,6 +39,18 @@ function formatMontoKpi(
     return `${signo}${texto}`
   }
   return texto
+}
+
+function formatMontoCortoKpi(
+  monto: number | null | undefined,
+  moneda: 'ARS' | 'USD',
+  signo?: '+' | '-'
+): string | undefined {
+  if (monto === null || monto === undefined) {
+    return undefined
+  }
+  const texto = formatMontoCorto(Math.abs(monto), moneda)
+  return signo ? `${signo}${texto}` : texto
 }
 
 function renderSubValue(texto: string) {
@@ -97,25 +109,31 @@ export default function NumerosPrincipales({
         ? 'El % aparece cuando termine el ciclo'
         : undefined
 
+  const esBalanceNegativo = (kpis.balance_neto ?? 0) < 0
+  const balanceSigno: '+' | '-' = esBalanceNegativo ? '-' : '+'
   const balanceMonto = formatMontoKpi(
     kpis.balance_neto,
     monedaVisual,
     tieneCentavos,
-    (kpis.balance_neto ?? 0) < 0 ? '-' : '+'
+    balanceSigno
   )
+  const balanceMontoCorto = formatMontoCortoKpi(kpis.balance_neto, monedaVisual, balanceSigno)
   const ingresosMonto = formatMontoKpi(kpis.ingresos_totales, monedaVisual, tieneCentavos, '+')
+  const ingresosMontoCorto = formatMontoCortoKpi(kpis.ingresos_totales, monedaVisual, '+')
   const egresosMonto = formatMontoKpi(kpis.gastos_totales, monedaVisual, tieneCentavos, '-')
-  const esBalanceNegativo = (kpis.balance_neto ?? 0) < 0
+  const egresosMontoCorto = formatMontoCortoKpi(kpis.gastos_totales, monedaVisual, '-')
 
   const promedioMonto =
     kpis.promedio_gasto_ciclo !== null && kpis.promedio_gasto_ciclo !== undefined
       ? formatMonto(kpis.promedio_gasto_ciclo, monedaVisual)
       : null
+  const promedioMontoCorto = formatMontoCortoKpi(kpis.promedio_gasto_ciclo, monedaVisual)
 
   const itemsSoloGastos: SummaryBarItem[] = [
     {
       label: 'Egresos',
       value: egresosMonto,
+      valorCorto: egresosMontoCorto,
       highlight: true,
       tone: 'negative',
       notice: textoPeso
@@ -131,6 +149,7 @@ export default function NumerosPrincipales({
           {
             label: 'Promedio por ciclo',
             value: promedioMonto,
+            valorCorto: promedioMontoCorto,
           } satisfies SummaryBarItem,
         ]
       : []),
@@ -140,6 +159,7 @@ export default function NumerosPrincipales({
     {
       label: 'Te quedó',
       value: balanceMonto,
+      valorCorto: balanceMontoCorto,
       highlight: true,
       tone: esBalanceNegativo ? 'negative' : 'default',
       notice: subValue
@@ -153,11 +173,13 @@ export default function NumerosPrincipales({
     {
       label: 'Ingresos',
       value: ingresosMonto,
+      valorCorto: ingresosMontoCorto,
       tone: 'positive',
     },
     {
       label: 'Egresos',
       value: egresosMonto,
+      valorCorto: egresosMontoCorto,
       tone: 'negative',
     },
   ]
@@ -166,22 +188,26 @@ export default function NumerosPrincipales({
     {
       label: 'Te quedó',
       value: balanceMonto,
+      valorCorto: balanceMontoCorto,
       tone: esBalanceNegativo ? 'negative' : 'positive',
     },
     {
       label: 'Ingresos',
       value: ingresosMonto,
+      valorCorto: ingresosMontoCorto,
       tone: 'positive',
     },
     {
       label: 'Egresos',
       value: egresosMonto,
+      valorCorto: egresosMontoCorto,
       tone: 'negative',
     },
   ]
 
   return (
     <div className={styles.summarySection}>
+      {/* PageSummaryBar usa MontoFit para estos montos */}
       <PageSummaryBar
         mobileVariant="strip"
         items={soloGastos ? itemsSoloGastos : itemsResumenDesktop}

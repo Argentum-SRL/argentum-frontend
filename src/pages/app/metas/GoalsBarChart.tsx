@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, type CSSProperties } from 'react'
 import { 
   Trophy, 
   TrendingUp,
@@ -11,10 +11,13 @@ import {
   ChevronRight,
   Eye
 } from '@/components/ui/icons'
+import { MontoFit } from '@/components/ui'
 import Modal from '@/components/ui/Modal/Modal'
 import type { Goal } from '@/types/goals'
 import { EstadoMeta } from '@/types/goals'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
+import { useViewport } from '@/hooks/useViewport'
+import { useColumnasConAsomo } from '@/hooks/useColumnasConAsomo'
 import styles from './GoalsBarChart.module.css'
 
 interface GoalsBarChartProps {
@@ -40,22 +43,6 @@ const PASTEL_PALETTE = [
 ]
 
 /**
- * Compact number formatting matching reference (e.g. 766k, 1.2M, $450)
- */
-function formatCompact(monto: number, moneda: 'ARS' | 'USD'): string {
-  const prefix = moneda === 'USD' ? 'US$' : '$'
-  if (monto >= 1_000_000) {
-    const val = monto / 1_000_000
-    return `${prefix}${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)}M`
-  }
-  if (monto >= 1_000) {
-    const val = monto / 1_000
-    return `${prefix}${Math.round(val)}k`
-  }
-  return `${prefix}${Math.round(monto)}`
-}
-
-/**
  * GoalsBarChart - Comparative TikTok-style vertical bar chart for savings goals.
  * Tapping on any column opens a bottom sheet modal with full actions.
  */
@@ -69,6 +56,14 @@ export default function GoalsBarChart({
 }: GoalsBarChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [activeGoal, setActiveGoal] = useState<Goal | null>(null)
+  const { esCelular } = useViewport()
+  const { ancho: columnaAncho } = useColumnasConAsomo(
+    containerRef,
+    goals.length,
+    esCelular
+      ? { base: 86, minimo: 86, gap: 16, padIzq: 28, padDer: 28 }
+      : { base: 110, minimo: 86, gap: 24, padIzq: 36, padDer: 36 }
+  )
 
   if (goals.length === 0) {
     return null
@@ -91,7 +86,11 @@ export default function GoalsBarChart({
         </span>
       </div>
 
-      <div className={styles.scrollContainer} ref={containerRef}>
+      <div
+        className={styles.scrollContainer}
+        ref={containerRef}
+        style={{ '--columna-ancho': `${columnaAncho}px` } as CSSProperties}
+      >
         {goals.map((g, idx) => {
           const objetivo = Number(g.monto_objetivo || 1)
           const actual = Number(g.monto_actual || 0)
@@ -174,7 +173,10 @@ export default function GoalsBarChart({
                     </div>
                   )}
                   <span className={styles.spentAmount}>
-                    {formatCompact(actual, g.moneda as 'ARS' | 'USD')}
+                    <MontoFit
+                      completo={formatMonto(actual, g.moneda as 'ARS' | 'USD')}
+                      corto={formatMontoCorto(actual, g.moneda as 'ARS' | 'USD')}
+                    />
                   </span>
                   <span className={styles.percentText}>
                     {porcentaje.toFixed(0)}%{isCappedOverflow ? ' ▲' : ''}

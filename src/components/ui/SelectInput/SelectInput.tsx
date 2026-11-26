@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, Check, AlertCircle } from '@/components/ui/icons'
 import Modal from '@/components/ui/Modal/Modal'
+import { useViewport } from '@/hooks/useViewport'
 import styles from './SelectInput.module.css'
 
 export interface SelectOption {
@@ -36,16 +37,9 @@ export const SelectInput: React.FC<SelectInputProps> = ({
   size = 'default',
 }) => {
   const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const { esCelular: isMobile } = useViewport()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const panelElRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 767)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
 
   const updatePosition = useCallback(() => {
     if (isMobile || !wrapperRef.current || !panelElRef.current) return

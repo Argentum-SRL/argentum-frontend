@@ -3,6 +3,7 @@ import { sileo } from 'sileo'
 import { Users } from '@/components/ui/icons'
 import { EmptyState } from '@/components/ui'
 import adminService from '@/services/adminService'
+import { useViewport } from '@/hooks/useViewport'
 import { getErrorMessage } from '@/utils/errorMessages'
 import type {
   FiltrosAdmin,
@@ -69,17 +70,7 @@ export const UsuariosPanel: React.FC<UsuariosPanelProps> = ({
 
   const scrollGuardadoRef = useRef(0)
   const eraDetalleMovilRef = useRef(false)
-  const [esDesktop, setEsDesktop] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth >= 1024
-  )
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)')
-    const sync = () => setEsDesktop(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
+  const { esEscritorio: esDesktop } = useViewport()
 
   useEffect(() => {
     const t = window.setTimeout(() => {

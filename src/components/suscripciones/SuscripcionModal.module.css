@@ -691,8 +691,8 @@
   color: var(--text);
   white-space: nowrap;
   text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .previewCosto {
@@ -851,12 +851,12 @@
     letter-spacing: -0.2px;
     white-space: nowrap;
     text-align: right;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .searchInput,
   .inlineNameInput {
     font-size: var(--control-font-mobile);

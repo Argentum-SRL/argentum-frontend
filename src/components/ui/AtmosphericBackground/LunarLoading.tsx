@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useTheme } from '@/hooks/useTheme'
+import { useViewport } from '@/hooks/useViewport'
 import { registerSystemBarSurface } from '@/utils/systemTheme'
 import { LunarPhase } from './LunarPhase'
 import { ArgentumCrescent } from './ArgentumCrescent'
@@ -69,27 +70,20 @@ export function LunarLoading({
   // Inicia en la fase creciente de Argentum (p = 0.15)
   const [progress, setProgress] = useState(0.15)
 
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.innerWidth <= 640
-  })
+  const { esCelular: isMobile } = useViewport()
 
   const animRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
 
-  // Escucha cambios de accesibilidad y tamaño de pantalla
+  // Escucha cambios de accesibilidad
   useEffect(() => {
     if (typeof window === 'undefined') return
     const mqMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
     mqMotion.addEventListener('change', handler)
 
-    const handleResize = () => setIsMobile(window.innerWidth <= 640)
-    window.addEventListener('resize', handleResize)
-
     return () => {
       mqMotion.removeEventListener('change', handler)
-      window.removeEventListener('resize', handleResize)
     }
   }, [])
 

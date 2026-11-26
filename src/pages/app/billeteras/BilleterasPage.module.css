@@ -111,7 +111,7 @@
   position: relative; /* Clave para el boton flotante de agregar */
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .grid > *:not(button) {
     /* r03-ok: solapamiento intencional para pila de tarjetas tipo billetera real */
     margin-bottom: -100px;

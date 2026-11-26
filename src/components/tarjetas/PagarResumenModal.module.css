@@ -408,7 +408,7 @@
   box-shadow: var(--elevation-none);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .inlineInput {
     font-size: var(--control-font-mobile);
   }

@@ -206,7 +206,7 @@
   background: var(--tnp-active-bg);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .controlsRow {
     justify-content: flex-start;
     overflow-x: auto;

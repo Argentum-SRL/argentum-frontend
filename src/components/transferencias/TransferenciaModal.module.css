@@ -335,7 +335,7 @@
 }
 
 /* ── Mobile Responsive Bottom Sheet Refinements (<768px) ─────────────────── */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   
 
   .formHeader {

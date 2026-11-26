@@ -11,7 +11,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .page {
     padding-top: 0;
   }
@@ -90,7 +90,7 @@
   gap: 8px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .headerActions {
     display: none;
   }
@@ -127,7 +127,7 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .btnGhost {
     width: 44px;
     height: 44px;

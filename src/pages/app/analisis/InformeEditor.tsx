@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   ArrowLeft, Check, LayoutDashboard, TrendingUp, ChartPie, Transfer, CreditCard, type LucideIcon,
 } from '@/components/ui/icons'
 import { Button, SelectInput } from '@/components/ui'
+import { useViewport } from '@/hooks/useViewport'
 import SegmentedControl, { type SegmentedControlOption } from '@/components/ui/SegmentedControl'
 import analisisService, {
   type BloqueInformeConfig, type ConfiguracionInforme, type InformePersonalizadoItem,
@@ -80,15 +81,7 @@ export default function InformeEditor({
     cfg?.bloques?.map((b) => b.tipo) ?? ['kpis', 'evolucion_ciclos', 'desglose_categorias', 'comparativa_ciclos']
   )
   const [saving, setSaving] = useState<boolean>(false)
-  const [isMobile, setIsMobile] = useState<boolean>(
-    () => typeof window !== 'undefined' && window.innerWidth <= 767
-  )
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 767)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const { esCelular: isMobile } = useViewport()
 
   const handleToggleBloque = (tipo: TipoBloqueInforme) => {
     setFormBloques((prev) => {

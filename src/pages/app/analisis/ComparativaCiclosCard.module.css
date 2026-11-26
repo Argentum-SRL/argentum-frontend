@@ -455,7 +455,7 @@
   background: var(--surface-alt);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .card {
     border-radius: 16px;
     padding: 12px 12px;
@@ -576,9 +576,8 @@
   .summaryVal,
   .summaryValMuted {
     font-size: 13.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    width: 100%;
+    min-width: 0;
   }
 
   .deltaGood,

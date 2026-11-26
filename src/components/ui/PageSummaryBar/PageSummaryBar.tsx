@@ -1,4 +1,5 @@
 import React from 'react';
+import MontoFit from '../MontoFit/MontoFit';
 import styles from './PageSummaryBar.module.css';
 
 export type SummaryBarTone = 'default' | 'positive' | 'warning' | 'negative';
@@ -12,6 +13,7 @@ export interface SummaryBarNotice {
 export interface SummaryBarItem {
   label: string;
   value: string;
+  valorCorto?: string;
   subValue?: string;
   highlight?: boolean;
   tone?: SummaryBarTone;
@@ -50,6 +52,8 @@ export default function PageSummaryBar({
   const hideOnMobile = mobileVariant === 'none' || mobileVariant === 'strip';
   const stripItems = mobileItems ?? items;
   const stripNotice = mobileNotice ?? items.find((i) => i.notice)?.notice;
+  const renderValue = (item: SummaryBarItem) =>
+    item.valorCorto ? <MontoFit completo={item.value} corto={item.valorCorto} /> : item.value;
 
   return (
     <>
@@ -64,7 +68,7 @@ export default function PageSummaryBar({
                   <div className={styles.stripItem}>
                     <span className={styles.stripLabel}>{item.label}</span>
                     <span className={`${styles.stripValue} ${toneClass}`.trim()}>
-                      {item.value}
+                      {renderValue(item)}
                     </span>
                   </div>
                 </React.Fragment>
@@ -109,7 +113,7 @@ export default function PageSummaryBar({
                         item.highlight ? styles.valueHighlight : ''
                       } ${colorClass}`.trim()}
                     >
-                      {item.value}
+                      {renderValue(item)}
                     </span>
                     {item.subValue && <span className={styles.subValue}>{item.subValue}</span>}
                   </div>
@@ -132,7 +136,7 @@ export default function PageSummaryBar({
                       item.highlight ? styles.valueHighlight : ''
                     } ${colorClass}`.trim()}
                   >
-                    {item.value}
+                    {renderValue(item)}
                   </span>
                   {item.subValue && <span className={styles.subValue}>{item.subValue}</span>}
                 </>

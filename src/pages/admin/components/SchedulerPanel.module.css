@@ -296,7 +296,7 @@
   text-align: right;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .motivoBtn {
     min-height: 44px;
     padding: 0 4px;

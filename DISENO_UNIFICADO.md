@@ -117,7 +117,7 @@ ui/SegmentedControl ES la cápsula de la "Opción 1" de la página admin Diseño
 - `--selector-pill-text-active`: `#FFFFFF`.
 
 **Reglas de Columnas, Una Línea y Tres Tamaños (FS1):**
-1. **Columnas del mismo ancho y una línea en desktop:** En desktop (`>= 768px`), un grupo inline va en columnas iguales en una sola línea (`grid-auto-flow: column; grid-auto-columns: 1fr`, `white-space: nowrap`, sin `flex: 1 1 0`); en celular (`<= 767px`), un grupo inline que no entra pasa a la fila siguiente (`display: flex; flex-wrap: wrap`, `flex: 1 1 auto`, `min-width: min(max-content, 100%)`), partiendo la etiqueta solo si un botón solo no entra en el contenedor.
+1. **Columnas del mismo ancho y una línea en desktop:** En desktop (`>= 768px`), un grupo inline va en columnas iguales en una sola línea (`grid-auto-flow: column; grid-auto-columns: 1fr`, `white-space: nowrap`, sin `flex: 1 1 0`); en celular (`< 768px`), un grupo inline que no entra pasa a la fila siguiente (`display: flex; flex-wrap: wrap`, `flex: 1 1 auto`, `min-width: min(max-content, 100%)`), partiendo la etiqueta solo si un botón solo no entra en el contenedor.
 2. **Desborde de grupo en desktop:** Si la cápsula inline no entra en el ancho disponible en desktop, no parte las etiquetas: el contenedor padre con `flex-wrap: wrap` pasa el grupo entero a la fila inferior.
 3. **Comportamiento de `fullWidth`, `wrap` y `stacked`:** Con `fullWidth`, el grupo ocupa el 100% y reparte columnas con `grid-auto-columns: minmax(0, 1fr)`, permitiendo partir texto (`white-space: normal`) si una etiqueta no entra en su columna, nunca con puntos suspensivos (`ellipsis`) ni `overflow: hidden`. `fullWidth` y `wrap` solo fijan relleno horizontal (`padding-inline`) para que el relleno vertical dependa siempre del tamaño. `layout="stacked"` conserva `44px` de alto.
 4. **Zona de toque separada del tamaño visual (FS1C):** La altura visual no cambia con `pointer: coarse`; cada `.pill` usa `position: relative` y extiende su zona de toque a `44px` por fuera mediante `.pill::before` (`--selector-touch: 44px`). El contenedor decide el tamaño (`sm` barra de tarjeta/filtro, `md` navegación de página, `lg` modal/drawer/formulario).
@@ -234,7 +234,7 @@ El sistema de espaciado para formularios, modales y hojas inferiores de Argentum
 | `--modal-header-gap` | `20px` | Separación vertical entre el encabezado del modal y el primer bloque de contenido. |
 | `--modal-footer-gap` | `24px` | Separación vertical entre el último bloque de contenido y la botonera del pie (footer). |
 | `--modal-footer-btn-gap` | `12px` | Separación (gap) horizontal o vertical entre los botones de acción del footer. |
-| `--modal-footer-pad-bottom` | `max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))` (`<= 767px`); `20px` (`--space-xl`, `>= 768px`) | Margen inferior del pie de modales y hojas hacia el borde. En móvil suma 16px al área segura (mínimo 24px) para despejar vidrios templados, fundas y el borde inferior donde el toque es menos preciso. |
+| `--modal-footer-pad-bottom` | `max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))` (`< 768px` / `max-width: 767.98px`); `20px` (`--space-xl`, `>= 768px`) | Margen inferior del pie de modales y hojas hacia el borde. En móvil suma 16px al área segura (mínimo 24px) para despejar vidrios templados, fundas y el borde inferior donde el toque es menos preciso. |
 | `--modal-pad-x` | `20px` | Relleno lateral uniforme en el cuerpo y pie del modal. |
 
 Regla de Gestalt: ninguna distancia entre campos (`12px`) puede ser mayor o igual que la distancia entre bloques (`20px` / `16px`). Los grupos de opciones (`8px`) y las etiquetas/ayudas (`8px`) se mantienen cohesionados con su control.
@@ -455,30 +455,32 @@ El objetivo del candado es asegurar que los cambios de todos los colaboradores r
 
 ## 12. Sistema Responsive
 
-### Escala de Puntos de Corte Permitida y Rangos de Dispositivos
-La arquitectura responsive de Argentum se rige por la escala canónica custodiada por R15 (`{360, 479, 480, 639, 640, 719, 720, 767, 768, 1023, 1024, 1279, 1280, 1439, 1440, 1919, 1920, 2559, 2560}`):
+### Puntos de Corte Oficiales (FS2B)
+La arquitectura responsive de Argentum usa tres rangos oficiales, idénticos en CSS y JS, escritos con sintaxis clásica `min-width` / `max-width` (compatible con navegadores viejos; **PROHIBIDA** la sintaxis de rango tipo `width < 768px` o `768px <= width`) y sin solapamientos en 768px ni 1024px (nada de `max-width: 768px` junto a `min-width: 768px` ni `max-width: 1024px` junto a `min-width: 1024px`):
 
-| Rango de Ancho | Clasificación de Dispositivo | Escala / Variables |
-| :--- | :--- | :--- |
-| `320px - 359px` | Teléfonos chicos (iPhone SE) | Vista compacta, sin truncamiento en selectores |
-| `360px - 479px` | Teléfonos estándar | Vista móvil base |
-| `480px - 767px` | Teléfonos grandes y tablet vertical | Bottom sheets activos |
-| `768px - 1023px` | Tablet | Modales flotantes centrados |
-| `1024px - 1439px` | Notebook | Layout de escritorio estándar |
-| `1440px - 1919px` | Monitor | Layout amplio (`--screen-scale: 1`) |
-| `1920px - 2559px` | Monitor grande | Factor de escala `--screen-scale: 1.1` (+10%) |
-| `2560px` o más | Monitor muy grande / 4K | Factor de escala `--screen-scale: 1.2` (+20%) |
+| Rango de Ancho | Clasificación | Consulta CSS / JS | Notas |
+| :--- | :--- | :--- | :--- |
+| `< 768px` (hasta `767,98px`) | Celular | CSS `@media (max-width: 767.98px)`; JS `matchMedia('(max-width: 767.98px)')` | Anchos de referencia: `360`, `375`, `393`, `412` y `440` px; bottom sheets activos |
+| `768px - 1023,98px` | Tablet | `@media (min-width: 768px) and (max-width: 1023.98px)` | Modales flotantes centrados |
+| `>= 1024px` | Escritorio | `@media (min-width: 1024px)` | Layout de escritorio completo |
 
-### Reglas Normativas Responsive
+- **Escala de pantallas grandes:** `min-width: 1440px`, `1920px` y `2560px` se permiten **solo** en `src/styles/tokens.css` para el factor `--screen-scale` (`1`, `1.1`, `1.2`).
+- **Legado congelado:** Todo otro punto de corte existente (ej. `639`, `640`, `480`, `479`, `420`, `360`, `600`, `920`, `1100`, etc.) queda congelado en `src/styles/puntosDeCorte.test.ts` (solo puede bajar; las fases por área lo reemplazan por diseño fluido o corte justificado por contenido).
+- **Lectura de ancho en JS:** El ancho en JS se lee solo con `useViewport` (`src/hooks/useViewport.ts`); prohibido `window.innerWidth` para decidir celular/tablet/escritorio y `matchMedia` de ancho fuera del hook.
+- **Montos que no entran:** `MontoFit` (`src/components/ui/MontoFit`) muestra completo o corto (`formatMontoCorto`), nunca `'…'` ni achicando la letra. `PageSummaryBar`: todo ítem con monto lleva `valorCorto`.
+- **Gráficos de barras (Presupuestos y Metas):** columna mínima 86px; asoma media barra si no entran todas; nombre hasta 2 renglones.
+
+### Reglas Normativas Responsive y Defaults
 1. **Contención de la Cápsula (`SegmentedControl`):** La cápsula nunca corta texto con ellipsis (`text-overflow`) ni oculta contenido (`overflow: hidden`). Si el contenedor no tiene espacio suficiente, el track pasa fluidamente a la siguiente fila (`flex-wrap: wrap`).
 2. **Propiedad `fullWidth`:** El modificador `fullWidth` solo se permite dentro de modales o en selectores que se ocultan en escritorio (`MOBILE-ONLY`). Los grupos de nivel página en escritorio no deben llevar `fullWidth`.
 3. **Anchos Centralizados de Modales y Bottom Sheets:** Todos los modales y bottom sheets derivan sus medidas exclusivamente de las clases base del componente `Modal` (`.sm`, `.md`, `.lg`, `.xl`) y variables asociadas (`--modal-w-sm`, `--modal-w-md`, `--modal-w-md-wide`, `--modal-w-lg`, `--modal-w-xl`). Si un modal requiere un ancho específico, declara localmente `--modal-w: var(--modal-w-md-wide);` sin duplicar bloques de `@media` ni pisar con `!important`.
 4. **Prohibición de Anchos Rígidos con `!important`:** Queda terminantemente prohibido declarar `width` o `max-width` fijos de 300px o más con `!important` en archivos CSS (custodiado por regla R17).
-5. **Áreas Seguras Móviles (Safe Area):** Todo pie de modal o bottom sheet debe usar `padding-bottom: var(--modal-footer-pad-bottom)`. En móvil (`<= 767px`), `--modal-footer-pad-bottom` vale `max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))`: se suman `16px` al área segura del sistema (con mínimo de `24px`) porque el área segura solo cubre la barra de inicio, mientras que vidrios templados con marco, fundas y el alcance del pulgar vuelven el borde inferior la zona menos precisa del toque. En escritorio (`>= 768px`) vale `var(--space-xl)` (`20px`). El padding inferior del cuerpo scrolleable permanece en `var(--modal-footer-gap)` (`24px`).
+5. **Áreas Seguras Móviles (Safe Area):** Todo pie de modal o bottom sheet debe usar `padding-bottom: var(--modal-footer-pad-bottom)`. En celular (`< 768px`), `--modal-footer-pad-bottom` vale `max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))`: se suman `16px` al área segura del sistema (con mínimo de `24px`) porque el área segura solo cubre la barra de inicio, mientras que vidrios templados con marco, fundas y el alcance del pulgar vuelven el borde inferior la zona menos precisa del toque. En tablet y escritorio (`>= 768px`) vale `var(--space-xl)` (`20px`). El padding inferior del cuerpo scrolleable permanece en `var(--modal-footer-gap)` (`24px`).
+6. **Defaults de diseño responsive:** piso de fuente `11px`; zona táctil mínima `44px` con área invisible (`::before`) sin agrandar el botón visible (el selector cápsula `sm` sigue en `28px` visibles); grillas a 1 columna en celular; tablas con `overflow-x: auto` en su contenedor; `white-space: nowrap` sin ellipsis se resuelve caso por caso (dejar partir, ellipsis con `title`, o apilar).
 
 ### Matriz de Prueba
 Toda verificación o certificación responsive debe comprobar el correcto renderizado en la siguiente matriz de resoluciones y condiciones:
-- **Anchos:** 320px, 375px, 390px, 430px, 768px, 1024px, 1440px, 1920px, 2560px y 3840px.
+- **Anchos:** 360px, 375px, 393px, 412px, 440px, 768px, 1023px, 1024px, 1280px, 1440px, 1920px y 2560px.
 - **Temas:** Modo Claro y Modo Oscuro.
 - **Orientación:** Vertical y Horizontal en dispositivos móviles.
 
@@ -554,14 +556,14 @@ Todos los controles estándar del sistema (`Input`, `Field`, `SelectInput`, `Dat
 | `--control-radius` | `12px` | Radio de curvatura unificado para todos los controles del sistema (alineado con `Button`). |
 | `--control-pad-x` | `14px` | Relleno horizontal uniforme en controles de texto y selectores. |
 | `--control-font` | `15px` | Tamaño tipográfico en controles para pantallas de escritorio. |
-| `--control-font-mobile` | `16px` | Tamaño tipográfico normativo en controles editables (`input`, `select`, `textarea`) en pantallas `<= 768px` para prevenir zoom automático indeseado en Safari iOS. |
+| `--control-font-mobile` | `16px` | Tamaño tipográfico normativo en controles editables (`input`, `select`, `textarea`) en pantallas `< 768px` (`<= 767.98px`) para prevenir zoom automático indeseado en Safari iOS. |
 | `--control-disabled-opacity` | `0.5` | Opacidad estándar para controles en estado deshabilitado (`:disabled` / `aria-disabled="true"`). |
 | `--focus-ring` | `0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent)` | Indicador de foco por teclado de alta visibilidad (contraste `>= 3:1` sobre superficies del sistema). |
 | `--modal-footer-btn-gap` | `12px` | Separación estándar oficial entre botones de acción en el pie de modales y hojas. |
 
 #### Tabla de Controles del Sistema (Valores Resueltos)
 
-| Control | Alto | Radio | Padding-X | Font Desktop | Font Mobile (<=768px) | Opacidad Deshabilitado | Foco Visible | Dentro del Sistema |
+| Control | Alto | Radio | Padding-X | Font Desktop | Font Mobile (< 768px) | Opacidad Deshabilitado | Foco Visible | Dentro del Sistema |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `ui/Input` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
 | `ui/Field` | `44px` | `12px` | `14px` | `15px` | `16px` | `0.5` | `var(--focus-ring)` | SÍ |
@@ -591,7 +593,7 @@ Todo selector interactivo en todo el alcance que aplique `outline: none` o `outl
 Todo efecto de interacción `:hover` que induzca movimiento o cambio dimensional (`transform`, `translate`, `scale`) en componentes o páginas del alcance debe estar estrictamente confinado dentro de `@media (hover: hover) and (pointer: fine)`. Esto previene que los elementos queden permanentemente elevados o distorsionados tras una pulsación táctil en dispositivos móviles o tabletas (R31 = 0). Las mutaciones cromáticas neutrales (`background-color`, `color`, `box-shadow`) pueden residir fuera de dicha media query para feedback inmediato.
 
 ### 15.5 Prevención de Auto-Zoom en Safari iOS (Regla R32)
-Todo control de entrada real (`<input>`, `<select>`, `<textarea>`) en pantallas `<= 768px` debe resolver su tamaño de fuente a un mínimo normativo de `16px` (mediante `--control-font-mobile: 16px` o la regla defensiva de `index.css`). Queda prohibido el uso de tamaños inferiores a 16px en campos interactivos en vista móvil, eliminando el zoom forzado de viewport de iOS (R32 = 0).
+Todo control de entrada real (`<input>`, `<select>`, `<textarea>`) en pantallas `< 768px` (`<= 767.98px`) debe resolver su tamaño de fuente a un mínimo normativo de `16px` (mediante `--control-font-mobile: 16px` o la regla defensiva de `index.css`). Queda prohibido el uso de tamaños inferiores a 16px en campos interactivos en vista móvil, eliminando el zoom forzado de viewport de iOS (R32 = 0).
 
 ### 15.6 Separación Unificada en Botoneras de Pie de Modal (Regla R33)
 Toda fila o contenedor directo de botones de acción en el pie de un modal (`ModalFooter` o prop `footer`) debe usar obligatoriamente `gap: var(--modal-footer-btn-gap)` (12px). Se prohíbe el uso de separaciones divergentes (6px, 8px, literales sueltos) en pies de diálogo o wizard (R33 = 0).
@@ -767,13 +769,13 @@ Antes de crear cualquier página o vista nueva, elegir **exactamente uno** de es
    - `36.4px` de alcance máximo de transición + `11.6px` de margen de seguridad (Display Zoom / Larger Text) = **`48px`** (`calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))`), alineado con `--space-5xl`.
 
 3. **Reglas obligatorias de holgura superior en toda la app:**
-   - **Propietario único de `env(safe-area-inset-top)`:** En todas las pantallas `/app/*` y `/admin/*`, el shell [`AppLayout.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/components/layout/AppLayout/AppLayout.module.css) (`.content` en `max-width: 767px`) aplica el padding superior único `calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))`.
-   - **Prohibido duplicar `env(safe-area-inset-top)` o sumar padding superior en hijos de `AppLayout`:** Ninguna página hija dentro de `AppLayout` puede agregar `env(safe-area-inset-top)` ni `padding-top > 0` en móvil (`<= 767px`). Todo contenido arranca exactamente en `48px + safe-area`. Excepción acoplada: bloques full-bleed con margen negativo superior (como [`SuscripcionesPage.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/pages/app/suscripciones/SuscripcionesPage.module.css) `.emptyRoot` y `.emptyState`) deben referenciar obligatoriamente `var(--mobile-top-clearance, 48px)` en ambos lados para mantener simetría exacta.
-   - **Cero `backdrop-filter` sobre cabeceras opacas sticky `top: 0`:** Toda barra opaca anclada en `top: 0` (`TermsPage`) omite `backdrop-filter` y respeta `padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))` en móvil (`<= 767px`), ajustando `scroll-margin-top` para anclas internas.
-   - **Tope vertical en Modales y Bottom Sheets (`Modal.module.css`):** Para evitar que hojas altas en teléfonos grandes alcancen la franja blur superior, `.sheet` y `@media (max-width: 767px) .container` imponen `max-height: min(var(--modal-max-h), calc(100dvh - env(safe-area-inset-top, 0px) - var(--mobile-top-clearance, 48px)))`.
+   - **Propietario único de `env(safe-area-inset-top)`:** En todas las pantallas `/app/*` y `/admin/*`, el shell [`AppLayout.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/components/layout/AppLayout/AppLayout.module.css) (`.content` en `max-width: 767.98px`) aplica el padding superior único `calc(var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px))`.
+   - **Prohibido duplicar `env(safe-area-inset-top)` o sumar padding superior en hijos de `AppLayout`:** Ninguna página hija dentro de `AppLayout` puede agregar `env(safe-area-inset-top)` ni `padding-top > 0` en móvil (`< 768px`). Todo contenido arranca exactamente en `48px + safe-area`. Excepción acoplada: bloques full-bleed con margen negativo superior (como [`SuscripcionesPage.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/pages/app/suscripciones/SuscripcionesPage.module.css) `.emptyRoot` y `.emptyState`) deben referenciar obligatoriamente `var(--mobile-top-clearance, 48px)` en ambos lados para mantener simetría exacta.
+   - **Cero `backdrop-filter` sobre cabeceras opacas sticky `top: 0`:** Toda barra opaca anclada en `top: 0` (`TermsPage`) omite `backdrop-filter` y respeta `padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))` en móvil (`< 768px`), ajustando `scroll-margin-top` para anclas internas.
+   - **Tope vertical en Modales y Bottom Sheets (`Modal.module.css`):** Para evitar que hojas altas en teléfonos grandes alcancen la franja blur superior, `.sheet` y `@media (max-width: 767.98px) .container` imponen `max-height: min(var(--modal-max-h), calc(100dvh - env(safe-area-inset-top, 0px) - var(--mobile-top-clearance, 48px)))`.
    - **Alineación unificada en pantallas standalone, controles flotantes y toasts:** Todo componente fuera de `AppLayout` o `position: fixed` en el borde superior en móvil usa `var(--mobile-top-clearance, 48px) + env(safe-area-inset-top, 0px)`.
 
-4. **Mapa completo de cobertura superior en móvil (`<= 767px`):**
+4. **Mapa completo de cobertura superior en móvil (`< 768px`):**
 
 | Módulo / Elemento | Archivo CSS / TSX | Mecanismo aplicado |
 | :--- | :--- | :--- |
@@ -785,7 +787,7 @@ Antes de crear cualquier página o vista nueva, elegir **exactamente uno** de es
 | **Auth (`/login`, `/register`, `/login/telefono`, `/auth/*`, `/reset-password`)** | `src/components/auth/AuthLayout/AuthLayout.module.css` | `.mobileInner` y `.standalone` (móvil) a `+ var(--mobile-top-clearance, 48px)`; `.themeToggle` alineado |
 | **Botón flotante de tema** | `src/components/ui/ThemeToggle/ThemeToggle.module.css` | `.floating` móvil en `top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px))` |
 | **Onboarding (`/onboarding`)** | `src/pages/onboarding/OnboardingPage.module.css` | `.page` móvil con `padding-top: + var(--mobile-top-clearance, 48px)` y `.header` `padding-right: 52px` para despejar `ThemeToggle` |
-| **Bloqueo crear contraseña** | `src/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css` | `.bgHeader` móvil (`<= 767px`) a `+ var(--mobile-top-clearance, 48px)` |
+| **Bloqueo crear contraseña** | `src/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css` | `.bgHeader` móvil (`< 768px`) a `+ var(--mobile-top-clearance, 48px)` |
 | **Preview Admin (`/animacion`, `/app/animacion` e íconos)** | `AnimacionPreviewPage.module.css`, `IconPlayground.tsx` | `.reopenControlsBtn`, `.modularShowcase` e `IconPlayground` en móvil despejan `env(safe-area-inset-top) + var(--mobile-top-clearance, 48px)` |
 | **Pantallas de carga, Error 404 y ErrorBoundaries** | `LunarLoading.module.css`, `AtmosphericBackground.module.css` | Conservan velos opacos sobre el safe area e inyectan `padding-top: + var(--mobile-top-clearance, 48px)` en móvil |
 | **Modales y Bottom Sheets** | `src/components/ui/Modal/Modal.module.css` | `.sheet` y `.container` móvil limitados por `min(var(--modal-max-h), calc(100dvh - env(safe-area-inset-top, 0px) - var(--mobile-top-clearance, 48px)))` |
@@ -799,9 +801,9 @@ Antes de crear cualquier página o vista nueva, elegir **exactamente uno** de es
 Para garantizar alineación matemática perfecta y ausencia de saltos o desalineaciones visuales al cambiar de pantalla:
 1. **El contenedor [`AppLayout.module.css`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/components/layout/AppLayout/AppLayout.module.css) es el ÚNICO dueño de los márgenes y rellenos perimetrales exteriores:**
    - **Márgenes laterales (Eje X):**
-     - Mobile (`<= 767px`): `var(--container-px-mobile, 20px)`.
-     - Tablet (`768px - 1024px`): `var(--container-px-tablet, 32px)`.
-     - Desktop (`> 1024px`): `var(--container-px-desktop, 48px)`.
+     - Mobile (`< 768px`): `var(--container-px-mobile, 20px)`.
+     - Tablet (`768px - 1023,98px`): `var(--container-px-tablet, 32px)`.
+     - Desktop (`>= 1024px`): `var(--container-px-desktop, 48px)`.
      - *Prohibición:* Ninguna página o módulo hijo dentro de `/app/*` puede declarar `padding-inline` propio, `max-width` artificial centrado con `margin: 0 auto` (como el previo `1440px` de Análisis), ni márgenes que desplacen los bordes izquierdo o derecho respecto al resto de la aplicación.
    - **Margen inferior y despeje de barra flotante (Eje Y Bottom en Móvil):**
      - La barra de navegación móvil [`MobileBottomNav`](file:///c:/Users/sebas/OneDrive/Documentos/GitHub/argentum-frontend/src/components/layout/MobileBottomNav/MobileBottomNav.module.css) mide 56px de alto y flota a `calc(24px + env(safe-area-inset-bottom, 0px))`.
@@ -813,7 +815,7 @@ Para garantizar alineación matemática perfecta y ausencia de saltos o desaline
 
 ### 17.2 Tokens Canónicos de Ritmo Vertical entre Bloques
 Los contenedores principales de página (`.page`, `.root`, `.container`) se estructuran como columnas flexibles con la escala canónica:
-- **En Celular (`max-width: 767px`):** `gap: var(--module-gap-mobile, 16px);` (o `20px` según densidad).
+- **En Celular (`max-width: 767.98px`):** `gap: var(--module-gap-mobile, 16px);` (o `20px` según densidad).
 - **En Computadora (`min-width: 768px`):** `gap: var(--module-gap-desktop, 24px);`.
 - **Prohibición de espaciadores artificiales:** Prohibido el uso de pseudoelementos `::after` con alturas fijas (`16px`, `32px`, `36px`) para forzar holgura al final de las páginas.
 
@@ -829,7 +831,7 @@ Los contenedores principales de página (`.page`, `.root`, `.container`) se estr
   box-sizing: border-box;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .page {
     padding-top: 0;
   }
@@ -858,7 +860,7 @@ Para mantener coherencia estética, consistencia de interacciones y accesibilida
   - Posicionamiento dinámico con detección de límites de ventana para prevenir desbordes laterales.
   - Altura máxima acotada (`max-height: 280px`) con scroll vertical nativo suave para listas extensas.
   - Soporte de tamaño compacto (`size="sm"`) con altura de 36px y tipografía de 13px para filtros, encabezados y barras de control secundarias (como en Análisis y comparativas).
-- **En Celular / Mobile (`max-width: 767px`):**
+- **En Celular / Mobile (`max-width: 767.98px`):**
   - Se transforma automáticamente en Bottom Sheet modal canónico (`Modal variant="sheet"`).
   - Áreas táctiles cómodas de al menos 44px de altura por ítem (`padding: 13px 14px`), eliminando dificultades de selección en pantallas pequeñas.
   - Título contextual claro, backdrop difuminado y cierre intuitivo por pulsación externa o botón de cierre.
@@ -912,7 +914,7 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
 ---
 
 ## 22. Admin (fase_j3b_panel_admin y fase_j3b2_panel_admin)
-- Celular (`<= 767px`): muestra solo Usuarios (lista y detalle); `PageSummaryBar`, pestañas, Diseño, WhatsApp e IA, Tareas y Registro solo desde `768px`.
+- Celular (`< 768px`): muestra solo Usuarios (lista y detalle); `PageSummaryBar`, pestañas, Diseño, WhatsApp e IA, Tareas y Registro solo desde `768px`.
 - Estética alineada con Perfil > Seguridad (`.sectionCard` y `.securityRow`) y `PageSummaryBar`; raíz `.page` según §17 sin `!important` ni siglas `ARS`/`USD` visibles.
 - Estados de uso con punto de 8 px + texto (`estadoVisual`) y `AvatarUsuario` como único `<img>` del admin (`referrerPolicy="no-referrer"` + iniciales).
 - `SegmentedControl` mantiene sus etiquetas en una sola línea en desktop (`>= 768px` con `white-space: nowrap` y columnas iguales vía `grid-auto-columns: 1fr`); filtros en lista con container query (`@container`).
@@ -922,9 +924,9 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
 ---
 
 ## 23. Pantallas de referencia y contenido variable
-- **Anchos de referencia de celulares (CSS px):** 360 (Galaxy S24, J7 y la mayoría de Android de entrada), 375 (iPhone SE), 393 (iPhone 16/17), 412 (S24 Ultra, Pixel), 440 (iPhone Pro Max); límite de celular 767; desde 768 es tablet/escritorio. Todo componente se diseña para que se vea bien desde 360 hasta 440 sin cortes ni textos partidos feos, y se verifica en esos cinco anchos.
+- **Anchos de referencia de celulares (CSS px):** 360 (Galaxy S24, J7 y la mayoría de Android de entrada), 375 (iPhone SE), 393 (iPhone 16/17), 412 (S24 Ultra, Pixel), 440 (iPhone Pro Max); celular hasta `767,98px` (`< 768px`), tablet `768px - 1023,98px`, escritorio `>= 1024px`. Todo componente se diseña para que se vea bien desde 360 hasta 440 sin cortes ni textos partidos feos, y se verifica en esos cinco anchos.
 - **Área segura inferior:** iPhone con barra de inicio = 34px; SE, Galaxy y navegadores = 0. Nada se diseña asumiendo un valor fijo.
-- **Responsive vs. contenido variable:** Lo que depende del ancho de pantalla va en media queries (o container queries) apoyadas en estos puntos; lo que depende del largo del contenido (montos, nombres) se prueba con el peor caso real (por ejemplo `"$ 5.393.731,05"`) y, si no entra, el contenido sale del control, nunca se achica la letra ni se parte en dos renglones.
+- **Responsive vs. contenido variable:** Lo que depende del ancho de pantalla va en media queries (o container queries) apoyadas en estos puntos y en JS con `useViewport` (`src/hooks/useViewport.ts`); lo que depende del largo del contenido (montos, nombres) se prueba con el peor caso real (por ejemplo `"$ 5.393.731,05"`). Montos que no entran: `MontoFit` (`src/components/ui/MontoFit`) muestra completo o corto (`formatMontoCorto`), nunca `'…'` ni achicando la letra. `PageSummaryBar`: todo ítem con monto lleva `valorCorto`. Gráficos de barras (Presupuestos y Metas): columna mínima 86px; asoma media barra si no entran todas; nombre hasta 2 renglones.
 - **Botones del pie de modal:** Los botones del pie de un modal no llevan montos en la etiqueta y llevan padding horizontal de 16px.
 - **Un solo margen debajo del último botón:** en mobile debajo del último botón debe haber UN solo margen, igual a `--modal-footer-pad-bottom`; el `.content` del `Modal` con padding normal ya aporta ese margen cuando es el último hijo, así que un pie propio adentro del contenido lleva padding inferior `0` en mobile, y un modal `noPadding` aporta el margen en su propio pie. Todo modal o bottom sheet nuevo se mide en 360, 375, 393, 412 y 440px con 0 y 34px de área segura antes de darlo por bueno.
 - **Pie pegajoso en modales:** Un pie `position: sticky` adentro de un contenedor con scroll se ancla descontando el padding del contenedor; en mobile su `bottom` y su `margin-bottom` valen `calc(-1 * var(--modal-footer-pad-bottom))` para quedar a un solo margen del borde.

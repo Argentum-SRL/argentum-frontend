@@ -28,6 +28,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.titleGroup > div {
+  min-width: 0;
+  flex: 1;
 }
 
 .iconWrap {
@@ -70,9 +77,7 @@
   font-size: 0.8125rem;
   color: var(--text-2);
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .headerControls {
@@ -232,7 +237,7 @@
   border-radius: 14px;
   padding: 12px 14px;
   box-shadow: var(--elevation-md);
-  min-width: 220px;
+  min-width: min(220px, 100%);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -357,7 +362,7 @@
   color: var(--primary);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .card {
     border-radius: 16px;
     padding: 12px 12px;

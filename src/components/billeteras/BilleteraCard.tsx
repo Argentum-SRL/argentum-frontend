@@ -5,7 +5,9 @@ import { useNavigate } from 'react-router-dom'
 import { Edit2, Archive, DollarSign, Plus, Trash2, RotateCcw, TrendingUp, Star } from '@/components/ui/icons'
 import type { Billetera } from '@/types'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
+import { useViewport } from '@/hooks/useViewport'
+import { MontoFit } from '@/components/ui'
 import styles from './BilleteraCard.module.css'
 
 export interface BilleteraCardProps {
@@ -43,6 +45,7 @@ const BilleteraCard = memo(({
   hideCurrencyChip = false
 }: BilleteraCardProps) => {
   const navigate = useNavigate()
+  const { esCelular } = useViewport()
   const [menuOpen, setMenuOpen] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
   const kebabBtnRef = useRef<HTMLButtonElement>(null)
@@ -193,8 +196,7 @@ const BilleteraCard = memo(({
             if (disableNavigation) return
             // En mobile, el primer tap trae la tarjeta al frente si no lo está.
             // El segundo tap (cuando ya está al frente) navega al detalle.
-            const isTouch = window.matchMedia('(max-width: 767px)').matches
-            if (isTouch) {
+            if (esCelular) {
               if (!isFront) {
                 e.preventDefault()
                 onSetFront?.()
@@ -335,7 +337,10 @@ const BilleteraCard = memo(({
             {labelNombre}
           </p>
           <p className={`${styles.wcBalAmt} wcBalAmt ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>
-            {formatMonto(billetera.saldo_actual, billetera.moneda)}
+            <MontoFit
+              completo={formatMonto(billetera.saldo_actual, billetera.moneda)}
+              corto={formatMontoCorto(billetera.saldo_actual, billetera.moneda)}
+            />
           </p>
         </div>
       </div>

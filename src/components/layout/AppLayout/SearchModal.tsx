@@ -18,8 +18,9 @@ import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
 import type { Billetera, Categoria, TarjetaCredito, Transaccion, Presupuesto } from '@/types'
 import type { Goal } from '@/types/goals'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
+import { MontoFit } from '@/components/ui'
 import MovimientoAvatar from '@/components/ui/MovimientoAvatar'
 import styles from './SearchModal.module.css'
 
@@ -33,10 +34,12 @@ interface SearchResultItem {
   id: string
   title: string
   subtitle: string
+  subtitleNode?: React.ReactNode
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>
   path?: string
   action?: () => void
   extra?: string
+  extraNode?: React.ReactNode
   extraSub?: string
 }
 
@@ -243,54 +246,73 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   filteredAcciones.forEach(a => results.push({ type: 'action', id: a.id, title: a.title, subtitle: a.subtitle, Icon: a.Icon, action: a.action }))
   
   const visibleBilleteras = query ? filteredBilleteras : filteredBilleteras.slice(0, 4)
-  visibleBilleteras.forEach(b => results.push({
-    type: 'billetera',
-    id: `bill-${b.id}`,
-    title: b.nombre,
-    subtitle: b.es_efectivo ? 'Efectivo' : 'Banco / Cuenta Digital',
-    Icon: Wallet,
-    extra: formatMonto(b.saldo_actual, b.moneda),
-    path: `/app/billeteras/${b.id}`
-  }))
+  visibleBilleteras.forEach(b => {
+    const saldoCompleto = formatMonto(b.saldo_actual, b.moneda)
+    const saldoCorto = formatMontoCorto(b.saldo_actual, b.moneda)
+    results.push({
+      type: 'billetera',
+      id: `bill-${b.id}`,
+      title: b.nombre,
+      subtitle: b.es_efectivo ? 'Efectivo' : 'Banco / Cuenta Digital',
+      Icon: Wallet,
+      extra: saldoCompleto,
+      extraNode: <MontoFit completo={saldoCompleto} corto={saldoCorto} />,
+      path: `/app/billeteras/${b.id}`
+    })
+  })
 
   const visiblePresupuestos = query ? filteredPresupuestos : filteredPresupuestos.slice(0, 3)
-  visiblePresupuestos.forEach(p => results.push({
-    type: 'presupuesto',
-    id: `pres-${p.id}`,
-    title: p.nombre,
-    subtitle: `Límite: ${formatMonto(p.monto, p.moneda)}`,
-    Icon: PieChart,
-    extra: p.periodo_actual ? `${p.periodo_actual.porcentaje_usado.toFixed(0)}%` : '',
-    path: '/app/presupuestos'
-  }))
+  visiblePresupuestos.forEach(p => {
+    const limCompleto = `Límite: ${formatMonto(p.monto, p.moneda)}`
+    const limCorto = `Límite: ${formatMontoCorto(p.monto, p.moneda)}`
+    results.push({
+      type: 'presupuesto',
+      id: `pres-${p.id}`,
+      title: p.nombre,
+      subtitle: limCompleto,
+      subtitleNode: <MontoFit completo={limCompleto} corto={limCorto} />,
+      Icon: PieChart,
+      extra: p.periodo_actual ? `${p.periodo_actual.porcentaje_usado.toFixed(0)}%` : '',
+      path: '/app/presupuestos'
+    })
+  })
 
   const visibleMetas = query ? filteredMetas : filteredMetas.slice(0, 3)
-  visibleMetas.forEach(g => results.push({
-    type: 'meta',
-    id: `meta-${g.id}`,
-    title: g.nombre,
-    subtitle: `Objetivo: ${formatMonto(g.monto_objetivo, g.moneda)}`,
-    Icon: Target,
-    extra: `${((g.monto_actual / g.monto_objetivo) * 100).toFixed(0)}%`,
-    action: () => {
-      open('goalDetail', {
-        data: {
-          goal: g,
-          billeteras,
-        }
-      })
-      onClose()
-    }
-  }))
+  visibleMetas.forEach(g => {
+    const objCompleto = `Objetivo: ${formatMonto(g.monto_objetivo, g.moneda)}`
+    const objCorto = `Objetivo: ${formatMontoCorto(g.monto_objetivo, g.moneda as 'ARS' | 'USD')}`
+    results.push({
+      type: 'meta',
+      id: `meta-${g.id}`,
+      title: g.nombre,
+      subtitle: objCompleto,
+      subtitleNode: <MontoFit completo={objCompleto} corto={objCorto} />,
+      Icon: Target,
+      extra: `${((g.monto_actual / g.monto_objetivo) * 100).toFixed(0)}%`,
+      action: () => {
+        open('goalDetail', {
+          data: {
+            goal: g,
+            billeteras,
+          }
+        })
+        onClose()
+      }
+    })
+  })
 
   transacciones.forEach(t => {
+    const signoTx = t.tipo === 'ingreso' ? '+' : '-'
+    const txCompleto = `${signoTx} ${formatMonto(t.monto, t.moneda)}`
+    const txCorto = `${signoTx} ${formatMontoCorto(t.monto, t.moneda)}`
     results.push({
       type: 'transaccion',
       id: `tx-${t.id}`,
       title: t.descripcion || 'Sin descripción',
       subtitle: `${t.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'} • ${new Date(t.fecha).toLocaleDateString('es-AR')}`,
       Icon: ArrowUpDown,
-      extra: `${t.tipo === 'ingreso' ? '+' : '-'} ${formatMonto(t.monto, t.moneda)}`,
+      extra: txCompleto,
+      extraNode: <MontoFit completo={txCompleto} corto={txCorto} />,
       extraSub: billeteras.find(b => b.id === t.billetera_id)?.nombre || '',
       action: () => {
         open('transaccion', {
@@ -497,7 +519,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             </div>
                             <div className={styles.cardBody}>
                               <span className={styles.cardTitle}>{item.title}</span>
-                              <span className={styles.cardExtra}>{item.extra}</span>
+                              <span className={styles.cardExtra}>{item.extraNode ?? item.extra}</span>
                               <span className={styles.cardSubtitle}>{item.subtitle}</span>
                             </div>
                           </div>
@@ -531,7 +553,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             <div className={styles.cardBody}>
                               <span className={styles.cardTitle}>{item.title}</span>
                               {item.extra && <span className={styles.cardExtra}>{item.extra} usado</span>}
-                              <span className={styles.cardSubtitle}>{item.subtitle}</span>
+                              <span className={styles.cardSubtitle}>{item.subtitleNode ?? item.subtitle}</span>
                             </div>
                           </div>
                         )
@@ -564,7 +586,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             <div className={styles.cardBody}>
                               <span className={styles.cardTitle}>{item.title}</span>
                               <span className={styles.cardExtra}>{item.extra} completado</span>
-                              <span className={styles.cardSubtitle}>{item.subtitle}</span>
+                              <span className={styles.cardSubtitle}>{item.subtitleNode ?? item.subtitle}</span>
                             </div>
                           </div>
                         )
@@ -606,7 +628,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             </div>
                             <div className={styles.cardBody}>
                               <span className={styles.cardTitle}>{item.title}</span>
-                              <span className={styles.cardExtra}>{item.extra}</span>
+                              <span className={styles.cardExtra}>{item.extraNode ?? item.extra}</span>
                               <span className={styles.cardSubtitle}>{item.subtitle}</span>
                               {item.extraSub && <span className={styles.cardExtraSub}>{item.extraSub}</span>}
                             </div>

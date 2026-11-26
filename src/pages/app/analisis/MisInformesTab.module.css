@@ -651,7 +651,7 @@
   box-sizing: border-box;
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1023.98px) {
   .compactInputsRow {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -847,7 +847,7 @@
   display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .builderCard {
     padding: 12px;
     border-radius: 16px;
@@ -1052,13 +1052,13 @@
   background: var(--surface-alt);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1023.98px) {
   .reportsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .reportsGrid {
     grid-template-columns: 1fr;
     gap: 12px;

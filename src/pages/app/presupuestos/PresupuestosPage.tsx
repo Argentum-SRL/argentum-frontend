@@ -16,7 +16,7 @@ import type {
   Billetera,
   SugerenciaRubro
 } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { sileo } from 'sileo'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
@@ -262,18 +262,23 @@ export default function PresupuestosPage() {
     const hasARS = activos.some(p => p.moneda === 'ARS')
 
     let gastadoLabel: string
+    let gastadoCorto: string
     let limiteLabel: string | null = null
     if (hasARS && hasUSD) {
       gastadoLabel = `${formatMonto(totalARS, 'ARS')} + ${formatMonto(totalUSD, 'USD')}`
+      gastadoCorto = `${formatMontoCorto(totalARS, 'ARS')} + ${formatMontoCorto(totalUSD, 'USD')}`
       limiteLabel = `${formatMonto(limiteARS, 'ARS')} + ${formatMonto(limiteUSD, 'USD')}`
     } else if (hasUSD) {
       gastadoLabel = formatMonto(totalUSD, 'USD')
+      gastadoCorto = formatMontoCorto(totalUSD, 'USD')
       limiteLabel = formatMonto(limiteUSD, 'USD')
     } else if (hasARS) {
       gastadoLabel = formatMonto(totalARS, 'ARS')
+      gastadoCorto = formatMontoCorto(totalARS, 'ARS')
       limiteLabel = formatMonto(limiteARS, 'ARS')
     } else {
       gastadoLabel = formatMonto(0, primaryCurrency)
+      gastadoCorto = formatMontoCorto(0, primaryCurrency)
     }
 
     const totalGastadoNum = primaryCurrency === 'USD' ? totalUSD : totalARS
@@ -284,6 +289,7 @@ export default function PresupuestosPage() {
     return {
       activosCount: activos.length,
       gastadoLabel,
+      gastadoCorto,
       limiteLabel,
       porcentajeGlobal,
       enRiesgo,
@@ -327,6 +333,7 @@ export default function PresupuestosPage() {
             {
               label: 'Gastado este ciclo',
               value: resumen.gastadoLabel,
+              valorCorto: resumen.gastadoCorto,
               highlight: true,
               notice: resumen.limiteLabel
                 ? {

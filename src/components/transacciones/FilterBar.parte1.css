@@ -547,7 +547,7 @@
   border: 1px solid var(--border);
   padding: 12px;
   z-index: var(--z-raised);
-  min-width: 220px;
+  min-width: min(220px, 100%);
   max-width: min(340px, calc(100vw - 32px));
   animation: popoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;

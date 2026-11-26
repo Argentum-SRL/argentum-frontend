@@ -13,7 +13,7 @@ import {
 } from '@/components/ui'
 import adminService from '@/services/adminService'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import {
   formatearCantidad,
   formatearDiaMes,
@@ -299,6 +299,9 @@ export const MonitorWppPanel: React.FC<MonitorWppPanelProps> = ({
     {
       label: 'Costo de la IA',
       value: openaiOk ? formatMonto(openaiUsdNum, 'USD') : formatMonto(totalUsdNum, 'USD'),
+      valorCorto: openaiOk
+        ? formatMontoCorto(openaiUsdNum, 'USD')
+        : formatMontoCorto(totalUsdNum, 'USD'),
       subValue: openaiOk
         ? `según OpenAI · estimado ${formatMonto(totalUsdNum, 'USD')}`
         : 'estimado por Argentum',

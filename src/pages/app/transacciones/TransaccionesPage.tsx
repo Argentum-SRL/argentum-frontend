@@ -10,7 +10,7 @@ import billeteraService from '@/services/billetera.service'
 import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
 import type { Transaccion, Billetera, Categoria, TarjetaCredito, MovimientoItem, TotalesMoneda } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { getErrorMessage } from '@/utils/errorMessages'
 import { usePeriodoActual } from '@/hooks/usePeriodoActual'
@@ -470,7 +470,16 @@ export default function TransaccionesPage() {
   const totalGastos = Number(totalesMonedaActiva.gastos) || 0
   const balance = Number(totalesMonedaActiva.balance) || (totalIngresos - totalGastos)
 
-  const formatCurrency = (monto: number) => formatMonto(Math.round(monto), mainCurrency)
+  const formatCurrencyPair = (monto: number) => {
+    const redondeado = Math.round(monto)
+    return {
+      completo: formatMonto(redondeado, mainCurrency),
+      corto: formatMontoCorto(redondeado, mainCurrency),
+    }
+  }
+  const balanceFmt = formatCurrencyPair(Math.abs(balance))
+  const ingresosFmt = formatCurrencyPair(totalIngresos)
+  const egresosFmt = formatCurrencyPair(Math.abs(totalGastos))
   const resumen = useMemo(() => ({
     balance,
     ingresos: totalIngresos,
@@ -611,7 +620,8 @@ export default function TransaccionesPage() {
             items={[
               {
                 label: 'Balance del ciclo',
-                value: `${resumen.balance < 0 ? '-' : '+'}${formatCurrency(Math.abs(resumen.balance))}`,
+                value: `${resumen.balance < 0 ? '-' : '+'}${balanceFmt.completo}`,
+                valorCorto: `${resumen.balance < 0 ? '-' : '+'}${balanceFmt.corto}`,
                 highlight: true,
                 tone: resumen.balance < 0 ? 'negative' : 'default',
                 notice: metasInfo
@@ -624,29 +634,34 @@ export default function TransaccionesPage() {
               },
               {
                 label: 'Ingresos',
-                value: `+${formatCurrency(resumen.ingresos)}`,
+                value: `+${ingresosFmt.completo}`,
+                valorCorto: `+${ingresosFmt.corto}`,
                 tone: 'positive',
               },
               {
                 label: 'Egresos',
-                value: `-${formatCurrency(Math.abs(resumen.gastos))}`,
+                value: `-${egresosFmt.completo}`,
+                valorCorto: `-${egresosFmt.corto}`,
                 tone: 'negative',
               },
             ]}
             mobileItems={[
               {
                 label: 'Balance',
-                value: `${resumen.balance < 0 ? '-' : '+'}${formatCurrency(Math.abs(resumen.balance))}`,
+                value: `${resumen.balance < 0 ? '-' : '+'}${balanceFmt.completo}`,
+                valorCorto: `${resumen.balance < 0 ? '-' : '+'}${balanceFmt.corto}`,
                 tone: resumen.balance < 0 ? 'negative' : 'positive',
               },
               {
                 label: 'Ingresos',
-                value: `+${formatCurrency(resumen.ingresos)}`,
+                value: `+${ingresosFmt.completo}`,
+                valorCorto: `+${ingresosFmt.corto}`,
                 tone: 'positive',
               },
               {
                 label: 'Egresos',
-                value: `-${formatCurrency(Math.abs(resumen.gastos))}`,
+                value: `-${egresosFmt.completo}`,
+                valorCorto: `-${egresosFmt.corto}`,
                 tone: 'negative',
               },
             ]}

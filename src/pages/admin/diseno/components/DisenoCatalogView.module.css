@@ -124,7 +124,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .notesInput {
     font-size: var(--control-font-mobile);
   }
@@ -703,7 +703,7 @@
 
 .statusBannerLeft {
   flex: 1;
-  min-width: 240px;
+  min-width: min(240px, 100%);
 }
 
 .statusActiveGroup {

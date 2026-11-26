@@ -42,7 +42,7 @@
   transition: border-color 180ms ease;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .searchInput {
     font-size: var(--control-font-mobile, 16px);
   }
@@ -77,7 +77,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .filterSelect {
     font-size: var(--control-font-mobile, 16px);
   }

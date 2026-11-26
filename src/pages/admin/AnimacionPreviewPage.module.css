@@ -42,7 +42,7 @@
   transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .reopenControlsBtn {
     top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
   }
@@ -204,7 +204,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .selectInput {
     font-size: var(--control-font-mobile);
   }
@@ -361,7 +361,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .modularShowcase {
     padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px)) 16px calc(env(safe-area-inset-bottom, 0px) + 140px);
     align-items: flex-start;

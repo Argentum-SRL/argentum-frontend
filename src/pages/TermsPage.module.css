@@ -26,7 +26,7 @@
   gap: 20px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .headerContent {
     padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
   }
@@ -106,7 +106,7 @@
   scroll-margin-top: 80px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .section {
     scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 124px);
   }

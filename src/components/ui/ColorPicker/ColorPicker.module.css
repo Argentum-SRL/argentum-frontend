@@ -249,7 +249,7 @@
   background: var(--surface);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .hexInput {
     font-size: var(--control-font-mobile);
   }

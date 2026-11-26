@@ -13,7 +13,7 @@ import categoriaService from '@/services/categoria.service'
 import tarjetaService from '@/services/tarjeta.service'
 import suscripcionService from '@/services/suscripcion.service'
 import type { GrupoCuotasResumen, GrupoCuotasUpdate, Billetera, Categoria, TarjetaCredito, Subcategoria, Suscripcion } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { sortBilleteras } from '@/lib/utils/billeteras.utils'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
@@ -658,6 +658,11 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
     )
   }
 
+  const compromisoArs = Math.round(metricas.cuotaMensualARS)
+  const compromisoUsd = Math.round(metricas.cuotaMensualUSD)
+  const deudaArs = Math.round(metricas.deudaPendienteARS)
+  const deudaUsd = Math.round(metricas.deudaPendienteUSD)
+
   return (
     <div className={styles.container}>
       {/* ── 1. Resumen Superior (Desktop Only) ─────────────────────────── */}
@@ -670,17 +675,27 @@ export default function GruposCuotasTab({ refreshTrigger, onRefreshNeeded, onOpe
           },
           {
             label: 'Compromiso / mes',
-            value: `${formatMonto(Math.round(metricas.cuotaMensualARS), 'ARS')}${
-              metricas.cuotaMensualUSD > 0
-                ? ` + ${formatMonto(Math.round(metricas.cuotaMensualUSD), 'USD')}`
+            value: `${formatMonto(compromisoArs, 'ARS')}${
+              compromisoUsd > 0
+                ? ` + ${formatMonto(compromisoUsd, 'USD')}`
+                : ''
+            }`,
+            valorCorto: `${formatMontoCorto(compromisoArs, 'ARS')}${
+              compromisoUsd > 0
+                ? ` + ${formatMontoCorto(compromisoUsd, 'USD')}`
                 : ''
             }`,
           },
           {
             label: 'Total pendiente',
-            value: `${formatMonto(Math.round(metricas.deudaPendienteARS), 'ARS')}${
-              metricas.deudaPendienteUSD > 0
-                ? ` + ${formatMonto(Math.round(metricas.deudaPendienteUSD), 'USD')}`
+            value: `${formatMonto(deudaArs, 'ARS')}${
+              deudaUsd > 0
+                ? ` + ${formatMonto(deudaUsd, 'USD')}`
+                : ''
+            }`,
+            valorCorto: `${formatMontoCorto(deudaArs, 'ARS')}${
+              deudaUsd > 0
+                ? ` + ${formatMontoCorto(deudaUsd, 'USD')}`
                 : ''
             }`,
             highlight: true,

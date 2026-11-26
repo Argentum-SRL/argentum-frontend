@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import { TrendingUp, Activity, Sparkles } from '@/components/ui/icons'
 import SegmentedControl from '@/components/ui/SegmentedControl'
-import { CollapseToggle } from '@/components/ui'
+import { CollapseToggle, MontoFit } from '@/components/ui'
 import type { AnalisisCicloPunto, SerieEvolucionPersonalizada } from '@/services/analisis.service'
 import { formatMonto, formatPorcentaje, formatMontoCorto } from '@/utils/format'
 import { useTheme } from '@/hooks/useTheme'
@@ -222,11 +222,17 @@ export default function EvolucionCiclosCard({
                 )}
               </div>
               <p className={styles.subtitle}>
-                {esModoPersonalizado
-                  ? `Promedio selección: ${formatMonto(avgCustomSeries, monedaVisual)}/ciclo`
-                  : promedioHistoricoGastos !== null
-                    ? `Promedio de gastos: ${formatMonto(promedioHistoricoGastos, monedaVisual)}`
-                    : null}
+                {esModoPersonalizado ? (
+                  <MontoFit
+                    completo={`Promedio selección: ${formatMonto(avgCustomSeries, monedaVisual)}/ciclo`}
+                    corto={`Promedio selección: ${formatMontoCorto(avgCustomSeries, monedaVisual)}/ciclo`}
+                  />
+                ) : promedioHistoricoGastos !== null ? (
+                  <MontoFit
+                    completo={`Promedio de gastos: ${formatMonto(promedioHistoricoGastos, monedaVisual)}`}
+                    corto={`Promedio de gastos: ${formatMontoCorto(promedioHistoricoGastos, monedaVisual)}`}
+                  />
+                ) : null}
               </p>
             </div>
           </div>

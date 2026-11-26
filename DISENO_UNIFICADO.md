@@ -234,6 +234,7 @@ El sistema de espaciado para formularios, modales y hojas inferiores de Argentum
 | `--modal-header-gap` | `20px` | Separación vertical entre el encabezado del modal y el primer bloque de contenido. |
 | `--modal-footer-gap` | `24px` | Separación vertical entre el último bloque de contenido y la botonera del pie (footer). |
 | `--modal-footer-btn-gap` | `12px` | Separación (gap) horizontal o vertical entre los botones de acción del footer. |
+| `--modal-footer-pad-bottom` | `max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))` (`<= 767px`); `20px` (`--space-xl`, `>= 768px`) | Margen inferior del pie de modales y hojas hacia el borde. En móvil suma 16px al área segura (mínimo 24px) para despejar vidrios templados, fundas y el borde inferior donde el toque es menos preciso. |
 | `--modal-pad-x` | `20px` | Relleno lateral uniforme en el cuerpo y pie del modal. |
 
 Regla de Gestalt: ninguna distancia entre campos (`12px`) puede ser mayor o igual que la distancia entre bloques (`20px` / `16px`). Los grupos de opciones (`8px`) y las etiquetas/ayudas (`8px`) se mantienen cohesionados con su control.
@@ -375,7 +376,7 @@ Todo campo de formulario destinado a ingresar o editar montos de dinero debe uti
 
 ### Variante Bottom Sheet (`variant="sheet"`)
 El componente `Modal` soporta la prop `variant?: 'dialog' | 'sheet'` (por defecto `'dialog'`).
-- En modo `'sheet'`, el modal se ancla al fondo de la pantalla en todas las resoluciones, adopta bordes redondeados superiores (`border-radius: var(--modal-radius) var(--modal-radius) 0 0`), ancho completo responsivo hasta un máximo canónico y padding inferior adaptado al área segura (`env(safe-area-inset-bottom)`).
+- En modo `'sheet'`, el modal se ancla al fondo de la pantalla en todas las resoluciones, adopta bordes redondeados superiores (`border-radius: var(--modal-radius) var(--modal-radius) 0 0`), ancho completo responsivo hasta un máximo canónico y padding inferior del pie gobernado por `--modal-footer-pad-bottom` (`max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))` en móvil y `var(--space-xl)` en escritorio).
 - Todos los diálogos, modales de error y sheets (incluyendo `MobileMoreSheet` y `ModalErrorBoundary`) componen sobre esta base unificada.
 - El overlay se apila rigurosamente en `z-index: var(--z-modal)`.
 - Indicador de pasos: se gestiona exclusivamente a través de la prop `stepDots={{ total, current }}` del Modal base.
@@ -473,7 +474,7 @@ La arquitectura responsive de Argentum se rige por la escala canónica custodiad
 2. **Propiedad `fullWidth`:** El modificador `fullWidth` solo se permite dentro de modales o en selectores que se ocultan en escritorio (`MOBILE-ONLY`). Los grupos de nivel página en escritorio no deben llevar `fullWidth`.
 3. **Anchos Centralizados de Modales y Bottom Sheets:** Todos los modales y bottom sheets derivan sus medidas exclusivamente de las clases base del componente `Modal` (`.sm`, `.md`, `.lg`, `.xl`) y variables asociadas (`--modal-w-sm`, `--modal-w-md`, `--modal-w-md-wide`, `--modal-w-lg`, `--modal-w-xl`). Si un modal requiere un ancho específico, declara localmente `--modal-w: var(--modal-w-md-wide);` sin duplicar bloques de `@media` ni pisar con `!important`.
 4. **Prohibición de Anchos Rígidos con `!important`:** Queda terminantemente prohibido declarar `width` o `max-width` fijos de 300px o más con `!important` en archivos CSS (custodiado por regla R17).
-5. **Áreas Seguras Móviles (Safe Area):** Todo bottom sheet debe respetar el margen inferior del sistema mediante `padding-bottom: max(var(--modal-content-pad-bottom), env(safe-area-inset-bottom, 0px))` y análogamente en el footer.
+5. **Áreas Seguras Móviles (Safe Area):** Todo pie de modal o bottom sheet debe usar `padding-bottom: var(--modal-footer-pad-bottom)`. En móvil (`<= 767px`), `--modal-footer-pad-bottom` vale `max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))`: se suman `16px` al área segura del sistema (con mínimo de `24px`) porque el área segura solo cubre la barra de inicio, mientras que vidrios templados con marco, fundas y el alcance del pulgar vuelven el borde inferior la zona menos precisa del toque. En escritorio (`>= 768px`) vale `var(--space-xl)` (`20px`). El padding inferior del cuerpo scrolleable permanece en `var(--modal-footer-gap)` (`24px`).
 
 ### Matriz de Prueba
 Toda verificación o certificación responsive debe comprobar el correcto renderizado en la siguiente matriz de resoluciones y condiciones:
@@ -917,6 +918,16 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
 - `SegmentedControl` mantiene sus etiquetas en una sola línea en desktop (`>= 768px` con `white-space: nowrap` y columnas iguales vía `grid-auto-columns: 1fr`); filtros en lista con container query (`@container`).
 - WhatsApp e IA en grilla de 2/3 columnas con alto propio (`align-items: start`) y tarjeta Conversaciones plegable con `ui/CollapseToggle`.
 - `IdentidadModal` con botones `fullWidth` y foco en email al eliminar; cargas con `SkeletonAdmin` y helpers en `src/utils/admin.ts`.
+
+---
+
+## 23. Pantallas de referencia y contenido variable
+- **Anchos de referencia de celulares (CSS px):** 360 (Galaxy S24, J7 y la mayoría de Android de entrada), 375 (iPhone SE), 393 (iPhone 16/17), 412 (S24 Ultra, Pixel), 440 (iPhone Pro Max); límite de celular 767; desde 768 es tablet/escritorio. Todo componente se diseña para que se vea bien desde 360 hasta 440 sin cortes ni textos partidos feos, y se verifica en esos cinco anchos.
+- **Área segura inferior:** iPhone con barra de inicio = 34px; SE, Galaxy y navegadores = 0. Nada se diseña asumiendo un valor fijo.
+- **Responsive vs. contenido variable:** Lo que depende del ancho de pantalla va en media queries (o container queries) apoyadas en estos puntos; lo que depende del largo del contenido (montos, nombres) se prueba con el peor caso real (por ejemplo `"$ 5.393.731,05"`) y, si no entra, el contenido sale del control, nunca se achica la letra ni se parte en dos renglones.
+- **Botones del pie de modal:** Los botones del pie de un modal no llevan montos en la etiqueta y llevan padding horizontal de 16px.
+- **Un solo margen debajo del último botón:** en mobile debajo del último botón debe haber UN solo margen, igual a `--modal-footer-pad-bottom`; el `.content` del `Modal` con padding normal ya aporta ese margen cuando es el último hijo, así que un pie propio adentro del contenido lleva padding inferior `0` en mobile, y un modal `noPadding` aporta el margen en su propio pie. Todo modal o bottom sheet nuevo se mide en 360, 375, 393, 412 y 440px con 0 y 34px de área segura antes de darlo por bueno.
+- **Pie pegajoso en modales:** Un pie `position: sticky` adentro de un contenedor con scroll se ancla descontando el padding del contenedor; en mobile su `bottom` y su `margin-bottom` valen `calc(-1 * var(--modal-footer-pad-bottom))` para quedar a un solo margen del borde.
 
 
 

@@ -440,7 +440,7 @@
     font-size: 26px !important;
   }
   .formFooter {
-    padding: 8px var(--modal-pad-x) 10px; /* Separación lateral oficial */
+    padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial del pie */
   }
   .cancelBtn, .submitBtn {
     height: 40px;

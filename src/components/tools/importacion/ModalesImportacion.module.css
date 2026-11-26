@@ -370,6 +370,13 @@
   }
 }
 
+/* En mobile, Modal .content ya aporta --modal-footer-pad-bottom; evitamos doble margen */
+@media (max-width: 767px) {
+  .formFooter {
+    padding-bottom: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cancelBtn,
   .submitBtn,

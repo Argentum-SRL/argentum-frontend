@@ -238,13 +238,15 @@
 
 .cancelBtn, .submitBtn {
   height: 44px;
-  padding: 0 20px;
+  padding-block: 0;
+  padding-inline: 16px;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
   cursor: pointer;
   transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
   border: none;

@@ -52,7 +52,7 @@
   --modal-content-pad-top: var(--modal-header-gap); /* Padding superior del contenido del modal (20px) */
   --modal-content-pad-bottom: var(--modal-footer-gap); /* Padding inferior del contenido del modal (24px) */
   --modal-footer-pad-top: 0px; /* Padding superior del pie del modal (sin sumar al gap) */
-  --modal-footer-pad-bottom: var(--space-xl); /* Padding inferior del pie del modal hacia el borde (20px) */
+  --modal-footer-pad-bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px)); /* Padding inferior del pie del modal en mobile (área segura + 16px, mínimo 24px) */
   --modal-max-h: 90dvh; /* Altura máxima permitida para el diálogo modal */
   --carousel-pad: var(--space-2xl); /* Padding de carruseles */
   --carousel-reach-top: 3px; /* Alcance vertical superior de la sombra de selección (12 - 3 - 6) */
@@ -122,6 +122,13 @@
 @media (max-width: 480px) {
   :root {
     --modal-block-gap: 16px;
+  }
+}
+
+/* Padding inferior del pie de modales en escritorio (>=768px: 20px) */
+@media (min-width: 768px) {
+  :root {
+    --modal-footer-pad-bottom: var(--space-xl);
   }
 }
 

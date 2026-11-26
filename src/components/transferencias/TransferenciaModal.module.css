@@ -353,7 +353,7 @@
 
 
   .formFooter {
-    padding: var(--modal-footer-pad-top) var(--modal-pad-x) max(var(--modal-footer-pad-bottom), env(safe-area-inset-bottom, 0px)); /* Espaciado oficial del pie con safe-area */
+    padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
     gap: var(--modal-footer-btn-gap); /* Separación oficial entre botones del pie */
   }
 

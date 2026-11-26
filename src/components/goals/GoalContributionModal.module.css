@@ -374,7 +374,7 @@
 
 @media (max-width: 480px) {
   .formFooter {
-    padding: 8px var(--modal-pad-x) 14px; /* Separación lateral oficial */
+    padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial del pie */
   }
 }
 

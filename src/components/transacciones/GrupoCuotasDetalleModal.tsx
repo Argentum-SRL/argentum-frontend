@@ -510,7 +510,7 @@ export default function GrupoCuotasDetalleModal({
                       >
                         {saving
                           ? 'Procesando pago...'
-                          : `Confirmar pago (${formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)})`}
+                          : 'Confirmar pago'}
                       </button>
                     </div>
                   </form>

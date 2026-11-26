@@ -460,7 +460,7 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                     },
                     {
                       value: 'otro',
-                      label: 'Ingresar otro monto',
+                      label: 'Otro monto',
                       icon: <Edit3 size={15} strokeWidth={2} />,
                     },
                   ]}
@@ -825,10 +825,8 @@ export const PagarResumenModal: React.FC<PagarResumenModalProps> = ({
                     <Check size={16} strokeWidth={2.5} />
                     <span>
                       {monedaAPagar === 'USD' && modoUSD === 'pesificar'
-                        ? (pesificacionSim?.total_estimado_ars != null
-                          ? `Confirmar (${formatMonto(pesificacionSim.total_estimado_ars, 'ARS')})`
-                          : 'Confirmar')
-                        : `Confirmar pago (${formatMonto(numMonto, monedaAPagar)})`
+                        ? 'Confirmar'
+                        : 'Confirmar pago'
                       }
                     </span>
                   </>

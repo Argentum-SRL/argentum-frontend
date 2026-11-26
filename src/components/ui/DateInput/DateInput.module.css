@@ -383,6 +383,11 @@
   gap: 8px;
 }
 
+/* En hoja mobile (Modal noPadding), el pie aporta el margen inferior canónico sin alterar el popover */
+.calendarFooter.calendarFooterSheet {
+  padding-bottom: var(--modal-footer-pad-bottom);
+}
+
 .footerLeft {
   flex: 1;
   display: flex;

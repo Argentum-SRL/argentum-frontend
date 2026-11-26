@@ -65,12 +65,12 @@
   animation: slideUpMobile 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.sheet .content {
-  padding-bottom: max(var(--modal-content-pad-bottom), env(safe-area-inset-bottom, 0px));
+.sheet:not(.noPadding) .content {
+  padding-bottom: var(--modal-content-pad-bottom);
 }
 
 .sheet .footer {
-  padding-bottom: max(var(--modal-footer-pad-bottom), env(safe-area-inset-bottom, 0px));
+  padding-bottom: var(--modal-footer-pad-bottom);
 }
 
 @media (max-width: 767px) {
@@ -84,11 +84,14 @@
     border-radius: var(--modal-radius) var(--modal-radius) 0 0;
     animation: slideUpMobile 240ms cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .content {
-    padding-bottom: max(var(--modal-content-pad-bottom), env(safe-area-inset-bottom, 0px));
+  .container:not(.noPadding) .content {
+    padding-bottom: var(--modal-content-pad-bottom);
+  }
+  .container:not(.noPadding) .content:last-child {
+    padding-bottom: var(--modal-footer-pad-bottom);
   }
   .footer {
-    padding-bottom: max(var(--modal-footer-pad-bottom), env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--modal-footer-pad-bottom);
   }
 }
 
@@ -189,7 +192,7 @@
 }
 
 .footer {
-  padding: 0 var(--modal-pad-x) var(--modal-pad-x);
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom);
   display: flex;
   justify-content: flex-end;
   gap: var(--modal-footer-btn-gap);

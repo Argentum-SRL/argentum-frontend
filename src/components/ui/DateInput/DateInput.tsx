@@ -513,8 +513,8 @@ export const DateInput: React.FC<DateInputProps> = ({
     closePicker()
   }
 
-  const footerContent = (
-    <div className={styles.calendarFooter}>
+  const renderFooter = (inSheet: boolean) => (
+    <div className={[styles.calendarFooter, inSheet ? styles.calendarFooterSheet : ''].filter(Boolean).join(' ')}>
       <div className={styles.footerLeft}>
         {parsedValueDate && (
           <button className={styles.clearBtn} onClick={handleClear} type="button">
@@ -583,13 +583,13 @@ export const DateInput: React.FC<DateInputProps> = ({
             <div className={styles.bottomSheetContent} data-modal-block>
               {wheelPickerContent}
             </div>
-            {footerContent}
+            {renderFooter(true)}
           </Modal>
         )}
         {open && !isMobile && createPortal(
           <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
             {wheelPickerContent}
-            {footerContent}
+            {renderFooter(false)}
           </div>,
           document.body
         )}
@@ -673,13 +673,13 @@ export const DateInput: React.FC<DateInputProps> = ({
           <div className={styles.bottomSheetContent} data-modal-block>
             {wheelPickerContent}
           </div>
-          {footerContent}
+          {renderFooter(true)}
         </Modal>
       )}
       {open && !isMobile && createPortal(
         <div ref={popoverRef} className={styles.popover} data-portal="date-picker">
           {wheelPickerContent}
-          {footerContent}
+          {renderFooter(false)}
         </div>,
         document.body
       )}

@@ -494,7 +494,7 @@
 
 @media (max-width: 480px) {
   .detailFormFooter {
-    padding: var(--modal-footer-pad-top) 14px 14px;
+    padding: var(--modal-footer-pad-top) 14px var(--modal-footer-pad-bottom);
   }
   .detailHeroSurface {
     padding: 12px 14px;

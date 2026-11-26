@@ -543,7 +543,7 @@
 
 /* ── Mobile Modal Drawer Content Styles ── */
 .mobileDrawerContainer {
-  padding: 0 4px 10px;
+  padding: 0 4px;
 }
 
 .mobileDrawerBody {

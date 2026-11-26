@@ -193,6 +193,15 @@
   gap: 8px;
 }
 
+/* En hoja mobile (Modal noPadding), el pie aporta el margen inferior canónico sin alterar el popover */
+.bottomSheetContent .wheelPickerContainer {
+  padding-bottom: 0;
+}
+
+.bottomSheetContent .pickerFooter {
+  padding-bottom: var(--modal-footer-pad-bottom);
+}
+
 .nowBtn {
   font-size: 12px;
   font-weight: 600;

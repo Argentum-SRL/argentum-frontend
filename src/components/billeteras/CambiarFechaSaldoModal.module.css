@@ -133,7 +133,7 @@
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .modalFooter {
-  padding: 16px var(--modal-pad-x);
+  padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -211,7 +211,7 @@
   }
 
   .modalFooter {
-    padding: 12px var(--modal-pad-x) 16px;
+    padding: 12px var(--modal-pad-x) var(--modal-footer-pad-bottom);
   }
 
   .cancelBtn,

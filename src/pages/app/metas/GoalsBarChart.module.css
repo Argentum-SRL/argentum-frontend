@@ -507,6 +507,12 @@
     margin-top: 12px;
   }
 }
+@media (max-width: 767px) {
+  .sheetContent {
+    padding-bottom: var(--modal-footer-pad-bottom);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
 
   .barArea,

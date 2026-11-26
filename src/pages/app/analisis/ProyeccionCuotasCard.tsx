@@ -413,7 +413,7 @@ export default function ProyeccionCuotasCard({
                           <CreditCard size={16} />
                         </div>
                         <div className={styles.planTexts}>
-                          <span className={styles.planTitle}>{plan.descripcion}</span>
+                          <span className={styles.planTitle} title={plan.descripcion}>{plan.descripcion}</span>
                           <span className={styles.planSub}>
                             {plan.tarjeta_nombre} · Restan {plan.cuotas_restantes} de {plan.cantidad_cuotas}{' '}
                             cuotas · Termina en <strong>{plan.ultimo_mes_etiqueta}</strong>

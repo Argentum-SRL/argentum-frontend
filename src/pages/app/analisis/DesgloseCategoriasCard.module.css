@@ -51,6 +51,7 @@
 }
 
 .backBtn {
+  position: relative;
   width: 38px;
   height: 38px;
   border-radius: 12px;
@@ -63,6 +64,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
 }
 
 .backBtn:hover {
@@ -281,12 +288,6 @@
   align-items: center;
 }
 
-@media (min-width: 768px) {
-  .donutLayout {
-    grid-template-columns: 240px 1fr;
-  }
-}
-
 .donutChartBox {
   position: relative;
   width: 100%;
@@ -349,6 +350,7 @@
 
 .donutLegendItem {
   width: 100%;
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -434,6 +436,7 @@
 }
 
 .clearSubBtn {
+  position: relative;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--primary);
@@ -441,6 +444,12 @@
   border: none;
   cursor: pointer;
   padding: 0;
+}
+
+.clearSubBtn::before {
+  content: '';
+  position: absolute;
+  inset: -14px -8px;
 }
 
 .clearSubBtn:focus-visible {
@@ -452,12 +461,6 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
-}
-
-@media (min-width: 640px) {
-  .subcatList {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 .subcatRow {
@@ -565,6 +568,7 @@
 }
 
 .verMasBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -581,6 +585,12 @@
   align-self: center;
   margin-top: 8px;
   transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .verMasBtn:hover {
@@ -627,14 +637,23 @@
   }
 
   .subcatsHeading {
-    font-size: clamp(9.5px, 2.6vw, 11px);
+    font-size: 11px;
     letter-spacing: 0.015em;
-    white-space: nowrap;
   }
 
   .verMasBtn {
     min-height: 44px;
     height: 44px;
+  }
+}
+
+@media (min-width: 768px) {
+  .donutLayout {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .subcatList {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

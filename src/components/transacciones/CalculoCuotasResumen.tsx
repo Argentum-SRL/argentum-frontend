@@ -1,6 +1,7 @@
 import { memo, useState, useMemo } from 'react'
 import { SlidersHorizontal, Plus, Minus } from '@/components/ui/icons'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
+import { MontoFit } from '@/components/ui'
 import type { ResumenDeCompraResponse, PlanCuotas } from '@/types'
 import { useSimularCuotas } from '@/hooks/useSimularCuotas'
 import ResumenDeCompraInfo from './ResumenDeCompraInfo'
@@ -93,7 +94,10 @@ export const CalculoCuotasResumen = memo(function CalculoCuotasResumen({
                 <span className={styles.planCuotasLbl}>{n === 1 ? 'pago' : 'cuotas'}</span>
                 {n > 1 && monto && planN ? (
                   <span className={styles.planCuotasAmt}>
-                    {formatMonto(planN.monto_cuota, moneda)}/mes
+                    <MontoFit
+                      completo={`${formatMonto(planN.monto_cuota, moneda as 'ARS' | 'USD')}/mes`}
+                      corto={`${formatMontoCorto(planN.monto_cuota, moneda as 'ARS' | 'USD')}/mes`}
+                    />
                   </span>
                 ) : null}
               </button>

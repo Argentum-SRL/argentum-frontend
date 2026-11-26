@@ -46,7 +46,7 @@
   padding: 3px 9px;
   border-radius: 999px;
   letter-spacing: 0.2px;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: insignia corta de cotización sugerida */
   border: 1px solid rgba(99, 102, 241, 0.22);
 }
 
@@ -58,7 +58,7 @@
   padding: 3px 9px;
   border-radius: 999px;
   letter-spacing: 0.2px;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: insignia corta de cotización modificada */
   border: 1px solid var(--border);
 }
 
@@ -160,6 +160,7 @@
 }
 
 .resetBtn {
+  position: relative;
   background: transparent;
   border: none;
   color: var(--primary);
@@ -172,6 +173,12 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.resetBtn::before {
+  content: '';
+  position: absolute;
+  inset: -12px -4px;
 }
 
 .resetBtn:hover {

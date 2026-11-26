@@ -49,7 +49,12 @@ export function ReintegroSwitchCard({ tieneReintegro, onToggle, disabled }: Rein
           <span className={styles.settingLabel}>Me devolvieron plata (reintegro o devolución)</span>
           {tieneReintegro && <span className={styles.badgePillGreen}>Activo</span>}
         </div>
-        <span className={styles.settingSub}>
+        <span
+          className={styles.settingSub}
+          title={tieneReintegro
+            ? 'Se registrará para esta compra'
+            : 'Activalo si tenés una promoción o te devolvieron la compra'}
+        >
           {tieneReintegro
             ? 'Se registrará para esta compra'
             : 'Activalo si tenés una promoción o te devolvieron la compra'}

@@ -10,6 +10,10 @@ const AREAS = [
   'src/components/layout',
   'src/components/tools',
   'src/pages/app/tools',
+  'src/pages/app/analisis',
+  'src/components/transacciones',
+  'src/pages/app/transacciones',
+  'src/components/transferencias',
 ]
 
 const CORTES_OFICIALES_ANCHO = new Set([

@@ -22,6 +22,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.titleGroup > div {
+  min-width: 0;
+  flex: 1;
 }
 
 .iconWrap {
@@ -294,6 +301,7 @@
 }
 
 .verMasBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -310,6 +318,12 @@
   align-self: center;
   margin-top: 8px;
   transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .verMasBtn:hover {
@@ -339,7 +353,7 @@
   }
 
   .subtitle {
-    font-size: clamp(9.5px, 2.7vw, 11px);
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -126,6 +126,7 @@
 }
 
 .deleteHeaderBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -138,6 +139,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
+}
+
+.deleteHeaderBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px -4px;
 }
 
 .deleteHeaderBtn:hover {
@@ -166,6 +173,16 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background 120ms ease, color 120ms ease;
+}
+
+.backBtn {
+  position: relative;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px -4px;
 }
 
 .closeBtn {
@@ -210,16 +227,6 @@
   padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap); /* Separación oficial v3 */
 }
 
-@media (max-width: 480px) {
-  .formFields {
-    padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
-  }
-  .formBodyWithHeader .formHeader {
-    padding: 16px var(--modal-pad-x) 0;
-    margin-bottom: 0;
-  }
-}
-
 .formBody::-webkit-scrollbar {
   width: 4px;
 }
@@ -236,7 +243,7 @@
 }
 
 .fieldLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -296,6 +303,7 @@
 
 /* Chip toggle de moneda — un solo botón que alterna al hacer click */
 .monedaToggleChip {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -309,6 +317,12 @@
   flex-shrink: 0;
 }
 
+.monedaToggleChip::before {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}
+
 .monedaToggleChip:hover {
   background: var(--border);
 }
@@ -319,7 +333,7 @@
 }
 
 .monedaChipLabel {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--text-2);
   letter-spacing: 0.4px;
@@ -421,6 +435,17 @@
   background: #16A34A;
   color: white;
   box-shadow: var(--elevation-xs);
+}
+
+@media (max-width: 767.98px) {
+  .formFields {
+    padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
+  }
+
+  .formBodyWithHeader .formHeader {
+    padding: 16px var(--modal-pad-x) 0;
+    margin-bottom: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

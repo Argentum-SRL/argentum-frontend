@@ -131,6 +131,7 @@
 
 .iconActionBtn,
 .iconActionBtnDanger {
+  position: relative;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -143,6 +144,14 @@
   cursor: pointer;
   transition: background-color 140ms ease, color 140ms ease;
   padding: 0;
+}
+
+.iconActionBtn::before,
+.iconActionBtnDanger::before {
+  content: '';
+  position: absolute;
+  /* max horizontal N=3 por gap de 6px en .reportCardActions */
+  inset: -7px -3px;
 }
 
 .iconActionBtn:hover {
@@ -208,7 +217,7 @@
 }
 
 .blockChipsLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-3);
@@ -235,6 +244,7 @@
 }
 
 .openReportBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -252,6 +262,12 @@
   font-family: inherit;
   transition: opacity 140ms ease;
   box-sizing: border-box;
+}
+
+.openReportBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .openReportBtn:hover {
@@ -272,6 +288,7 @@
 }
 
 .templateBtnSecondary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -289,11 +306,18 @@
   transition: background-color 140ms ease;
 }
 
+.templateBtnSecondary::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
 .templateBtnSecondary:hover {
   background: var(--border);
 }
 
 .templateBtnPrimary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -310,6 +334,12 @@
   font-family: inherit;
   flex: 1;
   transition: opacity 140ms ease;
+}
+
+.templateBtnPrimary::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .templateBtnPrimary:hover {
@@ -394,6 +424,7 @@
 }
 
 .heroCalloutBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -407,39 +438,20 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón de acción en tarjeta hero */
   flex-shrink: 0;
   font-family: inherit;
   transition: opacity 140ms ease;
 }
 
-.heroCalloutBtn:hover {
-  opacity: 0.92;
+.heroCalloutBtn::before {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
-@media (max-width: 640px) {
-  .heroCalloutCard {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    padding: 16px;
-  }
-
-  .heroCalloutLeft {
-    align-items: flex-start;
-  }
-
-  .heroCalloutBtn {
-    width: 100%;
-    height: 44px;
-    min-height: 44px;
-  }
-
-  .templateBtnSecondary,
-  .templateBtnPrimary {
-    min-height: 44px;
-    height: 44px;
-  }
+.heroCalloutBtn:hover {
+  opacity: 0.92;
 }
 
 /* ── Constructor de Informes (Rediseñado 2026 Compacto & Ergonómico) ── */
@@ -479,6 +491,7 @@
 }
 
 .backBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -494,6 +507,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
 }
 
 @media (hover: hover) {
@@ -523,6 +542,8 @@
   color: var(--text);
   letter-spacing: -0.01em;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .statusBadge {
@@ -536,7 +557,7 @@
   font-size: 11px;
   font-weight: 600;
   flex-shrink: 0;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: insignia corta de cantidad de bloques */
 }
 
 .builderHeaderActions {
@@ -548,12 +569,20 @@
 
 .headerBtnSecondary,
 .headerBtnPrimary {
+  position: relative;
   min-width: auto;
   min-height: 36px;
   height: 36px;
   padding: 0 14px;
   font-size: 13px;
   flex-shrink: 0;
+}
+
+.headerBtnSecondary::before,
+.headerBtnPrimary::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
 }
 
 .builderLayout {
@@ -570,6 +599,10 @@
 @media (min-width: 1024px) {
   .builderLayout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  }
+
+  .builderBlocksCol .sectionPanel {
+    height: 100%;
   }
 }
 
@@ -604,12 +637,6 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-}
-
-@media (min-width: 1024px) {
-  .builderBlocksCol .sectionPanel {
-    height: 100%;
-  }
 }
 
 .sectionHeader {
@@ -847,7 +874,203 @@
   display: none;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .backBtn,
+  .textInput,
+  .blockRow,
+  .blockIconWrap,
+  .blockCheckCircle {
+    transition: none;
+  }
+}
+
+/* ── Visor de Informe ── */
+.viewerWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.viewerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.viewerTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.viewerBackBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  flex-shrink: 0;
+}
+
+.viewerBackBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+
+.viewerBackBtn:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+.viewerBackBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.viewerTitleText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.viewerTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.viewerSub {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.viewerBlocks {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loadingCard {
+  padding: 36px;
+  text-align: center;
+  color: var(--text-2);
+  font-size: 14px;
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.verMasBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  margin-top: 8px;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.verMasBtn:hover {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
+@media (max-width: 1023.98px) {
+  .reportsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 767.98px) {
+  .reportsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .reportCard,
+  .templateCard {
+    padding: 14px 14px;
+    gap: 8px;
+    border-radius: 16px;
+  }
+
+  .reportHeaderLeft {
+    gap: 8px;
+  }
+
+  .reportName {
+    font-size: 14.5px;
+  }
+
+  .openReportBtn {
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .templateBtnSecondary,
+  .templateBtnPrimary {
+    min-height: 44px;
+    height: 44px;
+  }
+
+  .heroCalloutCard {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .heroCalloutLeft {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .heroCalloutBtn {
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    white-space: normal;
+  }
+
   .builderCard {
     padding: 12px;
     border-radius: 16px;
@@ -868,16 +1091,13 @@
 
   .titleWithBadge {
     gap: 0;
-    flex-shrink: 0;
+    flex: 1;
     min-width: 0;
   }
 
   .builderTitle {
     font-size: 0.875rem;
     font-weight: 700;
-    white-space: nowrap;
-    overflow: visible;
-    flex-shrink: 0;
   }
 
   .statusBadge {
@@ -926,166 +1146,6 @@
 
   .mobileBottomActions {
     display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .backBtn,
-  .textInput,
-  .blockRow,
-  .blockIconWrap,
-  .blockCheckCircle {
-    transition: none;
-  }
-}
-
-/* ── Visor de Informe ── */
-.viewerWrap {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.viewerHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.viewerTitleGroup {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.viewerBackBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  min-height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
-  color: var(--text-2);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
-  flex-shrink: 0;
-}
-
-.viewerBackBtn:hover {
-  background: var(--surface);
-  color: var(--text);
-  border-color: var(--primary);
-}
-
-.viewerBackBtn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.viewerTitleText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.viewerTitle {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--text);
-}
-
-.viewerSub {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-2);
-}
-
-.viewerBlocks {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.loadingCard {
-  padding: 36px;
-  text-align: center;
-  color: var(--text-2);
-  font-size: 14px;
-  background: var(--surface);
-  border-radius: 20px;
-  border: 1px solid var(--border);
-}
-
-.verMasBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 14px;
-  min-height: 36px;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  color: var(--text-2);
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: center;
-  margin-top: 8px;
-  transition: color 140ms ease, background-color 140ms ease;
-}
-
-.verMasBtn:hover {
-  color: var(--text);
-  background: var(--surface-alt);
-}
-
-@media (max-width: 1023.98px) {
-  .reportsGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 767.98px) {
-  .reportsGrid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .reportCard,
-  .templateCard {
-    padding: 14px 14px;
-    gap: 8px;
-    border-radius: 16px;
-  }
-
-  .reportHeaderLeft {
-    gap: 8px;
-  }
-
-  .reportName {
-    font-size: 14.5px;
-  }
-
-  .openReportBtn {
-    height: 36px;
-    font-size: 13px;
-  }
-
-  .textInput {
-    font-size: 16px;
   }
 
   .verMasBtn {

@@ -342,7 +342,10 @@ export default function FilterBar({
             ) : (
               <Wallet size={15} />
             )}
-            <span className={styles.popoverItemText}>
+            <span
+              className={styles.popoverItemText}
+              title={bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}
+            >
               {bill.es_efectivo ? `Efectivo ${bill.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : bill.nombre}
             </span>
             {bill.es_principal && (
@@ -605,7 +608,10 @@ export default function FilterBar({
               aria-haspopup="dialog"
             >
               <Wallet size={14} className={styles.pillIcon} />
-              <span className={styles.pillText}>
+              <span
+                className={styles.pillText}
+                title={activeBilletera ? (activeBilletera.es_efectivo ? `Efectivo ${activeBilletera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : activeBilletera.nombre) : 'Billetera'}
+              >
                 {activeBilletera 
                   ? (activeBilletera.es_efectivo ? `Efectivo ${activeBilletera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : activeBilletera.nombre)
                   : 'Billetera'}
@@ -646,7 +652,14 @@ export default function FilterBar({
                 nombre={activeCategoria?.nombre} 
                 size={14} 
               />
-              <span className={styles.pillText}>
+              <span
+                className={styles.pillText}
+                title={filters.categoria_ids && filters.categoria_ids.length > 1
+                  ? `${filters.categoria_ids.length} categorías`
+                  : activeCategoria
+                  ? activeCategoria.nombre
+                  : 'Categoría'}
+              >
                 {filters.categoria_ids && filters.categoria_ids.length > 1
                   ? `${filters.categoria_ids.length} cat.`
                   : activeCategoria

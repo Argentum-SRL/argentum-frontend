@@ -306,7 +306,9 @@ export default function DesgloseCategoriasCard({
 
           <div className={styles.movsSection}>
             <div className={styles.sectionHeaderRow}>
-              <span className={styles.subcatsHeading}>Movimientos que componen este gasto</span>
+              <span className={styles.subcatsHeading} title="Movimientos que componen este gasto">
+                Movimientos que componen este gasto
+              </span>
               <span className={styles.movsCountBadge}>{movimientos.length}</span>
             </div>
 
@@ -316,32 +318,33 @@ export default function DesgloseCategoriasCard({
               <p className={styles.loadingText}>No se encontraron movimientos para este filtro.</p>
             ) : (
               <div className={styles.movsList}>
-                {movimientos.map((mov) => (
-                  <div key={mov.id} className={styles.movRow}>
-                    <div className={styles.movAvatarWrap}>
-                      <MovimientoAvatar
-                        movimiento={{
-                          descripcion: mov.descripcion,
-                          categoria_nombre: mov.categoria_nombre,
-                          subcategoria_nombre: mov.subcategoria_nombre,
-                          tipo: mov.tipo,
-                        }}
-                        size={28}
-                      />
-                    </div>
-                    <div className={styles.movInfo}>
-                      <span className={styles.movDesc}>{mov.descripcion}</span>
-                      <span className={styles.movSub}>
-                        {formatFecha(mov.fecha)} · {mov.billetera_nombre}
-                        {mov.tarjeta_nombre ? ` (${mov.tarjeta_nombre})` : ''}
-                        {mov.cuota_texto ? ` · ${mov.cuota_texto}` : ''}
+                {movimientos.map((mov) => {
+                  const movSubTexto = `${formatFecha(mov.fecha)} · ${mov.billetera_nombre}${mov.tarjeta_nombre ? ` (${mov.tarjeta_nombre})` : ''}${mov.cuota_texto ? ` · ${mov.cuota_texto}` : ''}`
+                  return (
+                    <div key={mov.id} className={styles.movRow}>
+                      <div className={styles.movAvatarWrap}>
+                        <MovimientoAvatar
+                          movimiento={{
+                            descripcion: mov.descripcion,
+                            categoria_nombre: mov.categoria_nombre,
+                            subcategoria_nombre: mov.subcategoria_nombre,
+                            tipo: mov.tipo,
+                          }}
+                          size={28}
+                        />
+                      </div>
+                      <div className={styles.movInfo}>
+                        <span className={styles.movDesc} title={mov.descripcion}>{mov.descripcion}</span>
+                        <span className={styles.movSub} title={movSubTexto}>
+                          {movSubTexto}
+                        </span>
+                      </div>
+                      <span className={styles.movAmount}>
+                        {formatMonto(mov.monto, mov.moneda)}
                       </span>
                     </div>
-                    <span className={styles.movAmount}>
-                      {formatMonto(mov.monto, mov.moneda)}
-                    </span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
@@ -413,7 +416,7 @@ export default function DesgloseCategoriasCard({
                   className={styles.colorSwatch}
                   style={{ backgroundColor: getCategoriaColor(cat, idx) }}
                 />
-                <span className={styles.donutLegendName}>{cat.categoria_nombre}</span>
+                <span className={styles.donutLegendName} title={cat.categoria_nombre}>{cat.categoria_nombre}</span>
                 <span className={styles.donutLegendPct}>
                   {formatPorcentaje(cat.porcentaje_del_total)}
                 </span>
@@ -451,7 +454,7 @@ export default function DesgloseCategoriasCard({
                       <span className={styles.rankBadge}>#{idx + 1}</span>
                     )}
                     <CategoriaIcon nombre={cat.categoria_nombre} size={26} />
-                    <span className={styles.catName}>{cat.categoria_nombre}</span>
+                    <span className={styles.catName} title={cat.categoria_nombre}>{cat.categoria_nombre}</span>
                   </div>
 
                   <div className={styles.catAmountsWrap}>
@@ -463,7 +466,10 @@ export default function DesgloseCategoriasCard({
                 </div>
 
                 <div className={styles.catMetaLine}>
-                  <span className={styles.catSubInfo}>
+                  <span
+                    className={styles.catSubInfo}
+                    title={`${cat.subcategorias.length} ${cat.subcategorias.length === 1 ? 'subcategoría' : 'subcategorías'} · ${cat.cantidad_movimientos} mov.`}
+                  >
                     {cat.subcategorias.length}{' '}
                     {cat.subcategorias.length === 1 ? 'subcategoría' : 'subcategorías'} ·{' '}
                     {cat.cantidad_movimientos} mov.

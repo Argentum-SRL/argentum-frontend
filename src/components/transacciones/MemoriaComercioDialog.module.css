@@ -248,21 +248,9 @@
   border-top: none;
 }
 
-@media (max-width: 480px) {
-  .formHeader {
-    padding: 14px var(--modal-pad-x) 4px; /* Separación lateral oficial */
-  }
-  .formBody {
-    padding: 10px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
-  }
-  .formFooter {
-    padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial del pie */
-  }
-}
-
 .cancelBtn {
   flex: 1;
-  height: 42px;
+  height: 44px;
   border-radius: 12px;
   border: 1.5px solid var(--surface-alt);
   background: transparent;
@@ -289,7 +277,7 @@
 
 .submitBtn {
   flex: 2;
-  height: 42px;
+  height: 44px;
   border-radius: 12px;
   border: none;
   background: var(--primary);
@@ -347,6 +335,20 @@
   margin-bottom: 0;
   line-height: 1.4;
   font-weight: 500;
+}
+
+@media (max-width: 767.98px) {
+  .formHeader {
+    padding: 14px var(--modal-pad-x) 4px; /* Separación lateral oficial */
+  }
+
+  .formBody {
+    padding: 10px var(--modal-pad-x) var(--modal-footer-gap); /* Separación lateral y pie oficial */
+  }
+
+  .formFooter {
+    padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial del pie */
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

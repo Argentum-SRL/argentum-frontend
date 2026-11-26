@@ -29,6 +29,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.titleGroup > div {
+  min-width: 0;
+  flex: 1;
 }
 
 .iconWrap {
@@ -314,7 +321,7 @@
   font-weight: 700;
   color: #FF8A65;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: monto principal de categoría en comparativa */
 }
 
 .amountSecondary {
@@ -322,7 +329,7 @@
   font-weight: 600;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: monto comparativo de categoría */
 }
 
 .badgeGood,
@@ -333,7 +340,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: insignia corta de variación monetaria y porcentual */
 }
 
 .badgeGood {
@@ -432,6 +439,7 @@
 }
 
 .verMasBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -448,6 +456,12 @@
   align-self: center;
   margin-top: 8px;
   transition: color 140ms ease, background-color 140ms ease;
+}
+
+.verMasBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .verMasBtn:hover {
@@ -477,7 +491,7 @@
   }
 
   .subtitle {
-    font-size: clamp(9.5px, 2.7vw, 11px);
+    font-size: 11px;
     letter-spacing: -0.01em;
     white-space: nowrap;
     overflow: hidden;
@@ -518,7 +532,7 @@
   }
 
   .selectLabel {
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.02em;
   }
 
@@ -532,7 +546,7 @@
 
   .vsBadge {
     height: 36px;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 800;
     color: var(--text-3);
     display: flex;

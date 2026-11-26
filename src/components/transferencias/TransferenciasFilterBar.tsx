@@ -184,7 +184,7 @@ export const TransferenciasFilterBar: React.FC<TransferenciasFilterBarProps> = (
                 aria-expanded={datePopoverOpen}
               >
                 <Calendar size={14} className={styles.pillIcon} />
-                <span className={styles.pillText}>{getPeriodoLabel(periodoPreset)}</span>
+                <span className={styles.pillText} title={getPeriodoLabel(periodoPreset)}>{getPeriodoLabel(periodoPreset)}</span>
                 <ChevronDown size={14} className={styles.pillChevron} />
               </div>
 

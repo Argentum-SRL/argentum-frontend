@@ -3,7 +3,7 @@
 }
 
 .planCuotasLbl {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -12,12 +12,14 @@
 }
 
 .planCuotasAmt {
-  font-size: 10px;
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-2);
   margin-top: 2px;
   line-height: 1;
-  white-space: nowrap;
 }
 
 .planOptionCardActive .planCuotasAmt {
@@ -39,15 +41,6 @@
   cursor: pointer;
   transition: transform 160ms ease, opacity 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
   min-height: 54px;
-}
-
-@media (max-width: 480px) {
-  .planCustomBtn {
-    grid-column: span 4;
-    min-height: 36px;
-    flex-direction: row;
-    gap: 6px;
-  }
 }
 
 .planCustomBtn:hover {
@@ -82,6 +75,7 @@
 }
 
 .stepperBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -95,6 +89,12 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
+}
+
+.stepperBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .stepperBtn:hover {
@@ -112,6 +112,7 @@
 
 /* ── Progressive Disclosure Link & Drawer ────────────────────────────────── */
 .advancedToggleBtn {
+  position: relative;
   background: none;
   border: none;
   font-size: 11.5px;
@@ -124,6 +125,12 @@
   padding: 2px 0;
   transition: color 150ms ease;
   align-self: flex-start;
+}
+
+.advancedToggleBtn::before {
+  content: '';
+  position: absolute;
+  inset: -12px 0;
 }
 
 .advancedToggleBtn:hover {
@@ -141,13 +148,6 @@
   animation: fadeIn 150ms ease-out;
 }
 
-@media (max-width: 480px) {
-  .advancedDrawer {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-}
-
 .advField {
   display: flex;
   flex-direction: column;
@@ -155,7 +155,7 @@
 }
 
 .advLabel {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -253,7 +253,7 @@
 
 
 .summaryLbl {
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -283,7 +283,7 @@
 
 .cancelBtn {
   flex: 1;
-  height: 42px;
+  height: 44px;
   border-radius: 12px;
   border: 1.5px solid var(--surface-alt);
   background: transparent;
@@ -307,6 +307,7 @@
 
 .bodyDeleteBtn {
   width: 100%;
+  min-height: 44px;
   height: var(--control-h);
   padding: 0 4px;
   border: none;
@@ -330,7 +331,7 @@
 
 .submitBtn {
   flex: 2;
-  height: 42px;
+  height: 44px;
   border-radius: 12px;
   border: none;
   background: var(--primary);
@@ -363,17 +364,9 @@
 }
 
 .fechaCol {
-  flex: 0 0 152px;
-  width: 152px;
-  min-width: 152px;
-}
-
-@media (max-width: 420px) {
-  .fechaCol {
-    flex: 0 0 140px;
-    width: 140px;
-    min-width: 140px;
-  }
+  flex: 0 0 clamp(140px, calc(129.4118px + 2.9412vw), 152px);
+  width: clamp(140px, calc(129.4118px + 2.9412vw), 152px);
+  min-width: 0;
 }
 
 .flex2 {
@@ -434,16 +427,46 @@
 }
 
 /* ── Global Responsive overrides for compact viewports ─────────────────── */
-@media (max-width: 480px), (max-height: 720px) {
+@media (max-width: 767.98px) {
+  .planCustomBtn {
+    grid-column: span 4;
+    min-height: 44px;
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .advancedDrawer {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
   .montoHeroPrefix,
   .montoHeroField {
     font-size: 26px !important;
   }
+
   .formFooter {
     padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial del pie */
   }
-  .cancelBtn, .submitBtn {
-    height: 40px;
+
+  .cancelBtn,
+  .submitBtn {
+    font-size: 13px;
+  }
+}
+
+@media (max-height: 720px) {
+  .montoHeroPrefix,
+  .montoHeroField {
+    font-size: 26px !important;
+  }
+
+  .formFooter {
+    padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial del pie */
+  }
+
+  .cancelBtn,
+  .submitBtn {
     font-size: 13px;
   }
 }

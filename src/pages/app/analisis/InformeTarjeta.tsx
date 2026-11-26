@@ -74,7 +74,7 @@ export default function InformeTarjeta({
             <FileSpreadsheet size={18} />
           </div>
           <div className={styles.reportTitleBlock}>
-            <h3 className={styles.reportName}>{informe.nombre}</h3>
+            <h3 className={styles.reportName} title={informe.nombre}>{informe.nombre}</h3>
             <p className={styles.reportDesc}>
               {informe.descripcion || 'Informe personalizado por bloques'}
             </p>
@@ -193,7 +193,7 @@ export function PlantillaTarjeta({
             {getTemplateIcon(plantilla.id)}
           </div>
           <div className={styles.reportTitleBlock}>
-            <h4 className={styles.reportName}>{plantilla.nombre}</h4>
+            <h4 className={styles.reportName} title={plantilla.nombre}>{plantilla.nombre}</h4>
             <p className={styles.reportDesc}>{plantilla.descripcion}</p>
           </div>
         </div>

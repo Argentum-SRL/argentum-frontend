@@ -150,12 +150,12 @@ const MovimientoRow = memo(({
         {/* Desktop metadata */}
         <div className={`${styles.metaRow} ${styles.desktopOnly}`}>
           {subtitle && (
-            <span className={styles.metaText}>{subtitle}</span>
+            <span className={styles.metaText} title={subtitle}>{subtitle}</span>
           )}
         </div>
 
         {/* Mobile metadata */}
-        <div className={`${styles.mobileSubtitleRow} ${styles.mobileOnly}`}>
+        <div className={`${styles.mobileSubtitleRow} ${styles.mobileOnly}`} title={subtitle || undefined}>
           {subtitle && (
             <span>{subtitle}</span>
           )}

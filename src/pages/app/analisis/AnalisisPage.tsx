@@ -178,8 +178,13 @@ export default function AnalisisPage() {
       {/* 1. Encabezado */}
       <header className={styles.pageHeader}>
         <div className={styles.titleGroup}>
-          <h1>{esInformes ? 'Mis Informes Personalizados' : 'Análisis'}</h1>
-          <p className={styles.subtitle}>
+          <h1 title={esInformes ? 'Mis Informes Personalizados' : 'Análisis'}>
+            {esInformes ? 'Mis Informes Personalizados' : 'Análisis'}
+          </h1>
+          <p
+            className={styles.subtitle}
+            title={esInformes ? 'Reportes a medida exportables a Excel o PDF' : subtituloDesktop}
+          >
             <span className={styles.subtitleDesktop}>
               {esInformes
                 ? 'Reportes a medida exportables a Excel o PDF'

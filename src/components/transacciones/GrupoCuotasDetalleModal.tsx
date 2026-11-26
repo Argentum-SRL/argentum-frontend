@@ -15,7 +15,8 @@ import {
 } from '@/components/ui/icons'
 import styles from './GruposCuotasTab.module.css'
 import type { GrupoCuotasResumen, Billetera, Categoria, Subcategoria, Suscripcion } from '@/types'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
+import { MontoFit } from '@/components/ui'
 import BilleteraCard from '@/components/billeteras/BilleteraCard'
 import SelectableSurface from '@/components/ui/SelectableSurface'
 import Modal from '@/components/ui/Modal/Modal'
@@ -230,14 +231,20 @@ export default function GrupoCuotasDetalleModal({
                             <div className={styles.detailStatCell}>
                               <span className={styles.detailStatLabel}>Total Pagado</span>
                               <span className={styles.detailStatValue}>
-                                {formatMonto(selectedGrupo.total_pagado, selectedGrupo.moneda)}
+                                <MontoFit
+                                  completo={formatMonto(selectedGrupo.total_pagado, selectedGrupo.moneda)}
+                                  corto={formatMontoCorto(selectedGrupo.total_pagado, selectedGrupo.moneda)}
+                                />
                               </span>
                             </div>
 
                             <div className={styles.detailStatCell}>
                               <span className={styles.detailStatLabel}>Total Pendiente</span>
                               <span className={`${styles.detailStatValue} ${selectedGrupo.cantidad_pendientes > 0 ? styles.statPendingRed : ''}`}>
-                                {formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)}
+                                <MontoFit
+                                  completo={formatMonto(selectedGrupo.total_pendiente, selectedGrupo.moneda)}
+                                  corto={formatMontoCorto(selectedGrupo.total_pendiente, selectedGrupo.moneda)}
+                                />
                               </span>
                             </div>
 

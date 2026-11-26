@@ -112,6 +112,16 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
+.backBtn {
+  position: relative;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
 .closeBtn {
   position: relative;
 }
@@ -163,16 +173,6 @@
   flex-direction: column;
 }
 
-@media (max-width: 480px) {
-  .formFields {
-    padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
-  }
-  .formHeader,
-  .formBodyWithHeader .formHeader {
-    padding: 16px var(--modal-pad-x) 0;
-  }
-}
-
 .formField {
   display: flex;
   flex-direction: column;
@@ -180,7 +180,7 @@
 }
 
 .fieldLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -219,20 +219,9 @@
 }
 
 .fechaCol {
-  flex: 0 0 152px;
-  width: 152px;
-  min-width: 152px;
-}
-
-@media (max-width: 420px) {
-  .descFechaRow {
-    gap: 6px;
-  }
-  .fechaCol {
-    flex: 0 0 140px;
-    width: 140px;
-    min-width: 140px;
-  }
+  flex: 0 0 clamp(140px, calc(129.4118px + 2.9412vw), 152px);
+  width: clamp(140px, calc(129.4118px + 2.9412vw), 152px);
+  min-width: 0;
 }
 
 .formFooter {
@@ -256,7 +245,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón corto de pie de modal en escritorio */
   cursor: pointer;
   transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
   border: none;
@@ -360,6 +349,27 @@
   line-height: 1.45;
   margin: 0;
   max-width: 320px;
+}
+
+@media (max-width: 767.98px) {
+  .formFields {
+    padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
+  }
+
+  .formHeader,
+  .formBodyWithHeader .formHeader {
+    padding: 16px var(--modal-pad-x) 0;
+  }
+
+  .descFechaRow {
+    gap: 6px;
+  }
+
+  .cancelBtn,
+  .submitBtn {
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,8 +5,8 @@ import path from 'node:path'
 const ROOT_DIR = path.resolve(__dirname, '../..')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
-// Cortes legados congelados al cierre de F2 (baja de 181 a 150 tras limpiar layout/, tools/ y pages/app/tools/): solo puede bajar.
-const TOPE_LEGADO = 150
+// Cortes legados congelados al cierre de F3 (baja de 150 a 111 tras limpiar analisis, transacciones y transferencias): solo puede bajar.
+const TOPE_LEGADO = 111
 
 const LEGADO: Record<string, Record<string, number>> = {
   'src/components/auth/AuthLayout/AuthLayout.module.css': {
@@ -70,50 +70,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   'src/components/tarjetas/TarjetaSummary.module.css': {
     'max 480': 2,
   },
-  'src/components/transacciones/DayGroup.module.css': {
-    'max 640': 1,
-  },
-  'src/components/transacciones/FilterBar.parte1.css': {
-    'min 1100': 8,
-    'min 1360': 1,
-  },
-  'src/components/transacciones/GruposCuotasTab.parte1.css': {
-    'max 640': 6,
-  },
-  'src/components/transacciones/GruposCuotasTab.parte2.css': {
-    'max 480': 3,
-    'max 640': 1,
-  },
-  'src/components/transacciones/GruposCuotasTab.parte3.css': {
-    'max 420': 1,
-    'max 480': 1,
-  },
-  'src/components/transacciones/MemoriaComercioDialog.module.css': {
-    'max 480': 1,
-  },
-  'src/components/transacciones/TransaccionModal.parte1.css': {
-    'max 480': 1,
-  },
-  'src/components/transacciones/TransaccionModal.parte2.css': {
-    'max 480': 1,
-  },
-  'src/components/transacciones/TransaccionModal.parte3.css': {
-    'max 420': 1,
-    'max 480': 3,
-  },
-  'src/components/transacciones/TransaccionRow.module.css': {
-    'max 640': 1,
-  },
-  'src/components/transferencias/TransferenciaModal.module.css': {
-    'max 480': 2,
-    'max 639': 1,
-  },
-  'src/components/transferencias/TransferenciaRow.module.css': {
-    'max 640': 1,
-  },
-  'src/components/transferencias/TransferenciasFilterBar.module.css': {
-    'min 1100': 3,
-  },
   'src/components/whatsapp/VinculacionWhatsAppCard.module.css': {
     'min 640': 1,
   },
@@ -141,12 +97,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   },
   'src/pages/admin/usuarios/UsuariosPanel.module.css': {
     'max 639': 2,
-  },
-  'src/pages/app/analisis/DesgloseCategoriasCard.module.css': {
-    'min 640': 1,
-  },
-  'src/pages/app/analisis/MisInformesTab.module.css': {
-    'max 640': 1,
   },
   'src/pages/app/billeteras/BilleteraDetallePage.module.css': {
     'max 360': 1,

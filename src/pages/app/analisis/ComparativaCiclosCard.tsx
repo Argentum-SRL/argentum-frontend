@@ -237,7 +237,7 @@ export default function ComparativaCiclosCard({
         <div className={styles.summaryStrip}>
           <div className={styles.summaryKpis}>
             <div className={styles.summaryItem}>
-              <span className={styles.summaryCaption}>Gastos en {etiquetaA}</span>
+              <span className={styles.summaryCaption} title={`Gastos en ${etiquetaA}`}>Gastos en {etiquetaA}</span>
               <span className={styles.summaryVal}>
                 <MontoFit
                   completo={formatMonto(data.resumen.gasto_a, monedaVisual)}
@@ -247,7 +247,7 @@ export default function ComparativaCiclosCard({
             </div>
 
             <div className={styles.summaryItem}>
-              <span className={styles.summaryCaption}>Gastos en {etiquetaB}</span>
+              <span className={styles.summaryCaption} title={`Gastos en ${etiquetaB}`}>Gastos en {etiquetaB}</span>
               <span className={styles.summaryValMuted}>
                 <MontoFit
                   completo={formatMonto(data.resumen.gasto_b, monedaVisual)}
@@ -466,7 +466,7 @@ export default function ComparativaCiclosCard({
               <div className={styles.deltaCatInfo}>
                 <CategoriaIcon nombre={item.categoria_nombre} size={28} />
                 <div className={styles.deltaCatTexts}>
-                  <span className={styles.deltaCatName}>{item.categoria_nombre}</span>
+                  <span className={styles.deltaCatName} title={item.categoria_nombre}>{item.categoria_nombre}</span>
                   <div className={styles.dualBars}>
                     <div className={styles.barLine}>
                       <span className={styles.barTag}>{etiquetaA}</span>

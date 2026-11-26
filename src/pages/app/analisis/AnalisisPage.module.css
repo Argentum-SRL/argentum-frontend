@@ -36,6 +36,8 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
 .titleGroup h1 {
@@ -97,6 +99,7 @@
 }
 
 .btnGhost {
+  position: relative;
   background: transparent;
   color: var(--text-2);
   border: none;
@@ -111,6 +114,12 @@
   align-items: center;
   gap: 6px;
   box-sizing: border-box;
+}
+
+.btnGhost::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
 }
 
 .btnGhost:hover {
@@ -251,6 +260,7 @@
 }
 
 .mobileFilterBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -269,11 +279,18 @@
   transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
+.mobileFilterBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
 .mobileFilterBtn:active {
   transform: scale(0.97);
 }
 
 .mobileActionBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -286,6 +303,12 @@
   cursor: pointer;
   box-shadow: var(--elevation-xs);
   transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.mobileActionBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
 }
 
 .mobileActionBtn:active {

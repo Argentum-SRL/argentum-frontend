@@ -88,6 +88,7 @@
 }
 
 .editSeriesQuickBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -105,6 +106,12 @@
   transition: background-color 140ms ease, border-color 140ms ease;
 }
 
+.editSeriesQuickBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
 .editSeriesQuickBtn:hover {
   background: var(--surface);
   border-color: var(--primary);
@@ -116,6 +123,7 @@
 }
 
 .resetSeriesQuickBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   padding: 0 12px;
@@ -129,6 +137,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: color 140ms ease, background-color 140ms ease;
+}
+
+.resetSeriesQuickBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .resetSeriesQuickBtn:hover {
@@ -162,6 +176,7 @@
 }
 
 .legendChip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -174,6 +189,13 @@
   padding: 4px 10px;
   cursor: pointer;
   transition: opacity 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.legendChip::before {
+  content: '';
+  position: absolute;
+  /* max horizontal N=3 por gap de 6px en celular / 8px en escritorio */
+  inset: -9px -3px;
 }
 
 .legendChip:hover {
@@ -430,6 +452,10 @@
     padding: 2px 8px;
     font-size: 0.6875rem;
     gap: 4px;
+  }
+
+  .legendChip::before {
+    inset: -11px -3px;
   }
 }
 

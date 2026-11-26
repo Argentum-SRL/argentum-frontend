@@ -93,13 +93,13 @@
   color: var(--text-1, #111827);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: fecha y monto corto de gasto */
 }
 
 .gastoDetalle {
   font-size: 0.8125rem;
   color: var(--text-2, #6b7280);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: fecha y monto corto de gasto */
   flex-shrink: 0;
 }
 

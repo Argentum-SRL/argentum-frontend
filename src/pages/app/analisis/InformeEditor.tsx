@@ -152,7 +152,7 @@ export default function InformeEditor({
             <span>{isMobile ? 'Volver' : 'Volver a Mis Informes'}</span>
           </button>
           <div className={styles.titleWithBadge}>
-            <h2 className={styles.builderTitle}>
+            <h2 className={styles.builderTitle} title={editingId ? 'Editar Informe' : 'Crear Informe'}>
               {editingId ? 'Editar Informe' : 'Crear Informe'}
             </h2>
             {!isMobile && (

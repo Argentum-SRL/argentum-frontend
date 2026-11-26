@@ -95,10 +95,10 @@ const DayGroup = memo(({
         <div className={styles.dateInfo}>
           <div className={styles.titleContainer}>
             <Calendar size={14} className={styles.calendarIcon} />
-            <h3 className={styles.title}>{dayInfo.title}</h3>
+            <h3 className={styles.title} title={dayInfo.title}>{dayInfo.title}</h3>
           </div>
           {dayInfo.subtitle && (
-            <span className={styles.subtitle}>{dayInfo.subtitle}</span>
+            <span className={styles.subtitle} title={dayInfo.subtitle}>{dayInfo.subtitle}</span>
           )}
         </div>
       </div>

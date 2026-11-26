@@ -47,6 +47,7 @@
 }
 
 .mobileFilterBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -62,6 +63,12 @@
   box-shadow: var(--elevation-xs);
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   user-select: none;
+}
+
+.mobileFilterBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .mobileFilterBtn:hover {
@@ -90,6 +97,7 @@
 }
 
 .clearBtnMobileInline {
+  position: relative;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-3);
@@ -101,11 +109,18 @@
   transition: color 0.15s ease;
 }
 
+.clearBtnMobileInline::before {
+  content: '';
+  position: absolute;
+  inset: -10px -4px;
+}
+
 .clearBtnMobileInline:hover {
   color: var(--text);
 }
 
 .mobileSearchTriggerBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -117,6 +132,12 @@
   color: var(--text-2);
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.mobileSearchTriggerBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
 }
 
 .mobileSearchTriggerBtn:hover {
@@ -260,22 +281,12 @@
   border: 1px solid var(--border);
   border-radius: 11px;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: píldora de filtro de escritorio */
   flex-shrink: 0;
   transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   user-select: none;
   box-sizing: border-box;
-}
-
-@media (min-width: 1100px) {
-  .pill {
-    padding: 0 14px;
-    height: 38px;
-    font-size: 13px;
-    gap: 6px;
-    border-radius: 12px;
-  }
 }
 
 .pill:hover:not(.pillActive) {
@@ -300,16 +311,17 @@
 }
 
 .pillIconFlex {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
   width: 100%;
 }
 
-@media (min-width: 1100px) {
-  .pillIconFlex {
-    gap: 6px;
-  }
+.pillIconFlex::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
 }
 
 .pillText {
@@ -319,12 +331,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1;
-}
-
-@media (min-width: 1100px) {
-  .pillText {
-    max-width: 140px;
-  }
 }
 
 .pillIcon {
@@ -342,6 +348,7 @@
 }
 
 .pillRemove {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -356,6 +363,12 @@
   cursor: pointer;
   transition: background 0.15s ease, transform 0.15s ease;
   flex-shrink: 0;
+}
+
+.pillRemove::before {
+  content: '';
+  position: absolute;
+  inset: -14px -2px;
 }
 
 .pillRemove:hover {
@@ -385,7 +398,7 @@
   padding: 12px;
   z-index: var(--z-raised);
   min-width: min(220px, 100%);
-  max-width: min(340px, calc(100vw - 32px));
+  max-width: 340px;
   animation: popoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
@@ -431,6 +444,7 @@
 }
 
 .desktopPresetBtn {
+  position: relative;
   padding: 7px 10px;
   border-radius: 8px;
   background: var(--surface-alt);
@@ -442,6 +456,12 @@
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   text-align: center;
   font-family: inherit;
+}
+
+.desktopPresetBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px -3px;
 }
 
 .desktopPresetBtn:hover {
@@ -538,6 +558,12 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.clearSearchBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px;
+}
+
 .clearSearchBtn:hover {
   background: var(--border);
   color: var(--text);
@@ -577,6 +603,7 @@
 .accountsTrigger {
   display: flex;
   align-items: center;
+  min-height: 44px;
   background: var(--surface-alt);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -683,6 +710,7 @@
 }
 
 .resetBtn {
+  position: relative;
   background: transparent;
   border: 1px solid transparent;
   padding: 2px 8px;
@@ -693,6 +721,12 @@
   border-radius: 6px;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   font-family: inherit;
+}
+
+.resetBtn::before {
+  content: '';
+  position: absolute;
+  inset: -12px -4px;
 }
 
 .resetBtn:hover {
@@ -720,6 +754,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 44px;
   padding: 8px 10px;
   border-radius: 8px;
   background: transparent;
@@ -864,6 +899,24 @@
   opacity: 0.4;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .pill {
+    padding: 0 14px;
+    height: 38px;
+    font-size: 13px;
+    gap: 6px;
+    border-radius: 12px;
+  }
+
+  .pillIconFlex {
+    gap: 6px;
+  }
+
+  .pillText {
+    max-width: 140px;
+  }
 }
 
 @media (max-width: 767.98px) {

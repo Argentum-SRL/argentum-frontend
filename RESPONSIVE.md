@@ -4,12 +4,13 @@ Fuente única y obligatoria para cualquier cambio que dependa del ancho de panta
 
 ## 1. Los tres rangos (no hay otros)
 
-| Nombre | Ancho | Dispositivos de referencia | CSS (copiar tal cual) | JS (solo con el hook) | Anchos donde se verifica |
+| Nombre | Ancho | Qué abarca | CSS (copiar tal cual) | JS (solo con el hook) | Anchos donde se verifica |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Celular (mobile) | hasta 767,98px | Galaxy S24 y J7 360, iPhone SE 375, iPhone 16/17 393, S24 Ultra y Pixel 412, iPhone Pro Max 440 | `@media (max-width: 767.98px)` | `useViewport().esCelular` | 360, 375, 393, 412 y 440 (y que 768 no cambie) |
-| Tablet | 768 a 1023,98px | iPad 768/810/820, Surface y Fold 880–912 | `@media (min-width: 768px) and (max-width: 1023.98px)` | `useViewport().esTablet` | 768, 820 y 1023 (y que 767 y 1024 no cambien) |
-| Escritorio (desktop) | desde 1024px | notebooks 1280–1440, monitores 1920 y 2560 | `@media (min-width: 1024px)` | `useViewport().esEscritorio` | 1024, 1280, 1440 y 1920 (y que 1023 no cambie) |
+| Celular (mobile) | hasta 767,98px | Todos los celulares: chicos (320–359), medianos (360–399), grandes (400–479) y plegables o celulares acostados (480–767) | `@media (max-width: 767.98px)` | `useViewport().esCelular` | 320, 360, 375, 393, 412, 440, 480, 600 y 767 (y que 768 no cambie) |
+| Tablet | 768 a 1023,98px | Tablets chicas y grandes en vertical, plegables abiertos | `@media (min-width: 768px) and (max-width: 1023.98px)` | `useViewport().esTablet` | 768, 820 y 1023 (y que 767 y 1024 no cambien) |
+| Escritorio (desktop) | desde 1024px | Tablets acostadas, notebooks, monitores comunes y muy grandes | `@media (min-width: 1024px)` | `useViewport().esEscritorio` | 1024, 1280, 1440 y 1920 (y que 1023 no cambie) |
 
+- Los modelos de celular (Galaxy, iPhone, Pixel) son solo ejemplos de que hay celulares chicos, medianos y grandes: nada se diseña para un modelo puntual. Todo tiene que verse bien en CUALQUIER ancho del rango, desde el más chico hasta el más grande; por eso se verifica en varios anchos repartidos y no en uno.
 - "Tablet y escritorio juntos" (todo lo que no es celular): `@media (min-width: 768px)` / `!useViewport().esCelular`.
 - Pantallas muy grandes: no se agregan cortes. El tamaño crece solo con `--screen-scale` (1 hasta 1919px, 1,1 desde 1920px y 1,2 desde 2560px), que vive únicamente en `src/styles/tokens.css`.
 - JS: el ancho se lee SOLO con `useViewport()` de `src/hooks/useViewport.ts` (`tipo`, `esCelular`, `esTablet`, `esEscritorio`). Prohibido `window.innerWidth <=/>=` y `matchMedia('(max-width: …)')` fuera del hook. Restar `window.innerWidth - ancho` para posicionar un popover sí está permitido.
@@ -22,7 +23,7 @@ Fuente única y obligatoria para cualquier cambio que dependa del ancho de panta
 | "en tablet", "en el iPad" | Solo el bloque `@media (min-width: 768px) and (max-width: 1023.98px)` (o `esTablet`). | Celular y escritorio. |
 | "en escritorio", "en desktop", "en la compu", "en la notebook", "en el monitor" | Solo `@media (min-width: 1024px)` (o `esEscritorio`). Si el cambio también tiene que valer en tablet, decilo en la respuesta y usá `@media (min-width: 768px)`. | Celular. |
 | "en todos lados", "siempre", o no nombra pantalla y el cambio no depende del ancho | Los estilos base del componente. | — |
-| Nombra un ancho concreto ("en 360 se corta") | Se corrige en su rango (360 → celular) con un valor fluido que sirva para todo el rango, nunca con un corte nuevo para ese ancho. | Los otros rangos. |
+| Nombra un ancho o un modelo ("en 360 se corta", "en mi Samsung") | Se corrige en su rango (celular, tablet o escritorio) con un valor fluido que sirva para todo el rango, nunca con un corte nuevo para ese ancho o modelo. | Los otros rangos. |
 
 Reglas para escribir el cambio:
 1. Cada archivo .css tiene como máximo un bloque por rango (`767.98`, tablet, `1024`, y si hace falta `min-width: 768px`). Si ya existe, el cambio va adentro; si no existe, se crea uno solo, después de los estilos base del componente.
@@ -52,13 +53,13 @@ Reglas para escribir el cambio:
 - Anchos fijos grandes con `min(Npx, 100%)`.
 - Excepciones permanentes: el selector Pesos/Dólares de `BalanceCard`; la cápsula sin pista, card ni fondo detrás; el pie de los modales (`ModalFooter`).
 
-## 5. Ajustes finos dentro del celular (360 vs 440) sin cortes nuevos
+## 5. Ajustes finos dentro del celular (chico vs grande) sin cortes nuevos
 
-Si algo se ve bien en 440 pero apretado en 360, no se agrega `@media (max-width: 400px)` ni nada parecido. Se usa un valor fluido que vaya de A (en 360px) a B (en 768px):
+Si algo se ve bien en un celular grande pero apretado en uno chico, no se agrega `@media (max-width: 400px)` ni nada parecido. Se usa un valor fluido que vaya de A (en el celular más chico, 320px) a B (en 768px):
 
-`clamp(A, calc(A + (B - A) * (100vw - 360px) / 408), B)`
+`clamp(A, calc(A + (B - A) * (100vw - 320px) / 448), B)`
 
-Ejemplo: gap de 8px en 360 y 12px desde 768 → `gap: clamp(8px, calc(8px + 4 * (100vw - 360px) / 408), 12px);`. Si el componente vive dentro de una caja que no ocupa todo el ancho, se usa una container query (`container-type: inline-size` y unidades `cqi`) en vez de `vw`. También sirven `min()`, `max()`, `flex-wrap` y `grid-template-columns: repeat(auto-fit, minmax(min(Npx, 100%), 1fr))`.
+Ejemplo: gap de 8px en 320 y 12px desde 768 → `gap: clamp(8px, calc(8px + 4 * (100vw - 320px) / 448), 12px);`. Los valores fluidos que ya existen (calculados desde 360) no se rehacen. Si el componente vive dentro de una caja que no ocupa todo el ancho, se usa una container query (`container-type: inline-size` y unidades `cqi`) en vez de `vw`. También sirven `min()`, `max()`, `flex-wrap` y `grid-template-columns: repeat(auto-fit, minmax(min(Npx, 100%), 1fr))`.
 
 ## 6. Prohibido
 
@@ -78,7 +79,7 @@ Ejemplo: gap de 8px en 360 y 12px desde 768 → `gap: clamp(8px, calc(8px + 4 * 
 ## 8. Checklist antes de dar algo por terminado
 
 1. ¿El cambio está solo en el rango pedido? ¿Los bordes del rango vecino (767/768, 1023/1024) quedaron iguales?
-2. ¿Se midió en todos los anchos del rango (sección 1)?
+2. ¿Se midió en todos los anchos del rango (sección 1), desde el más chico hasta el más grande, y no solo en uno?
 3. ¿Hay desborde horizontal (`scrollWidth > clientWidth` en `html`)? Tiene que ser 0.
 4. ¿Hay letra < 11px, montos con "…", tocables < 44px o textos cortados sin title?
 5. ¿Pasan `npx vitest run`, `npx tsc -b` y `npm run lint`?

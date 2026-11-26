@@ -325,7 +325,7 @@ export default function EditorSeriesEvolucionModal({
                                   parentCategory={cat.categoria_nombre}
                                   size={22}
                                 />
-                                <span className={styles.subLabelText}>
+                                <span className={styles.subLabelText} title={sub.subcategoria_nombre}>
                                   {sub.subcategoria_nombre}
                                 </span>
                               </div>
@@ -379,7 +379,7 @@ export default function EditorSeriesEvolucionModal({
                         style={{ backgroundColor: item.color }}
                       />
                       <div className={styles.chipTextStack}>
-                        <span className={styles.chipMainName}>{item.nombre}</span>
+                        <span className={styles.chipMainName} title={item.nombre}>{item.nombre}</span>
                         <span className={styles.chipSubType}>
                           {item.tipo === 'categoria'
                             ? 'Categoría completa (todo junto)'

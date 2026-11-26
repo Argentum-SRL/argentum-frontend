@@ -133,7 +133,7 @@
 }
 
 .badgePillGreen {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 5px;
@@ -280,6 +280,7 @@
 }
 
 .quitarBtn {
+  position: relative;
   background: none;
   border: none;
   padding: 4px 8px;
@@ -289,6 +290,12 @@
   cursor: pointer;
   border-radius: var(--radius-sm, 6px);
   transition: opacity var(--motion-fast, 150ms) var(--ease-out, ease-out);
+}
+
+.quitarBtn::before {
+  content: '';
+  position: absolute;
+  inset: -9px 0;
 }
 
 .quitarBtn:hover {

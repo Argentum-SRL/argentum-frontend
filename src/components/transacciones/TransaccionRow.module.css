@@ -174,7 +174,7 @@
   gap: 2px;
   padding: 1.5px 6px;
   border-radius: 5px;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -260,7 +260,8 @@
 
 .metaBullet {
   color: var(--text-3);
-  font-size: 8px;
+  font-size: 11px;
+  line-height: 1;
   opacity: 0.7;
   flex-shrink: 0;
 }
@@ -319,7 +320,7 @@
 .mobilePendingBadge {
   display: inline-flex;
   align-items: center;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -368,7 +369,7 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: monto de fila de transacción */
 }
 
 .amountValue {
@@ -437,6 +438,7 @@
 }
 
 .deleteBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -450,6 +452,12 @@
   opacity: 0;
   transform: scale(0.9);
   transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.deleteBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .row:hover .deleteBtn {
@@ -497,7 +505,7 @@
   display: none !important;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .desktopOnly {
     display: none !important;
   }

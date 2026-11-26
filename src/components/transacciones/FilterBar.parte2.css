@@ -1,8 +1,10 @@
 .popoverItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 7px 10px;
+  min-height: 36px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -15,6 +17,12 @@
   width: 100%;
   font-family: inherit;
   box-sizing: border-box;
+}
+
+.popoverItem::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .popoverItem:hover {
@@ -52,7 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -68,7 +76,7 @@
 }
 
 .catGroupCount {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   background: var(--surface-alt);
   padding: 1px 5px;
@@ -99,6 +107,7 @@
 }
 
 .desktopPresetBtn {
+  position: relative;
   padding: 6px 8px;
   border-radius: 8px;
   background: var(--surface-alt);
@@ -110,6 +119,12 @@
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   text-align: center;
   font-family: inherit;
+}
+
+.desktopPresetBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px -3px;
 }
 
 .desktopPresetBtn:hover {
@@ -125,6 +140,7 @@
 }
 
 .dateSubmitBtn {
+  position: relative;
   padding: 8px;
   border-radius: 8px;
   border: none;
@@ -135,6 +151,12 @@
   color: #ffffff;
   font-family: inherit;
   transition: opacity 0.15s ease;
+}
+
+.dateSubmitBtn::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
 }
 
 .dateSubmitBtn:hover {
@@ -174,6 +196,7 @@
 .accountsTrigger {
   display: flex;
   align-items: center;
+  min-height: 44px;
   background: var(--page);
   border: 1.5px solid var(--surface-alt);
   border-radius: 12px;
@@ -309,6 +332,7 @@
 }
 
 .resetBtn {
+  position: relative;
   background: transparent;
   border: 1px solid transparent;
   padding: 3px 8px;
@@ -319,6 +343,12 @@
   border-radius: 6px;
   transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   font-family: inherit;
+}
+
+.resetBtn::before {
+  content: '';
+  position: absolute;
+  inset: -11px -4px;
 }
 
 .resetBtn:hover {
@@ -346,6 +376,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 44px;
   padding: 8px 10px;
   border-radius: 8px;
   background: transparent;
@@ -461,6 +492,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 44px;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 13px;
@@ -530,7 +562,7 @@
 }
 
 .catGroupHeaderMobile {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;

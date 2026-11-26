@@ -243,7 +243,7 @@ export default function MisInformesTab({ onPedidoInformeChange }: MisInformesTab
               <span>Mis Informes</span>
             </button>
             <div className={styles.viewerTitleText}>
-              <h2 className={styles.viewerTitle}>{activeInforme.nombre}</h2>
+              <h2 className={styles.viewerTitle} title={activeInforme.nombre}>{activeInforme.nombre}</h2>
               {activeInforme.descripcion && (
                 <p className={styles.viewerSub}>{activeInforme.descripcion}</p>
               )}

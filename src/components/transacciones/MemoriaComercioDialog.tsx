@@ -156,7 +156,7 @@ export const MemoriaComercioDialog: React.FC<MemoriaComercioDialogProps> = ({
                 </div>
                 <div className={styles.catDetails}>
                   <span className={styles.catLabel}>{subcategoriaNombre ? 'Subcategoría' : 'Categoría'}</span>
-                  <span className={styles.catName}>{categoriaTexto}</span>
+                  <span className={styles.catName} title={categoriaTexto}>{categoriaTexto}</span>
                 </div>
               </div>
             </div>

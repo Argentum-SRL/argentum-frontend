@@ -60,6 +60,7 @@
 }
 
 .feedbackBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -72,6 +73,13 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.feedbackBtn::before {
+  content: '';
+  position: absolute;
+  /* toque-ok: gap 4px entre botones vecinos en .feedbackActions */
+  inset: -8px -2px;
 }
 
 .feedbackBtn:hover {
@@ -101,6 +109,7 @@
 }
 
 .actionBtn {
+  position: relative;
   flex-shrink: 0;
   height: var(--control-h-sm, 36px) !important;
   min-width: unset !important;
@@ -108,10 +117,15 @@
   font-size: 13px !important;
   font-weight: 600 !important;
   border-radius: var(--control-radius, 12px) !important;
-  white-space: nowrap;
 }
 
-@media (max-width: 640px) {
+.actionBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+@media (max-width: 767.98px) {
   .card {
     padding: var(--space-md);
   }
@@ -124,6 +138,9 @@
 
   .actionBtn {
     width: 100%;
+    height: auto !important;
+    min-height: var(--control-h, 44px);
+    padding-block: 8px !important;
   }
 }
 

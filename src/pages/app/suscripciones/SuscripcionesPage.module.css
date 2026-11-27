@@ -22,6 +22,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 0;
   animation: slideDown 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -30,6 +31,8 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
+  flex: 1;
 }
 
 .titleGroup h1 {
@@ -102,8 +105,15 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: 20px;
+  }
 }
 
 .grid > *:nth-child(1)   { animation: cardFadeIn 0.4s ease-out 0ms   both; }
@@ -565,20 +575,20 @@
   }
 
   .far {
-    width: 24px;
-    height: 24px;
+    width: clamp(20px, calc(17.1429px + 0.8929vw), 24px);
+    height: clamp(20px, calc(17.1429px + 0.8929vw), 24px);
     opacity: 0.35;
   }
 
   .mid {
-    width: 32px;
-    height: 32px;
+    width: clamp(28px, calc(25.1429px + 0.8929vw), 32px);
+    height: clamp(28px, calc(25.1429px + 0.8929vw), 32px);
     opacity: 0.55;
   }
 
   .near {
-    width: 42px;
-    height: 42px;
+    width: clamp(38px, calc(35.1429px + 0.8929vw), 42px);
+    height: clamp(38px, calc(35.1429px + 0.8929vw), 42px);
     opacity: 0.82;
   }
 
@@ -598,7 +608,7 @@
   .emptyContent {
     width: 100%;
     max-width: 326px;
-    padding: 26px 18px;
+    padding: clamp(22px, calc(19.1429px + 0.8929vw), 26px) clamp(12px, calc(7.7143px + 1.3393vw), 18px);
     border-radius: 26px;
     margin: 0 auto;
     box-sizing: border-box;
@@ -618,7 +628,7 @@
   }
 
   .emptySubtitle {
-    font-size: 13.5px;
+    font-size: clamp(12.5px, calc(11.7857px + 0.2232vw), 13.5px);
     line-height: 1.45;
     margin-bottom: 20px;
     max-width: 100%;
@@ -646,37 +656,6 @@
     line-height: 1.25 !important;
     margin: 0 auto !important;
     gap: 8px !important;
-  }
-}
-
-@media (max-width: 360px) {
-  .emptyContent {
-    padding: 24px 14px;
-  }
-
-  .emptyTitle {
-    font-size: 20px;
-    margin-bottom: 10px;
-  }
-
-  .emptySubtitle {
-    font-size: 13px;
-    margin-bottom: 20px;
-  }
-
-  .far {
-    width: 22px;
-    height: 22px;
-  }
-
-  .mid {
-    width: 30px;
-    height: 30px;
-  }
-
-  .near {
-    width: 40px;
-    height: 40px;
   }
 }
 
@@ -712,6 +691,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .cardLabel {
@@ -753,6 +734,7 @@
 }
 
 .nuevaBtn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -765,9 +747,15 @@
   font-weight: 700;
   border: none;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón CTA de cabecera con etiqueta corta */
   flex-shrink: 0;
   transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.nuevaBtn::before {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
 .btnTextMobile {

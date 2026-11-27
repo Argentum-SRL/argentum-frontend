@@ -886,7 +886,7 @@ export default function DashboardPage() {
               </div>
               <div className={styles.whatsappBannerText}>
                 <div className={styles.whatsappBannerTitleRow}>
-                  <span className={styles.whatsappBannerTitle}>Vinculá tu WhatsApp</span>
+                  <span className={styles.whatsappBannerTitle} title="Vinculá tu WhatsApp">Vinculá tu WhatsApp</span>
                   <span className={styles.whatsappBannerBadge}>Nuevo</span>
                 </div>
                 <p className={styles.whatsappBannerSubtitle}>
@@ -970,7 +970,7 @@ export default function DashboardPage() {
                     title="Volver a categorías"
                   >
                     <ArrowLeft size={16} />
-                    <span className={styles.cardTitle}>{selectedCategoria.nombre}</span>
+                    <span className={styles.cardTitle} title={selectedCategoria.nombre}>{selectedCategoria.nombre}</span>
                   </button>
                 ) : (
                   <h3 className={styles.cardTitle}>Gastos por categoría</h3>
@@ -1092,7 +1092,7 @@ export default function DashboardPage() {
                         >
                           <AppleCalendarIcon dateStr={p.fecha_cobro} />
                           <div className={styles.itemMeta}>
-                            <p className={styles.itemName}>{p.nombre || 'Pago próximo'}</p>
+                            <p className={styles.itemName} title={p.nombre || 'Pago próximo'}>{p.nombre || 'Pago próximo'}</p>
                             <p className={styles.itemSub}>{fechaTxt}</p>
                           </div>
                           <div className={styles.pagoRight}>
@@ -1190,7 +1190,7 @@ export default function DashboardPage() {
                             />
                           </div>
                           <div className={styles.itemMeta}>
-                            <p className={styles.itemName}>
+                            <p className={styles.itemName} title={m.titulo || m.descripcion || m.subcategoria_nombre || 'Sin descripción'}>
                               {m.titulo || m.descripcion || m.subcategoria_nombre || 'Sin descripción'}
                             </p>
                             <p className={styles.itemSub}>

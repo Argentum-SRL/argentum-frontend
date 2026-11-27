@@ -17,6 +17,7 @@
 }
 
 .mainAction {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -30,6 +31,13 @@
   color: inherit;
   font: inherit;
   border-radius: 6px;
+}
+
+.mainAction::before {
+  content: '';
+  position: absolute;
+  /* Lleva el área vertical a >= 44px en mobile cuando .subtitle se oculta y el ícono mide 26px */
+  inset: -9px 0;
 }
 
 .mainAction:focus-visible {
@@ -99,7 +107,8 @@
 .closeBtn::before {
   content: '';
   position: absolute;
-  inset: -6px;
+  /* toque-ok: gap 12px con .mainAction */
+  inset: -8px -6px;
 }
 
 .closeBtn:hover {
@@ -112,7 +121,7 @@
   box-shadow: var(--focus-ring);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .container {
     padding: 6px 8px 6px 10px;
     gap: 8px;
@@ -144,7 +153,8 @@
   }
 
   .closeBtn::before {
-    inset: -4px;
+    /* toque-ok: gap 8px con .mainAction en celular */
+    inset: -9px -4px;
   }
 }
 

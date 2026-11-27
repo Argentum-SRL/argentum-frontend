@@ -390,7 +390,10 @@ export default function GoalDetailModal({
                         </div>
 
                         <div className={styles.movDetails}>
-                          <span className={styles.movTitle}>
+                          <span
+                            className={styles.movTitle}
+                            title={isAporte ? 'Aporte a la meta' : 'Retiro de fondos'}
+                          >
                             {isAporte ? 'Aporte a la meta' : 'Retiro de fondos'}
                           </span>
                           <span className={styles.movMeta}>

@@ -220,7 +220,7 @@ export const BalanceCard = memo(function BalanceCard({
           <div className={`${styles.checkbox} ${isExplicitlyFiltered ? styles.checkboxChecked : ''}`}>
             {isExplicitlyFiltered && <Check size={10} strokeWidth={3} />}
           </div>
-          <span className={styles.accountName}>{b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}</span>
+          <span className={styles.accountName} title={b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}>{b.es_efectivo ? `Efectivo ${b.moneda === 'ARS' ? 'Pesos' : 'Dólares'}` : b.nombre}</span>
           {b.es_principal && (
             <Star size={12} strokeWidth={2.4} fill="currentColor" className={styles.starIcon} />
           )}
@@ -350,9 +350,9 @@ export const BalanceCard = memo(function BalanceCard({
                         <div className={styles.rowLeft}>
                           <span className={styles.itemDot} />
                           <div className={styles.accountTextCol}>
-                            <span className={styles.accountName}>{displayName}</span>
+                            <span className={styles.accountName} title={displayName}>{displayName}</span>
                             {detalle && (
-                              <span className={styles.compromisoDetalle}>
+                              <span className={styles.compromisoDetalle} title={detalle}>
                                 {detalle}
                               </span>
                             )}

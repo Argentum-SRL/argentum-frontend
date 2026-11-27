@@ -278,7 +278,10 @@ export default function GoalContributionModal({
             >
               <div className={styles.formHeader}>
                 <div className={styles.headerLeft}>
-                  <h2 className={styles.headerTitle}>
+                  <h2
+                    className={styles.headerTitle}
+                    title={`${tipo === 'aporte' ? 'Aportar a' : 'Retirar de'} ${goal.nombre}`}
+                  >
                     {tipo === 'aporte' ? 'Aportar a' : 'Retirar de'} {goal.nombre}
                   </h2>
                 </div>
@@ -430,7 +433,7 @@ export default function GoalContributionModal({
                 {/* Tarjeta Resumen de Impacto en la Meta */}
                 <div className={styles.summaryCard}>
                   <div className={styles.summaryHeader}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
                       <Target size={16} color="var(--primary)" />
                       <span className={styles.summaryGoalTitle}>{goal.nombre}</span>
                     </div>

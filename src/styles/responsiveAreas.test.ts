@@ -21,6 +21,14 @@ const AREAS = [
   'src/components/presupuestos',
   'src/pages/app/billeteras',
   'src/components/billeteras',
+  'src/pages/app/suscripciones',
+  'src/components/suscripciones',
+  'src/pages/app/dashboard',
+  'src/components/dashboard',
+  'src/pages/app/metas',
+  'src/components/goals',
+  'src/pages/app/lo-que-se-repite',
+  'src/components/ciclo',
 ]
 
 const CORTES_OFICIALES_ANCHO = new Set([
@@ -35,6 +43,14 @@ const EXCEPCIONES_LETRA: Record<string, string> = {}
 
 // Excepciones de toque F2/F3 (resueltas en F5).
 const EXCEPCIONES_TOQUE_F2_F3: Record<string, string> = {}
+
+// Excepciones R7 en áreas previas (F2–F5) fuera de permitidas de F6B.
+const EXCEPCIONES_R7_FUERA: Record<string, string> = {
+  'src/components/tarjetas/PagarResumenModal.module.css::.segmentBtn':
+    'Botón de segmento compacto (height: 36px <= 767.98px) en modal de tarjeta (F4, fuera de permitidas F6B)',
+  'src/pages/app/perfil/PerfilPage.parte1.css::.statusChip':
+    'Micro-chip informativo no interactivo de estado de verificación (height: 20px, F3, fuera de permitidas F6B)',
+}
 
 function walkFiles(dir: string, exts: string[], acc: string[] = []): string[] {
   if (!fs.existsSync(dir)) return acc
@@ -432,5 +448,93 @@ describe('Reglas responsive por área (AREAS)', () => {
       }
     }
     expect(hallados).toEqual([])
+  })
+
+  it('R7: todo selector clicable con height fijo < 44px en AREAS tiene ::before/::after >= 44px, min-height >= 44px o toque-ok', () => {
+    const CLICKABLE_TARGET_RE =
+      /\.[A-Za-z0-9_-]*(?:Btn|Button|Link|Trigger|Action|Chip|Tab|Pill|Toggle)$/
+    const insuficientes: string[] = []
+
+    const normalizeTarget = (sel: string): string => {
+      const last = sel.trim().split(/\s+/).pop() ?? sel.trim()
+      return last.replace(/:{1,2}[a-zA-Z-]+(?:\([^)]*\))?/g, '').trim()
+    }
+
+    for (const abs of cssFiles) {
+      const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
+      const blocks = extractCssBlocks(fs.readFileSync(abs, 'utf-8'))
+
+      const touchBySelMedia = new Map<string, CssBlock[]>()
+      const minHeightBySelMedia = new Map<string, boolean>()
+
+      for (const blk of blocks) {
+        for (const rawSel of blk.selector.split(',')) {
+          const sel = rawSel.trim()
+          if (sel.includes('::before') || sel.includes('::after')) {
+            const insM = blk.cleanBody.match(/inset\s*:\s*([^;!}]+)/i)
+            if (insM && /-\d/.test(insM[1])) {
+              const baseSel = sel.replace(/::(?:before|after).*$/, '').trim()
+              const key = `${baseSel}@@${blk.media}`
+              const list = touchBySelMedia.get(key) ?? []
+              list.push(blk)
+              touchBySelMedia.set(key, list)
+            }
+          } else {
+            const mh = parsePxProp(blk.cleanBody, 'min-height')
+            if (mh !== null && mh >= 44) {
+              minHeightBySelMedia.set(`${sel}@@${blk.media}`, true)
+            }
+          }
+        }
+      }
+
+      for (const blk of blocks) {
+        for (const rawSel of blk.selector.split(',')) {
+          const sel = rawSel.trim()
+          if (sel.includes('::')) continue
+          const target = normalizeTarget(sel)
+          if (!CLICKABLE_TARGET_RE.test(target)) continue
+          if (/toque-ok\s*:/i.test(blk.rawBody)) continue
+          if (`${rel}::${sel}` in EXCEPCIONES_R7_FUERA) continue
+
+          const h = parsePxProp(blk.cleanBody, 'height')
+          if (h === null || h >= 44) continue
+
+          const hasMinH =
+            minHeightBySelMedia.get(`${sel}@@${blk.media}`) === true ||
+            (blk.media === 'base' && minHeightBySelMedia.get(`${sel}@@base`) === true)
+          if (hasMinH) continue
+
+          const bw = parseBorderPx(blk.cleanBody)
+          const touchCandidates = [
+            ...(touchBySelMedia.get(`${sel}@@${blk.media}`) ?? []),
+            ...(blk.media !== 'base' ? touchBySelMedia.get(`${sel}@@base`) ?? [] : []),
+          ]
+          let okTouch = false
+          for (const tBlk of touchCandidates) {
+            const insM = tBlk.cleanBody.match(/inset\s*:\s*([^;!}]+)/i)
+            if (!insM) continue
+            const ins = parseInsetSides(insM[1])
+            if (!ins) {
+              okTouch = true
+              break
+            }
+            const effH = h - bw.v + -ins.top + -ins.bottom
+            if (effH >= 44) {
+              okTouch = true
+              break
+            }
+          }
+
+          if (!okTouch) {
+            insuficientes.push(
+              `${rel}:${blk.startLine} [${sel}] (${blk.media}) -> height=${h}px sin ::before/::after >= 44px ni min-height >= 44px`
+            )
+          }
+        }
+      }
+    }
+
+    expect(insuficientes).toEqual([])
   })
 })

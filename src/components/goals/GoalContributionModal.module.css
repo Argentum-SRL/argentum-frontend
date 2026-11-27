@@ -60,6 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
   flex-shrink: 0;
 }
@@ -69,6 +70,7 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
+  flex: 1;
 }
 
 .headerRightActions {
@@ -90,6 +92,7 @@
 }
 
 .backBtn, .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -104,11 +107,8 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
-.closeBtn {
-  position: relative;
-}
-
-.closeBtn::before {
+.closeBtn::before,
+.backBtn::before {
   content: '';
   position: absolute;
   inset: -6px;
@@ -146,15 +146,6 @@
   border-radius: 4px;
 }
 
-@media (max-width: 480px) {
-  .formHeader {
-    padding: 16px var(--modal-pad-x) 0;
-  }
-  .formBody {
-    padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
-  }
-}
-
 /* ── Form Field & Label con Saldo ────────────────────────────────────────── */
 .formField {
   display: flex;
@@ -166,11 +157,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-bottom: 2px;
 }
 
 .fieldLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -198,12 +191,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .summaryGoalTitle {
   font-size: 13.5px;
   font-weight: 700;
   color: var(--text);
+  overflow-wrap: anywhere;
 }
 
 .summaryBadge {
@@ -227,7 +223,7 @@
 
 .summaryStatsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr));
   gap: 8px;
 }
 
@@ -235,10 +231,11 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .summaryStatLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -250,6 +247,7 @@
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
 }
 
 .statGreen {
@@ -325,14 +323,14 @@
   align-items: center;
   gap: 6px;
   flex: 1;
-  min-width: 180px;
+  min-width: min(180px, 100%);
 }
 
 .rateUnitLabel {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text-3);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta corta de unidad cambiaria */
 }
 
 .rateInput {
@@ -382,15 +380,10 @@
   border-top: none;
 }
 
-@media (max-width: 480px) {
-  .formFooter {
-    padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Separación oficial del pie */
-  }
-}
-
 .cancelBtn {
   flex: 1;
-  height: 42px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: 12px;
   border: 1.5px solid var(--surface-alt);
   background: transparent;
@@ -412,7 +405,8 @@
 
 .submitBtn {
   flex: 2;
-  height: 42px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: 12px;
   border: none;
   background: var(--primary);
@@ -468,6 +462,23 @@
 }
 
 @media (max-width: 767.98px) {
+  .formHeader {
+    padding: 16px var(--modal-pad-x) 0;
+  }
+
+  .headerTitle {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .formFooter {
+    padding: 8px var(--modal-pad-x) var(--modal-footer-pad-bottom);
+  }
+
   .rateInput {
     font-size: var(--control-font-mobile);
   }

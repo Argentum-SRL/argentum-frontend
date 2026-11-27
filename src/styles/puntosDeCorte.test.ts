@@ -5,8 +5,8 @@ import path from 'node:path'
 const ROOT_DIR = path.resolve(__dirname, '../..')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
-// Cortes legados congelados al cierre de F5 (baja de 56 a 36 tras limpiar presupuestos y billeteras): solo puede bajar.
-const TOPE_LEGADO = 36
+// Cortes legados congelados al cierre de F6 (baja de 36 a 20 tras limpiar suscripciones, dashboard, metas, ciclo y lo-que-se-repite): solo puede bajar.
+const TOPE_LEGADO = 20
 
 const LEGADO: Record<string, Record<string, number>> = {
   'src/components/auth/AuthLayout/AuthLayout.module.css': {
@@ -17,32 +17,9 @@ const LEGADO: Record<string, Record<string, number>> = {
     'max 540': 1,
     'max 640': 1,
   },
-  'src/components/ciclo/CicloFinancieroSelector.module.css': {
-    'max 639': 2,
-    'min 640': 1,
-  },
-  'src/components/dashboard/AvisosConfianza/AvisosConfianza.module.css': {
-    'max 640': 1,
-  },
-  'src/components/dashboard/ConsejoCard/ConsejoCard.module.css': {
-    'max 640': 1,
-  },
-  'src/components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal.module.css': {
-    'max 640': 1,
-  },
-  'src/components/goals/GoalContributionModal.module.css': {
-    'max 480': 2,
-  },
-  'src/components/goals/GoalModal.module.css': {
-    'max 480': 3,
-  },
   'src/components/notificaciones/NotificacionesConfigModal.module.css': {
     'max 639': 1,
     'min 640': 1,
-  },
-  'src/components/suscripciones/SuscripcionModal.module.css': {
-    'max 480': 1,
-    'max 639': 1,
   },
   'src/components/whatsapp/VinculacionWhatsAppCard.module.css': {
     'min 640': 1,
@@ -71,13 +48,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   },
   'src/pages/admin/usuarios/UsuariosPanel.module.css': {
     'max 639': 2,
-  },
-  'src/pages/app/dashboard/DashboardPage.parte3.css': {
-    'max 500': 1,
-    'max 640': 1,
-  },
-  'src/pages/app/suscripciones/SuscripcionesPage.module.css': {
-    'max 360': 1,
   },
   'src/pages/auth/recuperar-password/RecuperarPassword.module.css': {
     'min 640': 1,

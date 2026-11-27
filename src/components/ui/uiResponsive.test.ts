@@ -19,7 +19,7 @@ const CERRAR: CerrarSpec[] = [
   {
     css: 'components/dashboard/AvisosConfianza/AvisosConfianza.module.css',
     selector: '.closeBtn',
-    excepcion: '28x28 desktop (gap 12px con .mainAction < 2*8=16 -> inset -6px); 26x26 <=640px (gap 8px < 2*9=18 -> inset -4px)',
+    excepcion: '28x28 desktop (gap 12px con .mainAction < 2*8=16 -> inset -8px -6px = 40x44); 26x26 <=767.98px (gap 8px < 2*9=18 -> inset -9px -4px = 34x44)',
   },
   { css: 'components/dashboard/ExplicativoFinancieroModal/ExplicativoFinancieroModal.module.css', selector: '.closeButton' },
   { css: 'components/goals/GoalContributionModal.module.css', selector: '.closeBtn' },
@@ -61,7 +61,7 @@ const CERRAR: CerrarSpec[] = [
   {
     css: 'pages/app/dashboard/DashboardPage.parte3.css',
     selector: '.whatsappBannerCloseBtn',
-    excepcion: '28x28 desktop (gap 12px con .whatsappBannerActionsDesktop < 2*8=16 -> inset -6px); 26x26 <=640px (gap 8px < 2*9=18 -> inset -4px)',
+    excepcion: '28x28 desktop (gap 12px con .whatsappBannerActionsDesktop < 2*8=16 -> inset -8px -6px = 40x44); 26x26 <=767.98px (gap 8px < 2*9=18 -> inset -9px -4px = 34x44)',
   },
   { css: 'pages/app/metas/GoalsBarChart.module.css', selector: '.sheetCloseBtn' },
   { css: 'pages/app/perfil/PerfilPage.parte3.css', selector: '.modalCloseBtn' },

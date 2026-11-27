@@ -60,6 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 20px var(--modal-pad-x) 0; /* Separación oficial v3: sin bottom para no sumar al gap */
   flex-shrink: 0;
 }
@@ -68,6 +69,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1;
 }
 
 .headerRightActions {
@@ -85,6 +88,7 @@
 }
 
 .backBtn, .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -99,11 +103,8 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
-.closeBtn {
-  position: relative;
-}
-
-.closeBtn::before {
+.closeBtn::before,
+.backBtn::before {
   content: '';
   position: absolute;
   inset: -6px;
@@ -130,15 +131,6 @@
   overflow: visible;
 }
 
-@media (max-width: 480px) {
-  .formHeader {
-    padding: 16px var(--modal-pad-x) 0;
-  }
-  .formBody {
-    padding: var(--modal-header-gap) var(--modal-pad-x) var(--modal-footer-gap);
-  }
-}
-
 .formField {
   display: flex;
   flex-direction: column;
@@ -146,7 +138,7 @@
 }
 
 .fieldLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -213,13 +205,6 @@
   gap: 12px;
 }
 
-@media (max-width: 480px) {
-  .row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-}
-
 .fieldHint {
   font-size: 12px;
   color: var(--text-3);
@@ -243,15 +228,10 @@
   border-top: none;
 }
 
-@media (max-width: 480px) {
-  .formFooter {
-    padding: 0 var(--modal-pad-x) var(--modal-footer-pad-bottom);
-  }
-}
-
 .cancelBtn {
   flex: 1;
-  height: 42px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: 12px;
   border: 1.5px solid var(--surface-alt);
   background: transparent;
@@ -273,7 +253,8 @@
 
 .submitBtn {
   flex: 2;
-  height: 42px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: 12px;
   border: none;
   background: var(--primary);
@@ -324,6 +305,19 @@
 }
 
 @media (max-width: 767.98px) {
+  .formHeader {
+    padding: 16px var(--modal-pad-x) 0;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .formFooter {
+    padding: 0 var(--modal-pad-x) var(--modal-footer-pad-bottom);
+  }
+
   .fieldInput,
   .textarea {
     font-size: var(--control-font-mobile);

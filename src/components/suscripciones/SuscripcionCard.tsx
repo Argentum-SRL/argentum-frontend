@@ -177,7 +177,7 @@ const SuscripcionCard: React.FC<SuscripcionCardProps> = ({
 
         <div className={styles.info}>
           <div className={styles.nameRow}>
-            <h3 className={styles.name}>{suscripcion.nombre}</h3>
+            <h3 className={styles.name} title={suscripcion.nombre}>{suscripcion.nombre}</h3>
             <span 
               className={styles.frecuencia} 
               ref={el => {

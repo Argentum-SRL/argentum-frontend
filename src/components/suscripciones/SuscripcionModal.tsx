@@ -279,7 +279,7 @@ function SuscripcionPickerItem({
         failedLogos={failedLogos}
         onLogoError={onLogoError}
       />
-      <span className={styles.pickerCardTitle}>{servicio.nombre}</span>
+      <span className={styles.pickerCardTitle} title={servicio.nombre}>{servicio.nombre}</span>
     </button>
   )
 }
@@ -891,7 +891,15 @@ export default function SuscripcionModal({
                             }
                             title="Editar nombre"
                           >
-                            <span className={styles.bankPreviewNombreText}>
+                            <span
+                              className={styles.bankPreviewNombreText}
+                              title={
+                                nombre.trim() ||
+                                serv?.nombre ||
+                                suscripcion?.nombre ||
+                                'Suscripción'
+                              }
+                            >
                               {nombre.trim() ||
                                 serv?.nombre ||
                                 suscripcion?.nombre ||
@@ -1153,7 +1161,15 @@ export default function SuscripcionModal({
                             }
                             title="Editar nombre"
                           >
-                            <span className={styles.bankPreviewNombreText}>
+                            <span
+                              className={styles.bankPreviewNombreText}
+                              title={
+                                nombre.trim() ||
+                                serv?.nombre ||
+                                suscripcion?.nombre ||
+                                'Suscripción'
+                              }
+                            >
                               {nombre.trim() ||
                                 serv?.nombre ||
                                 suscripcion?.nombre ||

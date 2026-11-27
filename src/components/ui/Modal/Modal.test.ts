@@ -506,3 +506,31 @@ describe('FS1G: pie pegajoso (position: sticky) en modal de notificaciones y mod
     expect(offenders).toEqual([]);
   });
 });
+
+describe('Handle único y márgenes en bottom sheets (variant="sheet")', () => {
+  const srcRoot = path.resolve(__dirname, '../../..');
+  const modalTsx = fs.readFileSync(path.join(__dirname, 'Modal.tsx'), 'utf-8');
+  const moreTsx = fs.readFileSync(path.join(srcRoot, 'components/layout/MobileBottomNav/MobileMoreSheet.tsx'), 'utf-8');
+  const moreCss = fs.readFileSync(path.join(srcRoot, 'components/layout/MobileBottomNav/MobileMoreSheet.module.css'), 'utf-8');
+  const dashTsx = fs.readFileSync(path.join(srcRoot, 'pages/app/dashboard/DashboardPage.tsx'), 'utf-8');
+  const dashCss = fs.readFileSync(path.join(srcRoot, 'pages/app/dashboard/DashboardPage.parte3.css'), 'utf-8');
+
+  it('Modal.tsx centraliza el sheetHandle único y MobileMoreSheet no duplica handle propio', () => {
+    expect(modalTsx).toContain('styles.sheetHandle');
+    expect(moreTsx).toContain('variant="sheet"');
+    expect(moreTsx).not.toContain('handleContainer');
+    expect(moreTsx).not.toContain('styles.handle');
+    expect(moreCss).not.toMatch(/\.handle(?:Container)?\b/);
+  });
+
+  it('MobileMoreSheet delega padding y scroll único al Modal base (sin noPadding)', () => {
+    expect(moreTsx).not.toContain('noPadding');
+    expect(moreCss).not.toMatch(/\.sheetInner\s*\{[^}]*padding\s*:/);
+  });
+
+  it('Mi Cuenta (DashboardPage) agrupa sus opciones con data-modal-options y :focus-visible', () => {
+    expect(dashTsx).toContain('title="Mi Cuenta"');
+    expect(dashTsx).toContain('<div data-modal-options>');
+    expect(dashCss).toMatch(/\.profileSheetItem:focus-visible/);
+  });
+});

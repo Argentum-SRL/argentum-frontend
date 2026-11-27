@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from '@/components/ui/icons'
 import styles from './Modal.module.css'
@@ -57,6 +57,57 @@ const Modal: React.FC<ModalProps> = ({
   closeOnEscape = true,
   stepDots,
 }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const dragStartYRef = useRef(0)
+  const isDraggingSheetRef = useRef(false)
+  const sheetDeltaYRef = useRef(0)
+
+  const handleSheetPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (variant !== 'sheet' || !closeOnOverlayClick || !e.isPrimary) return
+    isDraggingSheetRef.current = true
+    dragStartYRef.current = e.clientY
+    sheetDeltaYRef.current = 0
+    if (containerRef.current) {
+      containerRef.current.classList.remove(styles.sheetSnapBack)
+    }
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      // Ignore
+    }
+  }
+
+  const handleSheetPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingSheetRef.current || !containerRef.current) return
+    const deltaY = Math.max(0, e.clientY - dragStartYRef.current)
+    sheetDeltaYRef.current = deltaY
+    containerRef.current.style.transform = `translate3d(0, ${deltaY}px, 0)`
+  }
+
+  const finishSheetDrag = (e: React.PointerEvent<HTMLDivElement>, cancelled: boolean) => {
+    if (!isDraggingSheetRef.current) return
+    isDraggingSheetRef.current = false
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      }
+    } catch {
+      // Ignore
+    }
+    const el = containerRef.current
+    const finalDelta = sheetDeltaYRef.current
+    sheetDeltaYRef.current = 0
+    if (!el) return
+
+    if (!cancelled && finalDelta > 65) {
+      el.style.transform = ''
+      onClose()
+    } else {
+      el.classList.add(styles.sheetSnapBack)
+      el.style.transform = ''
+    }
+  }
+
   useEffect(() => {
     if (!isOpen) return
 
@@ -92,6 +143,7 @@ const Modal: React.FC<ModalProps> = ({
       onClick={closeOnOverlayClick ? onClose : undefined}
     >
       <div 
+        ref={containerRef}
         className={`
           ${styles.container} 
           ${variant === 'sheet' ? styles.sheet : styles[size]} 
@@ -107,7 +159,14 @@ const Modal: React.FC<ModalProps> = ({
       >
         {/* Handle superior unificado para hojas inferiores (variant="sheet") */}
         {variant === 'sheet' && (
-          <div className={styles.sheetHandle} aria-hidden="true" />
+          <div
+            className={styles.sheetHandle}
+            aria-hidden="true"
+            onPointerDown={handleSheetPointerDown}
+            onPointerMove={handleSheetPointerMove}
+            onPointerUp={(e) => finishSheetDrag(e, false)}
+            onPointerCancel={(e) => finishSheetDrag(e, true)}
+          />
         )}
         {/* Indicador de pasos superior opcional (solo se muestra si total > 1) */}
         {stepDots && stepDots.total > 1 && (

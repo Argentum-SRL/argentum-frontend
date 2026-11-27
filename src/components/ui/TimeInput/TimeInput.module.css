@@ -108,6 +108,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding: var(--modal-header-gap) var(--modal-pad-x) 0;
 }
 
 /* ─── WHEEL PICKER STYLES ─────────────────────────── */

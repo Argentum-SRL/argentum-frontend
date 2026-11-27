@@ -313,6 +313,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding: var(--modal-header-gap) var(--modal-pad-x) 0;
 }
 
 /* ─── WHEEL PICKER STYLES ─────────────────────────── */
@@ -400,6 +401,8 @@
 
 /* En hoja mobile (Modal noPadding), el pie aporta el margen inferior canónico sin alterar el popover */
 .calendarFooter.calendarFooterSheet {
+  padding-left: var(--modal-pad-x);
+  padding-right: var(--modal-pad-x);
   padding-bottom: var(--modal-footer-pad-bottom);
 }
 

@@ -143,8 +143,9 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
         title="Mi Cuenta"
         size="sm"
       >
-        <div data-modal-block>
+        <div data-modal-options>
           <button 
+            type="button"
             className={styles.profileSheetItem}
             onClick={() => {
               setIsMenuOpen(false)
@@ -156,6 +157,7 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
           </button>
 
           <button 
+            type="button"
             className={styles.profileSheetItem}
             onClick={() => {
               toggleTheme()
@@ -166,6 +168,7 @@ const MobileGreeting = memo(({ usuario }: { usuario: Usuario | null }) => {
           </button>
 
           <button 
+            type="button"
             className={`${styles.profileSheetItem} ${styles.profileSheetItemDanger}`}
             onClick={() => {
               setIsMenuOpen(false)

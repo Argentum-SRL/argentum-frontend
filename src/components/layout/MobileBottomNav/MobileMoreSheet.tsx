@@ -45,87 +45,11 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
   currentPath,
 }) => {
   const navigate = useNavigate()
-  const sheetRef = useRef<HTMLDivElement | null>(null)
   const [pressedId, setPressedId] = useState<string | null>(null)
-
-  // Drag-to-dismiss refs
-  const dragStartYRef = useRef(0)
-  const isDraggingSheetRef = useRef(false)
-  const sheetDeltaYRef = useRef(0)
 
   // Item touch tracking refs
   const itemTouchStartXRef = useRef(0)
   const itemTouchStartYRef = useRef(0)
-
-  // ── Drag to dismiss handlers ──────────────────────────────────────────────
-
-  const handleHandlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!e.isPrimary) return
-    isDraggingSheetRef.current = true
-    dragStartYRef.current = e.clientY
-    sheetDeltaYRef.current = 0
-
-    if (sheetRef.current) {
-      sheetRef.current.classList.add(styles.sheetDragging)
-    }
-
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId)
-    } catch {
-      // Ignore
-    }
-  }
-
-  const handleHandlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingSheetRef.current || !sheetRef.current) return
-    const deltaY = e.clientY - dragStartYRef.current
-    if (deltaY < 0) return // Don't allow upward pull beyond bounds
-
-    sheetDeltaYRef.current = deltaY
-    sheetRef.current.style.transform = `translate3d(0, ${deltaY}px, 0)`
-  }
-
-  const handleHandlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingSheetRef.current) return
-    isDraggingSheetRef.current = false
-
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      }
-    } catch {
-      // Ignore
-    }
-
-    if (!sheetRef.current) return
-    sheetRef.current.classList.remove(styles.sheetDragging)
-
-    const finalDelta = sheetDeltaYRef.current
-    sheetDeltaYRef.current = 0
-
-    if (finalDelta > 65) {
-      // Dismiss immediately without delay
-      sheetRef.current.style.transform = ''
-      onClose()
-    } else {
-      // Snap back smoothly
-      sheetRef.current.style.transform = 'translate3d(0, 0, 0)'
-    }
-  }
-
-  const handleHandlePointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
-    isDraggingSheetRef.current = false
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      }
-    } catch {
-      // Ignore
-    }
-    if (!sheetRef.current) return
-    sheetRef.current.classList.remove(styles.sheetDragging)
-    sheetRef.current.style.transform = 'translate3d(0, 0, 0)'
-  }
 
   // ── Item interaction handlers (Tactile feedback + reliable selection) ───
 
@@ -246,23 +170,9 @@ export const MobileMoreSheet: FC<MobileMoreSheetProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       showHeader={false}
-      noPadding
       ariaLabel="Más opciones"
-      className={styles.modalSheet}
     >
-      <div ref={sheetRef} className={styles.sheetInner} data-modal-frame>
-        {/* Drag handle */}
-        <div
-          className={styles.handleContainer}
-          onPointerDown={handleHandlePointerDown}
-          onPointerMove={handleHandlePointerMove}
-          onPointerUp={handleHandlePointerUp}
-          onPointerCancel={handleHandlePointerCancel}
-          aria-hidden="true"
-        >
-          <div className={styles.handle} />
-        </div>
-
+      <div className={styles.sheetInner} data-modal-frame>
         {/* Header */}
         <div className={styles.sheetHeader}>
           <p className={styles.sheetTitle}>Más opciones</p>

@@ -8,12 +8,19 @@
   border: none;
   background: var(--surface-alt);
   color: var(--text);
-  font-size: 0.9375rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 600;
-  border-radius:16px;
+  text-align: left;
+  border-radius: var(--control-radius);
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.1s ease;
   text-decoration: none;
+}
+
+.profileSheetItem:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
 }
 
 .profileSheetItem:active {

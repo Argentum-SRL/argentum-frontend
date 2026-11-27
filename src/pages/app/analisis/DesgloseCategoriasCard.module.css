@@ -69,7 +69,7 @@
 .backBtn::before {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: -4px;
 }
 
 .backBtn:hover {

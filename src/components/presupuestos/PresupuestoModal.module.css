@@ -116,6 +116,7 @@
 }
 
 .backBtn, .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -130,10 +131,7 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
-.closeBtn {
-  position: relative;
-}
-
+.backBtn::before,
 .closeBtn::before {
   content: '';
   position: absolute;
@@ -191,7 +189,7 @@
 }
 
 .fieldLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -228,16 +226,6 @@
 
 .hintMobile {
   display: none;
-}
-
-@media (max-width: 639px) {
-  .hintDesktop {
-    display: none;
-  }
-
-  .hintMobile {
-    display: inline;
-  }
 }
 
 /* ── Step 2: Categorías, Presets & Grilla Interactiva ──────────────────────── */
@@ -302,6 +290,12 @@
   padding: 0;
 }
 
+.clearSearchBtn::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+
 .clearSearchBtn:hover {
   background: var(--border);
   color: var(--text);
@@ -313,7 +307,7 @@
   align-items: center;
   gap: 6px;
   overflow-x: auto;
-  padding: 0;
+  padding: 4px 0;
   flex-shrink: 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -324,9 +318,11 @@
 }
 
 .presetPill {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 36px;
   padding: 5px 11px;
   border-radius: 99px;
   border: 1.5px solid var(--surface-alt);
@@ -335,11 +331,18 @@
   font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: chip de filtro rápido en barra horizontal desplazable */
   flex-shrink: 0;
   transition: transform 140ms ease, opacity 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
   font-family: 'Figtree', sans-serif;
   user-select: none;
+}
+
+.presetPill::before {
+  content: '';
+  position: absolute;
+  /* toque-ok: limitado horizontalmente por gap 6px en .presetsBar */
+  inset: -6px -3px;
 }
 
 .presetPill:hover {
@@ -522,6 +525,7 @@
 }
 
 .customSubcatBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -537,7 +541,14 @@
   transition: transform 140ms ease, opacity 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
   font-family: 'Figtree', sans-serif;
   user-select: none;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón corto de subcategorías en fila */
+}
+
+.customSubcatBtn::before {
+  content: '';
+  position: absolute;
+  /* toque-ok: limitado horizontalmente por proximidad a .checkCircle */
+  inset: -10px -4px;
 }
 
 .customSubcatBtn:hover {
@@ -621,6 +632,7 @@
 }
 
 .subcatSelectAllBtn {
+  position: relative;
   background: transparent;
   border: none;
   color: var(--primary);
@@ -631,6 +643,12 @@
   border-radius: 4px;
   transition: opacity 120ms ease;
   font-family: 'Figtree', sans-serif;
+}
+
+.subcatSelectAllBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 .subcatSelectAllBtn:hover {
@@ -645,6 +663,7 @@
 }
 
 .subcatChip {
+  position: relative;
   padding: 6px 10px;
   background: var(--page);
   border: 1px solid var(--border);
@@ -660,6 +679,13 @@
   user-select: none;
   -webkit-user-select: none;
   font-family: 'Figtree', sans-serif;
+}
+
+.subcatChip::before {
+  content: '';
+  position: absolute;
+  /* toque-ok: limitado horizontalmente por gap 6px en .subcatChipsGrid */
+  inset: -9px -3px;
 }
 
 .subcatChip:hover {
@@ -858,13 +884,6 @@
   background: #ffffff;
 }
 
-@media (max-width: 480px) {
-  .renewalCard {
-    padding: 9px 12px;
-    gap: var(--space-sm);
-  }
-}
-
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .formFooter {
   padding: var(--modal-footer-pad-top) var(--modal-pad-x) var(--modal-footer-pad-bottom); /* Espaciado oficial del pie */
@@ -971,6 +990,19 @@
   .fieldInput,
   .catSearchInput {
     font-size: var(--control-font-mobile);
+  }
+
+  .hintDesktop {
+    display: none;
+  }
+
+  .hintMobile {
+    display: inline;
+  }
+
+  .renewalCard {
+    padding: clamp(9px, calc(8.2857px + 0.2232vw), 10px) clamp(12px, calc(10.5714px + 0.4464vw), 14px);
+    gap: clamp(8px, 2.5vw, 12px);
   }
 }
 

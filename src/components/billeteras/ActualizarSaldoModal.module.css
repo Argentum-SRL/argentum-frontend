@@ -75,7 +75,7 @@
   border-radius: 6px;
   background: color-mix(in srgb, var(--primary) 10%, transparent);
   color: var(--primary);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -83,6 +83,7 @@
 
 .backBtn,
 .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -97,10 +98,7 @@
   transition: background 120ms ease, color 120ms ease;
 }
 
-.closeBtn {
-  position: relative;
-}
-
+.backBtn::before,
 .closeBtn::before {
   content: '';
   position: absolute;
@@ -463,7 +461,7 @@
 }
 
 /* ── Responsive Mobile ───────────────────────────────────────────────────── */
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .modalHeader {
     padding: 14px var(--modal-pad-x) 10px; /* Separación lateral oficial */
   }

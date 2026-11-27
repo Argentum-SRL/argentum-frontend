@@ -60,6 +60,7 @@
 
 /* Botón "Nueva" — visible en mobile Y desktop */
 .nuevaBtn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -72,9 +73,15 @@
   font-weight: 700;
   border: none;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón primario corto en cabecera ("Nueva") */
   flex-shrink: 0;
   transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.nuevaBtn::before {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
 .nuevaBtn:hover {
@@ -221,6 +228,7 @@
 }
 
 .showArchivedBtn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -233,6 +241,12 @@
   padding: 6px 12px;
   border-radius: 8px;
   transition: background 0.2s ease;
+}
+
+.showArchivedBtn::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }
 
 .showArchivedBtn:hover {
@@ -345,6 +359,7 @@
 }
 
 .btnGhost {
+  position: relative;
   background: transparent;
   color: var(--text-2);
   border: none;
@@ -357,6 +372,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.btnGhost::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
 }
 
 .btnGhost:hover {

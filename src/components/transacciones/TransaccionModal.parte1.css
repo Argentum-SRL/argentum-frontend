@@ -144,6 +144,7 @@
 .deleteHeaderBtn::before {
   content: '';
   position: absolute;
+  /* toque-ok: limitado horizontalmente a 40px por gap 8px en .headerRightActions */
   inset: -6px -4px;
 }
 
@@ -182,7 +183,7 @@
 .backBtn::before {
   content: '';
   position: absolute;
-  inset: -6px -4px;
+  inset: -6px;
 }
 
 .closeBtn {
@@ -192,7 +193,8 @@
 .closeBtn::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  /* toque-ok: limitado horizontalmente a 40px por gap 8px en .headerRightActions */
+  inset: -6px -4px;
 }
 
 .backBtn:hover, .closeBtn:hover {

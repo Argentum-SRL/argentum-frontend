@@ -45,7 +45,7 @@
   margin: 0;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .subtitle {
     display: none;
   }
@@ -58,6 +58,7 @@
 }
 
 .excelBtn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,9 +73,15 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón de acción en cabecera (solo ícono en celular) */
   flex-shrink: 0;
   transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.excelBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
 }
 
 .excelBtnText {
@@ -92,6 +99,7 @@
 }
 
 .nuevaBtn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -104,9 +112,15 @@
   font-weight: 700;
   border: none;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón primario corto en cabecera ("Nuevo") */
   flex-shrink: 0;
   transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.nuevaBtn::before {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
 .nuevaBtn:hover {
@@ -166,7 +180,7 @@
 
   .desktopGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
     gap: var(--space-xl);
   }
 }

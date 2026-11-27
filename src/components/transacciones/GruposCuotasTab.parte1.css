@@ -63,7 +63,7 @@
 .mobileSearchTriggerBtn::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -5px;
 }
 
 .mobileSearchTriggerBtn:hover {

@@ -6,7 +6,7 @@ import billeteraService from '@/services/billetera.service'
 import tarjetaService from '@/services/tarjeta.service'
 import movimientoService from '@/services/movimiento.service'
 import categoriaService from '@/services/categoria.service'
-import { EmptyState, BilleteraDetalleSkeleton, TransactionsListSkeleton, CardsGridSkeleton } from '@/components/ui'
+import { EmptyState, MontoFit, BilleteraDetalleSkeleton, TransactionsListSkeleton, CardsGridSkeleton } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { sileo } from 'sileo'
 import { useModal } from '@/hooks/useModal'
@@ -19,7 +19,7 @@ import RegistrarRendimientoModal from '@/components/billeteras/RegistrarRendimie
 import ActualizarSaldoModal from '@/components/billeteras/ActualizarSaldoModal'
 import CambiarFechaSaldoModal from '@/components/billeteras/CambiarFechaSaldoModal'
 import { getBankById, findBankByNombre, getBankLogoUrl, getInitials } from '@/lib/utils/billeteras.utils'
-import { formatMonto } from '@/utils/format'
+import { formatMonto, formatMontoCorto } from '@/utils/format'
 import { getErrorMessage } from '@/utils/errorMessages'
 import styles from './BilleteraDetallePage.module.css'
 
@@ -517,7 +517,7 @@ const BilleteraDetallePage: React.FC = () => {
 
             {/* Nombre y badge */}
             <div className={styles.headerIdentity} data-icon-parent>
-              <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`}>
+              <h1 className={`${styles.headerName} ${isLight ? styles.textLight : styles.textDark}`} title={billetera.nombre}>
                 {billetera.nombre}
               </h1>
               {billetera.es_principal && (
@@ -586,7 +586,10 @@ const BilleteraDetallePage: React.FC = () => {
               Saldo actual
             </span>
             <div className={`${styles.headerSaldoValue} ${isLight ? styles.textLight : styles.textDark}`}>
-              {formatMonto(billetera.saldo_actual, billetera.moneda)}
+              <MontoFit
+                completo={formatMonto(billetera.saldo_actual, billetera.moneda)}
+                corto={formatMontoCorto(billetera.saldo_actual, billetera.moneda)}
+              />
             </div>
           </div>
         </div>
@@ -609,7 +612,10 @@ const BilleteraDetallePage: React.FC = () => {
                 </div>
                 <div className={styles.rendimientoMontoRow}>
                   <span className={styles.rendimientoMonto}>
-                    +{formatMonto(rendimientoEstimado?.rendimiento_estimado ?? 0, billetera.moneda)}
+                    <MontoFit
+                      completo={`+${formatMonto(rendimientoEstimado?.rendimiento_estimado ?? 0, billetera.moneda)}`}
+                      corto={`+${formatMontoCorto(rendimientoEstimado?.rendimiento_estimado ?? 0, billetera.moneda)}`}
+                    />
                   </span>
                   <span className={styles.rendimientoDias}>
                     {rendimientoEstimado?.dias_transcurridos !== undefined

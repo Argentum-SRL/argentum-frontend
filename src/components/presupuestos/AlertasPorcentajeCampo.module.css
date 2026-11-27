@@ -5,6 +5,7 @@
 }
 
 .cabeceraBtn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,12 +22,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.cabeceraBtn::before {
+  content: '';
+  position: absolute;
+  inset: -12px 0;
+}
+
 .cabeceraBtn:focus-visible {
   box-shadow: var(--focus-ring);
 }
 
 .fieldLabel {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
@@ -179,6 +186,7 @@
 }
 
 .agregarBtn {
+  position: relative;
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
@@ -195,6 +203,12 @@
   cursor: pointer;
   transition: opacity var(--motion-fast) var(--ease-out),
     background-color var(--motion-fast) var(--ease-out);
+}
+
+.agregarBtn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .agregarBtn:hover {

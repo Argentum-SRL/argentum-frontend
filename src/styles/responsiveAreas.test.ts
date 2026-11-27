@@ -17,6 +17,10 @@ const AREAS = [
   'src/pages/app/perfil',
   'src/components/perfil',
   'src/components/tarjetas',
+  'src/pages/app/presupuestos',
+  'src/components/presupuestos',
+  'src/pages/app/billeteras',
+  'src/components/billeteras',
 ]
 
 const CORTES_OFICIALES_ANCHO = new Set([
@@ -29,35 +33,8 @@ const CORTES_OFICIALES_ANCHO = new Set([
 // Excepciones de letra < 11px documentadas con motivo (vacío en F2).
 const EXCEPCIONES_LETRA: Record<string, string> = {}
 
-// Excepciones de toque F2/F3 (fuera de permitidas.txt en F4B; no editar F2/F3 desde F4B).
-const EXCEPCIONES_TOQUE_F2_F3: Record<string, string> = {
-  'src/components/tools/ToolsComponents.parte3.css::.fwDot::before': 'F2 fuera de permitidas en F4B (30x30 border 1.5px inset -7px = 41px)',
-  'src/components/tools/ToolsComponents.parte3.css::.fwChip::before': 'F2 fuera de permitidas en F4B (H=40px border 1.5px inset -2px = 41px)',
-  'src/components/tools/importacion/ModalesImportacion.module.css::.cancelImportBtn::before': 'F2 fuera de permitidas en F4B (H=38px border 1px inset -3px = 42px)',
-  'src/components/tools/importacion/ModalesImportacion.module.css::.radioPill::before': 'F2 fuera de permitidas en F4B (H=38px border 1px inset -3px = 42px)',
-  'src/pages/app/analisis/AnalisisPage.module.css::.mobileFilterBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
-  'src/pages/app/analisis/AnalisisPage.module.css::.mobileActionBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
-  'src/pages/app/analisis/DesgloseCategoriasCard.module.css::.backBtn::before': 'F3 fuera de permitidas en F4B (38x38 border 1px inset -3px = 42px)',
-  'src/pages/app/analisis/EditorSeriesEvolucionModal.module.css::.addWholeCatBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
-  'src/pages/app/analisis/EditorSeriesEvolucionModal.module.css::.splitSubsBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
-  'src/pages/app/analisis/EditorSeriesEvolucionModal.module.css::.removeChipBtn::before': 'F3 fuera de permitidas en F4B (26x26 border 1px inset -9px = 42px)',
-  'src/pages/app/analisis/EvolucionCiclosCard.module.css::.editSeriesQuickBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
-  'src/pages/app/analisis/FiltrosAnalisis.module.css::.viewTileBtn::before': 'F3 fuera de permitidas en F4B (H=38px border 1px inset -3px = 42px)',
-  'src/pages/app/analisis/MisInformesTab.module.css::.iconActionBtn::before': 'F3 fuera de permitidas en F4B (30x30 border 1px inset -7px -3px = 34x42)',
-  'src/pages/app/analisis/MisInformesTab.module.css::.iconActionBtnDanger::before': 'F3 fuera de permitidas en F4B (30x30 border 1px inset -7px -3px = 34x42)',
-  'src/pages/app/analisis/MisInformesTab.module.css::.templateBtnSecondary::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
-  'src/pages/app/analisis/MisInformesTab.module.css::.backBtn::before': 'F3 fuera de permitidas en F4B (@media móvil H=32px border 1px inset -6px = 42px)',
-  'src/pages/app/analisis/MisInformesTab.module.css::.viewerBackBtn::before': 'F3 fuera de permitidas en F4B (@media móvil H=32px border 1px inset -6px = 42px)',
-  'src/components/transacciones/FilterBar.parte1.css::.mobileFilterBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
-  'src/components/transacciones/FilterBar.parte1.css::.mobileSearchTriggerBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
-  'src/components/transacciones/GruposCuotasTab.parte1.css::.mobileSearchTriggerBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
-  'src/components/transacciones/TransaccionModal.parte1.css::.deleteHeaderBtn::before': 'F3 fuera de permitidas en F4B (32x32 inset -6px -4px = 40x44)',
-  'src/components/transacciones/TransaccionModal.parte1.css::.backBtn::before': 'F3 fuera de permitidas en F4B (32x32 inset -6px -4px = 40x44)',
-  'src/components/transacciones/TransaccionModal.parte1.css::.closeBtn::before': 'F3 fuera de permitidas en F4B (32x32 inset -4px = 40x40)',
-  'src/components/transacciones/TransaccionModal.parte3.css::.stepperBtn::before': 'F3 fuera de permitidas en F4B (32x32 border 1px inset -6px = 42px)',
-  'src/components/transferencias/TransferenciasFilterBar.module.css::.mobileFilterBtn::before': 'F3 fuera de permitidas en F4B (H=36px border 1px inset -4px = 42px)',
-  'src/components/transferencias/TransferenciasFilterBar.module.css::.mobileSearchTriggerBtn::before': 'F3 fuera de permitidas en F4B (36x36 border 1px inset -4px = 42px)',
-}
+// Excepciones de toque F2/F3 (resueltas en F5).
+const EXCEPCIONES_TOQUE_F2_F3: Record<string, string> = {}
 
 function walkFiles(dir: string, exts: string[], acc: string[] = []): string[] {
   if (!fs.existsSync(dir)) return acc

@@ -150,8 +150,8 @@
 .iconActionBtnDanger::before {
   content: '';
   position: absolute;
-  /* max horizontal N=3 por gap de 6px en .reportCardActions */
-  inset: -7px -3px;
+  /* toque-ok: limitado horizontalmente por gap 6px en .reportCardActions */
+  inset: -8px -3px;
 }
 
 .iconActionBtn:hover {
@@ -309,7 +309,7 @@
 .templateBtnSecondary::before {
   content: '';
   position: absolute;
-  inset: -4px 0;
+  inset: -5px 0;
 }
 
 .templateBtnSecondary:hover {
@@ -512,7 +512,7 @@
 .backBtn::before {
   content: '';
   position: absolute;
-  inset: -6px 0;
+  inset: -7px 0;
 }
 
 @media (hover: hover) {
@@ -930,7 +930,7 @@
 .viewerBackBtn::before {
   content: '';
   position: absolute;
-  inset: -6px 0;
+  inset: -7px 0;
 }
 
 .viewerBackBtn:hover {

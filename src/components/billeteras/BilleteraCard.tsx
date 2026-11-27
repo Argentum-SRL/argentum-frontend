@@ -126,7 +126,12 @@ const BilleteraCard = memo(({
               </div>
 
               <div className={styles.selectIdentity}>
-                <span className={`${styles.selectName} ${isLight ? styles.textLight : styles.textDark}`}>
+                <span
+                  className={`${styles.selectName} ${isLight ? styles.textLight : styles.textDark}`}
+                  title={billetera.es_efectivo
+                    ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
+                    : billetera.nombre}
+                >
                   {billetera.es_efectivo
                     ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
                     : billetera.nombre}
@@ -170,7 +175,10 @@ const BilleteraCard = memo(({
               </span>
             </div>
             <div className={`${styles.selectSaldo} ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>
-              {formatMonto(billetera.saldo_actual, billetera.moneda)}
+              <MontoFit
+                completo={formatMonto(billetera.saldo_actual, billetera.moneda)}
+                corto={formatMontoCorto(billetera.saldo_actual, billetera.moneda)}
+              />
             </div>
           </div>
         </div>
@@ -224,7 +232,12 @@ const BilleteraCard = memo(({
           {/* Identidad */}
           <div className={`${styles.wcIdentity} wcIdentity`}>
             <div className={`${styles.wcName} wcName ${isLight ? styles.textLight : styles.textDark}`}>
-              <span className={`${styles.wcNameText} wcNameText`}>
+              <span
+                className={`${styles.wcNameText} wcNameText`}
+                title={billetera.es_efectivo
+                  ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
+                  : billetera.nombre}
+              >
                 {billetera.es_efectivo
                   ? `Efectivo ${billetera.moneda === 'ARS' ? 'Pesos' : 'Dólares'}`
                   : billetera.nombre}
@@ -333,7 +346,7 @@ const BilleteraCard = memo(({
 
         {/* ── BALANCE ──────────────────────────────────────────────────── */}
         <div className={`${styles.wcBalance} wcBalance`}>
-          <p className={`${styles.wcBalLbl} wcBalLbl ${isLight ? styles.balLblLight : styles.balLblDark}`}>
+          <p className={`${styles.wcBalLbl} wcBalLbl ${isLight ? styles.balLblLight : styles.balLblDark}`} title={labelNombre}>
             {labelNombre}
           </p>
           <p className={`${styles.wcBalAmt} wcBalAmt ${isLight ? styles.balAmtLight : styles.balAmtDark}`}>

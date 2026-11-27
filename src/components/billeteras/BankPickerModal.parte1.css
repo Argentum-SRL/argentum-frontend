@@ -1,6 +1,6 @@
 /* ── Modal Container Width ───────────────────────────────────────────────── */
 .modal {
-  --modal-w: min(620px, calc(100vw - 32px));
+  --modal-w: min(620px, 100%);
 }
 
 /* ── Modal Root Wrapper ─────────────────────────────────────────────────── */
@@ -154,7 +154,6 @@
   color: var(--text);
   margin: 0;
   line-height: 1.2;
-  white-space: nowrap;
 }
 
 /* Search input */
@@ -200,13 +199,19 @@
   padding: 2px;
 }
 
+.searchClear::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+}
+
 /* ── Filtro rápido de categorías (Chips horizontales) ─────────────────────── */
 .categoryChipsWrap {
   display: flex;
   align-items: center;
   gap: 6px;
   overflow-x: auto;
-  padding: 2px 0 4px;
+  padding: 6px 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -216,15 +221,17 @@
 }
 
 .categoryChip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 32px;
   padding: 5px 12px;
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: chip de filtro en tira horizontal desplazable */
   cursor: pointer;
   border: 1px solid var(--border-subtle);
   background: var(--surface-alt);
@@ -232,6 +239,13 @@
   font-family: inherit;
   flex-shrink: 0;
   transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.categoryChip::before {
+  content: '';
+  position: absolute;
+  /* toque-ok: limitado horizontalmente por gap 6px en .categoryChipsWrap */
+  inset: -7px -3px;
 }
 
 .categoryChip:hover {
@@ -477,6 +491,7 @@
 }
 
 .backBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -489,6 +504,12 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background 120ms ease;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .backBtn:hover {
@@ -556,6 +577,7 @@
 }
 
 .bankPreviewNombreBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -566,6 +588,12 @@
   cursor: pointer;
   text-align: left;
   font-family: inherit;
+}
+
+.bankPreviewNombreBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px 0;
 }
 
 .bankPreviewNombreText {

@@ -68,7 +68,7 @@
 .mobileFilterBtn::before {
   content: '';
   position: absolute;
-  inset: -4px 0;
+  inset: -5px 0;
 }
 
 .mobileFilterBtn:hover {
@@ -120,7 +120,7 @@
 .mobileSearchTriggerBtn::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -5px;
 }
 
 .mobileSearchTriggerBtn:hover {

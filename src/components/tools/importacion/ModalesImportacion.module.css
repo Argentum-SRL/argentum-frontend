@@ -165,7 +165,7 @@
 .cancelImportBtn::before {
   content: '';
   position: absolute;
-  inset: -3px 0;
+  inset: -4px 0;
 }
 
 .cancelImportBtn:hover {
@@ -320,7 +320,7 @@
 .radioPill::before {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: -4px;
 }
 
 .pillActiveEgreso {

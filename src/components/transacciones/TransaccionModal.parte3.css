@@ -94,7 +94,7 @@
 .stepperBtn::before {
   content: '';
   position: absolute;
-  inset: -6px;
+  inset: -7px;
 }
 
 .stepperBtn:hover {

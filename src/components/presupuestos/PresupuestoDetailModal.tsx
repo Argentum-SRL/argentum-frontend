@@ -744,10 +744,13 @@ export default function PresupuestoDetailModal({
                                 />
                               </div>
                               <div className={styles.txDetails}>
-                                <span className={styles.txTitle}>
+                                <span className={styles.txTitle} title={t.descripcion || catName}>
                                   {t.descripcion || catName}
                                 </span>
-                                <span className={styles.txMeta}>
+                                <span
+                                  className={styles.txMeta}
+                                  title={`${billeteraName ? `${billeteraName} · ` : ''}${formatFecha(t.fecha)}`}
+                                >
                                   {billeteraName ? `${billeteraName} · ` : ''}
                                   {formatFecha(t.fecha)}
                                 </span>

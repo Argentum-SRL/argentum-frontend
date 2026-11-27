@@ -207,7 +207,7 @@
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .modalHeader {
     padding: 14px var(--modal-pad-x) 10px;
   }

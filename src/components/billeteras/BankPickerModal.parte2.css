@@ -52,6 +52,7 @@
 }
 
 .colorSwatch {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -62,6 +63,13 @@
   justify-content: center;
   transition: transform 120ms ease, border-color 120ms ease;
   background: var(--swatch-color, transparent);
+}
+
+.colorSwatch::before {
+  content: '';
+  position: absolute;
+  /* toque-ok: limitado horizontalmente por gap 8px en .colorPicker */
+  inset: -8px -4px;
 }
 
 .colorSwatch:hover {
@@ -284,9 +292,6 @@
   font-size: 11.5px;
   color: var(--text-3);
   line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   transition: color 150ms ease;
 }
 
@@ -301,7 +306,7 @@
 
 /* Pills de estado activo */
 .badgePillGold {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   padding: 1px 7px;
   border-radius: 5px;
@@ -316,7 +321,7 @@
 }
 
 .badgePillGreen {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 5px;
@@ -509,60 +514,7 @@
 }
 
 /* ── Mobile ─────────────────────────────────────────────────────────────────── */
-@media (max-width: 639px) {
-  .pickerGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .modal {
-    --modal-pad-x: 12px;
-    --modal-block-gap: 16px;
-  }
-
-  .pickerTitle {
-    font-size: 15px;
-    letter-spacing: -0.2px;
-  }
-
-  .pickerGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-  }
-
-  .pickerCard {
-    padding: 6px 7px;
-    min-height: 42px;
-    gap: 6px;
-  }
-
-  .pickerCardTitle {
-    font-size: 11px;
-    letter-spacing: -0.1px;
-  }
-
-  .logoSlot36 {
-    width: 28px;
-    height: 28px;
-  }
-
-  .bankLogoImg {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-  }
-
-  .bankGenericBox {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-  }
-
-  .bankInitialText {
-    font-size: 11px;
-  }
-}
+/* Reglas responsive oficiales unificadas en @media (max-width: 767.98px) al pie */
 
 /* ── Reduced motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
@@ -669,6 +621,53 @@
 }
 
 @media (max-width: 767.98px) {
+  .modal {
+    --modal-pad-x: clamp(12px, calc(6.2857px + 1.7857vw), 20px);
+    --modal-block-gap: clamp(16px, calc(13.1429px + 0.8929vw), 20px);
+  }
+
+  .pickerTitle {
+    font-size: clamp(15px, calc(12.8571px + 0.6696vw), 18px);
+    letter-spacing: -0.2px;
+  }
+
+  .pickerGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(6px, 2vw, 8px);
+  }
+
+  .pickerCard {
+    padding: 6px 7px;
+    min-height: 44px;
+    gap: 6px;
+  }
+
+  .pickerCardTitle {
+    font-size: clamp(11px, calc(9.5714px + 0.4464vw), 13px);
+    letter-spacing: -0.1px;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .logoSlot36 {
+    width: 28px;
+    height: 28px;
+  }
+
+  .bankLogoImg,
+  .bankGenericBox {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .bankInitialText {
+    font-size: clamp(11px, calc(9.5714px + 0.4464vw), 13px);
+  }
+
   .searchInput, .fieldInput { font-size: var(--control-font-mobile); }
 }
 

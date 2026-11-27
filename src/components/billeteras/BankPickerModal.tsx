@@ -128,7 +128,7 @@ function BankPickerItem({
       aria-label={`Seleccionar ${bank.nombre}`}
     >
       <PickerLogo bank={bank} size={36} />
-      <span className={styles.pickerCardTitle}>{bank.nombre}</span>
+      <span className={styles.pickerCardTitle} title={bank.nombre}>{bank.nombre}</span>
     </button>
   )
 }

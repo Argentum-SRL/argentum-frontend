@@ -80,6 +80,7 @@
 .nextSlideBtn,
 .backBtn,
 .closeBtn {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -94,14 +95,18 @@
   flex-shrink: 0;
 }
 
-.closeBtn {
-  position: relative;
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
+.nextSlideBtn::before,
 .closeBtn::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  /* toque-ok: limitado horizontalmente a 40px por gap 8px en .headerRightActions */
+  inset: -6px -4px;
 }
 
 .nextSlideBtn:hover,
@@ -186,7 +191,7 @@
 
 .currencyPill,
 .periodPill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   background: var(--surface-alt);
   color: var(--text-2);
@@ -197,7 +202,7 @@
 }
 
 .statusPillPaused {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   background: var(--surface-alt);
   color: var(--text-2);
@@ -209,7 +214,7 @@
 }
 
 .statusPillSuperado {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   background: var(--error-bg);
   color: var(--error);
@@ -221,7 +226,7 @@
 }
 
 .statusPillAlerta {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   background: rgba(201, 162, 39, 0.15);
   color: #B38600;
@@ -254,7 +259,7 @@
 }
 
 .sectionMiniLabel {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -310,7 +315,7 @@
 }
 
 .amountLabel {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -562,7 +567,7 @@
 }
 
 .txMeta {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--text-3);
   white-space: nowrap;
   overflow: hidden;
@@ -645,7 +650,7 @@
 }
 
 .historyStatusBadge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   padding: 1.5px 6px;
@@ -838,6 +843,7 @@
 }
 
 .renewActionBtn {
+  position: relative;
   height: 34px;
   padding: 0 14px;
   border-radius: 9px;
@@ -850,9 +856,15 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón corto ("Iniciar ciclo") */
   flex-shrink: 0;
   transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.renewActionBtn::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
 }
 
 .renewActionBtn:hover {
@@ -900,6 +912,20 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+@media (max-width: 767.98px) {
+  .budgetName {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .noPeriodBanner {
+    flex-wrap: wrap;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

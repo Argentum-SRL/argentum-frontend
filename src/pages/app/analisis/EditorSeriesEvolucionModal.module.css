@@ -201,7 +201,7 @@
 .splitSubsBtn::before {
   content: '';
   position: absolute;
-  inset: -4px 0;
+  inset: -5px 0;
 }
 
 @media (max-width: 767.98px) {
@@ -435,7 +435,7 @@
 .removeChipBtn::before {
   content: '';
   position: absolute;
-  inset: -9px;
+  inset: -10px;
 }
 
 .removeChipBtn:hover {

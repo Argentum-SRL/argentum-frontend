@@ -5,8 +5,8 @@ import path from 'node:path'
 const ROOT_DIR = path.resolve(__dirname, '../..')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
-// Cortes legados congelados al cierre de F4 (baja de 111 a 56 tras limpiar perfil y tarjetas): solo puede bajar.
-const TOPE_LEGADO = 56
+// Cortes legados congelados al cierre de F5 (baja de 56 a 36 tras limpiar presupuestos y billeteras): solo puede bajar.
+const TOPE_LEGADO = 36
 
 const LEGADO: Record<string, Record<string, number>> = {
   'src/components/auth/AuthLayout/AuthLayout.module.css': {
@@ -15,16 +15,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   },
   'src/components/auth/CrearPasswordBloqueo/CrearPasswordBloqueo.module.css': {
     'max 540': 1,
-    'max 640': 1,
-  },
-  'src/components/billeteras/ActualizarSaldoModal.module.css': {
-    'max 640': 1,
-  },
-  'src/components/billeteras/BankPickerModal.parte2.css': {
-    'max 480': 1,
-    'max 639': 1,
-  },
-  'src/components/billeteras/CambiarFechaSaldoModal.module.css': {
     'max 640': 1,
   },
   'src/components/ciclo/CicloFinancieroSelector.module.css': {
@@ -49,10 +39,6 @@ const LEGADO: Record<string, Record<string, number>> = {
   'src/components/notificaciones/NotificacionesConfigModal.module.css': {
     'max 639': 1,
     'min 640': 1,
-  },
-  'src/components/presupuestos/PresupuestoModal.module.css': {
-    'max 480': 1,
-    'max 639': 1,
   },
   'src/components/suscripciones/SuscripcionModal.module.css': {
     'max 480': 1,
@@ -86,20 +72,8 @@ const LEGADO: Record<string, Record<string, number>> = {
   'src/pages/admin/usuarios/UsuariosPanel.module.css': {
     'max 639': 2,
   },
-  'src/pages/app/billeteras/BilleteraDetallePage.module.css': {
-    'max 360': 1,
-    'max 480': 1,
-    'max 600': 1,
-    'min 640': 9,
-  },
   'src/pages/app/dashboard/DashboardPage.parte3.css': {
     'max 500': 1,
-    'max 640': 1,
-  },
-  'src/pages/app/presupuestos/PresupuestosPage.module.css': {
-    'max 640': 1,
-  },
-  'src/pages/app/presupuestos/SugerenciaRubroCard.module.css': {
     'max 640': 1,
   },
   'src/pages/app/suscripciones/SuscripcionesPage.module.css': {

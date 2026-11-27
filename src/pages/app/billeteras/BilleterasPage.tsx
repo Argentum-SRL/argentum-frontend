@@ -16,7 +16,7 @@ import billeteraService from '@/services/billetera.service'
 import { dashboardService } from '@/services/dashboard.service'
 import type { Billetera, CotizacionDolar } from '@/types'
 import styles from './BilleterasPage.module.css'
-import { EmptyState, PageSummaryBar, CardsGridSkeleton } from '@/components/ui'
+import { EmptyState, MontoFit, PageSummaryBar, CardsGridSkeleton } from '@/components/ui'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { TransferenciaModal, TransferenciasTab } from '@/components/transferencias'
 import transferenciaService from '@/services/transferencia.service'
@@ -400,7 +400,12 @@ export default function BilleterasPage() {
                   {billeterasActivas.length} {billeterasActivas.length === 1 ? 'cuenta' : 'cuentas'}
                 </span>
               </div>
-              <span className={styles.cardAmount}>{formatCurrency(totalARS)}</span>
+              <span className={styles.cardAmount}>
+                <MontoFit
+                  completo={formatCurrency(totalARS)}
+                  corto={formatMontoCorto(totalARS, 'ARS')}
+                />
+              </span>
               <div className={styles.cardSubline}>
                 <span>≈ {formatMonto(totalUSD, 'USD')}</span>
               </div>

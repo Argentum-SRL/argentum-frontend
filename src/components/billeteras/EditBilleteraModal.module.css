@@ -85,6 +85,7 @@
 }
 
 .bankPreviewNombreBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -96,6 +97,12 @@
   font-family: inherit;
   color: var(--text);
   text-align: left;
+}
+
+.bankPreviewNombreBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px 0;
 }
 
 .bankPreviewNombreText {
@@ -326,7 +333,7 @@
 }
 
 .badgePillGold {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   padding: 1px 7px;
   border-radius: 5px;
@@ -341,7 +348,7 @@
 }
 
 .badgePillGreen {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 5px;
@@ -512,6 +519,7 @@
 }
 
 .usarAutomaticaBtn {
+  position: relative;
   background: transparent;
   border: none;
   color: var(--primary);
@@ -523,6 +531,12 @@
   font-family: inherit;
   margin-left: 4px;
   transition: opacity 120ms ease;
+}
+
+.usarAutomaticaBtn::before {
+  content: '';
+  position: absolute;
+  inset: -14px -4px;
 }
 
 .usarAutomaticaBtn:hover {
@@ -582,7 +596,7 @@
 
 .cancelBtn {
   flex: 1;
-  height: 42px;
+  height: var(--control-h, 44px);
   border: 1.5px solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
@@ -600,7 +614,7 @@
 
 .crearBtn {
   flex: 2;
-  height: 42px;
+  height: var(--control-h, 44px);
   border: none;
   background: var(--primary);
   color: white;

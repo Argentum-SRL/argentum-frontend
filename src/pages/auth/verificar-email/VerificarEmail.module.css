@@ -75,6 +75,7 @@
 
 /* ── Back button ─────────────────────────────── */
 .backBtn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -86,6 +87,12 @@
   cursor: pointer;
   padding: 0;
   transition: color 0.15s;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 .backBtn:hover {
@@ -104,6 +111,7 @@
 }
 
 .resendBtn {
+  position: relative;
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--primary);
@@ -111,6 +119,12 @@
   border: none;
   cursor: pointer;
   transition: opacity 0.15s;
+}
+
+.resendBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 .resendBtn:disabled {
@@ -126,8 +140,16 @@
 }
 
 .fallbackLink {
+  position: relative;
+  display: inline-block;
   color: var(--primary);
   text-decoration: none;
+}
+
+.fallbackLink::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 .successContainer {

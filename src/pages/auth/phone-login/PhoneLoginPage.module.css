@@ -55,6 +55,7 @@
 
 .phoneInput {
   flex: 1;
+  min-width: 0;
   height: 100%;
   outline: none;
   background: transparent;
@@ -95,7 +96,9 @@
 }
 
 .otpBox {
-  width: 44px;
+  flex: 1;
+  max-width: 44px;
+  min-width: 0;
   height: 56px;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -109,7 +112,6 @@
   -webkit-user-select: none;
   user-select: none;
   transition: border-color 0.15s, background 0.15s;
-  flex-shrink: 0;
 }
 
 .otpBoxActive {
@@ -182,7 +184,7 @@
 .altBtn {
   width: 100%;
   max-width: 400px;
-  height: 40px;
+  height: var(--control-h);
   border-radius: 9999px;
   border: 1px solid var(--silver);
   background: transparent;
@@ -213,9 +215,17 @@
 }
 
 .footerLink {
+  position: relative;
+  display: inline-block;
   font-weight: 500;
   color: var(--primary);
   text-decoration: none;
+}
+
+.footerLink::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 /* ── Code step ───────────────────────────────── */
@@ -248,6 +258,7 @@
 }
 
 .resendBtn {
+  position: relative;
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--primary);
@@ -258,6 +269,12 @@
   transition: opacity 0.15s;
 }
 
+.resendBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
+}
+
 .resendBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -265,6 +282,7 @@
 
 /* ── Back button ─────────────────────────────── */
 .backBtn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -276,6 +294,12 @@
   cursor: pointer;
   padding: 0;
   transition: opacity 0.15s;
+}
+
+.backBtn::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 .backBtn:hover {

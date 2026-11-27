@@ -92,6 +92,12 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 767.98px) {
+  .input {
+    font-size: var(--control-font-mobile);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
 
   .input,

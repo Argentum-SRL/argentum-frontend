@@ -29,6 +29,15 @@ const AREAS = [
   'src/components/goals',
   'src/pages/app/lo-que-se-repite',
   'src/components/ciclo',
+  'src/pages/auth',
+  'src/components/auth',
+  'src/pages/onboarding',
+  'src/components/onboarding',
+  'src/components/notificaciones',
+  'src/components/facturas',
+  'src/components/mock',
+  'src/pages/NotFoundPage.module.css',
+  'src/pages/TermsPage.module.css',
 ]
 
 const CORTES_OFICIALES_ANCHO = new Set([
@@ -44,19 +53,21 @@ const EXCEPCIONES_LETRA: Record<string, string> = {}
 // Excepciones de toque F2/F3 (resueltas en F5).
 const EXCEPCIONES_TOQUE_F2_F3: Record<string, string> = {}
 
-// Excepciones R7 en áreas previas (F2–F5) fuera de permitidas de F6B.
-const EXCEPCIONES_R7_FUERA: Record<string, string> = {
-  'src/components/tarjetas/PagarResumenModal.module.css::.segmentBtn':
-    'Botón de segmento compacto (height: 36px <= 767.98px) en modal de tarjeta (F4, fuera de permitidas F6B)',
+// Selectores con sufijo de R7 que no son clicables (verificados en su TSX: sin onClick ni role="button").
+const NO_CLICABLES_R7: Record<string, string> = {
   'src/pages/app/perfil/PerfilPage.parte1.css::.statusChip':
-    'Micro-chip informativo no interactivo de estado de verificación (height: 20px, F3, fuera de permitidas F6B)',
+    'Micro-chip informativo no interactivo (<span title="..."> sin onClick ni role="button" en ProfileHero.tsx)',
 }
 
-function walkFiles(dir: string, exts: string[], acc: string[] = []): string[] {
-  if (!fs.existsSync(dir)) return acc
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+function walkFiles(target: string, exts: string[], acc: string[] = []): string[] {
+  if (!fs.existsSync(target)) return acc
+  if (fs.statSync(target).isFile()) {
+    if (exts.some((ext) => target.endsWith(ext))) acc.push(target)
+    return acc.sort()
+  }
+  for (const entry of fs.readdirSync(target, { withFileTypes: true })) {
     if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '.git') continue
-    const full = path.join(dir, entry.name)
+    const full = path.join(target, entry.name)
     if (entry.isDirectory()) walkFiles(full, exts, acc)
     else if (exts.some((ext) => entry.name.endsWith(ext))) acc.push(full)
   }
@@ -229,12 +240,17 @@ describe('Reglas responsive por área (AREAS)', () => {
       const rel = path.relative(ROOT_DIR, abs).replace(/\\/g, '/')
       const blocks = extractCssBlocks(fs.readFileSync(abs, 'utf-8'))
       for (const blk of blocks) {
-        for (const fm of blk.cleanBody.matchAll(/font-size\s*:\s*([^;!}]+)/gi)) {
-          const px = resolverTamanoMinPx(fm[1], tokens)
-          if (px !== null && px < 11) {
-            const key = `${rel}::${blk.selector}`
-            if (!(key in EXCEPCIONES_LETRA)) {
-              menores.push(`${rel} [${blk.selector}] -> font-size: ${fm[1].trim()} (${px}px)`)
+        const rawLines = blk.rawBody.split(/\r?\n/)
+        const cleanLines = blk.cleanBody.split(/\r?\n/)
+        for (let idx = 0; idx < cleanLines.length; idx++) {
+          for (const fm of cleanLines[idx].matchAll(/font-size\s*:\s*([^;!}]+)/gi)) {
+            const px = resolverTamanoMinPx(fm[1], tokens)
+            if (px !== null && px < 11) {
+              const key = `${rel}::${blk.selector}`
+              const hasLetraOk = /\/\*\s*letra-ok\s*:/i.test(rawLines[idx] ?? '')
+              if (!(key in EXCEPCIONES_LETRA) && !hasLetraOk) {
+                menores.push(`${rel} [${blk.selector}] -> font-size: ${fm[1].trim()} (${px}px)`)
+              }
             }
           }
         }
@@ -495,7 +511,7 @@ describe('Reglas responsive por área (AREAS)', () => {
           const target = normalizeTarget(sel)
           if (!CLICKABLE_TARGET_RE.test(target)) continue
           if (/toque-ok\s*:/i.test(blk.rawBody)) continue
-          if (`${rel}::${sel}` in EXCEPCIONES_R7_FUERA) continue
+          if (`${rel}::${sel}` in NO_CLICABLES_R7) continue
 
           const h = parsePxProp(blk.cleanBody, 'height')
           if (h === null || h >= 44) continue
@@ -536,5 +552,39 @@ describe('Reglas responsive por área (AREAS)', () => {
     }
 
     expect(insuficientes).toEqual([])
+  })
+
+  it('R8: .timeInput de NotificacionesConfigModal en celular (>= 16px) tiene ancho fijo suficiente para "23:59" y el ícono nativo', () => {
+    // Cuenta mínima en celular (box-sizing: border-box, font-size: 16px):
+    //   - Peor caso "23:59" a 16px (4 dígitos ~42px + ':' ~5px + separación entre HH y MM ~7px): 54px
+    //   - Ícono nativo del reloj del navegador + separación interna: 26px
+    //   - Padding horizontal de .timeInput (12px * 2) + borde horizontal (1px * 2): 26px
+    //   Mínimo físico = 54 + 26 + 26 = 106px; mínimo con margen seguro multiplataforma = 124px.
+    const MIN_TIME_INPUT_MOBILE_PX = 124
+    const abs = path.join(ROOT_DIR, 'src/components/notificaciones/NotificacionesConfigModal.module.css')
+    const blocks = extractCssBlocks(fs.readFileSync(abs, 'utf-8'))
+
+    const timeBlocks = blocks.filter((blk) =>
+      blk.selector.split(',').some((s) => s.trim() === '.timeInput')
+    )
+    const baseBlocks = timeBlocks.filter((blk) => blk.media === 'base')
+    const mobileBlocks = timeBlocks.filter((blk) => blk.media.includes('767.98px'))
+
+    let cascadedWidth: number | null = null
+    let cascadedMinWidth: number | null = null
+    for (const blk of [...baseBlocks, ...mobileBlocks]) {
+      if (/(?:^|[;\s])width\s*:\s*auto\b/i.test(blk.cleanBody)) {
+        cascadedWidth = null
+      } else {
+        const w = parsePxProp(blk.cleanBody, 'width')
+        if (w !== null) cascadedWidth = w
+      }
+      const mw = parsePxProp(blk.cleanBody, 'min-width')
+      if (mw !== null) cascadedMinWidth = mw
+    }
+    const effectiveWidth = cascadedWidth ?? cascadedMinWidth
+
+    expect(effectiveWidth).not.toBeNull()
+    expect(effectiveWidth!).toBeGreaterThanOrEqual(MIN_TIME_INPUT_MOBILE_PX)
   })
 })

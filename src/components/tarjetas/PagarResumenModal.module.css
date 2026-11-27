@@ -685,6 +685,9 @@
 @media (max-width: 767.98px) {
   .inlineInput {
     font-size: var(--control-font-mobile);
+    width: 136px;
+    max-width: 100%;
+    min-height: var(--control-h);
   }
 
   .modalHeader {
@@ -707,9 +710,16 @@
   }
   
   .segmentBtn {
+    position: relative;
     font-size: 12px;
     padding: 0 6px;
     height: 36px;
+  }
+
+  .segmentBtn::before {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
   }
 }
 

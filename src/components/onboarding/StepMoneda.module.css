@@ -95,10 +95,17 @@
 
 /* ── Toggle ──────────────────────────────────── */
 .toggleLabel {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
+}
+
+.toggleLabel::before {
+  content: '';
+  position: absolute;
+  inset: -11px 0;
 }
 
 .toggle {
@@ -162,7 +169,7 @@
 
 .cotizacionGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(125px, 100%), 1fr));
   gap: 8px;
 }
 

@@ -30,10 +30,18 @@
 }
 
 .errorLink {
+  position: relative;
+  display: inline-block;
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--primary);
   text-decoration: underline;
+}
+
+.errorLink::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 .submitBtn {
@@ -77,7 +85,7 @@
 .altBtn {
   width: 100%;
   max-width: 400px;
-  height: 40px;
+  height: var(--control-h);
   border-radius: 9999px;
   border: 1px solid var(--silver);
   background: transparent;
@@ -113,18 +121,36 @@
 }
 
 .footerLink {
+  position: relative;
+  display: inline-block;
   font-weight: 500;
   color: var(--primary);
   text-decoration: none;
 }
 
+.footerLink::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
+}
+
 /* ── Toggle password button ──────────────────── */
 .togglePassword {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-3);
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
+}
+
+.togglePassword::before {
+  content: '';
+  position: absolute;
+  inset: -13px;
 }
 
 /* ── Forgot Password Link ────────────────────── */
@@ -137,11 +163,19 @@
 }
 
 .forgotLink {
+  position: relative;
+  display: inline-block;
   font-size: 0.8125rem;
   color: var(--primary);
   text-decoration: none;
   font-weight: 500;
   transition: opacity 0.15s;
+}
+
+.forgotLink::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
 }
 
 .forgotLink:hover {

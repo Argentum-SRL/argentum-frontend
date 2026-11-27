@@ -157,6 +157,7 @@
 }
 
 .playBtn {
+  /* toque-ok: ícono decorativo sin interacción dentro de maqueta visual de chat */
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -178,7 +179,7 @@
 }
 
 .msgTime {
-  font-size: 10px;
+  font-size: 10px; /* letra-ok: hora decorativa del mensaje en maqueta visual de WhatsApp */
   color: var(--text-3);
   margin-left: auto;
   flex-shrink: 0;
@@ -205,7 +206,7 @@
 }
 
 .textTime {
-  font-size: 10px;
+  font-size: 10px; /* letra-ok: hora decorativa del mensaje en maqueta visual de WhatsApp */
   color: var(--text-3);
   text-align: right;
   margin-top: 4px;

@@ -69,7 +69,7 @@
 .label {
   font-size: 11px;
   color: var(--text-3);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta de un término bajo cada paso del indicador (Datos/Ciclo/Moneda/WhatsApp) */
   transition: color 0.2s, font-weight 0.2s;
 }
 

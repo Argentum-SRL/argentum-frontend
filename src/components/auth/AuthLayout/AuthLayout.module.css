@@ -16,6 +16,10 @@
   .desktop {
     display: flex;
   }
+
+  .mobile {
+    display: none;
+  }
 }
 
 .leftPanel {
@@ -43,7 +47,7 @@
   margin: auto 0;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   .formWrap {
     max-width: 520px;
   }
@@ -56,12 +60,6 @@
   flex-direction: column;
   background: var(--page);
   transition: color 0.2s ease;
-}
-
-@media (min-width: 768px) {
-  .mobile {
-    display: none;
-  }
 }
 
 .mobileInner {
@@ -82,12 +80,6 @@
   padding: calc(env(safe-area-inset-top, 0px) + 40px) max(20px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 48px) max(20px, env(safe-area-inset-left, 0px));
   box-sizing: border-box;
   position: relative;
-}
-
-@media (max-width: 767.98px) {
-  .standalone {
-    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
-  }
 }
 
 .standaloneCard {
@@ -129,13 +121,6 @@
 
 :global([data-theme="dark"]) .standalone .title {
   color: #ffffff;
-}
-
-@media (max-width: 480px) {
-  .standaloneCard {
-    padding: 28px 20px;
-    border-radius:20px;
-  }
 }
 
 /* ── Shared content pieces ───────────────────── */
@@ -191,7 +176,21 @@
   z-index: 10;
 }
 
+.themeToggle::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+}
+
 @media (max-width: 767.98px) {
+  .standalone {
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
+
+  .standaloneCard {
+    padding: clamp(27.22px, calc(20.9412px + 1.9608vw), 36px) clamp(18.82px, calc(9.4118px + 2.9412vw), 32px);
+  }
+
   .themeToggle {
     top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
   }

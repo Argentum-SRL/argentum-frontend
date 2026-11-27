@@ -14,7 +14,7 @@ Nota: `.agents/`, `.claude/` y `.codex/` no se versionan en Git. Este archivo es
      - 8px etiqueta, texto de ayuda o error a control (`--modal-label-gap`). El hint/ayuda vive DENTRO del campo `[data-modal-field]`.
      - 8px lista de opciones/toggles de una misma pregunta (`--modal-option-gap`).
      - 12px campo a campo en el mismo bloque (`--modal-field-gap`).
-     - 20px bloque a bloque (`--modal-block-gap`, 16px en pantallas <= 480px).
+     - 15.61px–20px fluido bloque a bloque (`--modal-block-gap`: 16px en 360px, 20px desde 768px).
      - 10px subtítulo de bloque a primer elemento (`--modal-section-title-gap`).
      - 20px header a primer bloque (`--modal-header-gap`).
      - 24px último bloque a botonera de footer (`--modal-footer-gap`).

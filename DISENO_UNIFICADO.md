@@ -25,8 +25,8 @@ La escala de espaciado de Argentum está calibrada para ofrecer ritmo vertical a
 | `--space-icon` | `6px` | Separación exclusiva entre ícono y texto; separación interna de controles. |
 | `--space-sm` | `8px` | Gap entre etiqueta y campo (`--modal-label-gap`), grupos de opciones (`--modal-option-gap`). |
 | `--space-md` | `12px` | Separación entre campos (`--modal-field-gap`), gap entre botones de footer (`--modal-footer-btn-gap`). |
-| `--space-lg` | `16px` | Separación entre bloques en móviles `<= 480px` (`--modal-block-gap`), padding de tarjetas. |
-| `--space-xl` | `20px` | Separación entre bloques (`--modal-block-gap`), header a contenido (`--modal-header-gap`), padding lateral (`--modal-pad-x`). |
+| `--space-lg` | `16px` | Valor base en 360px de `--modal-block-gap` (fluido de 15.61px a 20px), padding de tarjetas. |
+| `--space-xl` | `20px` | Valor `>= 768px` de `--modal-block-gap`, header a contenido (`--modal-header-gap`), padding lateral (`--modal-pad-x`). |
 | `--space-2xl` | `24px` | Separación vertical de último contenido a footer (`--modal-footer-gap`). |
 | `--space-3xl` | `32px` | Separación entre módulos o secciones mayores. |
 | `--space-4xl` | `40px` | Márgenes estructurales y descansos visuales amplios. |
@@ -229,7 +229,7 @@ El sistema de espaciado para formularios, modales y hojas inferiores de Argentum
 | `--modal-label-gap` | `8px` | Separación vertical entre etiqueta, texto de ayuda o mensaje de error y su control. El texto de ayuda va adentro del campo. |
 | `--modal-option-gap` | `8px` | Separación entre ítems de una misma pregunta: filas de opciones/toggles, radios, chips, tarjetas de lista corta, pestañas (`[data-modal-options]`). |
 | `--modal-field-gap` | `12px` | Separación vertical entre campos consecutivos dentro del mismo bloque temático (misma pregunta o tema). |
-| `--modal-block-gap` | `20px` (`16px` en `max-width: 480px`) | Separación vertical entre bloques temáticos independientes (preguntas distintas). Se reduce en móviles para optimizar altura. |
+| `--modal-block-gap` | `clamp(15.61px, calc(12.4706px + 0.9804vw), 20px)` (`15.61px` en 320px, `16px` en 360px, `20px` desde 768px) | Separación vertical fluida entre bloques temáticos independientes (preguntas distintas). Se reduce progresivamente en celulares sin cortes fijos. |
 | `--modal-section-title-gap` | `10px` | Separación vertical entre el subtítulo de un bloque y su primer elemento. |
 | `--modal-header-gap` | `20px` | Separación vertical entre el encabezado del modal y el primer bloque de contenido. |
 | `--modal-footer-gap` | `24px` | Separación vertical entre el último bloque de contenido y la botonera del pie (footer). |
@@ -237,12 +237,12 @@ El sistema de espaciado para formularios, modales y hojas inferiores de Argentum
 | `--modal-footer-pad-bottom` | `max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))` (`< 768px` / `max-width: 767.98px`); `20px` (`--space-xl`, `>= 768px`) | Margen inferior del pie de modales y hojas hacia el borde. En móvil suma 16px al área segura (mínimo 24px) para despejar vidrios templados, fundas y el borde inferior donde el toque es menos preciso. |
 | `--modal-pad-x` | `20px` | Relleno lateral uniforme en el cuerpo y pie del modal. |
 
-Regla de Gestalt: ninguna distancia entre campos (`12px`) puede ser mayor o igual que la distancia entre bloques (`20px` / `16px`). Los grupos de opciones (`8px`) y las etiquetas/ayudas (`8px`) se mantienen cohesionados con su control.
+Regla de Gestalt: ninguna distancia entre campos (`12px`) puede ser mayor o igual que la distancia entre bloques (`15.61px–20px`). Los grupos de opciones (`8px`) y las etiquetas/ayudas (`8px`) se mantienen cohesionados con su control.
 
 ### Mecanismo Único por Atributos de Marcado
 Para evitar CSS duplicado o ad-hoc en cada modal, el espaciado se gobierna centralizadamente desde `Modal.module.css` mediante atributos HTML semánticos:
 - `[data-modal-frame]`: Contenedores estructurales (slide, `modalContainer`, `formContainer`, `slidesContainer`, `mobileDrawerContainer`, etc.). Aplica `display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 0;`. Header, cuerpo y footer se separan exclusivamente por sus tokens normativos, nunca por gap del frame estructural.
-- `[data-modal-stack]`: SOLO el contenedor del CUERPO del modal (el área de contenido scrolleable o editable). Gap = `--modal-block-gap` (20px / 16px). NUNCA en contenedores estructurales ni en elementos que contengan directamente header o footer (R26 = 0).
+- `[data-modal-stack]`: SOLO el contenedor del CUERPO del modal (el área de contenido scrolleable o editable). Gap = `--modal-block-gap` (fluido 15.61px–20px). NUNCA en contenedores estructurales ni en elementos que contengan directamente header o footer (R26 = 0).
 - `[data-modal-block]`: Contenedor de un grupo de elementos de UNA sola pregunta o tema con gap `--modal-field-gap` (12px). Un aviso/alerta que comenta al grupo va dentro del mismo bloque a 12px.
 - `[data-modal-field]`: Contenedor de control + su etiqueta/ayuda/error con gap `--modal-label-gap` (8px). El texto de ayuda vive DENTRO del campo, debajo del control, sin márgenes propios inline.
 - `[data-modal-options]`: Contenedor de lista de ítems de una misma pregunta (toggles, tarjetas de opción, radios, chips) con gap `--modal-option-gap` (8px).
@@ -328,7 +328,7 @@ Todos los carruseles horizontales de tarjetas de billeteras o crédito dentro de
   - Sangrado lateral *full-bleed*: `margin-inline: calc(-1 * var(--modal-pad-x))` con comentario `r03-ok`, compensado exactamente con `padding-inline: var(--modal-pad-x)` y `scroll-padding-inline: var(--modal-pad-x)`. La primera card queda perfectamente alineada al contenido (a 20px) y al deslizar se ve continua hasta el borde del modal.
   - Alojamiento vertical de sombras: `padding-top: var(--carousel-reach-top)` (3px) y `padding-bottom: var(--carousel-reach-bottom)` (15px), correspondientes al alcance real de `--elevation-selection-carousel`.
   - Compensación vertical sin agrandar el layout: `margin-top: calc(-1 * var(--carousel-reach-top))` y `margin-bottom: calc(-1 * var(--carousel-reach-bottom))` con el comentario normativo de patrón (4): `/* r03-ok: compensa el padding que aloja la sombra de selección para que el carrusel mida lo mismo que sus cards */`.
-  - Resultado: la distancia visible de la etiqueta a la card es exactamente `--modal-label-gap` (8px) y de la card al siguiente bloque es `--modal-block-gap` (20px / 16px en <=480px) o `--modal-footer-gap` (24px), sin holguras sobrantes.
+  - Resultado: la distancia visible de la etiqueta a la card es exactamente `--modal-label-gap` (8px) y de la card al siguiente bloque es `--modal-block-gap` (fluido 15.61px–20px; 16px en 360px y 20px desde 768px) o `--modal-footer-gap` (24px), sin holguras sobrantes.
 - **Pista (`[data-modal-carousel-track]`):**
   - Flexbox en fila con `gap: 12px` y `scroll-snap-type: x mandatory`.
   - Centrado automático cuando hay una sola card (`carouselCenter`) y alineación al inicio (`carouselStart`) cuando hay varias.

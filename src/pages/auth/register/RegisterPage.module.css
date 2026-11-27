@@ -74,6 +74,7 @@
 
 .phoneInput {
   flex: 1;
+  min-width: 0;
   height: 100%;
   outline: none;
   background: transparent;
@@ -143,7 +144,7 @@
 .altBtn {
   width: 100%;
   max-width: 400px;
-  height: 40px;
+  height: var(--control-h);
   border-radius: 9999px;
   border: 1px solid var(--silver);
   background: transparent;
@@ -179,18 +180,36 @@
 }
 
 .footerLink {
+  position: relative;
+  display: inline-block;
   font-weight: 500;
   color: var(--primary);
   text-decoration: none;
 }
 
+.footerLink::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
+}
+
 /* ── Toggle password button ──────────────────── */
 .togglePassword {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-3);
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
+}
+
+.togglePassword::before {
+  content: '';
+  position: absolute;
+  inset: -13px;
 }
 
 .infoText {
@@ -210,12 +229,19 @@
 }
 
 .checkbox {
+  position: relative;
   width: 16px;
   height: 16px;
   margin-top: 2px;
   cursor: pointer;
   accent-color: var(--primary);
   flex-shrink: 0;
+}
+
+.checkbox::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
 }
 
 .checkboxLabel {
@@ -228,10 +254,17 @@
 }
 
 .termsLink {
+  position: relative;
   color: var(--primary);
   text-decoration: underline;
   font-weight: 500;
   transition: opacity 0.15s;
+}
+
+.termsLink::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0; /* toque-ok: enlace inline en párrafo de términos; expansión acotada para no solapar renglones */
 }
 
 .termsLink:hover {
@@ -244,6 +277,15 @@
   align-items: center;
   margin: 16px 0;
   min-height: 65px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 767.98px) {
+  .passwordRow {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

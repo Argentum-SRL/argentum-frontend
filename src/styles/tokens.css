@@ -44,7 +44,7 @@
   --modal-label-gap: 8px; /* Etiqueta, texto de ayuda o error a su control (8px) */
   --modal-option-gap: 8px; /* Opciones o toggles de una misma pregunta (8px) */
   --modal-field-gap: 12px; /* Campo a campo dentro del mismo bloque (12px) */
-  --modal-block-gap: 20px; /* Bloque a bloque en >480px (20px; en <=480px pasa a 16px) */
+  --modal-block-gap: clamp(15.61px, calc(12.4706px + 0.9804vw), 20px); /* Bloque a bloque: fluido de 15.61px en 320px (16px en 360px) a 20px desde 768px */
   --modal-section-title-gap: 10px; /* Subtítulo de un bloque a su primer elemento (10px) */
   --modal-header-gap: 20px; /* Título/header del modal al primer bloque (20px) */
   --modal-footer-gap: 24px; /* Último bloque a la fila de botones del footer (24px) */
@@ -115,13 +115,6 @@
 @media (min-width: 2560px) {
   :root {
     --screen-scale: 1.2; /* Escala aumentada al 120% en pantallas de 2560px o más */
-  }
-}
-
-/* Espaciado de bloques en celulares chicos (<=480px: 16px) */
-@media (max-width: 480px) {
-  :root {
-    --modal-block-gap: 16px;
   }
 }
 

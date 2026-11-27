@@ -1,13 +1,23 @@
 import React, { useState } from 'react'
 import { esPunteroFino } from '@/utils/foco'
-import { Shield, Eye, EyeOff, Check, AlertCircle, Save, LogOut, Info } from '@/components/ui/icons'
+import { Eye, EyeOff, LogOut } from '@/components/ui/icons'
 import type { Usuario } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
 import { sileo } from 'sileo'
 import usuarioService from '@/services/usuario.service'
 import { getErrorMessage } from '@/utils/errorMessages'
-import { getPasswordRequirements, validatePassword, validatePasswordConfirmation } from '@/utils/password.utils'
-import { Modal, AtmosphericBackground, AtmosphericMoonIcon } from '@/components/ui'
+import {
+  getPasswordMissingError,
+  validatePassword,
+  validatePasswordConfirmation,
+} from '@/utils/password.utils'
+import {
+  AtmosphericBackground,
+  AtmosphericMoonIcon,
+  ThemeToggle,
+  Field,
+  Button,
+} from '@/components/ui'
 import styles from './CrearPasswordBloqueo.module.css'
 
 interface Props {
@@ -21,27 +31,21 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [hasSubmitted, setHasSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  const reqs = getPasswordRequirements(password, passwordConfirm)
-  const isFormValid = reqs.length && reqs.maxLength && reqs.upper && reqs.lower && reqs.number && reqs.match
+  const passwordError = hasSubmitted ? getPasswordMissingError(password) : null
+  const confirmError = hasSubmitted ? validatePasswordConfirmation(password, passwordConfirm) : null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setHasSubmitted(true)
     setErrorMsg(null)
 
     const pErr = validatePassword(password)
-    if (pErr) {
-      setErrorMsg(pErr)
-      return
-    }
-
     const cErr = validatePasswordConfirmation(password, passwordConfirm)
-    if (cErr) {
-      setErrorMsg(cErr)
-      return
-    }
+    if (pErr || cErr) return
 
     setIsSubmitting(true)
     try {
@@ -52,7 +56,7 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
       sileo.success({ title: 'Contraseña creada.' })
       updateUsuario({ ...usuario, password_configurada: true })
     } catch (err: unknown) {
-            const msg = getErrorMessage(
+      const msg = getErrorMessage(
         err,
         'No se pudo guardar la contraseña. Revisá los datos y probá de nuevo.'
       )
@@ -64,158 +68,114 @@ export default function CrearPasswordBloqueo({ usuario }: Props) {
   }
 
   return (
-    <AtmosphericBackground fullScreen centered={false} compensateBottomNav={false} className={styles.pageRoot}>
-      {/* Brand header */}
-      <header className={styles.bgHeader}>
-        <div className={styles.bgLogoWrap}>
+    <AtmosphericBackground
+      fullScreen={false}
+      centered={false}
+      compensateBottomNav={false}
+      className={styles.page}
+    >
+      <ThemeToggle />
+
+      <div className={styles.inner}>
+        <header className={styles.header}>
           <AtmosphericMoonIcon size={32} />
-          <span className={styles.bgLogoText}>Argentum</span>
-        </div>
-        <div className={styles.bgBadge}>
-          <span className={styles.bgBadgeDot} />
-          <span>Acceso Seguro</span>
-        </div>
-      </header>
+          <span className={styles.logoText}>Argentum</span>
+        </header>
 
-      {/* Central Modal (bottom sheet on mobile, centered card on desktop) */}
-      <Modal
-        isOpen={true}
-        onClose={() => logout()}
-        size="md"
-        noPadding
-        closeOnOverlayClick={false}
-        closeOnEscape={false}
-        ariaLabel="Establecer contraseña de acceso"
-        title={
-          <div className={styles.modalTitleWrap}>
-            <Shield size={18} className={styles.modalTitleIcon} />
-            <span>Establecer Contraseña de Acceso</span>
-          </div>
-        }
-      >
-        <form onSubmit={handleSubmit} className={styles.modalFormContainer} data-modal-frame noValidate>
-          {errorMsg && (
-            <div className={styles.modalAlertError} role="alert">
-              <AlertCircle size={15} />
-              <span>{errorMsg}</span>
-            </div>
-          )}
+        <main className={styles.card}>
+          <h1 className={styles.title}>Creá tu contraseña</h1>
 
-          <div className={styles.modalFormBody} data-modal-stack>
-            <div className={styles.explanationBanner}>
-              <Info size={16} />
-              <span>
-                Para tu seguridad y para garantizar que nunca pierdas el acceso a tu cuenta ni a tus datos financieros si no podés ingresar con Google, necesitás configurar una contraseña de acceso.
-              </span>
-            </div>
+          <form onSubmit={handleSubmit} noValidate>
+            <Field
+              id="bloqueo-nueva-pw"
+              name="new_password"
+              label="Nueva contraseña"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(val) => {
+                setPassword(val)
+                if (errorMsg) setErrorMsg(null)
+              }}
+              placeholder="Mínimo 8 caracteres"
+              autoComplete="new-password"
+              autoFocus={esPunteroFino()}
+              maxLength={128}
+              error={passwordError}
+              disabled={isSubmitting}
+              rightSlot={
+                <button
+                  type="button"
+                  className={styles.togglePassword}
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  disabled={isSubmitting}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
 
-            <div data-modal-block>
-              <div className={styles.formField} data-modal-field>
-                <label htmlFor="bloqueo-nueva-pw" className={styles.fieldLabel}>
-                  Nueva contraseña *
-                </label>
-                <div className={styles.passwordInputWrap}>
-                  <input
-                    id="bloqueo-nueva-pw"
-                    type={showPassword ? 'text' : 'password'}
-                    className={styles.fieldInput}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Ingresá una contraseña segura"
-                    autoComplete="new-password"
-                    required
-                    autoFocus={esPunteroFino()}
-                  />
-                  <button
-                    type="button"
-                    className={styles.modalPwEyeBtn}
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
+            <Field
+              id="bloqueo-confirm-pw"
+              name="confirm_password"
+              label="Confirmar contraseña"
+              type={showPasswordConfirm ? 'text' : 'password'}
+              value={passwordConfirm}
+              onChange={(val) => {
+                setPasswordConfirm(val)
+                if (errorMsg) setErrorMsg(null)
+              }}
+              placeholder="Repetí tu contraseña"
+              autoComplete="new-password"
+              maxLength={128}
+              error={confirmError}
+              disabled={isSubmitting}
+              rightSlot={
+                <button
+                  type="button"
+                  className={styles.togglePassword}
+                  onClick={() => setShowPasswordConfirm((v) => !v)}
+                  aria-label={showPasswordConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  disabled={isSubmitting}
+                >
+                  {showPasswordConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
 
-              <div className={styles.formField} data-modal-field>
-                <label htmlFor="bloqueo-confirm-pw" className={styles.fieldLabel}>
-                  Confirmar nueva contraseña *
-                </label>
-                <div className={styles.passwordInputWrap}>
-                  <input
-                    id="bloqueo-confirm-pw"
-                    type={showPasswordConfirm ? 'text' : 'password'}
-                    className={styles.fieldInput}
-                    value={passwordConfirm}
-                    onChange={(e) => setPasswordConfirm(e.target.value)}
-                    placeholder="Repetí la contraseña"
-                    autoComplete="new-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className={styles.modalPwEyeBtn}
-                    onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                    aria-label={showPasswordConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                    tabIndex={-1}
-                  >
-                    {showPasswordConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-            </div>
+            {errorMsg && (
+              <p className={styles.error} role="alert">
+                {errorMsg}
+              </p>
+            )}
 
-            <div className={styles.pwChecklist}>
-              <span className={styles.pwChecklistTitle}>Requisitos de seguridad:</span>
-              <div className={styles.pwChecklistGrid}>
-                <div className={`${styles.reqItem} ${reqs.length ? styles.reqSuccess : ''}`}>
-                  {reqs.length ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Mínimo 8 caracteres</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.upper ? styles.reqSuccess : ''}`}>
-                  {reqs.upper ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Al menos una mayúscula</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.lower ? styles.reqSuccess : ''}`}>
-                  {reqs.lower ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Al menos una minúscula</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.number ? styles.reqSuccess : ''}`}>
-                  {reqs.number ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Al menos un número</span>
-                </div>
-                <div className={`${styles.reqItem} ${reqs.match ? styles.reqSuccess : ''}`}>
-                  {reqs.match ? <Check size={13} /> : <span className={styles.reqDot} />}
-                  <span>Las contraseñas coinciden</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            <Button
+              type="submit"
+              loading={isSubmitting}
+              fullWidth
+              className={styles.submitBtn}
+            >
+              {isSubmitting ? 'Guardando...' : 'Guardar contraseña'}
+            </Button>
+          </form>
 
-          <div className={styles.modalFormFooter}>
+          <div className={styles.logoutWrap}>
             <button
               type="button"
               onClick={() => logout()}
-              className={styles.modalCancelBtn}
-              title="Cerrar sesión"
+              className={styles.logoutBtn}
+              disabled={isSubmitting}
             >
               <LogOut size={14} />
-              <span>Salir</span>
-            </button>
-
-            <button
-              type="submit"
-              disabled={isSubmitting || !isFormValid}
-              className={styles.modalSubmitBtn}
-            >
-              <Save size={14} />
-              <span>{isSubmitting ? 'Guardando...' : 'Guardar contraseña'}</span>
+              <span>Cerrar sesión</span>
             </button>
           </div>
-        </form>
-      </Modal>
+        </main>
+
+        <p className={styles.footer}>
+          Podés cambiarla en cualquier momento desde tu perfil.
+        </p>
+      </div>
     </AtmosphericBackground>
   )
 }
-

@@ -64,7 +64,7 @@ export const TabSeguridad: React.FC<TabSeguridadProps> = ({
 
   // Password validations
   const reqs = getPasswordRequirements(passwordNueva, passwordConfirm)
-  const isPwValid = reqs.length && reqs.maxLength && reqs.upper && reqs.lower && reqs.number && reqs.match
+  const isPwValid = reqs.length && reqs.maxBytes && reqs.maxLength && reqs.upper && reqs.lower && reqs.number && reqs.match
 
   const handleCancelPassword = () => {
     setIsEditingPassword(false)

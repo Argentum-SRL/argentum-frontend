@@ -15,6 +15,7 @@
 }
 
 .input {
+  display: block;
   width: 100%;
   height: var(--control-h);
   padding: 0 var(--control-pad-x);
@@ -67,6 +68,9 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .error {

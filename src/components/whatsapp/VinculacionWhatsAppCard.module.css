@@ -23,7 +23,7 @@
   width: 100%;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .twoColGrid {
     display: grid;
     grid-template-columns: 230px 1fr;
@@ -92,6 +92,7 @@
 }
 
 .whatsappBtn {
+  position: relative;
   width: 100%;
   height: 40px;
   border-radius: 8px;
@@ -107,6 +108,12 @@
   gap: 8px;
   text-decoration: none;
   transition: opacity 0.15s, transform 0.15s;
+}
+
+.whatsappBtn::before {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
 }
 
 .whatsappBtn:hover {
@@ -125,6 +132,7 @@
 }
 
 .copyBtn {
+  position: relative;
   width: 100%;
   height: 36px;
   border-radius: 8px;
@@ -139,6 +147,12 @@
   justify-content: center;
   gap: 6px;
   transition: background 0.15s, border-color 0.15s;
+}
+
+.copyBtn::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
 }
 
 .copyBtn:hover {
@@ -290,6 +304,7 @@
 }
 
 .skipBtn {
+  position: relative;
   background: none;
   border: 1px solid transparent;
   color: var(--text-3);
@@ -299,6 +314,12 @@
   padding: 6px 14px;
   border-radius: 8px;
   transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.skipBtn::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }
 
 .skipBtn:hover {

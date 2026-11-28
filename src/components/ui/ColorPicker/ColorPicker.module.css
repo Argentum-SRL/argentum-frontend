@@ -283,11 +283,18 @@
 
 @media (min-width: 768px) {
   .doneBtn {
+    position: relative;
     width: calc(100% - 28px);
     margin: 4px 14px 12px;
     height: 34px;
     font-size: 13px;
     border-radius:8px;
+  }
+
+  .doneBtn::before {
+    content: '';
+    position: absolute;
+    inset: -5px 0;
   }
 }
 

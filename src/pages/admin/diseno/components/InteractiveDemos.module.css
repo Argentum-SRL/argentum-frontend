@@ -6,7 +6,7 @@
   width: 100%;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .demoGrid {
     grid-template-columns: 1fr;
   }
@@ -134,7 +134,7 @@
 .segmentedCapsulePill {
   flex: 1;
   min-width: 0;
-  height: 40px;
+  height: 40px; /* toque-ok: variante comparativa de alto 40px en muestrario de diseño */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -211,6 +211,7 @@
 }
 
 .periodPill {
+  position: relative;
   flex: 1;
   height: 40px;
   display: flex;
@@ -225,6 +226,12 @@
   font-size: 13px;
   font-weight: 600;
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.periodPill::before {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
 }
 
 .periodPillActive {

@@ -239,7 +239,7 @@
   cursor: pointer;
   font-family: inherit;
   transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: opción de selector segmentado en demostrador de diseño */
   padding: 0 8px;
 }
 
@@ -291,7 +291,7 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1023.98px) {
   .specEditorGrid {
     grid-template-columns: 1fr;
   }

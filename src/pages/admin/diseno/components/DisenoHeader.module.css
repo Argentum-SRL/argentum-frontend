@@ -99,6 +99,7 @@
 
 .themeToggleBtn,
 .actionBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -113,6 +114,13 @@
   color: var(--text);
   cursor: pointer;
   transition: all 180ms ease;
+}
+
+.themeToggleBtn::before,
+.actionBtn::before {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
 .themeToggleBtn:hover,

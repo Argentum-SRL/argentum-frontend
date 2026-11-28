@@ -5,7 +5,7 @@
   padding: 0;
   overflow: hidden;
   clip-path: inset(50%);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: patrón estándar de texto solo para lectores de pantalla */
   border: 0;
 }
 
@@ -58,14 +58,6 @@
   width: 100%;
   min-width: 0;
   box-shadow: var(--elevation-sm);
-}
-
-@media (max-width: 639px) {
-  .sectionCard {
-    padding: 16px;
-    border-radius: 16px;
-    gap: 12px;
-  }
 }
 
 .sectionHeader {
@@ -240,7 +232,7 @@
 
 .numCell {
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: cifra tabular compacta en tabla desktop */
 }
 
 .userCell {
@@ -284,7 +276,7 @@
 .usoTime {
   font-size: 13px;
   color: var(--text);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: marca de tiempo compacta en columna de último uso */
 }
 
 .usoCanal {
@@ -299,7 +291,7 @@
   gap: 6px;
   font-size: 13px;
   color: var(--text);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: punto de estado + etiqueta corta en línea */
 }
 
 .statusDot {
@@ -378,7 +370,7 @@
 .metaPieza {
   display: inline-flex;
   align-items: center;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: fragmento numérico corto dentro de flex-wrap móvil */
 }
 
 .mobileChevron {
@@ -651,6 +643,7 @@
 
 .btnSecondary,
 .btnDanger {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -661,11 +654,18 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta corta de botón de acción en fila de seguridad */
   transition:
     background-color var(--motion-fast) var(--ease-out),
     border-color var(--motion-fast) var(--ease-out),
     color var(--motion-fast) var(--ease-out);
+}
+
+.btnSecondary::before,
+.btnDanger::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 
 .btnSecondary {
@@ -705,7 +705,13 @@
   }
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767.98px) {
+  .sectionCard {
+    padding: 16px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+
   .securityRow {
     flex-direction: column;
     align-items: stretch;
@@ -719,6 +725,7 @@
   .btnSecondary,
   .btnDanger {
     width: 100%;
+    height: auto;
     min-height: 44px;
     font-size: 13px;
   }

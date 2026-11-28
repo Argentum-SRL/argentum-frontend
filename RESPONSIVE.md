@@ -51,7 +51,7 @@ Reglas para escribir el cambio:
 - `white-space: nowrap` solo con ellipsis + title, con `MontoFit`, o con el comentario `/* nowrap-ok: <motivo> */` en la misma línea.
 - Nada de `100vw` (incluye la barra de scroll y genera desborde horizontal): `100%`.
 - Anchos fijos grandes con `min(Npx, 100%)`.
-- Excepciones permanentes: el selector Pesos/Dólares de `BalanceCard`; la cápsula sin pista, card ni fondo detrás; el pie de los modales (`ModalFooter`).
+- Excepciones permanentes: el selector Pesos/Dólares de `BalanceCard`; la cápsula sin pista, card ni fondo detrás; el pie de los modales (`ModalFooter`); controles de terceros (`GoogleLoginButton` en iframe de Google con alto 40px en `toque-ok`, y `sileo` con `--sileo-width: 100%` acotado dentro de `@media (max-width: 767.98px)`).
 
 ## 5. Ajustes finos dentro del celular (chico vs grande) sin cortes nuevos
 
@@ -71,9 +71,9 @@ Ejemplo: gap de 8px en 320 y 12px desde 768 → `gap: clamp(8px, calc(8px + 4 * 
 
 ## 7. Controles automáticos (si fallan, el cambio está mal; nunca se aflojan para que pasen)
 
-- `src/styles/puntosDeCorte.test.ts`: cortes oficiales, sin rango ni solapes, legado congelado (la lista LEGADO y `TOPE_LEGADO` solo pueden bajar). Hoy quedan cortes viejos en áreas todavía no revisadas, incluido `@media (max-width: 480px)` de `tokens.css` para `--modal-block-gap`: se migran en las fases por área, nunca se copian.
+- `src/styles/puntosDeCorte.test.ts`: cortes oficiales, sin rango ni solapes, legado en cero al cierre de F8 (`LEGADO = {}`, `TOPE_LEGADO = 0`, 0 `matchMedia` de ancho fuera de `useViewport.ts`).
 - `src/components/ui/uiResponsive.test.ts`: componentes compartidos (letra, nowrap, toque, botones de cerrar con área de 44px).
-- `src/styles/responsiveAreas.test.ts`: las mismas reglas para cada carpeta ya revisada (lista `AREAS`; cada fase agrega la suya).
+- `src/styles/responsiveAreas.test.ts`: las mismas reglas (`R1`–`R8`) y cobertura total del 100% de `.css` y `.tsx` (no test) de `src/` mediante `AREAS` + lista cerrada `SIN_PANTALLA` (`COBERTURA`). Cualquier carpeta o pantalla nueva se agrega a `AREAS` (o a `SIN_PANTALLA` con motivo solo si no dibuja estilos ni marcado propio).
 - `npm run lint` (incluye `audit:rules`, regla R15 de cortes).
 
 ## 8. Checklist antes de dar algo por terminado

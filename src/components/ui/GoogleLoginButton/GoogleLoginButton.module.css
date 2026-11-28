@@ -4,6 +4,7 @@
   align-items: center;
   width: 100%;
   max-width: 400px;
+  /* toque-ok: botón dibujado por Google en un iframe de terceros, alto máximo 40 del proveedor */
   min-height: 40px;
   margin: 0 auto;
   border-radius: 9999px;

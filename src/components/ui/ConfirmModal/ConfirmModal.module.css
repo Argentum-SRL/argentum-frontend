@@ -295,7 +295,7 @@
   .confirmBtn::before {
     content: '';
     position: absolute;
-    inset: -2px 0;
+    inset: -4px 0;
   }
 }
 
@@ -333,6 +333,13 @@
     height: 40px;
     font-size: 12.5px;
     padding: 0 12px;
+  }
+
+  .cancelBtn::before,
+  .confirmBtn::before {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
   }
 }
 

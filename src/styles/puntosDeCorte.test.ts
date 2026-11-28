@@ -5,36 +5,10 @@ import path from 'node:path'
 const ROOT_DIR = path.resolve(__dirname, '../..')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
-// Cortes legados congelados al cierre de F7 (baja de 20 a 10 tras limpiar auth, onboarding, notificaciones, públicas y tokens): solo puede bajar.
-const TOPE_LEGADO = 10
+// Cortes legados en cero al cierre de F8 (baja de 10 a 0 tras cerrar ui, whatsapp y admin).
+const TOPE_LEGADO = 0
 
-const LEGADO: Record<string, Record<string, number>> = {
-  'src/components/whatsapp/VinculacionWhatsAppCard.module.css': {
-    'min 640': 1,
-  },
-  'src/pages/admin/AnimacionPreviewPage.module.css': {
-    'max 640': 1,
-  },
-  'src/pages/admin/components/MonitorWppPanel.module.css': {
-    'max 639': 1,
-    'min 1280': 1,
-  },
-  'src/pages/admin/components/SchedulerPanel.module.css': {
-    'max 639': 1,
-  },
-  'src/pages/admin/diseno/components/DisenoSpecificationView.module.css': {
-    'max 900': 1,
-  },
-  'src/pages/admin/diseno/components/InteractiveDemos.module.css': {
-    'max 640': 1,
-  },
-  'src/pages/admin/registro/RegistroPanel.module.css': {
-    'max 639': 1,
-  },
-  'src/pages/admin/usuarios/UsuariosPanel.module.css': {
-    'max 639': 2,
-  },
-}
+const LEGADO: Record<string, Record<string, number>> = {}
 
 const OFICIALES = new Set([
   'max 767.98',
@@ -175,12 +149,7 @@ describe('Trinquete de puntos de corte y defectos (FS2B)', () => {
       const content = fs.readFileSync(abs, 'utf-8')
       expect(content, `${rel} usa innerWidth para decidir`).not.toMatch(innerWidthRe)
       const mmMatches = [...content.matchAll(matchMediaWidthRe)]
-      if (rel === 'src/pages/admin/usuarios/UsuariosLista.tsx') {
-        expect(mmMatches).toHaveLength(1)
-        expect(content).toContain("'(max-width: 479px)'")
-      } else {
-        expect(mmMatches, `${rel} usa matchMedia de ancho fuera de useViewport`).toHaveLength(0)
-      }
+      expect(mmMatches, `${rel} usa matchMedia de ancho fuera de useViewport`).toHaveLength(0)
     }
   })
 

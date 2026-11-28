@@ -191,6 +191,7 @@ function TidalAtmosphereScene() {
             y="59"
             textAnchor="middle"
             fill={primaryLightColor}
+            /* letra-ok: micro-leyenda decorativa en SVG con aria-hidden */
             fontSize="8"
             letterSpacing="0.26em"
             fontFamily="inherit"
@@ -204,6 +205,7 @@ function TidalAtmosphereScene() {
             y="70"
             textAnchor="middle"
             fill={tertiarySilverColor}
+            /* letra-ok: micro-leyenda decorativa en SVG con aria-hidden */
             fontSize="6.5"
             letterSpacing="0.18em"
             fontFamily="inherit"

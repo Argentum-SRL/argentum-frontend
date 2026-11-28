@@ -37,14 +37,42 @@ const AREAS = [
   'src/components/facturas',
   'src/components/mock',
   'src/pages/NotFoundPage.module.css',
+  'src/pages/NotFoundPage.tsx',
   'src/pages/TermsPage.module.css',
+  'src/pages/TermsPage.tsx',
+  'src/pages/AdminPage.module.css',
+  'src/pages/AdminPage.tsx',
+  'src/pages/admin',
+  'src/components/whatsapp',
+  'src/components/ui',
+  'src/index.css',
+  'src/styles/elevation.css',
+  'src/styles/sileo.css',
+  'src/styles/tokens.css',
 ]
+
+const SIN_PANTALLA: Record<string, string> = {
+  'src/App.tsx': 'Orquestador raíz sin clases ni estilos visuales propios',
+  'src/main.tsx': 'Punto de entrada de montaje React e imports de hojas raíz',
+  'src/context/AuthProvider.tsx': 'Proveedor de contexto de autenticación sin marcado ni estilos',
+  'src/context/NotificacionContext.tsx': 'Proveedor de contexto de notificaciones Sileo sin marcado ni estilos',
+  'src/context/ThemeProvider.tsx': 'Proveedor de contexto de tema claro/oscuro sin marcado ni estilos',
+  'src/router/ProtectedRoute.tsx': 'Guarda de rutas autenticadas sin marcado ni estilos propios',
+  'src/router/RootLayout.tsx': 'Envoltorio lógico del router sin marcado ni estilos propios',
+  'src/router/index.tsx': 'Definición declarativa de rutas sin clases ni estilos propios',
+}
 
 const CORTES_OFICIALES_ANCHO = new Set([
   'max 767.98',
   'min 768',
   'max 1023.98',
   'min 1024',
+])
+
+const TOKENS_EXTRA = new Set([
+  'min 1440',
+  'min 1920',
+  'min 2560',
 ])
 
 // Excepciones de letra < 11px documentadas con motivo (vacío en F2).
@@ -224,6 +252,7 @@ describe('Reglas responsive por área (AREAS)', () => {
         }
         for (const wm of cond.matchAll(/\(\s*(min|max)-width\s*:\s*([\d.]+)px\s*\)/gi)) {
           const key = `${wm[1].toLowerCase()} ${wm[2]}`
+          if (rel === 'src/styles/tokens.css' && TOKENS_EXTRA.has(key)) continue
           if (!CORTES_OFICIALES_ANCHO.has(key)) {
             ilegales.push(`${rel}: @media ${cond.trim()}`)
           }
@@ -262,21 +291,23 @@ describe('Reglas responsive por área (AREAS)', () => {
       const lines = fs.readFileSync(abs, 'utf-8').split(/\r?\n/)
       lines.forEach((lineText, idx) => {
         const ln = idx + 1
+        const prevLine = idx > 0 ? lines[idx - 1] : ''
+        const hasLetraOk = /letra-ok\s*:/i.test(prevLine) || /letra-ok\s*:/i.test(lineText)
         for (const m of lineText.matchAll(/\btext-\[(\d+(?:\.\d+)?)(px|rem|em)\]/g)) {
           const val = parseFloat(m[1])
           const px = m[2] === 'px' ? val : val * 16
-          if (px < 11) {
+          if (px < 11 && !hasLetraOk) {
             const key = `${rel}:${ln}:${m[0]}`
             if (!(key in EXCEPCIONES_LETRA)) {
               menores.push(`${rel}:${ln} -> ${m[0]} (${px}px)`)
             }
           }
         }
-        for (const m of lineText.matchAll(/fontSize\s*:\s*(?:['"](\d+(?:\.\d+)?)(px|rem|em)['"]|(\d+(?:\.\d+)?))/g)) {
+        for (const m of lineText.matchAll(/fontSize\s*(?::|=)\s*(?:\{\s*)?(?:['"](\d+(?:\.\d+)?)(px|rem|em)?['"]|(\d+(?:\.\d+)?))(?:\s*\})?/g)) {
           const val = parseFloat(m[1] ?? m[3])
           const unit = m[2] || 'px'
           const px = unit === 'px' ? val : val * 16
-          if (px < 11) {
+          if (px < 11 && !hasLetraOk) {
             const key = `${rel}:${ln}:${m[0]}`
             if (!(key in EXCEPCIONES_LETRA)) {
               menores.push(`${rel}:${ln} -> ${m[0]} (${px}px)`)
@@ -586,5 +617,30 @@ describe('Reglas responsive por área (AREAS)', () => {
 
     expect(effectiveWidth).not.toBeNull()
     expect(effectiveWidth!).toBeGreaterThanOrEqual(MIN_TIME_INPUT_MOBILE_PX)
+  })
+
+  it('COBERTURA: AREAS + SIN_PANTALLA cubren el 100% de .css y .tsx (no test) en src/', () => {
+    const todosCss = walkFiles(SRC_DIR, ['.css']).map((f) => path.relative(ROOT_DIR, f).replace(/\\/g, '/'))
+    const todosTsx = walkFiles(SRC_DIR, ['.tsx'])
+      .filter((f) => !f.endsWith('.test.tsx') && !f.endsWith('.spec.tsx'))
+      .map((f) => path.relative(ROOT_DIR, f).replace(/\\/g, '/'))
+
+    const cubiertos = new Set([
+      ...cssFiles.map((f) => path.relative(ROOT_DIR, f).replace(/\\/g, '/')),
+      ...tsxFiles.map((f) => path.relative(ROOT_DIR, f).replace(/\\/g, '/')),
+    ])
+
+    const sinCubrir = [...todosCss, ...todosTsx].filter(
+      (rel) => !cubiertos.has(rel) && !(rel in SIN_PANTALLA)
+    )
+    expect(sinCubrir).toEqual([])
+
+    const inexistentes = Object.keys(SIN_PANTALLA).filter(
+      (rel) => !fs.existsSync(path.join(ROOT_DIR, rel))
+    )
+    expect(inexistentes).toEqual([])
+
+    const solapados = Object.keys(SIN_PANTALLA).filter((rel) => cubiertos.has(rel))
+    expect(solapados).toEqual([])
   })
 })

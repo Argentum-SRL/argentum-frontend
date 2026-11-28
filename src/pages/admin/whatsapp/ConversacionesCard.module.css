@@ -5,7 +5,7 @@
   padding: 0;
   overflow: hidden;
   clip-path: inset(50%);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: patrón estándar de texto solo para lectores de pantalla */
   border: 0;
 }
 
@@ -111,7 +111,7 @@
   color: var(--text-2);
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: encabezado de tabla desktop >= 1024px */
 }
 
 .thRight {
@@ -135,7 +135,7 @@
 
 .numCell {
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: cifra tabular en tabla desktop */
 }
 
 .estadoInline {
@@ -144,7 +144,7 @@
   gap: 6px;
   font-size: 13px;
   color: var(--text);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: punto de estado + etiqueta corta en línea */
 }
 
 .statusDot {

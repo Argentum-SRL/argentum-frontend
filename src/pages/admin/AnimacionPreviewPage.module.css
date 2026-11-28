@@ -42,12 +42,6 @@
   transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
 }
 
-@media (max-width: 767.98px) {
-  .reopenControlsBtn {
-    top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
-  }
-}
-
 .reopenControlsBtn:hover {
   background: rgba(13, 32, 69, 0.98);
 }
@@ -120,7 +114,7 @@
 }
 
 .adminBadge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -149,6 +143,7 @@
 
 .minimizeBtn,
 .closeBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -163,14 +158,11 @@
   transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
 }
 
-.closeBtn {
-  position: relative;
-}
-
+.minimizeBtn::before,
 .closeBtn::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -10px -4px;
 }
 
 :global([data-theme="dark"]) .minimizeBtn,
@@ -344,20 +336,6 @@
   opacity: 0.92;
 }
 
-@media (max-width: 640px) {
-  .controlDock {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
-    padding: 10px 14px;
-    gap: 8px;
-  }
-  .dockTitle {
-    font-size: 11.5px;
-  }
-  .dockRow {
-    gap: 6px;
-  }
-}
-
 /* ── Vista Showcase LunarLoader Modular ──────────────────────────────────── */
 .modularShowcase {
   position: relative;
@@ -369,13 +347,6 @@
   justify-content: center;
   padding: 80px 24px 140px;
   box-sizing: border-box;
-}
-
-@media (max-width: 767.98px) {
-  .modularShowcase {
-    padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px)) 16px calc(env(safe-area-inset-bottom, 0px) + 140px);
-    align-items: flex-start;
-  }
 }
 
 .modularCard {
@@ -545,7 +516,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-3);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta corta de control en dock de preview */
 }
 
 .actionIconBtn {
@@ -587,6 +558,31 @@
   background: rgba(255, 255, 255, 0.2);
   border-color: #FFFFFF;
   color: #FFFFFF;
+}
+
+@media (max-width: 767.98px) {
+  .reopenControlsBtn {
+    top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
+
+  .controlDock {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .dockTitle {
+    font-size: 11.5px;
+  }
+
+  .dockRow {
+    gap: 6px;
+  }
+
+  .modularShowcase {
+    padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px)) 16px calc(env(safe-area-inset-bottom, 0px) + 140px);
+    align-items: flex-start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -111,7 +111,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-selector-pill);
   padding: var(--space-xs) var(--space-sm);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: etiqueta numérica de medida (ej. 44px) */
   font-variant-numeric: tabular-nums;
 }
 
@@ -260,7 +260,7 @@
 
 /* ── Bloque e: marco celular 375px ── */
 .phoneFrame {
-  width: 375px;
+  width: min(375px, 100%);
   max-width: 100%;
   background: var(--surface);
   border: 2px solid var(--border);

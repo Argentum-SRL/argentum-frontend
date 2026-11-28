@@ -41,7 +41,7 @@
 }
 
 .rangoInputWrap {
-  width: 180px;
+  width: min(180px, 100%);
   max-width: 100%;
 }
 
@@ -79,7 +79,7 @@
   }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   .columnas {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-xl);
@@ -109,7 +109,7 @@
   box-shadow: var(--elevation-sm);
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767.98px) {
   .sectionCard {
     padding: 16px;
     border-radius: 16px;
@@ -192,7 +192,7 @@
   color: var(--text);
   font-variant-numeric: tabular-nums;
   text-align: right;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: valor numérico compacto alineado a la derecha */
 }
 
 .cardFootnote {
@@ -253,7 +253,7 @@
   gap: 6px;
   font-size: 13px;
   color: var(--text);
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: punto de estado + etiqueta corta en línea */
 }
 
 .statusDot {
@@ -386,7 +386,7 @@
   font-weight: 700;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: total numérico alineado a la derecha */
   flex-shrink: 0;
 }
 

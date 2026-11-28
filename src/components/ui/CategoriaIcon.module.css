@@ -24,7 +24,7 @@
 }
 
 .size16 .fallbackText {
-  font-size: 10px;
+  font-size: 10px; /* letra-ok: letra de respaldo dentro de ícono de 16px (<= 20px), no es texto de lectura */
 }
 
 .size28 {

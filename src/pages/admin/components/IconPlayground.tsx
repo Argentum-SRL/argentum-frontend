@@ -379,7 +379,7 @@ export function IconPlayground() {
                     <span className="text-xs font-semibold text-white tracking-wide">{item.name}</span>
                     <span className="text-[11px] text-silver-400 line-clamp-1">{item.concept}</span>
                   </div>
-                  <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-silver-800/80 text-silver-300 border border-silver-700/40 shrink-0">
+                  <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-silver-800/80 text-silver-300 border border-silver-700/40 shrink-0">
                     {item.category}
                   </span>
                 </div>
@@ -393,7 +393,7 @@ export function IconPlayground() {
                       className="text-silver-200 transition-colors group-hover/stage:text-white"
                     />
                   </div>
-                  <span className="absolute bottom-1 right-2 text-[9px] text-silver-500 font-mono">
+                  <span className="absolute bottom-1 right-2 text-[11px] text-silver-500 font-mono">
                     hover me
                   </span>
                 </div>
@@ -403,10 +403,10 @@ export function IconPlayground() {
                 {/* Motion Signature & Description */}
                 <div className="p-2 rounded-lg bg-silver-950/60 border border-silver-800/40 mb-3 text-[11px]">
                   <div className="flex items-center justify-between text-silver-400 mb-0.5">
-                    <span className="font-mono text-primary text-[10px]">{item.signature}</span>
-                    <span className="text-[9px] text-silver-400">{signatureMeta?.category || 'Custom'}</span>
+                    <span className="font-mono text-primary text-[11px]">{item.signature}</span>
+                    <span className="text-[11px] text-silver-400">{signatureMeta?.category || 'Custom'}</span>
                   </div>
-                  <p className="text-[10px] text-silver-400 leading-tight">
+                  <p className="text-[11px] text-silver-400 leading-tight">
                     {signatureMeta?.description || 'Animación SVG interna'}
                   </p>
                 </div>

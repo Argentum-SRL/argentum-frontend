@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   AdminUsuariosListaSkeleton,
   AyudaBoton,
@@ -9,6 +9,7 @@ import {
   type SelectOption,
 } from '@/components/ui'
 import { ChevronRight, Search, Users } from '@/components/ui/icons'
+import { useViewport } from '@/hooks/useViewport'
 import { formatMonto } from '@/utils/format'
 import {
   AYUDA_COSTO_ESTIMADO,
@@ -98,15 +99,7 @@ export const UsuariosLista: React.FC<UsuariosListaProps> = ({
   onSelect,
   onRetry,
 }) => {
-  const [esPantallaChica, setEsPantallaChica] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 479px)')
-    const sync = () => setEsPantallaChica(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
+  const { esCelular: esPantallaChica } = useViewport()
 
   const conteos = data?.conteos_estado
   const opcionesEstado: SelectOption[] = [

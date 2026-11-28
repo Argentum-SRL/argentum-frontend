@@ -106,7 +106,7 @@
   cursor: pointer;
   font-family: inherit;
   transition: all 160ms ease;
-  white-space: nowrap;
+  white-space: nowrap; /* nowrap-ok: botón compacto de alternar métricas técnicas */
 }
 
 .toggleTechBtn:hover {

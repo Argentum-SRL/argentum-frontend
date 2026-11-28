@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { AtmosphericBackground, AtmosphericMoonIcon, ThemeToggle } from '@/components/ui'
+import { useViewport } from '@/hooks/useViewport'
 import styles from './AuthLayout.module.css'
 
 interface FormContentProps {
@@ -48,30 +49,32 @@ export default function AuthLayout({
   cardPadding,
   compact,
 }: AuthLayoutProps) {
+  const { esCelular } = useViewport()
   const themeBtn = <ThemeToggle variant="floating" />
 
   if (leftPanel) {
-    return (
-      <>
-        {/* Desktop: split 50/50 */}
-        <div className={styles.desktop}>
-          {themeBtn}
-          <div className={styles.leftPanel}>{leftPanel}</div>
-          <div className={styles.rightPanel}>
-            <div className={styles.formWrap}>
-              <FormContent title={title} compact>{children}</FormContent>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile: full screen */}
+    // D-FC1a: se monta una única rama según el viewport para no duplicar children ni ThemeToggle en el DOM
+    if (esCelular) {
+      return (
         <div className={styles.mobile}>
           {themeBtn}
           <div className={styles.mobileInner}>
             <FormContent title={title}>{children}</FormContent>
           </div>
         </div>
-      </>
+      )
+    }
+
+    return (
+      <div className={styles.desktop}>
+        {themeBtn}
+        <div className={styles.leftPanel}>{leftPanel}</div>
+        <div className={styles.rightPanel}>
+          <div className={styles.formWrap}>
+            <FormContent title={title} compact>{children}</FormContent>
+          </div>
+        </div>
+      </div>
     )
   }
 

@@ -28,56 +28,6 @@
   display: none;
 }
 
-@media (max-width: 767.98px) {
-  .header {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 8px;
-    padding-top: 0;
-    padding-bottom: 4px;
-  }
-
-  .desktopGreeting {
-    display: none;
-  }
-
-  .mobileGreetingHeader {
-    display: block;
-    width: 100%;
-  }
-
-  .cardHeader {
-    padding: 14px 16px 6px;
-  }
-
-  .cardHeaderWithToggle {
-    padding: 14px 16px 6px;
-  }
-
-  .chartCardContent {
-    min-height: 175px;
-    padding: 4px 16px 14px;
-  }
-
-  .cardContent {
-    padding: 4px 16px 14px;
-  }
-
-  .topRow,
-  .bottomRow {
-    gap: 16px;
-  }
-
-  .cardTitle {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
 .headerLeft {
   display: flex;
   flex-direction: column;
@@ -641,6 +591,42 @@
     overflow-y: auto;
     min-height: 0;
     padding-right: 4px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+    padding-top: 0;
+    padding-bottom: 4px;
+  }
+
+  .desktopGreeting {
+    display: none;
+  }
+
+  .mobileGreetingHeader {
+    display: block;
+    width: 100%;
+  }
+
+  .chartCardContent {
+    min-height: 175px;
+  }
+
+  .topRow {
+    gap: 16px;
+  }
+
+  .cardTitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 @media (prefers-reduced-motion: reduce) {

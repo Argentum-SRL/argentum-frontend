@@ -240,29 +240,6 @@ body {
   display: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html,
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-  button svg,
-a svg,
-[role="button"] svg,
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active,
-button:active svg:not(.animate-spin):not([data-no-animate]),
-a:active svg:not(.animate-spin):not([data-no-animate]),
-[role="button"]:active svg:not(.animate-spin):not([data-no-animate]),
-[class*="btn"]:active svg:not(.animate-spin):not([data-no-animate]),
-[class*="Btn"]:active svg:not(.animate-spin):not([data-no-animate]){
-    transition: none;
-    animation: none;
-  }
-}
-
 /* Hide scrollbars globally across all browsers while retaining scroll functionality */
 ::-webkit-scrollbar {
   display: none !important;
@@ -357,6 +334,29 @@ a:active svg:not(.animate-spin):not([data-no-animate]),
 [class*="Btn"]:active svg:not(.animate-spin):not([data-no-animate]) {
   transform: scale(0.92);
   transition: transform 0.08s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  button svg,
+a svg,
+[role="button"] svg,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+button:active svg:not(.animate-spin):not([data-no-animate]),
+a:active svg:not(.animate-spin):not([data-no-animate]),
+[role="button"]:active svg:not(.animate-spin):not([data-no-animate]),
+[class*="btn"]:active svg:not(.animate-spin):not([data-no-animate]),
+[class*="Btn"]:active svg:not(.animate-spin):not([data-no-animate]){
+    transition: none;
+    animation: none;
+  }
 }
 
 

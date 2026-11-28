@@ -159,26 +159,6 @@
     height: calc(100% + 64px);
     min-height: calc(100dvh - 68px);
   }
-
-  .emptyContent {
-    max-width: 420px;
-    padding: 44px 28px;
-  }
-
-  .far {
-    width: 32px;
-    height: 32px;
-  }
-
-  .mid {
-    width: 42px;
-    height: 42px;
-  }
-
-  .near {
-    width: 52px;
-    height: 52px;
-  }
 }
 
 @media (max-width: 767.98px) {
@@ -300,34 +280,6 @@
   50%  { transform: translate(calc(-50% + var(--dx2, 0px)), calc(-50% + var(--dy2, 0px))) rotate(var(--r2, 0deg)) scale(1); }
   75%  { transform: translate(calc(-50% + var(--dx3, 0px)), calc(-50% + var(--dy3, 0px))) rotate(var(--r3, 0deg)) scale(var(--s1, 1)); }
   100% { transform: translate(calc(-50% + 0px), calc(-50% + 0px)) rotate(0deg) scale(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .logoFlotante {
-    animation: none;
-  }
-  .header,
-.sections,
-.grid > *:nth-child(1),
-.grid > *:nth-child(2),
-.grid > *:nth-child(3),
-.grid > *:nth-child(4),
-.grid > *:nth-child(5),
-.grid > *:nth-child(6),
-.grid > *:nth-child(7),
-.grid > *:nth-child(8),
-.grid > *:nth-child(n+9),
-.emptyState,
-.emptyContent,
-.emptyContent::before,
-.emptyButton {
-    transition: none;
-    animation: none;
-  }
-  .nuevaBtn {
-    transition: none;
-    animation: none;
-  }
 }
 
 /* Atmospheric Radial Blur Overlay - gentle background depth behind central card */
@@ -789,6 +741,34 @@
 
   .btnTextDesktop {
     display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logoFlotante {
+    animation: none;
+  }
+  .header,
+.sections,
+.grid > *:nth-child(1),
+.grid > *:nth-child(2),
+.grid > *:nth-child(3),
+.grid > *:nth-child(4),
+.grid > *:nth-child(5),
+.grid > *:nth-child(6),
+.grid > *:nth-child(7),
+.grid > *:nth-child(8),
+.grid > *:nth-child(n+9),
+.emptyState,
+.emptyContent,
+.emptyContent::before,
+.emptyButton {
+    transition: none;
+    animation: none;
+  }
+  .nuevaBtn {
+    transition: none;
+    animation: none;
   }
 }
 

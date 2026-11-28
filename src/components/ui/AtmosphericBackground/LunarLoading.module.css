@@ -29,21 +29,6 @@
   color: #F8FAFC;
 }
 
-@media (max-width: 767.98px) {
-  .container {
-    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
-  }
-  .moonFrame {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 20px;
-  }
-  .coronaHalo {
-    width: 130px;
-    height: 130px;
-  }
-}
-
 /* ── Velos de borde para integración continua con barras de sistema y safe areas ── */
 .topSafeBlend {
   position: absolute;
@@ -140,6 +125,21 @@
   pointer-events: none;
   z-index: 1;
   transition: opacity 0.4s ease, transform 0.4s ease, background 0.5s ease;
+}
+
+@media (max-width: 767.98px) {
+  .container {
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-clearance, 48px));
+  }
+  .moonFrame {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+  }
+  .coronaHalo {
+    width: 130px;
+    height: 130px;
+  }
 }
 
 /* ── Contenedor de la Luna Principal ─────────────────────────────────────── */

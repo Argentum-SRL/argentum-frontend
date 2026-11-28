@@ -200,7 +200,7 @@
 @media (max-width: 767.98px) {
   .fwCompareRow { grid-template-columns: 1fr; gap: 12px; }
   .fwCompareVsLabel { display: none; }
-  .fwCompareDiff { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 12px; }
+  .fwCompareDiff { border-top: 1px solid var(--border); padding-top: 12px; }
 }
 
 .fwCompareCol { display: flex; flex-direction: column; gap: 2px; }

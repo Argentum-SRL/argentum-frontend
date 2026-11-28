@@ -266,3 +266,5 @@ tests/test_reglas_texto_web*.py en backend, y reglasTextoWeb.ts y textosCartelit
     - **Zona táctil mínima 44px:** todo elemento interactivo alcanza al menos `44 × 44px` con `::before`/`::after` e `inset` negativo sin cambiar lo visible. Vale para todo botón de cerrar del front; lo controla U7 de uiResponsive.test.ts.
     - **`white-space: nowrap` protegido:** solo se permite con `text-overflow: ellipsis` + `title`, dentro de `MontoFit`, o con comentario `/* nowrap-ok: <motivo> */` en la línea.
 - **Control por área:** Las reglas responsive por área las controla src/styles/responsiveAreas.test.ts; cada fase agrega su carpeta a AREAS.
+- **Orden de cascada `@media` (FC1):** En cada archivo `.css` (y en sus partes, en el orden de `@import`) todo bloque `@media` va DESPUÉS de las reglas base de los mismos selectores; si se mueven o fusionan bloques `@media`, nunca subirlos arriba de la regla base. Lo controla `src/styles/cascadaMedia.test.ts`.
+- **Montaje único en layouts responsive (FC1):** Un layout nunca dibuja dos veces el mismo contenido para celular y escritorio; se elige con `useViewport`.

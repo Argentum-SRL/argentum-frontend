@@ -27,8 +27,10 @@ Fuente única y obligatoria para cualquier cambio que dependa del ancho de panta
 
 Reglas para escribir el cambio:
 1. Cada archivo .css tiene como máximo un bloque por rango (`767.98`, tablet, `1024`, y si hace falta `min-width: 768px`). Si ya existe, el cambio va adentro; si no existe, se crea uno solo, después de los estilos base del componente.
-2. Nada de `!important` para ganarle a otro bloque: si no aplica, el orden o la especificidad están mal y se corrige eso.
-3. Al terminar, se mide en los anchos de la tabla del rango tocado y en los bordes del rango vecino (767/768 o 1023/1024) para confirmar que el otro rango no cambió.
+2. En cada archivo .css (y en sus partes, en el orden de @import) todo bloque `@media` va DESPUÉS de las reglas base de los mismos selectores; si se mueven o fusionan bloques `@media`, nunca subirlos arriba de la regla base. Lo controla `src/styles/cascadaMedia.test.ts`.
+3. Un layout nunca dibuja dos veces el mismo contenido para celular y escritorio; se elige con `useViewport`.
+4. Nada de `!important` para ganarle a otro bloque: si no aplica, el orden o la especificidad están mal y se corrige eso.
+5. Al terminar, se mide en los anchos de la tabla del rango tocado y en los bordes del rango vecino (767/768 o 1023/1024) para confirmar que el otro rango no cambió.
 
 ## 3. Qué es distinto en cada rango (cómo está hoy y cómo tiene que quedar todo lo nuevo)
 
@@ -74,6 +76,7 @@ Ejemplo: gap de 8px en 320 y 12px desde 768 → `gap: clamp(8px, calc(8px + 4 * 
 - `src/styles/puntosDeCorte.test.ts`: cortes oficiales, sin rango ni solapes, legado en cero al cierre de F8 (`LEGADO = {}`, `TOPE_LEGADO = 0`, 0 `matchMedia` de ancho fuera de `useViewport.ts`).
 - `src/components/ui/uiResponsive.test.ts`: componentes compartidos (letra, nowrap, toque, botones de cerrar con área de 44px).
 - `src/styles/responsiveAreas.test.ts`: las mismas reglas (`R1`–`R8`) y cobertura total del 100% de `.css` y `.tsx` (no test) de `src/` mediante `AREAS` + lista cerrada `SIN_PANTALLA` (`COBERTURA`). Cualquier carpeta o pantalla nueva se agrega a `AREAS` (o a `SIN_PANTALLA` con motivo solo si no dibuja estilos ni marcado propio).
+- `src/styles/cascadaMedia.test.ts`: garantiza que ninguna declaración dentro de `@media` quede pisada por una regla base posterior del mismo selector y propiedad.
 - `npm run lint` (incluye `audit:rules`, regla R15 de cortes).
 
 ## 8. Checklist antes de dar algo por terminado

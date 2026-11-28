@@ -936,6 +936,8 @@ Para todas las tarjetas, secciones o bloques de informe que admitan plegado o de
 - **Zona táctil mínima 44px:** todo elemento interactivo alcanza al menos `44 × 44px` de área táctil usando `::before` o `::after` con `inset` negativo sin cambiar el tamaño visible. Vale para todo botón de cerrar del front; lo controla U7 de uiResponsive.test.ts.
 - **`white-space: nowrap` protegido:** solo se permite en un bloque con `text-overflow: ellipsis` y atributo `title` con el texto completo, en `MontoFit`, o con comentario `/* nowrap-ok: <motivo> */` en la misma línea.
 - **Control de cobertura y cero legado (cierre F8):** `src/styles/responsiveAreas.test.ts` (`AREAS` + lista cerrada `SIN_PANTALLA`, test `COBERTURA`) cubre el 100% de `.css` y `.tsx` (no test) de `src/`, y `src/styles/puntosDeCorte.test.ts` fija `TOPE_LEGADO = 0` (`LEGADO = {}`) y cero `matchMedia` de ancho fuera de `useViewport.ts`. Excepciones de terceros documentadas: `GoogleLoginButton` (`toque-ok`, iframe 40px de Google) y `sileo.css` (`--sileo-width: 100%` acotado en `@media (max-width: 767.98px)`). Al sumar una carpeta o pantalla nueva, agregarla a `AREAS` en `responsiveAreas.test.ts`.
+- **Orden de cascada `@media` (FC1):** En cada archivo `.css` (y en sus partes, en el orden de `@import`) todo bloque `@media` va DESPUÉS de las reglas base de los mismos selectores; si se mueven o fusionan bloques `@media`, nunca subirlos arriba de la regla base. Lo controla `src/styles/cascadaMedia.test.ts`.
+- **Montaje único en layouts responsive (FC1):** Un layout nunca dibuja dos veces el mismo contenido para celular y escritorio; se elige con `useViewport`.
 
 
 

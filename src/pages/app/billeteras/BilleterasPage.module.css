@@ -257,19 +257,6 @@
   background: rgba(72, 120, 184, 0.1);
 }
 
-/* ── Reduced motion ────────────────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .skeletonCard { animation: none; background: var(--surface-alt); }
-  .nuevaBtn, .showArchivedBtn { transition: none; }
-  .grid > *:not(button),
-.emptyBtn,
-.card,
-.btnGhost {
-    transition: none;
-    animation: none;
-  }
-}
-
 .root::after {
   content: '';
   display: none;
@@ -395,6 +382,19 @@
 @media (min-width: 768px) {
   .desktopOnly {
     display: inline-flex !important;
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .skeletonCard { animation: none; background: var(--surface-alt); }
+  .nuevaBtn, .showArchivedBtn { transition: none; }
+  .grid > *:not(button),
+.emptyBtn,
+.card,
+.btnGhost {
+    transition: none;
+    animation: none;
   }
 }
 

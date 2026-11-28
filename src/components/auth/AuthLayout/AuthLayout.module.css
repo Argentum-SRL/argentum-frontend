@@ -12,16 +12,6 @@
   height: 100dvh;
 }
 
-@media (min-width: 768px) {
-  .desktop {
-    display: flex;
-  }
-
-  .mobile {
-    display: none;
-  }
-}
-
 .leftPanel {
   width: 50%;
   height: 100%;
@@ -60,6 +50,16 @@
   flex-direction: column;
   background: var(--page);
   transition: color 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .desktop {
+    display: flex;
+  }
+
+  .mobile {
+    display: none;
+  }
 }
 
 .mobileInner {

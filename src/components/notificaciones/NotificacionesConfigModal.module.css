@@ -9,28 +9,6 @@
   gap: var(--modal-block-gap);
 }
 
-@media (min-width: 768px) {
-  .topGrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 24px;
-  }
-  
-  .topGrid > .section {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  .soundSection {
-    grid-column: 1 / -1;
-  }
-
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 .section {
   display: flex;
   flex-direction: column;
@@ -58,6 +36,28 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .topGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  
+  .topGrid > .section {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .soundSection {
+    grid-column: 1 / -1;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .card {

@@ -459,27 +459,6 @@
 .fwStageFwd { animation-name: fwSlideInFwd; }
 .fwStageBwd { animation-name: fwSlideInBwd; }
 
-@media (prefers-reduced-motion: reduce) {
-  .fwStage, .fwStageFwd, .fwStageBwd {
-    animation: none !important;
-    transform: none !important;
-  }
-  .distSegment,
-.accordionSummary,
-.accordionContent,
-.previewPlaceholderCard,
-.previewFeatureItem,
-.fwDot,
-.fwDotLine,
-.fwRecapChip,
-.fwLiveCuota,
-.fwChip,
-.fwToggleBtn {
-    transition: none;
-    animation: none;
-  }
-}
-
 /* ── Single column container ─────────────────────────────────────────── */
 .fwSingleCol {
   max-width: 560px;
@@ -725,4 +704,25 @@
   cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease;
   font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fwStage, .fwStageFwd, .fwStageBwd {
+    animation: none !important;
+    transform: none !important;
+  }
+  .distSegment,
+.accordionSummary,
+.accordionContent,
+.previewPlaceholderCard,
+.previewFeatureItem,
+.fwDot,
+.fwDotLine,
+.fwRecapChip,
+.fwLiveCuota,
+.fwChip,
+.fwToggleBtn {
+    transition: none;
+    animation: none;
+  }
 }

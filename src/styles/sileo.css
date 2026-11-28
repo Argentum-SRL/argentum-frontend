@@ -92,8 +92,8 @@
     transform: translateX(-50%) !important;
     align-items: center !important;
     flex-direction: column-reverse !important;
-    width: 100vw !important;
-    max-width: min(360px, calc(100vw - 32px)) !important;
+    width: 100% !important;
+    max-width: min(360px, calc(100% - 32px)) !important;
     padding: 0 !important;
     gap: 8px !important;
     z-index: var(--z-modal) !important;

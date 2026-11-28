@@ -61,58 +61,44 @@ export const ExplicativoFinancieroModal: React.FC<ExplicativoFinancieroModalProp
           {activeTab === 'perfil' ? (
             <div role="tabpanel" aria-label="Tu perfil financiero" data-modal-stack>
               <div className={styles.introBox}>
-                Un diagnóstico objetivo de tus hábitos de dinero que evalúa la regularidad de tus ingresos y gastos a lo largo del tiempo, clasificándolos sin juicios morales para mostrar tu margen de maniobra real.
+                Tu perfil financiero contesta cuatro preguntas sobre tus últimos 6 meses terminados. Cada una aparece cuando hay datos para contestarla.
               </div>
 
-              <div className={styles.sectionTitle} data-modal-section-title>Tus 6 indicadores clave</div>
+              <div className={styles.sectionTitle} data-modal-section-title>Las cuatro preguntas</div>
 
               <div className={styles.kpiList} data-modal-block>
                 <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Ahorro</span>
+                  <span className={styles.kpiBadge}>Te sobra</span>
                   <p className={styles.kpiText}>
-                    <strong>Margen libre:</strong> Proporción de tu ingreso típico regular que no se consume en gastos corrientes del ciclo.
+                    En cuántos de tus últimos meses te entró más de lo que gastaste y cuánto te quedó en promedio. Es el mismo balance que ves en Análisis. Aparece con 3 meses terminados.
                   </p>
                 </div>
 
                 <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Comprometido</span>
+                  <span className={styles.kpiBadge}>Te bancás</span>
                   <p className={styles.kpiText}>
-                    <strong>Costos ineludibles:</strong> Porcentaje de ingresos atado a obligaciones fijas que tenés que pagar sí o sí (alquiler, servicios, cuotas).
+                    Cuántos meses podrías pagar tus gastos de siempre con la plata de tus cuentas, tus dólares y tus metas para imprevistos. Lo invertido no cuenta. Lo recomendable es tener de 3 a 6 meses. Aparece con 1 mes terminado.
                   </p>
                 </div>
 
                 <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Hábitos</span>
+                  <span className={styles.kpiBadge}>Cuotas</span>
                   <p className={styles.kpiText}>
-                    <strong>Estilo de vida:</strong> Consumos frecuentes y cotidianos que definen tu rutina de gastos mes a mes.
+                    Cuánto pagás por mes de compras en cuotas y qué parte de lo que te entra se lleva. Los bancos ponen el límite en el 25%. Aparece desde el primer día.
                   </p>
                 </div>
 
                 <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Cobertura</span>
+                  <span className={styles.kpiBadge}>Inflación</span>
                   <p className={styles.kpiText}>
-                    <strong>Meses de colchón (Runway):</strong> Tiempo que podés sostener tu nivel de vida con tu liquidez disponible ante una interrupción de ingresos.
-                  </p>
-                </div>
-
-                <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Volatilidad</span>
-                  <p className={styles.kpiText}>
-                    <strong>Variabilidad:</strong> Cuánto fluctúa tu gasto no recurrente respecto a tu nivel habitual. Menor número indica mayor previsibilidad.
-                  </p>
-                </div>
-
-                <div className={styles.kpiItem}>
-                  <span className={styles.kpiBadge}>Ingreso típico</span>
-                  <p className={styles.kpiText}>
-                    <strong>Mediana representativa:</strong> Tu ingreso mensual habitual deflactado por inflación, sin distorsión por meses con cobros extraordinarios.
+                    Si lo que te entra hoy compra más o menos que antes, con la inflación del INDEC. Aparece con 6 meses terminados.
                   </p>
                 </div>
               </div>
 
               <div className={styles.activationNotice}>
                 <CheckCircle2 size={16} />
-                <span>Se activa automáticamente al alcanzar 3 ciclos mensuales con transacciones registradas.</span>
+                <span>Arriba te decimos en cuántas de estas preguntas venís bien. Nunca te pedimos cuánto cobrás: lo sacamos de tus movimientos.</span>
               </div>
             </div>
           ) : (

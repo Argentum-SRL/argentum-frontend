@@ -1065,77 +1065,33 @@ export interface SimularCuotasResponse {
 
 // ===== PERFIL FINANCIERO =====
 
-export interface PerfilFinanciero {
-  id: string;
-  usuario_id: string;
-  tasa_ahorro_ars: number | null;
-  tasa_ahorro_usd: number | null;
-  ratio_cuotas_ars: number | null;
-  ratio_cuotas_usd: number | null;
-  consistencia_registro: number | null;
-  ultima_actualizacion: string | null;
-  fecha_creacion: string;
+export interface PerfilAccionMeta {
+  tipo: string
+  texto_boton: string
+  nombre: string
+  monto: number
+  moneda: 'ARS' | 'USD'
 }
 
-export type NivelIndicador = 'excelente' | 'bien' | 'moderado' | 'bajo' | 'critico' | 'sin_datos';
-
-export interface InterpretacionIndicador {
-  label: string;
-  nivel: NivelIndicador;
+export interface PerfilFila {
+  id: string
+  titulo: string
+  estado: 'bien' | 'atencion' | 'neutral'
+  texto: string
+  notas: string[]
+  accion: PerfilAccionMeta | null
 }
 
-export interface PerfilFinancieroConInterpretaciones extends PerfilFinanciero {
-  mostrar_card?: boolean
-  mostrar_modal_bienvenida?: boolean
-  perfil_nuevo: {
-    mostrar_card?: boolean
-    datos_suficientes?: boolean
-    mensaje_insuficiente?: string | null
-    calidad_registro_advertencia?: string | null
-    ciclos_con_datos: number
-    ciclos_observados: number
-    nivel_confianza: string
-    cobertura_registro: number
-    ingreso_tipico_ars: number | null
-    estabilidad_ingreso_mad: number | null
-    ingreso_actual_percentil: number | null
-    gasto_comprometido_ars: number
-    gasto_comprometido_ratio: number | null
-    gasto_habitos_ars?: number
-    gasto_habitos_ratio?: number | null
-    capacidad_ahorro: number | null
-    capacidad_ahorro_min?: number | null
-    capacidad_ahorro_max?: number | null
-    capacidad_ahorro_percentil: number | null
-    gasto_tipico_ars?: number | null
-    saldo_disponible_ars?: number | null
-    runway_meses: number | null
-    volatilidad_gasto_variable: number | null
-    gasto_actual_percentil: number | null
-    consistencia_registro: number | null
-    interpretaciones_relativas?: Record<string, string>
-    metodo: string
-  }
-  interpretaciones: {
-    tasa_ahorro_ars: InterpretacionIndicador;
-    tasa_ahorro_usd: InterpretacionIndicador;
-    ratio_cuotas_ars: InterpretacionIndicador;
-    ratio_cuotas_usd: InterpretacionIndicador;
-    consistencia_registro: InterpretacionIndicador;
-  };
-}
-
-export interface HistorialPerfilFinanciero {
-  id: string;
-  usuario_id: string;
-  periodo_inicio: string;
-  periodo_fin: string;
-  tasa_ahorro_ars: number | null;
-  tasa_ahorro_usd: number | null;
-  ratio_cuotas_ars: number | null;
-  ratio_cuotas_usd: number | null;
-  consistencia_registro: number | null;
-  fecha_snapshot: string;
+export interface PerfilResumen {
+  mostrar: boolean
+  moneda: 'ARS' | 'USD'
+  titulo: string
+  subtitulo: string | null
+  resumen: string | null
+  aviso: string | null
+  filas: PerfilFila[]
+  mostrar_modal_bienvenida: boolean
+  valores?: Record<string, string>
 }
 
 export interface SubcategoriaGasto {

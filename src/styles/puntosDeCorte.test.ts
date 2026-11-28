@@ -48,20 +48,6 @@ function extractMediaConditions(css: string): string[] {
   return out
 }
 
-function extractMediaBlock(css: string, headerRe: RegExp): string {
-  const clean = stripCssComments(css)
-  const m = headerRe.exec(clean)
-  if (!m) return ''
-  let depth = 1
-  let i = m.index + m[0].length
-  while (i < clean.length && depth > 0) {
-    if (clean[i] === '{') depth++
-    else if (clean[i] === '}') depth--
-    i++
-  }
-  return clean.slice(m.index + m[0].length, i - 1)
-}
-
 describe('Trinquete de puntos de corte y defectos (FS2B)', () => {
   const cssFiles = walkFiles(SRC_DIR, ['.css']).sort()
 
@@ -153,22 +139,14 @@ describe('Trinquete de puntos de corte y defectos (FS2B)', () => {
     }
   })
 
-  it('P1: PerfilFinancieroCard.module.css alinea las columnas en tablet y celular sin 640 ni 1023', () => {
+  it('P1: PerfilFinancieroCard.module.css sin 640, sin 1023 y sin la tira vieja', () => {
     const css = fs.readFileSync(
       path.join(SRC_DIR, 'components/perfil/PerfilFinancieroCard.module.css'),
       'utf-8'
     )
     expect(css).not.toMatch(/max-width\s*:\s*640px/)
     expect(css).not.toMatch(/max-width\s*:\s*1023px/)
-
-    const tabletBlock = extractMediaBlock(
-      css,
-      /@media\s*\(\s*min-width\s*:\s*768px\s*\)\s*and\s*\(\s*max-width\s*:\s*1023\.98px\s*\)\s*\{/
-    )
-    expect(tabletBlock).toMatch(/\.pfKpiCell:nth-child\(3n\+1\)\s*\{[^}]*padding-left\s*:\s*0/)
-
-    const mobileBlock = extractMediaBlock(css, /@media\s*\(\s*max-width\s*:\s*767\.98px\s*\)\s*\{/)
-    expect(mobileBlock).toMatch(/\.pfKpiCell:nth-child\(2n\+1\)\s*\{[^}]*padding-left\s*:\s*0/)
+    expect(css).not.toContain('pfKpiCell')
   })
 
   it('P2: UsuariosPanel.module.css tiene overflow-x: auto en .desktopTableWrap', () => {

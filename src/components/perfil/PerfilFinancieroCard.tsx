@@ -1,80 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { 
-  RefreshCw, 
-  AlertCircle, 
-  HelpCircle,
-  Info
-} from '@/components/ui/icons'
-import { getPerfilFinanciero, recalcularPerfilFinanciero } from '@/services/perfilFinanciero.service'
+import { sileo } from 'sileo'
+import { AlertCircle, CheckCircle2, Info } from '@/components/ui/icons'
+import { Button } from '@/components/ui'
+import { getPerfilFinanciero } from '@/services/perfilFinanciero.service'
 import { triggerBienvenidaFinancieraOnce } from '@/utils/bienvenidaFinancieraManager'
 import { useModal } from '@/hooks/useModal'
-import type { PerfilFinancieroConInterpretaciones } from '@/types'
-import { formatMonto, formatMontoCorto } from '@/utils/format'
-import { MontoFit } from '@/components/ui/MontoFit/MontoFit'
+import { getErrorMessage } from '@/utils/errorMessages'
+import type { PerfilResumen } from '@/types'
+import { armarVistaPerfil, type SugerenciaMetaPerfil } from './perfilVista'
 import styles from './PerfilFinancieroCard.module.css'
 
-const formatRelativeTime = (dateStr: string | null) => {
-  if (!dateStr) return 'Nunca'
-  try {
-    const d = new Date(dateStr)
-    const now = new Date()
-    const diffMs = now.getTime() - d.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    if (diffMins < 1) return 'Hace instantes'
-    if (diffMins < 60) return `Hace ${diffMins} min`
-    const diffHours = Math.floor(diffMins / 60)
-    if (diffHours < 24) return `Hace ${diffHours} h`
-    const diffDays = Math.floor(diffHours / 24)
-    return `Hace ${diffDays} días`
-  } catch {
-    return 'Recientemente'
-  }
-}
-
-// Hook de count-up suave para valores numéricos, respetando prefers-reduced-motion
-function useCountUp(target: number | null, duration = 600, decimals = 0) {
-  const [current, setCurrent] = useState<number | null>(() => {
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return target
-    }
-    return target === null ? null : 0
-  })
-
-  useEffect(() => {
-    if (target === null) return
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return
-    }
-    let startTime: number | null = null
-    let rafId: number
-
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp
-      const progress = Math.min((timestamp - startTime) / duration, 1)
-      const ease = 1 - Math.pow(1 - progress, 3) // cubic ease-out
-      const nextVal = progress === 1 ? target : Number((target * ease).toFixed(decimals))
-      setCurrent(nextVal)
-      if (progress < 1) {
-        rafId = requestAnimationFrame(step)
-      }
-    }
-
-    rafId = requestAnimationFrame(step)
-    return () => cancelAnimationFrame(rafId)
-  }, [target, duration, decimals])
-
-  return target === null ? null : current
-}
-
 interface PerfilFinancieroCardProps {
-  moneda?: 'ARS' | 'USD'
-  data?: PerfilFinancieroConInterpretaciones | null
+  data?: PerfilResumen | null
 }
 
 export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ data }) => {
-  const [internalPerfil, setInternalPerfil] = useState<PerfilFinancieroConInterpretaciones | null>(null)
+  const [internalPerfil, setInternalPerfil] = useState<PerfilResumen | null>(null)
   const [internalLoading, setInternalLoading] = useState(data === undefined)
-  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(false)
   const { open } = useModal()
 
@@ -112,202 +54,113 @@ export const PerfilFinancieroCard: React.FC<PerfilFinancieroCardProps> = ({ data
     }
   }, [data, loadData])
 
-  // Trigger automático de primera vez si el backend indica mostrar_modal_bienvenida
   useEffect(() => {
     if (perfil?.mostrar_modal_bienvenida) {
       triggerBienvenidaFinancieraOnce(open, 'perfil')
     }
   }, [perfil?.mostrar_modal_bienvenida, open])
 
-  const handleRecalcular = async () => {
-    setRefreshing(true)
-    try {
-      const res = await recalcularPerfilFinanciero()
-      setInternalPerfil(res)
-    } catch (err) {
-      console.error('Error al recalcular perfil financiero:', err)
-    } finally {
-      setRefreshing(false)
-    }
-  }
+  const recargar = useCallback(() => {
+    void loadData()
+  }, [loadData])
 
-  // Normalización defensiva de números
-  const toNum = (val: unknown): number | null => {
-    if (val === null || val === undefined || val === '') return null
-    const n = Number(val)
-    return isNaN(n) ? null : n
-  }
+  const handleAbrirMeta = useCallback(
+    (sugerencia: SugerenciaMetaPerfil) => {
+      try {
+        open('goal', {
+          data: {
+            goal: null,
+            sugerencia,
+            onSuccess: recargar,
+          },
+        })
+      } catch (err: unknown) {
+        sileo.error({
+          title: getErrorMessage(err, 'No se pudo abrir el formulario. Probá de nuevo.'),
+        })
+      }
+    },
+    [open, recargar],
+  )
 
-  const perfilNuevo = perfil?.perfil_nuevo
-  const capAhorroRaw = toNum(perfilNuevo?.capacidad_ahorro)
-  const gastoCompRatioRaw = toNum(perfilNuevo?.gasto_comprometido_ratio)
-  const gastoHabitosRatioRaw = toNum(perfilNuevo?.gasto_habitos_ratio)
-  const runwayRaw = toNum(perfilNuevo?.runway_meses)
-  const volatilidadRaw = toNum(perfilNuevo?.volatilidad_gasto_variable)
-  const ingresoTipicoRaw = toNum(perfilNuevo?.ingreso_tipico_ars)
-
-  // Animaciones de count-up
-  const capAhorroAnim = useCountUp(capAhorroRaw !== null ? Math.round(capAhorroRaw * 100) : null)
-  const gastoCompRatioAnim = useCountUp(gastoCompRatioRaw !== null ? Math.round(gastoCompRatioRaw * 100) : null)
-  const gastoHabitosRatioAnim = useCountUp(gastoHabitosRatioRaw !== null ? Math.round(gastoHabitosRatioRaw * 100) : null)
-  const runwayAnim = useCountUp(runwayRaw !== null ? Number(runwayRaw.toFixed(1)) : null, 600, 1)
-  const volatilidadAnim = useCountUp(volatilidadRaw !== null ? Math.round(volatilidadRaw * 100) : null)
-  const ingresoTipicoAnim = useCountUp(ingresoTipicoRaw !== null ? Math.round(ingresoTipicoRaw) : null)
-
-  if (loading || error || !perfil || !perfilNuevo) {
+  if (loading || error) {
     return null
   }
 
-  // Si no corresponde mostrar la card (< 3 ciclos de historia), no renderizar nada
-  const mostrarCard = perfilNuevo.mostrar_card ?? (perfil.mostrar_card ?? perfilNuevo.datos_suficientes)
-  if (!mostrarCard) {
+  const vista = armarVistaPerfil(perfil)
+  if (!vista) {
     return null
   }
-
-  const interps = perfilNuevo.interpretaciones_relativas || {}
-  const cobertura = toNum(perfilNuevo.cobertura_registro)
-  const ciclos = perfilNuevo.ciclos_con_datos ?? perfilNuevo.ciclos_observados ?? 0
-  const confianza = (perfilNuevo.nivel_confianza || 'en evaluación').toUpperCase()
-
-  // Lista de las 6 métricas protagónicas
-  const metrics = [
-    {
-      id: 'ahorro',
-      title: 'Ahorro',
-      valueElement: capAhorroAnim !== null ? `${capAhorroAnim}%` : '—',
-      displayValue: capAhorroRaw !== null ? `${Math.round(capAhorroRaw * 100)}%` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos'),
-      statusClass: capAhorroRaw === null ? styles.statusNeutral : (capAhorroRaw >= 0.2 ? styles.statusGood : (capAhorroRaw >= 0.1 ? styles.statusNeutral : (capAhorroRaw >= 0 ? styles.statusWarning : styles.statusCritical))),
-      statusText: capAhorroRaw === null ? 'Sin datos' : (capAhorroRaw >= 0.2 ? 'Saludable' : (capAhorroRaw >= 0.1 ? 'Moderado' : (capAhorroRaw >= 0 ? 'Bajo' : 'Déficit'))),
-      tooltip: interps.capacidad_ahorro || (capAhorroRaw !== null ? `${Math.round(capAhorroRaw * 100)}% de tu ingreso típico regular.` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos suficientes de ingreso.'))
-    },
-    {
-      id: 'comprometido',
-      title: 'Comprometido',
-      valueElement: gastoCompRatioAnim !== null ? `${gastoCompRatioAnim}%` : '—',
-      displayValue: gastoCompRatioRaw !== null ? `${Math.round(gastoCompRatioRaw * 100)}%` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos'),
-      statusClass: gastoCompRatioRaw === null ? styles.statusNeutral : (gastoCompRatioRaw <= 0.4 ? styles.statusGood : (gastoCompRatioRaw <= 0.55 ? styles.statusNeutral : styles.statusWarning)),
-      statusText: gastoCompRatioRaw === null ? 'Sin datos' : (gastoCompRatioRaw <= 0.4 ? 'Bajo control' : (gastoCompRatioRaw <= 0.55 ? 'Moderado' : 'Elevado')),
-      tooltip: interps.gasto_comprometido || (gastoCompRatioRaw !== null ? `${Math.round(gastoCompRatioRaw * 100)}% de tu ingreso típico comprometido en costos fijos.` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin compromisos registrados.'))
-    },
-    {
-      id: 'habitos',
-      title: 'Hábitos',
-      valueElement: gastoHabitosRatioAnim !== null ? `${gastoHabitosRatioAnim}%` : '—',
-      displayValue: gastoHabitosRatioRaw !== null ? `${Math.round(gastoHabitosRatioRaw * 100)}%` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin datos'),
-      statusClass: gastoHabitosRatioRaw === null ? styles.statusNeutral : (gastoHabitosRatioRaw <= 0.15 ? styles.statusGood : (gastoHabitosRatioRaw <= 0.3 ? styles.statusNeutral : styles.statusWarning)),
-      statusText: gastoHabitosRatioRaw === null ? 'Sin datos' : (gastoHabitosRatioRaw <= 0.15 ? 'Controlado' : (gastoHabitosRatioRaw <= 0.3 ? 'Moderado' : 'Flexible')),
-      tooltip: interps.gasto_habitos || (gastoHabitosRatioRaw !== null ? `${Math.round(gastoHabitosRatioRaw * 100)}% de tu ingreso típico en consumos recurrentes.` : (ingresoTipicoRaw === null ? 'Cargá tus cobros para ver esto' : 'Sin consumos de hábitos detectados.'))
-    },
-    {
-      id: 'cobertura',
-      title: 'Cobertura',
-      valueElement: (
-        <>
-          {runwayAnim !== null ? runwayAnim.toFixed(1) : '—'}
-          <small>meses</small>
-        </>
-      ),
-      displayValue: runwayRaw !== null ? `${runwayRaw.toFixed(1)} meses` : 'Sin datos',
-      statusClass: runwayRaw === null ? styles.statusNeutral : (runwayRaw >= 3 ? styles.statusGood : (runwayRaw >= 1.5 ? styles.statusNeutral : styles.statusWarning)),
-      statusText: runwayRaw === null ? 'Sin datos' : (runwayRaw >= 3 ? 'Óptimo' : (runwayRaw >= 1.5 ? 'Adecuado' : 'Ajustado')),
-      tooltip: interps.runway || 'Liquidez disponible sobre tu gasto mensual típico.'
-    },
-    {
-      id: 'volatilidad',
-      title: 'Volatilidad',
-      valueElement: volatilidadAnim !== null ? `±${volatilidadAnim}%` : '—',
-      displayValue: volatilidadRaw !== null ? `±${Math.round(volatilidadRaw * 100)}%` : 'Sin datos',
-      statusClass: volatilidadRaw === null ? styles.statusNeutral : (volatilidadRaw <= 0.15 ? styles.statusGood : (volatilidadRaw <= 0.3 ? styles.statusNeutral : styles.statusWarning)),
-      statusText: volatilidadRaw === null ? 'Sin datos' : (volatilidadRaw <= 0.15 ? 'Estable' : (volatilidadRaw <= 0.3 ? 'Moderada' : 'Alta')),
-      tooltip: interps.volatilidad || 'Dispersión típica respecto de tu mediana mensual.'
-    },
-    {
-      id: 'ingreso_tipico',
-      title: 'Ingreso Habitual',
-      valueElement: ingresoTipicoAnim !== null
-        ? <MontoFit completo={formatMonto(ingresoTipicoAnim, 'ARS')} corto={formatMontoCorto(ingresoTipicoAnim, 'ARS')} />
-        : 'Cargá tus cobros para ver esto',
-      displayValue: ingresoTipicoRaw !== null ? formatMonto(ingresoTipicoRaw, 'ARS') : 'Cargá tus cobros para ver esto',
-      statusClass: styles.statusNeutral,
-      statusText: ingresoTipicoRaw !== null ? 'Habitual' : 'Sin datos',
-      tooltip: interps.ingreso_tipico || (ingresoTipicoRaw !== null ? 'Ingreso habitual estimado en pesos.' : 'Cargá tus cobros para ver esto')
-    }
-  ]
 
   return (
-    <div className={styles.pfCard}>
-      {/* Header Compacto */}
+    <section className={styles.pfCard} aria-label={vista.titulo}>
       <div className={styles.pfCardHeader}>
-        <div className={styles.pfHeaderLeft}>
-          <h2 className={styles.pfTitle}>Tu perfil financiero</h2>
-          <span className={styles.pfConfidenceBadge}>
-            Confianza: <strong>{confianza}</strong>
-            {ciclos > 0 && ` • ${ciclos} ciclos`}
-            {cobertura !== null && ` (${Math.round(cobertura * 100)}% continuidad)`}
-          </span>
-        </div>
-        <div className={styles.pfHeaderRight}>
-          <span className={styles.pfUpdateTime}>
-            {formatRelativeTime(perfil.ultima_actualizacion)}
-          </span>
-          <button 
-            type="button"
-            className={styles.pfInfoBtn}
-            onClick={() => open('bienvenidaFinanciera', { data: { initialTab: 'perfil' } })}
-            title="Ver explicación de tu perfil financiero"
-            aria-label="Ver explicación de tu perfil financiero"
-          >
-            <Info size={14} />
-          </button>
-          <button 
-            className={`${styles.pfRefreshBtn} ${refreshing ? styles.pfRefreshBtnDisabled : ''}`} 
-            onClick={handleRecalcular}
-            disabled={refreshing}
-            aria-label="Actualizar perfil financiero"
-          >
-            <RefreshCw className={refreshing ? styles.pfSpin : ''} size={13} />
-            <span>{refreshing ? 'Actualizando...' : 'Actualizar'}</span>
-          </button>
-        </div>
+        <h2 className={styles.pfTitle}>{vista.titulo}</h2>
+        <button
+          type="button"
+          className={styles.pfInfoBtn}
+          onClick={() => open('bienvenidaFinanciera', { data: { initialTab: 'perfil' } })}
+          title="Ver explicación de tu perfil financiero"
+          aria-label="Ver explicación de tu perfil financiero"
+        >
+          <Info size={14} />
+        </button>
       </div>
 
-      {/* Tira Panorámica de 6 KPIs (Propuesta PF-1) */}
-      <div className={styles.pfMetricsStrip} role="list" aria-label="Métricas del perfil financiero">
-        {metrics.map((kpi) => (
-          <div 
-            key={kpi.id}
-            className={styles.pfKpiCell} 
-            tabIndex={0} 
-            role="listitem"
-            aria-label={`${kpi.title}: ${kpi.displayValue}. ${kpi.tooltip}`}
-          >
-            <div className={styles.pfKpiLabelRow}>
-              <span className={styles.pfKpiLabel} title={kpi.title}>
-                {kpi.title}
-              </span>
-              <HelpCircle size={12} className={styles.pfInfoIcon} aria-hidden="true" />
-            </div>
-            <div className={styles.pfKpiValue}>
-              {kpi.valueElement}
-            </div>
-            <span className={`${styles.pfKpiStatusBadge} ${kpi.statusClass}`}>
-              {kpi.statusText}
-            </span>
-            <div className={styles.pfTooltip} role="tooltip">
-              <span className={styles.pfTooltipHeader}>{kpi.title}</span>
-              {kpi.tooltip}
-            </div>
-          </div>
-        ))}
-      </div>
+      {vista.subtitulo && <p className={styles.pfSubtitulo}>{vista.subtitulo}</p>}
+      {vista.resumen && <p className={styles.pfResumen}>{vista.resumen}</p>}
 
-      {/* Advertencia metodológica si aplica */}
-      {perfilNuevo.calidad_registro_advertencia && (
-        <div className={styles.pfQualityNotice} role="alert">
-          <AlertCircle size={15} />
-          <span>{perfilNuevo.calidad_registro_advertencia}</span>
+      {vista.aviso && (
+        <div className={styles.pfAviso} role="alert">
+          <AlertCircle size={16} />
+          <span>{vista.aviso}</span>
         </div>
       )}
-    </div>
+
+      <ul className={styles.pfList}>
+        {vista.filas.map((fila) => (
+          <li key={fila.id} className={styles.pfRow}>
+            {fila.icono === 'bien' ? (
+              <CheckCircle2
+                size={20}
+                className={styles.pfIconGood}
+                role="img"
+                aria-label={fila.etiquetaIcono ?? undefined}
+              />
+            ) : fila.icono === 'atencion' ? (
+              <AlertCircle
+                size={20}
+                className={styles.pfIconWarn}
+                role="img"
+                aria-label={fila.etiquetaIcono ?? undefined}
+              />
+            ) : (
+              <span className={styles.pfIconEmpty} aria-hidden="true" />
+            )}
+
+            <div className={styles.pfRowBody}>
+              <h3 className={styles.pfRowTitle}>{fila.titulo}</h3>
+              <p className={styles.pfRowText}>{fila.texto}</p>
+              {fila.notas.map((nota, idx) => (
+                <p key={idx} className={styles.pfRowNote}>
+                  {nota}
+                </p>
+              ))}
+              {fila.textoBoton && fila.sugerenciaMeta && (
+                <div className={styles.pfRowAction}>
+                  <Button
+                    variant="secondary"
+                    className={styles.actionBtn}
+                    onClick={() => handleAbrirMeta(fila.sugerenciaMeta!)}
+                  >
+                    {fila.textoBoton}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }

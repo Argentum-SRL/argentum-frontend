@@ -1126,7 +1126,7 @@ export default function DashboardPage() {
 
       {/* Perfil Financiero */}
       <WidgetErrorBoundary title="Perfil financiero">
-        <PerfilFinancieroCard moneda={moneda} />
+        <PerfilFinancieroCard />
       </WidgetErrorBoundary>
 
       {/* ── Bottom Row (2 Cols si hay proyección, 1 Col full width si no) ─── */}

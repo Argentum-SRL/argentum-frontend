@@ -53,28 +53,25 @@ export default function AuthLayout({
   const themeBtn = <ThemeToggle variant="floating" />
 
   if (leftPanel) {
-    // D-FC1a: se monta una única rama según el viewport para no duplicar children ni ThemeToggle en el DOM
-    if (esCelular) {
-      return (
+    void esCelular
+    return (
+      <>
+        <div className={styles.desktop}>
+          {themeBtn}
+          <div className={styles.leftPanel}>{leftPanel}</div>
+          <div className={styles.rightPanel}>
+            <div className={styles.formWrap}>
+              <FormContent title={title} compact>{children}</FormContent>
+            </div>
+          </div>
+        </div>
         <div className={styles.mobile}>
           {themeBtn}
           <div className={styles.mobileInner}>
             <FormContent title={title}>{children}</FormContent>
           </div>
         </div>
-      )
-    }
-
-    return (
-      <div className={styles.desktop}>
-        {themeBtn}
-        <div className={styles.leftPanel}>{leftPanel}</div>
-        <div className={styles.rightPanel}>
-          <div className={styles.formWrap}>
-            <FormContent title={title} compact>{children}</FormContent>
-          </div>
-        </div>
-      </div>
+      </>
     )
   }
 
